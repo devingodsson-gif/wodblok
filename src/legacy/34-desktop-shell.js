@@ -133,7 +133,7 @@ const typing=()=>{const a=document.activeElement;if(!a||a===document.body)return
 let wsRT=0,wsPend=false;addEventListener('resize',()=>{clearTimeout(wsRT);wsRT=setTimeout(()=>{if(!wsReady)return;if(typing()){wsPend=true;return}wsRender()},150)});
 addEventListener('focusout',()=>{setTimeout(()=>{if(wsPend&&!typing()){wsPend=false;if(wsReady)wsRender()}},300)});
 const stage=document.querySelector('.stage');
-function setView(v){const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+function setView(v){const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
 $('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display=v=='pattern'?'':'none';$('gtb').style.display=v=='stamp'?'':'none';$('itb').style.display='';if(v=='pattern')requestAnimationFrame(applyZ);tbSync();if(was!=v||!wsReady)wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
 const L=wsL();let g=wsFind(p);if(!g&&p=='rand'){g=wsG([p],{x:null,y:null,w:272,h:620,pos:'r'});L.float.push(g)}
@@ -205,8 +205,8 @@ $('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.to
 $('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${WBS.cur+1} of ${WBS.tiles.length}`:'';
 if(WBS.layers[WBS.selL])$('lnmx').textContent=WBS.layers[WBS.selL].name}
 // wrap redraw hooks so the shell stays in sync
-const _draw=draw;draw=function(){_draw();nums();info()};
-const _sp=syncPr;syncPr=function(){_sp();nums()};const _stx=syncTex;syncTex=function(){_stx();nums()};
+const _draw=WBH.draw;WBH.draw=function(){_draw();nums();info()};
+const _sp=WBH.syncPr;WBH.syncPr=function(){_sp();nums()};const _stx=WBH.syncTex;WBH.syncTex=function(){_stx();nums()};
 
 // ---- toast-style status messages
 let mt=0;new MutationObserver(()=>{clearTimeout(mt);$('pmsg').style.opacity=1;if($('pmsg').textContent)mt=setTimeout(()=>{$('pmsg').style.transition='opacity .6s';$('pmsg').style.opacity=0;setTimeout(()=>{$('pmsg').style.transition=''},700)},6000)}).observe($('pmsg'),{childList:true,characterData:true,subtree:true});
@@ -236,7 +236,7 @@ function cap(){if(drag||WBX.wbNoCap)return;const s=coreStr();if(s!==hist[hi]){co
 setInterval(cap,450);
 function applyCore(c){WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
 WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
-store();savePr();saveTex();syncPr();syncTex();buildTex();upd()}
+store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
 function undo(){cap();if(hi>0){hi--;applyCore(JSON.parse(hist[hi]))}ub()}
 function redo(){if(hi<hist.length-1){hi++;applyCore(JSON.parse(hist[hi]))}ub()}
 $('undo').onclick=undo;$('redo').onclick=redo;ub();
@@ -282,7 +282,7 @@ else if(m&&k=='a'&&!typing&&view=='stamp'&&WBS.tiles[WBS.cur].items.length){e.pr
 else if(m&&k=='d'&&!typing&&q){e.preventDefault();$('scp').click()}
 else if(!typing&&(e.key=='Delete'||e.key=='Backspace')&&q&&view=='stamp'){e.preventDefault();$('sdl').click()}
 else if(!typing&&WBS.split&&e.key=='Enter'){e.preventDefault();doSplit()}
-else if(!typing&&WBS.split&&e.key=='Escape'){WBS.split=null;draw()}
+else if(!typing&&WBS.split&&e.key=='Escape'){WBS.split=null;WBH.draw()}
 else if(!typing&&!e.ctrlKey&&!e.metaKey&&e.key.toLowerCase()=='s'&&view=='stamp'&&Q()){e.preventDefault();$('ssp').click()}
 else if(!typing&&WBS.brush&&(e.key=='['||e.key==']')){e.preventDefault();WBS.brush.r=((WBS.brush.r+(e.key==']'?15:-15)+540)%360)-180;paintGhost()}
 else if(e.key=='Escape'&&WBS.brush&&!typing){WBS.brush=null;upd()}
@@ -314,7 +314,7 @@ $('gtx').onclick=()=>{WBS.edTx=!WBS.edTx;tbSync();upd()};
 {const w=$('itbw'),b=$('itbb'),set=o=>{w.classList.toggle('open',o);b.setAttribute('aria-expanded',String(o))};b.onclick=e=>{e.stopPropagation();set(!w.classList.contains('open'))};document.addEventListener('click',e=>{if(!e.target.closest('#itbw'))set(false)});document.addEventListener('keydown',e=>{if(e.key=='Escape')set(false)})}
 $('gtm').onclick=()=>{WBS.edMk=!WBS.edMk;$('gtm').classList.toggle('on',WBS.edMk);$('gtm').setAttribute('aria-pressed',String(WBS.edMk));upd()};
 document.addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input,select,textarea'))return;if(!e.metaKey&&!e.ctrlKey&&e.key.toLowerCase()=='g'){grid.on=!grid.on;saveGrid();upd()}});
-const _draw2=draw;draw=function(){_draw2();syncGrid()};
+const _draw2=WBH.draw;WBH.draw=function(){_draw2();syncGrid()};
 // ---- randomize motifs on the current stamp
 try{const z=JSON.parse(localStorage.getItem('wb36_rz')||'null');if(z){$('rzp').value=z.p;$('rzr').value=z.r;$('rzs').value=z.s}}catch(e){}
 ['rzp','rzr','rzs'].forEach(id=>$(id).addEventListener('input',()=>{try{localStorage.setItem('wb36_rz',JSON.stringify({p:+$('rzp').value,r:+$('rzr').value,s:+$('rzs').value}))}catch(e){}}));

@@ -75,5 +75,5 @@ $('art').setAttribute('viewBox',`0 0 ${CW} ${CH}`);pvView();const ikc=typeof ink
 {const ci=hasOut(),O=ci?cOut():null;$('cvdefs').innerHTML=ci?`<clipPath id="cvclip" clipPathUnits="userSpaceOnUse"><path d="${O.d}"/></clipPath>`:'';['dyn','texg','covg'].forEach(id=>ci?$(id).setAttribute('clip-path','url(#cvclip)'):$(id).removeAttribute('clip-path'));$('art').classList.toggle('shp',ci);const sh=$('artsh');sh.style.display=ci?'block':'none';sh.setAttribute('viewBox',`0 0 ${CW} ${CH}`);sh.innerHTML=ci?`<path d="${O.d}" fill="${pa}"/>`:''}
 $('tabs').innerHTML=WBS.tiles.map((t,k)=>{useT(t);return`<button data-k="${k}" class="${k==WBS.cur||tGrp().includes(k)?'on':''}" title="Stamp ${k+1}: ${SHN[SK]}"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button>`}).join('');useT(WBS.tiles[WBS.cur]);
 renderL();if(typeof renderLayers=='function')renderLayers();
-renderLib();frSync();fpSync();fpOverlay();if(WBX.wbGrade)WBX.wbGrade.refresh()}
+renderLib();frSync();WBH.fpSync();WBH.fpOverlay();if(WBX.wbGrade)WBX.wbGrade.refresh()}
 const hx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));

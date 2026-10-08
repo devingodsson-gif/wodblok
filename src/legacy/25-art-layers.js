@@ -1,3 +1,4 @@
+WBH.fpOverlay=fpOverlay;WBH.fpSync=fpSync;
 // ===== Art layers: imported images and saved WODBLOK projects, placed by hand like Free place stamps =====
 // ARTS[id] = {n name, k 'img'|'proj', src data URL, w, h, and for projects pid (source project) + ver (when it was last saved)}.
 // A layer in Art mode has L.free = true, L.art = true and L.pl = [{u, a: art id, x, y, s: long side (canvas units), r: degrees, f: 1 | -1}].
@@ -75,10 +76,10 @@ $('lfgss').onchange=()=>{const g=FGs();if(!g)return;g.ss=$('lfgss').checked;gch(
 $('lfgall').onclick=()=>{const L=fpL();if(!L||!(L.pl||[]).length)return;L.pl.forEach(q=>{const[x,y]=fpSnap(L,q.x,q.y,null,true);q.x=+x.toFixed(1);q.y=+y.toFixed(1);if(fpFG(L).ss)q.s=+fpSnapS(L,q.s,null,true).toFixed(2)});gch()};
 $('lfgopen').onclick=()=>{if(WBX.wbOpenPanel)WBX.wbOpenPanel('pgrid')}}
 $('lfpst').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;const id=+b.dataset.t;if(e.shiftKey||e.ctrlKey||e.metaKey){fpPick(String(id),e,[...$('lfpst').querySelectorAll('[data-t]')].map(x=>x.dataset.t));return}WBS.fpPool=new Set();WBS.fpPA=String(id);WBS.fpB=WBS.fpB==id&&!fpPoolOk()?null:id;if(WBS.fpB){WBS.fpSel=-1;WBS.fpMS=new Set()}upd()};
-$('lfps').addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p){if(WBS.fpB){WBS.fpLast=+($('lfps').value/100*Math.min(CW,CH)).toFixed(2);fpOverlay()}return}const v=+$('lfps').value/100*Math.min(CW,CH);if(Math.abs(v-p.s)<.01)return;const k=v/p.s,S0=Math.min(CW,CH);fpGrp().forEach(q=>{if(q!==p)q.s=+Math.max(S0*.02,Math.min(S0*3,q.s*k)).toFixed(2)});p.s=+v.toFixed(2);WBS.fpLast=p.s;store();upd()});
-$('lfpr').addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p){if(WBS.fpB){fpRot=Math.round(+$('lfpr').value);fpOverlay()}return}const v=+$('lfpr').value;if(v==p.r)return;const d=v-(+p.r||0);fpGrp().forEach(q=>{if(q!==p){let r=Math.round((+q.r||0)+d);r=((r+180)%360+360)%360-180;q.r=r}});p.r=v;store();upd()});
+$('lfps').addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p){if(WBS.fpB){WBS.fpLast=+($('lfps').value/100*Math.min(CW,CH)).toFixed(2);WBH.fpOverlay()}return}const v=+$('lfps').value/100*Math.min(CW,CH);if(Math.abs(v-p.s)<.01)return;const k=v/p.s,S0=Math.min(CW,CH);fpGrp().forEach(q=>{if(q!==p)q.s=+Math.max(S0*.02,Math.min(S0*3,q.s*k)).toFixed(2)});p.s=+v.toFixed(2);WBS.fpLast=p.s;store();upd()});
+$('lfpr').addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p){if(WBS.fpB){fpRot=Math.round(+$('lfpr').value);WBH.fpOverlay()}return}const v=+$('lfpr').value;if(v==p.r)return;const d=v-(+p.r||0);fpGrp().forEach(q=>{if(q!==p){let r=Math.round((+q.r||0)+d);r=((r+180)%360+360)%360-180;q.r=r}});p.r=v;store();upd()});
 ['lfps','lfpr'].forEach(id=>$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()}));
-$('lfpfl').onclick=()=>{const p=cur2();if(p){fpGrp().forEach(q=>{q.f=(q.f||1)*-1});ch()}else if(WBS.fpB){fpFlip*=-1;fpOverlay()}};
+$('lfpfl').onclick=()=>{const p=cur2();if(p){fpGrp().forEach(q=>{q.f=(q.f||1)*-1});ch()}else if(WBS.fpB){fpFlip*=-1;WBH.fpOverlay()}};
 $('lfpdu').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;const d=Math.min(CW,CH)*.04,g=fpGrp(),ns=[];g.forEach(o=>{const q={...o,u:fpU(),x:o.x+d,y:o.y+d};L.pl.push(q);ns.push(q);if(o===p)WBS.fpSel=q.u});WBS.fpMS=ns.length>1?new Set(ns.map(q=>String(q.u))):new Set();ch()};
 $('lfpup').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;const g=fpGrp();g.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));L.pl.push(...g);ch()};
 $('lfpdn').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;const g=fpGrp();g.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));L.pl.unshift(...g);ch()};

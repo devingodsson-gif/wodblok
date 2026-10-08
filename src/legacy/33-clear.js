@@ -30,4 +30,4 @@ else if(a=='dl'){const p=await ST.get(id);if(p)dl(p.name,JSON.parse(p.data))}
 else if(a=='del'){if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Sure?';setTimeout(()=>{if(b.isConnected){delete b.dataset.sure;b.textContent='Delete'}},3500);return}
 const p=await ST.get(id);await ST.del(id);if(id==WBS.cp.id){WBS.cp.id=null;saveCp()}pmsg('Deleted “'+(p&&p.name||'project')+'”.');renderPL();paintPst()}}
 catch(err){pmsg('Something went wrong: '+((err&&err.message)||'unknown error'))}};
-WBS.tiles.forEach(shOf);migLayers();migEdges();migInk();store();draw();build();
+WBS.tiles.forEach(shOf);migLayers();migEdges();migInk();store();WBH.draw();build();

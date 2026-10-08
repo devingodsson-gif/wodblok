@@ -76,7 +76,7 @@ document.addEventListener('keydown',e=>{if(!WBS.CR||(e.target.matches&&e.target.
 if(e.key=='Escape'){e.stopImmediatePropagation();e.preventDefault();WBS.CR=null;upd();return}
 if(e.key=='Enter'){e.stopImmediatePropagation();e.preventDefault();crApply();return}
 if(e.key=='Delete'||e.key=='Backspace'){e.stopImmediatePropagation();e.preventDefault();if(WBS.CR.m=='p'&&WBS.CR.sel>=0&&WBS.CR.pts.length>3){WBS.CR.pts.splice(WBS.CR.sel,1);WBS.CR.sel=-1;crOv();crSync()}}});
-{const o1=fpSync;fpSync=function(){o1.apply(this,arguments);crSync()};const o2=fpOverlay;fpOverlay=function(){o2.apply(this,arguments);crOv();crBarUpd()}}
+{const o1=WBH.fpSync;WBH.fpSync=function(){o1.apply(this,arguments);crSync()};const o2=WBH.fpOverlay;WBH.fpOverlay=function(){o2.apply(this,arguments);crOv();crBarUpd()}}
 // --- canvas: place, select, drag
 $('art').addEventListener('pointerdown',e=>{const L=fpL();if(!L||e.button!==0||$('boardP').classList.contains('off'))return;const[x,y]=fpPt(e);if(!inShape(x,y)&&!(e.target.closest&&e.target.closest('[data-fh]')))return;
 const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,moved:false};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
@@ -88,13 +88,13 @@ e.preventDefault();const g0=fpGrp(),inG=g0.length>1&&g0.includes(p);if(!inG)WBS.
 $('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBS.fpDrag){const[x,y]=fpPt(e),p=WBS.fpDrag.p,[nx,ny]=fpSnap(L,x-WBS.fpDrag.dx,y-WBS.fpDrag.dy,e);WBS.fpDrag.moved=true;if(WBS.fpDrag.g){const ddx=+nx.toFixed(1)-WBS.fpDrag.s0[0],ddy=+ny.toFixed(1)-WBS.fpDrag.s0[1];let oh='';WBS.fpDrag.g.forEach(([q,qx,qy])=>{q.x=+(qx+ddx).toFixed(1);q.y=+(qy+ddy).toFixed(1);const g2=document.querySelector(`#art [data-fp="${q.u}"]`);if(g2)g2.setAttribute('transform',`translate(${q.x} ${q.y})`);oh+=fpBox(q,'sel')});$('fpov').innerHTML=oh;return}
 p.x=+nx.toFixed(1);p.y=+ny.toFixed(1);
 const g=document.querySelector(`#art [data-fp="${p.u}"]`);if(g)g.setAttribute('transform',`translate(${p.x} ${p.y})`);$('fpov').innerHTML=fpBox(p,'sel')+fpHandles(p);return}
-if(WBS.fpB||(WBS.txArm&&L.txt)){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpPt(e),e);fpOverlay()}});
+if(WBS.fpB||(WBS.txArm&&L.txt)){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpPt(e),e);WBH.fpOverlay()}});
 $('art').addEventListener('pointermove',e=>{if(!WBS.fpXf)return;const[x,y]=fpPt(e),p=WBS.fpXf.p,S0=Math.min(CW,CH);
 if(WBS.fpXf.k=='sc'){let s=Math.max(S0*.02,Math.min(S0*3,WBS.fpXf.s0*Math.hypot(x-p.x,y-p.y)/WBS.fpXf.d0));s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);WBS.fpLast=p.s}
 else{let r=Math.atan2(y-p.y,x-p.x)*180/Math.PI+90;r=((r+180)%360+360)%360-180;if(e.shiftKey)r=Math.round(r/15)*15;p.r=Math.round(r)}
 WBS.fpXf.moved=true;upd()});
 const xfEnd=()=>{if(!WBS.fpXf)return;const mv=WBS.fpXf.moved;WBS.fpXf=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};$('art').addEventListener('pointerup',xfEnd);$('art').addEventListener('pointercancel',xfEnd);
-$('art').addEventListener('pointerleave',()=>{if(WBS.fpGhost){WBS.fpGhost=null;fpOverlay()}});
+$('art').addEventListener('pointerleave',()=>{if(WBS.fpGhost){WBS.fpGhost=null;WBH.fpOverlay()}});
 const fpEnd=()=>{if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved;WBS.fpDrag=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};$('art').addEventListener('pointerup',fpEnd);$('art').addEventListener('pointercancel',fpEnd);
 document.addEventListener('keydown',e=>{const L=fpL();if(!L||$('boardP').classList.contains('off')||(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]')))return;
 if(e.key=='Escape'&&(WBS.fpB||WBS.txArm||WBS.fpSel!==-1)){WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}

@@ -61,7 +61,7 @@ if(d.cover&&d.cover.book&&typeof d.cover.book=='object')WBS.book={...WBS.book,..
 WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,3]};WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pgrid=pgFix(d.pg,WBS.layers);
 WBS.pr={...PDEF.pr,...(d.pr||{})};WBS.tex={...PDEF.tex,...(d.tex||{})};WBS.texLib=txClean(d.texLib);texNorm();if(WBX.wbGrade)WBX.wbGrade.set(d.grade||null);{const c2=d.cover||{};cov={img:okImg(c2.img)?c2.img:'',iw:+c2.iw||0,ih:+c2.ih||0,sc:+c2.sc||100,tx:c2.tx!==false};if(!cov.iw||!cov.ih)cov.img='';const sl=o=>o&&okImg(o.img)&&+o.iw&&+o.ih?{img:o.img,iw:+o.iw,ih:+o.ih,sc:+o.sc||100}:blank();covB=sl(c2.back);covS=sl(c2.spine);WBS.cslot='f';$('cov').checked=c2.on!==false;saveCov();WBS.covKey='';if(WBX.wbBookSync)WBX.wbBookSync()}
 migEdges();migInk();WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));WBS.cur=0;selOne(-1);WBS.selL=WBS.layers.length-1;WBS.symKey='';$('sasp').dataset.custom='';$('casp').dataset.custom='';
-try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();savePr();saveTex();syncPr();syncTex();buildTex();upd()}
+try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
 WBS.cp={id:null,name:'',saved:''};try{const q=JSON.parse(localStorage.getItem('wb18_cur')||'null');if(q)WBS.cp={...WBS.cp,...q}}catch(e){}
 const saveCp=()=>{try{localStorage.setItem('wb18_cur',JSON.stringify(WBS.cp))}catch(e){}};
 const pmsg=t=>$('pmsg').textContent=t;

@@ -1,3 +1,4 @@
+const WBH={};
 const WBX={};
 const WBS={};
 // One place to change the version: the badge, tooltip and page title all follow this number.

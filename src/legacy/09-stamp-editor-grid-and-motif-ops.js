@@ -1,3 +1,4 @@
+WBH.draw=draw;
 // ---- Stamp editor grid: N cells across, rows chosen so cells stay near-square and always whole.
 WBS.edMk=true;WBS.edInk=true;WBS.edTx=true; // the Stamp texture / Canvas texture view switches: one setting shared by the Pattern view and the Stamp editor
 let grid={on:false,n:6,sp:'c',sd:false,sh:'rect'};try{const g=JSON.parse(localStorage.getItem('wb33_grid')||'null');if(g)grid={...grid,...g}}catch(e){}

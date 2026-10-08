@@ -1,3 +1,4 @@
+WBH.syncPr=syncPr;WBH.syncTex=syncTex;
 // ---- where each target gets its pictures ----
 // stamps: a wear mask (is<id>) and an overlay group; both kept in SURFC and only rebuilt when the stamp's textures change
 const SURFC={};WBS.SURFK='';
@@ -99,9 +100,9 @@ b+=`<feColorMatrix in="${cur}" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0
 
 return`<filter id="rf" filterUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}" color-interpolation-filters="sRGB">${b}</filter>`}
 function syncPr(){$('rgh').value=WBS.pr.e;$('psq').value=WBS.pr.q;if(WBX.wbTexReady)txRefresh()}
-[['rgh','e'],['psq','q']].forEach(([id,key])=>$(id).oninput=()=>{WBS.pr[key]=+$(id).value;syncPr();savePr();upd()});
+[['rgh','e'],['psq','q']].forEach(([id,key])=>$(id).oninput=()=>{WBS.pr[key]=+$(id).value;WBH.syncPr();savePr();upd()});
 
-syncPr();
+WBH.syncPr();
 // ---- Print / Textures tabs ----
 // ---- Canvas texture. Its uses live in tex.u: relief / stain become pictures laid over the canvas, wear knocks ink out of every layer ----
 WBS.tex={};
@@ -131,4 +132,4 @@ txReg('st_tex',{md:'wear',def:'pinholes',get:()=>{const t=WBS.tiles[WBS.cur];ret
 txReg('ly_tex',{md:'wear',def:'pinholes',get:()=>{const l=LY();return l&&l.tu||[]},set:a=>{const l=LY();if(!l)return;l.tu=a;txCommit()}});
 txReg('cv_tex',{md:'relief',def:'cotton',max:4,get:()=>Array.isArray(WBS.tex.u)?WBS.tex.u:[],set:a=>{WBS.tex.u=a;texNorm();saveTex();buildTex();store();txCap();txRefresh()}});
 
-syncTex();buildTex();WBX.wbTexReady=1;
+WBH.syncTex();buildTex();WBX.wbTexReady=1;

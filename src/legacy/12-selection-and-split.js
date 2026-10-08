@@ -8,13 +8,13 @@ const clampN=(v,a,b)=>Math.min(b,Math.max(a,v)),wrapA=a=>((a+540)%360)-180;
 // ---- Split: place a line over the selected motif, then cut it into two pieces (each keeps its own half).
 WBS.split=null;WBS.spDrag=null;
 addEventListener('pointerup',()=>{WBS.spDrag=null});
-$('ssp').onclick=()=>{const q=Q();if(!q||WBS.msel.size>1)return;WBS.brush=null;WBS.split=WBS.split?null:{i:WBS.sel,x:q.x,y:q.y,a:q.r+90};draw()};
-function doSplit(){const t=WBS.tiles[WBS.cur],q=t.items[WBS.split.i];if(!q){WBS.split=null;draw();return}
+$('ssp').onclick=()=>{const q=Q();if(!q||WBS.msel.size>1)return;WBS.brush=null;WBS.split=WBS.split?null:{i:WBS.sel,x:q.x,y:q.y,a:q.r+90};WBH.draw()};
+function doSplit(){const t=WBS.tiles[WBS.cur],q=t.items[WBS.split.i];if(!q){WBS.split=null;WBH.draw();return}
 const Sx=q.s*q.f*(q.sx||1),Sy=q.s*(q.sy||1),r=-q.r*Math.PI/180,rot=(x,y)=>[x*Math.cos(r)-y*Math.sin(r),x*Math.sin(r)+y*Math.cos(r)];
 const[px,py]=rot(WBS.split.x-q.x,WBS.split.y-q.y),L0=[px/Sx,py/Sy],a=WBS.split.a*Math.PI/180,[dx,dy]=rot(Math.cos(a),Math.sin(a)),U=[dx/Sx,dy/Sy],th=Math.atan2(U[1],U[0]),n=[-Math.sin(th),Math.cos(th)],d=L0[0]*n[0]+L0[1]*n[1];
 const A=+(th*180/Math.PI).toFixed(3),D=+d.toFixed(3),q2=JSON.parse(JSON.stringify(q));q.cl=[...(q.cl||[]),[A,D,1]];q2.cl=[...(q2.cl||[]),[A,D,-1]];
 t.items.splice(WBS.split.i+1,0,q2);selOne(WBS.split.i+1);WBS.split=null;store();upd();pmsg('Split into two pieces. Drag them apart, or select either one to change it.')}
-$('spok').onclick=doSplit;$('spno').onclick=()=>{WBS.split=null;draw()};
+$('spok').onclick=doSplit;$('spno').onclick=()=>{WBS.split=null;WBH.draw()};
 $('larr').oninput=()=>{const L=LY();if(!L.ak||typeof L.ak!='object')L.ak={};L.ak[latG(L).SK]=$('larr').value;store();upd()};
 // ---- manual arrangement: click an impression on the pattern to cycle which stamp is printed there
 $('man').onchange=()=>{const L=LY();L.man=$('man').checked;if(!L.ov)L.ov={};store();upd()};
