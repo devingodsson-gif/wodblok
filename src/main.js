@@ -35,6 +35,7 @@ import {init32} from './modules/32-layers-panel.js';
 import {init33} from './modules/33-clear.js';
 import {init34} from './modules/34-desktop-shell.js';
 import {init35} from './modules/35-import-artwork-and-motif-sheets.js';
+import {init36} from './modules/36-export-everything.js';
 
 init01();
 init02();
@@ -70,4 +71,5 @@ init32();
 init33();
 init34();
 init35();
+init36();
 window.__wbTest = { state: () => coreStr() };

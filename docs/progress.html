@@ -26,9 +26,9 @@ h1{font-size:22px;margin:0;letter-spacing:.01em}
 <main>
   <div>
     <h1>WODBLOK: repo move</h1>
-    <p class="sub">Phase 1: split the single file into modules, no behaviour change</p>
+    <p class="sub">Phase 1 (modules, no behaviour change) is done. Phase 2: platform seam, settings, commands, Export everything</p>
   </div>
-  <div class="hero"><span class="pct big" id="all">0%</span><span>of Phase 1 done</span></div>
+  <div class="hero"><span class="pct big" id="all">0%</span><span>of Phase 2 done</span></div>
   <div class="bar"><i id="allbar" style="width:0%"></i></div>
 
   <section>
@@ -38,15 +38,24 @@ h1{font-size:22px;margin:0;letter-spacing:.01em}
     <div class="row"><b>1c: ES modules, leaf-first</b><span class="pct" id="p1c">0%</span><div class="bar"><i id="b1c" style="width:0%"></i></div><small>Data, tools, engine, history, UI shell</small></div>
   </section>
 
+  <section>
+    <div class="row"><b>Phase 1: modules</b><span class="pct">100%</span><div class="bar"><i style="width:100%"></i></div><small>35 ES modules, tests green on bundle and raw modules, speed same as v100</small></div>
+    <div class="row"><b>2b: platform seam</b><span class="pct" id="q2b">0%</span><div class="bar"><i id="r2b" style="width:0%"></i></div><small>Storage, runtime and clipboard only through src/platform</small></div>
+    <div class="row"><b>2d: Export / Import everything</b><span class="pct" id="q2d">0%</span><div class="bar"><i id="r2d" style="width:0%"></i></div><small>One file moves projects, stamps and settings between the preview and the web app</small></div>
+    <div class="row"><b>2c: settings record</b><span class="pct" id="q2c">0%</span><div class="bar"><i id="r2c" style="width:0%"></i></div><small>One versioned record replaces the wbNN_ keys, with migration</small></div>
+    <div class="row"><b>2e: command registry</b><span class="pct" id="q2e">0%</span><div class="bar"><i id="r2e" style="width:0%"></i></div><small>Every action a named command, one shortcut table</small></div>
+    <div class="row"><b>2f: web adapter, tests on both</b><span class="pct" id="q2f">0%</span><div class="bar"><i id="r2f" style="width:0%"></i></div><small>IndexedDB and OPFS storage; same behaviour with both adapters</small></div>
+  </section>
+
   <div class="time"><b>Rough timeline.</b> 1a about 1 session, 1b about 3, 1c about 3 to 4: roughly 2 to 3 working days of back-and-forth. A full test run takes about 6 minutes and is most of the waiting.</div>
   <div class="stamp" id="stamp">updated at start of Phase 1</div>
 </main>
 <script>
 /* percentages are filled from this one object so the page and its numbers cannot disagree */
-var P={a:100,b:100,c:100,note:"Phase 1 done: 35 ES modules, explicit imports and exports, start-up in main.js, all tests green on the bundle and on raw modules, speed same as v100."};
+var P={a:100,b:100,c:100,n2:{b:100,d:100,c:0,e:0,f:0},note:"2b and 2d done and tested; next: command registry, settings record, web adapter."};
 function set(id,v){document.getElementById(id).textContent=v+"%"}
 set("p1a",P.a);set("p1b",P.b);set("p1c",P.c);
 document.getElementById("b1a").style.width=P.a+"%";document.getElementById("b1b").style.width=P.b+"%";document.getElementById("b1c").style.width=P.c+"%";
-var all=Math.round(P.a*0.2+P.b*0.4+P.c*0.4);set("all",all);document.getElementById("allbar").style.width=all+"%";
+var N=P.n2,all=Math.round(N.b*0.15+N.d*0.2+N.c*0.2+N.e*0.2+N.f*0.25);['b','d','c','e','f'].forEach(function(k){set('q2'+k,N[k]);document.getElementById('r2'+k).style.width=N[k]+'%'});set("all",all);document.getElementById("allbar").style.width=all+"%";
 document.getElementById("stamp").textContent=P.note;
 </script>

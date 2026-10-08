@@ -14,4 +14,4 @@ try{['wb2_tiles','wb2_proj','wb4_layers','wb14_dim','wb10_tex','wb11_print','wb4
 addEventListener('pageshow',e=>{if(e.persisted)location.reload()});
 WBS.ARTS={};
 }
-export {$,WBH,WBS,WBX,mod,init01};
+export {$,WBH,WBS,WBX,WB_VER,mod,init01};

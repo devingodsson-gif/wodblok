@@ -11,3 +11,6 @@ change. Fix them after Phase 3 as normal releases.
 2. **Opening a file nudges a frame inset from 9.6 to 9.5** in `project-1-diamond.wodblok.json`
    (`layers.2.fr.i`). Probably clamping or rounding on load. Pinned by the `open-normalisation-*` snapshots in
    `tests/__snapshots__/roundtrip.spec.js/`.
+
+## Test flake: canvas shape "hex" SVG summary (seen once, Phase 2d run)
+One full-suite run produced a different SVG summary for `canvas shape: hex` (clipPath 11→9, polygon 6→4, use 38→39); the same test passed 6 of 6 repeats on both the build and the untouched v100 file straight afterwards. So it is rare timing in the app (something drawn after the settle check), not a change from the build. Snapshot not touched. If it recurs, make `settle` also wait for pending frames before the summary is taken.

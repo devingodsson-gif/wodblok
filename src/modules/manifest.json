@@ -33,5 +33,6 @@
  "32-layers-panel.js",
  "33-clear.js",
  "34-desktop-shell.js",
- "35-import-artwork-and-motif-sheets.js"
+ "35-import-artwork-and-motif-sheets.js",
+ "36-export-everything.js"
 ]

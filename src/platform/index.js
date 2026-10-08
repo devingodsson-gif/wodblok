@@ -7,7 +7,11 @@ const kv = {
   get: k => localStorage.getItem(k),
   set: (k, v) => localStorage.setItem(k, v),
   remove: k => localStorage.removeItem(k),
+  keys: () => Object.keys(localStorage),
 };
+
+// Restart the app (used after Import everything so every module reads the restored data).
+const reload = () => location.reload();
 
 // The claude.ai artifact runtime: use('db' | 'user' | 'downloads' | 'sample'). Resolves to null when there is no runtime.
 const use = n => window.claude ? claude.use(n).catch(() => null) : Promise.resolve(null);
@@ -21,4 +25,4 @@ const clipboard = {
   write: items => navigator.clipboard.write(items),
 };
 
-export {kv,use,clipboard};
+export {kv,use,clipboard,reload};
