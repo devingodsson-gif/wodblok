@@ -22,7 +22,7 @@ Source of truth for the app is src/: ES modules in src/modules (order in manifes
 
 ## Tests (Phase 0 safety net)
 - `legacy/wodblok-v100.html` is the untouched baseline (sha256 in `legacy/wodblok-v100.html.sha256`). Tests run on it by default; `WB_TARGET=build` runs them on `dist/wodblok.html`.
-- Tests drive the real UI and use only two hooks: the page's `coreStr()` (the build must expose `window.__wbTest = { state() }` returning the same string).
+- Tests drive the real UI and use only these hooks: the page's `coreStr()` (the build exposes `window.__wbTest = { state(), commands }`; `state()` returns the same string, `commands` is the command registry for the commands tests).
 - Determinism: seeded Math.random, fixed Date, no network, fixed viewport and locale. All injected from the test side; the app is not modified.
 - Three layers of checks: document state (`tests/__snapshots__/**/*.state.json`), SVG markup summary (`*.svg.json`), pixels (`tests/__golden__/<WB_ENV>/`, only valid in the environment that made them; set `WB_PIXELS=0` to skip them).
 - Real project files in `tests/fixtures/` are format v18 and must open in every future build.

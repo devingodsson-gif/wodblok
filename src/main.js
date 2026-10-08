@@ -36,6 +36,8 @@ import {init33} from './modules/33-clear.js';
 import {init34} from './modules/34-desktop-shell.js';
 import {init35} from './modules/35-import-artwork-and-motif-sheets.js';
 import {init36} from './modules/36-export-everything.js';
+import {init37} from './modules/37-command-list.js';
+import {cmdConflicts,cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdList,cmdRun} from './commands/registry.js';
 
 init01();
 init02();
@@ -72,4 +74,5 @@ init33();
 init34();
 init35();
 init36();
-window.__wbTest = { state: () => coreStr() };
+init37();
+window.__wbTest = { state: () => coreStr(), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };

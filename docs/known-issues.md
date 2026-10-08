@@ -14,3 +14,6 @@ change. Fix them after Phase 3 as normal releases.
 
 ## Test flake: canvas shape "hex" SVG summary (seen once, Phase 2d run)
 One full-suite run produced a different SVG summary for `canvas shape: hex` (clipPath 11→9, polygon 6→4, use 38→39); the same test passed 6 of 6 repeats on both the build and the untouched v100 file straight afterwards. So it is rare timing in the app (something drawn after the settle check), not a change from the build. Snapshot not touched. If it recurs, make `settle` also wait for pending frames before the summary is taken.
+
+## Observation: Before (\) did not turn on right after Ctrl+S on a fresh document (not investigated)
+In a test that pressed Ctrl+S on a new document, then rolled Randomize, the `\` key did not switch Before on; with the order reversed it did. Probably the Save flow (name prompt or the reference picture) interferes. Not reproduced by hand; logged only.

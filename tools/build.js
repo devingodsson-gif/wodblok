@@ -17,9 +17,11 @@ const strip = (name, t) => {
   if (/^(import|export)\b/m.test(r)) throw new Error(name + ' has an import/export the bundler does not understand');
   return r;
 };
-const platDir = path.join(ROOT, 'src', 'platform');
-const plat = fs.readdirSync(platDir).filter(f => f.endsWith('.js')).sort();
-const parts = plat.map(f => strip('platform/' + f, fs.readFileSync(path.join(platDir, f), 'utf8')));
+const parts = [];
+for (const sub of ['platform', 'commands']) {                    // shared layers first, in this order
+  const d = path.join(ROOT, 'src', sub);
+  for (const f of fs.readdirSync(d).filter(f => f.endsWith('.js')).sort()) parts.push(strip(sub + '/' + f, fs.readFileSync(path.join(d, f), 'utf8')));
+}
 parts.push(...manifest.map(f => strip(f, fs.readFileSync(path.join(dir, f), 'utf8'))));
 parts.push(strip('main.js', fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8')));
 const body = "(function(){'use strict';\n" + parts.join('') + '})();';
