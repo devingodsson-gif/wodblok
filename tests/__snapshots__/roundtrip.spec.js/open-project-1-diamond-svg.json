@@ -1,0 +1,33 @@
+{
+ "length": 518695,
+ "sha256": "562acaa810d6d48191a1b3fc5d0d0bcf0e88c16455e2b05927b94797049f3a14",
+ "tags": {
+  "circle": 60,
+  "clipPath": 11,
+  "defs": 5,
+  "feColorMatrix": 17,
+  "feComponentTransfer": 30,
+  "feComposite": 30,
+  "feDisplacementMap": 1,
+  "feFuncA": 17,
+  "feFuncB": 13,
+  "feFuncG": 13,
+  "feFuncR": 13,
+  "feGaussianBlur": 2,
+  "feImage": 5,
+  "feMerge": 2,
+  "feMergeNode": 4,
+  "feMorphology": 1,
+  "feTurbulence": 1,
+  "filter": 10,
+  "g": 109,
+  "image": 50,
+  "mask": 74,
+  "path": 58,
+  "polygon": 8,
+  "rect": 76,
+  "svg": 1,
+  "symbol": 46,
+  "use": 102
+ }
+}

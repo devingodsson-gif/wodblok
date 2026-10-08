@@ -1,0 +1,381 @@
+{
+ "tiles": [
+  {
+   "id": 1,
+   "sh": {
+    "k": "diamond",
+    "o": "p",
+    "s": [
+     2,
+     3
+    ],
+    "z": 100
+   },
+   "items": [
+    {
+     "m": "i|muqda54ss53p9",
+     "x": 51.86582069908105,
+     "y": 91.86582069908104,
+     "s": 0.466,
+     "r": -45,
+     "f": 1
+    },
+    {
+     "m": "b88",
+     "x": 80,
+     "y": 120,
+     "s": 0.346,
+     "r": 0,
+     "f": 1
+    }
+   ],
+   "sym": {
+    "m": "quad"
+   },
+   "et": 1,
+   "er": 2.7,
+   "es": 147,
+   "neg": false,
+   "ink": null,
+   "tu": [
+    {
+     "x": "xmuztqamsx9g0",
+     "sd": 77785,
+     "md": "wear"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "sh": {
+    "k": "hex",
+    "o": "f",
+    "s": [
+     1,
+     1
+    ],
+    "z": 79
+   },
+   "items": [
+    {
+     "m": "i|muqemt6vs0nz",
+     "x": 120,
+     "y": 54.981070098554724,
+     "s": 0.721,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b95",
+     "x": 120,
+     "y": 103.92304845413263,
+     "s": 0.567,
+     "r": 0,
+     "f": 1
+    }
+   ],
+   "sym": {
+    "m": "rot",
+    "n": 3
+   },
+   "et": 3.8,
+   "er": 4.1,
+   "es": 924,
+   "neg": true,
+   "ink": "Mulled Plum",
+   "tu": [
+    {
+     "x": "xmuztqams8n95",
+     "sd": 13758,
+     "md": "wear"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "sh": {
+    "k": "rect",
+    "o": "p",
+    "s": [
+     12,
+     1
+    ],
+    "z": 100
+   },
+   "items": [
+    {
+     "m": "i|muqemt6vs10n6",
+     "x": 20,
+     "y": 10,
+     "s": 0.258,
+     "r": 45,
+     "f": 1
+    }
+   ],
+   "sym": {
+    "m": "rx",
+    "n": 6
+   },
+   "et": 2.3,
+   "er": 1,
+   "es": 383,
+   "tu": [
+    {
+     "x": "xmuztqams2og6",
+     "sd": 22008,
+     "md": "stain"
+    }
+   ]
+  }
+ ],
+ "layers": [
+  {
+   "u": "lmzbo9p4",
+   "name": "Layer 1",
+   "vis": true,
+   "st": [
+    1,
+    2
+   ],
+   "lay": "check",
+   "size": 140,
+   "ox": 9,
+   "oy": 45,
+   "rot": 0,
+   "pst": 6,
+   "pfl": 0,
+   "ak": {
+    "diamond": "d-pairs"
+   },
+   "lead": 1,
+   "fit": "",
+   "gap": 0,
+   "man": false,
+   "ov": {},
+   "rpos": 17,
+   "rsd": 37163
+  },
+  {
+   "u": "lk1a25m9",
+   "name": "Frame",
+   "vis": true,
+   "st": [
+    3
+   ],
+   "lay": "check",
+   "size": 180,
+   "ox": 0,
+   "oy": 0,
+   "rot": 0,
+   "pst": 1,
+   "pfl": 0,
+   "ak": {},
+   "fr": {
+    "on": true,
+    "w": 6.8,
+    "i": 0.7,
+    "g": 22,
+    "c": "m",
+    "cs": null,
+    "fc": "o",
+    "sc": "front",
+    "clr": true,
+    "safe": true,
+    "bar": true
+   },
+   "man": false,
+   "ov": {},
+   "op": 75,
+   "bl": "overlay"
+  },
+  {
+   "u": "ltfh009n",
+   "name": "Frame rule",
+   "vis": true,
+   "st": [
+    3
+   ],
+   "lay": "check",
+   "size": 180,
+   "ox": 0,
+   "oy": 0,
+   "rot": 0,
+   "pst": 3,
+   "pfl": 0,
+   "ak": {},
+   "fr": {
+    "on": true,
+    "w": 2.1,
+    "i": 9.5,
+    "g": 0,
+    "c": "m",
+    "cs": null,
+    "fc": "o",
+    "sc": "front",
+    "clr": false,
+    "safe": true,
+    "bar": true
+   },
+   "man": false,
+   "ov": {},
+   "bl": "lighten"
+  }
+ ],
+ "proj": {
+  "ink": "Jess Leather",
+  "bg": "Falcon Tan"
+ },
+ "dim": {
+  "s": [
+   2,
+   3
+  ],
+  "c": [
+   3,
+   2
+  ],
+  "k": "diamond",
+  "o": "p"
+ },
+ "pr": {
+  "e": 2,
+  "q": 3,
+  "t": "",
+  "a": 0,
+  "sc": 100,
+  "sd": 1
+ },
+ "tex": {
+  "u": [
+   {
+    "x": "xmuztqamsg0ga",
+    "sd": 53316,
+    "md": "relief"
+   }
+  ],
+  "v": 87,
+  "t": "1"
+ },
+ "texLib": [
+  {
+   "id": "xmuztqamsg0ga",
+   "name": "Hammered",
+   "t": "hammered",
+   "a": 68,
+   "sc": 68,
+   "az": 135,
+   "sd": 42365,
+   "auto": true
+  },
+  {
+   "id": "xmuztqamsx9g0",
+   "name": "Washi",
+   "t": "washi",
+   "a": 56,
+   "sc": 91,
+   "az": 315,
+   "sd": 44627,
+   "auto": true
+  },
+  {
+   "id": "xmuztqams8n95",
+   "name": "Cotton Rag",
+   "t": "cotton",
+   "a": 43,
+   "sc": 133,
+   "az": 135,
+   "sd": 10815,
+   "auto": true
+  },
+  {
+   "id": "xmuztqams2og6",
+   "name": "Leather",
+   "t": "leather",
+   "a": 35,
+   "sc": 132,
+   "az": 315,
+   "sd": 14469,
+   "auto": true
+  }
+ ],
+ "pg": {
+  "show": false,
+  "n": 8,
+  "m": "l",
+  "op": 70,
+  "sh": "rect"
+ },
+ "grade": {
+  "ex": 0,
+  "ct": 0,
+  "hi": 0,
+  "sh": 0,
+  "wh": 0,
+  "bl": 0,
+  "tp": 0,
+  "tn": 0,
+  "sat": 0,
+  "vib": 0,
+  "hue": 0,
+  "fd": 0,
+  "cov": false,
+  "masks": [
+   {
+    "sc": "",
+    "id": "mth9u3h",
+    "t": "col",
+    "name": "Colour shift",
+    "on": true,
+    "inv": false,
+    "amt": 100,
+    "a": {
+     "ex": -15,
+     "ct": 0,
+     "hi": 0,
+     "sh": 0,
+     "wh": 0,
+     "bl": 0,
+     "tp": 0,
+     "tn": 0,
+     "sat": 0,
+     "vib": 0,
+     "hue": 0,
+     "fd": 0
+    },
+    "c": "#3d2617",
+    "rg": 15,
+    "sm": 50
+   },
+   {
+    "sc": "",
+    "id": "mvn6ipn",
+    "t": "rad",
+    "name": "Uneven inking",
+    "on": true,
+    "inv": true,
+    "amt": 100,
+    "a": {
+     "ex": 15,
+     "ct": 3,
+     "hi": 0,
+     "sh": 0,
+     "wh": 0,
+     "bl": 0,
+     "tp": 0,
+     "tn": 0,
+     "sat": 0,
+     "vib": 0,
+     "hue": 0,
+     "fd": 0
+    },
+    "sp": "s",
+    "st": "",
+    "cx": 0.382,
+    "cy": 0.292,
+    "rx": 0.576,
+    "ry": 0.571,
+    "fe": 63
+   }
+  ]
+ }
+}

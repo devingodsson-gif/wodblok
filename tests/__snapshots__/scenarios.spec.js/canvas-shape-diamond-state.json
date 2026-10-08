@@ -1,0 +1,471 @@
+{
+ "tiles": [
+  {
+   "id": 1,
+   "sh": {
+    "k": "rect",
+    "o": "p",
+    "s": [
+     1,
+     1
+    ],
+    "z": 100
+   },
+   "items": [
+    {
+     "m": "b2",
+     "x": 120,
+     "y": 59.40467939229891,
+     "s": 0.665,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b89",
+     "x": 120,
+     "y": 120,
+     "s": 0.537,
+     "r": 0,
+     "f": 1
+    }
+   ],
+   "sym": {
+    "m": "star"
+   },
+   "et": 1.2,
+   "er": 2.5,
+   "es": 427,
+   "neg": false,
+   "ink": null,
+   "tu": [
+    {
+     "x": "xmuzts6tk48fm",
+     "sd": 21803,
+     "md": "wear"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "sh": {
+    "k": "rect",
+    "o": "p",
+    "s": [
+     1,
+     1
+    ],
+    "z": 100
+   },
+   "items": [
+    {
+     "m": "b87",
+     "x": 60,
+     "y": 60,
+     "s": 0.55,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b87",
+     "x": 60,
+     "y": 180,
+     "s": 0.55,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b87",
+     "x": 180,
+     "y": 60,
+     "s": 0.55,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b87",
+     "x": 180,
+     "y": 180,
+     "s": 0.55,
+     "r": 0,
+     "f": 1
+    }
+   ],
+   "sym": {
+    "m": "off"
+   },
+   "et": 5.3,
+   "er": 6,
+   "es": 98,
+   "neg": false,
+   "ink": "Nightshade",
+   "tu": [
+    {
+     "x": "xmuzts6tk1k0f",
+     "sd": 47999,
+     "md": "wear"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "sh": {
+    "k": "rect",
+    "o": "p",
+    "s": [
+     12,
+     1
+    ],
+    "z": 100
+   },
+   "items": [
+    {
+     "m": "b2",
+     "x": 24,
+     "y": 10,
+     "s": 0.258,
+     "r": -45,
+     "f": 1
+    }
+   ],
+   "sym": {
+    "m": "rx",
+    "n": 5
+   },
+   "et": 1.7,
+   "er": 0.4,
+   "es": 306,
+   "tu": [
+    {
+     "x": "xmuzts6tkt9ww",
+     "sd": 25878,
+     "md": "wear"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "sh": {
+    "k": "hex",
+    "o": "p",
+    "s": [
+     1,
+     1
+    ],
+    "z": 100
+   },
+   "items": [
+    {
+     "m": "b3",
+     "x": 103.92304845413263,
+     "y": 120,
+     "s": 1.412,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b89",
+     "x": 103.92304845413263,
+     "y": 30.560000000000002,
+     "s": 0.217,
+     "r": 0,
+     "f": 1
+    }
+   ],
+   "sym": {
+    "m": "rot",
+    "n": 8
+   },
+   "et": 0,
+   "er": 1.5,
+   "es": 872,
+   "neg": false,
+   "ink": null,
+   "tu": []
+  }
+ ],
+ "layers": [
+  {
+   "u": "l98ltiyc",
+   "name": "Layer 1",
+   "vis": true,
+   "st": [
+    1,
+    2
+   ],
+   "lay": "check",
+   "size": 237,
+   "ox": 72,
+   "oy": 50,
+   "rot": -15,
+   "pst": 0,
+   "pfl": 2,
+   "ak": {
+    "rect": "r-rand"
+   },
+   "lead": 1,
+   "fit": "",
+   "gap": 0,
+   "man": false,
+   "ov": {},
+   "tu": [
+    {
+     "x": "xmuzts6tkqx88",
+     "sd": 83490,
+     "md": "wear"
+    }
+   ],
+   "rsd": 70689
+  },
+  {
+   "u": "lebtz84x",
+   "name": "Frame",
+   "vis": true,
+   "st": [
+    3
+   ],
+   "lay": "check",
+   "size": 180,
+   "ox": 0,
+   "oy": 0,
+   "rot": 0,
+   "pst": 0,
+   "pfl": 0,
+   "ak": {},
+   "fr": {
+    "on": true,
+    "w": 2.9,
+    "i": 0,
+    "g": 26,
+    "c": "m",
+    "cs": null,
+    "fc": "o",
+    "sc": "front",
+    "clr": false,
+    "safe": true,
+    "bar": true
+   },
+   "man": false,
+   "ov": {},
+   "tu": [
+    {
+     "x": "xmuzts6tklcf8",
+     "sd": 15655,
+     "md": "wear"
+    }
+   ]
+  },
+  {
+   "u": "l6xc45uk",
+   "name": "Free stamps",
+   "vis": true,
+   "st": [
+    4
+   ],
+   "lay": "check",
+   "size": 180,
+   "ox": 0,
+   "oy": 0,
+   "rot": 0,
+   "pst": 0,
+   "pfl": 0,
+   "free": true,
+   "rz": "free",
+   "pl": [
+    {
+     "u": "pmuzts6vx86q1",
+     "t": 4,
+     "x": 400,
+     "y": 240,
+     "s": 320,
+     "r": 0,
+     "f": 1
+    }
+   ],
+   "fg": {
+    "snap": true,
+    "ss": true
+   },
+   "ak": {},
+   "man": false,
+   "ov": {}
+  }
+ ],
+ "proj": {
+  "ink": "Damask Crimson",
+  "bg": "Rosewater"
+ },
+ "dim": {
+  "s": [
+   1,
+   1
+  ],
+  "c": [
+   16,
+   9
+  ],
+  "k": "rect",
+  "o": "p",
+  "cs": "diamond"
+ },
+ "pr": {
+  "e": 0,
+  "q": 0,
+  "t": "",
+  "a": 0,
+  "sc": 100,
+  "sd": 1
+ },
+ "tex": {
+  "u": [
+   {
+    "x": "xmuzts6tkqk21",
+    "sd": 77892,
+    "md": "relief"
+   }
+  ],
+  "v": 87,
+  "t": "1"
+ },
+ "texLib": [
+  {
+   "id": "xmuzts6tkqk21",
+   "name": "Felt",
+   "t": "felt",
+   "a": 60,
+   "sc": 134,
+   "az": 135,
+   "sd": 43783,
+   "auto": true
+  },
+  {
+   "id": "xmuzts6tk48fm",
+   "name": "Felt 2",
+   "t": "felt",
+   "a": 25,
+   "sc": 117,
+   "az": 225,
+   "sd": 3046,
+   "auto": true
+  },
+  {
+   "id": "xmuzts6tk1k0f",
+   "name": "Cold Press",
+   "t": "cold",
+   "a": 54,
+   "sc": 126,
+   "az": 225,
+   "sd": 72141,
+   "auto": true
+  },
+  {
+   "id": "xmuzts6tkt9ww",
+   "name": "Marble Veins",
+   "t": "marble",
+   "a": 33,
+   "sc": 157,
+   "az": 315,
+   "sd": 46379,
+   "auto": true
+  },
+  {
+   "id": "xmuzts6tkqx88",
+   "name": "Dry Roller",
+   "t": "dry",
+   "a": 38,
+   "sc": 64,
+   "az": 315,
+   "sd": 46865,
+   "auto": true
+  },
+  {
+   "id": "xmuzts6tklcf8",
+   "name": "Denim Twill",
+   "t": "denim",
+   "a": 43,
+   "sc": 83,
+   "az": 250,
+   "sd": 60822,
+   "auto": true
+  }
+ ],
+ "pg": {
+  "show": false,
+  "n": 5,
+  "m": "c",
+  "op": 70,
+  "sh": "rect"
+ },
+ "grade": {
+  "ex": 0,
+  "ct": 0,
+  "hi": 0,
+  "sh": 0,
+  "wh": 0,
+  "bl": 0,
+  "tp": 0,
+  "tn": 0,
+  "sat": 0,
+  "vib": 0,
+  "hue": 0,
+  "fd": 0,
+  "cov": false,
+  "masks": [
+   {
+    "sc": "",
+    "id": "m1rui4d",
+    "t": "rad",
+    "name": "Vignette",
+    "on": true,
+    "inv": true,
+    "amt": 100,
+    "a": {
+     "ex": -26,
+     "ct": 0,
+     "hi": 0,
+     "sh": 0,
+     "wh": 0,
+     "bl": 0,
+     "tp": 0,
+     "tn": 0,
+     "sat": -23,
+     "vib": 0,
+     "hue": 0,
+     "fd": 20
+    },
+    "sp": "c",
+    "st": "",
+    "cx": 0.445,
+    "cy": 0.546,
+    "rx": 0.482,
+    "ry": 0.552,
+    "fe": 77
+   },
+   {
+    "sc": "",
+    "id": "mjgml70",
+    "t": "col",
+    "name": "Colour shift",
+    "on": true,
+    "inv": false,
+    "amt": 100,
+    "a": {
+     "ex": 0,
+     "ct": 0,
+     "hi": 0,
+     "sh": 0,
+     "wh": 0,
+     "bl": 0,
+     "tp": 0,
+     "tn": 0,
+     "sat": 0,
+     "vib": 0,
+     "hue": -23,
+     "fd": 0
+    },
+    "c": "#4b2a5e",
+    "rg": 15,
+    "sm": 52
+   }
+  ]
+ }
+}

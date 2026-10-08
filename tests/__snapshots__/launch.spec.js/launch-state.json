@@ -1,0 +1,95 @@
+{
+ "tiles": [
+  {
+   "id": 1,
+   "items": [],
+   "et": 0,
+   "er": 0,
+   "sh": {
+    "k": "rect",
+    "o": "p",
+    "s": [
+     1,
+     1
+    ],
+    "z": 100
+   },
+   "tu": []
+  }
+ ],
+ "layers": [
+  {
+   "u": "lztagjbl",
+   "name": "Layer 1",
+   "vis": true,
+   "st": [
+    1
+   ],
+   "lay": "check",
+   "size": 180,
+   "ox": 0,
+   "oy": 0,
+   "rot": 0,
+   "pst": 0,
+   "pfl": 0,
+   "ak": {},
+   "fit": "",
+   "gap": 0,
+   "man": false,
+   "ov": {}
+  }
+ ],
+ "proj": {
+  "ink": "Marian Blue",
+  "bg": "Lily White"
+ },
+ "dim": {
+  "s": [
+   1,
+   1
+  ],
+  "c": [
+   2,
+   3
+  ],
+  "k": "rect",
+  "o": "p"
+ },
+ "pr": {
+  "e": 0,
+  "q": 0,
+  "t": "",
+  "a": 0,
+  "sc": 100,
+  "sd": 811
+ },
+ "tex": {
+  "u": [],
+  "v": 87,
+  "t": ""
+ },
+ "texLib": [],
+ "pg": {
+  "show": false,
+  "n": 8,
+  "m": "l",
+  "op": 70,
+  "sh": "rect"
+ },
+ "grade": {
+  "ex": 0,
+  "ct": 0,
+  "hi": 0,
+  "sh": 0,
+  "wh": 0,
+  "bl": 0,
+  "tp": 0,
+  "tn": 0,
+  "sat": 0,
+  "vib": 0,
+  "hue": 0,
+  "fd": 0,
+  "cov": false,
+  "masks": []
+ }
+}

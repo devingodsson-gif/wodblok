@@ -1,0 +1,28 @@
+{
+ "length": 241970,
+ "sha256": "cf147c7d2cf06db0c96997f3bbfa8a315ebe4d29cce73776c1c2e9137dd77f83",
+ "tags": {
+  "circle": 138,
+  "clipPath": 8,
+  "defs": 5,
+  "ellipse": 92,
+  "feColorMatrix": 18,
+  "feComponentTransfer": 22,
+  "feComposite": 18,
+  "feFuncA": 12,
+  "feFuncB": 10,
+  "feFuncG": 10,
+  "feFuncR": 10,
+  "feImage": 2,
+  "filter": 7,
+  "g": 1134,
+  "image": 34,
+  "mask": 102,
+  "path": 1171,
+  "polygon": 4,
+  "rect": 104,
+  "svg": 1,
+  "symbol": 28,
+  "use": 39
+ }
+}

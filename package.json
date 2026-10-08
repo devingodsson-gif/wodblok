@@ -1,0 +1,19 @@
+{
+  "name": "wodblok",
+  "private": true,
+  "version": "100.0.0",
+  "description": "WODBLOK stamped-pattern editor (web app first). Phase 0: safety net around the v100 baseline.",
+  "scripts": {
+    "test": "playwright test --project=chromium",
+    "test:legacy": "WB_TARGET=legacy playwright test --project=chromium",
+    "test:update-golden": "playwright test --project=chromium --update-snapshots",
+    "test:webkit": "playwright test --project=webkit --grep @smoke",
+    "perf": "WB_PERF=1 playwright test --project=chromium tests/perf.spec.js",
+    "coupling-map": "node tools/coupling-map.js legacy/wodblok-v100.html > docs/coupling-map.md"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.0",
+    "eslint-scope": "9.1.2",
+    "espree": "11.2.0"
+  }
+}
