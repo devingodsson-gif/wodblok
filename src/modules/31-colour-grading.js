@@ -1,3 +1,4 @@
+import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {C,CH,CM,CW,closeDD,col,geom,placeFloat,shOf} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
@@ -107,7 +108,7 @@ has('wbgrade')?$('dyn').setAttribute('filter','url(#wbgrade)'):$('dyn').removeAt
 has('wbgradeT')?$('texg').setAttribute('filter','url(#wbgradeT)'):$('texg').removeAttribute('filter');
 if(has('wbgrade')&&grd.cov)$('covg').setAttribute('filter','url(#wbgrade)');else $('covg').removeAttribute('filter');$('ed').classList.toggle('graded',has('wbgradeE'));
 document.querySelector('.rail [data-pn="grade"]').classList.toggle('gdon',hasA(grd)||grd.masks.some(m=>m.on&&hasA(m.a)));gmHandles()}
-const gdSave=()=>{try{localStorage.setItem('wb41_grade',JSON.stringify(grd))}catch(e){}};
+const gdSave=()=>{try{kv.set('wb41_grade',JSON.stringify(grd))}catch(e){}};
 const gCap=()=>{if(WBX.wbCap)WBX.wbCap()};
 // ---- mask list + settings
 const tileN=id=>{const i=WBS.tiles.findIndex(t=>String(t.id)==String(id));return i<0?'':'Stamp '+(i+1)};
@@ -151,7 +152,7 @@ const P=ev=>{const p=svg.createSVGPoint();p.x=ev.clientX;p.y=ev.clientY;const q=
 const gmUp=()=>{if(!gmDrag)return;const mv=gmDrag.moved;gmDrag=null;if(mv){gdSave();gCap()}};
 function init31(){
 document.querySelectorAll('#gm_menu [data-ic]').forEach(e=>e.innerHTML=MIC[e.dataset.ic]);
-grd=gFix(null);try{const q=JSON.parse(localStorage.getItem('wb41_grade')||'null');if(q&&typeof q=='object')grd=gFix(q)}catch(e){}
+grd=gFix(null);try{const q=JSON.parse(kv.get('wb41_grade')||'null');if(q&&typeof q=='object')grd=gFix(q)}catch(e){}
 GK.forEach(k=>{const r=$('gd_'+k);r.addEventListener('input',e=>{const v=+e.target.value,A=tgtA();if(A[k]===v)return;const W=tgtA(1);W[k]=v;if(W!==grd&&!gmCur())store();gdSave();applyGrade();if(gmCur())renderGM()});r.addEventListener('change',gCap)});
 ['lo','hi','rg','sm','fe','amt'].forEach(k=>{const r=$('gm_'+k);r.addEventListener('input',()=>{const m=gmCur();if(!m||m[k]===undefined||m[k]===+r.value)return;m[k]=+r.value;gdSave();applyGrade();if(k=='lo'||k=='hi')renderGM()});r.addEventListener('change',gCap)});
 $('gm_sp').onclick=e=>{const b=e.target.closest('[data-gs]');if(b)gmSet('sp',b.dataset.gs)};

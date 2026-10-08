@@ -1,3 +1,4 @@
+import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,SH,SK,SW,shp,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {cust,inkOf,it,pal,selOne,store} from './06-motif-library-folders.js';
@@ -21,8 +22,8 @@ let gfOk=false;const gf=()=>{if(gfOk)return;gfOk=true;const l=document.createEle
 // your own fonts (kept in this browser when they fit)
 const UF=[];const addUF=async(name,buf,save)=>{const id='u-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30);if(F[id])return id;
 const ff=new FontFace('wbu-'+id,buf);await ff.load();document.fonts.add(ff);F[id]={id,fam:'wbu-'+id,w:400,d:'Your font',lbl:name,u:1};UF.push(id);
-if(save){try{const b=new Uint8Array(buf);let s='';for(let i=0;i<b.length;i+=8192)s+=String.fromCharCode.apply(null,b.subarray(i,i+8192));const all=JSON.parse(localStorage.getItem('wb17_fonts')||'{}');all[name]=btoa(s);localStorage.setItem('wb17_fonts',JSON.stringify(all))}catch(e){pmsg(`“${name}” is loaded for now, but it's too big to keep in this browser. Load it again next time.`)}}return id};
-try{const all=JSON.parse(localStorage.getItem('wb17_fonts')||'{}');Object.entries(all).forEach(([n,b64])=>{const s=atob(b64),b=new Uint8Array(s.length);for(let i=0;i<s.length;i++)b[i]=s.charCodeAt(i);addUF(n,b.buffer,false).then(()=>fillFonts()).catch(()=>{})})}catch(e){}
+if(save){try{const b=new Uint8Array(buf);let s='';for(let i=0;i<b.length;i+=8192)s+=String.fromCharCode.apply(null,b.subarray(i,i+8192));const all=JSON.parse(kv.get('wb17_fonts')||'{}');all[name]=btoa(s);kv.set('wb17_fonts',JSON.stringify(all))}catch(e){pmsg(`“${name}” is loaded for now, but it's too big to keep in this browser. Load it again next time.`)}}return id};
+try{const all=JSON.parse(kv.get('wb17_fonts')||'{}');Object.entries(all).forEach(([n,b64])=>{const s=atob(b64),b=new Uint8Array(s.length);for(let i=0;i<s.length;i++)b[i]=s.charCodeAt(i);addUF(n,b.buffer,false).then(()=>fillFonts()).catch(()=>{})})}catch(e){}
 const P=160,E=60,cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true}),GL=new Map();
 const css=f=>`${f.w} ${P}px "${f.fam}", Georgia, serif`;
 // --- tracing (marching squares -> simplified closed loops -> smooth quadratic path)

@@ -1,6 +1,6 @@
+import {kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {PAPER,TRIMS,bk,col,setDim} from './04-canvas-and-stamp-outlines.js';
-import {use} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {ser} from './14-presets-and-layer-grid-ui.js';
 import {buildTex} from './17-texture-panel-and-previews.js';
@@ -13,7 +13,7 @@ const mm=v=>(v*25.4).toFixed(1);let w='';if(!WBS.book.man&&(WBS.book.pages<24||W
 $('bkinfo').innerHTML=`<b>Full cover</b> ${g.W.toFixed(3)} × ${g.H.toFixed(3)} in (${mm(g.W)} × ${mm(g.H)} mm)<br><b>At 300 DPI</b> ${px(g.W)} × ${px(g.H)} px<br><b>Spine</b> ${g.sw.toFixed(3)} in (${mm(g.sw)} mm)${w}`;
 $('bksum').textContent=on?`${g.W.toFixed(2)} × ${g.H.toFixed(2)} in`:'';
 ['bkpdf','bkpng','bkxs'].forEach(id=>$(id).hidden=!on);$('cfree').hidden=on;$('bkgrp').hidden=!on;document.querySelectorAll('#cfmt [data-f]').forEach(b=>b.classList.toggle('on',(b.dataset.f=='book')==on));['casp','cswp','caw','cah'].forEach(id=>{if($(id))$(id).disabled=on});paintCov()}
-const bookSet=o=>{WBS.book={...WBS.book,...o};try{localStorage.setItem('wb40_book',JSON.stringify(WBS.book))}catch(e){}WBX.wbBookSync()};
+const bookSet=o=>{WBS.book={...WBS.book,...o};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}WBX.wbBookSync()};
 // --- export at 300 DPI (PNG, or a PDF sized to the full cover with trim and bleed boxes)
 function coverRaster(cb){const g=bk(),W=Math.round(g.W*300),H=Math.round(g.H*300);$('pmsg').textContent='Rendering the print cover at 300 DPI…';
 let sv=ser().replace(/^<svg([^>]*?)>/,(m,a)=>`<svg${a.replace(/\s(width|height|preserveAspectRatio)="[^"]*"/g,'')} width="${W}" height="${H}" preserveAspectRatio="none">`);

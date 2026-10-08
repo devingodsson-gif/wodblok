@@ -1,3 +1,4 @@
+import {kv} from '../platform/index.js';
 import {$,WBS,mod} from './01-launch-and-version.js';
 import {lyInkFill} from './32-layers-panel.js';
 let SW=240,SH=240,CW=533,CH=800;
@@ -100,7 +101,7 @@ const fixC=(n,d)=>{if(!n||CM[n])return n||d;const h=LEG[n];if(!h)return d;const 
 let PL;
 const PCOL={ink:"Marian Blue",bg:"Lily White"};
 const CC=[];
-const saveCC=()=>{try{localStorage.setItem('wb7_colors',JSON.stringify(C.filter(c=>CC.includes(c[0]))))}catch(e){}};
+const saveCC=()=>{try{kv.set('wb7_colors',JSON.stringify(C.filter(c=>CC.includes(c[0]))))}catch(e){}};
 // Open popups are lifted to the top of the page and placed against their button, so no panel, floating window,
 // scrolling area or the phone-width header (which scrolls sideways) can clip them or draw over them.
 function placeFloat(el,a,right,cap){if(el.parentNode!==document.body)document.body.appendChild(el);el.classList.add('fx');el.style.maxHeight='';el.style.width='';
@@ -132,9 +133,9 @@ function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15
 const tk=s=>(c,b)=>s.split('FILL').join(c).split('CUT').join(b);
 function init04(){// Stamp is SW x SH units (long side 240); canvas is CW x CH units (long side 800). Ratios live in dim.
 WBS.dim={s:[1,1],c:[2,3]};
-try{const d=JSON.parse(localStorage.getItem('wb14_dim')||'null');if(d&&d.s&&d.c)WBS.dim=d}catch(e){}
+try{const d=JSON.parse(kv.get('wb14_dim')||'null');if(d&&d.s&&d.c)WBS.dim=d}catch(e){}
 WBS.book={on:false,trim:'6x9',tw:6,th:9,pages:200,paper:'white',man:false,sw:.45,bleed:.125,gd:true};
-try{const q=JSON.parse(localStorage.getItem('wb40_book')||'null');if(q&&typeof q=='object')WBS.book={...WBS.book,...q}}catch(e){}
+try{const q=JSON.parse(kv.get('wb40_book')||'null');if(q&&typeof q=='object')WBS.book={...WBS.book,...q}}catch(e){}
 GC=new Map();
 CSN=Object.fromEntries(CSH);
 setDim();
@@ -151,7 +152,7 @@ Object.assign(LEG,{"Winchester Lapis": "#2f4f9a", "Wilton Ultramarine": "#23347a
 {const grp=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255),ch=Math.max(...v)-Math.min(...v),l=hsl(h)[2];return l>=.78?1:ch>=.17?0:2};
 C.sort((a,b)=>{const ga=grp(a[1]),gb=grp(b[1]),A=hsl(a[1]),B=hsl(b[1]);if(ga!=gb)return ga-gb;if(ga==2)return B[2]-A[2];const ha=Math.floor(((A[0]+12)%360)/24),hb=Math.floor(((B[0]+12)%360)/24);return ha-hb||B[2]-A[2]})}
 CM=Object.fromEntries(C);
-PL=PAL50.map(p=>[p[0],p[1],p[3]]);WBS.proj={...PCOL};try{JSON.parse(localStorage.getItem('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
+PL=PAL50.map(p=>[p[0],p[1],p[3]]);WBS.proj={...PCOL};try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 $('pal').innerHTML='<option value="">Custom mix</option>'+PL.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('');
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 mkdd('pI',C.map(cItem));mkdd('pB',C.map(cItem));mkdd('stI',[defItem,...C.map(cItem)]);

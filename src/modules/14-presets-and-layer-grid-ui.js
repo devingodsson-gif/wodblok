@@ -1,6 +1,7 @@
+import {clipboard,kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {C,CC,CH,CM,CW,PCOL,PL,SHN,SK,col,csk,geom,paintColors,saveCC,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
-import {clean,cust,luid,mcSave,mkL,say,store,use} from './06-motif-library-folders.js';
+import {clean,cust,luid,mcSave,mkL,say,store} from './06-motif-library-folders.js';
 import {build,hx,leadT} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC} from './17-texture-panel-and-previews.js';
@@ -19,8 +20,8 @@ function reshape(t,ch){const sh=shOf(t),a=geom(sh);if(ch.k)sh.k=ch.k;if(ch.o)sh.
 function applyAsp(k,v,ch){if(v){const r=v[0]/v[1],lim=k=='s'?20:5;if(!(r>=1/lim&&r<=lim)){if(k=='s')pmsg('Stamps can be up to 20 times longer than they are wide.');return}}
 if(k=='c'){if(v)WBS.dim.c=v;setDim()}
 else{const t=WBS.tiles[WBS.cur],c={...(ch||{})};if(v)c.s=v;reshape(t,c);const sh=shOf(t);WBS.dim={...WBS.dim,k:sh.k,o:sh.o,s:[...sh.s]}}
-WBS.symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd()}
-function csSet(ch){Object.assign(WBS.dim,ch);if(WBS.dim.cs=='rect')delete WBS.dim.cs;setDim();WBS.symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd()}
+WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd()}
+function csSet(ch){Object.assign(WBS.dim,ch);if(WBS.dim.cs=='rect')delete WBS.dim.cs;setDim();WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd()}
 // ---- layer grid: own grid or another layer's, where to print on it, which stamp sets its shape
 function syncGrid(L,T){const others=WBS.layers.filter(x=>x!==L&&!(x.fr&&x.fr.on)&&!x.free),ky=others.map(x=>x.u+x.name).join('|');
 if($('lgl').dataset.k!=ky){$('lgl').innerHTML='<option value="">Its own grid</option>'+others.map(x=>`<option value="${hx(x.u)}">Same grid as ${hx(x.name)}</option>`).join('');$('lgl').dataset.k=ky}
@@ -106,7 +107,7 @@ try{const r=await sample.json(prompt,{cache:false});let n=0;
 store();const inF=WBS.mcat.startsWith('g:');if(n&&!inF){WBS.mcat='d';mcSave()}say(n?`${n} motif${n>1?'s':''} added to ${inF?'“'+WBS.mcat.slice(2)+'”':'Drawn by Claude'}. Click to place.`:'Nothing usable came back. Try again.');build()}
 catch(e){say(e&&e.code=='not_granted'?'Permission to ask Claude was declined.':e&&e.code=='rate_limited'?'Rate limited. Try again in a bit.':'Drawing failed: '+((e&&e.message)||'unknown error'))}
 $('gen').disabled=false};
-$('cpy').onclick=async()=>{try{await navigator.clipboard.writeText(ser());say('SVG copied.')}catch(e){say('Copy was blocked here.')}};
+$('cpy').onclick=async()=>{try{await clipboard.writeText(ser());say('SVG copied.')}catch(e){say('Copy was blocked here.')}};
 $('sv').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
 try{await d.save({filename:expName('svg'),data:ser()})}catch(e){if(e&&e.code!='declined')say('Could not save: '+e.message)}};
 $('png').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');

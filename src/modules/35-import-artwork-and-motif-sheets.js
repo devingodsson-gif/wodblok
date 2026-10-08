@@ -1,3 +1,4 @@
+import {clipboard,kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {SH,SW,col} from './04-canvas-and-stamp-outlines.js';
 import {cust,it,mcSave,selOne,store} from './06-motif-library-folders.js';
@@ -8,7 +9,7 @@ function init35(){// ===== Import artwork: image -> clean black & white -> trace
 const IMP_RE=/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/;
 let src=null,W=0,H=0,lum=null,name='',last=null,tmr=0;
 const PROMPT=s=>`Create a single ${s||'[subject]'} designed as a bold woodblock stamp motif. Pure solid black shapes on a plain white background. No gray, no shading, no gradients, no texture, no frame, no text. Clean, smooth edges and a simple, readable silhouette, with a few thin white carved lines for detail. Centered, with generous white margin, square image.`;
-$('ipr').onclick=async()=>{const t=PROMPT($('isub').value.trim());let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){}
+$('ipr').onclick=async()=>{const t=PROMPT($('isub').value.trim());let ok=false;try{await clipboard.writeText(t);ok=true}catch(e){}
 if(ok){say2('Prompt copied. Paste it into ChatGPT, then import the image it makes.')}else{$('iprt').hidden=false;$('iprt').value=t;$('iprt').select();say2('Copy the prompt below, then paste it into ChatGPT.')}};
 const say2=t=>{$('imsg').textContent=t};
 
@@ -84,7 +85,7 @@ $('pmsg').textContent=`Added “${nm}” to ${fg?'“'+fg+'”':'My imports'} an
 
 // ===== Motif sheets: one image -> many motifs (grid you can adjust, or auto-detected shapes) =====
 const SPROMPT=(sub,c,r)=>`Create a sheet of ${c*r} different ${sub||'[subject]'} designed as bold woodblock stamp motifs, arranged in a neat grid of ${c} columns and ${r} rows. Every motif: pure solid black shapes on a plain white background, no gray, no shading, no gradients, no texture, with a few thin white carved lines for detail, clean smooth edges and a simple readable silhouette. Each motif is about the same size and centered in its own cell. Leave wide empty white space between all motifs (at least a fifth of a cell); nothing may touch, overlap or cross into a neighbouring cell. No grid lines, no borders, no frames, no labels, no numbers, no text. ${c>r?'Wide landscape image.':c<r?'Tall portrait image.':'Square image.'}`;
-$('spr').onclick=async()=>{const c=Math.max(1,Math.min(8,+$('scol').value||4)),r=Math.max(1,Math.min(8,+$('srow').value||4)),t=SPROMPT($('isub').value.trim(),c,r);$('sc').value=c;$('sr').value=r;let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){}
+$('spr').onclick=async()=>{const c=Math.max(1,Math.min(8,+$('scol').value||4)),r=Math.max(1,Math.min(8,+$('srow').value||4)),t=SPROMPT($('isub').value.trim(),c,r);$('sc').value=c;$('sr').value=r;let ok=false;try{await clipboard.writeText(t);ok=true}catch(e){}
 if(ok)say2(`Sheet prompt copied (${c} × ${r} = ${c*r} motifs). Paste it into ChatGPT, then use Import a motif sheet.`);else{$('iprt').hidden=false;$('iprt').value=t;$('iprt').select();say2('Copy the prompt below, then paste it into ChatGPT.')}};
 let S=null,stmr=0;const sc=document.createElement('canvas');
 const sOpen=(img,nm)=>{const MX=2000,k=Math.min(1,MX/Math.max(img.naturalWidth,img.naturalHeight)),w=Math.max(8,Math.round(img.naturalWidth*k)),h=Math.max(8,Math.round(img.naturalHeight*k));
@@ -159,7 +160,7 @@ const sClose=()=>{$('sdlg').hidden=true};$('scl').onclick=sClose;$('scx').onclic
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('sdlg').hidden)sClose()});
 $('sadd').onclick=()=>{if(!S)return;const cat=($('snm').value.trim()||'Sheet').replace(/[\"<>&|]/g,'').slice(0,30),base=Date.now().toString(36);let n=0;
 S.boxes.forEach((b,i)=>{const d=S.res[i]&&S.res[i].d;if(!d||S.off.has(i))return;n++;const key='i|'+base+'s'+i+Math.random().toString(36).slice(2,4);cust[key]={n:`${cat} ${n}`.slice(0,40),svg:`<path d="${d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,g:cat}});
-WBS.mcat='g:'+cat;try{localStorage.setItem('wb11_mcat',WBS.mcat)}catch(e){}store();sClose();upd();document.querySelector('.rail [data-pn="motifs"]').click();$('pmsg').textContent=`Added ${n} motifs to “${cat}” in the library.`};
+WBS.mcat='g:'+cat;try{kv.set('wb11_mcat',WBS.mcat)}catch(e){}store();sClose();upd();document.querySelector('.rail [data-pn="motifs"]').click();$('pmsg').textContent=`Added ${n} motifs to “${cat}” in the library.`};
 $('sfile').onchange=()=>{const f=$('sfile').files[0];$('sfile').value='';if(!f)return;if(f.type&&!/^image\//.test(f.type))return say2('That file is not an image. Use a PNG, JPG or WebP.');const url=URL.createObjectURL(f),img=new Image();
 img.onload=()=>{URL.revokeObjectURL(url);sOpen(img,(f.name||'').replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' '))};img.onerror=()=>{URL.revokeObjectURL(url);say2('That image could not be read. Try a PNG or JPG.')};img.src=url};
 $('isht').onclick=()=>{if(!src)return;closeDlg();sOpen(src,$('inm').value.trim())};

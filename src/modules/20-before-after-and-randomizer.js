@@ -1,3 +1,4 @@
+import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {BK} from './03-stamp-prints-and-drawing.js';
 import {C,CASP,CH,CM,CW,PL,SH,SK,SW,col,geom,inShape,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
@@ -161,9 +162,9 @@ if(FT.col&&sOn('col','pal')&&!noAcc){const keepN=new Set([pInk,pBg]),mapInk=n=>{
 if(FT.shape&&!WBS.book.on){const SGM={rect:'box',rrect:'box',circle:'round',oval:'round',arch:'arch',hex:'poly',tri:'poly',diamond:'poly',ngon:'poly'},SHL=[['rect',1.2],['rrect',1],['circle',.8],['oval',1],['arch',1],['hex',.8],['tri',.6],['diamond',.7],['ngon',.8]].filter(x=>sOn('shape',SGM[x[0]])),k=wpick(SHL.length?SHL:[['rect',1]]),nd=JSON.parse(JSON.stringify(c.dim));['cs','cr','n','co','g'].forEach(x=>delete nd[x]);
 if(k!='rect')nd.cs=k;if(CASP.includes(k)||k=='rect')nd.c=ratioPick();
 if(k=='rrect')nd.cr=ri(8,45);if(k=='ngon'){nd.n=ri(5,10);if(ch(.5))nd.co='f'}if(k=='hex'||k=='tri'){if(ch(.35))nd.co='f'}
-c.dim=nd;try{localStorage.setItem('wb14_dim',JSON.stringify(nd))}catch(e){}}
+c.dim=nd;try{kv.set('wb14_dim',JSON.stringify(nd))}catch(e){}}
 // Canvas size on its own: a new ratio for a canvas that has one (round and regular shapes stay square)
-if(FT.size&&!FT.shape&&!WBS.book.on){const kk=c.dim.cs||'rect';if(kk=='rect'||CASP.includes(kk)){const nd2=JSON.parse(JSON.stringify(c.dim));nd2.c=ratioPick();c.dim=nd2;try{localStorage.setItem('wb14_dim',JSON.stringify(nd2))}catch(e){}}}
+if(FT.size&&!FT.shape&&!WBS.book.on){const kk=c.dim.cs||'rect';if(kk=='rect'||CASP.includes(kk)){const nd2=JSON.parse(JSON.stringify(c.dim));nd2.c=ratioPick();c.dim=nd2;try{kv.set('wb14_dim',JSON.stringify(nd2))}catch(e){}}}
 WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;const oldL=WBS.layers.slice(),oldT=WBS.tiles.slice(),oldG=WBX.wbGrade?WBX.wbGrade.get():null;WBS.selL=0;(WBX.wbApply||applyCore)(c);WBS.selL=0;
 // colour grade: a gentle look most of the time (about a quarter stay neutral). Masks: up to two light local touches.
 if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v,isF=l=>!!(l.fr&&l.fr.on);let gl={};

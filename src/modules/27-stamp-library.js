@@ -1,7 +1,8 @@
+import {kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {BK} from './03-stamp-prints-and-drawing.js';
 import {C,CC,CH,CM,CW,col,geom,paintColors,saveCC,shOf,shp,useT} from './04-canvas-and-stamp-outlines.js';
-import {clean,cust,inkOf,selOne,store,use} from './06-motif-library-folders.js';
+import {clean,cust,inkOf,selOne,store} from './06-motif-library-folders.js';
 import {hx,lattice} from './10-layer-grids.js';
 import {eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC,inkCatch,txMerge,txPack} from './17-texture-panel-and-previews.js';
@@ -13,11 +14,11 @@ import {artEnc,artId,artLive,artOk} from './25-art-layers.js';
 // Stored privately with your Claude account when that is available, otherwise in this browser.
 const SL={kind:null,col:null,ready:null,
 init(){return this.ready||(this.ready=(async()=>{try{const db=await use('db'),u=db&&await use('user'),id=u&&await u.id();if(db&&id){this.col=db.collection('data/users/'+id+'/stamps');this.kind='account';return}}catch(e){}this.kind='browser'})())},
-loc(){try{return JSON.parse(localStorage.getItem('wb50_stamps')||'{}')}catch(e){return{}}},
+loc(){try{return JSON.parse(kv.get('wb50_stamps')||'{}')}catch(e){return{}}},
 async list(){await this.init();if(this.kind=='account'){const r=await this.col.get();return r.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.updated||0)-(a.updated||0))}return Object.entries(this.loc()).map(([id,v])=>({id,...v})).sort((a,b)=>(b.updated||0)-(a.updated||0))},
 async get(id){await this.init();if(this.kind=='account'){const x=await this.col.doc(id).get();return x.exists?{id,...x.data()}:null}const v=this.loc()[id];return v?{id,...v}:null},
-async put(id,rec){await this.init();if(this.kind=='account')return this.col.doc(id).set(rec);const o=this.loc();o[id]=rec;localStorage.setItem('wb50_stamps',JSON.stringify(o))},
-async del(id){await this.init();if(this.kind=='account')return this.col.doc(id).delete();const o=this.loc();delete o[id];localStorage.setItem('wb50_stamps',JSON.stringify(o))}};
+async put(id,rec){await this.init();if(this.kind=='account')return this.col.doc(id).set(rec);const o=this.loc();o[id]=rec;kv.set('wb50_stamps',JSON.stringify(o))},
+async del(id){await this.init();if(this.kind=='account')return this.col.doc(id).delete();const o=this.loc();delete o[id];kv.set('wb50_stamps',JSON.stringify(o))}};
 const slMsg=t=>{$('slmsg').textContent=t};
 const slOkImg=s=>typeof s=='string'&&s.length<6e6&&/^data:image\/(png|webp);base64,[A-Za-z0-9+\/=]*$/.test(s);
 // draw one stamp to a canvas: its ink and shape (and edge wear), long side = px, transparent or on the paper colour
@@ -42,7 +43,7 @@ const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);
 const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);return c}
 const slBlob=c=>new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('Could not make the PNG')),'image/png'));
 async function slSavePng(blob,name){const d=await use('downloads');if(!d)return slMsg('Saving is not available here.');try{await d.save({filename:name.replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')+'.png',data:blob})}catch(e){if(e&&e.code!='declined')slMsg('Could not save: '+((e&&e.message)||'unknown error'))}}
-const slOptSave=()=>{try{localStorage.setItem('wb50_slopt',JSON.stringify({fx:$('slfx').checked,tx:$('sltx').checked,px:$('slpx').value,bg:$('slbg').value}))}catch(e){}};
+const slOptSave=()=>{try{kv.set('wb50_slopt',JSON.stringify({fx:$('slfx').checked,tx:$('sltx').checked,px:$('slpx').value,bg:$('slbg').value}))}catch(e){}};
 function libMotifs(L){Object.entries(L.motifs||{}).forEach(([k,v])=>{if(!v||typeof v.svg!='string')return;if(k.startsWith('t|')){if(/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test(v.svg))cust[k]={n:String(v.n||'?').replace(/["<>&|]/g,'').slice(0,4),svg:v.svg,txt:1};return}if(k.startsWith('i|')){if(WBX.wbImpOk&&WBX.wbImpOk(k,v))cust[k]={n:String(v.n||'Imported motif').replace(/["<>&|]/g,'').slice(0,40),svg:v.svg,imp:1,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,30)}:{})}}else{const c=clean(v.svg);if(c)cust[k]={n:String(v.n||'motif').replace(/["<>&|]/g,'').slice(0,40),svg:c,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,30)}:{})}}});
 }
 function libColors(L){(L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();}
@@ -58,7 +59,7 @@ const artAddProj=(rec,pid)=>{let d=null;try{d=JSON.parse(rec.data)}catch(e){}con
 let id=Object.keys(WBS.ARTS).find(i=>WBS.ARTS[i].pid==pid);if(!id){id=artId();WBS.ARTS[id]={n:String(rec.name||'Project').replace(/["<>&|]/g,'').slice(0,40),k:'proj',src:a.src,w:+a.w,h:+a.h,pid,ver:rec.updated||0}}
 WBS.fpB=id;WBS.fpSel=-1;WBS.fpLast=null;$('lfapl').hidden=true;pmsg('“'+rec.name+'” added. Click on the canvas to place it. It updates when you save that project.');upd()};
 function init27(){
-try{const so=JSON.parse(localStorage.getItem('wb50_slopt')||'{}');$('slfx').checked=!!so.fx;$('sltx').checked=!!so.tx;if(so.px)$('slpx').value=so.px;if(so.bg!=null)$('slbg').value=so.bg}catch(e){}['slfx','sltx','slpx','slbg'].forEach(id=>$(id).addEventListener('change',slOptSave));
+try{const so=JSON.parse(kv.get('wb50_slopt')||'{}');$('slfx').checked=!!so.fx;$('sltx').checked=!!so.tx;if(so.px)$('slpx').value=so.px;if(so.bg!=null)$('slbg').value=so.bg}catch(e){}['slfx','sltx','slpx','slbg'].forEach(id=>$(id).addEventListener('change',slOptSave));
 $('slpng').onclick=async()=>{const t=WBS.tiles[WBS.cur];if(!t)return;$('slpng').disabled=true;try{const c=await stampCanvas(t,+$('slpx').value||1024,$('slbg').value=='paper',{fx:$('slfx').checked,tx:$('sltx').checked});await slSavePng(await slBlob(c),$('slname').value.trim()||('Stamp '+(WBS.cur+1)))}catch(e){slMsg((e&&e.message)||'Could not export that stamp.')}$('slpng').disabled=false};
 $('slsave').onclick=async()=>{const t=WBS.tiles[WBS.cur];if(!t)return;const b=$('slsave');b.disabled=true;slMsg('Saving…');
 try{const G=geom(shOf(t)),c=await stampCanvas(t,1400,false),w=c.toDataURL('image/webp',.9),img=w.startsWith('data:image/webp')?w:c.toDataURL('image/png'),used=new Set(),cm={};t.items.forEach(q=>used.add(q.m));used.forEach(k=>{if(cust[k])cm[k]=cust[k]});

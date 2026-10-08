@@ -9,7 +9,7 @@ const ROOT = path.resolve(__dirname, '..');
 const out = path.resolve(process.argv[2] || path.join(ROOT, 'dist', 'wodblok.html'));
 const dir = path.join(ROOT, 'src', 'modules');
 const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
-const IMPORT = /^import \{[A-Za-z0-9_$,]*\} from '\.\/[^']+';\n/gm;
+const IMPORT = /^import \{[A-Za-z0-9_$,]*\} from '\.{1,2}\/[^']+';\n/gm;
 const EXPORT = /^export \{[A-Za-z0-9_$,]*\};\n/gm;
 const strip = (name, t) => {
   if (!t.endsWith('\n')) throw new Error(name + ' must end with a newline');
@@ -17,7 +17,10 @@ const strip = (name, t) => {
   if (/^(import|export)\b/m.test(r)) throw new Error(name + ' has an import/export the bundler does not understand');
   return r;
 };
-const parts = manifest.map(f => strip(f, fs.readFileSync(path.join(dir, f), 'utf8')));
+const platDir = path.join(ROOT, 'src', 'platform');
+const plat = fs.readdirSync(platDir).filter(f => f.endsWith('.js')).sort();
+const parts = plat.map(f => strip('platform/' + f, fs.readFileSync(path.join(platDir, f), 'utf8')));
+parts.push(...manifest.map(f => strip(f, fs.readFileSync(path.join(dir, f), 'utf8'))));
 parts.push(strip('main.js', fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8')));
 const body = "(function(){'use strict';\n" + parts.join('') + '})();';
 const shell = fs.readFileSync(path.join(ROOT, 'src', 'shell.html'), 'utf8');

@@ -1,3 +1,4 @@
+import {kv} from '../platform/index.js';
 import {$,WBH,WBS} from './01-launch-and-version.js';
 import {CH,CM,CW,OFFS,ORN,PCOL,SH,SW,col,fixC,geom,shOf,shp,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {cols,inkOf,mk,mkL} from './06-motif-library-folders.js';
@@ -10,7 +11,7 @@ import {paintGhost,renderML,sync} from './13-preview-and-stamp-tool.js';
 import {isOf} from './16-texture-generators.js';
 import {buildTex,inkCatch,surfFor,texNorm} from './17-texture-panel-and-previews.js';
  // the Stamp texture / Canvas texture view switches: one setting shared by the Pattern view and the Stamp editor
-let grid={on:false,n:6,sp:'c',sd:false,sh:'rect'};const saveGrid=()=>{try{localStorage.setItem('wb33_grid',JSON.stringify(grid))}catch(e){}};
+let grid={on:false,n:6,sp:'c',sd:false,sh:'rect'};const saveGrid=()=>{try{kv.set('wb33_grid',JSON.stringify(grid))}catch(e){}};
 const gDim=()=>{const n=Math.max(1,Math.min(24,Math.round(grid.n)));return[n,Math.max(1,Math.round(n*SH/SW))]};
 function snapPt(x,y){if(grid.sh&&grid.sh!='rect'){const M=gModel(grid.sh,SW,SH,gDim()[0],true),[ux,uy]=wrapP(x,y),b=gNear((grid.sp!='l'?M.cents:[]).concat(grid.sp!='c'?M.verts:[]),ux,uy,SW,SH,true);if(b)return wrapP(b[0],b[1])}
 const[n,m]=gDim(),cw=SW/n,ch=SH/m,[wx,wy]=wrapP(x,y);const cands=[];
@@ -74,7 +75,7 @@ diamond:[['d-harl','Harlequin','diamond','rows'],['d-cols','Columns','diamond','
 tri:[['t-ud','Up and down','tri','check'],['t-rows','Rows','tri','rows'],['t-cols','Columns','tri','cols'],['t-diag','Diagonal stripes','tri','diag'],['t-rand','Random','tri','rand']]};
 function init09(){WBH.draw=draw;
 // ---- Stamp editor grid: N cells across, rows chosen so cells stay near-square and always whole.
-WBS.edMk=true;WBS.edInk=true;WBS.edTx=true;try{const g=JSON.parse(localStorage.getItem('wb33_grid')||'null');if(g)grid={...grid,...g}}catch(e){}
+WBS.edMk=true;WBS.edInk=true;WBS.edTx=true;try{const g=JSON.parse(kv.get('wb33_grid')||'null');if(g)grid={...grid,...g}}catch(e){}
 grid.sh=gShOk(grid.sh);
 ORN.forEach(k=>ARR[k]=ARR.circle);
 }

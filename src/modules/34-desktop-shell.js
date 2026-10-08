@@ -1,3 +1,4 @@
+import {kv} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {DRT,NODRAFT,drOff} from './02-draft-mode-speedups.js';
 import {CASP,CH,CSN,CW,SH,SHN,SW,bk,closeDD,csk,placeFloat,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
@@ -20,7 +21,7 @@ import {clearAll} from './33-clear.js';
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
 const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colors',stamp:'Stamp',motifs:'Motifs',layers:'Arrangement',cover:'Book cover'};
-let view='pattern',panel='canvas',z=0,fitS=1;try{panel=localStorage.getItem('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
+let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
@@ -31,12 +32,12 @@ let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=m=>m=='pattern'?{dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]}:{dock:[wsG(['motifs']),wsG(['stamp','colors','grade','tex','rand'])],float:[wsG(['mlist'],{x:null,y:null,w:230,h:440}),wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}),wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'})]};
 let WS={pattern:wsDef('pattern'),stamp:wsDef('stamp')};
-try{const sv=JSON.parse(localStorage.getItem('wb30_ws')||'null');if(sv)['pattern','stamp'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}});if(sv&&!sv.pv&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('preview')))WS.stamp.float.push(wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}));if(sv&&!sv.gr&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('grid')))WS.stamp.float.push(wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'}))}catch(e){}
-try{const sv0=JSON.parse(localStorage.getItem('wb30_ws')||'null');if(sv0&&!sv0.ly&&!WS.pattern.dock.concat(WS.pattern.float).some(g=>g.tabs.includes('lyrs')))WS.pattern.dock.unshift(wsG(['lyrs'],{f:.85}))}catch(e){}
-try{const sv1=JSON.parse(localStorage.getItem('wb30_ws')||'null');if(sv1&&!sv1.rs&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('rand'))){const g=WS.stamp.dock.find(g=>g.tabs.includes('grade'))||WS.stamp.dock[0];if(g)g.tabs.push('rand');else WS.stamp.dock.push(wsG(['rand']))}}catch(e){}
-try{const sv2=JSON.parse(localStorage.getItem('wb30_ws')||'null');if(sv2&&!sv2.tx)['pattern','stamp'].forEach(m=>{if(!WS[m].dock.concat(WS[m].float).some(g=>g.tabs.includes('tex'))){const g=WS[m].dock.find(g=>g.tabs.includes('grade'))||WS[m].dock[0];if(g)g.tabs.push('tex');else WS[m].dock.push(wsG(['tex']))}})}catch(e){}
+try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern','stamp'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}});if(sv&&!sv.pv&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('preview')))WS.stamp.float.push(wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}));if(sv&&!sv.gr&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('grid')))WS.stamp.float.push(wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'}))}catch(e){}
+try{const sv0=JSON.parse(kv.get('wb30_ws')||'null');if(sv0&&!sv0.ly&&!WS.pattern.dock.concat(WS.pattern.float).some(g=>g.tabs.includes('lyrs')))WS.pattern.dock.unshift(wsG(['lyrs'],{f:.85}))}catch(e){}
+try{const sv1=JSON.parse(kv.get('wb30_ws')||'null');if(sv1&&!sv1.rs&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('rand'))){const g=WS.stamp.dock.find(g=>g.tabs.includes('grade'))||WS.stamp.dock[0];if(g)g.tabs.push('rand');else WS.stamp.dock.push(wsG(['rand']))}}catch(e){}
+try{const sv2=JSON.parse(kv.get('wb30_ws')||'null');if(sv2&&!sv2.tx)['pattern','stamp'].forEach(m=>{if(!WS[m].dock.concat(WS[m].float).some(g=>g.tabs.includes('tex'))){const g=WS[m].dock.find(g=>g.tabs.includes('grade'))||WS[m].dock[0];if(g)g.tabs.push('tex');else WS[m].dock.push(wsG(['tex']))}})}catch(e){}
 WS.pv=1;WS.gr=1;WS.ly=1;WS.rs=1;WS.tx=1;
-const wsSave=()=>{try{localStorage.setItem('wb30_ws',JSON.stringify(WS))}catch(e){}};
+const wsSave=()=>{try{kv.set('wb30_ws',JSON.stringify(WS))}catch(e){}};
 const wsL=()=>WS[view]||WS.pattern;
 const wsAll=()=>[...wsL().dock,...wsL().float];
 const wsFind=p=>wsAll().find(g=>g.tabs.includes(p))||null;
@@ -156,7 +157,7 @@ function setView(v){const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimati
 $('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display=v=='pattern'?'':'none';$('gtb').style.display=v=='stamp'?'':'none';$('itb').style.display='';if(v=='pattern')requestAnimationFrame(applyZ);tbSync();if(was!=v||!wsReady)wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
 const L=wsL();let g=wsFind(p);if(!g&&p=='rand'){g=wsG([p],{x:null,y:null,w:272,h:620,pos:'r'});L.float.push(g)}
-if(!g){g=L.dock[0];if(g)g.tabs.push(p);else{g=wsG([p]);L.dock.push(g)}}g.a=p;g.col=false;panel=p;try{localStorage.setItem('wb24_panel',p)}catch(e){}
+if(!g){g=L.dock[0];if(g)g.tabs.push(p);else{g=wsG([p]);L.dock.push(g)}}g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
 $('rcls').onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length)return;L.dock=[];L.float=[];wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')};
@@ -175,8 +176,8 @@ const st=document.createElement('style');st.textContent='.stage.pv #sel{display:
 
 // ===== Randomize panel: which main features a roll may change. Anything switched off stays exactly as it is. Settings are remembered.
 (()=>{const sec=document.querySelector('section.pn[data-p="rand"]'),fts=[...sec.querySelectorAll('[data-ft]')],subs=[...sec.querySelectorAll('[data-sub]')],KEY='wb38_rzft',SKEY='wb50_rzsub',by=k=>fts.find(c=>c.dataset.ft==k),sk=m=>subs.filter(c=>c.dataset.sub.startsWith(m+'.'));
-try{const z=JSON.parse(localStorage.getItem(KEY)||'null');if(z)fts.forEach(c=>{if(c.dataset.ft in z)c.checked=!!z[c.dataset.ft]})}catch(e){}
-try{const z=JSON.parse(localStorage.getItem(SKEY)||'null');if(z)subs.forEach(c=>{if(c.dataset.sub in z)c.checked=!!z[c.dataset.sub]})}catch(e){}
+try{const z=JSON.parse(kv.get(KEY)||'null');if(z)fts.forEach(c=>{if(c.dataset.ft in z)c.checked=!!z[c.dataset.ft]})}catch(e){}
+try{const z=JSON.parse(kv.get(SKEY)||'null');if(z)subs.forEach(c=>{if(c.dataset.sub in z)c.checked=!!z[c.dataset.sub]})}catch(e){}
 // a switch counts as on only if something under it is ticked (Stamps also counts Lettering)
 const eff=c=>{const k=c.dataset.ft,ss=sk(k);if(!c.checked)return false;if(!ss.length)return true;return ss.some(x=>x.checked)||(k=='stamps'&&by('text').checked)};
 const get=()=>{const o={};fts.forEach(c=>o[c.dataset.ft]=eff(c));return o};
@@ -185,7 +186,7 @@ const sync=()=>{const st=by('stamps').checked,t=by('text');t.disabled=!st;t.clos
 sec.querySelectorAll('.rzx').forEach(b=>{const m=b.dataset.rzx,ss=sk(m),n=ss.filter(c=>c.checked).length,all=n==ss.length;b.querySelector('.rzn').textContent=all?'All':n+'/'+ss.length;b.classList.toggle('part',!all);const box=sec.querySelector('[data-rzs="'+m+'"]');if(box)box.classList.toggle('off',!by(m).checked)});
 const any=fts.some(c=>eff(c)&&!c.disabled),b=$('rzdo');if(b)b.disabled=!any;
 const h=$('rzhint');if(h)h.textContent=any?'Only what is switched on changes. Everything else stays exactly as it is. Use the arrows to choose which kinds of change are allowed. The canvas stays the same size and shape unless Canvas shape or Canvas size is on, and the book cover is always kept.':'Nothing is switched on, so Randomize has nothing to change.'};
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(Object.fromEntries(fts.map(c=>[c.dataset.ft,c.checked]))));localStorage.setItem(SKEY,JSON.stringify(Object.fromEntries(subs.map(c=>[c.dataset.sub,c.checked]))))}catch(e){}sync()};
+const save=()=>{try{kv.set(KEY,JSON.stringify(Object.fromEntries(fts.map(c=>[c.dataset.ft,c.checked]))));kv.set(SKEY,JSON.stringify(Object.fromEntries(subs.map(c=>[c.dataset.sub,c.checked]))))}catch(e){}sync()};
 sec.addEventListener('change',save);
 sec.addEventListener('click',e=>{const x=e.target.closest('[data-rzx]');if(x){const m=x.dataset.rzx,box=sec.querySelector('[data-rzs="'+m+'"]'),open=box.hidden;box.hidden=!open;x.setAttribute('aria-expanded',open?'true':'false');return}
 const a=e.target.closest('[data-rzall],[data-rzno]');if(a){const m=a.dataset.rzall||a.dataset.rzno,on=!!a.dataset.rzall;sk(m).forEach(c=>c.checked=on);save()}});
@@ -254,7 +255,7 @@ function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK
 function cap(){if(drag||WBX.wbNoCap)return;const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;hist.push(s);histL.push(hLabel(prev,s));histT.push(Date.now());if(hist.length>120){hist.shift();histL.shift();histT.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
 function applyCore(c){WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
-WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
+WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
 store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
 function undo(){cap();if(hi>0){hi--;applyCore(JSON.parse(hist[hi]))}ub()}
 function redo(){if(hi<hist.length-1){hi++;applyCore(JSON.parse(hist[hi]))}ub()}
@@ -264,9 +265,9 @@ WBX.wbHistGet=i=>hist[i];WBX.wbResetHist=()=>{if(WBX.wbBA)wbBA.reset();hist=[cor
 (()=>{const sec=document.querySelector('section.pn[data-p="hist"]'),hl=$('hhl'),sl=$('hsl'),XI=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 let snaps=[],sk='',raf=0,ren=-1;
 const key=()=>'wb95_sn_'+(WBS.cp&&WBS.cp.id?WBS.cp.id:'draft');
-const persist=()=>{try{localStorage.setItem(sk,JSON.stringify(snaps))}catch(e){pmsg('This snapshot is kept for now, but is too large to keep after you close the page.')}};
-function load(){const k=key();try{if(WBS.cp&&WBS.cp.id){const d=localStorage.getItem('wb95_sn_draft');if(d&&!localStorage.getItem(k)&&sk=='wb95_sn_draft'){localStorage.setItem(k,d);localStorage.removeItem('wb95_sn_draft')}}}catch(e){}
-if(k!=sk||!snaps){sk=k;try{snaps=JSON.parse(localStorage.getItem(k)||'[]')}catch(e){snaps=[]}if(!Array.isArray(snaps))snaps=[]}paint()}
+const persist=()=>{try{kv.set(sk,JSON.stringify(snaps))}catch(e){pmsg('This snapshot is kept for now, but is too large to keep after you close the page.')}};
+function load(){const k=key();try{if(WBS.cp&&WBS.cp.id){const d=kv.get('wb95_sn_draft');if(d&&!kv.get(k)&&sk=='wb95_sn_draft'){kv.set(k,d);kv.remove('wb95_sn_draft')}}}catch(e){}
+if(k!=sk||!snaps){sk=k;try{snaps=JSON.parse(kv.get(k)||'[]')}catch(e){snaps=[]}if(!Array.isArray(snaps))snaps=[]}paint()}
 const ago=t=>{const d=(Date.now()-t)/1000;return d<45?'now':d<3600?Math.round(d/60)+' min':d<86400?Math.round(d/3600)+' h':Math.round(d/86400)+' d'};
 const esc2=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function paint(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(sec.hidden)return;const k=key();if(k!=sk){load();return}
@@ -288,7 +289,7 @@ WBX.wbBAPaint=()=>{const m=wbBA.mode;$('bab').setAttribute('aria-pressed',String
  if(sec.hidden)return;const c=wbBA.core;hl.querySelectorAll('[data-h]').forEach(r=>{const i=+r.dataset.h;r.classList.toggle('ra',c!=null&&hist[i]===c);r.classList.toggle('rb',i==hi)});sl.querySelectorAll('[data-sn]').forEach(r=>{const n=snaps[+r.dataset.sn];r.classList.toggle('ra',!!n&&n.s===c)})};
 $('barst').onclick=()=>wbBA.clearRef();
 $('bab').onclick=()=>{$('bab').blur();wbBA.toggle()};$('bas').onclick=()=>{$('bas').blur();wbBA.split()};
-sk=key();try{snaps=JSON.parse(localStorage.getItem(sk)||'[]')}catch(e){snaps=[]}
+sk=key();try{snaps=JSON.parse(kv.get(sk)||'[]')}catch(e){snaps=[]}
 setInterval(()=>{if(!sec.hidden)paint()},30000)})();
 
 
@@ -335,8 +336,8 @@ $('gtm').onclick=()=>{WBS.edMk=!WBS.edMk;$('gtm').classList.toggle('on',WBS.edMk
 document.addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input,select,textarea'))return;if(!e.metaKey&&!e.ctrlKey&&e.key.toLowerCase()=='g'){grid.on=!grid.on;saveGrid();upd()}});
 const _draw2=WBH.draw;WBH.draw=function(){_draw2();syncGrid()};
 // ---- randomize motifs on the current stamp
-try{const z=JSON.parse(localStorage.getItem('wb36_rz')||'null');if(z){$('rzp').value=z.p;$('rzr').value=z.r;$('rzs').value=z.s}}catch(e){}
-['rzp','rzr','rzs'].forEach(id=>$(id).addEventListener('input',()=>{try{localStorage.setItem('wb36_rz',JSON.stringify({p:+$('rzp').value,r:+$('rzr').value,s:+$('rzs').value}))}catch(e){}}));
+try{const z=JSON.parse(kv.get('wb36_rz')||'null');if(z){$('rzp').value=z.p;$('rzr').value=z.r;$('rzs').value=z.s}}catch(e){}
+['rzp','rzr','rzs'].forEach(id=>$(id).addEventListener('input',()=>{try{kv.set('wb36_rz',JSON.stringify({p:+$('rzp').value,r:+$('rzr').value,s:+$('rzs').value}))}catch(e){}}));
 $('rzgo').onclick=()=>{const qs=QS();if(!qs.length){$('pmsg').textContent='Select some motifs first.';return}if(WBX.wbCap)WBX.wbCap();
 const P=+$('rzp').value/100*Math.min(SW,SH)*.25,R=+$('rzr').value,S=+$('rzs').value/100,rnd=()=>Math.random()*2-1;
 qs.forEach(q=>{if(P){const a=Math.random()*Math.PI*2,d=Math.sqrt(Math.random())*P;[q.x,q.y]=wrapP(q.x+Math.cos(a)*d,q.y+Math.sin(a)*d)}
@@ -431,7 +432,7 @@ r.oninput=()=>{const L=LY();L.size=L.fit?+fitTs(L,+r.value).toFixed(3):+r.value;
 tipRows();WS.stamp={dock:[],float:[]};WS.pattern={dock:[],float:[]};setView('pattern');info();nums();requestAnimationFrame(()=>{applyZ();nums()});
 
 {const sp=document.getElementById('splash'),t0=performance.now();if(sp){const go=()=>{const w=Math.max(0,520-(performance.now()-t0));setTimeout(()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),320)},w)};const f=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1400))]):Promise.resolve();requestAnimationFrame(()=>requestAnimationFrame(()=>f.then(go)))}}
-{const b=$('gdt');let on=true;try{on=localStorage.getItem('wb93_dots')!=='0'}catch(e){}const ap=()=>{document.body.classList.toggle('plain',!on);b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))};ap();b.onclick=()=>{on=!on;try{localStorage.setItem('wb93_dots',on?'1':'0')}catch(e){}ap()}}
+{const b=$('gdt');let on=true;try{on=kv.get('wb93_dots')!=='0'}catch(e){}const ap=()=>{document.body.classList.toggle('plain',!on);b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))};ap();b.onclick=()=>{on=!on;try{kv.set('wb93_dots',on?'1':'0')}catch(e){}ap()}}
 clearAll(true);WBS.cp={id:null,name:'',saved:coreStr()};saveCp();$('pnm').value='';paintPst();$('pmsg').textContent='';
 // warn before leaving if there's unsaved work (a fresh blank stamp doesn't count)
 {const blank=coreStr();addEventListener('beforeunload',e=>{if(WBS.cp.id?dirty():coreStr()!==blank){e.preventDefault();e.returnValue=''}})}

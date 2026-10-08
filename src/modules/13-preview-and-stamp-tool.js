@@ -1,3 +1,4 @@
+import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CASP,CH,CW,DD,HO,N,ORN,PL,SHN,SK,col,csN,csk,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {DOTK} from './05-motif-data.js';
@@ -50,19 +51,19 @@ let i=PL.findIndex(p=>p[1]==WBS.proj.ink&&p[2]==WBS.proj.bg);if(i<0)i=PL.findInd
 $('stI').value=t.ink||'';$('ssI').style.background=inkOf(t);$('neg').checked=!!t.neg;
 sv('lay',L.lay);sv('lgr',L.grid||'');const T=lattice(L),B=T.B,lk=T.linked;{const op=arrOpts(T.g),ky=T.g.SK+op.length;if($('larr').dataset.k!=ky){$('larr').innerHTML=op.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');$('larr').dataset.k=ky}sv('larr',arrOf(L,T.g).k)}sv('lgp',B.gap||0);sv('ts',B.fit?+fitTs(B).toFixed(1):B.size);document.querySelectorAll('#tsfit [data-f]').forEach(b=>{b.classList.toggle('on',b.dataset.f==(B.fit||''));b.disabled=lk});[['lox',!lk&&L.fit=='h'],['loy',!lk&&L.fit=='v'],['lrt',lk||!!L.fit],['lgp',lk],['ts',lk]].forEach(([id,off])=>{$(id).disabled=off;const n=$(id).parentNode.querySelector('.num input');if(n)n.disabled=off});sv('lox',L.ox);sv('loy',L.oy);sv('lrr',L.rrot||0);sv('lrp',L.rpos||0);$('lrsec').hidden=!!L.art;$('lrtn').checked=!!L.rtn;$('lrfh').checked=!!L.rfh;$('lrfv').checked=!!L.rfv;sv('lrt',B.rot||0);syncGrid(L,T);sv('shz',shOf(t).z||100);{const rr=$('shrad');if(rr){sv('shrad',shOf(t).rad||0);const row=rr.closest('.ctl');if(row)row.hidden=SK=='circle'}}sv('lps',L.pst||0);sv('lfs',L.pfl||0);sv('lnm',L.name);$('man').checked=!!L.man;{const c=Object.keys(L.ov||{}).length;$('mancnt').textContent=c?c+' changed':'';$('manr').disabled=!c}$('art').classList.toggle('man',!!L.man);sv('let',eT(t));sv('ler',eR(t));$('lers').disabled=!eT(t)||!eR(t);
 Object.values(DD).forEach(f=>f())}
-function init13(){try{pvZ=+localStorage.getItem('wb31_pvz')||1}catch(e){}
-{let on=false;try{on=localStorage.getItem('wb31_pvc')=='1'}catch(e){}const setC=v=>{on=v;$('pvc').setAttribute('aria-pressed',v);$('pvcu').setAttribute('visibility',v?'visible':'hidden');try{localStorage.setItem('wb31_pvc',v?'1':'0')}catch(e){}};setC(on);$('pvc').onclick=()=>setC(!on)}
-$('pvz').onclick=e=>{const b=e.target.closest('[data-z]');if(!b)return;pvZ=+b.dataset.z;try{localStorage.setItem('wb31_pvz',pvZ)}catch(e){}pvView()};
+function init13(){try{pvZ=+kv.get('wb31_pvz')||1}catch(e){}
+{let on=false;try{on=kv.get('wb31_pvc')=='1'}catch(e){}const setC=v=>{on=v;$('pvc').setAttribute('aria-pressed',v);$('pvcu').setAttribute('visibility',v?'visible':'hidden');try{kv.set('wb31_pvc',v?'1':'0')}catch(e){}};setC(on);$('pvc').onclick=()=>setC(!on)}
+$('pvz').onclick=e=>{const b=e.target.closest('[data-z]');if(!b)return;pvZ=+b.dataset.z;try{kv.set('wb31_pvz',pvZ)}catch(e){}pvView()};
 // ---- Stamp tool: pick a motif in the library, then click on the stamp to stamp it. Scroll resizes, [ ] rotates, Esc or right-click stops.
 WBS.brush=null;WBS.gp=null;
 ed.addEventListener('pointerleave',()=>{WBS.gp=null;paintGhost()});
 document.addEventListener('contextmenu',e=>{if(WBS.brush){e.preventDefault();WBS.brush=null;upd();return}
 if(typeof WBS.fpB!='undefined'&&(WBS.fpB||WBS.txArm||WBS.fpSel!==-1)&&fpL()){e.preventDefault();WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}e.preventDefault()},true);
 ed.addEventListener('wheel',e=>{if(!WBS.brush||e.ctrlKey||e.metaKey)return;e.preventDefault();WBS.brush.s=Math.min(2.6,Math.max(.08,WBS.brush.s*(e.deltaY<0?1.08:1/1.08)));paintGhost()},{passive:false});
-mlFold=new Set();try{mlFold=new Set(JSON.parse(localStorage.getItem('wb18_mlfold')||'[]'))}catch(e){}
+mlFold=new Set();try{mlFold=new Set(JSON.parse(kv.get('wb18_mlfold')||'[]'))}catch(e){}
 $('mlist').onmousedown=e=>{if(e.shiftKey&&e.target.closest('.mr'))e.preventDefault()};
 $('mlist').onclick=e=>{const ML=$('mlist'),C=q=>{const x=e.target.closest(q);return x&&ML.contains(x)?x:null},t=WBS.tiles[WBS.cur],add=e.shiftKey||e.ctrlKey||e.metaKey,rng=e.shiftKey,ofName=nm=>t.items.map((q,i)=>(q.tg?'txt:'+q.tg:mName(q.m))==nm?i:-1).filter(i=>i>=0);
-const f=C('[data-f]');if(f){const nm=f.dataset.f;mlFold.has(nm)?mlFold.delete(nm):mlFold.add(nm);try{localStorage.setItem('wb18_mlfold',JSON.stringify([...mlFold]))}catch(er){}renderML();return}
+const f=C('[data-f]');if(f){const nm=f.dataset.f;mlFold.has(nm)?mlFold.delete(nm):mlFold.add(nm);try{kv.set('wb18_mlfold',JSON.stringify([...mlFold]))}catch(er){}renderML();return}
 const gx=C('[data-gx]');if(gx){if(!gx.dataset.sure){gx.dataset.sure=1;gx.textContent='?';gx.title='Click again to delete them all';setTimeout(()=>{if(gx.isConnected){delete gx.dataset.sure;gx.innerHTML='&#215;'}},2500);return}delItems(ofName(gx.dataset.gx));store();upd();return}
 const x=C('[data-rx]');if(x){delItems([+x.dataset.rx]);store();upd();return}
 const g=C('[data-g]');if(g){selSet(ofName(g.dataset.g),add);upd();return}

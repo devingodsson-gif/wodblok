@@ -1,6 +1,7 @@
+import {kv,use} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {C,CC,CH,CM,CSN,CW,PCOL,SHN,bk,fixC,paintColors,saveCC,setDim,shOf} from './04-canvas-and-stamp-outlines.js';
-import {DEF_TILES,clean,cust,mkL,selOne,store,use} from './06-motif-library-folders.js';
+import {DEF_TILES,clean,cust,mkL,selOne,store} from './06-motif-library-folders.js';
 import {gShOk} from './08-grid-shapes.js';
 import {migLayers} from './10-layer-grids.js';
 import {migEdges,upd} from './11-pressure-flooding-block-edges.js';
@@ -28,7 +29,7 @@ let cov={img:'',iw:0,ih:0,sc:100};
 const okImg=u=>typeof u=='string'&&/^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(u);
 const slotC=()=>WBS.cslot=='b'?covB:WBS.cslot=='s'?covS:cov,setSlotC=o=>{if(WBS.cslot=='b')covB=o;else if(WBS.cslot=='s')covS=o;else cov=o};
 function covOrder(){const on=cov.tx!==false,a=$('art');if(on)a.insertBefore($('covg'),$('texg'));else a.appendChild($('covg'));const pv=$('pvw'),tu=pv.querySelector('use[href="#texg"]');if(on)pv.insertBefore($('pvcu'),tu);else pv.appendChild($('pvcu'));$('covtx').checked=on;a.appendChild($('guig'))}
-const saveCov=()=>{try{localStorage.setItem('wb40_coverB',JSON.stringify(covB));localStorage.setItem('wb40_coverS',JSON.stringify(covS))}catch(e){}try{localStorage.setItem('wb31_cover',JSON.stringify({...cov,on:$('cov').checked}))}catch(e){$('cvmsg').textContent='This image is too large to keep in the browser; it will stay until you reload. Saving the project keeps it.'}};
+const saveCov=()=>{try{kv.set('wb40_coverB',JSON.stringify(covB));kv.set('wb40_coverS',JSON.stringify(covS))}catch(e){}try{kv.set('wb31_cover',JSON.stringify({...cov,on:$('cov').checked}))}catch(e){$('cvmsg').textContent='This image is too large to keep in the browser; it will stay until you reload. Saving the project keeps it.'}};
 function renderCover(){const on=$('cov').checked,k=[on,CW,CH,WBS.book.on?JSON.stringify(WBS.book):'',...[cov,covB,covS].map(c=>[c.sc,c.img.length,c.img.slice(-24)].join(','))].join('|');if(k==WBS.covKey)return;WBS.covKey=k;let h='';
 const put=(c,x,y,w,hh)=>{if(!c.img||!c.iw)return'';const f=Math.min(w/c.iw,hh/c.ih)*c.sc/100,iw=c.iw*f,ih=c.ih*f;return`<image href="${c.img}" x="${(x+(w-iw)/2).toFixed(1)}" y="${(y+(hh-ih)/2).toFixed(1)}" width="${iw.toFixed(1)}" height="${ih.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`};
 if(on){if(WBS.book.on){const g=bk(),u=CW/g.W,y=g.b*u,hh=g.th*u;h=put(covB,g.b*u,y,g.tw*u,hh)+put(covS,(g.b+g.tw)*u,y,g.sw*u,hh)+put(cov,(g.b+g.tw+g.sw)*u,y,g.tw*u,hh)}else h=put(cov,0,0,CW,CH)}
@@ -57,12 +58,12 @@ WBS.ARTS=artLoad(d.arts);const L=d.lib||{};Object.entries(L.motifs||{}).forEach(
 WBS.tiles=JSON.parse(JSON.stringify(d.tiles));WBS.layers=JSON.parse(JSON.stringify(d.layers));
 WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(id=>WBS.tiles.some(t=>t.id==id));if(L.lay=='brick'){L.lay='cols';if(!L.grid)L.grid='brick'}});if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];
 WBS.proj=d.proj&&d.proj.ink&&d.proj.bg?{...d.proj,ink:fixC(d.proj.ink,PCOL.ink),bg:fixC(d.proj.bg,PCOL.bg)}:{...PCOL};
-if(d.cover&&d.cover.book&&typeof d.cover.book=='object')WBS.book={...WBS.book,...d.cover.book};else WBS.book={...WBS.book,on:false};try{localStorage.setItem('wb40_book',JSON.stringify(WBS.book))}catch(e){}
+if(d.cover&&d.cover.book&&typeof d.cover.book=='object')WBS.book={...WBS.book,...d.cover.book};else WBS.book={...WBS.book,on:false};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}
 WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,3]};WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pgrid=pgFix(d.pg,WBS.layers);
 WBS.pr={...PDEF.pr,...(d.pr||{})};WBS.tex={...PDEF.tex,...(d.tex||{})};WBS.texLib=txClean(d.texLib);texNorm();if(WBX.wbGrade)WBX.wbGrade.set(d.grade||null);{const c2=d.cover||{};cov={img:okImg(c2.img)?c2.img:'',iw:+c2.iw||0,ih:+c2.ih||0,sc:+c2.sc||100,tx:c2.tx!==false};if(!cov.iw||!cov.ih)cov.img='';const sl=o=>o&&okImg(o.img)&&+o.iw&&+o.ih?{img:o.img,iw:+o.iw,ih:+o.ih,sc:+o.sc||100}:blank();covB=sl(c2.back);covS=sl(c2.spine);WBS.cslot='f';$('cov').checked=c2.on!==false;saveCov();WBS.covKey='';if(WBX.wbBookSync)WBX.wbBookSync()}
 migEdges();migInk();WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));WBS.cur=0;selOne(-1);WBS.selL=WBS.layers.length-1;WBS.symKey='';$('sasp').dataset.custom='';$('casp').dataset.custom='';
-try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
-const saveCp=()=>{try{localStorage.setItem('wb18_cur',JSON.stringify(WBS.cp))}catch(e){}};
+try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
+const saveCp=()=>{try{kv.set('wb18_cur',JSON.stringify(WBS.cp))}catch(e){}};
 const pmsg=t=>$('pmsg').textContent=t;
 const dirty=()=>!WBS.cp.id||coreStr()!==WBS.cp.saved||($('pnm').value.trim()||'Untitled pattern')!==WBS.cp.name;
 function paintPst(){const d=dirty(),u=!WBS.cp.id||d,e=$('pst');e.textContent='';e.className=u?'dirty':'';e.title=u?(!WBS.cp.id?'Not saved yet':'Unsaved changes'):'';if(u)e.setAttribute('role','img'),e.setAttribute('aria-label',e.title);else e.removeAttribute('aria-label')}
@@ -71,8 +72,8 @@ const shapeInfo=d=>{const k=d.dim&&d.dim.k||'rect',c=d.dim&&d.dim.c||[2,3];retur
 // storage backend
 const ST={kind:null,col:null,ready:null,
 init(){return this.ready||(this.ready=(async()=>{try{const db=await use('db'),u=db&&await use('user'),id=u&&await u.id();if(db&&id){this.col=db.collection('data/users/'+id+'/projects');this.kind='account';return}}catch(e){}this.kind='browser'})())},
-loc(){try{return JSON.parse(localStorage.getItem('wb18_projects')||'{}')}catch(e){return{}}},
-locSave(o){localStorage.setItem('wb18_projects',JSON.stringify(o))},
+loc(){try{return JSON.parse(kv.get('wb18_projects')||'{}')}catch(e){return{}}},
+locSave(o){kv.set('wb18_projects',JSON.stringify(o))},
 async list(){await this.init();if(this.kind=='account'){const r=await this.col.get();return r.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.updated||0)-(a.updated||0))}
 const o=this.loc();return Object.entries(o).map(([id,v])=>({id,...v})).sort((a,b)=>(b.updated||0)-(a.updated||0))},
 async get(id){await this.init();if(this.kind=='account'){const x=await this.col.doc(id).get();return x.exists?{id,...x.data()}:null}const v=this.loc()[id];return v?{id,...v}:null},
@@ -85,8 +86,8 @@ const confirm2=(btn,label,fn)=>{if(!dirty()||btn.dataset.sure){delete btn.datase
 function openData(d,id,name){applySnap(d);WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;saveCp();paintPst();if(WBX.wbResetHist)WBX.wbResetHist();artLive(true)}
 function init18(){WBS.pgrid={...PGD};
 covB=blank();covS=blank();WBS.cslot='f';
-try{const q=JSON.parse(localStorage.getItem('wb40_coverB')||'null');if(q&&typeof q.sc=='number')covB={...covB,...q}}catch(e){}
-try{const q=JSON.parse(localStorage.getItem('wb40_coverS')||'null');if(q&&typeof q.sc=='number')covS={...covS,...q}}catch(e){}try{const q=JSON.parse(localStorage.getItem('wb31_cover')||'null');if(q&&typeof q.sc=='number')cov={...cov,...q};if(q&&q.on===false)$('cov').checked=false}catch(e){}if(!okImg(cov.img))cov.img='';if(!okImg(covB.img))covB.img='';if(!okImg(covS.img))covS.img='';
+try{const q=JSON.parse(kv.get('wb40_coverB')||'null');if(q&&typeof q.sc=='number')covB={...covB,...q}}catch(e){}
+try{const q=JSON.parse(kv.get('wb40_coverS')||'null');if(q&&typeof q.sc=='number')covS={...covS,...q}}catch(e){}try{const q=JSON.parse(kv.get('wb31_cover')||'null');if(q&&typeof q.sc=='number')cov={...cov,...q};if(q&&q.on===false)$('cov').checked=false}catch(e){}if(!okImg(cov.img))cov.img='';if(!okImg(covB.img))covB.img='';if(!okImg(covS.img))covS.img='';
 $('covtx').onchange=()=>{cov.tx=$('covtx').checked;saveCov();covOrder()};
 WBS.covKey='';
 WBX.wbCoverFile=coverFile;
@@ -97,7 +98,7 @@ $('cvrm').onclick=()=>{setSlotC(WBS.cslot=='f'?{img:'',iw:0,ih:0,sc:100,tx:cov.t
 pz.addEventListener('paste',e=>{const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();e.stopPropagation();pz.innerHTML=PZ;pz.blur();coverFile(it.getAsFile())}else setTimeout(chk,60)});
 const chk=()=>{const im=pz.querySelector('img');if(im&&im.src){const i2=new Image();i2.onload=()=>setCoverImg(i2);i2.src=im.src;pz.innerHTML=PZ;pz.blur()}else if(pz.textContent.trim()&&pz.innerHTML!=PZ){pz.innerHTML='';$('cvmsg').textContent='That was text, not an image.'}};pz.addEventListener('input',()=>setTimeout(chk,30))}
 $('cov').addEventListener('input',()=>{saveCov();renderCover()});
-WBS.cp={id:null,name:'',saved:''};try{const q=JSON.parse(localStorage.getItem('wb18_cur')||'null');if(q)WBS.cp={...WBS.cp,...q}}catch(e){}
+WBS.cp={id:null,name:'',saved:''};try{const q=JSON.parse(kv.get('wb18_cur')||'null');if(q)WBS.cp={...WBS.cp,...q}}catch(e){}
 $('pnm').value=WBS.cp.name||'';setInterval(paintPst,800);paintPst();
 ST.init().then(()=>{$('pwhere').textContent=ST.kind=='account'?'Projects are saved privately to your Claude account, so they follow you across devices.':'Projects are saved in this browser only. Use Download to keep a copy you can open anywhere.'});
 $('psv').onclick=async()=>{const name=$('pnm').value.trim()||'Untitled pattern';$('psv').disabled=true;pmsg('Saving…');

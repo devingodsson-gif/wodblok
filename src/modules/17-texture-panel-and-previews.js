@@ -1,3 +1,4 @@
+import {kv} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,SH,SW,col} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
@@ -109,7 +110,7 @@ b+=`<feColorMatrix in="${cur}" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0
 
 return`<filter id="rf" filterUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}" color-interpolation-filters="sRGB">${b}</filter>`}
 function syncPr(){$('rgh').value=WBS.pr.e;$('psq').value=WBS.pr.q;if(WBX.wbTexReady)txRefresh()}
-const saveTex=()=>{try{localStorage.setItem('wb10_tex',JSON.stringify(WBS.tex))}catch(e){}};
+const saveTex=()=>{try{kv.set('wb10_tex',JSON.stringify(WBS.tex))}catch(e){}};
 function buildTex(){let o='';try{o=txImgs(txSpecs(WBS.tex&&WBS.tex.u,'relief'),CW,CH,900,'inline',txIsO)}catch(e){o=''}
 TEXK=txCvKey();$('texg').innerHTML=o?`<g pointer-events="none">${o}</g>`:'';if(typeof upd=='function'&&WBX.wbTexReady)upd()}
 // the mask used on the ink so it skips the worn spots of the canvas texture (inl: pictures inside the markup, for a stand-alone file)
@@ -127,7 +128,7 @@ WBH.syncPr();
 // ---- Print / Textures tabs ----
 // ---- Canvas texture. Its uses live in tex.u: relief / stain become pictures laid over the canvas, wear knocks ink out of every layer ----
 WBS.tex={};
-try{const q=JSON.parse(localStorage.getItem('wb10_tex')||'null');if(q&&typeof q=='object')WBS.tex=q}catch(e){}
+try{const q=JSON.parse(kv.get('wb10_tex')||'null');if(q&&typeof q=='object')WBS.tex=q}catch(e){}
 // library panel wiring
 $('tx_type').innerHTML=TXF.map(([g,o])=>`<optgroup label="${g}">${Object.entries(o).map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</optgroup>`).join('');
 $('tx_list').onclick=e=>{if(e.target.closest('[data-n]')){$('tx_add').click();return}const r=e.target.closest('.mr');if(!r)return;const id=r.dataset.x;if(e.target.closest('[data-d]')){txDelete(id);return}WBS.txSel=id;txRefresh(true)};
