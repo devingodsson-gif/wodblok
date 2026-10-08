@@ -139,7 +139,7 @@ function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?vie
 const L=wsL();let g=wsFind(p);if(!g&&p=='rand'){g=wsG([p],{x:null,y:null,w:272,h:620,pos:'r'});L.float.push(g)}
 if(!g){g=L.dock[0];if(g)g.tabs.push(p);else{g=wsG([p]);L.dock.push(g)}}g.a=p;g.col=false;panel=p;try{localStorage.setItem('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
-window.wbOpenPanel=setPanel;
+WBX.wbOpenPanel=setPanel;
 $('rcls').onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length)return;L.dock=[];L.float=[];wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')};
 document.querySelector('.rail').onclick=e=>{const b=e.target.closest('[data-pn]');if(!b)return;const p=b.dataset.pn,g=wsFind(p);
 // double-clicking the Randomize tool rolls a new piece, the same as pressing the Randomize button in its window (the window is left open)
@@ -171,14 +171,14 @@ sec.addEventListener('change',save);
 sec.addEventListener('click',e=>{const x=e.target.closest('[data-rzx]');if(x){const m=x.dataset.rzx,box=sec.querySelector('[data-rzs="'+m+'"]'),open=box.hidden;box.hidden=!open;x.setAttribute('aria-expanded',open?'true':'false');return}
 const a=e.target.closest('[data-rzall],[data-rzno]');if(a){const m=a.dataset.rzall||a.dataset.rzno,on=!!a.dataset.rzall;sk(m).forEach(c=>c.checked=on);save()}});
 $('rzall').onclick=()=>{fts.forEach(c=>c.checked=true);subs.forEach(c=>c.checked=true);save()};$('rznone').onclick=()=>{fts.forEach(c=>c.checked=false);save()};
-sync();window.wbRZ={get,sub};
+sync();WBX.wbRZ={get,sub};
 $('rzdo').onclick=()=>randomize(false);
 })();
 
 // ---- zoom
 function fitZ(){const b=$('boardP');if(b.classList.contains('off'))return;const w=b.clientWidth-64,h=b.clientHeight-64;fitS=Math.max(.05,Math.min(w/CW,h/CH))}
 function applyZ(){fitZ();const s=z||fitS;$('art').style.width=Math.round(CW*s)+'px';$('art').style.height=Math.round(CH*s)+'px';$('artsh').style.width=$('art').style.width;$('artsh').style.height=$('art').style.height;$('zl').textContent=Math.round(s*100)+'%';$('zl').title=z?'Fit to screen':'Fitted to screen';if(window.bkZ)bkZ()}
-window.wbApplyZ=applyZ;window.wbZoomIn=()=>view=='pattern'&&!!z&&z>fitS*1.001;
+WBX.wbApplyZ=applyZ;WBX.wbZoomIn=()=>view=='pattern'&&!!z&&z>fitS*1.001;
 $('zi').onclick=()=>{z=Math.min(8,(z||fitS)*1.25);applyZ()};$('zo').onclick=()=>{z=Math.max(.1,(z||fitS)/1.25);applyZ()};$('zl').onclick=()=>{z=0;applyZ()};
 $('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();z=Math.min(8,Math.max(.1,(z||fitS)*(e.deltaY<0?1.1:1/1.1)));applyZ()},{passive:false});
 try{new ResizeObserver(()=>{if(view=='pattern')applyZ()}).observe($('boardP'))}catch(e){window.addEventListener('resize',applyZ)}
@@ -214,7 +214,7 @@ new MutationObserver(()=>{$('pwhere2').textContent=$('pwhere').textContent}).obs
 
 // ---- menus
 const menus=[['fileb','filem'],['expb','expm']];
-const closeMenus=()=>menus.forEach(([b,m])=>{$(m).hidden=true;$(b).setAttribute('aria-expanded','false')});window.wbCloseMenus=closeMenus;
+const closeMenus=()=>menus.forEach(([b,m])=>{$(m).hidden=true;$(b).setAttribute('aria-expanded','false')});WBX.wbCloseMenus=closeMenus;
 menus.forEach(([b,m])=>{$(b).onclick=e=>{e.stopPropagation();const o=$(m).hidden;closeMenus();closeDD();$(m).hidden=!o;if(o)placeFloat($(m),$(b),$(m).classList.contains('r'));$(b).setAttribute('aria-expanded',String(o))};$(m).addEventListener('click',e=>{if(e.target.closest('button,label'))closeMenus()})});
 document.addEventListener('click',e=>{if(!e.target.closest('.menu,.pop'))closeMenus()});
 // A floating popup would drift away from its button if the page or a panel scrolled under it, so close it instead.
@@ -228,19 +228,19 @@ $('pgrid').addEventListener('click',e=>{const b=e.target.closest('[data-a="open"
 
 // ---- undo / redo (snapshots of the whole project state)
 let hist=[coreStr()],hi=0;
-const ub=()=>{$('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;if(window.wbHistPaint)wbHistPaint()};
+const ub=()=>{$('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;if(WBX.wbHistPaint)WBX.wbHistPaint()};
 let histL=['Start'],histT=[Date.now()];
 const HK={tiles:'Stamp change',layers:'Layer change',proj:'Colours',dim:'Canvas size',pg:'Grid',pr:'Roughness',tex:'Texture',texLib:'Texture library',grade:'Grade'};
 function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added motif'+(y-x>1?'s':'');if(y<x)return 'Removed motif'+(x-y>1?'s':'');return 'Moved or edited motif'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
-function cap(){if(drag||window.wbNoCap)return;const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;hist.push(s);histL.push(hLabel(prev,s));histT.push(Date.now());if(hist.length>120){hist.shift();histL.shift();histT.shift()}hi=hist.length-1}ub()}
+function cap(){if(drag||WBX.wbNoCap)return;const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;hist.push(s);histL.push(hLabel(prev,s));histT.push(Date.now());if(hist.length>120){hist.shift();histL.shift();histT.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
-function applyCore(c){WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&window.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(wbGrade.get()))wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
+function applyCore(c){WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
 WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
 store();savePr();saveTex();syncPr();syncTex();buildTex();upd()}
 function undo(){cap();if(hi>0){hi--;applyCore(JSON.parse(hist[hi]))}ub()}
 function redo(){if(hi<hist.length-1){hi++;applyCore(JSON.parse(hist[hi]))}ub()}
 $('undo').onclick=undo;$('redo').onclick=redo;ub();
-window.wbHistGet=i=>hist[i];window.wbResetHist=()=>{if(window.wbBA)wbBA.reset();hist=[coreStr()];histL=['Start'];histT=[Date.now()];hi=0;ub();if(window.wbSnapLoad)wbSnapLoad()};window.wbCap=cap;window.wbApply=applyCore;
+WBX.wbHistGet=i=>hist[i];WBX.wbResetHist=()=>{if(WBX.wbBA)wbBA.reset();hist=[coreStr()];histL=['Start'];histT=[Date.now()];hi=0;ub();if(WBX.wbSnapLoad)WBX.wbSnapLoad()};WBX.wbCap=cap;WBX.wbApply=applyCore;
 // ---- History panel + named snapshots
 (()=>{const sec=document.querySelector('section.pn[data-p="hist"]'),hl=$('hhl'),sl=$('hsl'),XI=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 let snaps=[],sk='',raf=0,ren=-1;
@@ -253,8 +253,8 @@ const esc2=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 function paint(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(sec.hidden)return;const k=key();if(k!=sk){load();return}
 if(!(ren>=0&&sl.querySelector('input')))sl.innerHTML=snaps.map((n,i)=>i==ren?`<div class="hr sn" data-sn="${i}"><input type="text" value="${esc2(n.n)}" maxlength="40" aria-label="Snapshot name"><span></span><span></span></div>`:`<div class="hr sn" data-sn="${i}"><b>${esc2(n.n)}</b><i>${ago(n.t)}</i><button type="button" class="rfb" data-sref="${i}">Compare</button><button type="button" data-del="${i}" aria-label="Delete snapshot">${XI}</button></div>`).join('');
 let h='';for(let i=hist.length-1;i>=0;i--)h+=`<div class="hr${i==hi?' on':''}${i>hi?' fut':''}" data-h="${i}"><b>${esc2(histL[i]||'Change')}</b><i>${ago(histT[i]||Date.now())}</i>${i==hi?'<span></span>':`<button type="button" class="rfb" data-href="${i}">Compare</button>`}</div>`;
-hl.innerHTML=h;if(window.wbBAPaint)wbBAPaint();$('hsc').textContent=hist.length+' steps';const inp=sl.querySelector('input');if(inp&&document.activeElement!==inp){inp.focus();inp.select()}})}
-window.wbHistPaint=paint;window.wbSnapLoad=()=>{sk='';load()};
+hl.innerHTML=h;if(WBX.wbBAPaint)WBX.wbBAPaint();$('hsc').textContent=hist.length+' steps';const inp=sl.querySelector('input');if(inp&&document.activeElement!==inp){inp.focus();inp.select()}})}
+WBX.wbHistPaint=paint;WBX.wbSnapLoad=()=>{sk='';load()};
 function jump(i){cap();if(i<0||i>=hist.length||i==hi)return;hi=i;applyCore(JSON.parse(hist[hi]));ub()}
 hl.addEventListener('click',e=>{const b=e.target.closest('[data-href]');if(b){const i=+b.dataset.href;wbBA.setRef((histL[i]||'Change')+' · '+ago(histT[i]||Date.now()),hist[i],1);return}const r=e.target.closest('[data-h]');if(r)jump(+r.dataset.h)});
 $('hsadd').onclick=()=>{cap();snaps.unshift({n:'Snapshot '+(snaps.length+1),t:Date.now(),s:coreStr()});if(snaps.length>30)snaps.length=30;persist();ren=0;paint()};
@@ -265,7 +265,7 @@ function fin(ok){const inp=sl.querySelector('input');if(inp&&ren>=0&&snaps[ren])
 sl.addEventListener('keydown',e=>{if(!e.target.matches('input'))return;if(e.key=='Enter'){e.preventDefault();fin(1)}else if(e.key=='Escape'){e.stopPropagation();fin(0)}});
 sl.addEventListener('focusout',e=>{if(e.target.matches&&e.target.matches('input')&&ren>=0)setTimeout(()=>{if(ren>=0)fin(1)},0)});
 new MutationObserver(()=>{if(!sec.hidden)paint()}).observe(sec,{attributes:true,attributeFilter:['hidden']});
-window.wbBAPaint=()=>{const m=wbBA.mode;$('bab').setAttribute('aria-pressed',String(m==1));$('bas').setAttribute('aria-pressed',String(m==2));const lb=wbBA.label;$('barst').hidden=!wbBA.custom;if(!sec.hidden&&$('bal').dataset.l!==lb){$('bal').dataset.l=lb;$('bal').innerHTML=`<div class="hr"><b><u class="ab a">A</u>${esc2(lb)}</b><i>Compared to</i><span></span></div><div class="hr"><b><u class="ab b">B</u>Current</b><i>Now</i><span></span></div>`}
+WBX.wbBAPaint=()=>{const m=wbBA.mode;$('bab').setAttribute('aria-pressed',String(m==1));$('bas').setAttribute('aria-pressed',String(m==2));const lb=wbBA.label;$('barst').hidden=!wbBA.custom;if(!sec.hidden&&$('bal').dataset.l!==lb){$('bal').dataset.l=lb;$('bal').innerHTML=`<div class="hr"><b><u class="ab a">A</u>${esc2(lb)}</b><i>Compared to</i><span></span></div><div class="hr"><b><u class="ab b">B</u>Current</b><i>Now</i><span></span></div>`}
  if(sec.hidden)return;const c=wbBA.core;hl.querySelectorAll('[data-h]').forEach(r=>{const i=+r.dataset.h;r.classList.toggle('ra',c!=null&&hist[i]===c);r.classList.toggle('rb',i==hi)});sl.querySelectorAll('[data-sn]').forEach(r=>{const n=snaps[+r.dataset.sn];r.classList.toggle('ra',!!n&&n.s===c)})};
 $('barst').onclick=()=>wbBA.clearRef();
 $('bab').onclick=()=>{$('bab').blur();wbBA.toggle()};$('bas').onclick=()=>{$('bas').blur();wbBA.split()};
@@ -318,11 +318,11 @@ const _draw2=draw;draw=function(){_draw2();syncGrid()};
 // ---- randomize motifs on the current stamp
 try{const z=JSON.parse(localStorage.getItem('wb36_rz')||'null');if(z){$('rzp').value=z.p;$('rzr').value=z.r;$('rzs').value=z.s}}catch(e){}
 ['rzp','rzr','rzs'].forEach(id=>$(id).addEventListener('input',()=>{try{localStorage.setItem('wb36_rz',JSON.stringify({p:+$('rzp').value,r:+$('rzr').value,s:+$('rzs').value}))}catch(e){}}));
-$('rzgo').onclick=()=>{const qs=QS();if(!qs.length){$('pmsg').textContent='Select some motifs first.';return}if(window.wbCap)wbCap();
+$('rzgo').onclick=()=>{const qs=QS();if(!qs.length){$('pmsg').textContent='Select some motifs first.';return}if(WBX.wbCap)WBX.wbCap();
 const P=+$('rzp').value/100*Math.min(SW,SH)*.25,R=+$('rzr').value,S=+$('rzs').value/100,rnd=()=>Math.random()*2-1;
 qs.forEach(q=>{if(P){const a=Math.random()*Math.PI*2,d=Math.sqrt(Math.random())*P;[q.x,q.y]=wrapP(q.x+Math.cos(a)*d,q.y+Math.sin(a)*d)}
 if(R)q.r=Math.round(nr(q.r+rnd()*R))||0;if(S)q.s=+Math.min(2.6,Math.max(.2,q.s*(1+rnd()*S))).toFixed(3)});
-store();upd();if(window.wbCap)wbCap();$('pmsg').textContent=`Randomized ${qs.length} motif${qs.length>1?'s':''}. Press again for another shuffle, or Ctrl+Z to undo.`};
+store();upd();if(WBX.wbCap)WBX.wbCap();$('pmsg').textContent=`Randomized ${qs.length} motif${qs.length>1?'s':''}. Press again for another shuffle, or Ctrl+Z to undo.`};
 // ===== v90 controls: styled dropdowns, colour picker, slider scrub =====
 (()=>{
 const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'),SEL_SKIP=s=>s.style.display==='none'||s.classList.contains('ddsel')||s.dataset.native!=null;
@@ -351,7 +351,7 @@ Object.defineProperty(sel,'value',{configurable:true,get(){return desc.get.call(
 new MutationObserver(()=>st.sync()).observe(sel,{childList:true,subtree:true,attributes:true,attributeFilter:['disabled','hidden']});
 sel._dd=st;all.push(st);st.sync(true)}
 function scan(root){(root||document).querySelectorAll('select').forEach(mk)}
-window.wbDDsync=()=>{for(let i=all.length;i--;){const s=all[i];if(!s.sel.isConnected){all.splice(i,1);s.w.remove();continue}s.sync()}};
+WBX.wbDDsync=()=>{for(let i=all.length;i--;){const s=all[i];if(!s.sel.isConnected){all.splice(i,1);s.w.remove();continue}s.sync()}};
 // selects that appear later (rebuilt lists)
 {let q=0;const run=()=>{q=0;scan()};new MutationObserver(m=>{for(const r of m)for(const n of r.addedNodes){if(n.nodeType==1&&!(n instanceof SVGElement)&&(n.tagName=='SELECT'||n.querySelector&&n.querySelector('select'))){if(!q)q=requestAnimationFrame(run);return}}}).observe(document.body,{childList:true,subtree:true})}
 scan();
@@ -397,7 +397,7 @@ document.addEventListener('pointerdown',e=>{if(e.button||e.pointerType=='touch')
  if(t.matches&&t.matches('input[type=range]')){if(e.shiftKey){e.preventDefault();scrub(t,t,e,true)}return}
  if(t.tagName=='LABEL'&&t.closest('.ctl')){const r=rangeOf(t);if(r){e.preventDefault();scrub(t,r,e,false)}}},true);
 // keep labels in step with programmatic changes
-if(typeof nums=='function'){const _n=nums;nums=function(){_n();wbDDsync()}}
+if(typeof nums=='function'){const _n=nums;nums=function(){_n();WBX.wbDDsync()}}
 })();
 
 enhance();{const r=$('ts'),row=r.closest('.ctl'),f=document.createElement('div');f.className='ctl fitrow';

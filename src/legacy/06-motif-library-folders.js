@@ -20,7 +20,7 @@ const use=n=>window.claude?claude.use(n).catch(()=>null):Promise.resolve(null);
 const it=(m,x,y,s=.8,r=0,f=1)=>({m,x,y,s,r,f});
 let cust={};WBS.tiles=[{id:1,items:[it('b3',60,60,.9),it('b5',180,180,.9,0,-1),it('b9',180,60,.85),it('b1',60,180,.85)]},{id:2,items:[it('b11',120,120,1),it('b0',30,30,.5,45),it('b0',210,30,.5,-45),it('b0',30,210,.5,135),it('b0',210,210,.5,-135)]}];WBS.cur=0;WBS.sel=-1;
 WBS.msel=new Set();
-window.wbCur=()=>WBS.cur;
+WBX.wbCur=()=>WBS.cur;
 function selOne(i){WBS.sel=i;WBS.msel=new Set(i>=0?[i]:[])}
 const DEF_TILES=JSON.stringify(WBS.tiles);
 try{cust=JSON.parse(localStorage.getItem('wb2_cust')||'{}');Object.keys(cust).forEach(k=>{if(k.startsWith('i|')&&!/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test((cust[k]||{}).svg||''))delete cust[k]});const t=JSON.parse(localStorage.getItem('wb2_tiles')||'null');if(t&&t.length)WBS.tiles=t}catch(e){}

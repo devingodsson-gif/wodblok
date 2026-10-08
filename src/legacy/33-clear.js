@@ -1,9 +1,9 @@
 // ===== Clear: one blank square stamp, default palette, plain arrangement, no print effects. Canvas size and cover are kept. Undoable.
-function clearAll(fresh){if(window.wbGrade)wbGrade.set(null);if(!fresh&&window.wbCap)wbCap();const L=mkL('Layer 1',[1],'check',180);L.ak={};L.fit='';L.gap=0;L.pst=0;L.pfl=0;L.man=false;L.ov={};
+function clearAll(fresh){if(WBX.wbGrade)WBX.wbGrade.set(null);if(!fresh&&WBX.wbCap)WBX.wbCap();const L=mkL('Layer 1',[1],'check',180);L.ak={};L.fit='';L.gap=0;L.pst=0;L.pfl=0;L.man=false;L.ov={};
 WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;
 const dim0={...WBS.dim};['cs','cr','n','co','g','cp'].forEach(k=>delete dim0[k]); // the canvas outline goes back to a plain rectangle (the ratio stays)
-(window.wbApply||applyCore)({texLib:[],tiles:[{id:1,items:[],et:0,er:0}],layers:[L],proj:{...PCOL},dim:{...dim0,k:'rect',o:'p',s:[1,1]},pr:{e:0,q:0,t:'',a:0,sc:100,sd:811},tex:{u:[],v:87}});
-store();if(fresh){if(window.wbResetHist)wbResetHist();pmsg('Started a new, empty project.')}else{if(window.wbCap)wbCap();pmsg('Cleared. Ctrl+Z brings back what you had.')}}
+(WBX.wbApply||applyCore)({texLib:[],tiles:[{id:1,items:[],et:0,er:0}],layers:[L],proj:{...PCOL},dim:{...dim0,k:'rect',o:'p',s:[1,1]},pr:{e:0,q:0,t:'',a:0,sc:100,sd:811},tex:{u:[],v:87}});
+store();if(fresh){if(WBX.wbResetHist)WBX.wbResetHist();pmsg('Started a new, empty project.')}else{if(WBX.wbCap)WBX.wbCap();pmsg('Cleared. Ctrl+Z brings back what you had.')}}
 $('clr').onclick=()=>clearAll(false);
 
 const fname=n=>(n||'untitled').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase().slice(0,50)||'untitled';

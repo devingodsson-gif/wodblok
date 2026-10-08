@@ -2,17 +2,17 @@
 // The "before" is the first state of this project in the History panel unless another history step or snapshot is chosen there.
 const wbBA=(()=>{const st=()=>document.querySelector('.stage'),bd=()=>[...st().querySelectorAll(':scope>.board')].filter(b=>!b.hidden&&!b.classList.contains('off')),key=()=>bd().map(b=>b.id).join();
 let ref=null,pics=null,pk='',mode=0,busy=0,sp=.5,ovs=[],tags=[],hd=null,loop=0,dt=0,pk0=0;
-const sleep=ms=>new Promise(r=>setTimeout(r,ms)),paintUI=()=>{if(window.wbBAPaint)wbBAPaint()};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms)),paintUI=()=>{if(WBX.wbBAPaint)WBX.wbBAPaint()};
 async function settle(){const t0=performance.now();let lm=t0;const mo=new MutationObserver(()=>{lm=performance.now()});bd().forEach(b=>mo.observe(b,{childList:true,subtree:true,attributes:true}));['grdf','cvdefs','surfd','dyn'].forEach(id=>{const e=$(id);if(e)mo.observe(e,{childList:true,subtree:true,attributes:true})});
- await sleep(80);for(;;){const n=performance.now(),b=raf||BK.busy||BK.q.size||BK.tm||BK.defT||(window.wbTxBusy||0)>0;if(!b&&n-lm>=160)break;if(n-t0>9000)break;await sleep(40)}mo.disconnect()}
+ await sleep(80);for(;;){const n=performance.now(),b=raf||BK.busy||BK.q.size||BK.tm||BK.defT||(WBX.wbTxBusy||0)>0;if(!b&&n-lm>=160)break;if(n-t0>9000)break;await sleep(40)}mo.disconnect()}
 async function ensure(){const k=key();if(pics&&pk==k)return true;
- if(!ref){const c=window.wbHistGet&&wbHistGet(0);if(c==null)return false;ref={label:'Start',core:c}}
- busy=1;window.wbHoldOn=1;window.wbNoCap=1;document.body.classList.add('babusy');const boards=bd(),host=st(),cur=coreStr(),hold=[],same=ref.core===cur;
- try{if(!same){boards.forEach((b,i)=>{const o=wbHold.freezeSn(wbHold.snap(b,'bh'+i+'_'),b,host,0);wbHold.lay(o);hold.push(o)});window.wbApply(JSON.parse(ref.core));await settle()}
+ if(!ref){const c=WBX.wbHistGet&&WBX.wbHistGet(0);if(c==null)return false;ref={label:'Start',core:c}}
+ busy=1;WBX.wbHoldOn=1;WBX.wbNoCap=1;document.body.classList.add('babusy');const boards=bd(),host=st(),cur=coreStr(),hold=[],same=ref.core===cur;
+ try{if(!same){boards.forEach((b,i)=>{const o=wbHold.freezeSn(wbHold.snap(b,'bh'+i+'_'),b,host,0);wbHold.lay(o);hold.push(o)});WBX.wbApply(JSON.parse(ref.core));await settle()}
   pics=boards.map((b,i)=>wbHold.snap(b,'ba'+i+'_'));pk=k;
-  if(!same){window.wbApply(JSON.parse(cur));await settle()}}
- catch(e){pics=null;try{window.wbApply(JSON.parse(cur))}catch(_){}}
- finally{hold.forEach(o=>o.el.remove());busy=0;window.wbHoldOn=0;window.wbNoCap=0;document.body.classList.remove('babusy')}
+  if(!same){WBX.wbApply(JSON.parse(cur));await settle()}}
+ catch(e){pics=null;try{WBX.wbApply(JSON.parse(cur))}catch(_){}}
+ finally{hold.forEach(o=>o.el.remove());busy=0;WBX.wbHoldOn=0;WBX.wbNoCap=0;document.body.classList.remove('babusy')}
  return !!pics}
 function clear(){ovs.forEach(o=>o.el.remove());ovs=[];tags.forEach(t=>t.remove());tags=[];if(hd){hd.remove();hd=null}cancelAnimationFrame(loop);loop=0}
 function mk(){clear();const boards=bd(),host=st();
@@ -38,21 +38,21 @@ document.addEventListener('keydown',e=>{if(typing(e)||e.metaKey||e.ctrlKey||e.al
  if(e.key=='Escape'&&mode){off();return}
  if(e.key=='\\'||e.key=='|'){e.preventDefault();if(e.repeat||busy)return;const sh=e.key=='|';if(!sh&&mode==1){off();return}pk0=!sh&&pics&&pk==key()?1:0;dt=performance.now();setMode(sh?2:1)}},true);
 document.addEventListener('keyup',e=>{if(e.key=='\\'&&mode==1&&pk0&&performance.now()-dt>380)off()},true);
-return{setRef,reset,clearRef,off,toggle:()=>setMode(1),split:()=>setMode(2),get mode(){return mode},get busy(){return busy},get label(){return ref?ref.label:'Start'},get core(){return ref?ref.core:(window.wbHistGet?wbHistGet(0):null)},get custom(){return !!ref&&ref.label!=='Start'}}})();
-window.wbBA=wbBA;function randomize(fresh){if(window.wbBA)wbBA.off();wbHold.start();let r;try{r=randomize0(fresh)}catch(e){wbHold.arm();throw e}if(r&&typeof r.then=="function")r.then(()=>wbHold.arm(),()=>wbHold.arm());else wbHold.arm();return r}
-function randomize0(fresh){const ft=window.wbRZ?wbRZ.get():null;window.SLC=[];
+return{setRef,reset,clearRef,off,toggle:()=>setMode(1),split:()=>setMode(2),get mode(){return mode},get busy(){return busy},get label(){return ref?ref.label:'Start'},get core(){return ref?ref.core:(WBX.wbHistGet?WBX.wbHistGet(0):null)},get custom(){return !!ref&&ref.label!=='Start'}}})();
+WBX.wbBA=wbBA;function randomize(fresh){if(WBX.wbBA)wbBA.off();wbHold.start();let r;try{r=randomize0(fresh)}catch(e){wbHold.arm();throw e}if(r&&typeof r.then=="function")r.then(()=>wbHold.arm(),()=>wbHold.arm());else wbHold.arm();return r}
+function randomize0(fresh){const ft=WBX.wbRZ?WBX.wbRZ.get():null;window.SLC=[];
  if(ft&&ft.lib&&typeof SL!='undefined')return SL.list().then(l=>{window.SLC=(l||[]).filter(r=>r&&typeof r.tile=='string');return randomizeCore(fresh)},()=>randomizeCore(fresh));
  return randomizeCore(fresh)}
 function randomizeCore(fresh){const R=Math.random,pick=a=>a[Math.floor(R()*a.length)],rr=(a,b)=>a+R()*(b-a),ri=(a,b)=>Math.floor(rr(a,b+1)),ch=p=>R()<p,wpick=o=>{let t=R()*o.reduce((x,y)=>x+y[1],0);for(const x of o){if((t-=x[1])<=0)return x[0]}return o[0][0]};
-const FT=window.wbRZ?wbRZ.get():{stamps:1,text:1,frame:1,col:1,gr:1,masks:1,tx:1,pr:1,shape:0,free:1,layout:0,size:0,look:0,lib:0};
+const FT=WBX.wbRZ?WBX.wbRZ.get():{stamps:1,text:1,frame:1,col:1,gr:1,masks:1,tx:1,pr:1,shape:0,free:1,layout:0,size:0,look:0,lib:0};
 // which kinds of change each switch allows (the arrows in the Randomize panel)
-const SUBS={};['stamps','frame','shape','free','col','gr','masks','tx','pr','layout','size','look','lib'].forEach(m=>SUBS[m]=window.wbRZ?wbRZ.sub(m):null);const sOn=(m,k)=>!SUBS[m]||SUBS[m].has(k);
+const SUBS={};['stamps','frame','shape','free','col','gr','masks','tx','pr','layout','size','look','lib'].forEach(m=>SUBS[m]=WBX.wbRZ?WBX.wbRZ.sub(m):null);const sOn=(m,k)=>!SUBS[m]||SUBS[m].has(k);
 const RAT={portrait:[[2,3],[3,4],[4,5],[5,7]],square:[[1,1]],landscape:[[3,2],[4,3],[7,5]],banner:[[1,2],[9,16],[2,1],[16,9]]},ratioPick=()=>{let a=[];if(FT.size)Object.keys(RAT).forEach(g=>{if(sOn('size',g))a=a.concat(RAT[g])});if(!a.length)a=[[2,3],[3,4],[4,5],[5,7],[1,1],[3,2],[4,3]];return pick(a)};
 const SLCn=(window.SLC||[]).length,libFree=!!(FT.lib&&sOn('lib','free')&&SLCn),libPat=!!(FT.lib&&sOn('lib','pat')&&SLCn);let libDone=false;
 const libTile=id=>{const r=pick(window.SLC);let t=null;try{t=JSON.parse(r.tile)}catch(e){}if(!t||!Array.isArray(t.items))return null;try{libMotifs({motifs:r.motifs});libColors({colors:r.colors})}catch(e){}txMerge(t);t.id=id;shOf(t);return t};
 if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.shape||FT.free||FT.layout||FT.size||FT.look||FT.lib)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
 const dim0=JSON.parse(JSON.stringify(WBS.dim));
-if(!fresh&&window.wbCap)wbCap();
+if(!fresh&&WBX.wbCap)WBX.wbCap();
 // --- the bold moves for this roll (only used when Stamps is on)
 const MOVES=[['sym','new symmetry',1.3],['link','accents in the gaps',1.2],['shape','accent shapes',1],['mix','mixed shapes',.7],['rot','turned grid',.8],['inks','extra inks',.7],['motif','motif tweaks',.8],['swap','light on dark',.6],['blend','soft blending',.5],['text','lettering',1],['frame','frame',1.1]];
 const RZ={mv:null,n:0,keep:{col:!FT.col,gr:!FT.gr,tx:!FT.tx,pr:!FT.pr}};
@@ -60,8 +60,8 @@ let inkMap={};const noAcc=!FT.col||!sOn('col','acc'),noPal=!FT.col||!sOn('col','
 const MV=MOVES.filter(x=>FT.stamps&&x[0]!='frame'&&!(x[0]=='text'&&!FT.text)&&!(x[0]=='swap'&&noPal)&&!(x[0]=='inks'&&noAcc)&&(x[0]=='text'||sOn('stamps',x[0])));
 const F=new Set(),nf=Math.min(RZ.n||wpick([[1,.55],[2,.45]]),MV.length);while(F.size<nf){const m=wpick(MV.filter(x=>!F.has(x[0])).map(x=>[x[0],x[2]]));F.add(m)}
 // lettering takes over the main stamp, so it doesn't pair with moves that rework that stamp
-if(F.has('text')&&!window.wbTxPlace)F.delete('text');if(F.has('text'))['sym','mix','motif'].forEach(x=>F.delete(x));if(!F.size&&FT.stamps)F.add('link');if(FT.frame)F.add('frame');
-const tok=window.wbRndTok=(window.wbRndTok||0)+1;let txReq=null;
+if(F.has('text')&&!WBX.wbTxPlace)F.delete('text');if(F.has('text'))['sym','mix','motif'].forEach(x=>F.delete(x));if(!F.size&&FT.stamps)F.add('link');if(FT.frame)F.add('frame');
+const tok=WBX.wbRndTok=(WBX.wbRndTok||0)+1;let txReq=null;
 const on=k=>F.has(k);
 const KW=[['rect',.34],['hex',.15],['circle',.15],['diamond',.2],['tri',.16]];
 const mkSh=(k,z=100)=>({k,o:ch(.5)?'p':'f',s:(k=='rect'||k=='diamond')?wpick([[[1,1],.6],[[3,4],.15],[[4,3],.15],[[2,3],.1]]):[1,1],z});
@@ -130,7 +130,7 @@ if(on('text')){const t0=tl[0];useG(geom(t0.sh));const k=SK,C0=[SW/2,k=='tri'?SH*
  const WORDS=['EX LIBRIS','ANNO DOMINI','FIAT LUX','LUX','PAX','AMOR','VERITAS','ORA ET LABORA','CARPE DIEM','SOL','LUNA','FLORA','FAUNA','ALPHA','OMEGA','VITA','SPES','FIDES','MMXXVI','HORTUS','STELLA','AQUA','TERRA','IGNIS'];
  const AL='ABCDEFGHIKLMNOPRSTVW',nm=($('pnm')&&$('pnm').value.trim())||'',ini=nm?nm.split(/\s+/).map(w=>w[0]).join('').toUpperCase().replace(/[^A-Z]/g,'').slice(0,3):'';
  const style=k=='tri'?'initial':wpick([['initial',.4],['ring',k=='rect'&&Math.abs(SW-SH)>1?0:.35],['band',.25]]);
- const fonts=window.wbTxFonts||['cinzel'],fl=style=='initial'?['frak','uncial','cinzeld','fell','alfa','abril','medieval','holtwood','pirata']:['cinzel','fellsc','garamond','uncial','medieval','alfa','holtwood','rye','pirata','bebas','frak'],f=pick(fl.filter(x=>fonts.includes(x)).concat(['cinzel']));
+ const fonts=WBX.wbTxFonts||['cinzel'],fl=style=='initial'?['frak','uncial','cinzeld','fell','alfa','abril','medieval','holtwood','pirata']:['cinzel','fellsc','garamond','uncial','medieval','alfa','holtwood','rye','pirata','bebas','frak'],f=pick(fl.filter(x=>fonts.includes(x)).concat(['cinzel']));
  const m=pick(mains),d=pick(dots);let o;
  if(style=='initial'){const txt=ini&&ch(.35)?ini.slice(0,ch(.5)?1:3):pick([...AL]);o={text:txt,f,cv:0,ls:txt.length>1?4:0,maxSz:txt.length>1?45:75};
   const nd=pick([4,6,8,12]),rr2=Rad*(k=='rect'?.92:.82);if(k=='rect'&&ch(.5))[[0,0]].forEach(()=>items.push(it(d,...wrapP(0,0),S(Rad*.16),45)));
@@ -188,9 +188,9 @@ if(k=='rrect')nd.cr=ri(8,45);if(k=='ngon'){nd.n=ri(5,10);if(ch(.5))nd.co='f'}if(
 c.dim=nd;try{localStorage.setItem('wb14_dim',JSON.stringify(nd))}catch(e){}}
 // Canvas size on its own: a new ratio for a canvas that has one (round and regular shapes stay square)
 if(FT.size&&!FT.shape&&!WBS.book.on){const kk=c.dim.cs||'rect';if(kk=='rect'||CASP.includes(kk)){const nd2=JSON.parse(JSON.stringify(c.dim));nd2.c=ratioPick();c.dim=nd2;try{localStorage.setItem('wb14_dim',JSON.stringify(nd2))}catch(e){}}}
-WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;const oldL=WBS.layers.slice(),oldT=WBS.tiles.slice(),oldG=window.wbGrade?wbGrade.get():null;WBS.selL=0;(window.wbApply||applyCore)(c);WBS.selL=0;
+WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;const oldL=WBS.layers.slice(),oldT=WBS.tiles.slice(),oldG=WBX.wbGrade?WBX.wbGrade.get():null;WBS.selL=0;(WBX.wbApply||applyCore)(c);WBS.selL=0;
 // colour grade: a gentle look most of the time (about a quarter stay neutral). Masks: up to two light local touches.
-if(window.wbGrade){const g0=oldG||wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v,isF=l=>!!(l.fr&&l.fr.on);let gl={};
+if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v,isF=l=>!!(l.fr&&l.fr.on);let gl={};
  if(FT.gr){const lookOn=sOn('gr','look'),adjOn=sOn('gr','adj');if((lookOn||adjOn)&&!(sOn('gr','neutral')&&ch(.25))){
   // mild looks: each value is a [low, high] range, scaled down so a roll never lands on something harsh
   const LK=[{tp:[25,60],tn:[5,20],fd:[15,50],sat:[-35,-5],ct:[-15,10]},{tp:[-60,-22],ct:[12,45],sat:[-15,20]},{ct:[25,60],sat:[12,40],vib:[18,50],sh:[-25,0]},{ex:[-35,-10],ct:[15,45],sh:[-40,-10],sat:[-30,0]},{ex:[10,30],fd:[30,65],sat:[-55,-20],ct:[-30,0]},{tn:[-30,-10],tp:[-10,25],hi:[-40,-10],fd:[10,40]}];
@@ -216,7 +216,7 @@ if(window.wbGrade){const g0=oldG||wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v
   nfO.forEach((l,q)=>{if(nfN[q])mU[l.u]=nfN[q].u});frO.forEach((l,q)=>{if(frN[q])mU[l.u]=frN[q].u});
   oldT.forEach((t,q)=>{if(WBS.tiles[q])mT[String(t.id)]=String(WBS.tiles[q].id)});
   masks=((g0&&g0.masks)||[]).map(m=>{const q=JSON.parse(JSON.stringify(m));if(q.t=='lay'&&q.lay&&mU[q.lay])q.lay=mU[q.lay];if(q.st&&mT[q.st])q.st=mT[q.st];if(q.t=='col'&&q.c){for(const k in inkMap){if(col(k).toLowerCase()==String(q.c).toLowerCase()){q.c=col(inkMap[k]).toLowerCase();break}}}return q})}
- wbGrade.set({...gl,cov:g0.cov,masks})}
+ WBX.wbGrade.set({...gl,cov:g0.cov,masks})}
 if(c.layers.some(l=>LS.includes(l)))LS.forEach(l=>{if(c.layers.includes(l)&&l.fit&&!l.gl)l.size=+fitTs(l).toFixed(3)});store();upd();
 // Layout: pattern type, stamp size, spacing and scatter, offset, rotation and flips of the layers that repeat. Works on whatever layers the project has now.
 if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('layout','rot'),lty=sOn('layout','type'),lof=sOn('layout','offset'),
@@ -254,7 +254,7 @@ if(libPat){const L0=WBS.layers.find(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.art&&!l.txt
 // Free-placed stamps: a single feature, or a few stamps, set on the pattern grid and snapped to it, often with lettering. Added as their own Free place layer on top.
 let fzReqs=[],fzDone=false;
 if((FT.free||libFree)&&ch(.65)){
- const textOk=!!(FT.free&&sOn('free','ftext')&&FT.text&&window.wbTxPlace&&!on('text')),hs=!FT.free||sOn('free','single'),hf=!FT.free||sOn('free','few'),single=hs&&(!hf||ch(.45)),m2=ch(.7)?'c':'l',gn=m2=='c'?pick([3,5,7]):pick([4,6,8]);
+ const textOk=!!(FT.free&&sOn('free','ftext')&&FT.text&&WBX.wbTxPlace&&!on('text')),hs=!FT.free||sOn('free','single'),hf=!FT.free||sOn('free','few'),single=hs&&(!hf||ch(.45)),m2=ch(.7)?'c':'l',gn=m2=='c'?pick([3,5,7]):pick([4,6,8]);
  WBS.pgrid={...WBS.pgrid,n:gn,m:m2,sh:ch(.3)?pick(['hex','diamond']):'rect'};
  const cell=CW/gn,xs=[],ys=[];
  if(m2=='c'){for(let i=0;i<gn;i++)xs.push((i+.5)*cell);for(let j=0;(j+.5)*cell<CH;j++)ys.push((j+.5)*cell)}else{for(let i=1;i<gn;i++)xs.push(i*cell);for(let j=1;j*cell<CH-.5;j++)ys.push(j*cell)}
@@ -268,7 +268,7 @@ if((FT.free||libFree)&&ch(.65)){
  const WORDS2=['EX LIBRIS','ANNO DOMINI','FIAT LUX','LUX','PAX','AMOR','VERITAS','ORA ET LABORA','CARPE DIEM','SOL','LUNA','FLORA','FAUNA','ALPHA','OMEGA','VITA','SPES','FIDES','MMXXVI','HORTUS','STELLA','AQUA','TERRA','IGNIS'],AL2='ABCDEFGHIKLMNOPRSTVW';
  const mkText=()=>{const style=ch(.4)?'initial':'band',sh=style=='initial'?{k:pick(['rect','circle','hex','diamond']),o:'p',s:[1,1],z:100}:{k:'rect',o:'p',s:[pick([3,4,5]),1],z:100};useG(geom(sh));
   const k=SK,cx=SW/2,cy=SH/2,Rad=k=='tri'?SH/3:k=='diamond'?SW*SH/2/Math.hypot(SW,SH):k=='hex'?104:Math.min(SW,SH)/2,S=r=>+(r/48).toFixed(3),items=[],d=pick(dots),nm=($('pnm')&&$('pnm').value.trim())||'',ini=nm?nm.split(/\s+/).map(w=>w[0]).join('').toUpperCase().replace(/[^A-Z]/g,'').slice(0,3):'';
-  const fonts=window.wbTxFonts||['cinzel'],fl=style=='initial'?['frak','uncial','cinzeld','fell','alfa','abril','medieval','holtwood','pirata']:['cinzel','fellsc','garamond','uncial','medieval','alfa','holtwood','rye','pirata','bebas','frak'],f=pick(fl.filter(x=>fonts.includes(x)).concat(['cinzel']));let o;
+  const fonts=WBX.wbTxFonts||['cinzel'],fl=style=='initial'?['frak','uncial','cinzeld','fell','alfa','abril','medieval','holtwood','pirata']:['cinzel','fellsc','garamond','uncial','medieval','alfa','holtwood','rye','pirata','bebas','frak'],f=pick(fl.filter(x=>fonts.includes(x)).concat(['cinzel']));let o;
   if(style=='initial'){const txt=ini&&ch(.35)?ini.slice(0,ch(.5)?1:3):pick([...AL2]);o={text:txt,f,cv:0,ls:txt.length>1?4:0,maxSz:txt.length>1?45:75};const nd=pick([8,12,16]);for(let i=0;i<nd;i++){const a=-Math.PI/2+i*2*Math.PI/nd;items.push(it(d,cx+Math.cos(a)*Rad*.9,cy+Math.sin(a)*Rad*.9,S(Rad*.06)))}}
   else{o={text:pick(WORDS2),f,cv:0,ls:pick([0,4,10]),maxSz:60};items.push(it(d,SH*.5,cy,S(SH*.14)));items.push(it(d,SW-SH*.5,cy,S(SH*.14)))}
   return{tile:{id:++nidT,sh,items,sym:{m:'off'},et:+wpick([[0,.4],[rr(1,3),.6]]).toFixed(1),er:+rr(0,3).toFixed(1),es:ri(0,999),neg:false,ink:ch(.5)?inkFor():null},o,style}};
@@ -282,8 +282,8 @@ if((FT.free||libFree)&&ch(.65)){
  if(keep.length){FL.st=keep.map(t=>t.id);keep.forEach(t=>WBS.tiles.push(t));WBS.layers.push(FL);reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0))}
  setDim();useT(WBS.tiles[WBS.cur]);store();upd()}
 const txAll=(txReq?[[WBS.tiles[0],txReq]]:[]).concat(fzReqs);
-if(txAll.length){pmsg('Randomized… setting the lettering.');window.wbTxBusy=(window.wbTxBusy||0)+1;(async()=>{try{for(const[t,o] of txAll){try{await wbTxPlace(t,o,tok)}catch(e){}}if(tok!==window.wbRndTok)return;store();upd();if(fresh){if(window.wbResetHist)wbResetHist()}else if(window.wbCap)wbCap()}finally{window.wbTxBusy=Math.max(0,(window.wbTxBusy||1)-1)}})()}
-else if(fresh){if(window.wbResetHist)wbResetHist()}else if(window.wbCap)wbCap();
+if(txAll.length){pmsg('Randomized… setting the lettering.');WBX.wbTxBusy=(WBX.wbTxBusy||0)+1;(async()=>{try{for(const[t,o] of txAll){try{await WBX.wbTxPlace(t,o,tok)}catch(e){}}if(tok!==WBX.wbRndTok)return;store();upd();if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap)WBX.wbCap()}finally{WBX.wbTxBusy=Math.max(0,(WBX.wbTxBusy||1)-1)}})()}
+else if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap)WBX.wbCap();
 const fn=[...MOVES.filter(x=>F.has(x[0])).map(x=>x[1]),...(fzDone?['free-placed stamps']:[]),...(libDone?['library stamps']:[]),...[['layout','layout'],['shape','canvas shape'],['size','canvas size'],['look','layer opacity and blend'],['col','colours'],['gr','colour grade'],['masks','grade masks'],['tx','canvas texture'],['pr','textures and print effects']].filter(x=>FT[x[0]]).map(x=>x[1])].join(' + ')||'a calm base';
 const lr=$('rzlast');if(lr)lr.textContent='Last roll: '+fn;
 ['rzdo'].forEach(id=>{const b=$(id);if(b){b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin')}});pmsg((fresh?'Started a new project with a fresh random piece':'Randomized')+` (featuring ${fn}).`+(FT.lib&&!SLCn?' Your stamp library is empty, so no saved stamps were used.':'')+(fresh?'':' Ctrl+Z brings back the previous piece.'))}

@@ -11,7 +11,7 @@ function bkScale(){if(WBS.WBDRG&&WBS._bkS>0)return WBS._bkS;return WBS._bkS=bkSc
 function bkScale0(){const d=window.devicePixelRatio||1,a=$('art');let s=0;try{const m=a.getScreenCTM();if(m&&m.a)s=Math.hypot(m.a,m.b)}catch(e){}
  if(!(s>0)){let w=parseFloat(a.style.width);if(!(w>0))w=a.getBoundingClientRect().width;s=(w>0?w:CW)/CW}
  try{if(WBS.curView=='stamp'){const r=$('pvw').getBoundingClientRect();if(r.width>0&&r.height>0)s=Math.max(s,Math.min(r.width/CW,r.height/CH)*pvZ)}}catch(e){}return s*d}
-function bkPre(){BK.live=!!(window.wbZoomIn&&wbZoomIn());BK.sc=bkScale()}
+function bkPre(){BK.live=!!(WBX.wbZoomIn&&WBX.wbZoomIn());BK.sc=bkScale()}
 const bkSurf=t=>SURFC[t]?(WBS.edInk?SURFC[t].s:`<mask id="is${t}" maskUnits="userSpaceOnUse" x="-100000" y="-100000" width="200000" height="200000"><rect x="-100000" y="-100000" width="200000" height="200000" fill="#fff"/></mask>`):'';
 function bkTile(t,td){BK.TD[t.id]=td;BK.T[t.id]=bkH(td+'|'+(SURFC[t.id]?SURFC[t.id].k:'')+'|'+WBS.edInk)}
 const RXU=/<use href="#(q(\d+)_(\d+)_(\d+)|s(\d+))"((?: data-[a-z]+="[^"]*")*)((?: opacity="[^"]*")?) transform="(translate\([^)]*\) rotate\([^)]*\) scale\(([-\d.]+) ([-\d.]+)\) translate\(([-\d.]+) ([-\d.]+)\))"((?: filter="url\(#[^)]+\)")?)\/>/g;
@@ -37,7 +37,7 @@ function bkSub(s,used,need){
   if(!r)need.add('E'+t2);return r||m})}
 const bkDefs=used=>{let o='';used.forEach(e=>o+=`<symbol id="bk${e.n}" viewBox="${e.cx} ${e.cy} ${e.cw} ${e.ch}" preserveAspectRatio="none"><image href="${e.A.url}" width="${e.A.w}" height="${e.A.h}"/></symbol>`);return o};
 const bkDrop=e=>{if(e&&e.A&&--e.A.live<=0)BK.dead.push(e.A.url)};
-const bkFlush=()=>{if(window.wbHoldOn)return;if(BK.dead.length){const d=BK.dead;BK.dead=[];setTimeout(()=>d.forEach(u=>URL.revokeObjectURL(u)),3000)}};
+const bkFlush=()=>{if(WBX.wbHoldOn)return;if(BK.dead.length){const d=BK.dead;BK.dead=[];setTimeout(()=>d.forEach(u=>URL.revokeObjectURL(u)),3000)}};
 // put the pattern on screen. f, defs, ik: the definitions; lg: the printed layers; body(lg): everything after the definitions
 function bkShow(f,defs,ik,lg,body){BK.vdefs=f+defs+ik;BK.vdyn='<defs>'+BK.vdefs+'</defs>'+body(lg);BK.wasLive=BK.live;BK.sc0=BK.sc;
  if(BK.off||BK.live){$('dyn').innerHTML=BK.vdyn;BK.shown=1;BK.defT=0;return}
@@ -47,7 +47,7 @@ function bkShow(f,defs,ik,lg,body){BK.vdefs=f+defs+ik;BK.vdyn='<defs>'+BK.vdefs+
  // a big one-off change (randomize, undo, a new palette): keep the old picture up for a moment while the new stamps print, rather than flashing
  // a mix of old and new. While something is being dragged or a slider moves, the picture always updates at once.
  const chg=BK.nStale+BK.nMiss,tot=chg+BK.nHit+BK.nRes;
- if(chg&&BK.shown&&!BK.cont&&BK.q.size&&(BK.nMiss||chg>=tot*.4)&&(!BK.defT||now-BK.defT<700||window.wbHoldOn&&now-BK.defT<15000)){if(!BK.defT)BK.defT=now;BK.st.defer++;bkKick(0);return}
+ if(chg&&BK.shown&&!BK.cont&&BK.q.size&&(BK.nMiss||chg>=tot*.4)&&(!BK.defT||now-BK.defT<700||WBX.wbHoldOn&&now-BK.defT<15000)){if(!BK.defT)BK.defT=now;BK.st.defer++;bkKick(0);return}
  BK.defT=0;$('dyn').innerHTML=`<defs>${f}${d2.replace(RXM,(m,k,id,b)=>need.has(k+id)?b:'')}${ik}${bkDefs(used)}</defs>`+body(l2);BK.shown=1;
  // prints that have not been shown for a while are let go
  if(BK.map.size>300)for(const[k,e]of BK.map)if(BK.gen-(e.u||0)>4){bkDrop(e);BK.map.delete(k)}
@@ -85,9 +85,9 @@ function bkPng(id){const w=id.width,h=id.height,px=id.data,rl=w*4+1,n=rl*h,nb=Ma
   dv.setUint32(p,((b%65521)<<16|(a%65521))>>>0);p+=4});
  chunk('IEND',0,()=>{});return new Blob([buf.subarray(0,p)],{type:'image/png'})}
 // zooming or resizing: redraw when the pattern switches between printed and live, or shows at a new size
-window.bkZ=()=>{if(BK.off||!BK.shown)return;const live=!!(window.wbZoomIn&&wbZoomIn());if(live!==!!BK.wasLive||(!live&&Math.abs(bkScale()/BK.sc0-1)>1e-4))upd()};
+window.bkZ=()=>{if(BK.off||!BK.shown)return;const live=!!(WBX.wbZoomIn&&WBX.wbZoomIn());if(live!==!!BK.wasLive||(!live&&Math.abs(bkScale()/BK.sc0-1)>1e-4))upd()};
 // the vector pattern, for exports and anything else that turns the canvas into a picture
-window.wbVec=c=>{const d=c&&c.querySelector('#dyn');if(d&&BK.vdyn!=null)d.innerHTML=BK.vdyn.replace(/<!--@[^>]*-->/g,'')};
+WBX.wbVec=c=>{const d=c&&c.querySelector('#dyn');if(d&&BK.vdyn!=null)d.innerHTML=BK.vdyn.replace(/<!--@[^>]*-->/g,'')};
 // sliders, colour pickers and wheel zoom count as continuous: the picture follows at once, exact prints come a moment after they stop
 const bkIn=()=>{BK.inT=performance.now();clearTimeout(BK.inTm);BK.inTm=setTimeout(()=>{if(typeof upd=='function')upd()},500)};
 document.addEventListener('input',e=>{const t=e.target;if(e.isTrusted&&t&&(t.type=='range'||t.type=='color'||t.type=='number'))bkIn()},true);addEventListener('wheel',e=>{if(e.isTrusted&&(e.ctrlKey||e.metaKey))bkIn()},{capture:true,passive:true});

@@ -12,8 +12,8 @@ $('ifile').onchange=()=>{const f=$('ifile').files[0];$('ifile').value='';if(f)lo
 document.addEventListener('dragover',e=>{if([...(e.dataTransfer&&e.dataTransfer.items||[])].some(i=>i.kind=='file')){e.preventDefault();document.body.classList.add('dropping')}});
 document.addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.classList.remove('dropping')});
 const onCover=()=>{const b=document.querySelector('.rail [data-pn="canvas"]');return !!(WBS.book.on&&b&&b.classList.contains('on'))};
-document.addEventListener('drop',e=>{document.body.classList.remove('dropping');const f=[...(e.dataTransfer&&e.dataTransfer.files||[])].find(f=>/^image\//.test(f.type));if(f){e.preventDefault();onCover()?wbCoverFile(f):loadFile(f)}});
-document.addEventListener('paste',e=>{if(e.target.matches&&e.target.matches('input,textarea')||e.target.closest&&e.target.closest('#ipaste,#cvpaste'))return;const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();onCover()?wbCoverFile(it.getAsFile()):loadFile(it.getAsFile(),'Pasted image')}});
+document.addEventListener('drop',e=>{document.body.classList.remove('dropping');const f=[...(e.dataTransfer&&e.dataTransfer.files||[])].find(f=>/^image\//.test(f.type));if(f){e.preventDefault();onCover()?WBX.wbCoverFile(f):loadFile(f)}});
+document.addEventListener('paste',e=>{if(e.target.matches&&e.target.matches('input,textarea')||e.target.closest&&e.target.closest('#ipaste,#cvpaste'))return;const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();onCover()?WBX.wbCoverFile(it.getAsFile()):loadFile(it.getAsFile(),'Pasted image')}});
 function loadSrc(src,nm){const img=new Image();img.onload=()=>{prep(img);name=nm||'Imported motif';$('inm').value=name;$('ioimg').src=cv0.toDataURL('image/png');openDlg();run()};img.onerror=()=>say2('That image could not be read. Try copying it again, or save it as PNG.');img.src=src}
 // paste box for phones: catches pasted image files, or pasted <img> elements some browsers insert instead
 const pz=$('ipaste'),PZ=pz.innerHTML;pz.addEventListener('focus',()=>{if(pz.innerHTML==PZ)pz.innerHTML=''});pz.addEventListener('blur',()=>{if(!pz.textContent.trim()&&!pz.querySelector('img'))pz.innerHTML=PZ});
@@ -158,6 +158,6 @@ WBS.mcat='g:'+cat;try{localStorage.setItem('wb11_mcat',WBS.mcat)}catch(e){}store
 $('sfile').onchange=()=>{const f=$('sfile').files[0];$('sfile').value='';if(!f)return;if(f.type&&!/^image\//.test(f.type))return say2('That file is not an image. Use a PNG, JPG or WebP.');const url=URL.createObjectURL(f),img=new Image();
 img.onload=()=>{URL.revokeObjectURL(url);sOpen(img,(f.name||'').replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' '))};img.onerror=()=>{URL.revokeObjectURL(url);say2('That image could not be read. Try a PNG or JPG.')};img.src=url};
 $('isht').onclick=()=>{if(!src)return;closeDlg();sOpen(src,$('inm').value.trim())};
-window.wbImpOk=(k,v)=>k.startsWith('i|')?!!(v&&typeof v.svg=='string'&&IMP_RE.test(v.svg)&&v.svg.length<600000):true;
+WBX.wbImpOk=(k,v)=>k.startsWith('i|')?!!(v&&typeof v.svg=='string'&&IMP_RE.test(v.svg)&&v.svg.length<600000):true;
 })();
 

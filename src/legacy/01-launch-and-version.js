@@ -1,3 +1,4 @@
+const WBX={};
 const WBS={};
 // One place to change the version: the badge, tooltip and page title all follow this number.
 const WB_VER=100;document.title='Wodblok v'+WB_VER;{const v=document.getElementById('ver');if(v){v.textContent='v'+WB_VER;v.title='Version '+WB_VER}}

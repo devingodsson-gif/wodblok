@@ -104,7 +104,7 @@ has('wbgradeT')?$('texg').setAttribute('filter','url(#wbgradeT)'):$('texg').remo
 if(has('wbgrade')&&grd.cov)$('covg').setAttribute('filter','url(#wbgrade)');else $('covg').removeAttribute('filter');$('ed').classList.toggle('graded',has('wbgradeE'));
 document.querySelector('.rail [data-pn="grade"]').classList.toggle('gdon',hasA(grd)||grd.masks.some(m=>m.on&&hasA(m.a)));gmHandles()}
 const gdSave=()=>{try{localStorage.setItem('wb41_grade',JSON.stringify(grd))}catch(e){}};
-const gCap=()=>{if(window.wbCap)wbCap()};
+const gCap=()=>{if(WBX.wbCap)WBX.wbCap()};
 // ---- mask list + settings
 const tileN=id=>{const i=WBS.tiles.findIndex(t=>String(t.id)==String(id));return i<0?'':'Stamp '+(i+1)};
 const colName=h=>{const e=C.find(c=>c[1].toLowerCase()==h.toLowerCase());return e?e[0]:h.toUpperCase()};
@@ -135,7 +135,7 @@ $('gm_col').onchange=()=>gmSet('c',$('gm_col').value);$('gm_cc').addEventListene
 // eyedropper: samples the print as the colour mask sees it (pattern only, before the canvas-wide grade)
 let gmPick=null;const gmPickEnd=()=>{gmPick=null;$('art').classList.remove('gmpick');$('gm_eye').setAttribute('aria-pressed','false');if(gmCur())renderGM()};
 $('gm_eye').onclick=()=>{if(gmPick){gmPickEnd();return}if(vw()!='pattern'){const vb=document.querySelector('button[data-v="pattern"]');if(vb)vb.click()}
-const c=$('art').cloneNode(true);wbVec(c);['#texg','#covg','#guig','#gmov','#fpov'].forEach(q=>{const e=c.querySelector(q);if(e)e.remove()});c.querySelector('#dyn').removeAttribute('filter');c.querySelector('#grdf').innerHTML=gDefs(false);c.setAttribute('width',CW);c.setAttribute('height',CH);
+const c=$('art').cloneNode(true);WBX.wbVec(c);['#texg','#covg','#guig','#gmov','#fpov'].forEach(q=>{const e=c.querySelector(q);if(e)e.remove()});c.querySelector('#dyn').removeAttribute('filter');c.querySelector('#grdf').innerHTML=gDefs(false);c.setAttribute('width',CW);c.setAttribute('height',CH);
 const W=Math.round(CW),H=Math.round(CH),img=new Image();gmPick={d:null,W,H};$('art').classList.add('gmpick');$('gm_eye').setAttribute('aria-pressed','true');$('gm_hint').textContent='Click the print to pick the colour to mask. Esc cancels.';
 img.onload=()=>{if(!gmPick)return;try{const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');x.drawImage(img,0,0,W,H);gmPick.d=x.getImageData(0,0,W,H).data}catch(e){gmPickEnd()}};img.onerror=gmPickEnd;
 img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(c))};
@@ -146,7 +146,7 @@ document.addEventListener('keydown',e=>{if(e.key=='Escape'&&gmPick)gmPickEnd()})
 $('gm_inv').onchange=()=>gmSet('inv',$('gm_inv').checked);
 $('gm_ov').onchange=()=>{gmOv=$('gm_ov').checked;refreshG()};
 $('gm_go').onclick=()=>{const m=gmCur();if(m&&m.st){const i=WBS.tiles.findIndex(t=>String(t.id)==m.st);if(i>=0)WBS.cur=i}const vb=document.querySelector('button[data-v="stamp"]');if(vb)vb.click();upd();setTimeout(()=>{const rb=document.querySelector('.rail [data-pn="grade"]');if(rb&&!gmShown())rb.click();setTimeout(()=>{renderGM();gmHandles()},60)},60)};
-$('gm_add').onclick=e=>{e.stopPropagation();{const li=$('gm_menu').querySelector('[data-gt=lay]');if(li)li.hidden=vw()=='stamp'}const l=$('gm_menu'),open=l.hidden;closeDD();if(window.wbCloseMenus)wbCloseMenus();l.hidden=!open;if(open)placeFloat(l,$('gm_add'),true)};
+$('gm_add').onclick=e=>{e.stopPropagation();{const li=$('gm_menu').querySelector('[data-gt=lay]');if(li)li.hidden=vw()=='stamp'}const l=$('gm_menu'),open=l.hidden;closeDD();if(WBX.wbCloseMenus)WBX.wbCloseMenus();l.hidden=!open;if(open)placeFloat(l,$('gm_add'),true)};
 $('gm_menu').onclick=e=>{const it=e.target.closest('[data-gt]');if(!it)return;$('gm_menu').hidden=true;const t=it.dataset.gt,n=grd.masks.filter(q=>q.t==t).length+1,o={t,name:MS[t]+' '+n};
 if(t=='lay')o.lay=(LY()||{}).u||'';if(t=='col')o.c=col(WBS.proj.ink);if(vw()=='stamp'){const tt=WBS.tiles[WBS.cur];if(tt){o.sc=String(tt.id);if(isPos(o)){o.sp='s';o.st=o.sc}}}
 grd.masks.push(mFix(o));gmSel=grd.masks.length-1;gdSave();gradeSync();applyGrade();gCap()};
@@ -185,7 +185,7 @@ if(m.t=='lin'){if(h=='p1'||h=='mv'){m.x1=c(o.x1+dx);m.y1=c(o.y1+dy)}if(h=='p2'||
 else{if(h=='mv'){m.cx=c(o.cx+dx);m.cy=c(o.cy+dy)}else if(h=='rx')m.rx=Math.max(.01,Math.min(3,Math.abs(x-m.cx)));else if(h=='ry')m.ry=Math.max(.01,Math.min(3,Math.abs(y-m.cy)))}
 if(!gmRaf)gmRaf=requestAnimationFrame(()=>{gmRaf=0;refreshG()})});
 const gmUp=()=>{if(!gmDrag)return;const mv=gmDrag.moved;gmDrag=null;if(mv){gdSave();gCap()}};window.addEventListener('pointerup',gmUp);window.addEventListener('pointercancel',gmUp);
-window.wbGrade={get:()=>JSON.parse(JSON.stringify(grd)),set:o=>{grd=gFix(o);if(gmSel>=grd.masks.length)gmSel=grd.masks.length-1;gdSave();gradeSync();applyGrade()},
+WBX.wbGrade={get:()=>JSON.parse(JSON.stringify(grd)),set:o=>{grd=gFix(o);if(gmSel>=grd.masks.length)gmSel=grd.masks.length-1;gdSave();gradeSync();applyGrade()},
 defs:ov=>gDefs(!!ov),stF,layF,refresh:()=>{refreshG();const k=vw()+'|'+WBS.cur+'|'+gmSel;if(gmCur()||k!==gdLast){gdLast=k;gradeSync()}},edH:()=>edH()};
 gradeSync();applyGrade();
 
