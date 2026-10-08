@@ -1,4 +1,5 @@
 import {kv} from '../platform/index.js';
+import {cmdGet} from '../commands/registry.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {DRT,NODRAFT,drOff} from './02-draft-mode-speedups.js';
 import {CASP,CH,CSN,CW,SH,SHN,SW,bk,closeDD,csk,placeFloat,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
@@ -297,18 +298,18 @@ setInterval(()=>{if(!sec.hidden)paint()},30000)})();
 document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=WBS.tiles[WBS.cur]&&WBS.tiles[WBS.cur].items[WBS.sel];
 if(m&&k=='z'){if(typing&&(t.type=='text'||t.type=='number'))return;e.preventDefault();e.shiftKey?redo():undo()}
 else if(m&&k=='y'){e.preventDefault();redo()}
-else if(m&&k=='s'){e.preventDefault();$('psv').click()}
+else if(m&&k=='s'){e.preventDefault();cmdGet('file.save').run()}
 else if(m&&k=='a'&&!typing&&view=='stamp'&&WBS.tiles[WBS.cur].items.length){e.preventDefault();selSet(WBS.tiles[WBS.cur].items.map((_,i)=>i));upd()}
-else if(m&&k=='d'&&!typing&&q){e.preventDefault();$('scp').click()}
-else if(!typing&&(e.key=='Delete'||e.key=='Backspace')&&q&&view=='stamp'){e.preventDefault();$('sdl').click()}
+else if(m&&k=='d'&&!typing&&q){e.preventDefault();cmdGet('stamp.duplicateMotif').run()}
+else if(!typing&&(e.key=='Delete'||e.key=='Backspace')&&q&&view=='stamp'){e.preventDefault();cmdGet('stamp.deleteMotif').run()}
 else if(!typing&&WBS.split&&e.key=='Enter'){e.preventDefault();doSplit()}
 else if(!typing&&WBS.split&&e.key=='Escape'){WBS.split=null;WBH.draw()}
-else if(!typing&&!e.ctrlKey&&!e.metaKey&&e.key.toLowerCase()=='s'&&view=='stamp'&&Q()){e.preventDefault();$('ssp').click()}
+else if(!typing&&!e.ctrlKey&&!e.metaKey&&e.key.toLowerCase()=='s'&&view=='stamp'&&Q()){e.preventDefault();cmdGet('stamp.split').run()}
 else if(!typing&&WBS.brush&&(e.key=='['||e.key==']')){e.preventDefault();WBS.brush.r=((WBS.brush.r+(e.key==']'?15:-15)+540)%360)-180;paintGhost()}
 else if(e.key=='Escape'&&WBS.brush&&!typing){WBS.brush=null;upd()}
 else if(e.key=='Escape'){closeMenus();if(!$('plist').hidden)closeDlg();else if(WBS.sel>=0){selOne(-1);upd()}}
 else if(!typing&&!m&&q&&view=='stamp'&&e.key.startsWith('Arrow')){e.preventDefault();const d=e.shiftKey?10:1,dx=e.key=='ArrowLeft'?-d:e.key=='ArrowRight'?d:0,dy=e.key=='ArrowUp'?-d:e.key=='ArrowDown'?d:0;QS().forEach(o=>{o.x+=dx;o.y+=dy;[o.x,o.y]=wrapP(o.x,o.y)});store();upd()}
-else if(!typing&&!m&&k=='k'&&q&&view=='stamp'){e.preventDefault();$('sko').click()}
+else if(!typing&&!m&&k=='k'&&q&&view=='stamp'){e.preventDefault();cmdGet('stamp.knockout').run()}
 else if(!typing&&!m&&(k=='v'||k=='p')){setView(k=='v'?'stamp':'pattern')}
 else if(!typing&&!m&&k=='0'&&view=='pattern'){z=0;applyZ()}});
 

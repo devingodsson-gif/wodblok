@@ -2,7 +2,7 @@ import {cmdRegister} from '../commands/registry.js';
 import {$} from './01-launch-and-version.js';
 // ===== The app's commands =====
 // Each command does exactly what clicking its button does, so menus, shortcuts and (later) command search can never drift
-// apart. `shortcut` documents the key that already works today; the key handling itself is unchanged (Phases 1-3 are
+// apart. `shortcut` documents the key that already works today; the key handler in 34-desktop-shell looks the key up here and calls the command's run(), with the same conditions as before (Phases 1-3 are
 // bug-for-bug). A command is enabled when its button exists, is visible and is not disabled.
 const el = id => () => $(id);
 const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled; };
@@ -10,6 +10,10 @@ const click = id => () => $(id).click();
 const COMMANDS = [
   ['edit.undo', 'Undo', 'undo', 'Mod+Z'],
   ['edit.redo', 'Redo', 'redo', 'Mod+Shift+Z'],
+  ['stamp.duplicateMotif', 'Duplicate motif', 'scp', 'Mod+D'],
+  ['stamp.deleteMotif', 'Delete motif', 'sdl', 'Delete'],
+  ['stamp.split', 'Split motif', 'ssp', 'S'],
+  ['stamp.knockout', 'Knock out', 'sko', 'K'],
   ['file.projects', 'Projects', 'pls'],
   ['file.new', 'New project', 'pnw'],
   ['file.clear', 'Clear canvas', 'clr'],
