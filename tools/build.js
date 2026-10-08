@@ -24,10 +24,18 @@ for (const sub of ['platform', 'commands']) {                    // shared layer
 }
 parts.push(...manifest.map(f => strip(f, fs.readFileSync(path.join(dir, f), 'utf8'))));
 parts.push(strip('main.js', fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8')));
+// The version lives in package.json (major number = the release number: 101 is the first repo build). The build writes it
+// into WB_VER and the page <title>; nothing else needs editing for a release.
+const VER = parseInt(JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version, 10);
+if (!(VER >= 100)) throw new Error('package.json version must start with the release number');
+let stamped = 0;
+for (let i = 0; i < parts.length; i++) parts[i] = parts[i].replace(/^const WB_VER=\d+;/m, () => { stamped++; return 'const WB_VER=' + VER + ';'; });
+if (stamped !== 1) throw new Error('expected exactly one "const WB_VER=" line, found ' + stamped);
 const body = "(function(){'use strict';\n" + parts.join('') + '})();';
 const shell = fs.readFileSync(path.join(ROOT, 'src', 'shell.html'), 'utf8');
 const marker = '/*@@MAIN@@*/';
 if (shell.split(marker).length !== 2) throw new Error('shell.html must contain exactly one ' + marker);
 fs.mkdirSync(path.dirname(out), { recursive: true });
-fs.writeFileSync(out, shell.replace(marker, () => body));
+fs.writeFileSync(out, shell.replace(marker, () => body).replace(/<title>Wodblok v\d+<\/title>/, '<title>Wodblok v' + VER + '</title>'));
+console.log('version', VER);
 console.log('built', path.relative(ROOT, out), fs.statSync(out).size, 'bytes from', manifest.length, 'modules + main.js');
