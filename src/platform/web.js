@@ -2,20 +2,20 @@
 // Web adapter: IndexedDB for small records, OPFS for large files, real Save where the browser has it, download elsewhere.
 // No work on import; every function opens what it needs when called. Errors are not swallowed.
 /** @typedef {import('./types.d.ts').Records} Records */
-const DB = 'wodblok', STORE = 'records';
-let dbp = null;
-const open = () => dbp || (dbp = new Promise((res, rej) => {
-  const r = indexedDB.open(DB, 1);
-  r.onupgradeneeded = () => r.result.createObjectStore(STORE);
+const WEB_DB = 'wodblok', WEB_STORE = 'records';
+let webDbp = null;
+const webOpen = () => webDbp || (webDbp = new Promise((res, rej) => {
+  const r = indexedDB.open(WEB_DB, 1);
+  r.onupgradeneeded = () => r.result.createObjectStore(WEB_STORE);
   r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
 }));
-const tx = async (mode, fn) => { const db = await open(); return new Promise((res, rej) => { const t = db.transaction(STORE, mode), q = fn(t.objectStore(STORE)); t.oncomplete = () => res(q.result); t.onerror = () => rej(t.error); }); };
+const webTx = async (mode, fn) => { const db = await webOpen(); return new Promise((res, rej) => { const t = db.transaction(WEB_STORE, mode), q = fn(t.objectStore(WEB_STORE)); t.oncomplete = () => res(q.result); t.onerror = () => rej(t.error); }); };
 /** @type {Records} */
 const records = {
-  get: async k => { const v = await tx('readonly', s => s.get(k)); return v === undefined ? null : v; },
-  put: async (k, v) => { await tx('readwrite', s => s.put(v, k)); },
-  del: async k => { await tx('readwrite', s => s.delete(k)); },
-  list: async () => /** @type {string[]} */ (await tx('readonly', s => s.getAllKeys())),
+  get: async k => { const v = await webTx('readonly', s => s.get(k)); return v === undefined ? null : v; },
+  put: async (k, v) => { await webTx('readwrite', s => s.put(v, k)); },
+  del: async k => { await webTx('readwrite', s => s.delete(k)); },
+  list: async () => /** @type {string[]} */ (await webTx('readonly', s => s.getAllKeys())),
 };
 const root = () => navigator.storage.getDirectory();
 const blobs = {

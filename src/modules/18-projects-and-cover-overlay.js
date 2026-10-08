@@ -1,4 +1,4 @@
-import {kv,use} from '../platform/index.js';
+import {kv,use,collection} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {C,CC,CH,CM,CSN,CW,PCOL,SHN,bk,fixC,paintColors,saveCC,setDim,shOf} from './04-canvas-and-stamp-outlines.js';
 import {DEF_TILES,clean,cust,mkL,selOne,store} from './06-motif-library-folders.js';
@@ -71,14 +71,14 @@ const newId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6
 const shapeInfo=d=>{const k=d.dim&&d.dim.k||'rect',c=d.dim&&d.dim.c||[2,3];return`${d.dim&&CSN[d.dim.cs]&&d.dim.cs!='rect'?CSN[d.dim.cs]:(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2))} canvas · ${({hex:'hex',circle:'circle',diamond:'diamond',tri:'triangle'})[k]||(SHN[k]||'Rectangle').toLowerCase()} stamps · ${d.tiles.length} stamp${d.tiles.length>1?'s':''}`};
 // storage backend
 const ST={kind:null,col:null,ready:null,
-init(){return this.ready||(this.ready=(async()=>{try{const db=await use('db'),u=db&&await use('user'),id=u&&await u.id();if(db&&id){this.col=db.collection('data/users/'+id+'/projects');this.kind='account';return}}catch(e){}this.kind='browser'})())},
+init(){return this.ready||(this.ready=(async()=>{try{const db=await use('db'),u=db&&await use('user'),id=u&&await u.id();if(db&&id){this.col=db.collection('data/users/'+id+'/projects');this.kind='account';return}}catch(e){}this.kind='browser';this.col=await collection('projects','wb18_projects')})())},
 loc(){try{return JSON.parse(kv.get('wb18_projects')||'{}')}catch(e){return{}}},
 locSave(o){kv.set('wb18_projects',JSON.stringify(o))},
-async list(){await this.init();if(this.kind=='account'){const r=await this.col.get();return r.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.updated||0)-(a.updated||0))}
+async list(){await this.init();if(this.col){const r=await this.col.get();return r.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.updated||0)-(a.updated||0))}
 const o=this.loc();return Object.entries(o).map(([id,v])=>({id,...v})).sort((a,b)=>(b.updated||0)-(a.updated||0))},
-async get(id){await this.init();if(this.kind=='account'){const x=await this.col.doc(id).get();return x.exists?{id,...x.data()}:null}const v=this.loc()[id];return v?{id,...v}:null},
-async put(id,rec){await this.init();if(this.kind=='account')return this.col.doc(id).set(rec);const o=this.loc();o[id]=rec;this.locSave(o)},
-async del(id){await this.init();if(this.kind=='account')return this.col.doc(id).delete();const o=this.loc();delete o[id];this.locSave(o)}};
+async get(id){await this.init();if(this.col){const x=await this.col.doc(id).get();return x.exists?{id,...x.data()}:null}const v=this.loc()[id];return v?{id,...v}:null},
+async put(id,rec){await this.init();if(this.col)return this.col.doc(id).set(rec);const o=this.loc();o[id]=rec;this.locSave(o)},
+async del(id){await this.init();if(this.col)return this.col.doc(id).delete();const o=this.loc();delete o[id];this.locSave(o)}};
 function thumb(){return new Promise(res=>{try{const img=new Image(),to=setTimeout(()=>res(''),5000);img.onload=()=>{try{const w=200,h=Math.round(200*CH/CW),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);clearTimeout(to);res(c.toDataURL('image/jpeg',.7))}catch(e){res('')}};img.onerror=()=>res('');img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())}catch(e){res('')}})}
 async function saveTo(id,name){const sn=snapshot(),a=await artSnap();if(a)sn.art=a;const rec={name,updated:Date.now(),info:shapeInfo(sn),thumb:await thumb(),data:JSON.stringify(sn)};try{await ST.put(id,rec)}catch(e){if(!a)throw e;delete sn.art;rec.data=JSON.stringify(sn);await ST.put(id,rec);pmsg('Saved, but without a picture for Art: the project was too big to store with it.')}return sn}
 // two-tap confirm for actions that would drop unsaved work

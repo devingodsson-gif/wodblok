@@ -2,6 +2,8 @@
 // means writing another adapter and nothing else. This is the artifact/browser adapter: what the app can see and do is what v100 did.
 // Rules: no work on import; no alert/confirm/prompt; callers keep their own try/catch (these do not swallow errors).
 
+import {records} from './web.js';
+
 // Small key/value settings and records. v100 kept about 36 separate localStorage keys (wb2_ ... wb95_). They now live in ONE
 // versioned record, `wb_settings` = {v:1, values:{key:string}}, so they can be exported, versioned and moved as a unit.
 // Values over 64 KB (imported fonts, saved projects, the stamp library, the working-copy autosave) stay in their own keys.
@@ -35,6 +37,30 @@ const kv = {
   keys: () => [...new Set([...Object.keys(loadRecord().values), ...Object.keys(localStorage)])].filter(k => k !== SETTINGS_KEY),
 };
 
+// A named collection of records for projects and the stamp library, shaped like the artifact db's collection (get() -> {docs}, doc(id).get/set/delete)
+// so callers use one code path. Backed by IndexedDB (web adapter). Returns null when the browser has none; callers then use kv.
+// The first time a collection is opened, records held in the old single localStorage key are copied in (the old key is left in place).
+const hasRecords = () => typeof indexedDB !== 'undefined' && !!indexedDB;
+async function collection(name, legacyKey) {
+  if (!hasRecords()) return null;
+  const pre = name + ':', flag = '__migrated:' + name;
+  try {
+    if (legacyKey && !(await records.get(flag))) {
+      let old = {}; try { old = JSON.parse(kv.get(legacyKey) || '{}') || {}; } catch (e) { /* unreadable: nothing to copy */ }
+      for (const [id, v] of Object.entries(old)) if (!(await records.get(pre + id))) await records.put(pre + id, v);
+      await records.put(flag, 1);
+    }
+  } catch (e) { return null; }
+  return {
+    async get() { const ks = (await records.list()).filter(k => typeof k === 'string' && k.startsWith(pre)); return { docs: await Promise.all(ks.map(async k => { const v = await records.get(k); return { id: k.slice(pre.length), data: () => v }; })) }; },
+    doc: id => ({
+      async get() { const v = await records.get(pre + id); return { exists: v !== null, id, data: () => v }; },
+      set: v => records.put(pre + id, v),
+      delete: () => records.del(pre + id),
+    }),
+  };
+}
+
 // Restart the app (used after Import everything so every module reads the restored data).
 const reload = () => location.reload();
 
@@ -50,4 +76,4 @@ const clipboard = {
   write: items => navigator.clipboard.write(items),
 };
 
-export {kv,use,clipboard,reload};
+export {kv,use,clipboard,reload,collection};

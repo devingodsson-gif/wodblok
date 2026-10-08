@@ -1,4 +1,4 @@
-import {kv,use} from '../platform/index.js';
+import {kv,use,collection} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {BK} from './03-stamp-prints-and-drawing.js';
 import {C,CC,CH,CM,CW,col,geom,paintColors,saveCC,shOf,shp,useT} from './04-canvas-and-stamp-outlines.js';
@@ -13,12 +13,12 @@ import {artEnc,artId,artLive,artOk} from './25-art-layers.js';
 // A library record: {name, updated, w, h, img (transparent picture), tile (the stamp, as JSON), motifs (the custom motifs it uses), colors (its custom ink)}.
 // Stored privately with your Claude account when that is available, otherwise in this browser.
 const SL={kind:null,col:null,ready:null,
-init(){return this.ready||(this.ready=(async()=>{try{const db=await use('db'),u=db&&await use('user'),id=u&&await u.id();if(db&&id){this.col=db.collection('data/users/'+id+'/stamps');this.kind='account';return}}catch(e){}this.kind='browser'})())},
+init(){return this.ready||(this.ready=(async()=>{try{const db=await use('db'),u=db&&await use('user'),id=u&&await u.id();if(db&&id){this.col=db.collection('data/users/'+id+'/stamps');this.kind='account';return}}catch(e){}this.kind='browser';this.col=await collection('stamps','wb50_stamps')})())},
 loc(){try{return JSON.parse(kv.get('wb50_stamps')||'{}')}catch(e){return{}}},
-async list(){await this.init();if(this.kind=='account'){const r=await this.col.get();return r.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.updated||0)-(a.updated||0))}return Object.entries(this.loc()).map(([id,v])=>({id,...v})).sort((a,b)=>(b.updated||0)-(a.updated||0))},
-async get(id){await this.init();if(this.kind=='account'){const x=await this.col.doc(id).get();return x.exists?{id,...x.data()}:null}const v=this.loc()[id];return v?{id,...v}:null},
-async put(id,rec){await this.init();if(this.kind=='account')return this.col.doc(id).set(rec);const o=this.loc();o[id]=rec;kv.set('wb50_stamps',JSON.stringify(o))},
-async del(id){await this.init();if(this.kind=='account')return this.col.doc(id).delete();const o=this.loc();delete o[id];kv.set('wb50_stamps',JSON.stringify(o))}};
+async list(){await this.init();if(this.col){const r=await this.col.get();return r.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.updated||0)-(a.updated||0))}return Object.entries(this.loc()).map(([id,v])=>({id,...v})).sort((a,b)=>(b.updated||0)-(a.updated||0))},
+async get(id){await this.init();if(this.col){const x=await this.col.doc(id).get();return x.exists?{id,...x.data()}:null}const v=this.loc()[id];return v?{id,...v}:null},
+async put(id,rec){await this.init();if(this.col)return this.col.doc(id).set(rec);const o=this.loc();o[id]=rec;kv.set('wb50_stamps',JSON.stringify(o))},
+async del(id){await this.init();if(this.col)return this.col.doc(id).delete();const o=this.loc();delete o[id];kv.set('wb50_stamps',JSON.stringify(o))}};
 const slMsg=t=>{$('slmsg').textContent=t};
 const slOkImg=s=>typeof s=='string'&&s.length<6e6&&/^data:image\/(png|webp);base64,[A-Za-z0-9+\/=]*$/.test(s);
 // draw one stamp to a canvas: its ink and shape (and edge wear), long side = px, transparent or on the paper colour
