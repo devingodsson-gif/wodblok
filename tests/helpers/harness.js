@@ -14,7 +14,9 @@ const TARGETS = {
   build: path.join(ROOT, 'dist', 'wodblok.html'),
 };
 const TARGET = process.env.WB_TARGET || 'legacy';
-const APP_URL = 'file://' + TARGETS[TARGET];
+// WB_TARGET=esm loads the unbundled ES modules from `node tools/serve-esm.js` (http://127.0.0.1:5199/)
+const ESM_URL = 'http://127.0.0.1:5199/';
+const APP_URL = TARGET === 'esm' ? ESM_URL : 'file://' + TARGETS[TARGET];
 const FIXED_TIME = Date.UTC(2026, 9, 8, 12, 0, 0);   // 2026-10-08 12:00:00 UTC, the day of the baseline
 
 // Injected before any page script runs: seeded Math.random, plus (optionally) a stand-in for the claude.ai
@@ -65,7 +67,7 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL } =
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
   await page.addInitScript(initScript({ seed, runtime }));
   // No network: the app asks Google Fonts for two stylesheets; answer them empty so layout is the same everywhere.
-  await page.route(/^https?:\/\//, r => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+  await page.route(/^https?:\/\/(?!127\.0\.0\.1:5199\/)/, r => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
   await page.clock.setFixedTime(FIXED_TIME);
   await page.goto(url);
   await page.waitForFunction(() => typeof (window.__wbTest ? 1 : coreStr) !== 'undefined' && document.fonts.status === 'loaded');

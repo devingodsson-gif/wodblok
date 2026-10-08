@@ -43,7 +43,7 @@ h1{font-size:22px;margin:0;letter-spacing:.01em}
 </main>
 <script>
 /* percentages are filled from this one object so the page and its numbers cannot disagree */
-var P={a:100,b:100,c:0,note:"1b done: shared variables on one state object, bridges on one registry, tests green. Next: 1c ES modules."};
+var P={a:100,b:100,c:100,note:"Phase 1 done: 35 ES modules, explicit imports and exports, start-up in main.js, all tests green on the bundle and on raw modules, speed same as v100."};
 function set(id,v){document.getElementById(id).textContent=v+"%"}
 set("p1a",P.a);set("p1b",P.b);set("p1c",P.c);
 document.getElementById("b1a").style.width=P.a+"%";document.getElementById("b1b").style.width=P.b+"%";document.getElementById("b1c").style.width=P.c+"%";

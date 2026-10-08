@@ -6,8 +6,7 @@
   "scripts": {
     "build": "node tools/build.js",
     "build:single": "node tools/build.js",
-    "verify:build": "node tools/verify-build.js",
-    "dev": "node tools/build.js && echo Open dist/wodblok.html in your browser",
+    "dev": "node tools/serve-esm.js",
     "test": "playwright test --project=chromium",
     "test:legacy": "WB_TARGET=legacy playwright test --project=chromium",
     "test:update-golden": "playwright test --project=chromium --update-snapshots",
