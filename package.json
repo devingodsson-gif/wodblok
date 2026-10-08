@@ -12,6 +12,7 @@
     "test:update-golden": "playwright test --project=chromium --update-snapshots",
     "test:webkit": "playwright test --project=webkit --grep @smoke",
     "perf": "WB_PERF=1 playwright test --project=chromium tests/perf.spec.js",
+    "typecheck": "tsc -p .",
     "check:platform": "node tools/check-platform.js",
     "coupling-map": "node tools/coupling-map.js legacy/wodblok-v100.html > docs/coupling-map.md",
     "test:build": "node tools/build.js && WB_TARGET=build playwright test --project=chromium"
@@ -19,6 +20,7 @@
   "devDependencies": {
     "@playwright/test": "1.56.0",
     "eslint-scope": "9.1.2",
-    "espree": "11.2.0"
+    "espree": "11.2.0",
+    "typescript": "^7.0.2"
   }
 }
