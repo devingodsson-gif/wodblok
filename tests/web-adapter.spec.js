@@ -3,7 +3,7 @@
 const { test, expect } = require('@playwright/test');
 const { TARGET, APP_URL } = require('./helpers/harness');
 
-test.beforeEach(({}, ti) => { if (!/wiring|without an account/.test(ti.title)) test.skip(TARGET !== 'esm', 'web adapter unit tests load the ES modules (WB_TARGET=esm)'); });
+test.beforeEach(({}, ti) => { if (!/wiring|without an account|without the Claude runtime/.test(ti.title)) test.skip(TARGET !== 'esm', 'web adapter unit tests load the ES modules (WB_TARGET=esm)'); });
 
 async function adapter(page) {
   await page.goto(APP_URL);
@@ -66,4 +66,16 @@ test('without an account, projects move from the old key to IndexedDB and surviv
   await expect(page.locator('#pgrid .pc')).toHaveCount(1);
   expect(errors).toEqual([]);
   await ctx.close();
+});
+
+test('without the Claude runtime, Export everything still saves a file', async ({ page }) => {
+  test.skip(TARGET === 'legacy', 'new in the repo build');
+  const { openApp, settle } = require('./helpers/harness');
+  const { errors } = await openApp(page, { runtime: 'none' });
+  await page.evaluate(() => { delete window.showSaveFilePicker; });
+  const dl = page.waitForEvent('download');
+  await page.click('#fileb'); await page.click('#xall');
+  expect((await dl).suggestedFilename()).toMatch(/\.wodblok-all\.json$/);
+  await settle(page);
+  expect(errors).toEqual([]);
 });

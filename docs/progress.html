@@ -52,7 +52,7 @@ h1{font-size:22px;margin:0;letter-spacing:.01em}
 </main>
 <script>
 /* percentages are filled from this one object so the page and its numbers cannot disagree */
-var P={a:100,b:100,c:100,n2:{b:100,d:100,c:100,e:100,f:60},note:"2e done: stamp shortcuts run through the command registry; 50 tests green on the build. Next: switch the app to the web adapter (2f), run tests on both."};
+var P={a:100,b:100,c:100,n2:{b:100,d:100,c:100,e:100,f:100},note:"Phase 2 complete: web adapter wired in (IndexedDB, OPFS, Save/download), shortcuts through the command registry. 51 tests green on the build, 53 on raw modules."};
 function set(id,v){document.getElementById(id).textContent=v+"%"}
 set("p1a",P.a);set("p1b",P.b);set("p1c",P.c);
 document.getElementById("b1a").style.width=P.a+"%";document.getElementById("b1b").style.width=P.b+"%";document.getElementById("b1c").style.width=P.c+"%";
