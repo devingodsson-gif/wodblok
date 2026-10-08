@@ -2,8 +2,8 @@
 Stamped-pattern editor, web app first. Commercial product; the repo is private.
 
 ## Commands
-npm run test | test:legacy | test:update-golden | test:webkit | perf | coupling-map
-(`dev`, `build` and `build:single` arrive with Phase 1.)
+npm run build | dev | verify:build | test | test:build | test:legacy | test:update-golden | test:webkit | perf | coupling-map
+Source of truth for the app is src/ (src/shell.html + src/legacy/*.js in manifest order); `npm run build` writes dist/wodblok.html. legacy/ is never edited.
 
 ## Rules
 - The repo is the only source of truth. Every release, including the claude.ai preview artifact, is built from it.

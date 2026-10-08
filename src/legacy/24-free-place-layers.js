@@ -1,0 +1,39 @@
+// ===== Free-place layers: no arrangement, just stamps put down by hand anywhere on the canvas.
+// L.free = true; L.pl = [{u, t: stamp id, x, y (canvas units), s: long side (canvas units), r: degrees, f: 1 | -1}]
+var selLM=new Set(),lAnc=null,tM=new Set(),tAnc=null,mAnc=null,pSel=new Set(),pAnc=null;
+function lyGrp(){const g=layers.map((l,i)=>i).filter(i=>selLM.has(layers[i].u));return g.length>1&&layers[selL]&&selLM.has(layers[selL].u)?g:[selL]}
+function tGrp(){const g=tiles.map((t,i)=>i).filter(i=>tM.has(tiles[i].id));return g.length>1&&tiles[cur]&&tM.has(tiles[cur].id)?g:[cur]}
+var fpMS=new Set(),fpAnc=null,fpPool=new Set(),fpPA=null;
+function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(fpMS.size>1&&fpMS.has(String(fpSel))){const g=pl.filter(q=>fpMS.has(String(q.u)));if(g.length>1)return g}const p=pl.find(q=>q.u==fpSel);return p?[p]:[]}
+function fpPoolOk(){return!!(fpB&&fpPool.size>1&&fpPool.has(String(fpB)))}
+function fpTog(u){u=String(u);let cur=fpGrp().map(q=>String(q.u));if(!cur.length&&fpSel!==-1)cur=[String(fpSel)];const st=new Set(cur);if(st.has(u)){st.delete(u);fpSel=st.size?[...st][st.size-1]:-1}else{st.add(u);fpSel=u}fpMS=st;fpAnc=u;fpB=null;fpGhost=null;upd()}
+function fpRange(u){u=String(u);const L=fpL();if(!L)return;const order=(L.pl||[]).slice().reverse().map(q=>String(q.u)),a0=fpAnc!=null&&order.includes(String(fpAnc))?String(fpAnc):(fpSel!==-1?String(fpSel):u),a=order.indexOf(a0),b=order.indexOf(u);if(a<0||b<0){fpMS=new Set();fpSel=u;fpAnc=u;upd();return}fpMS=new Set(order.slice(Math.min(a,b),Math.max(a,b)+1));fpSel=u;fpB=null;fpGhost=null;upd()}
+function fpPick(k,e,order){const L=fpL(),art=!!(L&&L.art);let cur=fpPoolOk()?[...fpPool]:(fpB?[String(fpB)]:[]);if(e.shiftKey&&fpPA!=null&&order.includes(fpPA)){const a=order.indexOf(fpPA),b=order.indexOf(k);cur=order.slice(Math.min(a,b),Math.max(a,b)+1)}else{const st=new Set(cur);st.has(k)?st.delete(k):st.add(k);cur=[...st];fpPA=k}fpPool=new Set(cur);if(!cur.length)fpB=null;else{const pk=cur.includes(String(fpB))?String(fpB):cur[cur.length-1];fpB=art?pk:+pk}fpSel=-1;fpMS=new Set();fpLast=null;upd()}
+let CR=null,fpB=null,fpSel=-1,fpDrag=null,fpGhost=null,fpXf=null,fpSyncing=0,fpTh={},fpAlt=false;
+// snapping: L.fg = {snap, ss (snap size to whole cells)} per layer; the grid itself (columns, snap points) is the shared pgrid, edited in the Grid tool
+const fpFG=L=>({snap:false,ss:false,...((L&&L.fg)||{}),show:pgrid.show,n:pgrid.n,m:pgrid.m});
+const fpCell=L=>CW/Math.max(2,fpFG(L).n);
+function fpSnap(L,x,y,e,force){const g=fpFG(L);if(!force&&(!g.snap||(e&&e.altKey)))return[x,y];if(pgrid.sh&&pgrid.sh!='rect'){const M=gModel(pgrid.sh,CW,CH,Math.max(2,pgrid.n),false),b=gNear(g.m=='c'?M.cents:M.verts,x,y,CW,CH,false);if(b)return[b[0],b[1]]}const c=fpCell(L),o=g.m=='c'?c/2:0;return[Math.round((x-o)/c)*c+o,Math.round((y-o)/c)*c+o]}
+function fpSnapS(L,sz,e,force){const g=fpFG(L);if(!force&&(!g.snap||!g.ss||(e&&e.altKey)))return sz;const c=fpCell(L);return Math.max(c,Math.round(sz/c)*c)}
+function fpGridDraw(){const g=$('fpgrid');if(!g)return;const on=pgrid.show&&!$('boardP').classList.contains('off');if(!on){if(g.dataset.k){g.innerHTML='';g.dataset.k=''}return}
+const c=CW/Math.max(2,pgrid.n),k=CW+'x'+CH+'x'+pgrid.n+pgrid.m+pgrid.op+(pgrid.sh||'rect');if(g.dataset.k==k)return;g.dataset.k=k;
+if(pgrid.sh&&pgrid.sh!='rect'){const M=gModel(pgrid.sh,CW,CH,Math.max(2,pgrid.n),false),a=c*.09,mk=[],pm=pgrid.m=='c'?M.cents:(['rrect','circle','oval','arch'].includes(pgrid.sh)?M.verts:[]);pm.forEach(q=>{if(q[0]>=0&&q[0]<=CW&&q[1]>=0&&q[1]<=CH)mk.push(`M${(q[0]-a).toFixed(2)} ${q[1].toFixed(2)}h${(2*a).toFixed(2)}M${q[0].toFixed(2)} ${(q[1]-a).toFixed(2)}v${(2*a).toFixed(2)}`)});
+ const all=M.items.join('')+mk.join(''),w=Math.max(CW,CH)/900,o=pgrid.op/100;g.innerHTML=`<clipPath id="pgclip"><rect width="${CW}" height="${CH}"/></clipPath><g clip-path="url(#pgclip)"><path d="${all}" fill="none" stroke="#fff" stroke-opacity="${(.6*o).toFixed(2)}" stroke-width="${(w*2.6).toFixed(2)}"/><path d="${all}" fill="none" stroke="#2f6bff" stroke-opacity="${(.9*o).toFixed(2)}" stroke-width="${w.toFixed(2)}"/></g>`;return}
+let d='',m='';for(let x=0;x<=CW+.01;x+=c)d+=`M${x.toFixed(2)} 0V${CH}`;for(let y=0;y<=CH+.01;y+=c)d+=`M0 ${y.toFixed(2)}H${CW}`;
+if(pgrid.m=='c'){const a=c*.09;for(let y=c/2;y<CH;y+=c)for(let x=c/2;x<CW;x+=c)m+=`M${(x-a).toFixed(2)} ${y.toFixed(2)}h${(2*a).toFixed(2)}M${x.toFixed(2)} ${(y-a).toFixed(2)}v${(2*a).toFixed(2)}`}
+const w=Math.max(CW,CH)/900,all=d+m,o=pgrid.op/100;g.innerHTML=`<path d="${all}" fill="none" stroke="#fff" stroke-opacity="${(.6*o).toFixed(2)}" stroke-width="${(w*2.6).toFixed(2)}"/><path d="${all}" fill="none" stroke="#2f6bff" stroke-opacity="${(.9*o).toFixed(2)}" stroke-width="${w.toFixed(2)}"/>`}
+const fpL=()=>{const L=layers[selL];return L&&L.free?L:null};
+const fpU=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const fpSeed=u=>{let h=7;for(const c of String(u))h=(h*31+c.charCodeAt(0))>>>0;return h%100000};
+function freeLayer(L,li,pa,lgB){const pl=(L.pl||[]).filter(p=>tiles.some(t=>t.id==p.t));if(!pl.length)return['',''];const amt=0,act=!DRS()&&((L.pst||0)>0||(L.pfl||0)>0),pre=act?`#q${li}_`:'#s',need=new Set(),f=v=>v.toFixed(2),ed=li==selL&&!$('boardP').classList.contains('off');let defs='',out='';const bh=L.bl=='behind',prev=[];
+pl.forEach(p=>{const tt=tiles.find(t=>t.id==p.t),G=geom(shOf(tt)),k=p.s/Math.max(G.SW,G.SH),sd=fpSeed(p.u),R=rng(sd+li*977),r1=R()-.5,r2=R()-.5,r3=R()-.5,r4=R(),bin=act?Math.floor(rng(sd*7919+li*1299709+13)()*16):0;if(act)need.add(tt.id+'_'+bin);
+let drr=0,dxr=0,dyr=0,sx=1,sy=1;{const rR=+L.rrot||0,rP=+L.rpos||0,fH=!!L.rfh,fV=!!L.rfv,tN=!!L.rtn;if(rR||rP||fH||fV||tN){const Q=rng(sd*15485863+li*7919+(L.rsd|0)*104729+101),u1=Q(),u2=Q(),u3=Q(),u4=Q(),u5=Q(),u6=Q();drr=(u1*2-1)*rR;dxr=(u2*2-1)*rP/100*p.s*.5;dyr=(u3*2-1)*rP/100*p.s*.5;if(fH&&u4<.5)sx=-1;if(fV&&u5<.5&&flipVOk(G))sy=-1;if(tN)drr+=turnFit(G,u6)}}
+const ev=Math.floor(rng(sd*104729+li*15485863+(tt.es||0)*31)()*eNV(tt)),tr=`transform="translate(${f(r2*amt*.6+dxr)} ${f(r3*amt*.6+dyr)}) rotate(${(r1*amt+(+p.r||0)+drr).toFixed(2)}) scale(${(k*(p.f||1)*sx).toFixed(4)} ${(k*sy).toFixed(4)}) translate(${-G.SW/2} ${-G.SH/2})"`,op=`opacity="${(1-r4*amt*.03).toFixed(2)}"`,
+inner=act||DRS()||!eT(tt)?`<use href="${pre}${tt.id}${act?'_'+bin:''}" ${op} ${tr}${window.wbGrade&&wbGrade.stF(tt.id)?` filter="url(#${wbGrade.stF(tt.id)})"`:''}/>`:`<g ${op} ${tr}${window.wbGrade&&wbGrade.stF(tt.id)?` filter="url(#${wbGrade.stF(tt.id)})"`:''}><use href="#s${tt.id}"/><use href="#e${tt.id}_${ev}" fill="${inkOf(tt)}"/></g>`;
+const hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-G.SW*k/2)}" y="${f(-G.SH*k/2)}" width="${f(G.SW*k)}" height="${f(G.SH*k)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
+const sg=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x)} ${f(+p.y)})">${hit}${inner}</g>`;
+if(bh&&((lgB||'').length||prev.length)){const mid='bhf'+li+'_'+prev.length;defs+=`<mask id="${mid}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/><g filter="url(#bhk)">${bhStrip((lgB||'')+prev.join(''))}</g></mask>`;out+=`<g mask="url(#${mid})">${sg}</g>`}else out+=sg;prev.push(sg)});
+if(act)defs+=pressDefs(L,li,tiles,need);
+const ink=L.ink&&CM[L.ink]?col(L.ink):'';if(ink)defs+=`<filter id="lk${li}" filterUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" color-interpolation-filters="sRGB"><feFlood flood-color="${ink}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;
+const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'';
+return[defs,`<g${ink?` filter="url(#lk${li})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}

@@ -1,0 +1,77 @@
+// ===== Stamp library: keep stamps between projects, and export a stamp as a PNG =====
+// A library record: {name, updated, w, h, img (transparent picture), tile (the stamp, as JSON), motifs (the custom motifs it uses), colors (its custom ink)}.
+// Stored privately with your Claude account when that is available, otherwise in this browser.
+const SL={kind:null,col:null,ready:null,
+init(){return this.ready||(this.ready=(async()=>{try{const db=await use('db'),u=db&&await use('user'),id=u&&await u.id();if(db&&id){this.col=db.collection('data/users/'+id+'/stamps');this.kind='account';return}}catch(e){}this.kind='browser'})())},
+loc(){try{return JSON.parse(localStorage.getItem('wb50_stamps')||'{}')}catch(e){return{}}},
+async list(){await this.init();if(this.kind=='account'){const r=await this.col.get();return r.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.updated||0)-(a.updated||0))}return Object.entries(this.loc()).map(([id,v])=>({id,...v})).sort((a,b)=>(b.updated||0)-(a.updated||0))},
+async get(id){await this.init();if(this.kind=='account'){const x=await this.col.doc(id).get();return x.exists?{id,...x.data()}:null}const v=this.loc()[id];return v?{id,...v}:null},
+async put(id,rec){await this.init();if(this.kind=='account')return this.col.doc(id).set(rec);const o=this.loc();o[id]=rec;localStorage.setItem('wb50_stamps',JSON.stringify(o))},
+async del(id){await this.init();if(this.kind=='account')return this.col.doc(id).delete();const o=this.loc();delete o[id];localStorage.setItem('wb50_stamps',JSON.stringify(o))}};
+const slMsg=t=>{$('slmsg').textContent=t};
+const slOkImg=s=>typeof s=='string'&&s.length<6e6&&/^data:image\/(png|webp);base64,[A-Za-z0-9+\/=]*$/.test(s);
+// draw one stamp to a canvas: its ink and shape (and edge wear), long side = px, transparent or on the paper colour
+async function stampCanvas(t,px,onPaper,o){o=o||{};const G=geom(shOf(t)),dd=$('dyn').querySelector('defs');if(!dd)throw new Error('The stamp is not drawn yet');
+useT(t);const outline=shp(0);useT(tiles[cur]);const ink=inkOf(t),pa=col(proj.bg),fx=!!o.fx,tx=!!o.tx,hasD=sel=>!!dd.querySelector(sel);
+// print it at the size it prints in your pattern, so grain and roughness match what you see there
+let k=180/Math.max(G.SW,G.SH),L=null,li=-1;
+if(fx||tx)try{li=layers.findIndex(l=>l.vis!==false&&(l.st||[]).includes(t.id)&&!l.art&&!l.txt&&!(l.fr&&l.fr.on));if(li>=0){L=layers[li];if(!L.free){const T=lattice(L);k=T.ts*(shOf(t).z||100)/(T.g.SW*T.z)*1.004}else{const q=(L.pl||[]).find(z=>z.t==t.id);if(q)k=q.s/Math.max(G.SW,G.SH)}}}catch(e){L=null;li=-1}
+k=Math.min(k,.95*Math.min(CW,CH)/Math.max(G.SW,G.SH));if(!(k>0))k=1;
+const W=G.SW*k,H=G.SH*k,mx=Math.max(W,H),pad=(fx||tx)?mx*.05:0,cx=CW/2,cy=CH/2,xf=`translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${k.toFixed(5)}) translate(${-G.SW/2} ${-G.SH/2})`;
+let defs=(BK.vdefs!=null?BK.vdefs:dd.innerHTML)+(fx&&SURFC[t.id]?SURFC[t.id].s:'');if(!fx){defs=defs.split(` mask="url(#is${t.id})"`).join('');defs=defs.replace(/<g class="txo"[^>]*>.*?<\/g>/g,'')}let use=`<use href="#s${t.id}"/>`+(eT(t)?`<use href="#e${t.id}_0" fill="${ink}"/>`:'');
+if(fx&&L&&((L.pst||0)>0||(L.pfl||0)>0)){const key=t.id+'_'+Math.floor(Math.random()*16);defs+=pressDefs(L,li,[t],new Set([key]));useT(tiles[cur]);use=`<use href="#q${li}_${key}"/>`}
+if(fx&&L&&L.ink&&CM[L.ink]&&hasD('#lk'+li))use=`<g filter="url(#lk${li})">${use}</g>`;
+let g=`<g transform="${xf}">${use}</g>`;
+if(fx&&hasD('#rf'))g=`<g filter="url(#rf)">${g}</g>`;
+{const ic=tx?inkCatch(true):null;if(ic){defs+=ic.defs.replace('id="cw"','id="xcw"');g=`<g mask="url(#xcw)">${g}</g>`}}
+let bgs='',over='';
+if(onPaper){bgs=`<path d="${outline}" transform="${xf}" fill="${pa}"/>`;if(tx&&tex.t&&$('texg').innerHTML){defs+=`<clipPath id="xpclip"><path d="${outline}" transform="${xf}"/></clipPath>`;over=`<g clip-path="url(#xpclip)">${$('texg').innerHTML}</g>`}}
+const vw=W+2*pad,vh=H+2*pad,sc=px/Math.max(vw,vh),w=Math.max(1,Math.round(vw*sc)),h=Math.max(1,Math.round(vh*sc));
+const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${(cx-vw/2).toFixed(2)} ${(cy-vh/2).toFixed(2)} ${vw.toFixed(2)} ${vh.toFixed(2)}" width="${w}" height="${h}"><defs>${defs}</defs>${bgs}${g}${over}</svg>`;
+const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Could not draw the stamp'));i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)});
+const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);return c}
+const slBlob=c=>new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('Could not make the PNG')),'image/png'));
+async function slSavePng(blob,name){const d=await use('downloads');if(!d)return slMsg('Saving is not available here.');try{await d.save({filename:name.replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')+'.png',data:blob})}catch(e){if(e&&e.code!='declined')slMsg('Could not save: '+((e&&e.message)||'unknown error'))}}
+try{const so=JSON.parse(localStorage.getItem('wb50_slopt')||'{}');$('slfx').checked=!!so.fx;$('sltx').checked=!!so.tx;if(so.px)$('slpx').value=so.px;if(so.bg!=null)$('slbg').value=so.bg}catch(e){}
+const slOptSave=()=>{try{localStorage.setItem('wb50_slopt',JSON.stringify({fx:$('slfx').checked,tx:$('sltx').checked,px:$('slpx').value,bg:$('slbg').value}))}catch(e){}};['slfx','sltx','slpx','slbg'].forEach(id=>$(id).addEventListener('change',slOptSave));
+$('slpng').onclick=async()=>{const t=tiles[cur];if(!t)return;$('slpng').disabled=true;try{const c=await stampCanvas(t,+$('slpx').value||1024,$('slbg').value=='paper',{fx:$('slfx').checked,tx:$('sltx').checked});await slSavePng(await slBlob(c),$('slname').value.trim()||('Stamp '+(cur+1)))}catch(e){slMsg((e&&e.message)||'Could not export that stamp.')}$('slpng').disabled=false};
+function libMotifs(L){Object.entries(L.motifs||{}).forEach(([k,v])=>{if(!v||typeof v.svg!='string')return;if(k.startsWith('t|')){if(/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test(v.svg))cust[k]={n:String(v.n||'?').replace(/["<>&|]/g,'').slice(0,4),svg:v.svg,txt:1};return}if(k.startsWith('i|')){if(window.wbImpOk&&wbImpOk(k,v))cust[k]={n:String(v.n||'Imported motif').replace(/["<>&|]/g,'').slice(0,40),svg:v.svg,imp:1,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,30)}:{})}}else{const c=clean(v.svg);if(c)cust[k]={n:String(v.n||'motif').replace(/["<>&|]/g,'').slice(0,40),svg:c,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,30)}:{})}}});
+}
+function libColors(L){(L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();}
+$('slsave').onclick=async()=>{const t=tiles[cur];if(!t)return;const b=$('slsave');b.disabled=true;slMsg('Saving…');
+try{const G=geom(shOf(t)),c=await stampCanvas(t,1400,false),w=c.toDataURL('image/webp',.9),img=w.startsWith('data:image/webp')?w:c.toDataURL('image/png'),used=new Set(),cm={};t.items.forEach(q=>used.add(q.m));used.forEach(k=>{if(cust[k])cm[k]=cust[k]});
+const nm=($('slname').value.trim()||('Stamp '+(cur+1))).replace(/["<>&|]/g,'').slice(0,40),clone=JSON.parse(JSON.stringify(t));delete clone.id;clone.txl=txPack(t);
+const rec={name:nm,updated:Date.now(),w:+G.SW.toFixed(2),h:+G.SH.toFixed(2),img,tile:JSON.stringify(clone),motifs:cm,colors:t.ink&&CC.includes(t.ink)?[[t.ink,CM[t.ink]]]:[]};
+await SL.put(newId(),rec);$('slname').value='';slMsg('Saved “'+nm+'” to the library.');slPaint()}
+catch(e){slMsg(e&&/quota|storage/i.test(e.message||'')?'The library is full in this browser. Delete a stamp or two, then try again.':'Could not save: '+((e&&e.message)||'unknown error'))}b.disabled=false};
+async function slPaint(){if(!$('slgrid'))return;await SL.init();$('slwhere').textContent=SL.kind=='account'?'Your library is saved privately to your Claude account, so it follows you into every project and across devices.':'Your library is saved in this browser only, and is shared by all your projects here.';
+try{const ps=await SL.list();$('slcount').textContent=ps.length?String(ps.length):'';$('slgrid').innerHTML=ps.length?ps.map(p=>`<div class="slc" data-sl="${hx(p.id)}">${slOkImg(p.img)?`<div class="im"><img src="${hx(p.img)}" alt=""></div>`:'<div class="im"></div>'}<b title="${hx(p.name||'Stamp')}">${hx(p.name||'Stamp')}</b><div class="row"><button class="alt" data-sa="add" title="Add this stamp to the project">Add</button><button class="alt" data-sa="png" title="Export this stamp as a PNG">PNG</button><button class="alt" data-sa="del" title="Delete from the library">Delete</button></div></div>`).join(''):'<div class="hint" style="grid-column:1/-1">No saved stamps yet. Pick a stamp, give it a name and press Save to library.</div>'}
+catch(e){$('slgrid').innerHTML='<div class="hint" style="grid-column:1/-1">Could not load the library.</div>'}}
+$('slgrid').onclick=async e=>{const b=e.target.closest('[data-sa]');if(!b)return;const id=b.closest('[data-sl]').dataset.sl,a=b.dataset.sa;
+try{const rec=await SL.get(id);if(!rec)return slMsg('That stamp is gone.');
+if(a=='add'){let t=null;try{t=JSON.parse(rec.tile)}catch(er){}if(!t||!Array.isArray(t.items))return slMsg('That library entry is damaged.');
+libMotifs({motifs:rec.motifs});libColors({colors:rec.colors});txMerge(t);t.id=nid++;shOf(t);tiles.push(t);cur=tiles.length-1;selOne(-1);symKey='';store();upd();if(window.wbCap)wbCap();slMsg('Added “'+rec.name+'” as a new stamp. Tick it under Stamps in the Arrangement to print it.')}
+else if(a=='png'){if(!slOkImg(rec.img))return slMsg('That entry has no picture.');const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Could not read the picture'));i.src=rec.img}),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);await slSavePng(await slBlob(c),rec.name||'Stamp')}
+else if(a=='del'){if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Sure?';setTimeout(()=>{delete b.dataset.sure;b.textContent='Delete'},3000);return}await SL.del(id);slMsg('Deleted “'+rec.name+'”.');slPaint()}}
+catch(er){slMsg('Something went wrong: '+((er&&er.message)||'unknown error'))}};
+document.querySelector('.rail [data-pn="slib"]').addEventListener('click',()=>setTimeout(slPaint,60));
+// --- Art: import an image, or use a saved project
+async function artImport(f){if(!f||!/^image\//.test(f.type))return pmsg('That file is not an image.');if(f.size>30e6)return pmsg('That image is too large. Try one under 30 MB.');
+const url=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=()=>r(null);fr.readAsDataURL(f)}),img=url&&await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=url});
+if(!img)return pmsg('Could not read that image.');let nw=img.naturalWidth||img.width||1000,nh=img.naturalHeight||img.height||1000;const k=Math.min(1,2000/Math.max(nw,nh)),w=Math.max(1,Math.round(nw*k)),h=Math.max(1,Math.round(nh*k)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+const id=artId();ARTS[id]={n:(f.name||'Art').replace(/\.[^.]+$/,'').replace(/["<>&|]/g,'').slice(0,40)||'Art',k:'img',src:artEnc(c),w,h};fpB=id;fpSel=-1;fpLast=null;pmsg('Image added. Click on the canvas to place it.');upd()}
+$('lfaimp').onclick=()=>$('lfafile').click();
+$('lfafile').onchange=async()=>{const f=$('lfafile').files[0];$('lfafile').value='';if(f)await artImport(f)};
+$('lfars').onclick=e=>{const x=e.target.closest('[data-ax]');if(x){const id=x.dataset.ax;if(!layers.some(l=>l.art&&(l.pl||[]).some(p=>p.a==id))){delete ARTS[id];if(fpB==id)fpB=null;upd()}return}const b=e.target.closest('[data-a]');if(!b)return;const id=b.dataset.a;if(e.shiftKey||e.ctrlKey||e.metaKey){fpPick(String(id),e,[...$('lfars').querySelectorAll('[data-a]')].map(x=>x.dataset.a));return}fpPool=new Set();fpPA=String(id);fpB=fpB==id?null:id;if(fpB){fpSel=-1;fpMS=new Set();fpLast=null}upd()};
+$('lfaup').onclick=async()=>{const n=await artLive(true);pmsg(n?'Updated from the saved project.':'Already up to date.')};
+const artAddProj=(rec,pid)=>{let d=null;try{d=JSON.parse(rec.data)}catch(e){}const a=d&&d.art;if(!a||!artOk(a.src))return pmsg('Open “'+rec.name+'”, save it again once, and it will be ready to use as art.');
+let id=Object.keys(ARTS).find(i=>ARTS[i].pid==pid);if(!id){id=artId();ARTS[id]={n:String(rec.name||'Project').replace(/["<>&|]/g,'').slice(0,40),k:'proj',src:a.src,w:+a.w,h:+a.h,pid,ver:rec.updated||0}}
+fpB=id;fpSel=-1;fpLast=null;$('lfapl').hidden=true;pmsg('“'+rec.name+'” added. Click on the canvas to place it. It updates when you save that project.');upd()};
+$('lfaprj').onclick=async()=>{const box=$('lfapl');if(!box.hidden){box.hidden=true;return}box.hidden=false;$('lfaplist').innerHTML='<div class="em">Loading…</div>';
+try{const ps=(await ST.list()).filter(p=>p.id!=cp.id);$('lfaplist').innerHTML=ps.length?ps.map(p=>{const ok=typeof p.data=='string'&&p.data.includes('"art":{"src":"data:image');return`<div class="mr" data-pj="${hx(p.id)}" style="${ok?'':'opacity:.55'}" title="${ok?'Use this project as art':'Open it and save it again once to use it as art'}">${p.thumb?`<img class="ath" src="${hx(p.thumb)}" alt="">`:'<span></span>'}<b>${hx(p.name||'Untitled')}<i>${ok?new Date(p.updated||0).toLocaleDateString():'save it again first'}</i></b><span></span></div>`}).join(''):'<div class="em">No other saved projects yet. Save a project first, then it shows up here.</div>'}
+catch(e){$('lfaplist').innerHTML='<div class="em">Could not load projects.</div>'}};
+$('lfaplist').onclick=async e=>{const r=e.target.closest('[data-pj]');if(!r)return;const pid=r.dataset.pj;try{const rec=await ST.get(pid);if(!rec)return pmsg('That project is gone.');artAddProj(rec,pid)}catch(er){pmsg('Could not open that project.')}};
+$('lfapx').onclick=()=>{$('lfapl').hidden=true};
+$('lfapf').onclick=()=>$('lfapfile').click();
+$('lfapfile').onchange=async()=>{const f=$('lfapfile').files[0];$('lfapfile').value='';if(!f)return;try{const d=JSON.parse(await f.text()),a=d&&d.art;if(!d||d.app!='WODBLOK')return pmsg('That is not a WODBLOK project file.');if(!a||!artOk(a.src))return pmsg('That file was saved before Art existed. Open it, save it again, and download it again.');
+const id=artId();ARTS[id]={n:String(d.name||f.name).replace(/\.wodblok\.json$|\.json$/i,'').replace(/["<>&|]/g,'').slice(0,40)||'Project',k:'img',src:a.src,w:+a.w,h:+a.h};fpB=id;fpSel=-1;fpLast=null;$('lfapl').hidden=true;pmsg('Project picture added as a fixed image. Click on the canvas to place it.');upd()}catch(er){pmsg('Could not read that file.')}};

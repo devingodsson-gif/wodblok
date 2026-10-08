@@ -1,0 +1,52 @@
+<title>WODBLOK Progress</title>
+<style>
+/* Layout: one narrow column, a ledger of phases; the percentages are the only green on the page. */
+:root{--bg:#f3f1ec;--fg:#1d1c1a;--mut:#6d6a63;--line:#d9d5cb;--card:#fbfaf7;--pct:#0f8a3c;--bar:#1fa850;--track:#e4e0d6;--font:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1a18;--fg:#ede6da;--mut:#a39b8e;--line:#37332f;--card:#242220;--pct:#4ade80;--bar:#3fbf6a;--track:#37332f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1a18;--fg:#ede6da;--mut:#a39b8e;--line:#37332f;--card:#242220;--pct:#4ade80;--bar:#3fbf6a;--track:#37332f;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--font);padding-inline:16px;padding-block:28px}
+main{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1{font-size:22px;margin:0;letter-spacing:.01em}
+.sub{color:var(--mut);margin:2px 0 0;font-size:13px}
+.pct{color:var(--pct);font-weight:700;font-variant-numeric:tabular-nums}
+.big{font-size:44px;line-height:1}
+.hero{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.bar{height:8px;background:var(--track);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--bar)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:baseline;padding:12px 0;border-top:1px solid var(--line)}
+.row .bar{grid-column:1/-1}
+.row small{color:var(--mut);grid-column:1/-1}
+.row.sub1{padding-left:18px}
+.row b{font-weight:600}
+.time{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--mut)}
+.time b{color:var(--fg)}
+.stamp{font:12px var(--mono);color:var(--mut)}
+</style>
+<main>
+  <div>
+    <h1>WODBLOK: repo move</h1>
+    <p class="sub">Phase 1: split the single file into modules, no behaviour change</p>
+  </div>
+  <div class="hero"><span class="pct big" id="all">0%</span><span>of Phase 1 done</span></div>
+  <div class="bar"><i id="allbar" style="width:0%"></i></div>
+
+  <section>
+    <div class="row"><b>Phase 0: repo and test safety net</b><span class="pct">100%</span><div class="bar"><i style="width:100%"></i></div><small>41 tests pass, identical across 3 runs on v100</small></div>
+    <div class="row"><b>1a: cut the file into ordered pieces</b><span class="pct" id="p1a">0%</span><div class="bar"><i id="b1a" style="width:0%"></i></div><small>Build joins the pieces back; output must match v100</small></div>
+    <div class="row"><b>1b: shared state object, bridge registry</b><span class="pct" id="p1b">0%</span><div class="bar"><i id="b1b" style="width:0%"></i></div><small>60 shared variables, in batches, tests after each</small></div>
+    <div class="row"><b>1c: ES modules, leaf-first</b><span class="pct" id="p1c">0%</span><div class="bar"><i id="b1c" style="width:0%"></i></div><small>Data, tools, engine, history, UI shell</small></div>
+  </section>
+
+  <div class="time"><b>Rough timeline.</b> 1a about 1 session, 1b about 3, 1c about 3 to 4: roughly 2 to 3 working days of back-and-forth. A full test run takes about 6 minutes and is most of the waiting.</div>
+  <div class="stamp" id="stamp">updated at start of Phase 1</div>
+</main>
+<script>
+/* percentages are filled from this one object so the page and its numbers cannot disagree */
+var P={a:0,b:0,c:0,note:"updated at start of Phase 1"};
+function set(id,v){document.getElementById(id).textContent=v+"%"}
+set("p1a",P.a);set("p1b",P.b);set("p1c",P.c);
+document.getElementById("b1a").style.width=P.a+"%";document.getElementById("b1b").style.width=P.b+"%";document.getElementById("b1c").style.width=P.c+"%";
+var all=Math.round(P.a*0.2+P.b*0.4+P.c*0.4);set("all",all);document.getElementById("allbar").style.width=all+"%";
+document.getElementById("stamp").textContent=P.note;
+</script>

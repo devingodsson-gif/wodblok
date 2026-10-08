@@ -16,7 +16,7 @@ const { test, expect } = require('@playwright/test');
 const { ROOT, TARGET, APP_URL, openApp, openProjectFile, openPanel, settle } = require('./helpers/harness');
 
 const FIXTURE = path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok.json');
-const STEPS = 40, RUNS = 3;
+const STEPS = 40, RUNS = 5;
 
 async function measureDrag(page) {
   await openPanel(page, 'lyrs');
@@ -51,42 +51,48 @@ async function measureDrag(page) {
   }, wall);
 }
 
-async function measureTarget(browser, url, label) {
-  const runs = [];
-  for (let i = 0; i < RUNS; i++) {
-    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
-    const page = await ctx.newPage();
-    const { errors } = await openApp(page, { url });
-    await openProjectFile(page, FIXTURE);
-    runs.push(await measureDrag(page));
-    expect(errors, `${label} page errors`).toEqual([]);
-    await ctx.close();
-  }
-  const med = k => runs.map(r => r[k]).sort((a, b) => a - b)[Math.floor(RUNS / 2)];
-  return { label, runs, median: { wallMs: med('wallMs'), p95Ms: med('p95Ms'), maxMs: med('maxMs'), frames: med('frames') } };
+async function measureOnce(browser, url, label) {
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
+  const page = await ctx.newPage();
+  const { errors } = await openApp(page, { url });
+  await openProjectFile(page, FIXTURE);
+  const r = await measureDrag(page);
+  expect(errors, `${label} page errors`).toEqual([]);
+  await ctx.close();
+  return r;
 }
 
-test('slider drag: work done and speed', async ({ browser }, testInfo) => {
-  test.setTimeout(10 * 60 * 1000);
-  const legacy = await measureTarget(browser, 'file://' + path.join(ROOT, 'legacy', 'wodblok-v100.html'), 'legacy');
-  const results = { steps: STEPS, legacy };
-  fs.mkdirSync(path.join(ROOT, 'test-results'), { recursive: true });
+const median = (runs, k) => runs.map(r => r[k]).sort((a, b) => a - b)[Math.floor(runs.length / 2)];
+const summary = (label, runs) => ({ label, runs, median: { wallMs: median(runs, 'wallMs'), p95Ms: median(runs, 'p95Ms'), maxMs: median(runs, 'maxMs'), frames: median(runs, 'frames') } });
+const per = (t, k) => +(median(t.runs, k) / STEPS).toFixed(2);
 
-  const per = (t, k) => +(t.runs.map(r => r[k]).sort((a, b) => a - b)[Math.floor(RUNS / 2)] / STEPS).toFixed(2);
+test('slider drag: work done and speed', async ({ browser }, testInfo) => {
+  test.setTimeout(15 * 60 * 1000);
+  const legacyUrl = 'file://' + path.join(ROOT, 'legacy', 'wodblok-v100.html');
+  const compare = TARGET === 'build';
+  // Runs alternate (legacy, build, legacy, build, ...) so slow drift on the machine hits both the same way.
+  const L = [], B = [];
+  for (let i = 0; i < RUNS; i++) {
+    L.push(await measureOnce(browser, legacyUrl, 'legacy'));
+    if (compare) B.push(await measureOnce(browser, APP_URL, 'build'));
+  }
+  const legacy = summary('legacy', L);
+  const results = { steps: STEPS, runs: RUNS, legacy };
+  fs.mkdirSync(path.join(ROOT, 'test-results'), { recursive: true });
   results.legacyPerMove = { nodesAdded: per(legacy, 'nodesAdded'), mutations: per(legacy, 'mutations') };
   expect(results.legacyPerMove.mutations, 'the drag redraws the pattern').toBeGreaterThan(0);
 
-  if (TARGET === 'build') {
-    results.build = await measureTarget(browser, APP_URL, 'build');
+  if (compare) {
+    results.build = summary('build', B);
     const ratio = results.build.median.wallMs / legacy.median.wallMs;
     results.ratio = +ratio.toFixed(3);
     results.buildPerMove = { nodesAdded: per(results.build, 'nodesAdded'), mutations: per(results.build, 'mutations') };
     expect(results.buildPerMove.nodesAdded, 'DOM nodes added per move').toBeLessThanOrEqual(results.legacyPerMove.nodesAdded * 1.25 + 0.5);
-    expect(ratio, `build drag time / legacy drag time (median of ${RUNS})`).toBeLessThanOrEqual(1.10);
+    expect(ratio, `build drag time / legacy drag time (median of ${RUNS} alternating runs)`).toBeLessThanOrEqual(1.10);
   }
   fs.writeFileSync(path.join(ROOT, 'test-results', `perf-${TARGET}.json`), JSON.stringify(results, null, 1));
   await testInfo.attach('perf', { body: JSON.stringify(results, null, 1), contentType: 'application/json' });
-  console.log('perf legacy median', JSON.stringify(legacy.median));
+  console.log('perf', JSON.stringify({ legacy: legacy.median, build: results.build && results.build.median, ratio: results.ratio }));
 });
 
 test('randomize roll time', async ({ page }) => {

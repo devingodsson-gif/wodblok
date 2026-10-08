@@ -1,0 +1,1136 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wodblok v100</title>
+<script>/* v70 theme: dark unless the user chose light */(function(){var t="dark";try{var s=localStorage.getItem("wb60_theme");if(s==="light"||s==="dark")t=s}catch(e){}document.documentElement.setAttribute("data-theme",t)})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--stage:#eae4d8;--stage-dot:rgba(60,40,10,.07);--panel:#f6f2e9;--raise:#ffffff;--field:#ffffff;--line:#ddd5c6;--line2:#cbc2b0;--fg:#26221d;--mut:#706858;--faint:#a89f90;--acc:#b8914f;--acc-ink:#8a6528;--acc-fg:#1b1a18;--acc-soft:rgba(184,145,79,.16);--warn:#c0532e;--ok:#3f8f66;--shadow:0 1px 2px rgba(60,40,10,.1),0 8px 28px rgba(60,40,10,.16);--paper-shadow:0 1px 3px rgba(60,40,10,.25),0 26px 56px rgba(60,40,10,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--stage:#1b1a18;--stage-dot:rgba(255,255,255,.04);--panel:#242220;--raise:#2e2b28;--field:#1e1c1a;--line:#37332f;--line2:#4a453f;--fg:#ede6da;--mut:#a39b8e;--faint:#6f685e;--acc:#c9a66b;--acc-ink:#c9a66b;--acc-fg:#1b1a18;--acc-soft:rgba(201,166,107,.16);--warn:#e8895c;--ok:#7fb08a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);--paper-shadow:0 2px 6px rgba(0,0,0,.4),0 30px 70px rgba(0,0,0,.55)}}
+:root[data-theme="dark"]{color-scheme:dark}:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{--stage:#1b1a18;--stage-dot:rgba(255,255,255,.04);--panel:#242220;--raise:#2e2b28;--field:#1e1c1a;--line:#37332f;--line2:#4a453f;--fg:#ede6da;--mut:#a39b8e;--faint:#6f685e;--acc:#c9a66b;--acc-ink:#c9a66b;--acc-fg:#1b1a18;--acc-soft:rgba(201,166,107,.16);--warn:#e8895c;--ok:#7fb08a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);--paper-shadow:0 2px 6px rgba(0,0,0,.4),0 30px 70px rgba(0,0,0,.55)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;height:100%;overflow:hidden;background:var(--panel);color:var(--fg);font:12.5px/1.4 "Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+svg{display:block}
+
+
+/* v90 controls */
+svg[stroke="currentColor"]:not([width]):not(.ic){stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ic{stroke-width:1.7}.ib .ic,.rnd .ic{stroke-width:2.1}.gtb .ic,.lyb .ic,.eye .ic,.pop .ic,.seg .ic,.shg .ic{stroke-width:2.4}.txb .ic{stroke-width:2.25}.wb .ic{stroke-width:2.6}.cpe .ic{stroke-width:2.1}
+.ddsel,.ccsel{display:none!important}
+.dd2{width:100%}.dd2>.ddb{width:100%;height:auto;margin:0;min-height:30px;display:flex;border-radius:8px;padding:4px 8px 4px 10px;justify-content:space-between}.dd2 .ddb:hover:not(:disabled){border-color:var(--line2)}.dd2 .ddb[aria-expanded=true]{border-color:var(--acc)}.dd2 .ddb:disabled{opacity:.45}
+.dd2 .ddt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.dd2 .ddb em{transition:transform .15s}.dd2 .ddb[aria-expanded=true] em{transform:rotate(180deg)}
+.ddl{border-radius:10px;padding:5px}.ddi{border-radius:6px;padding:6px 9px}.ddi.cur{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}.ddi.dis{opacity:.4;cursor:default}.ddg{padding:7px 9px 3px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.sw .dd2,.asp .dd2,.lyo .dd2,.gmc .dd2{flex:1;min-width:0}
+.ccb{flex:none;width:38px;height:30px;padding:3px;margin:0;border:1px solid var(--line2);border-radius:8px;background:var(--field)}.ccb::before{content:"";display:block;width:100%;height:100%;border-radius:5px;background:var(--c,#888);box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}.ccb:hover{border-color:var(--faint)}.gmc .ccb{width:30px;height:28px}
+.cpop{position:fixed;z-index:9100;width:224px;padding:10px;background:var(--raise);border:1px solid var(--line2);border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;touch-action:none}.cpop[hidden]{display:none}
+.cpsv{position:relative;height:132px;border-radius:8px;cursor:crosshair;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}.cpsv i,.cph i{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);pointer-events:none}
+.cph{position:relative;height:12px;border-radius:6px;cursor:pointer;background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}.cph i{top:50%}
+.cprow{display:flex;align-items:center;gap:8px}.cpsw{flex:none;width:30px;height:30px;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}.cpx{flex:1;min-width:0;font-variant-numeric:tabular-nums;text-transform:uppercase}
+.ctl:has(input[type=range]) label{cursor:ew-resize}body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none!important}
+input[type=range]::-webkit-slider-thumb{transition:transform .12s,box-shadow .12s}input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.15)}input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 5px var(--acc-soft)}
+
+/* v93 chrome */
+.top{padding-left:var(--tl,0px)}
+#pst{flex:none;width:8px;height:8px;border-radius:50%;background:transparent;transition:background .2s}#pst.dirty{background:var(--warn)}
+.status #pwhere,#edhint{display:none!important}
+body.plain{--stage-dot:transparent}
+#splash{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:var(--stage);transition:opacity .28s ease}
+#splash.out{opacity:0;pointer-events:none}
+.spl{display:flex;flex-direction:column;align-items:center;gap:14px;animation:splin .5s ease-out both}
+.spl svg{width:56px;height:56px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.25))}
+.spl b{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:20px;letter-spacing:.18em;text-transform:uppercase;color:var(--fg)}
+.spl i{display:block;width:72px;height:2px;border-radius:2px;background:var(--line);overflow:hidden;position:relative}.spl i::after{content:"";position:absolute;inset:0;width:40%;background:var(--acc);border-radius:2px;animation:splbar 1s ease-in-out infinite}
+@keyframes splin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}@keyframes splbar{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
+.pop:not([hidden]),.ddl:not([hidden]),.cpop:not([hidden]){animation:popin .13s ease-out}
+@keyframes popin{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}
+button,.ddi,.wtab,.lyr,.rail button{transition:background-color .12s,border-color .12s,color .12s,box-shadow .12s}
+@media (prefers-reduced-motion:reduce){#splash,.spl,.spl i::after,.pop,.ddl,.cpop{animation:none!important;transition:none!important}}
+/* v95 history */
+.hs{display:flex;flex-direction:column;min-height:100%}
+.hsh{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 8px 6px 14px;font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:14px;border-bottom:1px solid var(--line)}
+.hsh .ib{width:26px;height:26px}.hsh .ib svg{width:15px;height:15px}.hsc{font-family:"Hanken Grotesk",system-ui,sans-serif;font-size:11px;font-weight:400;color:var(--mut);padding-right:6px}
+.hsl{padding:4px}.hsl:empty{display:none}
+.hr{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:12px;border:1px solid transparent;user-select:none}
+.hr:hover{background:var(--raise)}.hr.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink);font-weight:600}.hr.fut{opacity:.5}
+.hr b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hr i{font-style:normal;color:var(--faint);font-size:10.5px;font-weight:400}
+.hr input{width:100%;height:24px;font:inherit;padding:2px 6px}
+.hr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;visibility:hidden;display:inline-flex;align-items:center;justify-content:center}.hr button svg{width:13px;height:13px}.hr:hover button{visibility:visible}.hr button:hover{background:var(--line);color:var(--fg)}
+.hr.sn{grid-template-columns:minmax(0,1fr) auto auto}
+:root{--ca:#3b7ddd;--cb:#d9741a}
+.ab,.hr.ra b::before,.hr.rb b::before{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;margin-right:6px;border-radius:4px;font:700 10px/1 "Hanken Grotesk",system-ui,sans-serif;font-style:normal;text-decoration:none;color:#fff;vertical-align:1px;box-sizing:border-box}
+.ab.a,.hr.ra b::before{background:var(--ca);content:"A"}.ab.b,.hr.rb b::before{background:var(--cb);content:"B"}.hr.ra.rb b::before{content:"A=B";background:linear-gradient(90deg,var(--ca) 50%,var(--cb) 50%)}
+.hr.ra{box-shadow:inset 3px 0 0 var(--ca)}.hr.rb{box-shadow:inset 3px 0 0 var(--cb)}.hr.ra.rb{box-shadow:inset 3px 0 0 var(--ca),inset 6px 0 0 var(--cb)}
+.baT{display:inline-flex;align-items:center;max-width:46%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.baT .ab{flex:none;margin-right:6px}.baT.a{border-color:var(--ca)}.baT.b{border-color:var(--cb)}
+.baX{position:absolute;z-index:44;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 8px 0 14px;border-radius:15px;border:0;background:var(--acc);color:var(--acc-fg);font-weight:600;font-size:12px;box-shadow:var(--shadow);cursor:pointer}.baX:hover{filter:brightness(1.08)}.baX kbd{font:600 10px "Hanken Grotesk",system-ui,sans-serif;padding:2px 6px;border-radius:9px;background:rgba(0,0,0,.18);color:inherit}
+.babusy .dock,.babusy .film,.babusy .rail{opacity:.55;pointer-events:none}.dock,.film,.rail{transition:opacity .12s}
+.baT{position:absolute;z-index:42;font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px;background:var(--panel);border:1px solid var(--line2);color:var(--fg);pointer-events:none;box-shadow:var(--shadow)}.baT.r{transform:translateX(-100%)}
+.baH{position:absolute;z-index:43;width:20px;margin-left:-10px;cursor:ew-resize;touch-action:none}.baH::before{content:"";position:absolute;left:9px;top:0;bottom:0;width:2px;background:var(--acc);box-shadow:0 0 0 1px rgba(0,0,0,.25)}.baH i{position:absolute;left:1px;top:50%;width:18px;height:28px;margin-top:-14px;border-radius:9px;background:var(--acc);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+#bacmp button[aria-pressed=true]{background:var(--raise);color:var(--acc-ink);font-weight:600;box-shadow:0 0 0 1px var(--acc)}.hr button.rfb,.hsh button.rfb{width:auto;height:22px;padding:0 8px;font-size:11px;border:1px solid var(--line2);background:var(--field);color:var(--fg)}.hr button.rfb:hover,.hsh button.rfb:hover{border-color:var(--acc);color:var(--acc-ink);background:var(--field)}.hsh button.rfb{visibility:visible}.hsh button.rfb[hidden]{display:none}.hr.sn{grid-template-columns:minmax(0,1fr) auto auto auto}.hr .rfb{margin-left:0}
+/* ---------- app grid ---------- */
+#app{height:100%;display:grid;grid-template-columns:52px auto minmax(0,1fr) auto;grid-template-rows:46px auto minmax(0,1fr) auto 26px;grid-template-areas:"top top top top" "rail dl dt dr" "rail dl stage dr" "rail dl db dr" "status status status status"}
+.top{grid-area:top;display:flex;align-items:center;gap:10px;padding:0 10px 0 0;border-bottom:1px solid var(--line);background:var(--panel)}
+.rail{grid-area:rail;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;background:var(--panel)}
+.stage{grid-area:stage;position:relative;overflow:hidden;display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--stage);background-image:radial-gradient(var(--stage-dot) 1px,transparent 1.2px);background-size:18px 18px}
+.dock{display:flex;flex-direction:column;min-height:0;min-width:0;background:var(--panel);position:relative}
+.status{grid-area:status;display:flex;align-items:center;gap:18px;padding:0 12px;border-top:1px solid var(--line);font-size:11px;color:var(--mut);background:var(--panel);white-space:nowrap;overflow:hidden}
+.status .grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+#pmsg{color:var(--fg)}
+
+.lys{background:var(--panel)}.lys .lyt{cursor:default}.lys .lyl2{max-height:none}.lyh{display:flex;align-items:center;gap:2px;height:34px;padding:0 6px 0 4px;background:color-mix(in srgb,var(--stage) 50%,var(--panel));border-bottom:1px solid var(--line)}.lyt{flex:1;display:flex;align-items:center;gap:6px;border:0;background:transparent;font-weight:600;font-size:12px;padding:0 4px;margin:0;cursor:pointer;color:var(--fg)}.lyt svg{width:13px;height:13px;transition:transform .15s}.lyt[aria-expanded=false] svg{transform:rotate(-90deg)}.lyt span{color:var(--mut);font-weight:500}.lyh .ib{width:26px;height:26px}.lyh .ib svg{width:15px;height:15px}.lyo{display:flex;align-items:center;gap:8px;padding:7px 10px 0}.lyo select{flex:1;min-width:0}.lyo .sw{flex:1;min-width:0}.lyop{padding:6px 10px 0}.lyop .ctl{grid-template-columns:50px minmax(0,1fr) 52px;gap:8px}.lyop .ctl label{font-size:11.5px;color:var(--mut);font-weight:400}.lyk{font-size:11.5px;color:var(--mut);width:50px;flex:none}.lyl2{margin:8px 6px 4px;max-height:210px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:var(--field)}.lyr{display:flex;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12px;user-select:none}.lyr:last-child{border-bottom:0}.lyr:hover{background:var(--raise)}.lyr.on{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}.lyr.off .lyn,.lyr.off .lysw{opacity:.4}.lyr .eye{width:22px;height:22px;padding:0;margin:0;border:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center;border-radius:5px}.lyr .eye:hover{background:var(--line)}
+.lyr .lyact{display:flex;gap:1px;flex:none;margin-left:auto}.lyr .lyb{width:22px;height:22px;padding:0;margin:0;border:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center;border-radius:5px;opacity:.55}.lyr .lyb svg{width:15px;height:15px}.lyr:hover .lyb,.lyr.on .lyb,.lyr .lyb:focus-visible{opacity:1}.lyr .lyb:hover{background:var(--line);color:var(--fg)}.lyr .lyb[disabled]{opacity:.22!important;cursor:default;pointer-events:none}.lyr .eye svg{width:15px;height:15px}.lysw{width:26px;height:26px;border-radius:5px;border:1px solid var(--line2);flex:none;overflow:hidden}.lysw svg{width:100%;height:100%;display:block}.lyn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lyn input{width:100%;font:inherit;padding:1px 4px}.lym{font-size:10px;color:var(--faint);font-weight:400}.lyr.dragover-t{box-shadow:inset 0 2px 0 var(--acc)}.lyr.dragover-b{box-shadow:inset 0 -2px 0 var(--acc)}.lyhint{font-size:10.5px;color:var(--faint);padding:0 10px 8px}#lybody[hidden]{display:none}
+/* ---------- workspace: dockable / floating / tabbed panels ---------- */
+.dock-h{display:none!important}
+.wg{display:flex;flex-direction:column;min-height:0;background:var(--panel)}
+.wsd .wg{flex:1 1 0;min-height:110px}
+.wsd .wg.col{flex:none!important;min-height:0}
+.wg.col .wbd,.wg.col .wrs{display:none}
+.wh{display:flex;align-items:stretch;height:32px;flex:none;background:color-mix(in srgb,var(--stage) 50%,var(--panel));border-bottom:1px solid var(--line);cursor:grab;user-select:none;touch-action:none}
+.wt{display:flex;min-width:0;flex:1;overflow-x:auto;scrollbar-width:none}.wt::-webkit-scrollbar{display:none}
+.wtab{flex:none;border:0;border-right:1px solid var(--line);background:transparent;padding:0 11px;font-size:11.5px;font-weight:500;color:var(--mut);white-space:nowrap;border-radius:0;cursor:inherit;margin:0}
+.wtab.on{background:var(--panel);color:var(--fg);font-weight:600;box-shadow:inset 0 2px 0 var(--acc)}
+.wtab:hover:not(.on){color:var(--fg);background:color-mix(in srgb,var(--panel) 50%,transparent)}
+.wb{flex:none;width:26px;border:0;background:transparent;padding:0;margin:0;color:var(--faint);display:flex;align-items:center;justify-content:center;border-radius:0;cursor:pointer}
+.wb:hover{color:var(--fg);background:var(--raise)}.wb svg{width:14px;height:14px}
+.wbd{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0}
+.wsp{flex:none;height:5px;background:var(--line);cursor:row-resize}.wsp:hover,.wsp.on{background:var(--acc)}
+#wsfl{position:fixed;inset:0;pointer-events:none;z-index:45}
+.wg.fl{position:absolute;pointer-events:auto;border:1px solid var(--line2);border-radius:9px;box-shadow:var(--shadow);overflow:hidden;min-width:200px}
+.wrs{position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 55%,var(--line2) 55%,var(--line2) 63%,transparent 63%,transparent 74%,var(--line2) 74%,var(--line2) 82%,transparent 82%)}
+.wg.wdrop{box-shadow:inset 0 0 0 2px var(--acc)}.wg.fl.wdrop{box-shadow:0 0 0 2px var(--acc),var(--shadow)}.wg.wdrop .wh{background:var(--acc-soft)}
+#wsind{position:fixed;height:4px;background:var(--acc);border-radius:2px;pointer-events:none;z-index:71;box-shadow:0 0 0 1px var(--bg)}
+#wstint{position:fixed;background:var(--acc-soft);border:1px dashed var(--acc);border-radius:4px;pointer-events:none;z-index:69}
+.wghost{position:fixed;pointer-events:none;z-index:70;background:var(--panel);border:1px solid var(--acc);border-radius:6px;padding:5px 10px;font-weight:600;font-size:11.5px;box-shadow:var(--shadow)}
+.wg.lift{opacity:.85;pointer-events:none!important}
+body.wsdrag,body.wsdrag *{cursor:grabbing!important;user-select:none!important}
+.wsempty{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;color:var(--faint);font-size:11.5px;text-align:center}
+/* v71 four-edge docks: left, right, top, bottom. Side docks stack panels vertically; top and bottom docks lay panels out side by side. */
+.dk-r{grid-area:dr;border-left:1px solid var(--line);width:316px}
+.dk-l{grid-area:dl;border-right:1px solid var(--line);width:316px}
+.dk-t{grid-area:dt;border-bottom:1px solid var(--line);height:260px}
+.dk-b{grid-area:db;border-top:1px solid var(--line);height:260px}
+.dk>.wsd{display:flex;flex:1;min-height:0;min-width:0;overflow:hidden}
+.dk-l>.wsd,.dk-r>.wsd{flex-direction:column}
+.dk-t>.wsd,.dk-b>.wsd{flex-direction:row;overflow-x:auto;overflow-y:hidden}
+.dk-t .wsd .wg,.dk-b .wsd .wg{flex:1 1 300px;min-width:260px;min-height:0}
+.dk-t .wsd .wg.col,.dk-b .wsd .wg.col{flex:none!important;min-width:0;align-self:flex-start}
+.dk-t .wsp,.dk-b .wsp{height:auto;width:5px;cursor:col-resize}
+/* v72 top/bottom docks: every section of a panel is its own fixed column (never split across columns), so nothing reflows when one is collapsed */
+.dk-t .wbd,.dk-b .wbd{display:flex;flex-direction:row;align-items:stretch;overflow-x:auto;overflow-y:hidden}
+.dk-t .wbd>section.pn:not([hidden]),.dk-b .wbd>section.pn:not([hidden]){flex:1 0 300px;min-width:0;min-height:0;overflow-y:auto;overflow-x:hidden}
+.dk-t .wbd>section.pn.mc:not([hidden]),.dk-b .wbd>section.pn.mc:not([hidden]){display:contents}
+.dk-t .wbd>section.pn.mc>*,.dk-b .wbd>section.pn.mc>*{flex:0 0 300px;width:300px;box-sizing:border-box;min-height:0;overflow-y:auto;overflow-x:hidden;border-bottom:0;border-right:1px solid var(--line);padding-bottom:10px}
+.dk-t .wbd>section.pn.mc>details.g:not([open]),.dk-b .wbd>section.pn.mc>details.g:not([open]){flex-basis:190px;width:190px}
+.wed{position:absolute;z-index:6;background:transparent;transition:background .12s}
+.wed:hover,.wed.on{background:var(--acc)}
+.dk-r>.wed{left:0;top:0;bottom:0;width:5px;cursor:col-resize}
+.dk-l>.wed{right:0;top:0;bottom:0;width:5px;cursor:col-resize}
+.dk-t>.wed{left:0;right:0;bottom:0;height:5px;cursor:row-resize}
+.dk-b>.wed{left:0;right:0;top:0;height:5px;cursor:row-resize}
+.wzn{position:fixed;z-index:68;pointer-events:none;border:2px dashed color-mix(in srgb,var(--acc) 55%,transparent);background:color-mix(in srgb,var(--acc) 6%,transparent);border-radius:6px;opacity:0;transition:opacity .12s,left .1s,top .1s,width .1s,height .1s,background .1s}
+body.wsdrag .wzn{opacity:1}
+.wzn.hot{background:var(--acc-soft);border-style:solid;border-color:var(--acc)}
+body.wsedge,body.wsedge *{user-select:none!important}
+.dock.dropz{box-shadow:inset 0 0 0 2px var(--acc);background:var(--acc-soft)}
+@media (max-width:860px){.wsd .wg{flex:none!important;min-height:0}.wsp,.wb[data-act=float]{display:none}.dk-l,.dk-t,.dk-b,.wzn,.wed{display:none!important}.dk-r{grid-area:dock;width:auto!important}}
+
+
+/* ---------- v67 Randomize hold: the old picture stays up until the new one is fully made ---------- */
+.fzov{position:absolute;z-index:40;display:flex;flex-direction:column;overflow:hidden;cursor:progress;background:var(--stage);background-image:radial-gradient(var(--stage-dot) 1px,transparent 1.2px);background-size:18px 18px;transition:opacity .16s ease}
+.fzov.pv{inset:0;padding:10px;flex-direction:row}
+.fzov>.board{flex:1;min-height:0;pointer-events:none}
+.fzov.out{opacity:0}
+.fzbar{position:absolute;left:0;top:0;height:3px;width:100%;z-index:41;pointer-events:none;background:color-mix(in srgb,var(--acc) 16%,transparent);overflow:hidden;transition:opacity .2s}
+.fzbar i{display:block;height:100%;width:0;background:var(--acc);transition:width .25s ease;border-radius:0 2px 2px 0}
+.fzbar.out{opacity:0}
+#fzst{display:none;align-items:center;gap:8px;color:var(--fg);flex:none}
+#fzst.on{display:inline-flex}
+#fzst b{display:block;width:64px;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+#fzst b i{display:block;height:100%;width:0;background:var(--acc);transition:width .25s ease}
+/* ---------- top bar ---------- */
+.brand{display:flex;align-items:center;gap:9px;height:100%;width:52px;justify-content:center;border-right:1px solid var(--line);flex:none}
+.brand svg{width:24px;height:24px}
+.wordmark{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;margin-left:2px}
+.ver{font-size:10.5px;font-weight:600;letter-spacing:.02em;color:var(--mut,#8a8a8a);border:1px solid var(--line);border-radius:4px;padding:1px 5px;margin-left:2px;flex:none;line-height:1.4}
+.doc{display:flex;align-items:center;gap:8px;min-width:0}
+#pnm{width:220px;max-width:30vw;background:transparent;border:1px solid transparent;border-radius:5px;padding:5px 8px;font-weight:500;font-size:13px}
+#pnm:hover{border-color:var(--line)}#pnm:focus{border-color:var(--acc);background:var(--field);outline:none}
+#pst{font-size:11.5px;color:var(--mut);white-space:nowrap}#pst.dirty{color:var(--warn)}
+.sep{width:1px;height:22px;background:var(--line);flex:none}
+.spacer{flex:1}
+.rnd{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px;border-radius:7px;border:1px solid var(--line2);background:var(--raise);font-weight:600;font-size:12.5px;cursor:pointer}.rnd:hover{border-color:var(--acc);color:var(--acc-ink)}.rnd svg{width:17px;height:17px}.rnd.clr{margin-left:6px;font-weight:500;color:var(--mut)}.rnd.clr:hover{color:var(--warn);border-color:var(--warn)}.rnd.spin svg{animation:rspin .45s ease}@keyframes rspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.tb{display:flex;align-items:center;gap:2px}
+
+/* ---------- buttons ---------- */
+button{cursor:pointer;border:1px solid var(--line2);background:var(--raise);border-radius:8px;padding:5px 10px;line-height:1.3;margin:0}
+button:hover:not(:disabled){border-color:var(--faint)}
+button:disabled{opacity:.4;cursor:default}
+button.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-fg);font-weight:600}
+button.primary:hover:not(:disabled){filter:brightness(1.08);border-color:var(--acc)}
+button.ghost,.ib{background:transparent;border-color:transparent}
+button.ghost:hover:not(:disabled),.ib:hover:not(:disabled){background:var(--raise);border-color:var(--line)}
+.ib{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;color:var(--mut)}
+.ib:hover:not(:disabled){color:var(--fg)}
+.ib svg{width:17px;height:17px}
+button.alt{background:var(--raise)}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.row.tight{margin-top:0}
+
+/* ---------- rail ---------- */
+.rail button{width:40px;height:40px;padding:0;border:0;background:transparent;border-radius:8px;color:var(--mut);display:flex;align-items:center;justify-content:center;position:relative}
+.rail button svg{width:21px;height:21px}
+.rail button:hover{color:var(--fg);background:var(--raise)}
+.rail button.on{color:var(--acc-ink);background:var(--acc-soft)}
+.rail .rsep{width:24px;height:1px;background:var(--line);margin:2px 0 4px;flex:none}
+.rail button.op{color:var(--acc-ink)}.rail button.gdon:not(.on):not(.op)::after{content:'';position:absolute;right:6px;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--mut)}.rail button.op::after{content:'';position:absolute;right:6px;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--acc)}
+.rail button.on::before{content:"";position:absolute;left:-6px;top:10px;bottom:10px;width:3px;border-radius:2px;background:var(--acc)}
+.rail .tip{position:absolute;left:46px;top:50%;transform:translateY(-50%);background:var(--fg);color:var(--panel);font-size:11px;padding:3px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;z-index:30}
+.rail button:hover .tip{opacity:1}
+.rail .rsp{flex:1}
+
+/* ---------- stage ---------- */
+.viewbar{display:flex;align-items:center;gap:10px;padding:8px 12px;flex:none}
+.seg2{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.seg2 button{border:0;background:transparent;padding:4px 12px;border-radius:7px;color:var(--mut);font-weight:500}
+.seg2 button.on{background:var(--raise);color:var(--fg);box-shadow:0 0 0 1px var(--line2)}
+.gtb{margin-left:auto}#itbw{position:relative;display:inline-block}#itbw .gtb:first-child{margin-left:0}#itb{display:none;position:absolute;left:0;top:100%;margin:4px 0 0;z-index:60;flex-direction:column;align-items:stretch;min-width:176px;padding:4px;gap:2px;box-shadow:var(--shadow)}#itbw.open #itb{display:flex}#itb button{justify-content:flex-start;padding:6px 10px}#itbb .chev{width:12px;height:12px;margin-left:2px;transition:transform .15s}#itbw.open #itbb .chev{transform:rotate(180deg)}#itbw.open #itbb{background:var(--raise);color:var(--fg);box-shadow:0 0 0 1px var(--line2)}.gtb button{display:inline-flex;align-items:center;gap:6px}.gtb svg{width:15px;height:15px}.gtb button.on{background:var(--acc-soft);color:var(--acc-ink);box-shadow:0 0 0 1px var(--acc)}
+.zoom{margin-left:auto;display:inline-flex;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:2px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.zoom .ib{width:26px;height:24px}
+#zl{min-width:48px;text-align:center;font-variant-numeric:tabular-nums;font-size:11.5px;color:var(--mut);border:0;background:transparent;padding:3px 4px}
+.board{flex:1;min-height:0;overflow:auto;display:flex}
+.board>div{margin:auto;padding:28px}
+#art{display:block;box-shadow:var(--paper-shadow);border-radius:1px;max-width:none}#artwrap{position:relative}#art{position:relative}#art.shp{box-shadow:none;border-radius:0}
+#artsh{position:absolute;left:28px;top:28px;display:none;pointer-events:none;overflow:visible;filter:drop-shadow(0 2px 5px rgba(0,0,0,.14)) drop-shadow(0 14px 22px rgba(0,0,0,.13))}
+.shg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:4px}
+.shg button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 1px 5px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--mut);font-size:9.5px;line-height:1.1;cursor:pointer;min-width:0;overflow:hidden}
+.shg button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round;flex:none}
+.shg button:hover{color:var(--fg);border-color:var(--line2)}
+.shg button.on{color:var(--acc-ink);border-color:var(--acc);background:var(--acc-soft)}
+.shg button:disabled{opacity:.45;cursor:default}
+#boardS>div{width:100%;height:100%;display:flex;padding:18px 18px 8px}
+#ed{flex:1;width:100%;height:100%;touch-action:none;color:var(--mut);cursor:default}
+#ed [data-i]{cursor:grab}
+#ed.graded>.gw,#ed.graded>#ghost{filter:url(#wbgradeE)}#ed.graded>.gw.gi{filter:url(#wbgradeEI)}#ed.graded>path.edbg{filter:url(#wbgradeEB)}#ed.graded>.edtx:not(.spov):not(.gmh){filter:none}
+.gms{border-bottom:1px solid var(--line);margin:-1px 0 2px}.gms .lyl2{max-height:240px}
+.gmi{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--mut)}.gmi svg{width:16px;height:16px}.lyr.on .gmi{color:var(--acc-ink)}.gmsp{width:22px;flex:none}
+.gmadd{flex:none}.gmadd .ddl{left:auto;right:-58px;width:236px}.gmadd .ddi{align-items:flex-start}.gmadd .ddi .gmi{margin-top:1px}
+#gm_body{padding-bottom:6px}#gm_body .lyo .seg{flex:1}#gm_body .seg button{padding:5px 4px}
+.gmc{display:flex;gap:6px;flex:1;min-width:0}.gmc select{flex:1;min-width:0}.gmc .ib{width:30px;height:28px;flex:none}.gmc .ib[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink)}#art.gmpick,#art.gmpick *{cursor:crosshair!important}.gmc input[type=color]{width:30px;height:28px;padding:2px;border:1px solid var(--line);border-radius:6px;background:var(--field);flex:none;cursor:pointer}
+.gmchk{display:flex;flex-wrap:wrap;gap:4px 16px;padding:2px 10px 4px}.gmchk .chk{margin-top:6px}
+.gmgo{display:block;margin:0 10px 4px;width:calc(100% - 20px)}.gmgo[hidden]{display:none}
+#gm_body [hidden]{display:none}
+#gmov [data-gh]{touch-action:none}
+.spbar{position:absolute;left:50%;transform:translateX(-50%);top:52px;z-index:5;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--acc);border-radius:10px;padding:6px 6px 6px 12px;box-shadow:var(--shadow);font-size:11.5px;color:var(--mut)}.spbar button{margin:0;padding:5px 12px}
+#ed [data-sp]{cursor:grab}#ed [data-sp=r]{cursor:alias}
+#sko[aria-pressed=true]{color:var(--acc-ink);background:var(--acc-soft);border-color:var(--acc)}
+#art.man [data-cell]{cursor:pointer}#art.fpm{cursor:default}#art.fpm.brush{cursor:copy}#art.man [data-cell]:hover{opacity:.55}
+#ed.brush,#ed.brush [data-i]{cursor:none}
+.mlist{display:flex;flex-direction:column;min-height:100%}
+.pn[data-p=preview]:not([hidden]){display:flex;flex-direction:column;height:100%;min-height:200px}
+.pvbar{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);font-size:11.5px;color:var(--mut)}.pvbar span{flex:1}
+.pvc{margin:0;padding:2px 9px;font-size:11px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--mut)}.pvc[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+.pvz{grid-template-columns:repeat(3,auto)}.pvz button{padding:2px 9px;font-size:11px}
+.pvbox{position:relative;flex:1;min-height:0;padding:10px;background:var(--stage);background-image:radial-gradient(var(--stage-dot) 1px,transparent 1.2px);background-size:18px 18px;display:flex}
+#pvw{flex:1;width:100%;height:100%;min-height:160px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.18))}
+.mlist h3{margin:0;padding:9px 12px;font-size:12px;font-weight:600;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.mlist h3 span{color:var(--mut);font-weight:500}
+.mlist .ml{flex:1;padding:4px}
+.mlist .mr{display:grid;grid-template-columns:30px minmax(0,1fr) 22px;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:12px;border:1px solid transparent}
+.mlist .mr:hover{background:var(--raise)}.mlist .mr.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink);font-weight:600}
+.mlist .mr svg{width:30px;height:30px;border-radius:4px;border:1px solid var(--line)}
+.mlist .mr b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mlist .mr i{font-style:normal;color:var(--faint);font-weight:400;margin-left:4px}
+.mlist .mr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;visibility:hidden;font-size:14px;line-height:1}.mlist .mr:hover button{visibility:visible}.mlist .mr button:hover{background:var(--line);color:var(--fg)}
+.mlist .em{padding:12px;font-size:11.5px;color:var(--mut);line-height:1.45}
+.mlist{user-select:none;-webkit-user-select:none}
+.mlist .mh{grid-template-columns:14px 30px minmax(0,1fr) 22px;gap:6px;padding-left:2px}
+.mlist .mh.part{background:var(--raise);border-color:var(--line)}
+.mlist .mh .car{width:14px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--mut);border-radius:4px;cursor:pointer}
+.mlist .mh .car:hover{background:var(--line);color:var(--fg)}
+.mlist .mh .car svg{width:11px;height:11px;transition:transform .12s}
+.mlist .mg.open>.mh .car svg{transform:rotate(90deg)}
+.mlist .mh i.cnt{display:inline-block;margin-left:6px;padding:0 6px;border-radius:9px;background:var(--line);color:var(--mut);font-size:10.5px;line-height:16px;font-weight:500}
+.mlist .mh.on i.cnt{background:var(--acc);color:var(--acc-fg)}
+.mlist .mk{position:relative;margin-left:9px;padding-left:9px;border-left:1px solid var(--line)}
+.mlist .mr.kid{grid-template-columns:24px minmax(0,1fr) 22px}
+.mlist .mr.kid svg{width:24px;height:24px}
+.txs{display:flex;flex-direction:column;gap:8px}
+.txr{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:4px 6px;align-items:center}
+.txr .txt,.txl .txt{width:30px;height:30px;border-radius:4px;border:1px solid var(--line);display:block;object-fit:cover;background:var(--field)}
+.txr select{min-width:0;width:100%}
+.txa{display:flex;gap:1px}
+.txm{grid-column:2/4;display:flex;gap:2px;background:var(--field);border:1px solid var(--line);border-radius:6px;padding:2px}
+.txm button{flex:1;height:22px;padding:0;border:0;border-radius:4px;background:transparent;color:var(--mut);font-size:11px}
+.txm button:hover{color:var(--fg)}.txm button.on{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}
+.txb{width:26px;height:26px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:6px;display:inline-flex;align-items:center;justify-content:center}
+.txb:hover{background:var(--raise);color:var(--fg)}.txb svg{width:16px;height:16px}
+.txp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
+.txp figure{margin:0;min-width:0}.txp img{width:100%;aspect-ratio:1;object-fit:cover;border:1px solid var(--line);border-radius:6px;display:block;background:var(--field)}
+.txp figcaption{font-size:10.5px;color:var(--mut);text-align:center;margin-top:3px}
+.txl{margin:0;border-left:0;border-right:0;border-radius:0;max-height:240px}
+.txl .mr{display:grid;grid-template-columns:30px minmax(0,1fr) 22px;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:12px;border:1px solid transparent}
+.txl .mr:hover{background:var(--raise)}.txl .mr.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink);font-weight:600}
+.txl .mr b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.txl .mr i{font-style:normal;color:var(--faint);font-weight:400;margin-left:6px}
+.txl .mr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;visibility:hidden;font-size:15px;line-height:1}.txl .mr:hover button,.txl .mr.on button{visibility:visible}.txl .mr button:hover{background:var(--line);color:var(--fg)}
+.txl .nb{margin:6px}
+#sel .msc{font-size:11px;font-weight:600;color:var(--acc-ink);background:var(--acc-soft);border-radius:9px;padding:2px 9px;white-space:nowrap}
+.mlist .ft{border-top:1px solid var(--line);padding:6px 12px;font-size:10.5px;color:var(--faint)}
+.lib button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}
+.edhint{position:absolute;left:50%;transform:translateX(-50%);top:56px;font-size:11px;color:var(--mut);background:var(--panel);border:1px solid var(--line);padding:4px 10px;border-radius:20px;white-space:nowrap;pointer-events:none}
+
+/* stamps filmstrip */
+.film{flex:none;display:flex;align-items:center;gap:10px;padding:8px 12px 10px;border-top:1px solid var(--line);background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(6px)}
+.film .lbl{font-size:11px;color:var(--mut);flex:none}
+.tabs{display:flex;gap:8px;overflow-x:auto;flex:1;min-width:0;padding:3px}
+.tabs button{flex:none;width:54px;height:54px;padding:4px;background:var(--field);border:1px solid var(--line);border-radius:6px}
+.tabs button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}
+.tabs svg{width:100%;height:100%}
+.tdl{position:fixed;width:3px;border-radius:2px;background:var(--acc);pointer-events:none;z-index:9999}.tabs.tdrag{cursor:grabbing}.tabs.tdrag button{cursor:grabbing}.tabs button.tgh{opacity:.45}
+
+/* contextual motif bar */
+/* Stamp editor: the motif controls bar keeps its space even with nothing selected, so the stamp never changes size when you click a motif. */
+@media (min-width:861px){.stage:not(.pv) #boardS:not([hidden])~#sel[hidden]{display:flex!important;position:relative;pointer-events:none}.stage:not(.pv) #boardS:not([hidden])~#sel[hidden]>*{visibility:hidden}.stage:not(.pv) #boardS:not([hidden])~#sel>.msc[hidden]{display:block!important;visibility:hidden}.stage:not(.pv) #boardS:not([hidden])~#sel>.msc{min-width:78px;text-align:center}
+.stage:not(.pv) #boardS:not([hidden])~#sel[hidden]::before{content:"";position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:11.5px;color:var(--mut);white-space:normal}}
+#sel{flex:none;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 14px;background:var(--panel);border-top:1px solid var(--line);padding:8px 12px;white-space:nowrap}
+#sel .ctl{margin:0;width:auto;grid-template-columns:auto 96px 50px}#sel .ctl label{overflow:visible;color:var(--mut)}
+#sel .row{margin:0;flex-wrap:nowrap;gap:2px}
+#sel .sdiv{width:1px;height:22px;background:var(--line)}
+#sel .rzg{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;justify-content:center}#sel .rzg .ctl{grid-template-columns:auto 70px 46px}#sel .rzl{font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}#rzgo{margin:0;display:inline-flex;align-items:center;gap:6px;padding:4px 10px}#rzgo svg{width:15px;height:15px}
+
+/* ---------- dock ---------- */
+.dock-h{display:flex;align-items:center;gap:8px;padding:12px 14px 10px;border-bottom:1px solid var(--line);flex:none}
+.dock-h h1{margin:0;font-size:13.5px;font-weight:600}
+.dock-h small{color:var(--mut);font-size:11.5px;margin-left:auto}
+.dock-b{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0}
+.pn[hidden]{display:none}
+details.g{border-bottom:1px solid var(--line)}
+details.g>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:10px 14px;font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:14px;user-select:none}
+details.g>summary::-webkit-details-marker{display:none}
+details.g>summary::before{content:"";width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--faint);transition:transform .12s;transform:rotate(-90deg)}
+details.g[open]>summary::before{transform:none}
+details.g>summary:hover{background:color-mix(in srgb,var(--raise) 60%,transparent)}
+details.g>summary .aux{margin-left:auto;font-family:"Hanken Grotesk",system-ui,sans-serif;font-weight:400;color:var(--mut);font-size:11px}
+.gb{padding:2px 14px 14px}
+
+label{display:block;font-size:11.5px;color:var(--mut);margin:10px 0 5px}
+.gb>label:first-child,.gb>.ctl:first-child{margin-top:2px}
+select,input[type=text],input[type=number]{background:var(--field);border:1px solid var(--line);border-radius:8px;padding:5px 8px;height:30px;width:100%;min-width:0}
+select:hover,input[type=text]:hover,input[type=number]:hover{border-color:var(--line2)}
+select:focus,input[type=text]:focus,input[type=number]:focus{border-color:var(--acc);outline:none}
+select{appearance:none;-webkit-appearance:none;padding-right:26px;background-image:linear-gradient(45deg,transparent 50%,var(--mut) 50%),linear-gradient(135deg,var(--mut) 50%,transparent 50%);background-position:calc(100% - 13px) 13px,calc(100% - 9px) 13px;background-size:4px 4px;background-repeat:no-repeat}
+input[type=number]{-moz-appearance:textfield;text-align:right;font-variant-numeric:tabular-nums;padding:4px 6px}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.board.off{position:absolute;left:-20000px;top:0;width:40px;height:40px;overflow:hidden;pointer-events:none;flex:none}
+.pgrid .hint{grid-column:1/-1;margin:20px 0;text-align:center}
+.status .it{display:inline-flex;gap:5px}.status .it b{font-weight:500;color:var(--fg)}
+
+/* slider rows: label | slider | value */
+.ctl{display:grid;grid-template-columns:104px minmax(0,1fr) 52px;align-items:center;gap:8px;margin-top:6px}
+.ctl.fitrow{grid-template-columns:104px minmax(0,1fr)}.fitrow .seg button{padding:4px 2px}.ctl:has(input[type=range]:disabled){opacity:.4}.lk[aria-pressed=true] .on{display:block}.lk[aria-pressed=true] .off{display:none}
+.ctl label{margin:0;color:var(--fg);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctl .num{position:relative}
+.ctl .num input{height:24px;font-size:11.5px;padding:2px 5px}
+.ctl .num input.u{padding-right:15px}
+.ctl .num i{position:absolute;right:5px;top:50%;transform:translateY(-50%);font-style:normal;color:var(--faint);font-size:10.5px;pointer-events:none}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;margin:0;--p:50%}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--acc) var(--p),var(--line2) var(--p))}
+input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--acc) var(--p),var(--line2) var(--p))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--raise);border:1.5px solid var(--acc);margin-top:-5px;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:var(--raise);border:1.5px solid var(--acc)}
+input[type=range]:focus-visible{outline:none}input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--acc-soft)}
+
+.hint{font-size:11px;color:var(--mut);margin-top:8px;line-height:1.45}
+#msg{font-size:11px;color:var(--mut);margin-top:6px;min-height:14px}
+
+/* switches */
+.chk{display:flex;align-items:center;gap:9px;margin-top:10px;font-size:12px;cursor:pointer}
+.chk input{appearance:none;-webkit-appearance:none;width:28px;height:16px;border-radius:9px;background:var(--line2);position:relative;flex:none;margin:0;cursor:pointer;transition:background .15s}
+.chk input::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.chk input:checked{background:var(--acc)}.chk input:checked::after{transform:translateX(12px)}.chk.sub{margin-left:18px;margin-top:6px}.chk input:disabled{cursor:default}
+
+/* segmented shape picker */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);}
+#skind{grid-template-columns:repeat(5,1fr)}#skind button:nth-child(5n+1){border-left:0}#skind button:nth-child(n+6){border-top:1px solid var(--line)}#skind button{flex-direction:column;gap:3px;padding:6px 2px;font-size:10.5px}#skind button+button{border-left:1px solid var(--line)}
+.seg{gap:0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--field)}
+.seg button{border:0;border-radius:0;background:transparent;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 4px;color:var(--mut);font-size:11.5px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}
+.seg svg{width:15px;height:15px}
+.asp{display:flex;gap:6px;align-items:center}.asp select{flex:1}.asp button{flex:none;width:30px;height:30px;padding:0}
+.aspc{display:flex;gap:6px;align-items:center;margin-top:6px;font-size:11.5px;color:var(--mut)}.aspc input{width:62px;height:26px}
+
+/* swatch + custom dropdowns */
+.sw{display:flex;gap:6px;align-items:center}.sw i{flex:none;width:30px;height:30px;border-radius:6px;border:1px solid var(--line)}.sw select,.sw .dd{flex:1}
+.dd{position:relative;min-width:0}
+.ddb{display:flex;align-items:center;gap:8px;width:100%;margin:0;padding:4px 8px;height:30px;text-align:left;background:var(--field);border:1px solid var(--line);border-radius:6px;font-size:12px}
+.ddb{height:auto;min-height:30px}.ddb small{display:block;color:var(--mut);font-size:10.5px;line-height:1.2}.ddb>span{min-width:0;line-height:1.25}
+.ddb em{margin-left:auto;font-style:normal;color:var(--faint);font-size:10px}
+.ddl{position:absolute;z-index:40;left:0;right:0;top:100%;margin-top:3px;max-height:300px;overflow-y:auto;background:var(--raise);border:1px solid var(--line2);border-radius:8px;box-shadow:var(--shadow);padding:4px}
+.ddl[hidden]{display:none}
+.ddi{display:flex;align-items:center;gap:8px;padding:5px 7px;font-size:12px;cursor:pointer;border-radius:5px}
+.ddi:hover,.ddi.cur{background:var(--acc-soft)}.ddi small{display:block;color:var(--mut);font-size:10.5px}
+.chip{flex:none;width:18px;height:18px;border-radius:4px;border:1px solid rgba(128,128,128,.4)}
+.combo{flex:none;min-width:40px;height:20px;border-radius:4px;border:1px solid rgba(128,128,128,.4);font:600 11px Georgia,serif;text-align:center;line-height:18px}
+
+/* color library */
+.cl{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:5px;margin-top:8px;max-height:none}
+.cl button{margin:0;padding:0;background:none;border:1px solid var(--line);aspect-ratio:1;border-radius:6px;overflow:hidden;position:relative}
+.cl button:hover{border-color:var(--fg);transform:none}
+.cl i{display:block;width:100%;height:100%}.cl span{display:none}
+.cl button.cust{border-style:dashed;border-color:var(--mut)}
+.cl .plus{display:flex;align-items:center;justify-content:center;font-size:18px;font-style:normal;color:var(--mut);height:100%;background:var(--field)}
+.cf{margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--field)}
+#cpk{flex:none;width:38px;height:30px;padding:0;border:1px solid var(--line);background:none;border-radius:6px}
+#chx{flex:1;min-width:0;width:auto}
+
+/* symmetry */
+.sym{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.sym button{margin:0;padding:5px 2px 4px;background:var(--field);border:1px solid var(--line);font-size:10px;line-height:1.2;color:var(--mut);border-radius:6px}
+.sym button.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-soft)}
+.sym svg{width:70%;margin:0 auto 3px;aspect-ratio:1}
+
+/* motif library */
+.lib{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.lib button{margin:0;padding:5px;aspect-ratio:1;background:var(--field);border:1px solid var(--line);border-radius:7px}
+.lib button:hover{border-color:var(--acc)}
+.lib svg{width:100%;height:100%;border-radius:4px}
+.lib .em{grid-column:1/-1;font-size:11.5px;color:var(--mut);padding:6px 0}
+
+/* layers */
+.lyl{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--field)}
+.lr{display:flex;align-items:center;gap:8px;padding:6px 8px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--line)}
+.lr:last-child{border-bottom:0}
+.lr:hover{background:color-mix(in srgb,var(--raise) 70%,transparent)}
+.lr.on{background:var(--acc-soft);box-shadow:inset 3px 0 0 var(--acc)}
+.lr .ln{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lr button{margin:0;padding:0;width:22px;height:22px;font-size:9px;background:transparent;border-color:transparent;color:var(--mut)}
+.lr button:hover{border-color:var(--line2);color:var(--fg)}
+.lr input[type=checkbox]{margin:0;accent-color:var(--acc)}
+.strip{display:flex;gap:6px;overflow-x:auto;padding:2px}
+.strip button{flex:none;width:46px;height:46px;padding:3px;background:var(--field);border:1px solid var(--line);border-radius:6px}
+.strip svg{width:100%;height:100%}
+.slg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.slc{border:1px solid var(--line);border-radius:8px;background:var(--field);padding:6px;display:flex;flex-direction:column;gap:6px;min-width:0}.slc .im{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;background:repeating-conic-gradient(rgba(128,128,128,.14) 0 25%,transparent 0 50%) 0 0/12px 12px,var(--panel)}.slc .im img{max-width:92%;max-height:92%;object-fit:contain}.slc b{font-size:11.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.slc .row{gap:4px;flex-wrap:wrap}.slc button{padding:4px 7px;font-size:11px}
+.strip button img,.ath{display:block;width:100%;height:100%;object-fit:contain}.strip button{position:relative}#lfars button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}#lfars .alk{position:absolute;left:3px;bottom:3px;width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 1.5px var(--field)}#lfars i{position:absolute;top:-5px;right:-5px;width:15px;height:15px;line-height:13px;border-radius:50%;background:var(--panel);border:1px solid var(--line2);font-style:normal;font-size:11px;color:var(--mut)}
+#lfgrid{margin-top:8px}#lfgrid .hint{margin-top:6px}.fgk{font-style:normal;color:var(--faint);font-size:11px}#pgm button.on{background:var(--raise);color:var(--acc-ink);font-weight:600}
+#lfpst button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}.fpn{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--mut)}.fpn span{flex:1}.fpn button{margin:0}.fprow{gap:2px}
+.fpl{min-height:0;max-height:210px;overflow:auto;margin-top:6px;border:1px solid var(--line);border-radius:6px;background:var(--field);padding:3px}.fpl .mr.on button{visibility:visible}.fpl .mr svg{background:var(--panel)}
+.strip.ls button{opacity:.4}.strip.ls button.on{opacity:1;border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}
+.lhead{display:flex;align-items:center;gap:2px;margin-bottom:8px}.lhead span{font-size:11.5px;color:var(--mut);margin-right:auto}
+
+/* menus */
+.menu{position:relative}
+.pop{position:absolute;top:calc(100% + 6px);min-width:220px;background:var(--raise);border:1px solid var(--line2);border-radius:9px;box-shadow:var(--shadow);padding:5px;z-index:50}
+.pop.r{right:0}
+/* open menus and dropdowns float above every panel (placed by placeFloat) */
+.pop.fx,.ddl.fx{position:fixed;margin:0;right:auto;bottom:auto;z-index:9000;overflow-y:auto;overscroll-behavior:contain}
+.pop button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;text-align:left;padding:7px 9px;border-radius:6px}
+.pop button:hover{background:var(--acc-soft)}
+.pop button kbd{margin-left:auto;font:inherit;font-size:11px;color:var(--faint)}
+.pop button svg{width:15px;height:15px;color:var(--mut)}
+.pop hr{border:0;border-top:1px solid var(--line);margin:5px 3px}
+
+/* file pickers: real <label for> targets, so phones open the picker on tap */
+.vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;opacity:0}
+label.btn{display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--line2);background:var(--raise);border-radius:6px;padding:5px 10px;line-height:1.3;font-size:12.5px;color:var(--fg);margin:0;white-space:nowrap;-webkit-user-select:none;user-select:none;min-height:30px}
+label.btn:hover{border-color:var(--faint)}
+label.btn.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-fg);font-weight:600}
+.pop label.mi{display:flex;align-items:center;gap:10px;width:100%;margin:0;padding:7px 9px;border-radius:6px;font-size:12.5px;color:var(--fg);cursor:pointer}
+.pop label.mi:hover{background:var(--acc-soft)}.pop label.mi svg{width:15px;height:15px;color:var(--mut)}
+@media (pointer:coarse){label.btn{min-height:40px;padding:8px 14px}.drop span{display:none}}
+.pz{margin-top:8px;min-height:64px;padding:12px;border:1.5px dashed var(--line2);border-radius:8px;background:var(--field);font-size:11.5px;color:var(--mut);text-align:center;display:flex;align-items:center;justify-content:center;outline:none;-webkit-user-select:text;user-select:text;overflow:hidden}
+.pz:focus{border-color:var(--acc);background:var(--acc-soft)}.pz img{max-height:60px}
+.cvp{border:1px solid var(--line);border-radius:8px;background:var(--stage);background-image:linear-gradient(45deg,var(--line) 25%,transparent 25%,transparent 75%,var(--line) 75%),linear-gradient(45deg,var(--line) 25%,transparent 25%,transparent 75%,var(--line) 75%);background-size:14px 14px;background-position:0 0,7px 7px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:11.5px;color:var(--mut)}
+.cvp img{max-width:100%;max-height:100%;display:block}.cvp span{background:var(--panel);padding:4px 10px;border-radius:12px}
+/* import */
+textarea{width:100%;margin-top:8px;background:var(--field);border:1px solid var(--line);border-radius:6px;padding:7px 8px;font:11.5px/1.45 inherit;color:inherit;resize:vertical}
+.drop{display:flex;align-items:center;gap:10px;padding:10px;border:1.5px dashed var(--line2);border-radius:8px;background:var(--field)}
+.drop button{white-space:nowrap;flex:none}.drop span{font-size:11px;color:var(--mut);line-height:1.35}
+body.dropping .drop{border-color:var(--acc);background:var(--acc-soft)}
+body.dropping::after{content:"Drop the image to import it";position:fixed;inset:12px;border:2px dashed var(--acc);border-radius:14px;background:color-mix(in srgb,var(--acc) 10%,transparent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--acc-ink);z-index:90;pointer-events:none}
+.idl{width:min(1000px,100%)}
+.icmp{display:grid;grid-template-columns:1fr 1fr 300px;gap:18px;align-items:start}
+.icmp figure{margin:0}
+.bk2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bk2 input,.bk2 select{width:100%}
+.bkinfo{margin:8px 0 4px;padding:8px 10px;border-radius:8px;background:var(--raise);border:1px solid var(--line);font-size:11.5px;line-height:1.55;color:var(--fg)}.bkinfo b{font-weight:600}.bkinfo .w{color:var(--warn)}
+.psep{height:1px;background:var(--line);margin:4px 2px}
+.shrow{display:flex;align-items:center;gap:6px}.shrow input[type=number]{width:52px}.shrow span{color:var(--mut);font-size:11.5px}.shrow button{margin-left:auto}
+.sdl{width:min(1180px,100%)}.svw{grid-template-columns:auto auto;width:max-content;margin:0 auto 8px}.svw button{padding:4px 14px}.scmp{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:18px;align-items:start}.sctl{min-width:0}.sctl .seg{margin-bottom:8px}
+.sstage{position:relative;line-height:0;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;touch-action:none}.sstage img{width:100%;height:auto;display:block}
+#sov{position:absolute;inset:0;width:100%;height:100%}#sov [data-lx]{cursor:col-resize}#sov [data-ly]{cursor:row-resize}
+.scells{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px;margin-top:14px}
+.scells button{position:relative;margin:0;padding:4px;aspect-ratio:1;border:1px solid var(--line);border-radius:8px;background:var(--field)}.scells button svg{width:100%;height:100%;border-radius:5px}
+.scells button.off{opacity:.35}.scells button.off::after{content:'';position:absolute;inset:0;border-radius:8px;background:linear-gradient(45deg,transparent 48%,var(--warn) 48%,var(--warn) 52%,transparent 52%)}
+.scells button i{position:absolute;left:5px;top:3px;font-style:normal;font-size:10px;color:var(--faint)}.scells .em{grid-column:1/-1;color:var(--mut);font-size:11.5px}
+@media (max-width:860px){.scmp{grid-template-columns:1fr}}
+.icmp img,#iout{width:100%;aspect-ratio:1;object-fit:contain;background:var(--stage);border:1px solid var(--line);border-radius:8px;display:block}
+#iout svg{width:100%;height:100%;border-radius:8px}
+.icmp figcaption{font-size:11px;color:var(--mut);margin-top:6px}
+.ictl label:first-child{margin-top:0}
+.ictl .ctl{grid-template-columns:104px 1fr 34px}
+.ictl .v{font-size:11.5px;color:var(--mut);text-align:right;font-variant-numeric:tabular-nums}
+.ifoot{display:flex;align-items:center;gap:8px}.ifoot span{margin-right:auto}
+.lib .dx{position:absolute;top:2px;right:2px;width:18px;height:18px;padding:0;border-radius:50%;font-size:11px;line-height:16px;display:none;background:var(--raise);border:1px solid var(--line2);color:var(--mut)}
+.fbar{display:flex;align-items:center;gap:1px}.fbar select{flex:1;min-width:0;margin-right:4px}.fbar .ib[aria-pressed="true"]{color:var(--acc-ink);background:var(--acc-soft)}.fbar .ib:disabled{opacity:.35}
+.fform{display:flex;gap:6px;margin-top:8px}.fform input{flex:1;min-width:0}.fform button{margin:0}
+.fsbar{position:sticky;bottom:0;z-index:2;margin-top:8px;padding:8px;border:1px solid var(--line2);border-radius:8px;background:var(--raise);display:grid;gap:6px;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.fsbar .r{display:flex;gap:6px;align-items:center}.fsbar .r>*{margin:0}.fsbar .r button{flex:none}.fsbar select{width:100%;margin:0}.fsbar #fscnt{flex:1;font-size:12px;font-weight:600}
+.lib button.pk{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}.lib .ck{position:absolute;top:4px;left:4px;width:16px;height:16px;border-radius:50%;background:var(--acc);pointer-events:none;display:flex}.lib .ck svg{width:16px;height:16px}
+.lib.sel>div>button:first-child:not(.pk){opacity:.82}.lib.sel>div>button:first-child:hover{opacity:1}
+.txed{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 8px;border-radius:7px;background:var(--acc-soft);font-size:12px}.txed span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.txed button{margin:0;flex:none}
+#tx_t{width:100%;resize:vertical;font:inherit;font-size:13px;min-height:52px;box-sizing:border-box}
+.txpv{margin-top:10px;border:1px solid var(--line);border-radius:8px;background:var(--field);padding:6px;color:var(--fg)}.txpv svg{display:block;width:100%;max-height:220px}
+.lib>div{position:relative}.lib>div:hover .dx{display:block}.lib>div>button:first-child{width:100%}
+@media (max-width:860px){.edhint.sphide{visibility:hidden}
+.edhint{white-space:normal;max-width:calc(100% - 24px);text-align:center;border-radius:10px}#sel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 12px;padding:8px 10px}#sel .ctl{grid-template-columns:auto minmax(0,1fr) 46px;gap:6px}#sel .sdiv{display:none}#sel>.row{grid-column:1/-1;justify-content:center;gap:10px}#sel .rzg{grid-column:1/-1}#edhint.edhint{display:none!important}#sel .ib{width:36px;height:36px}.board{min-height:44vh}.modal.modal{padding:8px;align-items:flex-start}.dlg.dlg{width:100%;max-width:100%;max-height:calc(100vh - 16px);min-width:0}.dlg-b{min-width:0}.icmp>*{min-width:0}.icmp{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.ictl{grid-column:1/-1;min-width:0}.ictl .ctl{grid-template-columns:92px minmax(0,1fr) 30px}.ifoot span{display:none}.ifoot{justify-content:flex-end}.pgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.dlg-h{flex-wrap:wrap}}
+/* projects dialog */
+.modal{position:fixed;inset:0;background:rgba(10,11,14,.45);display:flex;align-items:center;justify-content:center;z-index:80;padding:30px}
+.dlg{width:min(920px,100%);max-height:100%;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line2);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.dlg-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.dlg-h h2{margin:0;font-size:14px;font-weight:600;margin-right:auto}
+.dlg-b{padding:16px;overflow-y:auto}
+.dlg-f{padding:10px 16px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.pc{border:1px solid var(--line);border-radius:9px;padding:8px;background:var(--raise);font-size:12px;display:flex;flex-direction:column;gap:5px}
+.pc.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}
+.pc img,.pc .nt{width:100%;aspect-ratio:4/3;object-fit:contain;background:var(--stage);border-radius:5px;display:block}
+.pc .nt{display:flex;align-items:center;justify-content:center;color:var(--mut)}
+.pc b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc small{color:var(--mut);font-size:11px}
+.pc .row{margin-top:2px;gap:4px}.pc .row button{padding:3px 8px;font-size:11px}
+
+@media (max-width:860px){
+#app{grid-template-columns:minmax(0,1fr);grid-template-rows:46px auto auto minmax(0,1fr) 26px;grid-template-areas:"top" "rail" "stage" "dock" "status"}
+html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.dock-b{overflow:visible}.dock{min-height:0}
+.rail{flex-direction:row;justify-content:center;border-right:0;border-bottom:1px solid var(--line);padding:4px}
+.rail .rsp{display:none}.rail button.on::before{display:none}.rail .tip{display:none}
+.dock{border-left:0;border-top:1px solid var(--line);min-height:60vh}
+#pnm{width:110px;min-width:0}.wordmark,.ver,#pst,.top .sep,#pwhere{display:none}.top{gap:4px;overflow-x:auto;padding-right:6px}.brand{width:44px}.top button{padding:5px 8px}.status{gap:10px}
+}
+#crbar{position:fixed;z-index:99999;display:flex;gap:6px;padding:6px;border-radius:8px;background:var(--panel);border:1px solid var(--line2);box-shadow:var(--shadow)}#crbar button{margin:0;white-space:nowrap}
+#cfmth,#ccirh,#pdesc,#symh,#lhint,#lfph,#lfh,#lfgi,#lcrih,#rzhint,#lglh{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.rzbig{width:100%;height:38px;display:flex;align-items:center;justify-content:center;gap:9px;font-size:13.5px}.rzbig svg{width:19px;height:19px}.rzmain{padding-top:12px}
+[data-p="rand"] .chk{margin-top:7px}.rzrow{display:flex;align-items:center;gap:6px}.rzrow .chk{flex:1;min-width:0}.rzx{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;margin-top:7px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--mut);font-size:10.5px;cursor:pointer}.rzx svg{transition:transform .15s}.rzx[aria-expanded="true"] svg{transform:rotate(180deg)}.rzx.part{color:var(--acc-ink);border-color:var(--acc)}.rzsub{margin:2px 0 6px 6px;padding:2px 0 4px 12px;border-left:2px solid var(--line)}.rzsub[hidden]{display:none}.rzsub.off{opacity:.55}.rzgh{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin-top:10px}.rzsub .row{margin-top:8px}[data-p="rand"] #rzlast{margin-top:10px;text-align:center}[data-p="rand"] select{width:100%}
+</style>
+</head>
+<body>
+<div id="splash" aria-hidden="true"><div class="spl"><svg viewBox="0 0 24 24"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="var(--acc)"/><rect x="8.6" y="8.6" width="6.8" height="6.8" rx="1" transform="rotate(45 12 12)" fill="none" stroke="var(--acc-fg)" stroke-width="2"/></svg><b>Wodblok</b><i></i></div></div>
+<div id="app">
+<header class="top">
+ <div class="brand" title="Wodblok"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="var(--acc)"/><rect x="8.6" y="8.6" width="6.8" height="6.8" rx="1" transform="rotate(45 12 12)" fill="none" stroke="var(--acc-fg)" stroke-width="2"/></svg></div>
+ <span class="wordmark">Wodblok</span>
+ <span class="ver" id="ver" title="Version 100">v100</span>
+ <div class="sep"></div>
+ <div class="doc"><input type="text" id="pnm" maxlength="60" placeholder="Untitled pattern" aria-label="Project name"><span id="pst"></span></div>
+ <div class="sep"></div>
+ <div class="tb">
+  <button class="ib" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6.5L4.5 11 9 15.5"/><path d="M5 11h9.5a4.5 4.5 0 010 9H11"/></svg></button>
+  <button class="ib" id="redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6.5l4.5 4.5-4.5 4.5"/><path d="M19 11H9.5a4.5 4.5 0 000 9H13"/></svg></button>
+ </div>
+ 
+ <div class="spacer"></div>
+ <button class="ib" id="thm" type="button" title="Switch to light mode" aria-label="Switch to light mode"></button>
+ <button class="ghost" id="pls">Projects</button>
+ <div class="menu"><button class="ghost" id="fileb" aria-haspopup="true">File</button>
+  <div class="pop r" id="filem" hidden>
+   <button id="pnw"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8l4.5 4.5v12.5H6z"/><path d="M14 3.5V8h4.5"/></svg>New project</button>
+   <button id="clr" title="Start from a blank stamp with default settings (Ctrl+Z to go back)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19.5h11"/><path d="M4.6 14.4l8.3-8.3a2 2 0 012.8 0l3 3a2 2 0 010 2.8L11 19.5H7.4l-2.8-2.8a2 2 0 010-2.8z"/><path d="M9.2 9.8l5 5"/></svg>Clear canvas</button>
+    <button id="pcp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg>Save a copy</button>
+   <hr>
+   <label id="pop" for="pfile" class="mi" role="button" tabindex="0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/></svg>Open project file…</label>
+   <button id="pdl"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 11L12 15.5 16.5 11M4.5 20h15"/></svg>Download project file</button>
+  </div>
+  <input type="file" id="pfile" class="vh" accept=".json,application/json,text/plain" tabindex="-1">
+ </div>
+ <button id="psv" title="Save (Ctrl+S)">Save</button>
+ <div class="menu"><button class="primary" id="expb" aria-haspopup="true">Export</button>
+  <div class="pop r" id="expm" hidden>
+   <button id="png"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 15l5-5 4 4 2.5-2.5 5.5 5.5"/></svg>PNG image<kbd>3× size</kbd></button>
+   <button id="sv"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5L12 5l7.5 14.5z"/><circle cx="12" cy="5" r="1.4"/></svg>SVG vector</button>
+   <div class="psep" id="bkxs" hidden></div>
+   <button id="bkpdf" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8l4.5 4.5v12.5H6z"/><path d="M14 3.5V8h4.5M9 13h6M9 16.5h6"/></svg>Print cover PDF<kbd>300 DPI</kbd></button>
+   <button id="bkpng" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M9.5 5v14M14.5 5v14"/></svg>Print cover PNG<kbd>300 DPI</kbd></button>
+   <button id="cpy"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg>Copy SVG code</button>
+  </div>
+ </div>
+</header>
+
+<nav class="rail" aria-label="Panels">
+ <button id="rcls" aria-label="Close all panels"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M14.5 4.5v15"/><path d="M7.2 9.8l3.6 4.4M10.8 9.8l-3.6 4.4"/></svg><span class="tip">Close all panels</span></button>
+ <span class="rsep"></span>
+ <button data-pn="canvas" aria-label="Canvas"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M7 3v2.5M17 3v2.5M7 18.5V21M17 18.5V21M3 7h2.5M3 17h2.5M18.5 7H21M18.5 17H21"/></svg><span class="tip">Canvas</span></button>
+ <button data-pn="colors" aria-label="Colors"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9.5" r="5"/><circle cx="15" cy="9.5" r="5"/><circle cx="12" cy="14.5" r="5"/></svg><span class="tip">Colors</span></button>
+ <button data-pn="stamp" aria-label="Stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5a2.5 2.5 0 012.5 2.5c0 1.7-1 2.3-1 3.8V11h-3V9.8c0-1.5-1-2.1-1-3.8A2.5 2.5 0 0112 3.5z"/><rect x="4" y="11" width="16" height="5" rx="2"/><path d="M6 20.5h12"/></svg><span class="tip">Stamp</span></button>
+ <button data-pn="slib" aria-label="Stamp library"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="5" height="14" rx="1.5"/><rect x="10" y="5" width="4" height="14" rx="1.5"/><rect x="15.6" y="5.4" width="4.6" height="14" rx="1.5" transform="rotate(-10 18 12.4)"/></svg><span class="tip">Stamp library</span></button>
+ <button data-pn="motifs" aria-label="Motifs"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9"/><path d="M12 14c-4.6 0-6.5-2.8-6.5-7 4.6 0 6.5 2.8 6.5 7zM12 12c0-3.6 1.8-5.5 5.5-5.5 0 3.6-1.8 5.5-5.5 5.5z"/></svg><span class="tip">Motifs</span></button>
+ <button data-pn="text" aria-label="Text"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 7.5V5h13v2.5M12 5v14M9 19h6"/></svg><span class="tip">Text</span></button>
+ <button data-pn="grid" aria-label="Grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 9.2h17M3.5 14.8h17M9.2 3.5v17M14.8 3.5v17"/></svg><span class="tip">Grid</span></button>
+ <button data-pn="preview" aria-label="Pattern preview"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="tip">Pattern preview</span></button>
+ <button data-pn="mlist" aria-label="Motif list"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="4" height="4" rx="1.2"/><rect x="3.5" y="10" width="4" height="4" rx="1.2"/><rect x="3.5" y="15.5" width="4" height="4" rx="1.2"/><path d="M11 6.5h9.5M11 12h9.5M11 17.5h9.5"/></svg><span class="tip">Motif list</span></button>
+ <button data-pn="lyrs" aria-label="Layers"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l8.5 4.5-8.5 4.5L3.5 8z"/><path d="M3.5 12l8.5 4.5 8.5-4.5"/><path d="M3.5 16l8.5 4.5 8.5-4.5"/></svg><span class="tip">Layers</span></button>
+ <button data-pn="layers" aria-label="Arrangement"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span class="tip">Arrangement</span></button>
+ <button data-pn="pgrid" aria-label="Pattern grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5h17M3.5 15.5h17M8.5 3.5v17M15.5 3.5v17"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg><span class="tip">Pattern grid</span></button>
+ <button data-pn="grade" aria-label="Color grading"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6h8.3M16.2 6h4.3M3.5 12h2.3M10.2 12h10.3M3.5 18h10.3M18.2 18h2.3"/><circle cx="14" cy="6" r="2.2"/><circle cx="8" cy="12" r="2.2"/><circle cx="16" cy="18" r="2.2"/></svg><span class="tip">Color grading</span></button>
+ <button data-pn="tex" aria-label="Textures"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5H7c2 0 3-2 5-2s3 2 5 2h3.5"/><path d="M3.5 12h5.5M15 12h5.5"/><ellipse cx="12" cy="12" rx="3" ry="1.8"/><path d="M3.5 16.5H7c2 0 3 2 5 2s3-2 5-2h3.5"/></svg><span class="tip">Textures</span></button>
+ <button data-pn="rand" aria-label="Randomize"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg><span class="tip">Randomize</span></button>
+ <button data-pn="hist" aria-label="History"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.7-6.2"/><path d="M3.5 4.5v4h4"/><path d="M12 7.5V12l3 2"/></svg><span class="tip">History</span></button>
+ <div class="rsp"></div>
+</nav>
+
+<main class="stage">
+ <div class="viewbar">
+  <div class="seg2" role="tablist"><button data-v="pattern" role="tab">Pattern</button><button data-v="stamp" role="tab">Stamp editor</button></div>
+  <div id="itbw"><div class="seg2 gtb"><button id="itbb" aria-haspopup="true" aria-expanded="false" title="Display options (view only)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>Display<svg class="chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l5 5 5-5"/></svg></button></div><div class="seg2 gtb" id="itb"><button id="gti" title="Show the stamp texture in the editor (view only)" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M8 16l8-8M8 11l3-3M13 16l3-3"/></svg>Stamp texture</button><button id="gtx" title="Show the canvas texture on the stamp (view only)" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5H7c2 0 3-2 5-2s3 2 5 2h3.5"/><path d="M3.5 12h5.5M15 12h5.5"/><ellipse cx="12" cy="12" rx="3" ry="1.8"/><path d="M3.5 16.5H7c2 0 3 2 5 2s3-2 5-2h3.5"/></svg>Canvas texture</button><button id="gtm" class="on" title="Show the grading masks (view only)" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" stroke-dasharray="2.6 2.4"/><circle cx="12" cy="12" r="3"/></svg>Grading masks</button><button id="gdt" class="on" title="Dotted stage behind the canvas" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 5.5h.01M12 5.5h.01M18.5 5.5h.01M5.5 12h.01M12 12h.01M18.5 12h.01M5.5 18.5h.01M12 18.5h.01M18.5 18.5h.01"/></svg>Stage dots</button></div></div>
+  <div class="seg2" id="bacmp" role="group" aria-label="Compare"><button type="button" id="bab" aria-pressed="false" title="Before (\)">Before</button><button type="button" id="bas" aria-pressed="false" title="Split view (Shift+\)">Split</button></div>
+  <div class="seg2 gtb" id="gtb" hidden><button id="gtg" title="Show grid (G)" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 9.2h17M3.5 14.8h17M9.2 3.5v17M14.8 3.5v17"/></svg>Grid</button><button id="gtq" title="Snap all motifs to the grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5h17M3.5 15.5h17M8.5 3.5v17M15.5 3.5v17"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>Snap</button></div>
+  <div class="zoom" id="zoomc"><button class="ib" id="zo" title="Zoom out" aria-label="Zoom out"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button><button id="zl" title="Fit to screen">Fit</button><button class="ib" id="zi" title="Zoom in" aria-label="Zoom in"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button></div>
+ </div>
+ <div class="board" id="boardP"><div id="artwrap"><svg id="artsh" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"></svg><svg id="art" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><defs id="grdf"></defs><defs id="cvdefs"></defs><defs id="surfd"></defs><defs id="txd"></defs><g id="dyn"></g><g id="covg"></g><g id="texg"></g><g id="guig" pointer-events="none"></g><g id="fpgrid" pointer-events="none"></g><g id="fpov" pointer-events="none"></g><g id="gmov"></g></svg></div></div>
+ <div class="board" id="boardS" hidden><div><svg id="ed" viewBox="-24 -24 288 288"></svg></div></div>
+ <div class="spbar" id="spbar" hidden><span>Drag the line to place it. Drag the round end to turn it (Shift snaps to 15&#176;).</span><button class="alt" id="spno">Cancel</button><button class="pri" id="spok">Split</button></div>
+ <div class="edhint" id="edhint" hidden><span id="edh1">Drag to move. Click to select, Shift+click to add.</span> <span id="wrh">Motifs wrap around the stamp edges.</span></div>
+ <div id="sel" hidden>
+  <span class="msc" id="msc" hidden></span>
+  <div class="ctl"><label>Size</label><input type="range" id="ssz" min="8" max="260" data-def="80"></div>
+  <div class="ctl"><label>Rotate</label><input type="range" id="srt" min="-180" max="180" data-def="0"></div>
+  <span class="sdiv"></span>
+  <div class="ctl"><label>Width</label><input type="range" id="ssx" min="20" max="300" data-u="%" data-def="100"></div>
+  <div class="ctl"><label>Height</label><input type="range" id="ssy" min="20" max="300" data-u="%" data-def="100"></div>
+  <div class="ctl"><label>Thickness</label><input type="range" id="sth" min="-3" max="3" step="0.1" data-def="0"></div>
+  <span class="sdiv"></span>
+  <div class="rzg" title="Nudge the selected motifs by a random amount, up to these limits. Press again for another shuffle, or Ctrl+Z to undo.">
+   <span class="rzl">Jitter</span><div class="ctl"><label>Move</label><input type="range" id="rzp" min="0" max="100" value="20" data-u="%" data-def="20"></div>
+   <div class="ctl"><label>Turn</label><input type="range" id="rzr" min="0" max="180" value="30" data-u="&#176;" data-def="30"></div>
+   <div class="ctl"><label>Scale</label><input type="range" id="rzs" min="0" max="100" value="20" data-u="%" data-def="20"></div>
+   <button class="alt" id="rzgo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>Randomize</button>
+  </div>
+  <span class="sdiv"></span>
+  <div class="row">
+   <button class="ib" id="ssr" title="Reset width and height" aria-label="Reset width and height"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 107.5-7.5A7.5 7.5 0 006.6 6.8L4.5 9"/><path d="M4.5 4.5V9H9"/></svg></button>
+   <button class="ib" id="sfl" title="Flip" aria-label="Flip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v17" stroke-dasharray="2.4 2.6"/><path d="M9.5 7L4 18h5.5z"/><path d="M14.5 7L20 18h-5.5z"/></svg></button>
+   <button class="ib" id="sko" title="Knockout: print this motif in the background colour, cutting it out of the motifs underneath (K)" aria-label="Knockout" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="12" cy="12" r="4.5" stroke-dasharray="2.4 2"/></svg></button>
+   <button class="ib" id="ssp" title="Split: cut this motif in two along a line you place (S)" aria-label="Split"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M6 17L18 7" stroke-dasharray="2.6 2.6"/></svg></button>
+   <button class="ib" id="scp" title="Duplicate (Ctrl+D)" aria-label="Duplicate"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button>
+   <button class="ib" id="sfr" title="Bring to front" aria-label="Bring to front"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button>
+   <button class="ib" id="sdl" title="Delete (Del)" aria-label="Delete"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button>
+  </div>
+ </div>
+ <div class="film">
+  <span class="lbl">Stamps</span>
+  <div class="tabs" id="tabs"></div>
+  <div class="row tight">
+   <button class="ib" id="addT" title="New stamp" aria-label="New stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+   <button class="ib" id="dupT" title="Duplicate stamp" aria-label="Duplicate stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button>
+   <button class="ib" id="delT" title="Delete stamp" aria-label="Delete stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button>
+  </div>
+ </div>
+</main>
+
+<aside class="dock">
+ <div class="dock-h"><h1 id="dockt">Canvas</h1><small id="docks"></small></div>
+ <div class="dock-b">
+
+ <section class="pn" data-p="canvas">
+  <details class="g" open><summary>Format</summary><div class="gb">
+   <div class="seg" id="cfmt" style="grid-template-columns:1fr 1fr"><button type="button" data-f="free">Free canvas</button><button type="button" data-f="book">Book cover</button></div>
+   <div class="hint" id="cfmth">Free canvas: pick any shape and ratio. Book cover: a print cover with back, spine and front, sized for the printer.</div>
+  </div></details>
+  <details class="g" id="cfree" open><summary>Canvas size</summary><div class="gb">
+   <label>Shape</label><div class="shg" id="cshp"><button type="button" data-s="rect" title="Rectangle"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/></svg><span>Rectangle</span></button><button type="button" data-s="rrect" title="Rounded"><svg viewBox="0 0 24 24"><rect x="5.5" y="4" width="13" height="16" rx="4.5"/></svg><span>Rounded</span></button><button type="button" data-s="circle" title="Circle"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg><span>Circle</span></button><button type="button" data-s="oval" title="Oval"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="6.5" ry="8.5"/></svg><span>Oval</span></button><button type="button" data-s="arch" title="Arch"><svg viewBox="0 0 24 24"><path d="M6 20V10a6 6 0 0112 0v10z"/></svg><span>Arch</span></button><button type="button" data-s="hex" title="Hexagon"><svg viewBox="0 0 24 24"><path d="M12 3.5l7.4 4.25v8.5L12 20.5l-7.4-4.25v-8.5z"/></svg><span>Hexagon</span></button><button type="button" data-s="tri" title="Triangle"><svg viewBox="0 0 24 24"><path d="M12 4l8 14H4z"/></svg><span>Triangle</span></button><button type="button" data-s="diamond" title="Diamond"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 8.5-6.5 8.5L5.5 12z"/></svg><span>Diamond</span></button><button type="button" data-s="ngon" title="Polygon"><svg viewBox="0 0 24 24"><path d="M12 3.8l7.8 5.7-3 9.2H7.2l-3-9.2z"/></svg><span>Polygon</span></button></div>
+   <div id="crrbox" hidden><label>Corner radius</label><input type="range" id="ccr" min="0" max="100" step="1" value="25" data-u="%" data-def="25"></div>
+   <div id="cngbox" hidden><label>Sides</label><input type="range" id="cns" min="3" max="16" step="1" value="5" data-def="5"></div>
+   <div id="ccobox" hidden><label>Orientation</label><div class="seg" id="cor" style="grid-template-columns:1fr 1fr"><button type="button" data-o="p">Point up</button><button type="button" data-o="f">Flat top</button></div></div>
+   <div id="caspbox"><label>Aspect ratio</label><div class="asp"><select id="casp"></select><button class="alt" id="cswp" title="Swap width and height" aria-label="Swap width and height">&#8646;</button></div>
+   <div class="aspc" id="cascw">Width <input type="number" id="caw" min="0.1" max="50" step="0.1"> Height <input type="number" id="cah" min="0.1" max="50" step="0.1"></div></div>
+   <div class="hint" id="ccirh" hidden>The pattern is cut to this outline. Exports keep everything outside it transparent.</div>
+  </div></details>
+  <div id="bkgrp" hidden>
+  <details class="g" open><summary>Book cover <span class="aux" id="bksum"></span></summary><div class="gb">
+   <input type="checkbox" id="bkon" hidden>
+   <div id="bkc">
+    <label>Trim size (one cover)</label><select id="bktr"></select>
+    <div class="aspc" id="bkcu">Width <input type="number" id="bktw" min="1" max="20" step="0.01"> Height <input type="number" id="bkth" min="1" max="20" step="0.01"> in</div>
+    <div class="bk2"><div><label>Pages</label><input type="number" id="bkpg" min="1" max="1200" step="1"></div><div><label>Paper</label><select id="bkpp"></select></div></div>
+    <label class="chk"><input type="checkbox" id="bkman"><span>Enter the spine width myself</span></label>
+    <div class="bk2"><div><label>Spine width (in)</label><input type="number" id="bksw" min="0" max="4" step="0.001"></div><div><label>Bleed (in)</label><input type="number" id="bkbl" min="0" max="1" step="0.001"></div></div>
+    <label class="chk"><input type="checkbox" id="bkgd"><span>Show trim, spine and safe-area guides</span></label>
+    <div class="bkinfo" id="bkinfo"></div>
+   </div>
+  </div></details>
+  <details class="g" open><summary>Cover overlay</summary><div class="gb">
+   <label class="chk" style="margin-top:2px"><input type="checkbox" id="cov" checked><span>Show the cover image on the pattern</span></label>
+   <label class="chk"><input type="checkbox" id="covtx" checked><span>Draw the canvas texture over the cover</span></label>
+  </div></details>
+  <details class="g" id="cvimgsec" hidden><summary>Cover image</summary><div class="gb">
+   <div class="seg" id="cvslot" hidden style="grid-template-columns:repeat(3,1fr);margin-bottom:8px"><button type="button" data-s="b">Back</button><button type="button" data-s="s">Spine</button><button type="button" data-s="f" class="on">Front</button></div>
+   <div class="cvp" id="cvp"></div>
+   <div class="row"><label class="btn primary" id="cvopen" for="cvfile" role="button" tabindex="0">Import cover image…</label><button class="alt" id="cvrm" hidden>Remove image</button></div>
+   <input type="file" id="cvfile" class="vh" accept="image/*" tabindex="-1">
+   <div class="pz" id="cvpaste" contenteditable="true" role="textbox" aria-label="Paste a cover image here"><span>Or copy an image, then press and hold here and choose <b>Paste</b></span></div>
+   <label id="cvsl">Scale</label><input type="range" id="cvs" min="10" max="200" value="100" data-u="%">
+   <div class="hint" id="cvmsg"></div>
+  </div></details>
+  </div>
+  <details class="g" open><summary>Surface</summary><div class="gb"><div class="txs" id="cv_tex"></div></div></details>
+ </section>
+
+ <section class="pn" data-p="slib" hidden>
+  <details class="g" open><summary>This stamp</summary><div class="gb">
+   <label>Name</label><input type="text" id="slname" maxlength="40" placeholder="e.g. Lion in a ring">
+   <div class="row"><button class="primary" id="slsave">Save to library</button></div>
+   <label>Export as PNG</label>
+   <div class="row"><select id="slpx" aria-label="Size"><option value="512">512 px</option><option value="1024" selected>1024 px</option><option value="2048">2048 px</option><option value="4096">4096 px</option></select><select id="slbg" aria-label="Background"><option value="">Transparent</option><option value="paper">Paper colour</option></select></div>
+   <label class="chk" title="Printed the way the pattern prints it: the layer's pressure and flooding, the edge roughness and wear, and this stamp's texture."><input type="checkbox" id="slfx"><span>With my print settings</span></label>
+   <label class="chk" title="The ink catches the grain of the surface texture. On a paper background the paper's own texture is added too."><input type="checkbox" id="sltx"><span>With my surface texture</span></label>
+   <div class="row"><button class="alt" id="slpng">Export PNG</button></div>
+  </div></details>
+  <details class="g" open><summary>Library <span class="aux" id="slcount"></span></summary><div class="gb">
+   <div class="hint" id="slwhere"></div>
+   <div class="slg" id="slgrid"></div>
+   <div class="hint" id="slmsg"></div>
+  </div></details>
+ </section>
+
+ <section class="pn" data-p="colors" hidden>
+  <details class="g" open><summary>Project colors</summary><div class="gb">
+   <label>Palette</label><select id="pal"></select>
+   <label>Ink</label><select id="pI"></select>
+   <label>Background</label><select id="pB"></select>
+   <div class="row"><button class="alt" id="pswp" title="Swap ink and background" style="display:inline-flex;align-items:center;gap:6px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h13l-3-3M19 16H6l3 3"/></svg>Swap ink and background</button></div>
+  </div></details>
+  <details class="g" open><summary><span id="cth">Color library</span></summary><div class="gb">
+   <label>Clicking a color sets</label><select id="ap"><option value="pI">Project ink</option><option value="pB">Project background</option><option value="stI">This stamp's ink</option></select>
+   <div class="cl" id="cl"></div>
+   <div class="cf" id="cf" hidden><label style="margin-top:0">Color</label><div class="row tight"><input type="color" id="cpk" value="#8b5a2b"><input type="text" id="chx" value="#8b5a2b" maxlength="7" placeholder="#8b5a2b"></div>
+    <label>Name</label><input type="text" id="cnm" maxlength="30" placeholder="e.g. Cloister Ink">
+    <div class="row"><button class="primary" id="csv">Save color</button><button class="alt" id="ccl">Cancel</button></div><div class="hint" id="cer"></div></div>
+   <div class="hint" id="cn">Click a color to apply it.</div><div class="row"><button class="alt" id="rmC" hidden>Remove this custom color</button></div>
+  </div></details>
+ </section>
+
+ <section class="pn" data-p="stamp" hidden>
+  <details class="g" open><summary>Block</summary><div class="gb">
+   <label>Shape</label><div class="seg" id="skind"><button type="button" data-k="rect"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Rectangle</button><button type="button" data-k="hex"><svg viewBox="0 0 20 20"><path d="M10 2L17 6V14L10 18L3 14V6Z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Hexagon</button><button type="button" data-k="circle"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Circle</button><button type="button" data-k="diamond"><svg viewBox="0 0 20 20"><path d="M10 2L18 10L10 18L2 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Diamond</button><button type="button" data-k="tri"><svg viewBox="0 0 20 20"><path d="M10 3L18 17H2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Triangle</button><button type="button" data-k="arch"><svg viewBox="0 0 20 20"><path d="M4.5 17V9.5a5.5 5.5 0 0111 0V17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Arch</button><button type="button" data-k="oct"><svg viewBox="0 0 20 20"><path d="M7 3h6l4 4v6l-4 4H7l-4-4V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Octagon</button><button type="button" data-k="star"><svg viewBox="0 0 20 20"><path d="M10.0 2.5L11.8 5.7L15.3 4.7L14.3 8.2L17.5 10.0L14.3 11.8L15.3 15.3L11.8 14.3L10.0 17.5L8.2 14.3L4.7 15.3L5.7 11.8L2.5 10.0L5.7 8.2L4.7 4.7L8.2 5.7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Star</button><button type="button" data-k="quat"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7.4" cy="10" r="4.2"/><circle cx="12.6" cy="10" r="4.2"/><circle cx="10" cy="7.4" r="4.2"/><circle cx="10" cy="12.6" r="4.2"/></svg>Quatrefoil</button><button type="button" data-k="lancet"><svg viewBox="0 0 20 20"><path d="M4.5 17v-6.5Q4.5 6.5 10 3q5.5 3.5 5.5 7.5V17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Lancet</button></div>
+   <div id="sasprow" style="margin-top:6px"><div class="asp"><select id="sasp"></select><button class="alt" id="sswp" title="Swap width and height" aria-label="Swap width and height">&#8646;</button></div><div class="aspc" id="sascw">Width <input type="number" id="saw" min="0.1" max="50" step="0.1"> Height <input type="number" id="sah" min="0.1" max="50" step="0.1"></div></div>
+   <div id="shexrow" style="margin-top:6px"><select id="shor"><option value="p">Pointy top</option><option value="f">Flat top</option></select></div>
+   <label>Size</label><input type="range" id="shz" min="20" max="300" value="100" data-u="%" data-def="100">
+   <label>Corner radius</label><input type="range" id="shrad" min="0" max="100" value="0" data-u="%" data-def="0">
+   <div class="row"><button class="alt" id="sall">Use this shape on every stamp</button></div>
+   <label>Ink</label><div class="sw"><i id="ssI"></i><select id="stI"></select></div>
+   <label class="chk"><input type="checkbox" id="neg"><span>Invert (carve the motifs away)</span></label>
+  </div></details>
+  <details class="g" open><summary>Block edge</summary><div class="gb">
+   <label id="letl">Thickness</label><input type="range" id="let" min="0" max="12" step="0.5" value="3">
+   <label id="lerl">Roughness</label><input type="range" id="ler" min="0" max="10" step="0.5" value="3">
+   <div class="row"><button class="alt" id="lers">Reshuffle edges</button></div>
+  </div></details>
+  <details class="g" open><summary>Stamp texture <span class="aux">this stamp</span></summary><div class="gb"><div class="txs" id="st_tex"></div></div></details>
+  <details class="g" open><summary>Symmetry</summary><div class="gb">
+   <div class="sym" id="sym"></div>
+   <div id="symn" hidden><label id="snl">Copies</label><input type="range" id="sn" min="2" max="12"></div>
+   <div class="hint" id="symh"></div>
+   <div class="row" id="sbkr" hidden><button class="alt" id="sbk">Make copies separate</button></div>
+  </div></details>
+ </section>
+
+ <section class="pn" data-p="text" hidden>
+  <details class="g" open><summary>Text</summary><div class="gb">
+   <div class="txed" id="tx_ed" hidden><span>Editing <b id="tx_edn"></b></span><button class="alt" id="tx_new">New text</button></div>
+   <textarea id="tx_t" rows="2" maxlength="200" placeholder="Type your text, then press Enter" aria-label="Text"></textarea>
+   <label>Font</label><select id="tx_f"></select>
+   <div class="row" style="margin-top:6px"><label class="btn alt" for="tx_file" role="button" tabindex="0">Load a font file&#8230;</label></div><input type="file" id="tx_file" class="vh" accept=".ttf,.otf,.woff,.woff2,font/*" tabindex="-1">
+   <div class="txpv" id="tx_pv"></div>
+   <label>Size</label><input type="range" id="tx_sz" min="5" max="100" value="30" data-u="%" data-def="30">
+   <label>Letter spacing</label><input type="range" id="tx_ls" min="-20" max="100" value="0" data-u="%" data-def="0">
+   <label>Line spacing</label><input type="range" id="tx_lh" min="60" max="220" value="115" data-u="%" data-def="115">
+   <label>Align</label><div class="seg" id="tx_al"><button type="button" data-a="l">Left</button><button type="button" data-a="c" class="on">Centre</button><button type="button" data-a="r">Right</button></div>
+   <label>Curve</label><input type="range" id="tx_cv" min="-100" max="100" value="0" data-u="%" data-def="0">
+   <label>Rotate</label><input type="range" id="tx_rot" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
+   <div class="row"><button class="primary" id="tx_go">Add to stamp</button><button class="primary" id="tx_up" hidden>Update text</button></div>
+  </div></details>
+ </section>
+ <section class="pn" data-p="motifs" hidden>
+  <details class="g" open><summary>Library</summary><div class="gb">
+   <div class="fbar"><select id="mcat" aria-label="Folder"></select>
+    <button class="ib" id="fnew" title="New folder" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/><path d="M12 11v5M9.5 13.5h5"/></svg></button>
+    <button class="ib" id="fren" title="Rename" aria-label="Rename"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5l.9-3.9L16 5a2.1 2.1 0 013 3L8.4 18.6z"/><path d="M14.4 6.6l3 3"/></svg></button>
+    <button class="ib" id="fdel" title="Delete folder" aria-label="Delete folder"></button>
+    <button class="ib" id="fsel" title="Select motifs to move or delete (or Ctrl/&#8984;-click a motif)" aria-label="Select motifs" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5" stroke-dasharray="3 3"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></button>
+   </div>
+   <div class="fform" id="fform" hidden><input type="text" id="fname" maxlength="30" placeholder="Folder name" aria-label="Folder name"><button class="primary" id="fok">Create</button><button class="alt" id="fcx">Cancel</button></div>
+   <div class="lib" id="lib"></div>
+   <div class="fsbar" id="fsbar" hidden>
+    <div class="r"><span id="fscnt"></span><button class="alt" id="fall">Select all</button><button class="primary" id="fdone">Done</button></div>
+    <select id="fmove" aria-label="Move to folder"></select>
+    <div class="r"><button class="alt" id="fout">Take out of folder</button><button class="alt" id="fdelm">Delete</button></div>
+   </div>
+   <div class="hint" id="lhint">Click a motif to pick it up, then click on the stamp to stamp it as many times as you like. Click it again, press Esc, or right-click to put it down.<br>To sort motifs into folders, press the check-box button (or Ctrl/&#8984;-click motifs), select several, then move them.</div>
+  </div></details>
+  <details class="g" open><summary>Import artwork</summary><div class="gb">
+   <label>1. Subject for the prompt</label><input type="text" id="isub" placeholder="e.g. a heron catching a fish">
+   <div class="row"><button class="alt" id="ipr">Copy prompt for ChatGPT</button></div>
+   <textarea id="iprt" hidden readonly rows="6"></textarea>
+   <label>Or ask for a whole sheet of them</label>
+   <div class="row shrow"><input type="number" id="scol" min="1" max="8" value="4" aria-label="Columns"><span>&#215;</span><input type="number" id="srow" min="1" max="8" value="4" aria-label="Rows"><button class="alt" id="spr">Copy sheet prompt</button></div>
+   <label>2. Bring in the image</label>
+   <div class="drop" id="idrop"><label class="btn primary" id="iopen" for="ifile" role="button" tabindex="0">Import image…</label><span>or drop a file here, or paste with Ctrl+V</span></div>
+   <input type="file" id="ifile" class="vh" accept="image/*" tabindex="-1">
+   <div class="row"><label class="btn alt" for="sfile" role="button" tabindex="0">Import a motif sheet&#8230;</label></div><input type="file" id="sfile" class="vh" accept="image/*" tabindex="-1">
+   <div class="pz" id="ipaste" contenteditable="true" role="textbox" aria-label="Paste an image here"><span>Or copy the image, then press and hold here and choose <b>Paste</b></span></div>
+   <div class="hint" id="imsg"></div>
+  </div></details>
+  <details class="g" open><summary>Draw with Claude</summary><div class="gb">
+   <label>Describe motifs, separated by commas</label><input type="text" id="txt" value="lion, olive branch, amphora">
+   <div class="row"><button class="primary" id="gen">Draw motifs</button></div><div id="msg"></div>
+  </div></details>
+ </section>
+
+ <section class="pn" data-p="grid" hidden>
+  <details class="g" open><summary>Grid <span class="aux" id="gdim"></span></summary><div class="gb">
+   <label class="chk" style="margin-top:2px"><input type="checkbox" id="gon"><span>Show grid (G)</span></label>
+   <label>Shape</label><div class="shg" id="gsh"><button type="button" data-sh="rect" title="Square"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/></svg><span>Square</span></button><button type="button" data-sh="hex" title="Hexagon"><svg viewBox="0 0 24 24"><path d="M12 3.5l7.4 4.25v8.5L12 20.5l-7.4-4.25v-8.5z"/></svg><span>Hexagon</span></button><button type="button" data-sh="tri" title="Triangle"><svg viewBox="0 0 24 24"><path d="M12 4l8 14H4z"/></svg><span>Triangle</span></button><button type="button" data-sh="diamond" title="Diamond"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 8.5-6.5 8.5L5.5 12z"/></svg><span>Diamond</span></button></div>
+   <label>Cells across</label><input type="range" id="gn" min="1" max="24" value="6">
+   <label>Snap points</label><select id="gsp"><option value="c">Cell centers</option><option value="l">Line crossings</option><option value="b">Both</option></select>
+   <label class="chk"><input type="checkbox" id="gsd"><span>Snap while dragging</span></label>
+   <div class="row"><button class="alt" id="gq">Snap all motifs to grid</button></div>
+  </div></details>
+ </section>
+ <section class="pn" data-p="preview" hidden><div class="pvbar"><span>Live pattern</span><button type="button" class="pvc" id="pvc" aria-pressed="false" title="Show the book cover text block in the preview">Cover</button><div class="seg pvz" id="pvz"><button type="button" data-z="1" class="on">Fit</button><button type="button" data-z="2">2&#215;</button><button type="button" data-z="4">4&#215;</button></div></div><div class="pvbox"><svg id="pvw" viewBox="0 0 533 800" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><use href="#dyn"/><use href="#texg"/><use href="#covg" id="pvcu" visibility="hidden"/></svg></div></section>
+ <section class="pn" data-p="mlist" hidden><div class="mlist" id="mlist" aria-label="Motifs on this stamp"></div></section>
+<section class="pn" data-p="lyrs" hidden><div class="lys" id="lys">
+ <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><button type="button" class="ib" id="ly_add" title="New layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button></div>
+ <div id="lybody">
+  <div class="lyo"><span class="lyk">Blend</span><select id="ly_bl" title="Blend mode"><option value="">Normal</option><option value="multiply">Multiply (overprint)</option><option value="darken">Darken</option><option value="screen">Screen</option><option value="lighten">Lighten</option><option value="overlay">Overlay</option><option value="soft-light">Soft light</option><option value="behind">Behind (fills gaps only)</option><option value="cancel">Cancel out (overlap prints nothing)</option><option value="replace">Replace (overlap prints a colour)</option></select></div>
+  <div class="lyop"><label>Opacity</label><input type="range" id="ly_op" min="0" max="100" value="100" data-u="%" data-def="100"></div>
+  <div class="lyo"><span class="lyk">Ink</span><div class="sw"><i id="lyS"></i><select id="ly_ink" title="Ink for this layer"></select></div></div>
+  <div class="lyo" style="display:block"><span class="lyk" style="display:block;margin-bottom:6px">Texture</span><div class="txs" id="ly_tex"></div></div>
+  <div class="lyo" id="ly_rprow" hidden><span class="lyk">Replace</span><div class="sw"><i id="lyRS"></i><select id="ly_rp" title="Colour printed where this layer overlaps"></select></div></div>
+  <div class="lyl2" id="lyl2"></div>
+  <div class="lyhint">Top of the list prints last. Drag to reorder, double-click to rename.</div>
+ </div>
+</div></section>
+ <section class="pn" data-p="pgrid" hidden>
+  <details class="g" open><summary>Pattern grid</summary><div class="gb">
+   <label class="chk" style="margin-top:2px"><input type="checkbox" id="pgs"><span>Show grid</span></label>
+   <label>Shape</label><div class="shg" id="pgsh"><button type="button" data-sh="rect" title="Square"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/></svg><span>Square</span></button><button type="button" data-sh="hex" title="Hexagon"><svg viewBox="0 0 24 24"><path d="M12 3.5l7.4 4.25v8.5L12 20.5l-7.4-4.25v-8.5z"/></svg><span>Hexagon</span></button><button type="button" data-sh="tri" title="Triangle"><svg viewBox="0 0 24 24"><path d="M12 4l8 14H4z"/></svg><span>Triangle</span></button><button type="button" data-sh="diamond" title="Diamond"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 8.5-6.5 8.5L5.5 12z"/></svg><span>Diamond</span></button></div>
+   <label>Columns across</label><input type="range" id="pgz" min="2" max="60" value="8" data-def="8">
+   <label>Snap points</label>
+   <div class="seg" id="pgm" style="grid-template-columns:1fr 1fr"><button type="button" data-g="l" title="Stamp centres land on the grid lines">Grid lines</button><button type="button" data-g="c" title="Stamp centres land in the middle of each cell">Cell centres</button></div>
+   <label>Line strength</label><input type="range" id="pgo" min="10" max="100" value="70" data-u="%" data-def="70">
+   <div class="hint" id="pgi"></div>
+   <div class="row"><button class="alt" id="pgr">Reset grid</button></div>
+  </div></details>
+ </section>
+ <section class="pn" data-p="layers" hidden>
+  <div hidden>  <div><summary>Layers</summary><div class="gb">
+   <div class="lhead"><span>Top of the list prints last</span>
+    <button class="ib" id="addL" title="New layer" aria-label="New layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button class="ib" id="dupL" title="Duplicate layer" aria-label="Duplicate layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button>
+    <button class="ib" id="delL" title="Delete layer" aria-label="Delete layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button>
+   </div>
+   <div class="lyl" id="lyl"></div>
+  </div></div>
+  <div><summary>Selected layer <span class="aux" id="lnmx"></span></summary><div class="gb">
+   <label>Name</label><input type="text" id="lnm">
+   <label>Stamps on this layer</label>
+  </div></div>
+</div>
+  <details class="g" open id="lstbox"><summary>Stamps in the pattern</summary><div class="gb">
+   <div class="strip ls" id="lst"></div>
+  </div></details>
+  <details class="g" open><summary>Layout</summary><div class="gb">
+   <div class="seg" id="lmode" style="grid-template-columns:repeat(5,auto);margin-bottom:4px"><button type="button" data-m="p" class="on" title="Stamps repeat across the canvas in a pattern">Repeat</button><button type="button" data-m="f" title="A strip stamp walked round the edges">Frame</button><button type="button" data-m="x" title="Place stamps anywhere by hand">Free place</button><button type="button" data-m="a" title="Place imported images or saved WODBLOK projects anywhere by hand">Art</button><button type="button" data-m="t" title="Place text boxes anywhere by hand">Text</button></div>
+   <div id="lfree" hidden>
+    <div class="hint" id="lfph" style="margin-top:6px"></div>
+    <label id="lfpstl">Stamp to place</label><div class="strip" id="lfpst"></div>
+    <div id="lfart" hidden>
+     <label>Art to place</label><div class="strip" id="lfars"></div>
+     <div class="row"><button class="alt" id="lfaimp" title="Import a PNG, JPG, WebP or SVG image">Import image&#8230;</button><button class="alt" id="lfaprj" title="Use a project saved from WODBLOK">Use a project&#8230;</button></div>
+     <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".json,application/json" tabindex="-1">
+     <div id="lfapl" hidden><div class="mlist fpl" id="lfaplist" aria-label="Saved projects"></div><div class="row"><button class="alt" id="lfapf" title="Use a project file you downloaded. It is added as a fixed picture, not a live link.">Choose a project file&#8230;</button><button class="alt" id="lfapx">Close</button></div></div>
+     <div class="hint" id="lfam"></div><div class="row"><button class="alt" id="lfaup" hidden>Update from project</button></div>
+    </div>
+    <div id="lftx" hidden>
+     <div class="txed" id="tb_ed" hidden><span>Editing <b id="tb_edn"></b></span><button class="alt" id="tb_new">New text</button></div>
+     <div class="row" id="tb_sprow" hidden><button class="alt" id="tb_split" title="Turn every letter into its own text box">Split into letters</button></div>
+     <textarea id="tb_t" rows="2" maxlength="200" placeholder="Type your text" aria-label="Text"></textarea>
+     <label>Font</label><select id="tb_f"></select>
+     <div class="row" style="margin-top:6px"><label class="btn alt" for="tb_file" role="button" tabindex="0">Load a font file&#8230;</label></div><input type="file" id="tb_file" class="vh" accept=".ttf,.otf,.woff,.woff2,font/*" tabindex="-1">
+     <label>Size</label><input type="range" id="tb_sz" min="2" max="60" value="10" data-u="%" data-def="10">
+     <label>Letter spacing</label><input type="range" id="tb_ls" min="-20" max="100" value="0" data-u="%" data-def="0">
+     <label>Line spacing</label><input type="range" id="tb_lh" min="60" max="220" value="115" data-u="%" data-def="115">
+     <label>Align</label><div class="seg" id="tb_al"><button type="button" data-a="l">Left</button><button type="button" data-a="c" class="on">Centre</button><button type="button" data-a="r">Right</button></div>
+     <label>Curve</label><input type="range" id="tb_cv" min="-100" max="100" value="0" data-u="%" data-def="0">
+     <label>Rotate letters</label><input type="range" id="tb_rot" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
+     <label>Ink</label><div class="sw"><i id="tb_inkc"></i><select id="tb_ink"></select></div>
+     <label>Textures</label><div class="txs" id="tb_tex"></div>
+     <div class="row"><button class="primary" id="tb_go" aria-pressed="false">Stamp text</button></div>
+    </div>
+    <div id="lfgrid">
+     <label class="chk"><input type="checkbox" id="lfgn"><span>Snap to grid <em class="fgk">(hold Alt to skip)</em></span></label>
+     <div id="lfgbox" hidden>
+      <label class="chk"><input type="checkbox" id="lfgss"><span>Snap size to whole cells</span></label>
+      <div class="row"><button class="alt" id="lfgall" title="Move every stamp on this layer onto the grid">Snap placed stamps to grid</button></div>
+     </div>
+     <div class="hint" id="lfgi"></div>
+     <div class="row"><button class="alt" id="lfgopen">Open the Grid tool</button></div>
+    </div>
+    <div class="fpn"><span id="lfpn"></span><button class="alt" id="lfpclr">Clear all</button></div>
+     <div class="mlist fpl" id="lfpl" aria-label="Placed stamps"></div>
+    <div id="lfpsel" hidden>
+     <label>Size</label><input type="range" id="lfps" min="2" max="300" value="20" data-u="%" data-def="20">
+     <label>Rotate</label><input type="range" id="lfpr" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
+     <div class="row fprow"><button class="ib" id="lfpfl" title="Flip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v17" stroke-dasharray="2.4 2.6"/><path d="M9.5 7L4 18h5.5z"/><path d="M14.5 7L20 18h-5.5z"/></svg></button><button class="ib" id="lfpdu" title="Duplicate"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button><button class="ib" id="lfpup" title="Bring to front"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button><button class="ib" id="lfpdn" title="Send to back"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M15.5 8.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5h-7A2.5 2.5 0 018.5 18v-2.5"/></svg></button><button class="ib" id="lfpdl" title="Delete (Del)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button></div>
+    </div>
+     <div id="lcrop" hidden>
+      <label>Crop</label>
+      <div class="row tight"><button class="alt" id="lcrb">Crop&#8230;</button><button class="alt" id="lcrx" hidden title="Show the whole picture again">Remove crop</button></div>
+      <div id="lcred" hidden>
+       <div class="seg" id="lcrm" style="grid-template-columns:1fr 1fr;margin-top:6px"><button type="button" data-m="r">Rectangle</button><button type="button" data-m="p">Free points</button></div>
+       <div id="lcrr">
+        <label>Ratio</label><div class="asp"><select id="lcra"><option value="free">Free</option><option value="orig">Original</option><option value="1:1">1 : 1</option><option value="4:5">4 : 5</option><option value="5:4">5 : 4</option><option value="3:4">3 : 4</option><option value="4:3">4 : 3</option><option value="2:3">2 : 3</option><option value="3:2">3 : 2</option><option value="9:16">9 : 16</option><option value="16:9">16 : 9</option></select><button class="alt" id="lcrsw" title="Swap width and height" aria-label="Swap width and height">&#8646;</button></div>
+        <div class="aspc">X <input type="number" id="lcrnx" min="0" max="100" step="0.1"> Y <input type="number" id="lcrny" min="0" max="100" step="0.1"> %</div>
+        <div class="aspc">W <input type="number" id="lcrnw" min="1" max="100" step="0.1"> H <input type="number" id="lcrnh" min="1" max="100" step="0.1"> %</div>
+       </div>
+       <label>Shape preset</label><select id="lcrpr"><option value="">Start from a shape&#8230;</option><option value="ell">Ellipse</option><option value="tri">Triangle</option><option value="dia">Diamond</option><option value="hex">Hexagon</option></select>
+       <label class="chk"><input type="checkbox" id="lcrall"><span>Apply to every copy of this picture on this layer</span></label>
+       <div class="row"><button class="primary" id="lcrok">Apply crop</button><button class="alt" id="lcrno">Cancel</button><button class="alt" id="lcrrs" title="Back to the whole picture">Reset</button></div>
+       <div class="hint" id="lcrih"></div>
+      </div>
+     </div>
+   </div>
+   <div id="lfrm" hidden>
+    <div class="hint" id="lfh" style="margin-top:6px"></div>
+    <div id="lfscrow"><label>Frame around</label><select id="lfsc"><option value="front">Front cover</option><option value="both">Back and front covers</option><option value="each">Back, spine and front</option><option value="all">The whole cover</option></select>
+     <label class="chk"><input type="checkbox" id="lfsafe"><span>Keep inside the safe area</span></label>
+     <label class="chk" id="lfbarrow"><input type="checkbox" id="lfbar"><span>Leave the barcode area clear</span></label>
+     <div class="hint" id="lfinfo"></div></div>
+    <label>Width</label><input type="range" id="lfw" min="0.3" max="10" step="0.1" value="2.5" data-u="%" data-def="2.5">
+    <label>Inset</label><input type="range" id="lfi" min="0" max="20" step="0.5" value="0" data-u="%" data-def="0">
+    <label>Spacing</label><input type="range" id="lfg" min="0" max="100" value="0" data-u="%" data-def="0">
+    <label>Corners</label><div class="seg" id="lfc"><button type="button" data-c="m" title="Sides cut at 45°, meeting in a diagonal seam">Mitred</button><button type="button" data-c="b" title="A corner stamp in each corner, strips in between">Corner stamp</button><button type="button" data-c="o" title="Strips run past each other">Overlap</button></div>
+    <div id="lfcsrow"><label>Corner stamp</label><select id="lfcs"></select></div>
+    <label>Top of the strip faces</label><div class="seg" id="lffc" style="grid-template-columns:1fr 1fr"><button type="button" data-f="o">Outward</button><button type="button" data-f="i">Inward</button></div>
+    <label class="chk"><input type="checkbox" id="lfclr"><span>Clear the pattern under the frame</span></label>
+   </div>
+   <div id="lpat">
+   <label>Grid</label><select id="lgl"></select>
+   <div id="lglrow" hidden><label>Print on</label><div class="seg" id="lpa"><button type="button" data-p="c" title="One stamp in the middle of every cell">Centres</button><button type="button" data-p="k" title="Where the shapes of the grid meet">Corners</button><button type="button" data-p="e" title="Halfway along every edge of the grid">Edges</button></div><div class="hint" id="lglh"></div></div>
+   <div id="lldrow" hidden><label>Grid shape follows</label><select id="lld"></select></div>
+   <label>Pattern</label><select id="larr"></select>
+   <div hidden><select id="lgr"><option value="">Auto (fits the stamp shape)</option><option value="square">Grid</option><option value="brick">Brick (offset rows)</option><option value="drop">Half-drop (offset columns)</option><option value="honey">Honeycomb</option></select>
+   <select id="lay"><option value="check">Checker</option><option value="rows">Rows</option><option value="cols">Columns</option><option value="diag">Diagonal stripes</option><option value="rand">Random</option></select></div>
+   <label>Stamp size</label><input type="range" id="ts" min="80" max="320" value="180">
+   <label id="lgpl">Spacing</label><input type="range" id="lgp" min="-20" max="100" value="0" data-u="%">
+   <label>Offset X</label><input type="range" id="lox" min="-50" max="50" value="0">
+   <label>Offset Y</label><input type="range" id="loy" min="-50" max="50" value="0">
+   <label id="lrl">Rotation</label><input type="range" id="lrt" min="-180" max="180" value="0" data-u="°">
+   </div>
+  </div></details>
+  <details class="g" open id="lmanbox"><summary>Manual arrangement <span class="aux" id="mancnt"></span></summary><div class="gb">
+   <label class="chk" style="margin-top:2px"><input type="checkbox" id="man"><span>Pick stamps by hand</span></label>
+   <div class="row"><button class="alt" id="manr">Reset hand-picked stamps</button></div>
+  </div></details>
+  <details class="g" open><summary>Impression <span class="aux">this layer</span></summary><div class="gb">
+   <label id="lpl">Uneven pressure</label><input type="range" id="lps" min="0" max="10" value="0">
+   <label id="lfl">Ink flooding</label><input type="range" id="lfs" min="0" max="10" value="0">
+  </div></details>
+  <details class="g" id="lrsec" open><summary>Randomness <span class="aux">this layer</span></summary><div class="gb">
+   <label>Rotation</label><input type="range" id="lrr" min="0" max="180" value="0" data-u="&#176;" data-def="0">
+   <label>Position</label><input type="range" id="lrp" min="0" max="100" value="0" data-u="%" data-def="0">
+   <label class="chk"><input type="checkbox" id="lrtn"><span>Turn to fit each shape</span></label>
+   <label class="chk"><input type="checkbox" id="lrfh"><span>Flip some left &#8596; right</span></label>
+   <label class="chk"><input type="checkbox" id="lrfv"><span>Flip some up &#8597; down</span></label>
+   <div class="row"><button class="alt" id="lrsh" title="Roll a new random arrangement">Shuffle</button></div>
+  </div></details>
+  <details class="g" open><summary>Ink edges <span class="aux">whole pattern</span></summary><div class="gb">
+   <label id="pel">Roughness</label><input type="range" id="rgh" min="0" max="10" value="3">
+   <label id="pql">Ink squash</label><input type="range" id="psq" min="0" max="10" value="0">
+  </div></details>
+ </section>
+
+ <section class="pn" data-p="tex" hidden>
+  <div class="lys">
+   <div class="lyh"><span class="lyt" style="cursor:default">Textures <span id="tx_cnt"></span></span>
+    <button type="button" class="ib" id="tx_add" title="New texture" aria-label="New texture"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" class="ib" id="tx_dup" title="Duplicate texture" aria-label="Duplicate texture"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button></div>
+   <div class="fpl txl" id="tx_list"></div>
+  </div>
+  <details class="g" open id="tx_edg"><summary>Texture</summary><div class="gb">
+   <div class="txp" id="tx_prev"></div>
+   <label>Name</label><input type="text" id="tx_name" maxlength="40" autocomplete="off" spellcheck="false">
+   <label>Type</label><select id="tx_type"></select>
+   <label>Strength</label><input type="range" id="tx_a" min="0" max="100" value="40" data-def="40">
+   <label>Scale</label><input type="range" id="tx_sc" min="25" max="300" value="100" data-u="%" data-def="100">
+   <label>Light from</label><input type="range" id="tx_az" min="0" max="359" value="225" data-u="&#176;" data-def="225">
+  </div></details>
+  <details class="g" open id="tx_apg"><summary>Apply</summary><div class="gb">
+   <select id="tx_to" aria-label="Apply to"></select>
+   <div class="row"><button class="primary" id="tx_apply">Apply</button><button class="alt" id="tx_del">Delete texture</button></div>
+  </div></details>
+ </section>
+
+ <section class="pn" data-p="grade" hidden>
+  <div class="lys gms">
+   <div class="lyh"><span class="lyt" style="cursor:default">Masks <span id="gm_cnt"></span></span>
+    <div class="dd gmadd"><button type="button" class="ib" id="gm_add" title="Add a mask" aria-label="Add a mask" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+     <div class="ddl" id="gm_menu" data-w="236" hidden>
+      <div class="ddi" data-gt="lin"><span class="gmi" data-ic="lin"></span><span>Linear gradient<small>Fades across the canvas or each stamp</small></span></div>
+      <div class="ddi" data-gt="rad"><span class="gmi" data-ic="rad"></span><span>Radial gradient<small>An oval you can feather, inside or out</small></span></div>
+      <div class="ddi" data-gt="lay"><span class="gmi" data-ic="lay"></span><span>Layer<small>Only the stamps on one layer</small></span></div>
+      <div class="ddi" data-gt="col"><span class="gmi" data-ic="col"></span><span>Colour range<small>Wherever one colour prints</small></span></div>
+      <div class="ddi" data-gt="lum"><span class="gmi" data-ic="lum"></span><span>Luminance range<small>The darks, the lights, or a band between</small></span></div>
+     </div></div>
+    <button type="button" class="ib" id="gm_dup" title="Duplicate mask" aria-label="Duplicate mask"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button>
+    <button type="button" class="ib" id="gm_del" title="Delete mask" aria-label="Delete mask"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button>
+   </div>
+   <div class="lyl2" id="gm_list"></div>
+   <div id="gm_body" hidden>
+    <div class="lyo" id="gm_sp_r"><span class="lyk">Apply to</span><div class="seg" id="gm_sp" style="grid-template-columns:1fr 1fr"><button type="button" data-gs="c" title="One gradient over the whole print">Whole canvas</button><button type="button" data-gs="s" title="The gradient repeats inside every print of the stamp">Each stamp</button></div></div>
+    <div class="lyo" id="gm_st_r"><span class="lyk">Stamps</span><select id="gm_st"></select></div>
+    <div class="lyo" id="gm_lay_r"><span class="lyk">Layer</span><select id="gm_lay"></select></div>
+    <div class="lyo" id="gm_col_r"><span class="lyk">Colour</span><div class="gmc"><select id="gm_col"></select><input type="color" id="gm_cc" title="Pick any colour"><button type="button" class="ib" id="gm_eye" title="Pick a colour from the print" aria-label="Pick a colour from the print" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19l.7-3.3L14 7.4 16.6 10 8.3 18.3z"/><path d="M13 6.4l1.2-1.2a1.8 1.8 0 012.6 0l2 2a1.8 1.8 0 010 2.6L17.6 11"/></svg></button></div></div>
+    <div class="lyop" id="gm_lo_r"><label>From</label><input type="range" id="gm_lo" min="0" max="100" value="0" data-def="0"></div>
+    <div class="lyop" id="gm_hi_r"><label>To</label><input type="range" id="gm_hi" min="0" max="100" value="35" data-def="35"></div>
+    <div class="lyop" id="gm_rg_r"><label>Range</label><input type="range" id="gm_rg" min="0" max="100" value="20" data-def="20"></div>
+    <div class="lyop" id="gm_sm_r"><label>Soften</label><input type="range" id="gm_sm" min="0" max="100" value="50" data-def="50"></div>
+    <div class="lyop" id="gm_fe_r"><label>Feather</label><input type="range" id="gm_fe" min="1" max="100" value="50" data-def="50"></div>
+    <div class="lyop" id="gm_amt_r"><label>Amount</label><input type="range" id="gm_amt" min="0" max="100" value="100" data-u="%" data-def="100"></div>
+    <div class="gmchk"><label class="chk" id="gm_inv_r"><input type="checkbox" id="gm_inv"><span>Invert</span></label><label class="chk" title="Tint the masked area red (O)"><input type="checkbox" id="gm_ov"><span>Show overlay</span></label></div>
+    <div class="lyhint" id="gm_hint"></div>
+    <button type="button" class="alt gmgo" id="gm_go" hidden>Show the handles on the stamp</button>
+   </div>
+  </div>
+  <details class="g" open><summary>Light <span class="aux" id="gd_who"></span></summary><div class="gb">
+   <label>Exposure</label><input type="range" id="gd_ex" min="-100" max="100" value="0" data-def="0">
+   <label>Contrast</label><input type="range" id="gd_ct" min="-100" max="100" value="0" data-def="0">
+   <label>Highlights</label><input type="range" id="gd_hi" min="-100" max="100" value="0" data-def="0">
+   <label>Shadows</label><input type="range" id="gd_sh" min="-100" max="100" value="0" data-def="0">
+   <label>Whites</label><input type="range" id="gd_wh" min="-100" max="100" value="0" data-def="0">
+   <label>Blacks</label><input type="range" id="gd_bl" min="-100" max="100" value="0" data-def="0">
+  </div></details>
+  <details class="g" open><summary>Colour</summary><div class="gb">
+   <label>Temperature</label><input type="range" id="gd_tp" min="-100" max="100" value="0" data-def="0">
+   <label>Tint</label><input type="range" id="gd_tn" min="-100" max="100" value="0" data-def="0">
+   <label>Saturation</label><input type="range" id="gd_sat" min="-100" max="100" value="0" data-def="0">
+   <label>Vibrance</label><input type="range" id="gd_vib" min="-100" max="100" value="0" data-def="0">
+   <label>Hue</label><input type="range" id="gd_hue" min="-180" max="180" value="0" data-def="0">
+  </div></details>
+  <details class="g" open><summary>Effect</summary><div class="gb">
+   <label>Fade</label><input type="range" id="gd_fd" min="0" max="100" value="0" data-def="0">
+  </div></details>
+  <details class="g" open><summary>Options</summary><div class="gb">
+   <label class="chk" style="margin-top:2px"><input type="checkbox" id="gdcov"><span>Also grade the cover images</span></label>
+   <div class="row"><button class="alt" id="gdcmp" title="Hold to see the ungraded colours">Hold to compare</button><button class="alt" id="gdrst" title="Set the sliders of the selected item back to zero">Reset sliders</button></div>
+  </div></details>
+ </section>
+<section class="pn" data-p="hist" hidden><div class="hs">
+ <div class="hsh"><span>Snapshots</span><button type="button" class="ib" id="hsadd" aria-label="Save snapshot"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button></div>
+ <div class="hsl" id="hsl"></div>
+ <div class="hsh"><span>Compare</span><button type="button" class="rfb" id="barst" hidden>Reset</button></div>
+ <div class="hsl" id="bal"></div>
+ <div class="hsh"><span>History</span><span class="hsc" id="hsc"></span></div>
+ <div class="hsl" id="hhl"></div></div></section>
+<section class="pn" data-p="rand" hidden>
+  <div class="gb rzmain"><button class="primary rzbig" id="rzdo" title="Roll a whole new piece (Ctrl+Z to go back)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>Randomize</button>
+   <div class="hint" id="rzlast">Rolls a whole new piece. Ctrl+Z brings back the previous one.</div></div>
+  <details class="g" open><summary>What to randomize</summary><div class="gb">
+   <div class="row tight"><button class="alt" id="rzall">All on</button><button class="alt" id="rznone">All off</button></div>
+    <div class="rzrow"><label class="chk" title="The artwork on the stamps, their shapes, symmetry, layers and print layout"><input type="checkbox" data-ft="stamps" checked><span>Stamps</span></label><button type="button" class="rzx" data-rzx="stamps" aria-expanded="false" aria-label="Choose what Stamps may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <label class="chk sub" title="Sometimes turn the main stamp into an initial or a word. Needs Stamps."><input type="checkbox" data-ft="text" checked><span>Lettering</span></label>
+    <div class="rzsub" data-rzs="stamps" hidden><label class="chk sub"><input type="checkbox" data-sub="stamps.sym" checked><span>New symmetry</span></label><label class="chk sub"><input type="checkbox" data-sub="stamps.link" checked><span>Accents in the gaps</span></label><label class="chk sub"><input type="checkbox" data-sub="stamps.shape" checked><span>Accent shapes</span></label><label class="chk sub"><input type="checkbox" data-sub="stamps.mix" checked><span>Mixed shapes</span></label><label class="chk sub"><input type="checkbox" data-sub="stamps.rot" checked><span>Turned grid</span></label><label class="chk sub"><input type="checkbox" data-sub="stamps.inks" checked><span>Extra inks</span></label><label class="chk sub"><input type="checkbox" data-sub="stamps.motif" checked><span>Motif tweaks</span></label><label class="chk sub"><input type="checkbox" data-sub="stamps.swap" checked><span>Light on dark</span></label><label class="chk sub"><input type="checkbox" data-sub="stamps.blend" checked><span>Soft blending</span></label><div class="row tight"><button type="button" class="alt" data-rzall="stamps">All</button><button type="button" class="alt" data-rzno="stamps">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="Pattern type, stamp size, spacing and scatter, offset, rotation and flips of the layers that repeat"><input type="checkbox" data-ft="layout"><span>Layout</span></label><button type="button" class="rzx" data-rzx="layout" aria-expanded="false" aria-label="Choose what Layout may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="layout" hidden><label class="chk sub"><input type="checkbox" data-sub="layout.type" checked><span>Pattern type</span></label><label class="chk sub"><input type="checkbox" data-sub="layout.size" checked><span>Stamp size</span></label><label class="chk sub"><input type="checkbox" data-sub="layout.space" checked><span>Spacing &amp; scatter</span></label><label class="chk sub"><input type="checkbox" data-sub="layout.offset" checked><span>Offset</span></label><label class="chk sub"><input type="checkbox" data-sub="layout.rot" checked><span>Rotation &amp; flips</span></label><div class="row tight"><button type="button" class="alt" data-rzall="layout">All</button><button type="button" class="alt" data-rzno="layout">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="A border of stamps round the edge"><input type="checkbox" data-ft="frame" checked><span>Frame</span></label><button type="button" class="rzx" data-rzx="frame" aria-expanded="false" aria-label="Choose what Frame may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="frame" hidden><div class="rzgh">Corners</div><label class="chk sub"><input type="checkbox" data-sub="frame.cm" checked><span>Clean mitred corners</span></label><label class="chk sub"><input type="checkbox" data-sub="frame.cb" checked><span>Corner stamps</span></label><label class="chk sub"><input type="checkbox" data-sub="frame.co" checked><span>Overlapping strips</span></label><div class="rzgh">Style</div><label class="chk sub"><input type="checkbox" data-sub="frame.s_dots" checked><span>Dots</span></label><label class="chk sub"><input type="checkbox" data-sub="frame.s_motif" checked><span>Motif strip</span></label><label class="chk sub"><input type="checkbox" data-sub="frame.s_chain" checked><span>Chain</span></label><label class="chk sub"><input type="checkbox" data-sub="frame.s_rope" checked><span>Rope</span></label><div class="rzgh">Extras</div><label class="chk sub"><input type="checkbox" data-sub="frame.rule" checked><span>Extra rule lines</span></label><div class="row tight"><button type="button" class="alt" data-rzall="frame">All</button><button type="button" class="alt" data-rzno="frame">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="The outline of the canvas: rounded, oval, hexagon and so on. Never changes a print cover."><input type="checkbox" data-ft="shape"><span>Canvas shape</span></label><button type="button" class="rzx" data-rzx="shape" aria-expanded="false" aria-label="Choose what Canvas shape may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="shape" hidden><label class="chk sub"><input type="checkbox" data-sub="shape.box" checked><span>Rectangles (plain, rounded)</span></label><label class="chk sub"><input type="checkbox" data-sub="shape.round" checked><span>Round (circle, oval)</span></label><label class="chk sub"><input type="checkbox" data-sub="shape.arch" checked><span>Arch</span></label><label class="chk sub"><input type="checkbox" data-sub="shape.poly" checked><span>Straight-sided (hexagon, triangle, diamond, polygon)</span></label><div class="row tight"><button type="button" class="alt" data-rzall="shape">All</button><button type="button" class="alt" data-rzno="shape">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="The shape of the canvas: its width to height ratio. Round and regular shapes stay square. Never changes a print cover."><input type="checkbox" data-ft="size"><span>Canvas size</span></label><button type="button" class="rzx" data-rzx="size" aria-expanded="false" aria-label="Choose what Canvas size may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="size" hidden><label class="chk sub"><input type="checkbox" data-sub="size.portrait" checked><span>Portrait (2:3, 3:4, 4:5, 5:7)</span></label><label class="chk sub"><input type="checkbox" data-sub="size.square" checked><span>Square (1:1)</span></label><label class="chk sub"><input type="checkbox" data-sub="size.landscape" checked><span>Landscape (3:2, 4:3, 7:5)</span></label><label class="chk sub"><input type="checkbox" data-sub="size.banner" checked><span>Tall and wide banners (1:2, 9:16, 2:1, 16:9)</span></label><div class="row tight"><button type="button" class="alt" data-rzall="size">All</button><button type="button" class="alt" data-rzno="size">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="One feature or a few stamps set on the pattern grid, often with lettering, on their own Free place layer"><input type="checkbox" data-ft="free" checked><span>Free-placed stamps</span></label><button type="button" class="rzx" data-rzx="free" aria-expanded="false" aria-label="Choose what Free-placed stamps may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="free" hidden><div class="rzgh">What</div><label class="chk sub"><input type="checkbox" data-sub="free.ftext" checked><span>Lettering stamps (words and initials)</span></label><label class="chk sub"><input type="checkbox" data-sub="free.fmotif" checked><span>Motif stamps</span></label><div class="rzgh">How many</div><label class="chk sub"><input type="checkbox" data-sub="free.single" checked><span>One feature</span></label><label class="chk sub"><input type="checkbox" data-sub="free.few" checked><span>A few stamps</span></label><div class="row tight"><button type="button" class="alt" data-rzall="free">All</button><button type="button" class="alt" data-rzno="free">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="Palette, ink and background"><input type="checkbox" data-ft="col" checked><span>Colours</span></label><button type="button" class="rzx" data-rzx="col" aria-expanded="false" aria-label="Choose what Colours may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="col" hidden><label class="chk sub"><input type="checkbox" data-sub="col.pal" checked><span>Paper and ink colours</span></label><label class="chk sub"><input type="checkbox" data-sub="col.acc" checked><span>Accent inks</span></label><div class="row tight"><button type="button" class="alt" data-rzall="col">All</button><button type="button" class="alt" data-rzno="col">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="The overall look: toning, contrast, saturation and so on"><input type="checkbox" data-ft="gr" checked><span>Colour grade</span></label><button type="button" class="rzx" data-rzx="gr" aria-expanded="false" aria-label="Choose what Colour grade may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="gr" hidden><label class="chk sub"><input type="checkbox" data-sub="gr.look" checked><span>Preset looks</span></label><label class="chk sub"><input type="checkbox" data-sub="gr.adj" checked><span>Free adjustments</span></label><label class="chk sub"><input type="checkbox" data-sub="gr.neutral" checked><span>Sometimes stay neutral</span></label><div class="row tight"><button type="button" class="alt" data-rzall="gr">All</button><button type="button" class="alt" data-rzno="gr">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="Vignettes, edge fades, uneven inking, layer, colour and tone masks in the Grade tool"><input type="checkbox" data-ft="masks" checked><span>Grade masks</span></label><button type="button" class="rzx" data-rzx="masks" aria-expanded="false" aria-label="Choose what Grade masks may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="masks" hidden><label class="chk sub"><input type="checkbox" data-sub="masks.vig" checked><span>Vignette</span></label><label class="chk sub"><input type="checkbox" data-sub="masks.fade" checked><span>Edge fade</span></label><label class="chk sub"><input type="checkbox" data-sub="masks.ink" checked><span>Uneven inking</span></label><label class="chk sub"><input type="checkbox" data-sub="masks.layer" checked><span>Layer tint</span></label><label class="chk sub"><input type="checkbox" data-sub="masks.colour" checked><span>Colour shift</span></label><label class="chk sub"><input type="checkbox" data-sub="masks.tone" checked><span>Shadow and highlight tone</span></label><div class="row tight"><button type="button" class="alt" data-rzall="masks">All</button><button type="button" class="alt" data-rzno="masks">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="The textures on the canvas (paper, cloth, stone and more)"><input type="checkbox" data-ft="tx" checked><span>Canvas texture</span></label><button type="button" class="rzx" data-rzx="tx" aria-expanded="false" aria-label="Choose what Canvas texture may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="tx" hidden><div class="rzgh">Canvas texture</div><label class="chk sub"><input type="checkbox" data-sub="tx.none" checked><span>Sometimes none</span></label><div class="rzgh">Kinds</div><label class="chk sub"><input type="checkbox" data-sub="tx.f0" checked><span>Paper and board</span></label><label class="chk sub"><input type="checkbox" data-sub="tx.f1" checked><span>Cloth and weave</span></label><label class="chk sub"><input type="checkbox" data-sub="tx.f2" checked><span>Natural</span></label><label class="chk sub"><input type="checkbox" data-sub="tx.f3" checked><span>Stone and mineral</span></label><label class="chk sub"><input type="checkbox" data-sub="tx.f4" checked><span>Metal and made</span></label><label class="chk sub"><input type="checkbox" data-sub="tx.f5" checked><span>Print faults and wear</span></label><div class="rzgh">Mode</div><label class="chk sub"><input type="checkbox" data-sub="tx.m_relief" checked><span>Relief (lit surface)</span></label><label class="chk sub"><input type="checkbox" data-sub="tx.m_wear" checked><span>Wear (ink knocked out)</span></label><label class="chk sub"><input type="checkbox" data-sub="tx.m_stain" checked><span>Stain (tint)</span></label><div class="row tight"><button type="button" class="alt" data-rzall="tx">All</button><button type="button" class="alt" data-rzno="tx">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="Textures on stamps, layers and text boxes, and ink wear"><input type="checkbox" data-ft="pr" checked><span>Print effects</span></label><button type="button" class="rzx" data-rzx="pr" aria-expanded="false" aria-label="Choose what Print effects may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="pr" hidden><div class="rzgh">Effects</div><label class="chk sub"><input type="checkbox" data-sub="pr.edges" checked><span>Ink edges (roughness, squash)</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.press" checked><span>Pressure and flooding</span></label><div class="rzgh">Textures on</div><label class="chk sub"><input type="checkbox" data-sub="pr.surf" checked><span>Each stamp</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.lay" checked><span>Layers</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.txt" checked><span>Text boxes</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.t_clean" checked><span>Sometimes leave stamps clean</span></label><div class="rzgh">Kinds</div><label class="chk sub"><input type="checkbox" data-sub="pr.f0" checked><span>Paper and board</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.f1" checked><span>Cloth and weave</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.f2" checked><span>Natural</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.f3" checked><span>Stone and mineral</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.f4" checked><span>Metal and made</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.f5" checked><span>Print faults and wear</span></label><div class="rzgh">Mode</div><label class="chk sub"><input type="checkbox" data-sub="pr.m_relief" checked><span>Relief (lit surface)</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.m_wear" checked><span>Wear (ink knocked out)</span></label><label class="chk sub"><input type="checkbox" data-sub="pr.m_stain" checked><span>Stain (tint)</span></label><div class="row tight"><button type="button" class="alt" data-rzall="pr">All</button><button type="button" class="alt" data-rzno="pr">None</button></div></div>
+    <div class="rzrow"><label class="chk" title="See-through layers and blend modes on the layers above the first"><input type="checkbox" data-ft="look"><span>Layer opacity and blend</span></label><button type="button" class="rzx" data-rzx="look" aria-expanded="false" aria-label="Choose what Layer opacity and blend may change" title="Choose which kinds"><span class="rzn"></span><svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button></div>
+    <div class="rzsub" data-rzs="look" hidden><label class="chk sub"><input type="checkbox" data-sub="look.op" checked><span>Opacity</span></label><div class="rzgh">Blend modes</div><label class="chk sub"><input type="checkbox" data-sub="look.b_multiply" checked><span>Multiply</span></label><label class="chk sub"><input type="checkbox" data-sub="look.b_darken" checked><span>Darken</span></label><label class="chk sub"><input type="checkbox" data-sub="look.b_screen" checked><span>Screen</span></label><label class="chk sub"><input type="checkbox" data-sub="look.b_lighten" checked><span>Lighten</span></label><label class="chk sub"><input type="checkbox" data-sub="look.b_overlay" checked><span>Overlay</span></label><label class="chk sub"><input type="checkbox" data-sub="look.b_soft-light" checked><span>Soft light</span></label><div class="row tight"><button type="button" class="alt" data-rzall="look">All</button><button type="button" class="alt" data-rzno="look">None</button></div></div>
+   <div class="hint" id="rzhint">Only what is switched on changes. Everything else stays exactly as it is. The canvas size stays the same unless Canvas shape is on, and the book cover is always kept.</div>
+  </div></details>
+ </section>
+ </div>
+</aside>
+
+<footer class="status"><span id="sinfo" style="display:flex;gap:16px"></span><span class="grow" id="pmsg" role="status"></span><span id="fzst" aria-live="polite"><span id="fzt">Randomizing…</span><b><i id="fzsb"></i></b></span><span id="pwhere"></span></footer>
+</div>
+
+<div class="modal" id="idlg" hidden><div class="dlg idl" role="dialog" aria-modal="true" aria-labelledby="idlgt">
+ <div class="dlg-h"><h2 id="idlgt">Import artwork</h2><button class="ib" id="icx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-b"><div class="icmp">
+  <figure><img id="ioimg" alt="Original image"><figcaption>Original</figcaption></figure>
+  <figure><div id="iout"></div><figcaption>As a stamp motif</figcaption></figure>
+  <div class="ictl">
+   <label>Name</label><input type="text" id="inm" maxlength="40">
+   <div class="ctl"><label for="ith">Threshold</label><input type="range" id="ith" min="5" max="250" value="128"><span class="v" id="ithv"></span></div>
+   <div class="ctl"><label for="ism">Smooth edges</label><input type="range" id="ism" min="0" max="4" value="1"><span class="v" id="ismv"></span></div>
+   <div class="ctl"><label for="isp">Clean up</label><input type="range" id="isp" min="0" max="100" value="15"><span class="v" id="ispv"></span></div>
+   <div class="ctl"><label for="idt">Simplify</label><input type="range" id="idt" min="0.2" max="3" step="0.1" value="0.8"><span class="v" id="idtv"></span></div>
+   <label class="chk"><input type="checkbox" id="iinv"><span>Invert (light artwork on a dark background)</span></label>
+   <label class="chk"><input type="checkbox" id="ifull"><span>Fill the whole stamp</span></label>
+   <div class="hint" id="iinfo"></div>
+  </div>
+ </div></div>
+ <div class="dlg-f ifoot"><span>Threshold decides what counts as ink. Everything else is carved away.</span><button class="alt" id="isht" title="Cut this image into several motifs">Split as a sheet&#8230;</button><button class="alt" id="icl">Cancel</button><button class="primary" id="iadd">Add motif</button></div>
+</div></div>
+<div class="modal" id="sdlg" hidden><div class="dlg sdl" role="dialog" aria-modal="true" aria-labelledby="sdlgt">
+ <div class="dlg-h"><h2 id="sdlgt">Import a motif sheet</h2><button class="ib" id="scx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-b"><div class="scmp">
+  <div><div class="seg svw" id="sview"><button type="button" data-v="o">Original</button><button type="button" data-v="t" class="on">Traced result</button></div><div class="sstage" id="sstage"><img id="simg" alt="Motif sheet"><svg id="sov" preserveAspectRatio="none"></svg></div><div class="hint" id="shint"></div></div>
+  <div class="sctl">
+   <label>Find the motifs by</label><div class="seg" id="smode" style="grid-template-columns:1fr 1fr"><button type="button" data-m="grid" class="on">Grid</button><button type="button" data-m="auto">Auto-detect</button></div>
+   <div id="sgc"><div class="row shrow"><span>Columns</span><input type="number" id="sc" min="1" max="12" value="4"><span>Rows</span><input type="number" id="sr" min="1" max="12" value="4"></div><div class="row"><button class="alt" id="seven">Even out the lines</button></div></div>
+   <div id="sac" hidden><div class="ctl"><label for="sgap">Join parts within</label><input type="range" id="sgap" min="0" max="40" step="1" value="10"><span class="v" id="sgapv"></span></div></div>
+   <div class="ctl"><label for="shth">Threshold</label><input type="range" id="shth" min="5" max="250" step="1" value="128"><span class="v" id="shthv"></span></div>
+   <div class="ctl"><label for="ssm">Smooth edges</label><input type="range" id="ssm" min="0" max="4" step="1" value="1"><span class="v" id="ssmv"></span></div>
+   <div class="ctl"><label for="shsp">Clean up</label><input type="range" id="shsp" min="0" max="100" step="1" value="15"><span class="v" id="shspv"></span></div>
+   <div class="ctl"><label for="sdt">Simplify</label><input type="range" id="sdt" min="0.2" max="3" step="0.1" value="0.8"><span class="v" id="sdtv"></span></div>
+   <label class="chk"><input type="checkbox" id="sinv"><span>Invert (light artwork on a dark background)</span></label>
+   <label>Library folder</label><input type="text" id="snm" maxlength="30" list="fdl"><datalist id="fdl"></datalist>
+   <div class="hint" id="shinfo"></div>
+  </div>
+ </div>
+ <div class="scells" id="scells"></div>
+ </div>
+ <div class="dlg-f ifoot"><span>Click a motif to leave it out.</span><button class="alt" id="scl">Cancel</button><button class="primary" id="sadd">Import motifs</button></div>
+</div></div>
+<div class="modal" id="plist" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="pdlgt">
+ <div class="dlg-h"><h2 id="pdlgt">Projects</h2><button class="alt" id="pnw2">New project</button><label class="btn alt" id="pop2" for="pfile" role="button" tabindex="0">Open file…</label><button class="ib" id="pclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-b"><div class="pgrid" id="pgrid"></div></div>
+ <div class="dlg-f" id="pwhere2"></div>
+</div></div>
+
+<script>
+/*@@MAIN@@*/
+</script>
+<script>
+// v70 light / dark toggle in the top bar. Dark is the default; the choice is remembered when the browser allows it.
+(function(){const b=document.getElementById('thm'),R=document.documentElement;if(!b)return;
+const SUN='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg>',
+MOON='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>';
+const paint=()=>{const dark=R.getAttribute('data-theme')!=='light';b.innerHTML=dark?SUN:MOON;b.title=dark?'Switch to light mode':'Switch to dark mode';b.setAttribute('aria-label',b.title)};
+b.onclick=()=>{const n=R.getAttribute('data-theme')==='light'?'dark':'light';R.setAttribute('data-theme',n);try{localStorage.setItem('wb60_theme',n)}catch(e){}paint()};
+paint()})();
+</script></body></html>
+
+</body></html>
