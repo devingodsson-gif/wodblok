@@ -39,7 +39,7 @@ h1{font-size:22px;margin:0;letter-spacing:.01em}
   </section>
 
   <section>
-    <div class="row"><b>Phase 1: modules</b><span class="pct">100%</span><div class="bar"><i style="width:100%"></i></div><small>35 ES modules, tests green on bundle and raw modules, speed same as v100</small></div>
+    <div class="row"><b>Phase 1: modules</b><span class="pct">100%</span><div class="bar"><i style="width:100%"></i></div><small>37 ES modules, tests green on bundle and raw modules, speed same as v100. v101 is live.</small></div>
     <div class="row"><b>2b: platform seam</b><span class="pct" id="q2b">0%</span><div class="bar"><i id="r2b" style="width:0%"></i></div><small>Storage, runtime and clipboard only through src/platform</small></div>
     <div class="row"><b>2d: Export / Import everything</b><span class="pct" id="q2d">0%</span><div class="bar"><i id="r2d" style="width:0%"></i></div><small>One file moves projects, stamps and settings between the preview and the web app</small></div>
     <div class="row"><b>2c: settings record</b><span class="pct" id="q2c">0%</span><div class="bar"><i id="r2c" style="width:0%"></i></div><small>One versioned record replaces the wbNN_ keys, with migration</small></div>
@@ -52,7 +52,7 @@ h1{font-size:22px;margin:0;letter-spacing:.01em}
 </main>
 <script>
 /* percentages are filled from this one object so the page and its numbers cannot disagree */
-var P={a:100,b:100,c:100,n2:{b:100,d:100,c:100,e:70,f:0},note:"2c done: one settings record with migration. Next: web adapter (2f), then finish the command wiring (2e)."};
+var P={a:100,b:100,c:100,n2:{b:100,d:100,c:100,e:70,f:0},note:"v101 published and verified live (WB_VER 101, Export everything present). Next: web adapter (2f), then finish the command wiring (2e)."};
 function set(id,v){document.getElementById(id).textContent=v+"%"}
 set("p1a",P.a);set("p1b",P.b);set("p1c",P.c);
 document.getElementById("b1a").style.width=P.a+"%";document.getElementById("b1b").style.width=P.b+"%";document.getElementById("b1c").style.width=P.c+"%";
