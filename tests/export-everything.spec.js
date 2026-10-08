@@ -51,7 +51,7 @@ test('export everything from the artifact runtime, import into a clean browser',
   // the settings and libraries came with it (the app always launches cleared, so the open document is not part of this)
   // (the cover and book keys are working-document state that the app clears at every launch, so they are not expected to remain)
   const CLEARED_AT_LAUNCH = ['wb31_cover', 'wb40_book', 'wb40_coverS', 'wb40_coverB'];
-  const missing = await p2.evaluate(keys => keys.filter(k => localStorage.getItem(k) === null), Object.keys(x.kv).filter(k => !CLEARED_AT_LAUNCH.includes(k)));
+  const missing = await p2.evaluate(keys => keys.filter(k => window.__wbTest.kv.get(k) === null), Object.keys(x.kv).filter(k => !CLEARED_AT_LAUNCH.includes(k)));
   expect(missing).toEqual([]);
   // and the imported project opens
   const openBtn = p2.locator('#pgrid .pc [data-a="open"]').first(); await openBtn.click(); if ((await p2.locator('#plist:visible').count()) && (await openBtn.textContent()).trim() !== 'Open') await openBtn.click(); await settle(p2);

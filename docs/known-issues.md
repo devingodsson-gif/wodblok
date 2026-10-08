@@ -17,3 +17,6 @@ One full-suite run produced a different SVG summary for `canvas shape: hex` (cli
 
 ## Observation: Before (\) did not turn on right after Ctrl+S on a fresh document (not investigated)
 In a test that pressed Ctrl+S on a new document, then rolled Randomize, the `\` key did not switch Before on; with the order reversed it did. Probably the Save flow (name prompt or the reference picture) interferes. Not reproduced by hand; logged only.
+
+## Test flake: "open project-3" round trip on the raw-module target (seen once, Phase 2e run)
+Failed once in a full run on `WB_TARGET=esm`; passed 3 of 3 repeats straight afterwards and on every bundle run. Same family as the hex-shape flake above (something drawn after the settle check). Not changed.

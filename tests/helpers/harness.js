@@ -80,14 +80,16 @@ async function getState(page) {
 }
 
 // Wait until the document state and the drawing stop changing (async stamp prints, textures, loading bar).
-async function settle(page, { quiet = 3, step = 120, max = 15000 } = {}) {
+async function settle(page, { quiet = 4, step = 120, max = 15000 } = {}) {
   const t0 = Date.now();
   let last = null, same = 0;
   while (Date.now() - t0 < max) {
     const sig = await page.evaluate(() => {
       const art = document.getElementById('art'), ed = document.getElementById('ed');
       const busy = document.body.classList.contains('babusy') || !!document.querySelector('.rzbusy,.lding:not([hidden])');
-      return (window.__wbTest ? window.__wbTest.state() : coreStr()).length + '|' + (art ? art.innerHTML.length : 0) + '|' + (ed ? ed.innerHTML.length : 0) + '|' + busy;
+      // a content hash, not just lengths: a redraw that rebuilds the same amount of markup in a different shape still counts as change
+      const h = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0).toString(36); };
+      return h(window.__wbTest ? window.__wbTest.state() : coreStr()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + (ed ? h(ed.innerHTML) : 0) + '|' + busy;
     });
     if (sig === last) { if (++same >= quiet) return; } else { same = 0; last = sig; }
     await page.waitForTimeout(step);
