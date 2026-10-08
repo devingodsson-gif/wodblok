@@ -29,7 +29,7 @@ const useG=g=>{SK=g.SK;HO=g.HO;SW=g.SW;SH=g.SH;HL=g.HL;HN=g.HN;OFFS=g.OFFS;CRAD=
 const shOf=t=>{if(!t.sh||typeof t.sh!='object')t.sh={k:SHK.includes(WBS.dim.k)?WBS.dim.k:'rect',o:WBS.dim.o=='f'?'f':'p',s:[...(WBS.dim.s||[1,1])],z:100};return t.sh};
 const useT=t=>{if(t)useG(geom(shOf(t)))};
 const SHN={rect:'Rectangle',hex:'Hexagon',circle:'Circle',diamond:'Diamond',tri:'Triangle',arch:'Arch',oct:'Octagon',star:'Star',quat:'Quatrefoil',lancet:'Lancet'};
-const setDim=()=>{if(WBS.dim.cs&&!CSN[WBS.dim.cs]){delete WBS.dim.cs;delete WBS.dim.g}if(WBS.dim.cp)delete WBS.dim.cp;useG(geom(WBS.dim));try{useT(tiles[WBS.cur])}catch(e){}
+const setDim=()=>{if(WBS.dim.cs&&!CSN[WBS.dim.cs]){delete WBS.dim.cs;delete WBS.dim.g}if(WBS.dim.cp)delete WBS.dim.cp;useG(geom(WBS.dim));try{useT(WBS.tiles[WBS.cur])}catch(e){}
 if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims(csk())};
 // Canvas outline: dim.cs = rect (default) | rrect | circle | oval | arch | hex | tri | diamond | ngon.
 // Everything is clipped to the outline. dim.cr = rounded corner %, dim.n = polygon sides, dim.co = 'f' for the flat orientation.
@@ -112,7 +112,7 @@ const CM=Object.fromEntries(C),col=n=>CM[n]||LEG[n]||'#888888';
 // Old colour names (from saved projects) map to the closest new colour.
 const fixC=(n,d)=>{if(!n||CM[n])return n||d;const h=LEG[n];if(!h)return d;const v=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16));const a=v(h);let best=d,bd=1e9;C.forEach(([nm,hx])=>{const b=v(hx),e=(a[0]-b[0])**2*.3+(a[1]-b[1])**2*.59+(a[2]-b[2])**2*.11;if(e<bd){bd=e;best=nm}});return best};
 const PL=PAL50.map(p=>[p[0],p[1],p[3]]);
-const PCOL={ink:"Marian Blue",bg:"Lily White"};let proj={...PCOL};
+const PCOL={ink:"Marian Blue",bg:"Lily White"};WBS.proj={...PCOL};
 const CC=[];try{JSON.parse(localStorage.getItem('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 const saveCC=()=>{try{localStorage.setItem('wb7_colors',JSON.stringify(C.filter(c=>CC.includes(c[0]))))}catch(e){}};
 $('pal').innerHTML='<option value="">Custom mix</option>'+PL.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('');

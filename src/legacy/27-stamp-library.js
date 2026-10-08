@@ -12,20 +12,20 @@ const slMsg=t=>{$('slmsg').textContent=t};
 const slOkImg=s=>typeof s=='string'&&s.length<6e6&&/^data:image\/(png|webp);base64,[A-Za-z0-9+\/=]*$/.test(s);
 // draw one stamp to a canvas: its ink and shape (and edge wear), long side = px, transparent or on the paper colour
 async function stampCanvas(t,px,onPaper,o){o=o||{};const G=geom(shOf(t)),dd=$('dyn').querySelector('defs');if(!dd)throw new Error('The stamp is not drawn yet');
-useT(t);const outline=shp(0);useT(tiles[WBS.cur]);const ink=inkOf(t),pa=col(proj.bg),fx=!!o.fx,tx=!!o.tx,hasD=sel=>!!dd.querySelector(sel);
+useT(t);const outline=shp(0);useT(WBS.tiles[WBS.cur]);const ink=inkOf(t),pa=col(WBS.proj.bg),fx=!!o.fx,tx=!!o.tx,hasD=sel=>!!dd.querySelector(sel);
 // print it at the size it prints in your pattern, so grain and roughness match what you see there
 let k=180/Math.max(G.SW,G.SH),L=null,li=-1;
 if(fx||tx)try{li=WBS.layers.findIndex(l=>l.vis!==false&&(l.st||[]).includes(t.id)&&!l.art&&!l.txt&&!(l.fr&&l.fr.on));if(li>=0){L=WBS.layers[li];if(!L.free){const T=lattice(L);k=T.ts*(shOf(t).z||100)/(T.g.SW*T.z)*1.004}else{const q=(L.pl||[]).find(z=>z.t==t.id);if(q)k=q.s/Math.max(G.SW,G.SH)}}}catch(e){L=null;li=-1}
 k=Math.min(k,.95*Math.min(CW,CH)/Math.max(G.SW,G.SH));if(!(k>0))k=1;
 const W=G.SW*k,H=G.SH*k,mx=Math.max(W,H),pad=(fx||tx)?mx*.05:0,cx=CW/2,cy=CH/2,xf=`translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${k.toFixed(5)}) translate(${-G.SW/2} ${-G.SH/2})`;
 let defs=(BK.vdefs!=null?BK.vdefs:dd.innerHTML)+(fx&&SURFC[t.id]?SURFC[t.id].s:'');if(!fx){defs=defs.split(` mask="url(#is${t.id})"`).join('');defs=defs.replace(/<g class="txo"[^>]*>.*?<\/g>/g,'')}let use=`<use href="#s${t.id}"/>`+(eT(t)?`<use href="#e${t.id}_0" fill="${ink}"/>`:'');
-if(fx&&L&&((L.pst||0)>0||(L.pfl||0)>0)){const key=t.id+'_'+Math.floor(Math.random()*16);defs+=pressDefs(L,li,[t],new Set([key]));useT(tiles[WBS.cur]);use=`<use href="#q${li}_${key}"/>`}
+if(fx&&L&&((L.pst||0)>0||(L.pfl||0)>0)){const key=t.id+'_'+Math.floor(Math.random()*16);defs+=pressDefs(L,li,[t],new Set([key]));useT(WBS.tiles[WBS.cur]);use=`<use href="#q${li}_${key}"/>`}
 if(fx&&L&&L.ink&&CM[L.ink]&&hasD('#lk'+li))use=`<g filter="url(#lk${li})">${use}</g>`;
 let g=`<g transform="${xf}">${use}</g>`;
 if(fx&&hasD('#rf'))g=`<g filter="url(#rf)">${g}</g>`;
 {const ic=tx?inkCatch(true):null;if(ic){defs+=ic.defs.replace('id="cw"','id="xcw"');g=`<g mask="url(#xcw)">${g}</g>`}}
 let bgs='',over='';
-if(onPaper){bgs=`<path d="${outline}" transform="${xf}" fill="${pa}"/>`;if(tx&&tex.t&&$('texg').innerHTML){defs+=`<clipPath id="xpclip"><path d="${outline}" transform="${xf}"/></clipPath>`;over=`<g clip-path="url(#xpclip)">${$('texg').innerHTML}</g>`}}
+if(onPaper){bgs=`<path d="${outline}" transform="${xf}" fill="${pa}"/>`;if(tx&&WBS.tex.t&&$('texg').innerHTML){defs+=`<clipPath id="xpclip"><path d="${outline}" transform="${xf}"/></clipPath>`;over=`<g clip-path="url(#xpclip)">${$('texg').innerHTML}</g>`}}
 const vw=W+2*pad,vh=H+2*pad,sc=px/Math.max(vw,vh),w=Math.max(1,Math.round(vw*sc)),h=Math.max(1,Math.round(vh*sc));
 const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${(cx-vw/2).toFixed(2)} ${(cy-vh/2).toFixed(2)} ${vw.toFixed(2)} ${vh.toFixed(2)}" width="${w}" height="${h}"><defs>${defs}</defs>${bgs}${g}${over}</svg>`;
 const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Could not draw the stamp'));i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)});
@@ -34,11 +34,11 @@ const slBlob=c=>new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('Could
 async function slSavePng(blob,name){const d=await use('downloads');if(!d)return slMsg('Saving is not available here.');try{await d.save({filename:name.replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')+'.png',data:blob})}catch(e){if(e&&e.code!='declined')slMsg('Could not save: '+((e&&e.message)||'unknown error'))}}
 try{const so=JSON.parse(localStorage.getItem('wb50_slopt')||'{}');$('slfx').checked=!!so.fx;$('sltx').checked=!!so.tx;if(so.px)$('slpx').value=so.px;if(so.bg!=null)$('slbg').value=so.bg}catch(e){}
 const slOptSave=()=>{try{localStorage.setItem('wb50_slopt',JSON.stringify({fx:$('slfx').checked,tx:$('sltx').checked,px:$('slpx').value,bg:$('slbg').value}))}catch(e){}};['slfx','sltx','slpx','slbg'].forEach(id=>$(id).addEventListener('change',slOptSave));
-$('slpng').onclick=async()=>{const t=tiles[WBS.cur];if(!t)return;$('slpng').disabled=true;try{const c=await stampCanvas(t,+$('slpx').value||1024,$('slbg').value=='paper',{fx:$('slfx').checked,tx:$('sltx').checked});await slSavePng(await slBlob(c),$('slname').value.trim()||('Stamp '+(WBS.cur+1)))}catch(e){slMsg((e&&e.message)||'Could not export that stamp.')}$('slpng').disabled=false};
+$('slpng').onclick=async()=>{const t=WBS.tiles[WBS.cur];if(!t)return;$('slpng').disabled=true;try{const c=await stampCanvas(t,+$('slpx').value||1024,$('slbg').value=='paper',{fx:$('slfx').checked,tx:$('sltx').checked});await slSavePng(await slBlob(c),$('slname').value.trim()||('Stamp '+(WBS.cur+1)))}catch(e){slMsg((e&&e.message)||'Could not export that stamp.')}$('slpng').disabled=false};
 function libMotifs(L){Object.entries(L.motifs||{}).forEach(([k,v])=>{if(!v||typeof v.svg!='string')return;if(k.startsWith('t|')){if(/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test(v.svg))cust[k]={n:String(v.n||'?').replace(/["<>&|]/g,'').slice(0,4),svg:v.svg,txt:1};return}if(k.startsWith('i|')){if(window.wbImpOk&&wbImpOk(k,v))cust[k]={n:String(v.n||'Imported motif').replace(/["<>&|]/g,'').slice(0,40),svg:v.svg,imp:1,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,30)}:{})}}else{const c=clean(v.svg);if(c)cust[k]={n:String(v.n||'motif').replace(/["<>&|]/g,'').slice(0,40),svg:c,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,30)}:{})}}});
 }
 function libColors(L){(L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();}
-$('slsave').onclick=async()=>{const t=tiles[WBS.cur];if(!t)return;const b=$('slsave');b.disabled=true;slMsg('Saving…');
+$('slsave').onclick=async()=>{const t=WBS.tiles[WBS.cur];if(!t)return;const b=$('slsave');b.disabled=true;slMsg('Saving…');
 try{const G=geom(shOf(t)),c=await stampCanvas(t,1400,false),w=c.toDataURL('image/webp',.9),img=w.startsWith('data:image/webp')?w:c.toDataURL('image/png'),used=new Set(),cm={};t.items.forEach(q=>used.add(q.m));used.forEach(k=>{if(cust[k])cm[k]=cust[k]});
 const nm=($('slname').value.trim()||('Stamp '+(WBS.cur+1))).replace(/["<>&|]/g,'').slice(0,40),clone=JSON.parse(JSON.stringify(t));delete clone.id;clone.txl=txPack(t);
 const rec={name:nm,updated:Date.now(),w:+G.SW.toFixed(2),h:+G.SH.toFixed(2),img,tile:JSON.stringify(clone),motifs:cm,colors:t.ink&&CC.includes(t.ink)?[[t.ink,CM[t.ink]]]:[]};
@@ -50,7 +50,7 @@ catch(e){$('slgrid').innerHTML='<div class="hint" style="grid-column:1/-1">Could
 $('slgrid').onclick=async e=>{const b=e.target.closest('[data-sa]');if(!b)return;const id=b.closest('[data-sl]').dataset.sl,a=b.dataset.sa;
 try{const rec=await SL.get(id);if(!rec)return slMsg('That stamp is gone.');
 if(a=='add'){let t=null;try{t=JSON.parse(rec.tile)}catch(er){}if(!t||!Array.isArray(t.items))return slMsg('That library entry is damaged.');
-libMotifs({motifs:rec.motifs});libColors({colors:rec.colors});txMerge(t);t.id=WBS.nid++;shOf(t);tiles.push(t);WBS.cur=tiles.length-1;selOne(-1);symKey='';store();upd();if(window.wbCap)wbCap();slMsg('Added “'+rec.name+'” as a new stamp. Tick it under Stamps in the Arrangement to print it.')}
+libMotifs({motifs:rec.motifs});libColors({colors:rec.colors});txMerge(t);t.id=WBS.nid++;shOf(t);WBS.tiles.push(t);WBS.cur=WBS.tiles.length-1;selOne(-1);WBS.symKey='';store();upd();if(window.wbCap)wbCap();slMsg('Added “'+rec.name+'” as a new stamp. Tick it under Stamps in the Arrangement to print it.')}
 else if(a=='png'){if(!slOkImg(rec.img))return slMsg('That entry has no picture.');const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Could not read the picture'));i.src=rec.img}),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);await slSavePng(await slBlob(c),rec.name||'Stamp')}
 else if(a=='del'){if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Sure?';setTimeout(()=>{delete b.dataset.sure;b.textContent='Delete'},3000);return}await SL.del(id);slMsg('Deleted “'+rec.name+'”.');slPaint()}}
 catch(er){slMsg('Something went wrong: '+((er&&er.message)||'unknown error'))}};

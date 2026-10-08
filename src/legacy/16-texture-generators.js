@@ -4,7 +4,7 @@
 //   wear   = the pattern knocks the ink out (worn, patchy, pinholes)
 //   relief = the pattern becomes lit surface shading (light comes from the "Light from" angle)
 //   stain  = the pattern tints / darkens
-var texLib=[],txSel='';
+WBS.texLib=[];WBS.txSel='';
 const TXF=[['Paper and board',{cotton:'Cotton Rag',cold:'Cold Press',laid:'Laid Lines',washi:'Washi',kraft:'Kraft',news:'Newsprint',crumple:'Crumpled'}],
 ['Cloth and weave',{linen:'Linen',canvas:'Canvas',burlap:'Burlap',denim:'Denim Twill',felt:'Felt'}],
 ['Natural',{wood:'Wood Grain',bark:'Bark',cork:'Cork',leather:'Leather'}],
@@ -16,11 +16,11 @@ const TXMD=['wear','relief','stain'],TXMN={wear:'Wear',relief:'Relief',stain:'St
 // textures from before v87 become their closest new one
 const TXLEG={ink:{speckle:'pinholes',grain:'wood',dry:'dry',mottle:'blotchy',laid:'laid',linen:'linen',worn:'worn'},surf:{cotton:'cotton',cold:'cold',laid:'laid',washi:'washi',kraft:'kraft',parch:'washi',crumple:'crumple',linen:'linen',canvas:'canvas',burlap:'burlap',leather:'leather',wood:'wood',plaster:'plaster',stone:'plaster',concrete:'concrete',grit:'plaster',metal:'brushed',stain:'foxing'}};
 const txRid=()=>1+Math.floor(Math.random()*99999),txUid=()=>'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-const txLib=id=>id?texLib.find(x=>x.id===id)||null:null;
-function txUniq(b){let n=b,i=2;while(texLib.some(x=>x.name===n))n=b+' '+i++;return n}
+const txLib=id=>id?WBS.texLib.find(x=>x.id===id)||null:null;
+function txUniq(b){let n=b,i=2;while(WBS.texLib.some(x=>x.name===n))n=b+' '+i++;return n}
 function txMake(t,o){return{id:txUid(),name:txUniq(TXN[t]||'Texture'),t,a:40,sc:100,az:225,sd:txRid(),auto:false,...(o||{})}}
 const txSame=(x,s)=>x.t===s.t&&+x.a===+s.a&&+x.sc===+s.sc&&+x.az===+s.az;
-function txEnsure(s){const m=texLib.find(x=>txSame(x,s));if(m)return m.id;const L=txMake(s.t,{...s,auto:true});texLib.push(L);return L.id}
+function txEnsure(s){const m=WBS.texLib.find(x=>txSame(x,s));if(m)return m.id;const L=txMake(s.t,{...s,auto:true});WBS.texLib.push(L);return L.id}
 function txClean(a){if(!Array.isArray(a))return[];const ok=[],ids=new Set(),n=(v,lo,hi,d)=>{v=+v;return isFinite(v)?Math.max(lo,Math.min(hi,v)):d};
 a.slice(0,200).forEach(x=>{if(!x||typeof x!='object')return;let t=x.t,leg=0;if(x.fam==='ink'||x.fam==='surf'){t=TXLEG[x.fam][x.t];leg=1}if(!t||!Object.prototype.hasOwnProperty.call(TXN,t))return;
 const id=String(x.id||'').replace(/[^\w-]/g,'').slice(0,24);if(!id||ids.has(id))return;ids.add(id);

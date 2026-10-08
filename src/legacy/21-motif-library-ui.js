@@ -60,10 +60,10 @@ delete fd.dataset.sure;const ks=fKeys(c.n);ks.forEach(k=>fSet(k,null));WBS.FOLD=
 $('pmsg').textContent=`Deleted the folder “${c.n}”.`+(ks.some(k=>k[0]!='b')?' Its imports went back to My imports and drawings back to Drawn by Claude.':'')};
 $('fmove').oninput=()=>{const v=$('fmove').value;if(!v)return;if(v=='+'){$('fmove').value='';fOpen('mv');return}libMove(v.slice(2))};
 $('fout').onclick=()=>{const c=libCur(),ks=[...lsel];if(c.t!='f'||!ks.length)return;ks.forEach(k=>fSet(k,null));fSave();store();lsel.clear();upd();$('pmsg').textContent=`Took ${ks.length} motif${ks.length>1?'s':''} out of “${c.n}”.`};
-$('fdelm').onclick=()=>{const dm=$('fdelm'),ks=[...lsel].filter(k=>k[0]!='b'),usedK=new Set(tiles.flatMap(t=>t.items.map(q=>q.m))),ok=ks.filter(k=>!usedK.has(k));if(!ks.length)return;
+$('fdelm').onclick=()=>{const dm=$('fdelm'),ks=[...lsel].filter(k=>k[0]!='b'),usedK=new Set(WBS.tiles.flatMap(t=>t.items.map(q=>q.m))),ok=ks.filter(k=>!usedK.has(k));if(!ks.length)return;
 if(!ok.length){$('pmsg').textContent='Those motifs are used on your stamps. Remove them from the stamps first.';return}
 if(!dm.dataset.sure){dm.dataset.sure=1;dm.textContent='Click to confirm';setTimeout(()=>{if(dm.dataset.sure){delete dm.dataset.sure;renderLib()}},3000);return}
 delete dm.dataset.sure;ok.forEach(k=>{delete cust[k];lsel.delete(k)});store();upd();$('pmsg').textContent=`Deleted ${ok.length} motif${ok.length>1?'s':''} from the library.`+(ok.length<ks.length?` ${ks.length-ok.length} in use on your stamps were kept.`:'')};
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&!$('boardS').hidden&&!(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]'))){const n=tiles[WBS.cur].items.length;if(!n)return;e.preventDefault();selSet([...Array(n).keys()],false);upd();pmsg(`Selected all ${n} motif${n>1?'s':''} on this stamp.`)}});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&!$('boardS').hidden&&!(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]'))){const n=WBS.tiles[WBS.cur].items.length;if(!n)return;e.preventDefault();selSet([...Array(n).keys()],false);upd();pmsg(`Selected all ${n} motif${n>1?'s':''} on this stamp.`)}});
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&WBS.lsm&&!(e.target.matches&&e.target.matches('input,textarea,select')))libExit()});
 

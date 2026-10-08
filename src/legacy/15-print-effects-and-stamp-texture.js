@@ -2,9 +2,9 @@
 // Edge roughness: outlines wobble and ink spreads a little, without flattening ink-density variation inside shapes.
 // Ink squash: a darker rim where ink is pushed out, lighter middle.
 // Ink surface: a mask that knocks ink out (fully or partly) in the pattern of a real printing fault.
-let pr={e:3,q:0,t:'speckle',a:35,sc:100,sd:811};
-try{const q=JSON.parse(localStorage.getItem('wb11_print')||'null');if(q&&typeof q=='object')pr={...pr,...q}}catch(e){}
-const savePr=()=>{try{localStorage.setItem('wb11_print',JSON.stringify(pr))}catch(e){}};
+WBS.pr={e:3,q:0,t:'speckle',a:35,sc:100,sd:811};
+try{const q=JSON.parse(localStorage.getItem('wb11_print')||'null');if(q&&typeof q=='object')WBS.pr={...WBS.pr,...q}}catch(e){}
+const savePr=()=>{try{localStorage.setItem('wb11_print',JSON.stringify(WBS.pr))}catch(e){}};
 const PDESC={'':'Solid, even ink.',speckle:'Tiny pinholes where the paper did not pick up ink, clustered in places.',grain:'Streaks of missing ink following the wood grain of the block.',dry:'Too little ink on the roller: large patches break up into broken, speckled ink.',mottle:'Ink density varies in soft blotches with a few white salt spots, like a solid area printed by hand.',laid:'Fine horizontal lines where the ridges of laid paper skipped the ink.',linen:'A woven crosshatch where ink only reached the raised threads of cloth or a textured sheet.',worn:'An old, damaged block: fine cracks through the ink and small chips missing.'};
 // Ink surface now belongs to each stamp: t.is = {t: type, a: amount 0-100, sc: scale %, sd: variation}. t.is.t === '' means clean.
 // It is drawn inside the stamp itself, in the stamp's own coordinates; ref keeps the grain at the size it had when it was one setting for the whole canvas.

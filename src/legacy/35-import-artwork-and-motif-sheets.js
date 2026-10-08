@@ -64,7 +64,7 @@ let loops=trace(b).map(l=>{let fi=0,fd=0;l.forEach((p,i)=>{const d=(p[0]-l[0][0]
 const cx=(x0+x1+1)/2,cy=(y0+y1+1)/2,k=92/Math.max(x1-x0+1,y1-y0+1),f=v=>(Math.round(v*10)/10).toString();
 let d='',pts=0;loops.forEach(l=>{const n=l.length,P=l.map(([x,y])=>[(x-cx)*k,(y-cy)*k]),mid=i=>{const a=P[i%n],c=P[(i+1)%n];return[(a[0]+c[0])/2,(a[1]+c[1])/2]};
 if(n<3)return;const m0=mid(0);d+='M'+f(m0[0])+','+f(m0[1]);for(let i=1;i<=n;i++){const p=P[i%n],m=mid(i);d+='Q'+f(p[0])+','+f(p[1])+' '+f(m[0])+','+f(m[1])}d+='Z';pts+=n});
-last={d,pts};const ink=col(proj.ink),bg=col(proj.bg);
+last={d,pts};const ink=col(WBS.proj.ink),bg=col(WBS.proj.bg);
 $('iout').innerHTML=`<svg viewBox="-50 -50 100 100"><rect x="-50" y="-50" width="100" height="100" fill="${bg}"/><path d="${d}" fill="${ink}" fill-rule="evenodd"/></svg>`;
 const kb=(d.length/1024).toFixed(0);$('iinfo').textContent=`${loops.length} shape${loops.length==1?'':'s'}, ${pts} points, ${kb} KB`+(d.length>180000?'. That is heavy; raise Simplify or Clean up.':'');$('iadd').disabled=d.length>400000}
 ['ith','ism','isp','idt'].forEach(id=>$(id).addEventListener('input',()=>{clearTimeout(tmr);tmr=setTimeout(run,60)}));$('iinv').addEventListener('input',run);
@@ -73,7 +73,7 @@ $('icl').onclick=closeDlg;$('icx').onclick=closeDlg;$('idlg').addEventListener('
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('idlg').hidden)closeDlg()});
 $('iadd').onclick=()=>{if(!last)return;const nm=($('inm').value.trim()||'Imported motif').replace(/["<>&|]/g,'').slice(0,40),key='i|'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const fg=WBS.mcat.startsWith('g:')?WBS.mcat.slice(2):'';cust[key]={n:nm,svg:`<path d="${last.d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,...(fg?{g:fg}:{})};
-const t=tiles[WBS.cur],full=$('ifull').checked,s=full?+(Math.min(SW,SH)/100*1.04).toFixed(3):.9;t.items.push(it(key,SW/2,SH/2,s));selOne(t.items.length-1);
+const t=WBS.tiles[WBS.cur],full=$('ifull').checked,s=full?+(Math.min(SW,SH)/100*1.04).toFixed(3):.9;t.items.push(it(key,SW/2,SH/2,s));selOne(t.items.length-1);
 if(!fg)WBS.mcat='i';mcSave();store();closeDlg();upd();document.querySelector('.rail [data-pn="motifs"]').click();
 $('pmsg').textContent=`Added “${nm}” to ${fg?'“'+fg+'”':'My imports'} and placed it on the stamp.`};
 
@@ -136,13 +136,13 @@ if(S.mode=='grid'){const{xs,ys}=S;S.boxes=[];for(let j=0;j<ys.length-1;j++)for(l
 if(S.off.size&&[...S.off].some(i=>i>=S.boxes.length))S.off.clear();
 S.res=S.boxes.map(b=>cellVec(b,S.mode=='grid'));drawOv();drawCells()}
 function drawOv(){const{w,h}=S,f=v=>v.toFixed(1),sw=Math.max(w,h)/320;let o='';
-if(S.view=='t'){const ink=col(proj.ink),bg=col(proj.bg);o+=`<rect width="${w}" height="${h}" fill="${bg}"/>`;S.res.forEach((r,i)=>{if(r)o+=`<path d="${r.d}" transform="${r.tf}" fill="${ink}" fill-rule="evenodd" opacity="${S.off.has(i)?.25:1}"/>`})}
+if(S.view=='t'){const ink=col(WBS.proj.ink),bg=col(WBS.proj.bg);o+=`<rect width="${w}" height="${h}" fill="${bg}"/>`;S.res.forEach((r,i)=>{if(r)o+=`<path d="${r.d}" transform="${r.tf}" fill="${ink}" fill-rule="evenodd" opacity="${S.off.has(i)?.25:1}"/>`})}
 document.querySelectorAll('#sview [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v==S.view));
 S.boxes.forEach((b,i)=>{const off=S.off.has(i)||!S.res[i];o+=`<rect x="${f(b.x0*w)}" y="${f(b.y0*h)}" width="${f((b.x1-b.x0)*w)}" height="${f((b.y1-b.y0)*h)}" fill="${off?'rgba(200,60,40,.12)':S.view=='t'?'none':'rgba(63,95,224,.06)'}" stroke="${S.mode=='auto'?'#3f5fe0':'none'}" stroke-width="${f(sw*1.5)}"/><text x="${f(b.x0*w+sw*5)}" y="${f(b.y0*h+sw*14)}" font-size="${f(sw*12)}" fill="#3f5fe0" font-family="sans-serif">${i+1}</text>`});
 if(S.mode=='grid'){S.xs.forEach((x,i)=>{o+=`<line x1="${f(x*w)}" y1="0" x2="${f(x*w)}" y2="${h}" stroke="#3f5fe0" stroke-width="${f(sw*1.6)}" stroke-dasharray="${f(sw*6)} ${f(sw*4)}"/><line data-lx="${i}" x1="${f(x*w)}" y1="0" x2="${f(x*w)}" y2="${h}" stroke="transparent" stroke-width="${f(sw*14)}"/>`});
 S.ys.forEach((y,j)=>{o+=`<line x1="0" y1="${f(y*h)}" x2="${w}" y2="${f(y*h)}" stroke="#3f5fe0" stroke-width="${f(sw*1.6)}" stroke-dasharray="${f(sw*6)} ${f(sw*4)}"/><line data-ly="${j}" x1="0" y1="${f(y*h)}" x2="${w}" y2="${f(y*h)}" stroke="transparent" stroke-width="${f(sw*14)}"/>`})}
 $('sov').innerHTML=o;$('shint').textContent=S.mode=='grid'?'Drag any dashed line, including the outer edges, to line the grid up with the artwork.':'Each blue box is one motif. Raise "Join parts within" if a motif is split into pieces, lower it if two motifs are merged.'}
-function drawCells(){const ink=col(proj.ink),bg=col(proj.bg);let n=0;
+function drawCells(){const ink=col(WBS.proj.ink),bg=col(WBS.proj.bg);let n=0;
 $('scells').innerHTML=S.boxes.length?S.boxes.map((b,i)=>{const r=S.res[i],d=r&&r.d,off=S.off.has(i)||!d;if(!off)n++;return`<button type="button" data-c="${i}" class="${off?'off':''}" title="${d?(off?'Left out. Click to include':'Click to leave out'):'No ink found in this cell'}"><svg viewBox="-50 -50 100 100" style="background:${bg}">${d?`<path d="${d}" fill="${ink}" fill-rule="evenodd"/>`:''}</svg><i>${i+1}</i></button>`}).join(''):'<div class="em">No motifs found. Adjust the threshold or try the other mode.</div>';
 $('sadd').textContent=`Import ${n} motif${n==1?'':'s'}`;$('sadd').disabled=!n;$('shinfo').textContent=`${S.boxes.length} cell${S.boxes.length==1?'':'s'} found, ${n} will be imported.`}
 $('scells').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;const i=+b.dataset.c;if(!S.res[i])return;S.off.has(i)?S.off.delete(i):S.off.add(i);drawOv();drawCells()};

@@ -7,7 +7,7 @@ const DRS=()=>WBS.DRAFT&&(BK.off||BK.live); // stamp-level drafting is only need
 const bkH=s=>{s=s.replace(/(id="|#)k[csw]\d+/g,'$1k');let h=2166136261,g=0;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h=Math.imul(h^c,16777619);g=(Math.imul(g,31)+c)|0}return(h>>>0).toString(36)+'.'+(g>>>0).toString(36)+'.'+s.length};
 // prints are made at exactly the size they show at (that is what makes them look the same as the live drawing)
 const bkQ=x=>+Math.max(.02,x).toPrecision(5);
-function bkScale(){if(WBDRG&&WBS._bkS>0)return WBS._bkS;return WBS._bkS=bkScale0()}
+function bkScale(){if(WBS.WBDRG&&WBS._bkS>0)return WBS._bkS;return WBS._bkS=bkScale0()}
 function bkScale0(){const d=window.devicePixelRatio||1,a=$('art');let s=0;try{const m=a.getScreenCTM();if(m&&m.a)s=Math.hypot(m.a,m.b)}catch(e){}
  if(!(s>0)){let w=parseFloat(a.style.width);if(!(w>0))w=a.getBoundingClientRect().width;s=(w>0?w:CW)/CW}
  try{if(WBS.curView=='stamp'){const r=$('pvw').getBoundingClientRect();if(r.width>0&&r.height>0)s=Math.max(s,Math.min(r.width/CW,r.height/CH)*pvZ)}}catch(e){}return s*d}

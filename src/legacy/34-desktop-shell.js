@@ -200,10 +200,10 @@ function nums(){document.querySelectorAll('input[type=range]').forEach(paint)}
 document.addEventListener('input',e=>{if(e.target.type=='range')paint(e.target)});
 
 // ---- status line + dock subtitle
-function info(){const ks=new Set(tiles.map(t=>shOf(t).k)),k=ks.size>1?'Mixed':SHN[[...ks][0]]||'Rectangle',c=WBS.dim.c;
-$('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(()=>{const k=csk(),r=(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2));return k=='rect'?r:CSN[k]+(CASP.includes(k)?' '+r:'')})()}</b></span>`}<span class="it">Block <b>${k}</b></span><span class="it">Stamps <b>${tiles.length}</b></span><span class="it">Layers <b>${WBS.layers.length}</b></span>`;
-$('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${WBS.cur+1} of ${tiles.length}`:'';
-if(WBS.layers[selL])$('lnmx').textContent=WBS.layers[selL].name}
+function info(){const ks=new Set(WBS.tiles.map(t=>shOf(t).k)),k=ks.size>1?'Mixed':SHN[[...ks][0]]||'Rectangle',c=WBS.dim.c;
+$('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(()=>{const k=csk(),r=(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2));return k=='rect'?r:CSN[k]+(CASP.includes(k)?' '+r:'')})()}</b></span>`}<span class="it">Block <b>${k}</b></span><span class="it">Stamps <b>${WBS.tiles.length}</b></span><span class="it">Layers <b>${WBS.layers.length}</b></span>`;
+$('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${WBS.cur+1} of ${WBS.tiles.length}`:'';
+if(WBS.layers[WBS.selL])$('lnmx').textContent=WBS.layers[WBS.selL].name}
 // wrap redraw hooks so the shell stays in sync
 const _draw=draw;draw=function(){_draw();nums();info()};
 const _sp=syncPr;syncPr=function(){_sp();nums()};const _stx=syncTex;syncTex=function(){_stx();nums()};
@@ -234,8 +234,8 @@ const HK={tiles:'Stamp change',layers:'Layer change',proj:'Colours',dim:'Canvas 
 function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added motif'+(y-x>1?'s':'');if(y<x)return 'Removed motif'+(x-y>1?'s':'');return 'Moved or edited motif'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
 function cap(){if(drag||window.wbNoCap)return;const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;hist.push(s);histL.push(hLabel(prev,s));histT.push(Date.now());if(hist.length>120){hist.shift();histL.shift();histT.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
-function applyCore(c){tiles=c.tiles;WBS.layers=c.layers;proj=c.proj;WBS.dim=c.dim;pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,tiles.length-1);tiles.forEach(shOf);migLayers();setDim();pr=c.pr;migInk();tex=c.tex;if(Array.isArray(c.texLib))texLib=txClean(c.texLib);texNorm();if(c.grade&&window.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(wbGrade.get()))wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...tiles.map(t=>+t.id||0));
-WBS.cur=Math.min(WBS.cur,tiles.length-1);selL=Math.min(selL,WBS.layers.length-1);selOne(-1);symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
+function applyCore(c){WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&window.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(wbGrade.get()))wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
+WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
 store();savePr();saveTex();syncPr();syncTex();buildTex();upd()}
 function undo(){cap();if(hi>0){hi--;applyCore(JSON.parse(hist[hi]))}ub()}
 function redo(){if(hi<hist.length-1){hi++;applyCore(JSON.parse(hist[hi]))}ub()}
@@ -274,19 +274,19 @@ setInterval(()=>{if(!sec.hidden)paint()},30000)})();
 
 
 // ---- keyboard shortcuts
-document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=tiles[WBS.cur]&&tiles[WBS.cur].items[sel];
+document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=WBS.tiles[WBS.cur]&&WBS.tiles[WBS.cur].items[WBS.sel];
 if(m&&k=='z'){if(typing&&(t.type=='text'||t.type=='number'))return;e.preventDefault();e.shiftKey?redo():undo()}
 else if(m&&k=='y'){e.preventDefault();redo()}
 else if(m&&k=='s'){e.preventDefault();$('psv').click()}
-else if(m&&k=='a'&&!typing&&view=='stamp'&&tiles[WBS.cur].items.length){e.preventDefault();selSet(tiles[WBS.cur].items.map((_,i)=>i));upd()}
+else if(m&&k=='a'&&!typing&&view=='stamp'&&WBS.tiles[WBS.cur].items.length){e.preventDefault();selSet(WBS.tiles[WBS.cur].items.map((_,i)=>i));upd()}
 else if(m&&k=='d'&&!typing&&q){e.preventDefault();$('scp').click()}
 else if(!typing&&(e.key=='Delete'||e.key=='Backspace')&&q&&view=='stamp'){e.preventDefault();$('sdl').click()}
-else if(!typing&&split&&e.key=='Enter'){e.preventDefault();doSplit()}
-else if(!typing&&split&&e.key=='Escape'){split=null;draw()}
+else if(!typing&&WBS.split&&e.key=='Enter'){e.preventDefault();doSplit()}
+else if(!typing&&WBS.split&&e.key=='Escape'){WBS.split=null;draw()}
 else if(!typing&&!e.ctrlKey&&!e.metaKey&&e.key.toLowerCase()=='s'&&view=='stamp'&&Q()){e.preventDefault();$('ssp').click()}
 else if(!typing&&WBS.brush&&(e.key=='['||e.key==']')){e.preventDefault();WBS.brush.r=((WBS.brush.r+(e.key==']'?15:-15)+540)%360)-180;paintGhost()}
 else if(e.key=='Escape'&&WBS.brush&&!typing){WBS.brush=null;upd()}
-else if(e.key=='Escape'){closeMenus();if(!$('plist').hidden)closeDlg();else if(sel>=0){selOne(-1);upd()}}
+else if(e.key=='Escape'){closeMenus();if(!$('plist').hidden)closeDlg();else if(WBS.sel>=0){selOne(-1);upd()}}
 else if(!typing&&!m&&q&&view=='stamp'&&e.key.startsWith('Arrow')){e.preventDefault();const d=e.shiftKey?10:1,dx=e.key=='ArrowLeft'?-d:e.key=='ArrowRight'?d:0,dy=e.key=='ArrowUp'?-d:e.key=='ArrowDown'?d:0;QS().forEach(o=>{o.x+=dx;o.y+=dy;[o.x,o.y]=wrapP(o.x,o.y)});store();upd()}
 else if(!typing&&!m&&k=='k'&&q&&view=='stamp'){e.preventDefault();$('sko').click()}
 else if(!typing&&!m&&(k=='v'||k=='p')){setView(k=='v'?'stamp':'pattern')}
@@ -294,7 +294,7 @@ else if(!typing&&!m&&k=='0'&&view=='pattern'){z=0;applyZ()}});
 
 document.querySelectorAll('label[role=button]').forEach(l=>l.addEventListener('keydown',e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();l.click()}}));
 // ---- double-click (or double-tap) a slider or its label to reset it to its default (double-click the number box instead to type a value)
-function resetRange(r){let d=r.dataset.def!=null?r.dataset.def:r.getAttribute('value');if(r.id=='sn'){const sy=symOf(tiles[WBS.cur]);d=sy.d[4]}if(d==null||d==='')return false;
+function resetRange(r){let d=r.dataset.def!=null?r.dataset.def:r.getAttribute('value');if(r.id=='sn'){const sy=symOf(WBS.tiles[WBS.cur]);d=sy.d[4]}if(d==null||d==='')return false;
 r.value=d;r.dispatchEvent(new Event('input',{bubbles:true}));paint(r);const row=r.closest('.ctl');if(row){row.classList.remove('rst');void row.offsetWidth;row.classList.add('rst')}return true}
 const rowRange=t=>{if(t.closest&&t.closest('.num'))return null; /* the number box has its own double-click: select all */ const row=t.closest&&t.closest('.ctl');return row&&row.querySelector('input[type=range]')};
 document.addEventListener('dblclick',e=>{const r=rowRange(e.target);if(r&&resetRange(r)){e.preventDefault();if(document.activeElement&&document.activeElement.type=='number')document.activeElement.blur();const sel=getSelection&&getSelection();if(sel)sel.removeAllRanges()}});
@@ -307,7 +307,7 @@ $('gon').addEventListener('input',()=>{grid.on=$('gon').checked;saveGrid();upd()
 $('gn').addEventListener('input',()=>{grid.n=+$('gn').value;if(!grid.on){grid.on=true}saveGrid();upd()});
 $('gsp').addEventListener('input',()=>{grid.sp=$('gsp').value;saveGrid();upd()});
 $('gsd').addEventListener('input',()=>{grid.sd=$('gsd').checked;if(grid.sd)grid.on=true;saveGrid();upd()});
-$('gq').onclick=()=>{const t=tiles[WBS.cur];if(!t.items.length)return;let moved=0;t.items.forEach(q=>{const[x,y]=snapPt(q.x,q.y);if(Math.abs(x-q.x)>.01||Math.abs(y-q.y)>.01)moved++;q.x=x;q.y=y});grid.on=true;saveGrid();store();upd();$('pmsg').textContent=moved?`Snapped ${moved} motif${moved>1?'s':''} to the grid.`:'Every motif is already on the grid.'};
+$('gq').onclick=()=>{const t=WBS.tiles[WBS.cur];if(!t.items.length)return;let moved=0;t.items.forEach(q=>{const[x,y]=snapPt(q.x,q.y);if(Math.abs(x-q.x)>.01||Math.abs(y-q.y)>.01)moved++;q.x=x;q.y=y});grid.on=true;saveGrid();store();upd();$('pmsg').textContent=moved?`Snapped ${moved} motif${moved>1?'s':''} to the grid.`:'Every motif is already on the grid.'};
 $('gtg').onclick=()=>{grid.on=!grid.on;saveGrid();upd()};$('gtq').onclick=()=>$('gq').click();
 $('gti').onclick=()=>{WBS.edInk=!WBS.edInk;tbSync();upd()};
 $('gtx').onclick=()=>{WBS.edTx=!WBS.edTx;tbSync();upd()};

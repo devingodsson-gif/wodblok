@@ -43,7 +43,7 @@ h1{font-size:22px;margin:0;letter-spacing:.01em}
 </main>
 <script>
 /* percentages are filled from this one object so the page and its numbers cannot disagree */
-var P={a:100,b:0,c:0,note:"1a done: 35 pieces, build identical to v100, tests pass. Starting 1b."};
+var P={a:100,b:60,c:0,note:"1b: all 61 shared variables now live on one state object, 3 batches, tests green after each. Next: replace the 44 window bridges."};
 function set(id,v){document.getElementById(id).textContent=v+"%"}
 set("p1a",P.a);set("p1b",P.b);set("p1c",P.c);
 document.getElementById("b1a").style.width=P.a+"%";document.getElementById("b1b").style.width=P.b+"%";document.getElementById("b1c").style.width=P.c+"%";
