@@ -201,9 +201,9 @@ document.addEventListener('input',e=>{if(e.target.type=='range')paint(e.target)}
 
 // ---- status line + dock subtitle
 function info(){const ks=new Set(tiles.map(t=>shOf(t).k)),k=ks.size>1?'Mixed':SHN[[...ks][0]]||'Rectangle',c=WBS.dim.c;
-$('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(()=>{const k=csk(),r=(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2));return k=='rect'?r:CSN[k]+(CASP.includes(k)?' '+r:'')})()}</b></span>`}<span class="it">Block <b>${k}</b></span><span class="it">Stamps <b>${tiles.length}</b></span><span class="it">Layers <b>${layers.length}</b></span>`;
+$('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(()=>{const k=csk(),r=(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2));return k=='rect'?r:CSN[k]+(CASP.includes(k)?' '+r:'')})()}</b></span>`}<span class="it">Block <b>${k}</b></span><span class="it">Stamps <b>${tiles.length}</b></span><span class="it">Layers <b>${WBS.layers.length}</b></span>`;
 $('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${WBS.cur+1} of ${tiles.length}`:'';
-if(layers[selL])$('lnmx').textContent=layers[selL].name}
+if(WBS.layers[selL])$('lnmx').textContent=WBS.layers[selL].name}
 // wrap redraw hooks so the shell stays in sync
 const _draw=draw;draw=function(){_draw();nums();info()};
 const _sp=syncPr;syncPr=function(){_sp();nums()};const _stx=syncTex;syncTex=function(){_stx();nums()};
@@ -234,8 +234,8 @@ const HK={tiles:'Stamp change',layers:'Layer change',proj:'Colours',dim:'Canvas 
 function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added motif'+(y-x>1?'s':'');if(y<x)return 'Removed motif'+(x-y>1?'s':'');return 'Moved or edited motif'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
 function cap(){if(drag||window.wbNoCap)return;const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;hist.push(s);histL.push(hLabel(prev,s));histT.push(Date.now());if(hist.length>120){hist.shift();histL.shift();histT.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
-function applyCore(c){tiles=c.tiles;layers=c.layers;proj=c.proj;WBS.dim=c.dim;pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,tiles.length-1);tiles.forEach(shOf);migLayers();setDim();pr=c.pr;migInk();tex=c.tex;if(Array.isArray(c.texLib))texLib=txClean(c.texLib);texNorm();if(c.grade&&window.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(wbGrade.get()))wbGrade.set(c.grade);nid=1+Math.max(0,...tiles.map(t=>+t.id||0));
-WBS.cur=Math.min(WBS.cur,tiles.length-1);selL=Math.min(selL,layers.length-1);selOne(-1);symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
+function applyCore(c){tiles=c.tiles;WBS.layers=c.layers;proj=c.proj;WBS.dim=c.dim;pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,tiles.length-1);tiles.forEach(shOf);migLayers();setDim();pr=c.pr;migInk();tex=c.tex;if(Array.isArray(c.texLib))texLib=txClean(c.texLib);texNorm();if(c.grade&&window.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(wbGrade.get()))wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...tiles.map(t=>+t.id||0));
+WBS.cur=Math.min(WBS.cur,tiles.length-1);selL=Math.min(selL,WBS.layers.length-1);selOne(-1);symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
 store();savePr();saveTex();syncPr();syncTex();buildTex();upd()}
 function undo(){cap();if(hi>0){hi--;applyCore(JSON.parse(hist[hi]))}ub()}
 function redo(){if(hi<hist.length-1){hi++;applyCore(JSON.parse(hist[hi]))}ub()}

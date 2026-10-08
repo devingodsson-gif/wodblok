@@ -8,13 +8,13 @@ const txoG=(t,mid)=>{const c=SURFC[t.id];return c&&c.o?`<g class="txo"${WBS.edIn
 // a whole layer: wear = one mask over the canvas, relief / stain = a filter on the layer
 function layTexMask(L,li){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return'';const v=txImgs(q,CW,CH,800,'host',txIsW);return v?`<mask id="lt${li}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`:''}
 function layTexOv(L){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return['',''];const f=txFilt(q,0,0,CW,CH,800);return f?[`<g filter="url(#${f})">`,'</g>']:['','']}
-function txRefs(){const m=new Map(),add=u=>(Array.isArray(u)?u:[]).forEach(z=>{if(z&&z.x)m.set(z.x,(m.get(z.x)||0)+1)});tiles.forEach(t=>add(t.tu));layers.forEach(L=>{add(L.tu);(L.pl||[]).forEach(p=>add(p.tu))});if(tex&&Array.isArray(tex.u))add(tex.u);if(window.wbTxUses)add(window.wbTxUses());return m}
+function txRefs(){const m=new Map(),add=u=>(Array.isArray(u)?u:[]).forEach(z=>{if(z&&z.x)m.set(z.x,(m.get(z.x)||0)+1)});tiles.forEach(t=>add(t.tu));WBS.layers.forEach(L=>{add(L.tu);(L.pl||[]).forEach(p=>add(p.tu))});if(tex&&Array.isArray(tex.u))add(tex.u);if(window.wbTxUses)add(window.wbTxUses());return m}
 // Older projects kept their texture in other places (per-stamp "is", the single canvas surface). They become library textures here.
 // Returns true when the canvas texture changed and has to be rebuilt.
 let TEXK='';
 function texNorm(){if(!Array.isArray(texLib))texLib=[];let ch=0;
 const cv=o=>{const q=o.is;if(q&&q.t&&+q.a>0&&TXLEG.ink[q.t]){if(!Array.isArray(o.tu))o.tu=[];o.tu.push({x:txEnsure({t:TXLEG.ink[q.t],a:Math.max(0,Math.min(100,+q.a)),sc:Math.max(25,Math.min(300,+q.sc||100)),az:225}),sd:((+q.sd||1)|0)||1,md:'wear'})}delete o.is;if(!Array.isArray(o.tu))o.tu=[];ch=1};
-tiles.forEach(t=>{if(t.is!==undefined||!Array.isArray(t.tu))cv(t)});layers.forEach(L=>{(L.pl||[]).forEach(p=>{if(p.is!==undefined)cv(p)})});
+tiles.forEach(t=>{if(t.is!==undefined||!Array.isArray(t.tu))cv(t)});WBS.layers.forEach(L=>{(L.pl||[]).forEach(p=>{if(p.is!==undefined)cv(p)})});
 if(tex&&tex.v!==87){const u=[],Lx=txLib(tex.x),sd=((+tex.sd||1)|0)||1;
 if(Lx){u.push({x:Lx.id,sd,md:'relief'});if(+Lx._k>0)u.push({x:txEnsure({t:Lx.t,a:Lx._k,sc:Lx.sc,az:Lx.az}),sd,md:'wear'})}
 else if(tex.t&&TXLEG.surf[tex.t]){const t=TXLEG.surf[tex.t],sc=Math.max(25,Math.min(300,+tex.sc||100)),az=tex.az==null?225:+tex.az;u.push({x:txEnsure({t,a:Math.max(0,Math.min(100,tex.it==null?50:+tex.it)),sc,az}),sd,md:'relief'});if(+tex.ink>0)u.push({x:txEnsure({t,a:Math.min(100,+tex.ink),sc,az}),sd,md:'wear'})}
@@ -76,12 +76,12 @@ try{$('tx_prev').innerHTML=TXMD.map(m=>`<figure><img alt="" src="${txSwatch(L,m,
 txSetR('tx_a',L.a);txSetR('tx_sc',L.sc);txSetR('tx_az',L.az);
 const opts=[['stamp','This stamp'],['stamps','All stamps'],['layer','This layer'],['layers','All layers'],['text','Selected text boxes'],['texts','All text boxes'],['canvas','Canvas']],cur=$('tx_to').value;
 if(!$('tx_to').options.length){$('tx_to').innerHTML=opts.map(([v,n])=>`<option value="${v}">${n}</option>`).join('');if(opts.some(o=>o[0]==cur))$('tx_to').value=cur}}finally{txLd=false}}
-function txDelete(id){const L=txLib(id);if(!L)return;txCap();let n=0;const cut=o=>{if(Array.isArray(o.tu)){const b=o.tu.length;o.tu=o.tu.filter(z=>z&&z.x!==id);n+=b-o.tu.length}};tiles.forEach(cut);layers.forEach(l=>{cut(l);(l.pl||[]).forEach(cut)});if(window.wbTxCut)wbTxCut(id);
+function txDelete(id){const L=txLib(id);if(!L)return;txCap();let n=0;const cut=o=>{if(Array.isArray(o.tu)){const b=o.tu.length;o.tu=o.tu.filter(z=>z&&z.x!==id);n+=b-o.tu.length}};tiles.forEach(cut);WBS.layers.forEach(l=>{cut(l);(l.pl||[]).forEach(cut)});if(window.wbTxCut)wbTxCut(id);
 if(tex&&Array.isArray(tex.u)){const b=tex.u.length;tex.u=tex.u.filter(z=>z&&z.x!==id);n+=b-tex.u.length}texLib=texLib.filter(x=>x.id!==id);if(txSel===id)txSel=(texLib[0]||{}).id||'';texNorm();store();saveTex();buildTex();upd();txCap();txRefresh(true);pmsg(`Deleted “${L.name}”${n?` and took it off ${n} place${n>1?'s':''}`:''}.`)}
 function txApply(){const L=txCur();if(!L)return;const to=$('tx_to').value;txCap();let n=0;const add=o=>{if(!Array.isArray(o.tu))o.tu=[];if(!o.tu.some(u=>u.x===L.id)&&o.tu.length<6){o.tu.push({x:L.id,sd:txRid(),md:'wear'});n++}};
 if(to=='canvas'){if(!Array.isArray(tex.u))tex.u=[];if(!tex.u.some(u=>u.x===L.id)&&tex.u.length<4){tex.u.push({x:L.id,sd:txRid(),md:'relief'});n=1}texNorm();saveTex();buildTex()}
-else if(to=='stamp'){const t=tiles[WBS.cur];if(t)add(t)}else if(to=='stamps')tiles.forEach(add);else if(to=='layer'){const l=LY();if(l)add(l)}else if(to=='layers')layers.forEach(add);
-else if(to=='text'){n=window.wbTxApply?wbTxApply(L.id):0}else if(to=='texts')layers.forEach(l=>(l.pl||[]).forEach(p=>{if(p.tx)add(p)}));
+else if(to=='stamp'){const t=tiles[WBS.cur];if(t)add(t)}else if(to=='stamps')tiles.forEach(add);else if(to=='layer'){const l=LY();if(l)add(l)}else if(to=='layers')WBS.layers.forEach(add);
+else if(to=='text'){n=window.wbTxApply?wbTxApply(L.id):0}else if(to=='texts')WBS.layers.forEach(l=>(l.pl||[]).forEach(p=>{if(p.tx)add(p)}));
 store();upd();txCap();txRefresh(true);pmsg(n?`Applied “${L.name}” to ${n} ${to=='canvas'?'canvas':n>1?'places':'place'}.`:to=='text'?'Select a text box first. New text boxes will use it.':'Nothing to apply it to, or it is already there.')}
 
 // projects made before this: the one canvas-wide surface is handed to every stamp (each with its own variation), then retired

@@ -8,7 +8,7 @@ const pgFix=(o,ls)=>{let g={...PGD};const nn=v=>Math.max(2,Math.min(60,Math.roun
  if(o&&typeof o=='object')g={show:!!o.show,n:nn(o.n),m:o.m=='c'?'c':'l',op:Math.max(10,Math.min(100,Math.round(+o.op)||70)),sh:gShOk(o.sh)};
  else{const L=(ls||[]).find(l=>l&&l.fg&&(l.fg.show||l.fg.n!=null));if(L)g={...g,show:!!L.fg.show,n:nn(L.fg.n),m:L.fg.m=='c'?'c':'l'}} // projects from before: take the grid the first layer had
  return g};
-const core=()=>({tiles,layers,proj,dim:WBS.dim,pr,tex,texLib,pg:{...pgrid},grade:window.wbGrade?wbGrade.get():null});
+const core=()=>({tiles,layers:WBS.layers,proj,dim:WBS.dim,pr,tex,texLib,pg:{...pgrid},grade:window.wbGrade?wbGrade.get():null});
 const coreStr=()=>JSON.stringify(core());
 // ---- Book cover overlay: built-in label template, or the user's own image, centered with one scale.
 const blank=()=>({img:'',iw:0,ih:0,sc:100});let covB=blank(),covS=blank();WBS.cslot='f';
@@ -54,13 +54,13 @@ return{app:'WODBLOK',v:18,...c,arts:artUsed(),cover:{img:cov.img,iw:cov.iw,ih:co
 function applySnap(d){if(!d||!Array.isArray(d.tiles)||!d.tiles.length||!Array.isArray(d.layers))throw new Error('Not a WODBLOK project');
 WBS.ARTS=artLoad(d.arts);const L=d.lib||{};Object.entries(L.motifs||{}).forEach(([k,v])=>{if(!v||typeof v.svg!='string')return;if(k.startsWith('t|')){if(/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test(v.svg))cust[k]={n:String(v.n||'?').replace(/["<>&|]/g,'').slice(0,4),svg:v.svg,txt:1};return}if(k.startsWith('i|')){if(window.wbImpOk&&wbImpOk(k,v))cust[k]={n:String(v.n||'Imported motif').replace(/["<>&|]/g,'').slice(0,40),svg:v.svg,imp:1,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,30)}:{})}}else{const c=clean(v.svg);if(c)cust[k]={n:String(v.n||'motif').replace(/["<>&|]/g,'').slice(0,40),svg:c,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,30)}:{})}}});
 (L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();
-tiles=JSON.parse(JSON.stringify(d.tiles));layers=JSON.parse(JSON.stringify(d.layers));
-layers.forEach(L=>{L.st=(L.st||[]).filter(id=>tiles.some(t=>t.id==id));if(L.lay=='brick'){L.lay='cols';if(!L.grid)L.grid='brick'}});if(!layers.length)layers=[mkL('Layer 1',tiles.map(t=>t.id),'check',180)];
+tiles=JSON.parse(JSON.stringify(d.tiles));WBS.layers=JSON.parse(JSON.stringify(d.layers));
+WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(id=>tiles.some(t=>t.id==id));if(L.lay=='brick'){L.lay='cols';if(!L.grid)L.grid='brick'}});if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',tiles.map(t=>t.id),'check',180)];
 proj=d.proj&&d.proj.ink&&d.proj.bg?{...d.proj,ink:fixC(d.proj.ink,PCOL.ink),bg:fixC(d.proj.bg,PCOL.bg)}:{...PCOL};
 if(d.cover&&d.cover.book&&typeof d.cover.book=='object')WBS.book={...WBS.book,...d.cover.book};else WBS.book={...WBS.book,on:false};try{localStorage.setItem('wb40_book',JSON.stringify(WBS.book))}catch(e){}
-WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,3]};tiles.forEach(shOf);migLayers();setDim();pgrid=pgFix(d.pg,layers);
+WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,3]};tiles.forEach(shOf);migLayers();setDim();pgrid=pgFix(d.pg,WBS.layers);
 pr={...PDEF.pr,...(d.pr||{})};tex={...PDEF.tex,...(d.tex||{})};texLib=txClean(d.texLib);texNorm();if(window.wbGrade)wbGrade.set(d.grade||null);{const c2=d.cover||{};cov={img:okImg(c2.img)?c2.img:'',iw:+c2.iw||0,ih:+c2.ih||0,sc:+c2.sc||100,tx:c2.tx!==false};if(!cov.iw||!cov.ih)cov.img='';const sl=o=>o&&okImg(o.img)&&+o.iw&&+o.ih?{img:o.img,iw:+o.iw,ih:+o.ih,sc:+o.sc||100}:blank();covB=sl(c2.back);covS=sl(c2.spine);WBS.cslot='f';$('cov').checked=c2.on!==false;saveCov();WBS.covKey='';if(window.wbBookSync)wbBookSync()}
-migEdges();migInk();nid=1+Math.max(0,...tiles.map(t=>+t.id||0));WBS.cur=0;selOne(-1);selL=layers.length-1;symKey='';$('sasp').dataset.custom='';$('casp').dataset.custom='';
+migEdges();migInk();WBS.nid=1+Math.max(0,...tiles.map(t=>+t.id||0));WBS.cur=0;selOne(-1);selL=WBS.layers.length-1;symKey='';$('sasp').dataset.custom='';$('casp').dataset.custom='';
 try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();savePr();saveTex();syncPr();syncTex();buildTex();upd()}
 WBS.cp={id:null,name:'',saved:''};try{const q=JSON.parse(localStorage.getItem('wb18_cur')||'null');if(q)WBS.cp={...WBS.cp,...q}}catch(e){}
 const saveCp=()=>{try{localStorage.setItem('wb18_cur',JSON.stringify(WBS.cp))}catch(e){}};

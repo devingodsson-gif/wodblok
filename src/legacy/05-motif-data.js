@@ -219,4 +219,4 @@ return[['Plants',PLANTS],['Animals',ANIMALS],['Medieval weapons',WEAPONS],['Misc
 // Register categories. Keys are b0..bN in order; unknown keys fall back to a motif by index.
 const CATS=MCAT.map(([n,list])=>({n,k:list.map(([nm,svg])=>{M.push(tk(svg));N.push(nm);return'b'+(M.length-1)})}));
 const DOTK=new Set((CATS.find(c=>c.n=='Dots')||{k:[]}).k);
-let mcat='0';try{mcat=localStorage.getItem('wb11_mcat')||'0'}catch(e){}
+WBS.mcat='0';try{WBS.mcat=localStorage.getItem('wb11_mcat')||'0'}catch(e){}

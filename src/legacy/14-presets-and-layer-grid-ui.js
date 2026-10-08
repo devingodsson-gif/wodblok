@@ -28,7 +28,7 @@ $('shz').oninput=()=>{shOf(tiles[WBS.cur]).z=+$('shz').value;store();upd()};
 $('shrad').oninput=()=>{const sh=shOf(tiles[WBS.cur]),v=Math.max(0,Math.min(100,Math.round(+$('shrad').value)||0));if((sh.rad||0)==v)return;if(v>0)sh.rad=v;else delete sh.rad;symKey='';store();upd()};
 $('sall').onclick=()=>{const sh=shOf(tiles[WBS.cur]);let n=0;tiles.forEach(t=>{if(t===tiles[WBS.cur])return;const o=shOf(t);if(o.k!=sh.k||o.o!=sh.o||o.s[0]!=sh.s[0]||o.s[1]!=sh.s[1]){reshape(t,{k:sh.k,o:sh.o,s:sh.s});n++}});symKey='';store();upd();pmsg(n?`${n} other stamp${n>1?'s':''} now use this shape.`:'Every stamp already has this shape.')};
 // ---- layer grid: own grid or another layer's, where to print on it, which stamp sets its shape
-function syncGrid(L,T){const others=layers.filter(x=>x!==L&&!(x.fr&&x.fr.on)&&!x.free),ky=others.map(x=>x.u+x.name).join('|');
+function syncGrid(L,T){const others=WBS.layers.filter(x=>x!==L&&!(x.fr&&x.fr.on)&&!x.free),ky=others.map(x=>x.u+x.name).join('|');
 if($('lgl').dataset.k!=ky){$('lgl').innerHTML='<option value="">Its own grid</option>'+others.map(x=>`<option value="${hx(x.u)}">Same grid as ${hx(x.name)}</option>`).join('');$('lgl').dataset.k=ky}
 $('lgl').value=T.linked?L.gl:'';$('lglrow').hidden=!T.linked;
 document.querySelectorAll('#lpa [data-p]').forEach(b=>b.classList.toggle('on',b.dataset.p==(L.pa||'c')));
@@ -63,26 +63,26 @@ $('rmC').onclick=()=>{const n=lastC;if(!n||!CC.includes(n))return;
 C.splice(C.findIndex(c=>c[0]==n),1);delete CM[n];CC.splice(CC.indexOf(n),1);
 if(proj.ink==n)proj.ink=PCOL.ink;if(proj.bg==n)proj.bg=PCOL.bg;tiles.forEach(t=>{if(t.ink==n)t.ink=null});
 saveCC();store();paintColors();lastC=null;$('rmC').hidden=true;$('cn').textContent='Removed '+n+'.';upd()};
-const LY=()=>layers[selL];
+const LY=()=>WBS.layers[selL];
 [['lgp','gap',Number],['ts','size',Number],['lox','ox',Number],['loy','oy',Number],['lrr','rrot',Number],['lrp','rpos',Number],['lrt','rot',Number],['lps','pst',Number],['lfs','pfl',Number],['lnm','name',v=>v]].forEach(([id,k,f])=>$(id).oninput=()=>{LY()[k]=f($(id).value);store();upd()});
 [['lrtn','rtn'],['lrfh','rfh'],['lrfv','rfv']].forEach(([id,k])=>$(id).oninput=()=>{const L=LY();if($(id).checked)L[k]=true;else delete L[k];store();upd()});
 $('lrsh').onclick=()=>{LY().rsd=1+Math.floor(Math.random()*99999);store();upd();if(window.wbCap)wbCap()};
 $('let').oninput=()=>{tiles[WBS.cur].et=+$('let').value;store();upd()};$('ler').oninput=()=>{tiles[WBS.cur].er=+$('ler').value;store();upd()};$('lers').onclick=()=>{tiles[WBS.cur].es=(tiles[WBS.cur].es||0)+1;store();upd()};
 $('lyl').onclick=e=>{const r=e.target.closest('[data-l]');if(!r)return;const i=+r.dataset.l;
 const grp=lyGrp(),inG=grp.length>1&&grp.includes(i);
-const mv=d=>{if(inG){const pl=layers[selL],set=new Set(grp),it=layers.map((l,k)=>({l,s:set.has(k)}));if(d>0){for(let k=it.length-2;k>=0;k--)if(it[k].s&&!it[k+1].s){const t=it[k];it[k]=it[k+1];it[k+1]=t}}else{for(let k=1;k<it.length;k++)if(it[k].s&&!it[k-1].s){const t=it[k];it[k]=it[k-1];it[k-1]=t}}layers.splice(0,layers.length,...it.map(x=>x.l));selL=layers.indexOf(pl);return}
-const k=i+d;if(k<0||k>=layers.length)return;[layers[i],layers[k]]=[layers[k],layers[i]];if(selL==i)selL=k;else if(selL==k)selL=i};
-if(e.target.matches('input')){if(inG)grp.forEach(k=>{layers[k].vis=e.target.checked});else layers[i].vis=e.target.checked}
+const mv=d=>{if(inG){const pl=WBS.layers[selL],set=new Set(grp),it=WBS.layers.map((l,k)=>({l,s:set.has(k)}));if(d>0){for(let k=it.length-2;k>=0;k--)if(it[k].s&&!it[k+1].s){const t=it[k];it[k]=it[k+1];it[k+1]=t}}else{for(let k=1;k<it.length;k++)if(it[k].s&&!it[k-1].s){const t=it[k];it[k]=it[k-1];it[k-1]=t}}WBS.layers.splice(0,WBS.layers.length,...it.map(x=>x.l));selL=WBS.layers.indexOf(pl);return}
+const k=i+d;if(k<0||k>=WBS.layers.length)return;[WBS.layers[i],WBS.layers[k]]=[WBS.layers[k],WBS.layers[i]];if(selL==i)selL=k;else if(selL==k)selL=i};
+if(e.target.matches('input')){if(inG)grp.forEach(k=>{WBS.layers[k].vis=e.target.checked});else WBS.layers[i].vis=e.target.checked}
 else if(e.target.closest('[data-up]'))mv(1);else if(e.target.closest('[data-dn]'))mv(-1);
-else if(e.shiftKey){const a0=lAnc!=null?layers.findIndex(l=>l.u==lAnc):selL,a=a0<0?selL:a0;selLM=new Set(layers.slice(Math.min(a,i),Math.max(a,i)+1).map(l=>l.u));selL=i}
-else if(e.ctrlKey||e.metaKey){const st=new Set(grp.map(k=>layers[k].u)),u=layers[i].u;if(st.has(u)&&st.size>1){st.delete(u);selL=layers.findIndex(l=>st.has(l.u))}else{st.add(u);selL=i}selLM=st;lAnc=u}
-else{selLM=new Set();selL=i;lAnc=layers[i].u}
+else if(e.shiftKey){const a0=WBS.lAnc!=null?WBS.layers.findIndex(l=>l.u==WBS.lAnc):selL,a=a0<0?selL:a0;selLM=new Set(WBS.layers.slice(Math.min(a,i),Math.max(a,i)+1).map(l=>l.u));selL=i}
+else if(e.ctrlKey||e.metaKey){const st=new Set(grp.map(k=>WBS.layers[k].u)),u=WBS.layers[i].u;if(st.has(u)&&st.size>1){st.delete(u);selL=WBS.layers.findIndex(l=>st.has(l.u))}else{st.add(u);selL=i}selLM=st;WBS.lAnc=u}
+else{selLM=new Set();selL=i;WBS.lAnc=WBS.layers[i].u}
 store();upd()};
 $('lyl').onmousedown=e=>{if(e.shiftKey)e.preventDefault()};
 $('lst').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;const id=+b.dataset.s,a=LY().st,k=a.indexOf(id);if(k<0)a.push(id);else a.splice(k,1);store();upd()};
-$('addL').onclick=()=>{const L=mkL('Layer '+(layers.length+1),[],'check',180);L.ak={};layers.push(L);selL=layers.length-1;store();upd()};
-$('dupL').onclick=()=>{const g=lyGrp(),pu=layers[selL].u,cps=[];let pc=null;g.slice().reverse().forEach(k=>{const c=JSON.parse(JSON.stringify(layers[k]));c.u=luid();c.name+=' copy';layers.splice(k+1,0,c);cps.push(c.u);if(layers[k].u==pu)pc=c.u});selL=layers.findIndex(l=>l.u==pc);selLM=cps.length>1?new Set(cps):new Set();store();upd()};
-$('delL').onclick=()=>{const g=lyGrp();if(layers.length<=g.length)return;g.slice().reverse().forEach(k=>layers.splice(k,1));selLM=new Set();selL=Math.min(g[0],layers.length-1);store();upd()};
+$('addL').onclick=()=>{const L=mkL('Layer '+(WBS.layers.length+1),[],'check',180);L.ak={};WBS.layers.push(L);selL=WBS.layers.length-1;store();upd()};
+$('dupL').onclick=()=>{const g=lyGrp(),pu=WBS.layers[selL].u,cps=[];let pc=null;g.slice().reverse().forEach(k=>{const c=JSON.parse(JSON.stringify(WBS.layers[k]));c.u=luid();c.name+=' copy';WBS.layers.splice(k+1,0,c);cps.push(c.u);if(WBS.layers[k].u==pu)pc=c.u});selL=WBS.layers.findIndex(l=>l.u==pc);selLM=cps.length>1?new Set(cps):new Set();store();upd()};
+$('delL').onclick=()=>{const g=lyGrp();if(WBS.layers.length<=g.length)return;g.slice().reverse().forEach(k=>WBS.layers.splice(k,1));selLM=new Set();selL=Math.min(g[0],WBS.layers.length-1);store();upd()};
 $('cov').addEventListener('input',upd);
 const STY="One unified carved-stamp style drawn from medieval sources: the flat, heavy, firmly outlined forms of Romanesque Bible illumination; the spirals, dots and interlace of Insular manuscripts; the bold geometric shapes, stripes and scallops of Mozarabic Beatus pages; and the thick, even outline of 15th-century blockbook woodcuts. No shading, no perspective, frontal or profile poses, strong readable silhouettes.";
 $('gen').onclick=async()=>{const ws=$('txt').value.split(',').map(s=>s.trim()).filter(Boolean).slice(0,4);if(!ws.length)return;
@@ -90,8 +90,8 @@ const sample=await use('sample');if(!sample)return say('Claude drawing is not av
 $('gen').disabled=true;say('Claude is drawing your motifs… this can take up to a minute.');
 const prompt=`You are an expert in medieval Bible illumination and early woodcut. Style: ${STY}\n\nDraw each motif below as a carved printing-block stamp in that spirit: solemn and devotional, never cartoonish. Keep the set cohesive (same detail level and line weights). Technical rules: centered at 0,0 inside a -50..50 box (stay within radius 48). Use only path, circle, ellipse, rect, polygon, polyline, line, g. Solid silhouette shapes use fill="FILL". Incised detail lines over them use stroke="CUT" with fill="none", stroke-width 2 to 3.5, stroke-linecap="round". Every element must set fill explicitly. No other colors, gradients, text, filters or images. Strong silhouette that reads when small, under 1800 characters each. Return ONLY JSON: {"motifs":[{"name":"...","svg":"inner markup only"}]} in this order:\n${ws.map((w,i)=>`${i+1}. ${w}`).join('\n')}`;
 try{const r=await sample.json(prompt,{cache:false});let n=0;
-(r.motifs||[]).forEach((m,i)=>{const s=clean(m.svg||'');if(s){const nm=String(m.name||ws[i]||'motif').replace(/["<>&|]/g,''),fg=mcat.startsWith('g:')?mcat.slice(2):'';cust['c|u|'+nm]={n:nm,svg:s,...(fg?{g:fg}:{})};n++}});
-store();const inF=mcat.startsWith('g:');if(n&&!inF){mcat='d';mcSave()}say(n?`${n} motif${n>1?'s':''} added to ${inF?'“'+mcat.slice(2)+'”':'Drawn by Claude'}. Click to place.`:'Nothing usable came back. Try again.');build()}
+(r.motifs||[]).forEach((m,i)=>{const s=clean(m.svg||'');if(s){const nm=String(m.name||ws[i]||'motif').replace(/["<>&|]/g,''),fg=WBS.mcat.startsWith('g:')?WBS.mcat.slice(2):'';cust['c|u|'+nm]={n:nm,svg:s,...(fg?{g:fg}:{})};n++}});
+store();const inF=WBS.mcat.startsWith('g:');if(n&&!inF){WBS.mcat='d';mcSave()}say(n?`${n} motif${n>1?'s':''} added to ${inF?'“'+WBS.mcat.slice(2)+'”':'Drawn by Claude'}. Click to place.`:'Nothing usable came back. Try again.');build()}
 catch(e){say(e&&e.code=='not_granted'?'Permission to ask Claude was declined.':e&&e.code=='rate_limited'?'Rate limited. Try again in a bit.':'Drawing failed: '+((e&&e.message)||'unknown error'))}
 $('gen').disabled=false};
 const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'wodblok-pattern';return n+'.'+ext};

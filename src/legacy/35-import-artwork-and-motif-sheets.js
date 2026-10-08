@@ -72,9 +72,9 @@ const openDlg=()=>{$('idlg').hidden=false;setTimeout(()=>$('iadd').focus(),50)};
 $('icl').onclick=closeDlg;$('icx').onclick=closeDlg;$('idlg').addEventListener('click',e=>{if(e.target===$('idlg'))closeDlg()});
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('idlg').hidden)closeDlg()});
 $('iadd').onclick=()=>{if(!last)return;const nm=($('inm').value.trim()||'Imported motif').replace(/["<>&|]/g,'').slice(0,40),key='i|'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-const fg=mcat.startsWith('g:')?mcat.slice(2):'';cust[key]={n:nm,svg:`<path d="${last.d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,...(fg?{g:fg}:{})};
+const fg=WBS.mcat.startsWith('g:')?WBS.mcat.slice(2):'';cust[key]={n:nm,svg:`<path d="${last.d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,...(fg?{g:fg}:{})};
 const t=tiles[WBS.cur],full=$('ifull').checked,s=full?+(Math.min(SW,SH)/100*1.04).toFixed(3):.9;t.items.push(it(key,SW/2,SH/2,s));selOne(t.items.length-1);
-if(!fg)mcat='i';mcSave();store();closeDlg();upd();document.querySelector('.rail [data-pn="motifs"]').click();
+if(!fg)WBS.mcat='i';mcSave();store();closeDlg();upd();document.querySelector('.rail [data-pn="motifs"]').click();
 $('pmsg').textContent=`Added “${nm}” to ${fg?'“'+fg+'”':'My imports'} and placed it on the stamp.`};
 
 // ===== Motif sheets: one image -> many motifs (grid you can adjust, or auto-detected shapes) =====
@@ -90,7 +90,7 @@ $('shth').value=Math.max(10,Math.min(245,th));let dk=0,n=0;for(let x=0;x<w;x++){
 const cols=Math.max(1,Math.min(12,+$('sc').value||4)),rows=Math.max(1,Math.min(12,+$('sr').value||4));
 S={w,h,L,mode:'grid',view:'t',xs:[],ys:[],boxes:[],off:new Set(),res:[]};evenLines(cols,rows);
 $('simg').src=sc.toDataURL('image/png');$('sov').setAttribute('viewBox',`0 0 ${w} ${h}`);$('sstage').style.maxWidth=`min(100%, calc(58vh * ${(w/h).toFixed(4)}))`;
-$('snm').value=mcat.startsWith('g:')?mcat.slice(2):(($('isub').value.trim()||nm||'Sheet').replace(/[\"<>&|]/g,'').replace(/^./,c=>c.toUpperCase())).slice(0,30);
+$('snm').value=WBS.mcat.startsWith('g:')?WBS.mcat.slice(2):(($('isub').value.trim()||nm||'Sheet').replace(/[\"<>&|]/g,'').replace(/^./,c=>c.toUpperCase())).slice(0,30);
 setMode('grid');$('sdlg').hidden=false;sRun()};
 const evenLines=(c,r)=>{S.xs=Array.from({length:c+1},(_,i)=>i/c);S.ys=Array.from({length:r+1},(_,i)=>i/r)};
 const setMode=m=>{S.mode=m;document.querySelectorAll('#smode [data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m==m));$('sgc').hidden=m!='grid';$('sac').hidden=m!='auto';S.off.clear()};
@@ -154,7 +154,7 @@ const sClose=()=>{$('sdlg').hidden=true};$('scl').onclick=sClose;$('scx').onclic
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('sdlg').hidden)sClose()});
 $('sadd').onclick=()=>{if(!S)return;const cat=($('snm').value.trim()||'Sheet').replace(/[\"<>&|]/g,'').slice(0,30),base=Date.now().toString(36);let n=0;
 S.boxes.forEach((b,i)=>{const d=S.res[i]&&S.res[i].d;if(!d||S.off.has(i))return;n++;const key='i|'+base+'s'+i+Math.random().toString(36).slice(2,4);cust[key]={n:`${cat} ${n}`.slice(0,40),svg:`<path d="${d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,g:cat}});
-mcat='g:'+cat;try{localStorage.setItem('wb11_mcat',mcat)}catch(e){}store();sClose();upd();document.querySelector('.rail [data-pn="motifs"]').click();$('pmsg').textContent=`Added ${n} motifs to “${cat}” in the library.`};
+WBS.mcat='g:'+cat;try{localStorage.setItem('wb11_mcat',WBS.mcat)}catch(e){}store();sClose();upd();document.querySelector('.rail [data-pn="motifs"]').click();$('pmsg').textContent=`Added ${n} motifs to “${cat}” in the library.`};
 $('sfile').onchange=()=>{const f=$('sfile').files[0];$('sfile').value='';if(!f)return;if(f.type&&!/^image\//.test(f.type))return say2('That file is not an image. Use a PNG, JPG or WebP.');const url=URL.createObjectURL(f),img=new Image();
 img.onload=()=>{URL.revokeObjectURL(url);sOpen(img,(f.name||'').replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' '))};img.onerror=()=>{URL.revokeObjectURL(url);say2('That image could not be read. Try a PNG or JPG.')};img.src=url};
 $('isht').onclick=()=>{if(!src)return;closeDlg();sOpen(src,$('inm').value.trim())};

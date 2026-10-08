@@ -25,7 +25,7 @@ function crPreset(k){const[b0,b1,b2,b3]=crBox(WBS.CR.pts),cx=(b0+b2)/2,cy=(b1+b3
 if(k=='ell'){P=[];for(let i=0;i<36;i++){const t=2*Math.PI*i/36-Math.PI/2;P.push([cx+(w/2)*Math.cos(t),cy+((b3-b1)/2)*Math.sin(t)])}}
 else if(k=='tri')P=[[cx,b1],[b2,b3],[b0,b3]];else if(k=='dia')P=[[cx,b1],[b2,cy],[cx,b3],[b0,cy]];else P=[[b0+.25*w,b1],[b2-.25*w,b1],[b2,cy],[b2-.25*w,b3],[b0+.25*w,b3],[b0,cy]];
 WBS.CR.pts=P;WBS.CR.m='p';WBS.CR.sel=-1}
-function crOv(){if(!WBS.CR)return;const ov=$('fpov'),p=crP();if(!ov||!p||fpSel!=WBS.CR.u||$('boardP').classList.contains('off'))return;
+function crOv(){if(!WBS.CR)return;const ov=$('fpov'),p=crP();if(!ov||!p||WBS.fpSel!=WBS.CR.u||$('boardP').classList.contains('off'))return;
 const A=WBS.CR.A,k=p.s/Math.max(A.w,A.h),f=p.f||1,hs=Math.max(CW,CH)/95/k,lw=hs/5,n=v=>(+v).toFixed(2),P=WBS.CR.pts.map(q=>n(q[0]*A.w)+','+n(q[1]*A.h)).join(' '),src=artBU(A);
 let g=`<g transform="translate(${n(p.x)} ${n(p.y)}) rotate(${+p.r||0}) scale(${n(k*f)} ${n(k)}) translate(${n(-WBS.CR.cu*A.w)} ${n(-WBS.CR.cv*A.h)})">`;
 g+=`<image href="${src}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none" opacity=".32" pointer-events="none"/><rect x="0" y="0" width="${A.w}" height="${A.h}" fill="none" stroke="#e33" stroke-opacity=".45" stroke-width="${n(lw)}" stroke-dasharray="${n(lw*4)} ${n(lw*3)}" pointer-events="none"/>`;
@@ -39,18 +39,18 @@ ys.forEach((y,r)=>xs.forEach((x,c)=>{const h=nm[r][c];if(!h)return;g+=`<rect dat
 ov.innerHTML=g+'</g>';crBarUpd()}
 // Apply / Cancel buttons that float next to the crop box, so you never have to scroll back to the panel to confirm.
 function crBarUpd(){let b=$('crbar');if(!b){b=document.createElement('div');b.id='crbar';b.hidden=true;b.innerHTML='<button type="button" class="primary" id="crbok" title="Apply crop (Enter)">Apply crop</button><button type="button" class="alt" id="crbno" title="Cancel (Esc)">Cancel</button>';document.body.appendChild(b);$('crbok').onclick=crApply;$('crbno').onclick=()=>{WBS.CR=null;upd()}}
-const p=WBS.CR&&crP();if(!WBS.CR||!p||fpSel!=WBS.CR.u||$('boardP').classList.contains('off')){b.hidden=true;return}
+const p=WBS.CR&&crP();if(!WBS.CR||!p||WBS.fpSel!=WBS.CR.u||$('boardP').classList.contains('off')){b.hidden=true;return}
 const A=WBS.CR.A,k=p.s/Math.max(A.w,A.h),f=p.f||1,r=(+p.r||0)*Math.PI/180,c=Math.cos(r),sn=Math.sin(r),bb=crBox(WBS.CR.pts),art=$('art'),m=art.getScreenCTM();if(!m){b.hidden=true;return}
 let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;[[bb[0],bb[1]],[bb[2],bb[1]],[bb[2],bb[3]],[bb[0],bb[3]]].forEach(([u,v])=>{const lx=(u-WBS.CR.cu)*A.w*k*f,ly=(v-WBS.CR.cv)*A.h*k,q=art.createSVGPoint();q.x=p.x+lx*c-ly*sn;q.y=p.y+lx*sn+ly*c;const t=q.matrixTransform(m);x0=Math.min(x0,t.x);y0=Math.min(y0,t.y);x1=Math.max(x1,t.x);y1=Math.max(y1,t.y)});
 b.hidden=false;const bw=b.offsetWidth,bh=b.offsetHeight,br=$('boardP').getBoundingClientRect();let y=y1+12;if(y+bh>br.bottom-6){y=y0-bh-12;if(y<br.top+6)y=Math.max(br.top+6,Math.min(y1-bh-10,br.bottom-bh-6))}
 const x=Math.max(br.left+6,Math.min((x0+x1)/2-bw/2,br.right-bw-6));b.style.left=Math.round(x)+'px';b.style.top=Math.round(y)+'px'}
-function crSync(){const L=fpL(),p=L&&L.art?(L.pl||[]).find(q=>q.u==fpSel):null;if(WBS.CR&&(!p||p.u!=WBS.CR.u))WBS.CR=null;const box=$('lcrop');if(!box)return;box.hidden=!(p&&p.a);if(!p||!p.a)return;
+function crSync(){const L=fpL(),p=L&&L.art?(L.pl||[]).find(q=>q.u==WBS.fpSel):null;if(WBS.CR&&(!p||p.u!=WBS.CR.u))WBS.CR=null;const box=$('lcrop');if(!box)return;box.hidden=!(p&&p.a);if(!p||!p.a)return;
 $('lcrb').hidden=!!WBS.CR;$('lcrx').hidden=!!WBS.CR||!crPts(p);$('lcred').hidden=!WBS.CR;$('lcrb').textContent=crPts(p)?'Edit crop…':'Crop…';if(!WBS.CR)return;
 document.querySelectorAll('#lcrm [data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m==WBS.CR.m));$('lcrr').hidden=WBS.CR.m!='r';if($('lcra').value!=WBS.CR.lv)$('lcra').value=WBS.CR.lv;$('lcrall').checked=!!WBS.CR.all;crNums();
 $('lcrih').textContent=WBS.CR.m=='r'?'Drag a corner or an edge to crop. Drag inside to move the crop. Enter applies it, Esc cancels. Hold Alt to turn off snapping to the picture edge.':'Drag a point to move it. Click an edge to add a point; double-click a point, or select it and press Delete, to remove it. Drag inside to move the whole shape. Enter applies, Esc cancels.'}
 function crApply(){const L=fpL(),p=crP();if(!WBS.CR||!L||!p){WBS.CR=null;upd();return}const pts=WBS.CR.pts.map(q=>[+crC(q[0]).toFixed(4),+crC(q[1]).toFixed(4)]),m=WBS.CR.m,ts=WBS.CR.all?(L.pl||[]).filter(q=>q.a==p.a):[p];ts.forEach(q=>crSet(q,pts,m));WBS.CR=null;store();upd();if(window.wbCap)wbCap()}
-$('lcrb').onclick=()=>{const L=fpL(),p=L&&(L.pl||[]).find(q=>q.u==fpSel);if(!p||!p.a||!WBS.ARTS[p.a])return;const ex=crPts(p),ref=crRef(p);WBS.CR={u:p.u,A:WBS.ARTS[p.a],pts:ex?ex.map(q=>q.slice()):crRect(0,0,1,1),m:ex&&p.c.m=='p'?'p':'r',lv:'free',osw:false,all:false,sel:-1,drag:null,cu:ref.cu,cv:ref.cv};fpB=null;fpGhost=null;upd()};
-$('lcrx').onclick=()=>{const L=fpL(),p=L&&(L.pl||[]).find(q=>q.u==fpSel);if(!p)return;crSet(p,crRect(0,0,1,1),'r');store();upd();if(window.wbCap)wbCap()};
+$('lcrb').onclick=()=>{const L=fpL(),p=L&&(L.pl||[]).find(q=>q.u==WBS.fpSel);if(!p||!p.a||!WBS.ARTS[p.a])return;const ex=crPts(p),ref=crRef(p);WBS.CR={u:p.u,A:WBS.ARTS[p.a],pts:ex?ex.map(q=>q.slice()):crRect(0,0,1,1),m:ex&&p.c.m=='p'?'p':'r',lv:'free',osw:false,all:false,sel:-1,drag:null,cu:ref.cu,cv:ref.cv};WBS.fpB=null;WBS.fpGhost=null;upd()};
+$('lcrx').onclick=()=>{const L=fpL(),p=L&&(L.pl||[]).find(q=>q.u==WBS.fpSel);if(!p)return;crSet(p,crRect(0,0,1,1),'r');store();upd();if(window.wbCap)wbCap()};
 $('lcrok').onclick=crApply;$('lcrno').onclick=()=>{WBS.CR=null;upd()};
 $('lcrrs').onclick=()=>{if(!WBS.CR)return;WBS.CR.pts=crRect(0,0,1,1);WBS.CR.m='r';crFit();crOv();crSync()};
 $('lcrm').onclick=e=>{const b=e.target.closest('[data-m]');if(!b||!WBS.CR||b.dataset.m==WBS.CR.m)return;if(b.dataset.m=='r'){crToRect();crFit()}else WBS.CR.m='p';crOv();crSync()};
@@ -79,27 +79,27 @@ if(e.key=='Delete'||e.key=='Backspace'){e.stopImmediatePropagation();e.preventDe
 {const o1=fpSync;fpSync=function(){o1.apply(this,arguments);crSync()};const o2=fpOverlay;fpOverlay=function(){o2.apply(this,arguments);crOv();crBarUpd()}}
 // --- canvas: place, select, drag
 $('art').addEventListener('pointerdown',e=>{const L=fpL();if(!L||e.button!==0||$('boardP').classList.contains('off'))return;const[x,y]=fpPt(e);if(!inShape(x,y)&&!(e.target.closest&&e.target.closest('[data-fh]')))return;
-const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!fpB){const hp=(L.pl||[]).find(q=>q.u==fpSel);if(hp){e.preventDefault();fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,moved:false};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
+const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,moved:false};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
 if(txArm&&L.txt&&tbG){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),n=Math.max(tbG.bw,tbG.bh,.01);L.pl.push({u:fpU(),tx:{...tbRead()},G:tbG.G,Lt:tbG.Lt,bw:tbG.bw,bh:tbG.bh,n,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+n.toFixed(2),r:0,f:1,...(tbSty.tu.length?{tu:tbSty.tu.map(u=>({x:u.x,sd:txRid()}))}:{}),...(tbSty.ink?{ink:tbSty.ink}:{})});store();upd();if(window.wbCap)wbCap();return}
-if(fpB&&(L.art?WBS.ARTS[fpB]:tiles.some(t=>t.id==fpB))){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),q={u:fpU(),[L.art?'a':'t']:fpB,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+fpSnapS(L,fpSz(),e).toFixed(2),r:fpRot,f:fpFlip};L.pl.push(q);if(fpPoolOk()){const a=[...fpPool],nx=a[Math.floor(Math.random()*a.length)];fpB=L.art?nx:+nx}store();upd();if(window.wbCap)wbCap();return}
-const p=fpHit(L,x,y);if(!p){if(fpSel!==-1||fpMS.size){fpSel=-1;fpMS=new Set();upd()}return}
+if(WBS.fpB&&(L.art?WBS.ARTS[WBS.fpB]:tiles.some(t=>t.id==WBS.fpB))){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),q={u:fpU(),[L.art?'a':'t']:WBS.fpB,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+fpSnapS(L,fpSz(),e).toFixed(2),r:fpRot,f:fpFlip};L.pl.push(q);if(fpPoolOk()){const a=[...WBS.fpPool],nx=a[Math.floor(Math.random()*a.length)];WBS.fpB=L.art?nx:+nx}store();upd();if(window.wbCap)wbCap();return}
+const p=fpHit(L,x,y);if(!p){if(WBS.fpSel!==-1||WBS.fpMS.size){WBS.fpSel=-1;WBS.fpMS=new Set();upd()}return}
 if(e.shiftKey||e.ctrlKey||e.metaKey){e.preventDefault();fpTog(p.u);return}
-e.preventDefault();const g0=fpGrp(),inG=g0.length>1&&g0.includes(p);if(!inG)fpMS=new Set();fpSel=p.u;WBS.fpAnc=String(p.u);const g=inG?g0.map(q=>[q,q.x,q.y]):null;fpDrag={p,g,s0:[p.x,p.y],dx:x-p.x,dy:y-p.y,moved:false,id:e.pointerId};try{$('art').setPointerCapture(e.pointerId)}catch(er){}upd()});
-$('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(fpDrag){const[x,y]=fpPt(e),p=fpDrag.p,[nx,ny]=fpSnap(L,x-fpDrag.dx,y-fpDrag.dy,e);fpDrag.moved=true;if(fpDrag.g){const ddx=+nx.toFixed(1)-fpDrag.s0[0],ddy=+ny.toFixed(1)-fpDrag.s0[1];let oh='';fpDrag.g.forEach(([q,qx,qy])=>{q.x=+(qx+ddx).toFixed(1);q.y=+(qy+ddy).toFixed(1);const g2=document.querySelector(`#art [data-fp="${q.u}"]`);if(g2)g2.setAttribute('transform',`translate(${q.x} ${q.y})`);oh+=fpBox(q,'sel')});$('fpov').innerHTML=oh;return}
+e.preventDefault();const g0=fpGrp(),inG=g0.length>1&&g0.includes(p);if(!inG)WBS.fpMS=new Set();WBS.fpSel=p.u;WBS.fpAnc=String(p.u);const g=inG?g0.map(q=>[q,q.x,q.y]):null;WBS.fpDrag={p,g,s0:[p.x,p.y],dx:x-p.x,dy:y-p.y,moved:false,id:e.pointerId};try{$('art').setPointerCapture(e.pointerId)}catch(er){}upd()});
+$('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBS.fpDrag){const[x,y]=fpPt(e),p=WBS.fpDrag.p,[nx,ny]=fpSnap(L,x-WBS.fpDrag.dx,y-WBS.fpDrag.dy,e);WBS.fpDrag.moved=true;if(WBS.fpDrag.g){const ddx=+nx.toFixed(1)-WBS.fpDrag.s0[0],ddy=+ny.toFixed(1)-WBS.fpDrag.s0[1];let oh='';WBS.fpDrag.g.forEach(([q,qx,qy])=>{q.x=+(qx+ddx).toFixed(1);q.y=+(qy+ddy).toFixed(1);const g2=document.querySelector(`#art [data-fp="${q.u}"]`);if(g2)g2.setAttribute('transform',`translate(${q.x} ${q.y})`);oh+=fpBox(q,'sel')});$('fpov').innerHTML=oh;return}
 p.x=+nx.toFixed(1);p.y=+ny.toFixed(1);
 const g=document.querySelector(`#art [data-fp="${p.u}"]`);if(g)g.setAttribute('transform',`translate(${p.x} ${p.y})`);$('fpov').innerHTML=fpBox(p,'sel')+fpHandles(p);return}
-if(fpB||(txArm&&L.txt)){WBS.fpAlt=e.altKey;fpGhost=fpSnap(L,...fpPt(e),e);fpOverlay()}});
-$('art').addEventListener('pointermove',e=>{if(!fpXf)return;const[x,y]=fpPt(e),p=fpXf.p,S0=Math.min(CW,CH);
-if(fpXf.k=='sc'){let s=Math.max(S0*.02,Math.min(S0*3,fpXf.s0*Math.hypot(x-p.x,y-p.y)/fpXf.d0));s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);fpLast=p.s}
+if(WBS.fpB||(txArm&&L.txt)){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpPt(e),e);fpOverlay()}});
+$('art').addEventListener('pointermove',e=>{if(!WBS.fpXf)return;const[x,y]=fpPt(e),p=WBS.fpXf.p,S0=Math.min(CW,CH);
+if(WBS.fpXf.k=='sc'){let s=Math.max(S0*.02,Math.min(S0*3,WBS.fpXf.s0*Math.hypot(x-p.x,y-p.y)/WBS.fpXf.d0));s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);WBS.fpLast=p.s}
 else{let r=Math.atan2(y-p.y,x-p.x)*180/Math.PI+90;r=((r+180)%360+360)%360-180;if(e.shiftKey)r=Math.round(r/15)*15;p.r=Math.round(r)}
-fpXf.moved=true;upd()});
-const xfEnd=()=>{if(!fpXf)return;const mv=fpXf.moved;fpXf=null;if(mv){store();upd();if(window.wbCap)wbCap()}};$('art').addEventListener('pointerup',xfEnd);$('art').addEventListener('pointercancel',xfEnd);
-$('art').addEventListener('pointerleave',()=>{if(fpGhost){fpGhost=null;fpOverlay()}});
-const fpEnd=()=>{if(!fpDrag)return;const mv=fpDrag.moved;fpDrag=null;if(mv){store();upd();if(window.wbCap)wbCap()}};$('art').addEventListener('pointerup',fpEnd);$('art').addEventListener('pointercancel',fpEnd);
+WBS.fpXf.moved=true;upd()});
+const xfEnd=()=>{if(!WBS.fpXf)return;const mv=WBS.fpXf.moved;WBS.fpXf=null;if(mv){store();upd();if(window.wbCap)wbCap()}};$('art').addEventListener('pointerup',xfEnd);$('art').addEventListener('pointercancel',xfEnd);
+$('art').addEventListener('pointerleave',()=>{if(WBS.fpGhost){WBS.fpGhost=null;fpOverlay()}});
+const fpEnd=()=>{if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved;WBS.fpDrag=null;if(mv){store();upd();if(window.wbCap)wbCap()}};$('art').addEventListener('pointerup',fpEnd);$('art').addEventListener('pointercancel',fpEnd);
 document.addEventListener('keydown',e=>{const L=fpL();if(!L||$('boardP').classList.contains('off')||(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]')))return;
-if(e.key=='Escape'&&(fpB||txArm||fpSel!==-1)){fpB=null;txArm=false;fpSel=-1;fpMS=new Set();fpPool=new Set();fpGhost=null;upd();return}
-if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&(L.pl||[]).length&&$('boardS').hidden){e.preventDefault();fpMS=new Set(L.pl.map(q=>String(q.u)));fpSel=L.pl[L.pl.length-1].u;fpB=null;fpGhost=null;upd();return}
+if(e.key=='Escape'&&(WBS.fpB||txArm||WBS.fpSel!==-1)){WBS.fpB=null;txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}
+if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&(L.pl||[]).length&&$('boardS').hidden){e.preventDefault();WBS.fpMS=new Set(L.pl.map(q=>String(q.u)));WBS.fpSel=L.pl[L.pl.length-1].u;WBS.fpB=null;WBS.fpGhost=null;upd();return}
 const gr=fpGrp(),p=gr[0];if(!p)return;
-if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();gr.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));fpSel=-1;fpMS=new Set();store();upd();if(window.wbCap)wbCap();return}
-const gg=fpFG(L),st=gg.snap?fpCell(L)*(e.shiftKey?5:1):(e.shiftKey?10:1)*Math.min(CW,CH)/400,mv={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[e.key];if(mv){e.preventDefault();let ddx=mv[0],ddy=mv[1];if(gg.snap){const pr=fpGrp().find(q=>q.u==fpSel)||p,[sx,sy]=fpSnap(L,pr.x+mv[0],pr.y+mv[1],null);ddx=sx-pr.x;ddy=sy-pr.y}gr.forEach(q=>{q.x=+(q.x+ddx).toFixed(1);q.y=+(q.y+ddy).toFixed(1)});store();upd()}});
+if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();gr.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));WBS.fpSel=-1;WBS.fpMS=new Set();store();upd();if(window.wbCap)wbCap();return}
+const gg=fpFG(L),st=gg.snap?fpCell(L)*(e.shiftKey?5:1):(e.shiftKey?10:1)*Math.min(CW,CH)/400,mv={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[e.key];if(mv){e.preventDefault();let ddx=mv[0],ddy=mv[1];if(gg.snap){const pr=fpGrp().find(q=>q.u==WBS.fpSel)||p,[sx,sy]=fpSnap(L,pr.x+mv[0],pr.y+mv[1],null);ddx=sx-pr.x;ddy=sy-pr.y}gr.forEach(q=>{q.x=+(q.x+ddx).toFixed(1);q.y=+(q.y+ddy).toFixed(1)});store();upd()}});
 

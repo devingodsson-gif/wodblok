@@ -1,8 +1,8 @@
 // ---- Each layer lays its stamps on a grid. The grid takes its shape from one "lead" stamp (L.lead, else the first),
 // or follows another layer's grid (L.gl = that layer's u), so small stamps can be dropped into another layer's gaps (L.pa).
-function migLayers(){const seen=new Set();layers.forEach(L=>{if(!L.u||seen.has(L.u))L.u=luid();seen.add(L.u)})}
+function migLayers(){const seen=new Set();WBS.layers.forEach(L=>{if(!L.u||seen.has(L.u))L.u=luid();seen.add(L.u)})}
 function leadT(L){const ls=tiles.filter(t=>(L.st||[]).includes(t.id));return ls.find(t=>t.id==L.lead)||ls[0]||tiles[WBS.cur]||tiles[0]}
-function baseL(L){let B=L;const seen=new Set([L]);for(let d=0;d<8&&B.gl;d++){const N=layers.find(x=>x.u==B.gl);if(!N||seen.has(N))break;seen.add(N);B=N}return B}
+function baseL(L){let B=L;const seen=new Set([L]);for(let d=0;d<8&&B.gl;d++){const N=WBS.layers.find(x=>x.u==B.gl);if(!N||seen.has(N))break;seen.add(N);B=N}return B}
 const latG=L=>geom(shOf(leadT(baseL(L))));
 const arrOpts=g=>(ARR[g.SK]||ARR.rect).filter(o=>!(o[4]=='pin'||o[4]=='r90')||Math.abs(g.SW-g.SH)<1);
 function arrOf(L,g){g=g||latG(L);const op=arrOpts(g),k=(L.ak&&typeof L.ak=='object')?L.ak[g.SK]:null;let o=op.find(x=>x[0]==k);
@@ -48,7 +48,7 @@ function build(){bkPre();
 const[pa,pb]=pal();
 let defs='',lg='';
 tiles.forEach(t=>{useT(t);surfFor(t);const ci=inkOf(t),_d0=defs.length;defs+=`<clipPath id="shc${t.id}"><path d="${shp(0)}"/></clipPath><!--@E:${t.id}-->`+edgeDefs(t)+'<!--@-->'+`<mask id="m${t.id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${t.neg?`<rect width="${SW}" height="${SH}" fill="#fff"/>${items(t,{c:'#000',d:'#fff'},0,0)}`:items(t,{c:'#fff',d:'#000'},0,0)}</mask><g id="s${t.id}" clip-path="url(#shc${t.id})">${isOf(t)?`<g mask="url(#is${t.id})">`:''}<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#m${t.id})"/>${txoG(t,'m'+t.id)}${isOf(t)?'</g>':''}</g>`;bkTile(t,defs.slice(_d0))});useT(tiles[WBS.cur]);
-layers.forEach((L,li)=>{if(!L.vis)return;const lgB=lg;(()=>{const ls=tiles.filter(t=>L.st.includes(t.id)),n=ls.length;const lw=h=>{const lf=window.wbGrade?wbGrade.layF(L.u):'';let o=lf?`<g filter="url(#${lf})">${h}</g>`:h;const tm=layTexMask(L,li);if(tm){defs+=tm;o=`<g mask="url(#lt${li})">${o}</g>`}const ov=layTexOv(L);return ov[0]+o+ov[1]};if(L.free){const r=L.art?artLayer(L,li):L.txt?txtLayer(L,li):freeLayer(L,li,pa,lgB);defs+=r[0];lg+=lw(r[1]);return}if(L.fr&&L.fr.on){const r=frameLayer(L,li,ls,pa);defs+=r[0];lg+=lw(r[1]);return}if(!n)return;
+WBS.layers.forEach((L,li)=>{if(!L.vis)return;const lgB=lg;(()=>{const ls=tiles.filter(t=>L.st.includes(t.id)),n=ls.length;const lw=h=>{const lf=window.wbGrade?wbGrade.layF(L.u):'';let o=lf?`<g filter="url(#${lf})">${h}</g>`:h;const tm=layTexMask(L,li);if(tm){defs+=tm;o=`<g mask="url(#lt${li})">${o}</g>`}const ov=layTexOv(L);return ov[0]+o+ov[1]};if(L.free){const r=L.art?artLayer(L,li):L.txt?txtLayer(L,li):freeLayer(L,li,pa,lgB);defs+=r[0];lg+=lw(r[1]);return}if(L.fr&&L.fr.on){const r=frameLayer(L,li,ls,pa);defs+=r[0];lg+=lw(r[1]);return}if(!n)return;
 const T=lattice(L),{ts,th,rot,px,py,P,ox,oy,gm}=T,amt=0,S=rng(11+li*977),RR=Math.hypot(CW,CH)/2,X0=rot?CW/2-RR:0,Y0=rot?CH/2-RR:0,XW=rot?2*RR:CW,YH=rot?2*RR:CH;
 // each stamp's own outline and print scale on this grid
 const GS={};tiles.forEach(t=>{const g=geom(shOf(t));GS[t.id]={g,k:ts*(shOf(t).z||100)/(T.g.SW*T.z)}});

@@ -42,7 +42,7 @@ const bkFlush=()=>{if(window.wbHoldOn)return;if(BK.dead.length){const d=BK.dead;
 function bkShow(f,defs,ik,lg,body){BK.vdefs=f+defs+ik;BK.vdyn='<defs>'+BK.vdefs+'</defs>'+body(lg);BK.wasLive=BK.live;BK.sc0=BK.sc;
  if(BK.off||BK.live){$('dyn').innerHTML=BK.vdyn;BK.shown=1;BK.defT=0;return}
  const now=performance.now();BK.cont=WBS.DRAFT||now-BK.inT<450;BK.gen++;BK.nHit=BK.nStale=BK.nRes=BK.nMiss=0;const used=new Set(),need=new Set();
- const d2=bkSub(defs,used,need),l2=bkSub(lg,used,need);try{if(fpB!=null&&fpB!==false)need.add('E'+fpB)}catch(e){}
+ const d2=bkSub(defs,used,need),l2=bkSub(lg,used,need);try{if(WBS.fpB!=null&&WBS.fpB!==false)need.add('E'+WBS.fpB)}catch(e){}
  BK.st.hit+=BK.nHit;BK.st.stale+=BK.nStale;BK.st.miss+=BK.nMiss;
  // a big one-off change (randomize, undo, a new palette): keep the old picture up for a moment while the new stamps print, rather than flashing
  // a mix of old and new. While something is being dragged or a slider moves, the picture always updates at once.

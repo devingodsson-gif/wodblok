@@ -36,7 +36,7 @@ const sm = eslintScope.analyze(ast, { ecmaVersion: 2022, sourceType: 'script' })
 const g = sm.globalScope;
 
 // refuse a name that already exists as a binding anywhere (a local named S would shadow the state object)
-for (const sc of sm.scopes) if (sc.set.has(STATE)) { console.error(`a binding named "${STATE}" already exists (${sc.type} scope); pick another state name`); process.exit(2); }
+for (const sc of sm.scopes) if (sc.set.has(STATE) && sc !== g) { console.error(`a binding named "${STATE}" already exists (${sc.type} scope); pick another state name`); process.exit(2); }
 
 const parentOf = new Map();
 (function walk(n, p) { parentOf.set(n, p); for (const k in n) { if (k === 'loc' || k === 'range') continue; const v = n[k]; if (Array.isArray(v)) v.forEach(c => c && c.type && walk(c, n)); else if (v && typeof v.type === 'string') walk(v, n); } })(ast, null);

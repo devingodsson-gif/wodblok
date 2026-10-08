@@ -157,10 +157,10 @@ L.st=tl.filter(t=>!skipIds.has(t.id)&&!LS.slice(1).some(l=>l.st[0]==t.id)).map(t
 // --- anything switched off stays as it is: keep the current stamps / frame and only swap in what was rolled
 const isFr=l=>!!(l.fr&&l.fr.on),idMax=a=>Math.max(0,...a.map(t=>+t.id||0));
 const remap=(ts,ls,base)=>{const m={};ts.forEach((t,i)=>m[t.id]=base+1+i);return[ts.map(t=>({...t,id:m[t.id]})),ls.map(l=>{const n={...l,st:(l.st||[]).map(x=>m[x]!=null?m[x]:x)};if(l.fr&&l.fr.cs!=null&&m[l.fr.cs]!=null)n.fr={...l.fr,cs:m[l.fr.cs]};if(l.lead!=null&&m[l.lead]!=null)n.lead=m[l.lead];return n})]};
-const curFrL=layers.filter(isFr),curFrIds=new Set();curFrL.forEach(l=>{(l.st||[]).forEach(x=>curFrIds.add(x));if(l.fr.cs!=null)curFrIds.add(l.fr.cs)});
+const curFrL=WBS.layers.filter(isFr),curFrIds=new Set();curFrL.forEach(l=>{(l.st||[]).forEach(x=>curFrIds.add(x));if(l.fr.cs!=null)curFrIds.add(l.fr.cs)});
 let mT=tl.filter(t=>!skipIds.has(t.id)),mL=LS.filter(l=>!isFr(l)),fT=tl.filter(t=>skipIds.has(t.id)),fL=LS.filter(isFr),usedGen=true;
-const oldFz=new Set();if(FT.free||libFree)layers.forEach(l=>{if(l.rz=='free')(l.st||[]).forEach(x=>oldFz.add(x))});
-if(!FT.stamps){const kT=tiles.filter(t=>!curFrIds.has(t.id)&&!oldFz.has(t.id)),kL=layers.filter(l=>!isFr(l)&&!((FT.free||libFree)&&l.rz=='free'));if(kT.length&&kL.length){mT=kT;mL=kL;usedGen=false}}
+const oldFz=new Set();if(FT.free||libFree)WBS.layers.forEach(l=>{if(l.rz=='free')(l.st||[]).forEach(x=>oldFz.add(x))});
+if(!FT.stamps){const kT=tiles.filter(t=>!curFrIds.has(t.id)&&!oldFz.has(t.id)),kL=WBS.layers.filter(l=>!isFr(l)&&!((FT.free||libFree)&&l.rz=='free'));if(kT.length&&kL.length){mT=kT;mL=kL;usedGen=false}}
 if(!FT.frame){fT=tiles.filter(t=>curFrIds.has(t.id));fL=curFrL}
 [fT,fL]=remap(fT,fL,idMax(mT));
 const rzPool=m=>{const a=[];TXFK.forEach((ks,i)=>{if(sOn(m,'f'+i))a.push(...ks)});return a},rzMds=m=>TXMD.filter(x=>sOn(m,'m_'+x)),
@@ -169,7 +169,7 @@ rzUse=(pool,md)=>{const t=pick(pool),L=txMake(t,{a:md=='wear'?ri(18,60):md=='sta
 rzList=(m,w,n)=>{const pool=rzPool(m),u=[];if(!pool.length||!rzMds(m).length)return u;for(let i=0;i<n;i++){const md=rzMd(m,w);if(md)u.push(rzUse(pool,md))}return u},
 WCV={relief:3,stain:1,wear:1.4},WST={wear:4,relief:1.5,stain:1},
 rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(tex)).u:(sOn('tx','none')&&ch(.2)?[]:rzList('tx',WCV,ch(.3)?2:1));
-const c={pg:{...pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(l=>l.art)?[]:layers.filter(l=>l.art||l.txt)),proj:{ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:rzCv(),v:87}};
+const c={pg:{...pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(l=>l.art)?[]:WBS.layers.filter(l=>l.art||l.txt)),proj:{ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:rzCv(),v:87}};
 if(RZ.keep.pr)c.pr={...pr};
 if(FT.pr&&!sOn('pr','edges')){c.pr.e=pr.e;c.pr.q=pr.q}
 // textures: a Print effects roll gives each stamp (and layer, and text box) its own textures, each in its own mode
@@ -188,7 +188,7 @@ if(k=='rrect')nd.cr=ri(8,45);if(k=='ngon'){nd.n=ri(5,10);if(ch(.5))nd.co='f'}if(
 c.dim=nd;try{localStorage.setItem('wb14_dim',JSON.stringify(nd))}catch(e){}}
 // Canvas size on its own: a new ratio for a canvas that has one (round and regular shapes stay square)
 if(FT.size&&!FT.shape&&!WBS.book.on){const kk=c.dim.cs||'rect';if(kk=='rect'||CASP.includes(kk)){const nd2=JSON.parse(JSON.stringify(c.dim));nd2.c=ratioPick();c.dim=nd2;try{localStorage.setItem('wb14_dim',JSON.stringify(nd2))}catch(e){}}}
-WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;const oldL=layers.slice(),oldT=tiles.slice(),oldG=window.wbGrade?wbGrade.get():null;selL=0;(window.wbApply||applyCore)(c);selL=0;
+WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;const oldL=WBS.layers.slice(),oldT=tiles.slice(),oldG=window.wbGrade?wbGrade.get():null;selL=0;(window.wbApply||applyCore)(c);selL=0;
 // colour grade: a gentle look most of the time (about a quarter stay neutral). Masks: up to two light local touches.
 if(window.wbGrade){const g0=oldG||wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v,isF=l=>!!(l.fr&&l.fr.on);let gl={};
  if(FT.gr){const lookOn=sOn('gr','look'),adjOn=sOn('gr','adj');if((lookOn||adjOn)&&!(sOn('gr','neutral')&&ch(.25))){
@@ -198,8 +198,8 @@ if(window.wbGrade){const g0=oldG||wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v
   else gl={ex:z(B(-18,18)),ct:z(B(-24,40)),hi:z(B(-40,24)),sh:z(B(-24,40)),wh:z(B(-24,24)),bl:z(B(-30,24)),tp:z(B(-48,54)),tn:z(B(-18,18)),sat:z(B(-54,24)),vib:z(B(-24,36)),hue:R()<.12?B(-18,18):0,fd:R()<.38?B(10,48):0}}}
  else Object.keys(g0).forEach(k=>{if(k!='cov'&&k!='masks')gl[k]=g0[k]});
  let masks;
- const nfN=layers.filter(l=>!isF(l)),r3=v=>+v.toFixed(3);
- if(FT.masks){const inks=[...new Set([pInk,...layers.map(l=>l.ink),...tiles.map(t=>t.ink)].filter(x=>x&&CM[x]))],nm=wpick([[0,.2],[1,.45],[2,.35]]),usedK=new Set(),nz=(a,b,f)=>ri(a,b)||f;
+ const nfN=WBS.layers.filter(l=>!isF(l)),r3=v=>+v.toFixed(3);
+ if(FT.masks){const inks=[...new Set([pInk,...WBS.layers.map(l=>l.ink),...tiles.map(t=>t.ink)].filter(x=>x&&CM[x]))],nm=wpick([[0,.2],[1,.45],[2,.35]]),usedK=new Set(),nz=(a,b,f)=>ri(a,b)||f;
   const KINDS=[['vig',1.2],['fade',1],['ink',1.1],['layer',nfN.length>1?1:0],['colour',inks.length>1?.8:0],['tone',.9]].map(x=>[x[0],sOn('masks',x[0])?x[1]:0]);masks=[];
   const lin=(d,sp)=>{const e=pick(sp?['t','b','l','r','tl','br']:['t','b','l','r','tl','tr','bl','br']),D={t:[.5,0,0,1],b:[.5,1,0,-1],l:[0,.5,1,0],r:[1,.5,-1,0],tl:[0,0,.7,.7],tr:[1,0,-.7,.7],bl:[0,1,.7,-.7],br:[1,1,-.7,-.7]}[e];return{x1:D[0],y1:D[1],x2:r3(D[0]+D[2]*d),y2:r3(D[1]+D[3]*d)}};
   for(let q=0;q<nm;q++){const pool=KINDS.filter(x=>x[1]>0&&!usedK.has(x[0]));if(!pool.length)break;const k=wpick(pool);usedK.add(k);let m;
@@ -212,7 +212,7 @@ if(window.wbGrade){const g0=oldG||wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v
    else{const sd=ch(.5);m={t:'lum',name:sd?'Shadow tone':'Highlight tone',lo:sd?0:ri(55,75),hi:sd?ri(25,45):100,sm:ri(20,45),a:{tp:nz(-35,35,18),tn:ri(-20,20),fd:sd&&ch(.4)?ri(5,20):0}}}
    masks.push(m)}}
  else{// keep the masks you have, pointed at the new piece: same layer / stamp position, same role colour
-  const nfO=oldL.filter(l=>!isF(l)),frO=oldL.filter(isF),frN=layers.filter(isF),mU={},mT={},mC={};
+  const nfO=oldL.filter(l=>!isF(l)),frO=oldL.filter(isF),frN=WBS.layers.filter(isF),mU={},mT={},mC={};
   nfO.forEach((l,q)=>{if(nfN[q])mU[l.u]=nfN[q].u});frO.forEach((l,q)=>{if(frN[q])mU[l.u]=frN[q].u});
   oldT.forEach((t,q)=>{if(tiles[q])mT[String(t.id)]=String(tiles[q].id)});
   masks=((g0&&g0.masks)||[]).map(m=>{const q=JSON.parse(JSON.stringify(m));if(q.t=='lay'&&q.lay&&mU[q.lay])q.lay=mU[q.lay];if(q.st&&mT[q.st])q.st=mT[q.st];if(q.t=='col'&&q.c){for(const k in inkMap){if(col(k).toLowerCase()==String(q.c).toLowerCase()){q.c=col(inkMap[k]).toLowerCase();break}}}return q})}
@@ -220,7 +220,7 @@ if(window.wbGrade){const g0=oldG||wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v
 if(c.layers.some(l=>LS.includes(l)))LS.forEach(l=>{if(c.layers.includes(l)&&l.fit&&!l.gl)l.size=+fitTs(l).toFixed(3)});store();upd();
 // Layout: pattern type, stamp size, spacing and scatter, offset, rotation and flips of the layers that repeat. Works on whatever layers the project has now.
 if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('layout','rot'),lty=sOn('layout','type'),lof=sOn('layout','offset'),
- lays=layers.filter(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.art&&!l.txt),lnk=new Set(layers.filter(l=>l.gl).map(l=>l.gl)),
+ lays=WBS.layers.filter(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.art&&!l.txt),lnk=new Set(WBS.layers.filter(l=>l.gl).map(l=>l.gl)),
  EN=[...(lsp?[['scatter',1.2]]:[]),...(lrt?[['tilt',1.1],['spread',1],['flips',1]]:[])],E=new Set();
  // at most two energetic effects per roll (position scatter, turned grid, rotation spread, flips), so a piece stays coherent
  for(let q=wpick([[1,.55],[2,.45]]);q>0&&E.size<EN.length;q--)E.add(wpick(EN.filter(x=>!E.has(x[0]))));
@@ -242,15 +242,15 @@ if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('
  });useT(tiles[WBS.cur]);store();upd()}
 // Layer opacity and blend: the first layer stays mostly solid; the ones above can turn see-through or blend
 if(FT.look){const bl=['multiply','darken','screen','lighten','overlay','soft-light'].filter(x=>sOn('look','b_'+x));
- layers.forEach((l,i)=>{if(l.rz=='free')return;
+ WBS.layers.forEach((l,i)=>{if(l.rz=='free')return;
   if(sOn('look','op')){if(ch(i?.7:.3))l.op=ri(i?45:75,i?92:96);else delete l.op}
   if(bl.length&&i>0){if(ch(.65))l.bl=pick(bl);else if(l.bl&&l.bl!='behind'&&l.bl!='cancel'&&l.bl!='replace')delete l.bl}});store();upd()}
 // Print effects, Impression: uneven pressure and ink flooding on the layers you already had as well as the new ones
-if(FT.pr&&sOn('pr','press')){layers.forEach(l=>{if(l.art||l.txt||l.rz=='free')return;l.pst=ch(.5)?0:ri(1,6);l.pfl=l.fr&&l.fr.on?0:ch(.65)?0:ri(1,3)});store();upd()}
+if(FT.pr&&sOn('pr','press')){WBS.layers.forEach(l=>{if(l.art||l.txt||l.rz=='free')return;l.pst=ch(.5)?0:ri(1,6);l.pfl=l.fr&&l.fr.on?0:ch(.65)?0:ri(1,3)});store();upd()}
 // Stamp library, mixed into the pattern: one or two saved stamps join the repeating layer
-if(libPat){const L0=layers.find(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.art&&!l.txt&&!l.gl),lead0=L0&&tiles.find(t=>t.id==(L0.lead!=null?L0.lead:(L0.st||[])[0]));
+if(libPat){const L0=WBS.layers.find(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.art&&!l.txt&&!l.gl),lead0=L0&&tiles.find(t=>t.id==(L0.lead!=null?L0.lead:(L0.st||[])[0]));
  if(L0){const n=ri(1,Math.min(2,window.SLC.length));let nx=Math.max(0,...tiles.map(t=>+t.id||0));for(let i=0;i<n;i++){const t=libTile(++nx);if(!t)continue;if(lead0&&t.sh&&lead0.sh&&t.sh.k!=lead0.sh.k)t.sh={...t.sh,z:85};tiles.push(t);L0.st=[...(L0.st||[]),t.id];libDone=true}
-  nid=1+Math.max(0,...tiles.map(t=>+t.id||0));store();upd()}}
+  WBS.nid=1+Math.max(0,...tiles.map(t=>+t.id||0));store();upd()}}
 // Free-placed stamps: a single feature, or a few stamps, set on the pattern grid and snapped to it, often with lettering. Added as their own Free place layer on top.
 let fzReqs=[],fzDone=false;
 if((FT.free||libFree)&&ch(.65)){
@@ -279,7 +279,7 @@ if((FT.free||libFree)&&ch(.65)){
  if(single){if(want=='text')addText(CW/2,CH/2);else addMotif(CW/2,CH/2,Math.max(2,Math.round(gn*rr(.4,.65))))}
  else{const n2=ri(2,4);let first=true;for(let i=0;i<n2;i++){const tx=rr(0,CW),ty=rr(0,CH);if(first&&want=='text'){addText(CW/2,CH*pick([.3,.5,.7]))}else addMotif(tx,ty,pick([1,1,2,2,3]));first=false}}
  const usedIds=new Set(FL.pl.map(q=>q.t)),keep=made.filter(t=>usedIds.has(t.id));
- if(keep.length){FL.st=keep.map(t=>t.id);keep.forEach(t=>tiles.push(t));layers.push(FL);reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;nid=1+Math.max(0,...tiles.map(t=>+t.id||0))}
+ if(keep.length){FL.st=keep.map(t=>t.id);keep.forEach(t=>tiles.push(t));WBS.layers.push(FL);reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;WBS.nid=1+Math.max(0,...tiles.map(t=>+t.id||0))}
  setDim();useT(tiles[WBS.cur]);store();upd()}
 const txAll=(txReq?[[tiles[0],txReq]]:[]).concat(fzReqs);
 if(txAll.length){pmsg('Randomized… setting the lettering.');window.wbTxBusy=(window.wbTxBusy||0)+1;(async()=>{try{for(const[t,o] of txAll){try{await wbTxPlace(t,o,tok)}catch(e){}}if(tok!==window.wbRndTok)return;store();upd();if(fresh){if(window.wbResetHist)wbResetHist()}else if(window.wbCap)wbCap()}finally{window.wbTxBusy=Math.max(0,(window.wbTxBusy||1)-1)}})()}

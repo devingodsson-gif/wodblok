@@ -1,15 +1,15 @@
 // ===== Free-place layers: no arrangement, just stamps put down by hand anywhere on the canvas.
 // L.free = true; L.pl = [{u, t: stamp id, x, y (canvas units), s: long side (canvas units), r: degrees, f: 1 | -1}]
-var selLM=new Set(),lAnc=null,tM=new Set(),tAnc=null,mAnc=null,pSel=new Set(),pAnc=null;
-function lyGrp(){const g=layers.map((l,i)=>i).filter(i=>selLM.has(layers[i].u));return g.length>1&&layers[selL]&&selLM.has(layers[selL].u)?g:[selL]}
+var selLM=new Set();WBS.lAnc=null;var tM=new Set(),tAnc=null;WBS.mAnc=null;var pSel=new Set();WBS.pAnc=null;
+function lyGrp(){const g=WBS.layers.map((l,i)=>i).filter(i=>selLM.has(WBS.layers[i].u));return g.length>1&&WBS.layers[selL]&&selLM.has(WBS.layers[selL].u)?g:[selL]}
 function tGrp(){const g=tiles.map((t,i)=>i).filter(i=>tM.has(tiles[i].id));return g.length>1&&tiles[WBS.cur]&&tM.has(tiles[WBS.cur].id)?g:[WBS.cur]}
-var fpMS=new Set();WBS.fpAnc=null;var fpPool=new Set(),fpPA=null;
-function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(fpMS.size>1&&fpMS.has(String(fpSel))){const g=pl.filter(q=>fpMS.has(String(q.u)));if(g.length>1)return g}const p=pl.find(q=>q.u==fpSel);return p?[p]:[]}
-function fpPoolOk(){return!!(fpB&&fpPool.size>1&&fpPool.has(String(fpB)))}
-function fpTog(u){u=String(u);let cur=fpGrp().map(q=>String(q.u));if(!cur.length&&fpSel!==-1)cur=[String(fpSel)];const st=new Set(cur);if(st.has(u)){st.delete(u);fpSel=st.size?[...st][st.size-1]:-1}else{st.add(u);fpSel=u}fpMS=st;WBS.fpAnc=u;fpB=null;fpGhost=null;upd()}
-function fpRange(u){u=String(u);const L=fpL();if(!L)return;const order=(L.pl||[]).slice().reverse().map(q=>String(q.u)),a0=WBS.fpAnc!=null&&order.includes(String(WBS.fpAnc))?String(WBS.fpAnc):(fpSel!==-1?String(fpSel):u),a=order.indexOf(a0),b=order.indexOf(u);if(a<0||b<0){fpMS=new Set();fpSel=u;WBS.fpAnc=u;upd();return}fpMS=new Set(order.slice(Math.min(a,b),Math.max(a,b)+1));fpSel=u;fpB=null;fpGhost=null;upd()}
-function fpPick(k,e,order){const L=fpL(),art=!!(L&&L.art);let cur=fpPoolOk()?[...fpPool]:(fpB?[String(fpB)]:[]);if(e.shiftKey&&fpPA!=null&&order.includes(fpPA)){const a=order.indexOf(fpPA),b=order.indexOf(k);cur=order.slice(Math.min(a,b),Math.max(a,b)+1)}else{const st=new Set(cur);st.has(k)?st.delete(k):st.add(k);cur=[...st];fpPA=k}fpPool=new Set(cur);if(!cur.length)fpB=null;else{const pk=cur.includes(String(fpB))?String(fpB):cur[cur.length-1];fpB=art?pk:+pk}fpSel=-1;fpMS=new Set();fpLast=null;upd()}
-WBS.CR=null;let fpB=null,fpSel=-1,fpDrag=null,fpGhost=null,fpXf=null,fpSyncing=0,fpTh={};WBS.fpAlt=false;
+WBS.fpMS=new Set();WBS.fpAnc=null;WBS.fpPool=new Set();WBS.fpPA=null;
+function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(WBS.fpMS.size>1&&WBS.fpMS.has(String(WBS.fpSel))){const g=pl.filter(q=>WBS.fpMS.has(String(q.u)));if(g.length>1)return g}const p=pl.find(q=>q.u==WBS.fpSel);return p?[p]:[]}
+function fpPoolOk(){return!!(WBS.fpB&&WBS.fpPool.size>1&&WBS.fpPool.has(String(WBS.fpB)))}
+function fpTog(u){u=String(u);let cur=fpGrp().map(q=>String(q.u));if(!cur.length&&WBS.fpSel!==-1)cur=[String(WBS.fpSel)];const st=new Set(cur);if(st.has(u)){st.delete(u);WBS.fpSel=st.size?[...st][st.size-1]:-1}else{st.add(u);WBS.fpSel=u}WBS.fpMS=st;WBS.fpAnc=u;WBS.fpB=null;WBS.fpGhost=null;upd()}
+function fpRange(u){u=String(u);const L=fpL();if(!L)return;const order=(L.pl||[]).slice().reverse().map(q=>String(q.u)),a0=WBS.fpAnc!=null&&order.includes(String(WBS.fpAnc))?String(WBS.fpAnc):(WBS.fpSel!==-1?String(WBS.fpSel):u),a=order.indexOf(a0),b=order.indexOf(u);if(a<0||b<0){WBS.fpMS=new Set();WBS.fpSel=u;WBS.fpAnc=u;upd();return}WBS.fpMS=new Set(order.slice(Math.min(a,b),Math.max(a,b)+1));WBS.fpSel=u;WBS.fpB=null;WBS.fpGhost=null;upd()}
+function fpPick(k,e,order){const L=fpL(),art=!!(L&&L.art);let cur=fpPoolOk()?[...WBS.fpPool]:(WBS.fpB?[String(WBS.fpB)]:[]);if(e.shiftKey&&WBS.fpPA!=null&&order.includes(WBS.fpPA)){const a=order.indexOf(WBS.fpPA),b=order.indexOf(k);cur=order.slice(Math.min(a,b),Math.max(a,b)+1)}else{const st=new Set(cur);st.has(k)?st.delete(k):st.add(k);cur=[...st];WBS.fpPA=k}WBS.fpPool=new Set(cur);if(!cur.length)WBS.fpB=null;else{const pk=cur.includes(String(WBS.fpB))?String(WBS.fpB):cur[cur.length-1];WBS.fpB=art?pk:+pk}WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpLast=null;upd()}
+WBS.CR=null;WBS.fpB=null;WBS.fpSel=-1;WBS.fpDrag=null;WBS.fpGhost=null;WBS.fpXf=null;WBS.fpSyncing=0;WBS.fpTh={};WBS.fpAlt=false;
 // snapping: L.fg = {snap, ss (snap size to whole cells)} per layer; the grid itself (columns, snap points) is the shared pgrid, edited in the Grid tool
 const fpFG=L=>({snap:false,ss:false,...((L&&L.fg)||{}),show:pgrid.show,n:pgrid.n,m:pgrid.m});
 const fpCell=L=>CW/Math.max(2,fpFG(L).n);
@@ -22,7 +22,7 @@ if(pgrid.sh&&pgrid.sh!='rect'){const M=gModel(pgrid.sh,CW,CH,Math.max(2,pgrid.n)
 let d='',m='';for(let x=0;x<=CW+.01;x+=c)d+=`M${x.toFixed(2)} 0V${CH}`;for(let y=0;y<=CH+.01;y+=c)d+=`M0 ${y.toFixed(2)}H${CW}`;
 if(pgrid.m=='c'){const a=c*.09;for(let y=c/2;y<CH;y+=c)for(let x=c/2;x<CW;x+=c)m+=`M${(x-a).toFixed(2)} ${y.toFixed(2)}h${(2*a).toFixed(2)}M${x.toFixed(2)} ${(y-a).toFixed(2)}v${(2*a).toFixed(2)}`}
 const w=Math.max(CW,CH)/900,all=d+m,o=pgrid.op/100;g.innerHTML=`<path d="${all}" fill="none" stroke="#fff" stroke-opacity="${(.6*o).toFixed(2)}" stroke-width="${(w*2.6).toFixed(2)}"/><path d="${all}" fill="none" stroke="#2f6bff" stroke-opacity="${(.9*o).toFixed(2)}" stroke-width="${w.toFixed(2)}"/>`}
-const fpL=()=>{const L=layers[selL];return L&&L.free?L:null};
+const fpL=()=>{const L=WBS.layers[selL];return L&&L.free?L:null};
 const fpU=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const fpSeed=u=>{let h=7;for(const c of String(u))h=(h*31+c.charCodeAt(0))>>>0;return h%100000};
 function freeLayer(L,li,pa,lgB){const pl=(L.pl||[]).filter(p=>tiles.some(t=>t.id==p.t));if(!pl.length)return['',''];const amt=0,act=!DRS()&&((L.pst||0)>0||(L.pfl||0)>0),pre=act?`#q${li}_`:'#s',need=new Set(),f=v=>v.toFixed(2),ed=li==selL&&!$('boardP').classList.contains('off');let defs='',out='';const bh=L.bl=='behind',prev=[];
