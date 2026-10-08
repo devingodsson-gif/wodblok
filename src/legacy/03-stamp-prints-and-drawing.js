@@ -3,17 +3,17 @@
 // The vector pattern is still built every time and is what every export, copy and eyedropper uses. Zoomed in past fit, the pattern draws live.
 const BK={map:new Map(),alt:new Map(),q:new Map(),busy:0,tm:0,n:0,off:0,live:0,sc:1,sc0:0,wasLive:0,shown:0,defT:0,fail:0,last:0,inT:0,inTm:0,gen:0,cont:0,
  T:{},TD:{},P:{},PC:{},PF:{},PD:new Map(),dead:[],vdyn:null,vdefs:null,MAXC:2048,nHit:0,nStale:0,nRes:0,nMiss:0,st:{hit:0,stale:0,miss:0,bakes:0,ms:0,printed:0,defer:0}};
-const DRS=()=>DRAFT&&(BK.off||BK.live); // stamp-level drafting is only needed when the pattern is drawn live
+const DRS=()=>WBS.DRAFT&&(BK.off||BK.live); // stamp-level drafting is only needed when the pattern is drawn live
 const bkH=s=>{s=s.replace(/(id="|#)k[csw]\d+/g,'$1k');let h=2166136261,g=0;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h=Math.imul(h^c,16777619);g=(Math.imul(g,31)+c)|0}return(h>>>0).toString(36)+'.'+(g>>>0).toString(36)+'.'+s.length};
 // prints are made at exactly the size they show at (that is what makes them look the same as the live drawing)
 const bkQ=x=>+Math.max(.02,x).toPrecision(5);
-function bkScale(){if(WBDRG&&_bkS>0)return _bkS;return _bkS=bkScale0()}
+function bkScale(){if(WBDRG&&WBS._bkS>0)return WBS._bkS;return WBS._bkS=bkScale0()}
 function bkScale0(){const d=window.devicePixelRatio||1,a=$('art');let s=0;try{const m=a.getScreenCTM();if(m&&m.a)s=Math.hypot(m.a,m.b)}catch(e){}
  if(!(s>0)){let w=parseFloat(a.style.width);if(!(w>0))w=a.getBoundingClientRect().width;s=(w>0?w:CW)/CW}
- try{if(curView=='stamp'){const r=$('pvw').getBoundingClientRect();if(r.width>0&&r.height>0)s=Math.max(s,Math.min(r.width/CW,r.height/CH)*pvZ)}}catch(e){}return s*d}
+ try{if(WBS.curView=='stamp'){const r=$('pvw').getBoundingClientRect();if(r.width>0&&r.height>0)s=Math.max(s,Math.min(r.width/CW,r.height/CH)*pvZ)}}catch(e){}return s*d}
 function bkPre(){BK.live=!!(window.wbZoomIn&&wbZoomIn());BK.sc=bkScale()}
-const bkSurf=t=>SURFC[t]?(edInk?SURFC[t].s:`<mask id="is${t}" maskUnits="userSpaceOnUse" x="-100000" y="-100000" width="200000" height="200000"><rect x="-100000" y="-100000" width="200000" height="200000" fill="#fff"/></mask>`):'';
-function bkTile(t,td){BK.TD[t.id]=td;BK.T[t.id]=bkH(td+'|'+(SURFC[t.id]?SURFC[t.id].k:'')+'|'+edInk)}
+const bkSurf=t=>SURFC[t]?(WBS.edInk?SURFC[t].s:`<mask id="is${t}" maskUnits="userSpaceOnUse" x="-100000" y="-100000" width="200000" height="200000"><rect x="-100000" y="-100000" width="200000" height="200000" fill="#fff"/></mask>`):'';
+function bkTile(t,td){BK.TD[t.id]=td;BK.T[t.id]=bkH(td+'|'+(SURFC[t.id]?SURFC[t.id].k:'')+'|'+WBS.edInk)}
 const RXU=/<use href="#(q(\d+)_(\d+)_(\d+)|s(\d+))"((?: data-[a-z]+="[^"]*")*)((?: opacity="[^"]*")?) transform="(translate\([^)]*\) rotate\([^)]*\) scale\(([-\d.]+) ([-\d.]+)\) translate\(([-\d.]+) ([-\d.]+)\))"((?: filter="url\(#[^)]+\)")?)\/>/g;
 const RXG=/<g((?: data-[a-z]+="[^"]*")*)((?: opacity="[^"]*")?) transform="(translate\([^)]*\) rotate\([^)]*\) scale\(([-\d.]+) ([-\d.]+)\) translate\(([-\d.]+) ([-\d.]+)\))"((?: filter="url\(#[^)]+\)")?)><use href="#s(\d+)"\/><use href="#e(\d+)_(\d+)" fill="([^"]*)"\/><\/g>/g;
 const RXM=/<!--@([FPE]):(\w+)-->([\s\S]*?)<!--@-->/g;
@@ -41,7 +41,7 @@ const bkFlush=()=>{if(window.wbHoldOn)return;if(BK.dead.length){const d=BK.dead;
 // put the pattern on screen. f, defs, ik: the definitions; lg: the printed layers; body(lg): everything after the definitions
 function bkShow(f,defs,ik,lg,body){BK.vdefs=f+defs+ik;BK.vdyn='<defs>'+BK.vdefs+'</defs>'+body(lg);BK.wasLive=BK.live;BK.sc0=BK.sc;
  if(BK.off||BK.live){$('dyn').innerHTML=BK.vdyn;BK.shown=1;BK.defT=0;return}
- const now=performance.now();BK.cont=DRAFT||now-BK.inT<450;BK.gen++;BK.nHit=BK.nStale=BK.nRes=BK.nMiss=0;const used=new Set(),need=new Set();
+ const now=performance.now();BK.cont=WBS.DRAFT||now-BK.inT<450;BK.gen++;BK.nHit=BK.nStale=BK.nRes=BK.nMiss=0;const used=new Set(),need=new Set();
  const d2=bkSub(defs,used,need),l2=bkSub(lg,used,need);try{if(fpB!=null&&fpB!==false)need.add('E'+fpB)}catch(e){}
  BK.st.hit+=BK.nHit;BK.st.stale+=BK.nStale;BK.st.miss+=BK.nMiss;
  // a big one-off change (randomize, undo, a new palette): keep the old picture up for a moment while the new stamps print, rather than flashing
@@ -51,8 +51,8 @@ function bkShow(f,defs,ik,lg,body){BK.vdefs=f+defs+ik;BK.vdyn='<defs>'+BK.vdefs+
  BK.defT=0;$('dyn').innerHTML=`<defs>${f}${d2.replace(RXM,(m,k,id,b)=>need.has(k+id)?b:'')}${ik}${bkDefs(used)}</defs>`+body(l2);BK.shown=1;
  // prints that have not been shown for a while are let go
  if(BK.map.size>300)for(const[k,e]of BK.map)if(BK.gen-(e.u||0)>4){bkDrop(e);BK.map.delete(k)}
- bkFlush();bkKick(DRAFT?120:20)}
-function bkKick(d){if(BK.tm||BK.busy||!BK.q.size||BK.off)return;BK.tm=setTimeout(()=>{BK.tm=0;const n=performance.now();if((DRAFT||n-BK.inT<300)&&n-BK.last<350){bkKick(100);return}bkRun()},d==null?20:d)}
+ bkFlush();bkKick(WBS.DRAFT?120:20)}
+function bkKick(d){if(BK.tm||BK.busy||!BK.q.size||BK.off)return;BK.tm=setTimeout(()=>{BK.tm=0;const n=performance.now();if((WBS.DRAFT||n-BK.inT<300)&&n-BK.last<350){bkKick(100);return}bkRun()},d==null?20:d)}
 async function bkRun(){if(BK.busy||!BK.q.size||BK.off)return;BK.busy=1;const t0=performance.now();
  try{const MW=4096,MH=4096,G=4,P=2,take=[],cells=[],tids=new Set(),pks=new Set();let x=0,y=0,rh=0,aw=0;
   for(const[slot,j]of BK.q){const sx=Math.min(j.bx,BK.MAXC/j.W),sy=Math.min(j.by,BK.MAXC/j.H),cw=Math.ceil(j.W*sx)+2*P,ch=Math.ceil(j.H*sy)+2*P;

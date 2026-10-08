@@ -51,7 +51,7 @@ const RAT={portrait:[[2,3],[3,4],[4,5],[5,7]],square:[[1,1]],landscape:[[3,2],[4
 const SLCn=(window.SLC||[]).length,libFree=!!(FT.lib&&sOn('lib','free')&&SLCn),libPat=!!(FT.lib&&sOn('lib','pat')&&SLCn);let libDone=false;
 const libTile=id=>{const r=pick(window.SLC);let t=null;try{t=JSON.parse(r.tile)}catch(e){}if(!t||!Array.isArray(t.items))return null;try{libMotifs({motifs:r.motifs});libColors({colors:r.colors})}catch(e){}txMerge(t);t.id=id;shOf(t);return t};
 if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.shape||FT.free||FT.layout||FT.size||FT.look||FT.lib)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
-const dim0=JSON.parse(JSON.stringify(dim));
+const dim0=JSON.parse(JSON.stringify(WBS.dim));
 if(!fresh&&window.wbCap)wbCap();
 // --- the bold moves for this roll (only used when Stamps is on)
 const MOVES=[['sym','new symmetry',1.3],['link','accents in the gaps',1.2],['shape','accent shapes',1],['mix','mixed shapes',.7],['rot','turned grid',.8],['inks','extra inks',.7],['motif','motif tweaks',.8],['swap','light on dark',.6],['blend','soft blending',.5],['text','lettering',1],['frame','frame',1.1]];
@@ -65,7 +65,7 @@ const tok=window.wbRndTok=(window.wbRndTok||0)+1;let txReq=null;
 const on=k=>F.has(k);
 const KW=[['rect',.34],['hex',.15],['circle',.15],['diamond',.2],['tri',.16]];
 const mkSh=(k,z=100)=>({k,o:ch(.5)?'p':'f',s:(k=='rect'||k=='diamond')?wpick([[[1,1],.6],[[3,4],.15],[[4,3],.15],[[2,3],.1]]):[1,1],z});
-const sh0=mkSh(wpick(KW));dim={...dim,k:sh0.k,o:sh0.o,s:sh0.s};setDim();
+const sh0=mkSh(wpick(KW));WBS.dim={...WBS.dim,k:sh0.k,o:sh0.o,s:sh0.s};setDim();
 // --- colours: two-colour base, at most one accent ink (two with the "extra inks" move)
 const p=pick(PL),sw=on('swap'),pInk=RZ.keep.col?proj.ink:sw?p[2]:p[1],pBg=RZ.keep.col?proj.bg:sw?p[1]:p[2];
 const lum=h=>{const v=hx3(col(h));return .2126*v[0]+.7152*v[1]+.0722*v[2]},bgL=lum(pBg),used=new Set([pInk]),acc=[];
@@ -148,7 +148,7 @@ if(on('frame')){const R2=pick([6,8,8,12,12,16]),ssh={k:'rect',o:'p',s:[R2,1],z:1
  else{items.push(it(m,cw/2,hh/2,S(Math.min(cw,hh)*.62),ch(.5)?45:-45,1))}
  const fid=tl.length+1;tl.push({id:fid,sh:ssh,items,sym:{m:'rx',n},et:ch(.25)?0:+rr(1.6,3).toFixed(1),er:+rr(0,2.5).toFixed(1),es:ri(0,999)});skipIds.add(fid);
  const hasM=sOn('frame','cm'),hasO=sOn('frame','co'),corner=sOn('frame','cb')&&(!hasM&&!hasO?true:ch(.35));let cid=null;if(corner){cid=tl.length+1;const csh={k:'rect',o:'p',s:[1,1],z:100};useG(geom(csh));const ci=ch(.5)?[it(pick(dots),120,120,S(110))]:[it(m,120,70,S(44),0,1),it(pick(dots),120,120,S(26))];tl.push({id:cid,sh:csh,items:ci,sym:ci.length>1?{m:'rot',n:4}:{m:'off'},et:+rr(1,2).toFixed(1),er:+rr(0,2).toFixed(1),es:ri(0,999)});skipIds.add(cid)}
- const mkF=(nm,w,i,g=0)=>{const F2=mkL(nm,[fid],'check',180);F2.ak={};F2.fr={on:true,w,i,g,c:corner?'b':pick([...(hasM?['m','m']:[]),...(hasO?['o']:[]),...(!hasM&&!hasO?['m']:[])]),cs:cid,fc:(fs=='motif'||fs=='rope')&&ch(.35)?'i':'o',sc:book.on?pick(['front','front','both','each']):'front',clr:false,safe:true,bar:true};F2.pst=ch(.7)?0:ri(1,3);F2.pfl=0;F2.man=false;F2.ov={};return F2};
+ const mkF=(nm,w,i,g=0)=>{const F2=mkL(nm,[fid],'check',180);F2.ak={};F2.fr={on:true,w,i,g,c:corner?'b':pick([...(hasM?['m','m']:[]),...(hasO?['o']:[]),...(!hasM&&!hasO?['m']:[])]),cs:cid,fc:(fs=='motif'||fs=='rope')&&ch(.35)?'i':'o',sc:WBS.book.on?pick(['front','front','both','each']):'front',clr:false,safe:true,bar:true};F2.pst=ch(.7)?0:ri(1,3);F2.pfl=0;F2.man=false;F2.ov={};return F2};
  const wk=R(),w0=+(wk<.25?rr(.6,1.5):wk<.7?rr(1.8,3.8):rr(4,7.5)).toFixed(1),i0=+(ch(.35)?0:ch(.6)?rr(.5,5):rr(5,11)).toFixed(1),g0=ch(.7)?0:ri(8,45),F1=mkF('Frame',w0,i0,g0);F1.fr.clr=ch(.55);if(ch(.4))F1.ink=inkFor();LS.push(F1);
  if(sOn('frame','rule')&&ch(.42)){const F2=mkF('Frame rule',+Math.max(.3,w0*rr(.2,.5)).toFixed(1),+Math.min(20,i0+w0+rr(.4,3)).toFixed(1));F2.fr.c='m';F2.fr.cs=null;F2.fr.sc=F1.fr.sc;F2.ink=F1.ink;LS.push(F2);
  if(ch(.2)){const F3=mkF('Frame rule 2',+Math.max(.3,w0*rr(.15,.35)).toFixed(1),+Math.min(20,Math.max(0,i0-rr(.5,2.5))).toFixed(1));F3.fr.c='m';F3.fr.cs=null;F3.fr.sc=F1.fr.sc;F3.ink=F1.ink;LS.push(F3)}}setDim()}
@@ -169,7 +169,7 @@ rzUse=(pool,md)=>{const t=pick(pool),L=txMake(t,{a:md=='wear'?ri(18,60):md=='sta
 rzList=(m,w,n)=>{const pool=rzPool(m),u=[];if(!pool.length||!rzMds(m).length)return u;for(let i=0;i<n;i++){const md=rzMd(m,w);if(md)u.push(rzUse(pool,md))}return u},
 WCV={relief:3,stain:1,wear:1.4},WST={wear:4,relief:1.5,stain:1},
 rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(tex)).u:(sOn('tx','none')&&ch(.2)?[]:rzList('tx',WCV,ch(.3)?2:1));
-const c={pg:{...pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(l=>l.art)?[]:layers.filter(l=>l.art||l.txt)),proj:{ink:pInk,bg:pBg},dim:usedGen?dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:rzCv(),v:87}};
+const c={pg:{...pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(l=>l.art)?[]:layers.filter(l=>l.art||l.txt)),proj:{ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:rzCv(),v:87}};
 if(RZ.keep.pr)c.pr={...pr};
 if(FT.pr&&!sOn('pr','edges')){c.pr.e=pr.e;c.pr.q=pr.q}
 // textures: a Print effects roll gives each stamp (and layer, and text box) its own textures, each in its own mode
@@ -182,13 +182,13 @@ c.pr.t='';
 if(FT.col&&sOn('col','pal')&&!noAcc){const keepN=new Set([pInk,pBg]),mapInk=n=>{if(!n||!CM[n]||keepN.has(n)||acc.includes(n))return n;if(!(n in inkMap))inkMap[n]=inkFor()||n;return inkMap[n]};
  c.tiles=c.tiles.map(t=>{const n=mapInk(t.ink);return n!==t.ink?{...t,ink:n}:t});c.layers=c.layers.map(l=>{const n=mapInk(l.ink);return n!==l.ink?{...l,ink:n}:l})}
 // Canvas shape: roll a new outline (never the print cover, and never Custom, which needs a file)
-if(FT.shape&&!book.on){const SGM={rect:'box',rrect:'box',circle:'round',oval:'round',arch:'arch',hex:'poly',tri:'poly',diamond:'poly',ngon:'poly'},SHL=[['rect',1.2],['rrect',1],['circle',.8],['oval',1],['arch',1],['hex',.8],['tri',.6],['diamond',.7],['ngon',.8]].filter(x=>sOn('shape',SGM[x[0]])),k=wpick(SHL.length?SHL:[['rect',1]]),nd=JSON.parse(JSON.stringify(c.dim));['cs','cr','n','co','g'].forEach(x=>delete nd[x]);
+if(FT.shape&&!WBS.book.on){const SGM={rect:'box',rrect:'box',circle:'round',oval:'round',arch:'arch',hex:'poly',tri:'poly',diamond:'poly',ngon:'poly'},SHL=[['rect',1.2],['rrect',1],['circle',.8],['oval',1],['arch',1],['hex',.8],['tri',.6],['diamond',.7],['ngon',.8]].filter(x=>sOn('shape',SGM[x[0]])),k=wpick(SHL.length?SHL:[['rect',1]]),nd=JSON.parse(JSON.stringify(c.dim));['cs','cr','n','co','g'].forEach(x=>delete nd[x]);
 if(k!='rect')nd.cs=k;if(CASP.includes(k)||k=='rect')nd.c=ratioPick();
 if(k=='rrect')nd.cr=ri(8,45);if(k=='ngon'){nd.n=ri(5,10);if(ch(.5))nd.co='f'}if(k=='hex'||k=='tri'){if(ch(.35))nd.co='f'}
 c.dim=nd;try{localStorage.setItem('wb14_dim',JSON.stringify(nd))}catch(e){}}
 // Canvas size on its own: a new ratio for a canvas that has one (round and regular shapes stay square)
-if(FT.size&&!FT.shape&&!book.on){const kk=c.dim.cs||'rect';if(kk=='rect'||CASP.includes(kk)){const nd2=JSON.parse(JSON.stringify(c.dim));nd2.c=ratioPick();c.dim=nd2;try{localStorage.setItem('wb14_dim',JSON.stringify(nd2))}catch(e){}}}
-cur=0;selOne(-1);if(typeof brush!='undefined')brush=null;const oldL=layers.slice(),oldT=tiles.slice(),oldG=window.wbGrade?wbGrade.get():null;selL=0;(window.wbApply||applyCore)(c);selL=0;
+if(FT.size&&!FT.shape&&!WBS.book.on){const kk=c.dim.cs||'rect';if(kk=='rect'||CASP.includes(kk)){const nd2=JSON.parse(JSON.stringify(c.dim));nd2.c=ratioPick();c.dim=nd2;try{localStorage.setItem('wb14_dim',JSON.stringify(nd2))}catch(e){}}}
+WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;const oldL=layers.slice(),oldT=tiles.slice(),oldG=window.wbGrade?wbGrade.get():null;selL=0;(window.wbApply||applyCore)(c);selL=0;
 // colour grade: a gentle look most of the time (about a quarter stay neutral). Masks: up to two light local touches.
 if(window.wbGrade){const g0=oldG||wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v,isF=l=>!!(l.fr&&l.fr.on);let gl={};
  if(FT.gr){const lookOn=sOn('gr','look'),adjOn=sOn('gr','adj');if((lookOn||adjOn)&&!(sOn('gr','neutral')&&ch(.25))){
@@ -239,7 +239,7 @@ if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('
    if(E.has('flips')){const h=ch(.75),v=ch(.5)||!h;if(h)l.rfh=true;else delete l.rfh;if(v)l.rfv=true;else delete l.rfv}else{delete l.rfh;delete l.rfv}}
   if(lsp||lrt)l.rsd=1+Math.floor(R()*99999);
   if(lsz&&!lk&&i==0&&!l.rot&&ch(.3)){l.fit=pick(['h','v']);try{l.size=+fitTs(l).toFixed(3)}catch(e){}}
- });useT(tiles[cur]);store();upd()}
+ });useT(tiles[WBS.cur]);store();upd()}
 // Layer opacity and blend: the first layer stays mostly solid; the ones above can turn see-through or blend
 if(FT.look){const bl=['multiply','darken','screen','lighten','overlay','soft-light'].filter(x=>sOn('look','b_'+x));
  layers.forEach((l,i)=>{if(l.rz=='free')return;
@@ -280,7 +280,7 @@ if((FT.free||libFree)&&ch(.65)){
  else{const n2=ri(2,4);let first=true;for(let i=0;i<n2;i++){const tx=rr(0,CW),ty=rr(0,CH);if(first&&want=='text'){addText(CW/2,CH*pick([.3,.5,.7]))}else addMotif(tx,ty,pick([1,1,2,2,3]));first=false}}
  const usedIds=new Set(FL.pl.map(q=>q.t)),keep=made.filter(t=>usedIds.has(t.id));
  if(keep.length){FL.st=keep.map(t=>t.id);keep.forEach(t=>tiles.push(t));layers.push(FL);reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;nid=1+Math.max(0,...tiles.map(t=>+t.id||0))}
- setDim();useT(tiles[cur]);store();upd()}
+ setDim();useT(tiles[WBS.cur]);store();upd()}
 const txAll=(txReq?[[tiles[0],txReq]]:[]).concat(fzReqs);
 if(txAll.length){pmsg('Randomized… setting the lettering.');window.wbTxBusy=(window.wbTxBusy||0)+1;(async()=>{try{for(const[t,o] of txAll){try{await wbTxPlace(t,o,tok)}catch(e){}}if(tok!==window.wbRndTok)return;store();upd();if(fresh){if(window.wbResetHist)wbResetHist()}else if(window.wbCap)wbCap()}finally{window.wbTxBusy=Math.max(0,(window.wbTxBusy||1)-1)}})()}
 else if(fresh){if(window.wbResetHist)wbResetHist()}else if(window.wbCap)wbCap();

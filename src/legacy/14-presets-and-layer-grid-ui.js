@@ -2,31 +2,31 @@
 const ASP={c:[['2:3',2,3],['3:4',3,4],['4:5',4,5],['5:7',5,7],['1:1 square',1,1],['A4 / A-series',1,1.4142],['US Letter',8.5,11],['6×9 book',6,9],['9:16 tall',9,16],['3:2',3,2],['4:3',4,3],['16:9 wide',16,9]],
 s:[['1:1 square',1,1],['2:3',2,3],['3:2',3,2],['3:4',3,4],['4:3',4,3],['1:2',1,2],['2:1',2,1],['1:3',1,3],['3:1',3,1],['6:1 frame strip',6,1],['8:1 frame strip',8,1],['12:1 frame strip',12,1],['16:1 frame strip',16,1]]};
 const aspKey=([w,h])=>(+w).toFixed(4)+':'+(+h).toFixed(4);
-function syncAsp(k,p){const cur=k=='s'?shOf(tiles[window.wbCur()]).s:dim[k],i=ASP[k].findIndex(a=>aspKey([a[1],a[2]])==aspKey(cur));
+function syncAsp(k,p){const cur=k=='s'?shOf(tiles[window.wbCur()]).s:WBS.dim[k],i=ASP[k].findIndex(a=>aspKey([a[1],a[2]])==aspKey(cur));
 if(!$(p+'asp').options.length)$(p+'asp').innerHTML=ASP[k].map((a,j)=>`<option value="${j}">${a[0]}</option>`).join('')+'<option value="x">Custom…</option>';
 const custom=i<0||$(p+'asp').dataset.custom=='1';$(p+'asp').value=custom?'x':i;
 const f=v=>String(+(+v).toFixed(3));if(document.activeElement!=$(p+'aw'))$(p+'aw').value=f(cur[0]);if(document.activeElement!=$(p+'ah'))$(p+'ah').value=f(cur[1])}
 // Change one stamp's outline and stretch its motifs to match
-function reshape(t,ch){const sh=shOf(t),a=geom(sh);if(ch.k)sh.k=ch.k;if(ch.o)sh.o=ch.o;if(ch.s)sh.s=[+ch.s[0],+ch.s[1]];const b=geom(sh);useG(b);t.items.forEach(q=>{[q.x,q.y]=wrapP(q.x*b.SW/a.SW,q.y*b.SH/a.SH)});useT(tiles[cur])}
+function reshape(t,ch){const sh=shOf(t),a=geom(sh);if(ch.k)sh.k=ch.k;if(ch.o)sh.o=ch.o;if(ch.s)sh.s=[+ch.s[0],+ch.s[1]];const b=geom(sh);useG(b);t.items.forEach(q=>{[q.x,q.y]=wrapP(q.x*b.SW/a.SW,q.y*b.SH/a.SH)});useT(tiles[WBS.cur])}
 function applyAsp(k,v,ch){if(v){const r=v[0]/v[1],lim=k=='s'?20:5;if(!(r>=1/lim&&r<=lim)){if(k=='s')pmsg('Stamps can be up to 20 times longer than they are wide.');return}}
-if(k=='c'){if(v)dim.c=v;setDim()}
-else{const t=tiles[cur],c={...(ch||{})};if(v)c.s=v;reshape(t,c);const sh=shOf(t);dim={...dim,k:sh.k,o:sh.o,s:[...sh.s]}}
-symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(dim))}catch(e){}store();upd()}
+if(k=='c'){if(v)WBS.dim.c=v;setDim()}
+else{const t=tiles[WBS.cur],c={...(ch||{})};if(v)c.s=v;reshape(t,c);const sh=shOf(t);WBS.dim={...WBS.dim,k:sh.k,o:sh.o,s:[...sh.s]}}
+symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd()}
 [['c','c'],['s','s']].forEach(([k,p])=>{
 $(p+'asp').oninput=()=>{const v=$(p+'asp').value;if(v=='x'){$(p+'asp').dataset.custom='1';$(p+'aw').focus();return}
 $(p+'asp').dataset.custom='';const a=ASP[k][+v];applyAsp(k,[a[1],a[2]])};
 const cu=()=>{const w=+$(p+'aw').value,h=+$(p+'ah').value;if(w>0&&h>0)applyAsp(k,[w,h])};$(p+'aw').oninput=$(p+'ah').oninput=cu;
-$(p+'swp').onclick=()=>{const a=k=='s'?shOf(tiles[cur]).s:dim[k];applyAsp(k,[a[1],a[0]])}});
-function csSet(ch){Object.assign(dim,ch);if(dim.cs=='rect')delete dim.cs;setDim();symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(dim))}catch(e){}store();upd()}
-$('cshp').onclick=e=>{const b=e.target.closest('[data-s]');if(!b||book.on||b.disabled)return;const v=b.dataset.s;if(v==csk())return;csSet({cs:v})};
+$(p+'swp').onclick=()=>{const a=k=='s'?shOf(tiles[WBS.cur]).s:WBS.dim[k];applyAsp(k,[a[1],a[0]])}});
+function csSet(ch){Object.assign(WBS.dim,ch);if(WBS.dim.cs=='rect')delete WBS.dim.cs;setDim();symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd()}
+$('cshp').onclick=e=>{const b=e.target.closest('[data-s]');if(!b||WBS.book.on||b.disabled)return;const v=b.dataset.s;if(v==csk())return;csSet({cs:v})};
 $('ccr').oninput=()=>csSet({cr:Math.max(0,Math.min(100,Math.round(+$('ccr').value)||0))});
 $('cns').oninput=()=>csSet({n:Math.max(3,Math.min(16,Math.round(+$('cns').value)||5))});
-$('cor').onclick=e=>{const b=e.target.closest('[data-o]');if(!b)return;const o=b.dataset.o=='f'?'f':'p';if((dim.co=='f'?'f':'p')==o)return;const ch={co:o};if(o=='p')delete dim.co;csSet(o=='p'?{}:ch)};
+$('cor').onclick=e=>{const b=e.target.closest('[data-o]');if(!b)return;const o=b.dataset.o=='f'?'f':'p';if((WBS.dim.co=='f'?'f':'p')==o)return;const ch={co:o};if(o=='p')delete WBS.dim.co;csSet(o=='p'?{}:ch)};
 $('skind').onclick=e=>{const b=e.target.closest('[data-k]');if(b&&b.dataset.k!=SK)applyAsp('s',null,{k:b.dataset.k})};
 $('shor').oninput=()=>applyAsp('s',null,{o:$('shor').value});
-$('shz').oninput=()=>{shOf(tiles[cur]).z=+$('shz').value;store();upd()};
-$('shrad').oninput=()=>{const sh=shOf(tiles[cur]),v=Math.max(0,Math.min(100,Math.round(+$('shrad').value)||0));if((sh.rad||0)==v)return;if(v>0)sh.rad=v;else delete sh.rad;symKey='';store();upd()};
-$('sall').onclick=()=>{const sh=shOf(tiles[cur]);let n=0;tiles.forEach(t=>{if(t===tiles[cur])return;const o=shOf(t);if(o.k!=sh.k||o.o!=sh.o||o.s[0]!=sh.s[0]||o.s[1]!=sh.s[1]){reshape(t,{k:sh.k,o:sh.o,s:sh.s});n++}});symKey='';store();upd();pmsg(n?`${n} other stamp${n>1?'s':''} now use this shape.`:'Every stamp already has this shape.')};
+$('shz').oninput=()=>{shOf(tiles[WBS.cur]).z=+$('shz').value;store();upd()};
+$('shrad').oninput=()=>{const sh=shOf(tiles[WBS.cur]),v=Math.max(0,Math.min(100,Math.round(+$('shrad').value)||0));if((sh.rad||0)==v)return;if(v>0)sh.rad=v;else delete sh.rad;symKey='';store();upd()};
+$('sall').onclick=()=>{const sh=shOf(tiles[WBS.cur]);let n=0;tiles.forEach(t=>{if(t===tiles[WBS.cur])return;const o=shOf(t);if(o.k!=sh.k||o.o!=sh.o||o.s[0]!=sh.s[0]||o.s[1]!=sh.s[1]){reshape(t,{k:sh.k,o:sh.o,s:sh.s});n++}});symKey='';store();upd();pmsg(n?`${n} other stamp${n>1?'s':''} now use this shape.`:'Every stamp already has this shape.')};
 // ---- layer grid: own grid or another layer's, where to print on it, which stamp sets its shape
 function syncGrid(L,T){const others=layers.filter(x=>x!==L&&!(x.fr&&x.fr.on)&&!x.free),ky=others.map(x=>x.u+x.name).join('|');
 if($('lgl').dataset.k!=ky){$('lgl').innerHTML='<option value="">Its own grid</option>'+others.map(x=>`<option value="${hx(x.u)}">Same grid as ${hx(x.name)}</option>`).join('');$('lgl').dataset.k=ky}
@@ -42,11 +42,11 @@ $('lld').oninput=()=>{LY().lead=+$('lld').value;store();upd()};
 $('pal').oninput=()=>{const p=PL[$('pal').value];if(p){proj={ink:p[1],bg:p[2]};store();upd()}};
 $('pI').oninput=()=>{proj.ink=$('pI').value;store();upd()};
 $('pB').oninput=()=>{proj.bg=$('pB').value;store();upd()};
-$('stI').oninput=()=>{tiles[cur].ink=$('stI').value||null;store();upd()};
-$('neg').oninput=()=>{tiles[cur].neg=$('neg').checked;store();upd()};
+$('stI').oninput=()=>{tiles[WBS.cur].ink=$('stI').value||null;store();upd()};
+$('neg').oninput=()=>{tiles[WBS.cur].neg=$('neg').checked;store();upd()};
 let lastC=null;
 $('cl').onclick=e=>{if(e.target.closest('#addC')){openCF();return}const b=e.target.closest('[data-c]');if(!b)return;lastC=b.dataset.c;const n=b.dataset.c,a=$('ap').value;
-if(a=='pI')proj.ink=n;else if(a=='pB')proj.bg=n;else tiles[cur].ink=n;
+if(a=='pI')proj.ink=n;else if(a=='pB')proj.bg=n;else tiles[WBS.cur].ink=n;
 $('cn').textContent=n+' '+col(n);$('rmC').hidden=!CC.includes(n);store();upd()};
 const normHex=v=>{const m=/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(v).trim());if(!m)return null;let h=m[1].toLowerCase();if(h.length==3)h=h.split('').map(c=>c+c).join('');return'#'+h};
 function openCF(){$('cf').hidden=false;$('cer').textContent='';$('cnm').focus()}
@@ -67,7 +67,7 @@ const LY=()=>layers[selL];
 [['lgp','gap',Number],['ts','size',Number],['lox','ox',Number],['loy','oy',Number],['lrr','rrot',Number],['lrp','rpos',Number],['lrt','rot',Number],['lps','pst',Number],['lfs','pfl',Number],['lnm','name',v=>v]].forEach(([id,k,f])=>$(id).oninput=()=>{LY()[k]=f($(id).value);store();upd()});
 [['lrtn','rtn'],['lrfh','rfh'],['lrfv','rfv']].forEach(([id,k])=>$(id).oninput=()=>{const L=LY();if($(id).checked)L[k]=true;else delete L[k];store();upd()});
 $('lrsh').onclick=()=>{LY().rsd=1+Math.floor(Math.random()*99999);store();upd();if(window.wbCap)wbCap()};
-$('let').oninput=()=>{tiles[cur].et=+$('let').value;store();upd()};$('ler').oninput=()=>{tiles[cur].er=+$('ler').value;store();upd()};$('lers').onclick=()=>{tiles[cur].es=(tiles[cur].es||0)+1;store();upd()};
+$('let').oninput=()=>{tiles[WBS.cur].et=+$('let').value;store();upd()};$('ler').oninput=()=>{tiles[WBS.cur].er=+$('ler').value;store();upd()};$('lers').onclick=()=>{tiles[WBS.cur].es=(tiles[WBS.cur].es||0)+1;store();upd()};
 $('lyl').onclick=e=>{const r=e.target.closest('[data-l]');if(!r)return;const i=+r.dataset.l;
 const grp=lyGrp(),inG=grp.length>1&&grp.includes(i);
 const mv=d=>{if(inG){const pl=layers[selL],set=new Set(grp),it=layers.map((l,k)=>({l,s:set.has(k)}));if(d>0){for(let k=it.length-2;k>=0;k--)if(it[k].s&&!it[k+1].s){const t=it[k];it[k]=it[k+1];it[k+1]=t}}else{for(let k=1;k<it.length;k++)if(it[k].s&&!it[k-1].s){const t=it[k];it[k]=it[k-1];it[k-1]=t}}layers.splice(0,layers.length,...it.map(x=>x.l));selL=layers.indexOf(pl);return}
@@ -95,8 +95,8 @@ store();const inF=mcat.startsWith('g:');if(n&&!inF){mcat='d';mcSave()}say(n?`${n
 catch(e){say(e&&e.code=='not_granted'?'Permission to ask Claude was declined.':e&&e.code=='rate_limited'?'Rate limited. Try again in a bit.':'Drawing failed: '+((e&&e.message)||'unknown error'))}
 $('gen').disabled=false};
 const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'wodblok-pattern';return n+'.'+ext};
-const ser=()=>{const k=edMk;if(!k){edMk=true;upd()}try{return ser0()}finally{if(!k){edMk=false;upd()}}};
-const ser0=()=>{const c=$('art').cloneNode(true);wbVec(c);['#guig','#fpgrid','#fpov','#gmov'].forEach(q=>{const g=c.querySelector(q);if(g)g.remove()});const gd=c.querySelector('#grdf');if(gd&&window.wbGrade)gd.innerHTML=wbGrade.defs(false);{const sd=c.querySelector('#surfd');if(sd&&!edInk)sd.innerHTML=tiles.map(t=>SURFC[t.id]?SURFC[t.id].s:'').join('');c.querySelectorAll('[data-tki]').forEach(g=>{g.setAttribute('mask','url(#cw)');g.removeAttribute('data-tki')});c.querySelectorAll('.txo[display]').forEach(g=>g.removeAttribute('display'));const tg=c.querySelector('#texg');if(tg)tg.style.display=''}return new XMLSerializer().serializeToString(c)};
+const ser=()=>{const k=WBS.edMk;if(!k){WBS.edMk=true;upd()}try{return ser0()}finally{if(!k){WBS.edMk=false;upd()}}};
+const ser0=()=>{const c=$('art').cloneNode(true);wbVec(c);['#guig','#fpgrid','#fpov','#gmov'].forEach(q=>{const g=c.querySelector(q);if(g)g.remove()});const gd=c.querySelector('#grdf');if(gd&&window.wbGrade)gd.innerHTML=wbGrade.defs(false);{const sd=c.querySelector('#surfd');if(sd&&!WBS.edInk)sd.innerHTML=tiles.map(t=>SURFC[t.id]?SURFC[t.id].s:'').join('');c.querySelectorAll('[data-tki]').forEach(g=>{g.setAttribute('mask','url(#cw)');g.removeAttribute('data-tki')});c.querySelectorAll('.txo[display]').forEach(g=>g.removeAttribute('display'));const tg=c.querySelector('#texg');if(tg)tg.style.display=''}return new XMLSerializer().serializeToString(c)};
 $('cpy').onclick=async()=>{try{await navigator.clipboard.writeText(ser());say('SVG copied.')}catch(e){say('Copy was blocked here.')}};
 $('sv').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
 try{await d.save({filename:expName('svg'),data:ser()})}catch(e){if(e&&e.code!='declined')say('Could not save: '+e.message)}};

@@ -1,22 +1,22 @@
 // ===== Print cover controls, guides and 300 DPI export =====
 $('bktr').innerHTML=TRIMS.map(t=>`<option value="${t[0]}">${t[1]}</option>`).join('');$('bkpp').innerHTML=Object.entries(PAPER).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join('');
-function bookSync(){const g=bk(),on=book.on,px=v=>Math.round(v*300);$('bkon').checked=on;$('bkc').hidden=!on;$('bktr').value=TRIMS.some(t=>t[0]==book.trim)?book.trim:'custom';$('bkcu').hidden=book.trim!='custom';
-if(document.activeElement!==$('bktw'))$('bktw').value=+g.tw.toFixed(3);if(document.activeElement!==$('bkth'))$('bkth').value=+g.th.toFixed(3);if(document.activeElement!==$('bkpg'))$('bkpg').value=book.pages;$('bkpp').value=book.paper;$('bkman').checked=!!book.man;
-$('bksw').disabled=!book.man;if(document.activeElement!==$('bksw'))$('bksw').value=+g.sw.toFixed(4);if(document.activeElement!==$('bkbl'))$('bkbl').value=+g.b.toFixed(4);$('bkgd').checked=!!book.gd;
-const mm=v=>(v*25.4).toFixed(1);let w='';if(!book.man&&(book.pages<24||book.pages>828))w='<div class="w">KDP paperbacks take 24 to 828 pages.</div>';if(covS.img&&!book.man&&book.pages<100)w+='<div class="w">KDP only allows spine text on books with 100 or more pages.</div>';
+function bookSync(){const g=bk(),on=WBS.book.on,px=v=>Math.round(v*300);$('bkon').checked=on;$('bkc').hidden=!on;$('bktr').value=TRIMS.some(t=>t[0]==WBS.book.trim)?WBS.book.trim:'custom';$('bkcu').hidden=WBS.book.trim!='custom';
+if(document.activeElement!==$('bktw'))$('bktw').value=+g.tw.toFixed(3);if(document.activeElement!==$('bkth'))$('bkth').value=+g.th.toFixed(3);if(document.activeElement!==$('bkpg'))$('bkpg').value=WBS.book.pages;$('bkpp').value=WBS.book.paper;$('bkman').checked=!!WBS.book.man;
+$('bksw').disabled=!WBS.book.man;if(document.activeElement!==$('bksw'))$('bksw').value=+g.sw.toFixed(4);if(document.activeElement!==$('bkbl'))$('bkbl').value=+g.b.toFixed(4);$('bkgd').checked=!!WBS.book.gd;
+const mm=v=>(v*25.4).toFixed(1);let w='';if(!WBS.book.man&&(WBS.book.pages<24||WBS.book.pages>828))w='<div class="w">KDP paperbacks take 24 to 828 pages.</div>';if(covS.img&&!WBS.book.man&&WBS.book.pages<100)w+='<div class="w">KDP only allows spine text on books with 100 or more pages.</div>';
 $('bkinfo').innerHTML=`<b>Full cover</b> ${g.W.toFixed(3)} × ${g.H.toFixed(3)} in (${mm(g.W)} × ${mm(g.H)} mm)<br><b>At 300 DPI</b> ${px(g.W)} × ${px(g.H)} px<br><b>Spine</b> ${g.sw.toFixed(3)} in (${mm(g.sw)} mm)${w}`;
 $('bksum').textContent=on?`${g.W.toFixed(2)} × ${g.H.toFixed(2)} in`:'';
 ['bkpdf','bkpng','bkxs'].forEach(id=>$(id).hidden=!on);$('cfree').hidden=on;$('bkgrp').hidden=!on;document.querySelectorAll('#cfmt [data-f]').forEach(b=>b.classList.toggle('on',(b.dataset.f=='book')==on));['casp','cswp','caw','cah'].forEach(id=>{if($(id))$(id).disabled=on});paintCov()}
-window.wbBookSync=()=>{bookSync();setDim();covKey='';renderCover();if(typeof buildTex=='function')buildTex();upd();if(window.wbApplyZ)requestAnimationFrame(wbApplyZ)};
-const bookSet=o=>{book={...book,...o};try{localStorage.setItem('wb40_book',JSON.stringify(book))}catch(e){}wbBookSync()};
+window.wbBookSync=()=>{bookSync();setDim();WBS.covKey='';renderCover();if(typeof buildTex=='function')buildTex();upd();if(window.wbApplyZ)requestAnimationFrame(wbApplyZ)};
+const bookSet=o=>{WBS.book={...WBS.book,...o};try{localStorage.setItem('wb40_book',JSON.stringify(WBS.book))}catch(e){}wbBookSync()};
 $('bkon').onchange=()=>bookSet({on:$('bkon').checked});
-$('cfmt').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const on=b.dataset.f=='book';if(on!=book.on)bookSet({on})};
+$('cfmt').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const on=b.dataset.f=='book';if(on!=WBS.book.on)bookSet({on})};
 $('bktr').onchange=()=>{const v=$('bktr').value,g=bk();bookSet(v=='custom'?{trim:'custom',tw:g.tw,th:g.th}:{trim:v})};
 $('bktw').onchange=()=>bookSet({trim:'custom',tw:+$('bktw').value});$('bkth').onchange=()=>bookSet({trim:'custom',th:+$('bkth').value});
 $('bkpg').oninput=()=>{const v=Math.round(+$('bkpg').value);if(v>0)bookSet({pages:v})};$('bkpp').onchange=()=>bookSet({paper:$('bkpp').value});
 $('bkman').onchange=()=>bookSet({man:$('bkman').checked,sw:+bk().sw.toFixed(4)});$('bksw').oninput=()=>{if($('bksw').value!=='')bookSet({sw:+$('bksw').value})};
 $('bkbl').oninput=()=>{if($('bkbl').value!=='')bookSet({bleed:+$('bkbl').value})};$('bkgd').onchange=()=>bookSet({gd:$('bkgd').checked});
-$('cvslot').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;cslot=b.dataset.s;$('cvmsg').textContent='';paintCov()};
+$('cvslot').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;WBS.cslot=b.dataset.s;$('cvmsg').textContent='';paintCov()};
 // --- export at 300 DPI (PNG, or a PDF sized to the full cover with trim and bleed boxes)
 function coverRaster(cb){const g=bk(),W=Math.round(g.W*300),H=Math.round(g.H*300);$('pmsg').textContent='Rendering the print cover at 300 DPI…';
 let sv=ser().replace(/^<svg([^>]*?)>/,(m,a)=>`<svg${a.replace(/\s(width|height|preserveAspectRatio)="[^"]*"/g,'')} width="${W}" height="${H}" preserveAspectRatio="none">`);

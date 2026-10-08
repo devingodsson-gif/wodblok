@@ -4,10 +4,10 @@ const SURFC={};let SURFK='';
 function inkSurfF(t,q){const w=txImgs(q,SW,SH,512,'inline',txIsW);return`<mask id="is${t.id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}"><rect width="${SW}" height="${SH}" fill="#fff"/>${w}</mask>`}
 function surfFor(t){const q=isOf(t);if(!q){delete SURFC[t.id];return''}const k=q.map(txKey).join(';')+'|'+SW+'|'+SH;let c=SURFC[t.id];if(!c||c.k!==k){const o=txImgs(q,SW,SH,512,'inline',txIsO);c=SURFC[t.id]={k,o:!!o,s:inkSurfF(t,q)+(o?`<g id="txo${t.id}">${o}</g>`:'')}}return c.s}
 // the overlay, clipped to the stamp's ink by the stamp's own mask (mid)
-const txoG=(t,mid)=>{const c=SURFC[t.id];return c&&c.o?`<g class="txo"${edInk?'':' display="none"'} mask="url(#${mid})"><use href="#txo${t.id}"/></g>`:''};
+const txoG=(t,mid)=>{const c=SURFC[t.id];return c&&c.o?`<g class="txo"${WBS.edInk?'':' display="none"'} mask="url(#${mid})"><use href="#txo${t.id}"/></g>`:''};
 // a whole layer: wear = one mask over the canvas, relief / stain = a filter on the layer
-function layTexMask(L,li){const q=txSpecs(L.tu,'wear');if(!q.length||!edInk)return'';const v=txImgs(q,CW,CH,800,'host',txIsW);return v?`<mask id="lt${li}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`:''}
-function layTexOv(L){const q=txSpecs(L.tu,'wear');if(!q.length||!edInk)return['',''];const f=txFilt(q,0,0,CW,CH,800);return f?[`<g filter="url(#${f})">`,'</g>']:['','']}
+function layTexMask(L,li){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return'';const v=txImgs(q,CW,CH,800,'host',txIsW);return v?`<mask id="lt${li}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`:''}
+function layTexOv(L){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return['',''];const f=txFilt(q,0,0,CW,CH,800);return f?[`<g filter="url(#${f})">`,'</g>']:['','']}
 function txRefs(){const m=new Map(),add=u=>(Array.isArray(u)?u:[]).forEach(z=>{if(z&&z.x)m.set(z.x,(m.get(z.x)||0)+1)});tiles.forEach(t=>add(t.tu));layers.forEach(L=>{add(L.tu);(L.pl||[]).forEach(p=>add(p.tu))});if(tex&&Array.isArray(tex.u))add(tex.u);if(window.wbTxUses)add(window.wbTxUses());return m}
 // Older projects kept their texture in other places (per-stamp "is", the single canvas surface). They become library textures here.
 // Returns true when the canvas texture changed and has to be rebuilt.
@@ -80,7 +80,7 @@ function txDelete(id){const L=txLib(id);if(!L)return;txCap();let n=0;const cut=o
 if(tex&&Array.isArray(tex.u)){const b=tex.u.length;tex.u=tex.u.filter(z=>z&&z.x!==id);n+=b-tex.u.length}texLib=texLib.filter(x=>x.id!==id);if(txSel===id)txSel=(texLib[0]||{}).id||'';texNorm();store();saveTex();buildTex();upd();txCap();txRefresh(true);pmsg(`Deleted “${L.name}”${n?` and took it off ${n} place${n>1?'s':''}`:''}.`)}
 function txApply(){const L=txCur();if(!L)return;const to=$('tx_to').value;txCap();let n=0;const add=o=>{if(!Array.isArray(o.tu))o.tu=[];if(!o.tu.some(u=>u.x===L.id)&&o.tu.length<6){o.tu.push({x:L.id,sd:txRid(),md:'wear'});n++}};
 if(to=='canvas'){if(!Array.isArray(tex.u))tex.u=[];if(!tex.u.some(u=>u.x===L.id)&&tex.u.length<4){tex.u.push({x:L.id,sd:txRid(),md:'relief'});n=1}texNorm();saveTex();buildTex()}
-else if(to=='stamp'){const t=tiles[cur];if(t)add(t)}else if(to=='stamps')tiles.forEach(add);else if(to=='layer'){const l=LY();if(l)add(l)}else if(to=='layers')layers.forEach(add);
+else if(to=='stamp'){const t=tiles[WBS.cur];if(t)add(t)}else if(to=='stamps')tiles.forEach(add);else if(to=='layer'){const l=LY();if(l)add(l)}else if(to=='layers')layers.forEach(add);
 else if(to=='text'){n=window.wbTxApply?wbTxApply(L.id):0}else if(to=='texts')layers.forEach(l=>(l.pl||[]).forEach(p=>{if(p.tx)add(p)}));
 store();upd();txCap();txRefresh(true);pmsg(n?`Applied “${L.name}” to ${n} ${to=='canvas'?'canvas':n>1?'places':'place'}.`:to=='text'?'Select a text box first. New text boxes will use it.':'Nothing to apply it to, or it is already there.')}
 
@@ -127,7 +127,7 @@ $('tx_type').addEventListener('input',()=>{const L=txCur();if(!L||txLd)return;co
 [['tx_a','a'],['tx_sc','sc'],['tx_az','az']].forEach(([id,k])=>{$(id).addEventListener('input',()=>{if(!txLd)txThr({[k]:+$(id).value})});$(id).addEventListener('change',()=>{if(txLd)return;txEdit({[k]:+$(id).value});txCap()})});
 // the same stack control in the Stamp, Layers and Canvas panels
 const txCommit=()=>{store();upd();txCap();txRefresh()};
-txReg('st_tex',{md:'wear',def:'pinholes',get:()=>{const t=tiles[cur];return t&&t.tu||[]},set:a=>{const t=tiles[cur];if(!t)return;t.tu=a;txCommit()}});
+txReg('st_tex',{md:'wear',def:'pinholes',get:()=>{const t=tiles[WBS.cur];return t&&t.tu||[]},set:a=>{const t=tiles[WBS.cur];if(!t)return;t.tu=a;txCommit()}});
 txReg('ly_tex',{md:'wear',def:'pinholes',get:()=>{const l=LY();return l&&l.tu||[]},set:a=>{const l=LY();if(!l)return;l.tu=a;txCommit()}});
 txReg('cv_tex',{md:'relief',def:'cotton',max:4,get:()=>Array.isArray(tex.u)?tex.u:[],set:a=>{tex.u=a;texNorm();saveTex();buildTex();store();txCap();txRefresh()}});
 

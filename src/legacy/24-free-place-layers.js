@@ -2,14 +2,14 @@
 // L.free = true; L.pl = [{u, t: stamp id, x, y (canvas units), s: long side (canvas units), r: degrees, f: 1 | -1}]
 var selLM=new Set(),lAnc=null,tM=new Set(),tAnc=null,mAnc=null,pSel=new Set(),pAnc=null;
 function lyGrp(){const g=layers.map((l,i)=>i).filter(i=>selLM.has(layers[i].u));return g.length>1&&layers[selL]&&selLM.has(layers[selL].u)?g:[selL]}
-function tGrp(){const g=tiles.map((t,i)=>i).filter(i=>tM.has(tiles[i].id));return g.length>1&&tiles[cur]&&tM.has(tiles[cur].id)?g:[cur]}
-var fpMS=new Set(),fpAnc=null,fpPool=new Set(),fpPA=null;
+function tGrp(){const g=tiles.map((t,i)=>i).filter(i=>tM.has(tiles[i].id));return g.length>1&&tiles[WBS.cur]&&tM.has(tiles[WBS.cur].id)?g:[WBS.cur]}
+var fpMS=new Set();WBS.fpAnc=null;var fpPool=new Set(),fpPA=null;
 function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(fpMS.size>1&&fpMS.has(String(fpSel))){const g=pl.filter(q=>fpMS.has(String(q.u)));if(g.length>1)return g}const p=pl.find(q=>q.u==fpSel);return p?[p]:[]}
 function fpPoolOk(){return!!(fpB&&fpPool.size>1&&fpPool.has(String(fpB)))}
-function fpTog(u){u=String(u);let cur=fpGrp().map(q=>String(q.u));if(!cur.length&&fpSel!==-1)cur=[String(fpSel)];const st=new Set(cur);if(st.has(u)){st.delete(u);fpSel=st.size?[...st][st.size-1]:-1}else{st.add(u);fpSel=u}fpMS=st;fpAnc=u;fpB=null;fpGhost=null;upd()}
-function fpRange(u){u=String(u);const L=fpL();if(!L)return;const order=(L.pl||[]).slice().reverse().map(q=>String(q.u)),a0=fpAnc!=null&&order.includes(String(fpAnc))?String(fpAnc):(fpSel!==-1?String(fpSel):u),a=order.indexOf(a0),b=order.indexOf(u);if(a<0||b<0){fpMS=new Set();fpSel=u;fpAnc=u;upd();return}fpMS=new Set(order.slice(Math.min(a,b),Math.max(a,b)+1));fpSel=u;fpB=null;fpGhost=null;upd()}
+function fpTog(u){u=String(u);let cur=fpGrp().map(q=>String(q.u));if(!cur.length&&fpSel!==-1)cur=[String(fpSel)];const st=new Set(cur);if(st.has(u)){st.delete(u);fpSel=st.size?[...st][st.size-1]:-1}else{st.add(u);fpSel=u}fpMS=st;WBS.fpAnc=u;fpB=null;fpGhost=null;upd()}
+function fpRange(u){u=String(u);const L=fpL();if(!L)return;const order=(L.pl||[]).slice().reverse().map(q=>String(q.u)),a0=WBS.fpAnc!=null&&order.includes(String(WBS.fpAnc))?String(WBS.fpAnc):(fpSel!==-1?String(fpSel):u),a=order.indexOf(a0),b=order.indexOf(u);if(a<0||b<0){fpMS=new Set();fpSel=u;WBS.fpAnc=u;upd();return}fpMS=new Set(order.slice(Math.min(a,b),Math.max(a,b)+1));fpSel=u;fpB=null;fpGhost=null;upd()}
 function fpPick(k,e,order){const L=fpL(),art=!!(L&&L.art);let cur=fpPoolOk()?[...fpPool]:(fpB?[String(fpB)]:[]);if(e.shiftKey&&fpPA!=null&&order.includes(fpPA)){const a=order.indexOf(fpPA),b=order.indexOf(k);cur=order.slice(Math.min(a,b),Math.max(a,b)+1)}else{const st=new Set(cur);st.has(k)?st.delete(k):st.add(k);cur=[...st];fpPA=k}fpPool=new Set(cur);if(!cur.length)fpB=null;else{const pk=cur.includes(String(fpB))?String(fpB):cur[cur.length-1];fpB=art?pk:+pk}fpSel=-1;fpMS=new Set();fpLast=null;upd()}
-let CR=null,fpB=null,fpSel=-1,fpDrag=null,fpGhost=null,fpXf=null,fpSyncing=0,fpTh={},fpAlt=false;
+WBS.CR=null;let fpB=null,fpSel=-1,fpDrag=null,fpGhost=null,fpXf=null,fpSyncing=0,fpTh={};WBS.fpAlt=false;
 // snapping: L.fg = {snap, ss (snap size to whole cells)} per layer; the grid itself (columns, snap points) is the shared pgrid, edited in the Grid tool
 const fpFG=L=>({snap:false,ss:false,...((L&&L.fg)||{}),show:pgrid.show,n:pgrid.n,m:pgrid.m});
 const fpCell=L=>CW/Math.max(2,fpFG(L).n);

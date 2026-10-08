@@ -1,5 +1,5 @@
 // ===== Motif library: folders, renaming, hiding sets, multi-select and moving =====
-const fAll=()=>{const o=[...FOLD];Object.values(cust).forEach(v=>{if(v&&v.g&&!o.includes(v.g))o.push(v.g)});Object.values(BF).forEach(g=>{if(!o.includes(g))o.push(g)});return o};
+const fAll=()=>{const o=[...WBS.FOLD];Object.values(cust).forEach(v=>{if(v&&v.g&&!o.includes(v.g))o.push(v.g)});Object.values(BF).forEach(g=>{if(!o.includes(g))o.push(g)});return o};
 const bOk=k=>/^b\d+$/.test(k)&&+k.slice(1)<M.length;
 const fKeys=g=>[...Object.keys(cust).filter(k=>cust[k].g==g),...Object.keys(BF).filter(k=>BF[k]==g&&bOk(k))];
 const fOf=k=>k[0]=='b'?BF[k]:(cust[k]||{}).g;
@@ -23,7 +23,7 @@ else{fd.disabled=c.t!='f';if(!fd.dataset.sure)fd.innerHTML=IC.del;fd.title='Dele
 $('fsel').setAttribute('aria-pressed',String(lsm));
 const all=new Set(L.flatMap(x=>x.ks));[...lsel].forEach(k=>{if(!all.has(k))lsel.delete(k)});
 $('lib').classList.toggle('sel',lsm);
-$('lib').innerHTML=c.ks.length?c.ks.map(k=>{const on=lsel.has(k),f=fOf(k),b=`<button data-m="${k}" class="${brush&&brush.m==k&&!lsm?'on':''}${on?' pk':''}" title="${hx(mNm(k))}${f&&c.t!='f'?' · in '+hx(f):''}"><svg viewBox="-50 -50 100 100" style="background:${pa};border-radius:4px">${mk(k,pb,pa)}</svg></button>`;
+$('lib').innerHTML=c.ks.length?c.ks.map(k=>{const on=lsel.has(k),f=fOf(k),b=`<button data-m="${k}" class="${WBS.brush&&WBS.brush.m==k&&!lsm?'on':''}${on?' pk':''}" title="${hx(mNm(k))}${f&&c.t!='f'?' · in '+hx(f):''}"><svg viewBox="-50 -50 100 100" style="background:${pa};border-radius:4px">${mk(k,pb,pa)}</svg></button>`;
 return`<div>${b}${on?`<i class="ck">${IC.ck}</i>`:''}${k[0]=='b'||lsm?'':`<button class="dx" data-x="${k}" title="Remove from library" aria-label="Remove from library">&#215;</button>`}</div>`}).join('')
 :`<div class="em">${c.t=='f'?'This folder is empty. Open any other folder or set, select motifs (check-box button, or Ctrl/&#8984;-click), then choose Move to folder.':c.v=='i'?'No unsorted imports. Use Import artwork below.':c.v=='d'?'Nothing here yet. Use Draw below to have Claude make some.':'Nothing here.'}</div>`;
 // selection bar
@@ -31,16 +31,16 @@ const n=lsel.size;$('fsbar').hidden=!lsm;$('fscnt').textContent=n?`${n} selected
 $('fall').textContent=c.ks.length&&c.ks.every(k=>lsel.has(k))?'Select none':'Select all';
 const tg=fAll().filter(g=>c.v!='g:'+g);$('fmove').innerHTML=`<option value="">${n?'Move to folder…':'Select motifs to move'}</option>`+tg.map(g=>`<option value="g:${hx(g)}">${hx(g)}</option>`).join('')+'<option value="+">＋ New folder…</option>';$('fmove').disabled=!n;$('fmove').value='';
 const fo=$('fout');fo.hidden=c.t!='f';fo.disabled=!n;const dm=$('fdelm'),cn=[...lsel].filter(k=>k[0]!='b').length;dm.disabled=!cn;if(!dm.dataset.sure)dm.textContent=cn?`Delete ${cn}`:'Delete'}
-function libPick(k,e){if(!lsm){lsm=true;lsel.clear()}brush=null;const ks=libCur().ks;
+function libPick(k,e){if(!lsm){lsm=true;lsel.clear()}WBS.brush=null;const ks=libCur().ks;
 if(e.shiftKey&&!lanc&&lsel.size==0&&ks.length)lanc=ks[0];
 if(e.shiftKey&&lanc&&ks.includes(lanc)){const a=ks.indexOf(lanc),b=ks.indexOf(k);ks.slice(Math.min(a,b),Math.max(a,b)+1).forEach(x=>lsel.add(x))}else{lsel.has(k)?lsel.delete(k):lsel.add(k);lanc=k}upd()}
 function libExit(){lsm=false;lsel.clear();lanc=null;closeF();upd()}
-function fOpen(mode){fmode=mode;const c=libCur();$('fform').hidden=false;$('fname').value=mode=='ren'?c.n:'';$('fname').placeholder=mode=='ren'&&c.t=='b'?c.orig:'Folder name';$('fok').textContent=mode=='ren'?'Rename':mode=='mv'?'Create and move':'Create';$('fname').focus();$('fname').select()}
-function closeF(){fmode=null;$('fform').hidden=true}
-function libMove(g){const ks=[...lsel];if(!ks.length)return;const nb=ks.filter(k=>k[0]=='b').length;ks.forEach(k=>fSet(k,g));if(!FOLD.includes(g))FOLD.push(g);fSave();store();lsel.clear();lanc=null;upd();
+function fOpen(mode){WBS.fmode=mode;const c=libCur();$('fform').hidden=false;$('fname').value=mode=='ren'?c.n:'';$('fname').placeholder=mode=='ren'&&c.t=='b'?c.orig:'Folder name';$('fok').textContent=mode=='ren'?'Rename':mode=='mv'?'Create and move':'Create';$('fname').focus();$('fname').select()}
+function closeF(){WBS.fmode=null;$('fform').hidden=true}
+function libMove(g){const ks=[...lsel];if(!ks.length)return;const nb=ks.filter(k=>k[0]=='b').length;ks.forEach(k=>fSet(k,g));if(!WBS.FOLD.includes(g))WBS.FOLD.push(g);fSave();store();lsel.clear();lanc=null;upd();
 $('pmsg').textContent=`Moved ${ks.length} motif${ks.length>1?'s':''} to “${g}”.`+(nb?` Built-in motifs also stay in their own set.`:'')}
 $('mcat').oninput=()=>{mcat=$('mcat').value;mcSave();lsel.clear();lanc=null;closeF();renderLib()};
-$('fsel').onclick=()=>{if(lsm)libExit();else{lsm=true;brush=null;upd()}};
+$('fsel').onclick=()=>{if(lsm)libExit();else{lsm=true;WBS.brush=null;upd()}};
 $('fdone').onclick=libExit;
 $('fall').onclick=()=>{const ks=libCur().ks;if(ks.length&&ks.every(k=>lsel.has(k)))ks.forEach(k=>lsel.delete(k));else ks.forEach(k=>lsel.add(k));renderLib()};
 $('fnew').onclick=()=>fOpen(lsm&&lsel.size?'mv':'new');
@@ -48,15 +48,15 @@ $('fren').onclick=()=>fOpen('ren');
 $('fcx').onclick=closeF;
 $('fname').onkeydown=e=>{if(e.key=='Enter'){e.preventDefault();$('fok').click()}else if(e.key=='Escape'){e.stopPropagation();closeF()}};
 $('fok').onclick=()=>{const v=fClean($('fname').value),c=libCur();
-if(fmode=='ren'&&c.t=='b'){if(!v||v==c.orig)delete REN[c.orig];else REN[c.orig]=v;fSave();closeF();renderLib();$('pmsg').textContent=v&&v!=c.orig?`Renamed the set to “${v}”.`:'Set name reset.';return}
+if(WBS.fmode=='ren'&&c.t=='b'){if(!v||v==c.orig)delete REN[c.orig];else REN[c.orig]=v;fSave();closeF();renderLib();$('pmsg').textContent=v&&v!=c.orig?`Renamed the set to “${v}”.`:'Set name reset.';return}
 if(!v){$('fname').focus();return}
-if(fmode=='ren'){const old=c.n;if(v==old){closeF();return}const merge=fAll().includes(v);fKeys(old).forEach(k=>fSet(k,v));FOLD=FOLD.filter(x=>x!=old);if(!FOLD.includes(v)){const i=fAll().indexOf(old);FOLD.push(v)}mcat='g:'+v;mcSave();fSave();store();closeF();upd();$('pmsg').textContent=merge?`Merged “${old}” into “${v}”.`:`Renamed the folder to “${v}”.`;return}
-if(!FOLD.includes(v)&&!fAll().includes(v))FOLD.push(v);fSave();const mv=fmode=='mv';closeF();
+if(WBS.fmode=='ren'){const old=c.n;if(v==old){closeF();return}const merge=fAll().includes(v);fKeys(old).forEach(k=>fSet(k,v));WBS.FOLD=WBS.FOLD.filter(x=>x!=old);if(!WBS.FOLD.includes(v)){const i=fAll().indexOf(old);WBS.FOLD.push(v)}mcat='g:'+v;mcSave();fSave();store();closeF();upd();$('pmsg').textContent=merge?`Merged “${old}” into “${v}”.`:`Renamed the folder to “${v}”.`;return}
+if(!WBS.FOLD.includes(v)&&!fAll().includes(v))WBS.FOLD.push(v);fSave();const mv=WBS.fmode=='mv';closeF();
 if(mv)libMove(v);else{mcat='g:'+v;mcSave();renderLib();$('pmsg').textContent=`Made the folder “${v}”. Select motifs anywhere and move them in.`}};
 $('fdel').onclick=()=>{const c=libCur(),fd=$('fdel');
 if(c.t=='b'){if(c.hid)HID=HID.filter(x=>x!=c.orig);else HID.push(c.orig);fSave();renderLib();$('pmsg').textContent=c.hid?`“${c.n}” is back in the list.`:`Hid “${c.n}”. You'll find it under Hidden sets at the bottom of the list.`;return}
 if(c.t!='f')return;if(!fd.dataset.sure){fd.dataset.sure=1;fd.innerHTML='<b style="font-size:13px">?</b>';fd.title='Click again to delete the folder';$('pmsg').textContent=`Click again to delete “${c.n}”. Its motifs are kept.`;setTimeout(()=>{if(fd.dataset.sure){delete fd.dataset.sure;renderLib()}},3000);return}
-delete fd.dataset.sure;const ks=fKeys(c.n);ks.forEach(k=>fSet(k,null));FOLD=FOLD.filter(x=>x!=c.n);fSave();store();mcat='i';mcSave();lsel.clear();upd();
+delete fd.dataset.sure;const ks=fKeys(c.n);ks.forEach(k=>fSet(k,null));WBS.FOLD=WBS.FOLD.filter(x=>x!=c.n);fSave();store();mcat='i';mcSave();lsel.clear();upd();
 $('pmsg').textContent=`Deleted the folder “${c.n}”.`+(ks.some(k=>k[0]!='b')?' Its imports went back to My imports and drawings back to Drawn by Claude.':'')};
 $('fmove').oninput=()=>{const v=$('fmove').value;if(!v)return;if(v=='+'){$('fmove').value='';fOpen('mv');return}libMove(v.slice(2))};
 $('fout').onclick=()=>{const c=libCur(),ks=[...lsel];if(c.t!='f'||!ks.length)return;ks.forEach(k=>fSet(k,null));fSave();store();lsel.clear();upd();$('pmsg').textContent=`Took ${ks.length} motif${ks.length>1?'s':''} out of “${c.n}”.`};
@@ -64,6 +64,6 @@ $('fdelm').onclick=()=>{const dm=$('fdelm'),ks=[...lsel].filter(k=>k[0]!='b'),us
 if(!ok.length){$('pmsg').textContent='Those motifs are used on your stamps. Remove them from the stamps first.';return}
 if(!dm.dataset.sure){dm.dataset.sure=1;dm.textContent='Click to confirm';setTimeout(()=>{if(dm.dataset.sure){delete dm.dataset.sure;renderLib()}},3000);return}
 delete dm.dataset.sure;ok.forEach(k=>{delete cust[k];lsel.delete(k)});store();upd();$('pmsg').textContent=`Deleted ${ok.length} motif${ok.length>1?'s':''} from the library.`+(ok.length<ks.length?` ${ks.length-ok.length} in use on your stamps were kept.`:'')};
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&!$('boardS').hidden&&!(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]'))){const n=tiles[cur].items.length;if(!n)return;e.preventDefault();selSet([...Array(n).keys()],false);upd();pmsg(`Selected all ${n} motif${n>1?'s':''} on this stamp.`)}});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&!$('boardS').hidden&&!(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]'))){const n=tiles[WBS.cur].items.length;if(!n)return;e.preventDefault();selSet([...Array(n).keys()],false);upd();pmsg(`Selected all ${n} motif${n>1?'s':''} on this stamp.`)}});
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&lsm&&!(e.target.matches&&e.target.matches('input,textarea,select')))libExit()});
 

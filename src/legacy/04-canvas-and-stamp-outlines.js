@@ -1,15 +1,15 @@
 // Stamp is SW x SH units (long side 240); canvas is CW x CH units (long side 800). Ratios live in dim.
-let dim={s:[1,1],c:[2,3]},SW=240,SH=240,CW=533,CH=800;
-try{const d=JSON.parse(localStorage.getItem('wb14_dim')||'null');if(d&&d.s&&d.c)dim=d}catch(e){}
+WBS.dim={s:[1,1],c:[2,3]};let SW=240,SH=240,CW=533,CH=800;
+try{const d=JSON.parse(localStorage.getItem('wb14_dim')||'null');if(d&&d.s&&d.c)WBS.dim=d}catch(e){}
 const fitD=([w,h],L)=>w>=h?[L,Math.round(L*h/w)]:[Math.round(L*w/h),L];
 // Print cover (full wrap): back + spine + front, with bleed all round. Sizes in inches.
 const TRIMS=[['5x8','5 × 8 in',5,8],['5.25x8','5.25 × 8 in',5.25,8],['5.5x8.5','5.5 × 8.5 in',5.5,8.5],['6x9','6 × 9 in',6,9],['6.14x9.21','6.14 × 9.21 in (Royal)',6.14,9.21],['6.69x9.61','6.69 × 9.61 in',6.69,9.61],['7x10','7 × 10 in',7,10],['7.5x9.25','7.5 × 9.25 in',7.5,9.25],['8x10','8 × 10 in',8,10],['8.25x8.25','8.25 × 8.25 in',8.25,8.25],['8.5x8.5','8.5 × 8.5 in',8.5,8.5],['8.5x11','8.5 × 11 in (Letter)',8.5,11],['8.27x11.69','8.27 × 11.69 in (A4)',8.27,11.69],['custom','Custom size']];
 // spine width per page (Amazon KDP paperback figures)
 const PAPER={white:['White paper',.002252],cream:['Cream paper',.0025],color:['Standard colour',.002252],premium:['Premium colour',.002347]};
-let book={on:false,trim:'6x9',tw:6,th:9,pages:200,paper:'white',man:false,sw:.45,bleed:.125,gd:true};
-try{const q=JSON.parse(localStorage.getItem('wb40_book')||'null');if(q&&typeof q=='object')book={...book,...q}}catch(e){}
-const bk=()=>{const t=TRIMS.find(x=>x[0]==book.trim&&x[2]),tw=t?t[2]:Math.min(20,Math.max(1,+book.tw||6)),th=t?t[3]:Math.min(20,Math.max(1,+book.th||9)),
-sw=book.man?Math.min(4,Math.max(0,+book.sw||0)):Math.max(0,(+book.pages||0)*(PAPER[book.paper]||PAPER.white)[1]),b=Math.min(1,Math.max(0,+book.bleed||0));return{tw,th,sw,b,W:2*b+2*tw+sw,H:2*b+th}};
+WBS.book={on:false,trim:'6x9',tw:6,th:9,pages:200,paper:'white',man:false,sw:.45,bleed:.125,gd:true};
+try{const q=JSON.parse(localStorage.getItem('wb40_book')||'null');if(q&&typeof q=='object')WBS.book={...WBS.book,...q}}catch(e){}
+const bk=()=>{const t=TRIMS.find(x=>x[0]==WBS.book.trim&&x[2]),tw=t?t[2]:Math.min(20,Math.max(1,+WBS.book.tw||6)),th=t?t[3]:Math.min(20,Math.max(1,+WBS.book.th||9)),
+sw=WBS.book.man?Math.min(4,Math.max(0,+WBS.book.sw||0)):Math.max(0,(+WBS.book.pages||0)*(PAPER[WBS.book.paper]||PAPER.white)[1]),b=Math.min(1,Math.max(0,+WBS.book.bleed||0));return{tw,th,sw,b,W:2*b+2*tw+sw,H:2*b+th}};
 // Stamp outline: SK = 'rect' | 'hex' | 'circle'; HO = hex orientation 'p' (pointy top) | 'f' (flat top).
 // Rect and hex stamps tile seamlessly: motifs wrap across the edges (hex uses the honeycomb lattice). Circles just trim.
 let SK='rect',HO='p',HL=[],HN=[],OFFS=[[0,0]],CRAD=0;
@@ -26,21 +26,21 @@ else if(k=='diamond'){[SW,SH]=fitD(s,240);HL=[[SW/2,SH/2],[-SW/2,SH/2]];const[a,
 else{[SW,SH]=fitD(s,240);if(k=='rect')OFFS=[-1,0,1].flatMap(a=>[-1,0,1].map(b=>[a*SW,b*SH]))}
 g={SK:k,HO:o,SW,SH,HL,HN,OFFS,RAD:rad};GC.set(key,g);return g}
 const useG=g=>{SK=g.SK;HO=g.HO;SW=g.SW;SH=g.SH;HL=g.HL;HN=g.HN;OFFS=g.OFFS;CRAD=g.RAD||0};
-const shOf=t=>{if(!t.sh||typeof t.sh!='object')t.sh={k:SHK.includes(dim.k)?dim.k:'rect',o:dim.o=='f'?'f':'p',s:[...(dim.s||[1,1])],z:100};return t.sh};
+const shOf=t=>{if(!t.sh||typeof t.sh!='object')t.sh={k:SHK.includes(WBS.dim.k)?WBS.dim.k:'rect',o:WBS.dim.o=='f'?'f':'p',s:[...(WBS.dim.s||[1,1])],z:100};return t.sh};
 const useT=t=>{if(t)useG(geom(shOf(t)))};
 const SHN={rect:'Rectangle',hex:'Hexagon',circle:'Circle',diamond:'Diamond',tri:'Triangle',arch:'Arch',oct:'Octagon',star:'Star',quat:'Quatrefoil',lancet:'Lancet'};
-const setDim=()=>{if(dim.cs&&!CSN[dim.cs]){delete dim.cs;delete dim.g}if(dim.cp)delete dim.cp;useG(geom(dim));try{useT(tiles[cur])}catch(e){}
-if(book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims(csk())};
+const setDim=()=>{if(WBS.dim.cs&&!CSN[WBS.dim.cs]){delete WBS.dim.cs;delete WBS.dim.g}if(WBS.dim.cp)delete WBS.dim.cp;useG(geom(WBS.dim));try{useT(tiles[WBS.cur])}catch(e){}
+if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims(csk())};
 // Canvas outline: dim.cs = rect (default) | rrect | circle | oval | arch | hex | tri | diamond | ngon.
 // Everything is clipped to the outline. dim.cr = rounded corner %, dim.n = polygon sides, dim.co = 'f' for the flat orientation.
 // Print covers always stay rectangular.
 const CSH=[['rect','Rectangle'],['rrect','Rounded'],['circle','Circle'],['oval','Oval'],['arch','Arch'],['hex','Hexagon'],['tri','Triangle'],['diamond','Diamond'],['ngon','Polygon']],CSN=Object.fromEntries(CSH),CASP=['rect','rrect','oval','arch','diamond'];
-function csk(){if(book.on)return'rect';const k=dim.cs;return CSN[k]?k:'rect'}
+function csk(){if(WBS.book.on)return'rect';const k=WBS.dim.cs;return CSN[k]?k:'rect'}
 const hasOut=()=>csk()!='rect';
-const csN=()=>Math.max(3,Math.min(16,Math.round(+dim.n||5)));
+const csN=()=>Math.max(3,Math.min(16,Math.round(+WBS.dim.n||5)));
 function polyUnit(n,o){const off=o=='f'?Math.PI/n:0,P=[];for(let i=0;i<n;i++){const a=-Math.PI/2+off+2*Math.PI*i/n;P.push([Math.cos(a),Math.sin(a)])}return P}
 function polyFit(n,o){const P=polyUnit(n,o),xs=P.map(p=>p[0]),ys=P.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys),bw=Math.max(...xs)-x0,bh=Math.max(...ys)-y0,k=800/Math.max(bw,bh);return{W:+(bw*k).toFixed(3),H:+(bh*k).toFixed(3),pts:P.map(p=>[(p[0]-x0)*k,(p[1]-y0)*k])}}
-function csDims(k){if(k=='circle')return[800,800];if(k=='hex'||k=='tri'||k=='ngon'){const q=polyFit(k=='hex'?6:k=='tri'?3:csN(),dim.co);return[q.W,q.H]}return fitD(dim.c,800)}
+function csDims(k){if(k=='circle')return[800,800];if(k=='hex'||k=='tri'||k=='ngon'){const q=polyFit(k=='hex'?6:k=='tri'?3:csN(),WBS.dim.co);return[q.W,q.H]}return fitD(WBS.dim.c,800)}
 const polyArea=P=>{let a=0;for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length];a+=p[0]*q[1]-q[0]*p[1]}return a/2};
 // Inset a closed outline by d (mitred corners). Needs the points to run clockwise on screen; returns null once it collapses.
 function offPoly(P,d){const m=P.length;if(m<3)return null;const N=[];for(let i=0;i<m;i++){const a=P[i],b=P[(i+1)%m],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1e-9;N.push([-dy/L,dx/L])}
@@ -49,12 +49,12 @@ return polyArea(R)>0?R:null}
 // The outline of the canvas: d (SVG path), pts (clockwise polyline), keys (indices of the corner / marker points), vk (true when the keys are the real corners of a polygon)
 function cOut(){const k=csk(),W=CW,H=CH,fm=v=>+(+v).toFixed(2),poly=P=>'M'+P.map(p=>fm(p[0])+' '+fm(p[1])).join('L')+'Z';let pts=[],keys=[],vk=false,d='';
 if(k=='circle'||k=='oval'){const rx=W/2,ry=H/2,N=160;for(let i=0;i<N;i++){const a=-Math.PI/2+2*Math.PI*i/N;pts.push([rx+rx*Math.cos(a),ry+ry*Math.sin(a)])}keys=[0,N/4,N/2,3*N/4];d=`M${fm(rx)} 0A${fm(rx)} ${fm(ry)} 0 1 1 ${fm(rx)} ${fm(H)}A${fm(rx)} ${fm(ry)} 0 1 1 ${fm(rx)} 0Z`}
-else if(k=='rrect'){const r=Math.min(W,H)/2*Math.max(0,Math.min(100,dim.cr==null?25:+dim.cr))/100;
+else if(k=='rrect'){const r=Math.min(W,H)/2*Math.max(0,Math.min(100,WBS.dim.cr==null?25:+WBS.dim.cr))/100;
 if(r<.5){pts=[[0,0],[W,0],[W,H],[0,H]];keys=[0,1,2,3];vk=true;d=poly(pts)}
 else{const M=10;[[W-r,r,-90],[W-r,H-r,0],[r,H-r,90],[r,r,180]].forEach(([cx,cy,a0],ci)=>{for(let j=0;j<=M;j++){const a=(a0+90*j/M)*Math.PI/180;pts.push([cx+r*Math.cos(a),cy+r*Math.sin(a)])}keys.push(ci*(M+1)+M/2)});
 const q=fm(r);d=`M${q} 0H${fm(W-r)}A${q} ${q} 0 0 1 ${fm(W)} ${q}V${fm(H-r)}A${q} ${q} 0 0 1 ${fm(W-r)} ${fm(H)}H${q}A${q} ${q} 0 0 1 0 ${fm(H-r)}V${q}A${q} ${q} 0 0 1 ${q} 0Z`}}
 else if(k=='arch'){const rx=W/2,ry=Math.min(rx,H*.8);pts.push([0,H],[0,ry]);for(let j=1;j<=28;j++){const a=Math.PI+Math.PI*j/28;pts.push([rx+rx*Math.cos(a),ry+ry*Math.sin(a)])}pts.push([W,H]);keys=[0,15,pts.length-1];d=`M0 ${fm(H)}V${fm(ry)}A${fm(rx)} ${fm(ry)} 0 0 1 ${fm(W)} ${fm(ry)}V${fm(H)}Z`}
-else if(k=='hex'||k=='tri'||k=='ngon'){pts=polyFit(k=='hex'?6:k=='tri'?3:csN(),dim.co).pts;keys=pts.map((_,i)=>i);vk=true;d=poly(pts)}
+else if(k=='hex'||k=='tri'||k=='ngon'){pts=polyFit(k=='hex'?6:k=='tri'?3:csN(),WBS.dim.co).pts;keys=pts.map((_,i)=>i);vk=true;d=poly(pts)}
 else if(k=='diamond'){pts=[[W/2,0],[W,H/2],[W/2,H],[0,H/2]];keys=[0,1,2,3];vk=true;d=poly(pts)}
 else{pts=[[0,0],[W,0],[W,H],[0,H]];keys=[0,1,2,3];vk=true;d=poly(pts)}
 return{d,pts,keys,vk}}

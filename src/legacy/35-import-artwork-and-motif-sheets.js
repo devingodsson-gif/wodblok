@@ -11,7 +11,7 @@ $('ifile').onchange=()=>{const f=$('ifile').files[0];$('ifile').value='';if(f)lo
 // drag & drop anywhere, and paste from the clipboard
 document.addEventListener('dragover',e=>{if([...(e.dataTransfer&&e.dataTransfer.items||[])].some(i=>i.kind=='file')){e.preventDefault();document.body.classList.add('dropping')}});
 document.addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.classList.remove('dropping')});
-const onCover=()=>{const b=document.querySelector('.rail [data-pn="canvas"]');return !!(book.on&&b&&b.classList.contains('on'))};
+const onCover=()=>{const b=document.querySelector('.rail [data-pn="canvas"]');return !!(WBS.book.on&&b&&b.classList.contains('on'))};
 document.addEventListener('drop',e=>{document.body.classList.remove('dropping');const f=[...(e.dataTransfer&&e.dataTransfer.files||[])].find(f=>/^image\//.test(f.type));if(f){e.preventDefault();onCover()?wbCoverFile(f):loadFile(f)}});
 document.addEventListener('paste',e=>{if(e.target.matches&&e.target.matches('input,textarea')||e.target.closest&&e.target.closest('#ipaste,#cvpaste'))return;const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();onCover()?wbCoverFile(it.getAsFile()):loadFile(it.getAsFile(),'Pasted image')}});
 function loadSrc(src,nm){const img=new Image();img.onload=()=>{prep(img);name=nm||'Imported motif';$('inm').value=name;$('ioimg').src=cv0.toDataURL('image/png');openDlg();run()};img.onerror=()=>say2('That image could not be read. Try copying it again, or save it as PNG.');img.src=src}
@@ -73,7 +73,7 @@ $('icl').onclick=closeDlg;$('icx').onclick=closeDlg;$('idlg').addEventListener('
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('idlg').hidden)closeDlg()});
 $('iadd').onclick=()=>{if(!last)return;const nm=($('inm').value.trim()||'Imported motif').replace(/["<>&|]/g,'').slice(0,40),key='i|'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const fg=mcat.startsWith('g:')?mcat.slice(2):'';cust[key]={n:nm,svg:`<path d="${last.d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,...(fg?{g:fg}:{})};
-const t=tiles[cur],full=$('ifull').checked,s=full?+(Math.min(SW,SH)/100*1.04).toFixed(3):.9;t.items.push(it(key,SW/2,SH/2,s));selOne(t.items.length-1);
+const t=tiles[WBS.cur],full=$('ifull').checked,s=full?+(Math.min(SW,SH)/100*1.04).toFixed(3):.9;t.items.push(it(key,SW/2,SH/2,s));selOne(t.items.length-1);
 if(!fg)mcat='i';mcSave();store();closeDlg();upd();document.querySelector('.rail [data-pn="motifs"]').click();
 $('pmsg').textContent=`Added “${nm}” to ${fg?'“'+fg+'”':'My imports'} and placed it on the stamp.`};
 

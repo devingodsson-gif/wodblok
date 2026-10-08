@@ -133,7 +133,7 @@ const typing=()=>{const a=document.activeElement;if(!a||a===document.body)return
 let wsRT=0,wsPend=false;addEventListener('resize',()=>{clearTimeout(wsRT);wsRT=setTimeout(()=>{if(!wsReady)return;if(typing()){wsPend=true;return}wsRender()},150)});
 addEventListener('focusout',()=>{setTimeout(()=>{if(wsPend&&!typing()){wsPend=false;if(wsReady)wsRender()}},300)});
 const stage=document.querySelector('.stage');
-function setView(v){const was=view;view=v;curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+function setView(v){const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
 $('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display=v=='pattern'?'':'none';$('gtb').style.display=v=='stamp'?'':'none';$('itb').style.display='';if(v=='pattern')requestAnimationFrame(applyZ);tbSync();if(was!=v||!wsReady)wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
 const L=wsL();let g=wsFind(p);if(!g&&p=='rand'){g=wsG([p],{x:null,y:null,w:272,h:620,pos:'r'});L.float.push(g)}
@@ -200,9 +200,9 @@ function nums(){document.querySelectorAll('input[type=range]').forEach(paint)}
 document.addEventListener('input',e=>{if(e.target.type=='range')paint(e.target)});
 
 // ---- status line + dock subtitle
-function info(){const ks=new Set(tiles.map(t=>shOf(t).k)),k=ks.size>1?'Mixed':SHN[[...ks][0]]||'Rectangle',c=dim.c;
-$('sinfo').innerHTML=`${book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(()=>{const k=csk(),r=(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2));return k=='rect'?r:CSN[k]+(CASP.includes(k)?' '+r:'')})()}</b></span>`}<span class="it">Block <b>${k}</b></span><span class="it">Stamps <b>${tiles.length}</b></span><span class="it">Layers <b>${layers.length}</b></span>`;
-$('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${cur+1} of ${tiles.length}`:'';
+function info(){const ks=new Set(tiles.map(t=>shOf(t).k)),k=ks.size>1?'Mixed':SHN[[...ks][0]]||'Rectangle',c=WBS.dim.c;
+$('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(()=>{const k=csk(),r=(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2));return k=='rect'?r:CSN[k]+(CASP.includes(k)?' '+r:'')})()}</b></span>`}<span class="it">Block <b>${k}</b></span><span class="it">Stamps <b>${tiles.length}</b></span><span class="it">Layers <b>${layers.length}</b></span>`;
+$('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${WBS.cur+1} of ${tiles.length}`:'';
 if(layers[selL])$('lnmx').textContent=layers[selL].name}
 // wrap redraw hooks so the shell stays in sync
 const _draw=draw;draw=function(){_draw();nums();info()};
@@ -234,8 +234,8 @@ const HK={tiles:'Stamp change',layers:'Layer change',proj:'Colours',dim:'Canvas 
 function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added motif'+(y-x>1?'s':'');if(y<x)return 'Removed motif'+(x-y>1?'s':'');return 'Moved or edited motif'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
 function cap(){if(drag||window.wbNoCap)return;const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;hist.push(s);histL.push(hLabel(prev,s));histT.push(Date.now());if(hist.length>120){hist.shift();histL.shift();histT.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
-function applyCore(c){tiles=c.tiles;layers=c.layers;proj=c.proj;dim=c.dim;pgrid=pgFix(c.pg,c.layers);cur=Math.min(cur,tiles.length-1);tiles.forEach(shOf);migLayers();setDim();pr=c.pr;migInk();tex=c.tex;if(Array.isArray(c.texLib))texLib=txClean(c.texLib);texNorm();if(c.grade&&window.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(wbGrade.get()))wbGrade.set(c.grade);nid=1+Math.max(0,...tiles.map(t=>+t.id||0));
-cur=Math.min(cur,tiles.length-1);selL=Math.min(selL,layers.length-1);selOne(-1);symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(dim))}catch(e){}
+function applyCore(c){tiles=c.tiles;layers=c.layers;proj=c.proj;WBS.dim=c.dim;pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,tiles.length-1);tiles.forEach(shOf);migLayers();setDim();pr=c.pr;migInk();tex=c.tex;if(Array.isArray(c.texLib))texLib=txClean(c.texLib);texNorm();if(c.grade&&window.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(wbGrade.get()))wbGrade.set(c.grade);nid=1+Math.max(0,...tiles.map(t=>+t.id||0));
+WBS.cur=Math.min(WBS.cur,tiles.length-1);selL=Math.min(selL,layers.length-1);selOne(-1);symKey='';try{localStorage.setItem('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
 store();savePr();saveTex();syncPr();syncTex();buildTex();upd()}
 function undo(){cap();if(hi>0){hi--;applyCore(JSON.parse(hist[hi]))}ub()}
 function redo(){if(hi<hist.length-1){hi++;applyCore(JSON.parse(hist[hi]))}ub()}
@@ -244,9 +244,9 @@ window.wbHistGet=i=>hist[i];window.wbResetHist=()=>{if(window.wbBA)wbBA.reset();
 // ---- History panel + named snapshots
 (()=>{const sec=document.querySelector('section.pn[data-p="hist"]'),hl=$('hhl'),sl=$('hsl'),XI=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 let snaps=[],sk='',raf=0,ren=-1;
-const key=()=>'wb95_sn_'+(cp&&cp.id?cp.id:'draft');
+const key=()=>'wb95_sn_'+(WBS.cp&&WBS.cp.id?WBS.cp.id:'draft');
 const persist=()=>{try{localStorage.setItem(sk,JSON.stringify(snaps))}catch(e){pmsg('This snapshot is kept for now, but is too large to keep after you close the page.')}};
-function load(){const k=key();try{if(cp&&cp.id){const d=localStorage.getItem('wb95_sn_draft');if(d&&!localStorage.getItem(k)&&sk=='wb95_sn_draft'){localStorage.setItem(k,d);localStorage.removeItem('wb95_sn_draft')}}}catch(e){}
+function load(){const k=key();try{if(WBS.cp&&WBS.cp.id){const d=localStorage.getItem('wb95_sn_draft');if(d&&!localStorage.getItem(k)&&sk=='wb95_sn_draft'){localStorage.setItem(k,d);localStorage.removeItem('wb95_sn_draft')}}}catch(e){}
 if(k!=sk||!snaps){sk=k;try{snaps=JSON.parse(localStorage.getItem(k)||'[]')}catch(e){snaps=[]}if(!Array.isArray(snaps))snaps=[]}paint()}
 const ago=t=>{const d=(Date.now()-t)/1000;return d<45?'now':d<3600?Math.round(d/60)+' min':d<86400?Math.round(d/3600)+' h':Math.round(d/86400)+' d'};
 const esc2=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -274,18 +274,18 @@ setInterval(()=>{if(!sec.hidden)paint()},30000)})();
 
 
 // ---- keyboard shortcuts
-document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=tiles[cur]&&tiles[cur].items[sel];
+document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=tiles[WBS.cur]&&tiles[WBS.cur].items[sel];
 if(m&&k=='z'){if(typing&&(t.type=='text'||t.type=='number'))return;e.preventDefault();e.shiftKey?redo():undo()}
 else if(m&&k=='y'){e.preventDefault();redo()}
 else if(m&&k=='s'){e.preventDefault();$('psv').click()}
-else if(m&&k=='a'&&!typing&&view=='stamp'&&tiles[cur].items.length){e.preventDefault();selSet(tiles[cur].items.map((_,i)=>i));upd()}
+else if(m&&k=='a'&&!typing&&view=='stamp'&&tiles[WBS.cur].items.length){e.preventDefault();selSet(tiles[WBS.cur].items.map((_,i)=>i));upd()}
 else if(m&&k=='d'&&!typing&&q){e.preventDefault();$('scp').click()}
 else if(!typing&&(e.key=='Delete'||e.key=='Backspace')&&q&&view=='stamp'){e.preventDefault();$('sdl').click()}
 else if(!typing&&split&&e.key=='Enter'){e.preventDefault();doSplit()}
 else if(!typing&&split&&e.key=='Escape'){split=null;draw()}
 else if(!typing&&!e.ctrlKey&&!e.metaKey&&e.key.toLowerCase()=='s'&&view=='stamp'&&Q()){e.preventDefault();$('ssp').click()}
-else if(!typing&&brush&&(e.key=='['||e.key==']')){e.preventDefault();brush.r=((brush.r+(e.key==']'?15:-15)+540)%360)-180;paintGhost()}
-else if(e.key=='Escape'&&brush&&!typing){brush=null;upd()}
+else if(!typing&&WBS.brush&&(e.key=='['||e.key==']')){e.preventDefault();WBS.brush.r=((WBS.brush.r+(e.key==']'?15:-15)+540)%360)-180;paintGhost()}
+else if(e.key=='Escape'&&WBS.brush&&!typing){WBS.brush=null;upd()}
 else if(e.key=='Escape'){closeMenus();if(!$('plist').hidden)closeDlg();else if(sel>=0){selOne(-1);upd()}}
 else if(!typing&&!m&&q&&view=='stamp'&&e.key.startsWith('Arrow')){e.preventDefault();const d=e.shiftKey?10:1,dx=e.key=='ArrowLeft'?-d:e.key=='ArrowRight'?d:0,dy=e.key=='ArrowUp'?-d:e.key=='ArrowDown'?d:0;QS().forEach(o=>{o.x+=dx;o.y+=dy;[o.x,o.y]=wrapP(o.x,o.y)});store();upd()}
 else if(!typing&&!m&&k=='k'&&q&&view=='stamp'){e.preventDefault();$('sko').click()}
@@ -294,7 +294,7 @@ else if(!typing&&!m&&k=='0'&&view=='pattern'){z=0;applyZ()}});
 
 document.querySelectorAll('label[role=button]').forEach(l=>l.addEventListener('keydown',e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();l.click()}}));
 // ---- double-click (or double-tap) a slider or its label to reset it to its default (double-click the number box instead to type a value)
-function resetRange(r){let d=r.dataset.def!=null?r.dataset.def:r.getAttribute('value');if(r.id=='sn'){const sy=symOf(tiles[cur]);d=sy.d[4]}if(d==null||d==='')return false;
+function resetRange(r){let d=r.dataset.def!=null?r.dataset.def:r.getAttribute('value');if(r.id=='sn'){const sy=symOf(tiles[WBS.cur]);d=sy.d[4]}if(d==null||d==='')return false;
 r.value=d;r.dispatchEvent(new Event('input',{bubbles:true}));paint(r);const row=r.closest('.ctl');if(row){row.classList.remove('rst');void row.offsetWidth;row.classList.add('rst')}return true}
 const rowRange=t=>{if(t.closest&&t.closest('.num'))return null; /* the number box has its own double-click: select all */ const row=t.closest&&t.closest('.ctl');return row&&row.querySelector('input[type=range]')};
 document.addEventListener('dblclick',e=>{const r=rowRange(e.target);if(r&&resetRange(r)){e.preventDefault();if(document.activeElement&&document.activeElement.type=='number')document.activeElement.blur();const sel=getSelection&&getSelection();if(sel)sel.removeAllRanges()}});
@@ -307,12 +307,12 @@ $('gon').addEventListener('input',()=>{grid.on=$('gon').checked;saveGrid();upd()
 $('gn').addEventListener('input',()=>{grid.n=+$('gn').value;if(!grid.on){grid.on=true}saveGrid();upd()});
 $('gsp').addEventListener('input',()=>{grid.sp=$('gsp').value;saveGrid();upd()});
 $('gsd').addEventListener('input',()=>{grid.sd=$('gsd').checked;if(grid.sd)grid.on=true;saveGrid();upd()});
-$('gq').onclick=()=>{const t=tiles[cur];if(!t.items.length)return;let moved=0;t.items.forEach(q=>{const[x,y]=snapPt(q.x,q.y);if(Math.abs(x-q.x)>.01||Math.abs(y-q.y)>.01)moved++;q.x=x;q.y=y});grid.on=true;saveGrid();store();upd();$('pmsg').textContent=moved?`Snapped ${moved} motif${moved>1?'s':''} to the grid.`:'Every motif is already on the grid.'};
+$('gq').onclick=()=>{const t=tiles[WBS.cur];if(!t.items.length)return;let moved=0;t.items.forEach(q=>{const[x,y]=snapPt(q.x,q.y);if(Math.abs(x-q.x)>.01||Math.abs(y-q.y)>.01)moved++;q.x=x;q.y=y});grid.on=true;saveGrid();store();upd();$('pmsg').textContent=moved?`Snapped ${moved} motif${moved>1?'s':''} to the grid.`:'Every motif is already on the grid.'};
 $('gtg').onclick=()=>{grid.on=!grid.on;saveGrid();upd()};$('gtq').onclick=()=>$('gq').click();
-$('gti').onclick=()=>{edInk=!edInk;tbSync();upd()};
-$('gtx').onclick=()=>{edTx=!edTx;tbSync();upd()};
+$('gti').onclick=()=>{WBS.edInk=!WBS.edInk;tbSync();upd()};
+$('gtx').onclick=()=>{WBS.edTx=!WBS.edTx;tbSync();upd()};
 {const w=$('itbw'),b=$('itbb'),set=o=>{w.classList.toggle('open',o);b.setAttribute('aria-expanded',String(o))};b.onclick=e=>{e.stopPropagation();set(!w.classList.contains('open'))};document.addEventListener('click',e=>{if(!e.target.closest('#itbw'))set(false)});document.addEventListener('keydown',e=>{if(e.key=='Escape')set(false)})}
-$('gtm').onclick=()=>{edMk=!edMk;$('gtm').classList.toggle('on',edMk);$('gtm').setAttribute('aria-pressed',String(edMk));upd()};
+$('gtm').onclick=()=>{WBS.edMk=!WBS.edMk;$('gtm').classList.toggle('on',WBS.edMk);$('gtm').setAttribute('aria-pressed',String(WBS.edMk));upd()};
 document.addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input,select,textarea'))return;if(!e.metaKey&&!e.ctrlKey&&e.key.toLowerCase()=='g'){grid.on=!grid.on;saveGrid();upd()}});
 const _draw2=draw;draw=function(){_draw2();syncGrid()};
 // ---- randomize motifs on the current stamp
@@ -388,7 +388,7 @@ const rangeOf=l=>{const row=l.closest&&l.closest('.ctl');return row&&row.querySe
 function setR(r,v){const lo=+r.min,hi=+r.max,stp=+r.step||1;v=Math.max(lo,Math.min(hi,Math.round(v/stp)*stp));v=+v.toFixed(6);if(+r.value===v)return;r.value=v;r.dispatchEvent(new Event('input',{bubbles:true}))}
 function scrub(el,r,e,fine0){if(r.disabled)return;let x0=e.clientX,v0=+r.value,sh=e.shiftKey,moved=false;const span=+r.max-+r.min,W=(r.getBoundingClientRect().width||200)*(fine0?1:1.4);
 const dr=window.NODRAFT&&NODRAFT.has(r.id);
-const mv=ev=>{if(!moved&&Math.abs(ev.clientX-x0)<3)return;if(!moved){moved=true;document.body.classList.add('scrubbing');if(!dr&&typeof DRAFT!='undefined'){DRAFT=1;clearTimeout(DRT)}}
+const mv=ev=>{if(!moved&&Math.abs(ev.clientX-x0)<3)return;if(!moved){moved=true;document.body.classList.add('scrubbing');if(!dr&&typeof WBS.DRAFT!='undefined'){WBS.DRAFT=1;clearTimeout(DRT)}}
  if(ev.shiftKey!==sh){sh=ev.shiftKey;x0=ev.clientX;v0=+r.value}
  const k=sh?.1:1;setR(r,v0+(ev.clientX-x0)/W*span*k)};
 const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);document.body.classList.remove('scrubbing');if(moved){r.dispatchEvent(new Event('change',{bubbles:true}));if(typeof drOff=='function')drOff()}};
@@ -413,7 +413,7 @@ tipRows();WS.stamp={dock:[],float:[]};WS.pattern={dock:[],float:[]};setView('pat
 
 {const sp=document.getElementById('splash'),t0=performance.now();if(sp){const go=()=>{const w=Math.max(0,520-(performance.now()-t0));setTimeout(()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),320)},w)};const f=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1400))]):Promise.resolve();requestAnimationFrame(()=>requestAnimationFrame(()=>f.then(go)))}}
 {const b=$('gdt');let on=true;try{on=localStorage.getItem('wb93_dots')!=='0'}catch(e){}const ap=()=>{document.body.classList.toggle('plain',!on);b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))};ap();b.onclick=()=>{on=!on;try{localStorage.setItem('wb93_dots',on?'1':'0')}catch(e){}ap()}}
-clearAll(true);cp={id:null,name:'',saved:coreStr()};saveCp();$('pnm').value='';paintPst();$('pmsg').textContent='';
+clearAll(true);WBS.cp={id:null,name:'',saved:coreStr()};saveCp();$('pnm').value='';paintPst();$('pmsg').textContent='';
 // warn before leaving if there's unsaved work (a fresh blank stamp doesn't count)
-{const blank=coreStr();addEventListener('beforeunload',e=>{if(cp.id?dirty():coreStr()!==blank){e.preventDefault();e.returnValue=''}})}
+{const blank=coreStr();addEventListener('beforeunload',e=>{if(WBS.cp.id?dirty():coreStr()!==blank){e.preventDefault();e.returnValue=''}})}
 })();

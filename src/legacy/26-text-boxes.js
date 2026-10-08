@@ -6,11 +6,11 @@ for(const l of Lt){if(!Array.isArray(l))continue;const d=G[l[0]];if(typeof d!='s
 const id=pre+'_'+String(l[0]).replace(/[^\w-]/g,'_');if(!seen[id]){seen[id]=1;d0+=`<path id="${id}" d="${d}"/>`}o+=`<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s})"/>`}
 return`<defs>${d0}</defs><g fill="${fill}" fill-rule="evenodd">${o}</g>`}
 const TXM=new Map();
-function txMask(id,p){const q=txSpecs(p.tu,'wear');if(!q.length||!edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1),x=(-W/2).toFixed(2),y=(-H/2).toFixed(2),v=txImgs(q,W,H,384,'host',txIsW,x,y);if(!v)return'';
+function txMask(id,p){const q=txSpecs(p.tu,'wear');if(!q.length||!WBS.edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1),x=(-W/2).toFixed(2),y=(-H/2).toFixed(2),v=txImgs(q,W,H,384,'host',txIsW,x,y);if(!v)return'';
 const key=id+'|'+v+'|'+W+'|'+H;if(TXM.has(key))return TXM.get(key);
 const m=`<mask id="${id}" maskUnits="userSpaceOnUse" x="${x}" y="${y}" width="${W}" height="${H}"><rect x="${x}" y="${y}" width="${W}" height="${H}" fill="#fff"/>${v}</mask>`;
 if(TXM.size>300)TXM.delete(TXM.keys().next().value);TXM.set(key,m);return m}
-function txOvF(p){const q=txSpecs(p.tu,'wear');if(!q.length||!edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1);return txFilt(q,-W/2,-H/2,W,H,384)}
+function txOvF(p){const q=txSpecs(p.tu,'wear');if(!q.length||!WBS.edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1);return txFilt(q,-W/2,-H/2,W,H,384)}
 function txtLayer(L,li){const pl=(L.pl||[]).filter(p=>p.tx&&p.Lt&&p.G);if(!pl.length)return['',''];const f=v=>(+v).toFixed(2),ed=li==selL&&!$('boardP').classList.contains('off'),fill=L.ink&&CM[L.ink]?col(L.ink):col(proj.ink);let out='',defs='';
 pl.forEach(p=>{const[w,h]=fpWH(p),k=p.s/Math.max(p.n||1,.01),mid='tm'+li+'_'+String(p.u).replace(/[^\w-]/g,''),mk=txMask(mid,p),fo=txOvF(p);if(mk)defs+=mk;const pf=p.ink&&CM[p.ink]?col(p.ink):fill,hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-w/2)}" y="${f(-h/2)}" width="${f(w)}" height="${f(h)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
 out+=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x)} ${f(+p.y)})">${hit}<g transform="rotate(${+p.r||0}) scale(${(k*(p.f||1)).toFixed(4)} ${k.toFixed(4)})"${fo?` filter="url(#${fo})"`:''}${mk?` mask="url(#${mid})"`:''}>${txtGl(p,pf,'tg'+li+'_'+String(p.u).replace(/[^\w-]/g,''))}</g></g>`});
