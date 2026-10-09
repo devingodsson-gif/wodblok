@@ -27,8 +27,8 @@ let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'ca
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colors',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Preview',grid:'Grid',layers:'Arrangement',pgrid:'Grid',grade:'Grade',tex:'Textures',rand:'Randomize',hist:'History'};
-const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib'],stamp:['motifs','text','mlist','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
+const PNAME={nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colors',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Preview',grid:'Grid',layers:'Arrangement',pgrid:'Grid',grade:'Grade',tex:'Textures',rand:'Randomize',hist:'History'};
+const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib','nav'],stamp:['motifs','text','mlist','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=m=>m=='pattern'?{dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]}:{dock:[wsG(['motifs']),wsG(['stamp','colors','grade','tex','rand'])],float:[wsG(['mlist'],{x:null,y:null,w:230,h:440}),wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}),wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'})]};
@@ -200,10 +200,12 @@ $('rzdo').onclick=()=>randomize(false);
 
 // ---- zoom
 function fitZ(){const b=$('boardP');if(b.classList.contains('off'))return;const w=b.clientWidth-64,h=b.clientHeight-64;fitS=Math.max(.05,Math.min(w/CW,h/CH))}
-function applyZ(){fitZ();const s=z||fitS;$('art').style.width=Math.round(CW*s)+'px';$('art').style.height=Math.round(CH*s)+'px';$('artsh').style.width=$('art').style.width;$('artsh').style.height=$('art').style.height;$('zl').textContent=Math.round(s*100)+'%';$('zl').title=z?'Fit to screen':'Fitted to screen';if(window.bkZ)bkZ()}
-WBX.wbApplyZ=applyZ;WBX.wbZoomIn=()=>view=='pattern'&&!!z&&z>fitS*1.001;
-$('zi').onclick=()=>{z=Math.min(8,(z||fitS)*1.25);applyZ()};$('zo').onclick=()=>{z=Math.max(.1,(z||fitS)/1.25);applyZ()};$('zl').onclick=()=>{z=0;applyZ()};
-$('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();z=Math.min(8,Math.max(.1,(z||fitS)*(e.deltaY<0?1.1:1/1.1)));applyZ()},{passive:false});
+function applyZ(){fitZ();const s=z||fitS;$('art').style.width=Math.round(CW*s)+'px';$('art').style.height=Math.round(CH*s)+'px';$('artsh').style.width=$('art').style.width;$('artsh').style.height=$('art').style.height;$('zl').textContent=Math.round(s*100)+'%';$('zl').title=z?'Fit to screen':'Fitted to screen';if(window.bkZ)bkZ();if(WBX.wbZoomed)WBX.wbZoomed()}
+function zoomAt(ns,cx,cy){const b=$('boardP'),a=$('art'),r0=a.getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);z=Math.min(8,Math.max(.1,ns));applyZ();const r1=a.getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
+const zoomMid=f=>{const r=$('boardP').getBoundingClientRect();zoomAt((z||fitS)*f,r.left+r.width/2,r.top+r.height/2)};
+WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbZoomTo=s=>{const r=$('boardP').getBoundingClientRect();zoomAt(s,r.left+r.width/2,r.top+r.height/2)};WBX.wbZoomNow=()=>z||fitS;WBX.wbZoomIn=()=>view=='pattern'&&!!z&&z>fitS*1.001;
+$('zi').onclick=()=>zoomMid(1.25);$('zo').onclick=()=>zoomMid(1/1.25);$('zl').onclick=()=>{z=0;applyZ()};
+$('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomAt((z||fitS)*(e.deltaY<0?1.1:1/1.1),e.clientX,e.clientY)},{passive:false});
 try{new ResizeObserver(()=>{if(view=='pattern')applyZ()}).observe($('boardP'))}catch(e){window.addEventListener('resize',applyZ)}
 new MutationObserver(()=>applyZ()).observe($('art'),{attributes:true,attributeFilter:['viewBox']});
 
@@ -256,14 +258,14 @@ let histL=['Start'],histT=[Date.now()];
 const HK={tiles:'Stamp change',layers:'Layer change',proj:'Colours',dim:'Canvas size',pg:'Grid',pr:'Roughness',tex:'Texture',texLib:'Texture library',grade:'Grade'};
 function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added motif'+(y-x>1?'s':'');if(y<x)return 'Removed motif'+(x-y>1?'s':'');return 'Moved or edited motif'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
 // wbRollHold: a Randomize roll is still setting its lettering, so the half-made piece is not a history step
-function cap(){if(drag||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;hist.push(s);histL.push(hLabel(prev,s));histT.push(Date.now());if(hist.length>120){hist.shift();histL.shift();histT.shift()}hi=hist.length-1}ub()}
+function cap(){if(drag||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;hist.push(s);histL.push(hLabel(prev,s));histT.push(Date.now());if(WBX.wbNavDirty)WBX.wbNavDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
 function applyCore(c){WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
 WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
 store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
 // Loading a step normalises the document a little (for example every stamp gets an empty texture list), so the entry is re-read
 // after loading; otherwise the next capture sees a difference, adds a step and cuts off the steps still to redo.
-function goTo(i){hi=i;applyCore(JSON.parse(hist[hi]));hist[hi]=coreStr()}
+function goTo(i){hi=i;applyCore(JSON.parse(hist[hi]));hist[hi]=coreStr();if(WBX.wbNavDirty)WBX.wbNavDirty()}
 function undo(){cap();if(hi>0)goTo(hi-1);ub()}
 function redo(){if(hi<hist.length-1)goTo(hi+1);ub()}
 $('undo').onclick=undo;$('redo').onclick=redo;ub();
