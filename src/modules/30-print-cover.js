@@ -46,4 +46,4 @@ $('bkpdf').onclick=async()=>{const d=await use('downloads');if(!d)return $('pmsg
 WBX.wbCoverPDF=(cb)=>coverRaster((c,g,W,H)=>c.toBlob(async jb=>cb(pdfJpeg(new Uint8Array(await jb.arrayBuffer()),W,H,g),W,H),'image/jpeg',.95));
 bookSync();
 }
-export {init30};
+export {init30,pdfJpeg};

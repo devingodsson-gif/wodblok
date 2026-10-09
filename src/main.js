@@ -44,6 +44,7 @@ import {init41} from './modules/41-navigator.js';
 import {init42} from './modules/42-workspaces.js';
 import {init43} from './modules/43-export-recipes.js';
 import {init44} from './modules/44-repeat-tile.js';
+import {init45} from './modules/45-print-proof.js';
 import {kv} from './platform/index.js';
 import {cmdConflicts,cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdList,cmdRun} from './commands/registry.js';
 
@@ -90,4 +91,5 @@ init41();
 init42();
 init43();
 init44();
+init45();
 window.__wbTest = { state: () => coreStr(), kv, recoveryTick: rcTick, commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };

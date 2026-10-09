@@ -42,5 +42,6 @@
  "41-navigator.js",
  "42-workspaces.js",
  "43-export-recipes.js",
- "44-repeat-tile.js"
+ "44-repeat-tile.js",
+ "45-print-proof.js"
 ]

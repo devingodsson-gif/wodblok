@@ -121,7 +121,7 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 .xrl{margin-top:8px}.xrh{padding:8px 0 2px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .xrr{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:4px;padding:4px 4px 4px 10px;border-radius:7px;cursor:pointer;font-size:12.5px;border:1px solid transparent}
 .xrr:hover,.xrr:focus-visible{background:var(--raise)}.xrr b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xrr small{display:block;color:var(--mut);font-size:10.5px}
-.xrr .ib{width:26px;height:26px}.xrr .ib svg{width:14px;height:14px}.xrr input{height:26px}.xrall{margin-top:12px}
+.xrph{margin-top:16px}.xrp select{width:auto;flex:1}.xrr .ib{width:26px;height:26px}.xrr .ib svg{width:14px;height:14px}.xrr input{height:26px}.xrall{margin-top:12px}
 #artwrap.tpv>*{pointer-events:none}
 #pbuilt{flex:none;color:var(--faint);font-size:10.5px}
 #pstore{flex:none;color:var(--faint);font-size:10.5px}
@@ -1118,6 +1118,8 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  </div>
  <div class="xrl" id="xrl" role="list"></div>
  <div class="row xrall"><button type="button" id="xrall">Export all as one zip</button></div>
+ <div class="xrh xrph">Print proof</div>
+ <div class="row xrp"><select id="xpp" aria-label="Paper"><option value="letter">Letter</option><option value="a4">A4</option></select><button type="button" id="xppdf">PDF</button><button type="button" id="xppng">PNG</button></div>
 </div></section>
 <section class="pn" data-p="rand" hidden>
   <div class="gb rzmain"><button class="primary rzbig" id="rzdo" title="Roll a whole new piece (Ctrl+Z to go back)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>Randomize</button>

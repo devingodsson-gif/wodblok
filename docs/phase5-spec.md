@@ -12,8 +12,8 @@ commands in the registry (so command search finds them), no tool windows open at
 | 3 | Workspaces | done, v0.113 |
 | 4 | Export recipes | done, v0.114 |
 | 5 | Repeat tile (a canvas format) | done, v0.115 |
-| 6 | Print proof | next |
-| 7 | Presets | |
+| 6 | Print proof | done, v0.116 |
+| 7 | Presets | next |
 | 8 | Variations strip | |
 | 9 | Task bar | |
 
@@ -39,8 +39,8 @@ commands in the registry (so command search finds them), no tool windows open at
 - v0.115.1: a layer coloured by a layer colour mask or a layer wear texture used to be cut to the middle tile (its grade area and texture filter only covered the canvas); both now reach past the edges and repeat.
 - "Repeat 3 × 3" (top bar, only on a tile) shows the tile repeated so seams can be checked; nothing can be edited in that view.
 
-## 6. Print proof (default design)
-- A one-page proof sheet to check before printing: the piece, the repeat shown tiled, the colours used with their names and book numbers, the size, and the date. Saved as PNG or PDF.
+## 6. Print proof (v0.116)
+- In the Export recipes tool, under "Print proof": choose Letter or A4, then PDF or PNG (150 dpi). One portrait page: the project name, the date and app version, the piece (on a repeat tile: the single tile beside the tile repeated 3 × 3), the colours as swatches with their names and hex values, the palette's name and its number in Wada's book when it is one of the 348 combinations, the canvas ratio (or the print cover size and 300 DPI pixels), and the stamp and layer counts. Commands: Print proof (PDF), Print proof (PNG).
 
 ## 7. Presets (default design)
 - A preset is a saved look: palette, colour grade, textures and print effects. It does not touch stamps or layout. Save the current look, apply with one click (one undo step brings the old look back), rename, delete. Each shows a small picture of the piece when it was saved.

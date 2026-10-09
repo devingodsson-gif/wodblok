@@ -42,6 +42,8 @@ const COMMANDS = [
   ['view.tileRepeat', 'Repeat tile: show 3 × 3', 'tpv'],
   ['export.now', 'Export with the recipe settings', 'xrnow'],
   ['export.allRecipes', 'Export all recipes as one zip', 'xrall'],
+  ['export.proofPdf', 'Print proof (PDF)', 'xppdf'],
+  ['export.proofPng', 'Print proof (PNG)', 'xppng'],
   ['view.before', 'Before', 'bab', '\\'],
   ['view.split', 'Split view', 'bas', 'Shift+\\'],
   ['view.grid', 'Show grid', 'gtg', 'G'],
