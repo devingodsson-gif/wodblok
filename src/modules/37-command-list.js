@@ -37,6 +37,7 @@ const COMMANDS = [
   ['view.split', 'Split view', 'bas', 'Shift+\\'],
   ['view.grid', 'Show grid', 'gtg', 'G'],
   ['panels.closeAll', 'Close all panels', 'rcls'],
+  ['view.customizeToolbars', 'Customize toolbars', 'tzopen'],
 ];
 function init37() {
   for (const [id, label, elId, shortcut, kind] of COMMANDS) {

@@ -195,6 +195,19 @@ button.alt{background:var(--raise)}
 .rail .tip{position:absolute;left:46px;top:50%;transform:translateY(-50%);background:var(--fg);color:var(--panel);font-size:11px;padding:3px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;z-index:30}
 .rail button:hover .tip{opacity:1}
 .rail .rsp{flex:1}
+.tzoff{display:none!important}
+.tzedit .rail .tzoff:not([hidden]){display:flex!important}.tzedit .tb .tzoff:not([hidden]){display:inline-flex!important}
+.tzedit .tzoff{opacity:.38}
+.tzedit .rail button,.tzedit .tb .ib{position:relative;touch-action:none;cursor:grab;animation:tzw .55s ease-in-out infinite alternate}
+.tzedit .rail button:nth-child(2n),.tzedit .tb .ib:nth-child(2n){animation-direction:alternate-reverse}
+@keyframes tzw{from{transform:rotate(-1.4deg)}to{transform:rotate(1.4deg)}}
+.tzedit .rail .tip{display:none}
+.tzb{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--fg);color:var(--panel);display:flex;align-items:center;justify-content:center;font:600 13px/1 "Hanken Grotesk",system-ui,sans-serif;cursor:pointer;z-index:2}
+.tzb::before{content:'\2212'}.tzoff .tzb{background:var(--acc);color:var(--acc-fg)}.tzoff .tzb::before{content:'+'}
+.tzedit .tzlift{opacity:.25;animation:none}
+.tzghost{position:fixed;z-index:90;margin:0;pointer-events:none;background:var(--raise)!important;border-radius:8px;box-shadow:var(--shadow);animation:none!important;transform:scale(1.08);opacity:1!important}.tzghost .tzb{display:none}
+.tzbar{position:fixed;left:50%;bottom:44px;transform:translateX(-50%);z-index:80;display:flex;gap:6px;padding:5px;background:var(--raise);border:1px solid var(--line2);border-radius:10px;box-shadow:var(--shadow)}
+@media (prefers-reduced-motion:reduce){.tzedit .rail button,.tzedit .tb .ib{animation:none}}
 
 /* ---------- stage ---------- */
 .viewbar{display:flex;align-items:center;gap:10px;padding:8px 12px;flex:none}
@@ -548,6 +561,8 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
    <hr>
    <button id="xall"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 11L12 15.5 16.5 11M4.5 20h15"/></svg>Export everything</button>
    <label id="xalli" for="xallf" class="mi" role="button" tabindex="0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M4.5 20h15"/></svg>Import everything</label>
+   <hr>
+   <button id="tzopen"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6h8.3M16.2 6h4.3M3.5 12h2.3M10.2 12h10.3M3.5 18h10.3M18.2 18h2.3"/><circle cx="14" cy="6" r="2.2"/><circle cx="8" cy="12" r="2.2"/><circle cx="16" cy="18" r="2.2"/></svg>Customize toolbars</button>
   </div>
   <input type="file" id="pfile" class="vh" accept=".wodblok,.json,application/json,application/zip,text/plain" tabindex="-1">
   <input type="file" id="xallf" class="vh" accept=".json,application/json,text/plain" tabindex="-1">
@@ -586,6 +601,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  <button data-pn="hist" aria-label="History"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.7-6.2"/><path d="M3.5 4.5v4h4"/><path d="M12 7.5V12l3 2"/></svg><span class="tip">History</span></button>
  <div class="rsp"></div>
 </nav>
+<div class="tzbar" id="tzbar" role="toolbar" aria-label="Customize toolbars" hidden><button type="button" id="tzrs" class="ghost">Reset</button><button type="button" id="tzdn" class="primary">Done</button></div>
 
 <main class="stage">
  <div class="viewbar">
