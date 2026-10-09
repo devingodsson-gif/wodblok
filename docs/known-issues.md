@@ -23,3 +23,6 @@ Failed once in a full run on `WB_TARGET=esm`; passed 3 of 3 repeats straight aft
 
 ## v103 note: tests no longer match the v100 baseline
 v103 replaced the colour library (Wada colours, src/data/wada.js) and the default ink/paper (Dark Tyrian Blue on Pale Lemon Yellow, was Marian Blue on Lily White). Snapshots and screenshots were regenerated from the build with the owner's OK, so `WB_TARGET=legacy` runs now differ by design. Run the tests on the build (or esm) from here on.
+
+## Undo after several Randomize rolls in a row does not get back to the start (seen in v104 and v105, not investigated)
+Roll Randomize twice, then press Undo (or Ctrl+Z) repeatedly: the document stays on the last roll and Undo stays enabled. One roll followed by Undo works. Seen in the test browser on both the v104 and v105 builds; not yet checked by hand. Possibly the roll keeps changing the document after the history has captured it, so each Undo first records the current state again. `tests/palette.spec.js` checks undo after a single roll only.
