@@ -115,6 +115,13 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 .wxr:hover,.wxr:focus-visible{background:var(--raise)}.wxr b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wxr .ib{width:26px;height:26px}.wxr .ib svg{width:14px;height:14px}.wxr input{height:26px}
 .wxh{padding:8px 10px 2px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+/* export recipes */
+.xr{padding:10px 14px 14px}.xrs{display:flex;flex-direction:column;gap:8px}.xrs .ctl{grid-template-columns:90px minmax(0,1fr)}
+.xrd{font-size:11.5px;color:var(--mut);min-height:16px}.xrn{display:flex;gap:8px}.xrn input{flex:1;min-width:0}
+.xrl{margin-top:8px}.xrh{padding:8px 0 2px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.xrr{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:4px;padding:4px 4px 4px 10px;border-radius:7px;cursor:pointer;font-size:12.5px;border:1px solid transparent}
+.xrr:hover,.xrr:focus-visible{background:var(--raise)}.xrr b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xrr small{display:block;color:var(--mut);font-size:10.5px}
+.xrr .ib{width:26px;height:26px}.xrr .ib svg{width:14px;height:14px}.xrr input{height:26px}.xrall{margin-top:12px}
 #pbuilt{flex:none;color:var(--faint);font-size:10.5px}
 #pstore{flex:none;color:var(--faint);font-size:10.5px}
 #pupd{flex:none;display:inline-flex;align-items:center;gap:6px;height:18px;padding:0 8px;border-radius:9px;border:0;background:var(--acc-soft);color:var(--acc-ink);font-size:10.5px;font-weight:600}#pupd::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--acc)}#pupd[hidden]{display:none}
@@ -623,6 +630,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  <button id="rail-hist" data-pn="hist" aria-label="History"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.7-6.2"/><path d="M3.5 4.5v4h4"/><path d="M12 7.5V12l3 2"/></svg><span class="tip">History</span></button>
  <button id="rail-nav" data-pn="nav" aria-label="Navigator"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><rect x="7.5" y="8.5" width="6" height="5.5" rx="1"/></svg><span class="tip">Navigator</span></button>
  <button id="rail-wspc" data-pn="wspc" aria-label="Workspaces"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M14.5 4.5v15M14.5 11h6"/></svg><span class="tip">Workspaces</span></button>
+ <button id="rail-xrec" data-pn="xrec" aria-label="Export recipes"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 11L12 15.5 16.5 11"/><path d="M4.5 15v3.5a1.5 1.5 0 001.5 1.5h12a1.5 1.5 0 001.5-1.5V15"/></svg><span class="tip">Export recipes</span></button>
  <div class="rsp"></div>
 </nav>
 
@@ -1096,6 +1104,18 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
 <section class="pn" data-p="wspc" hidden><div class="wx">
  <div class="wxl" id="wxl" role="list"></div>
  <div class="wxs"><input type="text" id="wxn" maxlength="40" aria-label="Workspace name" placeholder="Name"><button type="button" class="primary" id="wxsave">Save current</button></div>
+</div></section>
+<section class="pn" data-p="xrec" hidden><div class="xr">
+ <div class="xrs">
+  <div class="seg" id="xrf" role="group" aria-label="Format"><button type="button" class="on" data-f="png">PNG</button><button type="button" data-f="jpg">JPG</button><button type="button" data-f="svg">SVG</button></div>
+  <div class="ctl"><label for="xrpx">Long side</label><div class="num"><input type="number" class="u" id="xrpx" min="256" max="8192" step="1" value="2048" aria-label="Long side in pixels"><i>px</i></div></div>
+  <div class="xrd" id="xrd" aria-live="polite"></div>
+  <input type="text" id="xrsfx" maxlength="24" aria-label="Added to the file name" placeholder="File name ending">
+  <div class="row"><button type="button" class="primary" id="xrnow">Export now</button></div>
+  <div class="xrn"><input type="text" id="xrn" maxlength="40" aria-label="Recipe name" placeholder="Recipe name"><button type="button" id="xrsave">Save recipe</button></div>
+ </div>
+ <div class="xrl" id="xrl" role="list"></div>
+ <div class="row xrall"><button type="button" id="xrall">Export all as one zip</button></div>
 </div></section>
 <section class="pn" data-p="rand" hidden>
   <div class="gb rzmain"><button class="primary rzbig" id="rzdo" title="Roll a whole new piece (Ctrl+Z to go back)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>Randomize</button>

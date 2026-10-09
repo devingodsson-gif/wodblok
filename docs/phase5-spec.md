@@ -10,8 +10,8 @@ commands in the registry (so command search finds them), no tool windows open at
 | 1 | Command search (Ctrl/Cmd+K) | done, v0.109 |
 | 2 | Navigator, hand tool, zoom keys | done, v0.112 |
 | 3 | Workspaces | done, v0.113 |
-| 4 | Export recipes | next |
-| 5 | Repeat-tile export | |
+| 4 | Export recipes | done, v0.114 |
+| 5 | Repeat-tile export | next |
 | 6 | Print proof | |
 | 7 | Presets | |
 | 8 | Variations strip | |
@@ -27,9 +27,10 @@ commands in the registry (so command search finds them), no tool windows open at
 - Save the current arrangement under a name, apply it with one click, rename, delete. Stored with your settings (not inside project files). A few starting ones: Colour work, Layout work, Everything closed.
 - Launch still opens no tool windows; a workspace is only applied when you choose it. The Workspaces tool stays open (as its own group at the end) after you pick one, so the next is one click away. Commands: Open Workspaces, Save workspace. Your own saved workspaces are in the Workspaces tool, not in command search.
 
-## 4. Export recipes (default design)
-- A recipe is a saved set of export settings (format, size or scale, background, and the other choices the Export menu has). Save the current settings as a recipe, then export with one click, or run several recipes in a row ("web, print, thumbnail").
-- Stored with your settings. Each recipe is a command.
+## 4. Export recipes (v0.114)
+- A recipe is a saved set of export settings: format (PNG, JPG or SVG), the long side in pixels (256 to 8192), and an ending added to the file name. The Export recipes tool (side bar) has the current settings, "Export now", and "Save recipe".
+- Click a recipe to export with it (its settings also load into the fields). Starting points: Web (PNG 2048 px), Print (PNG 6000 px), Preview (JPG 800 px). Yours can be renamed and deleted. "Export all as one zip" makes every recipe in a single file.
+- Stored with your settings. The Export menu in the top bar is unchanged. Commands: Open Export recipes, Export with the recipe settings, Export all recipes as one zip.
 
 ## 5. Repeat-tile export (default design)
 - Exports one repeat of the pattern as an image that tiles without a seam: PNG at a chosen size, and SVG. A check image shows it repeated 3 x 3 before saving.

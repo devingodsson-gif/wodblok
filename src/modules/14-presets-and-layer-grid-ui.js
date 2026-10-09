@@ -118,4 +118,4 @@ c.toBlob(async b=>{try{await d.save({filename:expName('png'),data:b})}catch(e){i
 img.onerror=()=>say('PNG export failed.');
 img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())};
 }
-export {LY,ser,syncAsp,syncGrid,init14};
+export {LY,expName,ser,syncAsp,syncGrid,init14};

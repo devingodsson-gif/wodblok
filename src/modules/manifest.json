@@ -40,5 +40,6 @@
  "39-web-app.js",
  "40-command-search.js",
  "41-navigator.js",
- "42-workspaces.js"
+ "42-workspaces.js",
+ "43-export-recipes.js"
 ]
