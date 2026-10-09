@@ -37,7 +37,7 @@ let inkMap={};const noAcc=!FT.col||!sOn('col','acc'),noPal=!FT.col||!sOn('col','
 const MV=MOVES.filter(x=>FT.stamps&&x[0]!='frame'&&!(x[0]=='text'&&!FT.text)&&!(x[0]=='swap'&&noPal)&&!(x[0]=='inks'&&noAcc)&&(x[0]=='text'||sOn('stamps',x[0])));
 const F=new Set(),nf=Math.min(RZ.n||wpick([[1,.55],[2,.45]]),MV.length);while(F.size<nf){const m=wpick(MV.filter(x=>!F.has(x[0])).map(x=>[x[0],x[2]]));F.add(m)}
 // lettering takes over the main stamp, so it doesn't pair with moves that rework that stamp
-if(F.has('text')&&!WBX.wbTxPlace)F.delete('text');if(F.has('text'))['sym','mix','motif'].forEach(x=>F.delete(x));if(!F.size&&FT.stamps)F.add('link');if(FT.frame)F.add('frame');
+if(F.has('text')&&!WBX.wbTxPlace)F.delete('text');if(F.has('text'))['sym','mix','motif'].forEach(x=>F.delete(x));if(!F.size&&FT.stamps)F.add('link');if(FT.frame&&!(WBS.dim.rt&&!WBS.book.on))F.add('frame');
 const tok=WBX.wbRndTok=(WBX.wbRndTok||0)+1;let txReq=null;
 const on=k=>F.has(k);
 const KW=[['rect',.34],['hex',.15],['circle',.15],['diamond',.2],['tri',.16]];
@@ -162,12 +162,12 @@ c.pr.t='';
 if(FT.col&&(sOn('col','pal')||newPal)&&!noAcc){const keepN=new Set(PC),mapInk=n=>{if(!n||!CM[n]||keepN.has(n)||acc.includes(n))return n;if(!(n in inkMap))inkMap[n]=inkFor()||n;return inkMap[n]};
  c.tiles=c.tiles.map(t=>{const n=mapInk(t.ink);return n!==t.ink?{...t,ink:n}:t});c.layers=c.layers.map(l=>{const n=mapInk(l.ink);return n!==l.ink?{...l,ink:n}:l})}
 // Canvas shape: roll a new outline (never the print cover, and never Custom, which needs a file)
-if(FT.shape&&!WBS.book.on){const SGM={rect:'box',rrect:'box',circle:'round',oval:'round',arch:'arch',hex:'poly',tri:'poly',diamond:'poly',ngon:'poly'},SHL=[['rect',1.2],['rrect',1],['circle',.8],['oval',1],['arch',1],['hex',.8],['tri',.6],['diamond',.7],['ngon',.8]].filter(x=>sOn('shape',SGM[x[0]])),k=wpick(SHL.length?SHL:[['rect',1]]),nd=JSON.parse(JSON.stringify(c.dim));['cs','cr','n','co','g'].forEach(x=>delete nd[x]);
+if(FT.shape&&!WBS.book.on&&!WBS.dim.rt){const SGM={rect:'box',rrect:'box',circle:'round',oval:'round',arch:'arch',hex:'poly',tri:'poly',diamond:'poly',ngon:'poly'},SHL=[['rect',1.2],['rrect',1],['circle',.8],['oval',1],['arch',1],['hex',.8],['tri',.6],['diamond',.7],['ngon',.8]].filter(x=>sOn('shape',SGM[x[0]])),k=wpick(SHL.length?SHL:[['rect',1]]),nd=JSON.parse(JSON.stringify(c.dim));['cs','cr','n','co','g'].forEach(x=>delete nd[x]);
 if(k!='rect')nd.cs=k;if(CASP.includes(k)||k=='rect')nd.c=ratioPick();
 if(k=='rrect')nd.cr=ri(8,45);if(k=='ngon'){nd.n=ri(5,10);if(ch(.5))nd.co='f'}if(k=='hex'||k=='tri'){if(ch(.35))nd.co='f'}
 c.dim=nd;try{kv.set('wb14_dim',JSON.stringify(nd))}catch(e){}}
 // Canvas size on its own: a new ratio for a canvas that has one (round and regular shapes stay square)
-if(FT.size&&!FT.shape&&!WBS.book.on){const kk=c.dim.cs||'rect';if(kk=='rect'||CASP.includes(kk)){const nd2=JSON.parse(JSON.stringify(c.dim));nd2.c=ratioPick();c.dim=nd2;try{kv.set('wb14_dim',JSON.stringify(nd2))}catch(e){}}}
+if(FT.size&&!FT.shape&&!WBS.book.on&&!WBS.dim.rt){const kk=c.dim.cs||'rect';if(kk=='rect'||CASP.includes(kk)){const nd2=JSON.parse(JSON.stringify(c.dim));nd2.c=ratioPick();c.dim=nd2;try{kv.set('wb14_dim',JSON.stringify(nd2))}catch(e){}}}
 WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;const oldL=WBS.layers.slice(),oldT=WBS.tiles.slice(),oldG=WBX.wbGrade?WBX.wbGrade.get():null;WBS.selL=0;(WBX.wbApply||applyCore)(c);WBS.selL=0;
 // colour grade: a gentle look most of the time (about a quarter stay neutral). Masks: up to two light local touches.
 if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v,isF=l=>!!(l.fr&&l.fr.on);let gl={};

@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,SH,SW,col} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,SH,SW,col,tileExt,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -17,7 +17,10 @@ function surfFor(t){const q=isOf(t);if(!q){delete SURFC[t.id];return''}const k=q
 // the overlay, clipped to the stamp's ink by the stamp's own mask (mid)
 const txoG=(t,mid)=>{const c=SURFC[t.id];return c&&c.o?`<g class="txo"${WBS.edInk?'':' display="none"'} mask="url(#${mid})"><use href="#txo${t.id}"/></g>`:''};
 // a whole layer: wear = one mask over the canvas, relief / stain = a filter on the layer
-function layTexMask(L,li){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return'';const v=txImgs(q,CW,CH,800,'host',txIsW);return v?`<mask id="lt${li}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`:''}
+// Repeat tile: a picture that covers the tile is repeated one tile over in every direction (used by masks, which must reach past the edges)
+const tileCopies=(v,id)=>{let o=`<g id="${id}">${v}</g>`;for(const dx of[-1,0,1])for(const dy of[-1,0,1])if(dx||dy)o+=`<use href="#${id}" x="${dx*CW}" y="${dy*CH}"/>`;return o};
+function layTexMask(L,li){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return'';const tl=tileOn(),v=txImgs(q,CW,CH,800,'host',txIsW,0,0,tl);if(!v)return'';
+return tl?`<mask id="lt${li}" maskUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"><rect x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" fill="#fff"/>${tileCopies(v,'ltc'+li)}</mask>`:`<mask id="lt${li}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`}
 function layTexOv(L){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return['',''];const f=txFilt(q,0,0,CW,CH,800);return f?[`<g filter="url(#${f})">`,'</g>']:['','']}
 function txRefs(){const m=new Map(),add=u=>(Array.isArray(u)?u:[]).forEach(z=>{if(z&&z.x)m.set(z.x,(m.get(z.x)||0)+1)});WBS.tiles.forEach(t=>add(t.tu));WBS.layers.forEach(L=>{add(L.tu);(L.pl||[]).forEach(p=>add(p.tu))});if(WBS.tex&&Array.isArray(WBS.tex.u))add(WBS.tex.u);if(WBX.wbTxUses)add(WBX.wbTxUses());return m}
 // Older projects kept their texture in other places (per-stamp "is", the single canvas surface). They become library textures here.
@@ -100,7 +103,7 @@ const migInk=()=>{if(WBS.pr&&WBS.pr.t&&WBS.tiles.some(t=>(t.is===undefined&&t.tu
 function roughFilter(){
 const E=WBS.pr.e,Q=WBS.pr.q,A=WBS.pr.a/100,k=100/Math.max(25,WBS.pr.sc),f=v=>+(v*k).toFixed(5),S=WBS.pr.sd;
 if(!E&&!Q)return'';
-const nz=(id,type,bf,oc,sd)=>`<feTurbulence type="${type}" baseFrequency="${bf}" numOctaves="${oc}" seed="${sd}" result="${id}"/>`;
+const tl=tileOn(),nz=(id,type,bf,oc,sd)=>tl?`<feTurbulence type="${type}" baseFrequency="${bf}" numOctaves="${oc}" seed="${sd}" stitchTiles="stitch" x="0" y="0" width="${CW}" height="${CH}" result="${id}0"/><feTile in="${id}0" result="${id}"/>`:`<feTurbulence type="${type}" baseFrequency="${bf}" numOctaves="${oc}" seed="${sd}" result="${id}"/>`;
 const th=(src,id,sl,ic)=>`<feComponentTransfer in="${src}" result="${id}"><feFuncA type="linear" slope="${sl}" intercept="${(+ic).toFixed(3)}"/></feComponentTransfer>`;
 const mix=(a,b,ka,kb,id)=>`<feComposite in="${a}" in2="${b}" operator="arithmetic" k1="0" k2="${ka}" k3="${kb}" k4="0" result="${id}"/>`;
 let b='',cur='SourceGraphic';
@@ -108,14 +111,15 @@ if(E){b+=nz('en','fractalNoise',.045,2,S)+`<feDisplacementMap in="SourceGraphic"
 if(Q){const r=(.8+Q*.22).toFixed(2),dk=(1-Q*.04).toFixed(3),lt=(1-Q*.035).toFixed(3);
 b+=`<feColorMatrix in="${cur}" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 ${lt} 0" result="qc"/><feColorMatrix in="${cur}" type="matrix" values="${dk} 0 0 0 0 0 ${dk} 0 0 0 0 0 ${dk} 0 0 0 0 0 1 0" result="qd"/><feMorphology in="${cur}" operator="erode" radius="${r}" result="qe"/><feGaussianBlur in="qe" stdDeviation="${(r*.6).toFixed(2)}" result="qb"/><feComposite in="qd" in2="qb" operator="out" result="qr"/><feMerge result="r2"><feMergeNode in="qc"/><feMergeNode in="qr"/></feMerge>`;cur='r2'}
 
+if(tl){const[ex,ey]=tileExt();return`<filter id="rf" filterUnits="userSpaceOnUse" x="${-ex}" y="${-ey}" width="${CW+2*ex}" height="${CH+2*ey}" color-interpolation-filters="sRGB">${b}</filter>`}
 return`<filter id="rf" filterUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}" color-interpolation-filters="sRGB">${b}</filter>`}
 function syncPr(){$('rgh').value=WBS.pr.e;$('psq').value=WBS.pr.q;if(WBX.wbTexReady)txRefresh()}
 const saveTex=()=>{try{kv.set('wb10_tex',JSON.stringify(WBS.tex))}catch(e){}};
-function buildTex(){let o='';try{o=txImgs(txSpecs(WBS.tex&&WBS.tex.u,'relief'),CW,CH,900,'inline',txIsO)}catch(e){o=''}
+function buildTex(){let o='';try{o=txImgs(txSpecs(WBS.tex&&WBS.tex.u,'relief'),CW,CH,900,'inline',txIsO,0,0,tileOn());if(o&&tileOn()&&WBS.tilePv)o=tileCopies(o,'txgc')}catch(e){o=''}
 TEXK=txCvKey();$('texg').innerHTML=o?`<g pointer-events="none">${o}</g>`:'';if(typeof upd=='function'&&WBX.wbTexReady)upd()}
 // the mask used on the ink so it skips the worn spots of the canvas texture (inl: pictures inside the markup, for a stand-alone file)
-function inkCatch(inl){const q=txSpecs(WBS.tex&&WBS.tex.u,'relief').filter(txIsW);if(!q.length)return null;const v=txImgs(q,CW,CH,900,inl?'inline':'host',txIsW);
-return v?{defs:`<mask id="cw" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`}:null}
+function inkCatch(inl){const q=txSpecs(WBS.tex&&WBS.tex.u,'relief').filter(txIsW);if(!q.length)return null;const tl=tileOn(),v=txImgs(q,CW,CH,900,inl?'inline':'host',txIsW,0,0,tl);
+if(!v)return null;return tl?{defs:`<mask id="cw" maskUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"><rect x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" fill="#fff"/>${tileCopies(v,'cwc')}</mask>`}:{defs:`<mask id="cw" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`}}
 function syncTex(){texNorm();txRefresh(true)}
 // the same stack control in the Stamp, Layers and Canvas panels
 const txCommit=()=>{store();upd();txCap();txRefresh()};

@@ -1,6 +1,6 @@
 import {clipboard,kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {C,CC,CH,CM,CW,PCOL,PL,SHN,SK,col,csk,geom,paintColors,projSet,saveCC,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {C,CC,CH,CM,CW,PCOL,PL,SHN,SK,col,csk,geom,paintColors,projSet,saveCC,setDim,shOf,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {clean,cust,luid,mcSave,mkL,say,store} from './06-motif-library-folders.js';
 import {build,hx,leadT} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -38,7 +38,8 @@ const LY=()=>WBS.layers[WBS.selL];
 const STY="One unified carved-stamp style drawn from medieval sources: the flat, heavy, firmly outlined forms of Romanesque Bible illumination; the spirals, dots and interlace of Insular manuscripts; the bold geometric shapes, stripes and scallops of Mozarabic Beatus pages; and the thick, even outline of 15th-century blockbook woodcuts. No shading, no perspective, frontal or profile poses, strong readable silhouettes.";
 const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'wodblok-pattern';return n+'.'+ext};
 const ser=()=>{const k=WBS.edMk;if(!k){WBS.edMk=true;upd()}try{return ser0()}finally{if(!k){WBS.edMk=false;upd()}}};
-const ser0=()=>{const c=$('art').cloneNode(true);WBX.wbVec(c);['#guig','#fpgrid','#fpov','#gmov'].forEach(q=>{const g=c.querySelector(q);if(g)g.remove()});const gd=c.querySelector('#grdf');if(gd&&WBX.wbGrade)gd.innerHTML=WBX.wbGrade.defs(false);{const sd=c.querySelector('#surfd');if(sd&&!WBS.edInk)sd.innerHTML=WBS.tiles.map(t=>SURFC[t.id]?SURFC[t.id].s:'').join('');c.querySelectorAll('[data-tki]').forEach(g=>{g.setAttribute('mask','url(#cw)');g.removeAttribute('data-tki')});c.querySelectorAll('.txo[display]').forEach(g=>g.removeAttribute('display'));const tg=c.querySelector('#texg');if(tg)tg.style.display=''}return new XMLSerializer().serializeToString(c)};
+const ser0=()=>{const c=$('art').cloneNode(true);WBX.wbVec(c);if(tileOn())c.setAttribute('viewBox',`0 0 ${CW} ${CH}`);   // a repeat tile is saved as the tile, also while the 3 x 3 view is on
+['#guig','#fpgrid','#fpov','#gmov'].forEach(q=>{const g=c.querySelector(q);if(g)g.remove()});const gd=c.querySelector('#grdf');if(gd&&WBX.wbGrade)gd.innerHTML=WBX.wbGrade.defs(false);{const sd=c.querySelector('#surfd');if(sd&&!WBS.edInk)sd.innerHTML=WBS.tiles.map(t=>SURFC[t.id]?SURFC[t.id].s:'').join('');c.querySelectorAll('[data-tki]').forEach(g=>{g.setAttribute('mask','url(#cw)');g.removeAttribute('data-tki')});c.querySelectorAll('.txo[display]').forEach(g=>g.removeAttribute('display'));const tg=c.querySelector('#texg');if(tg)tg.style.display=''}return new XMLSerializer().serializeToString(c)};
 function init14(){
 [['c','c'],['s','s']].forEach(([k,p])=>{
 $(p+'asp').oninput=()=>{const v=$(p+'asp').value;if(v=='x'){$(p+'asp').dataset.custom='1';$(p+'aw').focus();return}

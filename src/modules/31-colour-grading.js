@@ -78,8 +78,8 @@ const flt=(id,x,y,w,h,pr)=>`<filter id="${id}" filterUnits="userSpaceOnUse" prim
 // the whole print (texture=1: the paper texture, which skips colour/luminance masks since it has no print colours of its own)
 function canvasF(id,texture){let o='',c='SourceGraphic';if(hasA(grd)){const r=adjP(grd,c,'G');o+=r[0];c=r[1]}
 const ctx={W:CW,H:CH,X:0,Y:0,RW:CW,RH:CH,k:'c'};
-grd.masks.forEach((m,i)=>{if(!m.on||!WBS.edMk||m.t=='lay'||(isPos(m)&&m.sp=='s')||(texture&&!isPos(m)))return;const r=maskStep(m,i,c,ctx);o+=r[0];c=r[1]});
-return o?flt(id,0,0,CW,CH,o):''}
+grd.masks.forEach((m,i)=>{if(!m.on||!WBS.edMk||m.t=='lay'||(isPos(m)&&m.sp=='s')||(texture&&!isPos(m))||(isPos(m)&&WBS.dim.rt&&!WBS.book.on))return;const r=maskStep(m,i,c,ctx);o+=r[0];c=r[1]});
+return o?(WBS.dim.rt&&!WBS.book.on&&WBS.tilePv?flt(id,-CW,-CH,3*CW,3*CH,o):flt(id,0,0,CW,CH,o)):''}
 // stamp-space gradients ride along with every print of the stamp
 function stampF(t){const g=geom(shOf(t)),W=g.SW,H=g.SH,p=Math.max(W,H)*.15,ctx={W,H,X:-p,Y:-p,RW:W+2*p,RH:H+2*p,k:'s'},ms=stMasks(t.id);let o='',c='SourceGraphic';
 if(!gdBypass&&hasA(t.gr)){const r=adjP(t.gr,c,'T');o+=r[0];c=r[1]}

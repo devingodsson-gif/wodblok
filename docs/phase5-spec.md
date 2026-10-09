@@ -11,8 +11,8 @@ commands in the registry (so command search finds them), no tool windows open at
 | 2 | Navigator, hand tool, zoom keys | done, v0.112 |
 | 3 | Workspaces | done, v0.113 |
 | 4 | Export recipes | done, v0.114 |
-| 5 | Repeat-tile export | next |
-| 6 | Print proof | |
+| 5 | Repeat tile (a canvas format) | done, v0.115 |
+| 6 | Print proof | next |
 | 7 | Presets | |
 | 8 | Variations strip | |
 | 9 | Task bar | |
@@ -32,8 +32,11 @@ commands in the registry (so command search finds them), no tool windows open at
 - Click a recipe to export with it (its settings also load into the fields). Starting points: Web (PNG 2048 px), Print (PNG 6000 px), Preview (JPG 800 px). Yours can be renamed and deleted. "Export all as one zip" makes every recipe in a single file.
 - Stored with your settings. The Export menu in the top bar is unchanged. Commands: Open Export recipes, Export with the recipe settings, Export all recipes as one zip.
 
-## 5. Repeat-tile export (default design)
-- Exports one repeat of the pattern as an image that tiles without a seam: PNG at a chosen size, and SVG. A check image shows it repeated 3 x 3 before saving.
+## 5. Repeat tile (v0.115, a canvas format instead of an export)
+- Canvas > Format has a third choice, Repeat tile: a rectangle (the ratio controls stay) whose edges meet. Saved with the canvas (`dim.rt`), undoable. Exports (also Export recipes) give the tile.
+- Grids stretch or squeeze a little so a whole number of cells fills the tile each way (staggered grids use an even number); each cell's look comes from its place within one repeat. Loose layers (free-placed stamps, pictures, text) are drawn again one tile over each way. Canvas and layer textures are blended with a half-shifted copy so their edges meet; print roughness uses noise that repeats.
+- Not drawn on a repeat tile: frames and gradients across the whole canvas (a note in the Canvas tool says how many). Layer rotation is ignored. Randomize leaves the tile's shape alone and adds no frame.
+- "Repeat 3 × 3" (top bar, only on a tile) shows the tile repeated so seams can be checked; nothing can be edited in that view.
 
 ## 6. Print proof (default design)
 - A one-page proof sheet to check before printing: the piece, the repeat shown tiled, the colours used with their names and book numbers, the size, and the date. Saved as PNG or PDF.

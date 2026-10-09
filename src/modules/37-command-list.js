@@ -39,6 +39,7 @@ const COMMANDS = [
   ['panel.wspc', 'Open Workspaces', 'rail-wspc'],
   ['workspace.save', 'Save workspace', 'wxsave'],
   ['panel.xrec', 'Open Export recipes', 'rail-xrec'],
+  ['view.tileRepeat', 'Repeat tile: show 3 × 3', 'tpv'],
   ['export.now', 'Export with the recipe settings', 'xrnow'],
   ['export.allRecipes', 'Export all recipes as one zip', 'xrall'],
   ['view.before', 'Before', 'bab', '\\'],

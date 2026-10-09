@@ -30,7 +30,11 @@ const useG=g=>{SK=g.SK;HO=g.HO;SW=g.SW;SH=g.SH;HL=g.HL;HN=g.HN;OFFS=g.OFFS;CRAD=
 const shOf=t=>{if(!t.sh||typeof t.sh!='object')t.sh={k:SHK.includes(WBS.dim.k)?WBS.dim.k:'rect',o:WBS.dim.o=='f'?'f':'p',s:[...(WBS.dim.s||[1,1])],z:100};return t.sh};
 const useT=t=>{if(t)useG(geom(shOf(t)))};
 const SHN={rect:'Rectangle',hex:'Hexagon',circle:'Circle',diamond:'Diamond',tri:'Triangle',arch:'Arch',oct:'Octagon',star:'Star',quat:'Quatrefoil',lancet:'Lancet'};
-const setDim=()=>{if(WBS.dim.cs&&!CSN[WBS.dim.cs]){delete WBS.dim.cs;delete WBS.dim.g}if(WBS.dim.cp)delete WBS.dim.cp;useG(geom(WBS.dim));try{useT(WBS.tiles[WBS.cur])}catch(e){}
+// Repeat tile canvas (dim.rt): a rectangle whose edges wrap, so copies placed side by side show no seam. The content is drawn a little past
+// each edge (tileExt) so filters see the neighbouring tile, and a whole 3 x 3 when the repeat preview is on (WBS.tilePv).
+const tileOn=()=>!!WBS.dim.rt&&!WBS.book.on;
+const tileExt=()=>tileOn()?(WBS.tilePv?[CW,CH]:[Math.min(CW,48),Math.min(CH,48)]):[0,0];
+const setDim=()=>{if(WBS.dim.rt&&WBS.dim.cs)delete WBS.dim.cs;if(WBS.dim.cs&&!CSN[WBS.dim.cs]){delete WBS.dim.cs;delete WBS.dim.g}if(WBS.dim.cp)delete WBS.dim.cp;useG(geom(WBS.dim));try{useT(WBS.tiles[WBS.cur])}catch(e){}
 if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims(csk())};
 // Canvas outline: dim.cs = rect (default) | rrect | circle | oval | arch | hex | tri | diamond | ngon.
 // Everything is clipped to the outline. dim.cr = rounded corner %, dim.n = polygon sides, dim.co = 'f' for the flat orientation.
@@ -166,4 +170,4 @@ mkdd('pI',C.map(cItem));mkdd('pB',C.map(cItem));mkdd('p3',[noneItem,...C.map(cIt
 paintColors();
 mkdd('pal',[{v:'',h:'<span class="combo">&mdash;</span>Custom mix'},...PL.map((p,i)=>({v:i,h:`<span class="combo" style="background:${CM[p[2]]};color:${CM[p[1]]}">Aa</span><span>${esc(p[0])}<small>No. ${i+1} · ${[p[2],p[1],p[3],p[4]].filter(Boolean).map(esc).join(' · ')}</small></span>`}))]);
 }
-export {C,CASP,CC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,PSLOT,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,col,csN,csk,fixC,geom,hasOut,inShape,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,projCols,projSet,rng,saveCC,setDim,shOf,shp,tk,useG,useT,wrapP,init04};
+export {C,CASP,CC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,PSLOT,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,col,csN,csk,fixC,geom,hasOut,inShape,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,projCols,projSet,rng,saveCC,setDim,tileExt,tileOn,shOf,shp,tk,useG,useT,wrapP,init04};

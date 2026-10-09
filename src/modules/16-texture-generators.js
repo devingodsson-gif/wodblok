@@ -94,8 +94,13 @@ for(let j=0;j<ph;j++){const j0=Math.max(0,j-st),j1=Math.min(ph-1,j+st);for(let i
 return px}
 let TXB;let TXBN=0;
 function txDims(W,H,R){const s=R/Math.max(W,H,1e-6);return[Math.max(8,Math.round(W*s)),Math.max(8,Math.round(H*s))]}
-function txBmp(S,W,H,R){const Z=R>=800?Math.max(1,Math.max(W,H)/200):1;if(Z>1)S={...S,sc:S.sc/Z};const[pw,ph]=txDims(W,H,R),key=txKey(S)+'|'+pw+'x'+ph;let e=TXB.get(key);if(e){TXB.delete(key);TXB.set(key,e);return e}
-const px=txPix(S,pw,ph),cv=document.createElement('canvas');cv.width=pw;cv.height=ph;cv.getContext('2d').putImageData(new ImageData(px,pw,ph),0,0);
+// Repeat tile: make the picture meet itself at the edges. The middle is the texture as it was; towards each edge it fades into a copy
+// moved half a picture across, and at the edge both sides show the same part of that copy, so the edges match.
+function txSeam(px,pw,ph){const src=new Uint8ClampedArray(px),hx=pw>>1,hy=ph>>1,wx=new Float32Array(pw),wy=new Float32Array(ph);
+for(let x=0;x<pw;x++)wx[x]=Math.pow(Math.sin(Math.PI*x/pw),2);for(let y=0;y<ph;y++)wy[y]=Math.pow(Math.sin(Math.PI*y/ph),2);
+for(let y=0;y<ph;y++){const y2=(y+hy)%ph;for(let x=0;x<pw;x++){const a=wx[x]*wy[y],o=(y*pw+x)*4,o2=(y2*pw+(x+hx)%pw)*4;for(let c=0;c<4;c++)px[o+c]=src[o+c]*a+src[o2+c]*(1-a)}}}
+function txBmp(S,W,H,R,tl){const Z=R>=800?Math.max(1,Math.max(W,H)/200):1;if(Z>1)S={...S,sc:S.sc/Z};const[pw,ph]=txDims(W,H,R),key=txKey(S)+'|'+pw+'x'+ph+(tl?'|tile':'');let e=TXB.get(key);if(e){TXB.delete(key);TXB.set(key,e);return e}
+const px=txPix(S,pw,ph);if(tl)txSeam(px,pw,ph);const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;cv.getContext('2d').putImageData(new ImageData(px,pw,ph),0,0);
 e={id:++TXBN,url:cv.toDataURL('image/png'),pw,ph,key};TXB.set(key,e);while(TXB.size>90){const k=TXB.keys().next().value;txUnhost(TXB.get(k).id);TXB.delete(k)}return e}
 // big pictures stay out of the per-frame markup: they live once in a persistent block (#txd) and the page refers to them by id
 let TXHS;
@@ -103,7 +108,7 @@ function txHostEl(){return document.getElementById('txd')}
 function txUnhost(id){const h=txHostEl();if(!h)return;h.querySelectorAll('[data-e="'+id+'"]').forEach(n=>{TXHS.delete(n.id);n.remove()})}
 function txHostImg(e,W,H){const id='txi'+e.id+'_'+(+W).toFixed(1)+'_'+(+H).toFixed(1),h=txHostEl();if(h&&!TXHS.has(id)){h.insertAdjacentHTML('beforeend',`<image id="${id}" data-e="${e.id}" href="${e.url}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none"/>`);TXHS.add(id)}return id}
 // images for the specs of one mode-group. how: 'inline' = the picture is in the markup, 'host' = a reference to the persistent copy
-function txImgs(list,W,H,R,how,want,ox,oy){let o='';const x=ox||0,y=oy||0;list.forEach(S=>{if(!want(S))return;const e=txBmp(S,W,H,R);o+=how=='inline'?`<image href="${e.url}" x="${x}" y="${y}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none"/>`:`<use href="#${txHostImg(e,W,H)}" x="${x}" y="${y}"/>`});return o}
+function txImgs(list,W,H,R,how,want,ox,oy,tl){let o='';const x=ox||0,y=oy||0;list.forEach(S=>{if(!want(S))return;const e=txBmp(S,W,H,R,tl);o+=how=='inline'?`<image href="${e.url}" x="${x}" y="${y}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none"/>`:`<use href="#${txHostImg(e,W,H)}" x="${x}" y="${y}"/>`});return o}
 const txIsW=S=>S.md=='wear',txIsO=S=>S.md!='wear';
 const txHash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=(Math.imul(h,33)+s.charCodeAt(i))|0;return(h>>>0).toString(36)};
 // overlay filter (relief / stain on a layer or a text box): the picture is laid over the shape only where the shape has ink

@@ -41,5 +41,6 @@
  "40-command-search.js",
  "41-navigator.js",
  "42-workspaces.js",
- "43-export-recipes.js"
+ "43-export-recipes.js",
+ "44-repeat-tile.js"
 ]
