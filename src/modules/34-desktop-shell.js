@@ -27,8 +27,8 @@ let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'ca
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colors',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Preview',grid:'Grid',layers:'Arrangement',pgrid:'Grid',grade:'Grade',tex:'Textures',rand:'Randomize',hist:'History'};
-const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib','nav'],stamp:['motifs','text','mlist','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
+const PNAME={wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colors',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Preview',grid:'Grid',layers:'Arrangement',pgrid:'Grid',grade:'Grade',tex:'Textures',rand:'Randomize',hist:'History'};
+const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib','nav','wspc'],stamp:['wspc','motifs','text','mlist','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=m=>m=='pattern'?{dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]}:{dock:[wsG(['motifs']),wsG(['stamp','colors','grade','tex','rand'])],float:[wsG(['mlist'],{x:null,y:null,w:230,h:440}),wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}),wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'})]};
@@ -163,6 +163,13 @@ if(!g){const own=(p=='rand'||!L.dock.length)?wsG([p]):null;   // made in the sam
 g=(p=='rand'&&L.dock.find(x=>x.tabs.includes('grade')))||L.dock[0];if(g)g.tabs.push(p);else{g=own;L.dock.push(g)}}g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
+// Workspaces: read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
+WBX.wbWsGet=()=>JSON.parse(JSON.stringify({pattern:WS.pattern,stamp:WS.stamp}));
+WBX.wbWsSet=o=>{const had=!!wsFind('wspc');['pattern','stamp'].forEach(m=>{const L=o&&o[m];if(!L)return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=wsG([]).id;g.f=+g.f||1;g.e=g.e||'r';g.col=false;return g.tabs.length>0};
+ const c=JSON.parse(JSON.stringify(L));WS[m]={dock:(c.dock||[]).filter(ok),float:(c.float||[]).filter(ok)}});
+ // the Workspaces tool you are choosing from stays open (as its own group at the end), so the next workspace is one click away
+ if(had){const L=wsL();if(!wsAll().some(g=>g.tabs.includes('wspc')))L.dock.push(wsG(['wspc']))}
+ wsSave();wsRender();info();nums()};
 $('rcls').onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length)return;L.dock=[];L.float=[];wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')};
 document.querySelector('.rail').onclick=e=>{const b=e.target.closest('[data-pn]');if(!b)return;const p=b.dataset.pn,g=wsFind(p);
 // double-clicking the Randomize tool rolls a new piece, the same as pressing the Randomize button in its window (the window is left open)

@@ -9,8 +9,8 @@ commands in the registry (so command search finds them), no tool windows open at
 |---|---|---|
 | 1 | Command search (Ctrl/Cmd+K) | done, v0.109 |
 | 2 | Navigator, hand tool, zoom keys | done, v0.112 |
-| 3 | Workspaces | next |
-| 4 | Export recipes | |
+| 3 | Workspaces | done, v0.113 |
+| 4 | Export recipes | next |
 | 5 | Repeat-tile export | |
 | 6 | Print proof | |
 | 7 | Presets | |
@@ -22,10 +22,10 @@ commands in the registry (so command search finds them), no tool windows open at
 - Hand tool: hold Space, press the middle mouse button, or turn on the Hand button, then drag the picture. Keys: `+` `-` zoom, `1` is 100%, `0` fits, `H` toggles Hand.
 - Wheel or pinch zoom (Ctrl+wheel) now keeps the spot under the pointer fixed.
 
-## 3. Workspaces (default design)
+## 3. Workspaces (v0.113)
 - A workspace is a saved arrangement of the tool panels: which tools are open, their tabs and where they are docked or floating, for the Pattern view and the Stamp editor.
 - Save the current arrangement under a name, apply it with one click, rename, delete. Stored with your settings (not inside project files). A few starting ones: Colour work, Layout work, Everything closed.
-- Launch still opens no tool windows; a workspace is only applied when you choose it. Each one is a command ("Workspace: <name>").
+- Launch still opens no tool windows; a workspace is only applied when you choose it. The Workspaces tool stays open (as its own group at the end) after you pick one, so the next is one click away. Commands: Open Workspaces, Save workspace. Your own saved workspaces are in the Workspaces tool, not in command search.
 
 ## 4. Export recipes (default design)
 - A recipe is a saved set of export settings (format, size or scale, background, and the other choices the Export menu has). Save the current settings as a recipe, then export with one click, or run several recipes in a row ("web, print, thumbnail").

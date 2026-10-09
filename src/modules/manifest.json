@@ -39,5 +39,6 @@
  "38-crash-recovery.js",
  "39-web-app.js",
  "40-command-search.js",
- "41-navigator.js"
+ "41-navigator.js",
+ "42-workspaces.js"
 ]

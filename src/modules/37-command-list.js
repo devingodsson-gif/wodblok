@@ -36,6 +36,8 @@ const COMMANDS = [
   ['view.actualSize', 'Zoom to 100%', 'nv100', '1'],
   ['view.hand', 'Hand tool (drag to move the picture)', 'nvhand', 'H'],
   ['panel.nav', 'Open Navigator', 'rail-nav'],
+  ['panel.wspc', 'Open Workspaces', 'rail-wspc'],
+  ['workspace.save', 'Save workspace', 'wxsave'],
   ['view.before', 'Before', 'bab', '\\'],
   ['view.split', 'Split view', 'bas', 'Shift+\\'],
   ['view.grid', 'Show grid', 'gtg', 'G'],
