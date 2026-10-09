@@ -1,7 +1,7 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {BK} from './03-stamp-prints-and-drawing.js';
-import {C,CASP,CH,CM,CW,SH,SK,SW,col,geom,inShape,projCols,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {C,CASP,CH,CM,CW,PL,PSLOT,SH,SK,SW,col,geom,inShape,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {CATS} from './05-motif-data.js';
 import {cust,it,mkL,selOne,store} from './06-motif-library-folders.js';
 import {gModel} from './08-grid-shapes.js';
@@ -44,8 +44,10 @@ const KW=[['rect',.34],['hex',.15],['circle',.15],['diamond',.2],['tri',.16]];
 const mkSh=(k,z=100)=>({k,o:ch(.5)?'p':'f',s:(k=='rect'||k=='diamond')?wpick([[[1,1],.6],[[3,4],.15],[[4,3],.15],[[2,3],.1]]):[1,1],z});
 const sh0=mkSh(wpick(KW));WBS.dim={...WBS.dim,k:sh0.k,o:sh0.o,s:sh0.s};setDim();
 // --- colours: two-colour base, at most one accent ink (two with the "extra inks" move)
-// Colours stay inside the project's own palette (its 1st to 4th colours): 'light on dark' only swaps paper and ink, accents come from the other palette colours.
-const PC=projCols(),sw=on('swap'),pInk=sw?WBS.proj.bg:WBS.proj.ink,pBg=sw?WBS.proj.ink:WBS.proj.bg;
+// Colours stay inside the palette (its 1st to 4th colours): 'light on dark' only swaps paper and ink, accents come from the other palette colours.
+// "New palette" first picks a Wada combination for all four, as the Palette menu does; otherwise the project's own palette is kept.
+const newPal=FT.col&&sOn('col','new')&&PL.length?pick(PL):null,P0={...WBS.proj};if(newPal){P0.ink=newPal[1];P0.bg=newPal[2];['c3','c4'].forEach((k,i)=>{if(newPal[i+3])P0[k]=newPal[i+3];else delete P0[k]})}
+const PC=PSLOT.map(k=>P0[k]).filter(Boolean),sw=on('swap'),pInk=sw?P0.bg:P0.ink,pBg=sw?P0.ink:P0.bg;
 const lum=h=>{const v=hx3(col(h));return .2126*v[0]+.7152*v[1]+.0722*v[2]},bgL=lum(pBg),used=new Set([pInk]),acc=[];
 const inkFor=()=>{if(noAcc)return null;if(acc.length>=(on('inks')?2:1))return pick(acc);let ok=PC.filter(n=>!used.has(n)&&n!=pBg&&Math.abs(lum(n)-bgL)>.28);if(!ok.length)ok=PC.filter(n=>!used.has(n)&&n!=pBg);if(!ok.length)return pInk;const n=pick(ok);used.add(n);acc.push(n);return n};
 // --- motif pool: one main theme (your imports when you have a few), with dots as accents
@@ -147,7 +149,7 @@ rzUse=(pool,md)=>{const t=pick(pool),L=txMake(t,{a:md=='wear'?ri(18,60):md=='sta
 rzList=(m,w,n)=>{const pool=rzPool(m),u=[];if(!pool.length||!rzMds(m).length)return u;for(let i=0;i<n;i++){const md=rzMd(m,w);if(md)u.push(rzUse(pool,md))}return u},
 WCV={relief:3,stain:1,wear:1.4},WST={wear:4,relief:1.5,stain:1},
 rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u:(sOn('tx','none')&&ch(.2)?[]:rzList('tx',WCV,ch(.3)?2:1));
-const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(l=>l.art)?[]:WBS.layers.filter(l=>l.art||l.txt)),proj:{...WBS.proj,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:rzCv(),v:87}};
+const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(l=>l.art)?[]:WBS.layers.filter(l=>l.art||l.txt)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:rzCv(),v:87}};
 if(RZ.keep.pr)c.pr={...WBS.pr};
 if(FT.pr&&!sOn('pr','edges')){c.pr.e=WBS.pr.e;c.pr.q=WBS.pr.q}
 // textures: a Print effects roll gives each stamp (and layer, and text box) its own textures, each in its own mode
@@ -156,8 +158,8 @@ else{const src=(WBS.tiles.find(t=>t.tu&&t.tu.length)||{}).tu;c.tiles.forEach(t=>
 if(FT.pr&&sOn('pr','lay'))c.layers.forEach(l=>{if(!l.art&&!l.txt&&ch(.3))l.tu=rzList('pr',WST,1)});
 if(FT.pr&&sOn('pr','txt'))c.layers=c.layers.map(l=>{if(!l.txt||!(l.pl||[]).length)return l;const q=JSON.parse(JSON.stringify(l));q.pl.forEach(p=>{if(p.tx&&ch(.6))p.tu=rzList('pr',WST,1)});return q});
 c.pr.t='';
-// Colours: when the palette changes, kept stamps and layers that carry their own accent ink move to the new palette too
-if(FT.col&&sOn('col','pal')&&!noAcc){const keepN=new Set(PC),mapInk=n=>{if(!n||!CM[n]||keepN.has(n)||acc.includes(n))return n;if(!(n in inkMap))inkMap[n]=inkFor()||n;return inkMap[n]};
+// Colours: when the palette changes (a new palette, or paper and ink swapped), kept stamps and layers that carry their own accent ink move to the new palette too
+if(FT.col&&(sOn('col','pal')||newPal)&&!noAcc){const keepN=new Set(PC),mapInk=n=>{if(!n||!CM[n]||keepN.has(n)||acc.includes(n))return n;if(!(n in inkMap))inkMap[n]=inkFor()||n;return inkMap[n]};
  c.tiles=c.tiles.map(t=>{const n=mapInk(t.ink);return n!==t.ink?{...t,ink:n}:t});c.layers=c.layers.map(l=>{const n=mapInk(l.ink);return n!==l.ink?{...l,ink:n}:l})}
 // Canvas shape: roll a new outline (never the print cover, and never Custom, which needs a file)
 if(FT.shape&&!WBS.book.on){const SGM={rect:'box',rrect:'box',circle:'round',oval:'round',arch:'arch',hex:'poly',tri:'poly',diamond:'poly',ngon:'poly'},SHL=[['rect',1.2],['rrect',1],['circle',.8],['oval',1],['arch',1],['hex',.8],['tri',.6],['diamond',.7],['ngon',.8]].filter(x=>sOn('shape',SGM[x[0]])),k=wpick(SHL.length?SHL:[['rect',1]]),nd=JSON.parse(JSON.stringify(c.dim));['cs','cr','n','co','g'].forEach(x=>delete nd[x]);
