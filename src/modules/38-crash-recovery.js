@@ -9,10 +9,12 @@ import {coreStr,dirty,openData,paintPst,pmsg,snapshot} from './18-projects-and-c
 const RC_EVERY=8000;
 let rcBlank='',rcLast='',rcPrev=null,rcBusy=false;
 function rcShow(on){$('rcv').hidden=!on;$('rcx').hidden=!on}
+// Is there work that would be lost by restarting now? (a project still blank from launch does not count)
+const rcUnsaved=()=>(coreStr()!==rcBlank||!!WBS.cp.id)&&dirty();
 async function rcTick(){
   if(rcBusy||drag)return;rcBusy=true;
   try{
-    const s=coreStr(),need=(s!==rcBlank||!!WBS.cp.id)&&dirty(),key=need?s+'|'+$('pnm').value:'';
+    const s=coreStr(),need=rcUnsaved(),key=need?s+'|'+$('pnm').value:'';
     if(key===rcLast)return;rcLast=key;
     if(!need)return await recovery.del('current');
     await recovery.put('current',{t:Date.now(),id:WBS.cp.id||null,name:$('pnm').value.trim()||'Untitled pattern',data:JSON.stringify(snapshot())});
@@ -38,4 +40,4 @@ function init38(){
   $('rcv').onclick=rcRestore;$('rcx').onclick=rcDismiss;
   rcFind().then(()=>{setInterval(rcTick,RC_EVERY)});
 }
-export {init38,rcTick};
+export {init38,rcTick,rcUnsaved};

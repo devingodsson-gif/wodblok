@@ -1,6 +1,7 @@
 import {offline,reload,storage} from '../platform/index.js';
 import {$} from './01-launch-and-version.js';
-import {dirty,pmsg} from './18-projects-and-cover-overlay.js';
+import {pmsg} from './18-projects-and-cover-overlay.js';
+import {rcUnsaved} from './38-crash-recovery.js';
 // ===== Web app: offline use, updates and browser storage =====
 // Only does anything when the page is served over http(s) (the installed or hosted web app); the single file and the claude.ai
 // preview have no service worker. A new version is downloaded in the background and waits: it is used the next time the app is
@@ -14,7 +15,7 @@ function init39(){
   if(!offline.available())return;
   const dot=$('pupd');
   dot.onclick=async()=>{
-    if(dirty()){pmsg('Save your work first, then press the dot again to update.');return}
+    if(rcUnsaved()){pmsg('Save your work first, then press the dot again to update.');return}
     dot.disabled=true;await offline.apply();reload();
   };
   offline.register(()=>{dot.hidden=false}).catch(()=>{});

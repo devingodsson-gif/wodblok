@@ -59,17 +59,20 @@ test('installs, opens offline, finds a new version without reloading, and applie
   expect(await page.evaluate(async () => (await caches.keys()).sort())).toEqual(['wodblok-107-2026-10-09T10:00:00Z', 'wodblok-107-2026-10-09T11:00:00Z']);
 
   // with unsaved work the dot asks to save first and changes nothing
-  await page.evaluate(() => { document.getElementById('pnm').value = 'Changed'; document.getElementById('pnm').dispatchEvent(new Event('input', { bubbles: true })); });
+  await page.click('.rail [data-pn="rand"]');
+  await page.click('#rzdo');
+  await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)') && window.__wbTest.state().length > 1500);
   await page.click('#pupd');
   await expect(page.locator('#pmsg')).toContainText('Save your work first');
   expect(await page.evaluate(() => window.__stay)).toBe('same page');
 
-  // saved (here: nothing to save) -> the dot applies the update and the old version is cleaned up
-  await page.evaluate(() => { document.getElementById('pnm').value = ''; document.getElementById('pnm').dispatchEvent(new Event('input', { bubbles: true })); });
-  await page.evaluate(() => window.__wbTest.state());
-  await page.reload();                                                           // a new launch uses the new version by itself
+  // a new launch (a reload here) starts blank and still sees the waiting version; with nothing to lose the dot applies it and reloads
+  await page.reload();
+  await expect(page.locator('#pupd')).toBeVisible({ timeout: 15000 });
+  await Promise.all([page.waitForEvent('load'), page.click('#pupd')]);
   await page.waitForFunction(async () => (await caches.keys()).length === 1);
   expect(await page.evaluate(async () => (await caches.keys())[0])).toBe('wodblok-107-2026-10-09T11:00:00Z');
+  await expect(page.locator('#pupd')).toBeHidden();
   expect(external).toEqual([]);                                                  // no fonts or anything else from the network
 });
 

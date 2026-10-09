@@ -45,7 +45,7 @@ $('pfile').onchange=()=>{const fl=$('pfile').files[0];$('pfile').value='';if(fl)
 // Where the browser has its own Open dialog (Chrome, Edge) use it, so Download can write back to the same file; elsewhere the plain file input opens as before
 let pfNative=false;
 $('pfile').addEventListener('click',async e=>{if(!files.canOpen()||pfNative)return;e.preventDefault();
-try{const r=await files.open();if(r)openFile(r.file,r.handle)}catch(err){pfNative=true;pmsg('The Open dialog could not start. Press Open again.')}});
+try{const r=await files.open();if(r)openFile(r.file,r.handle)}catch(err){pfNative=true;$('pfile').click()}});   // the browser's own dialog is not available here (for example inside the claude.ai preview): use the plain file input
 $('pfile').addEventListener('change',()=>{pfNative=false});
 files.onLaunch((f,h)=>openFile(f,h));
 $('pls').onclick=()=>{$('plist').hidden=!$('plist').hidden;$('pls').classList.toggle('on',!$('plist').hidden);if(!$('plist').hidden)renderPL()};
