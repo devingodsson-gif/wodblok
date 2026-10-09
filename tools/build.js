@@ -33,7 +33,7 @@ for (const sub of ['data', 'platform', 'format', 'commands']) {                 
 parts.push(...manifest.map(f => strip(f, fs.readFileSync(path.join(dir, f), 'utf8'))));
 parts.push(strip('main.js', fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8')));
 // The version lives in package.json as 0.MINOR.PATCH while the app is pre-1.0 (the minor number is the release number: 0.108 is what was
-// called v108; it becomes 1.0.0 when Phase 6 is done). The build shows it as "0.108" (and "0.108.1" for a patch) in WB_VER, the badge and
+// called v108; it became 1.0.0 when Phase 6 was done). The build shows it as "0.108" (and "0.108.1" for a patch) in WB_VER, the badge and
 // the page <title>; nothing else needs editing for a release. Versions from before the change (108.0.0 and earlier) still show as 108.
 const PKG = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
 const VM = /^(\d+)\.(\d+)\.(\d+)$/.exec(PKG);
