@@ -2,6 +2,7 @@ import {kv} from '../platform/index.js';
 import {$,WBS,mod} from './01-launch-and-version.js';
 import {lyInkFill} from './32-layers-panel.js';
 import {WADA_COLORS,WADA_COMBOS} from '../data/wada.js';
+import {WADA_NAMES} from '../data/wada-names.js';
 let SW=240,SH=240,CW=533,CH=800;
 const fitD=([w,h],L)=>w>=h?[L,Math.round(L*h/w)]:[Math.round(L*w/h),L];
 // Print cover (full wrap): back + spine + front, with bleed all round. Sizes in inches.
@@ -158,11 +159,11 @@ Object.assign(LEG,{"Winchester Lapis": "#2f4f9a", "Wilton Ultramarine": "#23347a
 {const grp=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255),ch=Math.max(...v)-Math.min(...v),l=hsl(h)[2];return l>=.78?1:ch>=.17?0:2};
 C.sort((a,b)=>{const ga=grp(a[1]),gb=grp(b[1]),A=hsl(a[1]),B=hsl(b[1]);if(ga!=gb)return ga-gb;if(ga==2)return B[2]-A[2];const ha=Math.floor(((A[0]+12)%360)/24),hb=Math.floor(((B[0]+12)%360)/24);return ha-hb||B[2]-A[2]})}
 CM=Object.fromEntries(C);
-PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return['No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj={...PCOL};try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
+PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return[WADA_NAMES[i]||'No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj={...PCOL};try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 $('pal').innerHTML='<option value="">Custom mix</option>'+PL.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('');
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 mkdd('pI',C.map(cItem));mkdd('pB',C.map(cItem));mkdd('p3',[noneItem,...C.map(cItem)]);mkdd('p4',[noneItem,...C.map(cItem)]);mkdd('stI',[defItem,...C.map(cItem)]);
 paintColors();
-mkdd('pal',[{v:'',h:'<span class="combo">&mdash;</span>Custom mix'},...PL.map((p,i)=>({v:i,h:`<span class="combo" style="background:${CM[p[2]]};color:${CM[p[1]]}">Aa</span><span>${esc(p[0])}<small>${[p[2],p[1],p[3],p[4]].filter(Boolean).map(esc).join(' · ')}</small></span>`}))]);
+mkdd('pal',[{v:'',h:'<span class="combo">&mdash;</span>Custom mix'},...PL.map((p,i)=>({v:i,h:`<span class="combo" style="background:${CM[p[2]]};color:${CM[p[1]]}">Aa</span><span>${esc(p[0])}<small>No. ${i+1} · ${[p[2],p[1],p[3],p[4]].filter(Boolean).map(esc).join(' · ')}</small></span>`}))]);
 }
 export {C,CASP,CC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,PSLOT,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,col,csN,csk,fixC,geom,hasOut,inShape,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,projCols,projSet,rng,saveCC,setDim,shOf,shp,tk,useG,useT,wrapP,init04};
