@@ -16,6 +16,7 @@ Source of truth for the app is src/: ES modules in src/modules (order in manifes
 - Platform access only through src/platform/. User actions are commands in the registry. The document is plain data with stable ids. No runtime network; fonts bundled. Pointer events; nothing hover-only in new code. No alert/confirm/prompt.
 - Modules export functions and do no work on import; start-up order lives in src/main.js.
 - Ask before adding a dependency. Licences: MIT, BSD, ISC, Apache, OFL.
+- Every time an update is committed and pushed, rebuild (`npm run build`, from the clean commit so the bottom-bar stamp is the commit date) and publish dist/wodblok.html to the existing preview artifact (https://claude.ai/artifact/AkEURvCERNYJmNPWwiEduB, same URL, same capabilities) without being asked. Say so in the status update.
 - Version lives in package.json; the build writes it into WB_VER and <title>. v100 is the baseline; v101 is the first repo build. One git tag per release.
 - Desktop (Mac/Windows) and mobile are later; do not build them now, but do not block them.
 - Status updates: short, task list with approximate % complete.
