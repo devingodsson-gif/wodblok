@@ -35,5 +35,6 @@
  "34-desktop-shell.js",
  "35-import-artwork-and-motif-sheets.js",
  "36-export-everything.js",
- "37-command-list.js"
+ "37-command-list.js",
+ "38-crash-recovery.js"
 ]

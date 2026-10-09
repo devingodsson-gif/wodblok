@@ -26,6 +26,8 @@ const COMMANDS = [
   ['export.png', 'Export PNG', 'png'],
   ['export.svg', 'Export SVG', 'sv'],
   ['export.copySvg', 'Copy SVG', 'cpy'],
+  ['file.restoreRecovery', 'Restore unsaved work', 'rcv'],
+  ['file.dismissRecovery', 'Dismiss recovered work', 'rcx'],
   ['view.theme', 'Switch light / dark', 'thm'],
   ['view.zoomIn', 'Zoom in', 'zi'],
   ['view.zoomOut', 'Zoom out', 'zo'],

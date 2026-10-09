@@ -61,6 +61,13 @@ async function collection(name, legacyKey) {
   };
 }
 
+// Crash recovery slots: the app writes its unsaved work here every few seconds. Nothing is written when the browser has no IndexedDB.
+const recovery = {
+  get: async k => (hasRecords() ? records.get('recovery:' + k) : null),
+  put: async (k, v) => { if (hasRecords()) await records.put('recovery:' + k, v); },
+  del: async k => { if (hasRecords()) await records.del('recovery:' + k); },
+};
+
 // Restart the app (used after Import everything so every module reads the restored data).
 const reload = () => location.reload();
 
@@ -78,4 +85,4 @@ const clipboard = {
   write: items => navigator.clipboard.write(items),
 };
 
-export {kv,use,clipboard,reload,collection};
+export {kv,use,clipboard,reload,collection,recovery};
