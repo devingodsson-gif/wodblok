@@ -38,8 +38,13 @@ const LY=()=>WBS.layers[WBS.selL];
 const STY="One unified carved-stamp style drawn from medieval sources: the flat, heavy, firmly outlined forms of Romanesque Bible illumination; the spirals, dots and interlace of Insular manuscripts; the bold geometric shapes, stripes and scallops of Mozarabic Beatus pages; and the thick, even outline of 15th-century blockbook woodcuts. No shading, no perspective, frontal or profile poses, strong readable silhouettes.";
 const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'wodblok-pattern';return n+'.'+ext};
 const ser=()=>{const k=WBS.edMk;if(!k){WBS.edMk=true;upd()}try{return ser0()}finally{if(!k){WBS.edMk=false;upd()}}};
+// Knockouts repeat the same shape as a mask once per placement (about 1,300 copies in a busy piece: 10 MB of the 13 MB).
+// The saved, copied and exported picture keeps one copy of each identical mask and points the rest at it; the stage is untouched.
+function svShare(s){const seen=new Map(),to=new Map();
+  s=s.replace(/<mask id="(ks\d+)"([^>]*)>([\s\S]*?)<\/mask>/g,(m,id,a,b)=>{const k=a+'|'+b,f=seen.get(k);if(f){to.set(id,f);return''}seen.set(k,id);return m});
+  if(!to.size)return s;return s.replace(/url\(#(ks\d+)\)/g,(m,id)=>to.has(id)?'url(#'+to.get(id)+')':m)}
 const ser0=()=>{const c=$('art').cloneNode(true);WBX.wbVec(c);if(tileOn())c.setAttribute('viewBox',`0 0 ${CW} ${CH}`);   // a repeat tile is saved as the tile, also while the 3 x 3 view is on
-['#guig','#fpgrid','#fpov','#gmov'].forEach(q=>{const g=c.querySelector(q);if(g)g.remove()});const gd=c.querySelector('#grdf');if(gd&&WBX.wbGrade)gd.innerHTML=WBX.wbGrade.defs(false);{const sd=c.querySelector('#surfd');if(sd&&!WBS.edInk)sd.innerHTML=WBS.tiles.map(t=>SURFC[t.id]?SURFC[t.id].s:'').join('');c.querySelectorAll('[data-tki]').forEach(g=>{g.setAttribute('mask','url(#cw)');g.removeAttribute('data-tki')});c.querySelectorAll('.txo[display]').forEach(g=>g.removeAttribute('display'));const tg=c.querySelector('#texg');if(tg)tg.style.display=''}return new XMLSerializer().serializeToString(c)};
+['#guig','#fpgrid','#fpov','#gmov'].forEach(q=>{const g=c.querySelector(q);if(g)g.remove()});const gd=c.querySelector('#grdf');if(gd&&WBX.wbGrade)gd.innerHTML=WBX.wbGrade.defs(false);{const sd=c.querySelector('#surfd');if(sd&&!WBS.edInk)sd.innerHTML=WBS.tiles.map(t=>SURFC[t.id]?SURFC[t.id].s:'').join('');c.querySelectorAll('[data-tki]').forEach(g=>{g.setAttribute('mask','url(#cw)');g.removeAttribute('data-tki')});c.querySelectorAll('.txo[display]').forEach(g=>g.removeAttribute('display'));const tg=c.querySelector('#texg');if(tg)tg.style.display=''}return svShare(new XMLSerializer().serializeToString(c))};
 function init14(){
 [['c','c'],['s','s']].forEach(([k,p])=>{
 $(p+'asp').oninput=()=>{const v=$(p+'asp').value;if(v=='x'){$(p+'asp').dataset.custom='1';$(p+'aw').focus();return}
@@ -114,9 +119,10 @@ $('cpy').onclick=async()=>{try{await clipboard.writeText(ser());say('SVG copied.
 $('sv').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
 try{await d.save({filename:expName('svg'),data:ser()})}catch(e){if(e&&e.code!='declined')say('Could not save: '+e.message)}};
 $('png').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
+pmsg('Making the PNG…');await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));   // let the message show before the page is busy
 const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=CW*3;c.height=CH*3;c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-c.toBlob(async b=>{try{await d.save({filename:expName('png'),data:b})}catch(e){if(e&&e.code!='declined')say('Could not save: '+e.message)}},'image/png')};
-img.onerror=()=>say('PNG export failed.');
+c.toBlob(async b=>{try{await d.save({filename:expName('png'),data:b});pmsg('')}catch(e){pmsg('');if(e&&e.code!='declined')say('Could not save: '+e.message)}},'image/png')};
+img.onerror=()=>{pmsg('');say('PNG export failed.')};
 img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())};
 }
 export {LY,expName,ser,syncAsp,syncGrid,init14};

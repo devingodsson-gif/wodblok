@@ -39,3 +39,8 @@ The five-layer fixture serialises to a 13 MB SVG at 3x (2400 x 1800 px). Taking 
 
 So masks cost about 4.8 s, filters about 3.3 s, and they overlap (many filters sit inside masks). Textures alone (turbulence) are not the main cost, so a canvas/WebGL version of the textures and grade would not by itself fix the freeze, and it would risk every existing look.
 Decision: do not build the canvas/WebGL renderer for 1.0. If a Mac with a GPU (or Safari) still feels slow, the targets in order are: the mask-heavy layers (pressure, flood, wear, per-stamp knockout masks), reuse of identical knockout shapes instead of copying them 1339 times (13 MB down to about 3 MB), and a progress bar for large exports.
+
+## Phase 6 result (v0.120)
+- Saved, copied and exported pictures keep one copy of each identical knockout mask: the busy fixture's SVG went from 12.9 MB to 2.85 MB, with identical pixels (0 of 480,000 pixels differ). The stage itself is unchanged. Drawing time barely moves (about 4%), because the browser's cost is in compositing the masks, not reading them.
+- PNG export now shows "Making the PNG…" in the status bar before the page becomes busy, and clears it when saved.
+- Not done, on purpose: workers, canvas/WebGL renderer (measured, would not fix the cost). Open for a Mac/Safari check: `npm run perf-baseline`, `npm run test:webkit`.
