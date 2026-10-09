@@ -9,6 +9,7 @@ const FMT_MIME = 'application/vnd.wodblok+zip', FMT_REF = 'wbasset:';
 const FMT_EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' };
 const FMT_TYPE = Object.fromEntries(Object.entries(FMT_EXT).map(([k, v]) => [v, k]));
 const FMT_DATA_URL = /^data:(image\/(?:png|jpeg|webp|gif));base64,([A-Za-z0-9+/=\r\n]*)$/;
+const fmtSnapOk = n => !!n && typeof n.n === 'string' && Number.isFinite(+n.t) && typeof n.s === 'string' && n.s.length < 30e6;
 const fmtHex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
 const fmtB64ToBytes = s => { const bin = atob(s.replace(/[\r\n]/g, '')); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
 const fmtBytesToB64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
@@ -22,7 +23,7 @@ function fmtImageSlots(p) {
   if (c && typeof c === 'object') { s.push([c, 'img']); for (const k of ['back', 'spine']) if (c[k] && typeof c[k] === 'object') s.push([c[k], 'img']); }
   return s;
 }
-async function fmtPack(project, { thumbnail } = {}) {
+async function fmtPack(project, { thumbnail, snapshots } = {}) {
   const p = JSON.parse(JSON.stringify(fmtMigrate(project).project)), files = {}, seen = new Map();
   for (const [o, k] of fmtImageSlots(p)) {
     const m = typeof o[k] === 'string' && FMT_DATA_URL.exec(o[k]);
@@ -33,6 +34,8 @@ async function fmtPack(project, { thumbnail } = {}) {
   }
   const out = { mimetype: [strToU8(FMT_MIME), { level: 0 }], 'project.json': strToU8(JSON.stringify(p)) };
   if (thumbnail) out['thumbnail.png'] = [thumbnail, { level: 0 }];
+  // named snapshots travel inside the file (kept short: the app keeps at most 30)
+  (Array.isArray(snapshots) ? snapshots : []).slice(0, 30).forEach((n, i) => { if (fmtSnapOk(n)) out['snapshots/' + String(i).padStart(2, '0') + '.json'] = strToU8(JSON.stringify({ n: n.n, t: n.t, s: n.s })); });
   return zipSync({ ...out, ...files });
 }
 // Accepts the bytes of a .wodblok zip or of an older .wodblok.json. Returns { project (images as data URLs, format 19), newer, from, missingAssets }.
@@ -62,6 +65,10 @@ async function fmtOpen(bytes) {
     }
     missingAssets = missing;
   }
-  return { project, newer, from, missingAssets };
+  const snapshots = [];
+  if (files) for (const k of Object.keys(files).filter(k => /^snapshots\/\d+\.json$/.test(k)).sort().slice(0, 30)) {
+    try { const n = JSON.parse(strFromU8(files[k])); if (fmtSnapOk(n)) { JSON.parse(n.s); snapshots.push({ n: n.n.slice(0, 40), t: +n.t, s: n.s }); } } catch (e) { /* a damaged snapshot is left out; the project still opens */ }
+  }
+  return { project, newer, from, missingAssets, snapshots };
 }
 export {fmtPack,fmtOpen,fmtIsZip,FMT_MIME,FMT_LATEST};

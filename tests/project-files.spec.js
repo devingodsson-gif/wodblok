@@ -41,3 +41,23 @@ test('damaged files give a plain message and leave the document alone', async ({
   }
   expect(errors).toEqual([]);
 });
+
+test('named snapshots are saved inside the file and come back when it is opened', async ({ browser }) => {
+  const { openPanel } = require('./helpers/harness');
+  const c1 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p1 = await c1.newPage(), a = await openApp(p1);
+  await openFile(p1, path.join(FX, 'project-1-diamond.wodblok.json'));
+  await openPanel(p1, 'hist');
+  await p1.click('#hsadd'); await p1.locator('#hsl').first().locator('input').press('Enter'); await settle(p1);
+  await expect(p1.locator('#hsl').first().locator('[data-sn]')).toHaveCount(1);
+  await p1.evaluate(() => { window.__wbDownloads.length = 0; });
+  await p1.click('#fileb'); await p1.click('#pdl');
+  await p1.waitForFunction(() => window.__wbDownloads.length > 0);
+  const dl = await p1.evaluate(() => window.__wbDownloads[0]), bytes = Buffer.from(dl.base64, 'base64');
+  expect(Object.keys(require('fflate').unzipSync(new Uint8Array(bytes)))).toContain('snapshots/00.json');
+  const c2 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p2 = await c2.newPage(), b = await openApp(p2);
+  await openFile(p2, tmp('with-snaps.wodblok', bytes));
+  await openPanel(p2, 'hist'); await settle(p2);
+  await expect(p2.locator('#hsl').first().locator('[data-sn]')).toHaveCount(1);
+  expect(a.errors.concat(b.errors)).toEqual([]);
+  await c1.close(); await c2.close();
+});

@@ -111,3 +111,17 @@ test('SVG from files is cleaned: scripts, handlers, outside references and unkno
   for (const bad of ['', null, '<div>hi</div>', '<!DOCTYPE svg><svg/>', '<!-- x --><svg><path d="M0,0"/></svg>', '<svg>' + 'x'.repeat(700000) + '</svg>']) expect(fmtCleanSvg(bad), String(bad).slice(0, 30)).toBeNull();
   expect(fmtCleanSvg('<svg><path d="M1,1" fill="url(#g)"/></svg>')).toContain('url(#g)');       // a reference inside the same file is fine
 });
+
+test('snapshots round-trip inside the zip, and a damaged snapshot is left out without stopping the project opening', async () => {
+  const { fmtOpen, fmtPack } = await load('container.js');
+  const { zipSync, unzipSync, strToU8 } = require('fflate');
+  const base = JSON.parse(fs.readFileSync(path.join(FX, fixtures[0]), 'utf8'));
+  const snaps = [{ n: 'First', t: 1, s: '{"a":1}' }, { n: 'Second', t: 2, s: '{"a":2}' }, { n: 5, t: 'x', s: 1 }];
+  const zip = await fmtPack(base, { snapshots: snaps });
+  expect(Object.keys(unzipSync(zip)).filter(k => k.startsWith('snapshots/'))).toHaveLength(2);       // the invalid one was never written
+  const r = await fmtOpen(zip);
+  expect(r.snapshots).toEqual([snaps[0], snaps[1]]);
+  const files = unzipSync(zip); files['snapshots/00.json'] = strToU8('{not json');
+  const r2 = await fmtOpen(zipSync(Object.fromEntries(Object.entries(files).map(([k, v]) => [k, k === 'mimetype' ? [v, { level: 0 }] : v]))));
+  expect(r2.snapshots.map(s => s.n)).toEqual(['Second']);
+});
