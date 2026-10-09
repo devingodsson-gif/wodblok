@@ -8,6 +8,7 @@ const { test, expect } = require('@playwright/test');
 const { ROOT } = require('./helpers/harness');
 
 const OUT = path.join(ROOT, 'test-results', 'web-app');
+const VER = parseInt(require(path.join(ROOT, 'package.json')).version, 10);
 const build = (name, built) => {
   const dir = path.join(OUT, name);
   fs.rmSync(dir, { recursive: true, force: true });
@@ -56,7 +57,7 @@ test('installs, opens offline, finds a new version without reloading, and applie
   await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
   await expect(page.locator('#pupd')).toBeVisible({ timeout: 15000 });
   expect(await page.evaluate(() => window.__stay)).toBe('same page');            // the page was not reloaded
-  expect(await page.evaluate(async () => (await caches.keys()).sort())).toEqual(['wodblok-107-2026-10-09T10:00:00Z', 'wodblok-107-2026-10-09T11:00:00Z']);
+  expect(await page.evaluate(async () => (await caches.keys()).sort())).toEqual([`wodblok-${VER}-2026-10-09T10:00:00Z`, `wodblok-${VER}-2026-10-09T11:00:00Z`]);
 
   // with unsaved work the dot asks to save first and changes nothing
   await page.click('.rail [data-pn="rand"]');
@@ -71,7 +72,7 @@ test('installs, opens offline, finds a new version without reloading, and applie
   await expect(page.locator('#pupd')).toBeVisible({ timeout: 15000 });
   await Promise.all([page.waitForEvent('load'), page.click('#pupd')]);
   await page.waitForFunction(async () => (await caches.keys()).length === 1);
-  expect(await page.evaluate(async () => (await caches.keys())[0])).toBe('wodblok-107-2026-10-09T11:00:00Z');
+  expect(await page.evaluate(async () => (await caches.keys())[0])).toBe(`wodblok-${VER}-2026-10-09T11:00:00Z`);
   await expect(page.locator('#pupd')).toBeHidden();
   expect(external).toEqual([]);                                                  // no fonts or anything else from the network
 });
