@@ -1,5 +1,5 @@
 name: tag releases
-# One git tag per release (CLAUDE.md): the first commit that carries a version in package.json gets the tag vN.
+# One git tag per release (CLAUDE.md): the first commit that carries a version in package.json gets the tag (v0.108.0; v108 for the releases before the 0.x numbering).
 # Runs on every push, only adds tags that are missing (so it also fills in old ones once), never moves or deletes one.
 on: push
 permissions:
@@ -16,8 +16,11 @@ jobs:
           git config user.email "github-actions@users.noreply.github.com"
           seen=""
           for c in $(git log --reverse --format=%H -- package.json); do
-            v=$(git show "$c:package.json" | sed -n 's/.*"version": *"\([0-9]*\)\..*/\1/p' | head -1)
-            [ -z "$v" ] && continue
+            full=$(git show "$c:package.json" | sed -n 's/.*"version": *"\([0-9.]*\)".*/\1/p' | head -1)
+            [ -z "$full" ] && continue
+            major=${full%%.*}
+            # releases 100-108 were numbered by their major number (tag v108); from 0.108.0 on the tag is the whole version (v0.108.0)
+            if [ "$major" -ge 100 ]; then v="$major"; else v="$full"; fi
             case " $seen " in *" $v "*) continue;; esac
             seen="$seen $v"
             if git rev-parse -q --verify "refs/tags/v$v" >/dev/null; then continue; fi

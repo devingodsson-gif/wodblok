@@ -32,12 +32,15 @@ for (const sub of ['data', 'platform', 'format', 'commands']) {                 
 }
 parts.push(...manifest.map(f => strip(f, fs.readFileSync(path.join(dir, f), 'utf8'))));
 parts.push(strip('main.js', fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8')));
-// The version lives in package.json (major number = the release number: 101 is the first repo build). The build writes it
-// into WB_VER and the page <title>; nothing else needs editing for a release.
-const VER = parseInt(JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version, 10);
-if (!(VER >= 100)) throw new Error('package.json version must start with the release number');
+// The version lives in package.json as 0.MINOR.PATCH while the app is pre-1.0 (the minor number is the release number: 0.108 is what was
+// called v108; it becomes 1.0.0 when Phase 6 is done). The build shows it as "0.108" (and "0.108.1" for a patch) in WB_VER, the badge and
+// the page <title>; nothing else needs editing for a release. Versions from before the change (108.0.0 and earlier) still show as 108.
+const PKG = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
+const VM = /^(\d+)\.(\d+)\.(\d+)$/.exec(PKG);
+if (!VM) throw new Error('package.json version must look like 0.108.0');
+const VER = +VM[1] >= 100 ? VM[1] : VM[1] + '.' + VM[2] + (+VM[3] ? '.' + VM[3] : '');
 let stamped = 0;
-for (let i = 0; i < parts.length; i++) parts[i] = parts[i].replace(/^const WB_VER=\d+;/m, () => { stamped++; return 'const WB_VER=' + VER + ';'; });
+for (let i = 0; i < parts.length; i++) parts[i] = parts[i].replace(/^const WB_VER='[^']*';/m, () => { stamped++; return "const WB_VER='" + VER + "';"; });
 if (stamped !== 1) throw new Error('expected exactly one "const WB_VER=" line, found ' + stamped);
 // When the build was made: WB_BUILT from the environment, else the date of the commit being built (the same commit always gives the same
 // stamp), else now if there are uncommitted changes. The page shows it, subtly, in the bottom bar.
@@ -55,7 +58,7 @@ const marker = '/*@@MAIN@@*/';
 if (shell.split(marker).length !== 2) throw new Error('shell.html must contain exactly one ' + marker);
 fs.mkdirSync(path.dirname(out), { recursive: true });
 const WEBHEAD = WEB ? '<link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#1b1a18"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="WODBLOK">' : '';
-fs.writeFileSync(out, shell.replace('<!--@@WEBHEAD@@-->', () => WEBHEAD).replace('/*@@FONTS@@*/', () => require('./fonts')()).replace(marker, () => body).replace(/<title>Wodblok v\d+<\/title>/, '<title>Wodblok v' + VER + '</title>'));
+fs.writeFileSync(out, shell.replace('<!--@@WEBHEAD@@-->', () => WEBHEAD).replace('/*@@FONTS@@*/', () => require('./fonts')()).replace(marker, () => body).replace(/<title>Wodblok v[\d.]+<\/title>/, '<title>Wodblok v' + VER + '</title>'));
 console.log('version', VER, 'built', BUILT);
 console.log('built', path.relative(ROOT, out), fs.statSync(out).size, 'bytes from', manifest.length, 'modules + main.js');
 if (WEB) {

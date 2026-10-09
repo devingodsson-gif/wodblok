@@ -8,7 +8,8 @@ const { test, expect } = require('@playwright/test');
 const { ROOT } = require('./helpers/harness');
 
 const OUT = path.join(ROOT, 'test-results', 'web-app');
-const VER = parseInt(require(path.join(ROOT, 'package.json')).version, 10);
+const [vMa, vMi, vPa] = require(path.join(ROOT, 'package.json')).version.split('.');
+const VER = +vMa >= 100 ? vMa : `${vMa}.${vMi}${+vPa ? '.' + vPa : ''}`;     // as the build writes it
 const build = (name, built) => {
   const dir = path.join(OUT, name);
   fs.rmSync(dir, { recursive: true, force: true });

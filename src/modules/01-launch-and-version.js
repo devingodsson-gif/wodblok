@@ -2,8 +2,8 @@ import {kv} from '../platform/index.js';
 const WBH={};
 const WBX={};
 const WBS={};
-// One place to change the version: the badge, tooltip and page title all follow this number.
-const WB_VER=100;
+// One place to change the version (package.json): the badge, tooltip and page title all follow this text, e.g. 0.108 (shown as v0.108).
+const WB_VER='0.100';
 // When this build was made (ISO time, written by the build from the commit date; empty when running the unbundled modules).
 const WB_BUILT='';
 const $=id=>document.getElementById(id),mod=(a,b)=>((a%b)+b)%b;

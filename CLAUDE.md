@@ -17,7 +17,7 @@ Source of truth for the app is src/: ES modules in src/modules (order in manifes
 - Modules export functions and do no work on import; start-up order lives in src/main.js.
 - Ask before adding a dependency. Licences: MIT, BSD, ISC, Apache, OFL.
 - Every time an update is committed and pushed, rebuild (`npm run build`, from the clean commit so the bottom-bar stamp is the commit date) and publish dist/wodblok.html to the existing preview artifact (https://claude.ai/artifact/AkEURvCERNYJmNPWwiEduB, same URL, same capabilities) without being asked. Say so in the status update.
-- Version lives in package.json; the build writes it into WB_VER and <title>. v100 is the baseline; v101 is the first repo build. One git tag per release.
+- Version lives in package.json as 0.MINOR.PATCH; the build writes it into WB_VER, the badge and <title> (0.108.0 shows as v0.108). The minor number is the release number (0.108 was v108); each release raises it, a hotfix raises the patch. The app becomes 1.0.0 when Phase 6 is done. v100 is the baseline; v101 is the first repo build. One git tag per release (made by the tag workflow).
 - Desktop (Mac/Windows) and mobile are later; do not build them now, but do not block them.
 - Status updates: short, task list with approximate % complete.
 

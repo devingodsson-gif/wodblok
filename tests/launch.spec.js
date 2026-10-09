@@ -18,7 +18,7 @@ for (const runtime of ['artifact', 'none']) {
       theme: document.documentElement.dataset.theme,
       name: document.getElementById('pnm').value,
     }));
-    expect(facts.title).toMatch(/^Wodblok v\d+$/);
+    expect(facts.title).toMatch(/^Wodblok v\d+(\.\d+)*$/);
     expect(facts.pattern).toBe('true');
     expect(facts.stamp).toBe('false');
     expect(facts.openDocks, 'no tool windows open at launch').toBe(0);
