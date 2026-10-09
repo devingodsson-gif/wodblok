@@ -38,11 +38,21 @@ if (!(VER >= 100)) throw new Error('package.json version must start with the rel
 let stamped = 0;
 for (let i = 0; i < parts.length; i++) parts[i] = parts[i].replace(/^const WB_VER=\d+;/m, () => { stamped++; return 'const WB_VER=' + VER + ';'; });
 if (stamped !== 1) throw new Error('expected exactly one "const WB_VER=" line, found ' + stamped);
+// When the build was made: WB_BUILT from the environment, else the date of the commit being built (the same commit always gives the same
+// stamp), else now if there are uncommitted changes. The page shows it, subtly, in the bottom bar.
+const { execSync } = require('child_process');
+const git = c => { try { return execSync(c, { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch (e) { return ''; } };
+const iso = t => { const d = new Date(t); return isNaN(d) ? '' : d.toISOString().replace(/\.\d+Z$/, 'Z'); };
+const dirty = git('git status --porcelain -- src package.json tools');
+const BUILT = process.env.WB_BUILT || (dirty ? '' : iso(git('git log -1 --format=%cI'))) || iso(Date.now());
+let stampedB = 0;
+for (let i = 0; i < parts.length; i++) parts[i] = parts[i].replace(/^const WB_BUILT='';/m, () => { stampedB++; return "const WB_BUILT='" + BUILT + "';"; });
+if (stampedB !== 1) throw new Error('expected exactly one "const WB_BUILT=" line, found ' + stampedB);
 const body = "(function(){'use strict';\n" + parts.join('') + '})();';
 const shell = fs.readFileSync(path.join(ROOT, 'src', 'shell.html'), 'utf8');
 const marker = '/*@@MAIN@@*/';
 if (shell.split(marker).length !== 2) throw new Error('shell.html must contain exactly one ' + marker);
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, shell.replace(marker, () => body).replace(/<title>Wodblok v\d+<\/title>/, '<title>Wodblok v' + VER + '</title>'));
-console.log('version', VER);
+console.log('version', VER, 'built', BUILT);
 console.log('built', path.relative(ROOT, out), fs.statSync(out).size, 'bytes from', manifest.length, 'modules + main.js');

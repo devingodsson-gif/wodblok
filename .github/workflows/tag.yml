@@ -21,7 +21,7 @@ jobs:
             case " $seen " in *" $v "*) continue;; esac
             seen="$seen $v"
             if git rev-parse -q --verify "refs/tags/v$v" >/dev/null; then continue; fi
-            git tag -a "v$v" -m "WODBLOK v$v" "$c"
+            git tag -a "v$v" -m "WODBLOK v$v ($(git log -1 --format=%cI "$c"))" "$c"
             echo "tagged v$v at $c"
           done
           git push origin --tags
