@@ -2,7 +2,7 @@
 // means writing another adapter and nothing else. This is the artifact/browser adapter: what the app can see and do is what v100 did.
 // Rules: no work on import; no alert/confirm/prompt; callers keep their own try/catch (these do not swallow errors).
 
-import {records,files} from './web.js';
+import {records,files,offline,storage} from './web.js';
 
 // Small key/value settings and records. v100 kept about 36 separate localStorage keys (wb2_ ... wb95_). They now live in ONE
 // versioned record, `wb_settings` = {v:1, values:{key:string}}, so they can be exported, versioned and moved as a unit.
@@ -73,7 +73,7 @@ const reload = () => location.reload();
 
 // The claude.ai artifact runtime: use('db' | 'user' | 'downloads' | 'sample'). Resolves to null when there is no runtime.
 // Without the runtime, 'downloads' is served by the web adapter: a real Save dialog where the browser has one, a download otherwise.
-const webDownloads = { save: async o => { try { await files.save(o.filename, new Blob([o.data])); } catch (e) { if (e && e.name === 'AbortError') { const d = new Error('declined'); d.code = 'declined'; throw d; } throw e; } } };
+const webDownloads = { save: async o => { try { const r = await files.write(o.filename, new Blob([o.data]), { handle: o.handle }); return { how: r.how, handle: r.handle }; } catch (e) { if (e && e.name === 'AbortError') { const d = new Error('declined'); d.code = 'declined'; throw d; } throw e; } } };
 const use = n => window.claude ? claude.use(n).catch(() => null) : Promise.resolve(n === 'downloads' ? webDownloads : null);
 
 // Clipboard (text and images).
@@ -85,4 +85,4 @@ const clipboard = {
   write: items => navigator.clipboard.write(items),
 };
 
-export {kv,use,clipboard,reload,collection,recovery};
+export {kv,use,clipboard,reload,collection,recovery,offline,storage,files};

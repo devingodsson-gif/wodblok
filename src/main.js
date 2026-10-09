@@ -38,6 +38,7 @@ import {init35} from './modules/35-import-artwork-and-motif-sheets.js';
 import {init36} from './modules/36-export-everything.js';
 import {init37} from './modules/37-command-list.js';
 import {init38,rcTick} from './modules/38-crash-recovery.js';
+import {init39} from './modules/39-web-app.js';
 import {kv} from './platform/index.js';
 import {cmdConflicts,cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdList,cmdRun} from './commands/registry.js';
 
@@ -78,4 +79,5 @@ init35();
 init36();
 init37();
 init38();
+init39();
 window.__wbTest = { state: () => coreStr(), kv, recoveryTick: rcTick, commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };

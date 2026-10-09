@@ -3,7 +3,7 @@
 // the artifact runtime, the file pickers, or alert/confirm/prompt directly.
 const fs = require('fs'), path = require('path');
 const SRC = path.join(__dirname, '..', 'src');
-const banned = [/\blocalStorage\b/, /\bsessionStorage\b/, /\bindexedDB\b/, /navigator\.clipboard/, /window\.claude\b/, /\bclaude\.use\b/, /showSaveFilePicker|showOpenFilePicker/, /(^|[^.\w$])(alert|confirm|prompt)\s*\(/];
+const banned = [/\blocalStorage\b/, /\bsessionStorage\b/, /\bindexedDB\b/, /navigator\.clipboard/, /window\.claude\b/, /\bclaude\.use\b/, /showSaveFilePicker|showOpenFilePicker/, /navigator\.serviceWorker|navigator\.storage/, /(^|[^.\w$])(alert|confirm|prompt)\s*\(/];
 let bad = 0;
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 for (const f of walk(SRC)) {

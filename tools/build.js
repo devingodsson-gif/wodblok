@@ -2,11 +2,12 @@
 // Build the single-file app from the ES modules in src/modules (order: src/modules/manifest.json) and src/main.js.
 // There is no bundler dependency: every top-level name is unique across modules, so the bundle is the modules laid
 // end to end with the import/export lines removed, wrapped in one strict-mode function. `src/main.js` goes last and
-// runs the start-up. Usage: node tools/build.js [out]   (default dist/wodblok.html)
+// runs the start-up. Usage: node tools/build.js [out] [--web]   (default dist/wodblok.html; --web builds dist/web/ for hosting)
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
-const out = path.resolve(process.argv[2] || path.join(ROOT, 'dist', 'wodblok.html'));
+const args = process.argv.slice(2), WEB = args.includes('--web');      // --web: the hosted / installable web app in dist/web/ (index.html, manifest, service worker, icons)
+const out = path.resolve(args.find(a => !a.startsWith('--')) || path.join(ROOT, 'dist', WEB ? path.join('web', 'index.html') : 'wodblok.html'));
 const dir = path.join(ROOT, 'src', 'modules');
 const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
 const IMPORT = /^import \{[A-Za-z0-9_$,]*\} from '\.{1,2}\/[^']+';\n/gm;
@@ -53,6 +54,16 @@ const shell = fs.readFileSync(path.join(ROOT, 'src', 'shell.html'), 'utf8');
 const marker = '/*@@MAIN@@*/';
 if (shell.split(marker).length !== 2) throw new Error('shell.html must contain exactly one ' + marker);
 fs.mkdirSync(path.dirname(out), { recursive: true });
-fs.writeFileSync(out, shell.replace(marker, () => body).replace(/<title>Wodblok v\d+<\/title>/, '<title>Wodblok v' + VER + '</title>'));
+const WEBHEAD = WEB ? '<link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#1b1a18"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="WODBLOK">' : '';
+fs.writeFileSync(out, shell.replace('<!--@@WEBHEAD@@-->', () => WEBHEAD).replace('/*@@FONTS@@*/', () => require('./fonts')()).replace(marker, () => body).replace(/<title>Wodblok v\d+<\/title>/, '<title>Wodblok v' + VER + '</title>'));
 console.log('version', VER, 'built', BUILT);
 console.log('built', path.relative(ROOT, out), fs.statSync(out).size, 'bytes from', manifest.length, 'modules + main.js');
+if (WEB) {
+  // the rest of the web app, next to index.html. The service worker's cache name changes with every build, so a new build is a new version.
+  const wd = path.dirname(out), sd = path.join(ROOT, 'src', 'web');
+  for (const f of fs.readdirSync(sd)) {
+    if (f === 'sw.js') fs.writeFileSync(path.join(wd, f), fs.readFileSync(path.join(sd, f), 'utf8').replace('@@CACHE@@', 'wodblok-' + VER + '-' + BUILT));
+    else fs.copyFileSync(path.join(sd, f), path.join(wd, f));
+  }
+  console.log('web app files in', path.relative(ROOT, wd));
+}

@@ -25,14 +25,67 @@ const blobs = {
   list: async () => { const out = []; for await (const [n] of /** @type {any} */ (await root()).entries()) out.push(n); return out; },
 };
 const canSave = () => typeof /** @type {any} */ (window).showSaveFilePicker === 'function';
+const canOpen = () => typeof /** @type {any} */ (window).showOpenFilePicker === 'function';
+const picker = (name, type) => (type ? [{ accept: { [type]: ['.' + name.split('.').pop()] } }] : undefined);
+// Write a file: into the file the person already chose (opts.handle), else through the Save dialog where the browser has one,
+// else as a download. Returns how it went and the file handle (when there is one) so the next write can go to the same file.
+const write = async (name, data, opts = {}) => {
+  const h0 = /** @type {any} */ (opts.handle);
+  if (h0) {
+    try {
+      if (h0.queryPermission && (await h0.queryPermission({ mode: 'readwrite' })) !== 'granted' && (await h0.requestPermission({ mode: 'readwrite' })) !== 'granted') throw new Error('no permission');
+      const w = await h0.createWritable(); await w.write(data); await w.close(); return { how: 'saved', handle: h0 };
+    } catch (e) { if (e && e.name === 'AbortError') throw e; }   // the file moved or access was refused: fall through and ask again
+  }
+  if (canSave()) {
+    try { const h = await /** @type {any} */ (window).showSaveFilePicker({ suggestedName: name, types: picker(name, opts.type) }); const w = await h.createWritable(); await w.write(data); await w.close(); return { how: 'saved', handle: h }; }
+    catch (e) { if (e && e.name === 'AbortError') throw e; }
+  }
+  const a = document.createElement('a'), u = URL.createObjectURL(data); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 4000); return { how: 'downloaded', handle: null };
+};
 const files = {
   canSave,
-  save: async (name, data, opts = {}) => {
-    if (canSave()) {
-      try { const h = await /** @type {any} */ (window).showSaveFilePicker({ suggestedName: name, types: opts.type ? [{ accept: { [opts.type]: ['.' + name.split('.').pop()] } }] : undefined }); const w = await h.createWritable(); await w.write(data); await w.close(); return 'saved'; }
-      catch (e) { if (e && e.name === 'AbortError') throw e; }
-    }
-    const a = document.createElement('a'), u = URL.createObjectURL(data); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 4000); return 'downloaded';
+  canOpen,
+  write,
+  save: async (name, data, opts = {}) => (await write(name, data, opts)).how,
+  /** The Open dialog, keeping the file's handle so Save can write back to it. Resolves null when the person cancels. */
+  open: async () => {
+    try {
+      const [h] = await /** @type {any} */ (window).showOpenFilePicker({ multiple: false, types: [{ description: 'WODBLOK projects', accept: { 'application/zip': ['.wodblok'], 'application/json': ['.json'] } }] });
+      return { file: await h.getFile(), handle: h };
+    } catch (e) { if (e && e.name === 'AbortError') return null; throw e; }
+  },
+  /** Files the system opens this app with (the installed app as the .wodblok opener). Calls cb(file, handle) for each. */
+  onLaunch: cb => {
+    const q = /** @type {any} */ (window).launchQueue;
+    if (q && q.setConsumer) q.setConsumer(async p => { for (const h of p.files || []) { try { cb(await h.getFile(), h); } catch (e) { /* unreadable: ignore */ } } });
   },
 };
-export {records,blobs,files};
+// The installed / offline web app: a service worker keeps the app on the device. A new version waits until the next launch
+// (or until the user presses the update dot); nothing here ever reloads the page by itself.
+const isWebApp = () => 'serviceWorker' in navigator && /^https?:$/.test(location.protocol);
+let swReg = null;
+const offline = {
+  available: isWebApp,
+  /** Registers the worker and calls onWaiting() when a newer version is installed and waiting. */
+  register: async onWaiting => {
+    swReg = await navigator.serviceWorker.register('sw.js');
+    const check = () => { if (swReg.waiting && navigator.serviceWorker.controller) onWaiting(); };
+    check();
+    swReg.addEventListener('updatefound', () => { const w = swReg.installing; if (w) w.addEventListener('statechange', () => { if (w.state === 'installed') check(); }); });
+  },
+  /** Lets the waiting version take over; resolves when it has. The caller reloads. */
+  apply: () => /** @type {Promise<void>} */ (new Promise(res => {
+    if (!swReg || !swReg.waiting) return res(undefined);
+    navigator.serviceWorker.addEventListener('controllerchange', () => res(undefined), { once: true });
+    swReg.waiting.postMessage('apply');
+  })),
+};
+// Browser storage: ask the browser to keep the data (it may otherwise clear it when space is short), and report how much is used.
+const storage = {
+  available: () => !!(navigator.storage && navigator.storage.estimate),
+  persist: async () => (navigator.storage && navigator.storage.persist ? navigator.storage.persist() : false),
+  persisted: async () => (navigator.storage && navigator.storage.persisted ? navigator.storage.persisted() : false),
+  estimate: async () => { const e = await navigator.storage.estimate(); return { used: e.usage || 0, quota: e.quota || 0 }; },
+};
+export {records,blobs,files,offline,storage};

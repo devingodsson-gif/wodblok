@@ -18,7 +18,7 @@ const FONTS=[['cinzel','Cinzel','Cinzel',700,'Roman capitals'],['cinzeld','Cinze
 ['holtwood','Holtwood One SC','Holtwood+One+SC',400,'Wood type'],['rye','Rye','Rye',400,'Ornamental wood type'],
 ['abril','Abril Fatface','Abril+Fatface',400,'Fat face'],['bebas','Bebas Neue','Bebas+Neue',400,'Condensed poster']];
 const F={};FONTS.forEach(([id,fam,q,w,d])=>F[id]={id,fam,w,d,lbl:fam});
-let gfOk=false;const gf=()=>{if(gfOk)return;gfOk=true;const l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?'+FONTS.map(f=>'family='+f[2]+(f[3]!=400?':wght@'+f[3]:'')).join('&')+'&display=block';document.head.appendChild(l)};
+// the lettering fonts are bundled with the page (@font-face rules in the shell), so nothing is fetched
 // your own fonts (kept in this browser when they fit)
 const UF=[];const addUF=async(name,buf,save)=>{const id='u-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30);if(F[id])return id;
 const ff=new FontFace('wbu-'+id,buf);await ff.load();document.fonts.add(ff);F[id]={id,fam:'wbu-'+id,w:400,d:'Your font',lbl:name,u:1};UF.push(id);
@@ -71,7 +71,7 @@ function fillFonts(){const cur0=$('tx_f').value||st.f;$('tx_f').innerHTML=`<optg
 function toUI(){$('tx_t').value=st.text;$('tx_f').value=F[st.f]?st.f:'cinzel';[['tx_sz','sz'],['tx_ls','ls'],['tx_lh','lh'],['tx_cv','cv'],['tx_rot','rot']].forEach(([id,k])=>{$(id).value=st[k];$(id).dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))});
 document.querySelectorAll('#tx_al [data-a]').forEach(b=>b.classList.toggle('on',b.dataset.a==st.al))}
 function fromUI(){st.text=$('tx_t').value.replace(/\r/g,'').slice(0,200);st.f=$('tx_f').value;st.sz=+$('tx_sz').value;st.ls=+$('tx_ls').value;st.lh=+$('tx_lh').value;st.cv=+$('tx_cv').value;st.rot=+$('tx_rot').value}
-async function ready(){gf();const f=F[st.f]||F.cinzel;try{await document.fonts.load(css(f),st.text||'Aa');await document.fonts.ready}catch(e){}}
+async function ready(){const f=F[st.f]||F.cinzel;try{await document.fonts.load(css(f),st.text||'Aa');await document.fonts.ready}catch(e){}}
 async function preview(){await ready();const t=WBS.tiles[WBS.cur];useT(t);autoFit();const[pa]=pal(),ink=inkOf(t),ps=st.text.trim()?layout(st):[],C=cen();
 $('tx_pv').innerHTML=`<svg viewBox="-12 -12 ${SW+24} ${SH+24}"><path d="${shp(0)}" fill="${pa}" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/>`+ps.map(p=>`<g transform="translate(${(C[0]+p.x).toFixed(1)} ${(C[1]+p.y).toFixed(1)}) rotate(${p.r.toFixed(1)}) scale(${p.s})"><path d="${p.g.d}" fill="${ink}" fill-rule="evenodd"/></g>`).join('')+`</svg>`;
 $('tx_go').disabled=!st.text.trim();$('tx_up').disabled=!st.text.trim()}
@@ -86,7 +86,7 @@ const[cx0,cy0]=mean(ids),ax=M.ax+(cx0-M.mx),ay=M.ay+(cy0-M.my),pos=Math.min(...i
 const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();upd();if(WBX.wbCap)WBX.wbCap();pmsg(`Updated the text. Hand-moved letters were rebuilt.`)}
 // used by Randomize: set text on a stamp (fonts load first; a newer roll cancels an older one)
 WBX.wbTxFonts=FONTS.map(x=>x[0]);
-WBX.wbTxPlace=async(t,o,tok)=>{gf();const f=F[o.f]||F.cinzel;try{await document.fonts.load(css(f),o.text);await document.fonts.ready}catch(e){}
+WBX.wbTxPlace=async(t,o,tok)=>{const f=F[o.f]||F.cinzel;try{await document.fonts.load(css(f),o.text);await document.fonts.ready}catch(e){}
 if(tok!=null&&tok!==WBX.wbRndTok)return false;if(!WBS.tiles.includes(t))return false;const keep=st;st={...D,...o,auto:false};try{useT(t);st.sz=fitSz(st);const g='tx'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),[ax,ay]=cen(),L=letters(g,ax,ay);if(!L.length)return false;
 t.items.push(...L);const[mx,my]=(()=>{let x=0,y=0;L.forEach(q=>{x+=q.x;y+=q.y});return[x/L.length,y/L.length]})();const M={...st,ax,ay,mx,my};delete M.maxSz;delete M.inner;A(t)[g]=M;
 if(o.inner){let rm=1e9;L.forEach(q=>{rm=Math.min(rm,Math.hypot(q.x-ax,q.y-ay)-26*q.s)});t.items.forEach(q=>{if(q.cz){q.s=+Math.min(q.s,.85*Math.max(8,rm)/48).toFixed(3);delete q.cz}})}
@@ -108,7 +108,7 @@ $('tx_new').onclick=()=>{selOne(-1);edit=null;$('tx_ed').hidden=true;$('tx_go').
 $('tx_file').onchange=async()=>{const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl)return;try{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';
 const id=await addUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();$('tx_f').value=id;fromUI();later();pmsg(`Loaded “${nm}”.`+(fl.size>=900000?' It is large, so it will not be kept for next time.':''))}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}};
 // text boxes in the pattern: lay the text out at canvas scale, returning the letter paths (centred on the box)
-WBX.wbTxLay=async o=>{gf();const f=F[o.f]||F.cinzel;try{await document.fonts.load(css(f),o.text||'Aa');await document.fonts.ready}catch(e){}
+WBX.wbTxLay=async o=>{const f=F[o.f]||F.cinzel;try{await document.fonts.load(css(f),o.text||'Aa');await document.fonts.ready}catch(e){}
 const q={...D,...o};if(!q.text.trim())return null;const kk=Math.min(CW,CH)/Math.min(SW,SH),ps=layout(q);if(!ps.length)return null;
 const G={},Lt=[];let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
 ps.forEach(p=>{const d=p.g.d;if(!/^[MLQZ0-9.,\- ]+$/.test(d))return;G[p.g.k]=d;const nm=(d.match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);let a=1e9,b=1e9,c=-1e9,e=-1e9;for(let i=0;i+1<nm.length;i+=2){a=Math.min(a,nm[i]);c=Math.max(c,nm[i]);b=Math.min(b,nm[i+1]);e=Math.max(e,nm[i+1])}

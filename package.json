@@ -6,6 +6,7 @@
   "scripts": {
     "build": "node tools/build.js",
     "build:single": "node tools/build.js",
+    "build:web": "node tools/build.js --web",
     "dev": "node tools/serve-esm.js",
     "test": "playwright test --project=chromium",
     "test:legacy": "WB_TARGET=legacy playwright test --project=chromium",

@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Wodblok v100</title>
 <script>/* v70 theme: dark unless the user chose light */(function(){var t="dark";try{var s=localStorage.getItem("wb60_theme");if(s==="light"||s==="dark")t=s}catch(e){}document.documentElement.setAttribute("data-theme",t)})()</script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<!--@@WEBHEAD@@-->
+<style id="wbfonts">/*@@FONTS@@*/</style>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 --stage:#eae4d8;--stage-dot:rgba(60,40,10,.07);--panel:#f6f2e9;--raise:#ffffff;--field:#ffffff;--line:#ddd5c6;--line2:#cbc2b0;--fg:#26221d;--mut:#706858;--faint:#a89f90;--acc:#b8914f;--acc-ink:#8a6528;--acc-fg:#1b1a18;--acc-soft:rgba(184,145,79,.16);--warn:#c0532e;--ok:#3f8f66;--shadow:0 1px 2px rgba(60,40,10,.1),0 8px 28px rgba(60,40,10,.16);--paper-shadow:0 1px 3px rgba(60,40,10,.25),0 26px 56px rgba(60,40,10,.25)}
@@ -84,7 +84,9 @@ button,.ddi,.wtab,.lyr,.rail button{transition:background-color .12s,border-colo
 .status{grid-area:status;display:flex;align-items:center;gap:18px;padding:0 12px;border-top:1px solid var(--line);font-size:11px;color:var(--mut);background:var(--panel);white-space:nowrap;overflow:hidden}
 .status .grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 #pbuilt{flex:none;color:var(--faint);font-size:10.5px}
-@media (max-width:860px){#pbuilt{display:none}}
+#pstore{flex:none;color:var(--faint);font-size:10.5px}
+#pupd{flex:none;display:inline-flex;align-items:center;gap:6px;height:18px;padding:0 8px;border-radius:9px;border:0;background:var(--acc-soft);color:var(--acc-ink);font-size:10.5px;font-weight:600}#pupd::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--acc)}#pupd[hidden]{display:none}
+@media (max-width:860px){#pbuilt,#pstore{display:none}}
 #pmsg{color:var(--fg)}
 
 .lys{background:var(--panel)}.lys .lyt{cursor:default}.lys .lyl2{max-height:none}.lyh{display:flex;align-items:center;gap:2px;height:34px;padding:0 6px 0 4px;background:color-mix(in srgb,var(--stage) 50%,var(--panel));border-bottom:1px solid var(--line)}.lyt{flex:1;display:flex;align-items:center;gap:6px;border:0;background:transparent;font-weight:600;font-size:12px;padding:0 4px;margin:0;cursor:pointer;color:var(--fg)}.lyt svg{width:13px;height:13px;transition:transform .15s}.lyt[aria-expanded=false] svg{transform:rotate(-90deg)}.lyt span{color:var(--mut);font-weight:500}.lyh .ib{width:26px;height:26px}.lyh .ib svg{width:15px;height:15px}.lyo{display:flex;align-items:center;gap:8px;padding:7px 10px 0}.lyo select{flex:1;min-width:0}.lyo .sw{flex:1;min-width:0}.lyop{padding:6px 10px 0}.lyop .ctl{grid-template-columns:50px minmax(0,1fr) 52px;gap:8px}.lyop .ctl label{font-size:11.5px;color:var(--mut);font-weight:400}.lyk{font-size:11.5px;color:var(--mut);width:50px;flex:none}.lyl2{margin:8px 6px 4px;max-height:210px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:var(--field)}.lyr{display:flex;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12px;user-select:none}.lyr:last-child{border-bottom:0}.lyr:hover{background:var(--raise)}.lyr.on{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}.lyr.off .lyn,.lyr.off .lysw{opacity:.4}.lyr .eye{width:22px;height:22px;padding:0;margin:0;border:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center;border-radius:5px}.lyr .eye:hover{background:var(--line)}
@@ -1081,7 +1083,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  </div>
 </aside>
 
-<footer class="status"><span id="sinfo" style="display:flex;gap:16px"></span><span class="grow" id="pmsg" role="status"></span><button id="rcv" class="rcb primary" hidden>Restore unsaved work</button><button id="rcx" class="rcb" hidden>Dismiss</button><span id="fzst" aria-live="polite"><span id="fzt">Randomizing…</span><b><i id="fzsb"></i></b></span><span id="pwhere"></span><span id="pbuilt" hidden></span></footer>
+<footer class="status"><span id="sinfo" style="display:flex;gap:16px"></span><span class="grow" id="pmsg" role="status"></span><button id="rcv" class="rcb primary" hidden>Restore unsaved work</button><button id="rcx" class="rcb" hidden>Dismiss</button><span id="fzst" aria-live="polite"><span id="fzt">Randomizing…</span><b><i id="fzsb"></i></b></span><span id="pwhere"></span><button id="pupd" type="button" hidden aria-label="Update ready">Update ready</button><span id="pstore" hidden></span><span id="pbuilt" hidden></span></footer>
 </div>
 
 <div class="modal" id="idlg" hidden><div class="dlg idl" role="dialog" aria-modal="true" aria-labelledby="idlgt">

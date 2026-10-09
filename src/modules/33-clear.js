@@ -1,4 +1,4 @@
-import {kv,use} from '../platform/index.js';
+import {files,kv,use} from '../platform/index.js';
 import {FMT_MIME,fmtOpen,fmtPack} from '../format/container.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {PCOL,shOf} from './04-canvas-and-stamp-outlines.js';
@@ -8,7 +8,7 @@ import {migEdges} from './11-pressure-flooding-block-edges.js';
 import {migInk} from './17-texture-panel-and-previews.js';
 import {ST,thumb,confirm2,coreStr,dirty,newId,openData,paintPst,pmsg,saveCp,saveTo,snapshot} from './18-projects-and-cover-overlay.js';
 // ===== Clear: one blank square stamp, default palette, plain arrangement, no print effects. Canvas size and cover are kept. Undoable.
-function clearAll(fresh){if(!fresh&&WBX.wbCap)WBX.wbCap();if(WBX.wbGrade)WBX.wbGrade.set(null);const L=mkL('Layer 1',[1],'check',180);L.ak={};L.fit='';L.gap=0;L.pst=0;L.pfl=0;L.man=false;L.ov={};
+function clearAll(fresh){if(fresh)link=null;if(!fresh&&WBX.wbCap)WBX.wbCap();if(WBX.wbGrade)WBX.wbGrade.set(null);const L=mkL('Layer 1',[1],'check',180);L.ak={};L.fit='';L.gap=0;L.pst=0;L.pfl=0;L.man=false;L.ov={};
 WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;
 const dim0={...WBS.dim};['cs','cr','n','co','g','cp'].forEach(k=>delete dim0[k]); // the canvas outline goes back to a plain rectangle (the ratio stays)
 (WBX.wbApply||applyCore)({texLib:[],tiles:[{id:1,items:[],et:0,er:0}],layers:[L],proj:{...PCOL},dim:{...dim0,k:'rect',o:'p',s:[1,1]},pr:{e:0,q:0,t:'',a:0,sc:100,sd:811},tex:{u:[],v:87}});
@@ -20,8 +20,11 @@ const putSnaps=(id,a)=>{if(!a||!a.length)return;try{kv.set('wb95_sn_'+(id||'draf
 const thumbPng=url=>new Promise(res=>{if(!url)return res(null);const img=new Image(),to=setTimeout(()=>res(null),5000);img.onload=()=>{try{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);c.toBlob(async b=>{clearTimeout(to);res(b?new Uint8Array(await b.arrayBuffer()):null)},'image/png')}catch(e){res(null)}};img.onerror=()=>res(null);img.src=url});
 // named snapshots are kept per project in settings (wb95_sn_<id>, or _draft); they travel inside the file
 const snapsOf=id=>{try{const a=JSON.parse(kv.get('wb95_sn_'+(id||'draft'))||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}};
+// The file this project was opened from or last saved to (browsers that can write back to a file). Not part of the document.
+let link=null;
+const linkOf=id=>link&&link.id==(id||null)?link.handle:null;
 async function dl(name,data,thumbUrl,id){const d=await use('downloads');if(!d)return pmsg('Downloading is not available here.');
-try{const zip=await fmtPack({name,...data},{thumbnail:await thumbPng(thumbUrl),snapshots:snapsOf(id)});await d.save({filename:fname(name)+'.wodblok',data:new Blob([zip],{type:FMT_MIME})});pmsg('Downloaded “'+name+'”.')}catch(e){if(e&&e.code!='declined')pmsg('Could not download: '+e.message)}}
+try{const zip=await fmtPack({name,...data},{thumbnail:await thumbPng(thumbUrl),snapshots:snapsOf(id)});const r=await d.save({filename:fname(name)+'.wodblok',data:new Blob([zip],{type:FMT_MIME}),handle:linkOf(id)});if(r&&r.handle)link={id:id||null,handle:r.handle};pmsg((r&&r.how=='saved'?'Saved “':'Downloaded “')+name+'”.')}catch(e){if(e&&e.code!='declined')pmsg('Could not download: '+e.message)}}
 async function renderPL(){$('pgrid').innerHTML='<div class="hint">Loading…</div>';
 try{const ps=await ST.list();$('pgrid').innerHTML=ps.length?ps.map(p=>`<div class="pc${p.id==WBS.cp.id?' on':''}${WBS.pSel.has(p.id)?' ps':''}" data-p="${hx(p.id)}">${p.thumb?`<img src="${hx(p.thumb)}" alt="">`:'<div class="nt">No preview</div>'}<b title="${hx(p.name)}">${hx(p.name||'Untitled')}</b><small>${new Date(p.updated||0).toLocaleString([], {dateStyle:'medium',timeStyle:'short'})}<br>${hx(p.info||'')}</small><div class="row"><button class="alt" data-a="open">Open</button><button class="alt" data-a="dup">Duplicate</button><button class="alt" data-a="dl">Download</button><button class="alt" data-a="del">Delete</button></div></div>`).join(''):'<div class="hint">No saved projects yet. Click Save to keep this one.</div>';WBS.pSel=new Set([...WBS.pSel].filter(id=>ps.some(p=>p.id==id)));pSelUp()}
 catch(e){$('pgrid').innerHTML='<div class="hint">Could not load projects: '+hx((e&&e.message)||'unknown error')+'</div>'}}
@@ -31,13 +34,20 @@ function init33(){
 $('clr').onclick=()=>clearAll(false);
 $('pdl').onclick=async()=>dl($('pnm').value.trim()||'Untitled pattern',snapshot(),await thumb(),WBS.cp.id);
 
-$('pfile').onchange=async()=>{const fl=$('pfile').files[0];$('pfile').value='';if(!fl)return;
+const openFile=async(fl,handle)=>{
 try{const r=await fmtOpen(new Uint8Array(await fl.arrayBuffer())),d=r.project;
 const name=(d.name||fl.name.replace(/\.wodblok(\.json)?$|\.json$/i,'')).slice(0,60);
 // a file from a newer app opens as an unsaved copy: nothing is added to your projects and nothing is written back
-if(r.newer){openData(d,null,name);putSnaps(null,r.snapshots);pmsg('“'+name+'” was made by a newer WODBLOK, so it is open as a copy that is not saved. Update the app to work on the original.');return}
-const id=newId();openData(d,id,name);await saveTo(id,name);putSnaps(id,r.snapshots);WBS.cp.saved=coreStr();saveCp();pmsg('Opened “'+name+'” and added it to your projects.'+(r.missingAssets?' '+r.missingAssets+' picture'+(r.missingAssets>1?'s were':' was')+' missing from the file.':''));if(!$('plist').hidden)renderPL()}
+if(r.newer){openData(d,null,name);link=null;putSnaps(null,r.snapshots);pmsg('“'+name+'” was made by a newer WODBLOK, so it is open as a copy that is not saved. Update the app to work on the original.');return}
+const id=newId();openData(d,id,name);link=handle?{id,handle}:null;await saveTo(id,name);putSnaps(id,r.snapshots);WBS.cp.saved=coreStr();saveCp();pmsg('Opened “'+name+'” and added it to your projects.'+(r.missingAssets?' '+r.missingAssets+' picture'+(r.missingAssets>1?'s were':' was')+' missing from the file.':''));if(!$('plist').hidden)renderPL()}
 catch(e){pmsg((e&&e.message)||'Could not open that file.')}};
+$('pfile').onchange=()=>{const fl=$('pfile').files[0];$('pfile').value='';if(fl)openFile(fl,null)};
+// Where the browser has its own Open dialog (Chrome, Edge) use it, so Download can write back to the same file; elsewhere the plain file input opens as before
+let pfNative=false;
+$('pfile').addEventListener('click',async e=>{if(!files.canOpen()||pfNative)return;e.preventDefault();
+try{const r=await files.open();if(r)openFile(r.file,r.handle)}catch(err){pfNative=true;pmsg('The Open dialog could not start. Press Open again.')}});
+$('pfile').addEventListener('change',()=>{pfNative=false});
+files.onLaunch((f,h)=>openFile(f,h));
 $('pls').onclick=()=>{$('plist').hidden=!$('plist').hidden;$('pls').classList.toggle('on',!$('plist').hidden);if(!$('plist').hidden)renderPL()};
 document.addEventListener('click',async e=>{const t=e.target;if(!t||!t.id)return;if(t.id=='pselc2'){WBS.pSel=new Set();pSelUp()}else if(t.id=='pselx'){for(const id of [...WBS.pSel]){const p=await ST.get(id);if(p)dl(p.name,JSON.parse(p.data),p.thumb,p.id)}}
 else if(t.id=='pseld'){if(!t.dataset.sure){t.dataset.sure='1';t.textContent='Sure?';setTimeout(()=>{if(t.isConnected){delete t.dataset.sure;t.textContent='Delete selected'}},3500);return}const ids=[...WBS.pSel];for(const id of ids){await ST.del(id);if(id==WBS.cp.id){WBS.cp.id=null;saveCp()}}WBS.pSel=new Set();pmsg('Deleted '+ids.length+' project'+(ids.length>1?'s':'')+'.');renderPL();paintPst()}});

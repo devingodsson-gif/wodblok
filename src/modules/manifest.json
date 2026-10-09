@@ -36,5 +36,6 @@
  "35-import-artwork-and-motif-sheets.js",
  "36-export-everything.js",
  "37-command-list.js",
- "38-crash-recovery.js"
+ "38-crash-recovery.js",
+ "39-web-app.js"
 ]

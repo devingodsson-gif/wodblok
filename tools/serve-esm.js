@@ -4,7 +4,7 @@
 const http = require('http'), fs = require('fs'), path = require('path');
 const SRC = path.join(__dirname, '..', 'src'), port = +process.argv[2] || 5199;
 // the shell is read on every request, so edits show up without restarting
-const shellOf = () => fs.readFileSync(path.join(SRC, 'shell.html'), 'utf8').replace('<script>\n/*@@MAIN@@*/\n</script>', '<script type="module" src="/main.js"></script>');
+const shellOf = () => fs.readFileSync(path.join(SRC, 'shell.html'), 'utf8').replace('/*@@FONTS@@*/', () => require('./fonts')()).replace('<script>\n/*@@MAIN@@*/\n</script>', '<script type="module" src="/main.js"></script>');
 if (!shellOf().includes('src="/main.js"')) throw new Error('shell marker not found');
 http.createServer((q, r) => {
   const u = q.url.split('?')[0];
