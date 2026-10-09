@@ -13,8 +13,8 @@ commands in the registry (so command search finds them), no tool windows open at
 | 4 | Export recipes | done, v0.114 |
 | 5 | Repeat tile (a canvas format) | done, v0.115 |
 | 6 | Print proof | done, v0.116 |
-| 7 | Presets | next |
-| 8 | Variations strip | |
+| 7 | Presets | done, v0.117 |
+| 8 | Variations strip | next |
 | 9 | Task bar | |
 
 ## 2. Navigator, hand tool, zoom keys (v0.112)
@@ -42,10 +42,10 @@ commands in the registry (so command search finds them), no tool windows open at
 ## 6. Print proof (v0.116)
 - In the Export recipes tool, under "Print proof": choose Letter or A4, then PDF or PNG (150 dpi). One portrait page: the project name, the date and app version, the piece (on a repeat tile: the single tile beside the tile repeated 3 × 3), the colours as swatches with their names and hex values, the palette's name and its number in Wada's book when it is one of the 348 combinations, the canvas ratio (or the print cover size and 300 DPI pixels), and the stamp and layer counts. Commands: Print proof (PDF), Print proof (PNG).
 
-## 7. Presets (default design)
-- A preset is a saved look: palette, colour grade, textures and print effects. It does not touch stamps or layout. Save the current look, apply with one click (one undo step brings the old look back), rename, delete. Each shows a small picture of the piece when it was saved.
-- The plan said "hover preview"; new code cannot depend on hovering, so a preset is applied by click and undone with Undo.
-- Starting presets come from the palette book (the 348 named combinations) so you can try looks straight away. More colour books can be added later.
+## 7. Presets (v0.117)
+- The Presets tool (side bar, both views) has two parts. **Looks:** a look is a finish: the palette, colour grade, canvas texture and print effects. It never touches stamps or layout, and applying one is one undo step. Starting looks: Soft cotton, Strong ink, Worn block, Faded linen, Warm riso, Clean (they leave the palette alone). "Save look" keeps the current finish under a name with a small picture of the piece; rename and delete; kept with your settings (grade masks tied to a layer or stamp stay with that piece).
+- **Palettes:** all 348 combinations of Wada's book with their names, as a searchable list (by name, colour or number). One click sets the palette and moves each ink the stamps and layers use to the same place in the new palette (paper, ink, 3rd, 4th); inks from outside the palette spread over the new accents.
+- The plan said "hover preview"; a click applies and Undo takes it back, so nothing depends on hovering. More colour books can be added to the list later. Commands: Open Presets, Save look.
 
 ## 8. Variations strip (default design)
 - A row of six small alternatives of the current piece, made by re-rolling what you choose (by default the colours only). Click one to apply it (one undo step). "More" makes six new ones. Nothing changes until you click.

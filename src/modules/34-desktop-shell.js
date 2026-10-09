@@ -27,8 +27,8 @@ let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'ca
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colors',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Preview',grid:'Grid',layers:'Arrangement',pgrid:'Grid',grade:'Grade',tex:'Textures',rand:'Randomize',hist:'History'};
-const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib','nav','wspc','xrec'],stamp:['wspc','motifs','text','mlist','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
+const PNAME={pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colors',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Preview',grid:'Grid',layers:'Arrangement',pgrid:'Grid',grade:'Grade',tex:'Textures',rand:'Randomize',hist:'History'};
+const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib','nav','wspc','xrec','pres'],stamp:['wspc','pres','motifs','text','mlist','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=m=>m=='pattern'?{dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]}:{dock:[wsG(['motifs']),wsG(['stamp','colors','grade','tex','rand'])],float:[wsG(['mlist'],{x:null,y:null,w:230,h:440}),wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}),wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'})]};
