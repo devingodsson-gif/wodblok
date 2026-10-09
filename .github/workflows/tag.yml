@@ -1,0 +1,27 @@
+name: tag releases
+# One git tag per release (CLAUDE.md): the first commit that carries a version in package.json gets the tag vN.
+# Runs on every push, only adds tags that are missing (so it also fills in old ones once), never moves or deletes one.
+on: push
+permissions:
+  contents: write
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Create missing version tags
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          seen=""
+          for c in $(git log --reverse --format=%H -- package.json); do
+            v=$(git show "$c:package.json" | sed -n 's/.*"version": *"\([0-9]*\)\..*/\1/p' | head -1)
+            [ -z "$v" ] && continue
+            case " $seen " in *" $v "*) continue;; esac
+            seen="$seen $v"
+            if git rev-parse -q --verify "refs/tags/v$v" >/dev/null; then continue; fi
+            git tag -a "v$v" -m "WODBLOK v$v" "$c"
+            echo "tagged v$v at $c"
+          done
+          git push origin --tags
