@@ -47,6 +47,7 @@ import {init44} from './modules/44-repeat-tile.js';
 import {init45} from './modules/45-print-proof.js';
 import {init46} from './modules/46-presets.js';
 import {init47} from './modules/47-variations.js';
+import {init48} from './modules/48-task-bar.js';
 import {kv} from './platform/index.js';
 import {cmdConflicts,cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdList,cmdRun} from './commands/registry.js';
 
@@ -96,4 +97,5 @@ init44();
 init45();
 init46();
 init47();
+init48();
 window.__wbTest = { state: () => coreStr(), kv, recoveryTick: rcTick, commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };

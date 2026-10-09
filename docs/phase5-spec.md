@@ -15,7 +15,7 @@ commands in the registry (so command search finds them), no tool windows open at
 | 6 | Print proof | done, v0.116 |
 | 7 | Presets | done, v0.117 |
 | 8 | Variations strip | done (v0.118) |
-| 9 | Task bar | |
+| 9 | Task bar | done, v0.119 |
 
 ## 2. Navigator, hand tool, zoom keys (v0.112)
 - Navigator panel (side bar, Pattern view): the whole piece small with a frame for the visible part. Click or drag in it to move there. Zoom out/in, Fit, 100%.

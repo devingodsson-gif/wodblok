@@ -1,5 +1,6 @@
 import {cmdFormatShortcut,cmdIsEnabled,cmdList,cmdRun} from '../commands/registry.js';
 import {$} from './01-launch-and-version.js';
+import {pinIs,pinToggle} from './48-task-bar.js';
 // ===== Command search (Mod+K) =====
 // Type to find any command in the registry and run it: the same commands the buttons and shortcuts run, so nothing here can drift
 // from them. Up and Down move, Enter runs, Escape closes; a click or tap on a row runs it. Commands that cannot run right now are
@@ -33,6 +34,8 @@ function init40(){
       e.id='ck'+i;e.className='ckr'+(r.on?'':' dis');e.setAttribute('role','option');e.setAttribute('aria-selected','false');if(!r.on)e.setAttribute('aria-disabled','true');e.dataset.i=i;
       b.textContent=r.c.label;e.appendChild(b);
       if(r.c.shortcut){const k=document.createElement('kbd');k.textContent=cmdFormatShortcut(r.c.shortcut,isMac());e.appendChild(k)}
+      const pn=document.createElement('button'),on=pinIs(r.c.id);pn.type='button';pn.className='ckp'+(on?' on':'');pn.dataset.id=r.c.id;pn.tabIndex=-1;pn.setAttribute('aria-pressed',on?'true':'false');pn.setAttribute('aria-label',(on?'Unpin ':'Pin ')+r.c.label+(on?' from the task bar':' to the task bar'));
+      pn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7"/></svg>';e.appendChild(pn);
       list.appendChild(e);
     });
     mark();
@@ -47,7 +50,9 @@ function init40(){
     else if(e.key=='Escape'){e.preventDefault();e.stopPropagation();close()}
     else if(e.key=='Tab'){e.preventDefault()}   // the search box is the only stop in this window
   });
-  list.addEventListener('click',e=>{const r=e.target.closest('.ckr');if(r)go(+r.dataset.i)});
+  list.addEventListener('click',e=>{
+    const p=e.target.closest('.ckp');if(p){const on=pinToggle(p.dataset.id);p.classList.toggle('on',on);p.setAttribute('aria-pressed',on?'true':'false');const c=rows.find(r=>r.c.id==p.dataset.id).c;p.setAttribute('aria-label',(on?'Unpin ':'Pin ')+c.label+(on?' from the task bar':' to the task bar'));inp.focus();return}
+    const r=e.target.closest('.ckr');if(r)go(+r.dataset.i)});
   list.addEventListener('pointermove',e=>{const r=e.target.closest('.ckr');if(r&&!r.classList.contains('dis')&&+r.dataset.i!=cur){cur=+r.dataset.i;mark()}});
   box.querySelector('.ckbd').addEventListener('click',close);
   $('cmdkb').addEventListener('click',()=>box.hidden?open():close());
