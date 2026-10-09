@@ -22,5 +22,8 @@
     "eslint-scope": "9.1.2",
     "espree": "11.2.0",
     "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3"
   }
 }
