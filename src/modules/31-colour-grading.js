@@ -124,7 +124,7 @@ show('gm_sp_r',isPos(m)&&!m.sc&&m.sp=='s');show('gm_st_r',isPos(m)&&m.sp=='s'&&!
 $('gm_sp').querySelectorAll('[data-gs]').forEach(b=>b.classList.toggle('on',b.dataset.gs==m.sp));
 if(isPos(m)){$('gm_st').innerHTML='<option value="">All stamps</option>'+WBS.tiles.map((t,i)=>`<option value="${t.id}">Stamp ${i+1}</option>`).join('');$('gm_st').value=WBS.tiles.some(t=>String(t.id)==m.st)?m.st:''}
 if(T=='lay'){$('gm_lay').innerHTML=(m.lay&&WBS.layers.some(L=>L.u==m.lay)?'':'<option value="">Pick a layer</option>')+WBS.layers.map((L,i)=>i).reverse().map(i=>`<option value="${WBS.layers[i].u}">${hx(WBS.layers[i].name)}</option>`).join('');$('gm_lay').value=WBS.layers.some(L=>L.u==m.lay)?m.lay:''}
-if(T=='col'){const used=[...new Set([WBS.proj.bg,WBS.proj.ink,...WBS.tiles.map(t=>t.ink),...WBS.layers.map(L=>L.ink)].filter(n=>n&&CM[n]))],hs=used.map(n=>[n,col(n).toLowerCase()]),cur0=m.c.toLowerCase();
+if(T=='col'){const used=[...new Set([WBS.proj.bg,WBS.proj.ink,WBS.proj.c3,WBS.proj.c4,...WBS.tiles.map(t=>t.ink),...WBS.layers.map(L=>L.ink)].filter(n=>n&&CM[n]))],hs=used.map(n=>[n,col(n).toLowerCase()]),cur0=m.c.toLowerCase();
  $('gm_col').innerHTML=hs.map(([n,h])=>`<option value="${h}">${hx(n)}</option>`).join('')+(hs.some(x=>x[1]==cur0)?'':`<option value="${cur0}">${hx(colName(cur0))}</option>`);$('gm_col').value=cur0;$('gm_cc').value=cur0}
 ['lo','hi','rg','sm','fe','amt'].forEach(k=>{const r=$('gm_'+k);if(m[k]!==undefined&&+r.value!=+m[k]){r.value=m[k];r.dispatchEvent(new Event('input',{bubbles:true}))}});
 $('gm_inv').checked=!!m.inv;$('gm_ov').checked=gmOv;

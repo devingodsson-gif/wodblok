@@ -41,7 +41,7 @@ WBS.msel=new Set();
 WBX.wbCur=()=>WBS.cur;
 DEF_TILES=JSON.stringify(WBS.tiles);
 try{cust=JSON.parse(kv.get('wb2_cust')||'{}');Object.keys(cust).forEach(k=>{if(k.startsWith('i|')&&!/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test((cust[k]||{}).svg||''))delete cust[k]});const t=JSON.parse(kv.get('wb2_tiles')||'null');if(t&&t.length)WBS.tiles=t}catch(e){}
-try{const p=JSON.parse(kv.get('wb2_proj')||'null');if(p&&p.ink&&p.bg)WBS.proj={ink:fixC(p.ink,PCOL.ink),bg:fixC(p.bg,PCOL.bg)}}catch(e){}
+try{const p=JSON.parse(kv.get('wb2_proj')||'null');if(p&&p.ink&&p.bg){WBS.proj={ink:fixC(p.ink,PCOL.ink),bg:fixC(p.bg,PCOL.bg)};['c3','c4'].forEach(k=>{if(p[k])WBS.proj[k]=fixC(p[k],'')})}}catch(e){}
 WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));{const used=new Set();WBS.tiles.forEach(t=>{if(!t.id||used.has(t.id))t.id=WBS.nid++;used.add(t.id)})}
 WBS.layers=null;WBS.selL=0;
 try{const q=JSON.parse(kv.get('wb4_layers')||'null');if(q&&q.layers&&q.layers.length)WBS.layers=q.layers}catch(e){}

@@ -57,7 +57,7 @@ WBS.ARTS=artLoad(d.arts);const L=d.lib||{};Object.entries(L.motifs||{}).forEach(
 (L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();
 WBS.tiles=JSON.parse(JSON.stringify(d.tiles));WBS.layers=JSON.parse(JSON.stringify(d.layers));
 WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(id=>WBS.tiles.some(t=>t.id==id));if(L.lay=='brick'){L.lay='cols';if(!L.grid)L.grid='brick'}});if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];
-WBS.proj=d.proj&&d.proj.ink&&d.proj.bg?{...d.proj,ink:fixC(d.proj.ink,PCOL.ink),bg:fixC(d.proj.bg,PCOL.bg)}:{...PCOL};
+WBS.proj=d.proj&&d.proj.ink&&d.proj.bg?{...d.proj,ink:fixC(d.proj.ink,PCOL.ink),bg:fixC(d.proj.bg,PCOL.bg)}:{...PCOL};['c3','c4'].forEach(k=>{if(WBS.proj[k])WBS.proj[k]=fixC(WBS.proj[k],'');if(!WBS.proj[k])delete WBS.proj[k]});
 if(d.cover&&d.cover.book&&typeof d.cover.book=='object')WBS.book={...WBS.book,...d.cover.book};else WBS.book={...WBS.book,on:false};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}
 WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,3]};WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pgrid=pgFix(d.pg,WBS.layers);
 WBS.pr={...PDEF.pr,...(d.pr||{})};WBS.tex={...PDEF.tex,...(d.tex||{})};WBS.texLib=txClean(d.texLib);texNorm();if(WBX.wbGrade)WBX.wbGrade.set(d.grade||null);{const c2=d.cover||{};cov={img:okImg(c2.img)?c2.img:'',iw:+c2.iw||0,ih:+c2.ih||0,sc:+c2.sc||100,tx:c2.tx!==false};if(!cov.iw||!cov.ih)cov.img='';const sl=o=>o&&okImg(o.img)&&+o.iw&&+o.ih?{img:o.img,iw:+o.iw,ih:+o.ih,sc:+o.sc||100}:blank();covB=sl(c2.back);covS=sl(c2.spine);WBS.cslot='f';$('cov').checked=c2.on!==false;saveCov();WBS.covKey='';if(WBX.wbBookSync)WBX.wbBookSync()}

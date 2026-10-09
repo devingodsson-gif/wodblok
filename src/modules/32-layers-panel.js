@@ -1,5 +1,5 @@
 import {$,WBS} from './01-launch-and-version.js';
-import {C,CM,DD,DDset,SH,SW,cItem,col,geom,mkdd,shOf} from './04-canvas-and-stamp-outlines.js';
+import {C,CM,DD,DDset,PSLOT,SH,SW,cItem,col,geom,mkdd,projCols,projSet,shOf} from './04-canvas-and-stamp-outlines.js';
 import {luid,mkL,store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -39,6 +39,6 @@ $('ly_rp').oninput=()=>{LY().rp=$('ly_rp').value;store();upd()};
 $('ly_ink').oninput=()=>{const v=$('ly_ink').value;if(v)LY().ink=v;else delete LY().ink;store();upd()};
 
 covOrder();
-$('pswp').onclick=()=>{WBS.proj={ink:WBS.proj.bg,bg:WBS.proj.ink};store();upd()};
+$('pswp').onclick=()=>{const c=projCols();if(c.length<2)return;c.push(c.shift());PSLOT.forEach((k,i)=>projSet(k,c[i]));store();upd()};
 }
 export {lyInkFill,renderLayers,init32};

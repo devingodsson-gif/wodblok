@@ -1,6 +1,6 @@
 import {clipboard,kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {C,CC,CH,CM,CW,PCOL,PL,SHN,SK,col,csk,geom,paintColors,saveCC,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {C,CC,CH,CM,CW,PCOL,PL,SHN,SK,col,csk,geom,paintColors,projSet,saveCC,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {clean,cust,luid,mcSave,mkL,say,store} from './06-motif-library-folders.js';
 import {build,hx,leadT} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -57,13 +57,15 @@ $('sall').onclick=()=>{const sh=shOf(WBS.tiles[WBS.cur]);let n=0;WBS.tiles.forEa
 $('lgl').oninput=()=>{const L=LY(),v=$('lgl').value;if(v){L.gl=v;L.ox=0;L.oy=0;if(!L.pa)L.pa='c'}else delete L.gl;store();upd()};
 $('lpa').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;LY().pa=b.dataset.p;store();upd()};
 $('lld').oninput=()=>{LY().lead=+$('lld').value;store();upd()};
-$('pal').oninput=()=>{const p=PL[$('pal').value];if(p){WBS.proj={ink:p[1],bg:p[2]};store();upd()}};
+$('pal').oninput=()=>{const p=PL[$('pal').value];if(p){WBS.proj={ink:p[1],bg:p[2]};projSet('c3',p[3]);projSet('c4',p[4]);store();upd()}};
 $('pI').oninput=()=>{WBS.proj.ink=$('pI').value;store();upd()};
 $('pB').oninput=()=>{WBS.proj.bg=$('pB').value;store();upd()};
+$('p3').oninput=()=>{projSet('c3',$('p3').value);store();upd()};
+$('p4').oninput=()=>{projSet('c4',$('p4').value);store();upd()};
 $('stI').oninput=()=>{WBS.tiles[WBS.cur].ink=$('stI').value||null;store();upd()};
 $('neg').oninput=()=>{WBS.tiles[WBS.cur].neg=$('neg').checked;store();upd()};
 $('cl').onclick=e=>{if(e.target.closest('#addC')){openCF();return}const b=e.target.closest('[data-c]');if(!b)return;lastC=b.dataset.c;const n=b.dataset.c,a=$('ap').value;
-if(a=='pI')WBS.proj.ink=n;else if(a=='pB')WBS.proj.bg=n;else WBS.tiles[WBS.cur].ink=n;
+if(a=='pI')WBS.proj.ink=n;else if(a=='pB')WBS.proj.bg=n;else if(a=='p3'||a=='p4')projSet(a=='p3'?'c3':'c4',n);else WBS.tiles[WBS.cur].ink=n;
 $('cn').textContent=n+' '+col(n);$('rmC').hidden=!CC.includes(n);store();upd()};
 $('cpk').oninput=()=>{$('chx').value=$('cpk').value};
 $('chx').oninput=()=>{const h=normHex($('chx').value);if(h)$('cpk').value=h};
@@ -76,7 +78,7 @@ C.push([n,h]);CM[n]=h;CC.push(n);saveCC();paintColors();lastC=n;$('rmC').hidden=
 $('cn').textContent='Added '+n+' '+h+'. Click it to apply.';$('cnm').value='';$('cf').hidden=true;$('cl').scrollTop=$('cl').scrollHeight;upd()};
 $('rmC').onclick=()=>{const n=lastC;if(!n||!CC.includes(n))return;
 C.splice(C.findIndex(c=>c[0]==n),1);delete CM[n];CC.splice(CC.indexOf(n),1);
-if(WBS.proj.ink==n)WBS.proj.ink=PCOL.ink;if(WBS.proj.bg==n)WBS.proj.bg=PCOL.bg;WBS.tiles.forEach(t=>{if(t.ink==n)t.ink=null});
+if(WBS.proj.ink==n)WBS.proj.ink=PCOL.ink;if(WBS.proj.bg==n)WBS.proj.bg=PCOL.bg;if(WBS.proj.c3==n)projSet('c3',null);if(WBS.proj.c4==n)projSet('c4',null);WBS.tiles.forEach(t=>{if(t.ink==n)t.ink=null});
 saveCC();store();paintColors();lastC=null;$('rmC').hidden=true;$('cn').textContent='Removed '+n+'.';upd()};
 [['lgp','gap',Number],['ts','size',Number],['lox','ox',Number],['loy','oy',Number],['lrr','rrot',Number],['lrp','rpos',Number],['lrt','rot',Number],['lps','pst',Number],['lfs','pfl',Number],['lnm','name',v=>v]].forEach(([id,k,f])=>$(id).oninput=()=>{LY()[k]=f($(id).value);store();upd()});
 [['lrtn','rtn'],['lrfh','rfh'],['lrfv','rfv']].forEach(([id,k])=>$(id).oninput=()=>{const L=LY();if($(id).checked)L[k]=true;else delete L[k];store();upd()});

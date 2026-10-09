@@ -11,6 +11,7 @@ async function randomize(page) {
   await openPanel(page, 'rand');
   await page.click('#rzdo');
   await settle(page, { max: 30000 });
+  await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)'));   // the old picture is held until the new one is made; compare buttons ignore clicks until then
 }
 
 for (const seed of [1, 2, 3]) {
