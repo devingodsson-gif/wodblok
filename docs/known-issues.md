@@ -20,3 +20,6 @@ In a test that pressed Ctrl+S on a new document, then rolled Randomize, the `\` 
 
 ## Test flake: "open project-3" round trip on the raw-module target (seen once, Phase 2e run)
 Failed once in a full run on `WB_TARGET=esm`; passed 3 of 3 repeats straight afterwards and on every bundle run. Same family as the hex-shape flake above (something drawn after the settle check). Not changed.
+
+## v103 note: tests no longer match the v100 baseline
+v103 replaced the colour library (Wada colours, src/data/wada.js) and the default ink/paper (Dark Tyrian Blue on Pale Lemon Yellow, was Marian Blue on Lily White). Snapshots and screenshots were regenerated from the build with the owner's OK, so `WB_TARGET=legacy` runs now differ by design. Run the tests on the build (or esm) from here on.

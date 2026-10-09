@@ -1,6 +1,18 @@
 {
+ "tiles.1.ink": [
+  "Mulled Plum",
+  "Cotinga Purple"
+ ],
  "layers.2.fr.i": [
   9.6,
   9.5
+ ],
+ "proj.ink": [
+  "Jess Leather",
+  "Vandyke Brown"
+ ],
+ "proj.bg": [
+  "Falcon Tan",
+  "Maple"
  ]
 }

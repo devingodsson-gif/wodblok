@@ -399,7 +399,7 @@
    "er": 1.5,
    "es": 190,
    "neg": false,
-   "ink": "Moon Ivory",
+   "ink": "Sulpher Yellow",
    "tu": []
   },
   {
@@ -494,7 +494,7 @@
    "er": 1.7,
    "es": 88,
    "neg": false,
-   "ink": "Moon Ivory",
+   "ink": "Sulpher Yellow",
    "tu": []
   },
   {
@@ -534,7 +534,7 @@
    "er": 1,
    "es": 972,
    "neg": false,
-   "ink": "Moon Ivory",
+   "ink": "Sulpher Yellow",
    "tu": []
   }
  ],
@@ -726,8 +726,8 @@
   }
  ],
  "proj": {
-  "ink": "Tallow",
-  "bg": "Slate"
+  "ink": "Sulpher Yellow",
+  "bg": "Blackish Olive"
  },
  "dim": {
   "s": [

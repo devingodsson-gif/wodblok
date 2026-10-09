@@ -25,7 +25,7 @@ for (const f of fs.readdirSync(path.join(ROOT, 'src', 'vendor')).filter(f => f.e
   if (!m) throw new Error('vendor/' + f + ' needs a final export line');
   parts.push('const {' + m[1] + '}=(()=>{' + t.replace(m[0], '') + '\nreturn {' + m[1] + '};})();\n');
 }
-for (const sub of ['platform', 'format', 'commands']) {                    // shared layers first, in this order
+for (const sub of ['data', 'platform', 'format', 'commands']) {                    // shared layers first, in this order
   const d = path.join(ROOT, 'src', sub);
   for (const f of fs.readdirSync(d).filter(f => f.endsWith('.js')).sort()) parts.push(strip(sub + '/' + f, fs.readFileSync(path.join(d, f), 'utf8')));
 }

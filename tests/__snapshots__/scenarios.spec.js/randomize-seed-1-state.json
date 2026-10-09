@@ -380,7 +380,7 @@
    "er": 1.1,
    "es": 107,
    "neg": false,
-   "ink": "Ermine Black",
+   "ink": "Red",
    "tgm": {
     "txmuzhi800i88": {
      "text": "EX LIBRIS",
@@ -463,7 +463,7 @@
    },
    "man": false,
    "ov": {},
-   "ink": "Ermine Black",
+   "ink": "Red",
    "tu": [
     {
      "x": "xmuzhi800do7e",
@@ -502,7 +502,7 @@
    },
    "man": false,
    "ov": {},
-   "ink": "Ermine Black",
+   "ink": "Red",
    "tu": [
     {
      "x": "xmuzhi800e3c1",
@@ -541,7 +541,7 @@
    },
    "man": false,
    "ov": {},
-   "ink": "Ermine Black"
+   "ink": "Red"
   },
   {
    "u": "lnie1hki",
@@ -580,8 +580,8 @@
   }
  ],
  "proj": {
-  "ink": "Nightshade",
-  "bg": "Sage Leaf"
+  "ink": "Benzol Green",
+  "bg": "Light Glaucous Blue"
  },
  "dim": {
   "s": [

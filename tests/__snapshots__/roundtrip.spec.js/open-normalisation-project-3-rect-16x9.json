@@ -1,1 +1,14 @@
-{}
+{
+ "tiles.1.ink": [
+  "Nightshade",
+  "Red Violet"
+ ],
+ "proj.ink": [
+  "Damask Crimson",
+  "Pansy Purple"
+ ],
+ "proj.bg": [
+  "Rosewater",
+  "Seashell Pink"
+ ]
+}

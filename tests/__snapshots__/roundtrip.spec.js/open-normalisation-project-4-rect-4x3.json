@@ -1,1 +1,22 @@
-{}
+{
+ "tiles.5.ink": [
+  "Moon Ivory",
+  "Sulpher Yellow"
+ ],
+ "tiles.6.ink": [
+  "Moon Ivory",
+  "Sulpher Yellow"
+ ],
+ "tiles.7.ink": [
+  "Moon Ivory",
+  "Sulpher Yellow"
+ ],
+ "proj.ink": [
+  "Tallow",
+  "Sulpher Yellow"
+ ],
+ "proj.bg": [
+  "Slate",
+  "Blackish Olive"
+ ]
+}
