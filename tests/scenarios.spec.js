@@ -129,11 +129,8 @@ test('clear resets to a blank document; undo brings the document back', async ({
   expect(JSON.parse(await getState(page)).dim.cs || 'rect').toBe('rect');
   await page.keyboard.press('Control+z'); await settle(page);
   const undone = JSON.parse(await getState(page));
-  // Everything except colour grading comes back. KNOWN ISSUE (v100, docs/known-issues.md #1): undo after Clear
-  // leaves the grade blank, because the history's first entry is taken before the opened project's grade is
-  // applied. The grade is recorded below so Phases 1-3 keep this exactly as it is.
-  const { grade: g0, ...rest0 } = loaded, { grade: g1, ...rest1 } = undone;
-  expect(rest1).toEqual(rest0);
-  expect(JSON.stringify({ grade_after_undo: g1 }, null, 1) + '\n').toMatchSnapshot('clear-undo-grade.json');
+  // The whole document comes back, colour grade included (fixed in v107; before, the grade stayed blank).
+  expect(undone).toEqual(loaded);
+  expect(JSON.stringify({ grade_after_undo: undone.grade }, null, 1) + '\n').toMatchSnapshot('clear-undo-grade.json');
   expect(errors).toEqual([]);
 });

@@ -1,18 +1,45 @@
 {
  "grade_after_undo": {
   "ex": 0,
-  "ct": 0,
+  "ct": -4,
   "hi": 0,
   "sh": 0,
   "wh": 0,
   "bl": 0,
-  "tp": 0,
-  "tn": 0,
-  "sat": 0,
+  "tp": 25,
+  "tn": 7,
+  "sat": -19,
   "vib": 0,
   "hue": 0,
-  "fd": 0,
+  "fd": 27,
   "cov": false,
-  "masks": []
+  "masks": [
+   {
+    "sc": "",
+    "id": "monsqv3",
+    "t": "lum",
+    "name": "Highlight tone",
+    "on": true,
+    "inv": false,
+    "amt": 100,
+    "a": {
+     "ex": 0,
+     "ct": 0,
+     "hi": 0,
+     "sh": 0,
+     "wh": 0,
+     "bl": 0,
+     "tp": -1,
+     "tn": 17,
+     "sat": 0,
+     "vib": 0,
+     "hue": 0,
+     "fd": 0
+    },
+    "lo": 60,
+    "hi": 100,
+    "sm": 30
+   }
+  ]
  }
 }
