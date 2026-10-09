@@ -20,3 +20,7 @@ Not measured: Safari/WebKit (no WebKit browser in this sandbox; run `npm run tes
 - **Tracing an imported picture:** 1400 px of a busy picture holds the main thread for about 0.12 s. Not worth the cost and risk of moving it.
 - **Stamp printing** also draws SVG, so it has the same limit as PNG export.
 - Decision: no workers for now. Revisit only if a measurement on a real machine or Safari shows tracing or encoding is slow.
+
+## Step 3 finding: dragged-motif shortcut (v0.119, same machine)
+- Dragging a free-placed motif on the five-layer fixture (40 moves): 0.66 s in total, every frame 16 ms (60 per second), no long tasks. The drag handler already moves only that motif's transform (and its selection box) and redraws nothing else, so the parked idea is already how it works.
+- Pattern-layer sliders (a different case) are covered by the slider numbers above. Decision: nothing to build for step 3.
