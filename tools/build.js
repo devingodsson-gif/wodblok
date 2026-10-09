@@ -46,3 +46,10 @@ fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, shell.replace(marker, () => body).replace(/<title>Wodblok v\d+<\/title>/, '<title>Wodblok v' + VER + '</title>'));
 console.log('version', VER);
 console.log('built', path.relative(ROOT, out), fs.statSync(out).size, 'bytes from', manifest.length, 'modules + main.js');
+// Hosting (Cloudflare Pages etc.) serves index.html from the output folder, so a default build also leaves an identical
+// copy next to the single file. wodblok.html stays the file tests and GitHub Releases use.
+if (!process.argv[2]) {
+  const idx = path.join(path.dirname(out), 'index.html');
+  fs.copyFileSync(out, idx);
+  console.log('copied', path.relative(ROOT, idx));
+}
