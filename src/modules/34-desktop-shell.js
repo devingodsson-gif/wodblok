@@ -31,7 +31,7 @@ const PNAME={slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colo
 const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib'],stamp:['motifs','text','mlist','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
-const wsDef=m=>m=='pattern'?{dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]}:{dock:[wsG(['motifs']),wsG(['stamp','colors','grade','tex','rand'])],float:[wsG(['mlist'],{x:null,y:null,w:230,h:440}),wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}),wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'})]};
+const wsDef=m=>m=='pattern'?{dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]}:{dock:[wsG(['motifs','mlist']),wsG(['stamp','colors','grade','tex','rand'],{f:1.2}),wsG(['preview','grid'])],float:[]};
 let WS={pattern:wsDef('pattern'),stamp:wsDef('stamp')};
 try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern','stamp'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}});if(sv&&!sv.pv&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('preview')))WS.stamp.float.push(wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}));if(sv&&!sv.gr&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('grid')))WS.stamp.float.push(wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'}))}catch(e){}
 try{const sv0=JSON.parse(kv.get('wb30_ws')||'null');if(sv0&&!sv0.ly&&!WS.pattern.dock.concat(WS.pattern.float).some(g=>g.tabs.includes('lyrs')))WS.pattern.dock.unshift(wsG(['lyrs'],{f:.85}))}catch(e){}
@@ -157,8 +157,9 @@ const stage=document.querySelector('.stage');
 function setView(v){const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
 $('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display=v=='pattern'?'':'none';$('gtb').style.display=v=='stamp'?'':'none';$('itb').style.display='';if(v=='pattern')requestAnimationFrame(applyZ);tbSync();if(was!=v||!wsReady)wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
-const L=wsL();let g=wsFind(p);if(!g&&p=='rand'){g=wsG([p],{x:null,y:null,w:272,h:620,pos:'r'});L.float.push(g)}
-if(!g){g=L.dock[0];if(g)g.tabs.push(p);else{g=wsG([p]);L.dock.push(g)}}g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
+const L=wsL();let g=wsFind(p);
+// a tool that is not open yet opens docked on the right: Randomize beside the colour tools, anything else as a tab in the first group
+if(!g){g=(p=='rand'&&L.dock.find(x=>x.tabs.includes('grade')))||L.dock[0];if(g)g.tabs.push(p);else{g=wsG([p]);L.dock.push(g)}}g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
 $('rcls').onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length)return;L.dock=[];L.float=[];wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')};
