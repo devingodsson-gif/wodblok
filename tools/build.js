@@ -18,7 +18,14 @@ const strip = (name, t) => {
   return r;
 };
 const parts = [];
-for (const sub of ['platform', 'commands']) {                    // shared layers first, in this order
+// Vendored libraries keep their own scope: their short top-level names must not meet the app's. Each file becomes
+// `const {exported names} = (() => { ...library...; return {names}; })();`
+for (const f of fs.readdirSync(path.join(ROOT, 'src', 'vendor')).filter(f => f.endsWith('.js')).sort()) {
+  const t = fs.readFileSync(path.join(ROOT, 'src', 'vendor', f), 'utf8'), m = /^export \{([A-Za-z0-9_$,]*)\};\n/m.exec(t);
+  if (!m) throw new Error('vendor/' + f + ' needs a final export line');
+  parts.push('const {' + m[1] + '}=(()=>{' + t.replace(m[0], '') + '\nreturn {' + m[1] + '};})();\n');
+}
+for (const sub of ['platform', 'format', 'commands']) {                    // shared layers first, in this order
   const d = path.join(ROOT, 'src', sub);
   for (const f of fs.readdirSync(d).filter(f => f.endsWith('.js')).sort()) parts.push(strip(sub + '/' + f, fs.readFileSync(path.join(d, f), 'utf8')));
 }

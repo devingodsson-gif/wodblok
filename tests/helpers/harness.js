@@ -53,7 +53,13 @@ function initScript({ seed, runtime }) {
       async use(name) {
         if (name === 'db') return dbApi;
         if (name === 'user') return { async id() { return 'test-user'; } };
-        if (name === 'downloads') return { async save(o) { window.__wbDownloads.push({ filename: o.filename, data: o.data }); } };
+        if (name === 'downloads') return { async save(o) {
+          // text is kept as text; a Blob (zip, png) is kept as base64 so the test side can read the bytes
+          if (typeof Blob !== 'undefined' && o.data instanceof Blob) {
+            const u = new Uint8Array(await o.data.arrayBuffer()); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+            window.__wbDownloads.push({ filename: o.filename, base64: btoa(s), type: o.data.type });
+          } else window.__wbDownloads.push({ filename: o.filename, data: o.data });
+        } };
         return null;
       },
     };` : ''}

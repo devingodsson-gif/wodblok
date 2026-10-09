@@ -1,4 +1,5 @@
 import {use} from '../platform/index.js';
+import {FMT_MIME,fmtOpen,fmtPack} from '../format/container.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {PCOL,shOf} from './04-canvas-and-stamp-outlines.js';
 import {mkL,selOne,store} from './06-motif-library-folders.js';
@@ -15,7 +16,7 @@ store();if(fresh){if(WBX.wbResetHist)WBX.wbResetHist();pmsg('Started a new, empt
 
 const fname=n=>(n||'untitled').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase().slice(0,50)||'untitled';
 async function dl(name,data){const d=await use('downloads');if(!d)return pmsg('Downloading is not available here.');
-try{await d.save({filename:fname(name)+'.wodblok.json',data:JSON.stringify({name,...data})});pmsg('Downloaded “'+name+'”.')}catch(e){if(e&&e.code!='declined')pmsg('Could not download: '+e.message)}}
+try{const zip=await fmtPack({name,...data});await d.save({filename:fname(name)+'.wodblok',data:new Blob([zip],{type:FMT_MIME})});pmsg('Downloaded “'+name+'”.')}catch(e){if(e&&e.code!='declined')pmsg('Could not download: '+e.message)}}
 async function renderPL(){$('pgrid').innerHTML='<div class="hint">Loading…</div>';
 try{const ps=await ST.list();$('pgrid').innerHTML=ps.length?ps.map(p=>`<div class="pc${p.id==WBS.cp.id?' on':''}${WBS.pSel.has(p.id)?' ps':''}" data-p="${hx(p.id)}">${p.thumb?`<img src="${hx(p.thumb)}" alt="">`:'<div class="nt">No preview</div>'}<b title="${hx(p.name)}">${hx(p.name||'Untitled')}</b><small>${new Date(p.updated||0).toLocaleString([], {dateStyle:'medium',timeStyle:'short'})}<br>${hx(p.info||'')}</small><div class="row"><button class="alt" data-a="open">Open</button><button class="alt" data-a="dup">Duplicate</button><button class="alt" data-a="dl">Download</button><button class="alt" data-a="del">Delete</button></div></div>`).join(''):'<div class="hint">No saved projects yet. Click Save to keep this one.</div>';WBS.pSel=new Set([...WBS.pSel].filter(id=>ps.some(p=>p.id==id)));pSelUp()}
 catch(e){$('pgrid').innerHTML='<div class="hint">Could not load projects: '+hx((e&&e.message)||'unknown error')+'</div>'}}
@@ -26,8 +27,11 @@ $('clr').onclick=()=>clearAll(false);
 $('pdl').onclick=()=>dl($('pnm').value.trim()||'Untitled pattern',snapshot());
 
 $('pfile').onchange=async()=>{const fl=$('pfile').files[0];$('pfile').value='';if(!fl)return;
-try{const d=JSON.parse(await fl.text());if(d.app!='WODBLOK')throw new Error('That file is not a WODBLOK project.');
-const name=(d.name||fl.name.replace(/\.wodblok\.json$|\.json$/i,'')).slice(0,60),id=newId();openData(d,id,name);await saveTo(id,name);WBS.cp.saved=coreStr();saveCp();pmsg('Opened “'+name+'” and added it to your projects.');if(!$('plist').hidden)renderPL()}
+try{const r=await fmtOpen(new Uint8Array(await fl.arrayBuffer())),d=r.project;
+const name=(d.name||fl.name.replace(/\.wodblok(\.json)?$|\.json$/i,'')).slice(0,60);
+// a file from a newer app opens as an unsaved copy: nothing is added to your projects and nothing is written back
+if(r.newer){openData(d,null,name);pmsg('“'+name+'” was made by a newer WODBLOK, so it is open as a copy that is not saved. Update the app to work on the original.');return}
+const id=newId();openData(d,id,name);await saveTo(id,name);WBS.cp.saved=coreStr();saveCp();pmsg('Opened “'+name+'” and added it to your projects.'+(r.missingAssets?' '+r.missingAssets+' picture'+(r.missingAssets>1?'s were':' was')+' missing from the file.':''));if(!$('plist').hidden)renderPL()}
 catch(e){pmsg((e&&e.message)||'Could not open that file.')}};
 $('pls').onclick=()=>{$('plist').hidden=!$('plist').hidden;$('pls').classList.toggle('on',!$('plist').hidden);if(!$('plist').hidden)renderPL()};
 document.addEventListener('click',async e=>{const t=e.target;if(!t||!t.id)return;if(t.id=='pselc2'){WBS.pSel=new Set();pSelUp()}else if(t.id=='pselx'){for(const id of [...WBS.pSel]){const p=await ST.get(id);if(p)dl(p.name,JSON.parse(p.data))}}

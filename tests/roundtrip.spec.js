@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, openApp, openProjectFile, getState, stateText, checkpoint, settle, setMode } = require('./helpers/harness');
+const { ROOT, TARGET, openApp, openProjectFile, getState, stateText, checkpoint, settle, setMode } = require('./helpers/harness');
 
 const DIR = path.join(ROOT, 'tests', 'fixtures');
 const FIXTURES = fs.readdirSync(DIR).filter(f => f.endsWith('.wodblok.json')).sort();
@@ -33,10 +33,13 @@ for (const f of FIXTURES) {
     const before = await stateText(page);
 
     const dl = await download(page);
-    expect(dl.filename).toMatch(/\.wodblok\.json$/);
-    const saved = JSON.parse(dl.data);
+    // Phase 3: the repo build saves the zip container (format 19); the untouched v100 baseline still saves v18 JSON.
+    const zip = TARGET !== 'legacy';
+    expect(dl.filename).toMatch(zip ? /\.wodblok$/ : /\.wodblok\.json$/);
+    const bytes = zip ? Buffer.from(dl.base64, 'base64') : null;
+    const saved = zip ? JSON.parse(Buffer.from(require('fflate').unzipSync(new Uint8Array(bytes))['project.json']).toString('utf8')) : JSON.parse(dl.data);
     expect(saved.app).toBe('WODBLOK');
-    expect(saved.v).toBe(18);                              // the format number the repo must continue from
+    expect(saved.v).toBe(zip ? 19 : 18);                   // the format number continues from v:18
     // What was saved is exactly what the app held after opening (no loss on save)...
     const held = JSON.parse(before);
     for (const k of ['tiles', 'layers', 'proj', 'dim', 'pr', 'tex', 'texLib', 'pg', 'grade'])
@@ -50,7 +53,7 @@ for (const f of FIXTURES) {
 
     // Reopen the saved file in a fresh page: the document must come back identical.
     const tmp = testInfo_tmp(f);
-    fs.writeFileSync(tmp, dl.data);
+    fs.writeFileSync(tmp, zip ? bytes : dl.data);
     const page2 = await page.context().newPage();
     const r2 = await openApp(page2);
     await openProjectFile(page2, tmp);

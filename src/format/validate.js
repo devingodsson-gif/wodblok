@@ -1,7 +1,7 @@
 import {FormatError} from './errors.js';
 // Checks a loaded project before any of it is used, so damaged or hostile files fail with a friendly message.
-const MAX_ITEMS = 200000;
-function validateProject(p) {
+const FMT_MAX_ITEMS = 200000;
+function fmtValidate(p) {
   const bad = (code, msg) => { throw new FormatError(code, msg); };
   if (!p || typeof p !== 'object' || Array.isArray(p)) bad('shape', 'That file is not a WODBLOK project.');
   if (p.app !== 'WODBLOK') bad('app', 'That file is not a WODBLOK project.');
@@ -14,9 +14,9 @@ function validateProject(p) {
     n += t.items.length;
     for (const q of t.items) if (!q || typeof q !== 'object' || typeof q.m !== 'string' || !Number.isFinite(+q.x) || !Number.isFinite(+q.y)) bad('items', 'A motif in that project is damaged.');
   }
-  if (n > MAX_ITEMS || p.layers.length > 5000) bad('size', 'That project is far larger than WODBLOK can open.');
+  if (n > FMT_MAX_ITEMS || p.layers.length > 5000) bad('size', 'That project is far larger than WODBLOK can open.');
   for (const L of p.layers) if (!L || typeof L !== 'object') bad('layers', 'A layer in that project is damaged.');
   if (p.arts !== undefined && (p.arts === null || typeof p.arts !== 'object')) bad('arts', 'The pictures in that project are damaged.');
   return p;
 }
-export {validateProject};
+export {fmtValidate};
