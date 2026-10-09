@@ -37,5 +37,6 @@
  "36-export-everything.js",
  "37-command-list.js",
  "38-crash-recovery.js",
- "39-web-app.js"
+ "39-web-app.js",
+ "40-command-search.js"
 ]

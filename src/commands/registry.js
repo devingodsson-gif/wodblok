@@ -1,5 +1,5 @@
 // The command registry: every user action is a named command (id, label, shortcut, enabled check, run). Menus, the shortcut
-// table, command search (Mod+K, later) and a future native menu bar all read from here. Pure: no DOM, no work on import.
+// table, command search (Mod+K) and a future native menu bar all read from here. Pure: no DOM, no work on import.
 // Shortcut syntax: "Mod+Shift+Z", "G", "\\". "Mod" is Cmd on Mac and Ctrl elsewhere. A command may carry a separate
 // `desktopShortcut` for keys a browser tab keeps for itself (Mod+N, Mod+W, Mod+T).
 const CMDS = new Map();
