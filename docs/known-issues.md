@@ -26,3 +26,6 @@ v103 replaced the colour library (Wada colours, src/data/wada.js) and the defaul
 
 ## Undo after several Randomize rolls in a row does not get back to the start (seen in v104 and v105, not investigated)
 Roll Randomize twice, then press Undo (or Ctrl+Z) repeatedly: the document stays on the last roll and Undo stays enabled. One roll followed by Undo works. Seen in the test browser on both the v104 and v105 builds; not yet checked by hand. Possibly the roll keeps changing the document after the history has captured it, so each Undo first records the current state again. `tests/palette.spec.js` checks undo after a single roll only.
+
+## Test flake: canvas shape "arch" SVG summary (seen once, v106 full run)
+One full-suite run gave a different hash for `canvas shape: arch` (same length and tag counts); 4 of 4 repeats passed straight afterwards. Same family as the hex-shape flake above: something drawn after the settle check. Snapshot not touched.
