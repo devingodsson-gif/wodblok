@@ -110,4 +110,4 @@ catch(e){pmsg('Could not save: '+((e&&e.message)||'unknown error'))}paintPst()};
 $('pnw').onclick=()=>confirm2($('pnw'),'Click again to discard changes',()=>{const t=JSON.parse(DEF_TILES);
 openData({tiles:t,layers:[mkL('Layer 1',t.map(x=>x.id),'check',180)],proj:{...PCOL},dim:{s:[1,1],c:[2,3]},pr:PDEF.pr,tex:PDEF.tex},null,'');clearAll(true);cov={img:'',iw:0,ih:0,sc:100};covB=blank();covS=blank();WBS.cslot='f';saveCov();WBS.covKey='';renderCover();WBS.cp.saved=coreStr();saveCp();paintPst()});
 }
-export {PGD,ST,confirm2,coreStr,covOrder,covS,dirty,newId,openData,paintCov,paintPst,pgFix,pmsg,renderCover,saveCp,saveTo,snapshot,init18};
+export {PGD,ST,thumb,confirm2,coreStr,covOrder,covS,dirty,newId,openData,paintCov,paintPst,pgFix,pmsg,renderCover,saveCp,saveTo,snapshot,init18};

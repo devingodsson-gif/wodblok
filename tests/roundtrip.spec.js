@@ -39,6 +39,7 @@ for (const f of FIXTURES) {
     const bytes = zip ? Buffer.from(dl.base64, 'base64') : null;
     const saved = zip ? JSON.parse(Buffer.from(require('fflate').unzipSync(new Uint8Array(bytes))['project.json']).toString('utf8')) : JSON.parse(dl.data);
     expect(saved.app).toBe('WODBLOK');
+    if (zip) expect(Object.keys(require('fflate').unzipSync(new Uint8Array(bytes)))).toContain('thumbnail.png');
     expect(saved.v).toBe(zip ? 19 : 18);                   // the format number continues from v:18
     // What was saved is exactly what the app held after opening (no loss on save)...
     const held = JSON.parse(before);
