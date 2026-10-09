@@ -14,7 +14,7 @@ commands in the registry (so command search finds them), no tool windows open at
 | 5 | Repeat tile (a canvas format) | done, v0.115 |
 | 6 | Print proof | done, v0.116 |
 | 7 | Presets | done, v0.117 |
-| 8 | Variations strip | next |
+| 8 | Variations strip | done (v0.118) |
 | 9 | Task bar | |
 
 ## 2. Navigator, hand tool, zoom keys (v0.112)

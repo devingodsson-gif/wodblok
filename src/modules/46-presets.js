@@ -26,10 +26,13 @@ function lkCapture(){
   return{proj,pr:{...c.pr},grade:g?{...g,masks:(g.masks||[]).filter(m=>!m.lay&&!m.sc).map(m=>JSON.parse(JSON.stringify(m)))}:null,tex:{u},texLib:(c.texLib||[]).filter(x=>ids.has(x.id)).map(x=>({...x}))};
 }
 // moving to a new palette: each ink the stamps and layers use keeps its place in the palette (paper, ink, 3rd, 4th); inks from outside it spread over the new accents
-function lkRemap(c,np){
+function lkNameMap(c,np){
   const op=c.proj,pos=n=>n===op.bg?'bg':n===op.ink?'ink':n===op.c3?'c3':n===op.c4?'c4':null;
   const accents=[np.c3,np.c4].filter(Boolean),fallback=accents.length?accents:[np.ink],foreign=[];
-  const to=n=>{if(!n)return n;const p=pos(n);if(p)return np[p]||np.ink;if(!foreign.includes(n))foreign.push(n);return fallback[(foreign.indexOf(n))%fallback.length]};
+  return n=>{if(!n)return n;const p=pos(n);if(p)return np[p]||np.ink;if(!foreign.includes(n))foreign.push(n);return fallback[(foreign.indexOf(n))%fallback.length]};
+}
+function lkRemap(c,np){
+  const to=lkNameMap(c,np);
   c.tiles.forEach(t=>{if(t.ink)t.ink=to(t.ink)});c.layers.forEach(l=>{if(l.ink)l.ink=to(l.ink)});
 }
 function lkDo(label,mut){
@@ -119,4 +122,4 @@ function init46(){
   q.addEventListener('keydown',e=>e.stopPropagation());q.addEventListener('input',paintPalettes);
   paintLooks();paintPalettes();
 }
-export {init46};
+export {init46,lkApplyPalette,lkNameMap};

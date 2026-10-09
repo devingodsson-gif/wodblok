@@ -44,6 +44,8 @@ const COMMANDS = [
   ['export.allRecipes', 'Export all recipes as one zip', 'xrall'],
   ['panel.pres', 'Open Presets', 'rail-pres'],
   ['look.save', 'Save look', 'pssave'],
+  ['panel.vars', 'Open Variations', 'rail-vars'],
+  ['variations.more', 'More variations', 'vrmore'],
   ['export.proofPdf', 'Print proof (PDF)', 'xppdf'],
   ['export.proofPng', 'Print proof (PNG)', 'xppng'],
   ['view.before', 'Before', 'bab', '\\'],
