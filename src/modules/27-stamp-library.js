@@ -1,3 +1,4 @@
+import {fmtStampOpen,fmtStampPack} from '../format/stamp.js';
 import {fmtOpen} from '../format/container.js';
 import {kv,use,collection} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';

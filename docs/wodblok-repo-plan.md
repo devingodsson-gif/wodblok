@@ -275,3 +275,16 @@ npm run dev | build | build:single | test | test:update-golden | perf | coupling
 - Run everything against the legacy file twice, then report the baseline numbers and any flakiness.
 
 Do not start Phase 1."
+
+## 10. Status (Oct 8, end of day)
+- Phase 0, 1 and 2 are done. Phase 3 is done apart from items parked below.
+- **Phase 3 as built:**
+  - `.wodblok` is a zip: `mimetype` first (stored), `project.json`, `assets/<sha256>.<ext>` (each image once), `thumbnail.png`, `snapshots/NN.json`. Format 19. Download writes it; Open reads it, and still reads `.wodblok.json` (v18 and earlier) unchanged. Opening never writes back.
+  - Files from a newer app open as an unsaved copy and are not added to Projects.
+  - Damaged files give a plain message (`FormatError`); a 300-case byte-flip test shows only "opens" or a friendly error.
+  - Crash recovery: unsaved work is copied to a recovery slot every 8 s; the app still launches blank and offers "Restore unsaved work" / "Dismiss" in the status bar. The old copy is kept until one of them is pressed.
+  - A library stamp can be saved as `.wodblok-stamp` and imported back.
+  - "Save as copy" is the existing Duplicate project, "Recent projects" is the existing Projects list (newest first), and linked Art already keeps its cached picture and says when its source is gone, so none of those needed new code.
+  - fflate 0.8.3 (MIT) is vendored in `src/vendor/` (regenerate with `node tools/vendor-fflate.js`); the bundle grew by about 100 KB. TypeScript is a dev dependency used only to type-check `src/platform/`; the format code is JavaScript.
+- **Parked:** the SVG cleaner (`src/format/svg.js`) is written and tested but not wired in, because v100's `clean()` already guards motifs read from files and replacing it would change an existing tool. Wire it when SVG import arrives (Phase 5). Export everything still writes its own JSON file.
+- **Open:** tag `v101` could not be pushed to GitHub from the build environment (create it on commit 3c30728); create the `v100` tag and release by hand; the WebKit smoke test runs only in CI.
