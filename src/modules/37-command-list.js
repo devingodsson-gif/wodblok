@@ -28,6 +28,7 @@ const COMMANDS = [
   ['export.copySvg', 'Copy SVG', 'cpy'],
   ['file.restoreRecovery', 'Restore unsaved work', 'rcv'],
   ['file.dismissRecovery', 'Dismiss recovered work', 'rcx'],
+  ['library.importStamp', 'Import stamp file', 'slimp'],
   ['view.theme', 'Switch light / dark', 'thm'],
   ['view.zoomIn', 'Zoom in', 'zi'],
   ['view.zoomOut', 'Zoom out', 'zo'],

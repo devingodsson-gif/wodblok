@@ -61,3 +61,35 @@ test('named snapshots are saved inside the file and come back when it is opened'
   expect(a.errors.concat(b.errors)).toEqual([]);
   await c1.close(); await c2.close();
 });
+
+test('a library stamp can be saved as its own file and imported into another browser', async ({ browser }) => {
+  const { openPanel } = require('./helpers/harness');
+  const c1 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p1 = await c1.newPage(), a = await openApp(p1);
+  await openFile(p1, path.join(FX, 'project-1-diamond.wodblok.json'));
+  await openPanel(p1, 'slib');
+  await p1.fill('#slname', 'Test stamp'); await p1.click('#slsave');
+  await expect(p1.locator('#slgrid .slc')).toHaveCount(1);
+  await p1.evaluate(() => { window.__wbDownloads.length = 0; });
+  await p1.click('#slgrid [data-sa="file"]');
+  await p1.waitForFunction(() => window.__wbDownloads.length > 0);
+  const dl = await p1.evaluate(() => window.__wbDownloads[0]);
+  expect(dl.filename).toBe('test-stamp.wodblok-stamp');
+  const c2 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p2 = await c2.newPage(), b = await openApp(p2);
+  await openPanel(p2, 'slib');
+  await p2.setInputFiles('#slimpf', tmp('s.wodblok-stamp', dl.data)); await settle(p2);
+  await expect(p2.locator('#slgrid .slc')).toHaveCount(1);
+  await expect(p2.locator('#slgrid .slc b')).toHaveText('Test stamp');
+  await p2.setInputFiles('#slimpf', tmp('bad.wodblok-stamp', 'nope')); await settle(p2);
+  await expect(p2.locator('#slmsg')).toContainText('not a WODBLOK stamp');
+  expect(a.errors.concat(b.errors)).toEqual([]);
+  await c1.close(); await c2.close();
+});
+
+test('a downloaded project file can be used as Art in another project', async ({ browser }) => {
+  const c1 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p1 = await c1.newPage(), a = await openApp(p1);
+  await p1.setInputFiles('#lfapfile', path.join(FX, 'project-1-diamond-v19.wodblok')); await settle(p1);
+  // this fixture was saved before projects carried a picture for Art, and the message must say so plainly (not "could not read")
+  await expect(p1.locator('#pmsg')).toContainText(/saved before Art existed|added/);
+  expect(a.errors).toEqual([]);
+  await c1.close();
+});

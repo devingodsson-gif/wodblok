@@ -687,7 +687,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  <section class="pn" data-p="slib" hidden>
   <details class="g" open><summary>This stamp</summary><div class="gb">
    <label>Name</label><input type="text" id="slname" maxlength="40" placeholder="e.g. Lion in a ring">
-   <div class="row"><button class="primary" id="slsave">Save to library</button></div>
+   <div class="row"><button class="primary" id="slsave">Save to library</button><button class="alt" id="slimp">Import stamp file</button></div><input type="file" id="slimpf" class="vh" accept=".wodblok-stamp,.json,application/json" tabindex="-1">
    <label>Export as PNG</label>
    <div class="row"><select id="slpx" aria-label="Size"><option value="512">512 px</option><option value="1024" selected>1024 px</option><option value="2048">2048 px</option><option value="4096">4096 px</option></select><select id="slbg" aria-label="Background"><option value="">Transparent</option><option value="paper">Paper colour</option></select></div>
    <label class="chk" title="Printed the way the pattern prints it: the layer's pressure and flooding, the edge roughness and wear, and this stamp's texture."><input type="checkbox" id="slfx"><span>With my print settings</span></label>
@@ -856,7 +856,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
     <div id="lfart" hidden>
      <label>Art to place</label><div class="strip" id="lfars"></div>
      <div class="row"><button class="alt" id="lfaimp" title="Import a PNG, JPG, WebP or SVG image">Import image&#8230;</button><button class="alt" id="lfaprj" title="Use a project saved from WODBLOK">Use a project&#8230;</button></div>
-     <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".json,application/json" tabindex="-1">
+     <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".wodblok,.json,application/json,application/zip" tabindex="-1">
      <div id="lfapl" hidden><div class="mlist fpl" id="lfaplist" aria-label="Saved projects"></div><div class="row"><button class="alt" id="lfapf" title="Use a project file you downloaded. It is added as a fixed picture, not a live link.">Choose a project file&#8230;</button><button class="alt" id="lfapx">Close</button></div></div>
      <div class="hint" id="lfam"></div><div class="row"><button class="alt" id="lfaup" hidden>Update from project</button></div>
     </div>

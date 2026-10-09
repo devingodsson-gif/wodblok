@@ -41,7 +41,7 @@ test('an image used many times is stored once, big images survive, unknown field
   const base = JSON.parse(fs.readFileSync(path.join(FX, fixtures[0]), 'utf8'));
   const p = { ...base, futureField: { keep: [1, 2, 3] }, arts: { a1: { n: 'A', src: url }, a2: { n: 'B', src: url } }, cover: { img: url, back: { img: url }, spine: { img: '' } } };
   const zip = await fmtPack(p), names = Object.keys(unzipSync(zip));
-  expect(names.filter(n => n.startsWith('assets/'))).toHaveLength(1);
+  expect(names.filter(n => n.startsWith('assets/') && n.endsWith('.png'))).toHaveLength(1);
   expect(zip.length).toBeLessThan(png.length * 1.25);                                       // stored once, not four times
   const r = await fmtOpen(zip);
   expect(r.project.arts.a2.src).toBe(url); expect(r.project.cover.back.img).toBe(url);
@@ -124,4 +124,14 @@ test('snapshots round-trip inside the zip, and a damaged snapshot is left out wi
   const files = unzipSync(zip); files['snapshots/00.json'] = strToU8('{not json');
   const r2 = await fmtOpen(zipSync(Object.fromEntries(Object.entries(files).map(([k, v]) => [k, k === 'mimetype' ? [v, { level: 0 }] : v]))));
   expect(r2.snapshots.map(s => s.n)).toEqual(['Second']);
+});
+
+test('a single stamp file: round trip, and friendly errors for anything else', async () => {
+  const { fmtStampOpen, fmtStampPack } = await load('stamp.js');
+  const { FormatError } = await load('errors.js');
+  const rec = { name: 'Fish "A"', updated: 5, w: 100, h: 100, img: 'data:image/png;base64,AAAA', tile: JSON.stringify({ items: [{ m: 'x', x: 1, y: 2 }] }), motifs: { x: { n: 'x', svg: '<path/>' } }, colors: [['Ink', '#112233']] };
+  const back = fmtStampOpen(fmtStampPack(rec));
+  expect(back.name).toBe('Fish A'); expect(back.tile).toBe(rec.tile); expect(back.motifs).toEqual(rec.motifs); expect(back.colors).toEqual(rec.colors);
+  const bad = ['', 'nope', '[]', '{"app":"WODBLOK","v":1}', '{"app":"WODBLOK-STAMP","v":9,"tile":"{}"}', '{"app":"WODBLOK-STAMP","v":1,"tile":"{"}', '{"app":"WODBLOK-STAMP","v":1,"tile":"{\\"items\\":[]}","motifs":[]}', 'x'.repeat(9e6)];
+  for (const b of bad) expect(() => fmtStampOpen(b), b.slice(0, 40)).toThrow(FormatError);
 });

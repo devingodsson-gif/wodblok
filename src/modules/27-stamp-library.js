@@ -1,3 +1,4 @@
+import {fmtOpen} from '../format/container.js';
 import {kv,use,collection} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {BK} from './03-stamp-prints-and-drawing.js';
@@ -48,7 +49,7 @@ function libMotifs(L){Object.entries(L.motifs||{}).forEach(([k,v])=>{if(!v||type
 }
 function libColors(L){(L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();}
 async function slPaint(){if(!$('slgrid'))return;await SL.init();$('slwhere').textContent=SL.kind=='account'?'Your library is saved privately to your Claude account, so it follows you into every project and across devices.':'Your library is saved in this browser only, and is shared by all your projects here.';
-try{const ps=await SL.list();$('slcount').textContent=ps.length?String(ps.length):'';$('slgrid').innerHTML=ps.length?ps.map(p=>`<div class="slc" data-sl="${hx(p.id)}">${slOkImg(p.img)?`<div class="im"><img src="${hx(p.img)}" alt=""></div>`:'<div class="im"></div>'}<b title="${hx(p.name||'Stamp')}">${hx(p.name||'Stamp')}</b><div class="row"><button class="alt" data-sa="add" title="Add this stamp to the project">Add</button><button class="alt" data-sa="png" title="Export this stamp as a PNG">PNG</button><button class="alt" data-sa="del" title="Delete from the library">Delete</button></div></div>`).join(''):'<div class="hint" style="grid-column:1/-1">No saved stamps yet. Pick a stamp, give it a name and press Save to library.</div>'}
+try{const ps=await SL.list();$('slcount').textContent=ps.length?String(ps.length):'';$('slgrid').innerHTML=ps.length?ps.map(p=>`<div class="slc" data-sl="${hx(p.id)}">${slOkImg(p.img)?`<div class="im"><img src="${hx(p.img)}" alt=""></div>`:'<div class="im"></div>'}<b title="${hx(p.name||'Stamp')}">${hx(p.name||'Stamp')}</b><div class="row"><button class="alt" data-sa="add" title="Add this stamp to the project">Add</button><button class="alt" data-sa="png" title="Export this stamp as a PNG">PNG</button><button class="alt" data-sa="file" title="Save this stamp as its own file">File</button><button class="alt" data-sa="del" title="Delete from the library">Delete</button></div></div>`).join(''):'<div class="hint" style="grid-column:1/-1">No saved stamps yet. Pick a stamp, give it a name and press Save to library.</div>'}
 catch(e){$('slgrid').innerHTML='<div class="hint" style="grid-column:1/-1">Could not load the library.</div>'}}
 // --- Art: import an image, or use a saved project
 async function artImport(f){if(!f||!/^image\//.test(f.type))return pmsg('That file is not an image.');if(f.size>30e6)return pmsg('That image is too large. Try one under 30 MB.');
@@ -72,8 +73,11 @@ try{const rec=await SL.get(id);if(!rec)return slMsg('That stamp is gone.');
 if(a=='add'){let t=null;try{t=JSON.parse(rec.tile)}catch(er){}if(!t||!Array.isArray(t.items))return slMsg('That library entry is damaged.');
 libMotifs({motifs:rec.motifs});libColors({colors:rec.colors});txMerge(t);t.id=WBS.nid++;shOf(t);WBS.tiles.push(t);WBS.cur=WBS.tiles.length-1;selOne(-1);WBS.symKey='';store();upd();if(WBX.wbCap)WBX.wbCap();slMsg('Added “'+rec.name+'” as a new stamp. Tick it under Stamps in the Arrangement to print it.')}
 else if(a=='png'){if(!slOkImg(rec.img))return slMsg('That entry has no picture.');const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Could not read the picture'));i.src=rec.img}),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);await slSavePng(await slBlob(c),rec.name||'Stamp')}
+else if(a=='file'){const d=await use('downloads');if(!d)return slMsg('Saving is not available here.');try{await d.save({filename:(rec.name||'stamp').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase()+'.wodblok-stamp',data:fmtStampPack(rec)});slMsg('Saved “'+rec.name+'” as a file.')}catch(er){if(!er||er.code!='declined')slMsg('Could not save: '+((er&&er.message)||'unknown error'))}}
 else if(a=='del'){if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Sure?';setTimeout(()=>{delete b.dataset.sure;b.textContent='Delete'},3000);return}await SL.del(id);slMsg('Deleted “'+rec.name+'”.');slPaint()}}
 catch(er){slMsg('Something went wrong: '+((er&&er.message)||'unknown error'))}};
+$('slimp').onclick=()=>$('slimpf').click();
+$('slimpf').onchange=async()=>{const f=$('slimpf').files[0];$('slimpf').value='';if(!f)return;try{const rec=fmtStampOpen(await f.text());await SL.put(newId(),rec);slMsg('Added “'+rec.name+'” to the library.');slPaint()}catch(er){slMsg((er&&er.name=='FormatError'&&er.message)||'Could not read that file.')}};
 document.querySelector('.rail [data-pn="slib"]').addEventListener('click',()=>setTimeout(slPaint,60));
 $('lfaimp').onclick=()=>$('lfafile').click();
 $('lfafile').onchange=async()=>{const f=$('lfafile').files[0];$('lfafile').value='';if(f)await artImport(f)};
@@ -85,7 +89,7 @@ catch(e){$('lfaplist').innerHTML='<div class="em">Could not load projects.</div>
 $('lfaplist').onclick=async e=>{const r=e.target.closest('[data-pj]');if(!r)return;const pid=r.dataset.pj;try{const rec=await ST.get(pid);if(!rec)return pmsg('That project is gone.');artAddProj(rec,pid)}catch(er){pmsg('Could not open that project.')}};
 $('lfapx').onclick=()=>{$('lfapl').hidden=true};
 $('lfapf').onclick=()=>$('lfapfile').click();
-$('lfapfile').onchange=async()=>{const f=$('lfapfile').files[0];$('lfapfile').value='';if(!f)return;try{const d=JSON.parse(await f.text()),a=d&&d.art;if(!d||d.app!='WODBLOK')return pmsg('That is not a WODBLOK project file.');if(!a||!artOk(a.src))return pmsg('That file was saved before Art existed. Open it, save it again, and download it again.');
-const id=artId();WBS.ARTS[id]={n:String(d.name||f.name).replace(/\.wodblok\.json$|\.json$/i,'').replace(/["<>&|]/g,'').slice(0,40)||'Project',k:'img',src:a.src,w:+a.w,h:+a.h};WBS.fpB=id;WBS.fpSel=-1;WBS.fpLast=null;$('lfapl').hidden=true;pmsg('Project picture added as a fixed image. Click on the canvas to place it.');upd()}catch(er){pmsg('Could not read that file.')}};
+$('lfapfile').onchange=async()=>{const f=$('lfapfile').files[0];$('lfapfile').value='';if(!f)return;try{const d=(await fmtOpen(new Uint8Array(await f.arrayBuffer()))).project,a=d&&d.art;if(!d||d.app!='WODBLOK')return pmsg('That is not a WODBLOK project file.');if(!a||!artOk(a.src))return pmsg('That file was saved before Art existed. Open it, save it again, and download it again.');
+const id=artId();WBS.ARTS[id]={n:String(d.name||f.name).replace(/\.wodblok(\.json)?$|\.json$/i,'').replace(/["<>&|]/g,'').slice(0,40)||'Project',k:'img',src:a.src,w:+a.w,h:+a.h};WBS.fpB=id;WBS.fpSel=-1;WBS.fpLast=null;$('lfapl').hidden=true;pmsg('Project picture added as a fixed image. Click on the canvas to place it.');upd()}catch(er){pmsg((er&&er.name=='FormatError'&&er.message)||'Could not read that file.')}};
 }
 export {SL,libColors,libMotifs,init27};
