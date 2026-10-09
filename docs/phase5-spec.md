@@ -36,6 +36,7 @@ commands in the registry (so command search finds them), no tool windows open at
 - Canvas > Format has a third choice, Repeat tile: a rectangle (the ratio controls stay) whose edges meet. Saved with the canvas (`dim.rt`), undoable. Exports (also Export recipes) give the tile.
 - Grids stretch or squeeze a little so a whole number of cells fills the tile each way (staggered grids use an even number); each cell's look comes from its place within one repeat. Loose layers (free-placed stamps, pictures, text) are drawn again one tile over each way. Canvas and layer textures are blended with a half-shifted copy so their edges meet; print roughness uses noise that repeats.
 - Not drawn on a repeat tile: frames and gradients across the whole canvas (a note in the Canvas tool says how many). Layer rotation is ignored. Randomize leaves the tile's shape alone and adds no frame.
+- v0.115.1: a layer coloured by a layer colour mask or a layer wear texture used to be cut to the middle tile (its grade area and texture filter only covered the canvas); both now reach past the edges and repeat.
 - "Repeat 3 × 3" (top bar, only on a tile) shows the tile repeated so seams can be checked; nothing can be edited in that view.
 
 ## 6. Print proof (default design)

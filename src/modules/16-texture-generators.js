@@ -113,10 +113,11 @@ const txIsW=S=>S.md=='wear',txIsO=S=>S.md!='wear';
 const txHash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=(Math.imul(h,33)+s.charCodeAt(i))|0;return(h>>>0).toString(36)};
 // overlay filter (relief / stain on a layer or a text box): the picture is laid over the shape only where the shape has ink
 let TXFL;
-function txFilt(list,x,y,W,H,R){const ov=list.filter(txIsO);if(!ov.length)return'';const key='txf'+txHash(ov.map(txKey).join(';')+'|'+[x,y,W,H,R].join(',')),h=txHostEl();if(!TXFL.has(key)){let f='',m='<feMergeNode in="SourceGraphic"/>';ov.forEach((S,i)=>{const e=txBmp(S,W,H,R);f+=`<feImage href="${e.url}" x="${(+x).toFixed(2)}" y="${(+y).toFixed(2)}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none" result="o${i}"/><feComposite in="o${i}" in2="SourceAlpha" operator="in" result="c${i}"/>`;m+=`<feMergeNode in="c${i}"/>`});
-if(h)h.insertAdjacentHTML('beforeend',`<filter id="${key}" data-f="1" filterUnits="userSpaceOnUse" x="${(+x).toFixed(2)}" y="${(+y).toFixed(2)}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" color-interpolation-filters="sRGB">${f}<feMerge>${m}</feMerge></filter>`);TXFL.set(key,1);
+// ext = [ex,ey] on a repeat tile: the picture is repeated (feTile) over a filter area that reaches that far past the tile on every side
+function txFilt(list,x,y,W,H,R,ext){const ov=list.filter(txIsO);if(!ov.length)return'';const ex=ext?ext[0]:0,ey=ext?ext[1]:0,key='txf'+txHash(ov.map(txKey).join(';')+'|'+[x,y,W,H,R].join(',')+(ext?'|'+ex+','+ey:'')),h=txHostEl();if(!TXFL.has(key)){let f='',m='<feMergeNode in="SourceGraphic"/>';ov.forEach((S,i)=>{const e=txBmp(S,W,H,R,!!ext);f+=`<feImage href="${e.url}" x="${(+x).toFixed(2)}" y="${(+y).toFixed(2)}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none" result="o${i}"/>${ext?`<feTile in="o${i}" result="ot${i}"/>`:''}<feComposite in="${ext?'ot':'o'}${i}" in2="SourceAlpha" operator="in" result="c${i}"/>`;m+=`<feMergeNode in="c${i}"/>`});
+if(h)h.insertAdjacentHTML('beforeend',`<filter id="${key}" data-f="1" filterUnits="userSpaceOnUse" x="${(x-ex).toFixed(2)}" y="${(y-ey).toFixed(2)}" width="${(+W+2*ex).toFixed(2)}" height="${(+H+2*ey).toFixed(2)}" color-interpolation-filters="sRGB">${f}<feMerge>${m}</feMerge></filter>`);TXFL.set(key,1);
 while(TXFL.size>40){const k=TXFL.keys().next().value;TXFL.delete(k);const n=h&&h.querySelector('#'+k);if(n)n.remove()}}
-else if(h&&!h.querySelector('#'+key)){TXFL.delete(key);return txFilt(list,x,y,W,H,R)}return key}
+else if(h&&!h.querySelector('#'+key)){TXFL.delete(key);return txFilt(list,x,y,W,H,R,ext)}return key}
 function init16(){// ===== Texture library (v87) =====
 // One kind of texture for everything. A texture is a named grayscale pattern in texLib: {id,name,t,a,sc,az,sd,auto}.
 // Wherever it is used (a stamp, a layer, a text box, the canvas) the use picks a mode: {x: texture id, sd: variation, md: 'wear'|'relief'|'stain'}.

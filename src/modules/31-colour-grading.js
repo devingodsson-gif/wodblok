@@ -75,11 +75,13 @@ o+=`<feComposite in="${aR}" in2="${p}m" operator="in" result="${p}A"/><feComposi
 let c=p+'b';if(ov){o+=`<feFlood flood-color="${OVC}" flood-opacity=".55" result="${p}F"/><feComposite in="${p}F" in2="${p}m" operator="in" result="${p}G"/><feComposite in="${p}G" in2="SourceAlpha" operator="in" result="${p}H"/><feComposite in="${p}H" in2="${c}" operator="over" result="${p}O"/>`;c=p+'O'}
 return[o,c]}
 const flt=(id,x,y,w,h,pr)=>`<filter id="${id}" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="${f4(x)}" y="${f4(y)}" width="${f4(w)}" height="${f4(h)}" color-interpolation-filters="sRGB">${pr||'<feComponentTransfer/>'}</filter>`;
+// The area the grade covers: the canvas, or on a repeat tile the tile and the part of its neighbours that is drawn (a margin, or a whole tile for the 3 x 3 view)
+const gRg=()=>{if(!(WBS.dim.rt&&!WBS.book.on))return[0,0,CW,CH];const ex=WBS.tilePv?CW:Math.min(CW,48),ey=WBS.tilePv?CH:Math.min(CH,48);return[-ex,-ey,CW+2*ex,CH+2*ey]};
 // the whole print (texture=1: the paper texture, which skips colour/luminance masks since it has no print colours of its own)
 function canvasF(id,texture){let o='',c='SourceGraphic';if(hasA(grd)){const r=adjP(grd,c,'G');o+=r[0];c=r[1]}
 const ctx={W:CW,H:CH,X:0,Y:0,RW:CW,RH:CH,k:'c'};
 grd.masks.forEach((m,i)=>{if(!m.on||!WBS.edMk||m.t=='lay'||(isPos(m)&&m.sp=='s')||(texture&&!isPos(m))||(isPos(m)&&WBS.dim.rt&&!WBS.book.on))return;const r=maskStep(m,i,c,ctx);o+=r[0];c=r[1]});
-return o?(WBS.dim.rt&&!WBS.book.on&&WBS.tilePv?flt(id,-CW,-CH,3*CW,3*CH,o):flt(id,0,0,CW,CH,o)):''}
+return o?flt(id,...gRg(),o):''}
 // stamp-space gradients ride along with every print of the stamp
 function stampF(t){const g=geom(shOf(t)),W=g.SW,H=g.SH,p=Math.max(W,H)*.15,ctx={W,H,X:-p,Y:-p,RW:W+2*p,RH:H+2*p,k:'s'},ms=stMasks(t.id);let o='',c='SourceGraphic';
 if(!gdBypass&&hasA(t.gr)){const r=adjP(t.gr,c,'T');o+=r[0];c=r[1]}
@@ -87,7 +89,7 @@ if(!gdBypass)grd.masks.forEach((m,i)=>{if(!ms.includes(m))return;const r=maskSte
 function layerF(u){let o='',c='SourceGraphic';if(!gdBypass)grd.masks.forEach((m,i)=>{if(!layMasks(u).includes(m))return;const p='y'+i;
  if(hasA(m.a)){const r=adjP(m.a,c,p+'a'),k=m.amt/100;o+=r[0];if(k<1){o+=`<feComposite in="${r[1]}" in2="${c}" operator="arithmetic" k1="0" k2="${f4(k)}" k3="${f4(1-k)}" k4="0" result="${p}b"/>`;c=p+'b'}else c=r[1]}
  if(ovOf(m)){o+=`<feFlood flood-color="${OVC}" flood-opacity="${f4(.55*m.amt/100)}" result="${p}F"/><feComposite in="${p}F" in2="SourceAlpha" operator="in" result="${p}G"/><feComposite in="${p}G" in2="${c}" operator="over" result="${p}O"/>`;c=p+'O'}});
-return flt('wbgl'+u,0,0,CW,CH,o)}
+return flt('wbgl'+u,...gRg(),o)}
 // stamp editor: the current stamp's gradients, then the global grade, then colour/luminance masks
 // (bg=1: the stamp's paper, which stamp gradients leave alone, as in the pattern where they only touch the ink)
 // the editor's grade covers what is on screen (the stamp, its margin and the side areas), not three stamps' width all round

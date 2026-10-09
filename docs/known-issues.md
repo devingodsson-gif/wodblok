@@ -22,3 +22,6 @@ v103 replaced the colour library (Wada colours, src/data/wada.js) and the defaul
 
 ## Test flake: canvas shape "arch" SVG summary (seen once, v106 full run)
 One full-suite run gave a different hash for `canvas shape: arch` (same length and tag counts); 4 of 4 repeats passed straight afterwards. Same family as the hex-shape flake above: something drawn after the settle check. Snapshot not touched.
+
+## Test flake: "open project-1-diamond" (state or SVG snapshot, seen once, v0.115.1 run)
+Failed once in a run of the scenarios, round-trip and repeat-tile specs; passed alone, and 5 of 5 repeats straight afterwards. Same family as the hex, arch and project-3 flakes above (something drawn after the settle check). Snapshot not touched.
