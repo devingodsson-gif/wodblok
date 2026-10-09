@@ -24,3 +24,18 @@ Not measured: Safari/WebKit (no WebKit browser in this sandbox; run `npm run tes
 ## Step 3 finding: dragged-motif shortcut (v0.119, same machine)
 - Dragging a free-placed motif on the five-layer fixture (40 moves): 0.66 s in total, every frame 16 ms (60 per second), no long tasks. The drag handler already moves only that motif's transform (and its selection box) and redraws nothing else, so the parked idea is already how it works.
 - Pattern-layer sliders (a different case) are covered by the slider numbers above. Decision: nothing to build for step 3.
+
+## Step 4 finding: where the export time really goes (v0.119, same machine, software drawing)
+Corrected reading of the PNG export numbers above: the browser draws the SVG lazily, so the 6.6 s shows up inside `toBlob`; the PNG encoding itself is only about 0.25 s.
+The five-layer fixture serialises to a 13 MB SVG at 3x (2400 x 1800 px). Taking things out of that same SVG and timing the drawing:
+
+| What was taken out | Drawing time at 3x |
+|---|---|
+| nothing | 6.5 s |
+| all feTurbulence noise filters (77 of them) | 5.7 s |
+| every filter | 3.2 s |
+| the 1339 knockout masks (`ks#`, 9.7 MB of the 13 MB) | 5.2 s |
+| every mask | 1.6 s |
+
+So masks cost about 4.8 s, filters about 3.3 s, and they overlap (many filters sit inside masks). Textures alone (turbulence) are not the main cost, so a canvas/WebGL version of the textures and grade would not by itself fix the freeze, and it would risk every existing look.
+Decision: do not build the canvas/WebGL renderer for 1.0. If a Mac with a GPU (or Safari) still feels slow, the targets in order are: the mask-heavy layers (pressure, flood, wear, per-stamp knockout masks), reuse of identical knockout shapes instead of copying them 1339 times (13 MB down to about 3 MB), and a progress bar for large exports.
