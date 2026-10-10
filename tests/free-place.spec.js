@@ -31,3 +31,15 @@ test('Free place: Esc stops placing', async ({ page }) => {
   expect(JSON.parse(await getState(page)).layers[0].pl.length).toBe(0);
   expect(errors).toEqual([]);
 });
+
+test('Art and Text modes: no explanatory empty-state text in the placed list (UX review D3)', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'layers');
+  await page.click('#lmode [data-m="t"]');
+  await settle(page);
+  await expect(page.locator('#lfpl')).not.toContainText('show up here');
+  await page.click('#lmode [data-m="a"]');
+  await settle(page);
+  await expect(page.locator('#lfpl')).not.toContainText('Stamps you place');
+  expect(errors).toEqual([]);
+});
