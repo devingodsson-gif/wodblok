@@ -956,6 +956,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
     <label id="lfpstl">Stamp to place</label><div class="strip" id="lfpst"></div>
     <div id="lfart" hidden>
      <label>Art to place</label><div class="strip" id="lfars"></div>
+     <label class="chk"><input type="checkbox" id="lfaak"><span>Paper shows through</span></label>
      <div class="row"><button class="alt" id="lfaimp" title="Import a PNG, JPG, WebP or SVG image">Import image&#8230;</button><button class="alt" id="lfaprj" title="Use a .wodblok project file as a picture">Use a project&#8230;</button></div>
      <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".wodblok,.json,application/json,application/zip" tabindex="-1">
     </div>
@@ -1072,11 +1073,9 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
    <label>Strength</label><input type="range" id="tx_a" min="0" max="100" value="40" data-def="40">
    <label>Scale</label><input type="range" id="tx_sc" min="25" max="300" value="100" data-u="%" data-def="100">
    <label>Light from</label><input type="range" id="tx_az" min="0" max="359" value="225" data-u="&#176;" data-def="225">
+   <div class="row"><button class="alt" id="tx_del">Delete texture</button></div>
   </div></details>
-  <details class="g" open id="tx_apg"><summary>Apply</summary><div class="gb">
-   <select id="tx_to" aria-label="Apply to"></select>
-   <div class="row"><button class="primary" id="tx_apply">Apply</button><button class="alt" id="tx_del">Delete texture</button></div>
-  </div></details>
+
  </section>
 
  <section class="pn" data-p="grade" hidden>

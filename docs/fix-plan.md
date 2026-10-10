@@ -171,6 +171,12 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.18: Textures library and "Paper shows through" (D13, D4)
+
+- **D13:** the Textures tool is now only the library: create, rename, edit, duplicate, delete. The "Apply to" block is gone; a texture is applied where you work (Canvas, Layers, Stamp and Text panels, "Add texture", which already lists the library). Nothing in files changes; old files open.
+- **D4:** Pictures layers have a "Paper shows through" switch. It drops the light colour of every picture on that layer and keeps the dark, so line art and scans print like a stamp. One SVG filter per layer (only when switched on), saved in the layer as `akk`; off by default, so existing files and exports are unchanged.
+- Tests: `tests/art-textures.spec.js`.
+
 ## 1.0.17: Layout (D12, P3, P4, part of P2)
 
 - **D12:** applying a workspace sets exactly that arrangement and the Workspaces tool closes with the rest (it used to stay open as an extra group). A saved workspace no longer remembers the Workspaces tool, so applying one never reopens the list. The starting workspaces have at most two groups (a test checks it).

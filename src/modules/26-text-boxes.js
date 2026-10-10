@@ -55,7 +55,6 @@ $('tb_al').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;tbAl=b.
 $('tb_ink').addEventListener('input',()=>{if(!tbLoad)tbStyle('ink',$('tb_ink').value)});
 txReg('tb_tex',{md:'wear',def:'pinholes',get:()=>{const p=tbSel();return p?(Array.isArray(p.tu)?p.tu:[]):tbSty.tu},set:tbStySet,vary:tbStyVary});
 WBX.wbTxUses=()=>tbSty.tu;WBX.wbTxCut=id=>{tbSty.tu=tbSty.tu.filter(u=>u.x!==id)};
-WBX.wbTxApply=id=>{const g=fpGrp().filter(q=>q.tx);if(!g.length){if(!tbSty.tu.some(u=>u.x===id))tbSty.tu.push({x:id,sd:txRid()});return 0}g.forEach(q=>{if(!Array.isArray(q.tu))q.tu=[];if(!q.tu.some(u=>u.x===id)&&q.tu.length<6)q.tu.push({x:id,sd:txRid()})});tbSty.tu=g[g.length-1].tu.map(u=>({...u}));return g.length};
 $('tb_split').onclick=async()=>{const L=fpL();if(!L||!L.txt)return;const grp=fpGrp().filter(q=>q.tx);if(!grp.length)return;if(WBX.wbCap)WBX.wbCap();const cache=new Map(),made=[];let total=0;
 for(const p of grp){const ra=p.s/Math.max(p.n||1,.01),k=ra,rr=(+p.r||0)*Math.PI/180,cs=Math.cos(rr),sn=Math.sin(rr),fl=p.f||1,out=[];
 for(const l of (p.Lt||[])){const key=String(l[0]),cp=parseInt(key.split('|').pop(),36);if(!isFinite(cp))continue;let ch;try{ch=String.fromCodePoint(cp)}catch(e){continue}
