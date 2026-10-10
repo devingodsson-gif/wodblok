@@ -59,17 +59,18 @@ function init43(){
   }
   async function exportOne(r){
     const d=await use('downloads');if(!d)return pmsg('Saving is not available here.');
-    try{pmsg('Exporting…');const b=await xrRender(r);await d.save({filename:xrFile(r),data:b});pmsg('Exported “'+xrFile(r)+'”.')}
+    try{const h0=d.pick?await d.pick({filename:xrFile(r)}):null;pmsg('Exporting…');const b=await xrRender(r);await d.save({filename:xrFile(r),data:b,handle:h0});pmsg('Exported “'+xrFile(r)+'”.')}
     catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not export.')}
   }
   async function exportAll(){
     const d=await use('downloads');if(!d)return pmsg('Saving is not available here.');
     const all=[...XR_BUILTIN,...xrLoad()];
     try{
+      const base=expName('zip').replace(/\.zip$/,''),h0=d.pick?await d.pick({filename:base+'-exports.zip'}):null;   // ask where to save first: the renders below take longer than the browser keeps the click alive
       const files={};let k=0;
       for(const r of all){pmsg('Exporting '+(++k)+' of '+all.length+'…');const b=await xrRender(r);let f=xrFile(r),n=2;while(files[f])f=xrFile(r).replace(/(\.\w+)$/,'-'+(n++)+'$1');files[f]=new Uint8Array(await b.arrayBuffer())}
-      const zip=zipSync(files,{level:0}),base=expName('zip').replace(/\.zip$/,'');
-      await d.save({filename:base+'-exports.zip',data:new Blob([zip],{type:'application/zip'})});pmsg('Exported '+all.length+' files in one zip.');
+      const zip=zipSync(files,{level:0});
+      await d.save({filename:base+'-exports.zip',data:new Blob([zip],{type:'application/zip'}),handle:h0});pmsg('Exported '+all.length+' files in one zip.');
     }catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not export.')}
   }
   list.addEventListener('click',e=>{

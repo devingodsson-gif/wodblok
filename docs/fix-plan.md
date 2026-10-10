@@ -171,6 +171,10 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.10: Exports ask where to save first (rest of Q14)
+
+Every export (Export now, Export all as one zip, the 3x PNG, the print proofs, the cover PNG/PDF, Save project) now opens the Save dialog first and renders afterwards, so the browser still counts the click as recent. Before, a long export (the zip took 23 s) lost the dialog and silently downloaded. Cancelling the dialog stops the export. Browsers without a Save dialog download as before; the Claude artifact runtime is unchanged. Files: `src/platform/web.js` (`files.pick`), `index.js`, `14-…`, `30-…`, `33-…`, `43-…`, `45-…`. Tests: `tests/export-dialog.spec.js`.
+
 ## 1.0.9: Compare and history (plan items C3, C14 rest; C2 thumbnails left out)
 
 | # | Result | Notes |

@@ -70,9 +70,10 @@ function init45(){
   async function save(kind){
     const d=await use('downloads');if(!d)return pmsg('Saving is not available here.');
     try{
+      const h0=d.pick?await d.pick({filename:proofName(kind)}):null;   // ask where to save first
       pmsg('Making the proof…');const{c,W,H,pw,ph}=await proofCanvas(paper());
-      if(kind=='png'){const b=await new Promise((res,rej)=>c.toBlob(v=>v?res(v):rej(new Error('The proof could not be made.')),'image/png'));await d.save({filename:proofName('png'),data:b})}
-      else{const jb=await new Promise((res,rej)=>c.toBlob(v=>v?res(v):rej(new Error('The proof could not be made.')),'image/jpeg',.95));await d.save({filename:proofName('pdf'),data:pdfJpeg(new Uint8Array(await jb.arrayBuffer()),W,H,{W:pw,H:ph,b:0})})}
+      if(kind=='png'){const b=await new Promise((res,rej)=>c.toBlob(v=>v?res(v):rej(new Error('The proof could not be made.')),'image/png'));await d.save({filename:proofName('png'),data:b,handle:h0})}
+      else{const jb=await new Promise((res,rej)=>c.toBlob(v=>v?res(v):rej(new Error('The proof could not be made.')),'image/jpeg',.95));await d.save({filename:proofName('pdf'),data:pdfJpeg(new Uint8Array(await jb.arrayBuffer()),W,H,{W:pw,H:ph,b:0}),handle:h0})}
       pmsg('Print proof saved.');
     }catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not make the proof.')}
   }

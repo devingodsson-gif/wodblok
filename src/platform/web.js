@@ -45,6 +45,8 @@ const write = async (name, data, opts = {}) => {
 };
 const FOLDER_KEY = 'folder:projects';
 const files = {
+  /** Opens the Save dialog now and returns the file to write later (so a long export can ask first, while the click still counts). null when the browser has no Save dialog; throws AbortError when the person cancels. */
+  pick: async (name, type) => { if (!canSave()) return null; try { return await /** @type {any} */ (window).showSaveFilePicker({ suggestedName: name, types: picker(name, type) }); } catch (e) { if (e && e.name === 'AbortError') throw e; return null; } },
   canSave,
   canOpen,
   write,

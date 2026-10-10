@@ -119,9 +119,10 @@ $('cpy').onclick=async()=>{try{await clipboard.writeText(ser());say('SVG copied.
 $('sv').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
 try{await d.save({filename:expName('svg'),data:ser()})}catch(e){if(e&&e.code!='declined')say('Could not save: '+e.message)}};
 $('png').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
+let h0=null;try{h0=d.pick?await d.pick({filename:expName('png')}):null}catch(e){return}   // ask where to save first: making the picture takes a while
 pmsg('Making the PNG…');await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));   // let the message show before the page is busy
 const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=CW*3;c.height=CH*3;c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-c.toBlob(async b=>{try{await d.save({filename:expName('png'),data:b});pmsg('')}catch(e){pmsg('');if(e&&e.code!='declined')say('Could not save: '+e.message)}},'image/png')};
+c.toBlob(async b=>{try{await d.save({filename:expName('png'),data:b,handle:h0});pmsg('')}catch(e){pmsg('');if(e&&e.code!='declined')say('Could not save: '+e.message)}},'image/png')};
 img.onerror=()=>{pmsg('');say('PNG export failed.')};
 img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())};
 }

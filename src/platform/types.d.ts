@@ -8,6 +8,7 @@ export interface Blobs { put(name: string, data: Blob): Promise<void>; get(name:
 export interface Files {
   save(name: string, data: Blob, opts?: { type?: string }): Promise<'saved' | 'downloaded'>; canSave(): boolean;
   write(name: string, data: Blob, opts?: { type?: string; handle?: unknown }): Promise<{ how: 'saved' | 'downloaded'; handle: unknown | null }>;
+  pick(name: string, type?: string): Promise<unknown | null>;
   canOpen(): boolean; open(): Promise<{ file: File; handle: unknown } | null>;
   canPickFolder(): boolean; pickFolder(): Promise<unknown | null>; savedFolder(): Promise<unknown | null>; forgetFolder(): Promise<void>;
   folderWritable(handle: unknown): Promise<boolean>; saveToFolder(handle: unknown, name: string, data: Blob): Promise<{ name: string; handle: unknown }>;

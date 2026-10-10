@@ -73,7 +73,7 @@ const reload = () => location.reload();
 
 // The claude.ai artifact runtime: use('db' | 'user' | 'downloads' | 'sample'). Resolves to null when there is no runtime.
 // Without the runtime, 'downloads' is served by the web adapter: a real Save dialog where the browser has one, a download otherwise.
-const webDownloads = { save: async o => { try { const r = await files.write(o.filename, new Blob([o.data]), { handle: o.handle }); return { how: r.how, handle: r.handle }; } catch (e) { if (e && e.name === 'AbortError') { const d = new Error('declined'); d.code = 'declined'; throw d; } throw e; } } };
+const webDownloads = { pick: async o => { try { return await files.pick(o.filename); } catch (e) { if (e && e.name === 'AbortError') { const d = new Error('declined'); d.code = 'declined'; throw d; } throw e; } }, save: async o => { try { const r = await files.write(o.filename, new Blob([o.data]), { handle: o.handle }); return { how: r.how, handle: r.handle }; } catch (e) { if (e && e.name === 'AbortError') { const d = new Error('declined'); d.code = 'declined'; throw d; } throw e; } } };
 const use = n => window.claude ? claude.use(n).catch(() => null) : Promise.resolve(n === 'downloads' ? webDownloads : null);
 
 // Clipboard (text and images).
