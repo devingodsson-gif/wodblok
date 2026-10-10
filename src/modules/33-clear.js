@@ -22,12 +22,13 @@ const thumbPng=url=>new Promise(res=>{if(!url)return res(null);const img=new Ima
 const snapsOf=id=>{try{const a=JSON.parse(kv.get('wb95_sn_'+(id||'draft'))||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}};
 // The file this project was opened from or last saved to (browsers that can write back to a file). Not part of the document.
 let link=null;
-const linkOf=id=>link&&link.id==(id||null)?link.handle:null;
+// A project is written back into its file only while its name is the one it had when the file was opened or saved: rename it and it becomes a new file.
+const linkOf=(id,name)=>link&&link.id==(id||null)&&link.name===name?link.handle:null;
 async function dl(name,data,thumbUrl,id){const d=await use('downloads');if(!d){pmsg('Saving is not available here.');return false}
 try{const zip=await fmtPack({name,...data},{thumbnail:await thumbPng(thumbUrl),snapshots:snapsOf(id)}),blob=new Blob([zip],{type:FMT_MIME});
 // a project that is not tied to a file yet goes straight into the projects folder when one is chosen (never over a file that is already there)
-if(folder&&!linkOf(id)){try{if(await files.folderWritable(folder)){const f=await files.saveToFolder(folder,fname(name)+'.wodblok',blob);link={id:id||null,handle:f.handle};pmsg('Saved “'+name+'” to '+folder.name+'.');if(!$('plist').hidden)renderPL();return true}}catch(e){/* the folder cannot be written: use the Save dialog below */}}
-const r=await d.save({filename:fname(name)+'.wodblok',data:blob,handle:linkOf(id)});if(r&&r.handle)link={id:id||null,handle:r.handle};pmsg((r&&r.how=='saved'?'Saved “':'Downloaded “')+name+'”.');return true}catch(e){if(e&&e.code!='declined')pmsg('Could not save: '+e.message);else pmsg('');return false}}
+if(folder&&!linkOf(id,name)){try{if(await files.folderWritable(folder)){const f=await files.saveToFolder(folder,fname(name)+'.wodblok',blob);link={id:id||null,name,handle:f.handle};pmsg('Saved “'+name+'” to '+folder.name+'.');if(!$('plist').hidden)renderPL();return true}}catch(e){/* the folder cannot be written: use the Save dialog below */}}
+const r=await d.save({filename:fname(name)+'.wodblok',data:blob,handle:linkOf(id,name)});if(r&&r.handle)link={id:id||null,name,handle:r.handle};pmsg((r&&r.how=='saved'?'Saved “':'Downloaded “')+name+'”.');return true}catch(e){if(e&&e.code!='declined')pmsg('Could not save: '+e.message);else pmsg('');return false}}
 // Save project: write the .wodblok file (into the file this project came from or was last saved to, where the browser allows; else the Save dialog; else a download).
 async function saveProject(){const name=$('pnm').value.trim()||'Untitled pattern',id=WBS.cp.id||newId(),b=$('psv');b.disabled=true;pmsg('Saving…');
 try{if(await dl(name,await fileSnap(),await thumb(),id)){WBS.cp={id,name,saved:coreStr()};$('pnm').value=name}}finally{b.disabled=false;paintPst()}}
@@ -55,7 +56,7 @@ try{const r=await fmtOpen(new Uint8Array(await fl.arrayBuffer())),d=r.project;
 const name=(d.name||fl.name.replace(/\.wodblok(\.json)?$|\.json$/i,'')).slice(0,60);
 // a file from a newer app opens as an unsaved copy: nothing is written back
 if(r.newer){openData(d,null,name);WBS.cp.saved='';paintPst();link=null;putSnaps(null,r.snapshots);pmsg('“'+name+'” was made by a newer WODBLOK, so it is open as a copy that is not saved. Update the app to work on the original.');return}
-const id=newId();openData(d,id,name);link=handle?{id,handle}:null;putSnaps(id,r.snapshots);await new Promise(r2=>setTimeout(r2,50));WBS.cp.saved=coreStr();paintPst();pmsg('Opened “'+name+'”.'+(r.missingAssets?' '+r.missingAssets+' picture'+(r.missingAssets>1?'s were':' was')+' missing from the file.':''))}
+const id=newId();openData(d,id,name);link=handle?{id,name,handle}:null;putSnaps(id,r.snapshots);await new Promise(r2=>setTimeout(r2,50));WBS.cp.saved=coreStr();paintPst();pmsg('Opened “'+name+'”.'+(r.missingAssets?' '+r.missingAssets+' picture'+(r.missingAssets>1?'s were':' was')+' missing from the file.':''))}
 catch(e){pmsg((e&&e.message)||'Could not open that file.')}};
 $('pfile').onchange=()=>{const fl=$('pfile').files[0];$('pfile').value='';if(fl)openFile(fl,null)};
 // Where the browser has its own Open dialog (Chrome, Edge) use it, so Save can write back to the same file; elsewhere the plain file input opens as before
