@@ -13,7 +13,9 @@ Window sizes tested: 1920×1080, 1440×900, 1440×600, 1366×768, 1280×720, 128
 - **Real touch, a real Mac, a GPU, or a screen reader.** All timings come from a 4-core Xeon with software rendering, so they will be slower than a Mac. Treat them as relative, not absolute.
 - **Copy SVG.** The clipboard is blocked in headless mode. I saw no confirmation message, but I can't say what a real browser does.
 - **"Draw with Claude".** It needs the claude.ai runtime.
-- **Lightly covered:** the Text, Free place, Art, Crop and Frame layout modes. I opened them but did not complete a real task in each.
+- **Not tried:** deleting a project from the Projects list, Import everything, and Load a font file.
+
+**Second pass (same day, same build).** The original brief was written against an older version, so I went back and drove every tool the first pass skipped. They cover the four layout types (Frame, Free place, Art with Crop, Text layers) and new layers with blend modes and renaming. In the Stamp editor they cover the motif toolbar (duplicate, knockout, split, nudge), symmetry, stamp text and the Motif list. They also include the Stamp library, motif folders, motif sheet import and the texture editor. Finally they include the features added for 1.0: repeat tile with its 3 × 3 view, the Navigator and hand tool, Workspaces, Export recipes, Export all as zip, Print proof (PDF and PNG), Presets (palette search, looks, saved looks), Variations, the task bar, Save a copy, Export everything, and the Projects list with projects in it. The findings are in **section 2d**. Section 2 now lists the ones that affect the top five, and sections 3, 4 and 5 are extended.
 
 ---
 
@@ -36,6 +38,10 @@ Window sizes tested: 1920×1080, 1440×900, 1440×600, 1366×768, 1280×720, 128
    - Spelling switches between "Colors" and "colour" inside one panel.
    ([02](ux-review/02-rail-hover-label.png), [43](ux-review/43-colors-panel-spelling.png), [48](ux-review/48-grade-panel.png), [50](ux-review/50-pattern-grid-panel.png))
 
+**The second pass reinforces items 1, 2 and 5.** Two findings would rank just below the top five:
+- **The Layout tabs change the type of the current layer.** They look like "add a frame" or "add text" buttons, so the pattern seems to vanish when you click one (D1).
+- **Free place, Art and Text do nothing when you click the canvas** until you pick the item to place, and none is picked by default (D2).
+
 **What is good, and should be protected:**
 - **Randomize** produces a complete, attractive piece in one click. It holds the old picture until the new one is ready, with a progress bar.
 - **The motif and import flows** are solid once found. The flow from motif to stamp to pattern ([07](ux-review/07-first-pattern.png)) works. The Import artwork dialog (original beside the traced result, plain sliders, "2 shapes, 447 points, 9 KB") is the clearest screen in the app ([31](ux-review/31-import-artwork.png)).
@@ -48,7 +54,17 @@ Window sizes tested: 1920×1080, 1440×900, 1440×600, 1366×768, 1280×720, 128
 - **Command search** (Ctrl/Cmd+K) finds things by plain words.
 - **The layout copes with small windows.** The rail squeezes its buttons instead of clipping them ([40](ux-review/40-short-1440x600.png)), and below 860 px it switches cleanly to a top rail with a bottom panel ([39](ux-review/39-narrow-820.png)).
 - **Light and dark themes** are both clean ([38](ux-review/38-light-1366x768.png)).
-- **No console errors** in any flow except the New stamp one.
+- **No console errors** in any flow except the New stamp one. This held in the second pass too.
+- **From the second pass:**
+  - **Print proof** is excellent ([70](ux-review/70-print-proof.png)).
+  - **Crop** has proper handles on the canvas, Apply/Cancel next to the picture, and exact numbers in the panel ([59](ux-review/59-art-crop.png)).
+  - **Motif sheet import** shows numbered cells; you click a cell to leave it out ([71](ux-review/71-motif-sheet-import.png)).
+  - **Projects list:** thumbnails and always-visible buttons ([72](ux-review/72-projects-list.png)).
+  - **Motif list:** grouped like Figma's layers panel ([63](ux-review/63-motif-list.png)).
+  - **Split** has a clear on-canvas bar with Cancel and Split ([61](ux-review/61-stamp-split.png)).
+  - **Navigator:** Space-drag panning works ([66](ux-review/66-navigator.png)).
+  - **Free-place dragging** is smooth: median 33 ms per move.
+  - **Task bar:** pinning commands from command search works ([69](ux-review/69-task-bar.png)).
 
 ---
 
@@ -102,6 +118,32 @@ Effort: S = under a day, M = a few days, L = a week or more.
 | P5 | Projects | The empty Projects dialog relies on its footer for the key fact ("saved in this browser only"). | [23](ux-review/23-projects-empty.png) | See C1. | Folds into C1. | — | — |
 | P6 | Favicon | The browser asks for `/favicon.ico` and gets a 404. The app uses `icon-192.png`, so this is harmless. | — | It's console noise in hosting logs. | Add a `favicon.ico` to `dist/web`. | S | None. |
 
+### 2d. Second pass: the tools the first pass skipped
+
+Severity: **B** = blocks a task, **C** = confuses, **P** = polish. Everything here was driven on the same 1.0 build.
+
+| # | Sev | Area | What happens | Screenshot | Why it matters | Recommended fix | Effort | Speed / behaviour risk |
+|---|---|---|---|---|---|---|---|---|
+| D1 | C (high) | Arrangement: Layout tabs | Repeat / Frame / Free place / Art / Text sit under "Layout" and look like a choice of what to add. In fact they **change the type of the selected layer**. Clicking Frame on the starting layer replaces the repeat with a thin frame, and the pattern vanishes. Free place shows an empty page. Switching back to Repeat brings everything back (the settings are kept), which is good, but nothing says so. A real new layer is made with "+" in a *different* tool (Layers). | [55](ux-review/55-layout-frame-replaces-repeat.png) | "I want a frame around my pattern" is a natural first wish. The obvious click appears to delete the pattern. | Make Layers "+" open a small menu: **Repeat pattern / Frame / Free place / Picture / Text**. Each choice adds a layer of that type above the current one. Keep the tabs, renamed **"This layer is a"**, for changing an existing layer. Show the type next to each layer name in the Layers list. | M | A behaviour change in the add-layer flow (snapshots). No speed cost. |
+| D2 | C (borders on B) | Free place / Art / Text | In Free place, clicking the canvas does nothing until you pick a "Stamp to place". None is picked by default, and clicking the picked tile again un-picks it. There is no message. Art does pick the imported image for you ("Image added. Click on the canvas to place it.") and Text places live text as you type, so the three modes behave differently. | [56](ux-review/56-free-place-nothing-picked.png), [57](ux-review/57-free-place-selected.png) | It looks broken: you click and nothing appears. | Pick the current stamp by default when Free place opens. Show a faint copy of it under the pointer, as Art does. Make the tile choice sticky (click another tile to change it; Esc stops placing). | S | None (ghost is one `<use>` following the pointer). |
+| D3 | C | Free place / Art / Text: wording | The empty placed-items list says "Stamps you place show up here" in Art and Text modes too. Items are listed as "Stamp 1 20% · 0°", while the Size slider in Text showed 10% for the next text and 40% for the placed one. | [58](ux-review/58-art-imported.png), [60](ux-review/60-text-layer.png) | Small wording slips make people doubt they're in the right place. | Say "Pictures…" and "Text…" in those modes. Make the Size slider follow the selected item. | S | None. |
+| D4 | C | Art layer | An imported picture is placed as-is: my black-on-white test image printed as a **white box** with the star in it. Import artwork in the Motifs panel *traces* the same file into ink. I found no option on the Art layer to drop the white, though Crop's "Free points" can cut round it by hand. | [58](ux-review/58-art-imported.png), [59](ux-review/59-art-crop.png) | People bring line art or scans and expect them to print like a stamp. | In the Art panel, add a **"Paper shows through"** toggle (drop the light colour, keep the dark) or a "Make it a motif" button that runs Import artwork. | M | **Speed:** a light-colour knockout is one SVG filter per picture. Measure it on a page with several pictures. |
+| D5 | C | Text layer | Typing in the text box places the text on the canvas straight away ("1 text box placed"), yet there is also a **Stamp text** button. Which one commits is unclear. The Ink dropdown shows an empty value. | [60](ux-review/60-text-layer.png) | It's unclear whether a second text will be added or the first changed. | Typing edits the selected text box; **Add text** (renamed from Stamp text) adds a new one. Fill the Ink control with "Stamp colours" or the ink's name. | S | None. |
+| D6 | C | Stamp editor: symmetry + text | With 4-way symmetry on, adding text to a stamp mirrors the letters into an unreadable cluster. The Text tool's own preview shows the text the right way round. | [62](ux-review/62-stamp-text-mirrored.png) | The preview and the result disagree, and lettering is a headline use (Randomize's "Lettering"). | Leave text out of symmetry by default, with a per-text "Mirror with symmetry" toggle, or make the preview show what the stamp will show. | S–M | A behaviour change for text under symmetry (snapshot). |
+| D7 | C | Stamp editor: selecting | There is no drag-to-select box. Dragging on an empty part of the block does nothing. Ctrl/Cmd+A, Shift-click in the Motif list, and arrow-key nudge do work. | [63](ux-review/63-motif-list.png) | Figma, Illustrator and Procreate all select by dragging a box. People reach for it to move a group. | Add drag-to-select on empty block space, with Shift to add to the selection. | M | **Speed:** hit-testing on drag end only; nothing changes while dragging. |
+| D8 | P | Stamp editor: motif toolbar | Seven icon-only buttons under the block: reset size, flip, knockout (K), split (S), duplicate (Ctrl+D), bring to front, delete. There is "Bring to front" but no "Send to back". | [61](ux-review/61-stamp-split.png) | Order can only go one way, and the icons need hovering to learn. | Add **Send to back**. Put the key letter in a small corner badge on each icon (naming, not explanation). | S | None. |
+| D9 | C | Save a copy | File > Save a copy leaves you **working on the copy**: "Now working on 'Birds copy'. The original is unchanged." The message is clear, but Photoshop and Word's "Save a Copy" keep you on the original. In command search the same action is called "Duplicate project". | [72](ux-review/72-projects-list.png) | People may keep editing what they think is the original. | Either keep the user on the original (true Save a Copy), or rename the item **"Duplicate and open"** everywhere. | S | None. |
+| D10 | C | Exports: three different routes | **Export now** (recipes), **Print proof** and **Download project file** use Chrome's Save dialog. **Export all as one zip** and **Export everything** download straight to the Downloads folder. With the dialog switched off (the Safari/Firefox path) all of them downloaded: Export now 5.4 s, zip 23 s, proof PDF 1.3 s, proof PNG 1.1 s. | [22](ux-review/22-export-recipes.png) | One export asks where to save and the next doesn't. People lose track of where files went. | One rule: every export uses the Save dialog where the browser has one, or none of them do (your call, Q14). | S | None. |
+| D11 | C | Repeat tile 3 × 3 | The 3 × 3 preview shrinks the tiles into the same frame with **no tile boundary lines**, so you can't see where the seams are. That is the feature's purpose ("so seams can be checked"). Clicking the canvas in this view does nothing and says nothing. The "Repeat 3 × 3" button shows no pressed state. | [64](ux-review/64-repeat-tile.png), [65](ux-review/65-repeat-3x3.png) | You can't check seams you can't find. A non-editable view gives no sign that it is one. | Draw faint tile-edge lines (Display toggle), give the button a pressed style, and show "Preview only. Esc to edit" as an on-canvas chip, the same pattern as the Exit compare pill. | S | None. |
+| D12 | C | Workspaces | "Colour work" opens three panel groups stacked in one dock: Colors / Grade / Textures as tabs, plus Randomize, plus Workspaces. Each is squeezed (Colors shows only 2 of its 4 colour slots), and Workspaces stays open, using a third of the column. | [67](ux-review/67-workspace-colour-work.png) | A workspace that opens cramped panels feels worse than opening one tool. | Starting workspaces should open at most two groups. Close Workspaces itself after applying one (or let it collapse to its tab). | S | None. |
+| D13 | C | Textures: two ways in | Textures can be added with **Add texture** in Canvas, Layers, the Stamp panel and Text. Or you can make one in the **Textures** tool (create → set Wear/Relief/Stain → choose "Apply to" → Apply). The Textures tool repeats the name in a "Type" dropdown. | [73](ux-review/73-texture-editor.png) | Two models for one job. The Textures tool reads like a library manager but also applies. | Make the Textures tool the library (edit, rename, delete), and apply only from the place you are working (Canvas, Layer, Stamp). Drop the "Apply to" block. | M | None. |
+| D14 | C | Motif library | The folder list includes **"Drawn by Claude"** (empty), Plants (12), Animals (12), Medieval weapons (12), Misc (50) and Dots (10): 96 built-in motifs. An empty folder shows a three-line instruction paragraph. | [74](ux-review/74-motif-folder-empty.png) | It adds weight to the "no Claude-generated motifs" conflict in C11. | See Q3. | S | None. |
+| D15 | P | Stamp library | Save to library with no name silently saves "Stamp 1". The confirmation appears in the panel (`slmsg`), not the status bar, unlike every other save. | [44](ux-review/44-stamp-library-panel-text.png) | People end up with several "Stamp 1"s, and feedback shows up in a different place than elsewhere. | Use the stamp's own name (or the first motif's name) as the default, and confirm in the same place as other saves. | S | None. |
+| D16 | P | Layers list | Renaming a layer is double-click only (a hidden gesture). When "Stamp colours" is chosen, the Ink swatch is an empty box. Rows carry duplicate and delete icons. | [75](ux-review/75-layers-list.png) | Double-click to rename is common, but it's the only way. The empty swatch looks broken. | Add Rename to a row "⋯" menu (see C14). Show a two-colour swatch for "Stamp colours". | S | None. |
+| D17 | P | Presets: feedback | After applying a Look and pressing Undo, the status bar still says "Look 'Strong ink'." Saved looks get a thumbnail, but built-in ones don't (C16). | [68](ux-review/68-look-saved-thumbnail.png) | A stale message says the look is still applied. | Undo and Redo should replace the status message ("Undid: Look 'Strong ink'"). | S | None. |
+| D18 | P | Variations | "More" takes about 3.4 s to fill the six tiles here, with no progress sign in the panel. Applying one is a single click and names the palette in the status bar. | [33](ux-review/33-variations.png) | A 3-second blank wait feels broken. | Fill each tile as it's ready, with a light shimmer on tiles still waiting. | S | **Speed:** none; same work, shown earlier. |
+| D19 | P | Task bar | Pinning from command search works, and pinned commands show as a slim bar above the view bar. The only way to pin is the pin icon in command search, so few people will find it. | [69](ux-review/69-task-bar.png) | It's a good answer to "keep Randomize in reach" (B4), but it's hidden. | Pre-pin Randomize, or let a rail item be dragged onto the bar. | S | None. |
+
 ---
 
 ## 3. Uncommon structures (keep or change)
@@ -123,6 +165,12 @@ Effort: S = under a day, M = a few days, L = a week or more.
 | One layer edited in two tools (Layers + Arrangement) | Split by kind of setting | One layer inspector | **Change the names** (C18). Merging can wait. |
 | Repeat tile as a canvas format, not an export | Canvas > Format | Usually an export option | **Keep.** Seeing the seams while working is better. |
 | Grade "Hold to compare" (press and hold) | Hold the button | A toggle key | **Change**: merge into Before (C3). Press-and-hold won't map well to touch either. |
+| Layout tabs change the layer's type | Repeat / Frame / Free place / Art / Text on the selected layer | Add a layer of a chosen type (Photoshop's "New fill layer", Figma's frame vs text tools) | **Change** (D1): choose the type when adding a layer. Keep switching for existing layers, with a clear label. |
+| "Pick, then click to place" in Free place, Art and Text | Choose a tile, click the canvas, Esc to stop | Drag from a panel, or a placement tool that starts armed | **Keep** (it suits placing many copies), but start armed with the current stamp (D2). |
+| Text in a stamp follows the stamp's symmetry | Letters are mirrored with everything else | Text usually stays readable | **Change the default** (D6). |
+| Save a copy opens the copy | You keep working on the copy | Photoshop/Word keep you on the original | **Change the name or the behaviour** (D9). |
+| Textures made in a library tool, then "Applied" to a target | Two-step | Apply where you are | **Change** (D13): library to manage, apply in place. |
+| Print proof as a one-click sheet with colour names and Wada numbers | PDF/PNG page | Usually a separate print/preflight step | **Keep.** It's a strong, unusual feature. |
 
 ---
 
@@ -166,6 +214,14 @@ Each item is listed with its finding number. Every release needs the perf check 
 - C7: drag-and-drop motifs and on-canvas handles.
 - P2, P4, C15, C18, C20, P3.
 
+**Second-pass items, slotted into the releases above**
+- 1.1: D2 (Free place starts armed), D3 (wording), D5 (Text: typing edits, Add text adds), D17 (Undo replaces the status message).
+- 1.2: D1 (choose the type when adding a layer), D19 (pre-pin Randomize, if B4's top-bar button isn't taken).
+- 1.3: D9 (Save a copy), D10 (one export route).
+- 1.4: D11 (tile edges and a pressed 3 × 3 button), D12 (lighter starting workspaces).
+- 1.5: D13 (textures: library vs apply), D15 (stamp library names), D16 (layer row menu, two-colour swatch), D18 (Variations fill as they're ready).
+- 1.6 ⚡: D4 (paper shows through on pictures: measure the filter), D6 (text and symmetry), D7 (drag-to-select), D8 (Send to back).
+
 ---
 
 ## 5. Questions for you
@@ -180,3 +236,8 @@ Each item is listed with its finding number. Every release needs the perf check 
 8. **New stamps on the current layer automatically** (B2): OK to change this behaviour?
 9. **On-canvas first-run cue** (B4b): is a "+" slot on the empty stamp acceptable under "launch fully cleared"? It adds no content and opens nothing.
 10. **The native hover tooltips** (plan 7b.3) are still undecided. The rail's custom hover labels are the only way to learn the icons today, so this links to Q4.
+11. **Adding a layer** (D1): may Layers "+" ask for the layer type (Repeat, Frame, Free place, Picture, Text), so the Layout tabs only change an existing layer?
+12. **Save a copy** (D9): keep the user on the original (as in Photoshop), or keep today's behaviour and rename it "Duplicate and open"?
+13. **The "Drawn by Claude" folder and the 96 built-in motifs** (D14): same decision as Q3, but now with the full list (Plants, Animals, Medieval weapons, Misc, Dots).
+14. **Exports and the Save dialog** (D10): in Chrome and Edge, should every export ask where to save (as Export now and Print proof do), or should they all go straight to Downloads (as Export all and Export everything do)?
+15. **Text and symmetry** (D6): should text stay readable when the stamp has symmetry, with mirroring as an option?
