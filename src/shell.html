@@ -132,6 +132,7 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 #tpv[aria-pressed=true]{background:var(--raise);color:var(--acc-ink);font-weight:600;box-shadow:0 0 0 1px var(--acc)}
 #tpx{top:52px;left:50%}
 #mqb{position:fixed;display:none;z-index:60;pointer-events:none;border:1px solid var(--acc);background:var(--acc-soft);border-radius:2px}
+#rcc{position:absolute;top:calc(50% + 4px);left:50%;transform:translateX(-50%);z-index:44;display:flex;gap:8px;align-items:center}#rcc[hidden]{display:none}#rcc button{height:34px;padding:0 16px;border-radius:17px;border:0;font-size:13px;font-weight:600;cursor:pointer;background:var(--acc);color:var(--acc-fg);box-shadow:var(--shadow)}#rcc #rcc-x{background:var(--raise);color:var(--fg);box-shadow:0 0 0 1px var(--line2)}.stage:not(.pv) #rcc{display:none}#rcc:not([hidden])~#empc{display:none}
 #empc{top:calc(50% + 4px);left:50%;height:34px;padding:0 18px 0 14px;font-size:13px}
 #empc::before{content:"+";font-size:19px;font-weight:400;line-height:1;margin-right:-2px}
 /* an empty stamp in the tray shows a plus: click it to start drawing it */
@@ -366,9 +367,8 @@ button.alt{background:var(--raise)}
 .tdl{position:fixed;width:3px;border-radius:2px;background:var(--acc);pointer-events:none;z-index:9999}.tabs.tdrag{cursor:grabbing}.tabs.tdrag button{cursor:grabbing}.tabs button.tgh{opacity:.45}
 
 /* contextual motif bar */
-/* Stamp editor: the motif controls bar keeps its space even with nothing selected, so the stamp never changes size when you click a motif. */
-@media (min-width:861px){.stage:not(.pv) #boardS:not([hidden])~#sel[hidden]{display:flex!important;position:relative;pointer-events:none}.stage:not(.pv) #boardS:not([hidden])~#sel[hidden]>*{visibility:hidden}.stage:not(.pv) #boardS:not([hidden])~#sel>.msc[hidden]{display:block!important;visibility:hidden}.stage:not(.pv) #boardS:not([hidden])~#sel>.msc{min-width:78px;text-align:center}
-.stage:not(.pv) #boardS:not([hidden])~#sel[hidden]::before{content:"";position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:11.5px;color:var(--mut);white-space:normal}}
+/* Stamp editor: the motif controls bar floats over the bottom of the editor while a motif is selected, so no empty band is kept under the stamp. */
+.stage:not(.pv) #sel:not([hidden]){position:absolute;left:50%;bottom:91px;transform:translateX(-50%);max-width:calc(100% - 24px);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.35);z-index:6}
 #sel{flex:none;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 14px;background:var(--panel);border-top:1px solid var(--line);padding:8px 12px;white-space:nowrap}
 #sel .ctl{margin:0;width:auto;grid-template-columns:auto 96px 50px}#sel .ctl label{overflow:visible;color:var(--mut)}
 #sel .row{margin:0;flex-wrap:nowrap;gap:2px}
@@ -671,6 +671,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  </nav>
 
 <main class="stage">
+ <div id="rcc" hidden><button type="button" id="rcc-go">Restore unsaved work</button><button type="button" id="rcc-x">Dismiss</button></div>
  <button type="button" id="empc" hidden>Add a motif</button>
  <button type="button" id="tpx" hidden>Exit 3 × 3 preview<kbd>Esc</kbd></button>
  <div id="tbar" role="toolbar" aria-label="Task bar" hidden></div>

@@ -171,6 +171,13 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.12: Three small ones (C15 rest, C14 swatch, C19 recovery)
+
+- **Empty band (C15):** the Stamp editor no longer keeps a blank band for the motif bar. The bar floats over the bottom of the editor, above the stamp tray, only while a motif is selected, so the editor is about 80 px taller. The pixel golden for the Stamp editor view changes.
+- **Swatch (C14):** the default ink in Layers ("Stamp colours") shows a swatch split between the project's ink and background, instead of an empty dashed box.
+- **Recovery cue (C19):** after a crash the "Restore unsaved work / Dismiss" offer also shows as a pill on the empty canvas in the Pattern view (the status-bar buttons stay).
+- Files: `shell.html`, `32-layers-panel.js`, `38-crash-recovery.js`. Tests: `small-ones.spec.js`, `recovery.spec.js`.
+
 ## 1.0.11: Zoom in the Stamp editor and History thumbnails (C15 zoom, C2 thumbnails)
 
 - **Stamp editor zoom (C15):** the zoom controls (− / Fit / +) now show in the Stamp editor, with Ctrl/Cmd + wheel and Ctrl/Cmd + = − 0. 1x (Fit) to 8x; zoomed in, the editor scrolls inside its box; picking and dragging motifs work at any zoom. **Not done:** the empty band under the block (C15 rest).

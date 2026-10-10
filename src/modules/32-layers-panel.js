@@ -7,8 +7,9 @@ import {LY} from './14-presets-and-layer-grid-ui.js';
 import {covOrder} from './18-projects-and-cover-overlay.js';
 import {artBU} from './25-art-layers.js';
 // ===== Layers: each layer is one printing pass (its own stamps, arrangement, ink, opacity and blend). The selected layer is what the tools edit.
-const lyDef={v:'',h:'<span class="chip" style="border-style:dashed"></span>Stamp colours'};
-function lyInkFill(){$('ly_ink').innerHTML='<option value="">Stamp colours</option>'+C.map(([n])=>`<option value="${hx(n)}">${hx(n)}</option>`).join('');if(DDset.ly_ink)DDset.ly_ink([lyDef,...C.map(cItem)]);$('ly_rp').innerHTML=C.map(([n])=>`<option value="${hx(n)}">${hx(n)}</option>`).join('');if(DDset.ly_rp)DDset.ly_rp(C.map(cItem))}
+// the default ink is whatever colours each stamp already has: shown as the project's ink and background split in two
+const lyDef=()=>({v:'',h:'<span class="chip" style="background:linear-gradient(135deg,'+col(WBS.proj.ink)+' 50%,'+col(WBS.proj.bg)+' 50%)"></span>Stamp colours'});
+function lyInkFill(){$('ly_ink').innerHTML='<option value="">Stamp colours</option>'+C.map(([n])=>`<option value="${hx(n)}">${hx(n)}</option>`).join('');if(DDset.ly_ink)DDset.ly_ink([lyDef(),...C.map(cItem)]);$('ly_rp').innerHTML=C.map(([n])=>`<option value="${hx(n)}">${hx(n)}</option>`).join('');if(DDset.ly_rp)DDset.ly_rp(C.map(cItem))}
 const EYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>',NOEYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 5.7A8.6 8.6 0 0112 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 01-2.9 3.7M6.3 7.6C3.6 9.3 2.5 12 2.5 12S6 18.5 12 18.5c1.5 0 2.8-.3 4-.9"/><path d="M4 4l16 16"/></svg>';
 let lyRen=-1;
 function renderLayers(){const pa=col(WBS.proj.bg),L=LY();
@@ -21,7 +22,7 @@ const inp=$('lyl2').querySelector('input');if(inp){inp.focus();inp.select();cons
 let lyDrag=-1;
 const lyClr=()=>$('lyl2').querySelectorAll('.lyr').forEach(x=>x.classList.remove('dragover-t','dragover-b'));
 function init32(){
-lyInkFill();mkdd('ly_ink',[lyDef,...C.map(cItem)]);mkdd('ly_rp',C.map(cItem));lyInkFill();window.lyInkOn=1;
+lyInkFill();mkdd('ly_ink',[lyDef(),...C.map(cItem)]);mkdd('ly_rp',C.map(cItem));lyInkFill();window.lyInkOn=1;
 $('lyl2').onclick=e=>{const r=e.target.closest('[data-l]');if(!r||e.target.closest('input'))return;const i=+r.dataset.l;if(e.target.closest('[data-eye]')){WBS.layers[i].vis=!WBS.layers[i].vis;store();upd();return}
 if(e.target.closest('[data-dup]')){const c=JSON.parse(JSON.stringify(WBS.layers[i]));c.u=luid();c.name=(c.name+' copy').slice(0,30);WBS.layers.splice(i+1,0,c);WBS.selL=i+1;store();upd();return}
 if(e.target.closest('[data-del]')){if(WBS.layers.length<2)return;WBS.layers.splice(i,1);WBS.selL=WBS.selL>i?WBS.selL-1:WBS.selL==i?Math.max(0,i-1):WBS.selL;WBS.selL=Math.max(0,Math.min(WBS.selL,WBS.layers.length-1));store();upd();return}
