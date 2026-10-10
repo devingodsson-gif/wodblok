@@ -1,4 +1,5 @@
 import {cmdFormatShortcut,cmdIsEnabled,cmdList,cmdRun} from '../commands/registry.js';
+import {kv} from '../platform/index.js';
 import {$} from './01-launch-and-version.js';
 import {pinIs,pinToggle} from './48-task-bar.js';
 // ===== Command search (Mod+K) =====
@@ -15,10 +16,16 @@ function score(label,q){
   }
   return s;
 }
+// With nothing typed, the list opens with the commands you ran last, then those that apply in the view you are in, then the rest.
+const RK='wb_cmd_recent';
+const recents=()=>{try{const a=JSON.parse(kv.get(RK)||'[]');return Array.isArray(a)?a.filter(x=>typeof x=='string').slice(0,5):[]}catch(e){return[]}};
+const remember=id=>{try{kv.set(RK,JSON.stringify([id,...recents().filter(x=>x!==id)].slice(0,5)))}catch(e){}};
+// a command whose button sits in a part of the page that is not showing now (the other view's tools) is out of view; menu items and file inputs count as in view
+const inView=c=>{const e=c.elId&&$(c.elId);if(!e)return true;if(e.matches('input')||e.closest('.pop,.menu'))return true;return e.getClientRects().length>0};
 function search(q){
-  const all=cmdList().map((c,i)=>({c,i,on:cmdIsEnabled(c.id)}));
-  const hits=q.trim()?all.map(r=>({...r,s:score(r.c.label,q)})).filter(r=>r.s>=0):all.map(r=>({...r,s:0}));
-  return hits.sort((a,b)=>(b.on-a.on)||(a.s-b.s)||(a.i-b.i));
+  const rec=recents(),all=cmdList().map((c,i)=>({c,i,on:cmdIsEnabled(c.id),v:inView(c),r:rec.indexOf(c.id)}));
+  if(q.trim()){const hits=all.map(r=>({...r,s:score(r.c.label,q)})).filter(r=>r.s>=0);return hits.sort((a,b)=>(b.on-a.on)||(a.s-b.s)||(a.i-b.i))}
+  return all.sort((a,b)=>(b.on-a.on)||((b.r>=0)-(a.r>=0))||(a.r>=0&&b.r>=0?a.r-b.r:0)||(b.v-a.v)||(a.i-b.i));
 }
 // On a Mac the page says Cmd where it says Ctrl: button titles (now and when they are rewritten later) and the fixed panel text. Status messages
 // are converted where they are written (pmsg in 18).
@@ -50,7 +57,7 @@ function init40(){
     });
     mark();
   }
-  const go=i=>{const r=rows[i];if(!r||!r.on)return;close();cmdRun(r.c.id)};
+  const go=i=>{const r=rows[i];if(!r||!r.on)return;close();remember(r.c.id);cmdRun(r.c.id)};
   const step=d=>{if(!rows.some(r=>r.on))return;let i=cur;do{i=(i+d+rows.length)%rows.length}while(!rows[i].on);cur=i;mark()};
   inp.addEventListener('input',paint);
   inp.addEventListener('keydown',e=>{
