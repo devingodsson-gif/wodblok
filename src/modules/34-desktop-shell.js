@@ -2,7 +2,7 @@ import {kv} from '../platform/index.js';
 import {cmdGet} from '../commands/registry.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {DRT,NODRAFT,drOff} from './02-draft-mode-speedups.js';
-import {CASP,CH,CSN,CW,SH,SHN,SW,bk,closeDD,csk,placeFloat,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {CASP,CH,CSN,CW,SH,SHN,SW,bk,closeDD,csk,placeFloat,rowMenu,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {selOne,store} from './06-motif-library-folders.js';
 import {nr,symOf,tbSync} from './07-symmetry.js';
 import {gModel,gShOk} from './08-grid-shapes.js';
@@ -285,7 +285,7 @@ const navDirty=()=>{if(WBX.wbNavDirty)WBX.wbNavDirty();if(WBX.wbVarDirty)WBX.wbV
 let thT=0,thWant=null;
 function thRun(){if(drag||WBS.WBDRG||WBX.wbHoldOn||WBX.wbRollHold||(WBX.wbTxBusy||0)>0||document.body.classList.contains('babusy')){thT=setTimeout(thRun,800);return}
  const s=thWant;if(!s||s!==coreStr())return;thWant=null;thumb(120).then(u=>{const i=hist.lastIndexOf(s);if(u&&i>=0){histTh[i]=u;if(WBX.wbHistPaint)WBX.wbHistPaint()}})}
-function cap(){if(drag||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext;WBX.wbLabelNext=null;const named=nl&&performance.now()-nl.at<3000;histL.push(named?nl.t:hLabel(prev,s));if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
+function cap(){if(drag||WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext;WBX.wbLabelNext=null;const named=nl&&performance.now()-nl.at<3000;histL.push(named?nl.t:hLabel(prev,s));if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
 function applyCore(c){WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
 WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
@@ -300,6 +300,7 @@ WBX.wbHistGet=i=>hist[i];WBX.wbHistIdx=()=>hi;WBX.wbHistLabel=i=>histL[i]||'Chan
 // ---- History panel + named snapshots
 (()=>{const sec=document.querySelector('section.pn[data-p="hist"]'),hl=$('hhl'),sl=$('hsl'),XI=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 let snaps=[],sk='',raf=0,ren=-1;
+const DOTS='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
 const key=()=>'wb95_sn_'+(WBS.cp&&WBS.cp.id?WBS.cp.id:'draft');
 const persist=()=>{try{kv.set(sk,JSON.stringify(snaps))}catch(e){pmsg('This snapshot is kept for now, but is too large to keep after you close the page.')}};
 function load(){const k=key();try{if(WBS.cp&&WBS.cp.id){const d=kv.get('wb95_sn_draft');if(d&&!kv.get(k)&&sk=='wb95_sn_draft'){kv.set(k,d);kv.remove('wb95_sn_draft')}}}catch(e){}
@@ -307,14 +308,14 @@ if(k!=sk||!snaps){sk=k;try{snaps=JSON.parse(kv.get(k)||'[]')}catch(e){snaps=[]}i
 const ago=t=>{const d=(Date.now()-t)/1000;return d<45?'now':d<3600?Math.round(d/60)+' min':d<86400?Math.round(d/3600)+' h':Math.round(d/86400)+' d'};
 const esc2=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function paint(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(sec.hidden)return;const k=key();if(k!=sk){load();return}
-if(!(ren>=0&&sl.querySelector('input')))sl.innerHTML=snaps.map((n,i)=>i==ren?`<div class="hr sn" data-sn="${i}"><input type="text" value="${esc2(n.n)}" maxlength="40" aria-label="Snapshot name"><span></span><span></span></div>`:`<div class="hr sn${n.th?' th':''}" data-sn="${i}">${n.th?`<img class="hth" src="${n.th}" alt="">`:''}<b>${esc2(n.n)}</b><i>${ago(n.t)}</i><button type="button" class="rfb" data-sref="${i}">Compare</button><button type="button" data-del="${i}" aria-label="Delete snapshot">${XI}</button></div>`).join('');
+if(!(ren>=0&&sl.querySelector('input')))sl.innerHTML=snaps.map((n,i)=>i==ren?`<div class="hr sn" data-sn="${i}"><input type="text" value="${esc2(n.n)}" maxlength="40" aria-label="Snapshot name"><span></span><span></span></div>`:`<div class="hr sn${n.th?' th':''}" data-sn="${i}">${n.th?`<img class="hth" src="${n.th}" alt="">`:''}<b>${esc2(n.n)}</b><i>${ago(n.t)}</i><button type="button" class="rfb" data-sref="${i}">Compare</button><button type="button" data-more="${i}" aria-haspopup="menu" aria-expanded="false" title="Snapshot actions" aria-label="Snapshot actions">${DOTS}</button></div>`).join('');
 let h='';for(let i=hist.length-1;i>=0;i--)h+=`<div class="hr${i==hi?' on':''}${i>hi?' fut':''}${histTh[i]?' th':''}" data-h="${i}">${histTh[i]?`<img class="hth" src="${histTh[i]}" alt="">`:''}<b>${esc2(histL[i]||'Change')}</b><i>${ago(histT[i]||Date.now())}</i>${i==hi?'<span></span>':`<button type="button" class="rfb" data-href="${i}">Compare</button>`}</div>`;
 hl.innerHTML=h;if(WBX.wbBAPaint)WBX.wbBAPaint();$('hsc').textContent=hist.length+(hist.length==1?' step':' steps');const inp=sl.querySelector('input');if(inp&&document.activeElement!==inp){inp.focus();inp.select()}})}
 WBX.wbHistPaint=paint;WBX.wbSnapLoad=()=>{sk='';load()};
 function jump(i){cap();if(i<0||i>=hist.length||i==hi)return;goTo(i);ub()}
 hl.addEventListener('click',e=>{const b=e.target.closest('[data-href]');if(b){const i=+b.dataset.href;wbBA.setRef((histL[i]||'Change')+' · '+ago(histT[i]||Date.now()),hist[i],1);return}const r=e.target.closest('[data-h]');if(r)jump(+r.dataset.h)});
 $('hsadd').onclick=()=>{cap();const sn={n:'Snapshot '+(snaps.length+1),t:Date.now(),s:coreStr()};snaps.unshift(sn);if(snaps.length>30)snaps.length=30;persist();ren=0;paint();thumb(120).then(u=>{if(u&&snaps.includes(sn)){sn.th=u;persist();paint()}})};
-sl.addEventListener('click',e=>{const q=e.target.closest('[data-sref]');if(q){const n=snaps[+q.dataset.sref];if(n)wbBA.setRef(n.n,n.s,1);return}const d=e.target.closest('[data-del]');if(d){snaps.splice(+d.dataset.del,1);persist();ren=-1;paint();return}
+sl.addEventListener('click',e=>{const q=e.target.closest('[data-sref]');if(q){const n=snaps[+q.dataset.sref];if(n)wbBA.setRef(n.n,n.s,1);return}const d=e.target.closest('[data-more]');if(d){e.stopPropagation();const k=+d.dataset.more;rowMenu(d,[['Rename',()=>{ren=k;paint()}],['Delete',()=>{snaps.splice(k,1);persist();ren=-1;paint()}]]);return}
 if(e.target.closest('input'))return;const r=e.target.closest('[data-sn]');if(!r)return;const n=snaps[+r.dataset.sn];if(!n)return;cap();applyCore(JSON.parse(n.s));cap();pmsg('Restored “'+n.n+'”. Ctrl+Z goes back.')});
 sl.addEventListener('dblclick',e=>{const r=e.target.closest('[data-sn]');if(r&&!e.target.closest('input,button')){ren=+r.dataset.sn;paint()}});
 function fin(ok){const inp=sl.querySelector('input');if(inp&&ren>=0&&snaps[ren]){const v=inp.value.trim();if(ok&&v)snaps[ren].n=v.slice(0,40);persist()}ren=-1;paint()}

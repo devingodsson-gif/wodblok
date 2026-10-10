@@ -51,3 +51,20 @@ test('saved work leaves nothing to restore, and Dismiss removes the offer for go
   await expect(p3.locator('#rcv')).toBeHidden();
   await ctx.close();
 });
+
+// 1.0.12: the offer also shows on the empty canvas (the Pattern view), where people look; the status-bar buttons stay.
+test('the recovery offer also shows on the canvas, and its buttons do the same as the ones in the status bar', async ({ browser }) => {
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } }), page = await ctx.newPage();
+  await openApp(page);
+  const changed = await workAndTick(page);
+  await page.close();
+  const p2 = await ctx.newPage(), b = await openApp(p2);
+  await expect(p2.locator('#rcc')).toBeVisible();
+  await expect(p2.locator('#empc')).toBeHidden();                                  // the "Add a motif" pill gives way
+  await p2.click('#rcc-go'); await settle(p2);
+  expect(await getState(p2)).toBe(changed);
+  await expect(p2.locator('#rcc')).toBeHidden();
+  await expect(p2.locator('#rcv')).toBeHidden();
+  expect(b.errors).toEqual([]);
+  await ctx.close();
+});

@@ -8,7 +8,7 @@ import {coreStr,dirty,openData,paintPst,pmsg,snapshot} from './18-projects-and-c
 // until the person restores or dismisses it, so starting to work does not overwrite it.
 const RC_EVERY=8000;
 let rcBlank='',rcLast='',rcPrev=null,rcBusy=false;
-function rcShow(on){$('rcv').hidden=!on;$('rcx').hidden=!on}
+function rcShow(on){$('rcv').hidden=!on;$('rcx').hidden=!on;$('rcc').hidden=!on}   // the status bar and, in the Pattern view, a pill on the empty canvas
 // Is there work that would be lost by restarting now? (a project still blank from launch does not count)
 const rcUnsaved=()=>(coreStr()!==rcBlank||!!WBS.cp.id)&&dirty();
 async function rcTick(){
@@ -37,7 +37,7 @@ async function rcFind(){
 }
 function init38(){
   rcBlank=coreStr();
-  $('rcv').onclick=rcRestore;$('rcx').onclick=rcDismiss;
+  $('rcv').onclick=rcRestore;$('rcx').onclick=rcDismiss;$('rcc-go').onclick=rcRestore;$('rcc-x').onclick=rcDismiss;
   rcFind().then(()=>{setInterval(rcTick,RC_EVERY)});
 }
 export {init38,rcTick,rcUnsaved};

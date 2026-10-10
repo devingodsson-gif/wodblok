@@ -114,6 +114,17 @@ const projCols=()=>PSLOT.map(k=>WBS.proj[k]).filter(Boolean);
 const saveCC=()=>{try{kv.set('wb7_colors',JSON.stringify(C.filter(c=>CC.includes(c[0]))))}catch(e){}};
 // Open popups are lifted to the top of the page and placed against their button, so no panel, floating window,
 // scrolling area or the phone-width header (which scrolls sideways) can clip them or draw over them.
+// A small "..." menu for one row of a list: items are [label, action, disabled]. It opens next to the button, closes when you choose, click elsewhere or press Esc, and the items are real buttons (Tab and Enter work).
+let ROWM=null;
+function closeRowMenu(){if(ROWM){if(ROWM.btn)ROWM.btn.setAttribute('aria-expanded','false');ROWM.remove();ROWM=null}}
+function rowMenu(btn,items){const was=ROWM&&ROWM.btn===btn;closeRowMenu();if(was)return;const m=document.createElement('div');m.className='ddl rowm';m.dataset.w='150';m.setAttribute('role','menu');
+ m.innerHTML=items.map(([t,,off],i)=>`<button type="button" class="ddi" role="menuitem" data-i="${i}"${off?' disabled':''}><span>${t}</span></button>`).join('');
+ document.body.appendChild(m);placeFloat(m,btn,true);m.btn=btn;ROWM=m;btn.setAttribute('aria-expanded','true');
+ m.onclick=e=>{const b=e.target.closest('[data-i]');if(!b||b.disabled)return;const f=items[+b.dataset.i][1];closeRowMenu();f()};
+ m.onkeydown=e=>{if(e.key=='Escape'){e.stopPropagation();const b=m.btn;closeRowMenu();b.focus()}else if(e.key=='ArrowDown'||e.key=='ArrowUp'){e.preventDefault();const bs=[...m.querySelectorAll('button:not(:disabled)')],i=bs.indexOf(document.activeElement);bs[(i+(e.key=='ArrowDown'?1:-1)+bs.length)%bs.length].focus()}};
+ const f=m.querySelector('button:not(:disabled)');if(f)f.focus()}
+document.addEventListener('pointerdown',e=>{if(ROWM&&!e.target.closest('.rowm,[data-more]'))closeRowMenu()},true);
+addEventListener('scroll',e=>{if(ROWM&&!(e.target.closest&&e.target.closest('.rowm')))closeRowMenu()},true);
 function placeFloat(el,a,right,cap){if(el.parentNode!==document.body)document.body.appendChild(el);el.classList.add('fx');el.style.maxHeight='';el.style.width='';
 const r=a.getBoundingClientRect(),vw=document.documentElement.clientWidth,vh=window.innerHeight,g=4,pad=8;
 if(el.classList.contains('ddl'))el.style.width=Math.min(vw-2*pad,Math.max(r.width,+el.dataset.w||180))+'px';
@@ -170,4 +181,4 @@ mkdd('pI',C.map(cItem));mkdd('pB',C.map(cItem));mkdd('p3',[noneItem,...C.map(cIt
 paintColors();
 mkdd('pal',[{v:'',h:'<span class="combo">&mdash;</span>Custom mix'},...PL.map((p,i)=>({v:i,h:`<span class="combo" style="background:${CM[p[2]]};color:${CM[p[1]]}">Aa</span><span>${esc(p[0])}<small>No. ${i+1} · ${[p[2],p[1],p[3],p[4]].filter(Boolean).map(esc).join(' · ')}</small></span>`}))]);
 }
-export {C,CASP,CC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,PSLOT,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,col,csN,csk,fixC,geom,hasOut,inShape,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,projCols,projSet,rng,saveCC,setDim,tileExt,tileOn,shOf,shp,tk,useG,useT,wrapP,init04};
+export {C,CASP,CC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,PSLOT,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,closeRowMenu,col,csN,csk,fixC,geom,hasOut,inShape,init04,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,projCols,projSet,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
