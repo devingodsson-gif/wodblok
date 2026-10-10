@@ -155,7 +155,7 @@ let wsRT=0,wsPend=false;addEventListener('resize',()=>{clearTimeout(wsRT);wsRT=s
 addEventListener('focusout',()=>{setTimeout(()=>{if(wsPend&&!typing()){wsPend=false;if(wsReady)wsRender()}},300)});
 const stage=document.querySelector('.stage');
 function setView(v){const was=view;view=v;WBS.curView=v;if(WBX.wbEmptyCue)WBX.wbEmptyCue();if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
-$('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display=v=='pattern'?'':'none';$('gtb').style.display=v=='stamp'?'':'none';$('itb').style.display='';if(v=='pattern')requestAnimationFrame(applyZ);tbSync();if(was!=v||!wsReady)wsRender()}
+$('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display='';$('gtb').style.display=v=='stamp'?'':'none';$('itb').style.display='';if(v=='pattern')requestAnimationFrame(applyZ);else applyZE();tbSync();if(was!=v||!wsReady)wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
 const L=wsL();let g=wsFind(p);
 // a tool that is not open yet opens docked on the right: Randomize beside the colour tools, anything else as a tab in the first group
@@ -214,7 +214,13 @@ function applyZ(){fitZ();const s=z||fitS;$('art').style.width=Math.round(CW*s)+'
 function zoomAt(ns,cx,cy){const b=$('boardP'),a=$('art'),r0=a.getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);z=Math.min(8,Math.max(.1,ns));applyZ();const r1=a.getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
 const zoomMid=f=>{const r=$('boardP').getBoundingClientRect();zoomAt((z||fitS)*f,r.left+r.width/2,r.top+r.height/2)};
 WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbZoomTo=s=>{const r=$('boardP').getBoundingClientRect();zoomAt(s,r.left+r.width/2,r.top+r.height/2)};WBX.wbZoomNow=()=>z||fitS;WBX.wbZoomIn=()=>view=='pattern'&&!!z&&z>fitS*1.001;
-$('zi').onclick=()=>zoomMid(1.25);$('zo').onclick=()=>zoomMid(1/1.25);$('zl').onclick=()=>{z=0;applyZ()};
+// ---- zoom in the Stamp editor: at Fit the editor is the size of its box; zooming makes it larger inside a scrolling box (1x to 8x)
+let zE=1;const edBox=()=>$('boardS').firstElementChild;
+function applyZE(){const e=$('ed'),big=zE>1;e.style.flex=big?'none':'';e.style.width=big?(zE*100)+'%':'';e.style.height=big?(zE*100)+'%':'';edBox().style.overflow=big?'auto':'';$('zl').textContent=big?Math.round(zE*100)+'%':'Fit';$('zl').title=big?'Fit to screen':'Fitted to screen'}
+function zoomE(ns,cx,cy){const b=edBox(),r0=$('ed').getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);zE=Math.min(8,Math.max(1,ns));applyZE();const r1=$('ed').getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
+const zoomMidE=f=>{const r=edBox().getBoundingClientRect();zoomE(zE*f,r.left+r.width/2,r.top+r.height/2)};
+$('boardS').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomE(zE*(e.deltaY<0?1.1:1/1.1),e.clientX,e.clientY)},{passive:false});
+$('zi').onclick=()=>view=='stamp'?zoomMidE(1.25):zoomMid(1.25);$('zo').onclick=()=>view=='stamp'?zoomMidE(1/1.25):zoomMid(1/1.25);$('zl').onclick=()=>{if(view=='stamp'){zE=1;applyZE();edBox().scrollLeft=0;edBox().scrollTop=0}else{z=0;applyZ()}};
 $('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomAt((z||fitS)*(e.deltaY<0?1.1:1/1.1),e.clientX,e.clientY)},{passive:false});
 try{new ResizeObserver(()=>{if(view=='pattern')applyZ()}).observe($('boardP'))}catch(e){window.addEventListener('resize',applyZ)}
 new MutationObserver(()=>applyZ()).observe($('art'),{attributes:true,attributeFilter:['viewBox']});
