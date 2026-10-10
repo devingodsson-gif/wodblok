@@ -114,7 +114,7 @@ The Step 0 questions were not answered, so my suggested defaults were used, exce
 | C11 + D14 | **Part** | Done: "Draw with Claude" is hidden; the "Drawn by Claude" folder only shows when it holds an old project's drawings. **Not done, by decision:** the built-in motif sets (Plants, Animals, Medieval weapons, Misc, Dots) stay while you upload your own motifs; revisit when yours are in. |
 | D19 | Skipped | Randomize now has its own top-bar button, so pre-pinning it is not needed. |
 
-**Tests for 1.0.2:** the full suite was run twice. First run (with the wide rail): 122 passed, 31 failed, of which 2 were tests of mine asserting text I changed on purpose (fixed) and 29 were screenshot or SVG differences. After the tool-name column was removed, only 10 screenshots still differed (launch, before-view and 8 panels) plus 2 SVG snapshots that are the known timing flake (they pass 3 of 3 on their own). With your approval, the 10 screenshots were regenerated (no state snapshot changed, nothing else touched). See the release report for the final run.
+**Tests for 1.0.2:** the full suite was run twice. First run (with the wide rail): 122 passed, 31 failed, of which 2 were tests of mine asserting text I changed on purpose (fixed) and 29 were screenshot or SVG differences. After the tool-name column was removed, only 10 screenshots still differed (launch, before-view and 8 panels) plus 2 SVG snapshots that are the known timing flake (they pass 3 of 3 on their own). With your approval, the 10 screenshots were regenerated (no state snapshot changed, nothing else touched). Final run on the release commit: 152 passed, 0 failed, 5 skipped (18.6 minutes).
 
 ## 1.0.3: Layers and placing things (needs Q11, Q15)
 
