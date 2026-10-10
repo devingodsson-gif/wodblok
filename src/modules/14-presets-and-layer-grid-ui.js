@@ -51,7 +51,7 @@ $(p+'asp').oninput=()=>{const v=$(p+'asp').value;if(v=='x'){$(p+'asp').dataset.c
 $(p+'asp').dataset.custom='';const a=ASP[k][+v];applyAsp(k,[a[1],a[2]])};
 const cu=()=>{const w=+$(p+'aw').value,h=+$(p+'ah').value;if(w>0&&h>0)applyAsp(k,[w,h])};$(p+'aw').oninput=$(p+'ah').oninput=cu;
 $(p+'swp').onclick=()=>{const a=k=='s'?shOf(WBS.tiles[WBS.cur]).s:WBS.dim[k];applyAsp(k,[a[1],a[0]])}});
-$('cshp').onclick=e=>{const b=e.target.closest('[data-s]');if(!b||WBS.book.on||b.disabled)return;const v=b.dataset.s;if(v==csk())return;csSet({cs:v})};
+$('cshp').onclick=e=>{const b=e.target.closest('[data-s]');if(!b||WBS.book.on||b.disabled)return;const v=b.dataset.s;if(v==csk())return;csSet({cs:v});if(WBX.wbWatch)WBX.wbWatch()};
 $('ccr').oninput=()=>csSet({cr:Math.max(0,Math.min(100,Math.round(+$('ccr').value)||0))});
 $('cns').oninput=()=>csSet({n:Math.max(3,Math.min(16,Math.round(+$('cns').value)||5))});
 $('cor').onclick=e=>{const b=e.target.closest('[data-o]');if(!b)return;const o=b.dataset.o=='f'?'f':'p';if((WBS.dim.co=='f'?'f':'p')==o)return;const ch={co:o};if(o=='p')delete WBS.dim.co;csSet(o=='p'?{}:ch)};

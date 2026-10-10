@@ -65,5 +65,21 @@ wbHold=(()=>{let on=0,t0=0,armed=0,ovs=[],bar=null,prog=0,pr0=0,quiet=0,lastMut=
   if(now){gone();return}
   os.forEach(o=>o.el.classList.add('out'));if(b)b.classList.add('out');setTimeout(gone,190)}
  return{start,arm,stop,snap,freezeSn,lay,get on(){return!!on}}})();
+// A light progress bar for work that is not a Randomize roll: after a file is opened or the canvas shape changes, the stamps are printed
+// a few at a time, and until they are done the picture is only paper. The same thin bar as Randomize's runs across the top of the stage
+// while prints are queued; nothing is frozen or held, so the view stays live. Ends when the drawing has been quiet for a moment.
+let wat=null;
+WBX.wbWatch=()=>{if(wbHold.on||wat)return;const st=document.querySelector('.stage');if(!st)return;
+ const bar=document.createElement('div');bar.className='fzbar';bar.setAttribute('aria-hidden','true');bar.innerHTML='<i></i>';st.appendChild(bar);
+ const t0=performance.now(),pr0=BK.st.printed;let quiet=t0,prog=.05;wat=bar;bar.firstChild.style.width='5%';
+ const end=()=>{bar.classList.add('out');setTimeout(()=>{bar.remove();if(wat===bar)wat=null},220)};
+ const tick=()=>{if(!bar.isConnected)return;const now=performance.now(),el=now-t0;
+  const busy=raf||BK.busy||BK.q.size||BK.tm||BK.defT||WBX.wbHoldOn;
+  if(busy)quiet=now;
+  const done=BK.st.printed-pr0,left=BK.q.size;let est=.05+Math.min(.3,el/4000);if(done+left>0)est=Math.max(est,.15+.8*done/(done+left));
+  prog=Math.max(prog,Math.min(.95,est));bar.firstChild.style.width=(prog*100).toFixed(1)+'%';
+  if((el>=500&&now-quiet>=250)||el>20000){bar.firstChild.style.width='100%';end();return}
+  requestAnimationFrame(tick)};
+ requestAnimationFrame(tick)};
 }
 export {wbHold,init19};

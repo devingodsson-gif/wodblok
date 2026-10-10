@@ -84,7 +84,7 @@ function thumb(w0){return new Promise(res=>{try{const img=new Image(),to=setTime
 async function saveTo(id,name){const sn=snapshot(),a=await artSnap();if(a)sn.art=a;const rec={name,updated:Date.now(),info:shapeInfo(sn),thumb:await thumb(),data:JSON.stringify(sn)};try{await ST.put(id,rec)}catch(e){if(!a)throw e;delete sn.art;rec.data=JSON.stringify(sn);await ST.put(id,rec);pmsg('Saved, but without a picture for Art: the project was too big to store with it.')}return sn}
 // two-tap confirm for actions that would drop unsaved work
 const confirm2=(btn,label,fn)=>{if(!dirty()||btn.dataset.sure){delete btn.dataset.sure;return fn()}btn.dataset.sure='1';const o=btn.textContent;btn.textContent=label;setTimeout(()=>{delete btn.dataset.sure;btn.textContent=o},3500)};
-function openData(d,id,name){applySnap(d);WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;saveCp();paintPst();if(WBX.wbResetHist)WBX.wbResetHist();artLive(true)}
+function openData(d,id,name){applySnap(d);WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;saveCp();paintPst();if(WBX.wbResetHist)WBX.wbResetHist();artLive(true);if(WBX.wbWatch)WBX.wbWatch()}
 function init18(){WBS.pgrid={...PGD};
 covB=blank();covS=blank();WBS.cslot='f';
 try{const q=JSON.parse(kv.get('wb40_coverB')||'null');if(q&&typeof q.sc=='number')covB={...covB,...q}}catch(e){}
