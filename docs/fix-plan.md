@@ -171,6 +171,12 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.11: Zoom in the Stamp editor and History thumbnails (C15 zoom, C2 thumbnails)
+
+- **Stamp editor zoom (C15):** the zoom controls (− / Fit / +) now show in the Stamp editor, with Ctrl/Cmd + wheel and Ctrl/Cmd + = − 0. 1x (Fit) to 8x; zoomed in, the editor scrolls inside its box; picking and dragging motifs work at any zoom. **Not done:** the empty band under the block (C15 rest).
+- **History thumbnails (C2):** a step named by whoever made it (a Randomize roll, a look, a palette) gets a 40x30 picture, taken once from the finished piece 1.5 s after the step when nothing is happening (never during a drag, a roll or other busy work; waits and retries). Snapshots get one when they are made. Steps made by hand have none. Pictures are kept in memory (steps) and with the snapshots in this browser; they are not written into project files. Speed: perf ratio 0.843 against v100 (was 0.818); roll time unchanged.
+- Files: `34-desktop-shell.js`, `41-navigator.js`, `shell.html`. Tests: `stamp-zoom.spec.js`, `history-thumbs.spec.js`.
+
 ## 1.0.10: Exports ask where to save first (rest of Q14)
 
 Every export (Export now, Export all as one zip, the 3x PNG, the print proofs, the cover PNG/PDF, Save project) now opens the Save dialog first and renders afterwards, so the browser still counts the click as recent. Before, a long export (the zip took 23 s) lost the dialog and silently downloaded. Cancelling the dialog stops the export. Browsers without a Save dialog download as before; the Claude artifact runtime is unchanged. Files: `src/platform/web.js` (`files.pick`), `index.js`, `14-…`, `30-…`, `33-…`, `43-…`, `45-…`. Tests: `tests/export-dialog.spec.js`.
