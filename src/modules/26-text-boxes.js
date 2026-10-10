@@ -8,7 +8,7 @@ import {txRefresh,txReg} from './17-texture-panel-and-previews.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
-// ===== Text boxes (Arrangement > Text). A layer in Text mode has L.free = true, L.txt = true and L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
+// ===== Text boxes (Layout > Text). A layer in Text mode has L.free = true, L.txt = true and L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
 // The letters are stored as outlines (centred on the box), so the project needs no fonts to show them. s = the box's long side on the canvas.
 const fx1=v=>(+v).toFixed(1);
 function txtGl(p,fill,pre){const G=p.G,Lt=p.Lt;if(!G||typeof G!='object'||!Array.isArray(Lt)||Lt.length>800)return'';let d0='',o='';const seen={};
