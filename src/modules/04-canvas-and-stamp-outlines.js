@@ -148,7 +148,7 @@ const defItem={v:'',h:'<span class="chip" style="border-style:dashed"></span>Pro
 function paintColors(){const OPT=C.map(([n])=>`<option>${esc(n)}</option>`).join('');
 $('pI').innerHTML=$('pB').innerHTML=OPT;$('p3').innerHTML=$('p4').innerHTML='<option value="">None</option>'+OPT;$('stI').innerHTML='<option value="">Project default</option>'+OPT;
 DDset.pI(C.map(cItem));DDset.pB(C.map(cItem));DDset.p3([noneItem,...C.map(cItem)]);DDset.p4([noneItem,...C.map(cItem)]);DDset.stI([defItem,...C.map(cItem)]);if(window.lyInkOn)lyInkFill();
-$('cl').innerHTML=C.map(([n,h])=>`<button data-c="${esc(n)}" title="${esc(n)}"${CC.includes(n)?' class="cust"':''}><i style="background:${h}"></i><span>${esc(n)}</span></button>`).join('')+'<button id="addC" title="Add a colour"><i class="plus">+</i><span>Add colour</span></button>';
+$('cl').innerHTML='<button id="addC" title="Add a colour"><i class="plus">+</i><span>Add colour</span></button>'+C.map(([n,h])=>`<button data-c="${esc(n)}" title="${esc(n)}"${CC.includes(n)?' class="cust"':''}><i style="background:${h}"></i><span>${esc(n)}</span></button>`).join('');
 $('cth').textContent='Colour library ('+C.length+')'}
 const N=[],M=[];
 function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}

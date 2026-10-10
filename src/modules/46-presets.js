@@ -17,6 +17,10 @@ const LK_START=[
   {id:'s-riso',name:'Warm riso',pr:{e:3,q:2},grade:{ct:8,tp:14,sat:12},tex:[{t:'riso',a:40,sc:100}]},
   {id:'s-clean',name:'Clean',pr:{e:0,q:0},grade:{},tex:[]},
 ];
+// A picture for a starting look: a small sample (the project's paper and ink) with the look's tone and texture applied as SVG filters. It is made from the look's own numbers, so it costs nothing to draw.
+let lkFid=0;
+function lkPreview(s){const g=s.grade||{},id='lkf'+(++lkFid),sat=1+(g.sat||0)/100,ct=1+(g.ct||0)/100,tp=(g.tp||0)/100,fd=(g.fd||0)/100,tx=s.tex&&s.tex[0]?(s.tex[0].a||40)/100:0,b=(.5-.5*ct).toFixed(3);
+ return`<svg viewBox="0 0 34 34" width="34" height="34" aria-hidden="true"><defs><filter id="${id}" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="${sat.toFixed(2)}"/><feColorMatrix type="matrix" values="${ct} 0 0 0 ${(+b+tp*.08).toFixed(3)} 0 ${ct} 0 0 ${b} 0 0 ${ct} 0 ${(+b-tp*.08).toFixed(3)} 0 0 0 1 0"/></filter><filter id="${id}n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 -.2"/></filter></defs><g filter="url(#${id})"><rect width="34" height="34" fill="${col(WBS.proj.bg)}"/><circle cx="12" cy="13" r="7" fill="${col(WBS.proj.ink)}"/><rect x="18" y="17" width="10" height="10" rx="2" fill="${col(WBS.proj.ink)}"/></g>${fd?`<rect width="34" height="34" fill="#fff" opacity="${(fd*.5).toFixed(2)}"/>`:''}${tx?`<rect width="34" height="34" filter="url(#${id}n)" opacity="${(tx*.55).toFixed(2)}"/>`:''}</svg>`}
 const lkLoad=()=>{try{const a=JSON.parse(kv.get(LK_KEY)||'[]');return Array.isArray(a)?a.filter(r=>r&&typeof r.id=='string'&&typeof r.name=='string'&&r.look):[]}catch(e){return[]}};
 const lkStore=a=>{try{kv.set(LK_KEY,JSON.stringify(a))}catch(e){pmsg('Could not keep the looks in this browser.')}};
 // what a look keeps of the current piece (grade masks tied to a layer or a stamp stay with that piece)
@@ -69,7 +73,7 @@ function init46(){
     list.textContent='';
     const row=(r,own)=>{
       const e=document.createElement('div');e.className='psr';e.dataset.id=r.id;e.setAttribute('role','listitem');e.tabIndex=0;
-      const th=document.createElement('div');th.className='th';if(own&&r.thumb){const im=document.createElement('img');im.alt='';im.src=r.thumb;th.appendChild(im)}else th.appendChild(document.createElement('i'));
+      const th=document.createElement('div');th.className='th';if(own&&r.thumb){const im=document.createElement('img');im.alt='';im.src=r.thumb;th.appendChild(im)}else if(!own)th.innerHTML=lkPreview(r);else th.appendChild(document.createElement('i'));
       e.appendChild(th);
       if(own&&ren==r.id){
         const i=document.createElement('input');i.type='text';i.maxLength=40;i.value=r.name;i.setAttribute('aria-label','Look name');e.appendChild(i);

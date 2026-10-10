@@ -21,7 +21,8 @@ async list(){await this.init();if(this.col){const r=await this.col.get();return 
 async get(id){await this.init();if(this.col){const x=await this.col.doc(id).get();return x.exists?{id,...x.data()}:null}const v=this.loc()[id];return v?{id,...v}:null},
 async put(id,rec){await this.init();if(this.col)return this.col.doc(id).set(rec);const o=this.loc();o[id]=rec;kv.set('wb50_stamps',JSON.stringify(o))},
 async del(id){await this.init();if(this.col)return this.col.doc(id).delete();const o=this.loc();delete o[id];kv.set('wb50_stamps',JSON.stringify(o))}};
-const slMsg=t=>{$('slmsg').textContent=t};
+// messages go to the status line, like every other save; the stamp's own name ("Stamp 3") is what an empty name field falls back to, and the field says so
+const slMsg=t=>{$('slmsg').textContent='';pmsg(t)};
 const slOkImg=s=>typeof s=='string'&&s.length<6e6&&/^data:image\/(png|webp);base64,[A-Za-z0-9+\/=]*$/.test(s);
 // draw one stamp to a canvas: its ink and shape (and edge wear), long side = px, transparent or on the paper colour
 async function stampCanvas(t,px,onPaper,o){o=o||{};const G=geom(shOf(t)),dd=$('dyn').querySelector('defs');if(!dd)throw new Error('The stamp is not drawn yet');
@@ -49,7 +50,7 @@ const slOptSave=()=>{try{kv.set('wb50_slopt',JSON.stringify({fx:$('slfx').checke
 function libMotifs(L){Object.entries(L.motifs||{}).forEach(([k,v])=>{if(!v||typeof v.svg!='string')return;if(k.startsWith('t|')){if(/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test(v.svg))cust[k]={n:String(v.n||'?').replace(/["<>&|]/g,'').slice(0,4),svg:v.svg,txt:1};return}if(k.startsWith('i|')){if(WBX.wbImpOk&&WBX.wbImpOk(k,v))cust[k]={n:String(v.n||'Imported motif').replace(/["<>&|]/g,'').slice(0,40),svg:v.svg,imp:1,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,30)}:{})}}else{const c=clean(v.svg);if(c)cust[k]={n:String(v.n||'motif').replace(/["<>&|]/g,'').slice(0,40),svg:c,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,30)}:{})}}});
 }
 function libColors(L){(L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();}
-async function slPaint(){if(!$('slgrid'))return;await SL.init();$('slwhere').textContent=SL.kind=='account'?'Saved to your Claude account':'Saved in this browser';
+async function slPaint(){if(!$('slgrid'))return;$('slname').placeholder='Stamp '+(WBS.cur+1);await SL.init();$('slwhere').textContent=SL.kind=='account'?'Saved to your Claude account':'Saved in this browser';
 try{const ps=await SL.list();$('slcount').textContent=ps.length?String(ps.length):'';$('slgrid').innerHTML=ps.length?ps.map(p=>`<div class="slc" data-sl="${hx(p.id)}">${slOkImg(p.img)?`<div class="im"><img src="${hx(p.img)}" alt=""></div>`:'<div class="im"></div>'}<b title="${hx(p.name||'Stamp')}">${hx(p.name||'Stamp')}</b><div class="row"><button class="alt" data-sa="add" title="Add this stamp to the project">Add</button><button class="alt" data-sa="png" title="Export this stamp as a PNG">PNG</button><button class="alt" data-sa="file" title="Save this stamp as its own file">File</button><button class="alt" data-sa="del" title="Delete from the library">Delete</button></div></div>`).join(''):'<div class="hint" style="grid-column:1/-1">No saved stamps</div>'}
 catch(e){$('slgrid').innerHTML='<div class="hint" style="grid-column:1/-1">Could not load the library.</div>'}}
 // --- Art: import an image, or use a saved project
