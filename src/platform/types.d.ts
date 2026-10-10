@@ -8,7 +8,10 @@ export interface Blobs { put(name: string, data: Blob): Promise<void>; get(name:
 export interface Files {
   save(name: string, data: Blob, opts?: { type?: string }): Promise<'saved' | 'downloaded'>; canSave(): boolean;
   write(name: string, data: Blob, opts?: { type?: string; handle?: unknown }): Promise<{ how: 'saved' | 'downloaded'; handle: unknown | null }>;
-  canOpen(): boolean; open(): Promise<{ file: File; handle: unknown } | null>; onLaunch(cb: (file: File, handle: unknown) => void): void;
+  canOpen(): boolean; open(): Promise<{ file: File; handle: unknown } | null>;
+  canPickFolder(): boolean; pickFolder(): Promise<unknown | null>; savedFolder(): Promise<unknown | null>; forgetFolder(): Promise<void>;
+  folderAccess(handle: unknown): Promise<boolean>; listFolder(handle: unknown): Promise<{ name: string; handle: unknown }[]>;
+  onLaunch(cb: (file: File, handle: unknown) => void): void;
 }
 // Offline use and updates (the web app's service worker). Absent in the artifact and desktop adapters.
 export interface Offline { available(): boolean; register(onWaiting: () => void): Promise<void>; apply(): Promise<void> }

@@ -72,4 +72,16 @@ async function fmtOpen(bytes) {
   }
   return { project, newer, from, missingAssets, snapshots };
 }
-export {fmtPack,fmtOpen,fmtIsZip,FMT_MIME,FMT_LATEST};
+// For a list of files: just the project's name and its small preview picture, without unpacking the images. Never throws; a file that cannot be read gives {}.
+function fmtPeek(bytes) {
+  try {
+    if (fmtIsZip(bytes)) {
+      const f = unzipSync(bytes, { filter: e => e.name === 'project.json' || e.name === 'thumbnail.png' });
+      const raw = f['project.json'] ? JSON.parse(strFromU8(f['project.json'])) : {};
+      return { name: typeof raw.name === 'string' ? raw.name : '', thumbnail: f['thumbnail.png'] || null };
+    }
+    const raw = JSON.parse(strFromU8(bytes));
+    return { name: raw && typeof raw.name === 'string' ? raw.name : '', thumbnail: null };
+  } catch (e) { return {}; }
+}
+export {fmtPack,fmtOpen,fmtPeek,fmtIsZip,FMT_MIME,FMT_LATEST};

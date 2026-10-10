@@ -15,7 +15,7 @@ import {LY} from './14-presets-and-layer-grid-ui.js';
 import {savePr} from './15-print-effects-and-stamp-texture.js';
 import {txClean} from './16-texture-generators.js';
 import {buildTex,migInk,saveTex,texNorm} from './17-texture-panel-and-previews.js';
-import {coreStr,dirty,paintPst,pgFix,pmsg,saveCp} from './18-projects-and-cover-overlay.js';
+import {coreStr,dirty,paintPst,pgFix,pmsg} from './18-projects-and-cover-overlay.js';
 import {randomize,wbBA} from './20-before-after-and-randomizer.js';
 import {clearAll} from './33-clear.js';
 
@@ -247,10 +247,9 @@ const _sp=WBH.syncPr;WBH.syncPr=function(){_sp();nums()};const _stx=WBH.syncTex;
 
 // ---- toast-style status messages
 let mt=0;new MutationObserver(()=>{clearTimeout(mt);$('pmsg').style.opacity=1;if($('pmsg').textContent)mt=setTimeout(()=>{$('pmsg').style.transition='opacity .6s';$('pmsg').style.opacity=0;setTimeout(()=>{$('pmsg').style.transition=''},700)},6000)}).observe($('pmsg'),{childList:true,characterData:true,subtree:true});
-new MutationObserver(()=>{$('pwhere2').textContent=$('pwhere').textContent}).observe($('pwhere'),{childList:true,characterData:true,subtree:true});
 
 // ---- menus
-const menus=[['fileb','filem'],['expb','expm']];
+const menus=[['fileb','filem']];
 const closeMenus=()=>menus.forEach(([b,m])=>{$(m).hidden=true;$(b).setAttribute('aria-expanded','false')});WBX.wbCloseMenus=closeMenus;
 menus.forEach(([b,m])=>{$(b).onclick=e=>{e.stopPropagation();const o=$(m).hidden;closeMenus();closeDD();$(m).hidden=!o;if(o)placeFloat($(m),$(b),$(m).classList.contains('r'));$(b).setAttribute('aria-expanded',String(o))};$(m).addEventListener('click',e=>{if(e.target.closest('button,label')&&!e.target.closest('[data-sure]'))closeMenus()})});
 document.addEventListener('click',e=>{if(!e.target.closest('.menu,.pop'))closeMenus()});
@@ -260,7 +259,7 @@ addEventListener('scroll',e=>{const t=e.target;if(t&&t.closest&&t.closest('.pop,
 // ---- projects dialog
 const closeDlg=()=>{$('plist').hidden=true;$('pls').classList.remove('on')};
 $('pclose').onclick=closeDlg;$('plist').addEventListener('click',e=>{if(e.target===$('plist'))closeDlg()});
-$('pnw2').onclick=()=>{const b=$('pnw2');$('pnw').click();if($('pnw').dataset.sure){const o=b.dataset.o||b.textContent;b.dataset.o=o;b.textContent='Click again to discard changes';setTimeout(()=>{b.textContent=o;delete b.dataset.o},3500)}else if(b.dataset.o){b.textContent=b.dataset.o;delete b.dataset.o}};
+$('pnw2').onclick=()=>{const b=$('pnw2');$('pnw').click();if($('pnw').dataset.sure){const o=b.dataset.o||b.textContent;b.dataset.o=o;b.textContent='Click again: can’t be undone';setTimeout(()=>{b.textContent=o;delete b.dataset.o},3500)}else if(b.dataset.o){b.textContent=b.dataset.o;delete b.dataset.o}};
 $('pgrid').addEventListener('click',e=>{const b=e.target.closest('[data-a="open"]');if(b)setTimeout(()=>{if(b.textContent=='Open')closeDlg()},60)});
 
 // ---- undo / redo (snapshots of the whole project state)
@@ -456,9 +455,9 @@ tipRows();WS.stamp={dock:[],float:[]};WS.pattern={dock:[],float:[]};setView('pat
 
 {const sp=document.getElementById('splash'),t0=performance.now();if(sp){const go=()=>{const w=Math.max(0,520-(performance.now()-t0));setTimeout(()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),320)},w)};const f=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1400))]):Promise.resolve();requestAnimationFrame(()=>requestAnimationFrame(()=>f.then(go)))}}
 {const b=$('gdt');let on=true;try{on=kv.get('wb93_dots')!=='0'}catch(e){}const ap=()=>{document.body.classList.toggle('plain',!on);b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))};ap();b.onclick=()=>{on=!on;try{kv.set('wb93_dots',on?'1':'0')}catch(e){}ap()}}
-clearAll(true);WBS.cp={id:null,name:'',saved:coreStr()};saveCp();$('pnm').value='';paintPst();$('pmsg').textContent='';
-// warn before leaving if there's unsaved work (a fresh blank stamp doesn't count)
-{const blank=coreStr();addEventListener('beforeunload',e=>{if(WBS.cp.id?dirty():coreStr()!==blank){e.preventDefault();e.returnValue=''}})}
+clearAll(true);WBS.cp={id:null,name:'',saved:coreStr()};$('pnm').value='';paintPst();$('pmsg').textContent='';
+// warn before leaving if there's unsaved work (a fresh blank document doesn't count)
+{addEventListener('beforeunload',e=>{if(dirty()){e.preventDefault();e.returnValue=''}})}
 })();
 }
 export {init34};

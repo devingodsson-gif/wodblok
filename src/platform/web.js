@@ -43,6 +43,7 @@ const write = async (name, data, opts = {}) => {
   }
   const a = document.createElement('a'), u = URL.createObjectURL(data); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 4000); return { how: 'downloaded', handle: null };
 };
+const FOLDER_KEY = 'folder:projects';
 const files = {
   canSave,
   canOpen,
@@ -55,6 +56,18 @@ const files = {
       return { file: await h.getFile(), handle: h };
     } catch (e) { if (e && e.name === 'AbortError') return null; throw e; }
   },
+  /** A folder of projects (Chrome, Edge). pickFolder asks once and remembers the handle, so the next launch can list it again (the browser may ask for permission). */
+  canPickFolder: () => typeof /** @type {any} */ (window).showDirectoryPicker === 'function',
+  pickFolder: async () => {
+    try { const h = await /** @type {any} */ (window).showDirectoryPicker({ mode: 'read', id: 'wodblok-projects' }); try { await records.put(FOLDER_KEY, h); } catch (e2) { /* it just will not be remembered for next time */ } return h; }
+    catch (e) { if (e && e.name === 'AbortError') return null; throw e; }
+  },
+  savedFolder: async () => (await records.get(FOLDER_KEY)) || null,
+  forgetFolder: async () => { await records.del(FOLDER_KEY); },
+  /** true when the folder can be read now; asks the person when the browser needs a click first (call from a click). */
+  folderAccess: async h => { try { return (await h.queryPermission({ mode: 'read' })) === 'granted' || (await h.requestPermission({ mode: 'read' })) === 'granted'; } catch (e) { return false; } },
+  /** The project files directly inside the folder (.wodblok and the older .wodblok.json), newest name last. */
+  listFolder: async h => { const out = []; for await (const [n, fh] of /** @type {any} */ (h).entries()) if (fh.kind === 'file' && /\.wodblok(\.json)?$/i.test(n)) out.push({ name: n, handle: fh }); return out.sort((a, b) => a.name.localeCompare(b.name)); },
   /** Files the system opens this app with (the installed app as the .wodblok opener). Calls cb(file, handle) for each. */
   onLaunch: cb => {
     const q = /** @type {any} */ (window).launchQueue;

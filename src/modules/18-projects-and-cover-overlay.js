@@ -1,4 +1,4 @@
-import {kv,use,collection} from '../platform/index.js';
+import {kv} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {C,CC,CH,CM,CSN,CW,PCOL,SHN,bk,fixC,paintColors,saveCC,setDim,shOf} from './04-canvas-and-stamp-outlines.js';
 import {DEF_TILES,clean,cust,mkL,selOne,store} from './06-motif-library-folders.js';
@@ -9,11 +9,9 @@ import {ser} from './14-presets-and-layer-grid-ui.js';
 import {savePr} from './15-print-effects-and-stamp-texture.js';
 import {txClean} from './16-texture-generators.js';
 import {buildTex,migInk,saveTex,texNorm} from './17-texture-panel-and-previews.js';
-import {artLive,artLoad,artSnap,artUsed} from './25-art-layers.js';
-import {clearAll,renderPL} from './33-clear.js';
-// ---- Projects: save / open / duplicate / download / import.
-// The working copy always autosaves in this browser. Named projects are stored in the viewer's
-// private account storage (db, data/users/<id>/projects) when available, otherwise in this browser.
+import {artLoad,artSnap,artUsed} from './25-art-layers.js';
+import {clearAll} from './33-clear.js';
+// ---- Projects: the document, the status line, New project. A project is a .wodblok file (see 33-clear.js); the working copy autosaves in this browser for crash recovery.
 const PDEF={pr:{e:3,q:0,t:'speckle',a:35,sc:100,sd:811},tex:{}};
 // The pattern grid (its own tool in Pattern mode): show/hide, columns across, which points stamps snap to, line strength.
 const PGD={show:false,n:8,m:'l',op:70,sh:'rect'};
@@ -63,28 +61,18 @@ WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,
 WBS.pr={...PDEF.pr,...(d.pr||{})};WBS.tex={...PDEF.tex,...(d.tex||{})};WBS.texLib=txClean(d.texLib);texNorm();if(WBX.wbGrade)WBX.wbGrade.set(d.grade||null);{const c2=d.cover||{};cov={img:okImg(c2.img)?c2.img:'',iw:+c2.iw||0,ih:+c2.ih||0,sc:+c2.sc||100,tx:c2.tx!==false};if(!cov.iw||!cov.ih)cov.img='';const sl=o=>o&&okImg(o.img)&&+o.iw&&+o.ih?{img:o.img,iw:+o.iw,ih:+o.ih,sc:+o.sc||100}:blank();covB=sl(c2.back);covS=sl(c2.spine);WBS.cslot='f';$('cov').checked=c2.on!==false;saveCov();WBS.covKey='';if(WBX.wbBookSync)WBX.wbBookSync()}
 migEdges();migInk();WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));WBS.cur=0;selOne(-1);WBS.selL=WBS.layers.length-1;WBS.symKey='';$('sasp').dataset.custom='';$('casp').dataset.custom='';
 try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
-const saveCp=()=>{try{kv.set('wb18_cur',JSON.stringify(WBS.cp))}catch(e){}};
 // The status line fades after a while so an old message is not mistaken for the result of the last action; progress notes (ending in …) stay until replaced.
 let pmT=0;const pmsg=t=>{if(typeof t=='string'&&/Mac|iPhone|iPad/.test(navigator.platform||''))t=t.replace(/Ctrl\+/g,'Cmd+');$('pmsg').textContent=t;clearTimeout(pmT);if(t&&!/…$/.test(t))pmT=setTimeout(()=>{$('pmsg').textContent=''},12000);return t};
-const dirty=()=>!WBS.cp.id||coreStr()!==WBS.cp.saved||($('pnm').value.trim()||'Untitled pattern')!==WBS.cp.name;
-function paintPst(){const d=dirty(),u=!WBS.cp.id||d,e=$('pst');e.textContent='';e.className=u?'dirty':'';e.title=u?(!WBS.cp.id?'Not saved yet':'Unsaved changes'):'';if(u)e.setAttribute('role','img'),e.setAttribute('aria-label',e.title);else e.removeAttribute('aria-label')}
+const dirty=()=>coreStr()!==WBS.cp.saved||$('pnm').value.trim()!==WBS.cp.name;
+function paintPst(){const u=dirty(),e=$('pst');e.textContent='';e.className=u?'dirty':'';e.title=u?'Unsaved changes':'';if(u)e.setAttribute('role','img'),e.setAttribute('aria-label',e.title);else e.removeAttribute('aria-label')}
 const newId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const shapeInfo=d=>{const k=d.dim&&d.dim.k||'rect',c=d.dim&&d.dim.c||[2,3];return`${d.dim&&CSN[d.dim.cs]&&d.dim.cs!='rect'?CSN[d.dim.cs]:(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2))} canvas · ${({hex:'hex',circle:'circle',diamond:'diamond',tri:'triangle'})[k]||(SHN[k]||'Rectangle').toLowerCase()} stamps · ${d.tiles.length} stamp${d.tiles.length>1?'s':''}`};
-// storage backend
-const ST={kind:null,col:null,ready:null,
-init(){return this.ready||(this.ready=(async()=>{try{const db=await use('db'),u=db&&await use('user'),id=u&&await u.id();if(db&&id){this.col=db.collection('data/users/'+id+'/projects');this.kind='account';return}}catch(e){}this.kind='browser';this.col=await collection('projects','wb18_projects')})())},
-loc(){try{return JSON.parse(kv.get('wb18_projects')||'{}')}catch(e){return{}}},
-locSave(o){kv.set('wb18_projects',JSON.stringify(o))},
-async list(){await this.init();if(this.col){const r=await this.col.get();return r.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.updated||0)-(a.updated||0))}
-const o=this.loc();return Object.entries(o).map(([id,v])=>({id,...v})).sort((a,b)=>(b.updated||0)-(a.updated||0))},
-async get(id){await this.init();if(this.col){const x=await this.col.doc(id).get();return x.exists?{id,...x.data()}:null}const v=this.loc()[id];return v?{id,...v}:null},
-async put(id,rec){await this.init();if(this.col)return this.col.doc(id).set(rec);const o=this.loc();o[id]=rec;this.locSave(o)},
-async del(id){await this.init();if(this.col)return this.col.doc(id).delete();const o=this.loc();delete o[id];this.locSave(o)}};
 function thumb(w0){return new Promise(res=>{try{const img=new Image(),to=setTimeout(()=>res(''),5000);img.onload=()=>{try{const w=w0||200,h=Math.round(w*CH/CW),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);clearTimeout(to);res(c.toDataURL('image/jpeg',.7))}catch(e){res('')}};img.onerror=()=>res('');img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())}catch(e){res('')}})}
-async function saveTo(id,name){const sn=snapshot(),a=await artSnap();if(a)sn.art=a;const rec={name,updated:Date.now(),info:shapeInfo(sn),thumb:await thumb(),data:JSON.stringify(sn)};try{await ST.put(id,rec)}catch(e){if(!a)throw e;delete sn.art;rec.data=JSON.stringify(sn);await ST.put(id,rec);pmsg('Saved, but without a picture for Art: the project was too big to store with it.')}return sn}
+// The project as it is written to a file: the document plus the pictures Art layers use (so another project can take this one as a picture).
+async function fileSnap(){const sn=snapshot(),a=await artSnap();if(a)sn.art=a;return sn}
 // two-tap confirm for actions that would drop unsaved work
 const confirm2=(btn,label,fn)=>{if(!dirty()||btn.dataset.sure){delete btn.dataset.sure;return fn()}btn.dataset.sure='1';const o=btn.textContent;btn.textContent=label;setTimeout(()=>{delete btn.dataset.sure;btn.textContent=o},3500)};
-function openData(d,id,name){applySnap(d);WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;saveCp();paintPst();if(WBX.wbResetHist)WBX.wbResetHist();artLive(true);if(WBX.wbWatch)WBX.wbWatch()}
+function openData(d,id,name){applySnap(d);WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;paintPst();if(WBX.wbResetHist)WBX.wbResetHist();if(WBX.wbWatch)WBX.wbWatch()}
 function init18(){WBS.pgrid={...PGD};
 covB=blank();covS=blank();WBS.cslot='f';
 try{const q=JSON.parse(kv.get('wb40_coverB')||'null');if(q&&typeof q.sc=='number')covB={...covB,...q}}catch(e){}
@@ -99,18 +87,11 @@ $('cvrm').onclick=()=>{setSlotC(WBS.cslot=='f'?{img:'',iw:0,ih:0,sc:100,tx:cov.t
 pz.addEventListener('paste',e=>{const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();e.stopPropagation();pz.innerHTML=PZ;pz.blur();coverFile(it.getAsFile())}else setTimeout(chk,60)});
 const chk=()=>{const im=pz.querySelector('img');if(im&&im.src){const i2=new Image();i2.onload=()=>setCoverImg(i2);i2.src=im.src;pz.innerHTML=PZ;pz.blur()}else if(pz.textContent.trim()&&pz.innerHTML!=PZ){pz.innerHTML='';$('cvmsg').textContent='That was text, not an image.'}};pz.addEventListener('input',()=>setTimeout(chk,30))}
 $('cov').addEventListener('input',()=>{saveCov();renderCover()});
-WBS.cp={id:null,name:'',saved:''};try{const q=JSON.parse(kv.get('wb18_cur')||'null');if(q)WBS.cp={...WBS.cp,...q}}catch(e){}
+WBS.cp={id:null,name:'',saved:''};
 $('pnm').value=WBS.cp.name||'';setInterval(paintPst,800);paintPst();
-ST.init().then(()=>{$('pwhere').textContent=ST.kind=='account'?'Projects are saved privately to your Claude account, so they follow you across devices.':'Projects are saved in this browser only. Use Download to keep a copy you can open anywhere.'});
-$('psv').onclick=async()=>{const name=$('pnm').value.trim()||'Untitled pattern';$('psv').disabled=true;pmsg('Saving…');
-try{const id=WBS.cp.id||newId();await saveTo(id,name);WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;saveCp();pmsg('Saved “'+name+'”.');if(!$('plist').hidden)renderPL()}
-catch(e){pmsg('Could not save: '+((e&&e.message)||'unknown error'))}$('psv').disabled=false;paintPst()};
-$('pcp').onclick=async()=>{const name=($('pnm').value.trim()||'Untitled pattern')+' copy';pmsg('Saving a copy…');
-try{const id=newId();await saveTo(id,name);WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;saveCp();pmsg('Now working on “'+name+'”. The original is unchanged.');if(!$('plist').hidden)renderPL()}
-catch(e){pmsg('Could not save: '+((e&&e.message)||'unknown error'))}paintPst()};
-$('pnw').onclick=()=>{confirm2($('pnw'),'Click again to discard changes',()=>{const t=JSON.parse(DEF_TILES);
-openData({tiles:t,layers:[mkL('Layer 1',t.map(x=>x.id),'check',180)],proj:{...PCOL},dim:{s:[1,1],c:[2,3]},pr:PDEF.pr,tex:PDEF.tex},null,'');clearAll(true);cov={img:'',iw:0,ih:0,sc:100};covB=blank();covS=blank();WBS.cslot='f';saveCov();WBS.covKey='';renderCover();WBS.cp.saved=coreStr();saveCp();paintPst()});
+$('pnw').onclick=()=>{confirm2($('pnw'),'Click again: can’t be undone',()=>{const t=JSON.parse(DEF_TILES);
+openData({tiles:t,layers:[mkL('Layer 1',t.map(x=>x.id),'check',180)],proj:{...PCOL},dim:{s:[1,1],c:[2,3]},pr:PDEF.pr,tex:PDEF.tex},null,'');clearAll(true);cov={img:'',iw:0,ih:0,sc:100};covB=blank();covS=blank();WBS.cslot='f';saveCov();WBS.covKey='';renderCover();WBS.cp.saved=coreStr();paintPst()});
 // first click with unsaved work: the button says so (the File menu stays open, see 34-desktop-shell) and the status bar explains
-if($('pnw').dataset.sure)pmsg('This project has unsaved changes. Click New project again to discard them.')};
+if($('pnw').dataset.sure)pmsg('Starting a new project can’t be undone. Click New project again to discard this one.')};
 }
-export {PGD,ST,thumb,confirm2,coreStr,covOrder,covS,dirty,newId,openData,paintCov,paintPst,pgFix,pmsg,renderCover,saveCp,saveTo,snapshot,init18};
+export {PGD,fileSnap,thumb,confirm2,coreStr,covOrder,covS,dirty,newId,openData,paintCov,paintPst,pgFix,pmsg,renderCover,snapshot,init18};
