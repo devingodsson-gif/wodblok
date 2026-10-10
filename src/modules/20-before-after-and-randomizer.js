@@ -278,15 +278,16 @@ const lr=$('rzlast');if(lr)lr.textContent='Last roll: '+fn;
 ['rzdo'].forEach(id=>{const b=$(id);if(b){b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin')}});pmsg((fresh?'Started a new project with a fresh random piece':'Randomized')+` (featuring ${fn}).`+(FT.lib&&!SLCn?' Your stamp library is empty, so no saved stamps were used.':'')+(fresh?'':' Ctrl+Z brings back the previous piece.'))}
 function init20(){
 wbBA=(()=>{const st=()=>document.querySelector('.stage'),bd=()=>[...st().querySelectorAll(':scope>.board')].filter(b=>!b.hidden&&!b.classList.contains('off')),key=()=>bd().map(b=>b.id).join();
-let ref=null,pics=null,pk='',mode=0,busy=0,sp=.5,ovs=[],tags=[],hd=null,loop=0,dt=0,pk0=0;
+let ref=null,pics=null,pk='',pcore=null,mode=0,busy=0,sp=.5,ovs=[],tags=[],hd=null,loop=0,dt=0,pk0=0;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),paintUI=()=>{if(WBX.wbBAPaint)WBX.wbBAPaint()};
 async function settle(){const t0=performance.now();let lm=t0;const mo=new MutationObserver(()=>{lm=performance.now()});bd().forEach(b=>mo.observe(b,{childList:true,subtree:true,attributes:true}));['grdf','cvdefs','surfd','dyn'].forEach(id=>{const e=$(id);if(e)mo.observe(e,{childList:true,subtree:true,attributes:true})});
  await sleep(80);for(;;){const n=performance.now(),b=raf||BK.busy||BK.q.size||BK.tm||BK.defT||(WBX.wbTxBusy||0)>0;if(!b&&n-lm>=160)break;if(n-t0>9000)break;await sleep(40)}mo.disconnect()}
-async function ensure(){const k=key();if(pics&&pk==k)return true;
- if(!ref){const c=WBX.wbHistGet&&WBX.wbHistGet(0);if(c==null)return false;ref={label:'Start',core:c}}
- busy=1;WBX.wbHoldOn=1;WBX.wbNoCap=1;document.body.classList.add('babusy');const boards=bd(),host=st(),cur=coreStr(),hold=[],same=ref.core===cur;
- try{if(!same){boards.forEach((b,i)=>{const o=wbHold.freezeSn(wbHold.snap(b,'bh'+i+'_'),b,host,0);wbHold.lay(o);hold.push(o)});WBX.wbApply(JSON.parse(ref.core));await settle()}
-  pics=boards.map((b,i)=>wbHold.snap(b,'ba'+i+'_'));pk=k;
+// Until another step or snapshot is chosen in History, the picture compared against is the step before the current one (the Start when there is none).
+const defRef=()=>{const hi=WBX.wbHistIdx?WBX.wbHistIdx():0,i=Math.max(0,hi-1),c=WBX.wbHistGet?WBX.wbHistGet(i):null;return c==null?null:{label:WBX.wbHistLabel?WBX.wbHistLabel(i):'Start',core:c}},cur0=()=>ref||defRef();
+async function ensure(){const k=key(),R=cur0();if(!R)return false;if(pics&&pk==k&&pcore===R.core)return true;
+ busy=1;WBX.wbHoldOn=1;WBX.wbNoCap=1;document.body.classList.add('babusy');const boards=bd(),host=st(),cur=coreStr(),hold=[],same=R.core===cur;
+ try{if(!same){boards.forEach((b,i)=>{const o=wbHold.freezeSn(wbHold.snap(b,'bh'+i+'_'),b,host,0);wbHold.lay(o);hold.push(o)});WBX.wbApply(JSON.parse(R.core));await settle()}
+  pics=boards.map((b,i)=>wbHold.snap(b,'ba'+i+'_'));pk=k;pcore=R.core;
   if(!same){WBX.wbApply(JSON.parse(cur));await settle()}}
  catch(e){pics=null;try{WBX.wbApply(JSON.parse(cur))}catch(_){}}
  finally{hold.forEach(o=>o.el.remove());busy=0;WBX.wbHoldOn=0;WBX.wbNoCap=0;document.body.classList.remove('babusy')}
@@ -295,7 +296,7 @@ function clear(){ovs.forEach(o=>o.el.remove());ovs=[];tags.forEach(t=>t.remove()
 function mk(){clear();const boards=bd(),host=st();
  pics.forEach((sn,i)=>{const b=boards[i];if(!b)return;const o=wbHold.freezeSn(sn,b,host,0);o.el.classList.add('baov');ovs.push(o)});
  const mkT=(l,t,c)=>{const e=document.createElement('div');e.className='baT '+c;const u=document.createElement('u');u.className='ab '+c;u.textContent=l;const sp=document.createElement('span');sp.textContent=t;sp.style.cssText='overflow:hidden;text-overflow:ellipsis';e.append(u,sp);host.appendChild(e);tags.push(e);return e};
- mkT('A',ref?ref.label:'Start','a');if(mode==2){mkT('B','Current','b').classList.add('r');hd=document.createElement('div');hd.className='baH';hd.innerHTML='<i></i>';host.appendChild(hd);
+ mkT('A',(cur0()||{label:'Start'}).label,'a');if(mode==2){mkT('B','Current','b').classList.add('r');hd=document.createElement('div');hd.className='baH';hd.innerHTML='<i></i>';host.appendChild(hd);
   hd.onpointerdown=e=>{e.preventDefault();hd.setPointerCapture(e.pointerId);const mv=ev=>{const r=ovs[0]?ovs[0].src.getBoundingClientRect():null;if(!r)return;sp=Math.max(.02,Math.min(.98,(ev.clientX-r.left)/r.width));sync()},up=()=>{hd.removeEventListener('pointermove',mv);hd.removeEventListener('pointerup',up)};hd.addEventListener('pointermove',mv);hd.addEventListener('pointerup',up)}}
  {const x=document.createElement('button');x.type='button';x.className='baX';x.innerHTML='Exit compare<kbd>Esc</kbd>';x.onclick=()=>off();host.appendChild(x);tags.push(x)}
  sync();loop=requestAnimationFrame(tick)}
@@ -317,7 +318,7 @@ document.addEventListener('keydown',e=>{if(typing(e)||e.metaKey||e.ctrlKey||e.al
  if(e.key=='Escape'&&mode){off();return}
  if(e.key=='\\'||e.key=='|'){e.preventDefault();if(e.repeat||busy)return;const sh=e.key=='|';if(!sh&&mode==1){off();return}pk0=!sh&&pics&&pk==key()?1:0;dt=performance.now();setMode(sh?2:1)}},true);
 document.addEventListener('keyup',e=>{if(e.key=='\\'&&mode==1&&pk0&&performance.now()-dt>380)off()},true);
-return{setRef,reset,clearRef,off,toggle:()=>setMode(1),split:()=>setMode(2),get mode(){return mode},get busy(){return busy},get label(){return ref?ref.label:'Start'},get core(){return ref?ref.core:(WBX.wbHistGet?WBX.wbHistGet(0):null)},get custom(){return !!ref&&ref.label!=='Start'}}})();
+return{setRef,reset,clearRef,off,toggle:()=>setMode(1),split:()=>setMode(2),get mode(){return mode},get busy(){return busy},get label(){const r=cur0();return r?r.label:'Start'},get core(){const r=cur0();return r?r.core:null},get custom(){return !!ref&&ref.label!=='Start'}}})();
 WBX.wbBA=wbBA;
 }
 export {randomize,wbBA,init20};

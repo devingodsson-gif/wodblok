@@ -29,3 +29,18 @@ test('no row control is revealed by :hover alone', async () => {
     expect(css.match(hov) || [], sel + ' has a hover-only reveal').toHaveLength(0);
   }
 });
+
+test('every rule that reveals something on :hover has a keyboard or selected-row twin (no hover-only reveal is left)', async () => {
+  const fs = require('fs'), path = require('path');
+  const html = fs.readFileSync(path.join(__dirname, '..', 'src', 'shell.html'), 'utf8'), css = html.slice(html.indexOf('<style'), html.indexOf('</style>'));
+  const lone = [];
+  for (const m of css.matchAll(/([^{}]*:hover[ >+~][^{]*)\{([^}]*(?:visibility:visible|opacity:1\b|display:block)[^}]*)\}/g)) {
+    for (const part of m[1].split(',').map(s => s.trim().split('\n').pop().trim()).filter(s => /:hover[ >+~]/.test(s))) {
+      const twin = [part.replace(':hover', ':focus-visible'), part.replace(':hover', ':focus-within'), part.replace(':hover', '.on')];
+      const sel = part.replace(/:hover/g, '');
+      const has = twin.some(t => css.includes(t)) || css.includes(sel.replace(/\s.*$/, '') + '.on') || css.includes(':focus-within') && css.includes(sel.split(' ')[0] + ':focus-within');
+      if (!has) lone.push(part);
+    }
+  }
+  expect(lone, 'hover-only reveals: ' + lone.join(' | ')).toEqual([]);
+});

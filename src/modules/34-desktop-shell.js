@@ -285,7 +285,7 @@ function goTo(i){hi=i;applyCore(JSON.parse(hist[hi]));hist[hi]=coreStr();navDirt
 function undo(){cap();if(hi>0){const was=histL[hi];goTo(hi-1);pmsg('Undid: '+was)}ub()}
 function redo(){if(hi<hist.length-1){goTo(hi+1);pmsg('Redid: '+histL[hi])}ub()}
 $('undo').onclick=undo;$('redo').onclick=redo;ub();
-WBX.wbHistGet=i=>hist[i];WBX.wbResetHist=()=>{if(WBX.wbBA)wbBA.reset();hist=[coreStr()];histL=['Start'];histT=[Date.now()];hi=0;ub();if(WBX.wbSnapLoad)WBX.wbSnapLoad()};WBX.wbCap=cap;WBX.wbApply=applyCore;
+WBX.wbHistGet=i=>hist[i];WBX.wbHistIdx=()=>hi;WBX.wbHistLabel=i=>histL[i]||'Change';WBX.wbResetHist=()=>{if(WBX.wbBA)wbBA.reset();hist=[coreStr()];histL=['Start'];histT=[Date.now()];hi=0;ub();if(WBX.wbSnapLoad)WBX.wbSnapLoad()};WBX.wbCap=cap;WBX.wbApply=applyCore;
 // ---- History panel + named snapshots
 (()=>{const sec=document.querySelector('section.pn[data-p="hist"]'),hl=$('hhl'),sl=$('hsl'),XI=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 let snaps=[],sk='',raf=0,ren=-1;
