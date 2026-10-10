@@ -15,7 +15,7 @@ test('the shared tools are the first nine rail buttons, in the same order, in Pa
   const stamp = await labels(page);
   expect(pattern.slice(0, 9)).toEqual(SHARED);
   expect(stamp.slice(0, 9)).toEqual(SHARED);
-  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Arrangement', 'Pattern grid', 'Navigator', 'Variations', 'Export recipes']);
+  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Layout', 'Guides', 'Navigator', 'Variations', 'Export recipes']);
   expect(stamp.slice(9)).toEqual(['Stamp', 'Motifs', 'Text', 'Stamp grid', 'Motif list', 'Pattern preview']);
   expect(errors).toEqual([]);
 });

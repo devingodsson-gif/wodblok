@@ -63,7 +63,7 @@ button,.ddi,.wtab,.lyr,.rail button{transition:background-color .12s,border-colo
 .hr:hover{background:var(--raise)}.hr.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink);font-weight:600}.hr.fut{opacity:.5}
 .hr b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hr i{font-style:normal;color:var(--faint);font-size:10.5px;font-weight:400}
 .hr input{width:100%;height:24px;font:inherit;padding:2px 6px}
-.hr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;visibility:hidden;display:inline-flex;align-items:center;justify-content:center}.hr button svg{width:13px;height:13px}.hr:hover button{visibility:visible}.hr button:hover{background:var(--line);color:var(--fg)}
+.hr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;display:inline-flex;align-items:center;justify-content:center}.hr button svg{width:13px;height:13px}.hr:hover button,.hr.on button,.hr:focus-within button{visibility:visible}.hr button:hover{background:var(--line);color:var(--fg)}
 .hr.sn{grid-template-columns:minmax(0,1fr) auto auto}
 :root{--ca:#3b7ddd;--cb:#d9741a}
 .ab,.hr.ra b::before,.hr.rb b::before{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;margin-right:6px;border-radius:4px;font:700 10px/1 "Hanken Grotesk",system-ui,sans-serif;font-style:normal;text-decoration:none;color:#fff;vertical-align:1px;box-sizing:border-box}
@@ -131,6 +131,7 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
  linear-gradient(180deg,transparent calc(66.667% - .5px),var(--tl) calc(66.667% - .5px),var(--tl) calc(66.667% + .5px),transparent calc(66.667% + .5px))}
 #tpv[aria-pressed=true]{background:var(--raise);color:var(--acc-ink);font-weight:600;box-shadow:0 0 0 1px var(--acc)}
 #tpx{top:52px;left:50%}
+#mqb{position:fixed;display:none;z-index:60;pointer-events:none;border:1px solid var(--acc);background:var(--acc-soft);border-radius:2px}
 #empc{top:calc(50% + 4px);left:50%;height:34px;padding:0 18px 0 14px;font-size:13px}
 #empc::before{content:"+";font-size:19px;font-weight:400;line-height:1;margin-right:-2px}
 /* an empty stamp in the tray shows a plus: click it to start drawing it */
@@ -292,7 +293,7 @@ button.alt{background:var(--raise)}
 #ed.graded>.gw,#ed.graded>#ghost{filter:url(#wbgradeE)}#ed.graded>.gw.gi{filter:url(#wbgradeEI)}#ed.graded>path.edbg{filter:url(#wbgradeEB)}#ed.graded>.edtx:not(.spov):not(.gmh){filter:none}
 .gms{border-bottom:1px solid var(--line);margin:-1px 0 2px}.gms .lyl2{max-height:240px}
 .gmi{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--mut)}.gmi svg{width:16px;height:16px}.lyr.on .gmi{color:var(--acc-ink)}.gmsp{width:22px;flex:none}
-.gmadd{flex:none}.gmadd .ddl{left:auto;right:-58px;width:236px}.gmadd .ddi{align-items:flex-start}.gmadd .ddi .gmi{margin-top:1px}
+.gmadd{flex:none}.gmadd .ddl{left:auto;right:-58px;width:236px}#ly_menu{width:190px;right:-8px}.gmadd .ddi{align-items:flex-start}.gmadd .ddi .gmi{margin-top:1px}
 #gm_body{padding-bottom:6px}#gm_body .lyo .seg{flex:1}#gm_body .seg button{padding:5px 4px}
 .gmc{display:flex;gap:6px;flex:1;min-width:0}.gmc select{flex:1;min-width:0}.gmc .ib{width:30px;height:28px;flex:none}.gmc .ib[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink)}#art.gmpick,#art.gmpick *{cursor:crosshair!important}.gmc input[type=color]{width:30px;height:28px;padding:2px;border:1px solid var(--line);border-radius:6px;background:var(--field);flex:none;cursor:pointer}
 .gmchk{display:flex;flex-wrap:wrap;gap:4px 16px;padding:2px 10px 4px}.gmchk .chk{margin-top:6px}
@@ -317,7 +318,7 @@ button.alt{background:var(--raise)}
 .mlist .mr:hover{background:var(--raise)}.mlist .mr.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink);font-weight:600}
 .mlist .mr svg{width:30px;height:30px;border-radius:4px;border:1px solid var(--line)}
 .mlist .mr b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mlist .mr i{font-style:normal;color:var(--faint);font-weight:400;margin-left:4px}
-.mlist .mr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;visibility:hidden;font-size:14px;line-height:1}.mlist .mr:hover button{visibility:visible}.mlist .mr button:hover{background:var(--line);color:var(--fg)}
+.mlist .mr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;font-size:14px;line-height:1}.mlist .mr:hover button,.mlist .mr.on button,.mlist .mr:focus-within button{visibility:visible}.mlist .mr button:hover{background:var(--line);color:var(--fg)}
 .mlist .em{padding:12px;font-size:11.5px;color:var(--mut);line-height:1.45}
 .mlist{user-select:none;-webkit-user-select:none}
 .mlist .mh{grid-template-columns:14px 30px minmax(0,1fr) 22px;gap:6px;padding-left:2px}
@@ -348,7 +349,7 @@ button.alt{background:var(--raise)}
 .txl .mr{display:grid;grid-template-columns:30px minmax(0,1fr) 22px;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:12px;border:1px solid transparent}
 .txl .mr:hover{background:var(--raise)}.txl .mr.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink);font-weight:600}
 .txl .mr b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.txl .mr i{font-style:normal;color:var(--faint);font-weight:400;margin-left:6px}
-.txl .mr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;visibility:hidden;font-size:15px;line-height:1}.txl .mr:hover button,.txl .mr.on button{visibility:visible}.txl .mr button:hover{background:var(--line);color:var(--fg)}
+.txl .mr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;font-size:15px;line-height:1}.txl .mr:hover button,.txl .mr.on button,.txl .mr:focus-within button{visibility:visible}.txl .mr button:hover{background:var(--line);color:var(--fg)}
 .txl .nb{margin:6px}
 #sel .msc{font-size:11px;font-weight:600;color:var(--acc-ink);background:var(--acc-soft);border-radius:9px;padding:2px 9px;white-space:nowrap}
 .mlist .ft{border-top:1px solid var(--line);padding:6px 12px;font-size:10.5px;color:var(--faint)}
@@ -560,7 +561,7 @@ body.dropping::after{content:"Drop the image to import it";position:fixed;inset:
 .txed{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 8px;border-radius:7px;background:var(--acc-soft);font-size:12px}.txed span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.txed button{margin:0;flex:none}
 #tx_t{width:100%;resize:vertical;font:inherit;font-size:13px;min-height:52px;box-sizing:border-box}
 .txpv{margin-top:10px;border:1px solid var(--line);border-radius:8px;background:var(--field);padding:6px;color:var(--fg)}.txpv svg{display:block;width:100%;max-height:220px}
-.lib>div{position:relative}.lib>div:hover .dx{display:block}.lib>div>button:first-child{width:100%}
+.lib>div{position:relative}.lib>div:hover .dx,.lib>div:focus-within .dx,.lib>div:has(.ck) .dx{display:block}.lib>div>button:first-child{width:100%}
 @media (max-width:860px){.edhint.sphide{visibility:hidden}
 .edhint{white-space:normal;max-width:calc(100% - 24px);text-align:center;border-radius:10px}#sel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 12px;padding:8px 10px}#sel .ctl{grid-template-columns:auto minmax(0,1fr) 46px;gap:6px}#sel .sdiv{display:none}#sel>.row{grid-column:1/-1;justify-content:center;gap:10px}#sel .rzg{grid-column:1/-1}#edhint.edhint{display:none!important}#sel .ib{width:36px;height:36px}.board{min-height:44vh}.modal.modal{padding:8px;align-items:flex-start}.dlg.dlg{width:100%;max-width:100%;max-height:calc(100vh - 16px);min-width:0}.dlg-b{min-width:0}.icmp>*{min-width:0}.icmp{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.ictl{grid-column:1/-1;min-width:0}.ictl .ctl{grid-template-columns:92px minmax(0,1fr) 30px}.ifoot span{display:none}.ifoot{justify-content:flex-end}.pgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.dlg-h{flex-wrap:wrap}}
 /* projects dialog */
@@ -670,8 +671,8 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  <span class="rsep"></span>
  <button id="rail-canvas" data-pn="canvas" aria-label="Canvas"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M7 3v2.5M17 3v2.5M7 18.5V21M17 18.5V21M3 7h2.5M3 17h2.5M18.5 7H21M18.5 17H21"/></svg><span class="tip">Canvas</span></button>
  <button id="rail-lyrs" data-pn="lyrs" aria-label="Layers"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l8.5 4.5-8.5 4.5L3.5 8z"/><path d="M3.5 12l8.5 4.5 8.5-4.5"/><path d="M3.5 16l8.5 4.5 8.5-4.5"/></svg><span class="tip">Layers</span></button>
- <button id="rail-layers" data-pn="layers" aria-label="Arrangement"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span class="tip">Arrangement</span></button>
- <button id="rail-pgrid" data-pn="pgrid" aria-label="Pattern grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="6.5" cy="17.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="17.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="17.5" r="1.4" fill="currentColor" stroke="none"/></svg><span class="tip">Pattern grid</span></button>
+ <button id="rail-layers" data-pn="layers" aria-label="Layout"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span class="tip">Layout</span></button>
+ <button id="rail-pgrid" data-pn="pgrid" aria-label="Guides"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="6.5" cy="17.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="17.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="17.5" r="1.4" fill="currentColor" stroke="none"/></svg><span class="tip">Guides</span></button>
  <button id="rail-nav" data-pn="nav" aria-label="Navigator"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><rect x="7.5" y="8.5" width="6" height="5.5" rx="1"/></svg><span class="tip">Navigator</span></button>
  <button id="rail-vars" data-pn="vars" aria-label="Variations"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="5" height="13" rx="1.2"/><rect x="9.5" y="5.5" width="5" height="13" rx="1.2"/><rect x="15.5" y="5.5" width="5" height="13" rx="1.2"/></svg><span class="tip">Variations</span></button>
  <button id="rail-xrec" data-pn="xrec" aria-label="Export recipes"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 11L12 15.5 16.5 11"/><path d="M4.5 15v3.5a1.5 1.5 0 001.5 1.5h12a1.5 1.5 0 001.5-1.5V15"/></svg><span class="tip">Export recipes</span></button>
@@ -844,6 +845,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
    <div class="sym" id="sym"></div>
    <div id="symn" hidden><label id="snl">Copies</label><input type="range" id="sn" min="2" max="12"></div>
    <div class="hint" id="symh"></div>
+   <label class="chk" id="symtxr" hidden><input type="checkbox" id="symtx"><span>Mirror text with symmetry</span></label>
    <div class="row" id="sbkr" hidden><button class="alt" id="sbk">Make copies separate</button></div>
   </div></details>
  </section>
@@ -913,7 +915,14 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  <section class="pn" data-p="preview" hidden><div class="pvbar"><span>Live pattern</span><button type="button" class="pvc" id="pvc" aria-pressed="false" title="Show the book cover text block in the preview">Cover</button><div class="seg pvz" id="pvz"><button type="button" data-z="1" class="on">Fit</button><button type="button" data-z="2">2&#215;</button><button type="button" data-z="4">4&#215;</button></div></div><div class="pvbox"><svg id="pvw" viewBox="0 0 533 800" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><use href="#dyn"/><use href="#texg"/><use href="#covg" id="pvcu" visibility="hidden"/></svg></div></section>
  <section class="pn" data-p="mlist" hidden><div class="mlist" id="mlist" aria-label="Motifs on this stamp"></div></section>
 <section class="pn" data-p="lyrs" hidden><div class="lys" id="lys">
- <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><button type="button" class="ib" id="ly_add" title="New layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button></div>
+ <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><div class="dd gmadd"><button type="button" class="ib" id="ly_add" title="New layer" aria-label="New layer" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <div class="ddl" id="ly_menu" data-w="190" hidden>
+   <div class="ddi" data-lt="p"><span>Repeat pattern</span></div>
+   <div class="ddi" data-lt="f"><span>Frame</span></div>
+   <div class="ddi" data-lt="x"><span>Free place</span></div>
+   <div class="ddi" data-lt="a"><span>Pictures</span></div>
+   <div class="ddi" data-lt="t"><span>Text</span></div>
+  </div></div></div>
  <div id="lybody">
   <div class="lyo"><span class="lyk">Blend</span><select id="ly_bl" title="Blend mode"><option value="">Normal</option><option value="multiply">Multiply (overprint)</option><option value="darken">Darken</option><option value="screen">Screen</option><option value="lighten">Lighten</option><option value="overlay">Overlay</option><option value="soft-light">Soft light</option><option value="behind">Behind (fills gaps only)</option><option value="cancel">Cancel out (overlap prints nothing)</option><option value="replace">Replace (overlap prints a colour)</option></select></div>
   <div class="lyop"><label>Opacity</label><input type="range" id="ly_op" min="0" max="100" value="100" data-u="%" data-def="100"></div>
@@ -925,7 +934,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  </div>
 </div></section>
  <section class="pn" data-p="pgrid" hidden>
-  <details class="g" open><summary>Pattern grid</summary><div class="gb">
+  <details class="g" open><summary>Guides</summary><div class="gb">
    <label class="chk" style="margin-top:2px"><input type="checkbox" id="pgs"><span>Show grid</span></label>
    <label>Shape</label><div class="shg" id="pgsh"><button type="button" data-sh="rect" title="Square"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/></svg><span>Square</span></button><button type="button" data-sh="hex" title="Hexagon"><svg viewBox="0 0 24 24"><path d="M12 3.5l7.4 4.25v8.5L12 20.5l-7.4-4.25v-8.5z"/></svg><span>Hexagon</span></button><button type="button" data-sh="tri" title="Triangle"><svg viewBox="0 0 24 24"><path d="M12 4l8 14H4z"/></svg><span>Triangle</span></button><button type="button" data-sh="diamond" title="Diamond"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 8.5-6.5 8.5L5.5 12z"/></svg><span>Diamond</span></button></div>
    <label>Columns across</label><input type="range" id="pgz" min="2" max="60" value="8" data-def="8">
@@ -953,7 +962,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
   <details class="g" open id="lstbox"><summary>Stamps in the pattern</summary><div class="gb">
    <div class="strip ls" id="lst"></div>
   </div></details>
-  <details class="g" open><summary>Layout</summary><div class="gb">
+  <details class="g" open><summary>Layer type <span class="aux" id="lytn"></span></summary><div class="gb">
    <div class="seg" id="lmode" style="grid-template-columns:repeat(5,auto);margin-bottom:4px"><button type="button" data-m="p" class="on" title="Stamps repeat across the canvas in a pattern">Repeat</button><button type="button" data-m="f" title="A strip stamp walked round the edges">Frame</button><button type="button" data-m="x" title="Place stamps anywhere by hand">Free place</button><button type="button" data-m="a" title="Place imported images or saved WODBLOK projects anywhere by hand">Art</button><button type="button" data-m="t" title="Place text boxes anywhere by hand">Text</button></div>
    <div id="lfree" hidden>
     <div class="hint" id="lfph" style="margin-top:6px"></div>
@@ -979,7 +988,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
      <label>Rotate letters</label><input type="range" id="tb_rot" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
      <label>Ink</label><div class="sw"><i id="tb_inkc"></i><select id="tb_ink"></select></div>
      <label>Textures</label><div class="txs" id="tb_tex"></div>
-     <div class="row"><button class="primary" id="tb_go" aria-pressed="false">Stamp text</button></div>
+     <div class="row"><button class="primary" id="tb_go" aria-pressed="false">Add text</button></div>
     </div>
     <div id="lfgrid">
      <label class="chk"><input type="checkbox" id="lfgn"><span>Snap to grid <em class="fgk">(hold Alt to skip)</em></span></label>

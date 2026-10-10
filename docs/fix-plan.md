@@ -130,6 +130,22 @@ The Step 0 questions were not answered, so my suggested defaults were used, exce
 
 Risk: about 60% (selection and drawing). Perf required.
 
+### 1.0.3 outcome (what was actually done)
+
+Defaults were used for Q11 (the "+" asks for the layer type) and Q15 (text stays readable under symmetry, mirroring optional).
+
+| # | Result | Notes |
+|---|---|---|
+| D1 | Done | Layers "+" opens a type menu; the list shows each layer's type; the Layout section says "Layer type" and names the layer. |
+| C18 | Done | Arrangement is "Layout", Pattern grid is "Guides" (rail, tab, command search). Guides is pattern-wide, so it gets no layer name. |
+| D5 (rest) | Done | The button reads "Add text". Typing already edited the selected box; a test now pins it. |
+| D6 | Done | Text stays out of symmetry unless "Mirror text with symmetry" is ticked (stored as `sym.tx`). Old files show their letters once, not mirrored. |
+| D7 | Done | Drag a box on empty block space to select; Shift adds. |
+| C7 | Part | Drag from the library onto the stamp works; click-to-stamp unchanged; selection is accent coloured. **Not done:** corner and rotate handles. |
+| D16 + C14 | Part | History, Motif list and texture row buttons are always visible (hidden buttons could not take keyboard focus). **Not done:** the "⋯" row menu and the two-colour "Stamp colours" swatch. |
+
+Perf ratio 0.818. Full suite (Chromium): 164 passed, 0 failed, 5 skipped. No snapshots or goldens changed.
+
 ## 1.0.4: Saving you can trust (needs Q5, Q12; highest risk, platform code)
 
 | # | Fix | Where | Test / check |

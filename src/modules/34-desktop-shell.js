@@ -21,13 +21,13 @@ import {clearAll} from './33-clear.js';
 
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
-const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Motifs',layers:'Arrangement',cover:'Book cover'};
+const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Motifs',layers:'Layout',cover:'Book cover'};
 let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Pattern preview',grid:'Stamp grid',layers:'Arrangement',pgrid:'Pattern grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
+const PNAME={vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Pattern preview',grid:'Stamp grid',layers:'Layout',pgrid:'Guides',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
 const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib','nav','wspc','xrec','pres','vars'],stamp:['wspc','pres','motifs','text','mlist','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
