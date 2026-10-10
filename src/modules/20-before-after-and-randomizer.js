@@ -292,8 +292,10 @@ function mk(){clear();const boards=bd(),host=st();
  sync();loop=requestAnimationFrame(tick)}
 function sync(){ovs.forEach(o=>{wbHold.lay(o);const a=o.src,c=o.el.lastElementChild;if(c){c.scrollLeft=a.scrollLeft;c.scrollTop=a.scrollTop}o.el.style.clipPath=mode==2?`inset(0 ${((1-sp)*100).toFixed(2)}% 0 0)`:'none';o.el.style.pointerEvents=mode==2?'none':'auto'});
  const o=ovs[0];if(!o)return;const b=o.src,L=b.offsetLeft,T=b.offsetTop,W=b.offsetWidth,H=b.offsetHeight;
- if(tags[0]){tags[0].style.left=(L+10)+'px';tags[0].style.top=(T+10)+'px'}if(tags[1]){tags[1].style.left=(L+W-10)+'px';tags[1].style.top=(T+10)+'px'}
- if(tags[2]){tags[2].style.left=(L+W/2)+'px';tags[2].style.top=(T+10)+'px'}if(hd){hd.style.left=(L+W*sp)+'px';hd.style.top=T+'px';hd.style.height=H+'px'}}
+ // tags are placed by role, not by position in the list: in Before there is no B label, so the Exit pill used to land on B's spot at the right edge and was cut off
+ const tA=tags[0],tB=tags.find(t=>t.classList.contains('r')),tX=tags.find(t=>t.classList.contains('baX'));
+ if(tA){tA.style.left=(L+10)+'px';tA.style.top=(T+10)+'px'}if(tB){tB.style.left=(L+W-10)+'px';tB.style.top=(T+10)+'px'}
+ if(tX){tX.style.left=(L+W/2)+'px';tX.style.top=(T+10)+'px'}if(hd){hd.style.left=(L+W*sp)+'px';hd.style.top=T+'px';hd.style.height=H+'px'}}
 function tick(){loop=0;if(!mode)return;if(key()!=pk||wbHold.on){off();return}sync();loop=requestAnimationFrame(tick)}
 function off(){if(!mode&&!ovs.length)return;mode=0;clear();paintUI()}
 async function setMode(m){if(busy||wbHold.on)return;if(m==mode){off();return}
