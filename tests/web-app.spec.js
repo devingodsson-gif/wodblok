@@ -87,3 +87,8 @@ test('the web manifest is installable and every file it names exists', async ({ 
   expect(html).toContain('<link rel="manifest" href="manifest.webmanifest">');
   expect(fs.readFileSync(path.join(ROOT, 'dist', 'wodblok.html'), 'utf8')).not.toContain('manifest.webmanifest');   // the single file stays plain
 });
+
+test('favicon.ico is shipped and kept for offline use, so browsers that ask for it do not get a 404 (UX review P6)', async () => {
+  expect(fs.existsSync(path.join(OUT, 'a', 'favicon.ico'))).toBe(true);
+  expect(fs.readFileSync(path.join(OUT, 'a', 'sw.js'), 'utf8')).toContain("'favicon.ico'");
+});
