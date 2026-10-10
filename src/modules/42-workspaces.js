@@ -49,7 +49,8 @@ function init42(){
   list.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.classList&&e.target.classList.contains('wxr')){e.preventDefault();e.target.click()}});
   $('wxsave').onclick=()=>{
     const a=wxLoad();let name=inp.value.trim().slice(0,40);if(!name)name='Workspace '+(a.length+1);
-    const layout=WBX.wbWsGet(),same=a.find(w=>w.name.toLowerCase()==name.toLowerCase());
+    const layout=WBX.wbWsGet();['pattern','stamp'].forEach(m=>{const L=layout[m];if(!L)return;['dock','float'].forEach(k=>{L[k]=(L[k]||[]).map(g=>({...g,tabs:g.tabs.filter(t=>t!='wspc')})).filter(g=>g.tabs.length);L[k].forEach(g=>{if(!g.tabs.includes(g.a))g.a=g.tabs[0]})})});   // the list you are choosing from is not part of a workspace
+    const same=a.find(w=>w.name.toLowerCase()==name.toLowerCase());
     if(same)same.layout=layout;else a.push({id:newId(),name,layout});
     wxStore(a);inp.value='';paint();pmsg((same?'Updated workspace “':'Saved workspace “')+(same?same.name:name)+'”.');
   };

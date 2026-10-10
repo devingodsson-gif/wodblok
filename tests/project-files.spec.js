@@ -78,7 +78,7 @@ test('a library stamp can be saved as its own file and imported into another bro
   await expect(p2.locator('#slgrid .slc')).toHaveCount(1);
   await expect(p2.locator('#slgrid .slc b')).toHaveText('Test stamp');
   await p2.setInputFiles('#slimpf', tmp('bad.wodblok-stamp', 'nope')); await settle(p2);
-  await expect(p2.locator('#slmsg')).toContainText('not a WODBLOK stamp');
+  await expect(p2.locator('#pmsg')).toContainText('not a WODBLOK stamp');       // stamp library messages show in the status line since 1.0.16
   expect(a.errors.concat(b.errors)).toEqual([]);
   await c1.close(); await c2.close();
 });

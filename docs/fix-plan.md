@@ -171,6 +171,14 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.17: Layout (D12, P3, P4, part of P2)
+
+- **D12:** applying a workspace sets exactly that arrangement and the Workspaces tool closes with the rest (it used to stay open as an extra group). A saved workspace no longer remembers the Workspaces tool, so applying one never reopens the list. The starting workspaces have at most two groups (a test checks it).
+- **P2 (part):** a panel floated out of the dock lands below the zoom controls, not on them. **Not done:** opening a second tool as a stacked group instead of a tab. Stacking squeezes every panel (the very problem D12 was about) and many tests and habits rely on tabs; say if you still want it.
+- **P3:** the book cover guide labels (BACK, FRONT, SPINE, BARCODE) sit on small solid white chips with a magenta outline. They were not moved outside the bleed: the bleed is only 0.125 in, too thin for a label.
+- **P4:** the stamp tray has a small arrow button that collapses it to a thin strip (about 32 px instead of 79 px); the choice is remembered. The floating motif bar follows the tray's height.
+- Files: `shell.html`, `18-…` (cover guides), `34-desktop-shell.js`, `42-workspaces.js`. Tests: `layout-1017.spec.js`; `workspaces.spec.js` reads the new behaviour.
+
 ## 1.0.16: Easy wins (C9, C16, C20, D15; D18 and C6 already covered)
 
 - **C9:** the colour slots are Paper, Ink, Accent and Accent 2 (the print proof already said Paper and Ink; its 3rd and 4th colour are now Accent and Accent 2), also in "Clicking a colour sets". The Add colour tile is first in the library. The hex field and the colour picker (with Chromium's eyedropper) are in the Add colour form, as before; a per-slot hex field in each dropdown was not built.
