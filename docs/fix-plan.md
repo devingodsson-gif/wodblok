@@ -171,6 +171,12 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.19: Text and panels (UX review 2: N2, N4 label, N7)
+
+- Randomize no longer prints the "Last roll: …" paragraph (the status line already says what the roll did). Import artwork's labels lose their "1." / "2." numbers. History's "+" is a labelled **Save snapshot** button. Canvas shape names ("Rectangle") fit their buttons.
+- Left as they are, on purpose: "Clicking a colour sets" is a control label (it names a dropdown), not explanation. **N3** (two groups of export buttons) is not merged: the fixed-size PNG / SVG buttons are one-click and are used by commands and the perf test; "Export now" with the format tabs is the sized version. Needs a decision before removing either.
+- Tests: `tests/panels-1019.spec.js`.
+
 ## 1.0.18: Textures library and "Paper shows through" (D13, D4)
 
 - **D13:** the Textures tool is now only the library: create, rename, edit, duplicate, delete. The "Apply to" block is gone; a texture is applied where you work (Canvas, Layers, Stamp and Text panels, "Add texture", which already lists the library). Nothing in files changes; old files open.
