@@ -100,7 +100,7 @@ for (const seed of [7, 12, 21]) {
     const { errors } = await openApp(page, { seed });
     await tile(page);
     await openPanel(page, 'rand');
-    for (const k of ['layout', 'size', 'look']) await page.evaluate(k => { const c = document.querySelector(`[data-ft="${k}"]`); if (!c.checked) { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); } }, k);
+    for (const k of ['layout', 'size', 'look']) await page.evaluate(k => { const c = document.querySelector(`[data-ft="${k}"]`); if (c.type === 'range') { c.value = 100; c.dispatchEvent(new Event('input', { bubbles: true })); } else if (!c.checked) { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); } }, k);
     await roll(page);
     const p = await periodic(page);
     expect(p.half, 'the piece has something in it').toBeGreaterThan(1);
