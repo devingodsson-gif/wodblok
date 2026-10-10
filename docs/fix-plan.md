@@ -171,6 +171,10 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.13: No text under 11 px (rest of C13)
+
+All text that was 8 to 10.5 px (29 rules: small labels, units, captions, group headings, hints, the version badge) is now 11 px. A test opens every tool panel in both views and fails on any visible text under 11 px (it fails on 1.0.12). Layouts were checked by eye on the Canvas, Layout and Randomize panels; the pixel goldens that include affected text change. Files: `shell.html`. Tests: `text-size.spec.js`.
+
 ## 1.0.12: Three small ones (C15 rest, C14 swatch, C19 recovery)
 
 - **Empty band (C15):** the Stamp editor no longer keeps a blank band for the motif bar. The bar floats over the bottom of the editor, above the stamp tray, only while a motif is selected, so the editor is about 80 px taller. The pixel golden for the Stamp editor view changes.
