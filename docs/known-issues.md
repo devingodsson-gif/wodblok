@@ -25,3 +25,12 @@ One full-suite run gave a different hash for `canvas shape: arch` (same length a
 
 ## Test flake: "open project-1-diamond" (state or SVG snapshot, seen once, v0.115.1 run)
 Failed once in a run of the scenarios, round-trip and repeat-tile specs; passed alone, and 5 of 5 repeats straight afterwards. Same family as the hex, arch and project-3 flakes above (something drawn after the settle check). Snapshot not touched.
+
+## Seen once, not reproduced: stamps vanish after a canvas shape change (UX review, 1.0)
+After switching the canvas shape to Arch on a rolled piece, the stamps were missing from the canvas (the 4 stamps were still in the tray) until the next edit. Two later attempts, including the same steps, did not reproduce it. Same family as the flakes above (something drawn after a settle point). 1.0.1 adds a progress bar after shape changes, which should make a late draw visible.
+
+## Switching a layer between Free place, Art and Text clears its placed items
+Found by reading `23-frame-layers.js` (`if(was&&was!=m)L.pl=[]`), not by a test. Undo should bring them back. Not fixed.
+
+## Text layer Ink dropdown looked blank once (UX review D5)
+Could not be reproduced in later runs; no change made.

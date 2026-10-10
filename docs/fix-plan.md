@@ -36,14 +36,14 @@ Each question is from the review's section 5. Steps that need an answer say so; 
 
 ---
 
-## 1.0.1: Bugs and dead ends (no decisions needed)
+## 1.0.1: Bugs and dead ends (no decisions needed) — DONE, see the outcome table below
 
 Small fixes that remove "it looks broken" moments.
 
 | # | Fix | Where | Test / check |
 |---|---|---|---|
 | B1 | New stamp works: define what the `is:` field should hold (or drop it). | `13-preview-and-stamp-tool.js` (`$('addT').onclick`) | Click `#addT`; stamp count +1; no page error. |
-| B3 | File > New project: drop the "click again" confirm and rely on Undo. Status reads "Started a new project. Ctrl/Cmd+Z brings back the last one." | `18-projects-and-cover-overlay.js` (`confirm2` on `pnw`) | New with unsaved work → new project in one click; Undo restores. |
+| B3 | File > New project: make the confirm visible (see the outcome table; the first plan, "drop it and rely on Undo", was wrong). | `18-projects-and-cover-overlay.js` (`confirm2` on `pnw`) | New with unsaved work → new project in one click; Undo restores. |
 | D2 | Free place starts with the current stamp picked. A faint copy follows the pointer. The picked tile stays picked when clicked again. | `24-free-place-layers.js`, `shell.html` (`#lfpst`) | Open Free place, click the canvas → one stamp placed. |
 | D3 | Wording in Art and Text modes ("Pictures you place…", "Text you place…"). The Size slider follows the selected item. | `25-art-layers.js`, `26-text-boxes.js` | Text check, plus a state test for the slider value. |
 | D5 (part) | The Text-layer Ink control shows its value ("Stamp colours"), not blank. | `26-text-boxes.js` | Screenshot check. |
@@ -58,6 +58,27 @@ Small fixes that remove "it looks broken" moments.
 | P6 | Add `favicon.ico` to the web build. | `src/web/`, `tools/build.js` | No 404 in console. |
 
 Risk for the full-suite question: about 30% (shared shell and history messages).
+
+### 1.0.1 outcome (what was actually done)
+
+| # | Result | Notes |
+|---|---|---|
+| B1 | Done | New stamp starts like the launch stamp. Test fails without the fix. |
+| B3 | **Done differently** | The plan said "rely on Undo", but New project resets History, so Undo cannot bring the project back. The confirm stays and is now visible: the File menu stays open showing "Click again to discard changes", the status bar explains, and the Projects dialog's New button gets the same cue. |
+| D2 | Done | Free place opens with the current stamp picked. Clicking the picked tile still toggles it off (Esc also stops placing). |
+| D3 | Part | The explanatory empty-state sentence is gone. The "Size 10% vs 40%" part was not a fault (two settings). |
+| D5 (part) | Not done | The blank Ink dropdown could not be reproduced. |
+| D17 + C19 (part) | Done | Undo/Redo say "Undid: …" / "Redid: …". Status messages fade after 12 s; progress notes ending in "…" stay. |
+| C3 (part) | Done | The pill no longer gets cut off in Before. Before already showed as pressed. |
+| C5 | Part | A thin progress bar runs over the stage while stamps print after opening a file or changing the canvas shape. Not done: delaying the "Opened…" message until drawing ends. |
+| C12 | Done | Ctrl/Cmd + = − 0 zoom the canvas (1 is left to the browser, which keeps Ctrl+1 for tabs). Cmd shows on a Mac in titles, panel text and status messages. |
+| C13 | Done (most) | Strong slider and number-field focus rings; faint text now 4.5:1 or better on the panel in both themes; slider rows 24 px; shape labels 10.5 px. **Not done:** other text at 9–10.5 px (moved to 1.0.7). In the light theme faint text is now close to the normal grey; the contrast gain costs some hierarchy. |
+| C15 (part) | **Not done** | Before/Split work in the Stamp editor, so they stay. Zoom in the Stamp editor is a feature; moved to 1.0.7. |
+| D8 | Done | Send to back added. |
+| D11 | Done | Edge lines, pressed button, "Exit 3 × 3 preview · Esc" pill, and Esc exits. |
+| P6 | Done | `favicon.ico` shipped and precached. |
+
+Also added to **1.0.4**: starting a new project resets History, so it cannot be undone. Decide whether New project should be a history step (undoable) once Save writes real files.
 
 ## 1.0.2: The first minute (needs Q2, Q3, Q4, Q7, Q8, Q9)
 
@@ -97,6 +118,7 @@ Risk: about 60% (selection and drawing). Perf required.
 |---|---|---|---|
 | C1 | **Save** writes the real file in Chrome and Edge (the handle code already exists) and keeps a browser copy. In Safari and Firefox it is called **Download**. Menu renamed ("Save as file…", "Save to this browser" under Projects only). Tab title shows the name and "•" when unsaved. No unsaved dot on an untouched new document. | `src/platform/web.js`, `39-web-app.js`, `18-projects-…`, `33-clear.js`, `shell.html` | Round-trip and recovery tests. Launch test for no dot. Old v18 files open and are never overwritten. |
 | D9 | Save a copy keeps you on the original (or is renamed "Duplicate and open", per Q12). | `18-projects-…` | State test. |
+| N1 (new, from 1.0.1) | Starting a new project resets History, so it cannot be undone, and a blank untouched document already counts as unsaved. Decide whether New project becomes an undoable history step, and stop counting a pristine document as unsaved. | `33-clear.js`, `34-desktop-shell.js` (`wbResetHist`), `18-projects-…` (`dirty()`) | New → Undo restores the previous project. A fresh launch shows no unsaved dot. |
 | C19 (restore) + P5 | "Restore unsaved work / Dismiss" also shown in the empty canvas area after a crash. The Projects footer text moves into the Save flow. | `38-crash-recovery.js`, `shell.html` | Recovery test. |
 
 Risk: 60–90% (saving, opening, `src/platform`). Run the full suite before merging.

@@ -6,6 +6,15 @@ Note: at review time `main` was still at v104 (`7b924df`) and 1.0.0 existed only
 **How:** I built the web app (`npm run build:web`), served `dist/web/` on localhost, and drove it with Playwright on Chromium 141 (headless, 1440×900 unless stated). I walked each task as a first-time user. Screenshots are in [`docs/ux-review/`](ux-review/) and named in the tables.
 Window sizes tested: 1920×1080, 1440×900, 1440×600, 1366×768, 1280×720, 1280×640, 1024×700 and 820×700. Both themes were tested, as was a Mac user agent.
 
+**Errata (found while fixing, 1.0.1).** Wrong or unproven claims in the review above, corrected here and left in place so the record stays honest:
+- **B3 / New project and Undo.** The review said Undo already restores the old project after File > New project, so the confirm could be dropped. That is false: starting a new project resets History (`wbResetHist`), and Undo is greyed out afterwards. My earlier test counted the wrong thing. The confirm stays; 1.0.1 made it visible instead. A blank, untouched document also counts as "unsaved", so New asks even then (that belongs to C1, release 1.0.4).
+- **C3 / Before has no pressed state.** Wrong: Before and Split both show as pressed (checked by a test in 1.0.1). The real fault was the cut-off Exit compare pill.
+- **C13 / no focus ring on sliders.** Partly wrong: a ring existed, but at 16% opacity, effectively invisible. Number fields had only a 1 px border change. Both are now clear.
+- **C15 / hide Before and Split in the Stamp editor.** Not done: they work there (tested). Zoom in the Stamp editor does not exist yet; it is a feature, not a quick fix, and moves to 1.0.7.
+- **D5 / the Ink dropdown blank in Text mode.** Could not be reproduced outside the original run, so nothing was changed.
+- **D3 / the Size slider "10%" against "40%".** Two different settings (the text style's size and the placed item's scale), not a fault; at most a naming question.
+- **Found, not in the review:** switching a layer between Free place, Art and Text clears the placed items (undoable). Logged in `docs/known-issues.md`.
+
 **What I could not test (plainly):**
 - **WebKit/Safari.** No WebKit browser is installed here, and I was told not to run `playwright install`. Every finding below is Chromium only.
 - **The native Save and Open dialogs (Chrome's file pickers).** Headless Chromium can't show them. I tested the Safari/Firefox path instead (download, then the file picker) by hiding those APIs.
@@ -45,7 +54,7 @@ Window sizes tested: 1920×1080, 1440×900, 1440×600, 1366×768, 1280×720, 128
 **What is good, and should be protected:**
 - **Randomize** produces a complete, attractive piece in one click. It holds the old picture until the new one is ready, with a progress bar.
 - **The motif and import flows** are solid once found. The flow from motif to stamp to pattern ([07](ux-review/07-first-pattern.png)) works. The Import artwork dialog (original beside the traced result, plain sliders, "2 shapes, 447 points, 9 KB") is the clearest screen in the app ([31](ux-review/31-import-artwork.png)).
-- **History** behaves like Photoshop's: jumping to a row keeps the redo steps. Undo brings back the project after New project and a deleted stamp (both tested); Clear canvas promises the same.
+- **History** behaves like Photoshop's: jumping to a row keeps the redo steps. Undo brings back a deleted stamp. (Corrected in 1.0.1: it does **not** bring back a project after File > New project, which resets History; see the errata.)
 - **Crash recovery works.** After a simulated crash, the relaunch offered "Restore unsaved work", and the restore was exact ([24](ux-review/24-recovery-offer.png)).
 - **A damaged file** gives a plain sentence: "That file looks damaged: it could not be unpacked." ([27](ux-review/27-damaged-file-message.png))
 - **Old v18 files open.**
@@ -155,7 +164,7 @@ Severity: **B** = blocks a task, **C** = confuses, **P** = polish. Everything he
 | Click-to-stamp motif placement ("loaded brush") | Click a motif, click the block repeatedly, Esc to stop | Drag and drop | **Keep, and add drag** (C7). Click-to-stamp suits repeated placement well. |
 | Randomize holds the old picture until the new one is ready | Overlay with a progress bar | Usually a spinner | **Keep.** It's good. Hold the tray too (C8). |
 | A/B compare inside History, plus Before/Split, plus Grade hold-to-compare | Three systems | Lightroom: one Before/After (`\`, Y) | **Change**: one compare, with A defaulting to the previous step (C3). |
-| Confirm by "click again" on the same item | Used on File > New project | A dialog, or no confirm plus Undo | **Change**: rely on Undo (B3). It already works. |
+| Confirm by "click again" on the same item | Used on File > New project | A dialog, or no confirm plus Undo | **Keep, but make it visible** (B3, fixed in 1.0.1). New project resets History, so Undo cannot rescue it and the guard must stay. |
 | Save = browser storage; the file is a separate "Download" | Two concepts | Save = file (Photoshop, Figma desktop); autosave to the cloud (Figma web) | **Change** (C1). The plan already says files are the truth. |
 | Panels dock to four edges, float, tab, workspaces | Pro-grade window manager | Photoshop | **Keep.** Nothing opens at launch, so newcomers don't pay for it. Change only the default open behaviour (P2). |
 | Stamp tray (filmstrip) along the bottom | Always visible | Lightroom filmstrip | **Keep.** Make it collapsible (P4). |

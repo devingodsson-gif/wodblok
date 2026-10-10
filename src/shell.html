@@ -70,7 +70,7 @@ button,.ddi,.wtab,.lyr,.rail button{transition:background-color .12s,border-colo
 .ab.a,.hr.ra b::before{background:var(--ca);content:"A"}.ab.b,.hr.rb b::before{background:var(--cb);content:"B"}.hr.ra.rb b::before{content:"A=B";background:linear-gradient(90deg,var(--ca) 50%,var(--cb) 50%)}
 .hr.ra{box-shadow:inset 3px 0 0 var(--ca)}.hr.rb{box-shadow:inset 3px 0 0 var(--cb)}.hr.ra.rb{box-shadow:inset 3px 0 0 var(--ca),inset 6px 0 0 var(--cb)}
 .baT{display:inline-flex;align-items:center;max-width:46%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.baT .ab{flex:none;margin-right:6px}.baT.a{border-color:var(--ca)}.baT.b{border-color:var(--cb)}
-.baX{position:absolute;z-index:44;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 8px 0 14px;border-radius:15px;border:0;background:var(--acc);color:var(--acc-fg);font-weight:600;font-size:12px;box-shadow:var(--shadow);cursor:pointer}.baX:hover{filter:brightness(1.08)}.baX kbd{font:600 10px "Hanken Grotesk",system-ui,sans-serif;padding:2px 6px;border-radius:9px;background:rgba(0,0,0,.18);color:inherit}
+.baX,#tpx{position:absolute;z-index:44;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 8px 0 14px;border-radius:15px;border:0;background:var(--acc);color:var(--acc-fg);font-weight:600;font-size:12px;box-shadow:var(--shadow);cursor:pointer}.baX:hover,#tpx:hover{filter:brightness(1.08)}.baX kbd,#tpx kbd{font:600 10px "Hanken Grotesk",system-ui,sans-serif;padding:2px 6px;border-radius:9px;background:rgba(0,0,0,.18);color:inherit}
 .babusy .dock,.babusy .film,.babusy .rail{opacity:.55;pointer-events:none}.dock,.film,.rail{transition:opacity .12s}
 .baT{position:absolute;z-index:42;font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px;background:var(--panel);border:1px solid var(--line2);color:var(--fg);pointer-events:none;box-shadow:var(--shadow)}.baT.r{transform:translateX(-100%)}
 .baH{position:absolute;z-index:43;width:20px;margin-left:-10px;cursor:ew-resize;touch-action:none}.baH::before{content:"";position:absolute;left:9px;top:0;bottom:0;width:2px;background:var(--acc);box-shadow:0 0 0 1px rgba(0,0,0,.25)}.baH i{position:absolute;left:1px;top:50%;width:18px;height:28px;margin-top:-14px;border-radius:9px;background:var(--acc);box-shadow:0 1px 4px rgba(0,0,0,.4)}
@@ -674,7 +674,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
 </nav>
 
 <main class="stage">
- <button type="button" class="baX" id="tpx" hidden>Exit 3 × 3 preview<kbd>Esc</kbd></button>
+ <button type="button" id="tpx" hidden>Exit 3 × 3 preview<kbd>Esc</kbd></button>
  <div id="tbar" role="toolbar" aria-label="Task bar" hidden></div>
  <div class="viewbar">
   <div class="seg2" role="tablist"><button data-v="pattern" role="tab">Pattern</button><button data-v="stamp" role="tab">Stamp editor</button></div>

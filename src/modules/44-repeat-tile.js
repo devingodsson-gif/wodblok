@@ -31,7 +31,7 @@ function init44(){
   };
   // the 3 x 3 view cannot be edited: the pill and Esc both go back to editing
   $('tpx').onclick=()=>$('tpv').click();
-  document.addEventListener('keydown',e=>{if(e.key!='Escape'||!WBS.tilePv||document.querySelector('.baX:not(#tpx)')||(e.target.matches&&e.target.matches('input,select,textarea')))return;e.preventDefault();$('tpv').click()});
+  document.addEventListener('keydown',e=>{if(e.key!='Escape'||!WBS.tilePv||document.querySelector('.baX')||(e.target.matches&&e.target.matches('input,select,textarea')))return;e.preventDefault();$('tpv').click()});
   $('tpv').onclick=()=>{WBS.tilePv=!WBS.tilePv;last='';buildTex();upd();if(WBX.wbApplyZ)requestAnimationFrame(WBX.wbApplyZ)};
 }
 export {init44};
