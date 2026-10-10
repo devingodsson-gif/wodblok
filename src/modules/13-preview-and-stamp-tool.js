@@ -96,7 +96,7 @@ WBS.tiles.splice(0,WBS.tiles.length,...rest);WBS.cur=WBS.tiles.indexOf(dragged);
 document.addEventListener('pointercancel',()=>{if(d){d=null;clr()}});
 T.addEventListener('click',e=>{if(sw){e.stopImmediatePropagation();e.preventDefault();sw=false}},true);
 document.addEventListener('keydown',e=>{if(d&&d.on&&e.key=='Escape'){d=null;clr()}})}
-$('addT').onclick=()=>{const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:3,er:3,es:Math.floor(Math.random()*999),is:isDef()};WBS.tiles.push(t);WBS.cur=WBS.tiles.length-1;selOne(-1);store();upd();pmsg('New stamp added. Tick it under Stamps in the pattern (Arrangement) to print it in a layer.')};
+$('addT').onclick=()=>{const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:3,er:3,es:Math.floor(Math.random()*999),tu:[]};WBS.tiles.push(t);WBS.cur=WBS.tiles.length-1;selOne(-1);store();upd();pmsg('New stamp added. Tick it under Stamps in the pattern (Arrangement) to print it in a layer.')};
 $('dupT').onclick=()=>{const g=tGrp(),pid=WBS.tiles[WBS.cur].id,cps=[];let pc=null;g.slice().reverse().forEach(k=>{const t=JSON.parse(JSON.stringify(WBS.tiles[k]));t.id=WBS.nid++;WBS.tiles.splice(k+1,0,t);cps.push(t.id);if(WBS.tiles[k].id==pid)pc=t.id});WBS.cur=WBS.tiles.findIndex(t=>t.id==pc);WBS.tM=cps.length>1?new Set(cps):new Set();selOne(-1);store();upd();pmsg('Stamp duplicated. Tick it under Stamps in the pattern (Arrangement) to print it in a layer.')};
 $('delT').onclick=()=>{const g=tGrp();if(WBS.tiles.length>g.length){const ids=g.map(k=>WBS.tiles[k].id);g.slice().reverse().forEach(k=>WBS.tiles.splice(k,1));WBS.layers.forEach(L=>L.st=L.st.filter(x=>!ids.includes(x)));WBS.tM=new Set();WBS.cur=Math.min(g[0],WBS.tiles.length-1);selOne(-1);store();upd()}};
 }
