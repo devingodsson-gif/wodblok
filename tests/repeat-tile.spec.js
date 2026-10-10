@@ -109,3 +109,28 @@ for (const seed of [7, 12, 21]) {
     expect(errors).toEqual([]);
   });
 }
+
+test('the 3 x 3 view shows tile edges, a pressed button and an exit pill, and Esc goes back to editing (UX review D11)', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 1 });
+  await openPanel(page, 'canvas');
+  await page.click('#cfmt [data-f="tile"]');
+  await settle(page);
+  await expect(page.locator('#tpx')).toBeHidden();
+  await page.click('#tpv');
+  await settle(page);
+  await expect(page.locator('#tpv')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#tpx')).toBeVisible();
+  const lines = await page.evaluate(() => { const cs = getComputedStyle(document.getElementById('artwrap'), '::after'); return { img: cs.backgroundImage, pos: cs.position }; });
+  expect(lines.pos).toBe('absolute');
+  expect(lines.img).toContain('linear-gradient');
+  await page.keyboard.press('Escape');
+  await settle(page);
+  await expect(page.locator('#tpv')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('#tpx')).toBeHidden();
+  await page.click('#tpv');
+  await settle(page);
+  await page.click('#tpx');
+  await settle(page);
+  await expect(page.locator('#tpv')).toHaveAttribute('aria-pressed', 'false');
+  expect(errors).toEqual([]);
+});

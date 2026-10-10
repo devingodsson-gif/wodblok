@@ -123,6 +123,14 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 .xrr:hover,.xrr:focus-visible{background:var(--raise)}.xrr b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xrr small{display:block;color:var(--mut);font-size:10.5px}
 .xrph{margin-top:16px}.xrp select{width:auto;flex:1}.xrr .ib{width:26px;height:26px}.xrr .ib svg{width:14px;height:14px}.xrr input{height:26px}.xrall{margin-top:12px}
 #artwrap.tpv>*{pointer-events:none}
+/* 3 x 3 repeat preview: faint lines mark where each tile ends, so seams can be checked; the picture is not editable here */
+#artwrap.tpv::after{content:"";position:absolute;inset:28px;pointer-events:none;z-index:3;--tl:color-mix(in srgb,var(--acc) 92%,transparent);background:
+ linear-gradient(90deg,transparent calc(33.333% - .5px),var(--tl) calc(33.333% - .5px),var(--tl) calc(33.333% + .5px),transparent calc(33.333% + .5px)),
+ linear-gradient(90deg,transparent calc(66.667% - .5px),var(--tl) calc(66.667% - .5px),var(--tl) calc(66.667% + .5px),transparent calc(66.667% + .5px)),
+ linear-gradient(180deg,transparent calc(33.333% - .5px),var(--tl) calc(33.333% - .5px),var(--tl) calc(33.333% + .5px),transparent calc(33.333% + .5px)),
+ linear-gradient(180deg,transparent calc(66.667% - .5px),var(--tl) calc(66.667% - .5px),var(--tl) calc(66.667% + .5px),transparent calc(66.667% + .5px))}
+#tpv[aria-pressed=true]{background:var(--raise);color:var(--acc-ink);font-weight:600;box-shadow:0 0 0 1px var(--acc)}
+#tpx{top:52px;left:50%}
 /* presets */
 .ps .psl{display:flex;flex-direction:column;gap:2px}.psn{display:flex;gap:8px;margin-top:10px}.psn input{flex:1;min-width:0}
 .psr{display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:4px 4px 4px 6px;border-radius:7px;cursor:pointer;font-size:12.5px;border:1px solid transparent}
@@ -666,6 +674,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
 </nav>
 
 <main class="stage">
+ <button type="button" class="baX" id="tpx" hidden>Exit 3 × 3 preview<kbd>Esc</kbd></button>
  <div id="tbar" role="toolbar" aria-label="Task bar" hidden></div>
  <div class="viewbar">
   <div class="seg2" role="tablist"><button data-v="pattern" role="tab">Pattern</button><button data-v="stamp" role="tab">Stamp editor</button></div>

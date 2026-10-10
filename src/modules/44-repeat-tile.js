@@ -27,7 +27,11 @@ function init44(){
     const parts=[];if(on&&n)parts.push(n+(n>1?' frames':' frame'));if(g)parts.push(g+(g>1?' gradients':' gradient'));
     $('tpn').hidden=!parts.length;$('tpn').textContent=parts.length?'Hidden on a repeat tile: '+parts.join(', '):'';
     $('artwrap').classList.toggle('tpv',on&&!!WBS.tilePv);
+    $('tpx').hidden=!(on&&!!WBS.tilePv);
   };
+  // the 3 x 3 view cannot be edited: the pill and Esc both go back to editing
+  $('tpx').onclick=()=>$('tpv').click();
+  document.addEventListener('keydown',e=>{if(e.key!='Escape'||!WBS.tilePv||document.querySelector('.baX:not(#tpx)')||(e.target.matches&&e.target.matches('input,select,textarea')))return;e.preventDefault();$('tpv').click()});
   $('tpv').onclick=()=>{WBS.tilePv=!WBS.tilePv;last='';buildTex();upd();if(WBX.wbApplyZ)requestAnimationFrame(WBX.wbApplyZ)};
 }
 export {init44};
