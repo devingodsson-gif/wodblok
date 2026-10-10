@@ -70,7 +70,7 @@ button,.ddi,.wtab,.lyr,.rail button{transition:background-color .12s,border-colo
 .ab.a,.hr.ra b::before{background:var(--ca);content:"A"}.ab.b,.hr.rb b::before{background:var(--cb);content:"B"}.hr.ra.rb b::before{content:"A=B";background:linear-gradient(90deg,var(--ca) 50%,var(--cb) 50%)}
 .hr.ra{box-shadow:inset 3px 0 0 var(--ca)}.hr.rb{box-shadow:inset 3px 0 0 var(--cb)}.hr.ra.rb{box-shadow:inset 3px 0 0 var(--ca),inset 6px 0 0 var(--cb)}
 .baT{display:inline-flex;align-items:center;max-width:46%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.baT .ab{flex:none;margin-right:6px}.baT.a{border-color:var(--ca)}.baT.b{border-color:var(--cb)}
-.baX,#tpx{position:absolute;z-index:44;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 8px 0 14px;border-radius:15px;border:0;background:var(--acc);color:var(--acc-fg);font-weight:600;font-size:12px;box-shadow:var(--shadow);cursor:pointer}.baX:hover,#tpx:hover{filter:brightness(1.08)}.baX kbd,#tpx kbd{font:600 10px "Hanken Grotesk",system-ui,sans-serif;padding:2px 6px;border-radius:9px;background:rgba(0,0,0,.18);color:inherit}
+.baX,#tpx,#empc{position:absolute;z-index:44;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 8px 0 14px;border-radius:15px;border:0;background:var(--acc);color:var(--acc-fg);font-weight:600;font-size:12px;box-shadow:var(--shadow);cursor:pointer}.baX:hover,#tpx:hover,#empc:hover{filter:brightness(1.08)}.baX kbd,#tpx kbd{font:600 10px "Hanken Grotesk",system-ui,sans-serif;padding:2px 6px;border-radius:9px;background:rgba(0,0,0,.18);color:inherit}
 .babusy .dock,.babusy .film,.babusy .rail{opacity:.55;pointer-events:none}.dock,.film,.rail{transition:opacity .12s}
 .baT{position:absolute;z-index:42;font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px;background:var(--panel);border:1px solid var(--line2);color:var(--fg);pointer-events:none;box-shadow:var(--shadow)}.baT.r{transform:translateX(-100%)}
 .baH{position:absolute;z-index:43;width:20px;margin-left:-10px;cursor:ew-resize;touch-action:none}.baH::before{content:"";position:absolute;left:9px;top:0;bottom:0;width:2px;background:var(--acc);box-shadow:0 0 0 1px rgba(0,0,0,.25)}.baH i{position:absolute;left:1px;top:50%;width:18px;height:28px;margin-top:-14px;border-radius:9px;background:var(--acc);box-shadow:0 1px 4px rgba(0,0,0,.4)}
@@ -131,6 +131,11 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
  linear-gradient(180deg,transparent calc(66.667% - .5px),var(--tl) calc(66.667% - .5px),var(--tl) calc(66.667% + .5px),transparent calc(66.667% + .5px))}
 #tpv[aria-pressed=true]{background:var(--raise);color:var(--acc-ink);font-weight:600;box-shadow:0 0 0 1px var(--acc)}
 #tpx{top:52px;left:50%}
+#empc{top:calc(50% + 4px);left:50%;height:34px;padding:0 18px 0 14px;font-size:13px}
+#empc::before{content:"+";font-size:19px;font-weight:400;line-height:1;margin-right:-2px}
+/* an empty stamp in the tray shows a plus: click it to start drawing it */
+#tabs button.empty{position:relative}
+#tabs button.empty::after{content:"+";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:300;color:#fff;mix-blend-mode:difference;pointer-events:none}
 /* presets */
 .ps .psl{display:flex;flex-direction:column;gap:2px}.psn{display:flex;gap:8px;margin-top:10px}.psn input{flex:1;min-width:0}
 .psr{display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:4px 4px 4px 6px;border-radius:7px;cursor:pointer;font-size:12.5px;border:1px solid transparent}
@@ -626,6 +631,8 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
   <button class="ib" id="cmdkb" aria-label="Search commands" title="Search commands (Ctrl+K)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="5.5"/><path d="M15 15l5 5"/></svg></button>
  </div>
  
+ <div class="sep"></div>
+ <button class="rnd" id="rzbar" type="button" title="Roll a whole new piece"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>Randomize</button>
  <div class="spacer"></div>
  <button class="ib" id="thm" type="button" title="Switch to light mode" aria-label="Switch to light mode"></button>
  <button class="ghost" id="pls">Projects</button>
@@ -687,6 +694,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  </nav>
 
 <main class="stage">
+ <button type="button" id="empc" hidden>Add a motif</button>
  <button type="button" id="tpx" hidden>Exit 3 × 3 preview<kbd>Esc</kbd></button>
  <div id="tbar" role="toolbar" aria-label="Task bar" hidden></div>
  <div class="viewbar">

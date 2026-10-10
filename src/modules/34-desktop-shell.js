@@ -154,7 +154,7 @@ const typing=()=>{const a=document.activeElement;if(!a||a===document.body)return
 let wsRT=0,wsPend=false;addEventListener('resize',()=>{clearTimeout(wsRT);wsRT=setTimeout(()=>{if(!wsReady)return;if(typing()){wsPend=true;return}wsRender()},150)});
 addEventListener('focusout',()=>{setTimeout(()=>{if(wsPend&&!typing()){wsPend=false;if(wsReady)wsRender()}},300)});
 const stage=document.querySelector('.stage');
-function setView(v){const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+function setView(v){const was=view;view=v;WBS.curView=v;if(WBX.wbEmptyCue)WBX.wbEmptyCue();if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
 $('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display=v=='pattern'?'':'none';$('gtb').style.display=v=='stamp'?'':'none';$('itb').style.display='';if(v=='pattern')requestAnimationFrame(applyZ);tbSync();if(was!=v||!wsReady)wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
 const L=wsL();let g=wsFind(p);
@@ -243,7 +243,12 @@ $('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.to
 $('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${WBS.cur+1} of ${WBS.tiles.length}`:'';
 if(WBS.layers[WBS.selL])$('lnmx').textContent=WBS.layers[WBS.selL].name}
 // wrap redraw hooks so the shell stays in sync
-const _draw=WBH.draw;WBH.draw=function(){_draw();nums();info()};
+// An empty project shows an "Add a motif" button on the canvas (the Pattern view only); it goes to the Stamp editor and opens Motifs.
+const emptyCue=()=>{const empty=WBS.tiles.every(t=>!(t.items||[]).length)&&!WBS.layers.some(L=>(L.pl||[]).length);const b=$('empc');if(b)b.hidden=!(empty&&view=='pattern')};
+$('empc').onclick=()=>{setView('stamp');requestAnimationFrame(()=>{const sec=document.querySelector('section.pn[data-p="motifs"]');if(!sec||sec.hidden)$('rail-motifs').click()})};
+$('rzbar').onclick=()=>$('rzdo').click();
+WBX.wbEmptyCue=emptyCue;
+const _draw=WBH.draw;WBH.draw=function(){_draw();nums();info();emptyCue()};
 const _sp=WBH.syncPr;WBH.syncPr=function(){_sp();nums()};const _stx=WBH.syncTex;WBH.syncTex=function(){_stx();nums()};
 
 // ---- toast-style status messages
