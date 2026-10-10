@@ -171,6 +171,16 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.9: Compare and history (plan items C3, C14 rest; C2 thumbnails left out)
+
+| # | Result | Notes |
+|---|---|---|
+| C3 | Part | Before and Split now compare with the step before the current one (the Start when there is none) until another step or snapshot is chosen in History; the A label and the History "Compared to" row say which. **Not done:** folding Grade's "Hold to compare" into Before. It shows the ungraded colours, which Before cannot, so it stays. |
+| C14 (rest) | Done | A test scans the page's CSS: every rule that reveals something on `:hover` has a keyboard or selected-row twin. |
+| C2 (thumbnails) | Not done | Left for its own release: it needs a speed check (roll time and drags must not change). |
+
+Files: `20-before-after-and-randomizer.js`, `34-desktop-shell.js` (`wbHistIdx`, `wbHistLabel`). Tests: `compare.spec.js`, `row-actions.spec.js`; `undo.spec.js` now reads the history rows from `#hhl` (the "Compared to" row also names a step).
+
 ## 1.0.8: Randomize amounts (Q6, answered by the user)
 
 Each main switch in the Randomize panel is now a slider from 0 (off) to 100 (fully on); Colours keeps its plain switch. Today's choices are the starting values (on is 100, off is 0), so a default roll comes out exactly as before and no Randomize snapshot changed. Below 100, a feature with several kinds of change (the arrows) lets only some of them happen on a roll (at least one), and a feature without kinds happens on some rolls; Colour grade values and the Print effects edges are also scaled down. Old saved on/off choices load as 100/0. "Layer opacity and blend" is now "Opacity and blend". Files: `src/shell.html`, `34-desktop-shell.js` (panel), `20-before-after-and-randomizer.js` (roll). Tests: `tests/randomize-amounts.spec.js`; `repeat-tile.spec.js` sets the sliders instead of ticking boxes.

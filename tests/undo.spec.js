@@ -44,8 +44,8 @@ test('History names Randomize rolls "Randomize 1, 2…", and says "1 step" at th
   await roll(page);
   await roll(page);
   await openPanel(page, 'hist');
-  await expect(page.locator('.hsl .hr b', { hasText: 'Randomize 1' })).toHaveCount(1);
-  await expect(page.locator('.hsl .hr b', { hasText: 'Randomize 2' })).toHaveCount(1);
+  await expect(page.locator('#hhl .hr b', { hasText: 'Randomize 1' })).toHaveCount(1);
+  await expect(page.locator('#hhl .hr b', { hasText: 'Randomize 2' })).toHaveCount(1);
   await expect(page.locator('#hsc')).toHaveText('3 steps');
   await press(page, 'Control+z');
   await expect(page.locator('#pmsg')).toContainText('Undid: Randomize 2');
