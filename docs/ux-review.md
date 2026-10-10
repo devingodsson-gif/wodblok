@@ -1,7 +1,7 @@
 # WODBLOK 1.0: UX review
 
 **Reviewed:** tag `v1.0.0`, commit `617a33d0b03a3ed3235f09b880372c745899357b` ("Release 1.0.0"), app version **1.0.0** (badge "v1.0").
-Note: `main` on GitHub is still at v104 (`7b924df`). 1.0.0 exists only on branch `claude/wodblok-9lo9c7` and its tag, and has not been merged into `main` (see Questions).
+Note: at review time `main` was still at v104 (`7b924df`) and 1.0.0 existed only on branch `claude/wodblok-9lo9c7`. On your instruction, 1.0.0 and this review were then merged into `main`. The merge kept main's `dist/index.html` copy for hosting.
 
 **How:** I built the web app (`npm run build:web`), served `dist/web/` on localhost, and drove it with Playwright on Chromium 141 (headless, 1440×900 unless stated). I walked each task as a first-time user. Screenshots are in [`docs/ux-review/`](ux-review/) and named in the tables.
 Window sizes tested: 1920×1080, 1440×900, 1440×600, 1366×768, 1280×720, 1280×640, 1024×700 and 820×700. Both themes were tested, as was a Mac user agent.
@@ -226,7 +226,7 @@ Each item is listed with its finding number. Every release needs the perf check 
 
 ## 5. Questions for you
 
-1. **Which build is 1.0?** I reviewed tag `v1.0.0` (617a33d) on `claude/wodblok-9lo9c7`, because `main` is still at v104. Should that branch be merged into `main`? Until it is, anyone who pulls `main` gets v104.
+1. ~~**Which build is 1.0?**~~ Answered: 1.0.0 is now merged into `main` together with this review.
 2. **Explanatory text already in panels** (C10): remove it to match the rule, or allow a few one-line facts, such as "saved in this browser only"?
 3. **Built-in "Plants" motifs, "Draw with Claude", and "Copy prompt for ChatGPT"** (C11): these conflict with "no Claude-generated motifs". Hide them in the commercial build, replace them with your own set, or keep them?
 4. **Rail names:** would a one-word label under each rail icon count as "explanatory text"? I treat it as naming, not explanation. It is the single biggest discoverability gain, and it works on touch. The cost is a wider rail (about 64 px instead of 52).

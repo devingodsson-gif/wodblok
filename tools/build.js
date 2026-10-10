@@ -69,4 +69,10 @@ if (WEB) {
     else fs.copyFileSync(path.join(sd, f), path.join(wd, f));
   }
   console.log('web app files in', path.relative(ROOT, wd));
+} else if (!args.length) {
+  // Hosting (Cloudflare Pages etc.) serves index.html from the output folder, so a default build also leaves an identical
+  // copy next to the single file. wodblok.html stays the file tests and GitHub Releases use.
+  const idx = path.join(path.dirname(out), 'index.html');
+  fs.copyFileSync(out, idx);
+  console.log('copied', path.relative(ROOT, idx));
 }
