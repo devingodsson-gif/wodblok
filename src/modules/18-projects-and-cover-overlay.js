@@ -107,7 +107,9 @@ catch(e){pmsg('Could not save: '+((e&&e.message)||'unknown error'))}$('psv').dis
 $('pcp').onclick=async()=>{const name=($('pnm').value.trim()||'Untitled pattern')+' copy';pmsg('Saving a copy…');
 try{const id=newId();await saveTo(id,name);WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;saveCp();pmsg('Now working on “'+name+'”. The original is unchanged.');if(!$('plist').hidden)renderPL()}
 catch(e){pmsg('Could not save: '+((e&&e.message)||'unknown error'))}paintPst()};
-$('pnw').onclick=()=>confirm2($('pnw'),'Click again to discard changes',()=>{const t=JSON.parse(DEF_TILES);
+$('pnw').onclick=()=>{confirm2($('pnw'),'Click again to discard changes',()=>{const t=JSON.parse(DEF_TILES);
 openData({tiles:t,layers:[mkL('Layer 1',t.map(x=>x.id),'check',180)],proj:{...PCOL},dim:{s:[1,1],c:[2,3]},pr:PDEF.pr,tex:PDEF.tex},null,'');clearAll(true);cov={img:'',iw:0,ih:0,sc:100};covB=blank();covS=blank();WBS.cslot='f';saveCov();WBS.covKey='';renderCover();WBS.cp.saved=coreStr();saveCp();paintPst()});
+// first click with unsaved work: the button says so (the File menu stays open, see 34-desktop-shell) and the status bar explains
+if($('pnw').dataset.sure)pmsg('This project has unsaved changes. Click New project again to discard them.')};
 }
 export {PGD,ST,thumb,confirm2,coreStr,covOrder,covS,dirty,newId,openData,paintCov,paintPst,pgFix,pmsg,renderCover,saveCp,saveTo,snapshot,init18};

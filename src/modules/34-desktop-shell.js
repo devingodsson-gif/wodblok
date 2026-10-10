@@ -247,7 +247,7 @@ new MutationObserver(()=>{$('pwhere2').textContent=$('pwhere').textContent}).obs
 // ---- menus
 const menus=[['fileb','filem'],['expb','expm']];
 const closeMenus=()=>menus.forEach(([b,m])=>{$(m).hidden=true;$(b).setAttribute('aria-expanded','false')});WBX.wbCloseMenus=closeMenus;
-menus.forEach(([b,m])=>{$(b).onclick=e=>{e.stopPropagation();const o=$(m).hidden;closeMenus();closeDD();$(m).hidden=!o;if(o)placeFloat($(m),$(b),$(m).classList.contains('r'));$(b).setAttribute('aria-expanded',String(o))};$(m).addEventListener('click',e=>{if(e.target.closest('button,label'))closeMenus()})});
+menus.forEach(([b,m])=>{$(b).onclick=e=>{e.stopPropagation();const o=$(m).hidden;closeMenus();closeDD();$(m).hidden=!o;if(o)placeFloat($(m),$(b),$(m).classList.contains('r'));$(b).setAttribute('aria-expanded',String(o))};$(m).addEventListener('click',e=>{if(e.target.closest('button,label')&&!e.target.closest('[data-sure]'))closeMenus()})});
 document.addEventListener('click',e=>{if(!e.target.closest('.menu,.pop'))closeMenus()});
 // A floating popup would drift away from its button if the page or a panel scrolled under it, so close it instead.
 addEventListener('scroll',e=>{const t=e.target;if(t&&t.closest&&t.closest('.pop,.ddl'))return;if(typeof typing=='function'&&typing())return;closeMenus();closeDD()},true);addEventListener('resize',()=>{if(typeof typing=='function'&&typing())return;closeMenus();closeDD()});
@@ -255,7 +255,7 @@ addEventListener('scroll',e=>{const t=e.target;if(t&&t.closest&&t.closest('.pop,
 // ---- projects dialog
 const closeDlg=()=>{$('plist').hidden=true;$('pls').classList.remove('on')};
 $('pclose').onclick=closeDlg;$('plist').addEventListener('click',e=>{if(e.target===$('plist'))closeDlg()});
-$('pnw2').onclick=()=>$('pnw').click();
+$('pnw2').onclick=()=>{const b=$('pnw2');$('pnw').click();if($('pnw').dataset.sure){const o=b.dataset.o||b.textContent;b.dataset.o=o;b.textContent='Click again to discard changes';setTimeout(()=>{b.textContent=o;delete b.dataset.o},3500)}else if(b.dataset.o){b.textContent=b.dataset.o;delete b.dataset.o}};
 $('pgrid').addEventListener('click',e=>{const b=e.target.closest('[data-a="open"]');if(b)setTimeout(()=>{if(b.textContent=='Open')closeDlg()},60)});
 
 // ---- undo / redo (snapshots of the whole project state)
