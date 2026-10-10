@@ -21,13 +21,13 @@ import {clearAll} from './33-clear.js';
 
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
-const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colors',stamp:'Stamp',motifs:'Motifs',layers:'Arrangement',cover:'Book cover'};
+const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Motifs',layers:'Arrangement',cover:'Book cover'};
 let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colors',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Preview',grid:'Grid',layers:'Arrangement',pgrid:'Grid',grade:'Grade',tex:'Textures',rand:'Randomize',hist:'History'};
+const PNAME={vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Pattern preview',grid:'Stamp grid',layers:'Arrangement',pgrid:'Pattern grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
 const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib','nav','wspc','xrec','pres','vars'],stamp:['wspc','pres','motifs','text','mlist','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
@@ -171,6 +171,12 @@ WBX.wbWsSet=o=>{const had=!!wsFind('wspc');['pattern','stamp'].forEach(m=>{const
  if(had){const L=wsL();if(!wsAll().some(g=>g.tabs.includes('wspc')))L.dock.push(wsG(['wspc']))}
  wsSave();wsRender();info();nums()};
 $('rcls').onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length)return;L.dock=[];L.float=[];wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')};
+// Tool names beside the icons: on by default in wide windows, off in narrow ones, and the person's own choice (the button at the foot of the rail) wins.
+{const RN='wb_rail_names',rail=document.querySelector('.rail'),b=$('rnames');
+ const pref=()=>{try{return kv.get(RN)}catch(e){return null}};
+ const apply=()=>{const p=pref(),on=p==='1'||(p!=='0'&&innerWidth>=1180);document.body.classList.toggle('rwide',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',on?'Hide tool names':'Show tool names')};
+ b.onclick=()=>{const on=!document.body.classList.contains('rwide');try{kv.set(RN,on?'1':'0')}catch(e){}apply()};
+ addEventListener('resize',apply);apply()}
 document.querySelector('.rail').onclick=e=>{const b=e.target.closest('[data-pn]');if(!b)return;const p=b.dataset.pn,g=wsFind(p);
 // double-clicking the Randomize tool rolls a new piece, the same as pressing the Randomize button in its window (the window is left open)
 if(p=='rand'&&e.isTrusted&&e.detail>1){const g2=wsFind('rand');if(!(g2&&g2.a=='rand'&&!g2.col))setPanel('rand');$('rzdo').click();return}
