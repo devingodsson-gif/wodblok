@@ -166,6 +166,7 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 .wg.col .wbd,.wg.col .wrs{display:none}
 .wh{display:flex;align-items:stretch;height:32px;flex:none;background:color-mix(in srgb,var(--stage) 50%,var(--panel));border-bottom:1px solid var(--line);cursor:grab;user-select:none;touch-action:none}
 .wt{display:flex;min-width:0;flex:1;overflow-x:auto;scrollbar-width:none}.wt::-webkit-scrollbar{display:none}
+.wh.ovr .wt{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent)}.wh.ovl .wt{-webkit-mask-image:linear-gradient(270deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(270deg,#000 calc(100% - 24px),transparent)}.wh.ovl.ovr .wt{-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent)}
 .wtab{flex:none;border:0;border-right:1px solid var(--line);background:transparent;padding:0 11px;font-size:11.5px;font-weight:500;color:var(--mut);white-space:nowrap;border-radius:0;cursor:inherit;margin:0}
 .wtab.on{background:var(--panel);color:var(--fg);font-weight:600;box-shadow:inset 0 2px 0 var(--acc)}
 .wtab:hover:not(.on){color:var(--fg);background:color-mix(in srgb,var(--panel) 50%,transparent)}
@@ -247,6 +248,7 @@ button:disabled{opacity:.4;cursor:default}
 button.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-fg);font-weight:600}
 button.primary:hover:not(:disabled){filter:brightness(1.08);border-color:var(--acc)}
 button.ghost,.ib{background:transparent;border-color:transparent}
+#pls,#fileb{border-color:var(--line)}
 button.ghost:hover:not(:disabled),.ib:hover:not(:disabled){background:var(--raise);border-color:var(--line)}
 .ib{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;color:var(--mut)}
 .ib:hover:not(:disabled){color:var(--fg)}

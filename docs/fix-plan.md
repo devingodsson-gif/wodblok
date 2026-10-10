@@ -171,6 +171,13 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.20: Tabs and the top bar (UX review 2: N1, N6)
+
+- **N1:** when a panel group has more tabs than fit, the chosen tab is scrolled fully into view and the edge that hides more tabs fades (the strip was already scrollable, but "Colours" showed as "Colou" with nothing saying there was more). Chosen over stacking panels (the bigger P2 change).
+- **N6:** "Open projects folder" and "File" have an outline like Save project, so they read as buttons.
+- Not done, on purpose: **N4** more History thumbnails. Only rolls get a picture by design (a picture per hand edit costs speed; `history-thumbs.spec.js` pins this). **N5** left-rail labels: the rail is 15 icons by design; names show on hover and in the panel's tab.
+- Tests: `tests/tabs-1020.spec.js`.
+
 ## 1.0.19: Text and panels (UX review 2: N2, N4 label, N7)
 
 - Randomize no longer prints the "Last roll: …" paragraph (the status line already says what the roll did). Import artwork's labels lose their "1." / "2." numbers. History's "+" is a labelled **Save snapshot** button. Canvas shape names ("Rectangle") fit their buttons.
