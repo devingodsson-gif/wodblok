@@ -59,13 +59,26 @@ const files = {
   /** A folder of projects (Chrome, Edge). pickFolder asks once and remembers the handle, so the next launch can list it again (the browser may ask for permission). */
   canPickFolder: () => typeof /** @type {any} */ (window).showDirectoryPicker === 'function',
   pickFolder: async () => {
-    try { const h = await /** @type {any} */ (window).showDirectoryPicker({ mode: 'read', id: 'wodblok-projects' }); try { await records.put(FOLDER_KEY, h); } catch (e2) { /* it just will not be remembered for next time */ } return h; }
+    try { const h = await /** @type {any} */ (window).showDirectoryPicker({ mode: 'readwrite', id: 'wodblok-projects' }); try { await records.put(FOLDER_KEY, h); } catch (e2) { /* it just will not be remembered for next time */ } return h; }
     catch (e) { if (e && e.name === 'AbortError') return null; throw e; }
   },
   savedFolder: async () => (await records.get(FOLDER_KEY)) || null,
   forgetFolder: async () => { await records.del(FOLDER_KEY); },
   /** true when the folder can be read now; asks the person when the browser needs a click first (call from a click). */
   folderAccess: async h => { try { return (await h.queryPermission({ mode: 'read' })) === 'granted' || (await h.requestPermission({ mode: 'read' })) === 'granted'; } catch (e) { return false; } },
+  /** true when files can be written into the folder; asks the person when the browser needs a click first (call from a click). */
+  folderWritable: async h => { try { return (await h.queryPermission({ mode: 'readwrite' })) === 'granted' || (await h.requestPermission({ mode: 'readwrite' })) === 'granted'; } catch (e) { return false; } },
+  /** Writes a new file into the folder. It never replaces a file that is already there: the name becomes name-2.wodblok, name-3.wodblok, and so on. */
+  saveToFolder: async (h, name, data) => {
+    const m = /^(.*?)(\.wodblok)$/i.exec(name) || [name, name, '']; let n = name, i = 1;
+    for (;;) {
+      try { await h.getFileHandle(n); } catch (e) { if (e && e.name === 'NotFoundError') break; throw e; }
+      if (++i > 999) throw new Error('Too many files with that name.');
+      n = m[1] + '-' + i + m[2];
+    }
+    const fh = await h.getFileHandle(n, { create: true }), w = await fh.createWritable(); await w.write(data); await w.close();
+    return { name: n, handle: fh };
+  },
   /** The project files directly inside the folder (.wodblok and the older .wodblok.json), newest name last. */
   listFolder: async h => { const out = []; for await (const [n, fh] of /** @type {any} */ (h).entries()) if (fh.kind === 'file' && /\.wodblok(\.json)?$/i.test(n)) out.push({ name: n, handle: fh }); return out.sort((a, b) => a.name.localeCompare(b.name)); },
   /** Files the system opens this app with (the installed app as the .wodblok opener). Calls cb(file, handle) for each. */
