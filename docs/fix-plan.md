@@ -171,6 +171,12 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.5: Save into the projects folder (added on the user's request)
+
+Because of this release, the releases planned below as 1.0.5, 1.0.6 and 1.0.7 move to 1.0.6, 1.0.7 and 1.0.8.
+
+When a projects folder is chosen, Save project writes a project that is not tied to a file yet straight into that folder, as `<name>.wodblok`, without opening the Save dialog. It never replaces a file that is already there (`name-2.wodblok`, `name-3.wodblok`, …). A project opened from the folder, or saved before, is written back to its own file. The folder is now picked with write access; the browser asks for it once (and again after a reload). If the folder cannot be written, Save falls back to the normal Save dialog or download. Files: `src/platform/web.js` (`folderWritable`, `saveToFolder`), `src/modules/33-clear.js`. Tests: `tests/projects-folder.spec.js`.
+
 ## 1.0.5: Compare and history
 
 | # | Fix | Where | Test / check |

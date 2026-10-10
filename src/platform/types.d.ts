@@ -10,6 +10,7 @@ export interface Files {
   write(name: string, data: Blob, opts?: { type?: string; handle?: unknown }): Promise<{ how: 'saved' | 'downloaded'; handle: unknown | null }>;
   canOpen(): boolean; open(): Promise<{ file: File; handle: unknown } | null>;
   canPickFolder(): boolean; pickFolder(): Promise<unknown | null>; savedFolder(): Promise<unknown | null>; forgetFolder(): Promise<void>;
+  folderWritable(handle: unknown): Promise<boolean>; saveToFolder(handle: unknown, name: string, data: Blob): Promise<{ name: string; handle: unknown }>;
   folderAccess(handle: unknown): Promise<boolean>; listFolder(handle: unknown): Promise<{ name: string; handle: unknown }[]>;
   onLaunch(cb: (file: File, handle: unknown) => void): void;
 }

@@ -24,7 +24,10 @@ const snapsOf=id=>{try{const a=JSON.parse(kv.get('wb95_sn_'+(id||'draft'))||'[]'
 let link=null;
 const linkOf=id=>link&&link.id==(id||null)?link.handle:null;
 async function dl(name,data,thumbUrl,id){const d=await use('downloads');if(!d){pmsg('Saving is not available here.');return false}
-try{const zip=await fmtPack({name,...data},{thumbnail:await thumbPng(thumbUrl),snapshots:snapsOf(id)});const r=await d.save({filename:fname(name)+'.wodblok',data:new Blob([zip],{type:FMT_MIME}),handle:linkOf(id)});if(r&&r.handle)link={id:id||null,handle:r.handle};pmsg((r&&r.how=='saved'?'Saved “':'Downloaded “')+name+'”.');return true}catch(e){if(e&&e.code!='declined')pmsg('Could not save: '+e.message);else pmsg('');return false}}
+try{const zip=await fmtPack({name,...data},{thumbnail:await thumbPng(thumbUrl),snapshots:snapsOf(id)}),blob=new Blob([zip],{type:FMT_MIME});
+// a project that is not tied to a file yet goes straight into the projects folder when one is chosen (never over a file that is already there)
+if(folder&&!linkOf(id)){try{if(await files.folderWritable(folder)){const f=await files.saveToFolder(folder,fname(name)+'.wodblok',blob);link={id:id||null,handle:f.handle};pmsg('Saved “'+name+'” to '+folder.name+'.');if(!$('plist').hidden)renderPL();return true}}catch(e){/* the folder cannot be written: use the Save dialog below */}}
+const r=await d.save({filename:fname(name)+'.wodblok',data:blob,handle:linkOf(id)});if(r&&r.handle)link={id:id||null,handle:r.handle};pmsg((r&&r.how=='saved'?'Saved “':'Downloaded “')+name+'”.');return true}catch(e){if(e&&e.code!='declined')pmsg('Could not save: '+e.message);else pmsg('');return false}}
 // Save project: write the .wodblok file (into the file this project came from or was last saved to, where the browser allows; else the Save dialog; else a download).
 async function saveProject(){const name=$('pnm').value.trim()||'Untitled pattern',id=WBS.cp.id||newId(),b=$('psv');b.disabled=true;pmsg('Saving…');
 try{if(await dl(name,await fileSnap(),await thumb(),id)){WBS.cp={id,name,saved:coreStr()};$('pnm').value=name}}finally{b.disabled=false;paintPst()}}
