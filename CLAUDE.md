@@ -14,7 +14,7 @@ Source of truth for the app is src/: ES modules in src/modules (order in manifes
 - Modules export functions and do no work on import; start-up order lives in src/main.js.
 - Ask before adding a dependency. Licences: MIT, BSD, ISC, Apache, OFL.
 - Phase 1: no behaviour or visual changes. Phases 2-3: only what the phase lists; existing tools unchanged. Phases 1-3: no bug fixes; log bugs in docs/known-issues.md.
-- Never update snapshots or golden screenshots just to make tests pass: say which changed and why, and ask.
+- Snapshots and golden screenshots: never update them just to make tests pass. **Pixel goldens** (`tests/__golden__/`): when a full-suite run fails some, look at each diff; if it is exactly the change this release made on purpose (new labels, text size, layout, a new control), regenerate those goldens (`--update-snapshots=changed` on just those tests, then re-run them), and say in the report which ones and why. A golden that fails for a reason the release does not explain is a bug: fix it or ask, never regenerate it. **State and SVG snapshots** (`tests/__snapshots__/`) still need the user's approval first: say which changed and why, and ask.
 - Desktop (Mac/Windows) and mobile are later; do not build them now, but do not block them.
 
 ## Release workflow
