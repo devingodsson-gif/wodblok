@@ -171,6 +171,10 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.14: Selection handles (rest of C7)
+
+A single selected motif in the Stamp editor now shows four corner handles (drag outward or inward to scale it) and a round handle above it (drag to turn it; Shift snaps to 15 degrees). With several motifs selected there are none. A drag is one undo step (the history waits until the drag ends); the handles follow the editor's zoom. Files: `09-stamp-editor-grid-and-motif-ops.js`, `11-pressure-flooding-block-edges.js`, `34-desktop-shell.js`. Tests: `selection-handles.spec.js`. Not done: handles in the Pattern view's Free place layers (those already have their own handles).
+
 ## 1.0.13: No text under 11 px (rest of C13)
 
 All text that was 8 to 10.5 px (29 rules: small labels, units, captions, group headings, hints, the version badge) is now 11 px. A test opens every tool panel in both views and fails on any visible text under 11 px (it fails on 1.0.12). Layouts were checked by eye on the Canvas, Layout and Randomize panels; the pixel goldens that include affected text change. Files: `shell.html`. Tests: `text-size.spec.js`.
