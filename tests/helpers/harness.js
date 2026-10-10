@@ -31,7 +31,6 @@ function initScript({ seed, runtime }) {
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
     window.__wbDownloads = [];
-    ${process.env.WB_RAIL === 'compact' ? "try { localStorage.setItem('wb_rail_names', '0'); } catch (e) {}   // diagnostic: run with the tool rail collapsed, as before 1.0.2" : ''}
     ${runtime === 'artifact' ? `
     const store = {};                         // path -> { id -> data }
     const col = p => (store[p] = store[p] || {});

@@ -15,8 +15,8 @@ test('the shared tools are the first nine rail buttons, in the same order, in Pa
   const stamp = await labels(page);
   expect(pattern.slice(0, 9)).toEqual(SHARED);
   expect(stamp.slice(0, 9)).toEqual(SHARED);
-  expect(pattern.slice(9, -1)).toEqual(['Canvas', 'Layers', 'Arrangement', 'Pattern grid', 'Navigator', 'Variations', 'Export recipes']);
-  expect(stamp.slice(9, -1)).toEqual(['Stamp', 'Motifs', 'Text', 'Stamp grid', 'Motif list', 'Pattern preview']);
+  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Arrangement', 'Pattern grid', 'Navigator', 'Variations', 'Export recipes']);
+  expect(stamp.slice(9)).toEqual(['Stamp', 'Motifs', 'Text', 'Stamp grid', 'Motif list', 'Pattern preview']);
   expect(errors).toEqual([]);
 });
 
@@ -36,25 +36,18 @@ test('each tool has one name: the rail, the tab it opens, and "Open …" in comm
   expect(errors).toEqual([]);
 });
 
-test('names show beside the icons in a wide window, hide in a narrow one, and the button remembers a choice', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
+test('a tool name shows when the pointer rests on an icon or when it has keyboard focus, and nothing sits beside the icons', async ({ page }) => {
   const { errors } = await openApp(page);
-  await expect(page.locator('body')).toHaveClass(/rwide/);
-  await expect(page.locator('#rail-rand .tip')).toBeVisible();
-  const wide = await page.locator('.rail').evaluate(e => e.offsetWidth);
-  await page.click('#rnames');
-  await expect(page.locator('body')).not.toHaveClass(/rwide/);
-  expect(await page.locator('.rail').evaluate(e => e.offsetWidth)).toBeLessThan(wide - 80);
-  await page.reload();
-  await page.waitForFunction(() => window.__wbTest);
-  await expect(page.locator('body')).not.toHaveClass(/rwide/);      // the choice stays across a reload
-  expect(errors).toEqual([]);
-});
-
-test('below 1180 px the names are off unless chosen', async ({ page }) => {
-  await page.setViewportSize({ width: 1100, height: 800 });
-  const { errors } = await openApp(page);
-  await expect(page.locator('body')).not.toHaveClass(/rwide/);
-  await expect(page.locator('#rnames')).toHaveAttribute('aria-label', 'Show tool names');
+  expect(await page.locator('.rail').evaluate(e => e.offsetWidth)).toBeLessThan(60);
+  await expect(page.locator('#rnames')).toHaveCount(0);
+  await expect(page.locator('#rail-rand .tip')).toHaveCSS('opacity', '0');
+  await page.hover('#rail-rand');
+  await expect(page.locator('#rail-rand .tip')).toHaveCSS('opacity', '1');
+  await expect(page.locator('#rail-rand .tip')).toHaveText('Randomize');
+  await page.mouse.move(700, 400);
+  await page.focus('#rail-colors');
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.locator('#rail-colors .tip')).toHaveCSS('opacity', '1');
   expect(errors).toEqual([]);
 });

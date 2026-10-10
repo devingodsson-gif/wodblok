@@ -171,12 +171,6 @@ WBX.wbWsSet=o=>{const had=!!wsFind('wspc');['pattern','stamp'].forEach(m=>{const
  if(had){const L=wsL();if(!wsAll().some(g=>g.tabs.includes('wspc')))L.dock.push(wsG(['wspc']))}
  wsSave();wsRender();info();nums()};
 $('rcls').onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length)return;L.dock=[];L.float=[];wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')};
-// Tool names beside the icons: on by default in wide windows, off in narrow ones, and the person's own choice (the button at the foot of the rail) wins.
-{const RN='wb_rail_names',rail=document.querySelector('.rail'),b=$('rnames');
- const pref=()=>{try{return kv.get(RN)}catch(e){return null}};
- const apply=()=>{const p=pref(),on=p==='1'||(p!=='0'&&innerWidth>=1180);document.body.classList.toggle('rwide',on);b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',on?'Hide tool names':'Show tool names')};
- b.onclick=()=>{const on=!document.body.classList.contains('rwide');try{kv.set(RN,on?'1':'0')}catch(e){}apply()};
- addEventListener('resize',apply);apply()}
 document.querySelector('.rail').onclick=e=>{const b=e.target.closest('[data-pn]');if(!b)return;const p=b.dataset.pn,g=wsFind(p);
 // double-clicking the Randomize tool rolls a new piece, the same as pressing the Randomize button in its window (the window is left open)
 if(p=='rand'&&e.isTrusted&&e.detail>1){const g2=wsFind('rand');if(!(g2&&g2.a=='rand'&&!g2.col))setPanel('rand');$('rzdo').click();return}
