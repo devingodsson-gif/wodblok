@@ -2,7 +2,7 @@ import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CASP,CH,CW,DD,HO,N,ORN,PL,SHN,SK,col,csN,csk,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {DOTK} from './05-motif-data.js';
-import {cols,cust,inkOf,mk,selOne,store} from './06-motif-library-folders.js';
+import {cols,cust,inkOf,it,mk,selOne,store} from './06-motif-library-folders.js';
 import {SYM,expand,symOf} from './07-symmetry.js';
 import {clipWrap,grid,snapPt} from './09-stamp-editor-grid-and-motif-ops.js';
 import {arrOf,arrOpts,build,fitTs,hx,lattice} from './10-layer-grids.js';
@@ -83,6 +83,14 @@ $('sn').oninput=e=>{const t=WBS.tiles[WBS.cur];if(t.sym){t.sym.n=+e.target.value
 $('sbk').onclick=()=>{const t=WBS.tiles[WBS.cur];if(symOf(t).m=='off')return;t.items=expand(t).map(e=>({...e[0]}));t.sym={m:'off',n:0};selOne(-1);store();upd()};
 $('sdl').onclick=()=>{if(Q()){delItems([...WBS.msel]);selOne(-1);store();upd()}};
 
+{let ld=null,lsw=false;const L=$('lib');
+L.addEventListener('pointerdown',e=>{if(e.button!==0||e.shiftKey||e.ctrlKey||e.metaKey||WBS.lsm)return;const b=e.target.closest('button[data-m]');if(!b)return;ld={k:b.dataset.m,x:e.clientX,y:e.clientY,on:false,g:null}});
+document.addEventListener('pointermove',e=>{if(!ld)return;if(!ld.on){if(Math.hypot(e.clientX-ld.x,e.clientY-ld.y)<6)return;ld.on=true;const s=L.querySelector('button[data-m="'+ld.k+'"] svg');if(s){const g=s.cloneNode(true);g.id='mdg';g.style.cssText='position:fixed;width:44px;height:44px;pointer-events:none;z-index:70;opacity:.85;transform:translate(-50%,-50%)';document.body.appendChild(g);ld.g=g}}
+if(ld.g){ld.g.style.left=e.clientX+'px';ld.g.style.top=e.clientY+'px'}});
+const lend=e=>{if(!ld)return;const x=ld;ld=null;if(x.g)x.g.remove();if(!x.on)return;lsw=true;setTimeout(()=>{lsw=false},0);if(e.type!='pointerup')return;const r=ed.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;
+const p=ed.createSVGPoint();p.x=e.clientX;p.y=e.clientY;let[px,py]=(q=>[q.x,q.y])(p.matrixTransform(ed.getScreenCTM().inverse()));if(grid.sd)[px,py]=snapPt(px,py);[px,py]=wrapP(px,py);const a=WBS.tiles[WBS.cur].items;a.push(it(x.k,px,py,DOTK.has(x.k)?.22:.8,0));selOne(a.length-1);WBS.brush=null;store();upd();if(WBX.wbCap)WBX.wbCap()};
+document.addEventListener('pointerup',lend);document.addEventListener('pointercancel',lend);
+L.addEventListener('click',e=>{if(lsw){e.stopImmediatePropagation();e.preventDefault()}},true)}
 $('lib').onclick=e=>{const x=e.target.closest('[data-x]');if(x){const k=x.dataset.x;if(WBS.tiles.some(t=>t.items.some(q=>q.m==k))){$('pmsg').textContent='That motif is used on a stamp. Remove it from your stamps first.';return}if(!x.dataset.sure){x.dataset.sure=1;x.textContent='?';setTimeout(()=>{if(x.isConnected){delete x.dataset.sure;x.innerHTML='&#215;'}},2500);return}delete cust[k];store();build();$('pmsg').textContent='Removed from the library.';return}const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;if(WBS.lsm||e.ctrlKey||e.metaKey||e.shiftKey){libPick(k,e);return}WBS.brush=WBS.brush&&WBS.brush.m==k?null:{m:k,s:DOTK.has(k)?.22:.8,r:0};selOne(-1);upd()};
 $('tabs').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;const k=+b.dataset.k;if(e.shiftKey){const a=WBS.tAnc!=null?WBS.tiles.findIndex(t=>t.id==WBS.tAnc):WBS.cur,a1=a<0?WBS.cur:a;WBS.tM=new Set(WBS.tiles.slice(Math.min(a1,k),Math.max(a1,k)+1).map(t=>t.id));WBS.cur=k;selOne(-1);upd();return}if(e.ctrlKey||e.metaKey){const st=new Set(tGrp().map(i=>WBS.tiles[i].id)),id=WBS.tiles[k].id;if(st.has(id)&&st.size>1){st.delete(id);WBS.cur=WBS.tiles.findIndex(t=>st.has(t.id))}else{st.add(id);WBS.cur=k}WBS.tM=st;WBS.tAnc=id;selOne(-1);upd();return}WBS.tM=new Set();WBS.tAnc=WBS.tiles[k].id;WBS.cur=k;selOne(-1);upd()};
 $('tabs').onmousedown=e=>{if(e.shiftKey)e.preventDefault()};
