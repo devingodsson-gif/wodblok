@@ -27,9 +27,9 @@ test('running a command does what its button does', async ({ page }) => {
   expect(await page.evaluate(() => window.__wbTest.commands.run('view.theme'))).toBe(true);
   expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe('light');
   expect(await page.evaluate(() => window.__wbTest.commands.run('no.such.command'))).toBe(false);
-  expect(await page.evaluate(() => window.__wbTest.commands.run('file.exportEverything'))).toBe(true);
+  expect(await page.evaluate(() => window.__wbTest.commands.run('file.save'))).toBe(true);
   await settle(page);
-  expect((await page.evaluate(() => window.__wbDownloads)).some(d => /\.wodblok-all\.json$/.test(d.filename))).toBe(true);
+  await page.waitForFunction(() => window.__wbDownloads.some(d => /\.wodblok$/.test(d.filename)));
   expect(errors).toEqual([]);
 });
 
