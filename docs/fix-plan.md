@@ -80,7 +80,7 @@ Risk for the full-suite question: about 30% (shared shell and history messages).
 
 Also added to **1.0.4**: starting a new project resets History, so it cannot be undone. Decide whether New project should be a history step (undoable) once Save writes real files.
 
-## 1.0.2: The first minute (needs Q2, Q3, Q4, Q7, Q8, Q9)
+## 1.0.2: The first minute (needs Q2, Q3, Q4, Q7, Q8, Q9) — BUILT, waiting on golden-screenshot approval; see the outcome table below
 
 Goal: someone new can make a pattern without help.
 
@@ -97,6 +97,25 @@ Goal: someone new can make a pattern without help.
 | C11 + D14 | Apply Q3/Q13: hide "Draw with Claude", the "Drawn by Claude" folder and the ChatGPT prompt buttons, and the built-in sets if chosen. **Old files that use built-in motifs must still open and print.** | `shell.html`, `21-motif-library-ui.js`, `14-presets-…`, `05-motif-data.js` | Fixtures still open identically (state snapshots unchanged). |
 
 Risk: about 40% (launch state, rail and text across many panels).
+
+### 1.0.2 outcome (what was actually done)
+
+The Step 0 questions were not answered, so my suggested defaults were used, except where noted.
+
+| # | Result | Notes |
+|---|---|---|
+| B4 | Done | Randomize button in the top bar (both views). An empty project shows "Add a motif" on the canvas (Pattern view only): it opens the Stamp editor and Motifs. An empty stamp in the tray shows a "+". **Not done:** the dashed outline of the empty stamp on the canvas (the cue above replaces it; drawing into the artwork would risk exports and snapshots). Launch is still Pattern, cleared, no panel open (the launch test covers it). |
+| B2 | Done | New and duplicated stamps are added to the current layer; the status line says which. A new blank stamp therefore prints as blank cells in a repeat until it has a motif. |
+| C4 | Done | Shared tools (Randomize, Colours, Presets, Stamp library, Colour grading, Textures, History, Workspaces) are the first eight buttons in both views; the view's own tools follow. Pattern grid and Presets have new icons. One name per tool in rail, tab and command search (a test checks all three agree). Tool names show beside the icons at 1180 px and wider; the button at the foot of the rail turns them on or off and remembers it. **Not done:** renaming Arrangement and Pattern grid (that is C18, in 1.0.3). |
+| C2 | Done | History rows say "Randomize 1, 2, …" and "Look “…”"; "1 step". Other steps still say what changed, or "Several changes". |
+| C17 | Done | Command search with nothing typed: recent commands first, then ones that apply in this view. |
+| P1 | Done | British spelling in the interface (colour, centre). Colour *names* in the library ("Slate Color", "Neutral Gray") and Wada's book title are left as printed. Prompts sent to other AI tools are not changed. |
+| C10 | Done | 11 explanatory sentences removed from panels (Randomize, Colours, Stamp library, Layers, Pattern grid, Motifs, Motif list, grade masks, symmetry). A test scans every tool in both views and in the layout modes, grade masks, repeat tile and book cover. **Kept as a short label:** the Stamp library says "Saved in this browser" (the only statement of where the library lives; confirm you want it kept). **Not touched:** dialogs (Import artwork's hint, the Projects footer) and the Import artwork prompt buttons. |
+| C11 + D14 | **Part** | Done: "Draw with Claude" is hidden; the "Drawn by Claude" folder only shows when it holds an old project's drawings. **Not done:** hiding the built-in motif sets (Plants, Animals, Medieval weapons, Misc, Dots). That would leave a new person with an empty library right after "Add a motif", and old projects use those motifs. Still your decision (Q3). |
+| D19 | Skipped | Randomize now has its own top-bar button, so pre-pinning it is not needed. |
+
+**Tests for 1.0.2:** the full suite ran (21 minutes): 122 passed, 31 failed, 5 skipped. Of the failures, 2 were tests of my own that asserted text I changed on purpose (fixed, not snapshots), and 29 are screenshot or SVG snapshot differences, listed in the report. Nothing was updated. A diagnostic switch (`WB_RAIL=compact`, test side only) shows that with the rail collapsed 14 of the 25 picture differences vanish, so those are purely the wider rail.
+
 
 ## 1.0.3: Layers and placing things (needs Q11, Q15)
 

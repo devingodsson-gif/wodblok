@@ -38,9 +38,12 @@ test('on a Mac the labels say Cmd', async ({ page }) => {
   expect(await page.getAttribute('#undo', 'title')).toBe('Undo (Cmd+Z)');
   expect(await page.getAttribute('#psv', 'title')).toBe('Save (Cmd+S)');
   expect(await page.getAttribute('#cmdkb', 'title')).toContain('Cmd+K');
-  await page.click('#rail-rand');
-  await expect(page.locator('section.pn[data-p="rand"]')).toContainText('Cmd+Z');
-  await expect(page.locator('section.pn[data-p="rand"]')).not.toContainText('Ctrl+Z');
+  expect(await page.getAttribute('#clr', 'title')).toContain('Cmd+Z');          // a title that is set in the page text
+  expect(await page.getAttribute('#clr', 'title')).not.toContain('Ctrl+Z');
+  await page.click('#fileb');
+  await page.click('#clr');
+  await expect(page.locator('#pmsg')).toContainText('Cmd+Z');                    // and a status message written by the app
+  await expect(page.locator('#pmsg')).not.toContainText('Ctrl+Z');
   expect(errors).toEqual([]);
 });
 

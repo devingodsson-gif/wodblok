@@ -34,3 +34,6 @@ Found by reading `23-frame-layers.js` (`if(was&&was!=m)L.pl=[]`), not by a test.
 
 ## Text layer Ink dropdown looked blank once (UX review D5)
 Could not be reproduced in later runs; no change made.
+
+## Test flake again: roundtrip "open project-…" SVG summary (seen twice, 1.0.1 and 1.0.2 runs)
+`open-project-4-rect-4x3.svg.json` failed once on the 1.0.1 build and `open-project-1-diamond.svg.json` once on the 1.0.2 build (with the rail collapsed); each passed on an immediate re-run on the same build. Same family as the flakes above. Snapshots not touched.

@@ -45,9 +45,9 @@ test('the search button opens it, arrows move, a click on a row runs that comman
   expect(await page.locator('#cmdkl .ckr.on b').textContent()).not.toBe(on0);
   await page.keyboard.press('ArrowUp');
   expect(await page.locator('#cmdkl .ckr.on b').textContent()).toBe(on0);
-  // pointer: click the Color grading row
+  // pointer: click the Colour grading row
   await page.fill('#cmdki', 'grading');
-  await page.locator('#cmdkl .ckr', { hasText: 'Open Color grading' }).click();
+  await page.locator('#cmdkl .ckr', { hasText: 'Open Colour grading' }).click();
   await expect(page.locator('#cmdk')).toBeHidden();
   await expect(page.locator('section.pn[data-p="grade"]')).toBeVisible();
   // clicking the dim backdrop closes it
