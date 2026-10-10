@@ -20,6 +20,16 @@ function search(q){
   const hits=q.trim()?all.map(r=>({...r,s:score(r.c.label,q)})).filter(r=>r.s>=0):all.map(r=>({...r,s:0}));
   return hits.sort((a,b)=>(b.on-a.on)||(a.s-b.s)||(a.i-b.i));
 }
+// On a Mac the page says Cmd where it says Ctrl: button titles (now and when they are rewritten later) and the fixed panel text. Status messages
+// are converted where they are written (pmsg in 18).
+function macKeys(){
+  if(!isMac())return;
+  const fix=t=>t.replace(/Ctrl\+/g,'Cmd+');
+  const fixEl=e=>{const t=e.getAttribute('title');if(t&&t.includes('Ctrl+'))e.setAttribute('title',fix(t))};
+  document.querySelectorAll('[title*="Ctrl+"]').forEach(fixEl);
+  const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){if(n.nodeValue.includes('Ctrl+'))n.nodeValue=fix(n.nodeValue)}
+  new MutationObserver(ms=>ms.forEach(m=>{if(m.type=='attributes')fixEl(m.target)})).observe(document.body,{attributes:true,attributeFilter:['title'],subtree:true});
+}
 function init40(){
   const box=$('cmdk'),inp=$('cmdki'),list=$('cmdkl');
   let rows=[],cur=-1,back=null;
@@ -56,6 +66,7 @@ function init40(){
   list.addEventListener('pointermove',e=>{const r=e.target.closest('.ckr');if(r&&!r.classList.contains('dis')&&+r.dataset.i!=cur){cur=+r.dataset.i;mark()}});
   box.querySelector('.ckbd').addEventListener('click',close);
   $('cmdkb').addEventListener('click',()=>box.hidden?open():close());
+  macKeys();
   // Mod+K opens it (and closes it again); capture phase so it works from inside any field
   document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='k'){e.preventDefault();e.stopPropagation();box.hidden?open():close()}},true);
 }

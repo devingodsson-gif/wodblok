@@ -65,7 +65,7 @@ migEdges();migInk();WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));WBS.cur=
 try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
 const saveCp=()=>{try{kv.set('wb18_cur',JSON.stringify(WBS.cp))}catch(e){}};
 // The status line fades after a while so an old message is not mistaken for the result of the last action; progress notes (ending in …) stay until replaced.
-let pmT=0;const pmsg=t=>{$('pmsg').textContent=t;clearTimeout(pmT);if(t&&!/…$/.test(t))pmT=setTimeout(()=>{$('pmsg').textContent=''},12000);return t};
+let pmT=0;const pmsg=t=>{if(typeof t=='string'&&/Mac|iPhone|iPad/.test(navigator.platform||''))t=t.replace(/Ctrl\+/g,'Cmd+');$('pmsg').textContent=t;clearTimeout(pmT);if(t&&!/…$/.test(t))pmT=setTimeout(()=>{$('pmsg').textContent=''},12000);return t};
 const dirty=()=>!WBS.cp.id||coreStr()!==WBS.cp.saved||($('pnm').value.trim()||'Untitled pattern')!==WBS.cp.name;
 function paintPst(){const d=dirty(),u=!WBS.cp.id||d,e=$('pst');e.textContent='';e.className=u?'dirty':'';e.title=u?(!WBS.cp.id?'Not saved yet':'Unsaved changes'):'';if(u)e.setAttribute('role','img'),e.setAttribute('aria-label',e.title);else e.removeAttribute('aria-label')}
 const newId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
