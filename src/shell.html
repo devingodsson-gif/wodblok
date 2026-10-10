@@ -9,10 +9,10 @@
 <style id="wbfonts">/*@@FONTS@@*/</style>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---stage:#eae4d8;--stage-dot:rgba(60,40,10,.07);--panel:#f6f2e9;--raise:#ffffff;--field:#ffffff;--line:#ddd5c6;--line2:#cbc2b0;--fg:#26221d;--mut:#706858;--faint:#a89f90;--acc:#b8914f;--acc-ink:#8a6528;--acc-fg:#1b1a18;--acc-soft:rgba(184,145,79,.16);--warn:#c0532e;--ok:#3f8f66;--shadow:0 1px 2px rgba(60,40,10,.1),0 8px 28px rgba(60,40,10,.16);--paper-shadow:0 1px 3px rgba(60,40,10,.25),0 26px 56px rgba(60,40,10,.25)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--stage:#1b1a18;--stage-dot:rgba(255,255,255,.04);--panel:#242220;--raise:#2e2b28;--field:#1e1c1a;--line:#37332f;--line2:#4a453f;--fg:#ede6da;--mut:#a39b8e;--faint:#6f685e;--acc:#c9a66b;--acc-ink:#c9a66b;--acc-fg:#1b1a18;--acc-soft:rgba(201,166,107,.16);--warn:#e8895c;--ok:#7fb08a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);--paper-shadow:0 2px 6px rgba(0,0,0,.4),0 30px 70px rgba(0,0,0,.55)}}
+--stage:#eae4d8;--stage-dot:rgba(60,40,10,.07);--panel:#f6f2e9;--raise:#ffffff;--field:#ffffff;--line:#ddd5c6;--line2:#cbc2b0;--fg:#26221d;--mut:#706858;--faint:#766d60;--acc:#b8914f;--acc-ink:#8a6528;--acc-fg:#1b1a18;--acc-soft:rgba(184,145,79,.16);--warn:#c0532e;--ok:#3f8f66;--shadow:0 1px 2px rgba(60,40,10,.1),0 8px 28px rgba(60,40,10,.16);--paper-shadow:0 1px 3px rgba(60,40,10,.25),0 26px 56px rgba(60,40,10,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--stage:#1b1a18;--stage-dot:rgba(255,255,255,.04);--panel:#242220;--raise:#2e2b28;--field:#1e1c1a;--line:#37332f;--line2:#4a453f;--fg:#ede6da;--mut:#a39b8e;--faint:#8f887c;--acc:#c9a66b;--acc-ink:#c9a66b;--acc-fg:#1b1a18;--acc-soft:rgba(201,166,107,.16);--warn:#e8895c;--ok:#7fb08a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);--paper-shadow:0 2px 6px rgba(0,0,0,.4),0 30px 70px rgba(0,0,0,.55)}}
 :root[data-theme="dark"]{color-scheme:dark}:root[data-theme="light"]{color-scheme:light}
-:root[data-theme="dark"]{--stage:#1b1a18;--stage-dot:rgba(255,255,255,.04);--panel:#242220;--raise:#2e2b28;--field:#1e1c1a;--line:#37332f;--line2:#4a453f;--fg:#ede6da;--mut:#a39b8e;--faint:#6f685e;--acc:#c9a66b;--acc-ink:#c9a66b;--acc-fg:#1b1a18;--acc-soft:rgba(201,166,107,.16);--warn:#e8895c;--ok:#7fb08a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);--paper-shadow:0 2px 6px rgba(0,0,0,.4),0 30px 70px rgba(0,0,0,.55)}
+:root[data-theme="dark"]{--stage:#1b1a18;--stage-dot:rgba(255,255,255,.04);--panel:#242220;--raise:#2e2b28;--field:#1e1c1a;--line:#37332f;--line2:#4a453f;--fg:#ede6da;--mut:#a39b8e;--faint:#8f887c;--acc:#c9a66b;--acc-ink:#c9a66b;--acc-fg:#1b1a18;--acc-soft:rgba(201,166,107,.16);--warn:#e8895c;--ok:#7fb08a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);--paper-shadow:0 2px 6px rgba(0,0,0,.4),0 30px 70px rgba(0,0,0,.55)}
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -266,7 +266,7 @@ button.alt{background:var(--raise)}
 #art{display:block;box-shadow:var(--paper-shadow);border-radius:1px;max-width:none}#artwrap{position:relative}#art{position:relative}#art.shp{box-shadow:none;border-radius:0}
 #artsh{position:absolute;left:28px;top:28px;display:none;pointer-events:none;overflow:visible;filter:drop-shadow(0 2px 5px rgba(0,0,0,.14)) drop-shadow(0 14px 22px rgba(0,0,0,.13))}
 .shg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:4px}
-.shg button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 1px 5px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--mut);font-size:9.5px;line-height:1.1;cursor:pointer;min-width:0;overflow:hidden}
+.shg button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 1px 5px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--mut);font-size:10.5px;line-height:1.1;cursor:pointer;min-width:0;overflow:hidden}
 .shg button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round;flex:none}
 .shg button:hover{color:var(--fg);border-color:var(--line2)}
 .shg button.on{color:var(--acc-ink);border-color:var(--acc);background:var(--acc-soft)}
@@ -394,12 +394,15 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .ctl .num input{height:24px;font-size:11.5px;padding:2px 5px}
 .ctl .num input.u{padding-right:15px}
 .ctl .num i{position:absolute;right:5px;top:50%;transform:translateY(-50%);font-style:normal;color:var(--faint);font-size:10.5px;pointer-events:none}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;margin:0;--p:50%}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:transparent;margin:0;--p:50%}
 input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--acc) var(--p),var(--line2) var(--p))}
 input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--acc) var(--p),var(--line2) var(--p))}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--raise);border:1.5px solid var(--acc);margin-top:-5px;box-shadow:0 1px 2px rgba(0,0,0,.25)}
 input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:var(--raise);border:1.5px solid var(--acc)}
-input[type=range]:focus-visible{outline:none}input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--acc-soft)}
+input[type=range]:focus-visible{outline:none}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--acc)}
+input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--acc)}
+select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-visible,#pnm:focus-visible,#cmdki:focus-visible{box-shadow:0 0 0 2px var(--acc-soft),0 0 0 3px var(--acc)}
 
 .hint{font-size:11px;color:var(--mut);margin-top:8px;line-height:1.45}
 #msg{font-size:11px;color:var(--mut);margin-top:6px;min-height:14px}
