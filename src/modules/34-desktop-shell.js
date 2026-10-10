@@ -15,7 +15,7 @@ import {LY} from './14-presets-and-layer-grid-ui.js';
 import {savePr} from './15-print-effects-and-stamp-texture.js';
 import {txClean} from './16-texture-generators.js';
 import {buildTex,migInk,saveTex,texNorm} from './17-texture-panel-and-previews.js';
-import {coreStr,dirty,paintPst,pgFix,pmsg} from './18-projects-and-cover-overlay.js';
+import {coreStr,dirty,paintPst,pgFix,pmsg,thumb} from './18-projects-and-cover-overlay.js';
 import {randomize,wbBA} from './20-before-after-and-randomizer.js';
 import {clearAll} from './33-clear.js';
 
@@ -155,7 +155,7 @@ let wsRT=0,wsPend=false;addEventListener('resize',()=>{clearTimeout(wsRT);wsRT=s
 addEventListener('focusout',()=>{setTimeout(()=>{if(wsPend&&!typing()){wsPend=false;if(wsReady)wsRender()}},300)});
 const stage=document.querySelector('.stage');
 function setView(v){const was=view;view=v;WBS.curView=v;if(WBX.wbEmptyCue)WBX.wbEmptyCue();if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
-$('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display=v=='pattern'?'':'none';$('gtb').style.display=v=='stamp'?'':'none';$('itb').style.display='';if(v=='pattern')requestAnimationFrame(applyZ);tbSync();if(was!=v||!wsReady)wsRender()}
+$('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display='';$('gtb').style.display=v=='stamp'?'':'none';$('itb').style.display='';if(v=='pattern')requestAnimationFrame(applyZ);else applyZE();tbSync();if(was!=v||!wsReady)wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
 const L=wsL();let g=wsFind(p);
 // a tool that is not open yet opens docked on the right: Randomize beside the colour tools, anything else as a tab in the first group
@@ -214,7 +214,13 @@ function applyZ(){fitZ();const s=z||fitS;$('art').style.width=Math.round(CW*s)+'
 function zoomAt(ns,cx,cy){const b=$('boardP'),a=$('art'),r0=a.getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);z=Math.min(8,Math.max(.1,ns));applyZ();const r1=a.getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
 const zoomMid=f=>{const r=$('boardP').getBoundingClientRect();zoomAt((z||fitS)*f,r.left+r.width/2,r.top+r.height/2)};
 WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbZoomTo=s=>{const r=$('boardP').getBoundingClientRect();zoomAt(s,r.left+r.width/2,r.top+r.height/2)};WBX.wbZoomNow=()=>z||fitS;WBX.wbZoomIn=()=>view=='pattern'&&!!z&&z>fitS*1.001;
-$('zi').onclick=()=>zoomMid(1.25);$('zo').onclick=()=>zoomMid(1/1.25);$('zl').onclick=()=>{z=0;applyZ()};
+// ---- zoom in the Stamp editor: at Fit the editor is the size of its box; zooming makes it larger inside a scrolling box (1x to 8x)
+let zE=1;const edBox=()=>$('boardS').firstElementChild;
+function applyZE(){const e=$('ed'),big=zE>1;e.style.flex=big?'none':'';e.style.width=big?(zE*100)+'%':'';e.style.height=big?(zE*100)+'%':'';edBox().style.overflow=big?'auto':'';$('zl').textContent=big?Math.round(zE*100)+'%':'Fit';$('zl').title=big?'Fit to screen':'Fitted to screen'}
+function zoomE(ns,cx,cy){const b=edBox(),r0=$('ed').getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);zE=Math.min(8,Math.max(1,ns));applyZE();const r1=$('ed').getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
+const zoomMidE=f=>{const r=edBox().getBoundingClientRect();zoomE(zE*f,r.left+r.width/2,r.top+r.height/2)};
+$('boardS').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomE(zE*(e.deltaY<0?1.1:1/1.1),e.clientX,e.clientY)},{passive:false});
+$('zi').onclick=()=>view=='stamp'?zoomMidE(1.25):zoomMid(1.25);$('zo').onclick=()=>view=='stamp'?zoomMidE(1/1.25):zoomMid(1/1.25);$('zl').onclick=()=>{if(view=='stamp'){zE=1;applyZE();edBox().scrollLeft=0;edBox().scrollTop=0}else{z=0;applyZ()}};
 $('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomAt((z||fitS)*(e.deltaY<0?1.1:1/1.1),e.clientX,e.clientY)},{passive:false});
 try{new ResizeObserver(()=>{if(view=='pattern')applyZ()}).observe($('boardP'))}catch(e){window.addEventListener('resize',applyZ)}
 new MutationObserver(()=>applyZ()).observe($('art'),{attributes:true,attributeFilter:['viewBox']});
@@ -268,13 +274,18 @@ $('pgrid').addEventListener('click',e=>{const b=e.target.closest('[data-a="open"
 // ---- undo / redo (snapshots of the whole project state)
 let hist=[coreStr()],hi=0;
 const ub=()=>{$('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;if(WBX.wbHistPaint)WBX.wbHistPaint()};
-let histL=['Start'],histT=[Date.now()];
+let histL=['Start'],histT=[Date.now()],histTh=[''];
 const HK={tiles:'Stamp change',layers:'Layer change',proj:'Colours',dim:'Canvas size',pg:'Grid',pr:'Roughness',tex:'Texture',texLib:'Texture library',grade:'Grade'};
 function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added motif'+(y-x>1?'s':'');if(y<x)return 'Removed motif'+(x-y>1?'s':'');return 'Moved or edited motif'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
 // wbRollHold: a Randomize roll is still setting its lettering, so the half-made piece is not a history step
 const navDirty=()=>{if(WBX.wbNavDirty)WBX.wbNavDirty();if(WBX.wbVarDirty)WBX.wbVarDirty()};
 // A step can be named by whoever makes it: WBX.wbLabelNext={t:'Randomize 3',at:performance.now()} just before wbCap(); otherwise the label says what changed.
-function cap(){if(drag||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext;WBX.wbLabelNext=null;histL.push(nl&&performance.now()-nl.at<3000?nl.t:hLabel(prev,s))}histT.push(Date.now());navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift()}hi=hist.length-1}ub()}
+// A step named by whoever made it (a Randomize roll, a look, a palette) gets a small picture, taken once from the finished piece when nothing is happening
+// (never during a drag or a roll). Steps made by hand have none.
+let thT=0,thWant=null;
+function thRun(){if(drag||WBS.WBDRG||WBX.wbHoldOn||WBX.wbRollHold||(WBX.wbTxBusy||0)>0||document.body.classList.contains('babusy')){thT=setTimeout(thRun,800);return}
+ const s=thWant;if(!s||s!==coreStr())return;thWant=null;thumb(120).then(u=>{const i=hist.lastIndexOf(s);if(u&&i>=0){histTh[i]=u;if(WBX.wbHistPaint)WBX.wbHistPaint()}})}
+function cap(){if(drag||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext;WBX.wbLabelNext=null;const named=nl&&performance.now()-nl.at<3000;histL.push(named?nl.t:hLabel(prev,s));if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
 function applyCore(c){WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
 WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
@@ -285,7 +296,7 @@ function goTo(i){hi=i;applyCore(JSON.parse(hist[hi]));hist[hi]=coreStr();navDirt
 function undo(){cap();if(hi>0){const was=histL[hi];goTo(hi-1);pmsg('Undid: '+was)}ub()}
 function redo(){if(hi<hist.length-1){goTo(hi+1);pmsg('Redid: '+histL[hi])}ub()}
 $('undo').onclick=undo;$('redo').onclick=redo;ub();
-WBX.wbHistGet=i=>hist[i];WBX.wbHistIdx=()=>hi;WBX.wbHistLabel=i=>histL[i]||'Change';WBX.wbResetHist=()=>{if(WBX.wbBA)wbBA.reset();hist=[coreStr()];histL=['Start'];histT=[Date.now()];hi=0;ub();if(WBX.wbSnapLoad)WBX.wbSnapLoad()};WBX.wbCap=cap;WBX.wbApply=applyCore;
+WBX.wbHistGet=i=>hist[i];WBX.wbHistIdx=()=>hi;WBX.wbHistLabel=i=>histL[i]||'Change';WBX.wbResetHist=()=>{if(WBX.wbBA)wbBA.reset();hist=[coreStr()];histL=['Start'];histT=[Date.now()];histTh=[''];hi=0;thWant=null;ub();if(WBX.wbSnapLoad)WBX.wbSnapLoad()};WBX.wbCap=cap;WBX.wbApply=applyCore;
 // ---- History panel + named snapshots
 (()=>{const sec=document.querySelector('section.pn[data-p="hist"]'),hl=$('hhl'),sl=$('hsl'),XI=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 let snaps=[],sk='',raf=0,ren=-1;
@@ -296,13 +307,13 @@ if(k!=sk||!snaps){sk=k;try{snaps=JSON.parse(kv.get(k)||'[]')}catch(e){snaps=[]}i
 const ago=t=>{const d=(Date.now()-t)/1000;return d<45?'now':d<3600?Math.round(d/60)+' min':d<86400?Math.round(d/3600)+' h':Math.round(d/86400)+' d'};
 const esc2=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function paint(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(sec.hidden)return;const k=key();if(k!=sk){load();return}
-if(!(ren>=0&&sl.querySelector('input')))sl.innerHTML=snaps.map((n,i)=>i==ren?`<div class="hr sn" data-sn="${i}"><input type="text" value="${esc2(n.n)}" maxlength="40" aria-label="Snapshot name"><span></span><span></span></div>`:`<div class="hr sn" data-sn="${i}"><b>${esc2(n.n)}</b><i>${ago(n.t)}</i><button type="button" class="rfb" data-sref="${i}">Compare</button><button type="button" data-del="${i}" aria-label="Delete snapshot">${XI}</button></div>`).join('');
-let h='';for(let i=hist.length-1;i>=0;i--)h+=`<div class="hr${i==hi?' on':''}${i>hi?' fut':''}" data-h="${i}"><b>${esc2(histL[i]||'Change')}</b><i>${ago(histT[i]||Date.now())}</i>${i==hi?'<span></span>':`<button type="button" class="rfb" data-href="${i}">Compare</button>`}</div>`;
+if(!(ren>=0&&sl.querySelector('input')))sl.innerHTML=snaps.map((n,i)=>i==ren?`<div class="hr sn" data-sn="${i}"><input type="text" value="${esc2(n.n)}" maxlength="40" aria-label="Snapshot name"><span></span><span></span></div>`:`<div class="hr sn${n.th?' th':''}" data-sn="${i}">${n.th?`<img class="hth" src="${n.th}" alt="">`:''}<b>${esc2(n.n)}</b><i>${ago(n.t)}</i><button type="button" class="rfb" data-sref="${i}">Compare</button><button type="button" data-del="${i}" aria-label="Delete snapshot">${XI}</button></div>`).join('');
+let h='';for(let i=hist.length-1;i>=0;i--)h+=`<div class="hr${i==hi?' on':''}${i>hi?' fut':''}${histTh[i]?' th':''}" data-h="${i}">${histTh[i]?`<img class="hth" src="${histTh[i]}" alt="">`:''}<b>${esc2(histL[i]||'Change')}</b><i>${ago(histT[i]||Date.now())}</i>${i==hi?'<span></span>':`<button type="button" class="rfb" data-href="${i}">Compare</button>`}</div>`;
 hl.innerHTML=h;if(WBX.wbBAPaint)WBX.wbBAPaint();$('hsc').textContent=hist.length+(hist.length==1?' step':' steps');const inp=sl.querySelector('input');if(inp&&document.activeElement!==inp){inp.focus();inp.select()}})}
 WBX.wbHistPaint=paint;WBX.wbSnapLoad=()=>{sk='';load()};
 function jump(i){cap();if(i<0||i>=hist.length||i==hi)return;goTo(i);ub()}
 hl.addEventListener('click',e=>{const b=e.target.closest('[data-href]');if(b){const i=+b.dataset.href;wbBA.setRef((histL[i]||'Change')+' · '+ago(histT[i]||Date.now()),hist[i],1);return}const r=e.target.closest('[data-h]');if(r)jump(+r.dataset.h)});
-$('hsadd').onclick=()=>{cap();snaps.unshift({n:'Snapshot '+(snaps.length+1),t:Date.now(),s:coreStr()});if(snaps.length>30)snaps.length=30;persist();ren=0;paint()};
+$('hsadd').onclick=()=>{cap();const sn={n:'Snapshot '+(snaps.length+1),t:Date.now(),s:coreStr()};snaps.unshift(sn);if(snaps.length>30)snaps.length=30;persist();ren=0;paint();thumb(120).then(u=>{if(u&&snaps.includes(sn)){sn.th=u;persist();paint()}})};
 sl.addEventListener('click',e=>{const q=e.target.closest('[data-sref]');if(q){const n=snaps[+q.dataset.sref];if(n)wbBA.setRef(n.n,n.s,1);return}const d=e.target.closest('[data-del]');if(d){snaps.splice(+d.dataset.del,1);persist();ren=-1;paint();return}
 if(e.target.closest('input'))return;const r=e.target.closest('[data-sn]');if(!r)return;const n=snaps[+r.dataset.sn];if(!n)return;cap();applyCore(JSON.parse(n.s));cap();pmsg('Restored “'+n.n+'”. Ctrl+Z goes back.')});
 sl.addEventListener('dblclick',e=>{const r=e.target.closest('[data-sn]');if(r&&!e.target.closest('input,button')){ren=+r.dataset.sn;paint()}});

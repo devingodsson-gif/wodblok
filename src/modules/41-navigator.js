@@ -56,7 +56,7 @@ function init41(){
   const typing=t=>t&&t.matches&&t.matches('input,select,textarea,[contenteditable]');
   // Ctrl/Cmd and + - 0 zoom the picture, not the whole browser page (the habit from Photoshop and Figma)
   document.addEventListener('keydown',e=>{
-    if(!(e.ctrlKey||e.metaKey)||e.altKey||typing(e.target)||$('boardP').classList.contains('off'))return;
+    if(!(e.ctrlKey||e.metaKey)||e.altKey||typing(e.target))return;   // in both the Pattern view and the Stamp editor
     if(e.key=='='||e.key=='+'){e.preventDefault();$('zi').click()}
     else if(e.key=='-'||e.key=='_'){e.preventDefault();$('zo').click()}
     else if(e.key=='0'){e.preventDefault();$('zl').click()}
