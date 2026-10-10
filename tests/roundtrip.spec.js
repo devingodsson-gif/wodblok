@@ -11,8 +11,7 @@ const FIXTURES = fs.readdirSync(DIR).filter(f => f.endsWith('.wodblok.json')).so
 
 async function download(page) {
   await page.evaluate(() => { window.__wbDownloads.length = 0; });
-  await page.click('#fileb');
-  await page.click('#pdl');
+  if (TARGET === 'legacy') { await page.click('#fileb'); await page.click('#pdl'); } else await page.click('#psv');   // 1.0.4: the top-bar Save project writes the file
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   await page.keyboard.press('Escape');
   return page.evaluate(() => window.__wbDownloads[0]);
@@ -91,6 +90,7 @@ test('a file that is not a WODBLOK project is refused without damage', async ({ 
 });
 
 test('projects saved in the account database list and reopen', async ({ page }) => {
+  test.skip(TARGET !== 'legacy', 'the browser/account project list was removed in 1.0.4: projects are .wodblok files');
   const { errors } = await openApp(page, { runtime: 'artifact' });
   await openProjectFile(page, path.join(DIR, FIXTURES[0]));
   const before = await stateText(page);

@@ -49,26 +49,8 @@ test('files.save falls back to a download when there is no save picker', async (
   expect((await dl).suggestedFilename()).toBe('x.txt');
 });
 
-// Wiring (any build that has the web adapter): with no Claude account, projects live in IndexedDB; the old localStorage key is copied once and kept.
-test('without an account, projects move from the old key to IndexedDB and survive a reload', async ({ browser }) => {
-  test.skip(TARGET === 'legacy', 'new in the repo build');
-  const { openApp, settle } = require('./helpers/harness');
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  await ctx.addInitScript(() => { if (!localStorage.getItem('__seeded')) { localStorage.setItem('__seeded', '1'); localStorage.setItem('wb18_projects', JSON.stringify({ pOld1: { name: 'Old project', updated: 1, info: 'x', thumb: '', data: '{}' } })); } });
-  const page = await ctx.newPage();
-  const { errors } = await openApp(page, { runtime: 'none' });
-  await page.click('#pls'); await settle(page);
-  await expect(page.locator('#pgrid .pc')).toHaveCount(1);
-  expect(await page.evaluate(() => localStorage.getItem('wb18_projects'))).toContain('pOld1');          // not deleted
-  await page.evaluate(() => { localStorage.removeItem('wb18_projects'); });                              // prove the list now comes from IndexedDB
-  await page.reload(); await page.waitForFunction(() => document.fonts.status === 'loaded'); await settle(page);
-  await page.click('#pls'); await settle(page);
-  await expect(page.locator('#pgrid .pc')).toHaveCount(1);
-  expect(errors).toEqual([]);
-  await ctx.close();
-});
-
-test('without the Claude runtime, Export everything still saves a file', async ({ page }) => {
+// (Until 1.0.4 this file also tested projects moving from the old localStorage key into IndexedDB. Projects are now .wodblok files, so that is gone.)
+test('without the Claude runtime, Back up everything still saves a file', async ({ page }) => {
   test.skip(TARGET === 'legacy', 'new in the repo build');
   const { openApp, settle } = require('./helpers/harness');
   const { errors } = await openApp(page, { runtime: 'none' });
