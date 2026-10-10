@@ -292,7 +292,7 @@ button.alt{background:var(--raise)}
 #ed.graded>.gw,#ed.graded>#ghost{filter:url(#wbgradeE)}#ed.graded>.gw.gi{filter:url(#wbgradeEI)}#ed.graded>path.edbg{filter:url(#wbgradeEB)}#ed.graded>.edtx:not(.spov):not(.gmh){filter:none}
 .gms{border-bottom:1px solid var(--line);margin:-1px 0 2px}.gms .lyl2{max-height:240px}
 .gmi{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--mut)}.gmi svg{width:16px;height:16px}.lyr.on .gmi{color:var(--acc-ink)}.gmsp{width:22px;flex:none}
-.gmadd{flex:none}.gmadd .ddl{left:auto;right:-58px;width:236px}.gmadd .ddi{align-items:flex-start}.gmadd .ddi .gmi{margin-top:1px}
+.gmadd{flex:none}.gmadd .ddl{left:auto;right:-58px;width:236px}#ly_menu{width:190px;right:-8px}.gmadd .ddi{align-items:flex-start}.gmadd .ddi .gmi{margin-top:1px}
 #gm_body{padding-bottom:6px}#gm_body .lyo .seg{flex:1}#gm_body .seg button{padding:5px 4px}
 .gmc{display:flex;gap:6px;flex:1;min-width:0}.gmc select{flex:1;min-width:0}.gmc .ib{width:30px;height:28px;flex:none}.gmc .ib[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink)}#art.gmpick,#art.gmpick *{cursor:crosshair!important}.gmc input[type=color]{width:30px;height:28px;padding:2px;border:1px solid var(--line);border-radius:6px;background:var(--field);flex:none;cursor:pointer}
 .gmchk{display:flex;flex-wrap:wrap;gap:4px 16px;padding:2px 10px 4px}.gmchk .chk{margin-top:6px}
@@ -913,7 +913,14 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  <section class="pn" data-p="preview" hidden><div class="pvbar"><span>Live pattern</span><button type="button" class="pvc" id="pvc" aria-pressed="false" title="Show the book cover text block in the preview">Cover</button><div class="seg pvz" id="pvz"><button type="button" data-z="1" class="on">Fit</button><button type="button" data-z="2">2&#215;</button><button type="button" data-z="4">4&#215;</button></div></div><div class="pvbox"><svg id="pvw" viewBox="0 0 533 800" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><use href="#dyn"/><use href="#texg"/><use href="#covg" id="pvcu" visibility="hidden"/></svg></div></section>
  <section class="pn" data-p="mlist" hidden><div class="mlist" id="mlist" aria-label="Motifs on this stamp"></div></section>
 <section class="pn" data-p="lyrs" hidden><div class="lys" id="lys">
- <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><button type="button" class="ib" id="ly_add" title="New layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button></div>
+ <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><div class="dd gmadd"><button type="button" class="ib" id="ly_add" title="New layer" aria-label="New layer" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <div class="ddl" id="ly_menu" data-w="190" hidden>
+   <div class="ddi" data-lt="p"><span>Repeat pattern</span></div>
+   <div class="ddi" data-lt="f"><span>Frame</span></div>
+   <div class="ddi" data-lt="x"><span>Free place</span></div>
+   <div class="ddi" data-lt="a"><span>Pictures</span></div>
+   <div class="ddi" data-lt="t"><span>Text</span></div>
+  </div></div></div>
  <div id="lybody">
   <div class="lyo"><span class="lyk">Blend</span><select id="ly_bl" title="Blend mode"><option value="">Normal</option><option value="multiply">Multiply (overprint)</option><option value="darken">Darken</option><option value="screen">Screen</option><option value="lighten">Lighten</option><option value="overlay">Overlay</option><option value="soft-light">Soft light</option><option value="behind">Behind (fills gaps only)</option><option value="cancel">Cancel out (overlap prints nothing)</option><option value="replace">Replace (overlap prints a colour)</option></select></div>
   <div class="lyop"><label>Opacity</label><input type="range" id="ly_op" min="0" max="100" value="100" data-u="%" data-def="100"></div>
@@ -953,7 +960,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
   <details class="g" open id="lstbox"><summary>Stamps in the pattern</summary><div class="gb">
    <div class="strip ls" id="lst"></div>
   </div></details>
-  <details class="g" open><summary>Layout</summary><div class="gb">
+  <details class="g" open><summary>Layer type <span class="aux" id="lytn"></span></summary><div class="gb">
    <div class="seg" id="lmode" style="grid-template-columns:repeat(5,auto);margin-bottom:4px"><button type="button" data-m="p" class="on" title="Stamps repeat across the canvas in a pattern">Repeat</button><button type="button" data-m="f" title="A strip stamp walked round the edges">Frame</button><button type="button" data-m="x" title="Place stamps anywhere by hand">Free place</button><button type="button" data-m="a" title="Place imported images or saved WODBLOK projects anywhere by hand">Art</button><button type="button" data-m="t" title="Place text boxes anywhere by hand">Text</button></div>
    <div id="lfree" hidden>
     <div class="hint" id="lfph" style="margin-top:6px"></div>

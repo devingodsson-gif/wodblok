@@ -1,5 +1,5 @@
-import {$,WBS} from './01-launch-and-version.js';
-import {C,CM,DD,DDset,PSLOT,SH,SW,cItem,col,geom,mkdd,projCols,projSet,shOf} from './04-canvas-and-stamp-outlines.js';
+import {$,WBS,WBX} from './01-launch-and-version.js';
+import {C,CM,DD,DDset,PSLOT,SH,SW,cItem,closeDD,col,geom,mkdd,placeFloat,projCols,projSet,shOf} from './04-canvas-and-stamp-outlines.js';
 import {luid,mkL,store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -14,7 +14,7 @@ let lyRen=-1;
 function renderLayers(){const pa=col(WBS.proj.bg),L=LY();
 $('lyl2').innerHTML=WBS.layers.map((_,i)=>i).reverse().map(i=>{const l=WBS.layers[i],ink=l.ink&&CM[l.ink]?col(l.ink):'',ts=WBS.tiles.filter(t=>l.st.includes(t.id)).slice(0,2),tg=ts.length?geom(shOf(ts[0])):{SW,SH},
 sw=l.art&&WBS.ARTS[((l.pl||[])[0]||{}).a]?`<img class="ath" src="${artBU(WBS.ARTS[l.pl[0].a])}" alt="">`:`<svg viewBox="0 0 ${tg.SW} ${tg.SH}" preserveAspectRatio="xMidYMid slice"><rect width="${tg.SW}" height="${tg.SH}" fill="${pa}"/>${ts.length?`<g${ink?` filter="url(#lk${i})"`:''}><use href="#s${ts[0].id}"/></g>`:''}</svg>`,
-meta=[l.bl?$('ly_bl').querySelector(`option[value="${l.bl}"]`).textContent.split(' ')[0]:'',(l.op??100)<100?(l.op+'%'):''].filter(Boolean).join(' · ');
+meta=[l.txt?'Text':l.art?'Pictures':l.free?'Free place':(l.fr&&l.fr.on)?'Frame':'',l.bl?$('ly_bl').querySelector(`option[value="${l.bl}"]`).textContent.split(' ')[0]:'',(l.op??100)<100?(l.op+'%'):''].filter(Boolean).join(' · ');
 return`<div class="lyr${i==WBS.selL?' on':''}${l.vis?'':' off'}" data-l="${i}" draggable="true"><button type="button" class="eye" data-eye title="${l.vis?'Hide':'Show'}">${l.vis?EYE:NOEYE}</button><span class="lysw"${ink?` style="box-shadow:inset 0 -4px 0 ${ink}"`:''}>${sw}</span><span class="lyn">${i==lyRen?`<input value="${hx(l.name)}" maxlength="30">`:hx(l.name)}${meta?` <span class="lym">${meta}</span>`:''}</span><span class="lyact"><button type="button" class="lyb" data-dup title="Duplicate layer" aria-label="Duplicate layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button><button type="button" class="lyb" data-del title="${WBS.layers.length<2?'A project needs at least one layer':'Delete layer'}" aria-label="Delete layer"${WBS.layers.length<2?' disabled':''}><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button></span></div>`}).join('');
 $('lycnt').textContent=`${WBS.layers.length} layer${WBS.layers.length>1?'s':''}`;$('ly_bl').value=L.bl||'';if(+$('ly_op').value!=(L.op??100)){$('ly_op').value=L.op??100;$('ly_op').dispatchEvent(new Event('input',{bubbles:true}))}$('ly_ink').value=L.ink&&CM[L.ink]?L.ink:'';{const k=$('ly_ink').value,sw=$('lyS');sw.style.background=k?col(k):'transparent';sw.style.borderStyle=k?'solid':'dashed';DD.ly_ink()}{const rk=L.rp&&CM[L.rp]?L.rp:WBS.proj.ink;$('ly_rprow').hidden=L.bl!='replace';$('ly_rp').value=rk;$('lyRS').style.background=col(rk);DD.ly_rp()}
 const inp=$('lyl2').querySelector('input');if(inp){inp.focus();inp.select();const done=ok=>{if(lyRen<0)return;if(ok&&inp.value.trim())WBS.layers[lyRen].name=inp.value.trim().slice(0,30);lyRen=-1;store();upd()};inp.onkeydown=e=>{if(e.key=='Enter')done(1);else if(e.key=='Escape')done(0);e.stopPropagation()};inp.onblur=()=>done(1)}}
@@ -32,7 +32,17 @@ $('lyl2').addEventListener('drop',e=>{if(lyDrag<0)return;e.preventDefault();cons
 // list is shown top-first: "above" a row means printed after it (higher index)
 let to=above?t+1:t;const L=WBS.layers.splice(lyDrag,1)[0];if(lyDrag<to)to--;WBS.layers.splice(Math.max(0,Math.min(WBS.layers.length,to)),0,L);WBS.selL=WBS.layers.indexOf(L);lyDrag=-1;store();upd()});
 $('lyl2').addEventListener('dragend',()=>{lyDrag=-1;lyClr()});
-$('ly_add').onclick=()=>{const L=mkL('Layer '+(WBS.layers.length+1),[],'check',180);L.ak={};WBS.layers.splice(WBS.selL+1,0,L);WBS.selL++;store();upd();$('pmsg').textContent='New empty layer added above the selected one. Tick the stamps it should print in Arrangement.'};
+// "+" asks what kind of layer to add; the new layer goes above the selected one, holds the current stamp, and is made the selected layer.
+const LT={p:'Layer',f:'Frame',x:'Free stamps',a:'Pictures',t:'Text'};
+$('ly_add').onclick=e=>{e.stopPropagation();const l=$('ly_menu'),open=l.hidden;closeDD();if(WBX.wbCloseMenus)WBX.wbCloseMenus();l.hidden=!open;if(open)placeFloat(l,$('ly_add'),true)};
+$('ly_menu').onclick=e=>{const it=e.target.closest('[data-lt]');if(!it)return;$('ly_menu').hidden=true;addLayer(it.dataset.lt)};
+function addLayer(m){const base=LT[m]||'Layer',n=WBS.layers.filter(x=>x.name==base||x.name.startsWith(base+' ')).length,cur=WBS.tiles[WBS.cur],
+ L=mkL(m=='p'?'Layer '+(WBS.layers.length+1):(n?base+' '+(n+1):base),cur?[cur.id]:[],'check',180);L.ak={};
+ WBS.layers.splice(WBS.selL+1,0,L);WBS.selL++;
+ if(m!='p'){const b=$('lmode').querySelector('[data-m="'+m+'"]');if(b)b.click()}   // the same switch the Layer type buttons use, on the new layer
+ store();upd();
+ $('pmsg').textContent=(m=='p'?'Repeat layer':m=='f'?'Frame layer':m=='x'?'Free place layer':m=='a'?'Pictures layer':'Text layer')+' added above the selected one.';
+ if(m!='p'){const sec=document.querySelector('section.pn[data-p="layers"]');if(sec&&sec.hidden){const r=$('rail-layers');if(r)r.click()}}}
 $('ly_bl').onchange=()=>{const v=$('ly_bl').value;if(v)LY().bl=v;else delete LY().bl;store();upd()};
 $('ly_op').addEventListener('input',()=>{const v=+$('ly_op').value;if(v<100)LY().op=v;else delete LY().op;store();upd()});
 $('ly_rp').oninput=()=>{LY().rp=$('ly_rp').value;store();upd()};
