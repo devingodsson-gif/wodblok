@@ -24,6 +24,13 @@ function randomizeCore(fresh){const R=Math.random,pick=a=>a[Math.floor(R()*a.len
 const FT=WBX.wbRZ?WBX.wbRZ.get():{stamps:1,text:1,frame:1,col:1,gr:1,masks:1,tx:1,pr:1,shape:0,free:1,layout:0,size:0,look:0,lib:0};
 // which kinds of change each switch allows (the arrows in the Randomize panel)
 const SUBS={};['stamps','frame','shape','free','col','gr','masks','tx','pr','layout','size','look','lib'].forEach(m=>SUBS[m]=WBX.wbRZ?WBX.wbRZ.sub(m):null);const sOn=(m,k)=>!SUBS[m]||SUBS[m].has(k);
+// An amount under 100 (the sliders in the Randomize panel) lets only some of a feature's allowed kinds of change happen on this roll (at least one), or, for a feature
+// without kinds, lets it happen on some rolls. At 100 nothing is drawn here, so a roll comes out exactly as it did before the sliders. Colours keep a plain switch.
+const AM=k=>WBX.wbRZ&&WBX.wbRZ.amt?WBX.wbRZ.amt(k):1;
+{const gated=[];['stamps','text','layout','frame','shape','size','free','gr','masks','tx','pr','look'].forEach(m=>{const a=AM(m);if(!FT[m]||a>=1)return;const S=SUBS[m];
+ if(S&&S.size>1&&m!='text'){const keep=[...S].filter(()=>ch(a));if(!keep.length)keep.push(pick([...S]));SUBS[m]=new Set(keep)}
+ else if(!ch(a)){FT[m]=0;gated.push(m)}});
+ if(gated.length&&!['stamps','frame','col','gr','masks','tx','pr','shape','free','layout','size','look','lib'].some(m=>FT[m]))FT[pick(gated)]=1}
 const RAT={portrait:[[2,3],[3,4],[4,5],[5,7]],square:[[1,1]],landscape:[[3,2],[4,3],[7,5]],banner:[[1,2],[9,16],[2,1],[16,9]]},ratioPick=()=>{let a=[];if(FT.size)Object.keys(RAT).forEach(g=>{if(sOn('size',g))a=a.concat(RAT[g])});if(!a.length)a=[[2,3],[3,4],[4,5],[5,7],[1,1],[3,2],[4,3]];return pick(a)};
 const SLCn=(window.SLC||[]).length,libFree=!!(FT.lib&&sOn('lib','free')&&SLCn),libPat=!!(FT.lib&&sOn('lib','pat')&&SLCn);let libDone=false;
 const libTile=id=>{const r=pick(window.SLC);let t=null;try{t=JSON.parse(r.tile)}catch(e){}if(!t||!Array.isArray(t.items))return null;try{libMotifs({motifs:r.motifs});libColors({colors:r.colors})}catch(e){}txMerge(t);t.id=id;shOf(t);return t};
@@ -152,6 +159,7 @@ rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u:(sOn('tx','none')&&ch(
 const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(l=>l.art)?[]:WBS.layers.filter(l=>l.art||l.txt)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:rzCv(),v:87}};
 if(RZ.keep.pr)c.pr={...WBS.pr};
 if(FT.pr&&!sOn('pr','edges')){c.pr.e=WBS.pr.e;c.pr.q=WBS.pr.q}
+if(FT.pr&&sOn('pr','edges')&&AM('pr')<1){c.pr.e=Math.round(c.pr.e*AM('pr'));c.pr.q=Math.round(c.pr.q*AM('pr'))}
 // textures: a Print effects roll gives each stamp (and layer, and text box) its own textures, each in its own mode
 if(FT.pr&&sOn('pr','surf')){c.tiles.forEach(t=>{t.tu=sOn('pr','t_clean')&&ch(.25)?[]:rzList('pr',WST,ch(.3)?2:1);delete t.is})}
 else{const src=(WBS.tiles.find(t=>t.tu&&t.tu.length)||{}).tu;c.tiles.forEach(t=>{if(t.is===undefined&&t.tu===undefined)t.tu=src?src.map(u=>({x:u.x,sd:txRid(),md:u.md})):[]})}
@@ -196,6 +204,7 @@ if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:
   nfO.forEach((l,q)=>{if(nfN[q])mU[l.u]=nfN[q].u});frO.forEach((l,q)=>{if(frN[q])mU[l.u]=frN[q].u});
   oldT.forEach((t,q)=>{if(WBS.tiles[q])mT[String(t.id)]=String(WBS.tiles[q].id)});
   masks=((g0&&g0.masks)||[]).map(m=>{const q=JSON.parse(JSON.stringify(m));if(q.t=='lay'&&q.lay&&mU[q.lay])q.lay=mU[q.lay];if(q.st&&mT[q.st])q.st=mT[q.st];if(q.t=='col'&&q.c){for(const k in inkMap){if(col(k).toLowerCase()==String(q.c).toLowerCase()){q.c=col(inkMap[k]).toLowerCase();break}}}return q})}
+ if(FT.gr&&AM('gr')<1)Object.keys(gl).forEach(k=>{if(typeof gl[k]=='number')gl[k]=Math.round(gl[k]*AM('gr'))});
  WBX.wbGrade.set({...gl,cov:g0.cov,masks})}
 if(c.layers.some(l=>LS.includes(l)))LS.forEach(l=>{if(c.layers.includes(l)&&l.fit&&!l.gl)l.size=+fitTs(l).toFixed(3)});store();upd();
 // Layout: pattern type, stamp size, spacing and scatter, offset, rotation and flips of the layers that repeat. Works on whatever layers the project has now.

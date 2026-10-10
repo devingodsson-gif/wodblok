@@ -171,6 +171,10 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.8: Randomize amounts (Q6, answered by the user)
+
+Each main switch in the Randomize panel is now a slider from 0 (off) to 100 (fully on); Colours keeps its plain switch. Today's choices are the starting values (on is 100, off is 0), so a default roll comes out exactly as before and no Randomize snapshot changed. Below 100, a feature with several kinds of change (the arrows) lets only some of them happen on a roll (at least one), and a feature without kinds happens on some rolls; Colour grade values and the Print effects edges are also scaled down. Old saved on/off choices load as 100/0. "Layer opacity and blend" is now "Opacity and blend". Files: `src/shell.html`, `34-desktop-shell.js` (panel), `20-before-after-and-randomizer.js` (roll). Tests: `tests/randomize-amounts.spec.js`; `repeat-tile.spec.js` sets the sliders instead of ticking boxes.
+
 ## 1.0.7: Back up / Restore removed (Q14 answered by the user)
 
 Back up everything and Restore from backup (the old Export/Import everything) are gone, along with their commands and tests: the app saves and opens projects, and exports images and proofs. The other half of Q14 (one Save-dialog rule for every export) is not done: "Export all as one zip" takes long enough that the browser drops its Save dialog and downloads instead. The releases planned below as 1.0.6 to 1.0.8 are now 1.0.8 (Randomize amounts, Q6), then compare/history, export and colour, and feel and speed.

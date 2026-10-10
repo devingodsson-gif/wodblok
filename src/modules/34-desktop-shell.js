@@ -186,22 +186,25 @@ const st=document.createElement('style');st.textContent='.stage.pv #sel{display:
 
 // ===== Randomize panel: which main features a roll may change. Anything switched off stays exactly as it is. Settings are remembered.
 (()=>{const sec=document.querySelector('section.pn[data-p="rand"]'),fts=[...sec.querySelectorAll('[data-ft]')],subs=[...sec.querySelectorAll('[data-sub]')],KEY='wb38_rzft',SKEY='wb50_rzsub',by=k=>fts.find(c=>c.dataset.ft==k),sk=m=>subs.filter(c=>c.dataset.sub.startsWith(m+'.'));
-try{const z=JSON.parse(kv.get(KEY)||'null');if(z)fts.forEach(c=>{if(c.dataset.ft in z)c.checked=!!z[c.dataset.ft]})}catch(e){}
+// a main switch is a slider (0 off, 100 fully on) or, for Colours, a tick box. Older saves held true/false: true is 100.
+const amtOf=c=>c.type=='range'?(+c.value||0)/100:(c.checked?1:0),isOn=c=>amtOf(c)>0,setAmt=(c,v)=>{if(c.type=='range')c.value=v?100:0;else c.checked=!!v};
+try{const z=JSON.parse(kv.get(KEY)||'null');if(z)fts.forEach(c=>{const v=z[c.dataset.ft];if(v===undefined)return;if(c.type=='range')c.value=typeof v=='number'?Math.max(0,Math.min(100,v)):(v?100:0);else c.checked=!!v})}catch(e){}
 try{const z=JSON.parse(kv.get(SKEY)||'null');if(z)subs.forEach(c=>{if(c.dataset.sub in z)c.checked=!!z[c.dataset.sub]})}catch(e){}
 // a switch counts as on only if something under it is ticked (Stamps also counts Lettering)
-const eff=c=>{const k=c.dataset.ft,ss=sk(k);if(!c.checked)return false;if(!ss.length)return true;return ss.some(x=>x.checked)||(k=='stamps'&&by('text').checked)};
+const eff=c=>{const k=c.dataset.ft,ss=sk(k);if(!isOn(c))return false;if(!ss.length)return true;return ss.some(x=>x.checked)||(k=='stamps'&&isOn(by('text')))};
 const get=()=>{const o={};fts.forEach(c=>o[c.dataset.ft]=eff(c));return o};
 const sub=m=>{const ss=sk(m);return ss.length?new Set(ss.filter(c=>c.checked).map(c=>c.dataset.sub.slice(m.length+1))):null};
-const sync=()=>{const st=by('stamps').checked,t=by('text');t.disabled=!st;t.closest('label').style.opacity=st?'':'.45';
-sec.querySelectorAll('.rzx').forEach(b=>{const m=b.dataset.rzx,ss=sk(m),n=ss.filter(c=>c.checked).length,all=n==ss.length;b.querySelector('.rzn').textContent=all?'All':n+'/'+ss.length;b.classList.toggle('part',!all);const box=sec.querySelector('[data-rzs="'+m+'"]');if(box)box.classList.toggle('off',!by(m).checked)});
+const sync=()=>{const st=isOn(by('stamps')),t=by('text');t.disabled=!st;(t.closest('.ctl')||t.parentNode).style.opacity=st?'':'.45';
+sec.querySelectorAll('.rzx').forEach(b=>{const m=b.dataset.rzx,ss=sk(m),n=ss.filter(c=>c.checked).length,all=n==ss.length;b.querySelector('.rzn').textContent=all?'All':n+'/'+ss.length;b.classList.toggle('part',!all);const box=sec.querySelector('[data-rzs="'+m+'"]');if(box)box.classList.toggle('off',!isOn(by(m)))});
 const any=fts.some(c=>eff(c)&&!c.disabled),b=$('rzdo');if(b)b.disabled=!any;
 const h=$('rzhint');if(h)h.textContent=any?'Only what is switched on changes. Everything else stays exactly as it is. Use the arrows to choose which kinds of change are allowed. The canvas stays the same size and shape unless Canvas shape or Canvas size is on, and the book cover is always kept.':'Nothing is switched on, so Randomize has nothing to change.'};
-const save=()=>{try{kv.set(KEY,JSON.stringify(Object.fromEntries(fts.map(c=>[c.dataset.ft,c.checked]))));kv.set(SKEY,JSON.stringify(Object.fromEntries(subs.map(c=>[c.dataset.sub,c.checked]))))}catch(e){}sync()};
-sec.addEventListener('change',save);
+const save=()=>{try{kv.set(KEY,JSON.stringify(Object.fromEntries(fts.map(c=>[c.dataset.ft,c.type=='range'?+c.value:c.checked]))));kv.set(SKEY,JSON.stringify(Object.fromEntries(subs.map(c=>[c.dataset.sub,c.checked]))))}catch(e){}sync()};
+sec.addEventListener('change',save);sec.addEventListener('input',save);
 sec.addEventListener('click',e=>{const x=e.target.closest('[data-rzx]');if(x){const m=x.dataset.rzx,box=sec.querySelector('[data-rzs="'+m+'"]'),open=box.hidden;box.hidden=!open;x.setAttribute('aria-expanded',open?'true':'false');return}
 const a=e.target.closest('[data-rzall],[data-rzno]');if(a){const m=a.dataset.rzall||a.dataset.rzno,on=!!a.dataset.rzall;sk(m).forEach(c=>c.checked=on);save()}});
-$('rzall').onclick=()=>{fts.forEach(c=>c.checked=true);subs.forEach(c=>c.checked=true);save()};$('rznone').onclick=()=>{fts.forEach(c=>c.checked=false);save()};
-sync();WBX.wbRZ={get,sub};
+$('rzall').onclick=()=>{fts.forEach(c=>setAmt(c,true));subs.forEach(c=>c.checked=true);nums();save()};$('rznone').onclick=()=>{fts.forEach(c=>setAmt(c,false));nums();save()};
+const amt=k=>{const c=by(k);return c&&eff(c)?amtOf(c):0};
+sync();WBX.wbRZ={get,sub,amt};
 $('rzdo').onclick=()=>randomize(false);
 })();
 
