@@ -1,0 +1,175 @@
+# Fix plan for the UX review
+
+Source: [`docs/ux-review.md`](ux-review.md) (49 findings: B1–B4, C1–C20, P1–P6, D1–D19). Starting point: `main` at 1.0.0.
+Every finding is assigned to one step below; the [coverage table](#coverage-every-finding-has-a-step) at the end checks that none is missed.
+
+## How every step is run (from CLAUDE.md)
+
+1. **One release per step**, on its own branch (`fix/1.1-…`), merged into `main` when done. Version: minor +1 per release (1.1.0, 1.2.0, …), patch for a hotfix.
+2. **One finding per commit**, so any single fix can be reverted.
+3. **A test for each fix** that drives the real UI: the bug fails first, then passes. For example, B1's test clicks New stamp and expects one more stamp and no page error.
+4. **Snapshots and golden screenshots are never updated just to pass.** When a fix changes them on purpose, I list which ones changed and why, and ask before updating.
+5. **⚡ = touches drawing, dragging or sliders.** These run `npm run perf` before commit. A slowdown over 10% blocks the release.
+6. **Quick tests** for the touched area before publishing. After publishing, I say what ran and what didn't, and ask about the full suite (about 13 minutes) with a risk percentage.
+7. **After each pushed release**, rebuild from the clean commit and publish `dist/wodblok.html` to the preview artifact (same address). Then a short status update with a task list and % complete.
+8. **Bugs found along the way** are logged in `docs/known-issues.md`, not fixed silently.
+9. **The rules stay in force throughout:** no tool windows at launch, launch fully cleared in Pattern mode, no brush masks, no network, nothing hover-only in new code, commands in the registry, old files always open.
+
+## Step 0: your decisions (they unblock later steps)
+
+Each question is from the review's section 5. Steps that need an answer say so; everything else can start now.
+
+| Question | Decides | Needed by | My suggested default |
+|---|---|---|---|
+| Q2: explanatory text already in panels | C10 | 1.2 | Remove it. Move the storage facts into the Save flow (C1). |
+| Q3 + Q13: built-in motifs, "Draw with Claude", "Drawn by Claude" folder, ChatGPT prompt | C11, D14 | 1.2 | Hide Draw with Claude and the folder. Hide the built-in sets until you supply your own. |
+| Q4 + Q10: one-word labels under rail icons; native hover tooltips | C4 | 1.2 | Labels yes. Keep native tooltips as a fallback. |
+| Q5: what Save means | C1 | 1.4 | Save writes the real file where the browser allows it. Projects becomes "recent". |
+| Q6: lighter Randomize defaults | C8 | 1.7 | Yes, effects off by default. |
+| Q7: UK or US spelling | P1 | 1.2 | UK ("colour", matching Wada and the print proof). |
+| Q8: new stamps go onto the current layer | B2 | 1.2 | Yes. |
+| Q9: "+" slot on the empty stamp at launch | B4 | 1.2 | Yes. |
+| Q11: choose the layer type when adding a layer | D1 | 1.3 | Yes. |
+| Q12: Save a copy behaviour | D9 | 1.4 | Stay on the original. |
+| Q14: exports and the Save dialog | D10 | 1.6 | Every export asks where to save where the browser can. |
+| Q15: text and symmetry | D6 | 1.3 | Text stays readable, with mirroring as an option. |
+
+---
+
+## 1.1: Bugs and dead ends (no decisions needed)
+
+Small fixes that remove "it looks broken" moments.
+
+| # | Fix | Where | Test / check |
+|---|---|---|---|
+| B1 | New stamp works: define what the `is:` field should hold (or drop it). | `13-preview-and-stamp-tool.js` (`$('addT').onclick`) | Click `#addT`; stamp count +1; no page error. |
+| B3 | File > New project: drop the "click again" confirm and rely on Undo. Status reads "Started a new project. Ctrl/Cmd+Z brings back the last one." | `18-projects-and-cover-overlay.js` (`confirm2` on `pnw`) | New with unsaved work → new project in one click; Undo restores. |
+| D2 | Free place starts with the current stamp picked. A faint copy follows the pointer. The picked tile stays picked when clicked again. | `24-free-place-layers.js`, `shell.html` (`#lfpst`) | Open Free place, click the canvas → one stamp placed. |
+| D3 | Wording in Art and Text modes ("Pictures you place…", "Text you place…"). The Size slider follows the selected item. | `25-art-layers.js`, `26-text-boxes.js` | Text check, plus a state test for the slider value. |
+| D5 (part) | The Text-layer Ink control shows its value ("Stamp colours"), not blank. | `26-text-boxes.js` | Screenshot check. |
+| D17 + C19 (part) | Undo and Redo replace the status message ("Undid: Look 'Strong ink'"). Messages clear after a few seconds. | `34-desktop-shell.js` (undo/redo), `pmsg` helper | Apply a look, Undo → message changes. |
+| C3 (part) | The "Exit compare" pill stays inside the stage. Before gets the same pressed style as Split. | `20-before-after-and-randomizer.js`, `shell.html` (`.baX`, `#bab`) | Screenshot at 1440 and 1280 with a panel open. |
+| C5 | Show the existing progress bar (`.fzbar`) while stamp prints are still drawing after opening a file or changing shape. "Opened…" appears only when drawing has finished. | `19-randomize-and-hold.js`, `18-projects-…` (open) | Open the v18 fixture; the bar shows, then the message. ⚡ check that nothing is slower. |
+| C12 | Ctrl/Cmd+= / − / 0 / 1 zoom the canvas, not the page. Every shortcut label uses `cmdFormatShortcut` (Cmd on Mac). | `34-desktop-shell.js`, `41-navigator.js`, `shell.html` titles, panel text | Commands test, plus a Mac user-agent label check. |
+| C13 | Focus ring on sliders and number fields. `--faint` raised to about 4.5:1 in both themes. Labels at least 11 px. Slider hit area at least 24 px. | `shell.html` CSS | Contrast check in a test; tab-order screenshot. Pixel goldens change (ask). |
+| C15 (part) | Zoom controls also in the Stamp editor. Before and Split hidden there. | `shell.html`, `34-desktop-shell.js` | Screenshot. |
+| D8 | Add **Send to back** next to Bring to front. | `09-stamp-editor-grid-and-motif-ops.js`, `shell.html` | Motif order test. |
+| D11 | Repeat 3 × 3: faint tile-edge lines, a pressed state on the button, and a "Preview only. Esc to edit" chip. | `44-repeat-tile.js` | Screenshot + state unchanged. |
+| P6 | Add `favicon.ico` to the web build. | `src/web/`, `tools/build.js` | No 404 in console. |
+
+Risk for the full-suite question: about 30% (shared shell and history messages).
+
+## 1.2: The first minute (needs Q2, Q3, Q4, Q7, Q8, Q9)
+
+Goal: someone new can make a pattern without help.
+
+| # | Fix | Where | Test / check |
+|---|---|---|---|
+| B4 | **Randomize button in the top bar.** A "+" motif slot on the empty stamp that opens Stamp editor + Motifs. A faint dashed outline of the empty stamp in the Pattern view. No panels open at launch. | `shell.html` (top bar; the `.rnd` style already exists), `13-…`, `34-desktop-shell.js` | Launch guardrail test still passes (no panels, cleared). Launch goldens change (ask). |
+| B2 | New and duplicated stamps are added to the current layer automatically (`addSt` already exists). | `13-preview-and-stamp-tool.js` | Duplicate → the new stamp prints. Undo removes it. |
+| C4 | Rail: shared tools in fixed slots in both views; mode-only tools in a separated group; distinct icons for Canvas, Pattern grid and Presets; one name per tool in rail, tab and command search; one-word labels if Q4 = yes. | `shell.html` (rail), `34-desktop-shell.js`, `37-command-list.js` | Rail order test in both modes. Goldens change (ask). |
+| C2 (labels) | History rows read "Randomize 1, 2…" or what changed ("Colours", "Grade: Exposure"). Fix "1 steps". | `34-desktop-shell.js` (`Several changes`) | History label test. |
+| C17 | Command search empty list: recent first, then what applies in this view. Disabled commands hidden or greyed. | `40-command-search.js` | Order test in Pattern view. |
+| D19 | Pre-pin Randomize on the task bar, only if B4's top-bar button is not taken. | `48-task-bar.js` | — |
+| P1 | One spelling everywhere (Q7). | `shell.html`, modules with UI strings | Text grep in a test (no "Color" if UK is chosen). |
+| C10 | Apply Q2: remove or restyle explanatory sentences in panels. | `shell.html`, `20-…`, `27-stamp-library.js`, `32-layers-panel.js`, `31-colour-grading.js`, `29-grid-tool.js` | Text check. |
+| C11 + D14 | Apply Q3/Q13: hide "Draw with Claude", the "Drawn by Claude" folder and the ChatGPT prompt buttons, and the built-in sets if chosen. **Old files that use built-in motifs must still open and print.** | `shell.html`, `21-motif-library-ui.js`, `14-presets-…`, `05-motif-data.js` | Fixtures still open identically (state snapshots unchanged). |
+
+Risk: about 40% (launch state, rail and text across many panels).
+
+## 1.3: Layers and placing things (needs Q11, Q15)
+
+| # | Fix | Where | Test / check |
+|---|---|---|---|
+| D1 | Layers "+" opens a menu: Repeat pattern / Frame / Free place / Picture / Text. Each adds a layer of that type above the current one. The Layout tabs become "This layer is a", and the type shows in the Layers list. | `32-layers-panel.js`, `23-frame-layers.js`, `shell.html` (`#lmode`) | Add each type → the existing layer is unchanged. |
+| C18 | Rename to **Layers** and **Layout**, show the selected layer's name in both headers, and rename Pattern grid to **Guides**. | `shell.html`, `37-command-list.js` | Labels test. |
+| D6 | Text on a stamp stays readable under symmetry, with a "Mirror with symmetry" toggle. | `22-text-tool.js`, `07-symmetry.js` | State test with 4-way symmetry. Snapshot changes for text-plus-symmetry (ask). |
+| D7 ⚡ | Drag-to-select box on empty block space, with Shift to add. | `12-selection-and-split.js` | Drag a box → motifs selected. Perf: drag. |
+| C7 ⚡ | Drag a motif from the library onto the block (as well as click-to-stamp). The selection is drawn in the accent colour with corner handles and a rotate handle. | `21-motif-library-ui.js`, `12-…`, `09-…` | Drag-and-drop test. Perf: handles move only the selected motif's transform. |
+| D5 (rest) | In a Text layer, typing edits the selected text box; **Add text** (renamed from Stamp text) adds a new one. | `26-text-boxes.js` | Type → one box changes; Add text → a second box. |
+| D16 + C14 (rows) | Each row gets a "⋯" menu (rename, duplicate, delete). Buttons always visible on the selected row, never hover-only. Two-colour swatch for "Stamp colours". Applies to the Layers, History, Motif list, motif library and texture list. | `32-layers-panel.js`, `34-…` (history), `21-…`, `17-texture-panel-…`, `shell.html` CSS | Every row action can be reached without hovering. |
+
+Risk: about 60% (selection and drawing). Perf required.
+
+## 1.4: Saving you can trust (needs Q5, Q12; highest risk, platform code)
+
+| # | Fix | Where | Test / check |
+|---|---|---|---|
+| C1 | **Save** writes the real file in Chrome and Edge (the handle code already exists) and keeps a browser copy. In Safari and Firefox it is called **Download**. Menu renamed ("Save as file…", "Save to this browser" under Projects only). Tab title shows the name and "•" when unsaved. No unsaved dot on an untouched new document. | `src/platform/web.js`, `39-web-app.js`, `18-projects-…`, `33-clear.js`, `shell.html` | Round-trip and recovery tests. Launch test for no dot. Old v18 files open and are never overwritten. |
+| D9 | Save a copy keeps you on the original (or is renamed "Duplicate and open", per Q12). | `18-projects-…` | State test. |
+| C19 (restore) + P5 | "Restore unsaved work / Dismiss" also shown in the empty canvas area after a crash. The Projects footer text moves into the Save flow. | `38-crash-recovery.js`, `shell.html` | Recovery test. |
+
+Risk: 60–90% (saving, opening, `src/platform`). Run the full suite before merging.
+
+## 1.5: Compare and history
+
+| # | Fix | Where | Test / check |
+|---|---|---|---|
+| C3 | One compare. Before/Split defaults to "the step before this one"; History A/B pickers choose anything else; Grade "Hold to compare" folds into Before. | `20-before-after-and-randomizer.js`, `31-colour-grading.js` | Before after a roll shows the previous roll. |
+| C2 (thumbnails) ⚡ | A small thumbnail on Randomize rows and snapshots, taken from the picture the roll has already finished, or drawn lazily when History is open. Never during a drag. | `34-desktop-shell.js`, `19-randomize-and-hold.js` | Perf: roll time and slider drag unchanged. |
+| C14 (rest) | Whatever hover-only controls remain after 1.3 (History Compare button, rail labels if Q4 was no). | `shell.html` CSS | No `:hover`-only reveal rules left (grep test). |
+
+Risk: about 50% (history).
+
+## 1.6: Export and colour (needs Q14)
+
+| # | Fix | Where | Test / check |
+|---|---|---|---|
+| C6 | The **Export** button opens one sheet: format (PNG/JPG/SVG), long side, Export, then saved recipes and Print proof. The Export recipes rail tool goes or becomes recipes only. | `36-export-everything.js`, `43-export-recipes.js`, `45-print-proof.js`, `shell.html` | Each format downloads. Recipes still work. |
+| D10 | One rule for the Save dialog across all exports (Q14). | `src/platform/web.js`, `43-…`, `45-…`, `36-…` | Export tests on both paths (dialog on and off). |
+| C9 | Colour slots named **Paper / Ink / Accent / Accent 2** (as the print proof already does). Hex field and eyedropper in each slot's dropdown. The add-colour tile moves to the top of the library. | `14-presets-and-layer-grid-ui.js`, `shell.html` | Labels; a hex entry changes the colour. |
+| C16 ⚡ | Built-in Looks get a preview: a static image made once, or rendered lazily like Variations. | `46-presets.js` | Perf: opening the Presets panel. |
+| D18 | Variations tiles fill in as each is ready, with a shimmer while waiting. | `47-variations.js` | Screenshot during "More". |
+| D15 | Stamp library: the default name is the stamp's own; confirm in the same place as other saves. | `27-stamp-library.js` | Save with no name → a sensible name. |
+| C20 | Display menu uses check marks, with a "Show while editing" heading. | `shell.html`, `34-…` | Screenshot. |
+
+Risk: about 40%.
+
+## 1.7: Feel and speed (needs Q6)
+
+| # | Fix | Where | Test / check |
+|---|---|---|---|
+| C8 ⚡ | Lighter Randomize defaults (stamps, layout, colours, frame; effects opt-in). Hold the stamp tray with the picture during a roll. **Measure on your Mac before deciding.** | `19-randomize-and-hold.js`, `20-…` | Randomize snapshots change (ask). Perf: drag on a default roll. |
+| D4 ⚡ | Art layer "Paper shows through" toggle (drop the light colour). | `25-art-layers.js` | Perf with several pictures. |
+| D12 | Starting workspaces open at most two groups, and Workspaces closes after applying one. | `42-workspaces.js` | Screenshot. |
+| D13 | Textures tool is the library (edit, rename, delete). Applying happens where you are working (Canvas, Layer, Stamp). | `17-texture-panel-and-previews.js`, `shell.html` | Textures still apply everywhere. Old files open. |
+| P2 | New panels stack in the side dock by default. Floating panels open at the stage edge, not over the canvas. | `34-desktop-shell.js` | Screenshot. |
+| P3 | Book cover guide labels on solid chips, outside the bleed. | `30-print-cover.js` | Screenshot. |
+| P4 | The stamp tray can collapse to a thin strip. | `shell.html`, `34-…` | Screenshot at 1280×720. |
+| C15 (rest) | The empty band under the block in the Stamp editor goes, or is used for the motif toolbar. | `shell.html` | Screenshot. |
+
+Risk: about 70% (Randomize and drawing). Perf required. Full suite before merging.
+
+## After 1.7: checks I can't do here
+
+- Safari/WebKit run (`npm run test:webkit`) and the speed check on your Mac (`npm run perf-baseline`).
+- Chrome's real Save and Open dialogs; the installed app (double-click a `.wodblok`, offline, update dot).
+- A second UX pass on the finished 1.7 build, with the same scripts as the review, comparing screenshots before and after.
+
+---
+
+## Coverage: every finding has a step
+
+| Finding | Step | Finding | Step | Finding | Step |
+|---|---|---|---|---|---|
+| B1 | 1.1 | C11 | 1.2 | D1 | 1.3 |
+| B2 | 1.2 | C12 | 1.1 | D2 | 1.1 |
+| B3 | 1.1 | C13 | 1.1 | D3 | 1.1 |
+| B4 | 1.2 | C14 | 1.3 + 1.5 | D4 | 1.7 |
+| C1 | 1.4 | C15 | 1.1 + 1.7 | D5 | 1.1 |
+| C2 | 1.2 + 1.5 | C16 | 1.6 | D6 | 1.3 |
+| C3 | 1.1 + 1.5 | C17 | 1.2 | D7 | 1.3 |
+| C4 | 1.2 | C18 | 1.3 | D8 | 1.1 |
+| C5 | 1.1 | C19 | 1.1 + 1.4 | D9 | 1.4 |
+| C6 | 1.6 | C20 | 1.6 | D10 | 1.6 |
+| C7 | 1.3 | P1 | 1.2 | D11 | 1.1 |
+| C8 | 1.7 | P2 | 1.7 | D12 | 1.7 |
+| C9 | 1.6 | P3 | 1.7 | D13 | 1.7 |
+| C10 | 1.2 | P4 | 1.7 | D14 | 1.2 |
+| | | P5 | 1.4 | D15 | 1.6 |
+| | | P6 | 1.1 | D16 | 1.3 |
+| | | | | D17 | 1.1 |
+| | | | | D18 | 1.6 |
+| | | | | D19 | 1.2 |
+
+49 of 49 findings assigned. Seen once and not reproduced: the stamps that briefly vanished after a shape change (C5) get logged in `docs/known-issues.md` in 1.1, and the C5 progress bar covers the visible symptom.
