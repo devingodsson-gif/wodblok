@@ -15,3 +15,26 @@ test('New stamp adds a blank stamp, selects it, and raises no page error', async
   await settle(page);
   expect(JSON.parse(await getState(page)).tiles.length).toBe(before);
 });
+
+test('Send to back puts the selected motif behind the others (UX review D8)', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 3 });
+  await page.click('.seg2 [data-v="stamp"]');
+  await page.click('.rail [data-pn="motifs"]');
+  const lib = page.locator('#lib > *');
+  const ids = [];
+  for (const n of [0, 1]) {
+    await lib.nth(n).click();
+    await page.mouse.click(n ? 700 : 480, 400);
+    await page.keyboard.press('Escape');
+    await settle(page);
+  }
+  const before = JSON.parse(await getState(page)).tiles[0].items.map(i => i.m);
+  expect(before.length).toBe(2);
+  await page.mouse.click(700, 400);   // select the second, front-most motif
+  await expect(page.locator('#ssb')).toBeVisible();
+  await page.click('#ssb');
+  await settle(page);
+  const after = JSON.parse(await getState(page)).tiles[0].items.map(i => i.m);
+  expect(after).toEqual([before[1], before[0]]);
+  expect(errors).toEqual([]);
+});
