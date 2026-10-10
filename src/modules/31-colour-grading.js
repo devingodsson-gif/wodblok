@@ -130,7 +130,7 @@ if(T=='col'){const used=[...new Set([WBS.proj.bg,WBS.proj.ink,WBS.proj.c3,WBS.pr
  $('gm_col').innerHTML=hs.map(([n,h])=>`<option value="${h}">${hx(n)}</option>`).join('')+(hs.some(x=>x[1]==cur0)?'':`<option value="${cur0}">${hx(colName(cur0))}</option>`);$('gm_col').value=cur0;$('gm_cc').value=cur0}
 ['lo','hi','rg','sm','fe','amt'].forEach(k=>{const r=$('gm_'+k);if(m[k]!==undefined&&+r.value!=+m[k]){r.value=m[k];r.dispatchEvent(new Event('input',{bubbles:true}))}});
 $('gm_inv').checked=!!m.inv;$('gm_ov').checked=gmOv;
-const inEd=vw()=='stamp';$('gm_hint').textContent=T=='lin'?(m.sp=='s'?(inEd?'Drag the handles on the stamp. Every print gets the same fade, like uneven inking.':'This gradient sits inside each stamp, so its handles are on the stamp.'):'Drag the handles on the canvas. Full effect at the solid white dot, fading out by the ring.'):T=='rad'?(m.sp=='s'?(inEd?'Drag the centre to move it and the outer dots to resize. Every print gets the same fade.':'This gradient sits inside each stamp, so its handles are on the stamp.'):'Drag the centre to move it and the outer dots to resize. Invert to grade the outside instead.'):T=='lay'?'Only this layer\'s stamps get these adjustments.':T=='col'?'Picks out one colour wherever it prints. Widen Range to catch nearby shades.':'Picks out tones by brightness: 0 is black, 100 is white.';
+const inEd=vw()=='stamp';$('gm_hint').textContent='';
 $('gm_go').hidden=!(isPos(m)&&m.sp=='s'&&!inEd)}
 function gradeSync(){const A=tgtA();GK.forEach(k=>{const r=$('gd_'+k);if(+r.value!=+(A[k]||0)){r.value=A[k]||0;r.dispatchEvent(new Event('input',{bubbles:true}))}});$('gdcov').checked=!!grd.cov;renderGM()}
 const gmSet=(k,v)=>{const m=gmCur();if(!m)return;m[k]=v;gdSave();applyGrade();renderGM();gCap()};

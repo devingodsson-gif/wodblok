@@ -3,7 +3,6 @@ import {HO,SH,SK,SW,col,shp,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {isOf} from './16-texture-generators.js';
 // ---- Symmetry: live copies of each motif, generated at draw time from t.sym = {m, n}
 const SYM=[['off','Off'],['lr','Left ↔ right'],['ud','Up ↕ down'],['quad','4-way'],['star','8-way'],['hex','Hex'],['kal','Kaleido',2,12,6,'Mirrors'],['rot','Circular',2,16,6,'Copies'],['rx','Repeat ↔',2,6,2,'Repeats'],['ry','Repeat ↕',2,6,2,'Repeats'],['grid','Repeat grid',2,6,2,'Repeats']];
-const SYMH={off:'Pick a symmetry to have every motif copied automatically.',lr:'Motifs are mirrored across the line. Work in the shaded half.',ud:'Motifs are mirrored across the line. Work in the shaded half.',quad:'Mirrored four ways. Work in the shaded quarter.',star:'Mirrored eight ways, like a snowflake. Work in the shaded slice.',hex:'Six mirrors on a hexagon. Work in the shaded slice.',kal:'Mirrored around the center. Work in the shaded slice.',rot:'Copies turn around the center, no flipping. Work in the shaded slice.',rx:'Repeated across the stamp. Work in the shaded strip.',ry:'Repeated down the stamp. Work in the shaded strip.',grid:'Repeated in a grid. Work in the shaded cell.'};
 const REP=['rx','ry','grid'],symOf=t=>{const S=t.sym||{};let d=SYM.find(x=>x[0]==S.m)||SYM[0];if(SK!='rect'&&REP.includes(d[0]))d=SYM[0];return{m:d[0],n:d[2]?Math.max(d[2],Math.min(d[3],S.n||d[4])):0,d}};
 const nr=r=>mod(r+180,360)-180,RAD=Math.PI/180;
 function symOps(t){const{m,n}=symOf(t),C=SW/2,D=SH/2,o=[];
@@ -37,7 +36,7 @@ if(p){gi.title=WBS.tiles.some(isOf)?'Show the stamp texture in the pattern (view
 function renderSym(t){const{m,n,d}=symOf(t),k=m+n+col(WBS.proj.bg)+SW+'x'+SH+SK+HO;if(k==WBS.symKey)return;WBS.symKey=k;
 $('sym').innerHTML=SYM.filter(x=>SK=='rect'||!REP.includes(x[0])).map(x=>{const nn=x[0]==m?n:x[4]||0;return`<button type="button" data-y="${x[0]}" class="${x[0]==m?'on':''}"><svg viewBox="-12 -12 ${SW+24} ${SH+24}"><path d="${shp(0)}" fill="none" stroke="currentColor" stroke-width="7" opacity=".35"/>${symG(x[0],nn,9,0)}</svg>${x[1]}</button>`}).join('');
 $('symn').hidden=!d[2];if(d[2]){$('sn').min=d[2];$('sn').max=d[3];$('sn').value=n;$('snl').textContent=d[5]}
-$('symh').textContent=SYMH[m];$('sbkr').hidden=m=='off'}
+$('symh').textContent='';$('sbkr').hidden=m=='off'}
 function init07(){
 WBS.symKey='';WBS.curView='pattern';
 }
