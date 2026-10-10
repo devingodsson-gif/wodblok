@@ -21,12 +21,12 @@ test('a fresh launch shows no unsaved dot, and making a change shows it', async 
   expect(errors).toEqual([]);
 });
 
-test('the top bar has Save project but no Export; the File menu has only project and backup items; the Export tool holds the image exports', async ({ page }) => {
+test('the top bar has Save project but no Export; the File menu has only project items; the Export tool holds the image exports', async ({ page }) => {
   const { errors } = await openApp(page);
   await expect(page.locator('#expb')).toHaveCount(0);
   await expect(page.locator('#psv')).toHaveText('Save project');
   await page.click('#fileb');
-  await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'Clear canvas', 'Open project…', 'Back up everything', 'Restore from backup']);
+  await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'Clear canvas', 'Open project…']);
   await page.keyboard.press('Escape');
   await openPanel(page, 'xrec');
   for (const id of ['png', 'sv', 'cpy', 'xrnow']) await expect(page.locator('#' + id)).toBeVisible();

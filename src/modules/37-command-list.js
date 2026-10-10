@@ -19,8 +19,6 @@ const COMMANDS = [
   ['file.clear', 'Clear canvas', 'clr'],
   ['file.open', 'Open project', 'pfile', null, 'input'],
   ['file.save', 'Save project', 'psv', 'Mod+S'],
-  ['file.exportEverything', 'Back up everything', 'xall'],
-  ['file.importEverything', 'Restore from backup', 'xallf', null, 'input'],
   ['export.png', 'Export PNG', 'png'],
   ['export.svg', 'Export SVG', 'sv'],
   ['export.copySvg', 'Copy SVG', 'cpy'],

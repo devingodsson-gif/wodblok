@@ -50,14 +50,4 @@ test('files.save falls back to a download when there is no save picker', async (
 });
 
 // (Until 1.0.4 this file also tested projects moving from the old localStorage key into IndexedDB. Projects are now .wodblok files, so that is gone.)
-test('without the Claude runtime, Back up everything still saves a file', async ({ page }) => {
-  test.skip(TARGET === 'legacy', 'new in the repo build');
-  const { openApp, settle } = require('./helpers/harness');
-  const { errors } = await openApp(page, { runtime: 'none' });
-  await page.evaluate(() => { delete window.showSaveFilePicker; });
-  const dl = page.waitForEvent('download');
-  await page.click('#fileb'); await page.click('#xall');
-  expect((await dl).suggestedFilename()).toMatch(/\.wodblok-all\.json$/);
-  await settle(page);
-  expect(errors).toEqual([]);
-});
+
