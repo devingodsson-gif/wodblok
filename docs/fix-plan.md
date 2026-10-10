@@ -171,6 +171,10 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.6: A renamed project is a new file (bug found by the user in 1.0.5)
+
+A project opened from a file was written back into that file even after it was renamed, so saving overwrote the original. Now a project is written back into its file only while its name is unchanged; rename it, even with nothing else changed, and Save makes a new file (into the projects folder when one is chosen, else the Save dialog) and leaves the original alone. The releases planned below as 1.0.6 to 1.0.8 become 1.0.7 to 1.0.9. Files: `src/modules/33-clear.js`. Tests: `tests/save-rename.spec.js`.
+
 ## 1.0.5: Save into the projects folder (added on the user's request)
 
 Because of this release, the releases planned below as 1.0.5, 1.0.6 and 1.0.7 move to 1.0.6, 1.0.7 and 1.0.8.
