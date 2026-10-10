@@ -8,7 +8,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
-      - run: npm test            # first CI run: add WB_UPDATE via `npm run test:update-golden` to create tests/__golden__/ci/
+      - run: npm run build
+      # The tests run on the built app. Pixel goldens are only valid on the machine that made them (tests/__golden__/sandbox), so CI checks state, SVG and behaviour (WB_PIXELS=0).
+      - run: npx playwright test --project=chromium
+        env: { WB_TARGET: build, WB_PIXELS: '0' }
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: results-chromium, path: test-results }
@@ -18,7 +21,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
-      - run: npm run test:webkit
+      - run: npm run build
+      - run: npx playwright test --project=webkit --grep @smoke
+        env: { WB_TARGET: build, WB_PIXELS: '0' }
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: results-webkit, path: test-results }

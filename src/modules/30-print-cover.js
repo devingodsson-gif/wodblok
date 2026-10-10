@@ -12,7 +12,7 @@ $('bksw').disabled=!WBS.book.man;if(document.activeElement!==$('bksw'))$('bksw')
 const mm=v=>(v*25.4).toFixed(1);let w='';if(!WBS.book.man&&(WBS.book.pages<24||WBS.book.pages>828))w='<div class="w">KDP paperbacks take 24 to 828 pages.</div>';if(covS.img&&!WBS.book.man&&WBS.book.pages<100)w+='<div class="w">KDP only allows spine text on books with 100 or more pages.</div>';
 $('bkinfo').innerHTML=`<b>Full cover</b> ${g.W.toFixed(3)} × ${g.H.toFixed(3)} in (${mm(g.W)} × ${mm(g.H)} mm)<br><b>At 300 DPI</b> ${px(g.W)} × ${px(g.H)} px<br><b>Spine</b> ${g.sw.toFixed(3)} in (${mm(g.sw)} mm)${w}`;
 $('bksum').textContent=on?`${g.W.toFixed(2)} × ${g.H.toFixed(2)} in`:'';
-['bkpdf','bkpng','bkxs'].forEach(id=>$(id).hidden=!on);$('cfree').hidden=on;$('bkgrp').hidden=!on;document.querySelectorAll('#cfmt [data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==(on?'book':WBS.dim.rt?'tile':'free')));['casp','cswp','caw','cah'].forEach(id=>{if($(id))$(id).disabled=on});paintCov()}
+['bkpdf','bkpng'].forEach(id=>$(id).hidden=!on);$('cfree').hidden=on;$('bkgrp').hidden=!on;document.querySelectorAll('#cfmt [data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==(on?'book':WBS.dim.rt?'tile':'free')));['casp','cswp','caw','cah'].forEach(id=>{if($(id))$(id).disabled=on});paintCov()}
 const bookSet=o=>{WBS.book={...WBS.book,...o};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}WBX.wbBookSync()};
 // --- export at 300 DPI (PNG, or a PDF sized to the full cover with trim and bleed boxes)
 function coverRaster(cb){const g=bk(),W=Math.round(g.W*300),H=Math.round(g.H*300);$('pmsg').textContent='Rendering the print cover at 300 DPI…';

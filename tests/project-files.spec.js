@@ -20,13 +20,11 @@ test('a v19 zip file opens and gives the same document as the v18 file it was ma
   await c1.close(); await c2.close();
 });
 
-test('a file from a newer app opens as an unsaved copy and nothing is added to your projects', async ({ page }) => {
+test('a file from a newer app opens as an unsaved copy and nothing is written back', async ({ page }) => {
   const { errors } = await openApp(page);
   const base = JSON.parse(fs.readFileSync(path.join(FX, 'project-1-diamond.wodblok.json'), 'utf8'));
   const msg = await openFile(page, tmp('future.wodblok.json', JSON.stringify({ ...base, v: 99, name: 'Future' })));
   expect(msg).toContain('newer WODBLOK');
-  await page.click('#pls'); await settle(page);
-  await expect(page.locator('#pgrid .pc')).toHaveCount(0);
   await expect(page.locator('#pst')).toHaveClass(/dirty/);
   expect(errors).toEqual([]);
 });
@@ -50,7 +48,7 @@ test('named snapshots are saved inside the file and come back when it is opened'
   await p1.click('#hsadd'); await p1.locator('#hsl').first().locator('input').press('Enter'); await settle(p1);
   await expect(p1.locator('#hsl').first().locator('[data-sn]')).toHaveCount(1);
   await p1.evaluate(() => { window.__wbDownloads.length = 0; });
-  await p1.click('#fileb'); await p1.click('#pdl');
+  await p1.click('#psv');
   await p1.waitForFunction(() => window.__wbDownloads.length > 0);
   const dl = await p1.evaluate(() => window.__wbDownloads[0]), bytes = Buffer.from(dl.base64, 'base64');
   expect(Object.keys(require('fflate').unzipSync(new Uint8Array(bytes)))).toContain('snapshots/00.json');

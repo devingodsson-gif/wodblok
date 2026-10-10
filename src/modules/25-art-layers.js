@@ -4,7 +4,6 @@ import {inkOf,pal,store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {eT,upd} from './11-pressure-flooding-block-edges.js';
 import {ser} from './14-presets-and-layer-grid-ui.js';
-import {ST} from './18-projects-and-cover-overlay.js';
 import {fpFG,fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnap,fpSnapS,fpTog,fpU} from './24-free-place-layers.js';
 import {fx1,tbG,tbSty,txbSync,txtGl} from './26-text-boxes.js';
 
@@ -38,15 +37,7 @@ function artPanel(L){const on=!!L.art;$('lfpstl').hidden=on||!!L.txt;$('lfpst').
 const ids=Object.keys(WBS.ARTS),inUse=new Set();WBS.layers.forEach(l=>{if(l.art)(l.pl||[]).forEach(p=>inUse.add(p.a))});
 const ky=ids.map(i=>i+':'+WBS.ARTS[i].src.length+(WBS.ARTS[i].ver||'')+(inUse.has(i)?'u':'')).join('|')+'#'+WBS.fpB+(fpPoolOk()?'#'+[...WBS.fpPool].join('.'):''),st=$('lfars');
 if(st.dataset.k!=ky){st.dataset.k=ky;st.innerHTML=ids.length?ids.map(i=>{const A=WBS.ARTS[i];return`<button type="button" data-a="${hx(i)}" class="${WBS.fpB==i||(fpPoolOk()&&WBS.fpPool.has(String(i)))?'on':''}" title="${hx(A.n)}${A.pid?' (linked project)':''}"><img src="${artBU(A)}" alt="">${A.pid?'<u class="alk"></u>':''}${inUse.has(i)?'':`<i data-ax="${hx(i)}" title="Remove from this project">&#215;</i>`}</button>`}).join(''):'<div class="hint" style="margin:0">Nothing imported yet.</div>'}
-const sel=(L.pl||[]).find(q=>q.u==WBS.fpSel),A=WBS.ARTS[(sel&&sel.a)||WBS.fpB];$('lfaup').hidden=!(A&&A.pid);
-$('lfam').textContent=A&&A.pid?`Linked to the saved project “${A.n}”. It updates here when you save that project.`+(A.gone?' That project can no longer be found, so the last picture is kept.':''):''}
-let artBusy=false,artT=0;
-// check linked projects and pull in a newer picture when the source was saved again
-async function artLive(force){if(artBusy||(!force&&Date.now()-artT<3000))return 0;const ls=Object.values(WBS.ARTS).filter(A=>A.pid);if(!ls.length)return 0;artBusy=true;artT=Date.now();let ch=0;
-try{for(const A of ls){let rec=null;try{rec=await ST.get(A.pid)}catch(e){continue}
-if(!rec){if(!A.gone){A.gone=true;ch++}continue}if(A.gone){delete A.gone;ch++}if((rec.updated||0)===(A.ver||0))continue;
-let d=null;try{d=JSON.parse(rec.data)}catch(e){}const a=d&&d.art;if(a&&artOk(a.src)){if(A.bu&&A.bu.startsWith('blob:'))URL.revokeObjectURL(A.bu);delete A.bu;A.src=a.src;A.w=+a.w;A.h=+a.h;A.n=String(rec.name||A.n).replace(/["<>&|]/g,'').slice(0,40);A.ver=rec.updated||0;ch++}}}
-finally{artBusy=false}if(ch)upd();return ch}
+}
 // selection outline and the ghost of the stamp you're about to place
 function fpBox(p,cls){const wh=fpWH(p);if(!wh)return'';const w=wh[0],h=wh[1],sw=(Math.max(CW,CH)/500).toFixed(2);
 return`<rect class="${cls}" transform="translate(${(+p.x).toFixed(1)} ${(+p.y).toFixed(1)}) rotate(${+p.r||0})" x="${(-w/2).toFixed(1)}" y="${(-h/2).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="none" stroke="#e33" stroke-width="${sw}" stroke-dasharray="${sw*4} ${sw*3}"/>`}
@@ -75,7 +66,6 @@ el.innerHTML=pl2.length?pl2.slice().reverse().map(q=>{if(q.a){const A=WBS.ARTS[q
 el.scrollTop=sc;const on=el.querySelector('.mr.on');if(on){const t0=on.offsetTop-el.offsetTop,t1=t0+on.offsetHeight;if(t0<el.scrollTop)el.scrollTop=t0;else if(t1>el.scrollTop+el.clientHeight)el.scrollTop=t1-el.clientHeight}}}
 if(p||WBS.fpB){const S0=Math.min(CW,CH),sv=(id,v)=>{const el=$(id);if(+el.value!=v){el.value=v;WBS.fpSyncing=1;try{el.dispatchEvent(new Event('input',{bubbles:true}))}finally{WBS.fpSyncing=0}}};sv('lfps',Math.round((p?p.s:fpSz())/S0*100));sv('lfpr',Math.round(p?(+p.r||0):fpRot))}}
 function init25(){WBH.fpOverlay=fpOverlay;WBH.fpSync=fpSync;
-window.addEventListener('focus',()=>artLive());document.addEventListener('visibilitychange',()=>{if(!document.hidden)artLive()});
 WBS.fpLast=null;
 {const ch=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()},cur2=()=>{const L=fpL();return L&&(L.pl||[]).find(q=>q.u==WBS.fpSel)};
 $('lfpl').onclick=e=>{const L=fpL();if(!L)return;const x=e.target.closest('[data-px]');if(x){const i=(L.pl||[]).findIndex(q=>q.u==x.dataset.px);if(i>=0){L.pl.splice(i,1);if(WBS.fpSel==x.dataset.px)WBS.fpSel=-1;ch()}return}const r=e.target.closest('[data-pu]');if(!r)return;if(e.shiftKey){fpRange(r.dataset.pu);return}if(e.ctrlKey||e.metaKey){fpTog(r.dataset.pu);return}WBS.fpB=null;WBS.fpGhost=null;WBS.fpMS=new Set();WBS.fpAnc=r.dataset.pu;WBS.fpSel=r.dataset.pu;upd()};
@@ -96,4 +86,4 @@ $('lfpdn').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;const g=fpGrp();g.fo
 $('lfpdl').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;fpGrp().forEach(q=>L.pl.splice(L.pl.indexOf(q),1));WBS.fpSel=-1;WBS.fpMS=new Set();ch()};
 $('lfpclr').onclick=()=>{const L=fpL(),b=$('lfpclr');if(!L||!(L.pl||[]).length)return;if(!b.dataset.sure){b.dataset.sure=1;b.textContent='Click again to clear';setTimeout(()=>{delete b.dataset.sure;b.textContent='Clear all'},3000);return}delete b.dataset.sure;b.textContent='Clear all';L.pl=[];WBS.fpSel=-1;WBS.fpMS=new Set();ch()}}
 }
-export {artBU,artEnc,artId,artLayer,artLive,artLoad,artOk,artSnap,artUsed,crBox,crPts,crRef,fpBox,fpFlip,fpHandles,fpHit,fpPt,fpRot,fpSz,fpWH,init25};
+export {artBU,artEnc,artId,artLayer,artLoad,artOk,artSnap,artUsed,crBox,crPts,crRef,fpBox,fpFlip,fpHandles,fpHit,fpPt,fpRot,fpSz,fpWH,init25};

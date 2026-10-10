@@ -149,7 +149,7 @@ async function setMode(page, v) { await page.click(`.seg2 [data-v="${v}"]`); awa
 
 // The standard checks every scenario ends with: state, markup summary, no errors.
 async function checkpoint(page, testInfo, errors, name, { shot = true, selector = '#art' } = {}) {
-  await settle(page);
+  await settle(page, { quiet: 10 });   // longer than the default: on a slow machine (CI) textures finish drawing a moment after everything else looks still
   expect(await stateText(page)).toMatchSnapshot(`${name}.state.json`);
   const sum = await svgSummary(page, selector);
   if (process.env.WB_DUMP) { require('fs').mkdirSync(process.env.WB_DUMP, { recursive: true }); require('fs').writeFileSync(path.join(process.env.WB_DUMP, `${name}.svg`), sum.norm); }   // debugging aid: where do two runs differ?

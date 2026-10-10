@@ -1,0 +1,57 @@
+// The Projects folder: with no folder chosen the button says "Open projects folder"; once one is chosen it says "Projects" and lists the
+// .wodblok files in that folder; "Close folder" forgets it. (UX review C1: projects are files, not browser storage.)
+const path = require('path');
+const { test, expect } = require('@playwright/test');
+const { ROOT, TARGET, openApp, settle, getState } = require('./helpers/harness');
+const { installFolder } = require('./helpers/fake-folder');
+const FX = path.join(ROOT, 'tests', 'fixtures');
+
+test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+
+const FILES = [
+  { name: 'diamond.wodblok', path: path.join(FX, 'project-1-diamond-v19.wodblok') },
+  { name: 'old-rect.wodblok.json', path: path.join(FX, 'project-4-rect-4x3.wodblok.json') },
+];
+
+test('the button names the next step, the folder lists its projects, a project opens, and Close folder forgets it', async ({ page }) => {
+  const { errors } = await openApp(page);
+  test.skip(!(await page.evaluate(() => typeof window.showDirectoryPicker === 'function')), 'this browser has no folder picker');
+  await installFolder(page, FILES);
+  await expect(page.locator('#pls')).toHaveText('Open projects folder');
+  await page.click('#pls');
+  await expect(page.locator('#plist')).toBeVisible();
+  await expect(page.locator('#pls')).toHaveText('Projects');
+  await expect(page.locator('#pdlgt')).toHaveText('My patterns');
+  await expect(page.locator('#pgrid .pc')).toHaveCount(2);
+  await expect(page.locator('#pgrid .pc b').first()).toBeVisible();
+  const emptyBefore = await getState(page);
+  await page.locator('#pgrid .pc [data-a="open"]').first().click();   // nothing unsaved, so one click opens it
+  await expect(page.locator('#pmsg')).toContainText('Opened');
+  await settle(page);
+  expect(await getState(page)).not.toBe(emptyBefore);
+  await expect(page.locator('#plist')).toBeHidden();
+  await expect(page.locator('#pst')).not.toHaveClass(/dirty/);
+  await page.click('#pls');                                            // the list again (the folder is still chosen)
+  await expect(page.locator('#pgrid .pc')).toHaveCount(2);
+  await page.click('#pcf');
+  await expect(page.locator('#plist')).toBeHidden();
+  await expect(page.locator('#pls')).toHaveText('Open projects folder');
+  expect(errors).toEqual([]);
+});
+
+test('opening a project from the folder asks first when the current one has unsaved work', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 5 });
+  test.skip(!(await page.evaluate(() => typeof window.showDirectoryPicker === 'function')), 'this browser has no folder picker');
+  await page.click('#rzbar'); await settle(page, { max: 60000 });
+  await installFolder(page, FILES);
+  await page.click('#pls');
+  const b = page.locator('#pgrid .pc [data-a="open"]').first();
+  await expect(b).toBeVisible();
+  const before = await getState(page);
+  await b.click();
+  await expect(b).toHaveText('Discard changes?');
+  expect(await getState(page)).toBe(before);
+  await b.click();
+  await expect(page.locator('#pmsg')).toContainText('Opened');
+  expect(errors).toEqual([]);
+});

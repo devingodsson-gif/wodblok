@@ -36,7 +36,7 @@ test('on a Mac the labels say Cmd', async ({ page }) => {
   await page.addInitScript(() => Object.defineProperty(navigator, 'platform', { get: () => 'MacIntel' }));
   const { errors } = await openApp(page, { seed: 1 });
   expect(await page.getAttribute('#undo', 'title')).toBe('Undo (Cmd+Z)');
-  expect(await page.getAttribute('#psv', 'title')).toBe('Save (Cmd+S)');
+  expect(await page.getAttribute('#psv', 'title')).toBe('Save project (Cmd+S)');
   expect(await page.getAttribute('#cmdkb', 'title')).toContain('Cmd+K');
   expect(await page.getAttribute('#clr', 'title')).toContain('Cmd+Z');          // a title that is set in the page text
   expect(await page.getAttribute('#clr', 'title')).not.toContain('Ctrl+Z');

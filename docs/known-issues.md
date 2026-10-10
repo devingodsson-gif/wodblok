@@ -37,3 +37,6 @@ Could not be reproduced in later runs; no change made.
 
 ## Test flake again: roundtrip "open project-…" SVG summary (seen twice, 1.0.1 and 1.0.2 runs)
 `open-project-4-rect-4x3.svg.json` failed once on the 1.0.1 build and `open-project-1-diamond.svg.json` once on the 1.0.2 build (with the rail collapsed); each passed on an immediate re-run on the same build. Same family as the flakes above. Snapshots not touched.
+
+## CI flake: SVG summary counts differ on a slow machine (seen once, 1.0.4 CI run)
+On the first CI run that tested the built app, `roundtrip open-project-4-rect-4x3` and `canvas shape: tri` took their SVG summary a moment too early (image and symbol counts a few short; same family as the flakes above). Both passed locally. The checkpoint now waits for 10 quiet checks instead of 4 before taking a snapshot; the assertions are unchanged.
