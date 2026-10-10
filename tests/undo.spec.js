@@ -35,3 +35,19 @@ test('Undo and Redo say what they did, and an old status message fades (UX revie
   await expect(page.locator('#pmsg')).toHaveText('', { timeout: 20000 });
   expect(errors).toEqual([]);
 });
+
+test('History names Randomize rolls "Randomize 1, 2…", and says "1 step" at the start (UX review C2)', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 7 });
+  await openPanel(page, 'hist');
+  await expect(page.locator('#hsc')).toHaveText('1 step');
+  await openPanel(page, 'rand');
+  await roll(page);
+  await roll(page);
+  await openPanel(page, 'hist');
+  await expect(page.locator('.hsl .hr b', { hasText: 'Randomize 1' })).toHaveCount(1);
+  await expect(page.locator('.hsl .hr b', { hasText: 'Randomize 2' })).toHaveCount(1);
+  await expect(page.locator('#hsc')).toHaveText('3 steps');
+  await press(page, 'Control+z');
+  await expect(page.locator('#pmsg')).toContainText('Undid: Randomize 2');
+  expect(errors).toEqual([]);
+});

@@ -36,7 +36,7 @@ function lkRemap(c,np){
   c.tiles.forEach(t=>{if(t.ink)t.ink=to(t.ink)});c.layers.forEach(l=>{if(l.ink)l.ink=to(l.ink)});
 }
 function lkDo(label,mut){
-  const c=JSON.parse(coreStr());mut(c);WBX.wbApply(c);if(WBX.wbCap)WBX.wbCap();pmsg(label);
+  const c=JSON.parse(coreStr());mut(c);WBX.wbApply(c);WBX.wbLabelNext={t:String(label).replace(/\.$/,''),at:performance.now()};if(WBX.wbCap)WBX.wbCap();pmsg(label);
 }
 const lkSetProj=(c,p)=>{const np={};['bg','ink','c3','c4'].forEach(k=>{if(p[k])np[k]=p[k]});if(!np.bg||!np.ink)return;lkRemap(c,np);c.proj={...c.proj};['bg','ink','c3','c4'].forEach(k=>{if(np[k])c.proj[k]=np[k];else if(k=='c3'||k=='c4')delete c.proj[k]})};
 function lkSetGrade(c,g){
