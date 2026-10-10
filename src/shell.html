@@ -63,7 +63,7 @@ button,.ddi,.wtab,.lyr,.rail button{transition:background-color .12s,border-colo
 .hr:hover{background:var(--raise)}.hr.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink);font-weight:600}.hr.fut{opacity:.5}
 .hr b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hr i{font-style:normal;color:var(--faint);font-size:10.5px;font-weight:400}
 .hr input{width:100%;height:24px;font:inherit;padding:2px 6px}
-.hr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;visibility:hidden;display:inline-flex;align-items:center;justify-content:center}.hr button svg{width:13px;height:13px}.hr:hover button{visibility:visible}.hr button:hover{background:var(--line);color:var(--fg)}
+.hr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;display:inline-flex;align-items:center;justify-content:center}.hr button svg{width:13px;height:13px}.hr:hover button,.hr.on button,.hr:focus-within button{visibility:visible}.hr button:hover{background:var(--line);color:var(--fg)}
 .hr.sn{grid-template-columns:minmax(0,1fr) auto auto}
 :root{--ca:#3b7ddd;--cb:#d9741a}
 .ab,.hr.ra b::before,.hr.rb b::before{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;margin-right:6px;border-radius:4px;font:700 10px/1 "Hanken Grotesk",system-ui,sans-serif;font-style:normal;text-decoration:none;color:#fff;vertical-align:1px;box-sizing:border-box}
@@ -317,7 +317,7 @@ button.alt{background:var(--raise)}
 .mlist .mr:hover{background:var(--raise)}.mlist .mr.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink);font-weight:600}
 .mlist .mr svg{width:30px;height:30px;border-radius:4px;border:1px solid var(--line)}
 .mlist .mr b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mlist .mr i{font-style:normal;color:var(--faint);font-weight:400;margin-left:4px}
-.mlist .mr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;visibility:hidden;font-size:14px;line-height:1}.mlist .mr:hover button{visibility:visible}.mlist .mr button:hover{background:var(--line);color:var(--fg)}
+.mlist .mr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;font-size:14px;line-height:1}.mlist .mr:hover button,.mlist .mr.on button,.mlist .mr:focus-within button{visibility:visible}.mlist .mr button:hover{background:var(--line);color:var(--fg)}
 .mlist .em{padding:12px;font-size:11.5px;color:var(--mut);line-height:1.45}
 .mlist{user-select:none;-webkit-user-select:none}
 .mlist .mh{grid-template-columns:14px 30px minmax(0,1fr) 22px;gap:6px;padding-left:2px}
@@ -348,7 +348,7 @@ button.alt{background:var(--raise)}
 .txl .mr{display:grid;grid-template-columns:30px minmax(0,1fr) 22px;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:12px;border:1px solid transparent}
 .txl .mr:hover{background:var(--raise)}.txl .mr.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink);font-weight:600}
 .txl .mr b{font-weight:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.txl .mr i{font-style:normal;color:var(--faint);font-weight:400;margin-left:6px}
-.txl .mr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;visibility:hidden;font-size:15px;line-height:1}.txl .mr:hover button,.txl .mr.on button{visibility:visible}.txl .mr button:hover{background:var(--line);color:var(--fg)}
+.txl .mr button{width:22px;height:22px;padding:0;border:0;background:transparent;color:var(--mut);border-radius:5px;font-size:15px;line-height:1}.txl .mr:hover button,.txl .mr.on button,.txl .mr:focus-within button{visibility:visible}.txl .mr button:hover{background:var(--line);color:var(--fg)}
 .txl .nb{margin:6px}
 #sel .msc{font-size:11px;font-weight:600;color:var(--acc-ink);background:var(--acc-soft);border-radius:9px;padding:2px 9px;white-space:nowrap}
 .mlist .ft{border-top:1px solid var(--line);padding:6px 12px;font-size:10.5px;color:var(--faint)}
@@ -560,7 +560,7 @@ body.dropping::after{content:"Drop the image to import it";position:fixed;inset:
 .txed{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 8px;border-radius:7px;background:var(--acc-soft);font-size:12px}.txed span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.txed button{margin:0;flex:none}
 #tx_t{width:100%;resize:vertical;font:inherit;font-size:13px;min-height:52px;box-sizing:border-box}
 .txpv{margin-top:10px;border:1px solid var(--line);border-radius:8px;background:var(--field);padding:6px;color:var(--fg)}.txpv svg{display:block;width:100%;max-height:220px}
-.lib>div{position:relative}.lib>div:hover .dx{display:block}.lib>div>button:first-child{width:100%}
+.lib>div{position:relative}.lib>div:hover .dx,.lib>div:focus-within .dx,.lib>div:has(.ck) .dx{display:block}.lib>div>button:first-child{width:100%}
 @media (max-width:860px){.edhint.sphide{visibility:hidden}
 .edhint{white-space:normal;max-width:calc(100% - 24px);text-align:center;border-radius:10px}#sel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 12px;padding:8px 10px}#sel .ctl{grid-template-columns:auto minmax(0,1fr) 46px;gap:6px}#sel .sdiv{display:none}#sel>.row{grid-column:1/-1;justify-content:center;gap:10px}#sel .rzg{grid-column:1/-1}#edhint.edhint{display:none!important}#sel .ib{width:36px;height:36px}.board{min-height:44vh}.modal.modal{padding:8px;align-items:flex-start}.dlg.dlg{width:100%;max-width:100%;max-height:calc(100vh - 16px);min-width:0}.dlg-b{min-width:0}.icmp>*{min-width:0}.icmp{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.ictl{grid-column:1/-1;min-width:0}.ictl .ctl{grid-template-columns:92px minmax(0,1fr) 30px}.ifoot span{display:none}.ifoot{justify-content:flex-end}.pgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.dlg-h{flex-wrap:wrap}}
 /* projects dialog */
