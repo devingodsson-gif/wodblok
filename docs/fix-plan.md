@@ -157,6 +157,20 @@ Perf ratio 0.818. Full suite (Chromium): 164 passed, 0 failed, 5 skipped. No sna
 
 Risk: 60–90% (saving, opening, `src/platform`). Run the full suite before merging.
 
+### 1.0.4 outcome (what was actually done)
+
+Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
+
+| # | Result | Notes |
+|---|---|---|
+| C1 (Q5) | **Done differently** | **Save project** writes the `.wodblok` file only (in place after the first save in Chrome and Edge; a download elsewhere). **Open project** opens a file. **Open projects folder** (Chrome and Edge) becomes **Projects** once a folder is chosen and lists that folder's `.wodblok` and `.wodblok.json` files; **Close folder** forgets it. The folder is remembered between visits when the browser allows. The top-bar Export button is gone: PNG, SVG, Copy SVG code and the cover PDF/PNG moved into the Export tool. The browser project store, "Save a copy" and "Download project file" were removed (no existing users, so no migration). Export/Import everything are now **Back up everything** / **Restore from backup** and no longer include projects. |
+| D9 (Q12) | Not needed | "Save a copy" no longer exists. |
+| N1 | Done | New project says "Click again: can't be undone" (button and status line). A blank document no longer counts as unsaved, so a fresh launch shows no dot. |
+| C19 (restore) + P5 | Not done | Left for a later release. |
+| Side effect | Art from a saved project | The live-linked "Use a project" art (it read the browser store) was removed. "Use a project…" now picks a `.wodblok` file and uses its picture as a fixed image. |
+
+Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
+
 ## 1.0.5: Compare and history
 
 | # | Fix | Where | Test / check |
