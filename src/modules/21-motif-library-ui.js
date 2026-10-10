@@ -15,7 +15,8 @@ const fSet=(k,g)=>{if(k[0]=='b'){if(g)BF[k]=g;else delete BF[k]}else if(cust[k])
 const mNm=k=>k[0]=='b'?N[+k.slice(1)]||'Motif':cust[k]?cust[k].n:'Motif';
 function libCats(){const ck=Object.keys(cust).filter(k=>!k.startsWith('i|')&&!k.startsWith('t|')&&!cust[k].g),ik=Object.keys(cust).filter(k=>k.startsWith('i|')&&!cust[k].g),o=[];
 fAll().forEach(g=>o.push({v:'g:'+g,n:g,ks:fKeys(g),t:'f'}));
-o.push({v:'d',n:'Drawn by Claude',ks:ck,t:'u'},{v:'i',n:'My imports',ks:ik,t:'u'});
+// the "Drawn by Claude" folder only shows when it holds something (an old project's drawings); new work is imported by the user
+if(ck.length||WBS.mcat=='d')o.push({v:'d',n:'Drawn by Claude',ks:ck,t:'u'});o.push({v:'i',n:'My imports',ks:ik,t:'u'});
 CATS.forEach((c,i)=>o.push({v:String(i),n:REN[c.n]||c.n,ks:c.k,t:'b',hid:WBS.HID.includes(c.n),orig:c.n}));return o}
 const libCur=()=>{const L=libCats();let c=L.find(x=>x.v==WBS.mcat);if(!c){c=L.find(x=>x.t=='b'&&!x.hid)||L.find(x=>x.v=='i');WBS.mcat=c.v}return c};
 const IC={del:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg>',
