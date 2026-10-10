@@ -274,8 +274,8 @@ store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
 // Loading a step normalises the document a little (for example every stamp gets an empty texture list), so the entry is re-read
 // after loading; otherwise the next capture sees a difference, adds a step and cuts off the steps still to redo.
 function goTo(i){hi=i;applyCore(JSON.parse(hist[hi]));hist[hi]=coreStr();navDirty()}
-function undo(){cap();if(hi>0)goTo(hi-1);ub()}
-function redo(){if(hi<hist.length-1)goTo(hi+1);ub()}
+function undo(){cap();if(hi>0){const was=histL[hi];goTo(hi-1);pmsg('Undid: '+was)}ub()}
+function redo(){if(hi<hist.length-1){goTo(hi+1);pmsg('Redid: '+histL[hi])}ub()}
 $('undo').onclick=undo;$('redo').onclick=redo;ub();
 WBX.wbHistGet=i=>hist[i];WBX.wbResetHist=()=>{if(WBX.wbBA)wbBA.reset();hist=[coreStr()];histL=['Start'];histT=[Date.now()];hi=0;ub();if(WBX.wbSnapLoad)WBX.wbSnapLoad()};WBX.wbCap=cap;WBX.wbApply=applyCore;
 // ---- History panel + named snapshots

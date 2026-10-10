@@ -21,3 +21,17 @@ test('undo walks back through several rolls to the start, and redo walks forward
   for (let i = 1; i <= 3; i++) { await press(page, 'Control+Shift+z'); expect(await getState(page), `redo to step ${i}`).toBe(states[i]); }
   expect(errors).toEqual([]);
 });
+
+test('Undo and Redo say what they did, and an old status message fades (UX review D17, C19)', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 7 });
+  await openPanel(page, 'rand');
+  await roll(page);
+  await expect(page.locator('#pmsg')).toContainText('Randomized');
+  await press(page, 'Control+z');
+  await expect(page.locator('#pmsg')).toContainText('Undid:');
+  await expect(page.locator('#pmsg')).not.toContainText('Randomized');
+  await press(page, 'Control+Shift+z');
+  await expect(page.locator('#pmsg')).toContainText('Redid:');
+  await expect(page.locator('#pmsg')).toHaveText('', { timeout: 20000 });
+  expect(errors).toEqual([]);
+});
