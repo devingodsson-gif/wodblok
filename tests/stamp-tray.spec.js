@@ -38,3 +38,27 @@ test('Send to back puts the selected motif behind the others (UX review D8)', as
   expect(after).toEqual([before[1], before[0]]);
   expect(errors).toEqual([]);
 });
+
+test('a new or duplicated stamp is added to the current layer, and Undo takes it out again (UX review B2)', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 3 });
+  const st = async () => { const s = JSON.parse(await getState(page)); return { tiles: s.tiles.map(t => t.id), layer: s.layers[0].st }; };
+  const before = await st();
+  await page.click('#addT');
+  await settle(page);
+  const afterNew = await st();
+  expect(afterNew.tiles.length).toBe(before.tiles.length + 1);
+  expect(afterNew.layer).toContain(afterNew.tiles[afterNew.tiles.length - 1]);
+  await page.click('#dupT');
+  await settle(page);
+  const afterDup = await st();
+  expect(afterDup.tiles.length).toBe(afterNew.tiles.length + 1);
+  const added = afterDup.tiles.filter(id => !afterNew.tiles.includes(id));
+  expect(added.length).toBe(1);
+  expect(afterDup.layer).toContain(added[0]);
+  await page.keyboard.press('Control+z');
+  await settle(page);
+  const undone = await st();
+  expect(undone.tiles).toEqual(afterNew.tiles);
+  expect(undone.layer).toEqual(afterNew.layer);
+  expect(errors).toEqual([]);
+});

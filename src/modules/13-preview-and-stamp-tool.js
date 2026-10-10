@@ -41,6 +41,7 @@ const txC=()=>{const qs=QS();let x=0,y=0;qs.forEach(o=>{x+=o.x;y+=o.y});return[x
 const txAbs=(g,c)=>WBX.wbTxXf(g,M=>{M.ax+=c[0]-M.mx;M.ay+=c[1]-M.my;M.mx=c[0];M.my=c[1]});
 const sAx=k=>e=>{const q=Q();if(!q)return;const v=e.target.value/100,f=v/(q[k]||1);QS().forEach(o=>o[k]=o===q?v:clampN((o[k]||1)*f,.2,3));store();upd()};
 const addSt=t=>{const L=WBS.layers[WBS.selL];if(L&&!L.st.includes(t.id))L.st.push(t.id)};
+const layName=()=>{const L=WBS.layers[WBS.selL];return L?L.name:'the pattern'};
 function sync(){const t=WBS.tiles[WBS.cur],L=WBS.layers[WBS.selL],sv=(id,v)=>{if($(id).value!=v)$(id).value=v};syncAsp('c','c');syncAsp('s','s');{const k=csk();document.querySelectorAll('#cshp [data-s]').forEach(b=>{b.classList.toggle('on',b.dataset.s==k);b.disabled=WBS.book.on});
 $('caspbox').hidden=!CASP.includes(k);$('crrbox').hidden=k!='rrect';$('cngbox').hidden=k!='ngon';$('ccobox').hidden=!['hex','tri','ngon'].includes(k);$('ccirh').hidden=k=='rect';
 {const a=$('ccr'),b=$('cns');if(document.activeElement!==a)a.value=WBS.dim.cr==null?25:WBS.dim.cr;if(document.activeElement!==b)b.value=csN();if(typeof nums=='function')nums()}
@@ -97,8 +98,8 @@ WBS.tiles.splice(0,WBS.tiles.length,...rest);WBS.cur=WBS.tiles.indexOf(dragged);
 document.addEventListener('pointercancel',()=>{if(d){d=null;clr()}});
 T.addEventListener('click',e=>{if(sw){e.stopImmediatePropagation();e.preventDefault();sw=false}},true);
 document.addEventListener('keydown',e=>{if(d&&d.on&&e.key=='Escape'){d=null;clr()}})}
-$('addT').onclick=()=>{const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:3,er:3,es:Math.floor(Math.random()*999),tu:[]};WBS.tiles.push(t);WBS.cur=WBS.tiles.length-1;selOne(-1);store();upd();pmsg('New stamp added. Tick it under Stamps in the pattern (Arrangement) to print it in a layer.')};
-$('dupT').onclick=()=>{const g=tGrp(),pid=WBS.tiles[WBS.cur].id,cps=[];let pc=null;g.slice().reverse().forEach(k=>{const t=JSON.parse(JSON.stringify(WBS.tiles[k]));t.id=WBS.nid++;WBS.tiles.splice(k+1,0,t);cps.push(t.id);if(WBS.tiles[k].id==pid)pc=t.id});WBS.cur=WBS.tiles.findIndex(t=>t.id==pc);WBS.tM=cps.length>1?new Set(cps):new Set();selOne(-1);store();upd();pmsg('Stamp duplicated. Tick it under Stamps in the pattern (Arrangement) to print it in a layer.')};
+$('addT').onclick=()=>{const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:3,er:3,es:Math.floor(Math.random()*999),tu:[]};WBS.tiles.push(t);addSt(t);WBS.cur=WBS.tiles.length-1;selOne(-1);store();upd();pmsg('New stamp added to '+layName()+'.')};
+$('dupT').onclick=()=>{const g=tGrp(),pid=WBS.tiles[WBS.cur].id,cps=[];let pc=null;g.slice().reverse().forEach(k=>{const t=JSON.parse(JSON.stringify(WBS.tiles[k]));t.id=WBS.nid++;WBS.tiles.splice(k+1,0,t);cps.push(t.id);if(WBS.tiles[k].id==pid)pc=t.id});WBS.cur=WBS.tiles.findIndex(t=>t.id==pc);WBS.tM=cps.length>1?new Set(cps):new Set();cps.forEach(id=>addSt({id}));selOne(-1);store();upd();pmsg((cps.length>1?'Stamps duplicated':'Stamp duplicated')+' and added to '+layName()+'.')};
 $('delT').onclick=()=>{const g=tGrp();if(WBS.tiles.length>g.length){const ids=g.map(k=>WBS.tiles[k].id);g.slice().reverse().forEach(k=>WBS.tiles.splice(k,1));WBS.layers.forEach(L=>L.st=L.st.filter(x=>!ids.includes(x)));WBS.tM=new Set();WBS.cur=Math.min(g[0],WBS.tiles.length-1);selOne(-1);store();upd()}};
 }
 export {paintGhost,pvView,pvZ,renderML,sync,init13};
