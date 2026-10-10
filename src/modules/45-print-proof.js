@@ -11,7 +11,7 @@ const PAPERS={letter:[8.5,11],a4:[8.27,11.69]},DPI=150;
 const loadImg=url=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('The picture could not be made.'));i.src=url});
 const fit=(w,h,bw,bh)=>{const k=Math.min(bw/w,bh/h);return[w*k,h*k]};
 function colours(){
-  const p=WBS.proj,list=[['Paper',p.bg],['Ink',p.ink],['3rd colour',p.c3],['4th colour',p.c4]].filter(x=>x[1]),seen=new Set(list.map(x=>x[1]));
+  const p=WBS.proj,list=[['Paper',p.bg],['Ink',p.ink],['Accent',p.c3],['Accent 2',p.c4]].filter(x=>x[1]),seen=new Set(list.map(x=>x[1]));
   const more=[];[...WBS.tiles.map(t=>t.ink),...WBS.layers.map(l=>l.ink)].forEach(n=>{if(n&&!seen.has(n)){seen.add(n);more.push(['Also used',n])}});
   return list.concat(more).filter(x=>{try{return !!col(x[1])}catch(e){return false}});
 }

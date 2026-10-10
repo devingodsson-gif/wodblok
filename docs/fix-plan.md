@@ -171,6 +171,15 @@ Decisions (Q5, Q12, N1) came from the user and replaced the plan's defaults:
 
 Not tested in a real browser: the folder picker and in-place saving (tested with stand-ins). Perf not run (no drawing, dragging or sliders touched). Full suite (Chromium): 153 passed, 15 failed, 6 skipped before approval. All 15 were snapshots: 3 panel goldens (text only: top-bar labels, status line, Layout/Guides names, version) and 12 SVG hashes (the order of `class` and `style` on the art `<svg>`). Approved by the user and regenerated.
 
+## 1.0.16: Easy wins (C9, C16, C20, D15; D18 and C6 already covered)
+
+- **C9:** the colour slots are Paper, Ink, Accent and Accent 2 (the print proof already said Paper and Ink; its 3rd and 4th colour are now Accent and Accent 2), also in "Clicking a colour sets". The Add colour tile is first in the library. The hex field and the colour picker (with Chromium's eyedropper) are in the Add colour form, as before; a per-slot hex field in each dropdown was not built.
+- **C16:** each starting Look has a small picture made from its own settings (a sample in the project's paper and ink with the look's contrast, saturation, warmth, fade and texture), so it costs nothing to draw. Looks you save keep their own picture.
+- **C20:** the Display menu has a "Show while editing" heading and a check mark on whatever is switched on.
+- **D15:** the stamp library's name field says what an empty name will become ("Stamp 3"), and saves are confirmed in the status line like every other save.
+- **D18:** already true: the Variations tiles appear at once with a shimmer and fill in one by one as each is ready. **C6:** moot, since the top-bar Export button was removed in 1.0.4 and the image exports live in the Export tool.
+- Files: `shell.html`, `04-…`, `27-stamp-library.js`, `45-print-proof.js`, `46-presets.js`. Tests: `easy-wins.spec.js`; `palette.spec.js` reads the new labels.
+
 ## 1.0.15: The "⋯" row menu (rest of D16)
 
 Layers rows and snapshot rows now have one "⋯" button. Layers: Rename, Duplicate, Move up, Move down (an alternative to dragging) and Delete (not on the last layer). Snapshots: Rename and Delete. The menu opens beside the button, its items are real buttons (Tab, Arrow keys and Enter work), and it closes on choosing, Esc or a click elsewhere. Rename used to be a double-click nobody could discover. The row buttons of History, the Motif list and the texture list stay as they were: they are already visible (1.0.3) and have no hidden actions. The old Duplicate and Delete icons on Layers rows are replaced by the menu. Files: `04-canvas-and-stamp-outlines.js` (`rowMenu`), `32-layers-panel.js`, `34-desktop-shell.js`, `shell.html`. Tests: `row-menu.spec.js`.

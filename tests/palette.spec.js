@@ -32,8 +32,8 @@ test('a four-colour combination fills the four slots and rotating moves them alo
   const a = JSON.parse(await getState(page)).proj;
   expect(Object.keys(a).sort()).toEqual(['bg', 'c3', 'c4', 'ink']);
   expect(new Set([a.bg, a.ink, a.c3, a.c4]).size).toBe(4);
-  expect(await page.locator('label', { hasText: '1st colour' }).count()).toBe(1);
-  expect(await page.locator('label', { hasText: '4th colour' }).count()).toBe(1);
+  expect(await page.locator('section[data-p="colors"] label', { hasText: /^Paper$/ }).count()).toBe(1);
+  expect(await page.locator('section[data-p="colors"] label', { hasText: /^Accent 2$/ }).count()).toBe(1);
   expect(await page.locator('label', { hasText: /^Background$/ }).count()).toBe(0);
   await page.click('#pswp');
   await settle(page);
