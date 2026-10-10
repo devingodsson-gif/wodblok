@@ -5,7 +5,7 @@ Every finding is assigned to one step below; the [coverage table](#coverage-ever
 
 ## How every step is run (from CLAUDE.md)
 
-1. **One release per step**, on its own branch (`fix/1.1-…`), merged into `main` when done. Version: minor +1 per release (1.1.0, 1.2.0, …), patch for a hotfix.
+1. **One release per step**, on its own branch (`fix/1.0.1-…`), merged into `main` when done. Version: **1.0.X**, patch +1 per release (1.0.1, 1.0.2, … 1.0.7), as you asked. A hotfix between steps takes the next patch number too.
 2. **One finding per commit**, so any single fix can be reverted.
 3. **A test for each fix** that drives the real UI: the bug fails first, then passes. For example, B1's test clicks New stamp and expects one more stamp and no page error.
 4. **Snapshots and golden screenshots are never updated just to pass.** When a fix changes them on purpose, I list which ones changed and why, and ask before updating.
@@ -21,22 +21,22 @@ Each question is from the review's section 5. Steps that need an answer say so; 
 
 | Question | Decides | Needed by | My suggested default |
 |---|---|---|---|
-| Q2: explanatory text already in panels | C10 | 1.2 | Remove it. Move the storage facts into the Save flow (C1). |
-| Q3 + Q13: built-in motifs, "Draw with Claude", "Drawn by Claude" folder, ChatGPT prompt | C11, D14 | 1.2 | Hide Draw with Claude and the folder. Hide the built-in sets until you supply your own. |
-| Q4 + Q10: one-word labels under rail icons; native hover tooltips | C4 | 1.2 | Labels yes. Keep native tooltips as a fallback. |
-| Q5: what Save means | C1 | 1.4 | Save writes the real file where the browser allows it. Projects becomes "recent". |
-| Q6: lighter Randomize defaults | C8 | 1.7 | Yes, effects off by default. |
-| Q7: UK or US spelling | P1 | 1.2 | UK ("colour", matching Wada and the print proof). |
-| Q8: new stamps go onto the current layer | B2 | 1.2 | Yes. |
-| Q9: "+" slot on the empty stamp at launch | B4 | 1.2 | Yes. |
-| Q11: choose the layer type when adding a layer | D1 | 1.3 | Yes. |
-| Q12: Save a copy behaviour | D9 | 1.4 | Stay on the original. |
-| Q14: exports and the Save dialog | D10 | 1.6 | Every export asks where to save where the browser can. |
-| Q15: text and symmetry | D6 | 1.3 | Text stays readable, with mirroring as an option. |
+| Q2: explanatory text already in panels | C10 | 1.0.2 | Remove it. Move the storage facts into the Save flow (C1). |
+| Q3 + Q13: built-in motifs, "Draw with Claude", "Drawn by Claude" folder, ChatGPT prompt | C11, D14 | 1.0.2 | Hide Draw with Claude and the folder. Hide the built-in sets until you supply your own. |
+| Q4 + Q10: one-word labels under rail icons; native hover tooltips | C4 | 1.0.2 | Labels yes. Keep native tooltips as a fallback. |
+| Q5: what Save means | C1 | 1.0.4 | Save writes the real file where the browser allows it. Projects becomes "recent". |
+| Q6: lighter Randomize defaults | C8 | 1.0.7 | Yes, effects off by default. |
+| Q7: UK or US spelling | P1 | 1.0.2 | UK ("colour", matching Wada and the print proof). |
+| Q8: new stamps go onto the current layer | B2 | 1.0.2 | Yes. |
+| Q9: "+" slot on the empty stamp at launch | B4 | 1.0.2 | Yes. |
+| Q11: choose the layer type when adding a layer | D1 | 1.0.3 | Yes. |
+| Q12: Save a copy behaviour | D9 | 1.0.4 | Stay on the original. |
+| Q14: exports and the Save dialog | D10 | 1.0.6 | Every export asks where to save where the browser can. |
+| Q15: text and symmetry | D6 | 1.0.3 | Text stays readable, with mirroring as an option. |
 
 ---
 
-## 1.1: Bugs and dead ends (no decisions needed)
+## 1.0.1: Bugs and dead ends (no decisions needed)
 
 Small fixes that remove "it looks broken" moments.
 
@@ -59,7 +59,7 @@ Small fixes that remove "it looks broken" moments.
 
 Risk for the full-suite question: about 30% (shared shell and history messages).
 
-## 1.2: The first minute (needs Q2, Q3, Q4, Q7, Q8, Q9)
+## 1.0.2: The first minute (needs Q2, Q3, Q4, Q7, Q8, Q9)
 
 Goal: someone new can make a pattern without help.
 
@@ -77,7 +77,7 @@ Goal: someone new can make a pattern without help.
 
 Risk: about 40% (launch state, rail and text across many panels).
 
-## 1.3: Layers and placing things (needs Q11, Q15)
+## 1.0.3: Layers and placing things (needs Q11, Q15)
 
 | # | Fix | Where | Test / check |
 |---|---|---|---|
@@ -91,7 +91,7 @@ Risk: about 40% (launch state, rail and text across many panels).
 
 Risk: about 60% (selection and drawing). Perf required.
 
-## 1.4: Saving you can trust (needs Q5, Q12; highest risk, platform code)
+## 1.0.4: Saving you can trust (needs Q5, Q12; highest risk, platform code)
 
 | # | Fix | Where | Test / check |
 |---|---|---|---|
@@ -101,17 +101,17 @@ Risk: about 60% (selection and drawing). Perf required.
 
 Risk: 60–90% (saving, opening, `src/platform`). Run the full suite before merging.
 
-## 1.5: Compare and history
+## 1.0.5: Compare and history
 
 | # | Fix | Where | Test / check |
 |---|---|---|---|
 | C3 | One compare. Before/Split defaults to "the step before this one"; History A/B pickers choose anything else; Grade "Hold to compare" folds into Before. | `20-before-after-and-randomizer.js`, `31-colour-grading.js` | Before after a roll shows the previous roll. |
 | C2 (thumbnails) ⚡ | A small thumbnail on Randomize rows and snapshots, taken from the picture the roll has already finished, or drawn lazily when History is open. Never during a drag. | `34-desktop-shell.js`, `19-randomize-and-hold.js` | Perf: roll time and slider drag unchanged. |
-| C14 (rest) | Whatever hover-only controls remain after 1.3 (History Compare button, rail labels if Q4 was no). | `shell.html` CSS | No `:hover`-only reveal rules left (grep test). |
+| C14 (rest) | Whatever hover-only controls remain after 1.0.3 (History Compare button, rail labels if Q4 was no). | `shell.html` CSS | No `:hover`-only reveal rules left (grep test). |
 
 Risk: about 50% (history).
 
-## 1.6: Export and colour (needs Q14)
+## 1.0.6: Export and colour (needs Q14)
 
 | # | Fix | Where | Test / check |
 |---|---|---|---|
@@ -125,7 +125,7 @@ Risk: about 50% (history).
 
 Risk: about 40%.
 
-## 1.7: Feel and speed (needs Q6)
+## 1.0.7: Feel and speed (needs Q6)
 
 | # | Fix | Where | Test / check |
 |---|---|---|---|
@@ -140,11 +140,11 @@ Risk: about 40%.
 
 Risk: about 70% (Randomize and drawing). Perf required. Full suite before merging.
 
-## After 1.7: checks I can't do here
+## After 1.0.7: checks I can't do here
 
 - Safari/WebKit run (`npm run test:webkit`) and the speed check on your Mac (`npm run perf-baseline`).
 - Chrome's real Save and Open dialogs; the installed app (double-click a `.wodblok`, offline, update dot).
-- A second UX pass on the finished 1.7 build, with the same scripts as the review, comparing screenshots before and after.
+- A second UX pass on the finished 1.0.7 build, with the same scripts as the review, comparing screenshots before and after.
 
 ---
 
@@ -152,24 +152,24 @@ Risk: about 70% (Randomize and drawing). Perf required. Full suite before mergin
 
 | Finding | Step | Finding | Step | Finding | Step |
 |---|---|---|---|---|---|
-| B1 | 1.1 | C11 | 1.2 | D1 | 1.3 |
-| B2 | 1.2 | C12 | 1.1 | D2 | 1.1 |
-| B3 | 1.1 | C13 | 1.1 | D3 | 1.1 |
-| B4 | 1.2 | C14 | 1.3 + 1.5 | D4 | 1.7 |
-| C1 | 1.4 | C15 | 1.1 + 1.7 | D5 | 1.1 |
-| C2 | 1.2 + 1.5 | C16 | 1.6 | D6 | 1.3 |
-| C3 | 1.1 + 1.5 | C17 | 1.2 | D7 | 1.3 |
-| C4 | 1.2 | C18 | 1.3 | D8 | 1.1 |
-| C5 | 1.1 | C19 | 1.1 + 1.4 | D9 | 1.4 |
-| C6 | 1.6 | C20 | 1.6 | D10 | 1.6 |
-| C7 | 1.3 | P1 | 1.2 | D11 | 1.1 |
-| C8 | 1.7 | P2 | 1.7 | D12 | 1.7 |
-| C9 | 1.6 | P3 | 1.7 | D13 | 1.7 |
-| C10 | 1.2 | P4 | 1.7 | D14 | 1.2 |
-| | | P5 | 1.4 | D15 | 1.6 |
-| | | P6 | 1.1 | D16 | 1.3 |
-| | | | | D17 | 1.1 |
-| | | | | D18 | 1.6 |
-| | | | | D19 | 1.2 |
+| B1 | 1.0.1 | C11 | 1.0.2 | D1 | 1.0.3 |
+| B2 | 1.0.2 | C12 | 1.0.1 | D2 | 1.0.1 |
+| B3 | 1.0.1 | C13 | 1.0.1 | D3 | 1.0.1 |
+| B4 | 1.0.2 | C14 | 1.0.3 + 1.0.5 | D4 | 1.0.7 |
+| C1 | 1.0.4 | C15 | 1.0.1 + 1.0.7 | D5 | 1.0.1 |
+| C2 | 1.0.2 + 1.0.5 | C16 | 1.0.6 | D6 | 1.0.3 |
+| C3 | 1.0.1 + 1.0.5 | C17 | 1.0.2 | D7 | 1.0.3 |
+| C4 | 1.0.2 | C18 | 1.0.3 | D8 | 1.0.1 |
+| C5 | 1.0.1 | C19 | 1.0.1 + 1.0.4 | D9 | 1.0.4 |
+| C6 | 1.0.6 | C20 | 1.0.6 | D10 | 1.0.6 |
+| C7 | 1.0.3 | P1 | 1.0.2 | D11 | 1.0.1 |
+| C8 | 1.0.7 | P2 | 1.0.7 | D12 | 1.0.7 |
+| C9 | 1.0.6 | P3 | 1.0.7 | D13 | 1.0.7 |
+| C10 | 1.0.2 | P4 | 1.0.7 | D14 | 1.0.2 |
+| | | P5 | 1.0.4 | D15 | 1.0.6 |
+| | | P6 | 1.0.1 | D16 | 1.0.3 |
+| | | | | D17 | 1.0.1 |
+| | | | | D18 | 1.0.6 |
+| | | | | D19 | 1.0.2 |
 
-49 of 49 findings assigned. Seen once and not reproduced: the stamps that briefly vanished after a shape change (C5) get logged in `docs/known-issues.md` in 1.1, and the C5 progress bar covers the visible symptom.
+49 of 49 findings assigned. Seen once and not reproduced: the stamps that briefly vanished after a shape change (C5) get logged in `docs/known-issues.md` in 1.0.1, and the C5 progress bar covers the visible symptom.
