@@ -24,7 +24,7 @@ Treat everything pushed as published: it can be cloned and forked at once, and m
 - No Claude-drawn motif sets, and no third-party artwork, fonts or code without a licence that allows publishing (MIT, BSD, ISC, Apache, OFL).
 - No licence file and no "open source" wording: the code stays all-rights-reserved. Do not add a README that invites contributions or copies.
 - Never add anything that identifies the user personally (name, address, accounts) beyond the git commit author.
-- Hosting stays behind Cloudflare Access until the user decides to sell (the site ships the whole app to anyone who can open it). The repo being public does not make the site public.
+- wodblok.com is hosted on Cloudflare from `main` and is currently open to anyone who visits (no login), so the whole built app is already downloadable by visitors. Never put anything in the build that must stay secret (no keys, no personal data, no real project files in the app). Do not link wodblok.com anywhere public. Putting the site behind Cloudflare Access, or blocking search engines, is the user's decision: suggest it, never do it unasked.
 - Before the user makes the repo private again, follow the checklist in docs/public-repo.md. Never delete the repo, change its visibility, or rewrite git history without the user asking for that specifically.
 - GitHub Actions on a public repo are free, but keep the lean workflows (docs/ci-budget-rules.md) in case the repo goes private again.
 
