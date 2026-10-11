@@ -179,6 +179,29 @@ $('pal').innerHTML='<option value="">Custom mix</option>'+PL.map((p,i)=>`<option
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 mkdd('pI',C.map(cItem));mkdd('pB',C.map(cItem));mkdd('p3',[noneItem,...C.map(cItem)]);mkdd('p4',[noneItem,...C.map(cItem)]);mkdd('stI',[defItem,...C.map(cItem)]);
 paintColors();
-mkdd('pal',[{v:'',h:'<span class="combo">&mdash;</span>Custom mix'},...PL.map((p,i)=>({v:i,h:`<span class="combo" style="background:${CM[p[2]]};color:${CM[p[1]]}">Aa</span><span>${esc(p[0])}<small>No. ${i+1} · ${[p[2],p[1],p[3],p[4]].filter(Boolean).map(esc).join(' · ')}</small></span>`}))]);
+mkdd('pal',[{v:'',h:'<span class="combo">&mdash;</span>Custom mix'},...PL.map((p,i)=>({v:i,h:`<span class="combo sws">${[p[2],p[1],p[3],p[4]].filter(Boolean).map(n=>`<i style="background:${CM[n]}"></i>`).join('')}</span><span>${esc(p[0])}<small>No. ${i+1} · ${[p[2],p[1],p[3],p[4]].filter(Boolean).map(esc).join(' · ')}</small></span>`}))]);
+// Custom palettes: saved from the Palette menu, kept in your settings, listed first with a star.
+CP=cpLoad().filter(p=>p.s[0]&&p.s[1]&&p.s.every(n=>!n||CM[n]));
+palFill($('pal').value);
+$('cpsvb').onclick=()=>{$('cpsv').hidden=true;$('cpnf').hidden=false;$('cpnm').value='';$('cpnm').focus()};
+const cpSave=()=>{const n=$('cpnm').value.trim().slice(0,30);if(!n){$('cpnm').focus();return}
+ const id='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+ CP=[{id,name:n,s:[WBS.proj.bg,WBS.proj.ink,WBS.proj.c3||'',WBS.proj.c4||'']},...CP].slice(0,100);cpStore();$('cpnf').hidden=true;palFill('c:'+id)};
+$('cpok').onclick=cpSave;$('cpcx').onclick=()=>{$('cpnf').hidden=true;palUi()};
+$('cpnm').onkeydown=e=>{e.stopPropagation();if(e.key=='Enter'){e.preventDefault();cpSave()}else if(e.key=='Escape'){$('cpnf').hidden=true;palUi()}};
+$('cpdlb').onclick=()=>{const v=$('pal').value;if(!v.startsWith('c:'))return;CP=CP.filter(p=>'c:'+p.id!=v);cpStore();palFill('')};
 }
-export {C,CASP,CC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,PSLOT,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,closeRowMenu,col,csN,csk,fixC,geom,hasOut,inShape,init04,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,projCols,projSet,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
+// Custom palettes (newest first): each keeps colour names in paper, ink, accent, accent 2 order.
+let CP=[];
+const CP_KEY='wb110_cpal',escH=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cpLoad=()=>{try{const a=JSON.parse(kv.get(CP_KEY)||'[]');return Array.isArray(a)?a.filter(p=>p&&typeof p.id=='string'&&/^[a-z0-9]+$/.test(p.id)&&typeof p.name=='string'&&Array.isArray(p.s)&&p.s.length==4&&p.s.every(n=>typeof n=='string')).slice(0,100):[]}catch(e){return[]}};
+const cpStore=()=>{try{kv.set(CP_KEY,JSON.stringify(CP.map(({id,name,s})=>({id,name,s}))))}catch(e){}};
+const swH=s=>`<span class="combo sws">${s.filter(Boolean).map(n=>`<i style="background:${CM[n]}"></i>`).join('')}</span>`;
+function palFill(v){
+ $('pal').innerHTML=CP.map(p=>`<option value="c:${p.id}">${escH(p.name)}</option>`).join('')+'<option value="">Custom mix</option>'+PL.map((p,i)=>`<option value="${i}">${escH(p[0])}</option>`).join('');
+ $('pal').value=v==null?'':v;
+ DDset.pal([...CP.map(p=>({v:'c:'+p.id,h:`${swH(p.s)}<span><b class="cst" aria-hidden="true">★</b>${escH(p.name)}<small>Custom · ${p.s.filter(Boolean).map(escH).join(' · ')}</small></span>`})),{v:'',h:'<span class="combo">&mdash;</span>Custom mix'},...PL.map((p,i)=>({v:i,h:`${swH([p[2],p[1],p[3],p[4]])}<span>${esc(p[0])}<small>No. ${i+1} · ${[p[2],p[1],p[3],p[4]].filter(Boolean).map(esc).join(' · ')}</small></span>`}))]);
+ palUi()}
+// Save palette shows while the colours match no palette in the list (Custom mix); Delete palette shows while one of your own is selected.
+function palUi(){const v=$('pal').value,f=$('cpnf');if(v!=='')f.hidden=true;$('cpsv').hidden=v!==''||!f.hidden;$('cpdl').hidden=!v.startsWith('c:')}
+export {C,CASP,CC,CP,palUi,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,PSLOT,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,closeRowMenu,col,csN,csk,fixC,geom,hasOut,inShape,init04,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,projCols,projSet,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};

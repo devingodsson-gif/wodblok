@@ -15,8 +15,8 @@ test('the shared tools are the first nine rail buttons, in the same order, in Pa
   const stamp = await labels(page);
   expect(pattern.slice(0, 9)).toEqual(SHARED);
   expect(stamp.slice(0, 9)).toEqual(SHARED);
-  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Layout', 'Guides', 'Navigator', 'Variations', 'Export recipes']);
-  expect(stamp.slice(9)).toEqual(['Stamp', 'Motifs', 'Text', 'Stamp grid', 'Motif list', 'Pattern preview']);
+  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Layout', 'Guides', 'Navigator', 'Variations', 'Export recipes', 'More tools']);
+  expect(stamp.slice(9)).toEqual(['Stamp', 'Motifs', 'Text', 'Stamp grid', 'Motif list', 'Pattern preview', 'More tools']);
   expect(errors).toEqual([]);
 });
 
@@ -49,5 +49,49 @@ test('a tool name shows when the pointer rests on an icon or when it has keyboar
   await page.keyboard.press('Tab');
   await page.keyboard.press('Shift+Tab');
   await expect(page.locator('#rail-colors .tip')).toHaveCSS('opacity', '1');
+  expect(errors).toEqual([]);
+});
+
+test('the tool bar is one list; the three-line button opens a tool repository: tools drag between it and the bar, and a tool in it opens like on the bar', async ({ page }) => {
+  const { errors } = await openApp(page);
+  const ids = () => page.locator('.rail > [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn));
+  expect(await page.locator('.rail .rsep').count()).toBe(0);
+  expect(await page.locator('#rmenu:visible').count()).toBe(0);
+  const n = (await ids()).length;
+  await page.click('#rmore');
+  expect(await page.locator('#rmenu:visible').count()).toBe(1);
+  const drag = async (from, to) => {
+    const a = await from.boundingBox(), b = await to.boundingBox();
+    await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2); await page.mouse.down();
+    await page.mouse.move(a.x + a.width / 2 + 10, a.y + a.height / 2 + 10, { steps: 3 });
+    await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 8 }); await page.mouse.up();
+  };
+  await drag(page.locator('.rail [data-pn="hist"]'), page.locator('#rmenu'));
+  expect(await ids()).not.toContain('hist');
+  await page.reload(); await page.waitForTimeout(500);
+  expect(await ids()).not.toContain('hist');
+  await page.click('#rmore');
+  await page.click('#rmenu [data-add="hist"]');
+  expect(await page.locator('.dock [data-tab="hist"], .wtab:has-text("History")').count()).toBeGreaterThan(0);
+  await drag(page.locator('#rmenu [data-add="hist"]'), page.locator('.rail [data-pn="pres"]'));
+  expect((await ids()).length).toBe(n);
+  await page.keyboard.press('Escape');
+  expect(await page.locator('#rmenu:visible').count()).toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test('a tool drags to a new place on the bar, and the order is remembered', async ({ page }) => {
+  const { errors } = await openApp(page);
+  const ids = () => page.locator('.rail > [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn));
+  const before = await ids();
+  const a = await page.locator(`.rail [data-pn="${before[0]}"]`).boundingBox(), c = await page.locator(`.rail [data-pn="${before[3]}"]`).boundingBox();
+  await page.mouse.move(a.x + 20, a.y + 20); await page.mouse.down();
+  await page.mouse.move(a.x + 20, a.y + 32, { steps: 3 }); await page.mouse.move(c.x + 20, c.y + 30, { steps: 12 });
+  await page.mouse.up();
+  const after = await ids();
+  expect(after).not.toEqual(before);
+  expect(after.indexOf(before[0])).toBeGreaterThan(2);
+  await page.reload(); await page.waitForTimeout(500);
+  expect(await ids()).toEqual(after);
   expect(errors).toEqual([]);
 });

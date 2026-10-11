@@ -84,14 +84,20 @@ if(fl){wsClamp(g);el.style.cssText=`left:${g.x}px;top:${g.y}px;width:${g.w}px;${
 el.innerHTML=`<div class="wh" title="Drag to move. Drop on another panel's tabs to group it, on a dock to stack it there, or at any edge of the window to dock it."><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
 `<button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button><button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close (reopen from the left bar)">${IC.x}</button></div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
 const bd=el.querySelector('.wbd');g.tabs.forEach(p=>{const sc=wsSec(p);if(sc){sc.classList.toggle('mc',!!sc.querySelector(':scope>details.g'));sc.hidden=p!=g.a;bd.appendChild(sc)}});return el}
+// the tool bar: the user's own order and the tools they took off it (kept in settings)
+const RO={order:[],off:[]};try{const r=JSON.parse(kv.get('wb120_rail')||'null');if(r){if(Array.isArray(r.order))RO.order=r.order.filter(x=>typeof x=='string');if(Array.isArray(r.off))RO.off=r.off.filter(x=>typeof x=='string')}}catch(e){}
+const railEl=document.querySelector('.rail'),railSave=()=>{try{kv.set('wb120_rail',JSON.stringify(RO))}catch(e){}};
+const railBtns=()=>[...railEl.querySelectorAll(':scope > [data-pn]')];
+function railOrder(){const bs=railBtns(),by={};bs.forEach(b=>by[b.dataset.pn]=b);const ids=RO.order.filter(x=>by[x]);bs.forEach(b=>{if(!ids.includes(b.dataset.pn))ids.push(b.dataset.pn)});const sp=railEl.querySelector('.rsp');ids.forEach(id=>railEl.insertBefore(by[id],sp))}
+let railHook=null;
 function wsRender(){wsReady=true;const L=wsL(),nar=wsNarrow(),dl=nar?[...L.dock,...L.float]:L.dock;
 document.querySelectorAll('section.pn').forEach(sc=>wsStash.appendChild(sc));wsFl.innerHTML='';
 ['l','r','t','b'].forEach(k=>{const box=wsBox[k],dk=wsDk[k],gs=dl.filter(g=>(nar?'r':(g.e||'r'))==k);box.innerHTML='';
 gs.forEach((g,i)=>{if(i){const sp=document.createElement('div');sp.className='wsp';sp.dataset.i=i;box.appendChild(sp)}box.appendChild(wsEl(g,false))});
 dk.hidden=!gs.length;if(nar){dk.style.width='';dk.style.height=''}else if(gs.length){const ac=gs.every(g=>g.col);if(k=='l'||k=='r')dk.style.width=(ac?Math.min(200,wsClampSz(k,wsSz(k))):wsClampSz(k,wsSz(k)))+'px';else dk.style.height=(ac?34:wsClampSz(k,wsSz(k)))+'px'}});
 if(!nar)L.float.forEach(g=>wsFl.appendChild(wsEl(g,true)));
-document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=wsFind(p);b.hidden=!MODEP[view].includes(p);const fr=!!g&&g.a==p&&!g.col;b.classList.toggle('on',fr);b.classList.toggle('op',!!g&&!fr);b.title=fr?'':(g?'Open in a tab. Click to bring it to the front':'')});
-wsTabFit();nums()}
+document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=wsFind(p);b.hidden=!MODEP[view].includes(p)||RO.off.includes(p);const fr=!!g&&g.a==p&&!g.col;b.classList.toggle('on',fr);b.classList.toggle('op',!!g&&!fr);b.title=fr?'':(g?'Open in a tab. Click to bring it to the front':'')});
+wsTabFit();nums();if(railHook)railHook()}
 // a panel with more tabs than fit: the chosen tab is scrolled into view and the edge that hides more tabs fades
 function wsTabEdge(t){const h=t.parentElement;h.classList.toggle('ovr',t.scrollLeft+t.clientWidth<t.scrollWidth-1);h.classList.toggle('ovl',t.scrollLeft>1)}
 function wsTabFit(){document.querySelectorAll('.wh .wt').forEach(t=>{const a=t.querySelector('.wtab.on');if(a){if(a.offsetLeft+a.offsetWidth>t.scrollLeft+t.clientWidth)t.scrollLeft=a.offsetLeft+a.offsetWidth-t.clientWidth;else if(a.offsetLeft<t.scrollLeft)t.scrollLeft=a.offsetLeft}wsTabEdge(t)})}
@@ -184,6 +190,61 @@ if(p=='rand'&&e.isTrusted&&e.detail>1){const g2=wsFind('rand');if(!(g2&&g2.a=='r
 // clicking the button of a panel that is already showing closes it (only for real clicks, not when the app opens a panel itself)
 if(e.isTrusted&&g&&g.a==p&&!g.col){const i=g.tabs.indexOf(p);g.tabs.splice(i,1);if(g.a==p)g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g);wsSave();wsRender();return}
 setPanel(p)};
+
+// tool bar editing: the three-line button lists the tools that are off the bar; while it is open each tool on the bar shows an X to take it off; tools drag to a new place
+{const more=$('rmore'),menu=$('rmenu');let ed=false,drag=null,jus=0;
+const xsvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const vis=()=>railBtns().filter(b=>!MODEP[view].includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)?false:true);
+function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP[view].includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn));
+{const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML+'<span class="tip">'+b.getAttribute('aria-label')+'</span>';if(wsFind(b.dataset.pn))m.classList.add('on');g.appendChild(m)});menu.append(g)}
+menu.hidden=!ed;if(!menu.hidden){const w=railEl.getBoundingClientRect(),row=w.width>w.height;menu.style.left=(row?w.left:w.left-52)+'px';menu.style.top=(row?w.bottom:w.top)+'px';menu.style.width=w.width+'px';menu.style.height=w.height+'px';menu.style.bottom=''}}
+function edit(on){ed=on;document.body.classList.toggle('rtray',on);more.classList.toggle('on',on);more.setAttribute('aria-expanded',String(on));fill()}
+const refresh=()=>wsRender();railHook=()=>{if(ed)fill()};addEventListener('resize',()=>{if(ed)fill()});
+more.onclick=()=>edit(!ed);
+menu.onclick=e=>{if(Date.now()-jus<300)return;const m=e.target.closest('[data-add]');if(!m)return;const b=railEl.querySelector('[data-pn="'+m.dataset.add+'"]');if(b)b.click()};
+addEventListener('keydown',e=>{if(e.key=='Escape'&&ed)edit(false)});
+// a click that ends a drag is not a tool click
+railEl.addEventListener('click',e=>{if(Date.now()-jus<300){e.stopPropagation();e.preventDefault()}},true);
+// one drag for both columns: the bar and the repository get the same highlight, a line shows exactly where the tool will land, and the move happens on drop
+const rowMode=()=>getComputedStyle(railEl).flexDirection=='row';
+const inRect=(el,x,y)=>{const r=el.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom};
+const hvClear=()=>railEl.querySelectorAll('.hv').forEach(x=>x.classList.remove('hv'));
+const idOf=el=>el.dataset.pn||el.dataset.add;
+const colItems=c=>c=='rail'?vis():[...menu.querySelectorAll('[data-add]')];
+const colAt=(x,y)=>(!menu.hidden&&inRect(menu,x,y))?'tray':inRect(railEl,x,y)?'rail':null;
+let D=null,ins=null;
+function slot(c,x,y){const row=rowMode(),list=colItems(c).filter(el=>idOf(el)!==D.id);let idx=0;list.forEach(el=>{const r=el.getBoundingClientRect(),m=row?r.left+r.width/2:r.top+r.height/2;if((row?x:y)>m)idx++});return{c,idx,list,row}}
+function showIns(sl){if(!ins){ins=document.createElement('div');ins.className='rins';document.body.appendChild(ins)}
+const {list,idx,row,c}=sl,box=(c=='tray'?menu:railEl).getBoundingClientRect();let st,sz,cs,cz;
+const R=el=>el.getBoundingClientRect();
+if(list.length){const f=R(list[0]);cs=row?f.top:f.left;cz=row?f.height:f.width;
+ const p=idx>0?(row?R(list[idx-1]).right:R(list[idx-1]).bottom):null,n=idx<list.length?(row?R(list[idx]).left:R(list[idx]).top):null;
+ st=p!=null&&n!=null?(p+n)/2:p!=null?p+2:n-2}
+else{cs=row?box.top+4:box.left+6;cz=row?box.height-8:40;st=row?box.left+8:box.top+8}
+ins.style.display='block';
+if(row){ins.style.left=(st-1.5)+'px';ins.style.top=cs+'px';ins.style.width='3px';ins.style.height=cz+'px'}
+else{ins.style.top=(st-1.5)+'px';ins.style.left=cs+'px';ins.style.height='3px';ins.style.width=cz+'px'}}
+function dragEnd(){if(!D)return;const d=D;D=null;if(d.g)d.g.remove();d.el.classList.remove('rsrc');document.body.classList.remove('rdragging');railEl.classList.remove('rtgt','rover');menu.classList.remove('rtgt','rover');if(ins)ins.style.display='none';return d}
+railEl.addEventListener('pointerdown',e=>{if(e.button>0)return;const el=e.target.closest('.rail > [data-pn], #rmenu [data-add]');if(!el)return;D={el,id:idOf(el),src:el.dataset.pn?'rail':'tray',x:e.clientX,y:e.clientY,on:false,pid:e.pointerId,g:null}});
+railEl.addEventListener('pointermove',e=>{if(!D||e.pointerId!==D.pid)return;
+if(!D.on){if(Math.hypot(e.clientX-D.x,e.clientY-D.y)<7)return;D.on=true;hvClear();try{D.el.setPointerCapture(e.pointerId)}catch(_){}
+ const g=document.createElement('div');g.className='rghost';g.innerHTML=D.el.querySelector('svg').outerHTML;document.body.appendChild(g);D.g=g;D.el.classList.add('rsrc');
+ document.body.classList.add('rdragging');railEl.classList.add('rtgt');if(!menu.hidden)menu.classList.add('rtgt')}
+D.g.style.left=(e.clientX-18)+'px';D.g.style.top=(e.clientY-18)+'px';
+const c=colAt(e.clientX,e.clientY);railEl.classList.toggle('rover',c=='rail');menu.classList.toggle('rover',c=='tray');
+if(c)showIns(slot(c,e.clientX,e.clientY));else if(ins)ins.style.display='none'});
+const dragUp=e=>{if(!D||e.pointerId!==D.pid)return;const wasOn=D.on,x=e.clientX,y=e.clientY,cancel=e.type=='pointercancel';let sl=null;if(wasOn&&!cancel){const c=colAt(x,y);if(c)sl=slot(c,x,y)}
+const d=dragEnd();if(!wasOn)return;jus=Date.now();if(!sl)return;
+const el=railEl.querySelector('[data-pn="'+d.id+'"]'),ref=sl.list[sl.idx],end=railEl.querySelector('.rsp');
+if(sl.c=='rail'){RO.off=RO.off.filter(k=>k!==d.id);railEl.insertBefore(el,ref||end)}
+else{if(!RO.off.includes(d.id))RO.off.push(d.id);const rb=ref&&railEl.querySelector('[data-pn="'+idOf(ref)+'"]');railEl.insertBefore(el,rb||end)}
+RO.order=railBtns().map(b=>b.dataset.pn);railSave();refresh()};
+railEl.addEventListener('pointerup',dragUp);railEl.addEventListener('pointercancel',dragUp);railEl.addEventListener('lostpointercapture',e=>{if(D&&D.on&&e.pointerId===D.pid&&!D.el.isConnected)dragUp(e)});
+// the name label and highlight follow the mouse itself (not the browser's hover state, which can stick after a drag or a touch)
+railEl.addEventListener('pointermove',e=>{if(e.pointerType!='mouse'||D&&D.on)return;const b=document.elementFromPoint(e.clientX,e.clientY),t=b&&b.closest('.rail button');if(t&&t.classList.contains('hv'))return;hvClear();if(t)t.classList.add('hv')});
+railEl.addEventListener('pointerleave',hvClear);
+railOrder();
+}
 document.querySelector('.seg2').onclick=e=>{const b=e.target.closest('[data-v]');if(b)setView(b.dataset.v)};
 $('tabs').addEventListener('click',e=>{if(e.target.closest('[data-k]'))setView('stamp')});
 $('lib').addEventListener('click',e=>{if(e.target.closest('[data-m]'))setView('stamp')});
