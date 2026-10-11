@@ -57,7 +57,7 @@ button,.ddi,.wtab,.lyr,.rail button{transition:background-color .12s,border-colo
 /* v95 history */
 .hs{display:flex;flex-direction:column;min-height:100%}
 .hsh{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 8px 6px 14px;font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:14px;border-bottom:1px solid var(--line)}
-.hsh .ib{width:26px;height:26px}.hsh .ib svg{width:15px;height:15px}.hsc{font-family:"Hanken Grotesk",system-ui,sans-serif;font-size:11px;font-weight:400;color:var(--mut);padding-right:6px}
+.hsh .ib{width:26px;height:26px}.hsh .ib svg{width:15px;height:15px}.hsh .alt{height:26px;padding:0 10px;font-size:11px;font-family:"Hanken Grotesk",system-ui,sans-serif;font-weight:500}.hsc{font-family:"Hanken Grotesk",system-ui,sans-serif;font-size:11px;font-weight:400;color:var(--mut);padding-right:6px}
 .hsl{padding:4px}.hsl:empty{display:none}
 .hr{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:12px;border:1px solid transparent;user-select:none}
 .hr:hover{background:var(--raise)}.hr.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc-ink);font-weight:600}.hr.fut{opacity:.5}
@@ -283,7 +283,7 @@ button.alt{background:var(--raise)}
 #art{display:block;box-shadow:var(--paper-shadow);border-radius:1px;max-width:none}#artwrap{position:relative}#art{position:relative}#art.shp{box-shadow:none;border-radius:0}
 #artsh{position:absolute;left:28px;top:28px;display:none;pointer-events:none;overflow:visible;filter:drop-shadow(0 2px 5px rgba(0,0,0,.14)) drop-shadow(0 14px 22px rgba(0,0,0,.13))}
 .shg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:4px}
-.shg button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 1px 5px;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--mut);font-size:11px;line-height:1.1;cursor:pointer;min-width:0;overflow:hidden}
+.shg button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 5px;letter-spacing:-.02em;border:1px solid var(--line);border-radius:7px;background:var(--field);color:var(--mut);font-size:11px;line-height:1.1;cursor:pointer;min-width:0;overflow:hidden}
 .shg button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round;flex:none}
 .shg button:hover{color:var(--fg);border-color:var(--line2)}
 .shg button.on{color:var(--acc-ink);border-color:var(--acc);background:var(--acc-soft)}
@@ -871,12 +871,12 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
    <div class="hint" id="lhint">Click a motif to pick it up, then click on the stamp to stamp it as many times as you like. Click it again, press Esc, or right-click to put it down.<br>To sort motifs into folders, press the check-box button (or Ctrl/&#8984;-click motifs), select several, then move them.</div>
   </div></details>
   <details class="g" open><summary>Import artwork</summary><div class="gb">
-   <label>1. Subject for the prompt</label><input type="text" id="isub" placeholder="e.g. a heron catching a fish">
+   <label>Subject for the prompt</label><input type="text" id="isub" placeholder="e.g. a heron catching a fish">
    <div class="row"><button class="alt" id="ipr">Copy prompt for ChatGPT</button></div>
    <textarea id="iprt" hidden readonly rows="6"></textarea>
    <label>Whole sheet</label>
    <div class="row shrow"><input type="number" id="scol" min="1" max="8" value="4" aria-label="Columns"><span>&#215;</span><input type="number" id="srow" min="1" max="8" value="4" aria-label="Rows"><button class="alt" id="spr">Copy sheet prompt</button></div>
-   <label>2. Bring in the image</label>
+   <label>Bring in the image</label>
    <div class="drop" id="idrop"><label class="btn primary" id="iopen" for="ifile" role="button" tabindex="0">Import image…</label><span>or drop / paste</span></div>
    <input type="file" id="ifile" class="vh" accept="image/*" tabindex="-1">
    <div class="row"><label class="btn alt" for="sfile" role="button" tabindex="0">Import a motif sheet&#8230;</label></div><input type="file" id="sfile" class="vh" accept="image/*" tabindex="-1">
@@ -1133,7 +1133,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
   </div></details>
  </section>
 <section class="pn" data-p="hist" hidden><div class="hs">
- <div class="hsh"><span>Snapshots</span><button type="button" class="ib" id="hsadd" aria-label="Save snapshot"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button></div>
+ <div class="hsh"><span>Snapshots</span><button type="button" class="alt" id="hsadd" aria-label="Save snapshot">Save snapshot</button></div>
  <div class="hsl" id="hsl"></div>
  <div class="hsh"><span>Compare</span><button type="button" class="rfb" id="barst" hidden>Reset</button></div>
  <div class="hsl" id="bal"></div>
