@@ -1,8 +1,22 @@
 name: tests
-on: [push, pull_request]
+# Minutes budget (docs/ci-budget-rules.md): CI runs once per pull request to main, not on every push to a branch.
+# Open the pull request when the release is ready (as a draft until the local tests pass; a draft does not run CI,
+# marking it ready does). A new push to the same pull request cancels the run still in progress. Run by hand from
+# the Actions tab (workflow_dispatch) to test any branch without opening a pull request.
+# Job names `chromium` and `webkit` are the status checks named in docs/going-live.md; keep them.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+concurrency:
+  group: tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   chromium:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     container: mcr.microsoft.com/playwright:v1.56.0-noble   # pinned image: same Chromium as local runs
     env: { WB_ENV: ci }
     steps:
@@ -13,10 +27,12 @@ jobs:
       - run: npx playwright test --project=chromium
         env: { WB_TARGET: build, WB_PIXELS: '0' }
       - uses: actions/upload-artifact@v4
-        if: always()
-        with: { name: results-chromium, path: test-results }
+        if: failure()
+        with: { name: results-chromium, path: test-results, retention-days: 3 }
   webkit:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     container: mcr.microsoft.com/playwright:v1.56.0-noble
     steps:
       - uses: actions/checkout@v4
@@ -25,5 +41,5 @@ jobs:
       - run: npx playwright test --project=webkit --grep @smoke
         env: { WB_TARGET: build, WB_PIXELS: '0' }
       - uses: actions/upload-artifact@v4
-        if: always()
-        with: { name: results-webkit, path: test-results }
+        if: failure()
+        with: { name: results-webkit, path: test-results, retention-days: 3 }

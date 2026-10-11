@@ -1,7 +1,9 @@
 name: tag releases
 # One git tag per release (CLAUDE.md): the first commit that carries a version in package.json gets the tag (v0.108.0; v108 for the releases before the 0.x numbering).
-# Runs on every push, only adds tags that are missing (so it also fills in old ones once), never moves or deletes one.
-on: push
+# Runs on pushes to main only (a release gets its tag when it goes live), only adds tags that are missing (so it also fills in old ones once), never moves or deletes one.
+on:
+  push:
+    branches: [main]
 permissions:
   contents: write
 jobs:
