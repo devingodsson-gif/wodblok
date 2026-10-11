@@ -1,5 +1,7 @@
 # Fix plan for the UX review
 
+> **Closed in 1.1.0.** The releases 1.0.1 to 1.0.20 were built, tested and went live; 1.0.20 was renamed 1.1.0 on your say-so. What was left open when this plan was closed (not scheduled, to be re-decided in the next plan, [`docs/plan.md`](plan.md)): N3 two groups of export buttons, N4 History thumbnails only on rolls, N5 unlabelled left rail, P2 stacked panels instead of tabs, a per-slot hex field in the colour dropdown, selection handles outside the Stamp editor, the "Opened…" message timing. See [`ux-review-2.md`](ux-review-2.md).
+
 Source: [`docs/ux-review.md`](ux-review.md) (49 findings: B1–B4, C1–C20, P1–P6, D1–D19). Starting point: `main` at 1.0.0.
 Every finding is assigned to one step below; the [coverage table](#coverage-every-finding-has-a-step) at the end checks that none is missed.
 
