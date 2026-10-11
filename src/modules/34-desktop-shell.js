@@ -197,7 +197,7 @@ const xsvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wi
 const vis=()=>railBtns().filter(b=>!MODEP[view].includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)?false:true);
 function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP[view].includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn));
 {const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML+'<span class="tip">'+b.getAttribute('aria-label')+'</span>';if(wsFind(b.dataset.pn))m.classList.add('on');g.appendChild(m)});menu.append(g)}
-menu.hidden=!ed;if(!menu.hidden){const w=railEl.getBoundingClientRect(),row=w.width>w.height;menu.style.left=(row?w.left:w.right)+'px';menu.style.top=(row?w.bottom:w.top)+'px';menu.style.width=w.width+'px';menu.style.height=w.height+'px';menu.style.bottom=''}}
+menu.hidden=!ed;if(!menu.hidden){const w=railEl.getBoundingClientRect(),row=w.width>w.height;menu.style.left=(row?w.left:w.left-52)+'px';menu.style.top=(row?w.bottom:w.top)+'px';menu.style.width=w.width+'px';menu.style.height=w.height+'px';menu.style.bottom=''}}
 function edit(on){ed=on;document.body.classList.toggle('rtray',on);more.classList.toggle('on',on);more.setAttribute('aria-expanded',String(on));fill()}
 const refresh=()=>wsRender();railHook=()=>{if(ed)fill()};addEventListener('resize',()=>{if(ed)fill()});
 more.onclick=()=>edit(!ed);
@@ -206,11 +206,11 @@ addEventListener('keydown',e=>{if(e.key=='Escape'&&ed)edit(false)});
 // a click that ends a drag, or lands on an X, is not a tool click
 railEl.addEventListener('click',e=>{if(Date.now()-jus<300){e.stopPropagation();e.preventDefault();return}},true);
 railEl.addEventListener('pointerdown',e=>{const b=e.target.closest('.rail > [data-pn]');if(!b||e.button>0)return;drag={b,x:e.clientX,y:e.clientY,on:false,id:e.pointerId}});
-railEl.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;if(!drag.on){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<7)return;drag.on=true;hvClear();if(!ed)edit(true);zones(true,'rail');drag.b.classList.add('rdrag');try{drag.b.setPointerCapture(e.pointerId)}catch(_){}}
+railEl.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;if(!drag.on){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<7)return;drag.on=true;hvClear();zones(true,'rail');drag.b.classList.add('rdrag');try{drag.b.setPointerCapture(e.pointerId)}catch(_){}}
 menu.classList.toggle('rover',!menu.hidden&&inRect(menu,e.clientX,e.clientY));const o=vis().find(t=>{if(t===drag.b)return false;const r=t.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom});
-if(o){const a=railBtns(),ia=a.indexOf(drag.b),io=a.indexOf(o);if(ia<io)o.after(drag.b);else o.before(drag.b)}});
+if(o){const a=railBtns(),ia=a.indexOf(drag.b),io=a.indexOf(o);if(ia<io)o.after(drag.b);else o.before(drag.b);try{drag.b.setPointerCapture(drag.id)}catch(_){}}});
 const endDrag=e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;d.b.classList.remove('rdrag');zones(false);if(d.on&&ed&&!menu.hidden){const mr=menu.getBoundingClientRect();if(e.clientX>=mr.left&&e.clientX<=mr.right&&e.clientY>=mr.top&&e.clientY<=mr.bottom){jus=Date.now();if(!RO.off.includes(d.b.dataset.pn))RO.off.push(d.b.dataset.pn);RO.order=railBtns().map(b=>b.dataset.pn);railSave();refresh();return}}if(d.on){jus=Date.now();RO.order=railBtns().map(b=>b.dataset.pn);railSave()}};
-railEl.addEventListener('pointerup',endDrag);railEl.addEventListener('pointercancel',endDrag);railEl.addEventListener('lostpointercapture',endDrag);
+railEl.addEventListener('pointerup',endDrag);railEl.addEventListener('pointercancel',endDrag);
 // drag a tool out of the Add tray onto the bar to put it at that spot (a plain click puts it at the end of the bar)
 let td=null;
 const rowMode=()=>getComputedStyle(railEl).flexDirection=='row';

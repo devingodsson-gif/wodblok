@@ -79,3 +79,19 @@ test('the tool bar is one list; the three-line button opens a tool repository: t
   expect(await page.locator('#rmenu:visible').count()).toBe(0);
   expect(errors).toEqual([]);
 });
+
+test('a tool drags to a new place on the bar, and the order is remembered', async ({ page }) => {
+  const { errors } = await openApp(page);
+  const ids = () => page.locator('.rail > [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn));
+  const before = await ids();
+  const a = await page.locator(`.rail [data-pn="${before[0]}"]`).boundingBox(), c = await page.locator(`.rail [data-pn="${before[3]}"]`).boundingBox();
+  await page.mouse.move(a.x + 20, a.y + 20); await page.mouse.down();
+  await page.mouse.move(a.x + 20, a.y + 32, { steps: 3 }); await page.mouse.move(c.x + 20, c.y + 30, { steps: 12 });
+  await page.mouse.up();
+  const after = await ids();
+  expect(after).not.toEqual(before);
+  expect(after.indexOf(before[0])).toBeGreaterThan(2);
+  await page.reload(); await page.waitForTimeout(500);
+  expect(await ids()).toEqual(after);
+  expect(errors).toEqual([]);
+});
