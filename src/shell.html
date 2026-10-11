@@ -267,10 +267,9 @@ button.alt{background:var(--raise)}
 .rail .rx svg{width:9px;height:9px}
 .rail #rmore.on{color:var(--acc-ink);background:var(--acc-soft)}
 .rmenu{position:fixed;z-index:60;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 8px 28px rgba(0,0,0,.32);max-width:196px}
-.rmenu .rmh{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:0 2px 6px}
 .rmenu .rmg{display:grid;grid-template-columns:repeat(4,36px);gap:4px}
 .rmenu .rmg button{position:relative;width:36px;height:36px;padding:0;border:0;border-radius:8px;background:var(--raise);color:var(--fg);display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab}
-.rmenu .rmg button:hover{background:var(--acc-soft);color:var(--acc-ink)}
+.rmenu .rmg button:hover,.rmenu .rmg button:focus-visible{z-index:5}.rmenu .rmg button:hover{background:var(--acc-soft);color:var(--acc-ink)}
 .rmenu .rmg button svg{width:19px;height:19px;pointer-events:none}
 .rmenu .rmg button::after{content:'+';position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--acc);color:var(--panel);font-size:11px;font-weight:700;line-height:14px;text-align:center}
 .rail button[data-pn]{cursor:grab}.rail button.rdrag{cursor:grabbing;transform:scale(1.12);z-index:4}
