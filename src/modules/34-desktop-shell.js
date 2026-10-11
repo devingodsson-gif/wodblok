@@ -195,13 +195,14 @@ setPanel(p)};
 {const more=$('rmore'),menu=$('rmenu');let ed=false,drag=null,jus=0;
 const xsvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 const vis=()=>railBtns().filter(b=>!MODEP[view].includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)?false:true);
-function fill(){menu.innerHTML='';railBtns().filter(b=>MODEP[view].includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn)).forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.innerHTML=b.querySelector('svg').outerHTML;m.append(b.getAttribute('aria-label'));menu.appendChild(m)});
-menu.hidden=!ed||!menu.children.length;if(!menu.hidden){const r=more.getBoundingClientRect(),w=railEl.getBoundingClientRect();if(w.width<w.height){menu.style.left=(r.right+6)+'px';menu.style.bottom=(innerHeight-r.bottom)+'px';menu.style.top=''}else{menu.style.left=Math.max(4,r.left-80)+'px';menu.style.top=(r.bottom+6)+'px';menu.style.bottom=''}}}
+function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP[view].includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn));
+if(off.length){const h=document.createElement('div');h.className='rmh';h.textContent='Add';const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML;g.appendChild(m)});menu.append(h,g)}
+menu.hidden=!ed||!off.length;if(!menu.hidden){const r=more.getBoundingClientRect(),w=railEl.getBoundingClientRect();if(w.width<w.height){menu.style.left=(r.right+8)+'px';menu.style.bottom=(innerHeight-r.bottom)+'px';menu.style.top=''}else{menu.style.left=Math.max(4,r.left-80)+'px';menu.style.top=(r.bottom+8)+'px';menu.style.bottom=''}}}
 function marks(){railEl.querySelectorAll('.rx').forEach(x=>x.remove());if(ed)railBtns().forEach(b=>{if(b.hidden)return;const x=document.createElement('span');x.className='rx';x.setAttribute('role','button');x.setAttribute('aria-label','Remove '+b.getAttribute('aria-label')+' from the bar');x.innerHTML=xsvg;b.appendChild(x)})}
 function edit(on){ed=on;more.classList.toggle('on',on);more.setAttribute('aria-expanded',String(on));marks();fill()}
 const refresh=()=>wsRender();railHook=()=>{if(ed){marks();fill()}};
 more.onclick=()=>edit(!ed);
-menu.onclick=e=>{const m=e.target.closest('[data-add]');if(!m)return;RO.off=RO.off.filter(x=>x!==m.dataset.add);railSave();refresh()};
+menu.onclick=e=>{if(Date.now()-jus<300)return;const m=e.target.closest('[data-add]');if(!m)return;RO.off=RO.off.filter(x=>x!==m.dataset.add);railSave();refresh()};
 addEventListener('keydown',e=>{if(e.key=='Escape'&&ed)edit(false)});
 document.addEventListener('pointerdown',e=>{if(ed&&!e.target.closest('.rail,#rmenu'))edit(false)});
 // a click that ends a drag, or lands on an X, is not a tool click
@@ -210,8 +211,17 @@ railEl.addEventListener('pointerdown',e=>{const b=e.target.closest('.rail > [dat
 railEl.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;if(!drag.on){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<7)return;drag.on=true;drag.b.classList.add('rdrag');try{drag.b.setPointerCapture(e.pointerId)}catch(_){}}
 const o=vis().find(t=>{if(t===drag.b)return false;const r=t.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom});
 if(o){const a=railBtns(),ia=a.indexOf(drag.b),io=a.indexOf(o);if(ia<io)o.after(drag.b);else o.before(drag.b)}});
-const endDrag=e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;d.b.classList.remove('rdrag');if(d.on){jus=Date.now();RO.order=railBtns().map(b=>b.dataset.pn);railSave()}};
+const endDrag=e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;d.b.classList.remove('rdrag');if(d.on&&ed&&!menu.hidden){const mr=menu.getBoundingClientRect();if(e.clientX>=mr.left&&e.clientX<=mr.right&&e.clientY>=mr.top&&e.clientY<=mr.bottom){jus=Date.now();if(!RO.off.includes(d.b.dataset.pn))RO.off.push(d.b.dataset.pn);RO.order=railBtns().map(b=>b.dataset.pn);railSave();refresh();return}}if(d.on){jus=Date.now();RO.order=railBtns().map(b=>b.dataset.pn);railSave()}};
 railEl.addEventListener('pointerup',endDrag);railEl.addEventListener('pointercancel',endDrag);
+// drag a tool out of the Add tray onto the bar to put it at that spot (a plain click puts it at the end of the bar)
+let td=null;
+const hitBtn=(x,y)=>vis().find(t=>{const r=t.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom});
+menu.addEventListener('pointerdown',e=>{const m=e.target.closest('[data-add]');if(!m||e.button>0)return;td={id:m.dataset.add,m,x:e.clientX,y:e.clientY,on:false,pid:e.pointerId,g:null}});
+menu.addEventListener('pointermove',e=>{if(!td||e.pointerId!==td.pid)return;if(!td.on){if(Math.hypot(e.clientX-td.x,e.clientY-td.y)<6)return;td.on=true;try{menu.setPointerCapture(e.pointerId)}catch(_){}const g=document.createElement('div');g.className='rghost';g.innerHTML=td.m.innerHTML;document.body.appendChild(g);td.g=g}
+td.g.style.left=(e.clientX-18)+'px';td.g.style.top=(e.clientY-18)+'px'});
+const endTray=e=>{if(!td||e.pointerId!==td.pid)return;const d=td;td=null;if(d.g)d.g.remove();if(!d.on)return;jus=Date.now();const rr=railEl.getBoundingClientRect();
+if(e.clientX>=rr.left&&e.clientX<=rr.right&&e.clientY>=rr.top&&e.clientY<=rr.bottom){const el=railEl.querySelector('[data-pn="'+d.id+'"]');RO.off=RO.off.filter(x=>x!==d.id);const o=hitBtn(e.clientX,e.clientY);if(o){const r=o.getBoundingClientRect(),h=getComputedStyle(railEl).flexDirection=='row'?e.clientX>r.left+r.width/2:e.clientY>r.top+r.height/2;if(h)o.after(el);else o.before(el)}else railEl.insertBefore(el,railEl.querySelector('.rsp'));RO.order=railBtns().map(b=>b.dataset.pn);railSave();refresh()}};
+menu.addEventListener('pointerup',endTray);menu.addEventListener('pointercancel',endTray);
 railOrder();
 }
 document.querySelector('.seg2').onclick=e=>{const b=e.target.closest('[data-v]');if(b)setView(b.dataset.v)};
