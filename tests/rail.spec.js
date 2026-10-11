@@ -15,8 +15,8 @@ test('the shared tools are the first nine rail buttons, in the same order, in Pa
   const stamp = await labels(page);
   expect(pattern.slice(0, 9)).toEqual(SHARED);
   expect(stamp.slice(0, 9)).toEqual(SHARED);
-  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Layout', 'Guides', 'Navigator', 'Variations', 'Export recipes']);
-  expect(stamp.slice(9)).toEqual(['Stamp', 'Motifs', 'Text', 'Stamp grid', 'Motif list', 'Pattern preview']);
+  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Layout', 'Guides', 'Navigator', 'Variations', 'Export recipes', 'More tools']);
+  expect(stamp.slice(9)).toEqual(['Stamp', 'Motifs', 'Text', 'Stamp grid', 'Motif list', 'Pattern preview', 'More tools']);
   expect(errors).toEqual([]);
 });
 
@@ -49,5 +49,24 @@ test('a tool name shows when the pointer rests on an icon or when it has keyboar
   await page.keyboard.press('Tab');
   await page.keyboard.press('Shift+Tab');
   await expect(page.locator('#rail-colors .tip')).toHaveCSS('opacity', '1');
+  expect(errors).toEqual([]);
+});
+
+test('the tool bar is one list: tools come off with an X while the three-line menu is open, come back from that menu, and the choice is remembered', async ({ page }) => {
+  const { errors } = await openApp(page);
+  const ids = () => page.locator('.rail > [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn));
+  expect(await page.locator('.rail .rsep').count()).toBe(0);
+  expect(await page.locator('.rx').count()).toBe(0);
+  const n = (await ids()).length;
+  await page.click('#rmore');
+  await page.click('.rail [data-pn="hist"] .rx');
+  expect(await ids()).not.toContain('hist');
+  await page.reload(); await page.waitForTimeout(500);
+  expect(await ids()).not.toContain('hist');
+  await page.click('#rmore');
+  await page.click('#rmenu [data-add="hist"]');
+  expect((await ids()).length).toBe(n);
+  await page.keyboard.press('Escape');
+  expect(await page.locator('.rx').count()).toBe(0);
   expect(errors).toEqual([]);
 });
