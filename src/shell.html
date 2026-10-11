@@ -270,6 +270,7 @@ button.alt{background:var(--raise)}
 .rmenu .rmg button:hover,.rmenu .rmg button:focus-visible{z-index:5}.rmenu .rmg button:hover{background:var(--acc-soft);color:var(--acc-ink)}
 .rmenu .rmg button svg{width:19px;height:19px;pointer-events:none}
 .rail button[data-pn]{cursor:grab}.rail button.rdrag{cursor:grabbing;transform:scale(1.12);z-index:4}
+.rail,.rmenu,body.rdragging{-webkit-user-select:none;user-select:none}body.rdragging{cursor:grabbing}
 .rail.rtgt{outline:2px dashed var(--acc);outline-offset:-3px;background:var(--acc-soft)}.rail.rtgt.rover{outline-style:solid}
 .rmenu.rtgt{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft),0 8px 28px rgba(0,0,0,.32)}.rmenu.rtgt .rmg{outline:2px dashed var(--acc);outline-offset:4px;border-radius:4px}.rmenu.rtgt.rover{background:var(--acc-soft)}
 .rins{position:fixed;z-index:90;border-radius:2px;background:var(--acc);pointer-events:none;display:none;box-shadow:0 0 6px var(--acc)}
