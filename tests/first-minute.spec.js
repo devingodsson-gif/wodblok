@@ -29,6 +29,8 @@ test('Randomize is a labelled button in the top bar and rolls a piece', async ({
 test('an empty project shows "Add a motif" on the canvas; it opens the Stamp editor and Motifs; it goes away once there is a motif', async ({ page }) => {
   const { errors } = await openApp(page);
   await expect(page.locator('#empc')).toBeVisible();
+  await expect(page.locator('#empc')).toHaveText('');                // a round "+" icon, no label text
+  await expect(page.locator('#empc')).toHaveAttribute('aria-label', 'Add a motif');
   await expect(page.locator('#tabs button.empty')).toHaveCount(1);
   await page.click('#empc');
   await settle(page);
