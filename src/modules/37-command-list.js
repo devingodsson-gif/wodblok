@@ -57,6 +57,7 @@ const COMMANDS = [
   ['panel.grid', 'Open Stamp grid', 'rail-grid'],
   ['panel.preview', 'Open Pattern preview', 'rail-preview'],
   ['panel.mlist', 'Open Shape list', 'rail-mlist'],
+  ['panel.sedit', 'Open Shape editor', 'rail-sedit'],
   ['panel.lyrs', 'Open Layers', 'rail-lyrs'],
   ['panel.layers', 'Open Layout', 'rail-layers'],
   ['panel.pgrid', 'Open Guides', 'rail-pgrid'],
