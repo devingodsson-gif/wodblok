@@ -75,7 +75,7 @@ test('with nothing typed, the list starts with what you ran last, then commands 
   await page.keyboard.press('Control+k');
   const first = await rowsOf(page);
   // Pattern view: the stamp editor's motif commands are listed after the ones that apply here
-  expect(first.indexOf('Duplicate motif')).toBeGreaterThan(first.indexOf('Open Canvas'));
+  expect(first.indexOf('Duplicate shape')).toBeGreaterThan(first.indexOf('Open Canvas'));
   expect(first.indexOf('Knock out')).toBeGreaterThan(first.indexOf('Open Layers'));
   // run a command from the list: it comes first next time
   await page.keyboard.type('zoom in');
@@ -88,6 +88,6 @@ test('with nothing typed, the list starts with what you ran last, then commands 
   await settle(page);
   await page.keyboard.press('Control+k');
   const stamp = await rowsOf(page);
-  expect(stamp.indexOf('Open Motifs')).toBeLessThan(stamp.indexOf('Open Layers'));
+  expect(stamp.indexOf('Open Shapes')).toBeLessThan(stamp.indexOf('Open Layers'));
   expect(errors).toEqual([]);
 });

@@ -26,11 +26,11 @@ test('Randomize is a labelled button in the top bar and rolls a piece', async ({
   expect(errors).toEqual([]);
 });
 
-test('an empty project shows "Add a motif" centred on the canvas; it opens the Stamp editor and Motifs; it goes away once there is a motif', async ({ page }) => {
+test('an empty project shows "Add a shape" centred on the canvas; it opens the Stamp editor and Shapes; it goes away once there is a shape', async ({ page }) => {
   const { errors } = await openApp(page);
   await expect(page.locator('#empc')).toBeVisible();
   await expect(page.locator('#empc')).toHaveText('');                // a round "+" icon, no label text
-  await expect(page.locator('#empc')).toHaveAttribute('aria-label', 'Add a motif');
+  await expect(page.locator('#empc')).toHaveAttribute('aria-label', 'Add a shape');
   const pb = await page.locator('#empc').boundingBox(), cb = await page.locator('#art').boundingBox();
   expect(Math.abs(pb.x + pb.width / 2 - (cb.x + cb.width / 2))).toBeLessThan(2);   // centred on the canvas, both ways
   expect(Math.abs(pb.y + pb.height / 2 - (cb.y + cb.height / 2))).toBeLessThan(2);

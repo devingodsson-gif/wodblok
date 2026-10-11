@@ -21,13 +21,13 @@ import {clearAll} from './33-clear.js';
 
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
-const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Motifs',layers:'Layout',cover:'Book cover'};
+const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Shapes',layers:'Layout',cover:'Book cover'};
 let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Motifs',mlist:'Motif list',preview:'Pattern preview',grid:'Stamp grid',layers:'Layout',pgrid:'Guides',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
+const PNAME={vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Shapes',mlist:'Shape list',preview:'Pattern preview',grid:'Stamp grid',layers:'Layout',pgrid:'Guides',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
 const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib','nav','wspc','xrec','pres','vars'],stamp:['wspc','pres','motifs','text','mlist','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
@@ -345,7 +345,7 @@ let hist=[coreStr()],hi=0;
 const ub=()=>{$('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;if(WBX.wbHistPaint)WBX.wbHistPaint()};
 let histL=['Start'],histT=[Date.now()],histTh=[''];
 const HK={tiles:'Stamp change',layers:'Layer change',proj:'Colours',dim:'Canvas size',pg:'Grid',pr:'Roughness',tex:'Texture',texLib:'Texture library',grade:'Grade'};
-function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added motif'+(y-x>1?'s':'');if(y<x)return 'Removed motif'+(x-y>1?'s':'');return 'Moved or edited motif'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
+function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added shape'+(y-x>1?'s':'');if(y<x)return 'Removed shape'+(x-y>1?'s':'');return 'Moved or edited shape'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
 // wbRollHold: a Randomize roll is still setting its lettering, so the half-made piece is not a history step
 const navDirty=()=>{if(WBX.wbNavDirty)WBX.wbNavDirty();if(WBX.wbVarDirty)WBX.wbVarDirty()};
 // A step can be named by whoever makes it: WBX.wbLabelNext={t:'Randomize 3',at:performance.now()} just before wbCap(); otherwise the label says what changed.
@@ -433,7 +433,7 @@ $('gon').addEventListener('input',()=>{grid.on=$('gon').checked;saveGrid();upd()
 $('gn').addEventListener('input',()=>{grid.n=+$('gn').value;if(!grid.on){grid.on=true}saveGrid();upd()});
 $('gsp').addEventListener('input',()=>{grid.sp=$('gsp').value;saveGrid();upd()});
 $('gsd').addEventListener('input',()=>{grid.sd=$('gsd').checked;if(grid.sd)grid.on=true;saveGrid();upd()});
-$('gq').onclick=()=>{const t=WBS.tiles[WBS.cur];if(!t.items.length)return;let moved=0;t.items.forEach(q=>{const[x,y]=snapPt(q.x,q.y);if(Math.abs(x-q.x)>.01||Math.abs(y-q.y)>.01)moved++;q.x=x;q.y=y});grid.on=true;saveGrid();store();upd();$('pmsg').textContent=moved?`Snapped ${moved} motif${moved>1?'s':''} to the grid.`:'Every motif is already on the grid.'};
+$('gq').onclick=()=>{const t=WBS.tiles[WBS.cur];if(!t.items.length)return;let moved=0;t.items.forEach(q=>{const[x,y]=snapPt(q.x,q.y);if(Math.abs(x-q.x)>.01||Math.abs(y-q.y)>.01)moved++;q.x=x;q.y=y});grid.on=true;saveGrid();store();upd();$('pmsg').textContent=moved?`Snapped ${moved} shape${moved>1?'s':''} to the grid.`:'Every shape is already on the grid.'};
 $('gtg').onclick=()=>{grid.on=!grid.on;saveGrid();upd()};$('gtq').onclick=()=>$('gq').click();
 $('gti').onclick=()=>{WBS.edInk=!WBS.edInk;tbSync();upd()};
 $('gtx').onclick=()=>{WBS.edTx=!WBS.edTx;tbSync();upd()};
@@ -444,11 +444,11 @@ const _draw2=WBH.draw;WBH.draw=function(){_draw2();syncGrid()};
 // ---- randomize motifs on the current stamp
 try{const z=JSON.parse(kv.get('wb36_rz')||'null');if(z){$('rzp').value=z.p;$('rzr').value=z.r;$('rzs').value=z.s}}catch(e){}
 ['rzp','rzr','rzs'].forEach(id=>$(id).addEventListener('input',()=>{try{kv.set('wb36_rz',JSON.stringify({p:+$('rzp').value,r:+$('rzr').value,s:+$('rzs').value}))}catch(e){}}));
-$('rzgo').onclick=()=>{const qs=QS();if(!qs.length){$('pmsg').textContent='Select some motifs first.';return}if(WBX.wbCap)WBX.wbCap();
+$('rzgo').onclick=()=>{const qs=QS();if(!qs.length){$('pmsg').textContent='Select some shapes first.';return}if(WBX.wbCap)WBX.wbCap();
 const P=+$('rzp').value/100*Math.min(SW,SH)*.25,R=+$('rzr').value,S=+$('rzs').value/100,rnd=()=>Math.random()*2-1;
 qs.forEach(q=>{if(P){const a=Math.random()*Math.PI*2,d=Math.sqrt(Math.random())*P;[q.x,q.y]=wrapP(q.x+Math.cos(a)*d,q.y+Math.sin(a)*d)}
 if(R)q.r=Math.round(nr(q.r+rnd()*R))||0;if(S)q.s=+Math.min(2.6,Math.max(.2,q.s*(1+rnd()*S))).toFixed(3)});
-store();upd();if(WBX.wbCap)WBX.wbCap();$('pmsg').textContent=`Randomized ${qs.length} motif${qs.length>1?'s':''}. Press again for another shuffle, or Ctrl+Z to undo.`};
+store();upd();if(WBX.wbCap)WBX.wbCap();$('pmsg').textContent=`Randomized ${qs.length} shape${qs.length>1?'s':''}. Press again for another shuffle, or Ctrl+Z to undo.`};
 // ===== v90 controls: styled dropdowns, colour picker, slider scrub =====
 (()=>{
 const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'),SEL_SKIP=s=>s.style.display==='none'||s.classList.contains('ddsel')||s.dataset.native!=null;

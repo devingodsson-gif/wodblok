@@ -38,7 +38,7 @@ if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.shape||FT.fr
 const dim0=JSON.parse(JSON.stringify(WBS.dim));
 if(!fresh&&WBX.wbCap)WBX.wbCap();
 // --- the bold moves for this roll (only used when Stamps is on)
-const MOVES=[['sym','new symmetry',1.3],['link','accents in the gaps',1.2],['shape','accent shapes',1],['mix','mixed shapes',.7],['rot','turned grid',.8],['inks','extra inks',.7],['motif','motif tweaks',.8],['swap','light on dark',.6],['blend','soft blending',.5],['text','lettering',1],['frame','frame',1.1]];
+const MOVES=[['sym','new symmetry',1.3],['link','accents in the gaps',1.2],['shape','accent shapes',1],['mix','mixed shapes',.7],['rot','turned grid',.8],['inks','extra inks',.7],['motif','shape tweaks',.8],['swap','light on dark',.6],['blend','soft blending',.5],['text','lettering',1],['frame','frame',1.1]];
 const RZ={mv:null,n:0,keep:{col:!FT.col,gr:!FT.gr,tx:!FT.tx,pr:!FT.pr}};
 let inkMap={};const noAcc=!FT.col||!sOn('col','acc'),noPal=!FT.col||!sOn('col','pal');RZ.keep.col=noPal;
 const MV=MOVES.filter(x=>FT.stamps&&x[0]!='frame'&&!(x[0]=='text'&&!FT.text)&&!(x[0]=='swap'&&noPal)&&!(x[0]=='inks'&&noAcc)&&(x[0]=='text'||sOn('stamps',x[0])));

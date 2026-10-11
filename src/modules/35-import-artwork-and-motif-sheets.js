@@ -4,11 +4,11 @@ import {SH,SW,col} from './04-canvas-and-stamp-outlines.js';
 import {cust,it,mcSave,selOne,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 
-function init35(){// ===== Import artwork: image -> clean black & white -> traced vector motif =====
+function init35(){// ===== Import artwork: image -> clean black & white -> traced vector shape =====
 (()=>{
 const IMP_RE=/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/;
 let src=null,W=0,H=0,lum=null,name='',last=null,tmr=0;
-const PROMPT=s=>`Create a single ${s||'[subject]'} designed as a bold woodblock stamp motif. Pure solid black shapes on a plain white background. No gray, no shading, no gradients, no texture, no frame, no text. Clean, smooth edges and a simple, readable silhouette, with a few thin white carved lines for detail. Centered, with generous white margin, square image.`;
+const PROMPT=s=>`Create a single ${s||'[subject]'} designed as a bold woodblock stamp shape. Pure solid black shapes on a plain white background. No gray, no shading, no gradients, no texture, no frame, no text. Clean, smooth edges and a simple, readable silhouette, with a few thin white carved lines for detail. Centered, with generous white margin, square image.`;
 $('ipr').onclick=async()=>{const t=PROMPT($('isub').value.trim());let ok=false;try{await clipboard.writeText(t);ok=true}catch(e){}
 if(ok){say2('Prompt copied. Paste it into ChatGPT, then import the image it makes.')}else{$('iprt').hidden=false;$('iprt').value=t;$('iprt').select();say2('Copy the prompt below, then paste it into ChatGPT.')}};
 const say2=t=>{$('imsg').textContent=t};
@@ -20,13 +20,13 @@ document.addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.clas
 const onCover=()=>{const b=document.querySelector('.rail [data-pn="canvas"]');return !!(WBS.book.on&&b&&b.classList.contains('on'))};
 document.addEventListener('drop',e=>{document.body.classList.remove('dropping');const f=[...(e.dataTransfer&&e.dataTransfer.files||[])].find(f=>/^image\//.test(f.type));if(f){e.preventDefault();onCover()?WBX.wbCoverFile(f):loadFile(f)}});
 document.addEventListener('paste',e=>{if(e.target.matches&&e.target.matches('input,textarea')||e.target.closest&&e.target.closest('#ipaste,#cvpaste'))return;const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();onCover()?WBX.wbCoverFile(it.getAsFile()):loadFile(it.getAsFile(),'Pasted image')}});
-function loadSrc(src,nm){const img=new Image();img.onload=()=>{prep(img);name=nm||'Imported motif';$('inm').value=name;$('ioimg').src=cv0.toDataURL('image/png');openDlg();run()};img.onerror=()=>say2('That image could not be read. Try copying it again, or save it as PNG.');img.src=src}
+function loadSrc(src,nm){const img=new Image();img.onload=()=>{prep(img);name=nm||'Imported shape';$('inm').value=name;$('ioimg').src=cv0.toDataURL('image/png');openDlg();run()};img.onerror=()=>say2('That image could not be read. Try copying it again, or save it as PNG.');img.src=src}
 // paste box for phones: catches pasted image files, or pasted <img> elements some browsers insert instead
 const pz=$('ipaste'),PZ=pz.innerHTML;pz.addEventListener('focus',()=>{if(pz.innerHTML==PZ)pz.innerHTML=''});pz.addEventListener('blur',()=>{if(!pz.textContent.trim()&&!pz.querySelector('img'))pz.innerHTML=PZ});
 pz.addEventListener('paste',e=>{const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();e.stopPropagation();pz.innerHTML=PZ;pz.blur();loadFile(it.getAsFile(),'Pasted image')}else setTimeout(chk,60)});
 const chk=()=>{const im=pz.querySelector('img');if(im&&im.src){const src=im.src;pz.innerHTML=PZ;pz.blur();loadSrc(src,'Pasted image')}else if(pz.textContent.trim()&&pz.innerHTML!=PZ){pz.innerHTML='';say2('That was text, not an image. Copy the image itself, then paste it here.')}};pz.addEventListener('input',()=>setTimeout(chk,30));
 function loadFile(f,nm){if(f.type&&!/^image\//.test(f.type))return say2('That file is not an image. Use a PNG, JPG or WebP.');
-const url=URL.createObjectURL(f),img=new Image();img.onload=()=>{prep(img);URL.revokeObjectURL(url);name=(nm||f.name||'Imported motif').replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'Imported motif';$('inm').value=name;$('ioimg').src=cv0.toDataURL('image/png');openDlg();run()};
+const url=URL.createObjectURL(f),img=new Image();img.onload=()=>{prep(img);URL.revokeObjectURL(url);name=(nm||f.name||'Imported shape').replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'Imported shape';$('inm').value=name;$('ioimg').src=cv0.toDataURL('image/png');openDlg();run()};
 img.onerror=()=>{URL.revokeObjectURL(url);say2('That image could not be read. Try a PNG or JPG (some phones save photos as HEIC).')};img.src=url}
 const cv0=document.createElement('canvas');
 function prep(img){const MX=440,s=Math.min(1,MX/Math.max(img.naturalWidth,img.naturalHeight));W=Math.max(8,Math.round(img.naturalWidth*s));H=Math.max(8,Math.round(img.naturalHeight*s));
@@ -77,16 +77,16 @@ const kb=(d.length/1024).toFixed(0);$('iinfo').textContent=`${loops.length} shap
 const openDlg=()=>{$('idlg').hidden=false;setTimeout(()=>$('iadd').focus(),50)};const closeDlg=()=>{$('idlg').hidden=true};
 $('icl').onclick=closeDlg;$('icx').onclick=closeDlg;$('idlg').addEventListener('click',e=>{if(e.target===$('idlg'))closeDlg()});
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('idlg').hidden)closeDlg()});
-$('iadd').onclick=()=>{if(!last)return;const nm=($('inm').value.trim()||'Imported motif').replace(/["<>&|]/g,'').slice(0,40),key='i|'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+$('iadd').onclick=()=>{if(!last)return;const nm=($('inm').value.trim()||'Imported shape').replace(/["<>&|]/g,'').slice(0,40),key='i|'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const fg=WBS.mcat.startsWith('g:')?WBS.mcat.slice(2):'';cust[key]={n:nm,svg:`<path d="${last.d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,...(fg?{g:fg}:{})};
 const t=WBS.tiles[WBS.cur],full=$('ifull').checked,s=full?+(Math.min(SW,SH)/100*1.04).toFixed(3):.9;t.items.push(it(key,SW/2,SH/2,s));selOne(t.items.length-1);
 if(!fg)WBS.mcat='i';mcSave();store();closeDlg();upd();document.querySelector('.rail [data-pn="motifs"]').click();
 $('pmsg').textContent=`Added “${nm}” to ${fg?'“'+fg+'”':'My imports'} and placed it on the stamp.`};
 
 // ===== Motif sheets: one image -> many motifs (grid you can adjust, or auto-detected shapes) =====
-const SPROMPT=(sub,c,r)=>`Create a sheet of ${c*r} different ${sub||'[subject]'} designed as bold woodblock stamp motifs, arranged in a neat grid of ${c} columns and ${r} rows. Every motif: pure solid black shapes on a plain white background, no gray, no shading, no gradients, no texture, with a few thin white carved lines for detail, clean smooth edges and a simple readable silhouette. Each motif is about the same size and centered in its own cell. Leave wide empty white space between all motifs (at least a fifth of a cell); nothing may touch, overlap or cross into a neighbouring cell. No grid lines, no borders, no frames, no labels, no numbers, no text. ${c>r?'Wide landscape image.':c<r?'Tall portrait image.':'Square image.'}`;
+const SPROMPT=(sub,c,r)=>`Create a sheet of ${c*r} different ${sub||'[subject]'} designed as bold woodblock stamp shapes, arranged in a neat grid of ${c} columns and ${r} rows. Every shape: pure solid black shapes on a plain white background, no gray, no shading, no gradients, no texture, with a few thin white carved lines for detail, clean smooth edges and a simple readable silhouette. Each shape is about the same size and centered in its own cell. Leave wide empty white space between all shapes (at least a fifth of a cell); nothing may touch, overlap or cross into a neighbouring cell. No grid lines, no borders, no frames, no labels, no numbers, no text. ${c>r?'Wide landscape image.':c<r?'Tall portrait image.':'Square image.'}`;
 $('spr').onclick=async()=>{const c=Math.max(1,Math.min(8,+$('scol').value||4)),r=Math.max(1,Math.min(8,+$('srow').value||4)),t=SPROMPT($('isub').value.trim(),c,r);$('sc').value=c;$('sr').value=r;let ok=false;try{await clipboard.writeText(t);ok=true}catch(e){}
-if(ok)say2(`Sheet prompt copied (${c} × ${r} = ${c*r} motifs). Paste it into ChatGPT, then use Import a motif sheet.`);else{$('iprt').hidden=false;$('iprt').value=t;$('iprt').select();say2('Copy the prompt below, then paste it into ChatGPT.')}};
+if(ok)say2(`Sheet prompt copied (${c} × ${r} = ${c*r} shapes). Paste it into ChatGPT, then use Import a shape sheet.`);else{$('iprt').hidden=false;$('iprt').value=t;$('iprt').select();say2('Copy the prompt below, then paste it into ChatGPT.')}};
 let S=null,stmr=0;const sc=document.createElement('canvas');
 const sOpen=(img,nm)=>{const MX=2000,k=Math.min(1,MX/Math.max(img.naturalWidth,img.naturalHeight)),w=Math.max(8,Math.round(img.naturalWidth*k)),h=Math.max(8,Math.round(img.naturalHeight*k));
 sc.width=w;sc.height=h;const c=sc.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,w,h);c.drawImage(img,0,0,w,h);const d=c.getImageData(0,0,w,h).data,L=new Float32Array(w*h);for(let i=0;i<w*h;i++)L[i]=.2126*d[i*4]+.7152*d[i*4+1]+.0722*d[i*4+2];
@@ -128,7 +128,7 @@ for(let y=0;y<hh;y++)for(let x=0;x<ww;x++){let a=0,n=0;const sx0=X0+Math.floor(x
 for(let yy=sy0;yy<Math.max(sy0+1,sy1);yy+=1)for(let xx=sx0;xx<Math.max(sx0+1,sx1);xx+=1){a+=L[Math.min(h-1,yy)*w+Math.min(w-1,xx)];n++}lm[y*ww+x]=a/n}
 const oW=W,oH=H;W=ww;H=hh;try{const th=+$('shth').value,r=+$('ssm').value,area=Math.round(+$('shsp').value/100*W*H*.0008+(+$('shsp').value?2:0)),inv=$('sinv').checked,eps=+$('sdt').value;
 const a=blur(lm,r),b=new Uint8Array(W*H);for(let i=0;i<W*H;i++)b[i]=(a[i]<th)!=inv?1:0;despeckle(b,area);
-if(dropEdge){// remove small bits of neighbouring motifs that poke in across the cell edge
+if(dropEdge){// remove small bits of neighbouring shapes that poke in across the cell edge
 const lab=new Int32Array(W*H).fill(-1),st=new Int32Array(W*H),cs=[];let tot=0;for(let i0=0;i0<W*H;i0++){if(!b[i0]||lab[i0]>=0)continue;let sp=0,cnt=0,edge=false;const id=cs.length;st[sp++]=i0;lab[i0]=id;
 while(sp){const i=st[--sp],x=i%W,y=(i/W)|0;cnt++;if(x==0||y==0||x==W-1||y==H-1)edge=true;for(const j of[x>0?i-1:-1,x<W-1?i+1:-1,y>0?i-W:-1,y<H-1?i+W:-1])if(j>=0&&b[j]&&lab[j]<0){lab[j]=id;st[sp++]=j}}cs.push({cnt,edge});tot+=cnt}
 for(let i=0;i<W*H;i++)if(b[i]){const c=cs[lab[i]];if(c.edge&&c.cnt<tot*.25)b[i]=0}}
@@ -147,10 +147,10 @@ document.querySelectorAll('#sview [data-v]').forEach(b=>b.classList.toggle('on',
 S.boxes.forEach((b,i)=>{const off=S.off.has(i)||!S.res[i];o+=`<rect x="${f(b.x0*w)}" y="${f(b.y0*h)}" width="${f((b.x1-b.x0)*w)}" height="${f((b.y1-b.y0)*h)}" fill="${off?'rgba(200,60,40,.12)':S.view=='t'?'none':'rgba(63,95,224,.06)'}" stroke="${S.mode=='auto'?'#3f5fe0':'none'}" stroke-width="${f(sw*1.5)}"/><text x="${f(b.x0*w+sw*5)}" y="${f(b.y0*h+sw*14)}" font-size="${f(sw*12)}" fill="#3f5fe0" font-family="sans-serif">${i+1}</text>`});
 if(S.mode=='grid'){S.xs.forEach((x,i)=>{o+=`<line x1="${f(x*w)}" y1="0" x2="${f(x*w)}" y2="${h}" stroke="#3f5fe0" stroke-width="${f(sw*1.6)}" stroke-dasharray="${f(sw*6)} ${f(sw*4)}"/><line data-lx="${i}" x1="${f(x*w)}" y1="0" x2="${f(x*w)}" y2="${h}" stroke="transparent" stroke-width="${f(sw*14)}"/>`});
 S.ys.forEach((y,j)=>{o+=`<line x1="0" y1="${f(y*h)}" x2="${w}" y2="${f(y*h)}" stroke="#3f5fe0" stroke-width="${f(sw*1.6)}" stroke-dasharray="${f(sw*6)} ${f(sw*4)}"/><line data-ly="${j}" x1="0" y1="${f(y*h)}" x2="${w}" y2="${f(y*h)}" stroke="transparent" stroke-width="${f(sw*14)}"/>`})}
-$('sov').innerHTML=o;$('shint').textContent=S.mode=='grid'?'Drag any dashed line, including the outer edges, to line the grid up with the artwork.':'Each blue box is one motif. Raise "Join parts within" if a motif is split into pieces, lower it if two motifs are merged.'}
+$('sov').innerHTML=o;$('shint').textContent=S.mode=='grid'?'Drag any dashed line, including the outer edges, to line the grid up with the artwork.':'Each blue box is one shape. Raise "Join parts within" if a shape is split into pieces, lower it if two shapes are merged.'}
 function drawCells(){const ink=col(WBS.proj.ink),bg=col(WBS.proj.bg);let n=0;
-$('scells').innerHTML=S.boxes.length?S.boxes.map((b,i)=>{const r=S.res[i],d=r&&r.d,off=S.off.has(i)||!d;if(!off)n++;return`<button type="button" data-c="${i}" class="${off?'off':''}" title="${d?(off?'Left out. Click to include':'Click to leave out'):'No ink found in this cell'}"><svg viewBox="-50 -50 100 100" style="background:${bg}">${d?`<path d="${d}" fill="${ink}" fill-rule="evenodd"/>`:''}</svg><i>${i+1}</i></button>`}).join(''):'<div class="em">No motifs found. Adjust the threshold or try the other mode.</div>';
-$('sadd').textContent=`Import ${n} motif${n==1?'':'s'}`;$('sadd').disabled=!n;$('shinfo').textContent=`${S.boxes.length} cell${S.boxes.length==1?'':'s'} found, ${n} will be imported.`}
+$('scells').innerHTML=S.boxes.length?S.boxes.map((b,i)=>{const r=S.res[i],d=r&&r.d,off=S.off.has(i)||!d;if(!off)n++;return`<button type="button" data-c="${i}" class="${off?'off':''}" title="${d?(off?'Left out. Click to include':'Click to leave out'):'No ink found in this cell'}"><svg viewBox="-50 -50 100 100" style="background:${bg}">${d?`<path d="${d}" fill="${ink}" fill-rule="evenodd"/>`:''}</svg><i>${i+1}</i></button>`}).join(''):'<div class="em">No shapes found. Adjust the threshold or try the other mode.</div>';
+$('sadd').textContent=`Import ${n} shape${n==1?'':'s'}`;$('sadd').disabled=!n;$('shinfo').textContent=`${S.boxes.length} cell${S.boxes.length==1?'':'s'} found, ${n} will be imported.`}
 $('scells').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;const i=+b.dataset.c;if(!S.res[i])return;S.off.has(i)?S.off.delete(i):S.off.add(i);drawOv();drawCells()};
 // drag grid lines
 let sd=null;$('sov').addEventListener('pointerdown',e=>{const t=e.target.closest('[data-lx],[data-ly]');if(!t||!S)return;e.preventDefault();$('sov').setPointerCapture(e.pointerId);sd={x:t.dataset.lx!=null,i:+(t.dataset.lx??t.dataset.ly)}});
@@ -160,7 +160,7 @@ const sClose=()=>{$('sdlg').hidden=true};$('scl').onclick=sClose;$('scx').onclic
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('sdlg').hidden)sClose()});
 $('sadd').onclick=()=>{if(!S)return;const cat=($('snm').value.trim()||'Sheet').replace(/[\"<>&|]/g,'').slice(0,30),base=Date.now().toString(36);let n=0;
 S.boxes.forEach((b,i)=>{const d=S.res[i]&&S.res[i].d;if(!d||S.off.has(i))return;n++;const key='i|'+base+'s'+i+Math.random().toString(36).slice(2,4);cust[key]={n:`${cat} ${n}`.slice(0,40),svg:`<path d="${d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,g:cat}});
-WBS.mcat='g:'+cat;try{kv.set('wb11_mcat',WBS.mcat)}catch(e){}store();sClose();upd();document.querySelector('.rail [data-pn="motifs"]').click();$('pmsg').textContent=`Added ${n} motifs to “${cat}” in the library.`};
+WBS.mcat='g:'+cat;try{kv.set('wb11_mcat',WBS.mcat)}catch(e){}store();sClose();upd();document.querySelector('.rail [data-pn="motifs"]').click();$('pmsg').textContent=`Added ${n} shapes to “${cat}” in the library.`};
 $('sfile').onchange=()=>{const f=$('sfile').files[0];$('sfile').value='';if(!f)return;if(f.type&&!/^image\//.test(f.type))return say2('That file is not an image. Use a PNG, JPG or WebP.');const url=URL.createObjectURL(f),img=new Image();
 img.onload=()=>{URL.revokeObjectURL(url);sOpen(img,(f.name||'').replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' '))};img.onerror=()=>{URL.revokeObjectURL(url);say2('That image could not be read. Try a PNG or JPG.')};img.src=url};
 $('isht').onclick=()=>{if(!src)return;closeDlg();sOpen(src,$('inm').value.trim())};
