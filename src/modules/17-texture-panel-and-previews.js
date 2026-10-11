@@ -85,19 +85,12 @@ const sig=JSON.stringify([WBS.texLib,WBS.txSel,[...refs],WBS.proj.bg,WBS.proj.in
 $('tx_cnt').textContent=WBS.texLib.length?String(WBS.texLib.length):'';
 $('tx_list').innerHTML=!WBS.texLib.length?'<button type="button" class="alt nb" data-n="1">New texture</button>':WBS.texLib.map(L=>`<div class="mr${L.id===WBS.txSel?' on':''}" data-x="${hx(L.id)}">${txThumb(L,null,'relief')}<b>${hx(L.name)}${refs.get(L.id)?`<i>${refs.get(L.id)}</i>`:''}</b><button type="button" data-d="1" aria-label="Delete texture" title="Delete">&times;</button></div>`).join('');
 txPaintEd()}
-function txPaintEd(){const L=txCur(),has=!!L;$('tx_edg').hidden=!has;$('tx_apg').hidden=!has;$('tx_dup').disabled=!has;if(!has)return;txLd=true;
+function txPaintEd(){const L=txCur(),has=!!L;$('tx_edg').hidden=!has;$('tx_dup').disabled=!has;if(!has)return;txLd=true;
 try{$('tx_prev').innerHTML=TXMD.map(m=>`<figure><img alt="" src="${txSwatch(L,m,120,120)}"><figcaption>${TXMN[m]}</figcaption></figure>`).join('');if(document.activeElement!==$('tx_name'))$('tx_name').value=L.name;$('tx_type').value=L.t;
 txSetR('tx_a',L.a);txSetR('tx_sc',L.sc);txSetR('tx_az',L.az);
-const opts=[['stamp','This stamp'],['stamps','All stamps'],['layer','This layer'],['layers','All layers'],['text','Selected text boxes'],['texts','All text boxes'],['canvas','Canvas']],cur=$('tx_to').value;
-if(!$('tx_to').options.length){$('tx_to').innerHTML=opts.map(([v,n])=>`<option value="${v}">${n}</option>`).join('');if(opts.some(o=>o[0]==cur))$('tx_to').value=cur}}finally{txLd=false}}
+}finally{txLd=false}}
 function txDelete(id){const L=txLib(id);if(!L)return;txCap();let n=0;const cut=o=>{if(Array.isArray(o.tu)){const b=o.tu.length;o.tu=o.tu.filter(z=>z&&z.x!==id);n+=b-o.tu.length}};WBS.tiles.forEach(cut);WBS.layers.forEach(l=>{cut(l);(l.pl||[]).forEach(cut)});if(WBX.wbTxCut)WBX.wbTxCut(id);
 if(WBS.tex&&Array.isArray(WBS.tex.u)){const b=WBS.tex.u.length;WBS.tex.u=WBS.tex.u.filter(z=>z&&z.x!==id);n+=b-WBS.tex.u.length}WBS.texLib=WBS.texLib.filter(x=>x.id!==id);if(WBS.txSel===id)WBS.txSel=(WBS.texLib[0]||{}).id||'';texNorm();store();saveTex();buildTex();upd();txCap();txRefresh(true);pmsg(`Deleted “${L.name}”${n?` and took it off ${n} place${n>1?'s':''}`:''}.`)}
-function txApply(){const L=txCur();if(!L)return;const to=$('tx_to').value;txCap();let n=0;const add=o=>{if(!Array.isArray(o.tu))o.tu=[];if(!o.tu.some(u=>u.x===L.id)&&o.tu.length<6){o.tu.push({x:L.id,sd:txRid(),md:'wear'});n++}};
-if(to=='canvas'){if(!Array.isArray(WBS.tex.u))WBS.tex.u=[];if(!WBS.tex.u.some(u=>u.x===L.id)&&WBS.tex.u.length<4){WBS.tex.u.push({x:L.id,sd:txRid(),md:'relief'});n=1}texNorm();saveTex();buildTex()}
-else if(to=='stamp'){const t=WBS.tiles[WBS.cur];if(t)add(t)}else if(to=='stamps')WBS.tiles.forEach(add);else if(to=='layer'){const l=LY();if(l)add(l)}else if(to=='layers')WBS.layers.forEach(add);
-else if(to=='text'){n=WBX.wbTxApply?WBX.wbTxApply(L.id):0}else if(to=='texts')WBS.layers.forEach(l=>(l.pl||[]).forEach(p=>{if(p.tx)add(p)}));
-store();upd();txCap();txRefresh(true);pmsg(n?`Applied “${L.name}” to ${n} ${to=='canvas'?'canvas':n>1?'places':'place'}.`:to=='text'?'Select a text box first. New text boxes will use it.':'Nothing to apply it to, or it is already there.')}
-
 // projects made before this: the one canvas-wide surface is handed to every stamp (each with its own variation), then retired
 const migInk=()=>{if(WBS.pr&&WBS.pr.t&&WBS.tiles.some(t=>(t.is===undefined&&t.tu===undefined))){WBS.tiles.forEach((t,i)=>{if((t.is===undefined&&t.tu===undefined))t.is={t:WBS.pr.t,a:WBS.pr.a,sc:WBS.pr.sc,sd:((+WBS.pr.sd||1)+i*131)%99999+1}});WBS.pr.t=''}};
 function roughFilter(){
@@ -139,7 +132,6 @@ $('tx_list').onclick=e=>{if(e.target.closest('[data-n]')){$('tx_add').click();re
 $('tx_add').onclick=()=>{txCap();const L=txMake('cotton');WBS.texLib.push(L);WBS.txSel=L.id;store();txRefresh(true);txCap()};
 $('tx_dup').onclick=()=>{const L=txCur();if(!L)return;txCap();const n={...L,id:txUid(),name:txUniq(L.name),auto:false,sd:txRid()};WBS.texLib.push(n);WBS.txSel=n.id;store();txRefresh(true);txCap()};
 $('tx_del').onclick=()=>{if(txCur())txDelete(WBS.txSel)};
-$('tx_apply').onclick=txApply;
 $('tx_name').addEventListener('input',()=>{const L=txCur();if(!L||txLd)return;L.name=$('tx_name').value.replace(/[<>&"]/g,'').slice(0,40);L.auto=false;store();txRefresh()});
 $('tx_name').addEventListener('blur',()=>{const L=txCur();if(L&&!L.name.trim()){L.name=txUniq(TXN[L.t]||'Texture');store();txRefresh(true)}});
 $('tx_name').addEventListener('change',txCap);

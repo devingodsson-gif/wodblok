@@ -1,0 +1,52 @@
+// 1.0.18: D13 the Textures tool is only the library (no Apply block); D4 a Pictures layer can let the paper show through the light colour of a picture.
+const { test, expect } = require('@playwright/test');
+const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
+
+test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+
+const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAG0lEQVR4nGP4TyJgGOQaGHCAUQ301UAMGIQaAMSCPd+1UKgQAAAAAElFTkSuQmCC', 'base64');
+
+test('the Textures tool has no Apply block; textures are applied where you work', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'tex');
+  await page.click('#tx_add');
+  await settle(page);
+  await expect(page.locator('#tx_edg')).toBeVisible();
+  await expect(page.locator('#tx_del')).toBeVisible();
+  await expect(page.locator('#tx_apply, #tx_to, #tx_apg')).toHaveCount(0);
+  // Canvas still takes a texture from the library
+  await openPanel(page, 'canvas');
+  const n0 = JSON.parse(await getState(page)).tex.u.length;
+  await page.locator('#cv_tex [data-a="add"], [data-a="add"]:visible').first().click();
+  await settle(page);
+  expect(JSON.parse(await getState(page)).tex.u.length).toBe(n0 + 1);
+  expect(errors).toEqual([]);
+});
+
+test('"Paper shows through" puts a light-colour filter on the Pictures layer and saves it in the layer', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'lyrs');
+  await page.click('#ly_add');
+  await page.click('#ly_menu [data-lt="a"]');
+  await settle(page);
+  await page.setInputFiles('#lfafile', { name: 'a.png', mimeType: 'image/png', buffer: PNG });
+  await settle(page);
+  const bb = await page.locator('#art').boundingBox();
+  await page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2);
+  await settle(page);
+  expect(JSON.parse(await getState(page)).layers.some(l => l.art && (l.pl || []).length)).toBe(true);
+  const box = page.locator('#lfaak');
+  await expect(box).toBeVisible();
+  await expect(box).not.toBeChecked();
+  expect(await page.locator('#art filter[id^="ak"]').count()).toBe(0);
+  await box.check();
+  await settle(page);
+  expect(JSON.parse(await getState(page)).layers.some(l => l.art && l.akk === true)).toBe(true);
+  expect(await page.locator('#art filter[id^="ak"]').count()).toBe(1);
+  expect(await page.locator('#art g[filter^="url(#ak"]').count()).toBe(1);
+  await box.uncheck();
+  await settle(page);
+  expect(JSON.parse(await getState(page)).layers.some(l => l.akk)).toBe(false);
+  expect(await page.locator('#art filter[id^="ak"]').count()).toBe(0);
+  expect(errors).toEqual([]);
+});

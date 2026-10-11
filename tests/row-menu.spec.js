@@ -56,7 +56,8 @@ test('the menu closes on Escape and on a click elsewhere, and items are reachabl
 test('a snapshot has a "⋯" menu with Rename and Delete', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'hist');
-  await page.click('#hsadd'); await page.keyboard.press('Enter');
+  await page.click('#hsadd');
+  const nm = page.locator('#hsl .hr input'); await expect(nm).toBeFocused(); await nm.press('Enter');   // wait for the name box: on a slow machine Enter came too early
   const row = page.locator('#hsl .hr').first();
   await expect(row.locator('[data-more]')).toBeVisible();
   await row.locator('[data-more]').click(); await menu(page, 'Rename').click();
