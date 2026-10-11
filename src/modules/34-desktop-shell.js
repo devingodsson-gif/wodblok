@@ -91,7 +91,12 @@ gs.forEach((g,i)=>{if(i){const sp=document.createElement('div');sp.className='ws
 dk.hidden=!gs.length;if(nar){dk.style.width='';dk.style.height=''}else if(gs.length){const ac=gs.every(g=>g.col);if(k=='l'||k=='r')dk.style.width=(ac?Math.min(200,wsClampSz(k,wsSz(k))):wsClampSz(k,wsSz(k)))+'px';else dk.style.height=(ac?34:wsClampSz(k,wsSz(k)))+'px'}});
 if(!nar)L.float.forEach(g=>wsFl.appendChild(wsEl(g,true)));
 document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=wsFind(p);b.hidden=!MODEP[view].includes(p);const fr=!!g&&g.a==p&&!g.col;b.classList.toggle('on',fr);b.classList.toggle('op',!!g&&!fr);b.title=fr?'':(g?'Open in a tab. Click to bring it to the front':'')});
-nums()}
+wsTabFit();nums()}
+// a panel with more tabs than fit: the chosen tab is scrolled into view and the edge that hides more tabs fades
+function wsTabEdge(t){const h=t.parentElement;h.classList.toggle('ovr',t.scrollLeft+t.clientWidth<t.scrollWidth-1);h.classList.toggle('ovl',t.scrollLeft>1)}
+function wsTabFit(){document.querySelectorAll('.wh .wt').forEach(t=>{const a=t.querySelector('.wtab.on');if(a){if(a.offsetLeft+a.offsetWidth>t.scrollLeft+t.clientWidth)t.scrollLeft=a.offsetLeft+a.offsetWidth-t.clientWidth;else if(a.offsetLeft<t.scrollLeft)t.scrollLeft=a.offsetLeft}wsTabEdge(t)})}
+document.addEventListener('scroll',e=>{if(e.target.classList&&e.target.classList.contains('wt'))wsTabEdge(e.target)},true);
+addEventListener('resize',()=>{if(wsReady)wsTabFit()});
 // tabs and buttons
 document.addEventListener('click',e=>{const w=e.target.closest('.wg');if(!w||Date.now()-wsJust<250)return;const g=wsGroup(w.dataset.g);if(!g)return;
 const b=e.target.closest('.wb');if(b){const a=b.dataset.act,r=w.getBoundingClientRect();
