@@ -196,18 +196,16 @@ setPanel(p)};
 const xsvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 const vis=()=>railBtns().filter(b=>!MODEP[view].includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)?false:true);
 function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP[view].includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn));
-if(off.length){const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML+'<span class="tip">'+b.getAttribute('aria-label')+'</span>';g.appendChild(m)});menu.append(g)}
-menu.hidden=!ed||!off.length;if(!menu.hidden){const r=more.getBoundingClientRect(),w=railEl.getBoundingClientRect();if(w.width<w.height){menu.style.left=(r.right+8)+'px';menu.style.bottom=(innerHeight-r.bottom)+'px';menu.style.top=''}else{menu.style.left=Math.max(4,r.left-80)+'px';menu.style.top=(r.bottom+8)+'px';menu.style.bottom=''}}}
-function marks(){railEl.querySelectorAll('.rx').forEach(x=>x.remove());if(ed)railBtns().forEach(b=>{if(b.hidden)return;const x=document.createElement('span');x.className='rx';x.setAttribute('role','button');x.setAttribute('aria-label','Remove '+b.getAttribute('aria-label')+' from the bar');x.innerHTML=xsvg;b.appendChild(x)})}
-function edit(on){ed=on;more.classList.toggle('on',on);more.setAttribute('aria-expanded',String(on));marks();fill()}
-const refresh=()=>wsRender();railHook=()=>{if(ed){marks();fill()}};
+{const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML+'<span class="tip">'+b.getAttribute('aria-label')+'</span>';if(wsFind(b.dataset.pn))m.classList.add('on');g.appendChild(m)});menu.append(g)}
+menu.hidden=!ed;if(!menu.hidden){const r=more.getBoundingClientRect(),w=railEl.getBoundingClientRect();if(w.width<w.height){menu.style.left=(r.right+8)+'px';menu.style.bottom=(innerHeight-r.bottom)+'px';menu.style.top=''}else{menu.style.left=Math.max(4,r.left-80)+'px';menu.style.top=(r.bottom+8)+'px';menu.style.bottom=''}}}
+function edit(on){ed=on;more.classList.toggle('on',on);more.setAttribute('aria-expanded',String(on));fill()}
+const refresh=()=>wsRender();railHook=()=>{if(ed)fill()};
 more.onclick=()=>edit(!ed);
-menu.onclick=e=>{if(Date.now()-jus<300)return;const m=e.target.closest('[data-add]');if(!m)return;RO.off=RO.off.filter(x=>x!==m.dataset.add);railSave();refresh()};
+menu.onclick=e=>{if(Date.now()-jus<300)return;const m=e.target.closest('[data-add]');if(!m)return;const b=railEl.querySelector('[data-pn="'+m.dataset.add+'"]');if(b)b.click()};
 addEventListener('keydown',e=>{if(e.key=='Escape'&&ed)edit(false)});
-document.addEventListener('pointerdown',e=>{if(ed&&!e.target.closest('.rail,#rmenu'))edit(false)});
 // a click that ends a drag, or lands on an X, is not a tool click
-railEl.addEventListener('click',e=>{if(Date.now()-jus<300){e.stopPropagation();e.preventDefault();return}const x=e.target.closest('.rx');if(x){e.stopPropagation();e.preventDefault();const p=x.parentElement.dataset.pn;if(!RO.off.includes(p))RO.off.push(p);railSave();refresh()}},true);
-railEl.addEventListener('pointerdown',e=>{const b=e.target.closest('.rail > [data-pn]');if(!b||e.target.closest('.rx')||e.button>0)return;drag={b,x:e.clientX,y:e.clientY,on:false,id:e.pointerId}});
+railEl.addEventListener('click',e=>{if(Date.now()-jus<300){e.stopPropagation();e.preventDefault();return}},true);
+railEl.addEventListener('pointerdown',e=>{const b=e.target.closest('.rail > [data-pn]');if(!b||e.button>0)return;drag={b,x:e.clientX,y:e.clientY,on:false,id:e.pointerId}});
 railEl.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;if(!drag.on){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<7)return;drag.on=true;hvClear();drag.b.classList.add('rdrag');try{drag.b.setPointerCapture(e.pointerId)}catch(_){}}
 const o=vis().find(t=>{if(t===drag.b)return false;const r=t.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom});
 if(o){const a=railBtns(),ia=a.indexOf(drag.b),io=a.indexOf(o);if(ia<io)o.after(drag.b);else o.before(drag.b)}});

@@ -52,21 +52,30 @@ test('a tool name shows when the pointer rests on an icon or when it has keyboar
   expect(errors).toEqual([]);
 });
 
-test('the tool bar is one list: tools come off with an X while the three-line menu is open, come back from that menu, and the choice is remembered', async ({ page }) => {
+test('the tool bar is one list; the three-line button opens a tool repository: tools drag between it and the bar, and a tool in it opens like on the bar', async ({ page }) => {
   const { errors } = await openApp(page);
   const ids = () => page.locator('.rail > [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn));
   expect(await page.locator('.rail .rsep').count()).toBe(0);
-  expect(await page.locator('.rx').count()).toBe(0);
+  expect(await page.locator('#rmenu:visible').count()).toBe(0);
   const n = (await ids()).length;
   await page.click('#rmore');
-  await page.click('.rail [data-pn="hist"] .rx');
+  expect(await page.locator('#rmenu:visible').count()).toBe(1);
+  const drag = async (from, to) => {
+    const a = await from.boundingBox(), b = await to.boundingBox();
+    await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2); await page.mouse.down();
+    await page.mouse.move(a.x + a.width / 2 + 10, a.y + a.height / 2 + 10, { steps: 3 });
+    await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 8 }); await page.mouse.up();
+  };
+  await drag(page.locator('.rail [data-pn="hist"]'), page.locator('#rmenu'));
   expect(await ids()).not.toContain('hist');
   await page.reload(); await page.waitForTimeout(500);
   expect(await ids()).not.toContain('hist');
   await page.click('#rmore');
   await page.click('#rmenu [data-add="hist"]');
+  expect(await page.locator('.dock [data-tab="hist"], .wtab:has-text("History")').count()).toBeGreaterThan(0);
+  await drag(page.locator('#rmenu [data-add="hist"]'), page.locator('.rail [data-pn="pres"]'));
   expect((await ids()).length).toBe(n);
   await page.keyboard.press('Escape');
-  expect(await page.locator('.rx').count()).toBe(0);
+  expect(await page.locator('#rmenu:visible').count()).toBe(0);
   expect(errors).toEqual([]);
 });
