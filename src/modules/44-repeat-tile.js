@@ -11,6 +11,9 @@ import {buildTex} from './17-texture-panel-and-previews.js';
 // turns it on; it is saved with the canvas (dim.rt) and can be undone.
 function init44(){
   let last='';
+  const tloSet=v=>{v=Math.round(+v);if(!(v>=0))v=92;v=Math.min(100,v);$('artwrap').style.setProperty('--tlo',v+'%');return v};
+  try{const v=kv.get('wb_tlo');if(v!=null&&v!=='')$('tlo').value=tloSet(v);else tloSet(92)}catch(e){tloSet(92)}
+  $('tlo').addEventListener('input',()=>{const v=tloSet($('tlo').value);try{kv.set('wb_tlo',String(v))}catch(e){}});
   const frames=()=>WBS.layers.filter(L=>L.fr&&L.fr.on&&L.vis!==false).length;
   const grads=()=>{const g=WBX.wbGrade?WBX.wbGrade.get():null;return g?g.masks.filter(m=>m.on&&(m.t=='lin'||m.t=='rad')&&m.sp!='s').length:0};
   WBX.wbTileSet=on=>{
@@ -22,7 +25,7 @@ function init44(){
     const on=tileOn(),n=frames(),g=on?grads():0,key=[on,!!WBS.tilePv,WBS.book.on,n,g].join();if(key===last)return;last=key;
     if(!on&&WBS.tilePv)WBS.tilePv=false;
     document.querySelectorAll('#cfmt [data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==(WBS.book.on?'book':on?'tile':'free')));
-    $('tpvg').hidden=!on;$('tpv').disabled=!on;$('tpv').setAttribute('aria-pressed',String(on&&!!WBS.tilePv));
+    $('tlobox').hidden=!on;$('tpvg').hidden=!on;$('tpv').disabled=!on;$('tpv').setAttribute('aria-pressed',String(on&&!!WBS.tilePv));
     $('cshp').hidden=on;const lb=$('cshp').previousElementSibling;if(lb&&lb.tagName=='LABEL')lb.hidden=on;if(on)['crrbox','cngbox','ccobox'].forEach(id=>{$(id).hidden=true});
     const parts=[];if(on&&n)parts.push(n+(n>1?' frames':' frame'));if(g)parts.push(g+(g>1?' gradients':' gradient'));
     $('tpn').hidden=!parts.length;$('tpn').textContent=parts.length?'Hidden on a repeat tile: '+parts.join(', '):'';
