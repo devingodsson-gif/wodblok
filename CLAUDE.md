@@ -1,5 +1,5 @@
 # WODBLOK
-Stamped-pattern editor, web app first. Commercial product; the repo is private.
+Stamped-pattern editor, web app first. Commercial product. The repo is PUBLIC while it is developed (since Oct 11 2026) and goes private again before it is sold: see "Public repo rules" below and docs/public-repo.md.
 
 ## Commands
 npm run build | dev | check:platform | test | test:build | test:legacy | test:update-golden | test:webkit | perf | coupling-map
@@ -16,6 +16,17 @@ Source of truth for the app is src/: ES modules in src/modules (order in manifes
 - Phase 1: no behaviour or visual changes. Phases 2-3: only what the phase lists; existing tools unchanged. Phases 1-3: no bug fixes; log bugs in docs/known-issues.md.
 - Snapshots and golden screenshots: never update them just to make tests pass. **Pixel goldens** (`tests/__golden__/`): when a full-suite run fails some, look at each diff; if it is exactly the change this release made on purpose (new labels, text size, layout, a new control), regenerate those goldens (`--update-snapshots=changed` on just those tests, then re-run them), and say in the report which ones and why. A golden that fails for a reason the release does not explain is a bug: fix it or ask, never regenerate it. **State and SVG snapshots** (`tests/__snapshots__/`) still need the user's approval first: say which changed and why, and ask.
 - Desktop (Mac/Windows) and mobile are later; do not build them now, but do not block them.
+
+## Public repo rules (while the repo is public)
+Treat everything pushed as published: it can be cloned and forked at once, and making the repo private later does not remove copies.
+- Never commit secrets (keys, tokens, passwords), the user's email or phone, local file paths, or personal files. Check `git diff --cached` for these before every commit.
+- Test fixtures (`tests/fixtures/`) must be made-up sample projects or ones the user has approved as public. Never add the user's real project files, artwork, imported fonts or stamp library exports without asking first.
+- No Claude-drawn motif sets, and no third-party artwork, fonts or code without a licence that allows publishing (MIT, BSD, ISC, Apache, OFL).
+- No licence file and no "open source" wording: the code stays all-rights-reserved. Do not add a README that invites contributions or copies.
+- Never add anything that identifies the user personally (name, address, accounts) beyond the git commit author.
+- Hosting stays behind Cloudflare Access until the user decides to sell (the site ships the whole app to anyone who can open it). The repo being public does not make the site public.
+- Before the user makes the repo private again, follow the checklist in docs/public-repo.md. Never delete the repo, change its visibility, or rewrite git history without the user asking for that specifically.
+- GitHub Actions on a public repo are free, but keep the lean workflows (docs/ci-budget-rules.md) in case the repo goes private again.
 
 ## Release workflow
 1. **Check the version first.** At the start of every session, fetch, state the newest version on `main` (package.json) and the latest tag, and work from that, never from an older checkout or branch. Older versions and `legacy/` are never touched, rebuilt, archived or modified unless the user explicitly says so.

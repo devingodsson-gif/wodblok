@@ -12,7 +12,7 @@ and updates), the icons and `_headers`. It is plain static files, so any static 
    with a policy that lists the people allowed in. The free plan covers up to 50 users (confirm at set-up).
 4. Open the address in Chrome, Edge or Safari. Chrome and Edge offer Install in the address bar; Safari: File > Add to Dock.
 
-GitHub Pages is not an option while the repository is private: Pages sites are public unless the account is on GitHub Enterprise Cloud.
+GitHub Pages is not an option: Pages sites are public (private ones need GitHub Enterprise Cloud), and the site must stay behind Cloudflare Access until the owner decides to sell. This still holds now that the repository itself is public (docs/public-repo.md): a public repo does not make the hosted app public, and the hosted app sends the whole code to anyone who can open it.
 
 ## What the browser does with it
 - **Offline:** the first visit stores the app on the device; after that it opens with no network.

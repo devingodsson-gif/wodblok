@@ -2,6 +2,9 @@
 
 The repo is private on the GitHub Free plan: 2,000 Actions minutes a month. Linux runners count 1x, Windows 2x, macOS 10x. Each job is rounded up to whole minutes. The allowance was used up in two days when the tests ran on every push and every pull request update (two jobs, the full Chromium suite at 15-20 minutes each time).
 
+## Status: the repo is public (since Oct 11 2026)
+GitHub Actions on standard runners are free and unlimited for public repositories, so the minutes limit does not apply now. The rules below stay in place on purpose: they keep CI fast and tidy, and they are what keeps the project inside the 2,000 free minutes if the repo is made private again. If CI on every push ever becomes useful while the repo is public, add `push` to the triggers in `.github/workflows/test.yml`, and remove it again before the repo goes private.
+
 ## Rules
 1. **CI runs once per pull request to `main`**, not on pushes to branches. Work and push to a branch freely; no minutes are used.
 2. **Open the pull request as a draft** while working (a draft does not run CI). Mark it ready when the release is done and local tests pass; that starts the run. Each later push to a ready pull request restarts it, so push fixes in batches.
