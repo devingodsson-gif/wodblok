@@ -206,18 +206,29 @@ addEventListener('keydown',e=>{if(e.key=='Escape'&&ed)edit(false)});
 // a click that ends a drag, or lands on an X, is not a tool click
 railEl.addEventListener('click',e=>{if(Date.now()-jus<300){e.stopPropagation();e.preventDefault();return}},true);
 railEl.addEventListener('pointerdown',e=>{const b=e.target.closest('.rail > [data-pn]');if(!b||e.button>0)return;drag={b,x:e.clientX,y:e.clientY,on:false,id:e.pointerId}});
-railEl.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;if(!drag.on){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<7)return;drag.on=true;hvClear();drag.b.classList.add('rdrag');try{drag.b.setPointerCapture(e.pointerId)}catch(_){}}
-const o=vis().find(t=>{if(t===drag.b)return false;const r=t.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom});
+railEl.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;if(!drag.on){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<7)return;drag.on=true;hvClear();if(!ed)edit(true);zones(true,'rail');drag.b.classList.add('rdrag');try{drag.b.setPointerCapture(e.pointerId)}catch(_){}}
+menu.classList.toggle('rover',!menu.hidden&&inRect(menu,e.clientX,e.clientY));const o=vis().find(t=>{if(t===drag.b)return false;const r=t.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom});
 if(o){const a=railBtns(),ia=a.indexOf(drag.b),io=a.indexOf(o);if(ia<io)o.after(drag.b);else o.before(drag.b)}});
-const endDrag=e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;d.b.classList.remove('rdrag');if(d.on&&ed&&!menu.hidden){const mr=menu.getBoundingClientRect();if(e.clientX>=mr.left&&e.clientX<=mr.right&&e.clientY>=mr.top&&e.clientY<=mr.bottom){jus=Date.now();if(!RO.off.includes(d.b.dataset.pn))RO.off.push(d.b.dataset.pn);RO.order=railBtns().map(b=>b.dataset.pn);railSave();refresh();return}}if(d.on){jus=Date.now();RO.order=railBtns().map(b=>b.dataset.pn);railSave()}};
+const endDrag=e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag;drag=null;d.b.classList.remove('rdrag');zones(false);if(d.on&&ed&&!menu.hidden){const mr=menu.getBoundingClientRect();if(e.clientX>=mr.left&&e.clientX<=mr.right&&e.clientY>=mr.top&&e.clientY<=mr.bottom){jus=Date.now();if(!RO.off.includes(d.b.dataset.pn))RO.off.push(d.b.dataset.pn);RO.order=railBtns().map(b=>b.dataset.pn);railSave();refresh();return}}if(d.on){jus=Date.now();RO.order=railBtns().map(b=>b.dataset.pn);railSave()}};
 railEl.addEventListener('pointerup',endDrag);railEl.addEventListener('pointercancel',endDrag);
 // drag a tool out of the Add tray onto the bar to put it at that spot (a plain click puts it at the end of the bar)
 let td=null;
+const rowMode=()=>getComputedStyle(railEl).flexDirection=='row';
+const slotAt=(x,y)=>{const o=hitBtn(x,y);if(!o)return null;const r=o.getBoundingClientRect();return{el:o,after:rowMode()?x>r.left+r.width/2:y>r.top+r.height/2}};
+const inRect=(el,x,y)=>{const r=el.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom};
+let ins=null;
+function showIns(x,y){if(!ins){ins=document.createElement('div');ins.className='rins';document.body.appendChild(ins)}
+const sl=slotAt(x,y),bs=vis();let r,after=true;if(sl){r=sl.el.getBoundingClientRect();after=sl.after}else if(bs.length){r=bs[bs.length-1].getBoundingClientRect()}else{ins.style.display='none';return}
+const h=rowMode();ins.style.display='block';
+if(h){ins.style.width='3px';ins.style.height=r.height+'px';ins.style.top=r.top+'px';ins.style.left=((after?r.right:r.left)-1.5+(after?2:-2))+'px'}
+else{ins.style.height='3px';ins.style.width=r.width+'px';ins.style.left=r.left+'px';ins.style.top=((after?r.bottom:r.top)-1.5+(after?2:-2))+'px'}}
+const hideIns=()=>{if(ins)ins.style.display='none'};
+const zones=(on,from)=>{railEl.classList.toggle('rtgt',on&&from=='tray');menu.classList.toggle('rtgt',on&&from=='rail');if(!on){railEl.classList.remove('rover');menu.classList.remove('rover');hideIns()}};
 const hitBtn=(x,y)=>vis().find(t=>{const r=t.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom});
 menu.addEventListener('pointerdown',e=>{const m=e.target.closest('[data-add]');if(!m||e.button>0)return;td={id:m.dataset.add,m,x:e.clientX,y:e.clientY,on:false,pid:e.pointerId,g:null}});
-menu.addEventListener('pointermove',e=>{if(!td||e.pointerId!==td.pid)return;if(!td.on){if(Math.hypot(e.clientX-td.x,e.clientY-td.y)<6)return;td.on=true;hvClear();try{menu.setPointerCapture(e.pointerId)}catch(_){}const g=document.createElement('div');g.className='rghost';g.innerHTML=td.m.querySelector('svg').outerHTML;document.body.appendChild(g);td.g=g}
-td.g.style.left=(e.clientX-18)+'px';td.g.style.top=(e.clientY-18)+'px'});
-const endTray=e=>{if(!td||e.pointerId!==td.pid)return;const d=td;td=null;if(d.g)d.g.remove();if(!d.on)return;jus=Date.now();const rr=railEl.getBoundingClientRect();
+menu.addEventListener('pointermove',e=>{if(!td||e.pointerId!==td.pid)return;if(!td.on){if(Math.hypot(e.clientX-td.x,e.clientY-td.y)<6)return;td.on=true;hvClear();zones(true,'tray');try{menu.setPointerCapture(e.pointerId)}catch(_){}const g=document.createElement('div');g.className='rghost';g.innerHTML=td.m.querySelector('svg').outerHTML;document.body.appendChild(g);td.g=g}
+td.g.style.left=(e.clientX-18)+'px';td.g.style.top=(e.clientY-18)+'px';const over=inRect(railEl,e.clientX,e.clientY);railEl.classList.toggle('rover',over);if(over)showIns(e.clientX,e.clientY);else hideIns()});
+const endTray=e=>{if(!td||e.pointerId!==td.pid)return;const d=td;td=null;if(d.g)d.g.remove();zones(false);if(!d.on)return;jus=Date.now();const rr=railEl.getBoundingClientRect();
 if(e.clientX>=rr.left&&e.clientX<=rr.right&&e.clientY>=rr.top&&e.clientY<=rr.bottom){const el=railEl.querySelector('[data-pn="'+d.id+'"]');RO.off=RO.off.filter(x=>x!==d.id);const o=hitBtn(e.clientX,e.clientY);if(o){const r=o.getBoundingClientRect(),h=getComputedStyle(railEl).flexDirection=='row'?e.clientX>r.left+r.width/2:e.clientY>r.top+r.height/2;if(h)o.after(el);else o.before(el)}else railEl.insertBefore(el,railEl.querySelector('.rsp'));RO.order=railBtns().map(b=>b.dataset.pn);railSave();refresh()}};
 menu.addEventListener('pointerup',endTray);menu.addEventListener('pointercancel',endTray);
 // the name label and highlight follow the mouse itself (not the browser's hover state, which can stick after a drag or a touch)
