@@ -315,7 +315,8 @@ $('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${WBS.cur+1} of ${
 if(WBS.layers[WBS.selL])$('lnmx').textContent=WBS.layers[WBS.selL].name}
 // wrap redraw hooks so the shell stays in sync
 // An empty project shows an "Add a motif" button on the canvas (the Pattern view only); it goes to the Stamp editor and opens Motifs.
-const emptyCue=()=>{const empty=WBS.tiles.every(t=>!(t.items||[]).length)&&!WBS.layers.some(L=>(L.pl||[]).length);const b=$('empc');if(b)b.hidden=!(empty&&view=='pattern')};
+const emptyCue=()=>{const empty=WBS.tiles.every(t=>!(t.items||[]).length)&&!WBS.layers.some(L=>(L.pl||[]).length);const b=$('empc');if(b){b.hidden=!(empty&&view=='pattern');if(!b.hidden){const a=$('art').getBoundingClientRect(),o=b.offsetParent.getBoundingClientRect();b.style.left=(a.left+a.width/2-o.left)+'px';b.style.top=(a.top+a.height/2-o.top)+'px'}}};
+window.addEventListener('resize',()=>emptyCue());
 $('empc').onclick=()=>{setView('stamp');requestAnimationFrame(()=>{const sec=document.querySelector('section.pn[data-p="motifs"]');if(!sec||sec.hidden)$('rail-motifs').click()})};
 $('rzbar').onclick=()=>$('rzdo').click();
 WBX.wbEmptyCue=emptyCue;

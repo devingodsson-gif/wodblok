@@ -132,8 +132,7 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 #tpv[aria-pressed=true]{background:var(--raise);color:var(--acc-ink);font-weight:600;box-shadow:0 0 0 1px var(--acc)}
 #tpx{top:52px;left:50%}
 #mqb{position:fixed;display:none;z-index:60;pointer-events:none;border:1px solid var(--acc);background:var(--acc-soft);border-radius:2px}
-#rcc{position:absolute;top:calc(50% + 4px);left:50%;transform:translateX(-50%);z-index:44;display:flex;gap:8px;align-items:center}#rcc[hidden]{display:none}#rcc button{height:34px;padding:0 16px;border-radius:17px;border:0;font-size:13px;font-weight:600;cursor:pointer;background:var(--acc);color:var(--acc-fg);box-shadow:var(--shadow)}#rcc #rcc-x{background:var(--raise);color:var(--fg);box-shadow:0 0 0 1px var(--line2)}.stage:not(.pv) #rcc{display:none}#rcc:not([hidden])~#empc{display:none}
-#empc{top:calc(50% + 4px);left:50%;width:44px;height:44px;padding:0;gap:0;justify-content:center;border-radius:50%}
+#empc{top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;padding:0;gap:0;justify-content:center;border-radius:50%}
 #empc::before{content:"+";font-size:28px;font-weight:300;line-height:1;margin:-2px 0 0 0}
 /* an empty stamp in the tray shows a plus: click it to start drawing it */
 #tabs button.empty{position:relative}
@@ -689,8 +688,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  </nav>
 
 <main class="stage">
- <div id="rcc" hidden><button type="button" id="rcc-go">Restore unsaved work</button><button type="button" id="rcc-x">Dismiss</button></div>
- <button type="button" id="empc" aria-label="Add a motif" hidden></button>
+  <button type="button" id="empc" aria-label="Add a motif" hidden></button>
  <button type="button" id="tpx" hidden>Exit 3 × 3 preview<kbd>Esc</kbd></button>
  <div id="tbar" role="toolbar" aria-label="Task bar" hidden></div>
  <div class="viewbar">
