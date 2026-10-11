@@ -197,9 +197,9 @@ const xsvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wi
 const vis=()=>railBtns().filter(b=>!MODEP[view].includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)?false:true);
 function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP[view].includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn));
 {const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML+'<span class="tip">'+b.getAttribute('aria-label')+'</span>';if(wsFind(b.dataset.pn))m.classList.add('on');g.appendChild(m)});menu.append(g)}
-menu.hidden=!ed;if(!menu.hidden){const r=more.getBoundingClientRect(),w=railEl.getBoundingClientRect();if(w.width<w.height){menu.style.left=(r.right+8)+'px';menu.style.bottom=(innerHeight-r.bottom)+'px';menu.style.top=''}else{menu.style.left=Math.max(4,r.left-80)+'px';menu.style.top=(r.bottom+8)+'px';menu.style.bottom=''}}}
-function edit(on){ed=on;more.classList.toggle('on',on);more.setAttribute('aria-expanded',String(on));fill()}
-const refresh=()=>wsRender();railHook=()=>{if(ed)fill()};
+menu.hidden=!ed;if(!menu.hidden){const w=railEl.getBoundingClientRect(),row=w.width>w.height;menu.style.left=(row?w.left:w.right)+'px';menu.style.top=(row?w.bottom:w.top)+'px';menu.style.width=w.width+'px';menu.style.height=w.height+'px';menu.style.bottom=''}}
+function edit(on){ed=on;document.body.classList.toggle('rtray',on);more.classList.toggle('on',on);more.setAttribute('aria-expanded',String(on));fill()}
+const refresh=()=>wsRender();railHook=()=>{if(ed)fill()};addEventListener('resize',()=>{if(ed)fill()});
 more.onclick=()=>edit(!ed);
 menu.onclick=e=>{if(Date.now()-jus<300)return;const m=e.target.closest('[data-add]');if(!m)return;const b=railEl.querySelector('[data-pn="'+m.dataset.add+'"]');if(b)b.click()};
 addEventListener('keydown',e=>{if(e.key=='Escape'&&ed)edit(false)});

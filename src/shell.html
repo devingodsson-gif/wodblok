@@ -264,15 +264,14 @@ button.alt{background:var(--raise)}
 .rail button.on{color:var(--acc-ink);background:var(--acc-soft)}
 .rail button[data-pn]{touch-action:none}.rail button.rdrag{background:var(--raise);box-shadow:0 0 0 1px var(--acc)}
 .rail #rmore.on{color:var(--acc-ink);background:var(--acc-soft)}
-.rmenu{position:fixed;z-index:60;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;box-shadow:0 8px 28px rgba(0,0,0,.32);max-width:196px}
-.rmenu .rmg{display:grid;grid-template-columns:repeat(4,36px);gap:4px;min-height:36px;min-width:156px}.rmenu .rmg button.on{background:var(--acc-soft);color:var(--acc-ink)}
-.rmenu .rmg button{position:relative;width:36px;height:36px;padding:0;border:0;border-radius:8px;background:var(--raise);color:var(--fg);display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab}
-.rmenu .rmg button:hover,.rmenu .rmg button:focus-visible{z-index:5}.rmenu .rmg button:hover{background:var(--acc-soft);color:var(--acc-ink)}
-.rmenu .rmg button svg{width:19px;height:19px;pointer-events:none}
+@media (min-width:861px){body.rtray #app{grid-template-columns:104px auto minmax(0,1fr) auto}body.rtray .rail{width:52px;box-sizing:border-box}}
+.rmenu{position:fixed;z-index:60;box-sizing:border-box;background:var(--panel);border-right:1px solid var(--line);box-shadow:6px 0 24px rgba(0,0,0,.28)}
+.rmenu .rmg{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;min-height:100%;box-sizing:border-box}
+.rmenu .rmg button{touch-action:none}
 .rail button[data-pn]{cursor:grab}.rail button.rdrag{cursor:grabbing;transform:scale(1.12);z-index:4}
 .rail,.rmenu,body.rdragging{-webkit-user-select:none;user-select:none}body.rdragging{cursor:grabbing}
 .rail.rtgt{outline:2px dashed var(--acc);outline-offset:-3px;background:var(--acc-soft)}.rail.rtgt.rover{outline-style:solid}
-.rmenu.rtgt{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft),0 8px 28px rgba(0,0,0,.32)}.rmenu.rtgt .rmg{outline:2px dashed var(--acc);outline-offset:4px;border-radius:4px}.rmenu.rtgt.rover{background:var(--acc-soft)}
+.rmenu.rtgt .rmg{outline:2px dashed var(--acc);outline-offset:-3px}.rmenu.rtgt.rover{background:var(--acc-soft)}
 .rins{position:fixed;z-index:90;border-radius:2px;background:var(--acc);pointer-events:none;display:none;box-shadow:0 0 6px var(--acc)}
 .rghost{position:fixed;z-index:80;width:36px;height:36px;border-radius:8px;background:var(--acc-soft);color:var(--acc-ink);display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.4)}
 .rghost svg{width:19px;height:19px}
@@ -603,7 +602,7 @@ body.dropping::after{content:"Drop the image to import it";position:fixed;inset:
 #app{grid-template-columns:minmax(0,1fr);grid-template-rows:46px auto auto minmax(0,1fr) 26px;grid-template-areas:"top" "rail" "stage" "dock" "status"}
 html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.dock-b{overflow:visible}.dock{min-height:0}
 .rail{flex-direction:row;justify-content:center;border-right:0;border-bottom:1px solid var(--line);padding:4px}
-.rail .rsp{display:none}.rail button.on::before{display:none}.rail .tip{display:none}
+.rail .rsp{display:none}.rail button.on::before{display:none}.rail .tip{display:none}.rmenu{border-right:0;border-bottom:1px solid var(--line);box-shadow:0 6px 24px rgba(0,0,0,.28)}.rmenu .rmg{flex-direction:row;justify-content:center;flex-wrap:wrap;padding:4px}
 .dock{border-left:0;border-top:1px solid var(--line);min-height:60vh}
 #pnm{width:110px;min-width:0}.wordmark,.ver,#pst,.top .sep,#pwhere{display:none}.top{gap:4px;overflow-x:auto;padding-right:6px}.brand{width:44px}.top button{padding:5px 8px}.status{gap:10px}
 }
