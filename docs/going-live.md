@@ -3,7 +3,7 @@
 `main` is hosted on Cloudflare, so a merge into `main` is live on wodblok.com. Only go live when the user says so for that release.
 
 ## Before
-- CI green on the release branch (tests workflow: Chromium and WebKit).
+- CI green on the release's pull request (tests workflow: Chromium and WebKit). It runs when the pull request is opened or marked ready, not on every push; to test a branch without a pull request, run the workflow by hand from the Actions tab.
 - Version bumped, outcome written in docs/fix-plan.md.
 - The user has looked at the preview artifact.
 

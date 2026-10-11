@@ -1,8 +1,8 @@
 # Hosting the web app (Phase 4)
 
 `npm run build:web` writes the whole app to `dist/web/`: `index.html` (one file, fonts inside), `manifest.webmanifest`, `sw.js` (offline
-and updates), the icons and `_headers`. It is plain static files, so any static host works. Nothing is hosted yet: the selling model
-(plan 7b) decides whether the site is public.
+and updates), the icons and `_headers`. It is plain static files, so any static host works. It is hosted on Cloudflare Pages (status
+below); the selling model (plan 7b) decides how public it should be.
 
 ## Private first: Cloudflare Pages behind Cloudflare Access
 1. Cloudflare dashboard > Workers & Pages > Create > Pages > Connect to Git > this repository.
@@ -12,7 +12,9 @@ and updates), the icons and `_headers`. It is plain static files, so any static 
    with a policy that lists the people allowed in. The free plan covers up to 50 users (confirm at set-up).
 4. Open the address in Chrome, Edge or Safari. Chrome and Edge offer Install in the address bar; Safari: File > Add to Dock.
 
-GitHub Pages is not an option while the repository is private: Pages sites are public unless the account is on GitHub Enterprise Cloud.
+**Status (Oct 11 2026):** wodblok.com is live on Cloudflare Pages and updates a few moments after each merge into `main`. It is currently open to anyone who visits (steps 1-2 are done; step 3, Access, is not set up), and the hosted app sends the whole code to every visitor. Search engines are not blocked yet. Whether to add Access or a `noindex` header is the owner's decision (docs/public-repo.md).
+
+GitHub Pages is not an option: Pages sites are public (private ones need GitHub Enterprise Cloud).
 
 ## What the browser does with it
 - **Offline:** the first visit stores the app on the device; after that it opens with no network.
