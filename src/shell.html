@@ -260,7 +260,7 @@ button.alt{background:var(--raise)}
 /* ---------- rail ---------- */
 .rail button{width:40px;height:40px;padding:0;border:0;background:transparent;border-radius:8px;color:var(--mut);display:flex;align-items:center;justify-content:center;position:relative}
 .rail button svg{width:21px;height:21px}
-.rail button:hover{color:var(--fg);background:var(--raise)}
+.rail button.hv{color:var(--fg);background:var(--raise)}
 .rail button.on{color:var(--acc-ink);background:var(--acc-soft)}
 .rail button[data-pn]{touch-action:none}.rail button.rdrag{background:var(--raise);box-shadow:0 0 0 1px var(--acc)}
 .rail .rx{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--fg);color:var(--panel);display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;z-index:3;cursor:pointer}
@@ -278,7 +278,7 @@ button.alt{background:var(--raise)}
 .rail button.op{color:var(--acc-ink)}.rail button.gdon:not(.on):not(.op)::after{content:'';position:absolute;right:6px;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--mut)}.rail button.op::after{content:'';position:absolute;right:6px;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--acc)}
 .rail button.on::before{content:"";position:absolute;left:-6px;top:10px;bottom:10px;width:3px;border-radius:2px;background:var(--acc)}
 .rail .tip{position:absolute;left:46px;top:50%;transform:translateY(-50%);background:var(--fg);color:var(--panel);font-size:11px;padding:3px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;z-index:30}
-.rail button:hover .tip{opacity:1}
+.rail button.hv .tip{opacity:1}
 .rail .rsp{flex:1}
 /* the tool name shows when the pointer rests on an icon, or when it has keyboard focus */
 .rail button:focus-visible .tip{opacity:1}
