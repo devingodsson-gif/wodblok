@@ -457,6 +457,8 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 .chip{flex:none;width:18px;height:18px;border-radius:4px;border:1px solid rgba(128,128,128,.4)}
 .combo{flex:none;min-width:52px;height:20px;border-radius:4px;border:1px solid rgba(128,128,128,.4);font:600 11px Georgia,serif;text-align:center;line-height:18px}
 .combo.sws{display:flex;width:52px;overflow:hidden}.combo.sws i{display:block;flex:1 1 0;height:100%}
+.cst{color:var(--acc);margin-right:5px;font-size:11px}
+#pswp{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;font-size:11.5px}#pswp .ic{width:13px;height:13px}
 
 /* color library */
 .cl{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:5px;margin-top:8px;max-height:none}
@@ -798,11 +800,15 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  <section class="pn" data-p="colors" hidden>
   <details class="g" open><summary>Project colours</summary><div class="gb">
    <label>Palette</label><select id="pal"></select>
+   <div class="row" id="cpsv" hidden><button class="alt" id="cpsvb">Save palette</button></div>
+   <div class="cf" id="cpnf" hidden><label style="margin-top:0">Name</label><input type="text" id="cpnm" maxlength="30" placeholder="e.g. Autumn mix">
+    <div class="row"><button class="primary" id="cpok">Save</button><button class="alt" id="cpcx">Cancel</button></div></div>
+   <div class="row" id="cpdl" hidden><button class="alt" id="cpdlb">Delete palette</button></div>
    <label>Paper</label><select id="pB"></select>
    <label>Ink</label><select id="pI"></select>
    <label>Accent</label><select id="p3"></select>
    <label>Accent 2</label><select id="p4"></select>
-   <div class="row"><button class="alt" id="pswp" title="Rotate colours" style="display:inline-flex;align-items:center;gap:6px"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h13l-3-3M19 16H6l3 3"/></svg>Rotate colours</button></div>
+   <div class="row"><button class="alt" id="pswp" title="Rotate colours"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h13l-3-3M19 16H6l3 3"/></svg>Rotate colours</button></div>
   </div></details>
   <details class="g" open><summary><span id="cth">Colour library</span></summary><div class="gb">
    <label>Clicking a colour sets</label><select id="ap"><option value="pB">Paper</option><option value="pI">Ink</option><option value="p3">Accent</option><option value="p4">Accent 2</option><option value="stI">This stamp's ink</option></select>

@@ -1,6 +1,6 @@
 import {clipboard,kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {C,CC,CH,CM,CW,PCOL,PL,SHN,SK,col,csk,geom,paintColors,projSet,saveCC,setDim,shOf,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {C,CC,CH,CM,CP,CW,PCOL,PL,SHN,SK,col,csk,geom,paintColors,palUi,projSet,saveCC,setDim,shOf,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {clean,cust,luid,mcSave,mkL,say,store} from './06-motif-library-folders.js';
 import {build,hx,leadT} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -63,7 +63,7 @@ $('sall').onclick=()=>{const sh=shOf(WBS.tiles[WBS.cur]);let n=0;WBS.tiles.forEa
 $('lgl').oninput=()=>{const L=LY(),v=$('lgl').value;if(v){L.gl=v;L.ox=0;L.oy=0;if(!L.pa)L.pa='c'}else delete L.gl;store();upd()};
 $('lpa').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;LY().pa=b.dataset.p;store();upd()};
 $('lld').oninput=()=>{LY().lead=+$('lld').value;store();upd()};
-$('pal').oninput=()=>{const p=PL[$('pal').value];if(p){WBS.proj={ink:p[1],bg:p[2]};projSet('c3',p[3]);projSet('c4',p[4]);store();upd()}};
+$('pal').oninput=()=>{const v=$('pal').value,c=v.startsWith('c:')?CP.find(x=>'c:'+x.id==v):null,p=c?[c.name,c.s[1],c.s[0],c.s[2],c.s[3]]:PL[v];if(p){WBS.proj={ink:p[1],bg:p[2]};projSet('c3',p[3]);projSet('c4',p[4]);store();upd()}palUi()};
 $('pI').oninput=()=>{WBS.proj.ink=$('pI').value;store();upd()};
 $('pB').oninput=()=>{WBS.proj.bg=$('pB').value;store();upd()};
 $('p3').oninput=()=>{projSet('c3',$('p3').value);store();upd()};

@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CASP,CH,CW,DD,HO,N,ORN,PL,SHN,SK,col,csN,csk,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {CASP,CH,CP,CW,DD,HO,N,ORN,PL,SHN,SK,col,csN,csk,palUi,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {DOTK} from './05-motif-data.js';
 import {cols,cust,inkOf,it,mk,selOne,store} from './06-motif-library-folders.js';
 import {SYM,expand,symOf} from './07-symmetry.js';
@@ -48,7 +48,7 @@ $('caspbox').hidden=!CASP.includes(k);$('crrbox').hidden=k!='rrect';$('cngbox').
 const ob=document.querySelectorAll('#cor [data-o]');ob.forEach(x=>x.classList.toggle('on',x.dataset.o==(WBS.dim.co=='f'?'f':'p')));if(ob.length){ob[0].textContent=k=='hex'?'Pointy top':'Point up';ob[1].textContent=k=='tri'?'Point down':'Flat top'}
 }document.querySelectorAll('#skind [data-k]').forEach(b=>b.classList.toggle('on',b.dataset.k==SK));$('sasprow').hidden=SK=='hex'||SK=='tri';$('shexrow').hidden=SK!='hex';$('shor').value=HO;$('wrh').textContent=SK=='circle'||SK=='tri'||ORN.includes(SK)?`Motifs are trimmed to the ${(SHN[SK]||'stamp').toLowerCase()}.`:'Motifs wrap around the stamp edges, so it tiles seamlessly.';
 $('pI').value=WBS.proj.ink;$('pB').value=WBS.proj.bg;$('p3').value=WBS.proj.c3||'';$('p4').value=WBS.proj.c4||'';
-let i=PL.findIndex(p=>p[1]==WBS.proj.ink&&p[2]==WBS.proj.bg&&(p[3]||'')==(WBS.proj.c3||'')&&(p[4]||'')==(WBS.proj.c4||''));$('pal').value=i<0?'':i;
+let i=PL.findIndex(p=>p[1]==WBS.proj.ink&&p[2]==WBS.proj.bg&&(p[3]||'')==(WBS.proj.c3||'')&&(p[4]||'')==(WBS.proj.c4||'')),cp=CP.find(p=>p.s[1]==WBS.proj.ink&&p.s[0]==WBS.proj.bg&&(p.s[2]||'')==(WBS.proj.c3||'')&&(p.s[3]||'')==(WBS.proj.c4||''));$('pal').value=cp?'c:'+cp.id:i<0?'':i;palUi();
 $('stI').value=t.ink||'';$('ssI').style.background=inkOf(t);$('neg').checked=!!t.neg;
 sv('lay',L.lay);sv('lgr',L.grid||'');const T=lattice(L),B=T.B,lk=T.linked;{const op=arrOpts(T.g),ky=T.g.SK+op.length;if($('larr').dataset.k!=ky){$('larr').innerHTML=op.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');$('larr').dataset.k=ky}sv('larr',arrOf(L,T.g).k)}sv('lgp',B.gap||0);sv('ts',B.fit?+fitTs(B).toFixed(1):B.size);document.querySelectorAll('#tsfit [data-f]').forEach(b=>{b.classList.toggle('on',b.dataset.f==(B.fit||''));b.disabled=lk});[['lox',!lk&&L.fit=='h'],['loy',!lk&&L.fit=='v'],['lrt',lk||!!L.fit],['lgp',lk],['ts',lk]].forEach(([id,off])=>{$(id).disabled=off;const n=$(id).parentNode.querySelector('.num input');if(n)n.disabled=off});sv('lox',L.ox);sv('loy',L.oy);sv('lrr',L.rrot||0);sv('lrp',L.rpos||0);$('lrsec').hidden=!!L.art;$('lrtn').checked=!!L.rtn;$('lrfh').checked=!!L.rfh;$('lrfv').checked=!!L.rfv;sv('lrt',B.rot||0);syncGrid(L,T);sv('shz',shOf(t).z||100);{const rr=$('shrad');if(rr){sv('shrad',shOf(t).rad||0);const row=rr.closest('.ctl');if(row)row.hidden=SK=='circle'}}sv('lps',L.pst||0);sv('lfs',L.pfl||0);sv('lnm',L.name);$('man').checked=!!L.man;{const c=Object.keys(L.ov||{}).length;$('mancnt').textContent=c?c+' changed':'';$('manr').disabled=!c}$('art').classList.toggle('man',!!L.man);sv('let',eT(t));sv('ler',eR(t));$('lers').disabled=!eT(t)||!eR(t);
 Object.values(DD).forEach(f=>f())}
