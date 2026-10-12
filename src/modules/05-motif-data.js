@@ -226,6 +226,6 @@ DX('Asterisk',RT(3,L('M0,-38V38',12)));
 return[['Plants',PLANTS],['Animals',ANIMALS],['Medieval weapons',WEAPONS],['Misc',MISC],['Dots',DOTS]];})();
 CATS=MCAT.map(([n,list])=>({n,k:list.map(([nm,svg])=>{M.push(tk(svg));N.push(nm);return'b'+(M.length-1)})}));
 DOTK=new Set((CATS.find(c=>c.n=='Dots')||{k:[]}).k);
-WBS.mcat='0';try{WBS.mcat=kv.get('wb11_mcat')||'0'}catch(e){}
+WBS.mcat='/';try{WBS.mcat=kv.get('wb11_mcat')||'/'}catch(e){}
 }
 export {CATS,DOTK,init05};
