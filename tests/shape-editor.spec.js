@@ -12,6 +12,7 @@ test('placing a shape opens the floating Shape editor; Auto-open off keeps it cl
   await setMode(page, 'stamp');
   await expect(page.locator('.wtab', { hasText: 'Shape editor' })).toHaveCount(0);   // nothing open at launch
   await openPanel(page, 'motifs');
+  await page.click('#lfold [data-f="b:Plants"]');                   // the library opens on the list of folders (1.2.14)
   await place(page, 590, 330);
   await expect(page.locator('.wtab.on', { hasText: 'Shape editor' })).toHaveCount(1);
   expect(await page.evaluate(() => !!document.getElementById('sel').closest('.wg.fl')), 'floats by default').toBe(true);
