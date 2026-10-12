@@ -534,41 +534,67 @@ label.btn:hover{border-color:var(--faint)}
 label.btn.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-fg);font-weight:600}
 .pop label.mi{display:flex;align-items:center;gap:10px;width:100%;margin:0;padding:7px 9px;border-radius:6px;font-size:12.5px;color:var(--fg);cursor:pointer}
 .pop label.mi:hover{background:var(--acc-soft)}.pop label.mi svg{width:15px;height:15px;color:var(--mut)}
-@media (pointer:coarse){label.btn{min-height:40px;padding:8px 14px}.drop span{display:none}}
+@media (pointer:coarse){label.btn{min-height:40px;padding:8px 14px}}
 .pz{margin-top:8px;min-height:64px;padding:12px;border:1.5px dashed var(--line2);border-radius:8px;background:var(--field);font-size:11.5px;color:var(--mut);text-align:center;display:flex;align-items:center;justify-content:center;outline:none;-webkit-user-select:text;user-select:text;overflow:hidden}
 .pz:focus{border-color:var(--acc);background:var(--acc-soft)}.pz img{max-height:60px}
 .cvp{border:1px solid var(--line);border-radius:8px;background:var(--stage);background-image:linear-gradient(45deg,var(--line) 25%,transparent 25%,transparent 75%,var(--line) 75%),linear-gradient(45deg,var(--line) 25%,transparent 25%,transparent 75%,var(--line) 75%);background-size:14px 14px;background-position:0 0,7px 7px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:11.5px;color:var(--mut)}
 .cvp img{max-width:100%;max-height:100%;display:block}.cvp span{background:var(--panel);padding:4px 10px;border-radius:12px}
 /* import */
 textarea{width:100%;margin-top:8px;background:var(--field);border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:12.5px/1.45 inherit;color:inherit;resize:vertical}
-.drop{display:flex;align-items:center;gap:10px;padding:10px;border:1.5px dashed var(--line2);border-radius:8px;background:var(--field)}
-.drop button{white-space:nowrap;flex:none}.drop span{font-size:11px;color:var(--mut);line-height:1.35}
-body.dropping .drop{border-color:var(--acc);background:var(--acc-soft)}
+body.dropping .idz{border-color:var(--acc);background:var(--acc-soft)}
 body.dropping::after{content:"Drop the image to import it";position:fixed;inset:12px;border:2px dashed var(--acc);border-radius:14px;background:color-mix(in srgb,var(--acc) 10%,transparent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--acc-ink);z-index:90;pointer-events:none}
-.idl{width:min(1000px,100%)}
-.icmp{display:grid;grid-template-columns:1fr 1fr 300px;gap:18px;align-items:start}
-.icmp figure{margin:0}
 .bk2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bk2 input,.bk2 select{width:100%}
 .bkinfo{margin:8px 0 4px;padding:8px 10px;border-radius:8px;background:var(--raise);border:1px solid var(--line);font-size:11.5px;line-height:1.55;color:var(--fg)}.bkinfo b{font-weight:600}.bkinfo .w{color:var(--warn)}
 .psep{height:1px;background:var(--line);margin:4px 2px}
 .shrow{display:flex;align-items:center;gap:6px}.shrow input[type=number]{width:52px}.shrow span{color:var(--mut);font-size:11.5px}.shrow button{margin-left:auto}
-.sdl{width:min(1180px,100%)}.svw{grid-template-columns:auto auto;width:max-content;margin:0 auto 8px}.svw button{padding:4px 14px}.scmp{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:18px;align-items:start}.sctl{min-width:0}.sctl .seg{margin-bottom:8px}
+/* Import window: the artwork on the left (original or traced, with the sheet grid), settings on the right */
+.idl{width:min(1180px,100%);height:min(860px,100%)}.idl .dlg-b{flex:1;min-height:0;padding:0;overflow:hidden}
+.imd{grid-template-columns:auto auto;margin-left:auto}.imd button{padding:4px 14px}.idl .dlg-h h2{margin-right:6px}
+.iwrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;height:100%;min-height:0}
+.istg{min-width:0;min-height:0;overflow-y:auto;padding:16px 18px;background:color-mix(in srgb,var(--stage) 55%,var(--panel))}
+.svw{grid-template-columns:auto auto;width:max-content;margin:0 auto 10px}.svw button{padding:4px 14px}
+.icap{font-size:11px;color:var(--mut);text-align:center;margin-top:8px}.icap:empty{display:none}
+.iside{min-height:0;overflow-y:auto;border-left:1px solid var(--line);padding:4px 16px 16px}
+.isec{padding:12px 0 14px;border-bottom:1px solid var(--line)}.isec:last-child{border-bottom:0}
+.isec h3{margin:0 0 10px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.isec>label:not(.chk){margin-top:8px}.isec>h3+label{margin-top:0}.isec .seg{margin-bottom:8px}.isec .chk{margin-top:8px}#ifnew{margin-top:6px}
+.isec .ctl{grid-template-columns:96px 1fr 30px}.isec .v{font-size:11.5px;color:var(--mut);text-align:right;font-variant-numeric:tabular-nums}
+.isec .shrow input[type=number]{width:46px}
+@media (max-width:860px){.idl{height:auto}.idl .dlg-b{overflow-y:auto}.iwrap{grid-template-columns:1fr;height:auto}.iside{border-left:0;border-top:1px solid var(--line)}.istg{overflow:visible}}
 .sstage{position:relative;line-height:0;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;touch-action:none}.sstage img{width:100%;height:auto;display:block}
 #sov{position:absolute;inset:0;width:100%;height:100%}#sov [data-lx]{cursor:col-resize}#sov [data-ly]{cursor:row-resize}
 .scells{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px;margin-top:14px}
 .scells button{position:relative;margin:0;padding:4px;aspect-ratio:1;border:1px solid var(--line);border-radius:8px;background:var(--field)}.scells button svg{width:100%;height:100%;border-radius:5px}
 .scells button.off{opacity:.35}.scells button.off::after{content:'';position:absolute;inset:0;border-radius:8px;background:linear-gradient(45deg,transparent 48%,var(--warn) 48%,var(--warn) 52%,transparent 52%)}
 .scells button i{position:absolute;left:5px;top:3px;font-style:normal;font-size:11px;color:var(--faint)}.scells .em{grid-column:1/-1;color:var(--mut);font-size:11.5px}
-@media (max-width:860px){.scmp{grid-template-columns:1fr}}
-.icmp img,#iout{width:100%;aspect-ratio:1;object-fit:contain;background:var(--stage);border:1px solid var(--line);border-radius:8px;display:block}
-#iout svg{width:100%;height:100%;border-radius:8px}
-.icmp figcaption{font-size:11px;color:var(--mut);margin-top:6px}
-.ictl label:first-child{margin-top:0}
-.ictl .ctl{grid-template-columns:104px 1fr 34px}
-.ictl .v{font-size:11.5px;color:var(--mut);text-align:right;font-variant-numeric:tabular-nums}
 .ifoot{display:flex;align-items:center;gap:8px}.ifoot span{margin-right:auto}
 .lib .dx{position:absolute;top:2px;right:2px;width:18px;height:18px;padding:0;border-radius:50%;font-size:11px;line-height:16px;display:none;background:var(--raise);border:1px solid var(--line2);color:var(--mut)}
-.fbar{display:flex;align-items:center;gap:1px}.fbar select{flex:1;min-width:0;margin-right:4px}.fbar .ib[aria-pressed="true"]{color:var(--acc-ink);background:var(--acc-soft)}.fbar .ib:disabled{opacity:.35}
+/* Shapes library: path bar, one list of folders (built-in sets and your own), folders inside folders */
+.lnav{display:flex;align-items:center;gap:1px;min-height:30px}.lnav .ib{width:28px;height:28px;flex:none}.lnav .ib svg{width:16px;height:16px}.lnav .ib[aria-pressed="true"]{color:var(--acc-ink);background:var(--acc-soft)}.lnav .ib:disabled{opacity:.35}
+#lback{margin-left:-4px}
+.lcr{flex:1;min-width:0;display:flex;align-items:center;gap:2px;font-size:12.5px;overflow:hidden;white-space:nowrap;padding-right:4px}
+.lcb{flex:0 1 auto;min-width:0;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0;padding:3px 4px;border:0;border-radius:5px;background:transparent;color:var(--mut);font-size:12.5px;font-weight:400}.lcb:hover{background:var(--line);color:var(--fg)}
+.lcs{flex:none;font-style:normal;color:var(--faint);padding:0 1px}
+.lcc{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:600;color:var(--fg);padding:3px 4px}
+.lfl{display:grid;gap:1px;margin:6px -6px 0}.lfl.sub{margin-bottom:2px}
+.lfr,.lfh{display:flex;align-items:center;gap:9px;width:100%;height:32px;margin:0;padding:0 6px 0 8px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--fg);font-size:12.5px;font-weight:400;text-align:left}
+.lfr:hover,.lfh:hover,.lfr:focus-visible{background:var(--raise)}
+.lfi{flex:none;width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--mut)}.lfi svg{width:16px;height:16px}
+.lfn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lfc{flex:none;font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums}
+.lfa{flex:none;width:14px;height:14px;color:var(--faint)}
+.lfr.hid{color:var(--mut)}.lfr.hid .lfi{opacity:.6}
+.lfh{color:var(--mut);margin-top:4px}.lfh[aria-expanded="true"] .lfa{transform:rotate(90deg)}
+.lfr.dropt,.lcb.dropt{background:var(--acc-soft);border-color:var(--acc);color:var(--fg)}
+.lem{margin-top:8px;padding:18px 8px;border:1px dashed var(--line2);border-radius:8px;text-align:center;font-size:11.5px;color:var(--mut)}
+.fform{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.fform input,.fform select{flex:1;min-width:0;margin:0}.fform button{margin:0}#fq{flex-basis:100%;font-size:12px;line-height:1.4}
+button.warn{background:var(--warn);border-color:var(--warn);color:#fff;font-weight:600}
+/* Import: where new shapes go, and the two ways in */
+.idz{display:grid;gap:10px;padding:12px;border:1.5px dashed var(--line2);border-radius:10px;background:var(--field)}
+.idd{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--mut)}.idd .idi{flex:none;width:15px;height:15px}#idest{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg);font-weight:500}
+.idb{display:grid;grid-template-columns:1fr 1fr;gap:6px}.idb .btn{justify-content:center;margin:0}
+@media not (pointer:coarse){#ipaste{display:none}}
+.ipt{margin-top:8px;grid-template-columns:1fr 1fr}#ipsz{margin-top:8px}
 .fform{display:flex;gap:6px;margin-top:8px}.fform input{flex:1;min-width:0}.fform button{margin:0}
 .fsbar{position:sticky;bottom:0;z-index:2;margin-top:8px;padding:8px;border:1px solid var(--line2);border-radius:8px;background:var(--raise);display:grid;gap:6px;box-shadow:0 4px 14px rgba(0,0,0,.12)}
 .fsbar .r{display:flex;gap:6px;align-items:center}.fsbar .r>*{margin:0}.fsbar .r button{flex:none}.fsbar select{width:100%;margin:0}.fsbar #fscnt{flex:1;font-size:12px;font-weight:600}
@@ -875,33 +901,38 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  </section>
  <section class="pn" data-p="motifs" hidden>
   <details class="g" open><summary>Library</summary><div class="gb">
-   <div class="fbar"><select id="mcat" aria-label="Folder"></select>
-    <button class="ib" id="fnew" title="New folder" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/><path d="M12 11v5M9.5 13.5h5"/></svg></button>
-    <button class="ib" id="fren" title="Rename" aria-label="Rename"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5l.9-3.9L16 5a2.1 2.1 0 013 3L8.4 18.6z"/><path d="M14.4 6.6l3 3"/></svg></button>
-    <button class="ib" id="fdel" title="Delete folder" aria-label="Delete folder"></button>
-    <button class="ib" id="fsel" title="Select shapes to move or delete (or Ctrl/&#8984;-click a shape)" aria-label="Select shapes" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5" stroke-dasharray="3 3"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></button>
+   <div class="lnav">
+    <button class="ib" id="lback" aria-label="Back" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l-5 5 5 5"/></svg></button>
+    <div class="lcr" id="lcr"></div>
+    <button class="ib" id="fnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/><path d="M12 11v5M9.5 13.5h5"/></svg></button>
+    <button class="ib" id="fsel" aria-label="Select shapes" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5" stroke-dasharray="3 3"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></button>
+    <button class="ib" id="fmore" aria-label="Folder options" aria-haspopup="menu" data-more hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r=".9"/><circle cx="12" cy="12" r=".9"/><circle cx="18" cy="12" r=".9"/></svg></button>
    </div>
-   <div class="fform" id="fform" hidden><input type="text" id="fname" maxlength="30" placeholder="Folder name" aria-label="Folder name"><button class="primary" id="fok">Create</button><button class="alt" id="fcx">Cancel</button></div>
+   <div class="fform" id="fform" hidden><input type="text" id="fname" maxlength="30" placeholder="Folder name" aria-label="Folder name"><select id="fdest" aria-label="Move into" hidden></select><span id="fq" hidden></span><button class="primary" id="fok">Create</button><button class="alt" id="fcx">Cancel</button></div>
+   <div class="lfl" id="lfold"></div>
    <div class="lib" id="lib"></div>
+   <div class="lem" id="lem" hidden></div>
    <div class="fsbar" id="fsbar" hidden>
     <div class="r"><span id="fscnt"></span><button class="alt" id="fall">Select all</button><button class="primary" id="fdone">Done</button></div>
     <select id="fmove" aria-label="Move to folder"></select>
     <div class="r"><button class="alt" id="fout">Take out of folder</button><button class="alt" id="fdelm">Delete</button></div>
    </div>
-   <div class="hint" id="lhint">Click a shape to pick it up, then click on the stamp to stamp it as many times as you like. Click it again, press Esc, or right-click to put it down.<br>To sort shapes into folders, press the check-box button (or Ctrl/&#8984;-click shapes), select several, then move them.</div>
   </div></details>
-  <details class="g" open><summary>Import artwork</summary><div class="gb">
-   <label>Subject for the prompt</label><input type="text" id="isub" placeholder="e.g. a heron catching a fish">
-   <div class="row"><button class="alt" id="ipr">Copy prompt for ChatGPT</button></div>
-   <textarea id="iprt" hidden readonly rows="6"></textarea>
-   <label>Whole sheet</label>
-   <div class="row shrow"><input type="number" id="scol" min="1" max="8" value="4" aria-label="Columns"><span>&#215;</span><input type="number" id="srow" min="1" max="8" value="4" aria-label="Rows"><button class="alt" id="spr">Copy sheet prompt</button></div>
-   <label>Bring in the image</label>
-   <div class="drop" id="idrop"><label class="btn primary" id="iopen" for="ifile" role="button" tabindex="0">Import image…</label><span>or drop / paste</span></div>
-   <input type="file" id="ifile" class="vh" accept="image/*" tabindex="-1">
-   <div class="row"><label class="btn alt" for="sfile" role="button" tabindex="0">Import a shape sheet&#8230;</label></div><input type="file" id="sfile" class="vh" accept="image/*" tabindex="-1">
-   <div class="pz" id="ipaste" contenteditable="true" role="textbox" aria-label="Paste an image here"><span>Paste here</span></div>
+  <details class="g" open><summary>Import</summary><div class="gb">
+   <div class="idz" id="idrop">
+    <div class="idd"><svg class="ic idi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/></svg><span id="idest">My imports</span></div>
+    <div class="idb"><label class="btn primary" id="iopen" for="ifile" role="button" tabindex="0">Image&#8230;</label><label class="btn alt" id="sopen" for="sfile" role="button" tabindex="0">Sheet&#8230;</label></div>
+   </div>
+   <input type="file" id="ifile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="sfile" class="vh" accept="image/*" tabindex="-1">
+   <div class="pz" id="ipaste" contenteditable="true" role="textbox" aria-label="Paste an image here"><span>Paste an image</span></div>
    <div class="hint" id="imsg"></div>
+  </div></details>
+  <details class="g" id="iprg"><summary>ChatGPT prompt</summary><div class="gb">
+   <input type="text" id="isub" placeholder="Subject, e.g. folk-art tulips" aria-label="Subject">
+   <div class="seg ipt" id="iptype"><button type="button" data-t="1" class="on">Single shape</button><button type="button" data-t="s">Sheet</button></div>
+   <div class="row shrow" id="ipsz" hidden><input type="number" id="scol" min="1" max="8" value="4" aria-label="Columns"><span>&#215;</span><input type="number" id="srow" min="1" max="8" value="4" aria-label="Rows"></div>
+   <div class="row"><button class="alt" id="ipr">Copy prompt</button></div>
+   <textarea id="iprt" hidden readonly rows="6"></textarea>
   </div></details>
   <details class="g" id="dwc" hidden><summary>Draw with Claude</summary><div class="gb">
    <label>Describe shapes, separated by commas</label><input type="text" id="txt" value="lion, olive branch, amphora">
@@ -1245,43 +1276,36 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
 </div>
 
 <div class="modal" id="idlg" hidden><div class="dlg idl" role="dialog" aria-modal="true" aria-labelledby="idlgt">
- <div class="dlg-h"><h2 id="idlgt">Import artwork</h2><button class="ib" id="icx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
- <div class="dlg-b"><div class="icmp">
-  <figure><img id="ioimg" alt="Original image"><figcaption>Original</figcaption></figure>
-  <figure><div id="iout"></div><figcaption>As a stamp shape</figcaption></figure>
-  <div class="ictl">
-   <label>Name</label><input type="text" id="inm" maxlength="40">
-   <div class="ctl"><label for="ith">Threshold</label><input type="range" id="ith" min="5" max="250" value="128"><span class="v" id="ithv"></span></div>
-   <div class="ctl"><label for="ism">Smooth edges</label><input type="range" id="ism" min="0" max="4" value="1"><span class="v" id="ismv"></span></div>
-   <div class="ctl"><label for="isp">Clean up</label><input type="range" id="isp" min="0" max="100" value="15"><span class="v" id="ispv"></span></div>
-   <div class="ctl"><label for="idt">Simplify</label><input type="range" id="idt" min="0.2" max="3" step="0.1" value="0.8"><span class="v" id="idtv"></span></div>
-   <label class="chk"><input type="checkbox" id="iinv"><span>Invert (light artwork on a dark background)</span></label>
-   <label class="chk"><input type="checkbox" id="ifull"><span>Fill the whole stamp</span></label>
-   <div class="hint" id="iinfo"></div>
+ <div class="dlg-h"><h2 id="idlgt">Import</h2><div class="seg imd" id="imode" role="group" aria-label="Import as"><button type="button" data-m="one" class="on">Single shape</button><button type="button" data-m="sheet">Sheet</button></div><button class="ib" id="icx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-b"><div class="iwrap">
+  <div class="istg">
+   <div class="seg svw" id="sview" role="group" aria-label="Show"><button type="button" data-v="o">Original</button><button type="button" data-v="t" class="on">Traced</button></div>
+   <div class="sstage" id="sstage"><img id="simg" alt="Artwork"><svg id="sov" preserveAspectRatio="none"></svg></div>
+   <div class="icap" id="shint"></div>
+   <div class="scells" id="scells"></div>
+  </div>
+  <div class="iside">
+   <section class="isec" id="isecS"><h3>Find shapes</h3>
+    <div class="seg" id="smode" style="grid-template-columns:1fr 1fr"><button type="button" data-m="grid" class="on">Grid</button><button type="button" data-m="auto">Auto-detect</button></div>
+    <div id="sgc"><div class="row shrow"><span>Columns</span><input type="number" id="sc" min="1" max="12" value="4"><span>Rows</span><input type="number" id="sr" min="1" max="12" value="4"><button class="alt" id="seven">Even out</button></div></div>
+    <div id="sac" hidden><div class="ctl"><label for="sgap">Join parts</label><input type="range" id="sgap" min="0" max="40" step="1" value="10"><span class="v" id="sgapv"></span></div></div>
+   </section>
+   <section class="isec"><h3>Trace</h3>
+    <div class="ctl"><label for="ith">Threshold</label><input type="range" id="ith" min="5" max="250" step="1" value="128"><span class="v" id="ithv"></span></div>
+    <div class="ctl"><label for="ism">Smooth edges</label><input type="range" id="ism" min="0" max="4" step="1" value="1"><span class="v" id="ismv"></span></div>
+    <div class="ctl"><label for="isp">Clean up</label><input type="range" id="isp" min="0" max="100" step="1" value="15"><span class="v" id="ispv"></span></div>
+    <div class="ctl"><label for="idt">Simplify</label><input type="range" id="idt" min="0.2" max="3" step="0.1" value="0.8"><span class="v" id="idtv"></span></div>
+    <label class="chk"><input type="checkbox" id="iinv"><span>Invert (light art on dark)</span></label>
+   </section>
+   <section class="isec"><h3>Save</h3>
+    <label for="inm">Name</label><input type="text" id="inm" maxlength="40">
+    <label for="ifold">Folder</label><select id="ifold"></select>
+    <input type="text" id="ifnew" maxlength="30" placeholder="New folder name" aria-label="New folder name" hidden>
+    <label class="chk" id="ifullb"><input type="checkbox" id="ifull"><span>Fill the whole stamp</span></label>
+   </section>
   </div>
  </div></div>
- <div class="dlg-f ifoot"><span>Threshold decides what counts as ink. Everything else is carved away.</span><button class="alt" id="isht" title="Cut this image into several shapes">Split as a sheet&#8230;</button><button class="alt" id="icl">Cancel</button><button class="primary" id="iadd">Add shape</button></div>
-</div></div>
-<div class="modal" id="sdlg" hidden><div class="dlg sdl" role="dialog" aria-modal="true" aria-labelledby="sdlgt">
- <div class="dlg-h"><h2 id="sdlgt">Import a shape sheet</h2><button class="ib" id="scx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
- <div class="dlg-b"><div class="scmp">
-  <div><div class="seg svw" id="sview"><button type="button" data-v="o">Original</button><button type="button" data-v="t" class="on">Traced result</button></div><div class="sstage" id="sstage"><img id="simg" alt="Shape sheet"><svg id="sov" preserveAspectRatio="none"></svg></div><div class="hint" id="shint"></div></div>
-  <div class="sctl">
-   <label>Find the shapes by</label><div class="seg" id="smode" style="grid-template-columns:1fr 1fr"><button type="button" data-m="grid" class="on">Grid</button><button type="button" data-m="auto">Auto-detect</button></div>
-   <div id="sgc"><div class="row shrow"><span>Columns</span><input type="number" id="sc" min="1" max="12" value="4"><span>Rows</span><input type="number" id="sr" min="1" max="12" value="4"></div><div class="row"><button class="alt" id="seven">Even out the lines</button></div></div>
-   <div id="sac" hidden><div class="ctl"><label for="sgap">Join parts within</label><input type="range" id="sgap" min="0" max="40" step="1" value="10"><span class="v" id="sgapv"></span></div></div>
-   <div class="ctl"><label for="shth">Threshold</label><input type="range" id="shth" min="5" max="250" step="1" value="128"><span class="v" id="shthv"></span></div>
-   <div class="ctl"><label for="ssm">Smooth edges</label><input type="range" id="ssm" min="0" max="4" step="1" value="1"><span class="v" id="ssmv"></span></div>
-   <div class="ctl"><label for="shsp">Clean up</label><input type="range" id="shsp" min="0" max="100" step="1" value="15"><span class="v" id="shspv"></span></div>
-   <div class="ctl"><label for="sdt">Simplify</label><input type="range" id="sdt" min="0.2" max="3" step="0.1" value="0.8"><span class="v" id="sdtv"></span></div>
-   <label class="chk"><input type="checkbox" id="sinv"><span>Invert (light artwork on a dark background)</span></label>
-   <label>Library folder</label><input type="text" id="snm" maxlength="30" list="fdl"><datalist id="fdl"></datalist>
-   <div class="hint" id="shinfo"></div>
-  </div>
- </div>
- <div class="scells" id="scells"></div>
- </div>
- <div class="dlg-f ifoot"><span>Click a shape to leave it out.</span><button class="alt" id="scl">Cancel</button><button class="primary" id="sadd">Import shapes</button></div>
+ <div class="dlg-f ifoot"><span id="iinfo"></span><button class="alt" id="icl">Cancel</button><button class="primary" id="iadd">Add shape</button></div>
 </div></div>
 <div class="modal" id="plist" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="pdlgt">
  <div class="dlg-h"><h2 id="pdlgt">Projects</h2><button class="alt" id="pnw2">New project</button><button class="alt" id="pcf">Close folder</button><button class="ib" id="pclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>

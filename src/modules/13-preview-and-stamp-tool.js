@@ -86,8 +86,8 @@ $('sdl').onclick=()=>{if(Q()){delItems([...WBS.msel]);selOne(-1);store();upd()}}
 {let ld=null,lsw=false;const L=$('lib');
 L.addEventListener('pointerdown',e=>{if(e.button!==0||e.shiftKey||e.ctrlKey||e.metaKey||WBS.lsm)return;const b=e.target.closest('button[data-m]');if(!b)return;ld={k:b.dataset.m,x:e.clientX,y:e.clientY,on:false,g:null}});
 document.addEventListener('pointermove',e=>{if(!ld)return;if(!ld.on){if(Math.hypot(e.clientX-ld.x,e.clientY-ld.y)<6)return;ld.on=true;const s=L.querySelector('button[data-m="'+ld.k+'"] svg');if(s){const g=s.cloneNode(true);g.id='mdg';g.style.cssText='position:fixed;width:44px;height:44px;pointer-events:none;z-index:70;opacity:.85;transform:translate(-50%,-50%)';document.body.appendChild(g);ld.g=g}}
-if(ld.g){ld.g.style.left=e.clientX+'px';ld.g.style.top=e.clientY+'px'}});
-const lend=e=>{if(!ld)return;const x=ld;ld=null;if(x.g)x.g.remove();if(!x.on)return;lsw=true;setTimeout(()=>{lsw=false},0);if(e.type!='pointerup')return;const r=ed.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;
+if(ld.g){ld.g.style.left=e.clientX+'px';ld.g.style.top=e.clientY+'px';if(WBX.wbLibOver)WBX.wbLibOver(document.elementFromPoint(e.clientX,e.clientY))}});
+const lend=e=>{if(!ld)return;const x=ld;ld=null;if(x.g)x.g.remove();if(!x.on)return;lsw=true;setTimeout(()=>{lsw=false},0);if(WBX.wbLibOver)WBX.wbLibOver(null);if(e.type!='pointerup')return;if(WBX.wbLibDrop&&WBX.wbLibDrop(x.k,document.elementFromPoint(e.clientX,e.clientY)))return;const r=ed.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;
 const p=ed.createSVGPoint();p.x=e.clientX;p.y=e.clientY;let[px,py]=(q=>[q.x,q.y])(p.matrixTransform(ed.getScreenCTM().inverse()));if(grid.sd)[px,py]=snapPt(px,py);[px,py]=wrapP(px,py);const a=WBS.tiles[WBS.cur].items;a.push(it(x.k,px,py,DOTK.has(x.k)?.22:.8,0));selOne(a.length-1);WBS.brush=null;store();upd();if(WBX.wbCap)WBX.wbCap()};
 document.addEventListener('pointerup',lend);document.addEventListener('pointercancel',lend);
 L.addEventListener('click',e=>{if(lsw){e.stopImmediatePropagation();e.preventDefault()}},true)}
