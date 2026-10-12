@@ -7,6 +7,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC} from './17-texture-panel-and-previews.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {lyGrp} from './24-free-place-layers.js';
+import {libDest,libG,libPath} from './21-motif-library-ui.js';
 // ---- Canvas & stamp shape presets
 const ASP={c:[['2:3',2,3],['3:4',3,4],['4:5',4,5],['5:7',5,7],['1:1 square',1,1],['A4 / A-series',1,1.4142],['US Letter',8.5,11],['6×9 book',6,9],['9:16 tall',9,16],['3:2',3,2],['4:3',4,3],['16:9 wide',16,9]],
 s:[['1:1 square',1,1],['2:3',2,3],['3:2',3,2],['3:4',3,4],['4:3',4,3],['1:2',1,2],['2:1',2,1],['1:3',1,3],['3:1',3,1],['6:1 frame strip',6,1],['8:1 frame strip',8,1],['12:1 frame strip',12,1],['16:1 frame strip',16,1]]};
@@ -111,8 +112,8 @@ const sample=await use('sample');if(!sample)return say('Claude drawing is not av
 $('gen').disabled=true;say('Claude is drawing your shapes… this can take up to a minute.');
 const prompt=`You are an expert in medieval Bible illumination and early woodcut. Style: ${STY}\n\nDraw each shape below as a carved printing-block stamp in that spirit: solemn and devotional, never cartoonish. Keep the set cohesive (same detail level and line weights). Technical rules: centered at 0,0 inside a -50..50 box (stay within radius 48). Use only path, circle, ellipse, rect, polygon, polyline, line, g. Solid silhouette shapes use fill="FILL". Incised detail lines over them use stroke="CUT" with fill="none", stroke-width 2 to 3.5, stroke-linecap="round". Every element must set fill explicitly. No other colors, gradients, text, filters or images. Strong silhouette that reads when small, under 1800 characters each. Return ONLY JSON: {"motifs":[{"name":"...","svg":"inner markup only"}]} in this order:\n${ws.map((w,i)=>`${i+1}. ${w}`).join('\n')}`;
 try{const r=await sample.json(prompt,{cache:false});let n=0;
-(r.motifs||[]).forEach((m,i)=>{const s=clean(m.svg||'');if(s){const nm=String(m.name||ws[i]||'shape').replace(/["<>&|]/g,''),fg=WBS.mcat.startsWith('g:')?WBS.mcat.slice(2):'';cust['c|u|'+nm]={n:nm,svg:s,...(fg?{g:fg}:{})};n++}});
-store();const inF=WBS.mcat.startsWith('g:');if(n&&!inF){WBS.mcat='d';mcSave()}say(n?`${n} shape${n>1?'s':''} added to ${inF?'“'+WBS.mcat.slice(2)+'”':'Drawn by Claude'}. Click to place.`:'Nothing usable came back. Try again.');build()}
+(r.motifs||[]).forEach((m,i)=>{const s=clean(m.svg||'');if(s){const nm=String(m.name||ws[i]||'shape').replace(/["<>&|]/g,''),fg=libG(libDest());cust['c|u|'+nm]={n:nm,svg:s,...(fg?{g:fg}:{})};n++}});
+store();const inF=!!libG(libDest()),dn=libPath(libDest());if(n&&!inF){WBS.mcat='d';mcSave()}say(n?`${n} shape${n>1?'s':''} added to ${inF?'“'+dn+'”':'Drawn by Claude'}. Click to place.`:'Nothing usable came back. Try again.');build()}
 catch(e){say(e&&e.code=='not_granted'?'Permission to ask Claude was declined.':e&&e.code=='rate_limited'?'Rate limited. Try again in a bit.':'Drawing failed: '+((e&&e.message)||'unknown error'))}
 $('gen').disabled=false};
 $('cpy').onclick=async()=>{try{await clipboard.writeText(ser());say('SVG copied.')}catch(e){say('Copy was blocked here.')}};

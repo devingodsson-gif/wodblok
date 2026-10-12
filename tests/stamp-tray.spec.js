@@ -20,6 +20,7 @@ test('Send to back puts the selected motif behind the others (UX review D8)', as
   const { errors } = await openApp(page, { seed: 3 });
   await page.click('.seg2 [data-v="stamp"]');
   await page.click('.rail [data-pn="motifs"]');
+  await page.click('#lfold [data-f="g:Old shapes"]'); await page.click('#lfold [data-f="b:Plants"]');                   // the library opens on the list of folders (1.2.14)
   const lib = page.locator('#lib > *');
   const ids = [];
   for (const n of [0, 1]) {
