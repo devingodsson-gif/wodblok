@@ -8,7 +8,7 @@ test('drag a library motif onto the stamp adds one motif there; a click arms the
   const { errors } = await openApp(page);
   await setMode(page, 'stamp');
   await openPanel(page, 'motifs');
-  await page.click('#lfold [data-f="b:Plants"]');                    // the library opens on the list of folders (1.2.14)
+  await page.click('#lfold [data-f="g:Old shapes"]'); await page.click('#lfold [data-f="b:Plants"]');                    // the library opens on the list of folders (1.2.14)
   const count = () => page.evaluate(() => JSON.parse(window.__wbTest.state()).tiles[0].items.length);
   expect(await count()).toBe(0);
   const tile = page.locator('#lib button[data-m]').first();

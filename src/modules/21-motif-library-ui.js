@@ -14,6 +14,8 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 // format) and in BF[k] for a built-in shape added to a folder (it also stays in its own set). WBS.mcat is the open folder:
 // "/" the list of all folders, "i" My imports, "d" Drawn by Claude (old projects only), "b:<set>" or "g:<path>".
 const bOk=k=>/^b\d+$/.test(k)&&+k.slice(1)<M.length;
+// "Old shapes" holds the original built-in sets. It always exists, cannot be renamed, moved or deleted, and you can add your own folders to it.
+const OLD='Old shapes',lbFixed=p=>p===OLD;
 const lbSet=n=>CATS.findIndex(c=>c.n==n);
 const lbRoot=p=>p.startsWith('b:')&&!p.includes('/')&&lbSet(p.slice(2))>=0;
 const lbPar=p=>{const i=p.lastIndexOf('/');return i<0?'':p.slice(0,i)};
@@ -29,7 +31,7 @@ let LBX=null,lbHidOpen=false,lbSig='';
 // one pass over the library: every folder path, and which shapes each folder holds
 function lbIndex(){const all=new Set(),by=new Map(),imp=[],drw=[],put=(g,k)=>{(by.get(g)||by.set(g,[]).get(g)).push(k)};
 const add=p=>{if(typeof p!='string'||!p)return;const a=p.split('/');for(let i=1;i<=a.length;i++){if(!a[i-1])return;const q=a.slice(0,i).join('/');if(i==1&&lbRoot(q))continue;all.add(q)}};
-WBS.FOLD.forEach(add);
+WBS.FOLD.forEach(add);all.add(OLD);
 Object.keys(cust).forEach(k=>{const v=cust[k];if(!v)return;if(v.g){add(v.g);put(v.g,k)}else if(k.startsWith('i|'))imp.push(k);else if(!k.startsWith('t|'))drw.push(k)});
 Object.keys(BF).forEach(k=>{if(bOk(k)&&BF[k]){add(BF[k]);put(BF[k],k)}});
 return{all,by,imp,drw}}
@@ -44,11 +46,13 @@ if(v.startsWith('g:')){const p=v.slice(2);if(!X.all.has(p))return null;return{v,
 return null}
 // the folders inside a folder, A to Z; at the top: your folders and the built-in sets together (hid: only the hidden sets)
 function lbKids(nd,hid){const X=lbX();
-if(nd.t=='r'){const o=hid?[]:[...X.all].filter(p=>!lbPar(p)).map(p=>lbNode('g:'+p));CATS.forEach(c=>{if(WBS.HID.includes(c.n)==!!hid)o.push(lbNode('b:'+c.n))});return o.sort(lbSort)}
-if(nd.t!='f'&&nd.t!='b')return[];return[...X.all].filter(p=>lbPar(p)===nd.p).map(p=>lbNode('g:'+p)).sort(lbSort)}
+const sets=()=>CATS.filter(c=>!WBS.HID.includes(c.n)).map(c=>lbNode('b:'+c.n));
+if(nd.t=='r')return hid?CATS.filter(c=>WBS.HID.includes(c.n)).map(c=>lbNode('b:'+c.n)).sort(lbSort):[...X.all].filter(p=>!lbPar(p)).map(p=>lbNode('g:'+p)).sort(lbSort);
+if(nd.t!='f'&&nd.t!='b')return[];return[...[...X.all].filter(p=>lbPar(p)===nd.p).map(p=>lbNode('g:'+p)),...(nd.p===OLD?sets():[])].sort(lbSort)}
 // shapes in a folder and every folder inside it
-function lbCount(nd){if(nd.t!='f'&&nd.t!='b')return nd.ks.length;const s=new Set(nd.ks);lbX().by.forEach((ks,g)=>{if(g!==nd.p&&lbIn(g,nd.p))ks.forEach(k=>s.add(k))});return s.size}
-function lbCrumbs(nd){if(nd.t!='f')return nd.t=='r'?[]:[nd];const a=nd.p.split('/'),o=[];for(let i=1;i<=a.length;i++){const n=lbNode(lbId(a.slice(0,i).join('/')));if(n)o.push(n)}return o}
+function lbCount(nd){if(nd.t!='f'&&nd.t!='b')return nd.ks.length;const s=new Set(nd.ks);if(nd.p===OLD)CATS.forEach(c=>{if(!WBS.HID.includes(c.n)){c.k.forEach(k=>s.add(k));(lbX().by.get('b:'+c.n)||[]).forEach(k=>s.add(k))}});lbX().by.forEach((ks,g)=>{if(g!==nd.p&&lbIn(g,nd.p))ks.forEach(k=>s.add(k))});return s.size}
+function lbCrumbs(nd){if(nd.t!='f'&&nd.t!='b')return nd.t=='r'?[]:[nd];const a=nd.p.split('/'),o=[];for(let i=1;i<=a.length;i++){const n=lbNode(lbId(a.slice(0,i).join('/')));if(n)o.push(n)}
+const set=lbNode(lbId(a[0]));return a[0].startsWith('b:')&&set&&!set.hid?[lbNode('g:'+OLD),...o]:o}
 // every folder in list order, named by its full path, for the "Move to" and "Save to" pickers
 function lbTree(){const o=[{v:'i',n:'My imports',d:0}],walk=(nd,d,pre)=>{const n=pre?pre+' / '+nd.n:nd.n;o.push({v:nd.v,n,d});lbKids(nd).forEach(k=>walk(k,d+1,n))};lbKids(lbNode('/')).forEach(n=>walk(n,0,''));return o}
 const lbOpts=(sel,skip)=>lbTree().filter(x=>!skip||!skip(x)).map(x=>`<option value="${hx(x.v)}"${x.v==sel?' selected':''}>${hx(x.n)}</option>`).join('');
@@ -81,7 +85,7 @@ if(!force&&sig===lbSig)return;lbSig=sig;
 // path bar, and where Import will put new shapes
 $('lback').hidden=root;$('idest').textContent=own?lbCrumbs(c).map(x=>x.n).join(' / '):'My imports';
 const cr=lbCrumbs(c);$('lcr').innerHTML=root?'<span class="lcc">All folders</span>':cr.map((n,i)=>i<cr.length-1?`<button type="button" class="lcb" data-f="${hx(n.v)}">${hx(n.n)}</button><i class="lcs">/</i>`:`<span class="lcc">${hx(n.n)}</span>`).join('');
-$('fnew').disabled=c.t=='u';$('fsel').hidden=root;$('fsel').disabled=!c.ks.length&&!WBS.lsm;$('fsel').setAttribute('aria-pressed',String(WBS.lsm));$('fmore').hidden=!own;
+$('fnew').disabled=c.t=='u';$('fsel').hidden=root;$('fsel').disabled=!c.ks.length&&!WBS.lsm;$('fsel').setAttribute('aria-pressed',String(WBS.lsm));$('fmore').hidden=!own||(c.t=='f'&&lbFixed(c.p));
 // folders
 const rows=root?[lbNode('i'),...(lbX().drw.length?[lbNode('d')]:[]),...lbKids(c)]:lbKids(c),hidL=root?lbKids(c,true):[];
 const row=n=>`<button type="button" class="lfr${n.hid?' hid':''}" data-f="${hx(n.v)}"><span class="lfi">${n.t=='u'?(n.v=='i'?IC.tray:IC.pen):n.t=='b'?IC.set:IC.fold}</span><span class="lfn">${hx(n.n)}</span><span class="lfc">${lbCount(n)}</span>${IC.chev}</button>`;
@@ -121,7 +125,7 @@ function init21(){
 WBX.wbLibOpen=libOpen;
 $('lfold').onclick=e=>{if(e.target.closest('#lhid')){lbHidOpen=!lbHidOpen;renderLib(true);return}const b=e.target.closest('[data-f]');if(b)libOpen(b.dataset.f)};
 $('lcr').onclick=e=>{const b=e.target.closest('[data-f]');if(b)libOpen(b.dataset.f)};
-$('lback').onclick=()=>{const c=libCur();libOpen(c.t=='f'?lbId(lbPar(c.p)):'/')};
+$('lback').onclick=()=>{const c=libCur();libOpen(c.t=='f'&&lbPar(c.p)?lbId(lbPar(c.p)):c.t=='b'&&!c.hid?'g:'+OLD:'/')};
 // drop a shape dragged from the grid onto a folder (or a crumb of the path) to move it there
 WBX.wbLibDrop=(k,el)=>{const f=el&&el.closest&&el.closest('#lfold [data-f],#lcr [data-f]');if(!f)return false;const t=f.dataset.f;if(t=='/'||t==libCur().v)return true;libMoveKeys(lsel.has(k)?[...lsel]:[k],t);return true};
 WBX.wbLibOver=el=>{const f=el&&el.closest&&el.closest('#lfold [data-f],#lcr [data-f]');document.querySelectorAll('.lfr.dropt,.lcb.dropt').forEach(x=>{if(x!==f)x.classList.remove('dropt')});if(f)f.classList.add('dropt')};
