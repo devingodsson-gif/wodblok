@@ -65,6 +65,7 @@ const COMMANDS = [
   ['panel.tex', 'Open Textures', 'rail-tex'],
   ['panel.rand', 'Open Randomize', 'rail-rand'],
   ['panel.hist', 'Open History', 'rail-hist'],
+  ['library.exportShapes', 'Export shapes (SVG zip)', 'fexp'],
   ['randomize.roll', 'Randomize now', 'rzdo'],
   ['app.commandSearch', 'Search commands', 'cmdkb', 'Mod+K'],
 ];

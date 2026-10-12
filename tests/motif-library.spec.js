@@ -1,4 +1,4 @@
-// "No Claude-generated motifs" (CLAUDE.md; UX review C11): no "Draw with Claude" section and no empty "Drawn by Claude" folder in the library.
+// UX review C11: no "Draw with Claude" section and no empty "Drawn by Claude" folder in the library.
 // The built-in sets stay (a decision for the owner, Q3): an old project that uses them must still print, and a new one needs something to start with.
 const { test, expect } = require('@playwright/test');
 const { TARGET, openApp, setMode } = require('./helpers/harness');
