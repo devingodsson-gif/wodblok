@@ -30,7 +30,7 @@ const pal=()=>[col(WBS.proj.bg),col(WBS.proj.ink)];
 const inkOf=t=>col(t.ink||WBS.proj.ink);
 const cols=t=>{const b0=col(WBS.proj.bg),c0=inkOf(t);return t.neg?{bg:c0,c:b0,d:c0}:{bg:b0,c:c0,d:b0}};
 const mk=(k,c,d)=>(k[0]=='b'?M[(+k.slice(1)||0)%M.length]:cust[k]?tk(cust[k].svg):M[0])(c,d);
-function init06(){// ---- Library folders. Your folders hold imported and Claude-drawn motifs (moved in), and built-in motifs
+function init06(){// ---- Library folders. Your folders hold imported and Claude-drawn shapes (moved in), and built-in shapes
 // (added in: they also stay in their own set). Built-in sets can be renamed or hidden, never deleted.
 WBS.FOLD=[];WBS.HID=[];
 lsel=new Set();WBS.lsm=false;WBS.lanc=null;WBS.fmode=null;

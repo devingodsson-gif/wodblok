@@ -62,3 +62,13 @@ test('a new or duplicated stamp is added to the current layer, and Undo takes it
   expect(undone.layer).toEqual(afterNew.layer);
   expect(errors).toEqual([]);
 });
+
+test('A new stamp starts with no block edge (thickness and roughness 0)', async ({ page }) => {
+  await openApp(page, { seed: 3 });
+  await page.click('#addT');
+  await settle(page);
+  const s = JSON.parse(await getState(page));
+  const t = s.tiles[s.tiles.length - 1];
+  expect(t.et).toBe(0);
+  expect(t.er).toBe(0);
+});

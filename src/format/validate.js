@@ -12,7 +12,7 @@ function fmtValidate(p) {
   for (const t of p.tiles) {
     if (!t || typeof t !== 'object' || !Array.isArray(t.items)) bad('tiles', 'A stamp in that project is damaged.');
     n += t.items.length;
-    for (const q of t.items) if (!q || typeof q !== 'object' || typeof q.m !== 'string' || !Number.isFinite(+q.x) || !Number.isFinite(+q.y)) bad('items', 'A motif in that project is damaged.');
+    for (const q of t.items) if (!q || typeof q !== 'object' || typeof q.m !== 'string' || !Number.isFinite(+q.x) || !Number.isFinite(+q.y)) bad('items', 'A shape in that project is damaged.');
   }
   if (n > FMT_MAX_ITEMS || p.layers.length > 5000) bad('size', 'That project is far larger than WODBLOK can open.');
   for (const L of p.layers) if (!L || typeof L !== 'object') bad('layers', 'A layer in that project is damaged.');

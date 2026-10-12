@@ -7,7 +7,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS,delItems,selSet} from './12-selection-and-split.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 
-function init22(){// ===== Text tool: type text, it's traced into carved letter shapes. Each letter becomes its own motif on the stamp,
+function init22(){// ===== Text tool: type text, it's traced into carved letter shapes. Each letter becomes its own shape on the stamp,
 // grouped under the text in the Motif list. The original text and settings are kept on the group, so it can be edited.
 (()=>{
 const FONTS=[['cinzel','Cinzel','Cinzel',700,'Roman capitals'],['cinzeld','Cinzel Decorative','Cinzel+Decorative',700,'Decorated capitals'],
@@ -80,7 +80,7 @@ const later=()=>{clearTimeout(tmr);tmr=setTimeout(preview,120)};
 function letters(g,ax,ay){const ps=layout(st),out=[];ps.forEach(p=>{const k=p.g.k;if(!cust[k])cust[k]={n:p.c,svg:`<path d="${p.g.d}" fill="FILL" fill-rule="evenodd"/>`,txt:1};const[x,y]=wrapP(ax+p.x,ay+p.y);const q=it(k,x,y,p.s,+p.r.toFixed(1),1);q.tg=g;out.push(q)});return out}
 async function add(){fromUI();if(!st.text.trim())return;await ready();if(WBX.wbCap)WBX.wbCap();const t=WBS.tiles[WBS.cur];useT(t);autoFit();const g='tx'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),[ax,ay]=cen(),L=letters(g,ax,ay);
 if(!L.length){pmsg('No letters came out. Try another font.');return}const n0=t.items.length;t.items.push(...L);const ids=L.map((_,i)=>n0+i);const[mx,my]=mean(ids);A(t)[g]={...st,ax,ay,mx,my};
-selSet(ids,false);WBS.brush=null;store();upd();if(WBX.wbCap)WBX.wbCap();pmsg(`Added “${st.text.replace(/\n/g,' ')}” as ${L.length} letter${L.length>1?'s':''}. Drag to move them together, or click one in the Motif list to move it alone.`)}
+selSet(ids,false);WBS.brush=null;store();upd();if(WBX.wbCap)WBX.wbCap();pmsg(`Added “${st.text.replace(/\n/g,' ')}” as ${L.length} letter${L.length>1?'s':''}. Drag to move them together, or click one in the Shape list to move it alone.`)}
 async function update(){const g=edit;if(!g)return;fromUI();if(!st.text.trim())return;await ready();const t=WBS.tiles[WBS.cur],M=A(t)[g],ids=idsOf(g);if(!M||!ids.length)return;if(WBX.wbCap)WBX.wbCap();useT(t);
 const[cx0,cy0]=mean(ids),ax=M.ax+(cx0-M.mx),ay=M.ay+(cy0-M.my),pos=Math.min(...ids);delItems(ids);const L=letters(g,ax,ay);t.items.splice(Math.min(pos,t.items.length),0,...L);const nids=L.map((_,i)=>Math.min(pos,t.items.length-L.length)+i);
 const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();upd();if(WBX.wbCap)WBX.wbCap();pmsg(`Updated the text. Hand-moved letters were rebuilt.`)}
