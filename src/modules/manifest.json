@@ -45,5 +45,6 @@
  "45-print-proof.js",
  "46-presets.js",
  "47-variations.js",
- "48-task-bar.js"
+ "48-task-bar.js",
+ "49-motif-export.js"
 ]

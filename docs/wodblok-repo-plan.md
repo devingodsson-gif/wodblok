@@ -29,7 +29,7 @@ Nothing the user can see or do should change during the move (same look, same sp
   - The artifact runtime is reached through one helper, `use('db'|'user'|'downloads')`, which returns nothing outside claude.ai. The app already runs outside the artifact with browser-only storage. The stamp library (`SL`) has two backends, "account" and "browser".
 - History keeps up to 120 full JSON copies of the core state (`coreStr()`). Art images stay out of it (kept by id in a separate `ARTS` registry), a good precedent for rule 4.7.
 - Project file: JSON with `app:'WODBLOK', v:18`, the core state, `arts` (images embedded as data URLs), cover, grade, and `lib` (motifs, colours). The format already has a number to continue from. Snapshots (v95) live only in browser storage.
-- The comment at line 1612 says the built-in motif sets are Claude-drawn (see 7b).
+- The comment at line 1612 says the built-in motif sets are Claude-drawn (decided Oct 12: allowed, see 7b).
 - 178 native `title=` hover tooltips (Undo, Save, shape names, "Choose which kinds", …) and 112 `aria-label`s (see 7b).
 - Some buttons only appear on hover (e.g. the History row buttons).
 - Tests today: ad-hoc Playwright scripts in a scratch folder (profile, pixel diff of before/after). None are in a repo.
@@ -38,7 +38,7 @@ Nothing the user can see or do should change during the move (same look, same sp
 - Commercial product. Repo is private. Check licences of anything added (fonts Fraunces and Hanken Grotesk are OFL, fine to bundle); MIT, BSD, ISC, Apache and OFL are fine; nothing GPL in the shipped app. Ask before adding a dependency.
 - **One source of truth:** once Phase 0 lands, every release (including the preview artifact) is built from the repo. No more hand edits to a single file outside it. Design explorations in chat are prototypes; anything kept becomes a pull request.
 - Speed is a feature. A perf budget is part of the tests; no change may slow dragging or sliders.
-- No explanatory text or tooltips in panels. No tool windows open at launch. Opens in Pattern mode, fully cleared. No brush masks. No Claude-generated motifs.
+- No explanatory text or tooltips in panels. No tool windows open at launch. Opens in Pattern mode, fully cleared. No brush masks.
 - Phase 1 changes nothing the user can see or do. Phases 2–3 add only the capabilities they list (Export everything, autosave, recent projects and so on); existing tools look and behave the same.
 - Phases 1–3 are bug-for-bug: bugs found are logged in `docs/known-issues.md`, not fixed, and get fixed after Phase 3 as normal releases.
 - Keep every version: one git tag per release (vNNN) and the built single file attached to a GitHub Release. v100 is the baseline tag; v101 is the first release built from the repo.
@@ -221,7 +221,7 @@ First the bugs logged in Phases 1–3. Then Variations strip, Presets with hover
 
 ### 7b. Decisions for the user (none block Phase 0)
 1. **How will WODBLOK be sold?** One-time desktop licence, subscription web app, app stores, or free plus paid. This decides hosting, accounts, licence checks versus offline use. Needed before Phase 4 goes public.
-2. **Built-in motif sets:** the code says they are Claude-drawn, which clashes with the "no Claude-generated motifs" rule. Ship, replace with your own, or hide by default in the commercial version?
+2. **Built-in motif sets:** decided Oct 12 2026: the "no Claude-generated motifs" rule is removed. The built-in sets stay and are part of the library (and of the motif export).
 3. **Native hover tooltips:** v100 has 178 `title=` hover tooltips. Keep them (they appear only on hover), or remove them to match the no-tooltips rule? Phases 1–3 keep them either way.
 4. **The preview artifact:** still needed after Phase 4?
 5. **Asian colour book palettes:** which book and palettes (at Presets, Phase 5).
@@ -251,7 +251,7 @@ npm run dev | build | build:single | test | test:update-golden | perf | coupling
 - The repo is the only source of truth. Every release, including the claude.ai preview artifact, is built from it.
 - Speed first: run `npm run perf` before committing anything that touches drawing, dragging or sliders. No perf regression over 10%.
 - No explanatory text or tooltips in panels. No tool windows open at launch. Launch in Pattern mode, fully cleared.
-- No brush masks. No Claude-generated motifs (users import their own).
+- No brush masks.
 - Never edit legacy/. Old .wodblok.json files (format v:18 and earlier) must always open; never overwrite a file on first open of an older format.
 - Phase 1: no behaviour or visual changes. Phases 2-3: only what the phase lists; existing tools unchanged. Phases 1-3: no bug fixes; log bugs in docs/known-issues.md.
 - Never update golden screenshots or snapshots just to make tests pass: say which changed and why, and ask.
