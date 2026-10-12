@@ -19,17 +19,28 @@ function motifSvg(drawn) {
     + `<rect ${box} fill="#000" mask="url(#m)"/></svg>\n`;
 }
 
-// folders: [{name, items:[{name, svg}]}] -> {zip bytes, count}. Empty folders are left out. Names that collide get -2, -3 ...
-// (compared without regard to case, since Mac and Windows treat Motif.svg and motif.svg as one file).
+// folders: [{path:['Florals','Roses'], items:[{name, svg}]}] (a string `name` works for a single folder) -> {zip bytes, count}.
+// Folders inside folders become folders inside folders. Empty folders are left out. Names that collide get -2, -3 ...
+// (compared without regard to case, since Mac and Windows treat Motif.svg and motif.svg as one file); a renamed folder
+// takes the folders inside it along.
 function buildMotifZip(folders) {
-  const files = {}, usedDirs = new Set();
+  const files = {}, usedDirs = new Set(), made = new Map(), usedNames = new Map();
   let count = 0;
+  const dirOf = raw => {                        // raw: the folder's own names, outermost first
+    const key = raw.join('\u0000');                      // exact spelling: two folders that differ only in case stay two folders
+    if (made.has(key)) return made.get(key);
+    const parent = raw.length > 1 ? dirOf(raw.slice(0, -1)) : '', base = safeName(raw[raw.length - 1], 'Folder');
+    const full = n => parent ? parent + '/' + n : n;
+    let n = base, d = 2;
+    while (usedDirs.has(full(n).toLowerCase())) n = base + '-' + d++;
+    const dir = full(n);
+    usedDirs.add(dir.toLowerCase()); made.set(key, dir);
+    return dir;
+  };
   for (const f of folders) {
     if (!f.items || !f.items.length) continue;
-    let dir = safeName(f.name, 'Folder'), d = 2;
-    while (usedDirs.has(dir.toLowerCase())) dir = safeName(f.name, 'Folder') + '-' + d++;
-    usedDirs.add(dir.toLowerCase());
-    const used = new Set();
+    const raw = Array.isArray(f.path) ? f.path : [f.name], dir = dirOf(raw);
+    const used = usedNames.get(dir) || usedNames.set(dir, new Set()).get(dir);   // per folder in the zip, so nothing is ever overwritten
     for (const it of f.items) {
       const base = safeName(it.name, 'Motif');
       let n = base, k = 2;

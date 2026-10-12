@@ -65,6 +65,11 @@ function libOptions(sel){lbDirty();return lbOpts(sel)}
 function libMk(parentV,name){lbDirty();const nm=lbName(name);if(!nm)return null;const pn=lbNode(parentV)||lbNode('/'),own=pn.t=='f'||pn.t=='b'?pn:lbNode('/');
 const ex=lbKids(own).concat(own.t=='r'?lbKids(own,true):[]).find(x=>x.n.toLowerCase()==nm.toLowerCase());if(ex)return ex.v;
 const p=own.t=='r'?nm:own.p+'/'+nm;if(!WBS.FOLD.includes(p))WBS.FOLD.push(p);fSave();lbDirty();return lbId(p)}
+// for the export: what the open folder holds, as a flat list of folders, each named by its path. deep: the folders inside it too.
+// At the top (all folders) it is the whole library, hidden sets included.
+function libExportList(deep){lbDirty();const c=libCur(),out=[],top=c.t=='r',walk=(n,pre)=>{const p=[...pre,n.n];out.push({path:p,ks:n.ks});if(deep||top)lbKids(n).forEach(k=>walk(k,p))};
+if(top)[lbNode('i'),...(lbX().drw.length?[lbNode('d')]:[]),...lbKids(c),...lbKids(c,true)].forEach(n=>walk(n,[]));else walk(c,[]);
+return{root:top,name:c.n,folders:out,sub:!top&&lbKids(c).length>0}}
 function libOpen(v){lbDirty();const n=lbNode(v)||lbNode('/');WBS.mcat=n.v;mcSave();lsel.clear();WBS.lanc=null;if(n.t=='r')WBS.lsm=false;closeF();renderLib(true)}
 // a folder's path moves: everything inside it, and every shape filed there, follows
 function lbRemap(p,np){const m=x=>lbIn(x,p)?np+x.slice(p.length):x;
@@ -85,7 +90,7 @@ if(!force&&sig===lbSig)return;lbSig=sig;
 // path bar, and where Import will put new shapes
 $('lback').hidden=root;$('idest').textContent=own?lbCrumbs(c).map(x=>x.n).join(' / '):'My imports';
 const cr=lbCrumbs(c);$('lcr').innerHTML=root?'<span class="lcc">All folders</span>':cr.map((n,i)=>i<cr.length-1?`<button type="button" class="lcb" data-f="${hx(n.v)}">${hx(n.n)}</button><i class="lcs">/</i>`:`<span class="lcc">${hx(n.n)}</span>`).join('');
-$('fnew').disabled=c.t=='u';$('fsel').hidden=root;$('fsel').disabled=!c.ks.length&&!WBS.lsm;$('fsel').setAttribute('aria-pressed',String(WBS.lsm));$('fmore').hidden=!own||(c.t=='f'&&lbFixed(c.p));
+$('fnew').disabled=c.t=='u';$('fsel').hidden=root;$('fsel').disabled=!c.ks.length&&!WBS.lsm;$('fsel').setAttribute('aria-pressed',String(WBS.lsm));$('fmore').hidden=!own||(c.t=='f'&&lbFixed(c.p));$('fexp').setAttribute('aria-label',root?'Export all shapes':'Export this folder');$('fexp').disabled=!root&&!lbCount(c);
 // folders
 const rows=root?[lbNode('i'),...(lbX().drw.length?[lbNode('d')]:[]),...lbKids(c)]:lbKids(c),hidL=root?lbKids(c,true):[];
 const row=n=>`<button type="button" class="lfr${n.hid?' hid':''}" data-f="${hx(n.v)}"><span class="lfi">${n.t=='u'?(n.v=='i'?IC.tray:IC.pen):n.t=='b'?IC.set:IC.fold}</span><span class="lfn">${hx(n.n)}</span><span class="lfc">${lbCount(n)}</span>${IC.chev}</button>`;
@@ -157,4 +162,4 @@ delete dm.dataset.sure;ok.forEach(k=>{delete cust[k];lsel.delete(k)});store();lb
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&!$('boardS').hidden&&!(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]'))){const n=WBS.tiles[WBS.cur].items.length;if(!n)return;e.preventDefault();selSet([...Array(n).keys()],false);upd();pmsg(`Selected all ${n} shape${n>1?'s':''} on this stamp.`)}});
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&WBS.lsm&&!(e.target.matches&&e.target.matches('input,textarea,select')))libExit()});
 }
-export {libDest,libG,libMk,libOpen,libOptions,libPath,libPick,renderLib,init21};
+export {libDest,libExportList,libG,libMk,libOpen,libOptions,libPath,libPick,mNm,renderLib,init21};
