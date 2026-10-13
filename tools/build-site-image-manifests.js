@@ -43,7 +43,16 @@ if (!Number.isFinite(intervalMs) || intervalMs < 1000 || intervalMs > 60000) {
 }
 
 const heroImages = publicPaths(HERO_DIR, listImages(HERO_DIR));
-const galleryImages = publicPaths(GALLERY_DIR, listImages(GALLERY_DIR));
+// Keep the existing work-1.jpg, work-2.jpg ... artwork visible while allowing
+// new gallery uploads to use any filename inside site/img/gallery.
+const legacyGalleryNames = fs.readdirSync(IMG, { withFileTypes: true })
+  .filter(entry => entry.isFile() && /^work-\d+\.(jpg|jpeg|png|webp|gif|avif)$/i.test(entry.name))
+  .map(entry => entry.name)
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+const galleryImages = [
+  ...legacyGalleryNames.map(name => '/img/' + encodeURIComponent(name)),
+  ...publicPaths(GALLERY_DIR, listImages(GALLERY_DIR))
+];
 
 fs.writeFileSync(path.join(IMG, 'hero-manifest.json'), JSON.stringify({ intervalMs, images: heroImages }, null, 2) + '\n');
 fs.writeFileSync(path.join(IMG, 'gallery-manifest.json'), JSON.stringify({ images: galleryImages }, null, 2) + '\n');
