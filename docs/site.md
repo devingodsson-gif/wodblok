@@ -50,3 +50,9 @@ The page has a hidden trap field and checks the sign-up comes from the same site
 
 "Coming next" lists the first four items of the future-features list (colourways, print size, separations, mockups) and the
 smaller ones as chips. Keep the wording to what is actually planned; edit the list in `site/index.html`.
+
+## Adding pictures to the gallery
+
+Put new images in `site/img/` named `work-5.jpg`, `work-6.jpg` and so on (`.png` or `.webp` also work). The page adds them to the
+grid in number order. It stops at the first number that is missing, so do not skip one. Use 2:3 portrait pictures like the
+first four (they are cropped to that shape). Work 1 to 4 are written into the page so they show even without scripts.
