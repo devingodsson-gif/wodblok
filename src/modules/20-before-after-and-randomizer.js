@@ -59,7 +59,8 @@ const lum=h=>{const v=hx3(col(h));return .2126*v[0]+.7152*v[1]+.0722*v[2]},bgL=l
 const inkFor=()=>{if(noAcc)return null;if(acc.length>=(on('inks')?2:1))return pick(acc);let ok=PC.filter(n=>!used.has(n)&&n!=pBg&&Math.abs(lum(n)-bgL)>.28);if(!ok.length)ok=PC.filter(n=>!used.has(n)&&n!=pBg);if(!ok.length)return pInk;const n=pick(ok);used.add(n);acc.push(n);return n};
 // --- motif pool: one main theme (your imports when you have a few), with dots as accents
 const imp=Object.keys(cust).filter(x=>x.startsWith('i|')),dotsC=CATS.find(c=>c.n=='Dots'),themes=CATS.filter(c=>c.n!='Dots'&&c.k.length);
-const pool=imp.length>=3&&ch(.6)?imp:pick(themes).k,dots=dotsC?dotsC.k:pool,mains=[...pool].sort(()=>R()-.5).slice(0,ri(2,4));
+const FL=WBX.wbRZ&&WBX.wbRZ.folders?WBX.wbRZ.folders():null; // shape folders ticked in the Randomize panel (null: all of them)
+const pool=FL?(FL.themes.length?pick(FL.themes):FL.dots):imp.length>=3&&ch(.6)?imp:pick(themes).k,dots=FL?(FL.dots||pool):dotsC?dotsC.k:pool,mains=[...pool].sort(()=>R()-.5).slice(0,ri(2,4));
 // motif tweaks only with that move, and then one consistent look for the whole piece
 const tw=on('motif')?{st:ch(.5)?+pick([.75,.8,1.25,1.35]).toFixed(2):0,ax:ch(.5)?'sx':'sy',w:ch(.6)?+pick([-1,-.6,.8,1.2,1.6]):0,ko:true}:null;
 if(tw&&!tw.st&&!tw.w)tw.w=1.2;

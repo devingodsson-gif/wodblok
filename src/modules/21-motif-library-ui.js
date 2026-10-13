@@ -60,6 +60,8 @@ return o}
 // every folder in list order, named by its full path, for the "Move to" and "Save to" pickers
 function lbTree(){const o=[{v:'i',n:'My imports',d:0}],walk=(nd,d,pre)=>{const n=pre?pre+' / '+nd.n:nd.n;o.push({v:nd.v,n,d});lbKids(nd).forEach(k=>walk(k,d+1,n))};lbKids(lbNode('/')).forEach(n=>walk(n,0,''));return o}
 const lbOpts=(sel,skip)=>lbTree().filter(x=>!skip||!skip(x)).map(x=>`<option value="${hx(x.v)}"${x.v==sel?' selected':''}>${hx(x.n)}</option>`).join('');
+// for Randomize: every folder in list order (v: its id, n: its name, d: how deep, c: shapes inside it and its folders, ks: the shapes it holds itself)
+function libRz(){lbDirty();return lbTree().map(x=>{const nd=lbNode(x.v);return{v:x.v,n:nd?nd.n:x.n,d:x.d,c:nd?lbCount(nd):0,ks:nd?nd.ks.slice():[]}})}
 function libCur(){let v=WBS.mcat;if(/^\d+$/.test(v||'')){const c=CATS[+v];v=c?'b:'+c.n:'/'}const c=lbNode(v)||lbNode('/');if(WBS.mcat!==c.v)WBS.mcat=c.v;return c}
 // ---- for the import window: where new shapes go, how that folder is named, the folder picker, and making a folder
 function libDest(){lbDirty();const c=libCur();return c.t=='f'||c.t=='b'?c.v:'i'}
@@ -200,4 +202,4 @@ delete dm.dataset.sure;ok.forEach(k=>{delete cust[k];lsel.delete(k)});store();lb
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&!$('boardS').hidden&&!(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]'))){const n=WBS.tiles[WBS.cur].items.length;if(!n)return;e.preventDefault();selSet([...Array(n).keys()],false);upd();pmsg(`Selected all ${n} shape${n>1?'s':''} on this stamp.`)}});
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&WBS.lsm&&!(e.target.matches&&e.target.matches('input,textarea,select')))libExit()});
 }
-export {libDest,libExportList,libG,libMk,libOpen,libOptions,libPath,libPick,mNm,renderLib,init21};
+export {libDest,libExportList,libG,libMk,libOpen,libOptions,libPath,libPick,libRz,mNm,renderLib,init21};

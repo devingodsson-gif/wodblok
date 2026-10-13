@@ -16,6 +16,7 @@ import {savePr} from './15-print-effects-and-stamp-texture.js';
 import {txClean} from './16-texture-generators.js';
 import {buildTex,migInk,saveTex,texNorm} from './17-texture-panel-and-previews.js';
 import {coreStr,dirty,paintPst,pgFix,pmsg,thumb} from './18-projects-and-cover-overlay.js';
+import {libRz} from './21-motif-library-ui.js';
 import {randomize,wbBA} from './20-before-after-and-randomizer.js';
 import {clearAll} from './33-clear.js';
 
@@ -264,7 +265,7 @@ const eff=c=>{const k=c.dataset.ft,ss=sk(k);if(!isOn(c))return false;if(!ss.leng
 const get=()=>{const o={};fts.forEach(c=>o[c.dataset.ft]=eff(c));return o};
 const sub=m=>{const ss=sk(m);return ss.length?new Set(ss.filter(c=>c.checked).map(c=>c.dataset.sub.slice(m.length+1))):null};
 const sync=()=>{const st=isOn(by('stamps')),t=by('text');t.disabled=!st;(t.closest('.ctl')||t.parentNode).style.opacity=st?'':'.45';
-sec.querySelectorAll('.rzx').forEach(b=>{const m=b.dataset.rzx,ss=sk(m),n=ss.filter(c=>c.checked).length,all=n==ss.length;b.querySelector('.rzn').textContent=all?'All':n+'/'+ss.length;b.classList.toggle('part',!all);const box=sec.querySelector('[data-rzs="'+m+'"]');if(box)box.classList.toggle('off',!isOn(by(m)))});
+sec.querySelectorAll('.rzx[data-rzx]').forEach(b=>{const m=b.dataset.rzx,ss=sk(m),n=ss.filter(c=>c.checked).length,all=n==ss.length;b.querySelector('.rzn').textContent=all?'All':n+'/'+ss.length;b.classList.toggle('part',!all);const box=sec.querySelector('[data-rzs="'+m+'"]');if(box)box.classList.toggle('off',!isOn(by(m)))});
 const any=fts.some(c=>eff(c)&&!c.disabled),b=$('rzdo');if(b)b.disabled=!any;
 const h=$('rzhint');if(h)h.textContent=any?'Only what is switched on changes. Everything else stays exactly as it is. Use the arrows to choose which kinds of change are allowed. The canvas stays the same size and shape unless Canvas shape or Canvas size is on, and the book cover is always kept.':'Nothing is switched on, so Randomize has nothing to change.'};
 const save=()=>{try{kv.set(KEY,JSON.stringify(Object.fromEntries(fts.map(c=>[c.dataset.ft,c.type=='range'?+c.value:c.checked]))));kv.set(SKEY,JSON.stringify(Object.fromEntries(subs.map(c=>[c.dataset.sub,c.checked]))))}catch(e){}sync()};
@@ -273,7 +274,21 @@ sec.addEventListener('click',e=>{const x=e.target.closest('[data-rzx]');if(x){co
 const a=e.target.closest('[data-rzall],[data-rzno]');if(a){const m=a.dataset.rzall||a.dataset.rzno,on=!!a.dataset.rzall;sk(m).forEach(c=>c.checked=on);save()}});
 $('rzall').onclick=()=>{fts.forEach(c=>setAmt(c,true));subs.forEach(c=>c.checked=true);nums();save()};$('rznone').onclick=()=>{fts.forEach(c=>setAmt(c,false));nums();save()};
 const amt=k=>{const c=by(k);return c&&eff(c)?amtOf(c):0};
-sync();WBX.wbRZ={get,sub,amt};
+// Shape folders: which library folders a roll may take shapes from. New folders start ticked; only the unticked ones are remembered.
+// Ticking a folder ticks the folders inside it. At least one folder that holds shapes always stays ticked.
+const FK='wb160_rzfold',fbox=sec.querySelector('[data-rzfbox]'),flist=sec.querySelector('[data-rzflist]'),fbtn=sec.querySelector('[data-rzfx]');
+let foff=new Set(),FS=[];try{const z=JSON.parse(kv.get(FK)||'[]');if(Array.isArray(z))foff=new Set(z.filter(v=>typeof v=='string'))}catch(e){}
+const fPick=()=>FS.filter(x=>x.c>0),fOn=x=>!foff.has(x.v),fHas=()=>FS.some(x=>x.ks.length&&fOn(x));
+const fKids=i=>{const o=[];for(let j=i+1;j<FS.length&&FS[j].d>FS[i].d;j++)o.push(FS[j]);return o};
+const fLabel=()=>{try{FS=libRz()}catch(e){return}const p=fPick(),n=p.filter(fOn).length,all=n==p.length;fbtn.querySelector('.rzn').textContent=all?'All':n+'/'+p.length;fbtn.classList.toggle('part',!all)};
+const fSaveOff=()=>{try{kv.set(FK,JSON.stringify([...foff]))}catch(e){}};
+function fPaint(){try{FS=libRz()}catch(e){FS=[]}flist.textContent='';FS.forEach(x=>{const l=document.createElement('label'),c=document.createElement('input'),s=document.createElement('span');l.className='chk sub';l.style.marginLeft=(x.d*14)+'px';if(!x.c)l.style.opacity='.45';c.type='checkbox';c.dataset.fv=x.v;c.checked=x.c>0&&fOn(x);c.disabled=!x.c;s.textContent=x.n;l.append(c,s);flist.appendChild(l)});fLabel()}
+flist.addEventListener('change',e=>{const c=e.target.closest('[data-fv]');if(!c)return;const i=FS.findIndex(x=>x.v==c.dataset.fv);if(i<0)return;const prev=new Set(foff);[FS[i],...fKids(i)].forEach(x=>{if(!x.c)return;if(c.checked)foff.delete(x.v);else foff.add(x.v)});if(!fHas())foff=prev;fSaveOff();fPaint()});
+fbox.addEventListener('click',e=>{if(e.target.closest('[data-rzfall]')){foff.clear();fSaveOff();fPaint()}else if(e.target.closest('[data-rzfno]')){try{FS=libRz()}catch(e2){return}const keep=FS.find(x=>x.ks.length);foff=new Set(fPick().filter(x=>x!==keep).map(x=>x.v));fSaveOff();fPaint()}});
+fbtn.onclick=()=>{const open=fbox.hidden;if(open)fPaint();fbox.hidden=!open;fbtn.setAttribute('aria-expanded',open?'true':'false')};
+// null while every folder is ticked (the roll then works exactly as before); otherwise the shapes of each ticked folder, with the Dots set kept apart as the accents
+const folders=()=>{fLabel();const p=fPick();if(p.every(fOn)||!fHas())return null;const on=p.filter(x=>fOn(x)&&x.ks.length),dots=on.find(x=>x.v=='b:Dots'),th=on.filter(x=>x!==dots).map(x=>x.ks);return th.length||dots?{themes:th,dots:dots?dots.ks:null}:null};
+sync();fLabel();WBX.wbRZ={get,sub,amt,folders};
 $('rzdo').onclick=()=>randomize(false);
 })();
 
