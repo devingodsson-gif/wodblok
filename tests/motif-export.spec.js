@@ -73,14 +73,14 @@ const menuItem = (page, name) => page.locator('.rowm').getByRole('menuitem', { n
 async function build(page) {
   await mkFolder(page, 'Picks'); await mkFolder(page, 'Inner');
   await page.click('#lback'); await page.click('#lback');
-  await page.click('#lfold [data-f="g:Wodblok shapes"]'); await page.click('#lfold [data-f="b:Flowers"]');
+  await page.click('#lfold [data-f="b:Flowers"]');
   await page.click('#fsel');
   await page.locator('#lib button[data-m]').nth(0).click(); await page.locator('#lib button[data-m]').nth(1).click();
   await pick(page, '#fmove', 'g:Picks'); await settle(page);
   await page.locator('#lib button[data-m]').nth(2).click();
   await pick(page, '#fmove', 'g:Picks/Inner'); await settle(page);
   await page.click('#fdone');
-  await page.click('#lback'); await page.click('#lback');
+  await page.click('#lback');
 }
 
 test.describe('library button', () => {
@@ -96,8 +96,8 @@ test.describe('library button', () => {
     expect(z.filename).toBe('wodblok-shapes.zip');
     expect(under('Picks').length).toBe(2);
     expect(under('Picks/Inner').length).toBe(1);
-    expect(under('Wodblok shapes/Flowers').length).toBe(55);
-    expect(z.names.some(n => n.startsWith('Wodblok shapes/Mammals/'))).toBe(true);
+    expect(under('Flowers').length).toBe(55);
+    expect(z.names.some(n => n.startsWith('Mammals/'))).toBe(true);
     expect(z.names.length).toBeGreaterThan(90);
     expect(z.names.every(n => n.endsWith('.svg'))).toBe(true);
     // every file is a real, parseable SVG: black ink on transparent, with no leftover colour words

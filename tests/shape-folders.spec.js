@@ -30,8 +30,7 @@ test('the library opens on one A-Z list of every folder; folders can be made at 
   await expect(page.locator('#lib')).toBeHidden();
   let names = await rows(page);
   expect(names[0]).toBe('My imports');
-  expect(names).toContain('Wodblok shapes');                            // the built-in sets all sit inside Wodblok shapes
-  expect(names).not.toContain('Flowers');
+  expect(names).toContain('Flowers');                                   // the built-in sets sit in the same list as your folders
   await mkFolder(page, 'Florals');                                  // a new folder opens straight away
   await expect(page.locator('#lcr')).toHaveText('Florals');
   await mkFolder(page, 'Tulips');                                   // made inside the open folder
@@ -44,20 +43,17 @@ test('the library opens on one A-Z list of every folder; folders can be made at 
   const rest = names.slice(1);
   expect(rest).toContain('Florals');
   expect(rest).toEqual([...rest].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })));   // A to Z
-  await page.click('#lfold [data-f="g:Wodblok shapes"]');
-  expect(await rows(page)).toEqual(['Ancient Egypt', 'Birds', 'Boats & Water Travel', 'Buildings & Places', 'Christian & Biblical', 'Clothing & Accessories', 'Fire & Light', 'Flowers', 'Food & Farming', 'Geometric Shapes & Symbols', 'Greek & Mythology', 'Household & Tools', 'Landscape, Sky & Weather', 'Mammals', 'Music, Writing & Arts', 'Ornaments & Patterns', 'Reptiles, Insects & Amphibians', 'Sea Life', 'Trees, Leaves & Plants', 'Weapons & Armor']);
-  await expect(page.locator('#fmore')).toBeHidden();                // Wodblok shapes cannot be renamed, moved or deleted
   // a folder inside a built-in set
   await page.click('#lfold [data-f="b:Flowers"]');
-  await expect(page.locator('#lcr')).toHaveText('Wodblok shapes/Flowers');
+  await expect(page.locator('#lcr')).toHaveText('Flowers');
   await expect(page.locator('#lib button[data-m]')).toHaveCount(55);
   await mkFolder(page, 'Mine');
-  await expect(page.locator('#lcr')).toHaveText('Wodblok shapes/Flowers/Mine');
+  await expect(page.locator('#lcr')).toHaveText('Flowers/Mine');
   await page.click('#lcr [data-f="b:Flowers"]');
   expect(await rows(page)).toEqual(['Mine']);
   await expect(page.locator('#lib button[data-m]')).toHaveCount(55);
   await page.click('#lback');
-  await expect(page.locator('#lcr')).toHaveText('Wodblok shapes');
+  await expect(page.locator('#lcr')).toHaveText('All folders');
   expect(errors).toEqual([]);
 });
 
@@ -143,13 +139,11 @@ test('folder menu: rename and move keep what is inside; delete sends imports bac
   await expect(page.locator('#lfold [data-f="g:Tulips"]')).toHaveCount(0);
   await expect(page.locator('#lfold [data-f="i"] .lfc')).toHaveText('16');
   // hide a built-in set: it moves under Hidden sets
-  await page.click('#lfold [data-f="g:Wodblok shapes"]');
   await page.click('#lfold [data-f="b:Birds"]');
   await page.click('#fmore');
   await page.click('.rowm button:has-text("Hide")');
   await page.click('#lback');                                       // a hidden set goes back to the folder list
   await expect(page.locator('#lfold .lfr[data-f="b:Birds"]')).toHaveCount(0);
-  await expect(page.locator('#lfold .lfr[data-f="g:Wodblok shapes"]')).toHaveCount(1);
   await page.click('#lhid');
   await expect(page.locator('#lfold .lfr.hid[data-f="b:Birds"]')).toHaveCount(1);
   expect(errors).toEqual([]);
@@ -159,7 +153,6 @@ test('selected shapes move to a folder, and a shape dragged onto a folder moves 
   const { errors } = await open(page);
   await mkFolder(page, 'Picks');
   await page.click('#lback');
-  await page.click('#lfold [data-f="g:Wodblok shapes"]');
   await page.click('#lfold [data-f="b:Flowers"]');
   await page.click('#fsel');
   await page.locator('#lib button[data-m]').nth(0).click();
@@ -169,10 +162,8 @@ test('selected shapes move to a folder, and a shape dragged onto a folder moves 
   await settle(page);
   await page.click('#fdone');
   await page.click('#lback');
-  await page.click('#lback');
   await expect(page.locator('#lfold [data-f="g:Picks"] .lfc')).toHaveText('2');
   // drag a third shape onto a folder inside the set
-  await page.click('#lfold [data-f="g:Wodblok shapes"]');
   await page.click('#lfold [data-f="b:Flowers"]');
   await mkFolder(page, 'Sub');
   await page.click('#lcr [data-f="b:Flowers"]');
@@ -187,21 +178,5 @@ test('selected shapes move to a folder, and a shape dragged onto a folder moves 
   await expect(page.locator('#lfold [data-f="g:b:Flowers/Sub"] .lfc')).toHaveText('1');
   const items = await page.evaluate(() => JSON.parse(window.__wbTest.state()).tiles[0].items.length);
   expect(items).toBe(0);                                              // dropping on a folder does not stamp it
-  expect(errors).toEqual([]);
-});
-
-test('your own folders can be moved into Wodblok shapes, which itself cannot be changed', async ({ page }) => {
-  const { errors } = await open(page);
-  await mkFolder(page, 'Florals');
-  await page.click('#fmore');
-  await page.click('.rowm button:has-text("Move to")');
-  await pick(page, '#fdest', 'g:Wodblok shapes');
-  await page.click('#fok');
-  await settle(page);
-  await expect(page.locator('#lcr')).toHaveText('Wodblok shapes/Florals');
-  await page.click('#lback');
-  expect(await rows(page)).toEqual(['Ancient Egypt', 'Birds', 'Boats & Water Travel', 'Buildings & Places', 'Christian & Biblical', 'Clothing & Accessories', 'Fire & Light', 'Florals', 'Flowers', 'Food & Farming', 'Geometric Shapes & Symbols', 'Greek & Mythology', 'Household & Tools', 'Landscape, Sky & Weather', 'Mammals', 'Music, Writing & Arts', 'Ornaments & Patterns', 'Reptiles, Insects & Amphibians', 'Sea Life', 'Trees, Leaves & Plants', 'Weapons & Armor']);
-  await page.click('#lback');
-  expect(await rows(page)).not.toContain('Florals');
   expect(errors).toEqual([]);
 });

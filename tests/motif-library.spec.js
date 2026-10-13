@@ -13,7 +13,7 @@ test('the Shapes panel has no Draw with Claude section and the folder list has n
   const folders = await page.locator('#lfold .lfr .lfn').allTextContents();      // the library opens on the list of folders (1.2.14)
   expect(folders.some(f => /Drawn by Claude/.test(f))).toBe(false);
   expect(folders.some(f => /My imports/.test(f))).toBe(true);
-  await page.click('#lfold [data-f="g:Wodblok shapes"]'); await page.click('#lfold [data-f="b:Flowers"]');
+  await page.click('#lfold [data-f="b:Flowers"]');
   expect(await page.locator('#lib > *').count()).toBeGreaterThan(0);      // there is still something to place
   expect(errors).toEqual([]);
 });
