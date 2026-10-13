@@ -1,3 +1,4 @@
+import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {M,N,rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {CATS} from './05-motif-data.js';
@@ -26,7 +27,7 @@ const lbSort=(a,b)=>a.n.localeCompare(b.n,undefined,{numeric:true,sensitivity:'b
 const fOf=k=>k[0]=='b'?BF[k]:(cust[k]||{}).g;
 const fSet=(k,g)=>{if(k[0]=='b'){if(g)BF[k]=g;else delete BF[k]}else if(cust[k]){if(g)cust[k].g=g;else delete cust[k].g}};
 const mNm=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
-let LBX=null,lbHidOpen=false,lbSig='';
+let LBX=null,lbHidOpen=false,lbSig='',lbBrowse=false;const lbCol=new Set();   // lbBrowse: every folder's shapes in one scrolling view; lbCol: folders collapsed in it
 // one pass over the library: every folder path, and which shapes each folder holds
 function lbIndex(){const all=new Set(),by=new Map(),imp=[],drw=[],put=(g,k)=>{(by.get(g)||by.set(g,[]).get(g)).push(k)};
 const add=p=>{if(typeof p!='string'||!p)return;const a=p.split('/');for(let i=1;i<=a.length;i++){if(!a[i-1])return;const q=a.slice(0,i).join('/');if(i==1&&lbRoot(q))continue;all.add(q)}};
@@ -69,7 +70,7 @@ const p=own.t=='r'?nm:own.p+'/'+nm;if(!WBS.FOLD.includes(p))WBS.FOLD.push(p);fSa
 function libExportList(deep){lbDirty();const c=libCur(),out=[],top=c.t=='r',walk=(n,pre)=>{const p=[...pre,n.n];out.push({path:p,ks:n.ks});if(deep||top)lbKids(n).forEach(k=>walk(k,p))};
 if(top)[lbNode('i'),...(lbX().drw.length?[lbNode('d')]:[]),...lbKids(c),...lbKids(c,true)].forEach(n=>walk(n,[]));else walk(c,[]);
 return{root:top,name:c.n,folders:out,sub:!top&&lbKids(c).length>0}}
-function libOpen(v){lbDirty();const n=lbNode(v)||lbNode('/');WBS.mcat=n.v;mcSave();lsel.clear();WBS.lanc=null;if(n.t=='r')WBS.lsm=false;closeF();renderLib(true)}
+function libOpen(v){lbDirty();lbBrowse=false;const n=lbNode(v)||lbNode('/');WBS.mcat=n.v;mcSave();lsel.clear();WBS.lanc=null;if(n.t=='r')WBS.lsm=false;closeF();renderLib(true)}
 // a folder's path moves: everything inside it, and every shape filed there, follows
 function lbRemap(p,np){const m=x=>lbIn(x,p)?np+x.slice(p.length):x;
 WBS.FOLD=[...new Set(WBS.FOLD.map(m))];Object.values(cust).forEach(v=>{if(v&&v.g)v.g=m(v.g)});Object.keys(BF).forEach(k=>{BF[k]=m(BF[k])});
@@ -84,23 +85,29 @@ chev:'<svg class="lfa" viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 ck:'<svg viewBox="0 0 16 16"><path d="M4.3 8.4l2.4 2.4 5-5.3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
 function renderLib(force){lbDirty();const c=libCur(),[pa,pb]=pal(),root=c.t=='r',own=c.t=='f'||c.t=='b';
 // build() calls this on every change, so skip the work when nothing the library shows has changed
-const sig=[c.v,WBS.lsm,[...lsel].join(','),WBS.brush&&!WBS.lsm?WBS.brush.m:'',pa,pb,lbHidOpen,WBS.fmode,JSON.stringify(REN),WBS.HID.join(','),WBS.FOLD.join('|'),JSON.stringify(BF),Object.keys(cust).map(k=>{const v=cust[k]||{};return k+'>'+(v.g||'')+(v.svg||'').length+(v.n||'')}).join(',')].join('#');
+const sig=[c.v,WBS.lsm,[...lsel].join(','),WBS.brush&&!WBS.lsm?WBS.brush.m:'',pa,pb,lbHidOpen,lbBrowse,[...lbCol].join('|'),WBS.fmode,JSON.stringify(REN),WBS.HID.join(','),WBS.FOLD.join('|'),JSON.stringify(BF),Object.keys(cust).map(k=>{const v=cust[k]||{};return k+'>'+(v.g||'')+(v.svg||'').length+(v.n||'')}).join(',')].join('#');
 if(!force&&sig===lbSig)return;lbSig=sig;
 // path bar, and where Import will put new shapes
 $('lback').hidden=root;$('idest').textContent=own?lbCrumbs(c).map(x=>x.n).join(' / '):'My imports';
 const cr=lbCrumbs(c);$('lcr').innerHTML=root?'<span class="lcc">All folders</span>':cr.map((n,i)=>i<cr.length-1?`<button type="button" class="lcb" data-f="${hx(n.v)}">${hx(n.n)}</button><i class="lcs">/</i>`:`<span class="lcc">${hx(n.n)}</span>`).join('');
-$('fnew').disabled=c.t=='u';$('fsel').hidden=root;$('fsel').disabled=!c.ks.length&&!WBS.lsm;$('fsel').setAttribute('aria-pressed',String(WBS.lsm));$('fmore').hidden=!own;$('fexp').setAttribute('aria-label',root?'Export all shapes':'Export this folder');$('fexp').disabled=!root&&!lbCount(c);
+$('fnew').disabled=c.t=='u';$('fsel').hidden=root||lbBrowse;$('fsel').disabled=!c.ks.length&&!WBS.lsm;$('fsel').setAttribute('aria-pressed',String(WBS.lsm));$('fmore').hidden=!own;$('fbrw').hidden=!root&&!lbKids(c).length;$('fbrw').setAttribute('aria-pressed',String(lbBrowse));$('fbrw').setAttribute('aria-label',lbBrowse?'Collapse all folders':'Expand all folders');$('fexp').setAttribute('aria-label',root?'Export all shapes':'Export this folder');$('fexp').disabled=!root&&!lbCount(c);
 // folders
 const rows=root?[lbNode('i'),...(lbX().drw.length?[lbNode('d')]:[]),...lbKids(c)]:lbKids(c),hidL=root?lbKids(c,true):[];
 const row=n=>`<button type="button" class="lfr${n.hid?' hid':''}" data-f="${hx(n.v)}"><span class="lfi">${n.t=='u'?(n.v=='i'?IC.tray:IC.pen):n.t=='b'?IC.set:IC.fold}</span><span class="lfn">${hx(n.n)}</span><span class="lfc">${lbCount(n)}</span>${IC.chev}</button>`;
 $('lfold').innerHTML=rows.map(row).join('')+(hidL.length?`<button type="button" class="lfh" id="lhid" aria-expanded="${lbHidOpen}"><span class="lfi">${IC.hide}</span><span class="lfn">Hidden sets</span><span class="lfc">${hidL.length}</span>${IC.chev}</button>`+(lbHidOpen?hidL.map(row).join(''):''):'');
-$('lfold').hidden=!rows.length&&!hidL.length;$('lfold').classList.toggle('sub',!root);
+$('lfold').hidden=lbBrowse||(!rows.length&&!hidL.length);$('lfold').classList.toggle('sub',!root);
 // shapes
 [...lsel].forEach(k=>{if(!c.ks.includes(k))lsel.delete(k)});
-const L=$('lib');L.hidden=root||!c.ks.length;L.classList.toggle('sel',WBS.lsm);
-L.innerHTML=root?'':c.ks.map(k=>{const on=lsel.has(k),b=`<button data-m="${k}" class="${WBS.brush&&WBS.brush.m==k&&!WBS.lsm?'on':''}${on?' pk':''}" aria-label="${hx(mNm(k))}"><svg viewBox="-50 -50 100 100" style="background:${pa};border-radius:4px">${mk(k,pb,pa)}</svg></button>`;
-return`<div>${b}${on?`<i class="ck">${IC.ck}</i>`:''}${k[0]=='b'||WBS.lsm?'':`<button class="dx" data-x="${k}" aria-label="Remove from library">&#215;</button>`}</div>`}).join('');
-$('lem').hidden=root||!!c.ks.length||!!rows.length;$('lem').textContent=c.v=='i'?'No imports yet':'Empty folder';
+const L=$('lib');L.classList.toggle('sel',WBS.lsm);
+const tile=k=>{const on=lsel.has(k),b=`<button data-m="${k}" class="${WBS.brush&&WBS.brush.m==k&&!WBS.lsm?'on':''}${on?' pk':''}" aria-label="${hx(mNm(k))}"><svg viewBox="-50 -50 100 100" style="background:${pa};border-radius:4px">${mk(k,pb,pa)}</svg></button>`;
+return`<div>${b}${on?`<i class="ck">${IC.ck}</i>`:''}${k[0]=='b'||WBS.lsm?'':`<button class="dx" data-x="${k}" aria-label="Remove from library">&#215;</button>`}</div>`};
+if(lbBrowse){const out=[],walk=(n,d)=>{if(!lbCount(n))return;const open=!lbCol.has(n.v);
+out.push(`<div class="lsh" role="button" tabindex="0" aria-expanded="${open}" data-s="${hx(n.v)}" style="padding-left:${4+d*12}px">${IC.chev}<span class="lfn">${hx(n.n)}</span><span class="lfc">${lbCount(n)}</span><button type="button" class="lso" data-o="${hx(n.v)}" aria-label="Open ${hx(n.n)}">${IC.fold}</button></div>`);
+if(open){n.ks.forEach(k=>out.push(tile(k)));lbKids(n).forEach(x=>walk(x,d+1))}};
+(root?[lbNode('i'),...(lbX().drw.length?[lbNode('d')]:[]),...lbKids(c)]:[c]).forEach(n=>walk(n,0));
+L.hidden=!out.length;L.innerHTML=out.join('')}
+else{L.hidden=root||!c.ks.length;L.innerHTML=root?'':c.ks.map(tile).join('')}
+$('lem').hidden=lbBrowse||root||!!c.ks.length||!!rows.length;$('lem').textContent=c.v=='i'?'No imports yet':'Empty folder';
 // selection bar
 const n=lsel.size;$('fsbar').hidden=!WBS.lsm||root;$('fscnt').textContent=n?`${n} selected`:'None selected';
 $('fall').textContent=c.ks.length&&c.ks.every(k=>lsel.has(k))?'Select none':'Select all';
@@ -127,6 +134,15 @@ pmsg(`Moved ${ks.length} shape${ks.length>1?'s':''} to “${libPath(t)}”.`+(nb
 const libMove=t=>libMoveKeys([...lsel],t);
 function init21(){
 WBX.wbLibOpen=libOpen;
+// the size slider sets how many shapes sit in a row; the view button shows every folder's shapes in one scroll
+const SZ=$('lsz'),szSet=v=>{SZ.value=v;$('lib').style.setProperty('--lcols',10-v);SZ.style.setProperty('--p',(v/8*100)+'%')};
+let sz0=6;try{const v=+kv.get('wb150_lsz');if(kv.get('wb150_lsz')!=null&&v>=0&&v<=8)sz0=Math.round(v)}catch(e){}
+szSet(sz0);
+SZ.oninput=()=>{szSet(+SZ.value);try{kv.set('wb150_lsz',String(SZ.value))}catch(e){}};
+$('fbrw').onclick=()=>{lbBrowse=!lbBrowse;lbCol.clear();closeF();if(lbBrowse&&WBS.lsm){libExit();return}renderLib(true)};
+const secTog=h=>{const v=h.dataset.s;if(lbCol.has(v))lbCol.delete(v);else lbCol.add(v);renderLib(true)};
+$('lib').addEventListener('click',e=>{const o=e.target.closest('[data-o]');if(o){libOpen(o.dataset.o);return}const h=e.target.closest('.lsh');if(h)secTog(h)});
+$('lib').addEventListener('keydown',e=>{const h=e.target.closest&&e.target.closest('.lsh');if(h&&e.target===h&&(e.key=='Enter'||e.key==' ')){e.preventDefault();secTog(h)}});
 $('lfold').onclick=e=>{if(e.target.closest('#lhid')){lbHidOpen=!lbHidOpen;renderLib(true);return}const b=e.target.closest('[data-f]');if(b)libOpen(b.dataset.f)};
 $('lcr').onclick=e=>{const b=e.target.closest('[data-f]');if(b)libOpen(b.dataset.f)};
 $('lback').onclick=()=>{const c=libCur();libOpen(c.t=='f'&&lbPar(c.p)?lbId(lbPar(c.p)):'/')};

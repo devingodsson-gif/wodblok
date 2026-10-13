@@ -585,6 +585,13 @@ body.dropping::after{content:"Drop the image to import it";position:fixed;inset:
 .lfa{flex:none;width:14px;height:14px;color:var(--faint)}
 .lfr.hid{color:var(--mut)}.lfr.hid .lfi{opacity:.6}
 .lfh{color:var(--mut);margin-top:4px}.lfh[aria-expanded="true"] .lfa{transform:rotate(90deg)}
+.lview{display:flex;align-items:center;gap:8px;margin-top:6px}.lview .ib{width:28px;height:28px;flex:none}.lview .ib svg{width:16px;height:16px}.lview .ib[aria-pressed="true"]{color:var(--acc-ink);background:var(--acc-soft)}.lview input[type=range]{flex:1;min-width:0}
+#fbrw .c,#fbrw[aria-pressed="true"] .e{display:none}#fbrw[aria-pressed="true"] .c{display:block}
+.lib{grid-template-columns:repeat(var(--lcols,4),1fr)}
+.lib .lsh{grid-column:1/-1;display:flex;align-items:center;gap:8px;height:30px;margin-top:6px;padding-right:2px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer}.lib .lsh:first-child{margin-top:0}.lib .lsh:hover,.lib .lsh:focus-visible{background:var(--raise);outline:none}
+.lib .lsh .lfa{width:14px;height:14px;transition:transform .12s}.lib .lsh[aria-expanded="true"] .lfa{transform:rotate(90deg)}
+.lib .lsh .lfn{font-weight:600}
+.lib .lso{flex:none;width:26px;height:26px;aspect-ratio:auto;padding:0;margin:0;border:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center}.lib .lso:hover{color:var(--fg);background:var(--raise)}.lib .lso svg{width:15px;height:15px;border-radius:0}
 .lfr.dropt,.lcb.dropt{background:var(--acc-soft);border-color:var(--acc);color:var(--fg)}
 .lem{margin-top:8px;padding:18px 8px;border:1px dashed var(--line2);border-radius:8px;text-align:center;font-size:11.5px;color:var(--mut)}
 .fform{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.fform input,.fform select{flex:1;min-width:0;margin:0}.fform button{margin:0}#fq{flex-basis:100%;font-size:12px;line-height:1.4}
@@ -910,6 +917,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
     <button class="ib" id="fmore" aria-label="Folder options" aria-haspopup="menu" data-more hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r=".9"/><circle cx="12" cy="12" r=".9"/><circle cx="18" cy="12" r=".9"/></svg></button>
    </div>
    <div class="fform" id="fform" hidden><input type="text" id="fname" maxlength="30" placeholder="Folder name" aria-label="Folder name"><select id="fdest" aria-label="Move into" hidden></select><span id="fq" hidden></span><button class="primary" id="fok">Create</button><button class="alt" id="fcx">Cancel</button></div>
+   <div class="lview"><button class="ib" id="fbrw" aria-label="Expand all folders" aria-pressed="false"><svg class="ic e" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5-4 5 4M7 15l5 4 5-4"/></svg><svg class="ic c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5l5 4 5-4M7 19l5-4 5 4"/></svg></button><input type="range" id="lsz" min="0" max="8" step="1" value="6" aria-label="Shape size"></div>
    <div class="lfl" id="lfold"></div>
    <div class="lib" id="lib"></div>
    <div class="lem" id="lem" hidden></div>
