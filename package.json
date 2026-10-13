@@ -17,7 +17,8 @@
     "typecheck": "tsc -p .",
     "check:platform": "node tools/check-platform.js",
     "coupling-map": "node tools/coupling-map.js legacy/wodblok-v100.html > docs/coupling-map.md",
-    "test:build": "node tools/build.js && WB_TARGET=build playwright test --project=chromium"
+    "test:build": "node tools/build.js && WB_TARGET=build playwright test --project=chromium",
+    "test:site": "node --test tests/site-waitlist.test.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.56.0",
