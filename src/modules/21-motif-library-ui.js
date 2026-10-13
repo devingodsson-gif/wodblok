@@ -14,8 +14,8 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 // format) and in BF[k] for a built-in shape added to a folder (it also stays in its own set). WBS.mcat is the open folder:
 // "/" the list of all folders, "i" My imports, "d" Drawn by Claude (old projects only), "b:<set>" or "g:<path>".
 const bOk=k=>/^b\d+$/.test(k)&&+k.slice(1)<M.length;
-// "Old shapes" holds the original built-in sets. It always exists, cannot be renamed, moved or deleted, and you can add your own folders to it.
-const OLD='Old shapes',lbFixed=p=>p===OLD;
+// "Wodblok shapes" holds the built-in sets. It always exists, cannot be renamed, moved or deleted, and you can add your own folders to it.
+const OLD='Wodblok shapes',lbFixed=p=>p===OLD;
 const lbSet=n=>CATS.findIndex(c=>c.n==n);
 const lbRoot=p=>p.startsWith('b:')&&!p.includes('/')&&lbSet(p.slice(2))>=0;
 const lbPar=p=>{const i=p.lastIndexOf('/');return i<0?'':p.slice(0,i)};

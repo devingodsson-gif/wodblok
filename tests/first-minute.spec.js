@@ -40,7 +40,7 @@ test('an empty project shows "Add a shape" centred on the canvas; it opens the S
   await expect(page.locator('.seg2 [data-v="stamp"]')).toHaveClass(/on/);
   await expect(page.locator('section.pn[data-p="motifs"]')).toBeVisible();
   await expect(page.locator('#empc')).toBeHidden();                 // not shown in the Stamp editor
-  await page.click('#lfold [data-f="g:Old shapes"]');             // the library opens on the list of folders (1.2.14); the built-in sets sit in Old shapes
+  await page.click('#lfold [data-f="g:Wodblok shapes"]');             // the library opens on the list of folders (1.2.14); the built-in sets sit in Wodblok shapes
   await page.locator('#lfold .lfr').first().click();
   await page.locator('#lib > *').first().click();
   await page.mouse.click(590, 390);
