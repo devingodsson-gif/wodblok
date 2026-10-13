@@ -69,7 +69,9 @@ h1 em{font-style:normal;color:var(--acc-ink)}
 .lede{color:var(--mut);font-size:19px;margin:24px 0 36px;max-width:27rem}
 .small{color:var(--mut);font-size:14px;margin:18px 0 0}
 .print{margin:0;justify-self:center;width:100%;max-width:420px}
-.print img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:2px;box-shadow:var(--print-shadow)}
+.print img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:2px;box-shadow:var(--print-shadow);opacity:1;transition:opacity .65s ease}
+.print img.is-changing{opacity:.15}
+@media (prefers-reduced-motion:reduce){.print img{transition:none}}
 .print figcaption{color:var(--mut);font-size:13px;margin-top:18px;text-align:center;letter-spacing:.02em}
 
 /* sections */
@@ -146,19 +148,14 @@ footer a:hover{color:var(--fg)}
         <p class="small">Runs in your browser. Nothing to install.</p>
       </div>
       <figure class="print">
-        <img src="/img/hero.jpg" width="900" height="1350" alt="A pattern of pale birds printed in rows on dark blue-green paper, with a slightly uneven ink texture.">
+        <img id="hero-slideshow-image" src="/img/hero.jpg" width="900" height="1350" alt="Artwork made with Wodblok.">
         <figcaption>Made in Wodblok with one roll of Randomize.</figcaption>
       </figure>
     </div>
 
     <section aria-labelledby="work-label">
       <p class="label" id="work-label">Made with Wodblok</p>
-      <div class="work" id="work">
-        <img src="/img/work-1.jpg" width="600" height="900" loading="lazy" alt="Purple bonsai trees in a column of hexagons, edged with leaf prints.">
-        <img src="/img/work-2.jpg" width="600" height="900" loading="lazy" alt="Pink sun shapes in squares and circles on a muted plum ground.">
-        <img src="/img/work-3.jpg" width="600" height="900" loading="lazy" alt="Green flower stamps and blue griffins in rows on a pale sand ground.">
-        <img src="/img/work-4.jpg" width="600" height="900" loading="lazy" alt="Red sun medallions in a framed grid on pale yellow paper.">
-      </div>
+      <div class="work" id="work" aria-live="polite"></div>
     </section>
 
     <section aria-labelledby="how-label">
@@ -243,27 +240,40 @@ footer a:hover{color:var(--fg)}
   </footer>
 </div>
 <script>
-// Gallery: work-1 to work-4 are in the page above. Any further image named work-5.jpg, work-6.jpg ... in /img is added here,
-// in order, stopping at the first number that is missing. Also tries .png and .webp for each number.
+// Image lists are generated at deploy time by tools/build-site-image-manifests.js.
+// Add image files to /img/hero or /img/gallery; supported formats: jpg, jpeg, png, webp, gif, avif.
 (function(){
-  var grid=document.getElementById('work'); if(!grid) return;
-  var exts=['jpg','png','webp'];
-  function load(n,i,cb){
-    if(i>=exts.length) return cb(null);
-    var img=new Image(), src='/img/work-'+n+'.'+exts[i];
-    img.onload=function(){cb(img)};
-    img.onerror=function(){load(n,i+1,cb)};
-    img.src=src;
+  var hero=document.getElementById('hero-slideshow-image');
+  var grid=document.getElementById('work');
+  var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function fetchJSON(url){return fetch(url,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('Could not load '+url);return r.json()})}
+  if(hero){
+    fetchJSON('/img/hero-manifest.json').then(function(data){
+      var slides=Array.isArray(data.images)?data.images:[];
+      if(!slides.length)return;
+      var index=0, interval=Math.max(1000,Number(data.intervalMs)||4000);
+      hero.src=slides[0];
+      function advance(){
+        var next=(index+1)%slides.length;
+        var preload=new Image();
+        preload.onload=function(){
+          hero.classList.add('is-changing');
+          window.setTimeout(function(){hero.src=slides[next];index=next;hero.classList.remove('is-changing')},reduced?0:220);
+        };
+        preload.onerror=function(){index=next};
+        preload.src=slides[next];
+      }
+      if(slides.length>1&&!reduced)window.setInterval(advance,interval);
+    }).catch(function(){/* Keep the original hero image as a graceful fallback. */});
   }
-  function next(n){
-    load(n,0,function(img){
-      if(!img) return;
-      img.width=600; img.height=900; img.loading='lazy'; img.alt='A pattern made in Wodblok.';
-      grid.appendChild(img);
-      next(n+1);
-    });
+  if(grid){
+    fetchJSON('/img/gallery-manifest.json').then(function(data){
+      (Array.isArray(data.images)?data.images:[]).forEach(function(src){
+        var img=new Image();img.src=src;img.alt='Artwork made with Wodblok.';img.width=600;img.height=900;img.loading='lazy';
+        grid.appendChild(img);
+      });
+    }).catch(function(){/* The existing static site remains usable if a manifest is unavailable. */});
   }
-  next(grid.querySelectorAll('img').length+1);
 })();
 </script>
 <script>
