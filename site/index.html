@@ -51,6 +51,7 @@ a{color:inherit}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand svg{width:26px;height:26px;flex:none}
 .wordmark{font:600 15px/1 var(--display);letter-spacing:.14em;text-transform:uppercase}
+.top-nav{display:flex;gap:clamp(14px,3vw,28px)}
 .top-link{font-size:15px;color:var(--mut);text-decoration:none;padding:8px 2px}
 .top-link:hover{color:var(--fg)}
 
@@ -84,8 +85,37 @@ section{border-top:1px solid var(--line);padding-block:clamp(56px,8vw,104px)}
 .steps h3::before{content:counter(s);font:600 13px/1 var(--body);color:var(--acc-ink);font-variant-numeric:tabular-nums}
 .steps p{margin:0;color:var(--mut);max-width:22rem}
 
-.close{text-align:center}
-.close h2{font:500 clamp(30px,4vw,44px)/1.1 var(--display);margin:0 0 28px;text-wrap:balance}
+/* coming next */
+.next{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,4vw,56px) clamp(28px,5vw,80px);list-style:none;margin:0;padding:0}
+.next li{min-width:0}
+.next h3{font:500 24px/1.2 var(--display);margin:0 0 10px}
+.next p{margin:0;color:var(--mut);max-width:26rem}
+.also{margin:clamp(40px,6vw,64px) 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:10px}
+.also li{border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:14px;color:var(--mut)}
+
+/* waitlist */
+.join{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,6vw,88px);align-items:start}
+.join h2{font:500 clamp(30px,4vw,44px)/1.1 var(--display);margin:0 0 20px;text-wrap:balance}
+.join .lede{margin:0;font-size:18px}
+form{display:grid;gap:20px;min-width:0}
+.field{display:grid;gap:8px;min-width:0}
+.field>label,.field>span.q{font-size:14px;color:var(--mut)}
+input,select,textarea{width:100%;font:400 16px/1.4 var(--body);color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:13px 14px;transition:border-color .15s ease}
+input:hover,select:hover,textarea:hover{border-color:var(--mut)}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:1px;border-color:var(--acc)}
+select{appearance:none;-webkit-appearance:none;padding-right:40px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 6.5 8 10.5l4-4' fill='none' stroke='%23a39b8e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:16px}
+textarea{min-height:110px;resize:vertical}
+[hidden]{display:none!important}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-foot{display:flex;flex-wrap:wrap;align-items:center;gap:16px 20px}
+button.btn{border:0;cursor:pointer}
+button.btn[disabled]{opacity:.6;cursor:default}
+.note{color:var(--mut);font-size:13px;margin:0}
+.msg{margin:0;font-size:15px}
+.msg.err{color:#d98a6a}
+.thanks h3{font:500 28px/1.2 var(--display);margin:0 0 10px}
+.thanks p{margin:0;color:var(--mut)}
+
 
 footer{border-top:1px solid var(--line);padding-block:28px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;color:var(--mut);font-size:14px}
 footer a{text-decoration:none}
@@ -96,7 +126,7 @@ footer a:hover{color:var(--fg)}
   .hero-text{max-width:none}
   .print{max-width:360px}
   .work{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .steps{grid-template-columns:minmax(0,1fr)}
+  .steps,.next,.join{grid-template-columns:minmax(0,1fr)}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -108,7 +138,7 @@ footer a:hover{color:var(--fg)}
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="var(--acc)"/><rect x="8.6" y="8.6" width="6.8" height="6.8" rx="1" transform="rotate(45 12 12)" fill="none" stroke="var(--acc-fg)" stroke-width="2"/></svg>
       <span class="wordmark">Wodblok</span>
     </a>
-    <a class="top-link" href="https://app.wodblok.com">Open the app</a>
+    <nav class="top-nav"><a class="top-link" href="#waitlist">Join the waitlist</a><a class="top-link" href="https://app.wodblok.com">Open the app</a></nav>
   </header>
 
   <main>
@@ -145,10 +175,73 @@ footer a:hover{color:var(--fg)}
       </ol>
     </section>
 
-    <section class="close" aria-labelledby="close-title">
-      <h2 id="close-title">Start a pattern.</h2>
-      <a class="btn" href="https://app.wodblok.com">Open Wodblok
-        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+
+    <section aria-labelledby="next-label">
+      <p class="label" id="next-label">Coming next</p>
+      <ul class="next">
+        <li><h3>Colourways</h3><p>Keep several colour versions of one design in the same project, see them side by side and export them all at once.</p></li>
+        <li><h3>Print size</h3><p>Set the size in inches or centimetres at 150 or 300 DPI, so a tile arrives at the right size for fabric and wallpaper printers.</p></li>
+        <li><h3>Separations</h3><p>Export one black-and-white plate for each ink or stamp, for carving, screen printing or 3D-printing real stamps.</p></li>
+        <li><h3>Mockups</h3><p>Place the pattern on fabric, a pillow, a wall or a book cover for shop listings and client previews.</p></li>
+      </ul>
+      <ul class="also" aria-label="Also planned">
+        <li>Edit inside the repeat view</li>
+        <li>Smarter recolouring</li>
+        <li>Palette from a photo</li>
+        <li>Layered export for Photoshop</li>
+        <li>More brick and half-drop offsets</li>
+        <li>Radial and path layouts</li>
+      </ul>
+    </section>
+
+    <section class="join" id="waitlist" aria-labelledby="join-title">
+      <div>
+        <h2 id="join-title">Join the waitlist.</h2>
+        <p class="lede">Be first to hear about new features and launch news. A few quick questions help shape what comes next.</p>
+      </div>
+      <div id="join-body">
+        <form id="join-form" method="post" action="/api/waitlist">
+          <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required></div>
+          <div class="field"><label for="f-role">What will you use it for?</label>
+            <select id="f-role" name="role" required>
+              <option value="" selected disabled>Choose one</option>
+              <option>Pattern design</option>
+              <option>Textile or fabric design</option>
+              <option>Screen printing</option>
+              <option>Clothing or fashion design</option>
+              <option>Wallpaper or interiors</option>
+              <option>Advertising or branding</option>
+              <option>Logos and identity</option>
+              <option>Packaging or stationery</option>
+              <option>Illustration or art</option>
+              <option>Hobby or making</option>
+              <option value="other">Other</option>
+            </select>
+            <input id="f-role-other" name="role_other" type="text" maxlength="80" placeholder="Tell us" aria-label="Other use" hidden></div>
+          <div class="field"><label for="f-heard">How did you hear about Wodblok?</label>
+            <select id="f-heard" name="heard">
+              <option value="" selected>Choose one</option>
+              <option>Search</option>
+              <option>Instagram</option>
+              <option>Pinterest</option>
+              <option>TikTok</option>
+              <option>YouTube</option>
+              <option>Etsy</option>
+              <option>Reddit</option>
+              <option>A friend or colleague</option>
+              <option>A newsletter or blog</option>
+              <option value="other">Other</option>
+            </select>
+            <input id="f-heard-other" name="heard_other" type="text" maxlength="80" placeholder="Tell us" aria-label="Other source" hidden></div>
+          <div class="field"><label for="f-why">Why do you want it?</label><textarea id="f-why" name="why" maxlength="1000"></textarea></div>
+          <div class="hp" aria-hidden="true"><label>Company <input name="company" tabindex="-1" autocomplete="off"></label></div>
+          <div class="form-foot">
+            <button class="btn" type="submit">Join the waitlist</button>
+            <p class="msg" id="join-msg" role="status" aria-live="polite"></p>
+          </div>
+          <p class="note">We only email about Wodblok, and you can unsubscribe at any time.</p>
+        </form>
+      </div>
     </section>
   </main>
 
@@ -157,5 +250,28 @@ footer a:hover{color:var(--fg)}
     <a href="https://app.wodblok.com">app.wodblok.com</a>
   </footer>
 </div>
+<script>
+(function(){
+  var form=document.getElementById('join-form'); if(!form) return;
+  var msg=document.getElementById('join-msg'), btn=form.querySelector('button');
+  function other(sel,inp){function f(){var o=sel.value==='other';inp.hidden=!o;inp.required=o;if(!o)inp.value=''}sel.addEventListener('change',f);f()}
+  other(document.getElementById('f-role'),document.getElementById('f-role-other'));
+  other(document.getElementById('f-heard'),document.getElementById('f-heard-other'));
+  function done(){
+    var b=document.getElementById('join-body');
+    b.innerHTML='<div class="thanks" role="status"><h3>You\u2019re on the list.</h3><p>Thank you. We\u2019ll be in touch when there is news.</p></div>';
+  }
+  if(/[?&]joined=1/.test(location.search)) done();
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!form.reportValidity()) return;
+    var d={};new FormData(form).forEach(function(v,k){d[k]=v});
+    btn.disabled=true; msg.className='msg'; msg.textContent='';
+    fetch('/api/waitlist',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(d)})
+      .then(function(r){return r.json().catch(function(){return {}}).then(function(j){if(r.ok&&j.ok){done()}else{throw new Error(j.error||'Something went wrong. Please try again.')}})})
+      .catch(function(err){msg.className='msg err';msg.textContent=err.message==='Failed to fetch'?'Could not reach the server. Please try again.':err.message;btn.disabled=false});
+  });
+})();
+</script>
 </body>
 </html>

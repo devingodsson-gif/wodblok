@@ -27,3 +27,26 @@ To skip it, set Build watch paths in each project (app: exclude `site/*`; site: 
 
 Browsers keep a site's stored data per address. Work, settings and the stamp library saved in the app at wodblok.com do
 not appear at app.wodblok.com. Save anything worth keeping to a file (projects as .wodblok files, the stamp library as an export) before step 3.
+
+## Waitlist
+
+The sign-up form at the bottom of the page posts to `/api/waitlist`, a Cloudflare Pages Function in `functions/api/waitlist.js`.
+It stores each sign-up in a D1 database: email, what they will use it for, how they heard, why they want it, and the dates.
+Signing up again with the same email updates that row. It creates its own table on first use. No keys are stored in the repo.
+
+One-off set-up in the Cloudflare dashboard (the form shows "not set up yet" until it is done):
+1. Storage & databases > D1 > Create database, name it `wodblok-waitlist`.
+2. Workers & Pages > the **site** project > Settings > Bindings > Add > D1 database, variable name `DB` (capital letters), pick `wodblok-waitlist`. Save and redeploy (a new merge into `main`, or Deployments > Retry).
+
+Reading the list: D1 > `wodblok-waitlist` > Console > `SELECT * FROM waitlist ORDER BY created_at DESC;`
+or from a terminal `npx wrangler d1 execute wodblok-waitlist --remote --json --command "SELECT * FROM waitlist"`.
+Roles and sources picked as "Other" are stored as `Other: <what they typed>`.
+
+`functions/` sits at the repo root because that is where Pages looks; the app project picks it up too, but without a `DB`
+binding it only answers "not set up" and nothing else changes. Tests: `npm run test:site` (plain Node, no browser).
+The page has a hidden trap field and checks the sign-up comes from the same site; add Cloudflare Turnstile if spam shows up.
+
+## Features section
+
+"Coming next" lists the first four items of the future-features list (colourways, print size, separations, mockups) and the
+smaller ones as chips. Keep the wording to what is actually planned; edit the list in `site/index.html`.
