@@ -69,24 +69,29 @@ async function pick(page, sel, v) {
 }
 async function mkFolder(page, name) { await page.click('#fnew'); await page.fill('#fname', name); await page.click('#fok'); await settle(page); }
 const menuItem = (page, name) => page.locator('.rowm').getByRole('menuitem', { name, exact: true });
+async function folderMenu(page, v) {                                              // scroll first: a scroll closes an open menu
+  const b = page.locator(`#lib .lrw:has(> .lfr[data-f="${v}"]) .lmo`);
+  await b.scrollIntoViewIfNeeded(); await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+  await b.click();
+}
 // Picks (2 shapes) with Inner inside it (1 shape); everything else is the built-in sets
 async function build(page) {
   await mkFolder(page, 'Picks'); await mkFolder(page, 'Inner');
-  await page.click('#lback'); await page.click('#lback');
-  await page.click('#lfold [data-f="b:Flowers"]');
+  await page.click('#ltog');                                                        // close every folder
+  await page.click('#lib .lfr[data-f="b:Flowers"]');
   await page.click('#fsel');
   await page.locator('#lib button[data-m]').nth(0).click(); await page.locator('#lib button[data-m]').nth(1).click();
   await pick(page, '#fmove', 'g:Picks'); await settle(page);
   await page.locator('#lib button[data-m]').nth(2).click();
   await pick(page, '#fmove', 'g:Picks/Inner'); await settle(page);
   await page.click('#fdone');
-  await page.click('#lback');
+  await page.click('#ltog');
 }
 
 test.describe('library button', () => {
   test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
-  test('at the top (all folders) it exports every shape, folder by folder, with folders inside folders kept', async ({ page }) => {
+  test('the toolbar button exports every shape, folder by folder, with folders inside folders kept', async ({ page }) => {
     const { errors } = await open(page);
     await build(page);
     await expect(page.locator('#fexp')).toHaveAttribute('aria-label', 'Export all shapes');
@@ -107,12 +112,11 @@ test.describe('library button', () => {
     expect(errors).toEqual([]);
   });
 
-  test('inside a folder that has folders in it, a small menu asks: this folder only, or with the folders inside it', async ({ page }) => {
+  test('a folder that has folders in it asks from its menu: this folder only, or with the folders inside it', async ({ page }) => {
     const { errors } = await open(page);
     await build(page);
-    await page.click('#lfold [data-f="g:Picks"]');
-    await expect(page.locator('#fexp')).toHaveAttribute('aria-label', 'Export this folder');
-    await page.click('#fexp');
+    await folderMenu(page, 'g:Picks');
+    await menuItem(page, 'Export…').click();
     await expect(page.locator('.rowm [role="menuitem"]')).toHaveCount(2);
     await menuItem(page, 'This folder only').click();
     await page.waitForFunction(() => window.__wbDownloads.length > 0);
@@ -120,7 +124,8 @@ test.describe('library button', () => {
     expect(z.filename).toBe('Picks shapes.zip');
     expect(z.names.length).toBe(2);
     expect(z.names.every(n => /^Picks\/[^/]+\.svg$/.test(n))).toBe(true);
-    await page.click('#fexp');
+    await folderMenu(page, 'g:Picks');
+    await menuItem(page, 'Export…').click();
     await menuItem(page, 'This folder and the folders inside it').click();
     await page.waitForFunction(() => window.__wbDownloads.length > 1);
     z = await downloaded(page, 1);
@@ -132,16 +137,18 @@ test.describe('library button', () => {
   test('a folder with nothing inside it exports straight away; an empty folder cannot export', async ({ page }) => {
     const { errors } = await open(page);
     await build(page);
-    await page.click('#lfold [data-f="g:Picks"]'); await page.click('#lfold [data-f="g:Picks/Inner"]');
-    await page.click('#fexp');
+    await page.click('#lib .lfr[data-f="g:Picks"]');
+    await folderMenu(page, 'g:Picks/Inner');
+    await menuItem(page, 'Export…').click();
     await expect(page.locator('.rowm')).toHaveCount(0);                                // no menu: there is nothing to choose
     await page.waitForFunction(() => window.__wbDownloads.length > 0);
     const z = await downloaded(page, 0);
     expect(z.filename).toBe('Inner shapes.zip');
     expect(z.names.length).toBe(1);
-    await page.click('#lback'); await page.click('#lback');
+    await page.click('#ltog');
     await mkFolder(page, 'Nothing here');
-    await expect(page.locator('#fexp')).toBeDisabled();
+    await folderMenu(page, 'g:Nothing here');
+    await expect(menuItem(page, 'Export…')).toBeDisabled();
     expect(errors).toEqual([]);
   });
 

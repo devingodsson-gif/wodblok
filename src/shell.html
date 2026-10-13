@@ -585,13 +585,19 @@ body.dropping::after{content:"Drop the image to import it";position:fixed;inset:
 .lfa{flex:none;width:14px;height:14px;color:var(--faint)}
 .lfr.hid{color:var(--mut)}.lfr.hid .lfi{opacity:.6}
 .lfh{color:var(--mut);margin-top:4px}.lfh[aria-expanded="true"] .lfa{transform:rotate(90deg)}
-.lview{display:flex;align-items:center;gap:8px;margin-top:6px}.lview .ib{width:28px;height:28px;flex:none}.lview .ib svg{width:16px;height:16px}.lview .ib[aria-pressed="true"]{color:var(--acc-ink);background:var(--acc-soft)}.lview input[type=range]{flex:1;min-width:0}
-#fbrw .c,#fbrw[aria-pressed="true"] .e{display:none}#fbrw[aria-pressed="true"] .c{display:block}
-.lib{grid-template-columns:repeat(var(--lcols,4),1fr)}
-.lib .lsh{grid-column:1/-1;display:flex;align-items:center;gap:8px;height:30px;margin-top:6px;padding-right:2px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer}.lib .lsh:first-child{margin-top:0}.lib .lsh:hover,.lib .lsh:focus-visible{background:var(--raise);outline:none}
-.lib .lsh .lfa{width:14px;height:14px;transition:transform .12s}.lib .lsh[aria-expanded="true"] .lfa{transform:rotate(90deg)}
-.lib .lsh .lfn{font-weight:600}
-.lib .lso{flex:none;width:26px;height:26px;aspect-ratio:auto;padding:0;margin:0;border:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center}.lib .lso:hover{color:var(--fg);background:var(--raise)}.lib .lso svg{width:15px;height:15px;border-radius:0}
+.lnav{position:sticky;top:-1px;z-index:3;background:var(--panel);gap:2px}#lsz{flex:1;min-width:40px;margin:0 6px}
+#ltog .c,#ltog.on .e{display:none}#ltog.on .c{display:block}
+.ltr{margin:4px -6px 0}
+.lrw{display:flex;align-items:center;padding-left:calc(var(--d,0) * 14px);border-radius:7px}.lrw:hover{background:var(--raise)}
+.lrw .lfr{flex:1;min-width:0;gap:6px;padding:0 4px;background:transparent}.lrw .lfr:hover{background:transparent}
+.lrw .lfa{flex:none;width:13px;height:13px;transition:transform .12s}.lrw .lfr[aria-expanded="true"] .lfa{transform:rotate(90deg)}
+.lrw.act{background:var(--raise);box-shadow:inset 2px 0 0 var(--acc)}.lrw.hid .lfi,.lrw.hid .lfn{opacity:.6}
+.lmo{flex:none;width:26px;height:26px;padding:0;margin:0 3px 0 0;border:0;border-radius:6px;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center;opacity:0}.lmo svg{width:16px;height:16px}
+.lrw:hover .lmo,.lrw.act .lmo,.lmo:focus-visible,.lmo[aria-expanded="true"]{opacity:1}.lmo:hover{color:var(--fg);background:var(--line)}
+@media (pointer:coarse){.lmo{opacity:1}}
+.ltr .lib{grid-template-columns:repeat(var(--lcols,4),1fr);margin:4px 6px 8px calc(var(--d,0) * 14px + 8px)}
+.lmt{padding:3px 0 7px calc(var(--d,0) * 14px + 27px);font-size:11.5px;color:var(--faint)}
+.ltr .fform{margin:4px 6px 8px calc(var(--d,0) * 14px + 8px)}
 .lfr.dropt,.lcb.dropt{background:var(--acc-soft);border-color:var(--acc);color:var(--fg)}
 .lem{margin-top:8px;padding:18px 8px;border:1px dashed var(--line2);border-radius:8px;text-align:center;font-size:11.5px;color:var(--mut)}
 .fform{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.fform input,.fform select{flex:1;min-width:0;margin:0}.fform button{margin:0}#fq{flex-basis:100%;font-size:12px;line-height:1.4}
@@ -909,32 +915,23 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  <section class="pn" data-p="motifs" hidden>
   <details class="g" open><summary>Library</summary><div class="gb">
    <div class="lnav">
-    <button class="ib" id="lback" aria-label="Back" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l-5 5 5 5"/></svg></button>
-    <div class="lcr" id="lcr"></div>
+    <button class="ib" id="ltog" aria-label="Expand all folders"><svg class="ic e" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5-4 5 4M7 15l5 4 5-4"/></svg><svg class="ic c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5l5 4 5-4M7 19l5-4 5 4"/></svg></button>
+    <input type="range" id="lsz" min="0" max="8" step="1" value="6" aria-label="Shape size" data-plain>
+    <button class="ib" id="limp" aria-label="Import" aria-haspopup="menu" data-more><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V5M8.5 8.5L12 5l3.5 3.5"/><path d="M5 15v2.5A1.5 1.5 0 006.5 19h11a1.5 1.5 0 001.5-1.5V15"/></svg></button>
     <button class="ib" id="fnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/><path d="M12 11v5M9.5 13.5h5"/></svg></button>
-    <button class="ib" id="fexp" aria-label="Export all shapes" aria-haspopup="menu" data-more><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v9M8.5 9.8l3.5 3.5 3.5-3.5"/><path d="M5 15v2.5A1.5 1.5 0 006.5 19h11a1.5 1.5 0 001.5-1.5V15"/></svg></button>
     <button class="ib" id="fsel" aria-label="Select shapes" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5" stroke-dasharray="3 3"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></button>
-    <button class="ib" id="fmore" aria-label="Folder options" aria-haspopup="menu" data-more hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r=".9"/><circle cx="12" cy="12" r=".9"/><circle cx="18" cy="12" r=".9"/></svg></button>
+    <button class="ib" id="fexp" aria-label="Export all shapes" aria-haspopup="menu" data-more><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v9M8.5 9.8l3.5 3.5 3.5-3.5"/><path d="M5 15v2.5A1.5 1.5 0 006.5 19h11a1.5 1.5 0 001.5-1.5V15"/></svg></button>
    </div>
    <div class="fform" id="fform" hidden><input type="text" id="fname" maxlength="30" placeholder="Folder name" aria-label="Folder name"><select id="fdest" aria-label="Move into" hidden></select><span id="fq" hidden></span><button class="primary" id="fok">Create</button><button class="alt" id="fcx">Cancel</button></div>
-   <div class="lview"><button class="ib" id="fbrw" aria-label="Expand all folders" aria-pressed="false"><svg class="ic e" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5-4 5 4M7 15l5 4 5-4"/></svg><svg class="ic c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5l5 4 5-4M7 19l5-4 5 4"/></svg></button><input type="range" id="lsz" min="0" max="8" step="1" value="6" aria-label="Shape size"></div>
-   <div class="lfl" id="lfold"></div>
-   <div class="lib" id="lib"></div>
-   <div class="lem" id="lem" hidden></div>
+   <div class="ltr" id="lib"></div>
+   <input type="file" id="ifile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="sfile" class="vh" accept="image/*" tabindex="-1">
+   <div class="pz" id="ipaste" contenteditable="true" role="textbox" aria-label="Paste an image here"><span>Paste an image</span></div>
+   <div class="hint" id="imsg"></div>
    <div class="fsbar" id="fsbar" hidden>
     <div class="r"><span id="fscnt"></span><button class="alt" id="fall">Select all</button><button class="primary" id="fdone">Done</button></div>
     <select id="fmove" aria-label="Move to folder"></select>
     <div class="r"><button class="alt" id="fout">Take out of folder</button><button class="alt" id="fdelm">Delete</button></div>
    </div>
-  </div></details>
-  <details class="g" open><summary>Import</summary><div class="gb">
-   <div class="idz" id="idrop">
-    <div class="idd"><svg class="ic idi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/></svg><span id="idest">My imports</span></div>
-    <div class="idb"><label class="btn primary" id="iopen" for="ifile" role="button" tabindex="0">Image&#8230;</label><label class="btn alt" id="sopen" for="sfile" role="button" tabindex="0">Sheet&#8230;</label></div>
-   </div>
-   <input type="file" id="ifile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="sfile" class="vh" accept="image/*" tabindex="-1">
-   <div class="pz" id="ipaste" contenteditable="true" role="textbox" aria-label="Paste an image here"><span>Paste an image</span></div>
-   <div class="hint" id="imsg"></div>
   </div></details>
   <details class="g" id="iprg"><summary>ChatGPT prompt</summary><div class="gb">
    <input type="text" id="isub" placeholder="Subject, e.g. folk-art tulips" aria-label="Subject">

@@ -40,8 +40,8 @@ test('an empty project shows "Add a shape" centred on the canvas; it opens the S
   await expect(page.locator('.seg2 [data-v="stamp"]')).toHaveClass(/on/);
   await expect(page.locator('section.pn[data-p="motifs"]')).toBeVisible();
   await expect(page.locator('#empc')).toBeHidden();                 // not shown in the Stamp editor
-  await page.locator('#lfold .lfr[data-f^="b:"]').first().click();
-  await page.locator('#lib > *').first().click();
+  await page.locator('#lib .lfr[data-f^="b:"]').first().click();      // folders open in place (1.5.0)
+  await page.locator('#lib button[data-m]').first().click();
   await page.mouse.click(590, 390);
   await page.keyboard.press('Escape');
   await settle(page);

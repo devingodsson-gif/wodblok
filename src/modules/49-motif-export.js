@@ -1,13 +1,13 @@
 import {use} from '../platform/index.js';
-import {$} from './01-launch-and-version.js';
+import {$,WBX} from './01-launch-and-version.js';
 import {buildMotifZip,motifSvg,safeName} from '../format/motifs.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {mk} from './06-motif-library-folders.js';
 import {libExportList,mNm} from './21-motif-library-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 // ===== Shape export: the library as a zip of SVG files =====
-// With all folders showing (the top of the library) the button exports every shape, folder by folder. Inside a folder it exports
-// that folder; when the folder has folders inside it, a small menu asks whether to include them. Each shape is its own SVG (black on
+// The toolbar button exports every shape, folder by folder. A folder's menu exports that folder; when the folder has folders
+// inside it, a small menu asks whether to include them. Each shape is its own SVG (black on
 // transparent, cut parts as real holes, no stamp or palette colours) and folders inside folders stay folders inside the zip. A shape
 // that sits in two places (a built-in shape also filed in one of your folders) appears in both, as it does in the library.
 const mxEntry=k=>({name:mNm(k),svg:motifSvg((c,d)=>mk(k,c,d))});
@@ -23,12 +23,14 @@ async function mxSave(l){
     pmsg(`Exported ${count} shape${count>1?'s':''} as SVG files.`);
   }catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not export.')}
 }
+// the toolbar button exports the whole library; a folder's menu exports that folder, asking about the folders inside it if it has any
+function mxFolder(v,btn){
+  const deep=libExportList(true,v);
+  if(deep.root||!deep.sub)return mxSave(deep);
+  rowMenu(btn,[['This folder only',()=>mxSave(libExportList(false,v))],['This folder and the folders inside it',()=>mxSave(libExportList(true,v))]]);
+}
 function init49(){
-  $('fexp').onclick=e=>{
-    e.stopPropagation();                                      // as the folder's own menu button does: a click elsewhere must not close the menu at once
-    const deep=libExportList(true);
-    if(deep.root||!deep.sub)return mxSave(deep);
-    rowMenu($('fexp'),[['This folder only',()=>mxSave(libExportList(false))],['This folder and the folders inside it',()=>mxSave(libExportList(true))]]);
-  };
+  $('fexp').onclick=e=>{e.stopPropagation();mxSave(libExportList(true,'/'))};
+  WBX.wbExport=mxFolder;
 }
 export {init49};

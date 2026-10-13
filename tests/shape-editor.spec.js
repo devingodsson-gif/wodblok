@@ -5,14 +5,14 @@ const { TARGET, openApp, openPanel, setMode, settle } = require('./helpers/harne
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
-const place = async (page, x, y) => { await page.locator('#lib > *').first().click(); await page.mouse.click(x, y); await settle(page); };
+const place = async (page, x, y) => { await page.locator('#lib button[data-m]').first().click(); await page.mouse.click(x, y); await settle(page); };
 
 test('placing a shape opens the floating Shape editor; Auto-open off keeps it closed; the rail button opens it; it dims with nothing selected', async ({ page }) => {
   const { errors } = await openApp(page);
   await setMode(page, 'stamp');
   await expect(page.locator('.wtab', { hasText: 'Shape editor' })).toHaveCount(0);   // nothing open at launch
   await openPanel(page, 'motifs');
-  await page.click('#lfold [data-f="b:Flowers"]');                   // the library opens on the list of folders (1.2.14)
+  await page.click('#lib .lfr[data-f="b:Flowers"]');                // folders open in place (1.5.0)
   await place(page, 590, 330);
   await expect(page.locator('.wtab.on', { hasText: 'Shape editor' })).toHaveCount(1);
   expect(await page.evaluate(() => !!document.getElementById('sel').closest('.wg.fl')), 'floats by default').toBe(true);

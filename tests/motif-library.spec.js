@@ -10,10 +10,10 @@ test('the Shapes panel has no Draw with Claude section and the folder list has n
   await setMode(page, 'stamp');
   await page.click('.rail [data-pn="motifs"]');
   await expect(page.locator('summary', { hasText: 'Draw with Claude' })).toBeHidden();
-  const folders = await page.locator('#lfold .lfr .lfn').allTextContents();      // the library opens on the list of folders (1.2.14)
+  const folders = await page.locator('#lib .lfr .lfn').allTextContents();        // one tree of folders (1.5.0)
   expect(folders.some(f => /Drawn by Claude/.test(f))).toBe(false);
   expect(folders.some(f => /My imports/.test(f))).toBe(true);
-  await page.click('#lfold [data-f="b:Flowers"]');
-  expect(await page.locator('#lib > *').count()).toBeGreaterThan(0);      // there is still something to place
+  await page.click('#lib .lfr[data-f="b:Flowers"]');
+  expect(await page.locator('#lib button[data-m]').count()).toBeGreaterThan(0);      // there is still something to place
   expect(errors).toEqual([]);
 });

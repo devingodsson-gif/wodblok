@@ -302,7 +302,7 @@ n.addEventListener('change',()=>{if(paintBack){n.value=+(+r.value).toFixed(2);re
 n.addEventListener('keydown',e=>{if(e.key=='Enter')n.blur();else if(e.key=='Escape'){e.stopPropagation();paintBack=1;n.blur();paintBack=0;n.value=+(+r.value).toFixed(2)}})}
 // double-click any number box to select all of it; whatever you type then replaces it (Enter or click away to apply, Esc to cancel)
 let paintBack=0;document.addEventListener('dblclick',e=>{const t=e.target;if(t&&t.matches&&t.matches('input[type=number]')){t.focus();t.select()}});
-function enhance(){document.querySelectorAll('.dock input[type=range]').forEach(r=>{if(r.closest('.ctl'))return;const lb=r.previousElementSibling,row=document.createElement('div');row.className='ctl';
+function enhance(){document.querySelectorAll('.dock input[type=range]').forEach(r=>{if(r.closest('.ctl')||r.hasAttribute('data-plain'))return;const lb=r.previousElementSibling,row=document.createElement('div');row.className='ctl';
 const hasL=lb&&lb.tagName=='LABEL';r.parentNode.insertBefore(row,hasL?lb:r);if(hasL){row.appendChild(lb);if(!r.id)0;lb.htmlFor=r.id}row.appendChild(r);addNum(row,r)});
 document.querySelectorAll('#sel input[type=range]').forEach(r=>{const row=r.closest('.ctl');if(row&&!row.querySelector('.num')){row.querySelector('label').htmlFor=r.id;addNum(row,r)}})}
 function paint(r){const lo=+r.min,hi=+r.max,p=hi>lo?(r.value-lo)/(hi-lo)*100:0;r.style.setProperty('--p',p.toFixed(1)+'%');if(r._n&&document.activeElement!==r._n)r._n.value=+(+r.value).toFixed(2)}

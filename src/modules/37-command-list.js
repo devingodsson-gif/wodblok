@@ -66,6 +66,10 @@ const COMMANDS = [
   ['panel.rand', 'Open Randomize', 'rail-rand'],
   ['panel.hist', 'Open History', 'rail-hist'],
   ['library.exportShapes', 'Export shapes (SVG zip)', 'fexp'],
+  ['library.toggleFolders', 'Expand or collapse all shape folders', 'ltog'],
+  ['library.newFolder', 'New shape folder', 'fnew'],
+  ['library.importImage', 'Import a shape from an image', 'ifile', null, 'input'],
+  ['library.importSheet', 'Import a sheet of shapes', 'sfile', null, 'input'],
   ['randomize.roll', 'Randomize now', 'rzdo'],
   ['app.commandSearch', 'Search commands', 'cmdkb', 'Mod+K'],
 ];
