@@ -40,10 +40,10 @@ function xrRender(r){
   });
 }
 function init43(){
-  const list=$('xrl'),px=$('xrpx'),sfx=$('xrsfx'),nm=$('xrn');let fmt='png',ren=null,dpi=300;const dpiEl=$('xrdpi');
+  const list=$('xrl'),px=$('xrpx'),sfx=$('xrsfx'),nm=$('xrn');let fmt='png',ren=null,dpi=300;const dpiEl=$('xrdpi'),dpiRow=$('xrdpirow');
   const cur=()=>({fmt,px:xrPx(px.value),sfx:sfx.value.trim(),...(fmt=='tiff'?{dpi:+(dpiEl&&dpiEl.value)||300}:{})});
   const sum=r=>r.fmt=='svg'?'SVG':r.fmt.toUpperCase()+' · '+xrPx(r.px)+' px'+(r.fmt=='tiff'?' · '+(r.dpi||300)+' DPI':'');
-  function dims(){const r=cur();$('xrd').textContent=fmt=='svg'?'Vector, any size':xrDims(r.px).join(' × ')+' px';px.disabled=fmt=='svg';if(dpiEl)dpiEl.hidden=fmt!='tiff'}
+  function dims(){const r=cur();$('xrd').textContent=fmt=='svg'?'Vector, any size':xrDims(r.px).join(' × ')+' px';px.disabled=fmt=='svg';if(dpiRow)dpiRow.hidden=fmt!='tiff'}
   function setFmt(f){fmt=f;$('xrf').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.f==f));dims()}
   $('xrf').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setFmt(b.dataset.f)});
   px.addEventListener('input',dims);px.addEventListener('change',()=>{px.value=xrPx(px.value);dims()});
