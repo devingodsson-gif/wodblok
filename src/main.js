@@ -54,10 +54,6 @@ import {init50} from './modules/50-colorways.js';
 import {init51} from './modules/51-colorways-panel.js';
 import {init52} from './modules/52-colorways-export.js';
 
-// Publish the state serializer before feature initialization so test tooling can observe
-// launch state even if an initializer is asynchronous or fails later.
-window.__wbTest = { state: () => coreStr() };
-
 init01();
 init02();
 init03();
