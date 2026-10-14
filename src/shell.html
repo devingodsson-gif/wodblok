@@ -116,12 +116,13 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 .wxr .ib{width:26px;height:26px}.wxr .ib svg{width:14px;height:14px}.wxr input{height:26px}
 .wxh{padding:8px 10px 2px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 /* export recipes */
-.xr{padding:10px 14px 14px}.xrs{display:flex;flex-direction:column;gap:8px}.xrs .ctl{grid-template-columns:90px minmax(0,1fr)}
-.xrd{font-size:11.5px;color:var(--mut);min-height:16px}.xrn{display:flex;gap:8px}.xrn input{flex:1;min-width:0}
-.xrl{margin-top:8px}.xrh{padding:8px 0 2px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-.xrr{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:4px;padding:4px 4px 4px 10px;border-radius:7px;cursor:pointer;font-size:12.5px;border:1px solid transparent}
+.xr{padding:12px 14px 16px}.xrs{display:flex;flex-direction:column;gap:10px}.xrs .ctl{grid-template-columns:90px minmax(0,1fr)}
+.xrlabel{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:600}.xrsection{padding-bottom:12px;border-bottom:1px solid var(--line)}.xrformat{margin-top:5px}.xrsize{margin-top:2px}.xrd{font-size:11.5px;color:var(--mut);min-height:16px;font-variant-numeric:tabular-nums}.xrn{display:flex;gap:8px}.xrn input{flex:1;min-width:0}
+.xrl{margin-top:4px}.xrh{padding:8px 0 4px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.xrr{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:4px;padding:6px 4px 6px 10px;border-radius:7px;cursor:pointer;font-size:12.5px;border:1px solid transparent}
 .xrr:hover,.xrr:focus-visible{background:var(--raise)}.xrr b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xrr small{display:block;color:var(--mut);font-size:11px}
-.xrph{margin-top:16px}.xrp select{width:auto;flex:1}.xrr .ib{width:26px;height:26px}.xrr .ib svg{width:14px;height:14px}.xrr input{height:26px}.xrall{margin-top:12px}.xrq{margin-top:12px;gap:6px;flex-wrap:wrap}.xrq button{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;font-size:12.5px}.xrq button svg{width:14px;height:14px;flex:none}.xrq kbd{font-size:11px;color:var(--mut)}.xrq:not(:has(button:not([hidden]))){display:none}
+.xrph{margin-top:12px}.xrp select{width:auto;flex:1}.xrr .ib{width:26px;height:26px}.xrr .ib svg{width:14px;height:14px}.xrr input{height:26px}.xrall{margin-top:8px}.xrq{margin-top:10px;gap:6px;flex-wrap:wrap}.xrq button{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;font-size:12.5px}.xrq button svg{width:14px;height:14px;flex:none}.xrq kbd{font-size:11px;color:var(--mut)}.xrq:not(:has(button:not([hidden]))){display:none}
+.xrmore{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}.xrmore summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;color:var(--mut);font-size:12px;padding:2px 0}.xrmore summary::-webkit-details-marker{display:none}.xrmore summary::after{content:'+';font-size:16px;color:var(--faint)}.xrmore[open] summary::after{content:'−'}.xrmore summary:focus-visible{outline:2px solid var(--acc);outline-offset:3px}.xrmorebody{padding-top:4px}
 #artwrap.tpv>*{pointer-events:none}
 /* 3 x 3 repeat preview: faint lines mark where each tile ends, so seams can be checked; the picture is not editable here */
 #artwrap.tpv::after{content:"";position:absolute;inset:28px;pointer-events:none;z-index:3;--tl:color-mix(in srgb,var(--acc) var(--tlo,92%),transparent);background:
@@ -1210,22 +1211,26 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
  <div class="wxs"><input type="text" id="wxn" maxlength="40" aria-label="Workspace name" placeholder="Name"><button type="button" class="primary" id="wxsave">Save current</button></div>
 </div></section>
 <section class="pn" data-p="xrec" hidden><div class="xr">
- <div class="xrs">
-  <div class="seg" id="xrf" role="group" aria-label="Format"><button type="button" class="on" data-f="png">PNG</button><button type="button" data-f="jpg">JPG</button><button type="button" data-f="svg">SVG</button><button type="button" data-f="tiff">TIFF</button></div>
-  <div class="ctl"><label for="xrpx">Long side</label><div class="num"><input type="number" class="u" id="xrpx" min="256" max="8192" step="1" value="2048" aria-label="Long side in pixels"><i>px</i></div></div>
-  <div class="ctl" id="xrdpirow" hidden><label for="xrdpi">Print resolution</label><select id="xrdpi" aria-label="TIFF print resolution"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option></select></div>
-  <div class="xrd" id="xrd" aria-live="polite"></div>
-  <input type="text" id="xrsfx" maxlength="24" aria-label="Added to the file name" placeholder="File name ending">
-  <div class="row"><button type="button" class="primary" id="xrnow">Export now</button></div>
-  <div class="xrn"><input type="text" id="xrn" maxlength="40" aria-label="Recipe name" placeholder="Recipe name"><button type="button" id="xrsave">Save recipe</button></div>
- </div>
- <div class="xrl" id="xrl" role="list"></div>
- <div class="row xrq"><button id="png"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 15l5-5 4 4 2.5-2.5 5.5 5.5"/></svg>PNG image<kbd>3× size</kbd></button><button id="sv"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5L12 5l7.5 14.5z"/><circle cx="12" cy="5" r="1.4"/></svg>SVG vector</button><button id="cpy"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg>Copy SVG code</button></div>
- <div class="row xrq"><button id="bkpdf" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8l4.5 4.5v12.5H6z"/><path d="M14 3.5V8h4.5M9 13h6M9 16.5h6"/></svg>Print cover PDF<kbd>300 DPI</kbd></button><button id="bkpng" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M9.5 5v14M14.5 5v14"/></svg>Print cover PNG<kbd>300 DPI</kbd></button></div>
- <div class="row xrall"><button type="button" id="xrall">Export all as one zip</button></div>
- <div class="xrh xrph">Print proof</div>
- <div class="row xrp"><select id="xpp" aria-label="Paper"><option value="letter">Letter</option><option value="a4">A4</option></select><button type="button" id="xppdf">PDF</button><button type="button" id="xppng">PNG</button></div>
-</div></section>
+  <div class="xrsection">
+   <div class="xrlabel">Export settings</div>
+   <div class="seg xrformat" id="xrf" role="group" aria-label="Format"><button type="button" class="on" data-f="png">PNG</button><button type="button" data-f="jpg">JPG</button><button type="button" data-f="svg">SVG</button><button type="button" data-f="tiff">TIFF</button></div>
+   <div class="ctl xrsize"><label for="xrpx">Long side</label><div class="num"><input type="number" class="u" id="xrpx" min="256" max="8192" step="1" value="2048" aria-label="Long side in pixels"><i>px</i></div></div>
+   <div class="ctl" id="xrdpirow" hidden><label for="xrdpi">Print resolution</label><select id="xrdpi" aria-label="TIFF print resolution"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option></select></div>
+   <div class="xrd" id="xrd" aria-live="polite"></div>
+   <input type="text" id="xrsfx" maxlength="24" aria-label="Added to the file name" placeholder="File name ending (optional)">
+   <div class="row"><button type="button" class="primary" id="xrnow">Export current artwork</button></div>
+   <div class="xrn"><input type="text" id="xrn" maxlength="40" aria-label="Recipe name" placeholder="Name these settings"><button type="button" id="xrsave">Save recipe</button></div>
+  </div>
+  <div class="xrlabel" style="margin-top:12px">Saved recipes</div>
+  <div class="xrl" id="xrl" role="list"></div>
+  <div class="row xrall"><button type="button" id="xrall">Export all recipes as ZIP</button></div>
+  <details class="xrmore"><summary>More export tools</summary><div class="xrmorebody">
+   <div class="row xrq"><button id="png"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 15l5-5 4 4 2.5-2.5 5.5 5.5"/></svg>PNG image<kbd>3× size</kbd></button><button id="sv"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5L12 5l7.5 14.5z"/><circle cx="12" cy="5" r="1.4"/></svg>SVG vector</button><button id="cpy"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg>Copy SVG code</button></div>
+   <div class="row xrq"><button id="bkpdf" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8l4.5 4.5v12.5H6z"/><path d="M14 3.5V8h4.5M9 13h6M9 16.5h6"/></svg>Print cover PDF<kbd>300 DPI</kbd></button><button id="bkpng" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M9.5 5v14M14.5 5v14"/></svg>Print cover PNG<kbd>300 DPI</kbd></button></div>
+   <div class="xrh xrph">Print proof</div>
+   <div class="row xrp"><select id="xpp" aria-label="Paper"><option value="letter">Letter</option><option value="a4">A4</option></select><button type="button" id="xppdf">PDF</button><button type="button" id="xppng">PNG</button></div>
+  </div></details>
+ </div></section>
 <section class="pn" data-p="pres" hidden><div class="ps">
  <details class="g" open><summary>Looks</summary><div class="gb">
   <div class="psl" id="psl" role="list"></div>
