@@ -1211,8 +1211,9 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
 </div></section>
 <section class="pn" data-p="xrec" hidden><div class="xr">
  <div class="xrs">
-  <div class="seg" id="xrf" role="group" aria-label="Format"><button type="button" class="on" data-f="png">PNG</button><button type="button" data-f="jpg">JPG</button><button type="button" data-f="svg">SVG</button></div>
+  <div class="seg" id="xrf" role="group" aria-label="Format"><button type="button" class="on" data-f="png">PNG</button><button type="button" data-f="jpg">JPG</button><button type="button" data-f="svg">SVG</button><button type="button" data-f="tiff">TIFF</button></div>
   <div class="ctl"><label for="xrpx">Long side</label><div class="num"><input type="number" class="u" id="xrpx" min="256" max="8192" step="1" value="2048" aria-label="Long side in pixels"><i>px</i></div></div>
+  <div class="ctl" id="xrdpirow" hidden><label for="xrdpi">Print resolution</label><select id="xrdpi" aria-label="TIFF print resolution"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option></select></div>
   <div class="xrd" id="xrd" aria-live="polite"></div>
   <input type="text" id="xrsfx" maxlength="24" aria-label="Added to the file name" placeholder="File name ending">
   <div class="row"><button type="button" class="primary" id="xrnow">Export now</button></div>
