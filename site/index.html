@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Wodblok</title>
-<meta name="description" content="Create bold block-print motifs and seamless repeating patterns in Wodblok, a browser-based design workspace for makers.">
+<title>Wodblok — Pattern &amp; Print Design Studio</title>
+<meta name="description" content="Design bold motifs and repeating patterns with Wodblok, a creative studio for printmakers, stamp artists, and surface-pattern designers.">
 <link rel="canonical" href="https://wodblok.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Wodblok">
-<meta property="og:title" content="Wodblok — Make bold patterns, your way">
-<meta property="og:description" content="Create block-print motifs and repeating patterns in a creative workspace made for makers.">
+<meta property="og:title" content="Wodblok — Make patterns that are unmistakably yours">
+<meta property="og:description" content="A creative studio for bold motifs, repeating patterns, and print-inspired artwork.">
 <meta property="og:url" content="https://wodblok.com/">
 <meta property="og:image" content="https://wodblok.com/img/hero.jpg">
 <meta property="og:image:alt" content="Bold block-print artwork made with Wodblok">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Wodblok — Make bold patterns, your way">
-<meta name="twitter:description" content="Create block-print motifs and repeating patterns in a creative workspace made for makers.">
+<meta name="twitter:title" content="Wodblok — Make patterns that are unmistakably yours">
+<meta name="twitter:description" content="A creative studio for bold motifs, repeating patterns, and print-inspired artwork.">
 <meta name="twitter:image" content="https://wodblok.com/img/hero.jpg">
 <meta name="theme-color" content="#1b1a18">
 <meta name="color-scheme" content="dark light">
@@ -113,6 +113,14 @@ section{border-top:1px solid var(--line);padding-block:clamp(56px,8vw,104px)}
 .gallery-empty strong{color:var(--fg);font:500 22px/1.2 var(--display)}
 .gallery-empty span{max-width:30rem;font-size:14px}
 
+/* editorial feature cards */
+.pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,24px);margin-top:36px}
+.pillar{min-width:0;padding:clamp(20px,2.5vw,30px);border:1px solid var(--line);background:linear-gradient(145deg,var(--raise),transparent 78%);border-radius:var(--radius-sm)}
+.pillar-step{display:block;margin-bottom:34px;color:var(--acc-ink);font:600 10px/1.2 var(--body);letter-spacing:.15em}
+.pillar h3{margin:0 0 10px;font:500 clamp(22px,2.5vw,28px)/1.15 var(--display);letter-spacing:-.015em}
+.pillar p{margin:0;color:var(--mut);font-size:15px;line-height:1.7}
+.maker-audience{margin:28px 0 0;color:var(--mut);font-size:14px}
+
 /* waitlist */
 .join{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,6vw,88px);align-items:start}
 .join h2{font:500 clamp(30px,4vw,44px)/1.1 var(--display);margin:0 0 20px;text-wrap:balance}
@@ -147,6 +155,8 @@ footer a:hover{color:var(--fg)}
   .print{max-width:min(100%,440px)}
   .work{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .next,.join{grid-template-columns:minmax(0,1fr)}
+  .pillars{grid-template-columns:minmax(0,1fr)}
+  .pillar-step{margin-bottom:22px}
 }
 @media (max-width:560px){
   .top{align-items:flex-start;padding-block:16px}
@@ -191,14 +201,14 @@ footer a:hover{color:var(--fg)}
     <div class="hero">
       <div class="hero-text">
         <p class="eyebrow">A digital block-print studio</p>
-        <h1>Make bold patterns, <em>your way.</em></h1>
-        <p class="lede">A digital block-print studio for building bold motifs, composing seamless repeats, and finding the rhythm in your next idea.</p>
+        <h1>Make patterns that are <em>unmistakably yours.</em></h1>
+        <p class="lede">A focused creative studio for bold motifs, repeating patterns, and print-inspired artwork. Made for printmakers, stamp artists, and pattern-minded makers.</p>
         <div class="hero-actions">
-          <a class="btn" href="#waitlist">Get early access
+          <a class="btn" href="#waitlist">Join the waitlist
             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           <a class="btn btn-secondary" href="https://app.wodblok.com">Open the app <span aria-hidden="true">↗</span></a>
         </div>
-        <p class="small">Made for makers, print lovers, and pattern-minded people. Works in your browser—no installation needed.</p>
+        <p class="small">Get product updates and invitations to help shape Wodblok as it grows. Explore the studio in your browser—no installation needed.</p>
       </div>
       <figure class="print">
         <div class="print-frame">
@@ -216,23 +226,35 @@ footer a:hover{color:var(--fg)}
     </section>
 
 
-    <section aria-labelledby="vision-label">
-      <p class="label" id="vision-label">Made for the joy of making</p>
-      <div class="join">
-        <div>
-          <h2>Start with a mark. Make it your own.</h2>
-        </div>
-        <div>
-          <p class="lede">Shape a stamp, experiment with spacing, and turn individual marks into patterns with a handmade spirit. Wodblok brings the bold simplicity of block printing into a flexible digital studio for textiles, paper, interiors, and ideas still taking shape.</p>
-          <p class="small">Join the list for occasional product updates and invitations to try new features.</p>
-        </div>
+    <section class="maker-section" aria-labelledby="vision-label">
+      <p class="label" id="vision-label">A studio for pattern-minded makers</p>
+      <h2 class="gallery-heading">From a single mark to a world of patterns.</h2>
+      <p class="gallery-intro">Wodblok puts the craft of motif-making and repeat design at the center—so you can spend less time fighting a general-purpose workflow and more time developing your visual language.</p>
+      <div class="pillars">
+        <article class="pillar">
+          <span class="pillar-step">01 / MOTIF</span>
+          <h3>Start with a mark.</h3>
+          <p>Build bold, graphic elements inspired by block printing, stamps, and handmade illustration.</p>
+        </article>
+        <article class="pillar">
+          <span class="pillar-step">02 / REPEAT</span>
+          <h3>Find the rhythm.</h3>
+          <p>Bring individual elements together into repeating compositions with a sense of movement and balance.</p>
+        </article>
+        <article class="pillar">
+          <span class="pillar-step">03 / MAKE</span>
+          <h3>Make it your own.</h3>
+          <p>Explore the visual possibilities for your next print, textile concept, paper good, or personal art project.</p>
+        </article>
       </div>
+      <p class="maker-audience">Made for printmakers, stamp artists, surface-pattern designers, illustrators, and curious makers.</p>
     </section>
 
     <section class="join" id="waitlist" aria-labelledby="join-title">
       <div>
-        <h2 id="join-title">Be part of what comes next.</h2>
-        <p class="lede">Get thoughtful updates from Wodblok, tell us what you want to make, and let us know if you’d like to help test the studio as it grows.</p>
+        <p class="label">Early access</p>
+        <h2 id="join-title">Help shape Wodblok from the beginning.</h2>
+        <p class="lede">Join the waitlist for thoughtful product updates and invitations to try the studio early. Tell us what you make so we can build around real creative workflows.</p>
       </div>
       <div id="join-body">
         <form id="join-form" method="post" action="/api/waitlist">
@@ -241,6 +263,9 @@ footer a:hover{color:var(--fg)}
             <select id="f-role" name="role" required>
               <option value="" selected disabled>Choose one</option>
               <option>Pattern design</option>
+              <option>Surface-pattern design</option>
+              <option>Printmaking or linocut</option>
+              <option>Rubber stamps or block stamps</option>
               <option>Textile or fabric design</option>
               <option>Screen printing</option>
               <option>Clothing or fashion design</option>
