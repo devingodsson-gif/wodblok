@@ -81,12 +81,6 @@ section{border-top:1px solid var(--line);padding-block:clamp(56px,8vw,104px)}
 .work img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:2px;box-shadow:var(--print-shadow);transition:transform .25s ease}
 .work img:hover{transform:translateY(-3px)}
 
-.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(28px,4vw,56px);list-style:none;margin:0;padding:0;counter-reset:s}
-.steps li{min-width:0;counter-increment:s}
-.steps h3{font:500 24px/1.2 var(--display);margin:0 0 10px;display:flex;align-items:baseline;gap:12px}
-.steps h3::before{content:counter(s);font:600 13px/1 var(--body);color:var(--acc-ink);font-variant-numeric:tabular-nums}
-.steps p{margin:0;color:var(--mut);max-width:22rem}
-
 /* waitlist */
 .join{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,6vw,88px);align-items:start}
 .join h2{font:500 clamp(30px,4vw,44px)/1.1 var(--display);margin:0 0 20px;text-wrap:balance}
@@ -120,7 +114,7 @@ footer a:hover{color:var(--fg)}
   .hero-text{max-width:none}
   .print{max-width:360px}
   .work{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .steps,.next,.join{grid-template-columns:minmax(0,1fr)}
+  .next,.join{grid-template-columns:minmax(0,1fr)}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -156,15 +150,6 @@ footer a:hover{color:var(--fg)}
     <section aria-labelledby="work-label">
       <p class="label" id="work-label">Made with Wodblok</p>
       <div class="work" id="work" aria-live="polite"></div>
-    </section>
-
-    <section aria-labelledby="how-label">
-      <p class="label" id="how-label">How it works</p>
-      <ol class="steps">
-        <li><h3>Make the stamp</h3><p>Place shapes on a block and choose its outline and surface texture.</p></li>
-        <li><h3>Print the pattern</h3><p>Set it in a grid, half-drop, brick or honeycomb. Every print lands a little differently.</p></li>
-        <li><h3>Export it</h3><p>Save as PNG, JPG or SVG, or as a seamless repeat tile.</p></li>
-      </ol>
     </section>
 
 
