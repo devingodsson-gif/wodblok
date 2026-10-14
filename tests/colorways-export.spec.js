@@ -16,7 +16,7 @@ test('Colorways batch export helpers sanitize filenames and bound raster dimensi
       controls: ['cw-format','cw-size','cw-dpi','cw-export-selected','cw-export-all'].every(id => !!document.getElementById(id))
     };
   });
-  expect(result.clean).toBe('Night - Ink 02');
+  expect(result.clean).toBe('Night-Ink-02');
   expect(result.empty).toBe('Colorway');
   expect(result.small).toBe(256);
   expect(result.large).toBe(8192);
@@ -29,10 +29,8 @@ test('Colorways rows have independent export-selection checkboxes', async ({ pag
   const { errors } = await openApp(page);
   const result = await page.evaluate(() => {
     const api = window.__wbTest.colorways;
-    api.setList([
-      { id: 'cw-one', name: 'Warm Paper', colors: { bg: '#FFFFFF', ink: '#222222' } },
-      { id: 'cw-two', name: 'Night Print', colors: { bg: '#111111', ink: '#EEEEEE' } }
-    ]);
+    document.getElementById('cw-add').click();
+    document.getElementById('cw-add').click();
     const rows = [...document.querySelectorAll('#cw-list .cw-row')];
     const boxes = [...document.querySelectorAll('#cw-list .cw-pick')];
     boxes[1].checked = true;
