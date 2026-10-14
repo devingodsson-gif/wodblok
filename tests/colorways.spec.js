@@ -8,7 +8,7 @@ test('colorway core normalizes saved palettes and detects palette edits', async 
   const result = await page.evaluate(() => {
     const api = window.__wbTest.colorways;
     const core = { proj: { bg: '#FFFFFF', ink: '#111111', c3: '#CC0000' } };
-    const saved = api.capture('Warm print', 'cw-warm');
+    const saved = api.captureCore(core, 'Warm print', 'cw-warm');
     const clean = api.normalize([saved, null, { id: 'bad', name: 'Bad', colors: { bg: 'red', ink: '#000000' } }]);
     return {
       saved, clean,
