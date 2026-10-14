@@ -11,12 +11,12 @@
 <meta property="og:title" content="Wodblok — Pattern &amp; Print Design for Artists">
 <meta property="og:description" content="Create bold motifs and repeating patterns with a creative workspace made for printmakers, stamp artists, and surface-pattern designers.">
 <meta property="og:url" content="https://wodblok.com/">
-<meta property="og:image" content="https://wodblok.com/img/hero.jpg">
-<meta property="og:image:alt" content="Bold block-print artwork made with Wodblok">
+<meta property="og:image" content="https://wodblok.com/img/gallery/image-10.webp">
+<meta property="og:image:alt" content="Repeating pattern artwork made with Wodblok">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Wodblok — Pattern &amp; Print Design for Artists">
 <meta name="twitter:description" content="Create bold motifs and repeating patterns with a creative workspace made for printmakers, stamp artists, and surface-pattern designers.">
-<meta name="twitter:image" content="https://wodblok.com/img/hero.jpg">
+<meta name="twitter:image" content="https://wodblok.com/img/gallery/image-10.webp">
 <meta name="theme-color" content="#1b1a18">
 <meta name="color-scheme" content="dark light">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -113,6 +113,14 @@ section{border-top:1px solid var(--line);padding-block:clamp(56px,8vw,104px)}
 .gallery-empty strong{color:var(--fg);font:500 22px/1.2 var(--display)}
 .gallery-empty span{max-width:30rem;font-size:14px}
 
+/* editorial feature cards */
+.pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,24px);margin-top:36px}
+.pillar{min-width:0;padding:clamp(20px,2.5vw,30px);border:1px solid var(--line);background:linear-gradient(145deg,var(--raise),transparent 78%);border-radius:var(--radius-sm)}
+.pillar-step{display:block;margin-bottom:34px;color:var(--acc-ink);font:600 10px/1.2 var(--body);letter-spacing:.15em}
+.pillar h3{margin:0 0 10px;font:500 clamp(22px,2.5vw,28px)/1.15 var(--display);letter-spacing:-.015em}
+.pillar p{margin:0;color:var(--mut);font-size:15px;line-height:1.7}
+.maker-audience{margin:28px 0 0;color:var(--mut);font-size:14px}
+
 /* waitlist */
 .join{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(32px,6vw,88px);align-items:start}
 .join h2{font:500 clamp(30px,4vw,44px)/1.1 var(--display);margin:0 0 20px;text-wrap:balance}
@@ -147,6 +155,8 @@ footer a:hover{color:var(--fg)}
   .print{max-width:min(100%,440px)}
   .work{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .next,.join{grid-template-columns:minmax(0,1fr)}
+  .pillars{grid-template-columns:minmax(0,1fr)}
+  .pillar-step{margin-bottom:22px}
 }
 @media (max-width:560px){
   .top{align-items:flex-start;padding-block:16px}
@@ -216,17 +226,29 @@ footer a:hover{color:var(--fg)}
     </section>
 
 
-    <section aria-labelledby="vision-label">
+    <section class="maker-section" aria-labelledby="vision-label">
       <p class="label" id="vision-label">A focused creative workspace</p>
-      <div class="join">
-        <div>
-          <h2>Built for pattern-minded makers.</h2>
-        </div>
-        <div>
-          <p class="lede">Start with a motif, explore spacing and rhythm, and bring individual marks together into a repeat. Wodblok is being shaped around the needs of printmakers, stamp artists, and surface-pattern designers.</p>
-          <p class="small">Help shape the product before the wider launch by sharing what you make and what you need from your creative tools.</p>
-        </div>
+      <h2 class="gallery-heading">From a single mark to a world of pattern.</h2>
+      <p class="gallery-intro">Start with a motif, explore spacing and rhythm, and bring individual marks together into a repeat. Wodblok is being shaped around the needs of printmakers, stamp artists, and surface-pattern designers.</p>
+      <div class="pillars">
+        <article class="pillar">
+          <span class="pillar-step">01 / MOTIF</span>
+          <h3>Start with a mark.</h3>
+          <p>Build bold, graphic elements inspired by block printing, stamps, and handmade illustration.</p>
+        </article>
+        <article class="pillar">
+          <span class="pillar-step">02 / REPEAT</span>
+          <h3>Find the rhythm.</h3>
+          <p>Bring individual elements together into repeating compositions with a sense of movement and balance.</p>
+        </article>
+        <article class="pillar">
+          <span class="pillar-step">03 / MAKE</span>
+          <h3>Make it your own.</h3>
+          <p>Explore the visual possibilities for your next print, textile concept, paper good, or personal art project.</p>
+        </article>
       </div>
+      <p class="maker-audience">Made for printmakers, stamp artists, surface-pattern designers, illustrators, and curious makers.</p>
+      <p class="small">Help shape the product before the wider launch by sharing what you make and what you need from your creative tools.</p>
     </section>
 
     <section class="join" id="waitlist" aria-labelledby="join-title">
