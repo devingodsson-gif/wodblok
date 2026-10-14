@@ -1,6 +1,7 @@
 // Run with: npm run test:site (plain Node, no browser, no database: D1 is replaced by a small fake).
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { onRequestPost } from '../functions/api/waitlist.js';
 
 function fakeDB() {
@@ -69,4 +70,18 @@ test('the hidden field is ignored quietly', async () => {
   const r = await post({ email: 'bot@b.co', role: 'x', company: 'Acme' }, { DB });
   assert.equal(r.status, 200);
   assert.equal(DB.rows.size, 0);
+});
+
+
+test('landing page leads with pattern and print design and prioritizes the waitlist', async () => {
+  const html = await readFile(new URL('../site/index.html', import.meta.url), 'utf8');
+  assert.match(html, /<title>Wodblok — Pattern &amp; Print Design for Artists<\/title>/);
+  assert.match(html, /Make a mark\. <em>Build a pattern\.<\/em>/);
+  assert.match(html, /href="#waitlist">Get early access/);
+  assert.match(html, /From a single mark to a world of pattern\./);
+  assert.match(html, /01 \/ MOTIF[\s\S]*02 \/ REPEAT[\s\S]*03 \/ MAKE/);
+  assert.match(html, /Linocut or block printing/);
+  assert.match(html, /Stamp design/);
+  assert.match(html, /https:\/\/wodblok\.com\/img\/gallery\/image-10\.webp/);
+  assert.match(html, /class="pillars"[^]*?grid-template-columns:minmax\(0,1fr\)/);
 });
