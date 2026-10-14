@@ -51,6 +51,7 @@ import {init49} from './modules/49-motif-export.js';
 import {kv} from './platform/index.js';
 import {cmdConflicts,cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdList,cmdRun} from './commands/registry.js';
 import {init50} from './modules/50-colorways.js';
+import {init51} from './modules/51-colorways-panel.js';
 
 init01();
 init02();
@@ -100,4 +101,5 @@ init47();
 init48();
 init49();
 init50();
+init51();
 window.__wbTest = { state: () => coreStr(), kv, recoveryTick: rcTick, colorways: WBX.wbColorways, commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
