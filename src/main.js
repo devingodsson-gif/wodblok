@@ -105,6 +105,7 @@ init46();
 init47();
 init48();
 init49();
+WBX.wbCoreStr=coreStr;
 init50();
 init51();
 init52();
