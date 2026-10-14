@@ -24,11 +24,18 @@ jobs:
         with:
           filters: |
             app:
-              - '**'
-              - '!site/**'
-              - '!functions/api/waitlist.js'
-              - '!tests/site-*.mjs'
-              - '!.github/workflows/test.yml'
+              - 'src/**'
+              - 'legacy/**'
+              - 'tools/**'
+              - 'tests/**/*.spec.js'
+              - 'tests/**/*.spec.mjs'
+              - 'tests/fixtures/**'
+              - 'tests/__golden__/**'
+              - 'tests/__snapshots__/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'playwright.config.js'
+              - 'tsconfig.json'
             site:
               - 'site/**'
               - 'functions/api/waitlist.js'
