@@ -162,6 +162,17 @@ footer a:hover{color:var(--fg)}
 }
 @media (hover:none){.work img:hover{transform:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Image lightbox */
+#hero-slideshow-image,.work img{cursor:zoom-in}
+#hero-slideshow-image:focus-visible,.work img:focus-visible{outline:2px solid var(--acc);outline-offset:5px}
+.lightbox{width:min(94vw,1200px);max-width:none;max-height:94vh;padding:0;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--bg);color:var(--fg);box-shadow:0 24px 90px rgba(0,0,0,.65);overflow:visible}
+.lightbox::backdrop{background:rgba(12,11,10,.88);backdrop-filter:blur(4px)}
+.lightbox-image{display:block;max-width:calc(94vw - 32px);max-height:calc(94vh - 76px);width:auto;height:auto;object-fit:contain;margin:16px auto 8px;cursor:zoom-out}
+.lightbox-close{display:flex;align-items:center;justify-content:center;position:absolute;right:-12px;top:-12px;width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:var(--raise);color:var(--fg);font:400 26px/1 var(--body);cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.35)}
+.lightbox-caption{margin:0;padding:0 16px 12px;text-align:center;color:var(--mut);font-size:13px}
+@media (prefers-reduced-motion:reduce){.work img{transition:none}}
+
 </style>
 </head>
 <body>
@@ -275,6 +286,52 @@ footer a:hover{color:var(--fg)}
     <a data-contact-link href="#early-access">Contact</a>
   </footer>
 </div>
+<dialog class="lightbox" id="image-lightbox" aria-label="Enlarged artwork">
+  <button class="lightbox-close" type="button" aria-label="Close enlarged image">×</button>
+  <img class="lightbox-image" id="lightbox-image" alt="">
+  <p class="lightbox-caption" id="lightbox-caption"></p>
+</dialog>
+<script>
+(function(){
+  var dialog=document.getElementById('image-lightbox');
+  var enlarged=document.getElementById('lightbox-image');
+  var caption=document.getElementById('lightbox-caption');
+  var close=dialog.querySelector('.lightbox-close');
+  function openImage(img){
+    if(!img||!img.src)return;
+    enlarged.src=img.currentSrc||img.src;
+    enlarged.alt=img.alt||'Enlarged Wodblok artwork';
+    caption.textContent=img.alt||'';
+    if(!dialog.open)dialog.showModal();
+  }
+  function makeInteractive(img,label){
+    img.tabIndex=0;
+    img.setAttribute('role','button');
+    img.setAttribute('aria-label',label||'Enlarge artwork');
+    img.addEventListener('click',function(){openImage(img)});
+    img.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();openImage(img)}
+    });
+  }
+  var hero=document.getElementById('hero-slideshow-image');
+  if(hero)makeInteractive(hero,'Enlarge featured pattern');
+  var grid=document.getElementById('work');
+  if(grid){
+    var observer=new MutationObserver(function(){
+      grid.querySelectorAll('img:not([data-lightbox-ready])').forEach(function(img){
+        img.setAttribute('data-lightbox-ready','');
+        makeInteractive(img,'Enlarge gallery artwork');
+      });
+    });
+    observer.observe(grid,{childList:true});
+    grid.querySelectorAll('img').forEach(function(img){makeInteractive(img,'Enlarge gallery artwork')});
+  }
+  close.addEventListener('click',function(){dialog.close()});
+  enlarged.addEventListener('click',function(){dialog.close()});
+  dialog.addEventListener('click',function(e){if(e.target===dialog)dialog.close()});
+  dialog.addEventListener('close',function(){enlarged.removeAttribute('src')});
+})();
+</script>
 <script>
 // Image lists are generated at deploy time by tools/build-site-image-manifests.js.
 // Add image files to /img/hero or /img/gallery; supported formats: jpg, jpeg, png, webp, gif, avif.
