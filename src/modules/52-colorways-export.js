@@ -42,9 +42,9 @@ function init52(){
   const api=WBX.wbColorways,records=api.list(),ids=all?records.map(r=>r.id):picked(),items=records.filter(r=>ids.includes(r.id));
   if(!items.length){setNote(all?'No saved colorways to export.':'Select one or more colorways first.');return}
   const fmt=fmtEl.value,px=sizeOf(sizeEl.value),dpi=+dpiEl.value||300;
-  const downloads=await use('downloads');if(!downloads){setNote('Saving is not available in this browser.');return}
   const filename=expName('zip').replace(/\.zip$/,'')+'-colorways.zip';
   try{
+   const downloads=await use('downloads');if(!downloads){setNote('Saving is not available in this browser.');return}
    const handle=downloads.pick?await downloads.pick({filename}):null,files={};
    for(let i=0;i<items.length;i++){
     setNote('Rendering '+(i+1)+' of '+items.length+': '+items[i].name);
