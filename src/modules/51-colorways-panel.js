@@ -34,14 +34,15 @@ function init51(){
   all.forEach(rec=>{
    const row=document.createElement('div');row.className='cw-row';row.dataset.id=rec.id;row.tabIndex=0;row.setAttribute('role','button');
    row.setAttribute('aria-label','Apply '+rec.name);row.setAttribute('aria-pressed',String(WBX.wbColorways.active()===rec.id));
+   const pick=document.createElement('input');pick.type='checkbox';pick.className='cw-pick';pick.value=rec.id;pick.setAttribute('aria-label','Select '+rec.name+' for export');pick.addEventListener('click',e=>e.stopPropagation());
    const sw=document.createElement('span');sw.className='cw-swatches';sw.setAttribute('aria-hidden','true');
    [rec.colors.bg,rec.colors.ink,rec.colors.c3||rec.colors.ink,rec.colors.c4||rec.colors.bg].forEach(c=>{const i=document.createElement('i');i.style.background=c;sw.appendChild(i)});
    const main=document.createElement('span');main.className='cw-row-main';
    const b=document.createElement('b');b.textContent=rec.name;main.appendChild(b);
    const small=document.createElement('small');small.textContent=WBX.wbColorways.isModified(core(),rec)?'Colours changed':'Saved colours';main.appendChild(small);
    const mark=document.createElement('span');mark.className='cw-row-mark';mark.textContent=WBX.wbColorways.active()===rec.id?'Active':'';
-   row.append(sw,main,mark);row.addEventListener('click',()=>{selected=rec.id;doApply(rec);paint()});
-   row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selected=rec.id;doApply(rec);paint()}});
+   row.append(pick,sw,main,mark);row.addEventListener('click',e=>{if(e.target.closest('.cw-pick'))return;selected=rec.id;doApply(rec);paint()});
+   row.addEventListener('keydown',e=>{if(e.target.closest('.cw-pick'))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();selected=rec.id;doApply(rec);paint()}});
    frag.appendChild(row);
   });
   list.appendChild(frag);const rec=chosen();actions.hidden=!rec;
