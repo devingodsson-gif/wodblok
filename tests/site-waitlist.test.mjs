@@ -1,6 +1,7 @@
 // Run with: npm run test:site (plain Node, no browser, no database: D1 is replaced by a small fake).
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { onRequestPost } from '../functions/api/waitlist.js';
 
 function fakeDB() {
@@ -69,4 +70,17 @@ test('the hidden field is ignored quietly', async () => {
   const r = await post({ email: 'bot@b.co', role: 'x', company: 'Acme' }, { DB });
   assert.equal(r.status, 200);
   assert.equal(DB.rows.size, 0);
+});
+
+
+test('landing page leads with pattern and print design and prioritizes the waitlist', async () => {
+  const html = await readFile(new URL('../site/index.html', import.meta.url), 'utf8');
+  assert.match(html, /<title>Wodblok — Pattern &amp; Print Design Studio<\/title>/);
+  assert.match(html, /Make patterns that are <em>unmistakably yours\.<\/em>/);
+  assert.match(html, /href="#waitlist">Join the waitlist/);
+  assert.match(html, /From a single mark to a world of patterns\./);
+  assert.match(html, /01 \/ MOTIF[\s\S]*02 \/ REPEAT[\s\S]*03 \/ MAKE/);
+  assert.match(html, /Printmaking or linocut/);
+  assert.match(html, /Rubber stamps or block stamps/);
+  assert.match(html, /class="pillars"[^]*?grid-template-columns:minmax\(0,1fr\)/);
 });
