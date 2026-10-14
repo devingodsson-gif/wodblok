@@ -42,10 +42,7 @@ if (!Number.isFinite(intervalMs) || intervalMs < 1000 || intervalMs > 60000) {
   throw new Error('intervalMs in site/img/hero/slideshow.json must be between 1000 and 60000 milliseconds.');
 }
 
-const heroImages = [
-  ...(fs.existsSync(path.join(IMG, 'hero.jpg')) ? ['/img/hero.jpg'] : []),
-  ...publicPaths(HERO_DIR, listImages(HERO_DIR))
-];
+const heroImages = publicPaths(HERO_DIR, listImages(HERO_DIR));
 // Keep the existing work-1.jpg, work-2.jpg ... artwork visible while allowing
 // new gallery uploads to use any filename inside site/img/gallery.
 const legacyGalleryNames = fs.readdirSync(IMG, { withFileTypes: true })
