@@ -49,6 +49,40 @@ test('the settings: format, long side and ending; SVG needs no size; "Export now
   expect(errors).toEqual([]);
 });
 
+test('TIFF export is a real RGBA TIFF with dimensions and DPI metadata', async ({ page }) => {
+  const { errors } = await openApp(page);
+  await openPanel(page, 'xrec');
+  await page.click('#xrf [data-f="tiff"]');
+  await expect(page.locator('#xrdpirow')).toBeVisible();
+  await page.selectOption('#xrdpi', '150');
+  await page.fill('#xrpx', '300');
+  await page.fill('#xrsfx', 'fabric');
+  await page.click('#xrnow');
+  await page.waitForFunction(() => window.__wbDownloads.length > 0);
+  const result = await page.evaluate(() => {
+    const d = window.__wbDownloads[0], raw = atob(d.base64), u = Uint8Array.from(raw, c => c.charCodeAt(0));
+    const v = new DataView(u.buffer);
+    const ifd = v.getUint32(4, true), n = v.getUint16(ifd, true), tags = {};
+    for (let i = 0; i < n; i++) {
+      const p = ifd + 2 + i * 12, tag = v.getUint16(p, true), type = v.getUint16(p + 2, true), count = v.getUint32(p + 4, true);
+      tags[tag] = { type, count, value: type === 3 && count === 1 ? v.getUint16(p + 8, true) : v.getUint32(p + 8, true) };
+    }
+    const rational = tag => v.getUint32(tags[tag].value, true) / v.getUint32(tags[tag].value + 4, true);
+    return { filename: d.filename, type: d.type, byteOrder: raw.slice(0, 2), magic: v.getUint16(2, true), width: tags[256].value, height: tags[257].value, compression: tags[259].value, samples: tags[277].value, dpiX: rational(282), dpiY: rational(283) };
+  });
+  expect(result.filename).toMatch(/-fabric\.tiff$/);
+  expect(result.type).toBe('image/tiff');
+  expect(result.byteOrder).toBe('II');
+  expect(result.magic).toBe(42);
+  expect(result.width).toBe(200);
+  expect(result.height).toBe(300);
+  expect(result.compression).toBe(1);
+  expect(result.samples).toBe(4);
+  expect(result.dpiX).toBe(150);
+  expect(result.dpiY).toBe(150);
+  expect(errors).toEqual([]);
+});
+
 test('save a recipe, use it, rename it, keep it after a reload, delete it', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'xrec');
