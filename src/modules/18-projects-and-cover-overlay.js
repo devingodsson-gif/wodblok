@@ -20,7 +20,7 @@ const pgFix=(o,ls)=>{let g={...PGD};const nn=v=>Math.max(2,Math.min(60,Math.roun
  if(o&&typeof o=='object')g={show:!!o.show,n:nn(o.n),m:o.m=='c'?'c':'l',op:Math.max(10,Math.min(100,Math.round(+o.op)||70)),sh:gShOk(o.sh)};
  else{const L=(ls||[]).find(l=>l&&l.fg&&(l.fg.show||l.fg.n!=null));if(L)g={...g,show:!!L.fg.show,n:nn(L.fg.n),m:L.fg.m=='c'?'c':'l'}} // projects from before: take the grid the first layer had
  return g};
-const core=()=>({tiles:WBS.tiles,layers:WBS.layers,proj:WBS.proj,dim:WBS.dim,pr:WBS.pr,tex:WBS.tex,texLib:WBS.texLib,pg:{...WBS.pgrid},grade:WBX.wbGrade?WBX.wbGrade.get():null,colorways:cwNormalize(WBS.colorways),activeColorway:WBS.activeColorway||null});
+const core=()=>{const c={tiles:WBS.tiles,layers:WBS.layers,proj:WBS.proj,dim:WBS.dim,pr:WBS.pr,tex:WBS.tex,texLib:WBS.texLib,pg:{...WBS.pgrid},grade:WBX.wbGrade?WBX.wbGrade.get():null};const colorways=cwNormalize(WBS.colorways);if(colorways.length)c.colorways=colorways;if(WBS.activeColorway)c.activeColorway=WBS.activeColorway;return c};
 const coreStr=()=>JSON.stringify(core());
 // ---- Book cover overlay: built-in label template, or the user's own image, centered with one scale.
 const blank=()=>({img:'',iw:0,ih:0,sc:100});let covB;let covS;
