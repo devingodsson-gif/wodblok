@@ -76,7 +76,7 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL } =
   await page.route(/^https?:\/\/(?!127\.0\.0\.1:5199\/)/, r => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
   await page.clock.setFixedTime(FIXED_TIME);
   await page.goto(url);
-  await page.waitForFunction(() => (typeof window.__wbTest !== 'undefined' || typeof window.coreStr === 'function') && document.fonts.status === 'loaded');
+  await page.waitForFunction(() => (typeof window.__wbTest !== 'undefined' || typeof coreStr !== 'undefined') && document.fonts.status === 'loaded');
   await settle(page);
   return { errors };
 }
