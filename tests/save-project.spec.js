@@ -29,6 +29,7 @@ test('the top bar has Save project but no Export; the File menu has only project
   await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'Clear canvas', 'Open project…']);
   await page.keyboard.press('Escape');
   await openPanel(page, 'xrec');
+  await page.locator('.xrmore summary').click(); // secondary one-off exports are intentionally collapsed
   for (const id of ['png', 'sv', 'cpy', 'xrnow']) await expect(page.locator('#' + id)).toBeVisible();
   expect(errors).toEqual([]);
 });
