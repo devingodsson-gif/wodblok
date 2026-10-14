@@ -82,7 +82,11 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL } =
 }
 
 async function getState(page) {
-  return page.evaluate(() => (window.__wbTest ? window.__wbTest.state() : window.coreStr()));
+  return page.evaluate(() => {
+    if (window.__wbTest && typeof window.__wbTest.state === 'function') return window.__wbTest.state();
+    if (typeof window.coreStr === 'function') return window.coreStr();
+    throw new Error('Wodblok state hook is unavailable');
+  });
 }
 
 // Wait until the document state and the drawing stop changing (async stamp prints, textures, loading bar).
@@ -95,7 +99,8 @@ async function settle(page, { quiet = 4, step = 120, max = 15000 } = {}) {
       const busy = document.body.classList.contains('babusy') || !!document.querySelector('.rzbusy,.lding:not([hidden])');
       // a content hash, not just lengths: a redraw that rebuilds the same amount of markup in a different shape still counts as change
       const h = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0).toString(36); };
-      return h(window.__wbTest ? window.__wbTest.state() : window.coreStr()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + (ed ? h(ed.innerHTML) : 0) + '|' + busy;
+      const state = window.__wbTest && typeof window.__wbTest.state === 'function' ? window.__wbTest.state() : (typeof window.coreStr === 'function' ? window.coreStr() : document.title + '|' + document.body.innerText.slice(0, 500));
+      return h(state) + '|' + (art ? h(art.innerHTML) : 0) + '|' + (ed ? h(ed.innerHTML) : 0) + '|' + busy;
     });
     if (sig === last) { if (++same >= quiet) return; } else { same = 0; last = sig; }
     await page.waitForTimeout(step);
