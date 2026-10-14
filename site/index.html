@@ -286,6 +286,35 @@ footer a:hover{color:var(--fg)}
     <a data-contact-link href="#early-access">Contact</a>
   </footer>
 </div>
+<script>
+function artworkDescription(src,index){
+  var descriptions={
+    'image-3.webp':'A weathered burgundy-and-ink floral repeat, with dense blossoms and shadowy leaves arranged like an aged block print.',
+    'image-4.webp':'A golden-olive diamond lattice filled with small floral emblems and curling ornamental motifs.',
+    'image-5.webp':'A deep navy print of ochre sea creatures—fish, turtles, and other marine forms scattered like a vintage naturalist’s textile.',
+    'image-6.webp':'An earthy ochre-and-black stripe study, where rough horizontal bands and worn stamped marks create a rhythm of distressed ink.',
+    'image-7.webp':'A pale blue ground covered in rust-red rosettes and small abstracted animal-like shapes, repeating with a lively folk-print cadence.',
+    'image-8.webp':'A cool teal geometric repeat of interlocking triangles, fine linework, and tiny distressed details, like a weathered tile pattern.',
+    'image-9.webp':'A warm ochre field of purple floral marks and fine diagonal geometry, layered into a dense vintage-inspired all-over repeat.',
+    'image-10.webp':'A muted ochre design-study sheet with hand-stamped lettering, small floral symbols, and framed sample blocks.',
+    'image-11.webp':'A high-contrast orange-and-black repeat of oversized, rough-edged floral medallions, bold and almost poster-like.',
+    'image-12.webp':'A dark forest-green ground crossed by crimson triangular geometry and distressed ornamental marks.',
+    'image-13.webp':'A soft mint-green patchwork of diagonal panels, each holding small folk-inspired symbols and circular floral details.',
+    'image-14.webp':'An intricate midnight-blue and electric-cyan ornamental repeat, packed with symmetrical floral scrollwork and decorative medallions.',
+    'image-15.webp':'A sunlit golden-yellow print with purple floral clusters centered inside lightly outlined square panels.',
+    'image-16.webp':'A dusty blush ground with dark green geometric marks, dotted rhythms, and circular ornamental panels, like a vintage textile sampler.',
+    'image-17.webp':'A faded parchment-toned print of delicate rust-colored birds and small motifs arranged within diagonal triangular borders.',
+    'image-18.webp':'A slate-blue pattern study framed like a textile sampler, combining circular botanical panels, leaves, and small hand-carved marks.',
+    'Eye-Gates.png':'Eye Gates — a featured pattern study built around the artwork’s eye-inspired forms.',
+    'Kami-Kami-bodyblood.png':'Kami-Kami / Bodyblood — an expressive pattern study with an organic, hand-printed character.',
+    'Untitled-pattern.png':'Untitled Pattern — a featured Wodblok repeat showcasing the texture and rhythm of a composed motif pattern.'
+  };
+  var file;
+  try{file=decodeURIComponent(new URL(src,window.location.href).pathname.split('/').pop())}
+  catch(e){file=String(src).split('/').pop().split('?')[0]}
+  return descriptions[file]||'A Wodblok pattern study exploring repeating motifs, texture, and rhythm.';
+}
+</script>
 <dialog class="lightbox" id="image-lightbox" aria-label="Enlarged artwork">
   <button class="lightbox-close" type="button" aria-label="Close enlarged image">×</button>
   <img class="lightbox-image" id="lightbox-image" alt="">
@@ -314,7 +343,15 @@ footer a:hover{color:var(--fg)}
     });
   }
   var hero=document.getElementById('hero-slideshow-image');
-  if(hero)makeInteractive(hero,'Enlarge featured pattern');
+  if(hero){
+    function updateHeroDescription(){
+      hero.alt=artworkDescription(hero.currentSrc||hero.src,0);
+      hero.setAttribute('aria-label','Enlarge featured pattern: '+hero.alt);
+    }
+    updateHeroDescription();
+    hero.addEventListener('load',updateHeroDescription);
+    makeInteractive(hero,'Enlarge featured pattern');
+  }
   var grid=document.getElementById('work');
   if(grid){
     var observer=new MutationObserver(function(){
@@ -373,7 +410,7 @@ footer a:hover{color:var(--fg)}
         return;
       }
       images.forEach(function(src,index){
-        var img=new Image();img.src=src;img.alt='Wodblok pattern artwork '+(index+1);img.width=600;img.height=600;img.loading='lazy';img.decoding='async';
+        var img=new Image();img.src=src;img.alt=artworkDescription(src,index);img.width=600;img.height=600;img.loading='lazy';img.decoding='async';
         img.addEventListener('error',function(){img.hidden=true});
         grid.appendChild(img);
       });
