@@ -1,7 +1,7 @@
 // Start-up. Modules do no work when imported; everything that used to run at the top of the single script
 // runs here, in the same order as before.
 import {coreStr} from './modules/18-projects-and-cover-overlay.js';
-import {init01} from './modules/01-launch-and-version.js';
+import {init01,WBX} from './modules/01-launch-and-version.js';
 import {init02} from './modules/02-draft-mode-speedups.js';
 import {init03} from './modules/03-stamp-prints-and-drawing.js';
 import {init04} from './modules/04-canvas-and-stamp-outlines.js';
@@ -108,4 +108,4 @@ init49();
 init50();
 init51();
 init52();
-window.__wbTest = { state: () => coreStr(), kv, recoveryTick: rcTick, colorways: WBX.wbColorways, commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
+window.__wbTest = { state: () => coreStr(), kv, recoveryTick: rcTick, colorways: WBX.wbColorways, colorwaysExport: WBX.wbColorwaysExport, commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
