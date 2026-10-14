@@ -58,7 +58,7 @@ function init51(){
   setList([...all,rec]);selected=rec.id;WBX.wbColorways.setActive(rec.id);pmsg('Added “'+rec.name+'”.');paint();
  });
  rename.addEventListener('click',()=>{const r=chosen();if(!r)return;renaming=r.id;paint();nameInput.focus();nameInput.select()});
- nameSave.addEventListener('click',()=>{const r=chosen();if(!r||!renaming)return;const n=nameInput.value.trim().slice(0,40);if(!n){nameInput.focus();return}setList(current().map(x=>x.id===r.id?{...x,name:n}:x));renaming=null;paint()});
+ nameSave.addEventListener('click',()=>{const r=current().find(x=>x.id===renaming);if(!r)return;const n=nameInput.value.trim().slice(0,40);if(!n){nameInput.focus();return}setList(current().map(x=>x.id===r.id?{...x,name:n}:x));selected=r.id;renaming=null;paint()});
  nameCancel.addEventListener('click',()=>{renaming=null;paint()});
  nameInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();nameSave.click()}if(e.key==='Escape'){renaming=null;paint()}});
  duplicate.addEventListener('click',()=>{const r=chosen(),all=current();if(!r)return;if(all.length>=WBX.wbColorways.max){pmsg('Colorway limit reached.');return}const cp={...r,id:makeId(),name:(r.name+' copy').slice(0,40),colors:{...r.colors}};setList([...all,cp]);selected=cp.id;WBX.wbColorways.setActive(cp.id);paint()});
