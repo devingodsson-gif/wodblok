@@ -54,7 +54,13 @@ test('TIFF export is a real RGBA TIFF with dimensions and DPI metadata', async (
   await openPanel(page, 'xrec');
   await page.click('#xrf [data-f="tiff"]');
   await expect(page.locator('#xrdpirow')).toBeVisible();
-  await page.selectOption('#xrdpi', '150');
+  const dpiPicker = page.locator('#xrdpi').locator('xpath=following-sibling::div[contains(@class,"dd2")][1]/button');
+  if (await dpiPicker.count()) {
+    await dpiPicker.click();
+    await page.locator('.ddl:not([hidden]) .ddi[data-v="150"]').click();
+  } else {
+    await page.selectOption('#xrdpi', '150');
+  }
   await page.fill('#xrpx', '300');
   await page.fill('#xrsfx', 'fabric');
   await page.click('#xrnow');
