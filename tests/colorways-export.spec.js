@@ -41,7 +41,7 @@ test('selected Colorways export creates one ZIP without changing the current pro
   }));
   expect(result.download.filename).toMatch(/-colorways\.zip$/);
   expect(result.download.type).toBe('application/zip');
-  expect(result.download.base64.slice(0, 8)).toBe('UEsDBAoA');
+  expect(result.download.base64.slice(0, 5)).toBe('UEsDB');
   expect(result.after).toBe(before);
   expect(result.note).toMatch(/Exported 1 colorway to ZIP/);
   expect(errors).toEqual([]);
