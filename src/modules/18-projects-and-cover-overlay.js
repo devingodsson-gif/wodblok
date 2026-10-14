@@ -11,6 +11,7 @@ import {txClean} from './16-texture-generators.js';
 import {buildTex,migInk,saveTex,texNorm} from './17-texture-panel-and-previews.js';
 import {artLoad,artSnap,artUsed} from './25-art-layers.js';
 import {clearAll} from './33-clear.js';
+import {cwNormalize} from './50-colorways.js';
 // ---- Projects: the document, the status line, New project. A project is a .wodblok file (see 33-clear.js); the working copy autosaves in this browser for crash recovery.
 const PDEF={pr:{e:3,q:0,t:'speckle',a:35,sc:100,sd:811},tex:{}};
 // The pattern grid (its own tool in Pattern mode): show/hide, columns across, which points stamps snap to, line strength.
@@ -19,7 +20,7 @@ const pgFix=(o,ls)=>{let g={...PGD};const nn=v=>Math.max(2,Math.min(60,Math.roun
  if(o&&typeof o=='object')g={show:!!o.show,n:nn(o.n),m:o.m=='c'?'c':'l',op:Math.max(10,Math.min(100,Math.round(+o.op)||70)),sh:gShOk(o.sh)};
  else{const L=(ls||[]).find(l=>l&&l.fg&&(l.fg.show||l.fg.n!=null));if(L)g={...g,show:!!L.fg.show,n:nn(L.fg.n),m:L.fg.m=='c'?'c':'l'}} // projects from before: take the grid the first layer had
  return g};
-const core=()=>({tiles:WBS.tiles,layers:WBS.layers,proj:WBS.proj,dim:WBS.dim,pr:WBS.pr,tex:WBS.tex,texLib:WBS.texLib,pg:{...WBS.pgrid},grade:WBX.wbGrade?WBX.wbGrade.get():null});
+const core=()=>({tiles:WBS.tiles,layers:WBS.layers,proj:WBS.proj,dim:WBS.dim,pr:WBS.pr,tex:WBS.tex,texLib:WBS.texLib,pg:{...WBS.pgrid},grade:WBX.wbGrade?WBX.wbGrade.get():null,colorways:cwNormalize(WBS.colorways),activeColorway:WBS.activeColorway||null});
 const coreStr=()=>JSON.stringify(core());
 // ---- Book cover overlay: built-in label template, or the user's own image, centered with one scale.
 const blank=()=>({img:'',iw:0,ih:0,sc:100});let covB;let covS;
@@ -56,6 +57,7 @@ WBS.ARTS=artLoad(d.arts);const L=d.lib||{};Object.entries(L.motifs||{}).forEach(
 WBS.tiles=JSON.parse(JSON.stringify(d.tiles));WBS.layers=JSON.parse(JSON.stringify(d.layers));
 WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(id=>WBS.tiles.some(t=>t.id==id));if(L.lay=='brick'){L.lay='cols';if(!L.grid)L.grid='brick'}});if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];
 WBS.proj=d.proj&&d.proj.ink&&d.proj.bg?{...d.proj,ink:fixC(d.proj.ink,PCOL.ink),bg:fixC(d.proj.bg,PCOL.bg)}:{...PCOL};['c3','c4'].forEach(k=>{if(WBS.proj[k])WBS.proj[k]=fixC(WBS.proj[k],'');if(!WBS.proj[k])delete WBS.proj[k]});
+WBS.colorways=cwNormalize(d.colorways);WBS.activeColorway=WBS.colorways.some(x=>x.id===d.activeColorway)?d.activeColorway:null;
 if(d.cover&&d.cover.book&&typeof d.cover.book=='object')WBS.book={...WBS.book,...d.cover.book};else WBS.book={...WBS.book,on:false};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}
 WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,3]};WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pgrid=pgFix(d.pg,WBS.layers);
 WBS.pr={...PDEF.pr,...(d.pr||{})};WBS.tex={...PDEF.tex,...(d.tex||{})};WBS.texLib=txClean(d.texLib);texNorm();if(WBX.wbGrade)WBX.wbGrade.set(d.grade||null);{const c2=d.cover||{};cov={img:okImg(c2.img)?c2.img:'',iw:+c2.iw||0,ih:+c2.ih||0,sc:+c2.sc||100,tx:c2.tx!==false};if(!cov.iw||!cov.ih)cov.img='';const sl=o=>o&&okImg(o.img)&&+o.iw&&+o.ih?{img:o.img,iw:+o.iw,ih:+o.ih,sc:+o.sc||100}:blank();covB=sl(c2.back);covS=sl(c2.spine);WBS.cslot='f';$('cov').checked=c2.on!==false;saveCov();WBS.covKey='';if(WBX.wbBookSync)WBX.wbBookSync()}
@@ -73,7 +75,7 @@ async function fileSnap(){const sn=snapshot(),a=await artSnap();if(a)sn.art=a;re
 // two-tap confirm for actions that would drop unsaved work
 const confirm2=(btn,label,fn)=>{if(!dirty()||btn.dataset.sure){delete btn.dataset.sure;return fn()}btn.dataset.sure='1';const o=btn.textContent;btn.textContent=label;setTimeout(()=>{delete btn.dataset.sure;btn.textContent=o},3500)};
 function openData(d,id,name){applySnap(d);WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;paintPst();if(WBX.wbResetHist)WBX.wbResetHist();if(WBX.wbWatch)WBX.wbWatch()}
-function init18(){WBS.pgrid={...PGD};
+function init18(){WBS.pgrid={...PGD};WBS.colorways=[];WBS.activeColorway=null;
 covB=blank();covS=blank();WBS.cslot='f';
 try{const q=JSON.parse(kv.get('wb40_coverB')||'null');if(q&&typeof q.sc=='number')covB={...covB,...q}}catch(e){}
 try{const q=JSON.parse(kv.get('wb40_coverS')||'null');if(q&&typeof q.sc=='number')covS={...covS,...q}}catch(e){}try{const q=JSON.parse(kv.get('wb31_cover')||'null');if(q&&typeof q.sc=='number')cov={...cov,...q};if(q&&q.on===false)$('cov').checked=false}catch(e){}if(!okImg(cov.img))cov.img='';if(!okImg(covB.img))covB.img='';if(!okImg(covS.img))covS.img='';
