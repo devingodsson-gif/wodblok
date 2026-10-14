@@ -663,6 +663,8 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
 
 /* Colorways panel — follows the editor style guide tokens. */
 .cw-panel{display:flex;flex-direction:column;gap:9px;padding:10px}.cw-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.cw-head #cw-count{font-size:11px;color:var(--mut);font-variant-numeric:tabular-nums}.cw-list{display:flex;flex-direction:column;gap:5px}.cw-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:8px;padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--panel);cursor:pointer;min-width:0}.cw-row:focus-visible{outline:2px solid var(--acc);outline-offset:1px}.cw-row[aria-pressed=true]{border-color:var(--acc);background:var(--acc-soft)}.cw-swatches{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,13px);overflow:hidden;border:1px solid var(--line2);border-radius:5px}.cw-swatches i{display:block;min-width:0;min-height:0}.cw-row-main{min-width:0;display:flex;flex-direction:column;gap:3px}.cw-row-main b{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cw-row-main small{font-size:10px;color:var(--mut)}.cw-row-main input{width:100%;min-width:0}.cw-row-mark{font-size:10px;color:var(--acc-ink);white-space:nowrap}.cw-empty{padding:20px 8px;text-align:center;color:var(--mut);font-size:12px}.cw-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}.cw-actions button,.cw-rename-box button{min-width:0}.cw-rename-box{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:5px}.cw-preview{display:flex;gap:5px;align-items:center;padding:7px;border:1px solid var(--line);border-radius:7px}.cw-preview i{width:24px;height:24px;border-radius:4px;border:1px solid var(--line2)}.cw-preview small{color:var(--mut)}
+
+.cw-export-options{display:grid;grid-template-columns:minmax(0,1fr);gap:5px}.cw-export-options label{margin-top:4px}.cw-export .row{display:grid;grid-template-columns:1fr 1fr;gap:5px}.cw-export .row button{min-width:0}.cw-row{position:relative}.cw-row input.cw-pick{width:14px;height:14px;margin:0;accent-color:var(--acc)}.cw-row{grid-template-columns:18px 48px minmax(0,1fr) auto}
 </style>
 </head>
 <body>
@@ -1242,6 +1244,17 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
    <button type="button" class="alt" id="cw-delete">Delete</button>
   </div>
   <div class="cw-rename-box" id="cw-rename-box" hidden><input id="cw-name" maxlength="40" aria-label="Colorway name"><button type="button" class="primary" id="cw-name-save">Save</button><button type="button" class="alt" id="cw-name-cancel">Cancel</button></div>
+  <details class="g cw-export" open>
+   <summary>Batch export</summary><div class="gb">
+    <div class="cw-export-options">
+     <label for="cw-format">Format</label><select id="cw-format"><option value="png">PNG</option><option value="jpg">JPEG</option><option value="svg">SVG</option><option value="tiff">TIFF</option></select>
+     <label for="cw-size">Long side</label><div class="num"><input type="number" id="cw-size" min="256" max="8192" step="1" value="2048"><i>px</i></div>
+     <label for="cw-dpi">TIFF resolution</label><select id="cw-dpi"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option></select>
+    </div>
+    <div class="row"><button type="button" class="alt" id="cw-export-selected">Export selected</button><button type="button" class="primary" id="cw-export-all">Export all</button></div>
+    <div class="hint" id="cw-export-note" aria-live="polite">Exports each colorway to one ZIP file.</div>
+   </div>
+  </details>
   <div class="cw-preview" id="cw-preview" hidden></div>
  </div>
 </section>
