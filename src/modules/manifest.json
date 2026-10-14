@@ -46,5 +46,7 @@
  "46-presets.js",
  "47-variations.js",
  "48-task-bar.js",
- "49-motif-export.js"
+ "49-motif-export.js",
+ "50-colorways.js",
+ "51-colorways-panel.js"
 ]
