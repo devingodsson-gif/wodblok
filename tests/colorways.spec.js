@@ -25,6 +25,28 @@ test('colorway core normalizes saved palettes and detects palette edits', async 
   expect(errors).toEqual([]);
 });
 
+test('capturing a real project resolves named editor colours into portable hex values', async ({ page }) => {
+  const { errors } = await openApp(page);
+  const result = await page.evaluate(() => {
+    const api = window.__wbTest.colorways;
+    const saved = api.captureCurrent('Current palette', 'cw-current');
+    const converted = api.toProject(api.apply({
+      tiles: [{ id: 1, ink: 'Dark Tyrian Blue', items: [] }],
+      layers: [{ id: 'layer-1', ink: 'Dark Tyrian Blue' }],
+      proj: { bg: 'Pale Lemon Yellow', ink: 'Dark Tyrian Blue' }
+    }, { id: 'cw-test', name: 'Test', colors: { bg: '#101010', ink: '#F5F0E6' } }));
+    return { saved, converted };
+  });
+  expect(result.saved).not.toBeNull();
+  expect(result.saved.colors.bg).toMatch(/^#[0-9A-F]{6}$/);
+  expect(result.saved.colors.ink).toMatch(/^#[0-9A-F]{6}$/);
+  expect(result.converted.proj.bg).not.toBe('#101010');
+  expect(result.converted.proj.ink).not.toBe('#F5F0E6');
+  expect(result.converted.tiles[0].ink).toBe(result.converted.proj.ink);
+  expect(result.converted.layers[0].ink).toBe(result.converted.proj.ink);
+  expect(errors).toEqual([]);
+});
+
 test('applying a colorway remaps palette inks without changing the composition', async ({ page }) => {
   const { errors } = await openApp(page);
   const result = await page.evaluate(() => {
