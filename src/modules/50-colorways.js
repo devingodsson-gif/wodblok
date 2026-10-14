@@ -73,7 +73,7 @@ function cwApply(core,colorway){
 }
 function init50(){
   // Shared API for the Colorways panel (Step 2) and deterministic tests.
-  const currentCore=()=>{try{return JSON.parse(WBX.wbCoreStr?WBX.wbCoreStr():JSON.stringify({proj:WBS.proj||{bg:'#FFFFFF',ink:'#000000'}}))}catch(e){return{proj:WBS.proj||{bg:'#FFFFFF',ink:'#000000'}}}};
+  const currentCore=()=>{try{const c=WBX.wbCoreStr?JSON.parse(WBX.wbCoreStr()):{proj:WBS.proj||{}};c.proj={bg:c.proj&&c.proj.bg||'#FFFFFF',ink:c.proj&&c.proj.ink||'#000000',...(c.proj&&c.proj.c3?{c3:c.proj.c3}:{}),...(c.proj&&c.proj.c4?{c4:c.proj.c4}:{})};return c}catch(e){return{proj:{bg:WBS.proj&&WBS.proj.bg||'#FFFFFF',ink:WBS.proj&&WBS.proj.ink||'#000000'}}}};
   const captureCurrent=(name,id)=>{const c=currentCore();if(!c.proj)c.proj={bg:'#FFFFFF',ink:'#000000'};return cwCapture(c,name,id)};
   WBX.wbColorways={normalize:cwNormalize,capture:(name,id)=>captureCurrent(name,id),captureCore:cwCapture,captureCurrent,isModified:cwIsModified,apply:cwApply,sameColors:cwSameColors,slots:[...CW_SLOTS],max:CW_MAX,list:()=>cwNormalize(WBS.colorways),active:()=>WBS.activeColorway||null,setList:list=>{WBS.colorways=cwNormalize(list);if(!WBS.colorways.some(x=>x.id===WBS.activeColorway))WBS.activeColorway=null;if(WBX.wbCap)WBX.wbCap();return WBS.colorways},setActive:id=>{WBS.activeColorway=WBS.colorways&&WBS.colorways.some(x=>x.id===id)?id:null;if(WBX.wbCap)WBX.wbCap();return WBS.activeColorway}};
 }
