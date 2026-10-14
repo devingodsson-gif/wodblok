@@ -25,6 +25,28 @@ test('Colorways batch export helpers sanitize filenames and bound raster dimensi
   expect(errors).toEqual([]);
 });
 
+test('selected Colorways export creates one ZIP without changing the current project', async ({ page }) => {
+  const { errors } = await openApp(page);
+  await openPanel(page, 'colorways');
+  await page.click('#cw-add');
+  await page.click('#cw-add');
+  await page.locator('#cw-list .cw-pick').nth(1).check();
+  const before = await page.evaluate(() => window.__wbTest.state());
+  await page.click('#cw-export-selected');
+  await page.waitForFunction(() => window.__wbDownloads.length === 1, null, { timeout: 60000 });
+  const result = await page.evaluate(() => ({
+    download: window.__wbDownloads[0],
+    after: window.__wbTest.state(),
+    note: document.getElementById('cw-export-note').textContent
+  }));
+  expect(result.download.filename).toMatch(/-colorways\.zip$/);
+  expect(result.download.type).toBe('application/zip');
+  expect(result.download.base64.slice(0, 8)).toBe('UEsDBAoA');
+  expect(result.after).toBe(before);
+  expect(result.note).toMatch(/Exported 1 colorway to ZIP/);
+  expect(errors).toEqual([]);
+});
+
 test('Colorways rows have independent export-selection checkboxes', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'colorways');
