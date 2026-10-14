@@ -165,6 +165,7 @@ footer a:hover{color:var(--fg)}
 
 /* Image lightbox */
 #hero-slideshow-image,.work img{cursor:zoom-in}
+#hero-slideshow-image:not(.is-loaded){visibility:hidden}
 #hero-slideshow-image:focus-visible,.work img:focus-visible{outline:2px solid var(--acc);outline-offset:5px}
 .lightbox{width:min(94vw,1200px);max-width:none;max-height:94vh;padding:0;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--bg);color:var(--fg);box-shadow:0 24px 90px rgba(0,0,0,.65);overflow:visible}
 .lightbox::backdrop{background:rgba(12,11,10,.88);backdrop-filter:blur(4px)}
@@ -201,7 +202,7 @@ footer a:hover{color:var(--fg)}
       </div>
       <figure class="print">
         <div class="print-frame">
-          <img id="hero-slideshow-image" width="900" height="900" alt="A bold repeating pattern created with Wodblok." fetchpriority="high" decoding="async">
+          <img id="hero-slideshow-image" width="900" height="900" alt="" fetchpriority="high" decoding="async">
         </div>
         <figcaption><span>Pattern studies</span><span>Made with Wodblok</span></figcaption>
       </figure>
@@ -345,10 +346,11 @@ function artworkDescription(src,index){
   var hero=document.getElementById('hero-slideshow-image');
   if(hero){
     function updateHeroDescription(){
+      if(!hero.currentSrc&&!hero.src)return;
+      hero.classList.add('is-loaded');
       hero.alt=artworkDescription(hero.currentSrc||hero.src,0);
       hero.setAttribute('aria-label','Enlarge featured pattern: '+hero.alt);
     }
-    updateHeroDescription();
     hero.addEventListener('load',updateHeroDescription);
     makeInteractive(hero,'Enlarge featured pattern');
   }
@@ -394,7 +396,7 @@ function artworkDescription(src,index){
         preload.src=slides[next];
       }
       if(slides.length>1&&!reduced)window.setInterval(advance,interval);
-    }).catch(function(){/* Keep the original hero image as a graceful fallback. */});
+    }).catch(function(){/* Keep the hero hidden if its generated image manifest is unavailable. */});
   }
   if(grid){
     fetchJSON('/img/gallery-manifest.json').then(function(data){
