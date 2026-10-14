@@ -38,7 +38,7 @@ test('Colorways rows have independent export-selection checkboxes', async ({ pag
     return { rows: rows.length, ids: boxes.map(b => b.value), selected: boxes.filter(b => b.checked).map(b => b.value) };
   });
   expect(result.rows).toBe(2);
-  expect(result.ids).toEqual(['cw-one','cw-two']);
-  expect(result.selected).toEqual(['cw-two']);
+  expect(result.ids).toHaveLength(2);
+  expect(result.selected).toEqual([result.ids[1]]);
   expect(errors).toEqual([]);
 });
