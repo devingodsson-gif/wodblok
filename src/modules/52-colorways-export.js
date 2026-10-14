@@ -19,8 +19,8 @@ function tiffBlob(rgba,w,h,dpi){
 function fileBase(name){return String(name||'Colorway').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').slice(0,60)||'Colorway'}
 async function renderColorway(api,original,rec,fmt,px,dpi){
  const next=api.apply(original,rec);if(!next)throw new Error('Could not apply '+rec.name+'.');
- WBX.wbApply(api.toProject(next));
  try{
+  WBX.wbApply(api.toProject(next,false));
   const svg=ser();
   if(fmt==='svg')return new Blob([svg],{type:'image/svg+xml'});
   const [w,h]=dimsOf(sizeOf(px));if(w*h>MAX_AREA)throw new Error('Export size is too large for this browser. Choose a smaller long side.');
@@ -31,7 +31,7 @@ async function renderColorway(api,original,rec,fmt,px,dpi){
   ctx.drawImage(img,0,0,w,h);
   if(fmt==='tiff')return tiffBlob(ctx.getImageData(0,0,w,h).data,w,h,dpi);
   return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Could not create '+fmt.toUpperCase()+' output.')),fmt==='jpg'?'image/jpeg':'image/png',.92));
- }finally{WBX.wbApply(original)}
+ }finally{WBX.wbApply(original);api.clearTemporary()}
 }
 function init52(){
  const selectedBtn=$('cw-export-selected'),allBtn=$('cw-export-all'),fmtEl=$('cw-format'),sizeEl=$('cw-size'),dpiEl=$('cw-dpi'),note=$('cw-export-note'),list=$('cw-list');
