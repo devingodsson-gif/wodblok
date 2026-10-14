@@ -2496,6 +2496,7 @@ const pgFix=(o,ls)=>{let g={...PGD};const nn=v=>Math.max(2,Math.min(60,Math.roun
  return g};
 const core=()=>({tiles,layers,proj,dim,pr,tex,texLib,pg:{...pgrid},grade:window.wbGrade?wbGrade.get():null});
 const coreStr=()=>JSON.stringify(core());
+window.coreStr=coreStr;
 // ---- Book cover overlay: built-in label template, or the user's own image, centered with one scale.
 const blank=()=>({img:'',iw:0,ih:0,sc:100});let covB=blank(),covS=blank(),cslot='f';
 try{const q=JSON.parse(localStorage.getItem('wb40_coverB')||'null');if(q&&typeof q.sc=='number')covB={...covB,...q}}catch(e){}
