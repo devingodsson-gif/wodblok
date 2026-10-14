@@ -16,7 +16,7 @@ function init51(){
  const makeId=()=> 'cw-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
  function doApply(rec){
   const c=WBX.wbColorways.apply(core(),rec);if(!c)return;
-  if(WBX.wbApply)WBX.wbApply(c);
+  if(WBX.wbApply)WBX.wbApply(WBX.wbColorways.toProject(c));
   if(WBX.wbCap)WBX.wbCap();
   WBX.wbColorways.setActive(rec.id);
   pmsg('Colorway “'+rec.name+'”.');
