@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp } = require('./helpers/harness');
+const { TARGET, openApp, openPanel } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'Colorways export is new in the modular build'); });
 
@@ -27,14 +27,15 @@ test('Colorways batch export helpers sanitize filenames and bound raster dimensi
 
 test('Colorways rows have independent export-selection checkboxes', async ({ page }) => {
   const { errors } = await openApp(page);
+  await openPanel(page, 'colorways');
+  await page.click('#cw-add');
+  await page.click('#cw-add');
+  const boxes = page.locator('#cw-list .cw-pick');
+  await expect(boxes).toHaveCount(2);
+  await boxes.nth(1).check();
   const result = await page.evaluate(() => {
-    const api = window.__wbTest.colorways;
-    document.getElementById('cw-add').click();
-    document.getElementById('cw-add').click();
     const rows = [...document.querySelectorAll('#cw-list .cw-row')];
     const boxes = [...document.querySelectorAll('#cw-list .cw-pick')];
-    boxes[1].checked = true;
-    boxes[1].dispatchEvent(new Event('change', { bubbles: true }));
     return { rows: rows.length, ids: boxes.map(b => b.value), selected: boxes.filter(b => b.checked).map(b => b.value) };
   });
   expect(result.rows).toBe(2);
