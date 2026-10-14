@@ -9,6 +9,8 @@ test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build');
 const roll = async page => { if (!(await page.locator('section.pn[data-p="rand"]:not([hidden])').count())) await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
 const proof = async (page, kind, paper = 'letter') => {
   if (!(await page.locator('section.pn[data-p="xrec"]:not([hidden])').count())) await openPanel(page, 'xrec');
+  const moreTools = page.locator('.xrmore');
+  if (await moreTools.count() && !(await moreTools.evaluate(el => el.open))) await moreTools.locator('summary').click();
   await page.evaluate(() => { window.__wbDownloads.length = 0; });
   await page.evaluate(v => { const s = document.getElementById('xpp'); s.value = v; s.dispatchEvent(new Event('change', { bubbles: true })); }, paper);   // the page turns every list into its own menu; set the list under it
   await page.click(kind === 'pdf' ? '#xppdf' : '#xppng');
