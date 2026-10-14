@@ -5,15 +5,28 @@ import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
 // ===== Export recipes =====
-// A recipe is a saved set of export settings: format (PNG, JPG or SVG), the long side in pixels, and an ending for the file name.
+// A recipe is a saved set of export settings: format, long side in pixels, TIFF DPI, and file-name ending.
 // Click a recipe to export with it. "Export all" makes every recipe in one zip. Kept with your settings. The Export menu in the top
 // bar is unchanged.
 const XR_KEY='wb97_exportrecipes',XR_MAX=8192,XR_AREA=64e6;
 const XR_BUILTIN=[{id:'b-web',name:'Web',fmt:'png',px:2048,sfx:'web'},{id:'b-print',name:'Print',fmt:'png',px:6000,sfx:'print'},{id:'b-preview',name:'Preview',fmt:'jpg',px:800,sfx:'preview'}];
-const xrLoad=()=>{try{const a=JSON.parse(kv.get(XR_KEY)||'[]');return Array.isArray(a)?a.filter(r=>r&&typeof r.id=='string'&&typeof r.name=='string'&&['png','jpg','svg'].includes(r.fmt)):[]}catch(e){return[]}};
+const xrLoad=()=>{try{const a=JSON.parse(kv.get(XR_KEY)||'[]');return Array.isArray(a)?a.filter(r=>r&&typeof r.id=='string'&&typeof r.name=='string'&&['png','jpg','svg','tiff'].includes(r.fmt)):[]}catch(e){return[]}};
 const xrStore=a=>{try{kv.set(XR_KEY,JSON.stringify(a))}catch(e){pmsg('Could not keep the recipes in this browser.')}};
 const xrPx=v=>Math.min(XR_MAX,Math.max(256,Math.round(+v)||2048));
 const xrDims=px=>{const k=px/Math.max(CW,CH);return[Math.round(CW*k),Math.round(CH*k)]};
+// Write a standards-based, little-endian, uncompressed RGBA TIFF with inch-based X/Y resolution tags.
+function xrTiff(rgba,w,h,dpi){
+  const tags=[
+    [256,4,1,w],[257,4,1,h],[258,3,4,0],[259,3,1,1],[262,3,1,2],[273,4,1,0],
+    [277,3,1,4],[278,4,1,h],[279,4,1,rgba.length],[282,5,1,0],[283,5,1,0],[284,3,1,1],[296,3,1,2],[338,3,1,2]
+  ];
+  const ifdOffset=8,ifdSize=2+tags.length*12+4,extraOffset=ifdOffset+ifdSize,bitsOffset=extraOffset,resXOffset=bitsOffset+8,resYOffset=resXOffset+8,pixelOffset=resYOffset+8;
+  tags.find(t=>t[0]===258)[3]=bitsOffset;tags.find(t=>t[0]===273)[3]=pixelOffset;tags.find(t=>t[0]===282)[3]=resXOffset;tags.find(t=>t[0]===283)[3]=resYOffset;
+  const out=new Uint8Array(pixelOffset+rgba.length),v=new DataView(out.buffer);out[0]=0x49;out[1]=0x49;v.setUint16(2,42,true);v.setUint32(4,ifdOffset,true);v.setUint16(ifdOffset,tags.length,true);
+  tags.forEach((t,i)=>{const p=ifdOffset+2+i*12;v.setUint16(p,t[0],true);v.setUint16(p+2,t[1],true);v.setUint32(p+4,t[2],true);if(t[1]===3&&t[2]===1)v.setUint16(p+8,t[3],true);else v.setUint32(p+8,t[3],true)});
+  v.setUint32(ifdOffset+2+tags.length*12,0,true);[8,8,8,8].forEach((n,i)=>v.setUint16(bitsOffset+i*2,n,true));
+  v.setUint32(resXOffset,Math.round(dpi),true);v.setUint32(resXOffset+4,1,true);v.setUint32(resYOffset,Math.round(dpi),true);v.setUint32(resYOffset+4,1,true);out.set(rgba,pixelOffset);return new Blob([out],{type:'image/tiff'});
+}
 const xrFile=(r)=>{const f=expName(r.fmt),base=f.slice(0,-(r.fmt.length+1));return base+(r.sfx?'-'+r.sfx.replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-'):'')+'.'+r.fmt};
 // the picture itself, as a Blob
 function xrRender(r){
@@ -21,16 +34,16 @@ function xrRender(r){
     if(r.fmt=='svg')return res(new Blob([ser()],{type:'image/svg+xml'}));
     const [w,h]=xrDims(xrPx(r.px));if(w*h>XR_AREA)return rej(new Error('That size is too large for this browser. Try a smaller long side.'));
     const img=new Image();
-    img.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);c.toBlob(b=>b?res(b):rej(new Error('The picture could not be made at that size.')),r.fmt=='jpg'?'image/jpeg':'image/png',.92)}catch(e){rej(e)}};
+    img.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d',{willReadFrequently:r.fmt=='tiff'});ctx.drawImage(img,0,0,w,h);if(r.fmt=='tiff'){const im=ctx.getImageData(0,0,w,h);res(xrTiff(im.data,w,h,r.dpi||300));return}c.toBlob(b=>b?res(b):rej(new Error('The picture could not be made at that size.')),r.fmt=='jpg'?'image/jpeg':'image/png',.92)}catch(e){rej(e)}};
     img.onerror=()=>rej(new Error('The picture could not be made.'));
     img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser());
   });
 }
 function init43(){
-  const list=$('xrl'),px=$('xrpx'),sfx=$('xrsfx'),nm=$('xrn');let fmt='png',ren=null;
-  const cur=()=>({fmt,px:xrPx(px.value),sfx:sfx.value.trim()});
-  const sum=r=>r.fmt=='svg'?'SVG':r.fmt.toUpperCase()+' · '+xrPx(r.px)+' px';
-  function dims(){const r=cur();$('xrd').textContent=fmt=='svg'?'Vector, any size':xrDims(r.px).join(' × ')+' px';px.disabled=fmt=='svg'}
+  const list=$('xrl'),px=$('xrpx'),sfx=$('xrsfx'),nm=$('xrn');let fmt='png',ren=null,dpi=300;const dpiEl=$('xrdpi'),dpiRow=$('xrdpirow');
+  const cur=()=>({fmt,px:xrPx(px.value),sfx:sfx.value.trim(),...(fmt=='tiff'?{dpi:+(dpiEl&&dpiEl.value)||300}:{})});
+  const sum=r=>r.fmt=='svg'?'SVG':r.fmt.toUpperCase()+' · '+xrPx(r.px)+' px'+(r.fmt=='tiff'?' · '+(r.dpi||300)+' DPI':'');
+  function dims(){const r=cur();$('xrd').textContent=fmt=='svg'?'Vector, any size':xrDims(r.px).join(' × ')+' px';px.disabled=fmt=='svg';if(dpiRow)dpiRow.hidden=fmt!='tiff'}
   function setFmt(f){fmt=f;$('xrf').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.f==f));dims()}
   $('xrf').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setFmt(b.dataset.f)});
   px.addEventListener('input',dims);px.addEventListener('change',()=>{px.value=xrPx(px.value);dims()});
@@ -79,7 +92,7 @@ function init43(){
     if(btn&&btn.dataset.act=='ren'){ren=id;paint();return}
     if(e.target.closest('input'))return;
     const x=XR_BUILTIN.find(y=>y.id==id)||xrLoad().find(y=>y.id==id);if(!x)return;
-    setFmt(x.fmt);px.value=xrPx(x.px);sfx.value=x.sfx||'';dims();exportOne(x);
+    setFmt(x.fmt);px.value=xrPx(x.px);sfx.value=x.sfx||'';if(dpiEl)dpiEl.value=String(x.dpi||300);dims();exportOne(x);
   });
   list.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.classList&&e.target.classList.contains('xrr')){e.preventDefault();e.target.click()}});
   $('xrnow').onclick=()=>exportOne(cur());
@@ -90,7 +103,7 @@ function init43(){
     if(same)Object.assign(same,r);else a.push({id:newId(),...r});
     xrStore(a);nm.value='';paint();pmsg((same?'Updated recipe “':'Saved recipe “')+name+'”.');
   };
-  [nm,sfx,px].forEach(i=>i.addEventListener('keydown',e=>{e.stopPropagation();if(e.key=='Enter'&&i===nm)$('xrsave').click()}));
+  if(dpiEl)dpiEl.addEventListener('change',()=>{dpi=+(dpiEl.value)||300});[nm,sfx,px].forEach(i=>i.addEventListener('keydown',e=>{e.stopPropagation();if(e.key=='Enter'&&i===nm)$('xrsave').click()}));
   setFmt('png');paint();
 }
 export {init43};
