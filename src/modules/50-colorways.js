@@ -73,6 +73,6 @@ function cwApply(core,colorway){
 }
 function init50(){
   // Shared API for the Colorways panel (Step 2) and deterministic tests.
-  WBX.wbColorways={normalize:cwNormalize,capture:cwCapture,isModified:cwIsModified,apply:cwApply,sameColors:cwSameColors,slots:[...CW_SLOTS],max:CW_MAX};
+  WBX.wbColorways={normalize:cwNormalize,capture:(name,id)=>cwCapture({proj:WBS.proj},name,id),isModified:cwIsModified,apply:cwApply,sameColors:cwSameColors,slots:[...CW_SLOTS],max:CW_MAX,list:()=>cwNormalize(WBS.colorways),active:()=>WBS.activeColorway||null,setList:list=>{WBS.colorways=cwNormalize(list);if(!WBS.colorways.some(x=>x.id===WBS.activeColorway))WBS.activeColorway=null;if(WBX.wbCap)WBX.wbCap();return WBS.colorways},setActive:id=>{WBS.activeColorway=WBS.colorways&&WBS.colorways.some(x=>x.id===id)?id:null;if(WBX.wbCap)WBX.wbCap();return WBS.activeColorway}};
 }
 export {cwNormalize,cwCapture,cwIsModified,cwApply,cwSameColors,init50};
