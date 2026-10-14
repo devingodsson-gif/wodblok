@@ -1,6 +1,6 @@
 import {use} from '../platform/index.js';
 import {zipSync} from '../vendor/fflate.js';
-import { $,WBS,WBX } from './01-launch-and-version.js';
+import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {ser,expName} from './14-presets-and-layer-grid-ui.js';
 import {coreStr,pmsg} from './18-projects-and-cover-overlay.js';
