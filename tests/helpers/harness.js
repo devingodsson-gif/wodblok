@@ -105,7 +105,13 @@ async function settle(page, { quiet = 4, step = 120, max = 15000 } = {}) {
 
 // Pretty JSON of the document state (stable key order as the app writes it).
 async function stateText(page) {
-  return JSON.stringify(JSON.parse(await getState(page)), null, 1) + '\n';
+  const state = JSON.parse(await getState(page));
+  // Keep baseline snapshots stable when optional Colorways state is empty; Colorways-specific tests assert these fields directly.
+  if (Array.isArray(state.colorways) && state.colorways.length === 0 && state.activeColorway == null) {
+    delete state.colorways;
+    delete state.activeColorway;
+  }
+  return JSON.stringify(state, null, 1) + '\n';
 }
 
 // A compact, machine-independent description of an SVG subtree: tag counts, size and a hash of the normalised
