@@ -357,7 +357,7 @@ function artworkDescription(src,index){
     var observer=new MutationObserver(function(){
       grid.querySelectorAll('img:not([data-lightbox-ready])').forEach(function(img){
         img.setAttribute('data-lightbox-ready','');
-        makeInteractive(img,'Enlarge gallery artwork');
+        makeInteractive(img,'Enlarge gallery artwork: '+img.alt);
       });
     });
     observer.observe(grid,{childList:true});
