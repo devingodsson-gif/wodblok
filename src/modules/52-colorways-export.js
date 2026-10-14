@@ -19,7 +19,7 @@ function tiffBlob(rgba,w,h,dpi){
 function fileBase(name){return String(name||'Colorway').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').slice(0,60)||'Colorway'}
 async function renderColorway(api,original,rec,fmt,px,dpi){
  const next=api.apply(original,rec);if(!next)throw new Error('Could not apply '+rec.name+'.');
- WBX.wbApply(next);
+ WBX.wbApply(api.toProject(next));
  try{
   const svg=ser();
   if(fmt==='svg')return new Blob([svg],{type:'image/svg+xml'});
