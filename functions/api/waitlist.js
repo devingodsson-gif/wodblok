@@ -80,7 +80,7 @@ export async function onRequestPost({ request, env }) {
         'How they heard about Wodblok: ' + (heard || 'Not provided'),
         'Why they want access: ' + (why || 'Not provided'),
         '',
-        'Signed up at: ' + now,
+        'Signed up at: ' + new Date().toISOString(),
       ].join('\\n');
 
       const response = await fetch('https://api.resend.com/emails', {
