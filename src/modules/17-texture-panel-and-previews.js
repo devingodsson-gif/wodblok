@@ -77,8 +77,15 @@ function txRefresh(force){TXH.forEach(H=>txRender(H,force));txPaintLib(force)}
 let txLd=false,txSig='';const txCur=()=>txLib(WBS.txSel);
 const txSetR=(id,v)=>{const el=$(id);if(el&&+el.value!=+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};
 function txOpenLib(id){WBS.txSel=id;txRefresh(true);setPanel('tex')}
-function txAfter(id){store();if(WBS.tex&&Array.isArray(WBS.tex.u)&&WBS.tex.u.some(u=>u.x===id)){saveTex();buildTex()}else upd()}
-function txEdit(p){const L=txCur();if(!L||txLd)return;Object.assign(L,p);L.auto=false;txAfter(L.id)}
+// a relief or stain texture that only the canvas picture uses: changing it redraws that picture and nothing else (the pattern does not depend on it;
+// only a wear texture decides where ink catches, so wear, stamps and layers still rebuild the pattern)
+function txOnlyCanvas(id){const u=WBS.tex&&Array.isArray(WBS.tex.u)?WBS.tex.u:[],n=u.filter(z=>z&&z.x===id).length;if(!n||u.some(z=>z&&z.x===id&&z.md==='wear'))return false;return(txRefs().get(id)||0)===n}
+function txAfter(id){store();if(WBS.tex&&Array.isArray(WBS.tex.u)&&WBS.tex.u.some(u=>u.x===id)){saveTex();buildTex(txOnlyCanvas(id))}else upd()}
+// while the Amount slider moves: the picture is made once at full strength and Amount is its opacity (the exact picture is drawn when the slider is let go)
+function txPreviewA(L,p){if(Object.keys(p).join()!=='a'||tileOn()||!txOnlyCanvas(L.id)||!(+L.a>0))return false;
+ const g=$('texg');if(g.dataset.pv!==L.id||!g.querySelector('image[data-x="'+L.id+'"]')){saveTex();buildTex(true,L.id)}
+ g.querySelectorAll('image[data-x="'+L.id+'"]').forEach(i=>i.setAttribute('opacity',(+L.a/100).toFixed(3)));TEXK=txCvKey();txRefresh();return true}   // TEXK: so the history capture does not redraw the exact picture mid-drag
+function txEdit(p,pv){const L=txCur();if(!L||txLd)return;Object.assign(L,p);L.auto=false;if(pv&&txPreviewA(L,p))return;txAfter(L.id)}
 let txThr;
 function txPaintLib(force){if(!$('tx_list'))return;const refs=txRefs();if(!txLib(WBS.txSel))WBS.txSel=(WBS.texLib[0]||{}).id||'';
 const sig=JSON.stringify([WBS.texLib,WBS.txSel,[...refs],WBS.proj.bg,WBS.proj.ink]);if(!force&&sig===txSig)return;txSig=sig;
@@ -108,8 +115,8 @@ if(tl){const[ex,ey]=tileExt();return`<filter id="rf" filterUnits="userSpaceOnUse
 return`<filter id="rf" filterUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}" color-interpolation-filters="sRGB">${b}</filter>`}
 function syncPr(){$('rgh').value=WBS.pr.e;$('psq').value=WBS.pr.q;if(WBX.wbTexReady)txRefresh()}
 const saveTex=()=>{try{kv.set('wb10_tex',JSON.stringify(WBS.tex))}catch(e){}};
-function buildTex(){let o='';try{o=txImgs(txSpecs(WBS.tex&&WBS.tex.u,'relief'),CW,CH,900,'inline',txIsO,0,0,tileOn());if(o&&tileOn()&&WBS.tilePv)o=tileCopies(o,'txgc')}catch(e){o=''}
-TEXK=txCvKey();$('texg').innerHTML=o?`<g pointer-events="none">${o}</g>`:'';if(typeof upd=='function'&&WBX.wbTexReady)upd()}
+function buildTex(noPat,pv){let o='';try{o=txImgs(txSpecs(WBS.tex&&WBS.tex.u,'relief').map(S=>pv&&S.x===pv&&txIsO(S)?{...S,a:100,op:(S.a/100).toFixed(3)}:S),CW,CH,900,'inline',txIsO,0,0,tileOn());if(o&&tileOn()&&WBS.tilePv)o=tileCopies(o,'txgc')}catch(e){o=''}
+TEXK=txCvKey();$('texg').innerHTML=o?`<g pointer-events="none">${o}</g>`:'';if(pv)$('texg').dataset.pv=pv;else delete $('texg').dataset.pv;if(typeof upd=='function'&&WBX.wbTexReady){if(noPat)txRefresh();else upd()}}
 // the mask used on the ink so it skips the worn spots of the canvas texture (inl: pictures inside the markup, for a stand-alone file)
 function inkCatch(inl){const q=txSpecs(WBS.tex&&WBS.tex.u,'relief').filter(txIsW);if(!q.length)return null;const tl=tileOn(),v=txImgs(q,CW,CH,900,inl?'inline':'host',txIsW,0,0,tl);
 if(!v)return null;return tl?{defs:`<mask id="cw" maskUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"><rect x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" fill="#fff"/>${tileCopies(v,'cwc')}</mask>`}:{defs:`<mask id="cw" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`}}
@@ -118,7 +125,7 @@ function syncTex(){texNorm();txRefresh(true)}
 const txCommit=()=>{store();upd();txCap();txRefresh()};
 function init17(){WBH.syncPr=syncPr;WBH.syncTex=syncTex;WBS.SURFK='';
 txTc=new Map();
-txThr=(()=>{let last=0,tm=0,pend=null;const run=()=>{tm=0;last=performance.now();if(pend){const p=pend;pend=null;txEdit(p)}};return p=>{pend={...(pend||{}),...p};const w=160-(performance.now()-last);if(w<=0){clearTimeout(tm);tm=0;run()}else if(!tm)tm=setTimeout(run,w)}})();
+txThr=(()=>{let last=0,tm=0,pend=null;const run=()=>{tm=0;last=performance.now();if(pend){const p=pend;pend=null;txEdit(p,true)}};const f=p=>{pend={...(pend||{}),...p};const w=160-(performance.now()-last);if(w<=0){clearTimeout(tm);tm=0;run()}else if(!tm)tm=setTimeout(run,w)};f.cancel=()=>{clearTimeout(tm);tm=0;pend=null};return f})();
 [['rgh','e'],['psq','q']].forEach(([id,key])=>$(id).oninput=()=>{WBS.pr[key]=+$(id).value;WBH.syncPr();savePr();upd()});
 
 WBH.syncPr();
@@ -136,7 +143,7 @@ $('tx_name').addEventListener('input',()=>{const L=txCur();if(!L||txLd)return;L.
 $('tx_name').addEventListener('blur',()=>{const L=txCur();if(L&&!L.name.trim()){L.name=txUniq(TXN[L.t]||'Texture');store();txRefresh(true)}});
 $('tx_name').addEventListener('change',txCap);
 $('tx_type').addEventListener('input',()=>{const L=txCur();if(!L||txLd)return;const t=$('tx_type').value;if(!TXN[t])return;const old=TXN[L.t];txCap();L.t=t;if(old&&L.name.startsWith(old))L.name=txUniq(TXN[t]);L.auto=false;txAfter(L.id);txRefresh(true);txCap()});
-[['tx_a','a'],['tx_sc','sc'],['tx_az','az']].forEach(([id,k])=>{$(id).addEventListener('input',()=>{if(!txLd)txThr({[k]:+$(id).value})});$(id).addEventListener('change',()=>{if(txLd)return;txEdit({[k]:+$(id).value});txCap()})});
+[['tx_a','a'],['tx_sc','sc'],['tx_az','az']].forEach(([id,k])=>{$(id).addEventListener('input',()=>{if(!txLd)txThr({[k]:+$(id).value})});$(id).addEventListener('change',()=>{if(txLd)return;txThr.cancel();txEdit({[k]:+$(id).value});txCap()})});
 txReg('st_tex',{md:'wear',def:'pinholes',get:()=>{const t=WBS.tiles[WBS.cur];return t&&t.tu||[]},set:a=>{const t=WBS.tiles[WBS.cur];if(!t)return;t.tu=a;txCommit()}});
 txReg('ly_tex',{md:'wear',def:'pinholes',get:()=>{const l=LY();return l&&l.tu||[]},set:a=>{const l=LY();if(!l)return;l.tu=a;txCommit()}});
 txReg('cv_tex',{md:'relief',def:'cotton',max:4,get:()=>Array.isArray(WBS.tex.u)?WBS.tex.u:[],set:a=>{WBS.tex.u=a;texNorm();saveTex();buildTex();store();txCap();txRefresh()}});

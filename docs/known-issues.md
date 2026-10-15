@@ -45,3 +45,6 @@ On the first CI run that tested the built app, `roundtrip open-project-4-rect-4x
 - The free-stamps strip and list in the Layers panel (`#lfpst`, `#lfpl`) keep buttons for stamps that Randomize removed (busy test project: `#s7`, `#s8`), so those thumbnails are blank.
 - A texture overlay asks for a texture image that is not there (`#txi12_800` on the busy test project, Randomize with seed 21), so that overlay draws nothing.
 Not fixed (no bug fixes in this phase). The speed-guard test leaves both out by name (`tests/helpers/speed.js`) so it only flags new ones.
+
+## The TIFF export test fails (found in the 1.8 work, in 1.6.0 and later)
+`tests/export-recipes.spec.js` "TIFF export is a real RGBA TIFF…" times out in `page.selectOption('#xrdpi', …)`: the DPI select is not visible when the test tries to use it. Fails on the 1.6.0 build too, so it is not from a speed release. Not fixed here.

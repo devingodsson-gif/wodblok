@@ -23,7 +23,7 @@ const id=String(x.id||'').replace(/[^\w-]/g,'').slice(0,24);if(!id||ids.has(id))
 const L={id,name:String(x.name||TXN[t]).replace(/[<>&"]/g,'').slice(0,40),t,a:n(leg&&x.fam==='surf'?x.it:x.a,0,100,40),sc:n(x.sc,25,300,100),az:n(x.az,0,359,225),sd:n(x.sd,1,99999,1)|0,auto:!!x.auto};
 if(leg&&x.fam==='surf'&&+x.ink>0)L._k=n(x.ink,0,100,0);if(+x._k>0)L._k=n(x._k,0,100,0);ok.push(L)});return ok}
 // a use -> everything the renderer needs (null = nothing to draw). def = the mode a use gets when it has none
-const txSpec=(u,def)=>{const L=u&&typeof u=='object'?txLib(u.x):null;if(!L||!TXN[L.t]||!(+L.a>0))return null;return{t:L.t,a:+L.a,sc:+L.sc||100,az:isFinite(+L.az)?+L.az:225,sd:((+u.sd||+L.sd||1)|0)||1,md:TXMD.includes(u.md)?u.md:def}};
+const txSpec=(u,def)=>{const L=u&&typeof u=='object'?txLib(u.x):null;if(!L||!TXN[L.t]||!(+L.a>0))return null;return{x:L.id,t:L.t,a:+L.a,sc:+L.sc||100,az:isFinite(+L.az)?+L.az:225,sd:((+u.sd||+L.sd||1)|0)||1,md:TXMD.includes(u.md)?u.md:def}};
 const txSpecs=(l,def)=>(Array.isArray(l)?l:[]).slice(0,6).map(u=>txSpec(u,def)).filter(Boolean);
 const txKey=q=>[q.t,q.a,q.sc,q.sd,q.md=='relief'?q.az:'',q.md].join(',');
 const isOf=t=>{const r=txSpecs(t&&t.tu,'wear');return r.length?r:null};
@@ -108,7 +108,7 @@ function txHostEl(){return document.getElementById('txd')}
 function txUnhost(id){const h=txHostEl();if(!h)return;h.querySelectorAll('[data-e="'+id+'"]').forEach(n=>{TXHS.delete(n.id);n.remove()})}
 function txHostImg(e,W,H){const id='txi'+e.id+'_'+(+W).toFixed(1)+'_'+(+H).toFixed(1),h=txHostEl();if(h&&!TXHS.has(id)){h.insertAdjacentHTML('beforeend',`<image id="${id}" data-e="${e.id}" href="${e.url}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none"/>`);TXHS.add(id)}return id}
 // images for the specs of one mode-group. how: 'inline' = the picture is in the markup, 'host' = a reference to the persistent copy
-function txImgs(list,W,H,R,how,want,ox,oy,tl){let o='';const x=ox||0,y=oy||0;list.forEach(S=>{if(!want(S))return;const e=txBmp(S,W,H,R,tl);o+=how=='inline'?`<image href="${e.url}" x="${x}" y="${y}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none"/>`:`<use href="#${txHostImg(e,W,H)}" x="${x}" y="${y}"/>`});return o}
+function txImgs(list,W,H,R,how,want,ox,oy,tl){let o='';const x=ox||0,y=oy||0;list.forEach(S=>{if(!want(S))return;const e=txBmp(S,W,H,R,tl);o+=how=='inline'?`<image${S.op!=null?` data-x="${S.x}" opacity="${S.op}"`:''} href="${e.url}" x="${x}" y="${y}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none"/>`:`<use href="#${txHostImg(e,W,H)}" x="${x}" y="${y}"/>`});return o}
 const txIsW=S=>S.md=='wear',txIsO=S=>S.md!='wear';
 const txHash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=(Math.imul(h,33)+s.charCodeAt(i))|0;return(h>>>0).toString(36)};
 // overlay filter (relief / stain on a layer or a text box): the picture is laid over the shape only where the shape has ink
