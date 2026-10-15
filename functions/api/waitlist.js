@@ -67,5 +67,43 @@ export async function onRequestPost({ request, env }) {
   } catch {
     return fail('Something went wrong. Please try again.', 500);
   }
+  // Notify the site owner after the D1 write succeeds. Email delivery must never undo a signup.
+  try {
+    if (!env.RESEND_API_KEY) {
+      console.error('Waitlist signup saved, but RESEND_API_KEY is not configured; notification not sent.');
+    } else {
+      const message = [
+        'A Wodblok early-access signup was saved.',
+        '',
+        'Email: ' + email,
+        'Intended use: ' + (role || 'Not provided'),
+        'How they heard about Wodblok: ' + (heard || 'Not provided'),
+        'Why they want access: ' + (why || 'Not provided'),
+        '',
+        'Signed up at: ' + now,
+      ].join('\\n');
+
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          authorization: 'Bearer ' + env.RESEND_API_KEY,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'Wodblok Notifications <notification@wodblok.com>',
+          to: ['devingodsson@gmail.com'],
+          subject: 'New Wodblok Early Access Signup',
+          text: message,
+        }),
+      });
+      if (!response.ok) {
+        const detail = (await response.text()).slice(0, 500);
+        console.error('Waitlist notification failed:', response.status, detail);
+      }
+    }
+  } catch (error) {
+    console.error('Waitlist notification failed:', error instanceof Error ? error.message : String(error));
+  }
+
   return ok();
 }
