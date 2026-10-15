@@ -73,6 +73,57 @@ test('the hidden field is ignored quietly', async () => {
 });
 
 
+
+test('sends a Resend notification after saving a signup', async () => {
+  const DB = fakeDB();
+  const originalFetch = globalThis.fetch;
+  let sent;
+  globalThis.fetch = async (url, options) => {
+    sent = { url, options };
+    return new Response(JSON.stringify({ id: 'email_test_123' }), { status: 200 });
+  };
+  try {
+    const r = await post(
+      { email: 'new@example.com', role: 'Pattern design', heard: 'Instagram', why: 'I want to make fabric prints' },
+      { DB, RESEND_API_KEY: 'test-resend-key' },
+    );
+    assert.equal(r.status, 200);
+    assert.equal(DB.rows.has('new@example.com'), true);
+    assert.equal(sent.url, 'https://api.resend.com/emails');
+    assert.equal(sent.options.headers.authorization, 'Bearer test-resend-key');
+    const message = JSON.parse(sent.options.body);
+    assert.deepEqual(message.to, ['devingodsson@gmail.com']);
+    assert.equal(message.from, 'Wodblok Notifications <notification@wodblok.com>');
+    assert.equal(message.subject, 'New Wodblok Early Access Signup');
+    assert.match(message.text, /new@example.com/);
+    assert.match(message.text, /Pattern design/);
+    assert.match(message.text, /Instagram/);
+    assert.match(message.text, /I want to make fabric prints/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('email delivery failure does not fail or discard a saved signup', async () => {
+  const DB = fakeDB();
+  const originalFetch = globalThis.fetch;
+  const originalError = console.error;
+  globalThis.fetch = async () => new Response('provider unavailable', { status: 503 });
+  console.error = () => {};
+  try {
+    const r = await post(
+      { email: 'saved@example.com', role: 'Screen printing' },
+      { DB, RESEND_API_KEY: 'test-resend-key' },
+    );
+    assert.equal(r.status, 200);
+    assert.equal(DB.rows.has('saved@example.com'), true);
+    assert.deepEqual(await r.json(), { ok: true });
+  } finally {
+    globalThis.fetch = originalFetch;
+    console.error = originalError;
+  }
+});
+
 test('landing page leads with pattern and print design and prioritizes the waitlist', async () => {
   const html = await readFile(new URL('../site/index.html', import.meta.url), 'utf8');
   assert.match(html, /<title>Wodblok — Pattern &amp; Print Design for Artists<\/title>/);
