@@ -44,6 +44,7 @@ test('Ctrl+wheel zooms around the pointer: the spot under the pointer stays put'
 test('hand tool: Space+drag, middle button and the Hand button move the picture without changing the document', async ({ page }) => {
   const { errors } = await openApp(page);
   await bigger(page);
+  await page.waitForTimeout(400); await settle(page);                           // the zoom has finished moving the view before it is measured
   const doc = await getState(page);
   const r = await board(page).boundingBox(), cx = r.x + r.width / 2, cy = r.y + r.height / 2;
   const s0 = await scroll(page);
