@@ -35,6 +35,11 @@ async function render(browser, url, fixture) {
   await setMode(page, 'stamp');
   await shoot('Stamp editor', '#boardS');
   await setMode(page, 'pattern');
+  // the Textures tool's Amount slider, dragged and let go: the exact picture comes back once it is let go
+  await openPanel(page, 'tex');
+  await settle(page);
+  await page.evaluate(async () => { const e = document.getElementById('tx_a'); for (const v of [20, 45, 63]) { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); await new Promise(r => setTimeout(r, 220)); } e.dispatchEvent(new Event('change', { bubbles: true })); });
+  await shoot('texture Amount 63 (let go)', '#boardP');
   // PNG export at 800 px: draws the full vector picture, not the on-screen prints
   await openPanel(page, 'xrec');
   await page.fill('#xrpx', '800');
