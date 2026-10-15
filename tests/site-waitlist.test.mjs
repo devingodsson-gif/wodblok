@@ -130,7 +130,7 @@ test('landing page leads with pattern and print design and prioritizes the waitl
   assert.match(html, /Make a mark\. <em>Build a pattern\.<\/em>/);
   assert.match(html, /href="#waitlist">Get early access/);
   assert.match(html, /From a single mark to a world of pattern\./);
-  assert.match(html, /01 \/ MOTIF[\s\S]*02 \/ REPEAT[\s\S]*03 \/ MAKE/);
+  assert.doesNotMatch(html, /A focused creative workspace|01 \/ MOTIF|02 \/ REPEAT|03 \/ MAKE/);
   assert.match(html, /Linocut or block printing/);
   assert.match(html, /Stamp design/);
   assert.match(html, /https:\/\/wodblok\.com\/img\/gallery\/image-10\.webp/);
