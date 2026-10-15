@@ -134,5 +134,5 @@ test('landing page leads with pattern and print design and prioritizes the waitl
   assert.match(html, /Linocut or block printing/);
   assert.match(html, /Stamp design/);
   assert.match(html, /https:\/\/wodblok\.com\/img\/gallery\/image-10\.webp/);
-  assert.match(html, /class="pillars"[^]*?grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(html, /\.pillars\s*\{[^}]*grid-template-columns:minmax\(0,1fr\)/);
 });
