@@ -1,9 +1,9 @@
 {
- "length": 6766,
- "sha256": "131ec9010db131e60ad2ce249b7d2630206b4f00a31151e48c66cd74e7b5fdb6",
+ "length": 6791,
+ "sha256": "ed4472db23719326e967b432e1fca9284f857a24224b7c9ffc9594045604f90c",
  "tags": {
   "clipPath": 1,
-  "defs": 5,
+  "defs": 6,
   "feColorMatrix": 2,
   "feComponentTransfer": 2,
   "feFuncA": 2,
