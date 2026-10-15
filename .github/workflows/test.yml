@@ -77,7 +77,7 @@ jobs:
           WB_TARGET: build
           WB_PIXELS: '0'
           WB_BASELINE: ${{ github.workspace }}/baseline-main/dist/wodblok.html
-      - run: npx playwright test --project=chromium
+      - run: npx playwright test --project=chromium --reporter=list,github
         env:
           WB_TARGET: build
           WB_PIXELS: '0'
@@ -98,7 +98,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm ci
       - run: npm run build
-      - run: npx playwright test --project=webkit --grep @smoke
+      - run: npx playwright test --project=webkit --grep @smoke --reporter=list,github
         env:
           WB_TARGET: build
           WB_PIXELS: '0'
