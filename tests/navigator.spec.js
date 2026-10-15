@@ -64,8 +64,8 @@ test('hand tool: Space+drag, middle button and the Hand button move the picture 
   await page.click('#nvhand');
   await expect(page.locator('#nvhand')).toHaveAttribute('aria-pressed', 'false');
   // middle button
-  await page.mouse.move(cx, cy); await page.mouse.down({ button: 'middle' }); await page.mouse.move(cx - 60, cy, { steps: 4 }); await page.mouse.up({ button: 'middle' });
-  expect((await scroll(page))[0]).toBeGreaterThan(s2[0] + 30);
+  await page.mouse.move(cx, cy); await page.mouse.down({ button: 'middle' }); await page.mouse.move(cx + 60, cy, { steps: 4 }); await page.mouse.up({ button: 'middle' });   // to the right: there is room to scroll left (to the left the view can already be at its end)
+  expect((await scroll(page))[0]).toBeLessThan(s2[0] - 30);
   expect(await getState(page)).toBe(doc);
   expect(errors).toEqual([]);
 });
