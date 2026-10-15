@@ -48,3 +48,13 @@ Not fixed (no bug fixes in this phase). The speed-guard test leaves both out by 
 
 ## The TIFF export test fails (found in the 1.8 work, in 1.6.0 and later)
 `tests/export-recipes.spec.js` "TIFF export is a real RGBA TIFF…" times out in `page.selectOption('#xrdpi', …)`: the DPI select is not visible when the test tries to use it. Fails on the 1.6.0 build too, so it is not from a speed release. Not fixed here.
+
+## CI on `main` fails (checked Oct 15 2026 on 1.7.0 and 1.8.0; runs 38780769882, 38784071960)
+GitHub shows only the first 10 failing tests per job, so the list below may be incomplete. Both versions show the same 10 in Chromium; WebKit shows only the launch SVG.
+Failing before any speed work (also fail locally on the 1.6.0 build, so not caused by 1.7 or 1.8):
+- `scenarios` "randomize with seed 1, 2, 3" and "before / after compare does not change the document": the state snapshot differs (different stamps picked by Randomize). The snapshots do not match what the app draws today.
+- `navigator` "hand tool: Space+drag…": the picture scrolls less than the test expects (351 against more than 431).
+- `export-recipes` "TIFF export…": see the TIFF entry above.
+Failing because of 1.7 (one more `<defs id="stdefs">` host in the picture, so the SVG summary has one more defs element and 25 more characters). Waiting for approval to update these snapshots:
+- `launch` "launch state" (Chromium and WebKit) and `roundtrip` "open project-1, -3, -4".
+Not yet checked: any failures beyond the first 10 per job.
