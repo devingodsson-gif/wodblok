@@ -101,6 +101,7 @@ jobs:
           path: baseline-main
       - run: cd baseline-main && node tools/build.js && cd .. && npx playwright test --project=chromium tests/picture-compare.spec.js
         env:
+          WB_PICTURE_TOLERANCE: '0.6'   # 1.9 only (prints are packed in smaller sheets, so their grain moves a little): remove this line in 1.10
           WB_TARGET: build
           WB_PIXELS: '0'
           WB_BASELINE: ${{ github.workspace }}/baseline-main/dist/wodblok.html

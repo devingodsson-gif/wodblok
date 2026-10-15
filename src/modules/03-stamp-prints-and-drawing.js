@@ -61,8 +61,10 @@ function bkShow(f,defs,ik,lg,body,sd){sd=sd||'';const bd=body(lg);BK.vdefs=f+sd+
  if(BK.map.size>300)for(const[k,e]of BK.map)if(BK.gen-(e.u||0)>4){bkDrop(e);BK.map.delete(k)}
  bkFlush();bkKick(WBS.DRAFT?120:20)}
 function bkKick(d){if(BK.tm||BK.busy||!BK.q.size||BK.off)return;BK.tm=setTimeout(()=>{BK.tm=0;const n=performance.now();if((WBS.DRAFT||n-BK.inT<300)&&n-BK.last<350){bkKick(100);return}bkRun()},d==null?20:d)}
-async function bkRun(){if(BK.busy||!BK.q.size||BK.off)return;BK.busy=1;const t0=performance.now();
- try{const MW=4096,MH=4096,G=4,P=2,take=[],cells=[],tids=new Set(),pks=new Set();let x=0,y=0,rh=0,aw=0;
+// Prints in small sheets (about 1 megapixel, tens of milliseconds each) and lets the app react between them, instead of one sheet of up to 4096 x 4096
+// that holds everything up for a second or more. The pattern is redrawn once the queue is empty, or every half second while it is long.
+const bkTick=()=>new Promise(r=>setTimeout(r,0));
+async function bkBatch(){const MW=2048,MH=512,G=4,P=2,take=[],cells=[],tids=new Set(),pks=new Set();let x=0,y=0,rh=0,aw=0;
   for(const[slot,j]of BK.q){const sx=Math.min(j.bx,BK.MAXC/j.W),sy=Math.min(j.by,BK.MAXC/j.H),cw=Math.ceil(j.W*sx)+2*P,ch=Math.ceil(j.H*sy)+2*P;
    if(x&&x+cw>MW){x=0;y+=rh+G;rh=0}if(take.length&&y+ch>MH)break;
    j.c={x,y,cw,ch,sx,sy};cells.push(`<g transform="translate(${x+P} ${y+P}) scale(${sx} ${sy})">${j.inner}</g>`);take.push([slot,j]);x+=cw+G;rh=Math.max(rh,ch);aw=Math.max(aw,x);tids.add(j.tid);if(j.pk)pks.add(j.pk)}
@@ -75,9 +77,14 @@ async function bkRun(){if(BK.busy||!BK.q.size||BK.off)return;BK.busy=1;const t0=
   const A={url:URL.createObjectURL(blob),w:aw,h:ah,live:0};
   take.forEach(([key,j])=>{bkDrop(BK.map.get(key));BK.map.delete(key);A.live++;BK.map.set(key,{n:++BK.n,A,cx:j.c.x,cy:j.c.y,cw:j.c.cw,ch:j.c.ch,sx:j.c.sx,sy:j.c.sy,h:j.h,W:j.W,H:j.H,u:BK.gen});BK.alt.set(j.slot,key)});
   if(!A.live)URL.revokeObjectURL(A.url);
-  BK.st.printed+=take.length;BK.fail=0}
+  BK.st.printed+=take.length}
+async function bkRun(){if(BK.busy||!BK.q.size||BK.off)return;BK.busy=1;const t0=performance.now();let tu=t0;
+ try{while(BK.q.size&&!BK.off){await bkBatch();BK.fail=0;BK.st.bakes++;
+   if(!BK.q.size)break;
+   const n=performance.now();if(n-tu>500){tu=n;BK.last=n;if(typeof upd=='function')upd()}   // a long queue: show what is done so far
+   await bkTick();if(performance.now()-BK.inT<300)break}}                                 // something is being dragged: stop, bkKick prints the rest when it settles
  catch(e){if(++BK.fail>2)BK.off=1}
- BK.st.bakes++;BK.st.ms+=performance.now()-t0;BK.busy=0;BK.last=performance.now();if(typeof upd=='function')upd();bkKick(20)}
+ BK.st.ms+=performance.now()-t0;BK.busy=0;BK.last=performance.now();if(typeof upd=='function')upd();bkKick(20)}
 // a plain, uncompressed PNG: the browser's own PNG encoder takes over a second on a big sheet of prints, this takes a few milliseconds
 let bkCT=null;
 function bkPng(id){const w=id.width,h=id.height,px=id.data,rl=w*4+1,n=rl*h,nb=Math.max(1,Math.ceil(n/65535)),zl=2+n+nb*5+4,buf=new Uint8Array(8+25+12+zl+12+12),dv=new DataView(buf.buffer);
