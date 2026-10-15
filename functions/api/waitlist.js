@@ -81,7 +81,7 @@ export async function onRequestPost({ request, env }) {
         'Why they want access: ' + (why || 'Not provided'),
         '',
         'Signed up at: ' + new Date().toISOString(),
-      ].join('\\n');
+      ].join('\n');
 
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
