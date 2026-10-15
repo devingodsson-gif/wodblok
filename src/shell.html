@@ -108,6 +108,7 @@ button,.ddi,.wtab,.lyr,.rail button{transition:background-color .12s,border-colo
 .nvc button.alt{padding:4px 10px}
 #nvhand[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink);box-shadow:0 0 0 1px var(--acc)}
 body.handtool #boardP,body.handtool #boardP *{cursor:grab!important}
+body.handtool #empc,body.panning #empc{pointer-events:none}   /* the round + on an empty canvas sits in the middle: with the hand tool on, a drag that starts there pans like anywhere else */
 body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-select:none}
 /* workspaces */
 .wx{padding:0 0 12px}.wxl{padding:6px 8px}.wxs{display:flex;gap:8px;padding:6px 14px 0}.wxs input{flex:1;min-width:0}
