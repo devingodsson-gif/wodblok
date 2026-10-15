@@ -23,6 +23,8 @@ let dots='';if(grid.sp!='l')for(let i=0;i<n;i++)for(let j=0;j<m;j++)dots+=`<circ
 return`<g pointer-events="none" clip-path="url(#ec)" color="#6f8cff"><path d="${d}" fill="none" stroke="currentColor" stroke-width=".7" opacity=".55"/><rect width="${SW}" height="${SH}" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><g fill="currentColor" opacity=".7">${dots}</g></g>`}
 // Split pieces: q.cl is a list of [angle, offset, side] half-planes in the motif's own -50..50 space.
 let clipN=0;
+// the pattern build numbers its ids from a fixed start, so the same stamps give the same text every time and the hosted outlines are only rewritten when something changed
+function clipSeed(n){const o=clipN;clipN=n;return o}
 function clipWrap(q,m){if(!q.cl||!q.cl.length)return m;let o=m;for(const[a,d,sd]of q.cl){const r=a*Math.PI/180,u=[Math.cos(r),Math.sin(r)],n=[-u[1]*sd,u[0]*sd],c=[-u[1]*d,u[0]*d],B=400,P=[[c[0]-u[0]*B,c[1]-u[1]*B],[c[0]+u[0]*B,c[1]+u[1]*B],[c[0]+u[0]*B+n[0]*B,c[1]+u[1]*B+n[1]*B],[c[0]-u[0]*B+n[0]*B,c[1]-u[1]*B+n[1]*B]],id='kc'+(clipN++);
 o=`<clipPath id="${id}"><path d="M${P.map(p=>p[0].toFixed(2)+' '+p[1].toFixed(2)).join('L')}Z"/></clipPath><g clip-path="url(#${id})">${o}</g>`}return o}
 // Thickness: q.w (motif units) grows (+) or thins (-) the whole motif, cut details included.
@@ -82,4 +84,4 @@ WBS.edMk=true;WBS.edInk=true;WBS.edTx=true;try{const g=JSON.parse(kv.get('wb33_g
 grid.sh=gShOk(grid.sh);
 ORN.forEach(k=>ARR[k]=ARR.circle);
 }
-export {ARR,clipWrap,gDim,grid,hx3,items,saveGrid,snapPt,init09};
+export {ARR,clipSeed,clipWrap,gDim,grid,hx3,items,saveGrid,snapPt,init09};

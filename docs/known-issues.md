@@ -40,3 +40,8 @@ Could not be reproduced in later runs; no change made.
 
 ## CI flake: SVG summary counts differ on a slow machine (seen once, 1.0.4 CI run)
 On the first CI run that tested the built app, `roundtrip open-project-4-rect-4x3` and `canvas shape: tri` took their SVG summary a moment too early (image and symbol counts a few short; same family as the flakes above). Both passed locally. The checkpoint now waits for 10 quiet checks instead of 4 before taking a snapshot; the assertions are unchanged.
+
+## After Randomize, two things point at ids that no longer exist (found in the 1.7 speed work, in 1.6.0 and earlier)
+- The free-stamps strip and list in the Layers panel (`#lfpst`, `#lfpl`) keep buttons for stamps that Randomize removed (busy test project: `#s7`, `#s8`), so those thumbnails are blank.
+- A texture overlay asks for a texture image that is not there (`#txi12_800` on the busy test project, Randomize with seed 21), so that overlay draws nothing.
+Not fixed (no bug fixes in this phase). The speed-guard test leaves both out by name (`tests/helpers/speed.js`) so it only flags new ones.
