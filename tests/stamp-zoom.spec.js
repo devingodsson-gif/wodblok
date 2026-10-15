@@ -1,7 +1,7 @@
 // The Stamp editor can be zoomed (1x to 8x), with the same controls and shortcuts as the Pattern view; at Fit nothing changes (UX review C15).
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, TARGET, openApp, openProjectFile, openPanel, setMode, settle } = require('./helpers/harness');
+const { ROOT, TARGET, openApp, openProjectFile, openPanel, setMode, settle, motifPoint } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -36,11 +36,7 @@ test('a motif can still be picked and Ctrl + wheel zooms under the pointer while
   await setMode(page, 'stamp');
   await openPanel(page, 'mlist');
   for (let i = 0; i < 3; i++) await page.click('#zi');
-  const pt = await page.evaluate(() => {      // the centre of a motif that is inside the visible part of the editor
-    const h = document.getElementById('boardS').getBoundingClientRect();
-    for (const n of document.querySelectorAll('#ed [data-i]')) { const r = n.getBoundingClientRect(), x = r.x + r.width / 2, y = r.y + r.height / 2; if (x > h.x + 20 && x < h.right - 20 && y > h.y + 20 && y < h.bottom - 20) return { x, y }; }
-    return null;
-  });
+  const pt = await motifPoint(page, { bottom: 20 });      // a point on a motif that is inside the visible part of the editor
   expect(pt, 'a motif is visible at this zoom').not.toBeNull();
   await page.mouse.click(pt.x, pt.y);
   await expect(page.locator('#mlist .mr.on').first()).toBeVisible();
