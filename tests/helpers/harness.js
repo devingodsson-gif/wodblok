@@ -161,4 +161,21 @@ async function checkpoint(page, testInfo, errors, name, { shot = true, selector 
   expect(errors, 'page errors').toEqual([]);
 }
 
-module.exports = { ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, setMode, checkpoint };
+// A point on the screen that really lands on a motif in the Stamp editor (the centre of a thin shape can fall in a gap, where a click hits the background).
+// Looks at the motifs in order and tries a grid of points inside each one; { pad, bottom } keep the point inside the board, { c0: true } only takes motifs of the first copy.
+function motifPoint(page, { pad = 20, bottom = 120, c0 = false } = {}) {
+  return page.evaluate(({ pad, bottom, c0 }) => {
+    const h = document.getElementById('boardS').getBoundingClientRect();
+    for (const n of document.querySelectorAll(c0 ? '#ed [data-i][data-c="0"]' : '#ed [data-i]')) {
+      const r = n.getBoundingClientRect();
+      for (let i = 0; i <= 8; i++) for (let j = 0; j <= 8; j++) {
+        const x = r.x + r.width * (0.5 + (i - 4) / 10), y = r.y + r.height * (0.5 + (j - 4) / 10);
+        if (!(x > h.x + pad && x < h.right - pad && y > h.y + pad && y < h.bottom - bottom)) continue;
+        const e = document.elementFromPoint(x, y);
+        if (e && e.closest('[data-i]') === n) return { x, y };
+      }
+    }
+    return null;
+  }, { pad, bottom, c0 });
+}
+module.exports = { motifPoint, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, setMode, checkpoint };

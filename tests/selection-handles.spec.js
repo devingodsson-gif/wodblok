@@ -1,7 +1,7 @@
 // A single selected motif shows four corner handles that scale it and a round handle above it that turns it; one drag is one undo step (UX review C7).
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, TARGET, openApp, openProjectFile, setMode, settle, getState } = require('./helpers/harness');
+const { ROOT, TARGET, openApp, openProjectFile, setMode, settle, getState, motifPoint } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -9,7 +9,8 @@ const items = async page => JSON.parse(await getState(page)).tiles[0].items;
 async function selectOne(page) {
   await openProjectFile(page, path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok.json'));
   await setMode(page, 'stamp');
-  const pt = await page.evaluate(() => { const h = document.getElementById('boardS').getBoundingClientRect(); for (const n of document.querySelectorAll('#ed [data-i][data-c="0"]')) { const r = n.getBoundingClientRect(), x = r.x + r.width / 2, y = r.y + r.height / 2; if (x > h.x + 60 && x < h.right - 60 && y > h.y + 60 && y < h.bottom - 200) return { x, y }; } return null; });
+  const pt = await motifPoint(page, { pad: 60, bottom: 200, c0: true });
+  expect(pt, 'a motif can be clicked').not.toBeNull();
   await page.mouse.click(pt.x, pt.y);
   await expect(page.locator('#ed [data-hd]')).toHaveCount(5);
 }

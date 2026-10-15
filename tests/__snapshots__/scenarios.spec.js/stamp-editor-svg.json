@@ -1,13 +1,13 @@
 {
- "length": 151971,
- "sha256": "6263f2054aac2c139333a99d845c63bc96b2548b0a7064d9af10e4ea222b030f",
+ "length": 752883,
+ "sha256": "96392f862b1b334aff30cd0d9f577792dfc923485151c54d8c043b1a691ee6ea",
  "tags": {
   "clipPath": 1,
   "defs": 1,
-  "g": 327,
+  "g": 111,
   "image": 3,
   "mask": 67,
-  "path": 246,
+  "path": 102,
   "rect": 67,
   "svg": 1
  }

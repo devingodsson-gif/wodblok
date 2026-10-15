@@ -23,8 +23,10 @@ const steady = page => page.evaluate(() => new Promise(r => requestAnimationFram
 // a folder's own menu (its ⋯ button)
 async function menu(page, v, item) {
   const b = page.locator(`#lib .lrw:has(> .lfr[data-f="${v}"]) .lmo`);
-  await b.scrollIntoViewIfNeeded(); await steady(page);                // a scroll closes an open menu, so scroll first
-  await b.click();
+  for (let i = 0; ; i++) {                                              // the tree can redraw while this runs (slow machine): try again, three times at most
+    try { await b.scrollIntoViewIfNeeded(); await steady(page); await b.click(); break; }   // a scroll closes an open menu, so scroll first
+    catch (e) { if (i >= 2) throw e; await steady(page); }
+  }
   await page.locator('.rowm').getByRole('menuitem', { name: item, exact: true }).click();
 }
 async function open(page) { const r = await openApp(page); await setMode(page, 'stamp'); await openPanel(page, 'motifs'); return r; }

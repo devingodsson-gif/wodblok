@@ -51,12 +51,43 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm run test:site
       - run: node --test tests/site-marketing-page.test.mjs
-  chromium:
-    name: chromium
+  # The Chromium suite is split in four parts that run at the same time (Playwright --shard, by test file). Each part rebuilds the app, which is quick.
+  # The picture comparison with `main` is its own job. A last job called `chromium` collects them, so the required check name does not change.
+  chromium-shard:
+    name: chromium-shard ${{ matrix.shard }}/4
     needs: changes
     if: ${{ always() && (github.event_name != 'pull_request' || needs.changes.outputs.app == 'true') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 25
+    container: mcr.microsoft.com/playwright:v1.56.0-noble
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    env:
+      WB_ENV: ci
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright test --project=chromium --shard=${{ matrix.shard }}/4 --reporter=list,github
+        env:
+          WB_TARGET: build
+          WB_PIXELS: '0'
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: results-chromium-${{ matrix.shard }}
+          path: test-results
+          retention-days: 3
+  # draws the same projects with `main` and with this branch and compares the pictures (tests/picture-compare.spec.js);
+  # `main` is built on the side, it needs no install. Only on pull requests: on pushes to main there is nothing older to compare with.
+  picture-compare:
+    name: picture-compare
+    needs: changes
+    if: ${{ always() && github.event_name == 'pull_request' && needs.changes.outputs.app == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     container: mcr.microsoft.com/playwright:v1.56.0-noble
     env:
       WB_ENV: ci
@@ -64,29 +95,34 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm ci
       - run: npm run build
-      # draws the same projects with `main` and with this branch and compares the pictures pixel by pixel (tests/picture-compare.spec.js);
-      # `main` is built on the side, it needs no install. Skipped on pushes to main, where there is nothing older to compare with.
-      - if: github.event_name == 'pull_request'
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: main
           path: baseline-main
-      - if: github.event_name == 'pull_request'
-        run: cd baseline-main && node tools/build.js && cd .. && npx playwright test --project=chromium tests/picture-compare.spec.js
+      - run: cd baseline-main && node tools/build.js && cd .. && npx playwright test --project=chromium tests/picture-compare.spec.js
         env:
           WB_TARGET: build
           WB_PIXELS: '0'
           WB_BASELINE: ${{ github.workspace }}/baseline-main/dist/wodblok.html
-      - run: npx playwright test --project=chromium --reporter=list,github
-        env:
-          WB_TARGET: build
-          WB_PIXELS: '0'
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: results-chromium
+          name: results-picture-compare
           path: test-results
           retention-days: 3
+  # The check that branch protection asks for (docs/going-live.md). Passes when every part passed, or when the app was not touched and they were skipped.
+  chromium:
+    name: chromium
+    needs: [chromium-shard, picture-compare]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: |
+          echo "parts: ${{ needs.chromium-shard.result }}, picture compare: ${{ needs.picture-compare.result }}"
+          [ "${{ needs.chromium-shard.result }}" = "failure" ] || [ "${{ needs.chromium-shard.result }}" = "cancelled" ] && exit 1
+          [ "${{ needs.picture-compare.result }}" = "failure" ] || [ "${{ needs.picture-compare.result }}" = "cancelled" ] && exit 1
+          exit 0
   webkit:
     name: webkit
     needs: changes

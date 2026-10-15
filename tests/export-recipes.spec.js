@@ -54,7 +54,9 @@ test('TIFF export is a real RGBA TIFF with dimensions and DPI metadata', async (
   await openPanel(page, 'xrec');
   await page.click('#xrf [data-f="tiff"]');
   await expect(page.locator('#xrdpirow')).toBeVisible();
-  await page.selectOption('#xrdpi', '150');
+  await page.click('#xrdpirow .ddb');                                          // every select is a dropdown of its own: the native one is hidden
+  await page.click('.ddl:not([hidden]) .ddi[data-v="150"]');
+  await expect(page.locator('#xrdpi')).toHaveValue('150');
   await page.fill('#xrpx', '300');
   await page.fill('#xrsfx', 'fabric');
   await page.click('#xrnow');

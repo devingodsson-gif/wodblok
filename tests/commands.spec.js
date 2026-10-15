@@ -45,12 +45,19 @@ test('a disabled button means a disabled command', async ({ page }) => {
 
 test('documented shortcuts really work', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
-  // "\" turns Before on, and pressing it again turns it off (needs something to compare against)
+  // "\" turns Before on, and pressing it again turns it off (needs something to compare against); holding it peeks
   await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 30000 });
+  await expect(page.locator('#fzst')).not.toHaveClass(/on/);   // the roll's hold is over; a key pressed while it is on is ignored
   await page.locator('body').click({ position: { x: 5, y: 5 } });
-  await page.keyboard.down('Backslash'); await page.waitForTimeout(1200); await page.keyboard.up('Backslash');
+  // a tap keeps Before on; holding it is a peek that ends when the key is let go (the picture being compared is the current one after a roll)
+  await page.keyboard.press('Backslash');
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'true');
-  await page.keyboard.down('Backslash'); await page.waitForTimeout(600); await page.keyboard.up('Backslash');
+  await page.keyboard.press('Backslash');
+  await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'false');
+  await page.keyboard.down('Backslash');
+  await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'true');   // it takes a moment to get the other picture ready
+  await page.waitForTimeout(500);
+  await page.keyboard.up('Backslash');
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'false');
   // Mod+S clicks Save
   await page.evaluate(() => { window.__saveClicks = 0; document.getElementById('psv').addEventListener('click', () => { window.__saveClicks++; }); });
