@@ -17,7 +17,8 @@ function bkScale0(){const d=window.devicePixelRatio||1,a=$('art');let s=0;try{co
  try{if(WBS.curView=='stamp'){const r=$('pvw').getBoundingClientRect();if(r.width>0&&r.height>0)s=Math.max(s,Math.min(r.width/CW,r.height/CH)*pvZ)}}catch(e){}return s*d}
 function bkPre(){BK.live=!!(WBX.wbZoomIn&&WBX.wbZoomIn());BK.sc=bkScale()}
 const bkSurf=t=>SURFC[t]?(WBS.edInk?SURFC[t].s:`<mask id="is${t}" maskUnits="userSpaceOnUse" x="-100000" y="-100000" width="200000" height="200000"><rect x="-100000" y="-100000" width="200000" height="200000" fill="#fff"/></mask>`):'';
-function bkTile(t,td){BK.TD[t.id]=td;BK.T[t.id]=bkH(td+'|'+(SURFC[t.id]?SURFC[t.id].k:'')+'|'+WBS.edInk)}
+// a stamp's fingerprint is only worked out again when its outline text (or its surface) is not the same string as last time
+function bkTile(t,td){const k=(SURFC[t.id]?SURFC[t.id].k:'')+'|'+WBS.edInk;if(BK.TD[t.id]===td&&BK.TK[t.id]===k&&BK.T[t.id]!=null)return;BK.TD[t.id]=td;BK.TK[t.id]=k;BK.T[t.id]=bkH(td+'|'+k)}
 const RXU=/<use href="#(q(\d+)_(\d+)_(\d+)|s(\d+))"((?: data-[a-z]+="[^"]*")*)((?: opacity="[^"]*")?) transform="(translate\([^)]*\) rotate\([^)]*\) scale\(([-\d.]+) ([-\d.]+)\) translate\(([-\d.]+) ([-\d.]+)\))"((?: filter="url\(#[^)]+\)")?)\/>/g;
 const RXG=/<g((?: data-[a-z]+="[^"]*")*)((?: opacity="[^"]*")?) transform="(translate\([^)]*\) rotate\([^)]*\) scale\(([-\d.]+) ([-\d.]+)\) translate\(([-\d.]+) ([-\d.]+)\))"((?: filter="url\(#[^)]+\)")?)><use href="#s(\d+)"\/><use href="#e(\d+)_(\d+)" fill="([^"]*)"\/><\/g>/g;
 const RXM=/<!--@([FPE]):(\w+)-->([\s\S]*?)<!--@-->/g;
@@ -43,8 +44,11 @@ const bkDefs=used=>{let o='';used.forEach(e=>o+=`<symbol id="bk${e.n}" viewBox="
 const bkDrop=e=>{if(e&&e.A&&--e.A.live<=0)BK.dead.push(e.A.url)};
 const bkFlush=()=>{if(WBX.wbHoldOn)return;if(BK.dead.length){const d=BK.dead;BK.dead=[];setTimeout(()=>d.forEach(u=>URL.revokeObjectURL(u)),3000)}};
 // put the pattern on screen. f, defs, ik: the definitions; lg: the printed layers; body(lg): everything after the definitions
-function bkShow(f,defs,ik,lg,body){BK.vdefs=f+defs+ik;BK.vdyn='<defs>'+BK.vdefs+'</defs>'+body(lg);BK.wasLive=BK.live;BK.sc0=BK.sc;
- if(BK.off||BK.live){$('dyn').innerHTML=BK.vdyn;BK.shown=1;BK.defT=0;return}
+// sd: the outlines of every stamp (clip, mask, shape). They live once in #stdefs and are rewritten only when a stamp changes; the pattern itself
+// carries prints, so it does not hold them. The text for saving and exporting (BK.vdyn) still holds everything.
+function bkHost(sd){if(sd!==BK.sd){BK.sd=sd;const h=$('stdefs');if(h)h.innerHTML=sd}}
+function bkShow(f,defs,ik,lg,body,sd){sd=sd||'';const bd=body(lg);BK.vdefs=f+sd+defs+ik;BK.vdyn='<defs>'+BK.vdefs+'</defs>'+bd;BK.wasLive=BK.live;BK.sc0=BK.sc;
+ if(BK.off||BK.live){bkHost(sd);$('dyn').innerHTML='<defs>'+f+defs+ik+'</defs>'+bd;BK.shown=1;BK.defT=0;return}
  const now=performance.now();BK.cont=WBS.DRAFT||now-BK.inT<450;BK.gen++;BK.nHit=BK.nStale=BK.nRes=BK.nMiss=0;const used=new Set(),need=new Set();
  const d2=bkSub(defs,used,need),l2=bkSub(lg,used,need);try{if(WBS.fpB!=null&&WBS.fpB!==false)need.add('E'+WBS.fpB)}catch(e){}
  BK.st.hit+=BK.nHit;BK.st.stale+=BK.nStale;BK.st.miss+=BK.nMiss;
@@ -52,7 +56,7 @@ function bkShow(f,defs,ik,lg,body){BK.vdefs=f+defs+ik;BK.vdyn='<defs>'+BK.vdefs+
  // a mix of old and new. While something is being dragged or a slider moves, the picture always updates at once.
  const chg=BK.nStale+BK.nMiss,tot=chg+BK.nHit+BK.nRes;
  if(chg&&BK.shown&&!BK.cont&&BK.q.size&&(BK.nMiss||chg>=tot*.4)&&(!BK.defT||now-BK.defT<700||WBX.wbHoldOn&&now-BK.defT<15000)){if(!BK.defT)BK.defT=now;BK.st.defer++;bkKick(0);return}
- BK.defT=0;$('dyn').innerHTML=`<defs>${f}${d2.replace(RXM,(m,k,id,b)=>need.has(k+id)?b:'')}${ik}${bkDefs(used)}</defs>`+body(l2);BK.shown=1;
+ BK.defT=0;bkHost(sd);$('dyn').innerHTML=`<defs>${f}${d2.replace(RXM,(m,k,id,b)=>need.has(k+id)?b:'')}${ik}${bkDefs(used)}</defs>`+body(l2);BK.shown=1;
  // prints that have not been shown for a while are let go
  if(BK.map.size>300)for(const[k,e]of BK.map)if(BK.gen-(e.u||0)>4){bkDrop(e);BK.map.delete(k)}
  bkFlush();bkKick(WBS.DRAFT?120:20)}
@@ -92,11 +96,11 @@ function bkPng(id){const w=id.width,h=id.height,px=id.data,rl=w*4+1,n=rl*h,nb=Ma
 const bkIn=()=>{BK.inT=performance.now();clearTimeout(BK.inTm);BK.inTm=setTimeout(()=>{if(typeof upd=='function')upd()},500)};
 function init03(){
 BK={map:new Map(),alt:new Map(),q:new Map(),busy:0,tm:0,n:0,off:0,live:0,sc:1,sc0:0,wasLive:0,shown:0,defT:0,fail:0,last:0,inT:0,inTm:0,gen:0,cont:0,
- T:{},TD:{},P:{},PC:{},PF:{},PD:new Map(),dead:[],vdyn:null,vdefs:null,MAXC:2048,nHit:0,nStale:0,nRes:0,nMiss:0,st:{hit:0,stale:0,miss:0,bakes:0,ms:0,printed:0,defer:0}};
+ T:{},TD:{},TK:{},sd:'',P:{},PC:{},PF:{},PD:new Map(),dead:[],vdyn:null,vdefs:null,MAXC:2048,nHit:0,nStale:0,nRes:0,nMiss:0,st:{hit:0,stale:0,miss:0,bakes:0,ms:0,printed:0,defer:0}};
 // zooming or resizing: redraw when the pattern switches between printed and live, or shows at a new size
 window.bkZ=()=>{if(BK.off||!BK.shown)return;const live=!!(WBX.wbZoomIn&&WBX.wbZoomIn());if(live!==!!BK.wasLive||(!live&&Math.abs(bkScale()/BK.sc0-1)>1e-4))upd()};
 // the vector pattern, for exports and anything else that turns the canvas into a picture
-WBX.wbVec=c=>{const d=c&&c.querySelector('#dyn');if(d&&BK.vdyn!=null)d.innerHTML=BK.vdyn.replace(/<!--@[^>]*-->/g,'')};
+WBX.wbVec=c=>{const d=c&&c.querySelector('#dyn');if(d&&BK.vdyn!=null){d.innerHTML=BK.vdyn.replace(/<!--@[^>]*-->/g,'');const h=c.querySelector('#stdefs');if(h)h.innerHTML=''}};   // the outlines are in vdyn, so the hosted copy is left out of the clone
 document.addEventListener('input',e=>{const t=e.target;if(e.isTrusted&&t&&(t.type=='range'||t.type=='color'||t.type=='number'))bkIn()},true);addEventListener('wheel',e=>{if(e.isTrusted&&(e.ctrlKey||e.metaKey))bkIn()},{capture:true,passive:true});
 }
 export {BK,DRS,bkFlush,bkH,bkPre,bkShow,bkTile,init03};
