@@ -72,6 +72,50 @@ test('the hidden field is ignored quietly', async () => {
   assert.equal(DB.rows.size, 0);
 });
 
+test('sends a Resend notification after the signup is saved', async () => {
+  const DB = fakeDB();
+  const originalFetch = globalThis.fetch;
+  let sentRequest;
+  globalThis.fetch = async (url, options) => {
+    sentRequest = { url, options };
+    return new Response(JSON.stringify({ id: 'test-email-id' }), { status: 200, headers: { 'content-type': 'application/json' } });
+  };
+  try {
+    const r = await post(
+      { email: 'NewPerson@Example.com', role: 'Screen printing', heard: 'Instagram', why: 'Print tote bags' },
+      { DB, RESEND_API_KEY: 'test-key' },
+    );
+    assert.equal(r.status, 200);
+    assert.equal(DB.rows.has('newperson@example.com'), true);
+    assert.equal(sentRequest.url, 'https://api.resend.com/emails');
+    assert.equal(sentRequest.options.headers.Authorization, 'Bearer test-key');
+    const message = JSON.parse(sentRequest.options.body);
+    assert.equal(message.from, 'Wodblok Notifications <notification@wodblok.com>');
+    assert.deepEqual(message.to, ['devingodsson@gmail.com']);
+    assert.match(message.text, /newperson@example.com/);
+    assert.match(message.text, /Screen printing/);
+    assert.match(message.text, /Print tote bags/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('a Resend failure does not undo the signup or fail the form', async () => {
+  const DB = fakeDB();
+  const originalFetch = globalThis.fetch;
+  const originalError = console.error;
+  globalThis.fetch = async () => { throw new Error('network unavailable'); };
+  console.error = () => {};
+  try {
+    const r = await post({ email: 'saved@example.com', role: 'Pattern design' }, { DB, RESEND_API_KEY: 'test-key' });
+    assert.equal(r.status, 200);
+    assert.equal((await r.json()).ok, true);
+    assert.equal(DB.rows.has('saved@example.com'), true);
+  } finally {
+    globalThis.fetch = originalFetch;
+    console.error = originalError;
+  }
+});
 
 test('landing page leads with pattern and print design and prioritizes the waitlist', async () => {
   const html = await readFile(new URL('../site/index.html', import.meta.url), 'utf8');
