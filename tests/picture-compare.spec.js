@@ -1,0 +1,91 @@
+// Picture compare. Draws the same projects in an older build and in this one, in the same run on the same machine, and checks that the pictures are
+// identical: the Pattern at Fit, after a stamp size change, zoomed in (every copy drawn live), the Stamp editor, and a PNG export (which draws the full
+// vector picture). Pixel goldens cannot do this in CI because they only match the machine that made them; two builds in one run can.
+// Needs WB_BASELINE=<absolute path to the older dist/wodblok.html>; skipped without it. CI builds `main` for this (see .github/workflows/test.yml).
+const fs = require('fs');
+const path = require('path');
+const { test, expect } = require('@playwright/test');
+const { ROOT, TARGET, APP_URL, openApp, openProjectFile, openPanel, setMode, settle } = require('./helpers/harness');
+const { FIXTURES } = require('./helpers/speed');
+
+const BASE = process.env.WB_BASELINE;
+test.beforeEach(() => { test.skip(TARGET === 'legacy' || !BASE, 'needs WB_BASELINE=<older dist/wodblok.html> and the build as target'); });
+
+const CTX = { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce', acceptDownloads: true };
+
+async function render(browser, url, fixture) {
+  const ctx = await browser.newContext(CTX);
+  const page = await ctx.newPage();
+  const { errors } = await openApp(page, { seed: 21, url });
+  await openProjectFile(page, fixture);
+  const shots = {};
+  const shoot = async (label, sel) => { await settle(page, { quiet: 8 }); shots[label] = (await page.locator(sel).first().screenshot()).toString('base64'); };
+  await shoot('pattern at Fit', '#boardP');
+  await openPanel(page, 'lyrs');
+  await page.locator('#lybody .lyr').last().click({ position: { x: 60, y: 10 } });
+  await openPanel(page, 'layers');
+  await settle(page);
+  await page.evaluate(() => { const e = document.getElementById('ts'); e.value = 200; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
+  await shoot('after stamp size 200', '#boardP');
+  await page.mouse.move(700, 450);
+  await page.keyboard.press('1');
+  await shoot('zoomed to 100% (drawn live)', '#boardP');
+  await page.click('#zl');
+  await settle(page);
+  await setMode(page, 'stamp');
+  await shoot('Stamp editor', '#boardS');
+  await setMode(page, 'pattern');
+  // PNG export at 800 px: draws the full vector picture, not the on-screen prints
+  await openPanel(page, 'xrec');
+  await page.fill('#xrpx', '800');
+  await page.click('#xrf [data-f="png"]');
+  await page.evaluate(() => { window.__wbDownloads = []; });
+  await page.click('#xrnow');
+  await page.waitForFunction(() => (window.__wbDownloads || []).length > 0, null, { timeout: 120000 });
+  shots['PNG export 800 px'] = await page.evaluate(() => window.__wbDownloads[0].base64);
+  await ctx.close();
+  return { shots, errors };
+}
+
+// compare in a page: decode both PNGs, count pixels that differ
+async function diff(browser, a, b) {
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  const r = await page.evaluate(async ([a, b]) => {
+    const bmp = async s => createImageBitmap(await (await fetch('data:image/png;base64,' + s)).blob());
+    const [x, y] = await Promise.all([bmp(a), bmp(b)]);
+    if (x.width !== y.width || x.height !== y.height) return { sizeA: [x.width, x.height], sizeB: [y.width, y.height], diff: -1 };
+    const px = i => { const c = new OffscreenCanvas(i.width, i.height).getContext('2d', { willReadFrequently: true }); c.drawImage(i, 0, 0); return c.getImageData(0, 0, i.width, i.height).data; };
+    const p = px(x), q = px(y);
+    let n = 0, max = 0;
+    for (let i = 0; i < p.length; i += 4) {
+      const d = Math.max(Math.abs(p[i] - q[i]), Math.abs(p[i + 1] - q[i + 1]), Math.abs(p[i + 2] - q[i + 2]), Math.abs(p[i + 3] - q[i + 3]));
+      if (d) { n++; if (d > max) max = d; }
+    }
+    return { size: [x.width, x.height], diff: n, maxDelta: max };
+  }, [a, b]);
+  await ctx.close();
+  return r;
+}
+
+for (const name of Object.keys(FIXTURES)) {
+  test(`${name}: this build draws the same pictures as the baseline build`, async ({ browser }) => {
+    test.setTimeout(8 * 60 * 1000);
+    const was = await render(browser, 'file://' + path.resolve(BASE), FIXTURES[name]);
+    const now = await render(browser, APP_URL, FIXTURES[name]);
+    const out = {};
+    for (const label of Object.keys(was.shots)) {
+      out[label] = await diff(browser, was.shots[label], now.shots[label]);
+      if (out[label].diff !== 0) {                                                   // keep both pictures for a person to look at
+        fs.mkdirSync(path.join(ROOT, 'test-results', 'picture-compare'), { recursive: true });
+        const f = `${name}-${label.replace(/\W+/g, '-')}`;
+        fs.writeFileSync(path.join(ROOT, 'test-results', 'picture-compare', f + '-baseline.png'), Buffer.from(was.shots[label], 'base64'));
+        fs.writeFileSync(path.join(ROOT, 'test-results', 'picture-compare', f + '-now.png'), Buffer.from(now.shots[label], 'base64'));
+      }
+    }
+    console.log('picture-compare', name, JSON.stringify(out));
+    for (const [label, r] of Object.entries(out)) expect(r.diff, `${name}: ${label}: pixels that differ (size ${JSON.stringify(r.size || [r.sizeA, r.sizeB])}, biggest step ${r.maxDelta})`).toBe(0);
+    expect(was.errors).toEqual([]);
+    expect(now.errors).toEqual([]);
+  });
+}

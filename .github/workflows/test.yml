@@ -64,6 +64,19 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm ci
       - run: npm run build
+      # draws the same projects with `main` and with this branch and compares the pictures pixel by pixel (tests/picture-compare.spec.js);
+      # `main` is built on the side, it needs no install. Skipped on pushes to main, where there is nothing older to compare with.
+      - if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: baseline-main
+      - if: github.event_name == 'pull_request'
+        run: cd baseline-main && node tools/build.js && cd .. && npx playwright test --project=chromium tests/picture-compare.spec.js
+        env:
+          WB_TARGET: build
+          WB_PIXELS: '0'
+          WB_BASELINE: ${{ github.workspace }}/baseline-main/dist/wodblok.html
       - run: npx playwright test --project=chromium
         env:
           WB_TARGET: build
