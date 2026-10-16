@@ -28,5 +28,5 @@ Speed work from the Oct 15 audit (`docs/known-issues.md` lists the two old quirk
 
 ## 1.9.1 (test follow-ups to 1.9)
 - Test hook `__wbTest.printsBusy()`; `settle` waits for the stamp prints, so the quiet-25 workarounds in speed-guard and repeat-tile are gone.
-- The temporary picture-compare tolerance (`WB_PICTURE_TOLERANCE` in the workflow) is removed; main is now the 1.9 baseline.
+- picture-compare: the temporary 0.6 tolerance became a permanent 0.05 (mean of 255): print sheets are made up by timing, so grain moves ~0.01 between runs (measured main vs this branch). A build without the hook is given 2.5 s extra.
 - Seamless-tile right/down limit is 0.12*half+0.25 (was +0.15): 1.9's smaller print sheets move grain by about 1 of 255 on the CI renderer.
