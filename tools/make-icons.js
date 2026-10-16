@@ -1,18 +1,18 @@
 #!/usr/bin/env node
-// Renders the app icons from the brand mark (the WB letters on a bronze rounded square) into src/web/. Run when the mark changes:
+// Renders the app icons from the brand mark (the bare bronze WB letters) into src/web/. Run when the mark changes:
 // node tools/make-icons.js   (needs the Playwright Chromium that the tests use). The PNGs are committed.
 const path = require('path'), fs = require('fs');
 const { chromium } = require('@playwright/test');
 const OUT = path.join(__dirname, '..', 'src', 'web');
 const BG = '#1b1a18', ACC = '#c9a66b';
-// full-bleed square for iOS and "maskable" (the system rounds it; the mark stays inside the central 80%), rounded for the others
+// The bare bronze WB letters, no tile. "any" icons are transparent; the maskable and Apple icons need a background, so they get the dark brand colour,
+// with the mark inside the central 80% safe zone.
 const { PATH } = require('./brand-mark');
 const svg = (size, kind) => {
   const k = size / 24;
-  const rr = kind === 'rounded' ? `<rect x="${2.5 * k}" y="${2.5 * k}" width="${19 * k}" height="${19 * k}" rx="${5.5 * k}" fill="${ACC}"/>` : '';
-  const m = kind === 'rounded' ? 1 : 1.13; // the mark is 15 of 24 units wide; larger on full-bleed icons (17 of 24, inside the 80% safe zone)
-  const full = kind === 'rounded' ? '' : `<rect width="${size}" height="${size}" fill="${ACC}"/>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${full}${rr}<path transform="scale(${k}) translate(12 12) scale(${m}) translate(-12 -12)" fill="${BG}" d="${PATH}"/></svg>`;
+  const m = kind === 'rounded' ? 1.5 : 1.09; // the mark is 15 of 24 units wide
+  const full = kind === 'rounded' ? '' : `<rect width="${size}" height="${size}" fill="${BG}"/>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${full}<path transform="scale(${k}) translate(12 12) scale(${m}) translate(-12 -12)" fill="${ACC}" d="${PATH}"/></svg>`;
 };
 (async () => {
   const b = await chromium.launch(), p = await b.newPage();
