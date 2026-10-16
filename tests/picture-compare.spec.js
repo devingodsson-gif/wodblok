@@ -9,6 +9,8 @@ const { ROOT, TARGET, APP_URL, openApp, openProjectFile, openPanel, setMode, set
 const { FIXTURES } = require('./helpers/speed');
 
 const BASE = process.env.WB_BASELINE;
+// WB_PICTURE_TOLERANCE=<mean difference, 0-255>: only for a release that changes how prints are packed (their grain moves a little). Unset = exactly equal.
+const TOL = +process.env.WB_PICTURE_TOLERANCE || 0;
 test.beforeEach(() => { test.skip(TARGET === 'legacy' || !BASE, 'needs WB_BASELINE=<older dist/wodblok.html> and the build as target'); });
 
 const CTX = { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce', acceptDownloads: true };
@@ -62,12 +64,12 @@ async function diff(browser, a, b) {
     if (x.width !== y.width || x.height !== y.height) return { sizeA: [x.width, x.height], sizeB: [y.width, y.height], diff: -1 };
     const px = i => { const c = new OffscreenCanvas(i.width, i.height).getContext('2d', { willReadFrequently: true }); c.drawImage(i, 0, 0); return c.getImageData(0, 0, i.width, i.height).data; };
     const p = px(x), q = px(y);
-    let n = 0, max = 0;
+    let n = 0, max = 0, sum = 0, big = 0;
     for (let i = 0; i < p.length; i += 4) {
       const d = Math.max(Math.abs(p[i] - q[i]), Math.abs(p[i + 1] - q[i + 1]), Math.abs(p[i + 2] - q[i + 2]), Math.abs(p[i + 3] - q[i + 3]));
-      if (d) { n++; if (d > max) max = d; }
+      if (d) { n++; sum += d; if (d > max) max = d; if (d > 48) big++; }
     }
-    return { size: [x.width, x.height], diff: n, maxDelta: max };
+    return { size: [x.width, x.height], diff: n, maxDelta: max, meanDelta: +(sum / (p.length / 4)).toFixed(3), over48: big };
   }, [a, b]);
   await ctx.close();
   return r;
@@ -81,7 +83,7 @@ for (const name of Object.keys(FIXTURES)) {
     const out = {};
     for (const label of Object.keys(was.shots)) {
       out[label] = await diff(browser, was.shots[label], now.shots[label]);
-      if (out[label].diff !== 0) {                                                   // keep both pictures for a person to look at
+      if (TOL ? out[label].meanDelta > TOL : out[label].diff !== 0) {                                                   // keep both pictures for a person to look at
         fs.mkdirSync(path.join(ROOT, 'test-results', 'picture-compare'), { recursive: true });
         const f = `${name}-${label.replace(/\W+/g, '-')}`;
         fs.writeFileSync(path.join(ROOT, 'test-results', 'picture-compare', f + '-baseline.png'), Buffer.from(was.shots[label], 'base64'));
@@ -89,7 +91,11 @@ for (const name of Object.keys(FIXTURES)) {
       }
     }
     console.log('picture-compare', name, JSON.stringify(out));
-    for (const [label, r] of Object.entries(out)) expect(r.diff, `${name}: ${label}: pixels that differ (size ${JSON.stringify(r.size || [r.sizeA, r.sizeB])}, biggest step ${r.maxDelta})`).toBe(0);
+    for (const [label, r] of Object.entries(out)) {
+      const what = `${name}: ${label}: pixels that differ (size ${JSON.stringify(r.size || [r.sizeA, r.sizeB])}, biggest step ${r.maxDelta}, mean ${r.meanDelta})`;
+      if (!TOL || r.diff === -1) expect(r.diff, what).toBe(0);
+      else { expect(r.meanDelta, what).toBeLessThanOrEqual(TOL); expect(r.over48, what + ': pixels off by more than 48').toBeLessThanOrEqual(r.size[0] * r.size[1] * 0.001); }
+    }
     expect(was.errors).toEqual([]);
     expect(now.errors).toEqual([]);
   });

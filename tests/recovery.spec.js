@@ -49,6 +49,7 @@ test('saved work leaves nothing to restore, and Dismiss removes the offer for go
   await expect(p3.locator('#rcv')).toBeVisible();
   await p3.click('#rcx');
   await expect(p3.locator('#rcv')).toBeHidden();
+  await p3.waitForTimeout(500);                                             // the stored copy is deleted a moment after the click: do not reload before that
   await p3.reload(); await p3.waitForFunction(() => document.fonts.status === 'loaded'); await settle(p3);
   await expect(p3.locator('#rcv')).toBeHidden();
   await ctx.close();

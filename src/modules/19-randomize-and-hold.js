@@ -13,7 +13,7 @@ function init19(){// ===== Randomize: a whole new piece in the current project. 
 // Left alone on purpose: canvas size and print cover (your document setup), hand-picked stamps, editor grid.
 // Randomize reads your Stamp library first when the Stamp library switch is on, then rolls.
 window.SLC=[];
-wbHold=(()=>{let on=0,t0=0,armed=0,ovs=[],bar=null,prog=0,pr0=0,quiet=0,lastMut=0,mo=null,loop=0,view='',vis=[];
+wbHold=(()=>{let on=0,t0=0,armed=0,ovs=[],bar=null,prog=0,pr0=0,quiet=0,lastMut=0,lastLay=0,mo=null,loop=0,view='',vis=[];
  const RF=/(href="#|url\(#|url\(&quot;#|url\("#|url\('#)([^"'\)\s&]+)/g,RI=/\sid="([^"]+)"/g;
  // copy an element's markup with every id it refers to renamed, so the copy keeps looking the same while the original changes
  function snap(root,P){let html=root.outerHTML;const css=[];
@@ -37,7 +37,7 @@ wbHold=(()=>{let on=0,t0=0,armed=0,ovs=[],bar=null,prog=0,pr0=0,quiet=0,lastMut=
  function setP(v){prog=Math.max(prog,Math.min(1,v));const w=(prog*100).toFixed(1)+'%';if(bar)bar.firstChild.style.width=w;const s=$('fzsb');if(s)s.style.width=w;const t=$('fzt');if(t)t.textContent=prog>=1?'Done':prog>=.9?'Finishing…':'Randomizing… '+Math.round(prog*100)+'%'}
  function start(){if(on){armed=0;t0=performance.now();quiet=t0;return}
   const st=document.querySelector('.stage'),boards=[...st.querySelectorAll(':scope>.board')].filter(b=>!b.hidden);if(!boards.length)return;
-  on=1;WBX.wbHoldOn=1;armed=0;t0=performance.now();lastMut=t0;prog=0;pr0=BK.st.printed;view=boards.map(b=>b.id).join();
+  on=1;WBX.wbHoldOn=1;armed=0;t0=performance.now();lastMut=t0;lastLay=t0;prog=0;pr0=BK.st.printed;view=boards.map(b=>b.id).join();
   try{boards.forEach((b,i)=>ovs.push(freeze(b,st,'fz'+i+'_',0)));
    const pv=$('pvw');if(pv&&pv.getClientRects().length&&pv.closest('.pvbox'))ovs.push(freeze(pv,pv.closest('.pvbox'),'fzp_',1))}
   catch(e){ovs.forEach(o=>o.el.remove());ovs=[];on=0;WBX.wbHoldOn=0;return}
@@ -52,7 +52,7 @@ wbHold=(()=>{let on=0,t0=0,armed=0,ovs=[],bar=null,prog=0,pr0=0,quiet=0,lastMut=
  function tick(){loop=0;if(!on)return;const now=performance.now();
   const boards=[...document.querySelectorAll('.stage>.board')].filter(b=>!b.hidden).map(b=>b.id).join();
   if(boards!==view){stop(true);return} // the view was switched: let go straight away
-  ovs.forEach(lay);
+  if(now-lastLay>250){lastLay=now;ovs.forEach(lay)}   // reading offsetLeft/offsetTop forces a layout; the board hardly ever moves during a roll, so not on every frame
   const busy=!armed||raf||BK.busy||BK.q.size||BK.tm||BK.defT||(WBX.wbTxBusy||0)>0;
   const done=BK.st.printed-pr0,left=BK.q.size,el=now-t0;
   let est=.06+Math.min(.3,el/4000);if(done+left>0)est=Math.max(est,.15+.8*done/(done+left));if((WBX.wbTxBusy||0)>0)est=Math.min(est,.6);if(!busy)est=Math.max(est,.92);setP(Math.min(.97,est));
