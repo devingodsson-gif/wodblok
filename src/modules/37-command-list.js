@@ -52,7 +52,7 @@ const COMMANDS = [
   ['panel.colors', 'Open Colours', 'rail-colors'],
   ['panel.cways', 'Open Colourways', 'rail-cways'],
   ['colourway.new', 'New colourway', 'cwnew'],
-  ['colourway.exportAll', 'Export all colourways as one zip', 'cwexp'],
+  ['colourway.exportAll', 'Export all colourways', 'cwgo'],
   ['tray.add', 'Add a colour to the tray', 'tyaddl'],
   ['tray.save', 'Save tray', 'tysave'],
   ['panel.stamp', 'Open Stamp', 'rail-stamp'],

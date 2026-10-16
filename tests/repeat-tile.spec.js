@@ -9,7 +9,18 @@ const tile = async (page, on = true) => { await openPanel(page, 'canvas'); await
 
 // The "Repeat 3 x 3" view draws the tile and its neighbours for real. If the piece repeats, the middle tile and the one to its right (or
 // below) are the same picture; a tile moved half a tile across is not, which is what makes the comparison meaningful.
+// The comparison cuts the screenshot into three equal tiles, so the canvas must be a whole number of pixels per tile: the view is nudged
+// (a few pixels of window height) until the canvas on screen is a multiple of 3 in both directions. Otherwise the resampling of a tile that
+// starts part-way through a pixel reads as a seam (1.10: the colour dock made the canvas 424 px wide, 141.33 per tile).
+async function wholeTiles(page) {
+  for (let dh = 0; dh <= 24; dh++) {
+    await page.setViewportSize({ width: 1440, height: 900 + dh }); await page.waitForTimeout(250);
+    const b = await page.locator('#art').boundingBox();
+    if (b && b.width % 3 === 0 && b.height % 3 === 0) return;
+  }
+}
 async function periodic(page) {
+  await wholeTiles(page);
   await page.click('#tpv'); await settle(page, { max: 60000 }); await page.waitForTimeout(500);
   const buf = await page.locator('#art').screenshot();
   await page.click('#tpv'); await settle(page);
