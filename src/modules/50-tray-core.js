@@ -1,5 +1,5 @@
 import {WBS,WBX} from './01-launch-and-version.js';
-import {CM,LEG_HEX,PCOL,col,okC} from './04-canvas-and-stamp-outlines.js';
+import {CM,PCOL,col,fixC,okC} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 // ===== The colour tray: the project's working colours =====
@@ -30,7 +30,9 @@ const slotHex=(id,p=P())=>{const w=cwNow(p);return(w&&w.c[id])||'#888888'};
 const slotName=(id,p=P())=>{const w=cwNow(p);return(w&&w.m&&w.m[id])||''};
 const slotNo=(id,p=P())=>p.ts.indexOf(id)+1;
 const nextId=(used,pre)=>{let i=1;while(used.has(pre+i))i++;return pre+i};
-const hexOfName=n=>CM[n]||LEG_HEX(n)||null;
+// an old colour name as the app has always shown it: a palette colour is itself; a name from the first 100-colour palette becomes the nearest palette colour
+const nameOf=n=>{if(!n||typeof n!='string')return null;if(CM[n])return n;const m=fixC(n,null);return m&&CM[m]?m:null};
+const hexOfName=n=>{const m=nameOf(n);return m?CM[m]:null};
 // what a colour reference shows as words: the slot's colour name, else the hex
 function refLabel(r){if(!r)return'';if(isLink(r)){const id=r.slice(1);return slotName(id)||slotHex(id).toUpperCase()}if(isFixed(r))return col(r).toUpperCase();return r}
 // ---- a new tray from a list of [hex, name]; the first colour is the paper, the second the ink
@@ -41,7 +43,7 @@ const trayDefault=()=>trayNew([[CM[PCOL.bg],PCOL.bg],[CM[PCOL.ink],PCOL.ink]]);
 // ---- documents from before the tray: their colours were names (paper, ink, accent, accent 2, and inks on stamps and layers).
 // They become tray slots (up to 16; any more stay as fixed colours), linked where they were used. Works on {proj,tiles,layers}.
 function trayFromLegacy(c){const o=c.proj||{},cols=[],idx=new Map();
- const add=n=>{if(!n)return null;if(idx.has(n))return idx.get(n);const h=hexOfName(n);if(!h)return null;if(cols.length>=TRAY_MAX)return null;const id='k'+(cols.length+1);cols.push([id,h,n]);idx.set(n,id);return id};
+ const add=n0=>{const n=nameOf(n0);if(!n)return null;if(idx.has(n))return idx.get(n);if(cols.length>=TRAY_MAX)return null;const id='k'+(cols.length+1);cols.push([id,CM[n],n]);idx.set(n,id);return id};
  const bg=add(o.bg||PCOL.bg)||add(PCOL.bg),ink=add(o.ink||PCOL.ink)||add(PCOL.ink);add(o.c3);add(o.c4);
  const ref=n=>{if(!n)return n;if(typeof n=='string'&&(isLink(n)||isFixed(n)))return n;const id=add(n);if(id)return'@'+id;const h=hexOfName(n);return h?h:null};
  (c.tiles||[]).forEach(t=>{if(t&&t.ink){const r=ref(t.ink);if(r)t.ink=r;else delete t.ink}});

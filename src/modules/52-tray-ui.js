@@ -192,7 +192,7 @@ function init52(){
  mkWell($('wl_st'),{label:'Stamp ink',what:'Stamp ink',def:'Default ink',defRef:()=>o().ink,get:()=>{const t=WBS.tiles[WBS.cur];return t&&t.ink||''},set:v=>{const t=WBS.tiles[WBS.cur];if(!t)return;if(v)t.ink=v;else delete t.ink}});
  mkWell($('wl_ly'),{label:'Layer ink',what:'Layer ink',def:'Stamp colours',defSwatch:()=>`linear-gradient(135deg,${col(o().ink)} 50%,${col(o().bg)} 50%)`,get:()=>{const L=LY();return L&&L.ink||''},set:v=>{const L=LY();if(!L)return;if(v)L.ink=v;else delete L.ink}});
  mkWell($('wl_rp'),{label:'Replace colour',what:'Replace',defRef:()=>o().ink,get:()=>{const L=LY();return L&&L.rp||o().ink},set:v=>{const L=LY();if(L&&v)L.rp=v}});
- WBX.wbTrayPaint=f=>{paintAll(f);paintST(f)};
+ {const prev=WBX.wbTrayPaint;WBX.wbTrayPaint=f=>{if(prev)prev(f);paintAll(f);paintST(f)}}   // earlier tools (Export recipes) listen too
  WBX.wbTraySync=()=>paintAll(false);
  WBX.wbMkWell=mkWell;WBX.wbPaintWells=paintWells;
  document.addEventListener('pointerdown',e=>{if(WP&&!WP.el.contains(e.target)&&!WP.W.sb.contains(e.target))closeWell()},true);

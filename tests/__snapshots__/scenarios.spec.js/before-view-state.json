@@ -135,7 +135,7 @@
    "er": 3.3,
    "es": 439,
    "neg": false,
-   "ink": "Artemesia Green",
+   "ink": "@k3",
    "tu": []
   }
  ],
@@ -262,10 +262,33 @@
   }
  ],
  "proj": {
-  "ink": "Helvetia Blue",
-  "bg": "Yellow Orange",
-  "c3": "Artemesia Green",
-  "c4": "Burnt Sienna"
+  "bg": "@k1",
+  "ink": "@k2",
+  "ts": [
+   "k1",
+   "k2",
+   "k3",
+   "k4"
+  ],
+  "cw": [
+   {
+    "id": "w1",
+    "n": "Colourway 1",
+    "c": {
+     "k1": "#f99d1b",
+     "k2": "#005b8d",
+     "k3": "#709390",
+     "k4": "#ae5224"
+    },
+    "m": {
+     "k1": "Yellow Orange",
+     "k2": "Helvetia Blue",
+     "k3": "Artemesia Green",
+     "k4": "Burnt Sienna"
+    }
+   }
+  ],
+  "cwa": 0
  },
  "dim": {
   "s": [

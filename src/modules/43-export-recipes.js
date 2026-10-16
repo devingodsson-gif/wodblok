@@ -34,7 +34,7 @@ const xrFile=(r,w)=>{const f=expName(r.fmt),base=f.slice(0,-(r.fmt.length+1));re
 const frames=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
 // run fn once per colourway (each one showing in turn), then put back the one that was showing
 async function xrWays(all,fn){const o=WBS.proj;if(!all||o.cw.length<2)return fn(null);const keep=o.cwa;WBX.wbNoCap=1;
-  try{for(let i=0;i<o.cw.length;i++){o.cwa=i;upd();await frames();await fn(o.cw[i])}}finally{o.cwa=keep;upd();await frames();WBX.wbNoCap=0}}
+  try{for(let i=0;i<o.cw.length;i++){o.cwa=i;upd();await frames();await fn(o.cw[i])}}finally{const q=WBS.proj;q.cwa=Math.min(keep,q.cw.length-1);upd();await frames();WBX.wbNoCap=0}}
 // the picture itself, as a Blob
 function xrRender(r){
   return new Promise((res,rej)=>{

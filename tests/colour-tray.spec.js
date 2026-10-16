@@ -101,10 +101,14 @@ test('an older file opens with its colours in the tray, linked where they were u
   await openProjectFile(page, path.join(__dirname, 'fixtures', 'project-4-rect-4x3.wodblok.json'));
   await settle(page, { max: 60000 });
   const c = JSON.parse(await getState(page)), p = c.proj, w = p.cw[0];
-  expect(p.ts.map(id => w.m[id])).toEqual(['Slate', 'Tallow', 'Moon Ivory']);
+  // the file's old colour names (Slate, Tallow, Moon Ivory) become the nearest palette colours, as they always did when such a file opened;
+  // two of them land on the same colour, so the tray has two places
+  expect(p.ts.map(id => w.m[id])).toEqual(['Blackish Olive', 'Sulpher Yellow']);
   expect(p.bg).toBe('@k1'); expect(p.ink).toBe('@k2');
-  expect(c.tiles.filter(t => t.ink).every(t => t.ink === '@k3')).toBe(true);
-  expect(c.layers.filter(l => l.ink).every(l => l.ink === '@k3')).toBe(true);
+  expect(c.tiles.filter(t => t.ink).length).toBeGreaterThan(0);
+  expect(c.tiles.filter(t => t.ink).every(t => t.ink === '@k2')).toBe(true);
+  expect(c.layers.filter(l => l.ink).length).toBeGreaterThan(0);
+  expect(c.layers.filter(l => l.ink).every(l => l.ink === '@k2')).toBe(true);
   await expect(page.locator('#pst')).not.toHaveClass(/dirty/);   // opening converts without counting as a change
   expect(errors).toEqual([]);
 });

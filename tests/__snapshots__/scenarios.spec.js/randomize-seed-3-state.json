@@ -275,10 +275,33 @@
   }
  ],
  "proj": {
-  "ink": "Cotinga Purple",
-  "bg": "Grayish Lavender - A",
-  "c3": "Aconite Violet",
-  "c4": "Carmine"
+  "bg": "@k1",
+  "ink": "@k2",
+  "ts": [
+   "k1",
+   "k2",
+   "k3",
+   "k4"
+  ],
+  "cw": [
+   {
+    "id": "w1",
+    "n": "Colourway 1",
+    "c": {
+     "k1": "#b5b1d8",
+     "k2": "#501345",
+     "k3": "#a36aa5",
+     "k4": "#cc1236"
+    },
+    "m": {
+     "k1": "Grayish Lavender - A",
+     "k2": "Cotinga Purple",
+     "k3": "Aconite Violet",
+     "k4": "Carmine"
+    }
+   }
+  ],
+  "cwa": 0
  },
  "dim": {
   "s": [

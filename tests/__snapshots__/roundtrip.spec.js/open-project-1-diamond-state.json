@@ -82,7 +82,7 @@
    "er": 4.1,
    "es": 924,
    "neg": true,
-   "ink": "Cotinga Purple",
+   "ink": "@k3",
    "tu": [
     {
      "x": "xmuztqams8n95",
@@ -222,8 +222,30 @@
   }
  ],
  "proj": {
-  "ink": "Vandyke Brown",
-  "bg": "Maple"
+  "bg": "@k1",
+  "ink": "@k2",
+  "ts": [
+   "k1",
+   "k2",
+   "k3"
+  ],
+  "cw": [
+   {
+    "id": "w1",
+    "n": "Colourway 1",
+    "c": {
+     "k1": "#c59f6b",
+     "k2": "#4b3317",
+     "k3": "#501345"
+    },
+    "m": {
+     "k1": "Maple",
+     "k2": "Vandyke Brown",
+     "k3": "Cotinga Purple"
+    }
+   }
+  ],
+  "cwa": 0
  },
  "dim": {
   "s": [

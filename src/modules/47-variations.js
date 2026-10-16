@@ -25,7 +25,8 @@ function vrPick(){
 function vrRecolor(svg,from){
   // from: Map of colour (as drawn) -> new colour. Both cases of the hex are swapped.
   let s=svg;const pairs=[...from.entries()].filter(([a,b])=>a&&b&&a!==b);
-  pairs.forEach(([a],k)=>{[a,a.toUpperCase()].forEach(v=>{s=s.split(v).join('\u0001'+k+'\u0001')})});
+  // a 6-digit colour must not match the start of an 8-digit one (a see-through colour is a different colour)
+  pairs.forEach(([a],k)=>{s=s.replace(new RegExp(a.replace(/[^#0-9a-fA-F]/g,'')+'(?![0-9a-fA-F])','gi'),'\u0001'+k+'\u0001')});
   pairs.forEach(([a,b],k)=>{s=s.split('\u0001'+k+'\u0001').join(a.length==9&&b.length==7?b+a.slice(7):b)});
   return s;
 }
