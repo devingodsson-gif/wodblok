@@ -104,6 +104,7 @@ jobs:
           WB_PICTURE_TOLERANCE: '0.05'   # prints are packed in sheets whose make-up depends on timing, so their grain moves a little between runs (about 0.01 of 255 on average); a real change is far above this
           WB_TARGET: build
           WB_PIXELS: '0'
+          WB_PICTURE_LAYOUT_CHANGED: '1'   # 1.12.0 only (UI standard moved the chrome by ~2px); remove in the next release
           WB_BASELINE: ${{ github.workspace }}/baseline-main/dist/wodblok.html
       - uses: actions/upload-artifact@v4
         if: failure()
