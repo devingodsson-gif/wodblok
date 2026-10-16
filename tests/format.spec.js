@@ -6,13 +6,13 @@ const nativeImport = new Function('u', 'return import(u)');                     
 const load = async f => nativeImport(pathToFileURL(path.join(__dirname, '..', 'src', 'format', f)).href);
 const fixtures = fs.readdirSync(FX).filter(f => f.endsWith('.wodblok.json'));
 
-test('every real v18 project opens as format 19 and the original bytes are not touched', async () => {
+test('every real v18 project opens as the latest format (20 since the colour tray) and the original bytes are not touched', async () => {
   const { fmtOpen } = await load('container.js');
   expect(fixtures.length).toBeGreaterThan(0);
   for (const f of fixtures) {
     const bytes = new Uint8Array(fs.readFileSync(path.join(FX, f))), before = Buffer.from(bytes).toString('base64');
     const r = await fmtOpen(bytes);
-    expect(r.from, f).toBe('json'); expect(r.newer).toBe(false); expect(r.project.v).toBe(19); expect(r.project.app).toBe('WODBLOK');
+    expect(r.from, f).toBe('json'); expect(r.newer).toBe(false); expect(r.project.v).toBe(20); expect(r.project.app).toBe('WODBLOK');
     expect(Buffer.from(bytes).toString('base64')).toBe(before);
   }
 });

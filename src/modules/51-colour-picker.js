@@ -22,7 +22,7 @@ function pkRecents(){try{const a=JSON.parse(kv.get(RC_KEY)||'[]');return Array.i
 function addRecent(h){h=normHexA(h);if(!h)return;const a=pkRecents().filter(x=>x!==h);a.unshift(h);try{kv.set(RC_KEY,JSON.stringify(a.slice(0,RC_MAX)))}catch(e){}}
 // a swatch that shows opacity: the colour over a checkerboard
 const chk='repeating-conic-gradient(#c9c4ba 0 25%,#f4f1ea 0 50%) 50%/10px 10px';
-const swBg=h=>`linear-gradient(${h},${h}),${chk}`;
+const swBg=h=>h&&h.length==9&&!h.endsWith('ff')?`linear-gradient(${h},${h}),${chk}`:h;   // the checkerboard only where it shows
 function pkBuild(){const el=document.createElement('div');el.className='cpk';el.hidden=true;el.setAttribute('role','dialog');el.setAttribute('aria-label','Colour');
  el.innerHTML=`<div class="cpkh"><span class="cpkw"></span><input type="text" class="cpkn" maxlength="40" spellcheck="false" aria-label="Colour name"><span class="cpka"></span></div>
 <div class="cpksv" tabindex="0" aria-label="Saturation and brightness"><i></i></div>
@@ -94,9 +94,9 @@ function closePicker(){const p=PK;if(!p)return;commit();PK=null;EL.hidden=true;i
 let DROP=null;
 function artTargets(){const t=[];const a=$('art');if(a&&a.getClientRects().length&&!$('boardP').hidden)t.push(a);const pv=$('pvw');if(pv&&pv.getClientRects().length&&pv.closest('section.pn:not([hidden])'))t.push(pv);return t}
 function startDropper(cb){if(DROP)return;const tg=artTargets();if(!tg.length){pmsg('Show the Pattern view or the pattern preview to pick a colour from the picture.');return}
- const ov=document.createElement('div');ov.className='drpov';ov.innerHTML='<div class="drpl"><canvas width="132" height="132"></canvas><b></b></div>';document.body.appendChild(ov);
+ const ov=document.createElement('div');ov.className='edrov';ov.innerHTML='<div class="edrl"><canvas width="132" height="132"></canvas><b></b></div>';document.body.appendChild(ov);
  const lp=ov.firstChild,lc=lp.firstChild,lx=lc.getContext('2d'),lb=lp.lastChild;lx.imageSmoothingEnabled=false;
- DROP={ov,cb,img:null,W:0,H:0,data:null,busy:true};document.body.classList.add('dropping');
+ DROP={ov,cb,img:null,W:0,H:0,data:null,busy:true};document.body.classList.add('eyedrop');
  // draw the picture
  const r0=$('art').getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);let W=Math.round(Math.max(r0.width,400)*dpr),H=Math.round(W*CH/CW);const mx=3200;if(W>mx||H>mx){const k=mx/Math.max(W,H);W=Math.round(W*k);H=Math.round(H*k)}
  const img=new Image();img.onload=()=>{if(!DROP)return;try{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,W,H);DROP.data=x.getImageData(0,0,W,H).data;DROP.W=W;DROP.H=H;DROP.busy=false;ov.classList.remove('busy');if(DROP.last)move(DROP.last)}catch(e){stopDropper()}};
@@ -115,5 +115,5 @@ function startDropper(cb){if(DROP)return;const tg=artTargets();if(!tg.length){pm
  ov.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(e.button){stopDropper();return}if(DROP.busy)return;const uv=at(e.clientX,e.clientY);if(!uv)return;const h=hexAt(uv[0],uv[1]),f=DROP.cb,keep=e.altKey;stopDropper();f(h,keep)});
  ov.addEventListener('contextmenu',e=>{e.preventDefault();stopDropper()});
  DROP.key=e=>{if(e.key=='Escape'){e.preventDefault();e.stopPropagation();stopDropper()}};document.addEventListener('keydown',DROP.key,true)}
-function stopDropper(){if(!DROP)return;document.removeEventListener('keydown',DROP.key,true);DROP.ov.remove();DROP=null;document.body.classList.remove('dropping')}
+function stopDropper(){if(!DROP)return;document.removeEventListener('keydown',DROP.key,true);DROP.ov.remove();DROP=null;document.body.classList.remove('eyedrop')}
 export {addRecent,closePicker,init51,openPicker,startDropper,swBg};

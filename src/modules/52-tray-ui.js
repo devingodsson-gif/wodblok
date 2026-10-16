@@ -44,7 +44,7 @@ let dockK='';
 function paintDock(force){const o=tyP(),w=cwNow(o),box=$('tyc');if(!box)return;
  const used=new Set();refsUsed().forEach(id=>used.add(id));
  const k=JSON.stringify([o.ts,o.ts.map(id=>w.c[id]),[...used],WBS.trayEdit,o.cw.length,o.cwa,w.n]);if(!force&&k===dockK)return;dockK=k;
- let h=o.ts.map((id,i)=>{const c=w.c[id],nm=w.m[id];return`<button type="button" class="tys${WBS.trayEdit===id?' on':''}${used.has(id)?' used':''}" data-s="${id}" role="listitem" aria-label="Colour ${i+1}${nm?': '+tyEsc(nm):''}" style="--c:${c}">${hexAlpha(c)<1?'<b></b>':''}</button>`}).join('');
+ let h=o.ts.map((id,i)=>{const c=w.c[id],nm=w.m[id];return`<button type="button" class="tys${WBS.trayEdit===id?' on':''}${used.has(id)?' used':''}${hexAlpha(c)<1?' see':''}" data-s="${id}" role="listitem" aria-label="Colour ${i+1}${nm?': '+tyEsc(nm):''}" style="--c:${c}">${hexAlpha(c)<1?'<b></b>':''}</button>`}).join('');
  for(let i=o.ts.length;i<TRAY_VIEW;i++)h+=`<button type="button" class="tye" data-add="1" aria-label="Add a colour"></button>`;
  if(o.ts.length<TRAY_MAX)h+=`<button type="button" class="tyadd" data-add="1" aria-label="Add a colour">${TY_IC('<path d="M12 6v12M6 12h12"/>',2.2)}</button>`;
  box.innerHTML=h;
@@ -77,10 +77,11 @@ function mkWell(host,spec){if(!host)return null;host.classList.add('cwl');
   const u=unlockRef(r);if(u){spec.set(u);trayDone('Unlocked '+spec.what+' colour');return}openWell(W)};
  sb.onclick=e=>{e.stopPropagation();if(WP&&WP.W===W){closeWell();return}openWell(W)};
  paintWell(W,true);return W}
-function paintWell(W,force){if(!W.host.isConnected)return;const r=W.spec.get(),show=r||(W.spec.defRef&&W.spec.defRef())||'',def=!r&&W.spec.def;
- const k=[r,col(show),wellText(show),isLink(show)?tyP().ts.indexOf(show.slice(1)):-1,def].join('|');if(!force&&k===W.k)return;W.k=k;
+const shown=el=>{const sc=el.closest('section.pn');return!sc||!sc.hidden};
+function paintWell(W,force){if(!W.host.isConnected||(!force&&!shown(W.host)))return;const r=W.spec.get(),show=r||(W.spec.defRef&&W.spec.defRef())||'',def=!r&&W.spec.def;
+ const k=[r,col(show),wellText(show),isLink(show)?tyP().ts.indexOf(show.slice(1)):-1,def,def&&W.spec.defSwatch?W.spec.defSwatch():''].join('|');if(!force&&k===W.k)return;W.k=k;
  const i=W.sb.querySelector('i'),sp=W.sb.querySelector('span'),em=W.sb.querySelector('em');
- i.style.background=show?swBg(col(show)):'transparent';i.classList.toggle('none',!show);
+ const ds=def&&W.spec.defSwatch?W.spec.defSwatch():'';i.style.background=ds||(show?swBg(col(show)):'transparent');i.classList.toggle('none',!show&&!ds);
  sp.textContent=def?W.spec.def:wellText(show);
  const n=isLink(r)?tyP().ts.indexOf(r.slice(1))+1:0;em.textContent=n?String(n):'';em.hidden=!n;
  const fixed=isFixed(r);W.lk.innerHTML=fixed?LOCK_ON:LOCK_OFF;W.lk.setAttribute('aria-pressed',String(fixed));W.lk.disabled=!r;
@@ -90,7 +91,7 @@ let WP=null;   // the open well popover
 function closeWell(){if(!WP)return;WP.el.remove();WP.W.sb.setAttribute('aria-expanded','false');WP=null}
 function openWell(W){closeWell();closePicker();const o=tyP(),w=cwNow(o),r=W.spec.get(),el=document.createElement('div');el.className='cwp';el.setAttribute('role','dialog');el.setAttribute('aria-label',W.spec.label||'Colour');
  const cur=isLink(r)?r.slice(1):null;
- let h='';if(W.spec.def)h+=`<button type="button" class="cwpd${!r?' on':''}" data-def="1"><i></i><span>${tyEsc(W.spec.def)}</span></button>`;
+ let h='';if(W.spec.def){const ds=W.spec.defSwatch?W.spec.defSwatch():W.spec.defRef?swBg(col(W.spec.defRef())):'';h+=`<button type="button" class="cwpd${!r?' on':''}" data-def="1"><i${ds?` style="background:${ds};border-style:solid"`:''}></i><span>${tyEsc(W.spec.def)}</span></button>`}
  h+=`<div class="cwpg" role="list">${o.ts.map((id,i)=>`<button type="button" role="listitem" class="cwpc${id===cur?' on':''}" data-s="${id}" aria-label="Colour ${i+1}${w.m[id]?': '+tyEsc(w.m[id]):''}" title="${tyEsc(w.m[id]||w.c[id].toUpperCase())}" style="--c:${w.c[id]}"><em>${i+1}</em></button>`).join('')}${o.ts.length<TRAY_MAX?`<button type="button" class="cwpc add" data-add="1" aria-label="Add a colour to the tray">${TY_IC('<path d="M12 6v12M6 12h12"/>',2.2)}</button>`:''}</div>`;
  h+=`<div class="cwpr"><button type="button" class="alt" data-fix="1">${LOCK_ON}Fixed colour</button>${isFixed(r)&&o.ts.length<TRAY_MAX?`<button type="button" class="alt" data-adopt="1">${TY_IC('<path d="M12 6v12M6 12h12"/>')}Add to tray</button>`:''}</div>`;
  el.innerHTML=h;document.body.appendChild(el);placeFloat(el,W.sb,false);el.style.width='';WP={el,W};W.sb.setAttribute('aria-expanded','true');
@@ -110,13 +111,13 @@ const USEW={paper:'Paper',ink:'Ink'};
 function usesText(id){const u=trayUses(id),n={};u.forEach(x=>{n[x.k]=(n[x.k]||0)+1});const out=[];if(n.paper)out.push('Paper');if(n.ink)out.push('Ink');
  const pl=(k,a,b)=>{if(n[k])out.push(n[k]+' '+(n[k]>1?b:a))};pl('stamp','stamp','stamps');pl('layer','layer','layers');pl('replace','replace','replaces');pl('text','text','texts');return out.join(' · ')}
 let listK='';
-function paintList(force){const box=$('tyl');if(!box||!box.isConnected)return;const o=tyP(),w=cwNow(o);
+function paintList(force){const box=$('tyl');if(!box||!box.isConnected||(!force&&!shown(box)))return;const o=tyP(),w=cwNow(o);
  const k=JSON.stringify([o.ts,o.ts.map(id=>[w.c[id],w.m[id]]),o.bg,o.ink,WBS.tiles.map(t=>t.ink),WBS.layers.map(L=>[L.ink,L.rp,(L.pl||[]).map(q=>q&&q.ink)]),WBS.trayEdit]);if(!force&&k===listK)return;listK=k;
  box.innerHTML=o.ts.map((id,i)=>{const c=w.c[id],nm=w.m[id],u=usesText(id);return`<div class="tyr${WBS.trayEdit===id?' on':''}" data-s="${id}" role="listitem" tabindex="0"><span class="tyn">${i+1}</span><i style="background:${swBg(c)}"></i><span class="tyt"><b>${tyEsc(nm||c.slice(0,7).toUpperCase())}</b><small>${tyEsc([nm?c.slice(0,7).toUpperCase():'',hexAlpha(c)<1?Math.round(hexAlpha(c)*100)+'%':'',u].filter(Boolean).join(' · '))}</small></span><button type="button" class="ib" data-more aria-haspopup="menu" aria-expanded="false" aria-label="Actions for colour ${i+1}">${TY_MORE}</button></div>`}).join('');
  $('tycnt').textContent=o.ts.length+' of '+TRAY_MAX;$('tyaddl').disabled=o.ts.length>=TRAY_MAX}
 function listEvents(){const box=$('tyl');
  box.addEventListener('click',e=>{const r=e.target.closest('.tyr');if(!r)return;const id=r.dataset.s,o=tyP(),i=o.ts.indexOf(id);
-  if(e.target.closest('[data-more]')){const b=e.target.closest('[data-more]');rowMenu(b,[
+  if(e.target.closest('[data-more]')){e.stopPropagation();const b=e.target.closest('[data-more]');rowMenu(b,[
    ['Edit colour',()=>editSlot(id,r)],
    ['Move up',()=>{trayMove(id,i-1);trayDone('Moved tray colour')},i==0],
    ['Move down',()=>{trayMove(id,i+1);trayDone('Moved tray colour')},i==o.ts.length-1],
@@ -152,7 +153,7 @@ function paintST(force){const box=$('stl');if(!box||!box.isConnected)return;cons
  const row=(t,own)=>ST.ren===t.id?`<div class="str ren" data-t="${t.id}">${tyStrip(t.c)}<input type="text" maxlength="40" value="${tyEsc(t.n)}" aria-label="Tray name"></div>`:`<div class="str" data-t="${t.id}" role="listitem" tabindex="0">${tyStrip(t.c)}<b>${tyEsc(t.n)}</b>${t.no?`<small>No. ${t.no}</small>`:''}<button type="button" class="ib" data-more aria-haspopup="menu" aria-expanded="false" aria-label="Actions for ${tyEsc(t.n)}">${TY_MORE}</button></div>`;
  const frow=(id,n,c,own)=>ST.ren===id?`<div class="stf ren" data-f="${id}">${FOLDER}<input type="text" maxlength="40" value="${tyEsc(n)}" aria-label="Folder name"></div>`:`<div class="stf" data-f="${id}" role="listitem" tabindex="0">${FOLDER}<b>${tyEsc(n)}</b><small>${c}</small>${own?`<button type="button" class="ib" data-more aria-haspopup="menu" aria-expanded="false" aria-label="Actions for ${tyEsc(n)}">${TY_MORE}</button>`:''}</div>`;
  let h='',nav='';
- if(q.length){const hay=t=>(t.n+' '+t.c.map(x=>x[1]).join(' ')+(t.no?' no '+t.no:'')).toLowerCase();const hit=[...d.t,...W].filter(t=>q.every(w=>hay(t).includes(w)));
+ if(q.length){const hay=t=>(t.n+' '+t.c.map(x=>x[1]).join(' ')+(t.no?' no '+t.no+' no. '+t.no+' no.'+t.no:'')).toLowerCase();const hit=[...d.t,...W].filter(t=>q.every(w=>hay(t).includes(w)));
   h=hit.slice(0,200).map(t=>row(t,!t.no)).join('')||'<div class="stno">No matching tray</div>';$('stcnt').textContent=hit.length+' found'}
  else if(!ST.f){h=d.f.map(f=>frow(f.id,f.n,d.t.filter(t=>t.f===f.id).length,true)).join('')+d.t.filter(t=>!t.f||!d.f.some(f=>f.id===t.f)).map(t=>row(t,true)).join('')+WF.map(([id,n])=>frow(id,n,W.filter(t=>t.f===id).length,false)).join('');$('stcnt').textContent=String(d.t.length+W.length)}
  else{const wf=WF.find(x=>x[0]===ST.f),uf=d.f.find(f=>f.id===ST.f);if(!wf&&!uf){ST.f='';return paintST(true)}
@@ -166,6 +167,7 @@ function stAsCw(t){const i=cwAdd();cwUse(i);const w=cwNow();w.n=t.n.slice(0,40);
 function stEvents(){const box=$('stl');
  box.addEventListener('click',e=>{if(e.target.closest('input'))return;const f=e.target.closest('.stf'),r=e.target.closest('.str'),more=e.target.closest('[data-more]');
   if(f&&!more){ST.f=f.dataset.f;paintST(true);return}
+  if(more)e.stopPropagation();
   if(f&&more){const id=f.dataset.f;rowMenu(more,[['Rename',()=>{ST.ren=id;paintST(true)}],['Delete folder',()=>{const d=stLoad();d.f=d.f.filter(x=>x.id!==id);d.t.forEach(t=>{if(t.f===id)t.f=''});stStore(d);paintST(true);pmsg('Deleted the folder. Its trays moved to the top.')}]]);return}
   if(!r)return;const t=stFind(r.dataset.t);if(!t)return;
   if(more){const own=!t.no,d=stLoad(),items=[['Load into the tray',()=>stUse(t)],['Add as a colourway',()=>stAsCw(t)]];
@@ -188,7 +190,7 @@ function init52(){
  mkWell($('wl_pb'),{label:'Paper',what:'Paper',get:()=>o().bg,set:v=>{o().bg=v||o().bg}});
  mkWell($('wl_pi'),{label:'Ink',what:'Ink',get:()=>o().ink,set:v=>{o().ink=v||o().ink}});
  mkWell($('wl_st'),{label:'Stamp ink',what:'Stamp ink',def:'Default ink',defRef:()=>o().ink,get:()=>{const t=WBS.tiles[WBS.cur];return t&&t.ink||''},set:v=>{const t=WBS.tiles[WBS.cur];if(!t)return;if(v)t.ink=v;else delete t.ink}});
- mkWell($('wl_ly'),{label:'Layer ink',what:'Layer ink',def:'Stamp colours',get:()=>{const L=LY();return L&&L.ink||''},set:v=>{const L=LY();if(!L)return;if(v)L.ink=v;else delete L.ink}});
+ mkWell($('wl_ly'),{label:'Layer ink',what:'Layer ink',def:'Stamp colours',defSwatch:()=>`linear-gradient(135deg,${col(o().ink)} 50%,${col(o().bg)} 50%)`,get:()=>{const L=LY();return L&&L.ink||''},set:v=>{const L=LY();if(!L)return;if(v)L.ink=v;else delete L.ink}});
  mkWell($('wl_rp'),{label:'Replace colour',what:'Replace',defRef:()=>o().ink,get:()=>{const L=LY();return L&&L.rp||o().ink},set:v=>{const L=LY();if(L&&v)L.rp=v}});
  WBX.wbTrayPaint=f=>{paintAll(f);paintST(f)};
  WBX.wbTraySync=()=>paintAll(false);
@@ -196,6 +198,8 @@ function init52(){
  document.addEventListener('pointerdown',e=>{if(WP&&!WP.el.contains(e.target)&&!WP.W.sb.contains(e.target))closeWell()},true);
  addEventListener('scroll',e=>{if(WP&&!(e.target.closest&&e.target.closest('.cwp')))closeWell()},true);
  // the saved trays list is drawn when the Colours tool opens
+ // wells in a panel that was hidden are brought up to date when it opens
+ {const mo=new MutationObserver(()=>paintWells(false));document.querySelectorAll('section.pn').forEach(sc=>{if(sc.querySelector('.cwl'))mo.observe(sc,{attributes:true,attributeFilter:['hidden']})})}
  const sec=document.querySelector('section.pn[data-p="colors"]');new MutationObserver(()=>{if(!sec.hidden){paintList(true);paintST(false)}}).observe(sec,{attributes:true,attributeFilter:['hidden']});
  paintAll(true)}
 export {init52,mkWell,paintWell,paintWells};

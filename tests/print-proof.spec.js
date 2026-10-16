@@ -24,15 +24,12 @@ const look = (page, d, hexes) => page.evaluate(async ([b64, type, hexes]) => {
   for (let i = 0; i < p.length; i += 4) { if (p[i] < 250 || p[i + 1] < 250 || p[i + 2] < 250) nonWhite.v++; want.forEach((w, k) => { if (p[i] === w[0] && p[i + 1] === w[1] && p[i + 2] === w[2]) n[k]++; }); }
   return { w: c.width, h: c.height, n, nonWhite: nonWhite.v };
 }, [d.base64, d.type, hexes]);
-const hexOf = (page, name) => page.evaluate(n => { const s = document.querySelector('#cl [data-c="' + n.replace(/"/g, '\\"') + '"] i'); return s ? getComputedStyle(s).backgroundColor : null; }, name);
 
 test('the PNG proof is a Letter page with the palette colours on it; A4 is a different size', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 3 });
   await roll(page);
-  const pal = JSON.parse(await page.evaluate(() => window.__wbTest.state())).proj;
-  await openPanel(page, 'colors');
-  const hexes = [];
-  for (const n of [pal.bg, pal.ink]) { const rgb = await hexOf(page, n); const m = rgb && rgb.match(/\d+/g); hexes.push('#' + m.slice(0, 3).map(v => (+v).toString(16).padStart(2, '0')).join('')); }
+  const pal = JSON.parse(await page.evaluate(() => window.__wbTest.state())).proj, w = pal.cw[pal.cwa];
+  const hexes = [pal.bg, pal.ink].map(r => w.c[r.slice(1)].slice(0, 7));     // paper and ink are tray colours
   const d = await proof(page, 'png');
   expect(d.filename).toMatch(/-proof\.png$/);
   const l = await look(page, d, hexes);

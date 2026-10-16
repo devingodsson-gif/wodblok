@@ -54,3 +54,6 @@ For about half a second after opening the busy test project (`project-4`), 18 `<
 
 ## The stamp-zoom test "a motif can still be picked and Ctrl + wheel zooms…" fails (found in 1.9, also in 1.8.0)
 `tests/stamp-zoom.spec.js:33` fails on `toBeVisible` ("element(s) not found") on both the 1.8.0 and 1.9.0 builds. Not caused by a speed release as far as checked; not investigated or fixed.
+
+## Old files' layer inks (fixed in 1.10.0 by the tray)
+Since the colour library became Wada's colours, a layer ink saved with an older colour name (for example "Moon Ivory" on layers 2-4 of `project-4-rect-4x3`) was left out when the file opened, so those layers printed in their stamps' own colours. 1.10.0 turns the file's colour names into tray colours with their original hex values, so these layers print in their ink again, as they did when the file was made. Pictures of older files therefore differ from 1.9 (picture-compare and the state/SVG snapshots of those files will show it), and the slider-drag perf ratio on that file moves from about 0.8 to about 1.0 of legacy: the layer ink filters are drawn again, as legacy draws them.

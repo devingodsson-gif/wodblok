@@ -6,17 +6,17 @@ const { TARGET, openApp, setMode } = require('./helpers/harness');
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 const labels = page => page.locator('.rail button:visible').evaluateAll(b => b.map(x => x.getAttribute('aria-label')));
-const SHARED = ['Close all panels', 'Randomize', 'Colours', 'Presets', 'Stamp library', 'Colour grading', 'Textures', 'History', 'Workspaces'];
+const SHARED = ['Close all panels', 'Randomize', 'Colours', 'Colourways', 'Presets', 'Stamp library', 'Colour grading', 'Textures', 'History', 'Workspaces'];
 
-test('the shared tools are the first nine rail buttons, in the same order, in Pattern and in the Stamp editor', async ({ page }) => {
+test('the shared tools are the first ten rail buttons, in the same order, in Pattern and in the Stamp editor', async ({ page }) => {
   const { errors } = await openApp(page);
   const pattern = await labels(page);
   await setMode(page, 'stamp');
   const stamp = await labels(page);
-  expect(pattern.slice(0, 9)).toEqual(SHARED);
-  expect(stamp.slice(0, 9)).toEqual(SHARED);
-  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Layout', 'Guides', 'Navigator', 'Variations', 'Export recipes', 'More tools']);
-  expect(stamp.slice(9)).toEqual(['Stamp', 'Shapes', 'Text', 'Stamp grid', 'Shape list', 'Shape editor', 'Pattern preview', 'More tools']);
+  expect(pattern.slice(0, 10)).toEqual(SHARED);
+  expect(stamp.slice(0, 10)).toEqual(SHARED);
+  expect(pattern.slice(10)).toEqual(['Canvas', 'Layers', 'Layout', 'Guides', 'Navigator', 'Variations', 'Export recipes', 'More tools']);
+  expect(stamp.slice(10)).toEqual(['Stamp', 'Shapes', 'Text', 'Stamp grid', 'Shape list', 'Shape editor', 'Pattern preview', 'More tools']);
   expect(errors).toEqual([]);
 });
 

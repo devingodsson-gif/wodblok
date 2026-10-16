@@ -53,7 +53,7 @@ async function exportAll(){if(expBusy)return;const d=await use('downloads');if(!
 function init53(){const g=$('cwg');
  g.addEventListener('click',e=>{if(e.target.closest('input'))return;const c=e.target.closest('.cwc');if(!c)return;const i=+c.dataset.i,o=WBS.proj,w=o.cw[i];if(!w)return;
   const more=e.target.closest('[data-more]');
-  if(more){rowMenu(more,[['Rename',()=>{ren=i;cwPaint()}],['Duplicate',()=>{const k=cwAdd(i);o.cw[k].n=(w.n+' copy').slice(0,40);cwUse(k);trayDone('New colourway');cwPaint()}],
+  if(more){e.stopPropagation();rowMenu(more,[['Rename',()=>{ren=i;cwPaint()}],['Duplicate',()=>{const k=cwAdd(i);o.cw[k].n=(w.n+' copy').slice(0,40);cwUse(k);trayDone('New colourway');cwPaint()}],
    ['Move left',()=>{cwMove(i,i-1);trayDone('Moved colourway');cwPaint()},i==0],['Move right',()=>{cwMove(i,i+1);trayDone('Moved colourway');cwPaint()},i==o.cw.length-1],
    ['Delete',()=>{const n=w.n;cwDel(i);trayDone('Deleted colourway “'+n+'”');cwPaint();pmsg('Deleted the colourway “'+n+'”.')},o.cw.length<2]]);return}
   if(i!==o.cwa){cwUse(i);trayDone('Colourway “'+w.n+'”');cwPaint()}});
