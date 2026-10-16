@@ -1,8 +1,9 @@
 import {kv} from '../platform/index.js';
-import {$,WBS,mod} from './01-launch-and-version.js';
+import {$,WBS,WBX,mod} from './01-launch-and-version.js';
 import {lyInkFill} from './32-layers-panel.js';
 import {WADA_COLORS,WADA_COMBOS} from '../data/wada.js';
 import {WADA_NAMES} from '../data/wada-names.js';
+import {trayDefault} from './50-tray-core.js';
 let SW=240,SH=240,CW=533,CH=800;
 const fitD=([w,h],L)=>w>=h?[L,Math.round(L*h/w)]:[Math.round(L*w/h),L];
 // Print cover (full wrap): back + spine + front, with bleed all round. Sizes in inches.
@@ -101,16 +102,18 @@ const PAL50=[["Lady Chapel", "Marian Blue", "#1e4fa3", "Lily White", "#f6f3ea"],
 let LEG;
 const hsl=h=>{const r=parseInt(h.slice(1,3),16)/255,g=parseInt(h.slice(3,5),16)/255,b=parseInt(h.slice(5,7),16)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;let H=0;if(d){H=mx==r?((g-b)/d)%6:mx==g?(b-r)/d+2:(r-g)/d+4;H*=60;if(H<0)H+=360}return[H,d?d/(1-Math.abs(2*l-1)):0,l]};
 const C=[];
-let CM;const col=n=>CM[n]||LEG[n]||'#888888';
+let CM;
+// A colour reference (see 50-tray-core.js): '@slot' follows a tray slot in the colourway that is showing, '#rrggbb[aa][|slot]' is a fixed colour,
+// anything else is an old colour name (files from before the tray). The result is a CSS colour, '#rrggbb' or '#rrggbbaa' with its opacity.
+const col=n=>{if(!n)return'#888888';const c=n.charCodeAt(0);if(c===64){const p=WBS.proj,w=p&&p.cw&&p.cw[p.cwa|0];return(w&&w.c[n.slice(1)])||'#888888'}if(c===35){const i=n.indexOf('|');return i<0?n:n.slice(0,i)}return CM[n]||LEG[n]||'#888888'};
+// does a colour reference point at something that exists
+const okC=n=>{if(!n||typeof n!='string')return false;const c=n.charCodeAt(0);if(c===64){const p=WBS.proj;return!!(p&&p.ts&&p.ts.includes(n.slice(1)))}if(c===35)return/^#[0-9a-f]{6}([0-9a-f]{2})?(\|\w+)?$/.test(n);return!!(CM[n]||LEG[n])};
+const LEG_HEX=n=>LEG&&LEG[n]||null;
 // Old colour names (from saved projects) map to the closest new colour.
 const fixC=(n,d)=>{if(!n||CM[n])return n||d;const h=LEG[n];if(!h)return d;const v=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16));const a=v(h);let best=d,bd=1e9;C.forEach(([nm,hx])=>{const b=v(hx),e=(a[0]-b[0])**2*.3+(a[1]-b[1])**2*.59+(a[2]-b[2])**2*.11;if(e<bd){bd=e;best=nm}});return best};
 let PL;
 const PCOL={ink:"Dark Tyrian Blue",bg:"Pale Lemon Yellow"};
 const CC=[];
-// The project palette: slots 1 to 4 are proj.bg (paper), proj.ink, proj.c3, proj.c4. The 3rd and 4th are optional and absent from the document when empty.
-const PSLOT=['bg','ink','c3','c4'];
-const projSet=(k,v)=>{if(v)WBS.proj[k]=v;else delete WBS.proj[k]};
-const projCols=()=>PSLOT.map(k=>WBS.proj[k]).filter(Boolean);
 const saveCC=()=>{try{kv.set('wb7_colors',JSON.stringify(C.filter(c=>CC.includes(c[0]))))}catch(e){}};
 // Open popups are lifted to the top of the page and placed against their button, so no panel, floating window,
 // scrolling area or the phone-width header (which scrolls sideways) can clip them or draw over them.
@@ -143,13 +146,7 @@ l.onclick=e=>{const i=e.target.closest('.ddi');if(!i)return;sel.value=i.dataset.
 DD[id]=()=>{if(sel.value===last)return;last=sel.value;const o=items.find(o=>String(o.v)==sel.value)||items[0];b.innerHTML=o.h+'<em>▾</em>';l.querySelectorAll('.ddi').forEach(i=>i.classList.toggle('cur',i.dataset.v==sel.value))}
 DDset[id]=n=>{items=n;fill();last=undefined;DD[id]()}}
 const cItem=([n,h])=>({v:n,h:`<span class="chip" style="background:${h}"></span>${esc(n)}`});
-const noneItem={v:'',h:'<span class="chip" style="border-style:dashed"></span>None'};
-const defItem={v:'',h:'<span class="chip" style="border-style:dashed"></span>Project default'};
-function paintColors(){const OPT=C.map(([n])=>`<option>${esc(n)}</option>`).join('');
-$('pI').innerHTML=$('pB').innerHTML=OPT;$('p3').innerHTML=$('p4').innerHTML='<option value="">None</option>'+OPT;$('stI').innerHTML='<option value="">Project default</option>'+OPT;
-DDset.pI(C.map(cItem));DDset.pB(C.map(cItem));DDset.p3([noneItem,...C.map(cItem)]);DDset.p4([noneItem,...C.map(cItem)]);DDset.stI([defItem,...C.map(cItem)]);if(window.lyInkOn)lyInkFill();
-$('cl').innerHTML='<button id="addC" title="Add a colour"><i class="plus">+</i><span>Add colour</span></button>'+C.map(([n,h])=>`<button data-c="${esc(n)}" title="${esc(n)}"${CC.includes(n)?' class="cust"':''}><i style="background:${h}"></i><span>${esc(n)}</span></button>`).join('');
-$('cth').textContent='Colour library ('+C.length+')'}
+function paintColors(){if(window.lyInkOn)lyInkFill();if(WBX.wbTrayPaint)WBX.wbTrayPaint(true)}
 const N=[],M=[];
 function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const tk=s=>(c,b)=>s.split('FILL').join(c).split('CUT').join(b);
@@ -174,34 +171,13 @@ Object.assign(LEG,{"Winchester Lapis": "#2f4f9a", "Wilton Ultramarine": "#23347a
 {const grp=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255),ch=Math.max(...v)-Math.min(...v),l=hsl(h)[2];return l>=.78?1:ch>=.17?0:2};
 C.sort((a,b)=>{const ga=grp(a[1]),gb=grp(b[1]),A=hsl(a[1]),B=hsl(b[1]);if(ga!=gb)return ga-gb;if(ga==2)return B[2]-A[2];const ha=Math.floor(((A[0]+12)%360)/24),hb=Math.floor(((B[0]+12)%360)/24);return ha-hb||B[2]-A[2]})}
 CM=Object.fromEntries(C);
-PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return[WADA_NAMES[i]||'No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj={...PCOL};try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
-$('pal').innerHTML='<option value="">Custom mix</option>'+PL.map((p,i)=>`<option value="${i}">${p[0]}</option>`).join('');
+PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return[WADA_NAMES[i]||'No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj=trayDefault();try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
-mkdd('pI',C.map(cItem));mkdd('pB',C.map(cItem));mkdd('p3',[noneItem,...C.map(cItem)]);mkdd('p4',[noneItem,...C.map(cItem)]);mkdd('stI',[defItem,...C.map(cItem)]);
-paintColors();
-mkdd('pal',[{v:'',h:'<span class="combo">&mdash;</span>Custom mix'},...PL.map((p,i)=>({v:i,h:`<span class="combo sws">${[p[2],p[1],p[3],p[4]].filter(Boolean).map(n=>`<i style="background:${CM[n]}"></i>`).join('')}</span><span>${esc(p[0])}<small>No. ${i+1} · ${[p[2],p[1],p[3],p[4]].filter(Boolean).map(esc).join(' · ')}</small></span>`}))]);
-// Custom palettes: saved from the Palette menu, kept in your settings, listed first with a star.
+// Custom palettes from before the tray (kept in settings) become saved trays in the Colours tool (see 52-tray-ui.js).
 CP=cpLoad().filter(p=>p.s[0]&&p.s[1]&&p.s.every(n=>!n||CM[n]));
-palFill($('pal').value);
-$('cpsvb').onclick=()=>{$('cpsv').hidden=true;$('cpnf').hidden=false;$('cpnm').value='';$('cpnm').focus()};
-const cpSave=()=>{const n=$('cpnm').value.trim().slice(0,30);if(!n){$('cpnm').focus();return}
- const id='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
- CP=[{id,name:n,s:[WBS.proj.bg,WBS.proj.ink,WBS.proj.c3||'',WBS.proj.c4||'']},...CP].slice(0,100);cpStore();$('cpnf').hidden=true;palFill('c:'+id)};
-$('cpok').onclick=cpSave;$('cpcx').onclick=()=>{$('cpnf').hidden=true;palUi()};
-$('cpnm').onkeydown=e=>{e.stopPropagation();if(e.key=='Enter'){e.preventDefault();cpSave()}else if(e.key=='Escape'){$('cpnf').hidden=true;palUi()}};
-$('cpdlb').onclick=()=>{const v=$('pal').value;if(!v.startsWith('c:'))return;CP=CP.filter(p=>'c:'+p.id!=v);cpStore();palFill('')};
 }
 // Custom palettes (newest first): each keeps colour names in paper, ink, accent, accent 2 order.
 let CP=[];
 const CP_KEY='wb110_cpal',escH=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cpLoad=()=>{try{const a=JSON.parse(kv.get(CP_KEY)||'[]');return Array.isArray(a)?a.filter(p=>p&&typeof p.id=='string'&&/^[a-z0-9]+$/.test(p.id)&&typeof p.name=='string'&&Array.isArray(p.s)&&p.s.length==4&&p.s.every(n=>typeof n=='string')).slice(0,100):[]}catch(e){return[]}};
-const cpStore=()=>{try{kv.set(CP_KEY,JSON.stringify(CP.map(({id,name,s})=>({id,name,s}))))}catch(e){}};
-const swH=s=>`<span class="combo sws">${s.filter(Boolean).map(n=>`<i style="background:${CM[n]}"></i>`).join('')}</span>`;
-function palFill(v){
- $('pal').innerHTML=CP.map(p=>`<option value="c:${p.id}">${escH(p.name)}</option>`).join('')+'<option value="">Custom mix</option>'+PL.map((p,i)=>`<option value="${i}">${escH(p[0])}</option>`).join('');
- $('pal').value=v==null?'':v;
- DDset.pal([...CP.map(p=>({v:'c:'+p.id,h:`${swH(p.s)}<span><b class="cst" aria-hidden="true">★</b>${escH(p.name)}<small>Custom · ${p.s.filter(Boolean).map(escH).join(' · ')}</small></span>`})),{v:'',h:'<span class="combo">&mdash;</span>Custom mix'},...PL.map((p,i)=>({v:i,h:`${swH([p[2],p[1],p[3],p[4]])}<span>${esc(p[0])}<small>No. ${i+1} · ${[p[2],p[1],p[3],p[4]].filter(Boolean).map(esc).join(' · ')}</small></span>`}))]);
- palUi()}
-// Save palette shows while the colours match no palette in the list (Custom mix); Delete palette shows while one of your own is selected.
-function palUi(){const v=$('pal').value,f=$('cpnf');if(v!=='')f.hidden=true;$('cpsv').hidden=v!==''||!f.hidden;$('cpdl').hidden=!v.startsWith('c:')}
-export {C,CASP,CC,CP,palUi,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,PSLOT,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,closeRowMenu,col,csN,csk,fixC,geom,hasOut,inShape,init04,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,projCols,projSet,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
+export {C,CASP,CC,CP,LEG_HEX,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,closeRowMenu,col,csN,csk,fixC,geom,hasOut,inShape,init04,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};

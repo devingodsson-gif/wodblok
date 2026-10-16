@@ -106,4 +106,4 @@ function init43(){
   if(dpiEl)dpiEl.addEventListener('change',()=>{dpi=+(dpiEl.value)||300});[nm,sfx,px].forEach(i=>i.addEventListener('keydown',e=>{e.stopPropagation();if(e.key=='Enter'&&i===nm)$('xrsave').click()}));
   setFmt('png');paint();
 }
-export {init43};
+export {init43,xrRender,xrPx};

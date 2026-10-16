@@ -1,6 +1,7 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {M,PCOL,col,fixC,tk} from './04-canvas-and-stamp-outlines.js';
+import {M,col,tk} from './04-canvas-and-stamp-outlines.js';
+import {trayLive} from './50-tray-core.js';
 let BF={};let REN={};let lsel;
 const fSave=()=>{try{kv.set('wb16_fold',JSON.stringify(WBS.FOLD));kv.set('wb16_bf',JSON.stringify(BF));kv.set('wb16_hid',JSON.stringify(WBS.HID));kv.set('wb16_ren',JSON.stringify(REN))}catch(e){}};
 const mcSave=()=>{try{kv.set('wb11_mcat',WBS.mcat)}catch(e){}};
@@ -41,11 +42,11 @@ WBS.msel=new Set();
 WBX.wbCur=()=>WBS.cur;
 DEF_TILES=JSON.stringify(WBS.tiles);
 try{cust=JSON.parse(kv.get('wb2_cust')||'{}');Object.keys(cust).forEach(k=>{if(k.startsWith('i|')&&!/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test((cust[k]||{}).svg||''))delete cust[k]});const t=JSON.parse(kv.get('wb2_tiles')||'null');if(t&&t.length)WBS.tiles=t}catch(e){}
-try{const p=JSON.parse(kv.get('wb2_proj')||'null');if(p&&p.ink&&p.bg){WBS.proj={ink:fixC(p.ink,PCOL.ink),bg:fixC(p.bg,PCOL.bg)};['c3','c4'].forEach(k=>{if(p[k])WBS.proj[k]=fixC(p[k],'')})}}catch(e){}
+try{const p=JSON.parse(kv.get('wb2_proj')||'null');if(p&&typeof p=='object')WBS.proj=p}catch(e){}
 WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));{const used=new Set();WBS.tiles.forEach(t=>{if(!t.id||used.has(t.id))t.id=WBS.nid++;used.add(t.id)})}
 WBS.layers=null;WBS.selL=0;
 try{const q=JSON.parse(kv.get('wb4_layers')||'null');if(q&&q.layers&&q.layers.length)WBS.layers=q.layers}catch(e){}
-if(!WBS.layers)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];
+if(!WBS.layers)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];trayLive();
 WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(id=>WBS.tiles.some(t=>t.id==id));if(L.lay=='brick'){L.lay='cols';if(!L.grid)L.grid='brick'}if(L.fit===true)L.fit='h';else if(!L.fit)L.fit=''});WBS.selL=WBS.layers.length-1;addEventListener('pagehide',()=>{if(_stT){clearTimeout(_stT);store0()}});document.addEventListener('visibilitychange',()=>{if(document.hidden&&_stT){clearTimeout(_stT);store0()}});
 }
 export {BF,DEF_TILES,REN,clean,cols,cust,fClean,fSave,inkOf,it,lsel,luid,mcSave,mk,mkL,pal,say,selOne,store,init06};

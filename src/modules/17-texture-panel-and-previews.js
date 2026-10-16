@@ -68,7 +68,7 @@ else if(a=='e'&&uses[i])txOpenLib(uses[i].x)});
 el.addEventListener('change',e=>{const s=e.target.closest('select');if(!s)return;const row=s.closest('.txr');if(!row)return;const uses=(cfg.get()||[]).map(u=>({...u})),i=+row.dataset.i;if(!uses[i])return;uses[i].x=s.value;cfg.set(uses)});
 txRender(H,true)}
 function txRender(H,force){const el=$(H.id);if(!el)return;const c=H.cfg,uses=c.get()||[],o=WBS.texLib;
-const sig=JSON.stringify([uses,c.md,o.map(x=>[x.id,x.name,x.t,x.a,x.sc,x.az,x.sd]),WBS.proj.bg,WBS.proj.ink]);if(!force&&sig===H.sig)return;H.sig=sig;
+const sig=JSON.stringify([uses,c.md,o.map(x=>[x.id,x.name,x.t,x.a,x.sc,x.az,x.sd]),col(WBS.proj.bg),col(WBS.proj.ink)]);if(!force&&sig===H.sig)return;H.sig=sig;
 let h='';uses.forEach((u,i)=>{const L=txLib(u.x),md=TXMD.includes(u.md)?u.md:c.md;h+=`<div class="txr" data-i="${i}">${L?txThumb(L,u,md):'<span class="txt"></span>'}<select aria-label="Texture">${o.map(x=>`<option value="${hx(x.id)}"${x.id===u.x?' selected':''}>${hx(x.name)}</option>`).join('')}${o.some(x=>x.id===u.x)?'':`<option value="${hx(u.x)}" selected>Missing texture</option>`}</select><div class="txa"><button type="button" class="txb" data-a="v" aria-label="New variation" title="New variation">${TXIC.dice}</button><button type="button" class="txb" data-a="e" aria-label="Edit texture" title="Edit texture">${TXIC.edit}</button><button type="button" class="txb" data-a="x" aria-label="Remove texture" title="Remove">${TXIC.x}</button></div><div class="txm" role="group" aria-label="Mode">${TXMD.map(m=>`<button type="button" data-a="m" data-m="${m}" class="${m===md?'on':''}" aria-pressed="${m===md}">${TXMN[m]}</button>`).join('')}</div></div>`});
 if(uses.length<(c.max||6))h+=`<div class="row tight"><button type="button" class="alt" data-a="add">Add texture</button></div>`;
 const fi=document.activeElement&&document.activeElement.tagName=='SELECT'&&el.contains(document.activeElement)?[...el.querySelectorAll('select')].indexOf(document.activeElement):-1;el.innerHTML=h;if(fi>=0){const s=el.querySelectorAll('select')[fi];if(s)s.focus()}}
@@ -88,7 +88,7 @@ function txPreviewA(L,p){if(Object.keys(p).join()!=='a'||tileOn()||!txOnlyCanvas
 function txEdit(p,pv){const L=txCur();if(!L||txLd)return;Object.assign(L,p);L.auto=false;if(pv&&txPreviewA(L,p))return;txAfter(L.id)}
 let txThr;
 function txPaintLib(force){if(!$('tx_list'))return;const refs=txRefs();if(!txLib(WBS.txSel))WBS.txSel=(WBS.texLib[0]||{}).id||'';
-const sig=JSON.stringify([WBS.texLib,WBS.txSel,[...refs],WBS.proj.bg,WBS.proj.ink]);if(!force&&sig===txSig)return;txSig=sig;
+const sig=JSON.stringify([WBS.texLib,WBS.txSel,[...refs],col(WBS.proj.bg),col(WBS.proj.ink)]);if(!force&&sig===txSig)return;txSig=sig;
 $('tx_cnt').textContent=WBS.texLib.length?String(WBS.texLib.length):'';
 $('tx_list').innerHTML=!WBS.texLib.length?'<button type="button" class="alt nb" data-n="1">New texture</button>':WBS.texLib.map(L=>`<div class="mr${L.id===WBS.txSel?' on':''}" data-x="${hx(L.id)}">${txThumb(L,null,'relief')}<b>${hx(L.name)}${refs.get(L.id)?`<i>${refs.get(L.id)}</i>`:''}</b><button type="button" data-d="1" aria-label="Delete texture" title="Delete">&times;</button></div>`).join('');
 txPaintEd()}

@@ -1,8 +1,9 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {PL,col} from './04-canvas-and-stamp-outlines.js';
+import {CM,PL,col} from './04-canvas-and-stamp-outlines.js';
 import {ser} from './14-presets-and-layer-grid-ui.js';
 import {coreStr} from './18-projects-and-cover-overlay.js';
-import {lkApplyPalette,lkNameMap} from './46-presets.js';
+import {lkApplyPalette} from './46-presets.js';
+import {slotHex,slotName} from './50-tray-core.js';
 // ===== Variations =====
 // Six other colour schemes for the piece you have, shown as small pictures. Click one to use it (one step in the history); More
 // makes six new ones. They come from Wada's 348 combinations, with the same number of colours as the palette you have and a paper of
@@ -12,18 +13,20 @@ const vrLum=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(u=>u
 const vrSize=p=>[p[1],p[2],p[3],p[4]].filter(Boolean).length;
 const vrImg=url=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=url});
 function vrPick(){
-  const op=WBS.proj,n=[op.ink,op.bg,op.c3,op.c4].filter(Boolean).length,L0=vrLum(col(op.bg));
-  const same=(p,i)=>p[2]==op.bg&&p[1]==op.ink&&(p[3]||'')==(op.c3||'')&&(p[4]||'')==(op.c4||'');
+  // as many colours as the tray's first places hold (2 to 4), a paper of a similar lightness, and never the colours you already have
+  const op=WBS.proj,n=Math.max(2,Math.min(4,op.ts.length)),L0=vrLum(col(op.bg)),nm=op.ts.slice(0,n).map(id=>slotName(id));
+  const same=p=>[p[2],p[1],p[3],p[4]].filter(Boolean).every((x,i)=>x===nm[i]);
   let pool=PL.map((p,i)=>({p,i})).filter(x=>vrSize(x.p)==n&&!same(x.p));
   const near=pool.filter(x=>Math.abs(vrLum(col(x.p[2]))-L0)<.3);if(near.length>=VR_N)pool=near;
   const out=[];while(out.length<VR_N&&pool.length){const k=Math.floor(Math.random()*pool.length);out.push(pool.splice(k,1)[0])}
   return out;
 }
 // the piece's own picture with every colour moved to its new place (exact colour words only)
-function vrRecolor(svg,from,to){
+function vrRecolor(svg,from){
+  // from: Map of colour (as drawn) -> new colour. Both cases of the hex are swapped.
   let s=svg;const pairs=[...from.entries()].filter(([a,b])=>a&&b&&a!==b);
-  pairs.forEach(([a],k)=>{s=s.split(new RegExp(col(a).replace('#','#'),'i').source).join('\u0001'+k+'\u0001')});
-  pairs.forEach(([,b],k)=>{s=s.split('\u0001'+k+'\u0001').join(col(b))});
+  pairs.forEach(([a],k)=>{[a,a.toUpperCase()].forEach(v=>{s=s.split(v).join('\u0001'+k+'\u0001')})});
+  pairs.forEach(([a,b],k)=>{s=s.split('\u0001'+k+'\u0001').join(a.length==9&&b.length==7?b+a.slice(7):b)});
   return s;
 }
 function init47(){
@@ -37,8 +40,9 @@ function init47(){
       const cells=pick.map(x=>{const b=document.createElement('button');b.type='button';b.className='vrb';b.dataset.i=x.i;b.setAttribute('role','listitem');b.setAttribute('aria-label',x.p[0]);
         const im=document.createElement('span');im.className='im';im.appendChild(document.createElement('i'));const nm=document.createElement('b');nm.textContent=x.p[0];b.append(im,nm);grid.appendChild(b);return{b,im,x}});
       await Promise.all(cells.map(async({im,x})=>{
-        const np={ink:x.p[1],bg:x.p[2],c3:x.p[3],c4:x.p[4]},to=lkNameMap(c,np),names=new Set([c.proj.bg,c.proj.ink,c.proj.c3,c.proj.c4,...c.tiles.map(t=>t.ink),...c.layers.map(l=>l.ink)].filter(Boolean)),map=new Map();
-        names.forEach(n=>map.set(n,to(n)));
+        // the tray's first places take the combination's colours, paper first: every colour linked to them moves with them
+        const nc=[x.p[2],x.p[1],x.p[3],x.p[4]].filter(Boolean).map(n=>CM[n]),map=new Map();
+        c.proj.ts.slice(0,nc.length).forEach((id,k)=>map.set(slotHex(id),nc[k]));
         const img=await vrImg('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(vrRecolor(svg,map)));
         if(!img){im.textContent='';return}
         const w=220,h=Math.max(1,Math.round(w*img.naturalHeight/img.naturalWidth)),cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
@@ -53,4 +57,4 @@ function init47(){
   grid.addEventListener('click',e=>{const b=e.target.closest('.vrb');if(b)lkApplyPalette(+b.dataset.i)});
   $('vrmore').onclick=()=>{stale=true;make()};
 }
-export {init47};
+export {init47,vrRecolor};

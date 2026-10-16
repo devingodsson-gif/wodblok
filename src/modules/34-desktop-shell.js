@@ -3,6 +3,7 @@ import {cmdGet} from '../commands/registry.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {DRT,NODRAFT,drOff} from './02-draft-mode-speedups.js';
 import {CASP,CH,CSN,CW,SH,SHN,SW,bk,closeDD,csk,placeFloat,rowMenu,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {trayIn} from './50-tray-core.js';
 import {selOne,store} from './06-motif-library-folders.js';
 import {nr,symOf,tbSync} from './07-symmetry.js';
 import {gModel,gShOk} from './08-grid-shapes.js';
@@ -28,8 +29,8 @@ let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'ca
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Shapes',mlist:'Shape list',sedit:'Shape editor',preview:'Pattern preview',grid:'Stamp grid',layers:'Layout',pgrid:'Guides',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
-const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','grade','tex','rand','hist','slib','nav','wspc','xrec','pres','vars'],stamp:['wspc','pres','motifs','text','mlist','sedit','preview','grid','stamp','colors','grade','tex','rand','hist','slib']};
+const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Shapes',mlist:'Shape list',sedit:'Shape editor',preview:'Pattern preview',grid:'Stamp grid',layers:'Layout',pgrid:'Guides',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
+const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec','pres','vars'],stamp:['wspc','pres','motifs','text','mlist','sedit','preview','grid','stamp','colors','cways','grade','tex','rand','hist','slib']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=m=>m=='pattern'?{dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]}:{dock:[wsG(['motifs']),wsG(['stamp','colors','grade','tex','rand'])],float:[wsG(['mlist'],{x:null,y:null,w:230,h:440}),wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}),wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'})]};
@@ -368,16 +369,16 @@ function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK
 let seOn=true;try{seOn=kv.get('wb_se_auto')!=='0'}catch(e){}
 const seAuto=()=>seOn;
 {const b=$('seauto');if(b){const pt=()=>{b.setAttribute('aria-pressed',String(seOn));b.textContent=seOn?'On':'Off'};pt();b.onclick=()=>{seOn=!seOn;pt();try{kv.set('wb_se_auto',seOn?'1':'0')}catch(e){}}}}
-const navDirty=()=>{if(WBX.wbNavDirty)WBX.wbNavDirty();if(WBX.wbVarDirty)WBX.wbVarDirty()};
+const navDirty=()=>{if(WBX.wbNavDirty)WBX.wbNavDirty();if(WBX.wbVarDirty)WBX.wbVarDirty();if(WBX.wbCwDirty)WBX.wbCwDirty()};
 // A step can be named by whoever makes it: WBX.wbLabelNext={t:'Randomize 3',at:performance.now()} just before wbCap(); otherwise the label says what changed.
 // A step named by whoever made it (a Randomize roll, a look, a palette) gets a small picture, taken once from the finished piece when nothing is happening
 // (never during a drag or a roll). Steps made by hand have none.
 let thT=0,thWant=null;
 function thRun(){if(drag||WBS.WBDRG||WBX.wbHoldOn||WBX.wbRollHold||(WBX.wbTxBusy||0)>0||document.body.classList.contains('babusy')){thT=setTimeout(thRun,800);return}
  const s=thWant;if(!s||s!==coreStr())return;thWant=null;thumb(120).then(u=>{const i=hist.lastIndexOf(s);if(u&&i>=0){histTh[i]=u;if(WBX.wbHistPaint)WBX.wbHistPaint()}})}
-function cap(){if(drag||WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext;WBX.wbLabelNext=null;const named=nl&&performance.now()-nl.at<3000;histL.push(named?nl.t:hLabel(prev,s));if(view=='stamp'&&!named&&/^Added shape/.test(histL[histL.length-1])&&seAuto()&&!wsFind('sedit'))setPanel('sedit');if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
+function cap(){if(drag||WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));if(view=='stamp'&&!named&&/^Added shape/.test(histL[histL.length-1])&&seAuto()&&!wsFind('sedit'))setPanel('sedit');if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
-function applyCore(c){WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
+function applyCore(c){trayIn(c);WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
 WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
 store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
 // Loading a step normalises the document a little (for example every stamp gets an empty texture list), so the entry is re-read
@@ -502,32 +503,13 @@ WBX.wbDDsync=()=>{for(let i=all.length;i--;){const s=all[i];if(!s.sel.isConnecte
 // selects that appear later (rebuilt lists)
 {let q=0;const run=()=>{q=0;scan()};new MutationObserver(m=>{for(const r of m)for(const n of r.addedNodes){if(n.nodeType==1&&!(n instanceof SVGElement)&&(n.tagName=='SELECT'||n.querySelector&&n.querySelector('select'))){if(!q)q=requestAnimationFrame(run);return}}}).observe(document.body,{childList:true,subtree:true})}
 scan();
-// ---- colour picker
-const NC=document.createElement('div');NC.className='cpop';NC.hidden=true;
-NC.innerHTML='<div class="cpsv"><i></i></div><div class="cph"><i></i></div><div class="cprow"><span class="cpsw"></span><input type="text" class="cpx" maxlength="7" spellcheck="false" aria-label="Hex colour"><button type="button" class="ib cpe" aria-label="Pick from screen" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19l.7-3.3L14 7.4 16.6 10 8.3 18.3z"/><path d="M13 6.4l1.2-1.2a1.8 1.8 0 012.6 0l2 2a1.8 1.8 0 010 2.6L17.6 11"/></svg></button></div>';
-document.body.appendChild(NC);
-const sv=NC.querySelector('.cpsv'),svi=sv.firstChild,hb=NC.querySelector('.cph'),hbi=hb.firstChild,hx=NC.querySelector('.cpx'),sw=NC.querySelector('.cpsw'),eb=NC.querySelector('.cpe');
-let H=0,S=1,V=1,cur=null,dragging=false,dirty=false;
-const hex2=n=>Math.round(n).toString(16).padStart(2,'0');
-function rgb(h,s,v){const f=n=>{const k=(n+h/60)%6;return v-v*s*Math.max(0,Math.min(k,4-k,1))};return[f(5)*255,f(3)*255,f(1)*255]}
-const toHex=(h,s,v)=>'#'+rgb(h,s,v).map(hex2).join('');
-function fromHex(x){const m=/^#?([0-9a-f]{6})$/i.exec(x);if(!m)return null;const n=parseInt(m[1],16),r=(n>>16&255)/255,g=(n>>8&255)/255,b=n&255;const bb=b/255,mx=Math.max(r,g,bb),mn=Math.min(r,g,bb),d=mx-mn;let h=0;if(d){if(mx==r)h=((g-bb)/d+6)%6;else if(mx==g)h=(bb-r)/d+2;else h=(r-g)/d+4;h*=60}return[h,mx?d/mx:0,mx]}
-function paintPop(){const c=toHex(H,S,V);sv.style.background=`linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,hsl(${H},100%,50%))`;svi.style.left=S*100+'%';svi.style.top=(1-V)*100+'%';hbi.style.left=H/360*100+'%';sw.style.background=c;if(document.activeElement!==hx)hx.value=c;return c}
-function emit(fin){if(!cur)return;const c=paintPop();if(cur.value!==c){cur.value=c;cur.dispatchEvent(new Event('input',{bubbles:true}));dirty=true}if(fin&&dirty){dirty=false;cur.dispatchEvent(new Event('change',{bubbles:true}))}}
-function drag(el,fn){el.addEventListener('pointerdown',e=>{e.preventDefault();el.setPointerCapture(e.pointerId);dragging=true;fn(e);const mv=ev=>fn(ev),up=()=>{el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);dragging=false;emit(true)};el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)})}
-drag(sv,e=>{const r=sv.getBoundingClientRect();S=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));V=1-Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));emit()});
-drag(hb,e=>{const r=hb.getBoundingClientRect();H=Math.max(0,Math.min(359.9,(e.clientX-r.left)/r.width*360));emit()});
-hx.addEventListener('input',()=>{const v=fromHex(hx.value);if(v){[H,S,V]=v;emit(true)}});
-hx.addEventListener('keydown',e=>{if(e.key=='Enter')hx.blur()});
-if(window.EyeDropper){eb.hidden=false;eb.onclick=async()=>{try{const r=await new EyeDropper().open(),v=fromHex(r.sRGBHex);if(v){[H,S,V]=v;emit(true)}}catch(e){}}}
-function closeC(){NC.hidden=true;if(cur&&dirty){dirty=false;cur.dispatchEvent(new Event('change',{bubbles:true}))}cur=null}
-document.addEventListener('pointerdown',e=>{if(!NC.hidden&&!NC.contains(e.target)&&!e.target.closest('.ccb'))closeC()},true);
-document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!NC.hidden)closeC()});
+// ---- colour fields (input type=color in other tools): a swatch button that opens the shared colour picker (51-colour-picker.js)
 const cdesc=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');
-function mkc(inp){if(inp._cc)return;const b=document.createElement('button');b.type='button';b.className='ccb';b.setAttribute('aria-label',inp.title||'Colour');inp.after(b);inp.classList.add('ccsel');
+function mkc(inp){if(inp._cc)return;const b=document.createElement('button');b.type='button';b.className='ccb';b.setAttribute('aria-label',inp.title||'Colour');b.setAttribute('aria-haspopup','dialog');inp.after(b);inp.classList.add('ccsel');
 const sync=()=>{b.style.setProperty('--c',cdesc.get.call(inp))};
 Object.defineProperty(inp,'value',{configurable:true,get(){return cdesc.get.call(inp)},set(v){cdesc.set.call(inp,v);sync()}});
-b.onclick=e=>{e.stopPropagation();if(!NC.hidden&&cur===inp){closeC();return}closeC();closeDD();if(typeof closeMenus=='function')closeMenus();cur=inp;const v=fromHex(inp.value)||[0,1,1];[H,S,V]=v;paintPop();NC.hidden=false;placeFloat(NC,b,false);NC.style.width='';hx.value=inp.value};
+b.onclick=e=>{e.stopPropagation();const P=WBX.wbPicker;if(!P)return;if(P.isOpen()&&P.anchor()===b){P.close();return}closeDD();if(typeof closeMenus=='function')closeMenus();
+ P.open(b,{value:inp.value,alpha:false,onInput:h=>{if(inp.value!==h){inp.value=h;inp.dispatchEvent(new Event('input',{bubbles:true}))}},onChange:()=>inp.dispatchEvent(new Event('change',{bubbles:true}))})};
 inp._cc=1;sync()}
 document.querySelectorAll('input[type=color]').forEach(mkc);
 // ---- sliders: drag the label to scrub; hold Shift for fine control (also on the slider itself)

@@ -1,7 +1,8 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {BK} from './03-stamp-prints-and-drawing.js';
-import {C,CASP,CH,CM,CW,PL,PSLOT,SH,SK,SW,col,geom,inShape,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {C,CASP,CH,CM,CW,PL,SH,SK,SW,col,geom,inShape,okC,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {isFixed,isLink,trayLoad} from './50-tray-core.js';
 import {CATS} from './05-motif-data.js';
 import {cust,it,mkL,selOne,store} from './06-motif-library-folders.js';
 import {gModel} from './08-grid-shapes.js';
@@ -53,9 +54,13 @@ const sh0=mkSh(wpick(KW));WBS.dim={...WBS.dim,k:sh0.k,o:sh0.o,s:sh0.s};setDim();
 // --- colours: two-colour base, at most one accent ink (two with the "extra inks" move)
 // Colours stay inside the palette (its 1st to 4th colours): 'light on dark' only swaps paper and ink, accents come from the other palette colours.
 // "New palette" first picks a Wada combination for all four, as the Palette menu does; otherwise the project's own palette is kept.
-const newPal=FT.col&&sOn('col','new')&&PL.length?pick(PL):null,P0={...WBS.proj};if(newPal){P0.ink=newPal[1];P0.bg=newPal[2];['c3','c4'].forEach((k,i)=>{if(newPal[i+3])P0[k]=newPal[i+3];else delete P0[k]})}
-const PC=PSLOT.map(k=>P0[k]).filter(Boolean),sw=on('swap'),pInk=sw?P0.bg:P0.ink,pBg=sw?P0.ink:P0.bg;
-const lum=h=>{const v=hx3(col(h));return .2126*v[0]+.7152*v[1]+.0722*v[2]},bgL=lum(pBg),used=new Set([pInk]),acc=[];
+// With the tray: a new palette goes into the first places of the tray (the colourway showing); the piece then uses those places only.
+// Without one, every colour in the tray can be used. Paper, ink and accents are links to tray places, so later tray edits recolour the piece.
+const newPal=FT.col&&sOn('col','new')&&PL.length?pick(PL):null,P0=JSON.parse(JSON.stringify(WBS.proj));let PC;
+if(newPal){const ids=trayLoad([newPal[2],newPal[1],newPal[3],newPal[4]].filter(Boolean).map(n=>[CM[n],n]),P0);P0.bg='@'+ids[0];P0.ink='@'+ids[1];PC=ids.map(id=>'@'+id)}else PC=P0.ts.map(id=>'@'+id);
+const colP=r=>isLink(r)?(P0.cw[P0.cwa|0].c[r.slice(1)]||'#888888'):col(r);
+const sw=on('swap'),pInk=sw?P0.bg:P0.ink,pBg=sw?P0.ink:P0.bg;
+const lum=h=>{const v=hx3(colP(h));return .2126*v[0]+.7152*v[1]+.0722*v[2]},bgL=lum(pBg),used=new Set([pInk]),acc=[];
 const inkFor=()=>{if(noAcc)return null;if(acc.length>=(on('inks')?2:1))return pick(acc);let ok=PC.filter(n=>!used.has(n)&&n!=pBg&&Math.abs(lum(n)-bgL)>.28);if(!ok.length)ok=PC.filter(n=>!used.has(n)&&n!=pBg);if(!ok.length)return pInk;const n=pick(ok);used.add(n);acc.push(n);return n};
 // --- motif pool: one main theme (your imports when you have a few), with dots as accents
 const imp=Object.keys(cust).filter(x=>x.startsWith('i|')),dotsC=CATS.find(c=>c.n=='Dots'),themes=CATS.filter(c=>c.n!='Dots'&&c.k.length);
@@ -168,7 +173,7 @@ if(FT.pr&&sOn('pr','lay'))c.layers.forEach(l=>{if(!l.art&&!l.txt&&ch(.3))l.tu=rz
 if(FT.pr&&sOn('pr','txt'))c.layers=c.layers.map(l=>{if(!l.txt||!(l.pl||[]).length)return l;const q=JSON.parse(JSON.stringify(l));q.pl.forEach(p=>{if(p.tx&&ch(.6))p.tu=rzList('pr',WST,1)});return q});
 c.pr.t='';
 // Colours: when the palette changes (a new palette, or paper and ink swapped), kept stamps and layers that carry their own accent ink move to the new palette too
-if(FT.col&&(sOn('col','pal')||newPal)&&!noAcc){const keepN=new Set(PC),mapInk=n=>{if(!n||!CM[n]||keepN.has(n)||acc.includes(n))return n;if(!(n in inkMap))inkMap[n]=inkFor()||n;return inkMap[n]};
+if(FT.col&&(sOn('col','pal')||newPal)&&!noAcc){const keepN=new Set(PC),mapInk=n=>{if(!n||!okC(n)||isFixed(n)||keepN.has(n)||acc.includes(n))return n;if(!(n in inkMap))inkMap[n]=inkFor()||n;return inkMap[n]};
  c.tiles=c.tiles.map(t=>{const n=mapInk(t.ink);return n!==t.ink?{...t,ink:n}:t});c.layers=c.layers.map(l=>{const n=mapInk(l.ink);return n!==l.ink?{...l,ink:n}:l})}
 // Canvas shape: roll a new outline (never the print cover, and never Custom, which needs a file)
 if(FT.shape&&!WBS.book.on&&!WBS.dim.rt){const SGM={rect:'box',rrect:'box',circle:'round',oval:'round',arch:'arch',hex:'poly',tri:'poly',diamond:'poly',ngon:'poly'},SHL=[['rect',1.2],['rrect',1],['circle',.8],['oval',1],['arch',1],['hex',.8],['tri',.6],['diamond',.7],['ngon',.8]].filter(x=>sOn('shape',SGM[x[0]])),k=wpick(SHL.length?SHL:[['rect',1]]),nd=JSON.parse(JSON.stringify(c.dim));['cs','cr','n','co','g'].forEach(x=>delete nd[x]);
@@ -188,7 +193,7 @@ if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:
  else Object.keys(g0).forEach(k=>{if(k!='cov'&&k!='masks')gl[k]=g0[k]});
  let masks;
  const nfN=WBS.layers.filter(l=>!isF(l)),r3=v=>+v.toFixed(3);
- if(FT.masks){const inks=[...new Set([pInk,...WBS.layers.map(l=>l.ink),...WBS.tiles.map(t=>t.ink)].filter(x=>x&&CM[x]))],nm=wpick([[0,.2],[1,.45],[2,.35]]),usedK=new Set(),nz=(a,b,f)=>ri(a,b)||f;
+ if(FT.masks){const inks=[...new Set([pInk,...WBS.layers.map(l=>l.ink),...WBS.tiles.map(t=>t.ink)].filter(x=>okC(x)))],nm=wpick([[0,.2],[1,.45],[2,.35]]),usedK=new Set(),nz=(a,b,f)=>ri(a,b)||f;
   const KINDS=[['vig',1.2],['fade',1],['ink',1.1],['layer',nfN.length>1?1:0],['colour',inks.length>1?.8:0],['tone',.9]].map(x=>[x[0],sOn('masks',x[0])?x[1]:0]);masks=[];
   const lin=(d,sp)=>{const e=pick(sp?['t','b','l','r','tl','br']:['t','b','l','r','tl','tr','bl','br']),D={t:[.5,0,0,1],b:[.5,1,0,-1],l:[0,.5,1,0],r:[1,.5,-1,0],tl:[0,0,.7,.7],tr:[1,0,-.7,.7],bl:[0,1,.7,-.7],br:[1,1,-.7,-.7]}[e];return{x1:D[0],y1:D[1],x2:r3(D[0]+D[2]*d),y2:r3(D[1]+D[3]*d)}};
   for(let q=0;q<nm;q++){const pool=KINDS.filter(x=>x[1]>0&&!usedK.has(x[0]));if(!pool.length)break;const k=wpick(pool);usedK.add(k);let m;
@@ -197,14 +202,14 @@ if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:
    else if(k=='ink')m=ch(.5)?{t:'rad',name:'Uneven inking',sp:'s',st:'',cx:r3(rr(.25,.75)),cy:r3(rr(.25,.75)),rx:r3(rr(.35,.7)),ry:r3(rr(.35,.7)),fe:ri(60,95),inv:ch(.5),a:{ex:pick([ri(-30,-12),ri(12,28)]),ct:ch(.4)?ri(-15,15):0}}
     :{t:'lin',name:'Ink fade',sp:'s',st:'',...lin(rr(.6,1),1),a:{ex:pick([ri(-30,-12),ri(12,28)]),fd:ch(.3)?ri(10,25):0}};
    else if(k=='layer'){const Lm=pick(nfN.length>1?nfN.slice(1):nfN);m={t:'lay',name:'Layer tint',lay:Lm.u,amt:ri(60,100),a:pick([{hue:nz(-25,25,12)},{sat:ri(-50,-20)},{tp:nz(-35,35,20),tn:ri(-15,15)},{ex:nz(-20,20,-12),ct:ri(5,20)}])}}
-   else if(k=='colour')m={t:'col',name:'Colour shift',c:col(pick(inks)).toLowerCase(),rg:ri(15,35),sm:ri(40,70),a:pick([{hue:nz(-30,30,15)},{sat:nz(-40,30,15),vib:ri(0,25)},{ex:nz(-25,20,-10)}])};
+   else if(k=='colour')m={t:'col',name:'Colour shift',c:colP(pick(inks)).slice(0,7).toLowerCase(),rg:ri(15,35),sm:ri(40,70),a:pick([{hue:nz(-30,30,15)},{sat:nz(-40,30,15),vib:ri(0,25)},{ex:nz(-25,20,-10)}])};
    else{const sd=ch(.5);m={t:'lum',name:sd?'Shadow tone':'Highlight tone',lo:sd?0:ri(55,75),hi:sd?ri(25,45):100,sm:ri(20,45),a:{tp:nz(-35,35,18),tn:ri(-20,20),fd:sd&&ch(.4)?ri(5,20):0}}}
    masks.push(m)}}
  else{// keep the masks you have, pointed at the new piece: same layer / stamp position, same role colour
   const nfO=oldL.filter(l=>!isF(l)),frO=oldL.filter(isF),frN=WBS.layers.filter(isF),mU={},mT={},mC={};
   nfO.forEach((l,q)=>{if(nfN[q])mU[l.u]=nfN[q].u});frO.forEach((l,q)=>{if(frN[q])mU[l.u]=frN[q].u});
   oldT.forEach((t,q)=>{if(WBS.tiles[q])mT[String(t.id)]=String(WBS.tiles[q].id)});
-  masks=((g0&&g0.masks)||[]).map(m=>{const q=JSON.parse(JSON.stringify(m));if(q.t=='lay'&&q.lay&&mU[q.lay])q.lay=mU[q.lay];if(q.st&&mT[q.st])q.st=mT[q.st];if(q.t=='col'&&q.c){for(const k in inkMap){if(col(k).toLowerCase()==String(q.c).toLowerCase()){q.c=col(inkMap[k]).toLowerCase();break}}}return q})}
+  masks=((g0&&g0.masks)||[]).map(m=>{const q=JSON.parse(JSON.stringify(m));if(q.t=='lay'&&q.lay&&mU[q.lay])q.lay=mU[q.lay];if(q.st&&mT[q.st])q.st=mT[q.st];if(q.t=='col'&&q.c){for(const k in inkMap){if(col(k).toLowerCase()==String(q.c).toLowerCase()){q.c=colP(inkMap[k]).slice(0,7).toLowerCase();break}}}return q})}
  if(FT.gr&&AM('gr')<1)Object.keys(gl).forEach(k=>{if(typeof gl[k]=='number')gl[k]=Math.round(gl[k]*AM('gr'))});
  WBX.wbGrade.set({...gl,cov:g0.cov,masks})}
 if(c.layers.some(l=>LS.includes(l)))LS.forEach(l=>{if(c.layers.includes(l)&&l.fit&&!l.gl)l.size=+fitTs(l).toFixed(3)});store();upd();

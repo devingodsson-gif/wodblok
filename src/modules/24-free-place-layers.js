@@ -1,6 +1,6 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {DRS} from './03-stamp-prints-and-drawing.js';
-import {CH,CM,CW,col,geom,rng,shOf} from './04-canvas-and-stamp-outlines.js';
+import {CH,CM,CW,col,geom,rng,shOf,okC} from './04-canvas-and-stamp-outlines.js';
 import {inkOf} from './06-motif-library-folders.js';
 import {gModel,gNear} from './08-grid-shapes.js';
 import {bhStrip,flipVOk,turnFit} from './10-layer-grids.js';
@@ -37,7 +37,7 @@ const hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-G.SW*k/2)}" y="${f(-G
 const sg=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x)} ${f(+p.y)})">${hit}${inner}</g>`;
 if(bh&&((lgB||'').length||prev.length)){const mid='bhf'+li+'_'+prev.length;defs+=`<mask id="${mid}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/><g filter="url(#bhk)">${bhStrip((lgB||'')+prev.join(''))}</g></mask>`;out+=`<g mask="url(#${mid})">${sg}</g>`}else out+=sg;prev.push(sg)});
 if(act)defs+=pressDefs(L,li,WBS.tiles,need);
-const ink=L.ink&&CM[L.ink]?col(L.ink):'';if(ink)defs+=`<filter id="lk${li}" filterUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" color-interpolation-filters="sRGB"><feFlood flood-color="${ink}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;
+const ink=okC(L.ink)?col(L.ink):'';if(ink)defs+=`<filter id="lk${li}" filterUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" color-interpolation-filters="sRGB"><feFlood flood-color="${ink}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;
 const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'';
 return[defs,`<g${ink?` filter="url(#lk${li})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}
 function init24(){// ===== Free-place layers: no arrangement, just stamps put down by hand anywhere on the canvas.
