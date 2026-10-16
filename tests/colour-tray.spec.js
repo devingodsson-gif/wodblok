@@ -127,7 +127,7 @@ test('saved trays: a Wada set fills the first places; your own tray is kept and 
   expect(errors).toEqual([]);
 });
 
-test('colourways: a new one copies the colours; editing it leaves the first alone; switching swaps; export makes one file each', async ({ page }) => {
+test('colourways: a new one copies the colours; editing it leaves the first alone; switching swaps; export (in Export recipes) makes one file each', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'cways');
   await expect(page.locator('#cwg .cwc')).toHaveCount(1);
@@ -142,8 +142,12 @@ test('colourways: a new one copies the colours; editing it leaves the first alon
   await expect(page.locator('#tycw span')).toHaveText('Night');
   await page.click('#cwg .cwc >> nth=0'); await settle(page);
   expect(await colours(page)).toEqual(c0);
-  await page.fill('#cwxpx', '300');
-  await page.click('#cwexp');
+  await page.click('#cwgo');                                     // the Colourways tool hands over to Export recipes with "All" chosen
+  await expect(page.locator('section.pn[data-p="xrec"]')).toBeVisible();
+  await expect(page.locator('#xrcw [data-s="all"]')).toHaveClass(/on/);
+  await expect(page.locator('#xrcwall')).toHaveText('All 2');
+  await page.fill('#xrpx', '300');
+  await page.click('#xrnow');
   await page.waitForFunction(() => window.__wbDownloads.length > 0, null, { timeout: 60000 });
   const names = await zipNames(page);
   expect(names).toHaveLength(2);

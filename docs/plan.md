@@ -41,3 +41,6 @@ Speed work from the Oct 15 audit (`docs/known-issues.md` lists the two old quirk
 - Randomize, Looks, Variations, the print proof, the stamp library and the grade colour mask work with the tray (a new palette fills the tray's first places; locked colours are never changed by Randomize).
 - Not in this release: making a colourway switch instant (stamps are re-printed in the new colours, about the same time as a big slider change); the dropper sampling one layer only; drag a tray colour onto the canvas.
 - New tests: `tests/colour-tray.spec.js`; palette, palette-names, presets, print-proof, easy-wins, small-ones, rail and format tests updated for the tray.
+
+### 1.10.0 follow-up: Export recipes regrouped
+Export recipes now has four groups (Recipes, Custom export, Quick, Print proof) and a Colourways switch at the top (Showing / All, only when there is more than one colourway). "All" makes every export once per colourway in one zip, each file named after its colourway. The export block left the Colourways tool; its Export… button opens Export recipes with All chosen.

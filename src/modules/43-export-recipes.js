@@ -1,12 +1,14 @@
 import {kv,use} from '../platform/index.js';
 import {zipSync} from '../vendor/fflate.js';
-import {$} from './01-launch-and-version.js';
+import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW} from './04-canvas-and-stamp-outlines.js';
+import {upd} from './11-pressure-flooding-block-edges.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
 // ===== Export recipes =====
 // A recipe is a saved set of export settings: format, long side in pixels, TIFF DPI, and file-name ending.
-// Click a recipe to export with it. "Export all" makes every recipe in one zip. Kept with your settings. The Export menu in the top
+// Click a recipe to export with it. "Export all" makes every recipe in one zip. With more than one colourway, "Colourways: All" makes each
+// export once per colourway (one zip, each file named after its colourway). Kept with your settings. The Export menu in the top
 // bar is unchanged.
 const XR_KEY='wb97_exportrecipes',XR_MAX=8192,XR_AREA=64e6;
 const XR_BUILTIN=[{id:'b-web',name:'Web',fmt:'png',px:2048,sfx:'web'},{id:'b-print',name:'Print',fmt:'png',px:6000,sfx:'print'},{id:'b-preview',name:'Preview',fmt:'jpg',px:800,sfx:'preview'}];
@@ -27,7 +29,12 @@ function xrTiff(rgba,w,h,dpi){
   v.setUint32(ifdOffset+2+tags.length*12,0,true);[8,8,8,8].forEach((n,i)=>v.setUint16(bitsOffset+i*2,n,true));
   v.setUint32(resXOffset,Math.round(dpi),true);v.setUint32(resXOffset+4,1,true);v.setUint32(resYOffset,Math.round(dpi),true);v.setUint32(resYOffset+4,1,true);out.set(rgba,pixelOffset);return new Blob([out],{type:'image/tiff'});
 }
-const xrFile=(r)=>{const f=expName(r.fmt),base=f.slice(0,-(r.fmt.length+1));return base+(r.sfx?'-'+r.sfx.replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-'):'')+'.'+r.fmt};
+const xrSafe=x=>String(x).replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-');
+const xrFile=(r,w)=>{const f=expName(r.fmt),base=f.slice(0,-(r.fmt.length+1));return base+(r.sfx?'-'+xrSafe(r.sfx):'')+(w?'-'+(xrSafe(w.n)||'colourway'):'')+'.'+r.fmt};
+const frames=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+// run fn once per colourway (each one showing in turn), then put back the one that was showing
+async function xrWays(all,fn){const o=WBS.proj;if(!all||o.cw.length<2)return fn(null);const keep=o.cwa;WBX.wbNoCap=1;
+  try{for(let i=0;i<o.cw.length;i++){o.cwa=i;upd();await frames();await fn(o.cw[i])}}finally{o.cwa=keep;upd();await frames();WBX.wbNoCap=0}}
 // the picture itself, as a Blob
 function xrRender(r){
   return new Promise((res,rej)=>{
@@ -40,7 +47,7 @@ function xrRender(r){
   });
 }
 function init43(){
-  const list=$('xrl'),px=$('xrpx'),sfx=$('xrsfx'),nm=$('xrn');let fmt='png',ren=null,dpi=300;const dpiEl=$('xrdpi'),dpiRow=$('xrdpirow');
+  const list=$('xrl'),px=$('xrpx'),sfx=$('xrsfx'),nm=$('xrn');let fmt='png',ren=null,dpi=300,all=false,busy=false;const dpiEl=$('xrdpi'),dpiRow=$('xrdpirow');
   const cur=()=>({fmt,px:xrPx(px.value),sfx:sfx.value.trim(),...(fmt=='tiff'?{dpi:+(dpiEl&&dpiEl.value)||300}:{})});
   const sum=r=>r.fmt=='svg'?'SVG':r.fmt.toUpperCase()+' · '+xrPx(r.px)+' px'+(r.fmt=='tiff'?' · '+(r.dpi||300)+' DPI':'');
   function dims(){const r=cur();$('xrd').textContent=fmt=='svg'?'Vector, any size':xrDims(r.px).join(' × ')+' px';px.disabled=fmt=='svg';if(dpiRow)dpiRow.hidden=fmt!='tiff'}
@@ -70,22 +77,34 @@ function init43(){
     const h1=document.createElement('div');h1.className='xrh';h1.textContent='Starting points';list.appendChild(h1);XR_BUILTIN.forEach(r=>row(r,false));
     if(mine.length){const h2=document.createElement('div');h2.className='xrh';h2.textContent='Yours';list.appendChild(h2);mine.forEach(r=>row(r,true))}
   }
+  const ways=()=>all&&WBS.proj.cw.length>1;
+  async function bundle(list,tail){
+    if(busy)return;const d=await use('downloads');if(!d)return pmsg('Saving is not available here.');
+    const o=WBS.proj,multi=ways(),total=list.length*(multi?o.cw.length:1);busy=true;
+    try{
+      const base=expName('zip').replace(/\.zip$/,''),zn=base+(multi?'-colourways.zip':tail),h0=d.pick?await d.pick({filename:zn}):null;   // ask where to save first: the renders below take longer than the browser keeps the click alive
+      const files={};let k=0;
+      await xrWays(multi,async w=>{for(const r of list){pmsg('Exporting '+(++k)+' of '+total+'…');const b=await xrRender(r);let f=xrFile(r,w),n=2;while(files[f])f=xrFile(r,w).replace(/(\.\w+)$/,'-'+(n++)+'$1');files[f]=new Uint8Array(await b.arrayBuffer())}});
+      await d.save({filename:zn,data:new Blob([zipSync(files,{level:0})],{type:'application/zip'}),handle:h0});pmsg('Exported '+total+' file'+(total>1?'s':'')+' in one zip.');
+    }catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not export.')}
+    finally{busy=false}
+  }
   async function exportOne(r){
-    const d=await use('downloads');if(!d)return pmsg('Saving is not available here.');
+    if(ways())return bundle([r],'-exports.zip');
+    if(busy)return;const d=await use('downloads');if(!d)return pmsg('Saving is not available here.');
+    busy=true;
     try{const h0=d.pick?await d.pick({filename:xrFile(r)}):null;pmsg('Exporting…');const b=await xrRender(r);await d.save({filename:xrFile(r),data:b,handle:h0});pmsg('Exported “'+xrFile(r)+'”.')}
     catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not export.')}
+    finally{busy=false}
   }
-  async function exportAll(){
-    const d=await use('downloads');if(!d)return pmsg('Saving is not available here.');
-    const all=[...XR_BUILTIN,...xrLoad()];
-    try{
-      const base=expName('zip').replace(/\.zip$/,''),h0=d.pick?await d.pick({filename:base+'-exports.zip'}):null;   // ask where to save first: the renders below take longer than the browser keeps the click alive
-      const files={};let k=0;
-      for(const r of all){pmsg('Exporting '+(++k)+' of '+all.length+'…');const b=await xrRender(r);let f=xrFile(r),n=2;while(files[f])f=xrFile(r).replace(/(\.\w+)$/,'-'+(n++)+'$1');files[f]=new Uint8Array(await b.arrayBuffer())}
-      const zip=zipSync(files,{level:0});
-      await d.save({filename:base+'-exports.zip',data:new Blob([zip],{type:'application/zip'}),handle:h0});pmsg('Exported '+all.length+' files in one zip.');
-    }catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not export.')}
-  }
+  const exportAll=()=>bundle([...XR_BUILTIN,...xrLoad()],'-exports.zip');
+  // which colourways to export: the one showing, or all of them (only offered when there is more than one)
+  function scope(v){all=v=='all';$('xrcw').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.s==(all?'all':'one')))}
+  function ways$(){const n=WBS.proj.cw.length,row=$('xrcwr');row.hidden=n<2;if(n<2&&all)scope('one');$('xrcwall').textContent='All '+n}
+  $('xrcw').addEventListener('click',e=>{const b=e.target.closest('button');if(b)scope(b.dataset.s)});
+  WBX.wbXrScope=scope;
+  const prevPaint=WBX.wbTrayPaint;WBX.wbTrayPaint=f=>{if(prevPaint)prevPaint(f);ways$()};
+  new MutationObserver(ways$).observe(document.querySelector('section.pn[data-p="xrec"]'),{attributes:true,attributeFilter:['hidden']});
   list.addEventListener('click',e=>{
     const r=e.target.closest('.xrr');if(!r)return;const id=r.dataset.id,btn=e.target.closest('button');
     if(btn&&btn.dataset.act=='del'){xrStore(xrLoad().filter(x=>x.id!=id));paint();return}
@@ -104,6 +123,6 @@ function init43(){
     xrStore(a);nm.value='';paint();pmsg((same?'Updated recipe “':'Saved recipe “')+name+'”.');
   };
   if(dpiEl)dpiEl.addEventListener('change',()=>{dpi=+(dpiEl.value)||300});[nm,sfx,px].forEach(i=>i.addEventListener('keydown',e=>{e.stopPropagation();if(e.key=='Enter'&&i===nm)$('xrsave').click()}));
-  setFmt('png');paint();
+  setFmt('png');paint();ways$();
 }
 export {init43,xrRender,xrPx};
