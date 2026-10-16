@@ -1,6 +1,7 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {C,CH,CM,CW,closeDD,col,geom,placeFloat,shOf} from './04-canvas-and-stamp-outlines.js';
+import {C,CH,CM,CW,closeDD,col,geom,okC,placeFloat,shOf} from './04-canvas-and-stamp-outlines.js';
+import {refLabel} from './50-tray-core.js';
 import {store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -126,7 +127,7 @@ show('gm_sp_r',isPos(m)&&!m.sc&&m.sp=='s');show('gm_st_r',isPos(m)&&m.sp=='s'&&!
 $('gm_sp').querySelectorAll('[data-gs]').forEach(b=>b.classList.toggle('on',b.dataset.gs==m.sp));
 if(isPos(m)){$('gm_st').innerHTML='<option value="">All stamps</option>'+WBS.tiles.map((t,i)=>`<option value="${t.id}">Stamp ${i+1}</option>`).join('');$('gm_st').value=WBS.tiles.some(t=>String(t.id)==m.st)?m.st:''}
 if(T=='lay'){$('gm_lay').innerHTML=(m.lay&&WBS.layers.some(L=>L.u==m.lay)?'':'<option value="">Pick a layer</option>')+WBS.layers.map((L,i)=>i).reverse().map(i=>`<option value="${WBS.layers[i].u}">${hx(WBS.layers[i].name)}</option>`).join('');$('gm_lay').value=WBS.layers.some(L=>L.u==m.lay)?m.lay:''}
-if(T=='col'){const used=[...new Set([WBS.proj.bg,WBS.proj.ink,WBS.proj.c3,WBS.proj.c4,...WBS.tiles.map(t=>t.ink),...WBS.layers.map(L=>L.ink)].filter(n=>n&&CM[n]))],hs=used.map(n=>[n,col(n).toLowerCase()]),cur0=m.c.toLowerCase();
+if(T=='col'){const used=[...new Set([...WBS.proj.ts.map(id=>'@'+id),WBS.proj.bg,WBS.proj.ink,...WBS.tiles.map(t=>t.ink),...WBS.layers.map(L=>L.ink)].filter(n=>okC(n)))],hs=[...new Map(used.map(n=>[col(n).slice(0,7).toLowerCase(),refLabel(n)])).entries()].map(([h,n])=>[n,h]),cur0=m.c.toLowerCase();
  $('gm_col').innerHTML=hs.map(([n,h])=>`<option value="${h}">${hx(n)}</option>`).join('')+(hs.some(x=>x[1]==cur0)?'':`<option value="${cur0}">${hx(colName(cur0))}</option>`);$('gm_col').value=cur0;$('gm_cc').value=cur0}
 ['lo','hi','rg','sm','fe','amt'].forEach(k=>{const r=$('gm_'+k);if(m[k]!==undefined&&+r.value!=+m[k]){r.value=m[k];r.dispatchEvent(new Event('input',{bubbles:true}))}});
 $('gm_inv').checked=!!m.inv;$('gm_ov').checked=gmOv;
@@ -174,7 +175,7 @@ $('gm_ov').onchange=()=>{gmOv=$('gm_ov').checked;refreshG()};
 $('gm_go').onclick=()=>{const m=gmCur();if(m&&m.st){const i=WBS.tiles.findIndex(t=>String(t.id)==m.st);if(i>=0)WBS.cur=i}const vb=document.querySelector('button[data-v="stamp"]');if(vb)vb.click();upd();setTimeout(()=>{const rb=document.querySelector('.rail [data-pn="grade"]');if(rb&&!gmShown())rb.click();setTimeout(()=>{renderGM();gmHandles()},60)},60)};
 $('gm_add').onclick=e=>{e.stopPropagation();{const li=$('gm_menu').querySelector('[data-gt=lay]');if(li)li.hidden=vw()=='stamp'}const l=$('gm_menu'),open=l.hidden;closeDD();if(WBX.wbCloseMenus)WBX.wbCloseMenus();l.hidden=!open;if(open)placeFloat(l,$('gm_add'),true)};
 $('gm_menu').onclick=e=>{const it=e.target.closest('[data-gt]');if(!it)return;$('gm_menu').hidden=true;const t=it.dataset.gt,n=grd.masks.filter(q=>q.t==t).length+1,o={t,name:MS[t]+' '+n};
-if(t=='lay')o.lay=(LY()||{}).u||'';if(t=='col')o.c=col(WBS.proj.ink);if(vw()=='stamp'){const tt=WBS.tiles[WBS.cur];if(tt){o.sc=String(tt.id);if(isPos(o)){o.sp='s';o.st=o.sc}}}
+if(t=='lay')o.lay=(LY()||{}).u||'';if(t=='col')o.c=col(WBS.proj.ink).slice(0,7);if(vw()=='stamp'){const tt=WBS.tiles[WBS.cur];if(tt){o.sc=String(tt.id);if(isPos(o)){o.sp='s';o.st=o.sc}}}
 grd.masks.push(mFix(o));gmSel=grd.masks.length-1;gdSave();gradeSync();applyGrade();gCap()};
 $('gm_dup').onclick=()=>{const m=gmCur();if(!m)return;const c=mFix({...JSON.parse(JSON.stringify(m)),id:'',name:(m.name+' copy').slice(0,30)});grd.masks.splice(gmSel+1,0,c);gmSel++;gdSave();gradeSync();applyGrade();gCap()};
 $('gm_del').onclick=()=>{if(!gmCur())return;grd.masks.splice(gmSel,1);gmSel=Math.min(gmSel,grd.masks.length-1);gdSave();gradeSync();applyGrade();gCap()};

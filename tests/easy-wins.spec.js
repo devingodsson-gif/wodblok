@@ -5,13 +5,13 @@ const { TARGET, openApp, openPanel, setMode, settle } = require('./helpers/harne
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
-test('the colour slots are Paper, Ink, Accent and Accent 2, and the library starts with the add-colour tile', async ({ page }) => {
+test('the Colours tool holds the tray, paper and ink, and the saved trays (1.10)', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'colors');
-  const labels = await page.evaluate(() => [...document.querySelectorAll('section[data-p="colors"] .gb > label')].slice(0, 5).map(l => l.textContent.trim()));
-  expect(labels).toEqual(['Palette', 'Paper', 'Ink', 'Accent', 'Accent 2']);
-  expect(await page.evaluate(() => [...document.querySelectorAll('#ap option')].map(o => o.textContent))).toEqual(['Paper', 'Ink', 'Accent', 'Accent 2', "This stamp's ink"]);
-  expect(await page.evaluate(() => document.querySelector('#cl').firstElementChild.id)).toBe('addC');
+  const heads = await page.evaluate(() => [...document.querySelectorAll('section[data-p="colors"] details.g > summary')].map(s => s.firstChild.textContent.trim()));
+  expect(heads).toEqual(['Tray', 'Paper and ink', 'Saved trays']);
+  expect(await page.evaluate(() => [...document.querySelectorAll('section[data-p="colors"] .cwk')].map(l => l.textContent))).toEqual(['Paper', 'Ink']);
+  await expect(page.locator('#tyl .tyr')).toHaveCount(2);
   expect(errors).toEqual([]);
 });
 

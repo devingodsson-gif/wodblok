@@ -1,14 +1,45 @@
 {
  "tiles.1.ink": [
   "Mulled Plum",
-  "Cotinga Purple"
+  "@k3"
  ],
  "proj.ink": [
   "Jess Leather",
-  "Vandyke Brown"
+  "@k2"
  ],
  "proj.bg": [
   "Falcon Tan",
-  "Maple"
+  "@k1"
+ ],
+ "proj.ts": [
+  "(absent)",
+  [
+   "k1",
+   "k2",
+   "k3"
+  ]
+ ],
+ "proj.cw": [
+  "(absent)",
+  [
+   {
+    "id": "w1",
+    "n": "Colourway 1",
+    "c": {
+     "k1": "#c59f6b",
+     "k2": "#4b3317",
+     "k3": "#501345"
+    },
+    "m": {
+     "k1": "Maple",
+     "k2": "Vandyke Brown",
+     "k3": "Cotinga Purple"
+    }
+   }
+  ]
+ ],
+ "proj.cwa": [
+  "(absent)",
+  0
  ]
 }

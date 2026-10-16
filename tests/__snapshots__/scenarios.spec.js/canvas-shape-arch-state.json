@@ -97,7 +97,7 @@
    "er": 6,
    "es": 98,
    "neg": false,
-   "ink": "Red Violet",
+   "ink": "@k3",
    "tu": [
     {
      "x": "xmuzts6tk1k0f",
@@ -291,8 +291,30 @@
   }
  ],
  "proj": {
-  "ink": "Pansy Purple",
-  "bg": "Seashell Pink"
+  "bg": "@k1",
+  "ink": "@k2",
+  "ts": [
+   "k1",
+   "k2",
+   "k3"
+  ],
+  "cw": [
+   {
+    "id": "w1",
+    "n": "Colourway 1",
+    "c": {
+     "k1": "#fdd4bd",
+     "k2": "#7d133a",
+     "k3": "#59256a"
+    },
+    "m": {
+     "k1": "Seashell Pink",
+     "k2": "Pansy Purple",
+     "k3": "Red Violet"
+    }
+   }
+  ],
+  "cwa": 0
  },
  "dim": {
   "s": [

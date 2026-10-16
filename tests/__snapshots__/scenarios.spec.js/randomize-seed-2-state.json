@@ -230,7 +230,7 @@
    "fit": "",
    "man": false,
    "ov": {},
-   "ink": "Cinnamon Buff",
+   "ink": "@k3",
    "op": 67
   },
   {
@@ -266,9 +266,30 @@
   }
  ],
  "proj": {
-  "ink": "Pale Raw Umber",
-  "bg": "Pale King's Blue",
-  "c3": "Cinnamon Buff"
+  "bg": "@k1",
+  "ink": "@k2",
+  "ts": [
+   "k1",
+   "k2",
+   "k3"
+  ],
+  "cw": [
+   {
+    "id": "w1",
+    "n": "Colourway 1",
+    "c": {
+     "k1": "#a7d4e4",
+     "k2": "#71502f",
+     "k3": "#fdc57e"
+    },
+    "m": {
+     "k1": "Pale King's Blue",
+     "k2": "Pale Raw Umber",
+     "k3": "Cinnamon Buff"
+    }
+   }
+  ],
+  "cwa": 0
  },
  "dim": {
   "s": [

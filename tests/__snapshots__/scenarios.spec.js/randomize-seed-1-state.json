@@ -329,7 +329,7 @@
    "fit": "",
    "man": false,
    "ov": {},
-   "ink": "Benzol Green",
+   "ink": "@k2",
    "bl": "multiply"
   },
   {
@@ -365,8 +365,27 @@
   }
  ],
  "proj": {
-  "ink": "Benzol Green",
-  "bg": "Light Glaucous Blue"
+  "bg": "@k1",
+  "ink": "@k2",
+  "ts": [
+   "k1",
+   "k2"
+  ],
+  "cw": [
+   {
+    "id": "w1",
+    "n": "Colourway 1",
+    "c": {
+     "k1": "#a5c8d1",
+     "k2": "#00978d"
+    },
+    "m": {
+     "k1": "Light Glaucous Blue",
+     "k2": "Benzol Green"
+    }
+   }
+  ],
+  "cwa": 0
  },
  "dim": {
   "s": [

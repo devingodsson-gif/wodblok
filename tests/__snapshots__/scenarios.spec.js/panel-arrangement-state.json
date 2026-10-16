@@ -399,7 +399,7 @@
    "er": 1.5,
    "es": 190,
    "neg": false,
-   "ink": "Sulpher Yellow",
+   "ink": "@k2",
    "tu": []
   },
   {
@@ -494,7 +494,7 @@
    "er": 1.7,
    "es": 88,
    "neg": false,
-   "ink": "Sulpher Yellow",
+   "ink": "@k2",
    "tu": []
   },
   {
@@ -534,7 +534,7 @@
    "er": 1,
    "es": 972,
    "neg": false,
-   "ink": "Sulpher Yellow",
+   "ink": "@k2",
    "tu": []
   }
  ],
@@ -586,7 +586,7 @@
    "fit": "",
    "man": false,
    "ov": {},
-   "ink": "Moon Ivory",
+   "ink": "@k2",
    "op": 91,
    "rsd": 90493,
    "bl": "darken"
@@ -621,7 +621,7 @@
    },
    "man": false,
    "ov": {},
-   "ink": "Moon Ivory",
+   "ink": "@k2",
    "op": 71,
    "bl": "lighten"
   },
@@ -655,7 +655,7 @@
    },
    "man": false,
    "ov": {},
-   "ink": "Moon Ivory",
+   "ink": "@k2",
    "op": 74,
    "bl": "multiply"
   },
@@ -726,8 +726,27 @@
   }
  ],
  "proj": {
-  "ink": "Sulpher Yellow",
-  "bg": "Blackish Olive"
+  "bg": "@k1",
+  "ink": "@k2",
+  "ts": [
+   "k1",
+   "k2"
+  ],
+  "cw": [
+   {
+    "id": "w1",
+    "n": "Colourway 1",
+    "c": {
+     "k1": "#42533e",
+     "k2": "#f5ecc2"
+    },
+    "m": {
+     "k1": "Blackish Olive",
+     "k2": "Sulpher Yellow"
+    }
+   }
+  ],
+  "cwa": 0
  },
  "dim": {
   "s": [

@@ -1,6 +1,6 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {DRS} from './03-stamp-prints-and-drawing.js';
-import {CH,CM,CW,bk,cOut,col,csk,geom,hasOut,offPoly,polyArea,rng,shOf} from './04-canvas-and-stamp-outlines.js';
+import {CH,CM,CW,bk,cOut,col,csk,geom,hasOut,offPoly,polyArea,rng,shOf,okC} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,store} from './06-motif-library-folders.js';
 import {flipVOk,turnFit} from './10-layer-grids.js';
 import {eNV,eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
@@ -58,7 +58,7 @@ if(fr.c=='m'){const id=`fc${li}_${bi}_${si}`;defs+=`<clipPath id="${id}" clipPat
 if(cs){const G=geom(shOf(cs)),k=w/Math.max(G.SW,G.SH);[[a+w/2,b+w/2,0],[c-w/2,b+w/2,90],[c-w/2,d-w/2,180],[a+w/2,d-w/2,270]].forEach(([x,y,r],ci)=>out+=imp(cs,x,y,r+flip,k,k,(bi*4+ci)*1000+900))}
 if(B.bar){const[p0,q0,p1,q1]=B.bar,id=`fb${li}_${bi}`;defs+=`<clipPath id="${id}" clipPathUnits="userSpaceOnUse"><path clip-rule="evenodd" d="M${f(-CW)} ${f(-CH)}H${f(2*CW)}V${f(2*CH)}H${f(-CW)}Z M${f(p0)} ${f(q0)}V${f(q1)}H${f(p1)}V${f(q0)}Z"/></clipPath>`;out=out.slice(0,o0)+`<g clip-path="url(#${id})">${out.slice(o0)}</g>`}});
 if(act)defs+=pressDefs(L,li,cs&&!ls.includes(cs)?[...ls,cs]:ls,need);
-const ink=L.ink&&CM[L.ink]?col(L.ink):'';if(ink)defs+=`<filter id="lk${li}" filterUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" color-interpolation-filters="sRGB"><feFlood flood-color="${ink}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;
+const ink=okC(L.ink)?col(L.ink):'';if(ink)defs+=`<filter id="lk${li}" filterUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" color-interpolation-filters="sRGB"><feFlood flood-color="${ink}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;
 const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl||'';
 return[defs,clr+`<g${ink?` filter="url(#lk${li})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}
 // --- Arrangement panel: Pattern / Frame

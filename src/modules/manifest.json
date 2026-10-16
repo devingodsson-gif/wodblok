@@ -46,5 +46,9 @@
  "46-presets.js",
  "47-variations.js",
  "48-task-bar.js",
- "49-motif-export.js"
+ "49-motif-export.js",
+ "50-tray-core.js",
+ "51-colour-picker.js",
+ "52-tray-ui.js",
+ "53-colourways.js"
 ]

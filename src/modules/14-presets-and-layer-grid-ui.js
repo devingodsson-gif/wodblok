@@ -1,6 +1,6 @@
 import {clipboard,kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {C,CC,CH,CM,CP,CW,PCOL,PL,SHN,SK,col,csk,geom,paintColors,palUi,projSet,saveCC,setDim,shOf,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,SHN,SK,csk,geom,setDim,shOf,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {clean,cust,luid,mcSave,mkL,say,store} from './06-motif-library-folders.js';
 import {build,hx,leadT} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -32,9 +32,6 @@ if(T.linked)$('lglh').textContent=`Uses the grid of ${T.B.name}: same pattern, s
 const ls=WBS.tiles.filter(t=>L.st.includes(t.id)),lt=leadT(L);$('lldrow').hidden=T.linked||ls.length<2;
 const k2=ls.map(t=>t.id+shOf(t).k).join('|');if($('lld').dataset.k!=k2){$('lld').innerHTML=ls.map(t=>`<option value="${t.id}">Stamp ${WBS.tiles.indexOf(t)+1} (${SHN[shOf(t).k]})</option>`).join('');$('lld').dataset.k=k2}
 if(ls.length)$('lld').value=lt.id}
-let lastC=null;
-const normHex=v=>{const m=/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(v).trim());if(!m)return null;let h=m[1].toLowerCase();if(h.length==3)h=h.split('').map(c=>c+c).join('');return'#'+h};
-function openCF(){$('cf').hidden=false;$('cer').textContent='';$('cnm').focus()}
 const LY=()=>WBS.layers[WBS.selL];
 const STY="One unified carved-stamp style drawn from medieval sources: the flat, heavy, firmly outlined forms of Romanesque Bible illumination; the spirals, dots and interlace of Insular manuscripts; the bold geometric shapes, stripes and scallops of Mozarabic Beatus pages; and the thick, even outline of 15th-century blockbook woodcuts. No shading, no perspective, frontal or profile poses, strong readable silhouettes.";
 const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'wodblok-pattern';return n+'.'+ext};
@@ -64,29 +61,7 @@ $('sall').onclick=()=>{const sh=shOf(WBS.tiles[WBS.cur]);let n=0;WBS.tiles.forEa
 $('lgl').oninput=()=>{const L=LY(),v=$('lgl').value;if(v){L.gl=v;L.ox=0;L.oy=0;if(!L.pa)L.pa='c'}else delete L.gl;store();upd()};
 $('lpa').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;LY().pa=b.dataset.p;store();upd()};
 $('lld').oninput=()=>{LY().lead=+$('lld').value;store();upd()};
-$('pal').oninput=()=>{const v=$('pal').value,c=v.startsWith('c:')?CP.find(x=>'c:'+x.id==v):null,p=c?[c.name,c.s[1],c.s[0],c.s[2],c.s[3]]:PL[v];if(p){WBS.proj={ink:p[1],bg:p[2]};projSet('c3',p[3]);projSet('c4',p[4]);store();upd()}palUi()};
-$('pI').oninput=()=>{WBS.proj.ink=$('pI').value;store();upd()};
-$('pB').oninput=()=>{WBS.proj.bg=$('pB').value;store();upd()};
-$('p3').oninput=()=>{projSet('c3',$('p3').value);store();upd()};
-$('p4').oninput=()=>{projSet('c4',$('p4').value);store();upd()};
-$('stI').oninput=()=>{WBS.tiles[WBS.cur].ink=$('stI').value||null;store();upd()};
 $('neg').oninput=()=>{WBS.tiles[WBS.cur].neg=$('neg').checked;store();upd()};
-$('cl').onclick=e=>{if(e.target.closest('#addC')){openCF();return}const b=e.target.closest('[data-c]');if(!b)return;lastC=b.dataset.c;const n=b.dataset.c,a=$('ap').value;
-if(a=='pI')WBS.proj.ink=n;else if(a=='pB')WBS.proj.bg=n;else if(a=='p3'||a=='p4')projSet(a=='p3'?'c3':'c4',n);else WBS.tiles[WBS.cur].ink=n;
-$('cn').textContent=n+' '+col(n);$('rmC').hidden=!CC.includes(n);store();upd()};
-$('cpk').oninput=()=>{$('chx').value=$('cpk').value};
-$('chx').oninput=()=>{const h=normHex($('chx').value);if(h)$('cpk').value=h};
-$('ccl').onclick=()=>{$('cf').hidden=true};
-$('csv').onclick=()=>{const h=normHex($('chx').value),n=$('cnm').value.replace(/["<>]/g,'').replace(/\s+/g,' ').trim().slice(0,30),er=t=>{$('cer').textContent=t};
-if(!h)return er('Enter a colour as a hex value like #8b5a2b, or use the colour selector.');
-if(!n)return er('Give the colour a name.');
-if(C.some(c=>c[0].toLowerCase()==n.toLowerCase()))return er('That name is already used. Try another.');
-C.push([n,h]);CM[n]=h;CC.push(n);saveCC();paintColors();lastC=n;$('rmC').hidden=false;
-$('cn').textContent='Added '+n+' '+h+'. Click it to apply.';$('cnm').value='';$('cf').hidden=true;$('cl').scrollTop=$('cl').scrollHeight;upd()};
-$('rmC').onclick=()=>{const n=lastC;if(!n||!CC.includes(n))return;
-C.splice(C.findIndex(c=>c[0]==n),1);delete CM[n];CC.splice(CC.indexOf(n),1);
-if(WBS.proj.ink==n)WBS.proj.ink=PCOL.ink;if(WBS.proj.bg==n)WBS.proj.bg=PCOL.bg;if(WBS.proj.c3==n)projSet('c3',null);if(WBS.proj.c4==n)projSet('c4',null);WBS.tiles.forEach(t=>{if(t.ink==n)t.ink=null});
-saveCC();store();paintColors();lastC=null;$('rmC').hidden=true;$('cn').textContent='Removed '+n+'.';upd()};
 [['lgp','gap',Number],['ts','size',Number],['lox','ox',Number],['loy','oy',Number],['lrr','rrot',Number],['lrp','rpos',Number],['lrt','rot',Number],['lps','pst',Number],['lfs','pfl',Number],['lnm','name',v=>v]].forEach(([id,k,f])=>$(id).oninput=()=>{LY()[k]=f($(id).value);store();upd()});
 [['lrtn','rtn'],['lrfh','rfh'],['lrfv','rfv']].forEach(([id,k])=>$(id).oninput=()=>{const L=LY();if($(id).checked)L[k]=true;else delete L[k];store();upd()});
 $('lrsh').onclick=()=>{LY().rsd=1+Math.floor(Math.random()*99999);store();upd();if(WBX.wbCap)WBX.wbCap()};

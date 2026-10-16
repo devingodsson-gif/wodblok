@@ -1,14 +1,45 @@
 {
  "tiles.1.ink": [
   "Nightshade",
-  "Red Violet"
+  "@k3"
  ],
  "proj.ink": [
   "Damask Crimson",
-  "Pansy Purple"
+  "@k2"
  ],
  "proj.bg": [
   "Rosewater",
-  "Seashell Pink"
+  "@k1"
+ ],
+ "proj.ts": [
+  "(absent)",
+  [
+   "k1",
+   "k2",
+   "k3"
+  ]
+ ],
+ "proj.cw": [
+  "(absent)",
+  [
+   {
+    "id": "w1",
+    "n": "Colourway 1",
+    "c": {
+     "k1": "#fdd4bd",
+     "k2": "#7d133a",
+     "k3": "#59256a"
+    },
+    "m": {
+     "k1": "Seashell Pink",
+     "k2": "Pansy Purple",
+     "k3": "Red Violet"
+    }
+   }
+  ]
+ ],
+ "proj.cwa": [
+  "(absent)",
+  0
  ]
 }

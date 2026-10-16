@@ -13,6 +13,10 @@ const BASE = process.env.WB_BASELINE;
 const TOL = +process.env.WB_PICTURE_TOLERANCE || 0;
 test.beforeEach(() => { test.skip(TARGET === 'legacy' || !BASE, 'needs WB_BASELINE=<older dist/wodblok.html> and the build as target'); });
 
+// "busy" has layers with an ink saved in the file ("Moon Ivory" on layers 2-4). Before 1.10 those inks were left out when the file opened; the colour tray
+// brings them back (docs/known-issues.md), so the layers print in that colour now. That is a deliberate change: this one file is compared loosely
+// (a mean difference of 2.5 of 255, and at most 1 pixel in 100 off by more than 48); the other files must still match.
+const LOOSE = { busy: { mean: 2.5, big: 0.01 } };
 const CTX = { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce', acceptDownloads: true };
 
 async function render(browser, url, fixture) {
@@ -21,6 +25,7 @@ async function render(browser, url, fixture) {
   const { errors } = await openApp(page, { seed: 21, url });
   await openProjectFile(page, fixture);
   const shots = {};
+  await page.addStyleTag({ content: '.tip{display:none!important}' });   // the rail's name labels move when a tool is added to the rail: not part of the picture
   const shoot = async (label, sel) => { await settle(page, { quiet: 8 });
     // a build before 1.9.1 cannot say when its prints are done: give it time
     if (!(await page.evaluate(() => !!(window.__wbTest && window.__wbTest.printsBusy)))) { await page.waitForTimeout(2500); await settle(page, { quiet: 8 }); }
@@ -86,7 +91,8 @@ for (const name of Object.keys(FIXTURES)) {
     const out = {};
     for (const label of Object.keys(was.shots)) {
       out[label] = await diff(browser, was.shots[label], now.shots[label]);
-      if (TOL ? out[label].meanDelta > TOL : out[label].diff !== 0) {                                                   // keep both pictures for a person to look at
+      const lo = LOOSE[name], tol = lo ? Math.max(TOL, lo.mean) : TOL;
+      if (tol ? out[label].meanDelta > tol : out[label].diff !== 0) {                                                   // keep both pictures for a person to look at
         fs.mkdirSync(path.join(ROOT, 'test-results', 'picture-compare'), { recursive: true });
         const f = `${name}-${label.replace(/\W+/g, '-')}`;
         fs.writeFileSync(path.join(ROOT, 'test-results', 'picture-compare', f + '-baseline.png'), Buffer.from(was.shots[label], 'base64'));
@@ -96,8 +102,9 @@ for (const name of Object.keys(FIXTURES)) {
     console.log('picture-compare', name, JSON.stringify(out));
     for (const [label, r] of Object.entries(out)) {
       const what = `${name}: ${label}: pixels that differ (size ${JSON.stringify(r.size || [r.sizeA, r.sizeB])}, biggest step ${r.maxDelta}, mean ${r.meanDelta})`;
-      if (!TOL || r.diff === -1) expect(r.diff, what).toBe(0);
-      else { expect(r.meanDelta, what).toBeLessThanOrEqual(TOL); expect(r.over48, what + ': pixels off by more than 48').toBeLessThanOrEqual(r.size[0] * r.size[1] * 0.001); }
+      const lo = LOOSE[name], tol = lo ? Math.max(TOL, lo.mean) : TOL;
+      if (!tol || r.diff === -1) expect(r.diff, what).toBe(0);
+      else { expect(r.meanDelta, what).toBeLessThanOrEqual(tol); expect(r.over48, what + ': pixels off by more than 48').toBeLessThanOrEqual(r.size[0] * r.size[1] * (lo ? lo.big : 0.001)); }
     }
     expect(was.errors).toEqual([]);
     expect(now.errors).toEqual([]);

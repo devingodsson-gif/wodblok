@@ -1,11 +1,12 @@
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {C,CH,CM,CW,col} from './04-canvas-and-stamp-outlines.js';
+import {C,CH,CM,CW,col,okC} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {txFilt,txImgs,txIsW,txRid,txSpecs} from './16-texture-generators.js';
 import {txRefresh,txReg} from './17-texture-panel-and-previews.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
+import {mkWell,paintWell} from './52-tray-ui.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
 // ===== Text boxes (Layout > Text). A layer in Text mode has L.free = true, L.txt = true and L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
@@ -21,8 +22,8 @@ const key=id+'|'+v+'|'+W+'|'+H;if(TXM.has(key))return TXM.get(key);
 const m=`<mask id="${id}" maskUnits="userSpaceOnUse" x="${x}" y="${y}" width="${W}" height="${H}"><rect x="${x}" y="${y}" width="${W}" height="${H}" fill="#fff"/>${v}</mask>`;
 if(TXM.size>300)TXM.delete(TXM.keys().next().value);TXM.set(key,m);return m}
 function txOvF(p){const q=txSpecs(p.tu,'wear');if(!q.length||!WBS.edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1);return txFilt(q,-W/2,-H/2,W,H,384)}
-function txtLayer(L,li){const pl=(L.pl||[]).filter(p=>p.tx&&p.Lt&&p.G);if(!pl.length)return['',''];const f=v=>(+v).toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),fill=L.ink&&CM[L.ink]?col(L.ink):col(WBS.proj.ink);let out='',defs='';
-pl.forEach(p=>{const[w,h]=fpWH(p),k=p.s/Math.max(p.n||1,.01),mid='tm'+li+'_'+String(p.u).replace(/[^\w-]/g,''),mk=txMask(mid,p),fo=txOvF(p);if(mk)defs+=mk;const pf=p.ink&&CM[p.ink]?col(p.ink):fill,hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-w/2)}" y="${f(-h/2)}" width="${f(w)}" height="${f(h)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
+function txtLayer(L,li){const pl=(L.pl||[]).filter(p=>p.tx&&p.Lt&&p.G);if(!pl.length)return['',''];const f=v=>(+v).toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),fill=okC(L.ink)?col(L.ink):col(WBS.proj.ink);let out='',defs='';
+pl.forEach(p=>{const[w,h]=fpWH(p),k=p.s/Math.max(p.n||1,.01),mid='tm'+li+'_'+String(p.u).replace(/[^\w-]/g,''),mk=txMask(mid,p),fo=txOvF(p);if(mk)defs+=mk;const pf=okC(p.ink)?col(p.ink):fill,hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-w/2)}" y="${f(-h/2)}" width="${f(w)}" height="${f(h)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
 out+=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x)} ${f(+p.y)})">${hit}<g transform="rotate(${+p.r||0}) scale(${(k*(p.f||1)).toFixed(4)} ${k.toFixed(4)})"${fo?` filter="url(#${fo})"`:''}${mk?` mask="url(#${mid})"`:''}>${txtGl(p,pf,'tg'+li+'_'+String(p.u).replace(/[^\w-]/g,''))}</g></g>`});
 const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'';
 return[defs,`<g${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}
@@ -33,8 +34,8 @@ function tbRead(){return{text:$('tb_t').value.replace(/\r/g,'').slice(0,200),f:$
 function tbArmUI(){const b=$('tb_go');if(b){b.classList.toggle('on',WBS.txArm);b.setAttribute('aria-pressed',String(WBS.txArm))}}
 function tbGhost(){clearTimeout(tbGT);tbGT=setTimeout(async()=>{if(!WBS.txArm)return;const o=tbRead();if(!o.text.trim()){tbG=null;WBH.fpOverlay();return}const R=await WBX.wbTxLay(o);if(!WBS.txArm)return;tbG=R;WBH.fpOverlay()},120)}
 function tbArm(on){WBS.txArm=on;if(on){WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpB=null;tbKey='';tbGhost()}else{tbG=null}tbArmUI();upd()}
-var tbInkK='';
-function tbStyUI(){tbLoad=true;try{const k=C.map(x=>x[0]).join('|');if(k!==tbInkK){tbInkK=k;$('tb_ink').innerHTML='<option value="">Layer colour</option>'+C.map(([n])=>`<option value="${hx(n)}">${hx(n)}</option>`).join('')}$('tb_ink').value=tbSty.ink&&CM[tbSty.ink]?tbSty.ink:'';const L=fpL();$('tb_inkc').style.background=tbSty.ink&&CM[tbSty.ink]?col(tbSty.ink):L&&L.ink&&CM[L.ink]?col(L.ink):col(WBS.proj.ink)}finally{tbLoad=false}}
+var tbInkK='',TBW=null;
+function tbStyUI(){tbLoad=true;try{if(TBW)paintWell(TBW,true)}finally{tbLoad=false}}
 function tbStyle(k,v){const grp=fpGrp().filter(q=>q.tx);if(k=='ink'){tbSty.ink=v;grp.forEach(q=>{if(v)q.ink=v;else delete q.ink})}tbStyUI();if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();if(WBS.txArm)WBH.fpOverlay()}
 function tbStySet(a){const grp=fpGrp().filter(q=>q.tx);tbSty.tu=a.map(u=>({...u}));grp.forEach(q=>{q.tu=a.map((u,i)=>{const o=(q.tu||[])[i];return o&&o.x===u.x?o:{x:u.x,sd:grp.length>1?txRid():u.sd}})});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();if(WBS.txArm)WBH.fpOverlay();txRefresh()}
 function tbStyVary(i){const grp=fpGrp().filter(q=>q.tx);if(tbSty.tu[i])tbSty.tu[i]={...tbSty.tu[i],sd:txRid()};grp.forEach(q=>{if(q.tu&&q.tu[i])q.tu[i]={...q.tu[i],sd:txRid()}});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();txRefresh()}
@@ -52,7 +53,7 @@ TXM=new Map();WBS.txArm=false;
 {if(WBX.wbTxFontHTML){WBX.wbTbFonts=()=>{const c=$('tb_f').value;$('tb_f').innerHTML=WBX.wbTxFontHTML();$('tb_f').value=c&&[...$('tb_f').options].some(o=>o.value==c)?c:'cinzel'};WBX.wbTbFonts()}
 ['tb_t','tb_f','tb_sz','tb_ls','tb_lh','tb_cv','tb_rot'].forEach(id=>$(id).addEventListener('input',tbLive));
 $('tb_al').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;tbAl=b.dataset.a;document.querySelectorAll('#tb_al [data-a]').forEach(x=>x.classList.toggle('on',x==b));tbLive()};
-$('tb_ink').addEventListener('input',()=>{if(!tbLoad)tbStyle('ink',$('tb_ink').value)});
+TBW=mkWell($('wl_tb'),{label:'Text colour',what:'Text',def:'Layer colour',defRef:()=>{const L=fpL();return L&&okC(L.ink)?L.ink:WBS.proj.ink},get:()=>okC(tbSty.ink)?tbSty.ink:'',set:v=>{if(!tbLoad)tbStyle('ink',v||'')}});
 txReg('tb_tex',{md:'wear',def:'pinholes',get:()=>{const p=tbSel();return p?(Array.isArray(p.tu)?p.tu:[]):tbSty.tu},set:tbStySet,vary:tbStyVary});
 WBX.wbTxUses=()=>tbSty.tu;WBX.wbTxCut=id=>{tbSty.tu=tbSty.tu.filter(u=>u.x!==id)};
 $('tb_split').onclick=async()=>{const L=fpL();if(!L||!L.txt)return;const grp=fpGrp().filter(q=>q.tx);if(!grp.length)return;if(WBX.wbCap)WBX.wbCap();const cache=new Map(),made=[];let total=0;

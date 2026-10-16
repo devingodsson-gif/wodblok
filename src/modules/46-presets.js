@@ -1,6 +1,7 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {PL,col} from './04-canvas-and-stamp-outlines.js';
+import {CM,LEG_HEX,PL,col} from './04-canvas-and-stamp-outlines.js';
+import {normHexA,trayIn,trayLoad} from './50-tray-core.js';
 import {txEnsure} from './16-texture-generators.js';
 import {coreStr,newId,pmsg,thumb} from './18-projects-and-cover-overlay.js';
 // ===== Presets =====
@@ -26,23 +27,16 @@ const lkStore=a=>{try{kv.set(LK_KEY,JSON.stringify(a))}catch(e){pmsg('Could not 
 // what a look keeps of the current piece (grade masks tied to a layer or a stamp stay with that piece)
 function lkCapture(){
   const c=JSON.parse(coreStr()),g=c.grade||null,u=(c.tex&&Array.isArray(c.tex.u)?c.tex.u:[]).map(x=>({...x})),ids=new Set(u.map(x=>x.x));
-  const proj={};['bg','ink','c3','c4'].forEach(k=>{if(c.proj[k])proj[k]=c.proj[k]});
-  return{proj,pr:{...c.pr},grade:g?{...g,masks:(g.masks||[]).filter(m=>!m.lay&&!m.sc).map(m=>JSON.parse(JSON.stringify(m)))}:null,tex:{u},texLib:(c.texLib||[]).filter(x=>ids.has(x.id)).map(x=>({...x}))};
-}
-// moving to a new palette: each ink the stamps and layers use keeps its place in the palette (paper, ink, 3rd, 4th); inks from outside it spread over the new accents
-function lkNameMap(c,np){
-  const op=c.proj,pos=n=>n===op.bg?'bg':n===op.ink?'ink':n===op.c3?'c3':n===op.c4?'c4':null;
-  const accents=[np.c3,np.c4].filter(Boolean),fallback=accents.length?accents:[np.ink],foreign=[];
-  return n=>{if(!n)return n;const p=pos(n);if(p)return np[p]||np.ink;if(!foreign.includes(n))foreign.push(n);return fallback[(foreign.indexOf(n))%fallback.length]};
-}
-function lkRemap(c,np){
-  const to=lkNameMap(c,np);
-  c.tiles.forEach(t=>{if(t.ink)t.ink=to(t.ink)});c.layers.forEach(l=>{if(l.ink)l.ink=to(l.ink)});
+  const w=c.proj.cw[c.proj.cwa|0],tray=c.proj.ts.map(id=>[w.c[id],w.m[id]||'']);
+  return{tray,pr:{...c.pr},grade:g?{...g,masks:(g.masks||[]).filter(m=>!m.lay&&!m.sc).map(m=>JSON.parse(JSON.stringify(m)))}:null,tex:{u},texLib:(c.texLib||[]).filter(x=>ids.has(x.id)).map(x=>({...x}))};
 }
 function lkDo(label,mut){
   const c=JSON.parse(coreStr());mut(c);WBX.wbApply(c);WBX.wbLabelNext={t:String(label).replace(/\.$/,''),at:performance.now()};if(WBX.wbCap)WBX.wbCap();pmsg(label);
 }
-const lkSetProj=(c,p)=>{const np={};['bg','ink','c3','c4'].forEach(k=>{if(p[k])np[k]=p[k]});if(!np.bg||!np.ink)return;lkRemap(c,np);c.proj={...c.proj};['bg','ink','c3','c4'].forEach(k=>{if(np[k])c.proj[k]=np[k];else if(k=='c3'||k=='c4')delete c.proj[k]})};
+// a look's or a palette's colours go into the first places of the tray (the colourway showing); everything linked to those places follows
+const lkSetTray=(c,cols)=>{trayIn(c);trayLoad(cols.filter(x=>x&&x[0]),c.proj)};
+// looks saved before the tray kept colour names in paper, ink, accent, accent 2 order
+const lkOldCols=p=>[p.bg,p.ink,p.c3,p.c4].filter(Boolean).map(n=>[CM[n]||LEG_HEX(n),n]).filter(x=>x[0]);
 function lkSetGrade(c,g){
   const z=Object.fromEntries(LK_GK.map(k=>[k,0])),keep=((c.grade&&c.grade.masks)||[]).filter(m=>m.lay||m.sc);
   c.grade={...z,...(g||{}),cov:!!(c.grade&&c.grade.cov),masks:[...(g&&g.masks?g.masks.map(m=>JSON.parse(JSON.stringify(m))):[]),...keep]};
@@ -50,7 +44,7 @@ function lkSetGrade(c,g){
 function lkApplyUser(rec){
   const L=rec.look;
   lkDo('Look “'+rec.name+'”.',c=>{
-    if(L.proj)lkSetProj(c,L.proj);
+    if(Array.isArray(L.tray))lkSetTray(c,L.tray.map(x=>[normHexA(x[0]),x[1]]));else if(L.proj)lkSetTray(c,lkOldCols(L.proj));
     if(L.pr)c.pr={...c.pr,...L.pr};
     if('grade' in L)lkSetGrade(c,L.grade);
     if(L.tex){c.tex={...c.tex,u:L.tex.u.map(x=>({...x}))};const have=new Set((c.texLib||[]).map(x=>x.id));c.texLib=c.texLib||[];(L.texLib||[]).forEach(x=>{if(!have.has(x.id))c.texLib.push({...x})})}
@@ -64,10 +58,10 @@ function lkApplyStart(s){
 }
 function lkApplyPalette(i){
   const p=PL[i];if(!p)return;
-  lkDo('Palette “'+p[0]+'”.',c=>lkSetProj(c,{ink:p[1],bg:p[2],c3:p[3],c4:p[4]}));
+  lkDo('Palette “'+p[0]+'”.',c=>lkSetTray(c,[p[2],p[1],p[3],p[4]].filter(Boolean).map(n=>[CM[n],n])));
 }
 function init46(){
-  const list=$('psl'),pal=$('ppl'),q=$('prfind'),nm=$('psn');let ren=null;
+  const list=$('psl'),nm=$('psn');let ren=null;
   const icon=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
   function paintLooks(){
     list.textContent='';
@@ -92,18 +86,6 @@ function init46(){
     LK_START.forEach(s=>row(s,false));
     lkLoad().forEach(r=>row(r,true));
   }
-  function paintPalettes(){
-    const w=q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);pal.textContent='';let n=0;const frag=document.createDocumentFragment();
-    PL.forEach((p,i)=>{
-      const hay=(p[0]+' '+[p[1],p[2],p[3],p[4]].filter(Boolean).join(' ')+' no '+(i+1)).toLowerCase();if(w.some(t=>!hay.includes(t)))return;n++;
-      const r=document.createElement('div');r.className='ppr';r.dataset.i=i;r.setAttribute('role','listitem');r.tabIndex=0;
-      const sw=document.createElement('span');sw.className='sw4';[p[2],p[1],p[3],p[4]].filter(Boolean).forEach(c=>{const s=document.createElement('i');s.style.background=col(c);sw.appendChild(s)});
-      const b=document.createElement('b');b.textContent=p[0];const sm=document.createElement('small');sm.textContent='No. '+(i+1);
-      r.append(sw,b,sm);frag.appendChild(r);
-    });
-    if(!n){const d=document.createElement('div');d.className='ppn';d.textContent='No matching palette';pal.appendChild(d)}else pal.appendChild(frag);
-    $('pspc').textContent=n==PL.length?String(PL.length):n+' of '+PL.length;
-  }
   list.addEventListener('click',e=>{
     const r=e.target.closest('.psr');if(!r)return;const id=r.dataset.id,btn=e.target.closest('button');
     if(btn&&btn.dataset.act=='del'){lkStore(lkLoad().filter(x=>x.id!=id));paintLooks();return}
@@ -112,9 +94,8 @@ function init46(){
     const s=LK_START.find(x=>x.id==id);if(s)return lkApplyStart(s);
     const u=lkLoad().find(x=>x.id==id);if(u)lkApplyUser(u);
   });
-  pal.addEventListener('click',e=>{const r=e.target.closest('.ppr');if(r)lkApplyPalette(+r.dataset.i)});
-  const key=e=>{if((e.key=='Enter'||e.key==' ')&&e.target.classList&&(e.target.classList.contains('psr')||e.target.classList.contains('ppr'))){e.preventDefault();e.target.click()}};
-  list.addEventListener('keydown',key);pal.addEventListener('keydown',key);
+  const key=e=>{if((e.key=='Enter'||e.key==' ')&&e.target.classList&&e.target.classList.contains('psr')){e.preventDefault();e.target.click()}};
+  list.addEventListener('keydown',key);
   $('pssave').onclick=async()=>{
     const a=lkLoad();let name=nm.value.trim().slice(0,40);if(!name)name='Look '+(a.length+1);
     if(a.length>=LK_MAX&&!a.some(x=>x.name.toLowerCase()==name.toLowerCase()))return pmsg('That is the most looks that can be kept ('+LK_MAX+'). Delete one first.');
@@ -123,7 +104,6 @@ function init46(){
     lkStore(a);nm.value='';paintLooks();pmsg((same?'Updated look “':'Saved look “')+(same?same.name:name)+'”.');
   };
   nm.addEventListener('keydown',e=>{e.stopPropagation();if(e.key=='Enter')$('pssave').click()});
-  q.addEventListener('keydown',e=>e.stopPropagation());q.addEventListener('input',paintPalettes);
-  paintLooks();paintPalettes();
+  paintLooks();
 }
-export {init46,lkApplyPalette,lkNameMap};
+export {init46,lkApplyPalette};

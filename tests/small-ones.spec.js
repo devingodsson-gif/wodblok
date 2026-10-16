@@ -25,7 +25,7 @@ test('the Stamp editor has no reserved band under it; the shape controls live in
 test('the default ink in Layers shows a swatch split between the project ink and background', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'lyrs');
-  const bg = await page.evaluate(() => { const c = [...document.querySelectorAll('#ly_ink ~ .ddb .chip, .dd .ddb .chip')].map(e => e.getAttribute('style') || ''); return c.find(s => /linear-gradient/.test(s)) || ''; });
-  expect(bg).toMatch(/linear-gradient\(135deg, ?[^,]+ 50%, ?[^)]+ 50%\)/);
+  const bg = await page.evaluate(() => document.querySelector('#wl_ly .cwsb i').getAttribute('style') || '');
+  expect(bg).toMatch(/linear-gradient\(135deg, ?(rgba?\([^)]*\)|#[0-9a-f]+) 50%, ?(rgba?\([^)]*\)|#[0-9a-f]+) 50%\)/);
   expect(errors).toEqual([]);
 });

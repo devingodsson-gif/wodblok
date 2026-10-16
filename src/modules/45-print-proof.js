@@ -4,6 +4,7 @@ import {CH,CW,PL,bk,col,csk,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {pdfJpeg} from './30-print-cover.js';
+import {cwNow,fixedInUse,refLabel,slotName} from './50-tray-core.js';
 // ===== Print proof =====
 // One page to check before printing: the piece (and, for a repeat tile, the tile repeated 3 x 3), the colours with their names and
 // the book's number for the palette, the size, and the date. Letter or A4, as a PDF or a PNG. Drawn from the same picture the exports make.
@@ -11,9 +12,10 @@ const PAPERS={letter:[8.5,11],a4:[8.27,11.69]},DPI=150;
 const loadImg=url=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('The picture could not be made.'));i.src=url});
 const fit=(w,h,bw,bh)=>{const k=Math.min(bw/w,bh/h);return[w*k,h*k]};
 function colours(){
-  const p=WBS.proj,list=[['Paper',p.bg],['Ink',p.ink],['Accent',p.c3],['Accent 2',p.c4]].filter(x=>x[1]),seen=new Set(list.map(x=>x[1]));
-  const more=[];[...WBS.tiles.map(t=>t.ink),...WBS.layers.map(l=>l.ink)].forEach(n=>{if(n&&!seen.has(n)){seen.add(n);more.push(['Also used',n])}});
-  return list.concat(more).filter(x=>{try{return !!col(x[1])}catch(e){return false}});
+  // the tray in order (named by what uses it), then fixed colours in use: [role, reference, name]
+  const p=WBS.proj,out=p.ts.map((id,i)=>{const r='@'+id,role=p.bg===r?'Paper':p.ink===r?'Ink':'Tray '+(i+1);return[role,r,refLabel(r)]});
+  const seen=new Set();fixedInUse().forEach(h=>{if(!seen.has(h)){seen.add(h);out.push(['Fixed',h,h.toUpperCase()])}});
+  return out;
 }
 async function proofCanvas(paper){
   const [pw,ph]=PAPERS[paper]||PAPERS.letter,W=Math.round(pw*DPI),H=Math.round(ph*DPI),m=Math.round(W*.07);
@@ -44,14 +46,15 @@ async function proofCanvas(paper){
   // colours
   let y=top+ah+(tile?96:40);
   text('COLOURS',18,y,{w:600,c:mut});
-  const pal=WBS.proj,bi=PL.findIndex(p=>p[2]==pal.bg&&p[1]==pal.ink&&(p[3]||'')==(pal.c3||'')&&(p[4]||'')==(pal.c4||''));
+  const pal=WBS.proj,nm=pal.ts.map(id=>slotName(id)),bi=PL.findIndex(q=>{const a=[q[2],q[1],q[3],q[4]].filter(Boolean);return a.length==nm.length&&a.every((n,i)=>n===nm[i])}),cwn=pal.cw.length>1?cwNow(pal).n:'';
+  if(cwn&&bi<0)text('Colourway: '+cwn,20,y+34);
   if(bi>=0)text(`${PL[bi][0]}  ·  No. ${bi+1} in Sanzo Wada's Dictionary of Color Combinations`,20,y+34);
-  y+=bi>=0?62:30;
+  y+=bi>=0||cwn?62:30;
   const sw=Math.round((aw-3*18)/4),sh=Math.round(sw*.55);
   colours().forEach((cl,k)=>{
     const cx=m+(k%4)*(sw+18),cy=y+Math.floor(k/4)*(sh+84);
     x.fillStyle=col(cl[1]);x.fillRect(cx,cy,sw,sh);x.strokeStyle=line;x.lineWidth=2;x.strokeRect(cx,cy,sw,sh);
-    text(clip(cl[1],22,sw,{w:600}),22,cy+sh+28,{w:600,x:cx});
+    text(clip(cl[2],22,sw,{w:600}),22,cy+sh+28,{w:600,x:cx});
     text(`${cl[0]}  ·  ${col(cl[1]).toUpperCase()}`,17,cy+sh+52,{c:mut,x:cx});
   });
   // size and counts

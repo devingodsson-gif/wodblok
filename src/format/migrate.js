@@ -1,9 +1,11 @@
 // The migration chain for project files. Each step is a pure function from format n to n+1. Format numbers continue from the
 // single-file app's v:18; the zip container starts at 19. Files older than 18 are treated as 18 (the app has always read them).
 // Unknown fields are kept: every step copies the project and only touches what it names.
-const FMT_LATEST = 19;
+const FMT_LATEST = 20;
 const FMT_STEPS = {
   18: p => ({ ...p, v: 19 }),   // 18 -> 19: same content; images move out of the JSON into assets/ when packed (see container.js)
+  19: p => ({ ...p, v: 20 }),   // 19 -> 20: colours live in the tray (proj.ts / proj.cw). Colour names from older files are turned into tray colours
+                                //   by the app when it opens the project (src/modules/50-tray-core.js, trayIn): that needs the app's colour tables.
 };
 // Returns { project, newer }. A file from a newer app is returned untouched with newer:true (open read-only, never rewrite).
 function fmtMigrate(p) {
