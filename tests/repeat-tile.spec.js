@@ -84,7 +84,7 @@ for (const seed of [1, 2, 3, 4, 6]) {
     await tile(page); await roll(page);
     const p = await periodic(page);
     expect(p.half, 'the piece has something in it').toBeGreaterThan(1);
-    expect(p.right, JSON.stringify(p)).toBeLessThan(0.12 * p.half + 0.15);
+    expect(p.right, JSON.stringify(p)).toBeLessThan(0.12 * p.half + 0.25);   // 0.15 -> 0.25 in 1.9: prints are packed in smaller sheets, so their grain moves a little (about 1 of 255 on the CI renderer); a real seam is far above this
     expect(p.down, JSON.stringify(p)).toBeLessThan(0.12 * p.half + 0.15);
     const e = await exported(page);
     expect(e.colSeam, JSON.stringify(e)).toBeLessThanOrEqual(2.2 * e.colTop + 2);
