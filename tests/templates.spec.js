@@ -107,3 +107,13 @@ test('your templates: save, thumbnail, reload, rename, replace, delete, download
   await expect(page.locator('#tpy .tpc')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
+
+test('every id in the page is used once, and the template picker Close button closes it', async ({ page }) => {
+  const { errors } = await openApp(page);
+  const dup = await page.evaluate(() => { const seen = {}, d = []; document.querySelectorAll('[id]').forEach(e => { if (seen[e.id]) d.push(e.id); seen[e.id] = 1; }); return d; });
+  expect(dup).toEqual([]);
+  await openPicker(page);
+  await page.click('#tpclose');
+  await expect(page.locator('#tpdlg')).toBeHidden();
+  expect(errors).toEqual([]);
+});

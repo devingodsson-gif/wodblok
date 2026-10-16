@@ -106,7 +106,7 @@ async function tpRename(id,v){v=v.trim().slice(0,40);const a=tpIndex(),t=a.find(
 async function tpDelete(id){const st=await tpOpenStore();try{if(st)await st.doc(id).delete()}catch(e){}tpIndexSet(tpIndex().filter(x=>x.id!==id));TPS.list=tpIndex();TPS.del=null;tpPaint();pmsg('Deleted the template.')}
 function init54(){
  $('tpnew').onclick=()=>tpShow();$('tpsave').onclick=()=>tpSaveShow();
- $('tpx').onclick=tpHide;tpD().addEventListener('click',e=>{if(e.target===tpD())tpHide()});
+ $('tpclose').onclick=tpHide;tpD().addEventListener('click',e=>{if(e.target===tpD())tpHide()});
  $('tpty').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;TPS.kind=b.dataset.k;TPS.ren=TPS.del=TPS.arm=null;try{kv.set(TP_TYPE,TPS.kind)}catch(err){}tpPaint()});
  const onGrid=e=>{const c=e.target.closest('.tpc');if(!c||e.target.closest('input'))return;const id=c.dataset.id,t=TPS.list.find(x=>x.id===id);
   const more=e.target.closest('[data-more]');
