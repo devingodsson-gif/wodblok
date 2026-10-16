@@ -21,7 +21,10 @@ async function render(browser, url, fixture) {
   const { errors } = await openApp(page, { seed: 21, url });
   await openProjectFile(page, fixture);
   const shots = {};
-  const shoot = async (label, sel) => { await settle(page, { quiet: 8 }); shots[label] = (await page.locator(sel).first().screenshot()).toString('base64'); };
+  const shoot = async (label, sel) => { await settle(page, { quiet: 8 });
+    // a build before 1.9.1 cannot say when its prints are done: give it time
+    if (!(await page.evaluate(() => !!(window.__wbTest && window.__wbTest.printsBusy)))) { await page.waitForTimeout(2500); await settle(page, { quiet: 8 }); }
+    shots[label] = (await page.locator(sel).first().screenshot()).toString('base64'); };
   await shoot('pattern at Fit', '#boardP');
   await openPanel(page, 'lyrs');
   await page.locator('#lybody .lyr').last().click({ position: { x: 60, y: 10 } });

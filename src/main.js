@@ -3,7 +3,7 @@
 import {coreStr} from './modules/18-projects-and-cover-overlay.js';
 import {init01} from './modules/01-launch-and-version.js';
 import {init02} from './modules/02-draft-mode-speedups.js';
-import {init03} from './modules/03-stamp-prints-and-drawing.js';
+import {init03,BK} from './modules/03-stamp-prints-and-drawing.js';
 import {init04} from './modules/04-canvas-and-stamp-outlines.js';
 import {init05} from './modules/05-motif-data.js';
 import {init06} from './modules/06-motif-library-folders.js';
@@ -98,4 +98,4 @@ init46();
 init47();
 init48();
 init49();
-window.__wbTest = { state: () => coreStr(), kv, recoveryTick: rcTick, commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
+window.__wbTest = { state: () => coreStr(), kv, recoveryTick: rcTick, printsBusy: () => !BK.off && !!(BK.busy || BK.q.size), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
