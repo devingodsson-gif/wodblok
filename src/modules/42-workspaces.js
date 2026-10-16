@@ -35,8 +35,8 @@ function init42(){
       }else r.style.gridTemplateColumns='minmax(0,1fr)';
       list.appendChild(r);
     };
-    const h1=document.createElement('div');h1.className='wxh';h1.textContent='Starting points';list.appendChild(h1);WX_BUILTIN.forEach(w=>row(w,false));
-    if(mine.length){const h2=document.createElement('div');h2.className='wxh';h2.textContent='Yours';list.appendChild(h2);mine.forEach(w=>row(w,true))}
+    const h1=document.createElement('div');h1.className='glb';h1.textContent='Starting points';list.appendChild(h1);WX_BUILTIN.forEach(w=>row(w,false));
+    if(mine.length){const h2=document.createElement('div');h2.className='glb';h2.textContent='Yours';list.appendChild(h2);mine.forEach(w=>row(w,true))}
   }
   const apply=w=>{WBX.wbWsSet(w.layout);pmsg('Workspace “'+w.name+'”.')};
   list.addEventListener('click',e=>{

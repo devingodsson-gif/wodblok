@@ -19,15 +19,15 @@ function colours(){
 }
 async function proofCanvas(paper){
   const [pw,ph]=PAPERS[paper]||PAPERS.letter,W=Math.round(pw*DPI),H=Math.round(ph*DPI),m=Math.round(W*.07);
-  await Promise.all(['600 40px Fraunces','400 20px "Hanken Grotesk"','600 20px "Hanken Grotesk"'].map(f=>document.fonts.load(f).catch(()=>{})));
+  await Promise.all(['400 20px "Hanken Grotesk"','600 20px "Hanken Grotesk"'].map(f=>document.fonts.load(f).catch(()=>{})));
   const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
   x.fillStyle='#fff';x.fillRect(0,0,W,H);x.textBaseline='alphabetic';
-  const ink='#26221d',mut='#706858',line='#ddd5c6',serif='Fraunces, Georgia, serif',sans='"Hanken Grotesk", system-ui, sans-serif';
+  const ink='#26221d',mut='#706858',line='#ddd5c6',sans='"Hanken Grotesk", system-ui, sans-serif';
   const text=(s,px,y,o={})=>{x.font=`${o.w||400} ${px}px ${o.f||sans}`;x.fillStyle=o.c||ink;x.textAlign=o.a||'left';x.fillText(s,o.x??m,y)};
   const clip=(s,px,maxw,o={})=>{x.font=`${o.w||400} ${px}px ${o.f||sans}`;while(s.length>3&&x.measureText(s).width>maxw)s=s.slice(0,-2);return s};
   // header
   const name=($('pnm').value||'').trim()||'Untitled pattern',date=new Date().toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
-  text(clip(name,46,W-2*m,{w:600,f:serif}),46,m+34,{w:600,f:serif});
+  text(clip(name,46,W-2*m,{w:600}),46,m+34,{w:600});
   text(`Print proof  ·  ${date}  ·  WODBLOK v${WB_VER}`,20,m+70,{c:mut});
   x.strokeStyle=line;x.lineWidth=2;x.beginPath();x.moveTo(m,m+92);x.lineTo(W-m,m+92);x.stroke();
   // the picture

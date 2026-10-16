@@ -56,3 +56,7 @@ Export recipes now has four groups (Recipes, Custom export, Quick, Print proof) 
 ## 1.11.1: Template picker close button id (hotfix)
 - The picker's close button reused the id `tpx` of the repeat tile's "Exit 3 × 3 preview" pill, so it took on the pill's styling and its click handler was attached to the wrong element. It is now `tpclose`; nothing else changed.
 - Test: `tests/templates.spec.js` checks that no id appears twice on the page and that the picker's X closes it. `repeat-tile.spec.js` (UX review D11) passes again.
+
+## 1.12.0: UI standard (appearance only)
+Applies docs/style-guide.md to the page CSS: tokens, three radii (4/8/12), three font sizes (11/12.5/14), one spacing scale, two durations, one group-label style, one sans-serif font (Fraunces removed). `npm run check:style` guards sizes, radii and fonts. No behaviour changes. Not done yet (own releases): shared folder-tree component and moving every library onto it ("Yours" home folder), icon stroke weights, `#fff`/`#000` literals, saved colourways and textures libraries.
+Next: imported textures (was planned as 1.12.0; now 1.13.0).

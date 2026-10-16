@@ -9,6 +9,9 @@ const { ROOT, TARGET, APP_URL, openApp, openProjectFile, openPanel, setMode, set
 const { FIXTURES } = require('./helpers/speed');
 
 const BASE = process.env.WB_BASELINE;
+// WB_PICTURE_LAYOUT_CHANGED=1: only for a release that moves the chrome on purpose (1.12.0: the type dock is 32 high, so the stage is ~2px smaller). A board
+// picture whose size differs is then not compared; the PNG export (the artwork itself) and any board picture of equal size must still match exactly.
+const LAYOUT = process.env.WB_PICTURE_LAYOUT_CHANGED === '1';
 // WB_PICTURE_TOLERANCE=<mean difference, 0-255>: only for a release that changes how prints are packed (their grain moves a little). Unset = exactly equal.
 const TOL = +process.env.WB_PICTURE_TOLERANCE || 0;
 test.beforeEach(() => { test.skip(TARGET === 'legacy' || !BASE, 'needs WB_BASELINE=<older dist/wodblok.html> and the build as target'); });
@@ -103,6 +106,7 @@ for (const name of Object.keys(FIXTURES)) {
     for (const [label, r] of Object.entries(out)) {
       const what = `${name}: ${label}: pixels that differ (size ${JSON.stringify(r.size || [r.sizeA, r.sizeB])}, biggest step ${r.maxDelta}, mean ${r.meanDelta})`;
       const lo = LOOSE[name], tol = lo ? Math.max(TOL, lo.mean) : TOL;
+      if (LAYOUT && r.diff === -1 && !/^PNG export/.test(label)) continue;
       if (!tol || r.diff === -1) expect(r.diff, what).toBe(0);
       else { expect(r.meanDelta, what).toBeLessThanOrEqual(tol); expect(r.over48, what + ': pixels off by more than 48').toBeLessThanOrEqual(r.size[0] * r.size[1] * (lo ? lo.big : 0.001)); }
     }

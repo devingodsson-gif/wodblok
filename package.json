@@ -1,7 +1,7 @@
 {
   "name": "wodblok",
   "private": true,
-  "version": "1.11.1",
+  "version": "1.12.0",
   "description": "WODBLOK stamped-pattern editor (web app first). Phase 0: safety net around the v100 baseline.",
   "scripts": {
     "build": "node tools/build.js",
@@ -16,6 +16,7 @@
     "perf": "WB_PERF=1 playwright test --project=chromium tests/perf.spec.js",
     "typecheck": "tsc -p .",
     "check:platform": "node tools/check-platform.js",
+    "check:style": "node tools/check-style.js",
     "coupling-map": "node tools/coupling-map.js legacy/wodblok-v100.html > docs/coupling-map.md",
     "test:build": "node tools/build.js && WB_TARGET=build playwright test --project=chromium",
     "test:site": "node --test tests/site-waitlist.test.mjs",

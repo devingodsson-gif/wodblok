@@ -74,8 +74,8 @@ function init43(){
       }else e.style.gridTemplateColumns='minmax(0,1fr)';
       list.appendChild(e);
     };
-    const h1=document.createElement('div');h1.className='xrh';h1.textContent='Starting points';list.appendChild(h1);XR_BUILTIN.forEach(r=>row(r,false));
-    if(mine.length){const h2=document.createElement('div');h2.className='xrh';h2.textContent='Yours';list.appendChild(h2);mine.forEach(r=>row(r,true))}
+    const h1=document.createElement('div');h1.className='glb';h1.textContent='Starting points';list.appendChild(h1);XR_BUILTIN.forEach(r=>row(r,false));
+    if(mine.length){const h2=document.createElement('div');h2.className='glb';h2.textContent='Yours';list.appendChild(h2);mine.forEach(r=>row(r,true))}
   }
   const ways=()=>all&&WBS.proj.cw.length>1;
   async function bundle(list,tail){
