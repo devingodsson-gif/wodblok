@@ -1,0 +1,60 @@
+name: social-batch
+# Makes a batch of random designs and emails a contact sheet (tools/social, settings in tools/social/config.js).
+# The schedule lives in config.js, not here: this workflow wakes up every hour and the `gate` job (no install, a few seconds)
+# says whether this hour is the configured day and hour. Only then does the `batch` job install, build and render.
+# Run it by hand from the Actions tab (Run workflow): that skips the schedule and sends right away.
+# Secrets (Settings > Secrets and variables > Actions): RESEND_API_KEY, WB_SOCIAL_TO, WB_SOCIAL_FROM. The repo is public, so none of them is ever written in a file.
+# Budget note (docs/ci-budget-rules.md): the hourly gate is about 24 short runs a day, free while the repo is public.
+# If the repo goes private, change the cron below to the one or two hours that matter (for example '7 12,13 * * 1').
+on:
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'How many images (empty = the count in tools/social/config.js)'
+        required: false
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: social-batch
+  cancel-in-progress: false
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      due: ${{ steps.due.outputs.due }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/social
+      - id: due
+        run: node tools/social/due.js
+  batch:
+    needs: gate
+    if: ${{ needs.gate.outputs.due == 'true' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container: mcr.microsoft.com/playwright:v1.56.0-noble
+    env:
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      WB_SOCIAL_TO: ${{ secrets.WB_SOCIAL_TO }}
+      WB_SOCIAL_FROM: ${{ secrets.WB_SOCIAL_FROM }}
+      INPUT_COUNT: ${{ github.event.inputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build
+      - name: Render and send
+        run: |
+          if [ -n "$INPUT_COUNT" ]; then npm run social -- --force --count "$INPUT_COUNT"; else npm run social -- --force; fi
+      # Only when something went wrong, or on a manual run. This repo is public, so a successful scheduled batch is not left lying in the run.
+      - uses: actions/upload-artifact@v4
+        if: ${{ failure() || github.event_name == 'workflow_dispatch' }}
+        with:
+          name: social-batch
+          path: out
+          retention-days: 3
+          if-no-files-found: ignore
