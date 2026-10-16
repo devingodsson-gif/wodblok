@@ -17,7 +17,7 @@ The rulebook for how every part of the editor looks and behaves. Read it before 
 
 ## 2. How to use this guide
 
-- **Tokens, not numbers.** In CSS, write `var(--r-md)`, never `8px`; `var(--fs-m)`, never `12.5px`. The token names are defined in sections 3–8. Until the standardisation release lands (section 16), the table beside each token gives the literal value to use.
+- **Tokens, not numbers.** In CSS, write `var(--r-m)`, never `8px`; `var(--fs-m)`, never `12.5px`. The token names are defined in sections 3–8. Until the standardisation release lands (section 16), the table beside each token gives the literal value to use.
 - **Roles, not look.** Choose a component by what it is for (section 9), not by which one looks closest.
 - **No inline styles for chrome.** Colour, size, radius and font belong in CSS classes that use tokens. JavaScript may set only position and size that are computed (floating panel coordinates, the swatch colour variable `--c`).
 - **Change the guide with the code.** A pull request that adds a reusable pattern updates this document in the same commit.
@@ -63,16 +63,17 @@ Rules:
 |---|---|---|
 | `--fs-s` | 11px | Labels, hints, counts, group labels, tab text, meta |
 | `--fs-m` | 12.5px | Body, buttons, fields, list rows, menus. The base size |
-| `--fs-l` | 14px | Panel, group and dialog titles (Fraunces) |
+| `--fs-l` | 14px | Panel, group and dialog titles (600) |
 
 Brand sizes are separate and fixed: wordmark 15px, splash 20px. Nothing else uses another size.
 
-Fonts:
-- **Hanken Grotesk** for all UI text, fallback `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
-- **Fraunces** (fallback Georgia, serif) only for: the wordmark and splash; panel titles; collapsible group titles; dialog titles. Never for buttons, labels, fields or lists.
-- Both are bundled; no remote fonts, no runtime network.
+Font (one family, sans-serif only):
+- **Hanken Grotesk** for every piece of text in the app: the wordmark and splash, titles, labels, buttons, fields, lists, menus, status messages and the print proof sheet. Fallback `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
+- No serif, display or second UI face. Hierarchy comes from size, weight and case, never from a different font.
+- Exempt: the fonts the user picks for their own artwork in the Text tool (and imported fonts). They are content, not interface.
+- The font is bundled; no remote fonts, no runtime network.
 
-Weights: 400 body; 500 titles, tabs and segmented buttons; 600 emphasis, selected row text and the primary button. Nothing else (no 300, no 700).
+Weights: 400 body; 500 tabs and segmented buttons; 600 titles, emphasis, selected row text and the primary button. Nothing else (no 300, no 700).
 
 Other type rules:
 - Numbers users compare (sizes, counts, values, dimensions) MUST be tabular (`font-variant-numeric: tabular-nums`; already set on `body`).
@@ -82,20 +83,20 @@ Other type rules:
 
 ## 5. Shape
 
-Radius follows the role and size of the element, never taste.
+Three radii and a circle. Nothing else.
 
 | Token | Value | Use |
 |---|---|---|
-| `--r-xs` | 4px | Elements 20px tall or less: chips, checkboxes, tiny swatches, tags |
-| `--r-sm` | 6px | List rows, menu items, hover highlights, controls 22–28px tall, segmented buttons |
-| `--r-md` | 8px | Controls 30px and taller: buttons, fields, dropdown buttons, swatch wells, thumbnails, cards, the segmented container |
-| `--r-lg` | 12px | Surfaces that float or contain: menus, popovers, dialogs, floating panels |
+| `--r-s` | 4px | Elements 20px tall or less: chips, checkboxes, tags, small swatches, slider-like handles that are not round |
+| `--r-m` | 8px | **Everything else you can click, type in or select:** buttons, icon buttons, fields, dropdown buttons, list rows, menu items, tab highlights, segmented buttons, swatch wells, thumbnails, tiles, cards, the segmented container |
+| `--r-l` | 12px | Surfaces that float or contain: menus, popovers, dialogs, floating panels, the colour picker |
 | `50%` | circle | Dots, radio marks, round handles |
 
-- A shape nested inside another with padding MUST use outer radius minus the padding (minimum `--r-xs`): a swatch well of 8px with 3px padding holds a 5px→`--r-xs` swatch.
+- A shape nested inside a padded parent takes the next radius down: inside `--r-l` use `--r-m`; inside `--r-m` use `--r-s`. A swatch well (`--r-m`) holds a swatch at `--r-s`; the segmented container (`--r-m`) holds buttons at `--r-s`.
 - Slider and progress tracks use half their height.
-- Docked panels, panel headers, tab strips and dock edges are square (radius 0). Only floating panels use `--r-lg`.
-- Border: 1px, `--line` for dividers and cards, `--line2` for the edge of anything you click or type in. No 2px outlines except focus and selection (section 10).
+- Docked panels, panel headers, tab strips and dock edges are square (radius 0). Only floating panels use `--r-l`.
+- Border: 1px, `--line` for dividers and card borders, `--line2` for the edge of anything you click or type in. No 2px outlines except focus and selection (section 10).
+- There is no 5, 6, 7, 9, 10 or 14. If a shape seems to need one, it is one of the three above.
 
 ## 6. Size, spacing and layers
 
@@ -163,10 +164,10 @@ Each component has one definition. If a screen needs a variant, it uses the clos
 
 | Role | Looks | Use |
 |---|---|---|
-| **Primary** | `--acc` fill, `--acc-fg` text, 600, `--h-md`, `--r-md` | The one key action of a view or dialog (Save, Open, Replace). At most one per view |
-| **Secondary** | `--raise` fill, `--line2` border, 400, `--h-md`, `--r-md` | Every other text button |
+| **Primary** | `--acc` fill, `--acc-fg` text, 600, `--h-md`, `--r-m` | The one key action of a view or dialog (Save, Open, Replace). At most one per view |
+| **Secondary** | `--raise` fill, `--line2` border, 400, `--h-md`, `--r-m` | Every other text button |
 | **Quiet** | Transparent, no border, `--mut` text | Rows, headers and toolbars where a bordered button would be noisy |
-| **Icon** | Transparent until hover, `--h-md` square (`--h-sm` in a panel header, `--h-xs` in a row), `--r-md` / `--r-sm` by size | One action, no text |
+| **Icon** | Transparent until hover, `--h-md` square (`--h-sm` in a panel header, `--h-xs` in a row), `--r-m` | One action, no text |
 | **Toggle** | Secondary that stays selected: `--acc-soft` fill, `--acc` edge, `--acc-ink` text, `aria-pressed` | On/off settings |
 | **Destructive confirm** | Secondary whose label turns to the verb with `--warn` text on the first tap | Second tap does it (sections 12.6 and 12.7) |
 
@@ -186,7 +187,7 @@ One row layout for every slider: **label | track | value**, in a grid of `104px 
 
 ### 9.3 Fields
 
-- Text and number fields: `--h-md`, `--r-md`, `--field` fill, `--line2` border, `--fs-m`, padding 5 / 8. Number fields are tabular and right-aligned.
+- Text and number fields: `--h-md`, `--r-m`, `--field` fill, `--line2` border, `--fs-m`, padding 5 / 8. Number fields are tabular and right-aligned.
 - Focus shows the standard outline (section 10); no glow.
 - An invalid value shows `--warn` edge and keeps the typed text. It does not clear the field.
 - Colour fields (hex, RGB, HSB) are uppercase and tabular.
@@ -195,34 +196,34 @@ One row layout for every slider: **label | track | value**, in a grid of `104px 
 ### 9.4 Dropdowns
 
 - Native `<select>` is never shown. Use the custom dropdown (`.dd2`, which hides the native select).
-- Button: `--h-md` minimum, `--r-md`, `--field` fill, text left, chevron right that turns 180° when open.
-- List: `--r-lg`, `--raise`, `--line2` border, `--shadow`, padding 5, enters with `popin`.
-- Item: padding 6 / 9, `--r-sm`; current item `--acc-soft`, `--acc-ink`, 600; disabled item opacity .4.
+- Button: `--h-md` minimum, `--r-m`, `--field` fill, text left, chevron right that turns 180° when open.
+- List: `--r-l`, `--raise`, `--line2` border, `--shadow`, padding 5, enters with `popin`.
+- Item: padding 6 / 9, `--r-m`; current item `--acc-soft`, `--acc-ink`, 600; disabled item opacity .4.
 - Opens below the button; flips above when there is no room. Esc closes; arrow keys move; Enter picks.
 
 ### 9.5 Segmented control
 
-A row of two to four mutually exclusive options. Container `--r-md`, `--panel` fill, `--line` border, padding 2, gap 2; buttons `--r-sm`, 500; selected = `--raise` fill with `--line2` edge (or `--acc-soft` when it shows a mode of the whole app). Use it instead of a dropdown when there are four options or fewer and the choice should be visible.
+A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fill, `--line` border, padding 2, gap 2; buttons `--r-s`, 500; selected = `--raise` fill with `--line2` edge (or `--acc-soft` when it shows a mode of the whole app). Use it instead of a dropdown when there are four options or fewer and the choice should be visible.
 
 ### 9.6 Colour wells and the picker
 
-- Well (`.ccb`): 38 × 30, `--r-md`, padding 3, the swatch inside fills it and has the swatch edge. It opens the picker directly.
+- Well (`.ccb`): 38 × 30, `--r-m`, padding 3, the swatch inside fills it and has the swatch edge. It opens the picker directly.
 - Linked or locked state: the lock icon sits beside the well, `--h-md` square icon button; open lock = linked to a tray slot, closed lock = fixed. Same place on every colour control.
-- Picker (`.cpop`): 224px wide, `--r-lg`, padding 10, gap 10, `--shadow`. Saturation square 132px tall `--r-md`; hue bar 12px tall; fields below; recent colours last.
+- Picker (`.cpop`): 224px wide, `--r-l`, padding 10, gap 10, `--shadow`. Saturation square 132px tall `--r-m`; hue bar 12px tall; fields below; recent colours last.
 - Dropper is part of the picker, never a separate window.
 - Never write a one-off colour input; every colour in the app is chosen through the picker.
 
 ### 9.7 Tabs and rail
 
-- Rail buttons: `--h-touch`, icon only, `--r-md` selected highlight with `--acc-soft`.
+- Rail buttons: `--h-touch`, icon only, `--r-m` selected highlight with `--acc-soft`.
 - Panel tabs (`.wtab`): `--fs-s`, 500, `--mut`, 11px side padding, square; the active tab `--fg` with a 2px `--acc` bar on top.
 - A tool opens a panel; a panel never opens by itself at launch.
 
 ### 9.8 Swatches, thumbnails and cards
 
-- Swatch: 18–30px square, `--r-xs` (≤20px) or `--r-sm`, with the swatch edge.
-- Thumbnail: keeps the picture's aspect, `--r-md`, `--line` border. Lazy-loaded; never rendered on open.
-- Card (a thumbnail with a name): `--r-md`, `--line` border, name `--fs-m` truncated below the picture; hover `--raise`; selected `--acc` edge + `--acc-soft`.
+- Swatch: 18–30px square, `--r-s` (≤20px) or `--r-m`, with the swatch edge.
+- Thumbnail: keeps the picture's aspect, `--r-m`, `--line` border. Lazy-loaded; never rendered on open.
+- Card (a thumbnail with a name): `--r-m`, `--line` border, name `--fs-m` truncated below the picture; hover `--raise`; selected `--acc` edge + `--acc-soft`.
 
 ### 9.9 Status
 
@@ -248,9 +249,9 @@ A row of two to four mutually exclusive options. Container `--r-md`, `--panel` f
 
 ### 11.1 Panel structure
 
-- **Panel header:** min-height 40, padding 6 / 10 / 6 / 14, bottom border `--line`; title Fraunces `--fs-l` 500; header actions on the right are `--h-sm` icon buttons or one `--h-sm` quiet text button, gap 8.
+- **Panel header:** min-height 40, padding 6 / 10 / 6 / 14, bottom border `--line`; title `--fs-l` 600; header actions on the right are `--h-sm` icon buttons or one `--h-sm` quiet text button, gap 8.
 - **Body:** scrolls; inset 14 left and right.
-- **Group (`details.g`):** summary padding 10 / 14, Fraunces `--fs-l` 500, chevron left, bottom border `--line`; hover tints with `--raise`. Group content aligns to the same 14px inset.
+- **Group (`details.g`):** summary padding 10 / 14, `--fs-l` 600, chevron left, bottom border `--line`; hover tints with `--raise`. Group content aligns to the same 14px inset.
 - **Group label** (a sub-heading inside a group): section 11.2.
 - **Panel bar** (the compact bar under a header with a setting, e.g. Auto-open): padding 7 / 10, `--fs-s`, `--mut`, bottom border `--line`.
 - Panels MUST work at narrow widths: no fixed widths that overflow; labels truncate; the slider grid keeps its columns.
@@ -260,8 +261,8 @@ A row of two to four mutually exclusive options. Container `--r-md`, `--panel` f
 
 | Level | Style | Use |
 |---|---|---|
-| Panel / dialog title | Fraunces `--fs-l` 500 | Once per panel or dialog |
-| Group title | Fraunces `--fs-l` 500 in a `details.g` summary | Collapsible groups |
+| Panel / dialog title | `--fs-l`, 600 | Once per panel or dialog |
+| Group title | `--fs-l`, 600, in a `details.g` summary | Collapsible groups |
 | Group label | `--fs-s`, uppercase, `.06em`, `--faint`, padding 8 / 10 / 2 | Dividing a group inside a panel ("Showing", "All"). Libraries do not use it; their folders are rows (section 12) |
 
 There is no fourth heading. `h1`–`h6` tags are used for structure, then styled as one of these three.
@@ -313,7 +314,7 @@ Structure:
 ### 12.3 The folder row
 
 One row design for every folder, set, Home and the Hidden sets row (`.lfr`, `.lfh`):
-- Height `--h-row` (32), `--r-sm`, gap 6, padding 0 4, indented 14px per level of depth (`--d`).
+- Height `--h-row` (32), `--r-m`, gap 6, padding 0 4, indented 14px per level of depth (`--d`).
 - In order: **chevron** (13px, turns 90° open, `--t-fast`) · **icon** (closed folder, open folder, or the Home icon; hidden sets are dimmed) · **name** (truncates) · **count** (`--fs-s`, `--faint`, tabular: items inside it and every folder inside it, each counted once) · **"…" button** (always visible, `--h-xs`).
 - Hover fills the row `--raise`. The **active folder** has the `--raise` fill and a 2px `--acc` bar on its left edge; this is the selected state for every row in a tree.
 - The whole row is the target: **click opens or closes in place**; Right arrow opens, Left arrow closes (rows are focusable); right-click opens the same menu as "…".
@@ -323,7 +324,7 @@ One row design for every folder, set, Home and the Hidden sets row (`.lfr`, `.lf
 
 ### 12.4 Items
 
-- **Tiles** (shapes, stamps, textures): square (`aspect-ratio: 1`), `--r-md`, `--field` fill, `--line` border, padding 5, gap 6, in a grid indented under the folder (14px per level plus 8). The size slider sets items per row (remembered per library). The tile in use has the accent edge; select mode shows a check.
+- **Tiles** (shapes, stamps, textures): square (`aspect-ratio: 1`), `--r-m`, `--field` fill, `--line` border, padding 5, gap 6, in a grid indented under the folder (14px per level plus 8). The size slider sets items per row (remembered per library). The tile in use has the accent edge; select mode shows a check.
 - **Cards** (templates, colourways): section 9.8.
 - **Rows** (saved trays, workspaces, recipes): `--h-row`, the same anatomy as a folder row but with a swatch strip, thumbnail or name instead of the chevron.
 - Items always have an `aria-label` with their name. A tile or card never shows its name as a tooltip.
@@ -378,8 +379,8 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 ### 13.1 Dialogs
 
 - Backdrop: `rgba(10,11,14,.45)` scrim, `--z` 80, padding 30 (8 on a phone). Clicking the scrim or pressing Esc closes (unless a destructive step is mid-way).
-- Surface: `--panel`, `--line2` border, `--r-lg`, `--shadow`; width `min(<design width>, 100%)`.
-- Header: title (Fraunces `--fs-l`) left; a `--h-sm` close icon button right.
+- Surface: `--panel`, `--line2` border, `--r-l`, `--shadow`; width `min(<design width>, 100%)`.
+- Header: title (`--fs-l`, 600) left; a `--h-sm` close icon button right.
 - Body: scrolls; inset 14.
 - Footer: actions right-aligned, gap 8; **Cancel** (secondary) then the **primary** on the far right. Enter triggers the primary; Esc cancels.
 - Focus moves into the dialog on open and returns to the opener on close.
@@ -387,8 +388,8 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 
 ### 13.2 Menus
 
-- Anchored to the control that opened them. `--raise`, `--line2`, `--r-lg`, padding 5, `--shadow`, `popin`.
-- Item: `--fs-m`, about 30px tall (padding 6 / 9), `--r-sm`; icon (optional) 15px at the left; shortcut right, `--fs-s` `--faint`.
+- Anchored to the control that opened them. `--raise`, `--line2`, `--r-l`, padding 5, `--shadow`, `popin`.
+- Item: `--fs-m`, about 30px tall (padding 6 / 9), `--r-m`; icon (optional) 15px at the left; shortcut right, `--fs-s` `--faint`.
 - Divider: 1px `--line`, 4px above and below.
 - A menu item that opens a dialog ends with `…`. Disabled items stay visible at opacity .4.
 - Keyboard: arrows move, Enter picks, Esc closes and returns focus.
@@ -418,7 +419,7 @@ Counts are occurrences of a declared value in `src/shell.html` and `src/modules/
 |---|---|---|
 | Font sizes | 3 (11, 12.5, 14) | 11 (11, 11.5, 12, 12.5, 13, 13.5, 14, 15, 18, 20, 28). 11px ×58, 11.5px ×26, 12px ×27, 12.5px ×24 |
 | Font weights | 400, 500, 600 | also 300, 700, and `inherit` |
-| Radii | 4, 6, 8, 12, 50% | 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 20 plus tracks (1, 2, 3). 5px ×20, 7px ×19, 9px ×13, 10px ×7 |
+| Radii | 4, 8, 12, 50% (three, plus a circle) | 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 20 plus tracks (1, 2, 3). 5px ×20, 7px ×19, 9px ×13, 10px ×7 |
 | Control heights | 22, 26, 30, 32, 40 | 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 40, 44, 46, 54. 28px ×13, 24px ×8, 34px ×4 |
 | Same-size controls with different radii | one radius per size | 30px tall controls use 6, 7, 8 and 15 |
 | Gaps | 2, 4, 6, 8, 12, 16 | also 1, 3, 5, 7, 9, 10, 14. 9px ×8, 5px ×8 |
@@ -431,22 +432,23 @@ Counts are occurrences of a declared value in `src/shell.html` and `src/modules/
 | Templates, workspaces, export recipes | the tree | Flat list under two headings ("Starting points", "Yours"), three separate heading classes, no folders, no select mode |
 | Folder "…" button | always visible (rule 5) | Shapes library shows it only on hover, on the active row or on focus (`.lmo`); right-click is the other way in. Fix in the standardisation release |
 | Deleting | items two-tap in place; folders by the inline form | Folder delete is a form; item delete is two-tap; trays and templates use their own confirm styles |
-| Heading styles | 3 | panel title (Fraunces 14/500), group title (Fraunces 14/500), `h3` 12px/600 with a border, `h3` uppercase 11px, dialog `h2` 14/600 in the UI font |
+| Heading styles | 3 | panel title (Fraunces 14/500), group title (Fraunces 14/500), `h3` 12px/600 with a border, `h3` uppercase 11px, dialog `h2` 14/600 |
+| Fonts | 1 (Hanken Grotesk) | Fraunces (serif) in the wordmark, splash, panel and group titles and the print proof sheet; 67 KB of font file |
 | Icon stroke | one weight per size | five widths (1.7, 2.1, 2.25, 2.4, 2.6) assigned per control class |
 | Motion | 120 ms and 200 ms | .1, .12, .13, .15, .16, .2, .25, .28 s |
 | Layers | bands in section 6 | 30 distinct values, from 2 to 99999 (`.tdl` 9999, a one-off 99999) |
 | Literal colours in chrome | none | `#fff` ×69, `#000` ×33, plus one-off `#e33`, `#215`, `#176` |
 | Swatch edge | one value | `rgba(0,0,0,.18)` ×8 and `rgba(0,0,0,.2)` ×4 |
 | Disabled opacity | .4 | .4 and .5 (`.hr.fut`) |
-| Dialog titles | Fraunces `--fs-l` | UI font, 14/600 |
 | Tokens | `--r-*`, `--fs-*`, `--h-*`, `--sp-*`, `--t-*`, `--z-*` | None of these exist yet; only colour, shadow and `--tl` do |
 
 ## 16. Closing the gap (proposed release)
 
 A single "standardisation" release changes appearance only, no behaviour:
 1. Add the tokens from sections 4–8 to `:root`, with the literal values above.
-2. Replace literals with tokens file by file, mapping each old value to the nearest standard one **by role** (a 5px radius on a 22px control becomes `--r-sm`; on a 16px chip it becomes `--r-xs`).
-3. Merge `.wxh` and `.xrh` into one group-label class; give dialogs the Fraunces title.
+2. Replace literals with tokens file by file, mapping each old value to the nearest standard one **by role** (a 5px radius on a 22px control becomes `--r-m`; on a 16px chip it becomes `--r-s`).
+3. Merge `.wxh` and `.xrh` into one group-label class; one title style for panels, groups and dialogs (`--fs-l`, 600).
+3a. **Remove Fraunces:** titles, wordmark, splash and the print proof sheet move to Hanken Grotesk; delete `fraunces-latin.woff2` and its `face()` line in `tools/fonts.js`.
 3b. **Extract the folder tree** from `06-motif-library-folders.js` and `21-motif-library-ui.js` into one shared component. A library supplies only: its items, its built-in sets, its Home name, how an item is drawn (tile, card or row), what "Export" writes, and the key it saves under. Then move each library onto it: saved trays first (they have the most to gain), then stamps, templates, workspaces and recipes; textures and saved colourways are born on it. This is the biggest item in the release and can be its own release before the visual pass.
 4. Reduce icon stroke weights to the set in section 8, and layers and durations to the bands above.
 5. Add `npm run check:style`, a script that fails on a literal colour, a radius, font size, height, duration or z-index outside the scales in changed CSS. New code has to pass it.
