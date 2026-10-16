@@ -3,7 +3,7 @@
 The rulebook for how every part of the editor looks and behaves. Read it before adding or changing any UI. When a rule here and the code disagree, the rule wins and the code is a bug to fix (section 15 lists the known ones).
 
 **Scope:** the editor (`src/shell.html`, `src/modules/`). The marketing site is separate.
-**Status:** written Oct 16 2026 against 1.11.0. Sections 2–14 are the standard. Section 15 is the measured gap between that standard and the code today; closing it is a separate release (section 16).
+**Status:** written Oct 16 2026. Sections 2–14 are the standard. Release 1.12.0 applied the tokens, the three radii, three font sizes, the sans-serif font and the heading levels to the page CSS; `npm run check:style` enforces sizes, radii and fonts. Section 15 is the measurement taken on 1.11.0, before that release; what 1.12.0 did not change is listed in section 16.
 **Words:** MUST and MUST NOT are rules. SHOULD is a default you can break only with a stated reason in the pull request.
 
 ## 1. Principles
@@ -65,7 +65,7 @@ Rules:
 | `--fs-m` | 12.5px | Body, buttons, fields, list rows, menus. The base size |
 | `--fs-l` | 14px | Panel, group and dialog titles (600) |
 
-Brand sizes are separate and fixed: wordmark 15px, splash 20px. Nothing else uses another size.
+Brand sizes are separate and fixed: wordmark 15px, splash 20px. The "+" glyph of an empty slot is 18px (list) or 28px (large). Nothing else uses another size.
 
 Font (one family, sans-serif only):
 - **Hanken Grotesk** for every piece of text in the app: the wordmark and splash, titles, labels, buttons, fields, lists, menus, status messages and the print proof sheet. Fallback `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
@@ -97,6 +97,7 @@ Three radii and a circle. Nothing else.
 - Docked panels, panel headers, tab strips and dock edges are square (radius 0). Only floating panels use `--r-l`.
 - Border: 1px, `--line` for dividers and card borders, `--line2` for the edge of anything you click or type in. No 2px outlines except focus and selection (section 10).
 - There is no 5, 6, 7, 9, 10 or 14. If a shape seems to need one, it is one of the three above.
+- Exemptions: tracks of 1–3px (sliders, scrollbars) and the picture buttons listed in section 9.1. `check:style` allows these and nothing else.
 
 ## 6. Size, spacing and layers
 
@@ -105,8 +106,8 @@ Three radii and a circle. Nothing else.
 | Token | Height | Use |
 |---|---|---|
 | `--h-xs` | 22px | Compact buttons inside rows and chips that act |
-| `--h-sm` | 26px | Toolbar and panel-header icon buttons, small inline buttons |
-| `--h-md` | 30px | **Default.** Buttons, fields, dropdowns, icon buttons, swatch wells, segmented control |
+| `--h-sm` | 26px | Toolbar and panel-header icon buttons, small inline buttons, segmented control buttons |
+| `--h-md` | 30px | **Default.** Buttons, fields, dropdowns, icon buttons, swatch wells |
 | `--h-row` | 32px | List rows and folder headers |
 | `--h-touch` | 40px | Rail buttons and any new control that needs a touch target |
 
@@ -115,7 +116,7 @@ Elements under 22px are indicators (dots, chips that do not act, handles), not c
 **Spacing** (gap, margin and padding steps): 2, 4, 6, 8, 12, 16 px (`--sp-1` … `--sp-6`). 6 and 8 are the workhorses (control rows use gap 6; field groups gap 8).
 - Between control rows in a group: 6.
 - Between groups: 12.
-- Panel and group inset: 14 on the left and right, matching the header; rows inside lists use 8.
+- Panel and group inset: 12 on the left and right, matching the header; rows inside lists use 8. Spacing above 16 is a multiple of 4.
 - A control's internal horizontal padding: 8 for fields, 12 for buttons with text.
 
 **Elevation:** `--shadow` on menus, popovers, dialogs, floating panels and dragged ghosts. `--paper-shadow` on the artwork only. Docked panels, rows and cards have no shadow.
@@ -249,9 +250,9 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 
 ### 11.1 Panel structure
 
-- **Panel header:** min-height 40, padding 6 / 10 / 6 / 14, bottom border `--line`; title `--fs-l` 600; header actions on the right are `--h-sm` icon buttons or one `--h-sm` quiet text button, gap 8.
-- **Body:** scrolls; inset 14 left and right.
-- **Group (`details.g`):** summary padding 10 / 14, `--fs-l` 600, chevron left, bottom border `--line`; hover tints with `--raise`. Group content aligns to the same 14px inset.
+- **Panel header:** min-height 40, padding 6 / 12 / 6 / 12, bottom border `--line`; title `--fs-l` 600; header actions on the right are `--h-sm` icon buttons or one `--h-sm` quiet text button, gap 8.
+- **Body:** scrolls; inset 12 left and right.
+- **Group (`details.g`):** summary padding 8 / 12, `--fs-l` 600, chevron left, bottom border `--line`; hover tints with `--raise`. Group content aligns to the same 12px inset.
 - **Group label** (a sub-heading inside a group): section 11.2.
 - **Panel bar** (the compact bar under a header with a setting, e.g. Auto-open): padding 7 / 10, `--fs-s`, `--mut`, bottom border `--line`.
 - Panels MUST work at narrow widths: no fixed widths that overflow; labels truncate; the slider grid keeps its columns.
@@ -314,7 +315,7 @@ Structure:
 ### 12.3 The folder row
 
 One row design for every folder, set, Home and the Hidden sets row (`.lfr`, `.lfh`):
-- Height `--h-row` (32), `--r-m`, gap 6, padding 0 4, indented 14px per level of depth (`--d`).
+- Height `--h-row` (32), `--r-m`, gap 6, padding 0 4, indented 12px per level of depth (`--d`).
 - In order: **chevron** (13px, turns 90° open, `--t-fast`) · **icon** (closed folder, open folder, or the Home icon; hidden sets are dimmed) · **name** (truncates) · **count** (`--fs-s`, `--faint`, tabular: items inside it and every folder inside it, each counted once) · **"…" button** (always visible, `--h-xs`).
 - Hover fills the row `--raise`. The **active folder** has the `--raise` fill and a 2px `--acc` bar on its left edge; this is the selected state for every row in a tree.
 - The whole row is the target: **click opens or closes in place**; Right arrow opens, Left arrow closes (rows are focusable); right-click opens the same menu as "…".
@@ -324,7 +325,7 @@ One row design for every folder, set, Home and the Hidden sets row (`.lfr`, `.lf
 
 ### 12.4 Items
 
-- **Tiles** (shapes, stamps, textures): square (`aspect-ratio: 1`), `--r-m`, `--field` fill, `--line` border, padding 5, gap 6, in a grid indented under the folder (14px per level plus 8). The size slider sets items per row (remembered per library). The tile in use has the accent edge; select mode shows a check.
+- **Tiles** (shapes, stamps, textures): square (`aspect-ratio: 1`), `--r-m`, `--field` fill, `--line` border, padding 5, gap 6, in a grid indented under the folder (12px per level plus 8). The size slider sets items per row (remembered per library). The tile in use has the accent edge; select mode shows a check.
 - **Cards** (templates, colourways): section 9.8.
 - **Rows** (saved trays, workspaces, recipes): `--h-row`, the same anatomy as a folder row but with a swatch strip, thumbnail or name instead of the chevron.
 - Items always have an `aria-label` with their name. A tile or card never shows its name as a tooltip.
@@ -381,7 +382,7 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 - Backdrop: `rgba(10,11,14,.45)` scrim, `--z` 80, padding 30 (8 on a phone). Clicking the scrim or pressing Esc closes (unless a destructive step is mid-way).
 - Surface: `--panel`, `--line2` border, `--r-l`, `--shadow`; width `min(<design width>, 100%)`.
 - Header: title (`--fs-l`, 600) left; a `--h-sm` close icon button right.
-- Body: scrolls; inset 14.
+- Body: scrolls; inset 12.
 - Footer: actions right-aligned, gap 8; **Cancel** (secondary) then the **primary** on the far right. Enter triggers the primary; Esc cancels.
 - Focus moves into the dialog on open and returns to the opener on close.
 - A dialog asks for input or shows a library. It does not show instructions, and it does not ask yes/no questions; use two-tap instead.
@@ -442,18 +443,19 @@ Counts are occurrences of a declared value in `src/shell.html` and `src/modules/
 | Disabled opacity | .4 | .4 and .5 (`.hr.fut`) |
 | Tokens | `--r-*`, `--fs-*`, `--h-*`, `--sp-*`, `--t-*`, `--z-*` | None of these exist yet; only colour, shadow and `--tl` do |
 
-## 16. Closing the gap (proposed release)
+## 16. Closing the gap
 
-A single "standardisation" release changes appearance only, no behaviour:
-1. Add the tokens from sections 4–8 to `:root`, with the literal values above.
-2. Replace literals with tokens file by file, mapping each old value to the nearest standard one **by role** (a 5px radius on a 22px control becomes `--r-m`; on a 16px chip it becomes `--r-s`).
-3. Merge `.wxh` and `.xrh` into one group-label class; one title style for panels, groups and dialogs (`--fs-l`, 600).
-3a. **Remove Fraunces:** titles, wordmark, splash and the print proof sheet move to Hanken Grotesk; delete `fraunces-latin.woff2` and its `face()` line in `tools/fonts.js`.
-3b. **Extract the folder tree** from `06-motif-library-folders.js` and `21-motif-library-ui.js` into one shared component. A library supplies only: its items, its built-in sets, its Home name, how an item is drawn (tile, card or row), what "Export" writes, and the key it saves under. Then move each library onto it: saved trays first (they have the most to gain), then stamps, templates, workspaces and recipes; textures and saved colourways are born on it. This is the biggest item in the release and can be its own release before the visual pass.
-4. Reduce icon stroke weights to the set in section 8, and layers and durations to the bands above.
-5. Add `npm run check:style`, a script that fails on a literal colour, a radius, font size, height, duration or z-index outside the scales in changed CSS. New code has to pass it.
+**Done in 1.12.0** (appearance only, no behaviour): tokens in `:root`; font sizes, radii, spacing, durations and the group label moved onto the scales; Fraunces removed (titles, wordmark, splash and the print proof sheet are sans-serif); `.wxh` and `.xrh` merged into `.glb`; one title style; segmented buttons fixed at `--h-sm` (26); `npm run check:style` fails on a font size, radius or serif font outside the scales.
 
-Expected side effects, to be shown before anything is regenerated: small pixel shifts on controls that move one or two pixels (28 → 26 or 30; 34 → 32). Per `CLAUDE.md`, pixel goldens that change for this reason are listed and explained; state and SVG snapshots should not change at all. Full-suite importance about 60%: no logic changes, but every screen moves slightly. Run `npm run perf` as a guard.
+**Exemptions the checker allows:** brand text 15 and 20px; "+" glyphs 18 and 28px; tracks of 1–3px.
+
+**Still to do, each its own release:**
+1. **Extract the folder tree** from `06-motif-library-folders.js` and `21-motif-library-ui.js` into one shared component. A library supplies only: its items, its built-in sets, its Home name ("Yours"), how an item is drawn (tile, card or row), what "Export" writes, and the key it saves under. Then move each library onto it: saved trays first, then stamps, templates, workspaces and recipes; textures and saved colourways are born on it. Rename the shapes home folder "My imports" to "Yours", and make the folder "…" button always visible.
+2. Icon stroke weights to the set in section 8.
+3. Remove the `#fff` and `#000` literals from chrome (section 3).
+4. Extend `check:style` to heights, z-index bands and literal colours once those are clean.
+
+Side effects of 1.12.0: controls moved by one or two pixels (for example the type-dock bar is 32 high, so the stage is about 2px smaller at 1440×900). Pixel goldens that changed for this reason were listed in the release report.
 
 ## 17. New UI checklist
 

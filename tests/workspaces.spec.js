@@ -11,7 +11,7 @@ const row = (page, name) => page.locator('#wxl .wxr', { hasText: name });
 test('the starting workspaces set exactly their own arrangement (at most two groups) and the Workspaces tool closes', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'wspc');
-  await expect(page.locator('#wxl .wxh').first()).toHaveText('Starting points');
+  await expect(page.locator('#wxl .glb').first()).toHaveText('Starting points');
   await row(page, 'Colour work').click();
   await expect(page.locator('#pmsg')).toContainText('Colour work');
   const g = await groups(page);
@@ -35,7 +35,7 @@ test('save the current arrangement, set it again, rename it, keep it after a rel
   await page.fill('#wxn', 'Mine');
   await page.click('#wxsave');
   await expect(row(page, 'Mine')).toBeVisible();
-  await expect(page.locator('#wxl .wxh').nth(1)).toHaveText('Yours');
+  await expect(page.locator('#wxl .glb').nth(1)).toHaveText('Yours');
   await row(page, 'Everything closed').click();
   expect((await groups(page)).flat()).toEqual([]);
   await openPanel(page, 'wspc');

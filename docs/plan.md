@@ -52,3 +52,7 @@ Export recipes now has four groups (Recipes, Custom export, Quick, Print proof) 
 - **Yours**: stored in the browser through the platform (`collection('templates')` for the bytes, kv `wb111_templates` for the list with a small thumbnail). Rename, Download, Delete (two-tap), Replace on the same name, Add from file (newer formats refused).
 - **Built-ins** are made by `npm run templates` from `tools/templates/recipes.js` (drives the built app, built-in shapes and plain colours only) into `src/templates/<kind>/*.wodblok` and `src/data/templates.js`. The stored files drop their own thumbnail (the list holds it). Files total about 1.5 MB (art image per file), which the build carries as base64 (about 2.2 MB).
 - Tests: `tests/templates.spec.js`; `save-project.spec.js` File menu list updated.
+
+## 1.12.0: UI standard (appearance only)
+Applies docs/style-guide.md to the page CSS: tokens, three radii (4/8/12), three font sizes (11/12.5/14), one spacing scale, two durations, one group-label style, one sans-serif font (Fraunces removed). `npm run check:style` guards sizes, radii and fonts. No behaviour changes. Not done yet (own releases): shared folder-tree component and moving every library onto it ("Yours" home folder), icon stroke weights, `#fff`/`#000` literals, saved colourways and textures libraries.
+Next: imported textures (was planned as 1.12.0; now 1.13.0).

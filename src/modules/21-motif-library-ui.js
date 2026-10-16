@@ -101,7 +101,7 @@ const br=WBS.brush&&!WBS.lsm?WBS.brush.m:'';
 const sig=[c.v,WBS.lsm,[...lsel].join(','),pa,pb,lbHidOpen,[...lbOpen].join('|'),WBS.fmode,JSON.stringify(REN),WBS.HID.join(','),WBS.FOLD.join('|'),JSON.stringify(BF),Object.keys(cust).map(k=>{const v=cust[k]||{};return k+'>'+(v.g||'')+(v.svg||'').length+(v.n||'')}).join(',')].join('#');
 if(!force&&sig===lbSig){if(br!==lbBr){lbBr=br;L.querySelectorAll('button[data-m].on').forEach(b=>b.classList.remove('on'));if(br)L.querySelectorAll(`button[data-m="${br}"]`).forEach(b=>b.classList.add('on'))}return}
 lbSig=sig;lbBr=br;
-const tile=k=>{const on=lsel.has(k),b=`<button data-m="${k}" class="${br==k?'on':''}${on?' pk':''}" aria-label="${hx(mNm(k))}"><svg viewBox="-50 -50 100 100" style="background:${pa};border-radius:4px">${mk(k,pb,pa)}</svg></button>`;
+const tile=k=>{const on=lsel.has(k),b=`<button data-m="${k}" class="${br==k?'on':''}${on?' pk':''}" aria-label="${hx(mNm(k))}"><svg viewBox="-50 -50 100 100" style="background:${pa};border-radius:var(--r-s)">${mk(k,pb,pa)}</svg></button>`;
 return`<div>${b}${on?`<i class="ck">${IC.ck}</i>`:''}${k[0]=='b'||WBS.lsm?'':`<button class="dx" data-x="${k}" aria-label="Remove from library">&#215;</button>`}</div>`};
 const out=[],vis=new Set();
 const walk=(n,d)=>{const open=lbOpen.has(n.v),kids=open?lbKids(n):[];
