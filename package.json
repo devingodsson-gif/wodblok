@@ -20,7 +20,8 @@
     "coupling-map": "node tools/coupling-map.js legacy/wodblok-v100.html > docs/coupling-map.md",
     "test:build": "node tools/build.js && WB_TARGET=build playwright test --project=chromium",
     "test:site": "node --test tests/site-waitlist.test.mjs",
-    "templates": "node tools/build.js && WB_MAKE_TEMPLATES=1 WB_TARGET=build WB_PIXELS=0 playwright test --project=chromium tests/make-templates.spec.js && node tools/build.js"
+    "templates": "node tools/build.js && WB_MAKE_TEMPLATES=1 WB_TARGET=build WB_PIXELS=0 playwright test --project=chromium tests/make-templates.spec.js && node tools/build.js",
+    "social": "node tools/social/run.js"
   },
   "devDependencies": {
     "@playwright/test": "1.56.0",

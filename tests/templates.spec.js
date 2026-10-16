@@ -108,12 +108,17 @@ test('your templates: save, thumbnail, reload, rename, replace, delete, download
   expect(errors).toEqual([]);
 });
 
-test('every id in the page is used once, and the template picker Close button closes it', async ({ page }) => {
+// 1.11.1: the picker's close button shared its id (tpx) with the repeat tile's "Exit 3 x 3 preview" pill, so the pill's styling
+// and the repeat-tile test's lookups hit both, and the picker's own X was wired to the wrong element.
+test('no id appears twice on the page, and the picker\'s own X closes it and is a plain icon button', async ({ page }) => {
   const { errors } = await openApp(page);
-  const dup = await page.evaluate(() => { const seen = {}, d = []; document.querySelectorAll('[id]').forEach(e => { if (seen[e.id]) d.push(e.id); seen[e.id] = 1; }); return d; });
-  expect(dup).toEqual([]);
+  const twice = await page.evaluate(() => { const n = {}; document.querySelectorAll('[id]').forEach(e => { n[e.id] = (n[e.id] || 0) + 1; }); return Object.keys(n).filter(k => n[k] > 1); });
+  expect(twice).toEqual([]);
   await openPicker(page);
+  const pos = await page.evaluate(() => getComputedStyle(document.getElementById('tpclose')).position);
+  expect(pos).not.toBe('absolute');                           // it was floating like the Exit 3 x 3 pill
   await page.click('#tpclose');
   await expect(page.locator('#tpdlg')).toBeHidden();
+  await expect(page.locator('#tpx')).toBeHidden();             // the repeat tile's pill is one element and still hidden
   expect(errors).toEqual([]);
 });
