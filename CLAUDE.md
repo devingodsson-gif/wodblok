@@ -8,6 +8,7 @@ Source of truth for the app is src/: ES modules in src/modules (order in manifes
 ## Never break (what the app must always be)
 - No explanatory text or tooltips in panels. No tool windows open at launch. Launch in Pattern mode, fully cleared.
 - No brush masks.
+- UI follows docs/style-guide.md (tokens and scales, one component per role, and one folder tree for every library). Do not invent a size, radius, colour, duration or list design; if the scale lacks something, ask and change the guide first.
 - Speed first: run `npm run perf` before committing anything that touches drawing, dragging or sliders. No perf regression over 10%.
 - Old .wodblok.json files (format v:18 and earlier) must always open; never overwrite a file on first open of an older format.
 - Platform access only through src/platform/. User actions are commands in the registry. The document is plain data with stable ids. No runtime network; fonts bundled. Pointer events; nothing hover-only in new code. No alert/confirm/prompt.
