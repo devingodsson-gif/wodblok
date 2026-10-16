@@ -12,9 +12,34 @@ on:
   workflow_dispatch:
     inputs:
       count:
-        description: 'How many images (empty = the count in tools/social/config.js)'
+        description: 'How many images (empty = the count in config.js)'
         required: false
         default: ''
+      size:
+        description: 'Picture size in pixels, square, 256 to 4096 (empty = config.js)'
+        required: false
+        default: ''
+      palette:
+        description: 'Palette name from config.js, e.g. marigold (empty = any)'
+        required: false
+        default: ''
+      colours:
+        description: 'Your own colours, paper first then ink, 2 to 4, e.g. #f6f1e7 #14213d #fca311 (beats palette and mood)'
+        required: false
+        default: ''
+      mood:
+        description: 'Palettes by paper brightness'
+        type: choice
+        options: [any, light, dark]
+        default: any
+      seeds:
+        description: 'Re-render exact picks: seeds from a manifest, comma separated (ignores count)'
+        required: false
+        default: ''
+      test_run:
+        description: 'Test run: make the pictures but do not send the email'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -43,13 +68,28 @@ jobs:
       WB_SOCIAL_TO: ${{ secrets.WB_SOCIAL_TO }}
       WB_SOCIAL_FROM: ${{ secrets.WB_SOCIAL_FROM }}
       INPUT_COUNT: ${{ github.event.inputs.count }}
+      INPUT_SIZE: ${{ github.event.inputs.size }}
+      INPUT_PALETTE: ${{ github.event.inputs.palette }}
+      INPUT_COLOURS: ${{ github.event.inputs.colours }}
+      INPUT_MOOD: ${{ github.event.inputs.mood }}
+      INPUT_SEEDS: ${{ github.event.inputs.seeds }}
+      INPUT_TEST: ${{ github.event.inputs.test_run }}
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
       - run: npm run build
       - name: Render and send
+        # The typed values reach the script only as environment variables (never pasted into the shell line), and the script checks every one.
         run: |
-          if [ -n "$INPUT_COUNT" ]; then npm run social -- --force --count "$INPUT_COUNT"; else npm run social -- --force; fi
+          args=()
+          if [ "$INPUT_TEST" = "true" ]; then args+=(--dry); else args+=(--force); fi
+          [ -n "$INPUT_COUNT" ] && args+=(--count "$INPUT_COUNT")
+          [ -n "$INPUT_SIZE" ] && args+=(--size "$INPUT_SIZE")
+          [ -n "$INPUT_PALETTE" ] && args+=(--palette "$INPUT_PALETTE")
+          [ -n "$INPUT_COLOURS" ] && args+=(--colours "$INPUT_COLOURS")
+          [ -n "$INPUT_MOOD" ] && args+=(--mood "$INPUT_MOOD")
+          [ -n "$INPUT_SEEDS" ] && args+=(--seeds "$INPUT_SEEDS")
+          npm run social -- "${args[@]}"
       # Only when something went wrong, or on a manual run. This repo is public, so a successful scheduled batch is not left lying in the run.
       - uses: actions/upload-artifact@v4
         if: ${{ failure() || github.event_name == 'workflow_dispatch' }}

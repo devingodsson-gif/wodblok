@@ -10,6 +10,7 @@ const { isDue, isoWeek } = require('../tools/social/due');
 const { parseArgs } = require('../tools/social/run');
 const { checkRoll, strayColours, seedFor } = require('../tools/social/render');
 const { buildEmail, sendEmail } = require('../tools/social/email');
+const { resolveChoices, parseColours } = require('../tools/social/choices');
 
 const ROOT = path.resolve(__dirname, '..');
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -168,6 +169,41 @@ test.describe('email', () => {
   });
 });
 
+test.describe('run choices', () => {
+  test('a palette name narrows the pool, and an unknown name lists the valid ones', () => {
+    const cfg = validate(base());
+    expect(resolveChoices(cfg, { palette: 'Marigold' }).pool.map(p => p.name)).toEqual(['marigold']);
+    expect(resolveChoices(cfg, {}).pool).toHaveLength(cfg.roll.palettes.length);
+    expect(() => resolveChoices(cfg, { palette: 'wada' })).toThrow(/not in config.js. Names: parchment, sage/);
+  });
+  test('mood splits the palettes by paper brightness', () => {
+    const cfg = validate(base());
+    const light = resolveChoices(cfg, { mood: 'light' }).pool, dark = resolveChoices(cfg, { mood: 'dark' }).pool;
+    expect(light.length + dark.length).toBe(cfg.roll.palettes.length);
+    expect(dark.map(p => p.name)).toEqual(expect.arrayContaining(['midnight', 'ink']));
+    expect(light.map(p => p.name)).not.toContain('midnight');
+    expect(() => resolveChoices(cfg, { mood: 'warm' })).toThrow(/mood "warm"/);
+  });
+  test('your own colours: forgiving to type, strict about readability', () => {
+    expect(parseColours('F6F1E7, 14213d  #fca311')).toEqual(['#f6f1e7', '#14213d', '#fca311']);
+    expect(() => parseColours('#f6f1e7')).toThrow(/2 to 4/);
+    expect(() => parseColours('#f6f1e7 #zzzzzz')).toThrow(/not a hex colour/);
+    expect(() => parseColours('#f6f1e7 #f6f1e7')).toThrow(/must differ/);
+    expect(() => parseColours('#f6f1e7 #eeeeee')).toThrow(/too close to read/);
+    const cfg = validate(base());
+    expect(resolveChoices(cfg, { colours: '#fff8e7 #222222', palette: 'sage', mood: 'dark' }).pool).toEqual([{ name: 'custom', colours: ['#fff8e7', '#222222'] }]);
+  });
+  test('palette names in the settings must match the palettes', () => {
+    rejects(c => { c.roll.paletteNames.pop(); }, /one name for each palette/);
+    rejects(c => { c.roll.paletteNames[1] = c.roll.paletteNames[0]; }, /repeated name/);
+    rejects(c => { c.roll.paletteNames[0] = 'Bad Name'; }, /lowercase/);
+  });
+  test('the command line takes the new options', () => {
+    const a = parseArgs(['--dry', '--palette', 'sage', '--mood', 'dark', '--colours', '#fff #000']);
+    expect(a).toMatchObject({ dry: true, palette: 'sage', mood: 'dark', colours: '#fff #000' });
+  });
+});
+
 test.describe('dry run of the real thing', () => {
   const dist = path.join(ROOT, 'dist', 'wodblok.html');
   test.skip(!fs.existsSync(dist), 'run `npm run build` first');
@@ -191,6 +227,16 @@ test.describe('dry run of the real thing', () => {
     }
     expect(fs.statSync(path.join(out, 'contact-sheet.jpg')).size).toBeGreaterThan(5000);
     expect(new Set(m.images.map(i => i.seed)).size).toBe(3);
+    fs.rmSync(out, { recursive: true });
+  });
+
+  test('your own colours show up in every picture', () => {
+    const out = fs.mkdtempSync(path.join(os.tmpdir(), 'wb-social-opt-'));
+    run(['--count', '2', '--size', '512', '--colours', '#f6f1e7 #14213d #fca311'], out);
+    const m = JSON.parse(fs.readFileSync(path.join(out, 'manifest.json'), 'utf8'));
+    expect(m.got).toBe(2);
+    expect(m.choice).toMatchObject({ mood: 'any', palettes: ['custom'] });
+    for (const im of m.images) { expect(im.palette).toEqual(['#f6f1e7', '#14213d', '#fca311']); expect(im.paletteName).toBe('custom'); }
     fs.rmSync(out, { recursive: true });
   });
 

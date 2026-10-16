@@ -3,6 +3,7 @@
 //   npm run social -- --dry --count 2       a small test batch
 //   npm run social -- --force               render and send now, ignoring the schedule
 //   npm run social                          render and send only when the schedule in config.js says it is time
+//   npm run social -- --dry --palette marigold --mood dark --colours "#f6f1e7 #14213d #fca311"   narrow one run (see docs/social-batch.md)
 //   npm run social -- --dry --seeds 20261019101,20261019102 [--size 2048]    re-render exact picks from a manifest
 // Settings live in tools/social/config.js. The email key and addresses come from RESEND_API_KEY, WB_SOCIAL_TO and WB_SOCIAL_FROM.
 const path = require('path');
@@ -10,7 +11,7 @@ const { validate } = require('./validate');
 const { isDue } = require('./due');
 
 function parseArgs(argv) {
-  const a = { dry: false, force: false, count: null, seeds: null, size: null, out: null };
+  const a = { dry: false, force: false, count: null, seeds: null, size: null, out: null, palette: null, colours: null, mood: null };
   const need = (i, name) => { if (argv[i + 1] === undefined) throw new Error(`${name} needs a value`); return argv[i + 1]; };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
@@ -19,6 +20,9 @@ function parseArgs(argv) {
     else if (k === '--count') a.count = +need(i++, k);
     else if (k === '--size') a.size = +need(i++, k);
     else if (k === '--out') a.out = need(i++, k);
+    else if (k === '--palette') a.palette = need(i++, k);
+    else if (k === '--colours') a.colours = need(i++, k);
+    else if (k === '--mood') a.mood = need(i++, k);
     else if (k === '--seeds') a.seeds = need(i++, k).split(',').map(Number);
     else throw new Error(`unknown option ${k}`);
   }
@@ -35,6 +39,7 @@ async function main() {
   const { renderBatch, utcDate } = require('./render');
   const batch = await renderBatch(cfg, {
     count: args.count, seeds: args.seeds, size: args.size,
+    choice: { palette: args.palette, colours: args.colours, mood: args.mood },
     outDir: args.out ? path.resolve(args.out) : null, log: s => console.log(s),
   });
   const n = batch.items.length;
