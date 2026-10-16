@@ -17,7 +17,7 @@ function buildEmail(cfg, batch, date) {
     attachments.push({ filename: it.file, content: b, content_type: 'image/png' });
     used += b.length; full++;
   }
-  const lines = batch.items.map(it => `${it.n}. seed ${it.seed}, palette ${it.paletteName ? it.paletteName + ' ' : ''}${it.palette.join(' ')}`);
+  const lines = batch.items.map(it => `${it.n}. seed ${it.seed}, palette ${it.palette.join(' ')}`);
   const note = full === batch.items.length ? `All ${full} full-size PNGs are attached.`
     : `Only ${full} of ${batch.items.length} full-size PNGs fit in the email. Re-render any pick at full size from its seed (see manifest.json in the run, or the command below).`;
   const text = [

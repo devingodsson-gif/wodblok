@@ -46,11 +46,6 @@ function validate(cfg, { needEmail = false } = {}) {
     for (const c of p) if (!HEX.test(c)) fail(`roll.palettes[${i}] has "${c}"; write colours like #1f2a44`);
     if (p[0].toLowerCase() === p[1].toLowerCase()) fail(`roll.palettes[${i}]: paper and ink (the first two colours) must differ`);
   });
-  if (r.paletteNames !== undefined) {
-    if (!Array.isArray(r.paletteNames) || r.paletteNames.length !== r.palettes.length) fail('roll.paletteNames needs one name for each palette');
-    r.paletteNames.forEach(n => { if (!/^[a-z0-9-]+$/.test(n)) fail(`roll.paletteNames has "${n}"; use lowercase letters, numbers and dashes`); });
-    if (new Set(r.paletteNames).size !== r.paletteNames.length) fail('roll.paletteNames has a repeated name');
-  }
   if (!Array.isArray(r.layouts) || !r.layouts.length) fail('roll.layouts needs at least one layout');
   for (const l of r.layouts) if (!(l in LAYOUTS)) fail(`roll.layouts has "${l}"; use ${Object.keys(LAYOUTS).join(' ')}`);
   if (!Array.isArray(r.layers) || r.layers.length !== 2) fail('roll.layers must be [min, max]');

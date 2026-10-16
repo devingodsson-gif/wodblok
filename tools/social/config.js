@@ -26,7 +26,6 @@ module.exports = {
     // Left out or 0 means off. Colours are never rolled here: the palettes below decide them (Randomize's own colours come from the Wada sets).
     features: { stamps: 100, layout: 100 },
     // Plain colour sets (hex), paper first, then ink, then accents. Every design uses exactly one set. Add your own; 2 to 4 colours each.
-    // paletteNames (same order) are what you type in the Run workflow "palette" box.
     palettes: [
       ['#f4ecd8', '#23395b', '#d1603d', '#e8b04a'],
       ['#e9efe6', '#2f4f3e', '#c2553f', '#d9b86c'],
@@ -37,7 +36,6 @@ module.exports = {
       ['#dfe7ea', '#1b4965', '#e29578'],
       ['#2b2d42', '#edf2f4', '#ef233c'],
     ],
-    paletteNames: ['parchment', 'sage', 'midnight', 'marigold', 'terracotta', 'poppy', 'harbour', 'ink'],
     // Keep a roll only if it passes; otherwise the next seed is tried (up to maxAttempts per image).
     layouts: ['auto', 'grid', 'brick', 'halfdrop', 'hex'],   // allowed grid layouts of the layers
     layers: [1, 3],                  // allowed number of layers [min, max]
