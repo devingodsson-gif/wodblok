@@ -26,7 +26,7 @@ test('the top bar has Save project but no Export; the File menu has only project
   await expect(page.locator('#expb')).toHaveCount(0);
   await expect(page.locator('#psv')).toHaveText('Save project');
   await page.click('#fileb');
-  await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'Clear canvas', 'Open project…']);
+  await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save as template…']);
   await page.keyboard.press('Escape');
   await openPanel(page, 'xrec');
   for (const id of ['png', 'sv', 'cpy', 'xrnow']) await expect(page.locator('#' + id)).toBeVisible();

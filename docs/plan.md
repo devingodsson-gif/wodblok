@@ -44,3 +44,11 @@ Speed work from the Oct 15 audit (`docs/known-issues.md` lists the two old quirk
 
 ### 1.10.0 follow-up: Export recipes regrouped
 Export recipes now has four groups (Recipes, Custom export, Quick, Print proof) and a Colourways switch at the top (Showing / All, only when there is more than one colourway). "All" makes every export once per colourway in one zip, each file named after its colourway. The export block left the Colourways tool; its Export… button opens Export recipes with All chosen.
+
+## 1.11.0: Templates
+- **A template is a saved project** (.wodblok, format 20; no format change). Its kind comes from the project: book cover on → Book, repeat tile (`dim.rt`) → Repeating pattern, else Normal canvas.
+- **File menu**: New project, New from template…, Clear, Open…, Save as template… (commands `template.new`, `template.save`). Launch is unchanged.
+- **Picker** (`54-templates.js`): three kinds (remembered), Starting points (Blank first, then 3 built-ins per kind) and Yours. Opening works like New project (two-tap when there is unsaved work), goes through `openData`, leaves no file link, no name, the unsaved dot off, history reset.
+- **Yours**: stored in the browser through the platform (`collection('templates')` for the bytes, kv `wb111_templates` for the list with a small thumbnail). Rename, Download, Delete (two-tap), Replace on the same name, Add from file (newer formats refused).
+- **Built-ins** are made by `npm run templates` from `tools/templates/recipes.js` (drives the built app, built-in shapes and plain colours only) into `src/templates/<kind>/*.wodblok` and `src/data/templates.js`. The stored files drop their own thumbnail (the list holds it). Files total about 1.5 MB (art image per file), which the build carries as base64 (about 2.2 MB).
+- Tests: `tests/templates.spec.js`; `save-project.spec.js` File menu list updated.

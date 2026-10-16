@@ -413,6 +413,10 @@ select{appearance:none;-webkit-appearance:none;padding-right:26px;background-ima
 input[type=number]{-moz-appearance:textfield;text-align:right;font-variant-numeric:tabular-nums;padding:4px 6px}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .board.off{position:absolute;left:-20000px;top:0;width:40px;height:40px;overflow:hidden;pointer-events:none;flex:none}
+.tpd{width:min(820px,100%)}.tpd .seg{margin-bottom:6px}.tpd .xrh{padding:14px 2px 6px}.tpd .pgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.tpc{cursor:pointer;position:relative}.tpc:hover,.tpc:focus-visible{border-color:var(--line2);outline:none}.tpc:focus-visible{box-shadow:0 0 0 2px var(--acc-soft);border-color:var(--acc)}.tpc.sure{border-color:var(--acc)}.tpc.sure b{color:var(--acc-ink)}
+.tpc img,.tpc .nt{aspect-ratio:3/4}.tpc .nt svg{width:42%;height:auto}.tpm{display:flex;align-items:center;gap:4px;min-height:26px}.tpm b{flex:1;min-width:0}.tpm input{flex:1;min-width:0;height:26px}.tpm .ib{width:26px;height:26px;flex:none}.tpc .row{margin-top:0}
+.tpsd{width:min(380px,100%)}.tpsd .dlg-b{display:flex;flex-direction:column;gap:12px}.tpsd .row{gap:8px}
 .pgrid .hint{grid-column:1/-1;margin:20px 0;text-align:center}
 .status .it{display:inline-flex;gap:5px}.status .it b{font-weight:500;color:var(--fg)}
 
@@ -826,9 +830,11 @@ body.eyedrop{cursor:crosshair}
  <div class="menu"><button class="ghost" id="fileb" aria-haspopup="true">File</button>
   <div class="pop r" id="filem" hidden>
    <button id="pnw"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8l4.5 4.5v12.5H6z"/><path d="M14 3.5V8h4.5"/></svg>New project</button>
+   <button id="tpnew"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>New from template…</button>
    <button id="clr" title="Start from a blank stamp with default settings (Ctrl+Z to go back)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19.5h11"/><path d="M4.6 14.4l8.3-8.3a2 2 0 012.8 0l3 3a2 2 0 010 2.8L11 19.5H7.4l-2.8-2.8a2 2 0 010-2.8z"/><path d="M9.2 9.8l5 5"/></svg>Clear canvas</button>
    <hr>
    <label id="pop" for="pfile" class="mi" role="button" tabindex="0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/></svg>Open project…</label>
+   <button id="tpsave"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg>Save as template…</button>
   </div>
   <input type="file" id="pfile" class="vh" accept=".wodblok,.json,application/json,application/zip,text/plain" tabindex="-1">
  </div>
@@ -1459,6 +1465,19 @@ body.eyedrop{cursor:crosshair}
   </div>
  </div></div>
  <div class="dlg-f ifoot"><span id="iinfo"></span><button class="alt" id="icl">Cancel</button><button class="primary" id="iadd">Add shape</button></div>
+</div></div>
+<div class="modal" id="tpdlg" hidden><div class="dlg tpd" role="dialog" aria-modal="true" aria-labelledby="tpt">
+ <div class="dlg-h"><h2 id="tpt">New from template</h2><button type="button" class="alt" id="tpadd">Add from file</button><button class="ib" id="tpx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-b">
+  <div class="seg" id="tpty" role="group" aria-label="Kind"><button type="button" data-k="canvas">Normal canvas</button><button type="button" data-k="tile">Repeating pattern</button><button type="button" data-k="book">Book</button></div>
+  <div class="xrh">Starting points</div><div class="pgrid" id="tpg" role="list"></div>
+  <div class="xrh" id="tpyh" hidden>Yours</div><div class="pgrid" id="tpy" role="list" hidden></div>
+  <input type="file" id="tpfile" class="vh" accept=".wodblok,.json,application/json,application/zip" tabindex="-1">
+ </div>
+</div></div>
+<div class="modal" id="tpsd" hidden><div class="dlg tpsd" role="dialog" aria-modal="true" aria-labelledby="tpst">
+ <div class="dlg-h"><h2 id="tpst">Save as template</h2><button class="ib" id="tpsx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-b"><input type="text" id="tpsn" maxlength="40" aria-label="Template name" placeholder="Template name"><div class="row"><button type="button" class="primary" id="tpsok">Save</button><button type="button" class="alt" id="tpscx">Cancel</button></div></div>
 </div></div>
 <div class="modal" id="plist" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="pdlgt">
  <div class="dlg-h"><h2 id="pdlgt">Projects</h2><button class="alt" id="pnw2">New project</button><button class="alt" id="pcf">Close folder</button><button class="ib" id="pclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>

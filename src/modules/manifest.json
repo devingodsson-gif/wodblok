@@ -50,5 +50,6 @@
  "50-tray-core.js",
  "51-colour-picker.js",
  "52-tray-ui.js",
- "53-colourways.js"
+ "53-colourways.js",
+ "54-templates.js"
 ]
