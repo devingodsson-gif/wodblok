@@ -23,6 +23,7 @@ const thumbPng=url=>new Promise(res=>{if(!url)return res(null);const img=new Ima
 const snapsOf=id=>{try{const a=JSON.parse(kv.get('wb95_sn_'+(id||'draft'))||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}};
 // The file this project was opened from or last saved to (browsers that can write back to a file). Not part of the document.
 let link=null;
+const fileUnlink=()=>{link=null};   // a new project from a template is not tied to a file
 // A project is written back into its file only while its name is the one it had when the file was opened or saved: rename it and it becomes a new file.
 const linkOf=(id,name)=>link&&link.id==(id||null)&&link.name===name?link.handle:null;
 async function dl(name,data,thumbUrl,id){const d=await use('downloads');if(!d){pmsg('Saving is not available here.');return false}
@@ -77,4 +78,4 @@ $('pgrid').onclick=async e=>{const c=e.target.closest('[data-p]');if(!c)return;c
 try{confirm2(b,'Discard changes?',async()=>{const f=await it.handle.getFile();await openFile(f,it.handle);closeList()})}catch(err){pmsg('Something went wrong: '+((err&&err.message)||'unknown error'))}};
 WBS.tiles.forEach(shOf);migLayers();migEdges();migInk();store();WBH.draw();build();
 }
-export {clearAll,renderPL,init33};
+export {clearAll,fileUnlink,renderPL,thumbPng,init33};

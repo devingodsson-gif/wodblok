@@ -51,6 +51,7 @@ import {init49} from './modules/49-motif-export.js';
 import {init51} from './modules/51-colour-picker.js';
 import {init52} from './modules/52-tray-ui.js';
 import {init53} from './modules/53-colourways.js';
+import {init54} from './modules/54-templates.js';
 import {kv} from './platform/index.js';
 import {cmdConflicts,cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdList,cmdRun} from './commands/registry.js';
 
@@ -104,4 +105,5 @@ init49();
 init51();
 init52();
 init53();
+init54();
 window.__wbTest = { state: () => coreStr(), kv, recoveryTick: rcTick, printsBusy: () => !BK.off && !!(BK.busy || BK.q.size), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
