@@ -1,17 +1,18 @@
 #!/usr/bin/env node
-// Renders the app icons from the brand mark (rounded square with a turned square) into src/web/. Run when the mark changes:
+// Renders the app icons from the brand mark (the WB letters on a bronze rounded square) into src/web/. Run when the mark changes:
 // node tools/make-icons.js   (needs the Playwright Chromium that the tests use). The PNGs are committed.
 const path = require('path'), fs = require('fs');
 const { chromium } = require('@playwright/test');
 const OUT = path.join(__dirname, '..', 'src', 'web');
 const BG = '#1b1a18', ACC = '#c9a66b';
 // full-bleed square for iOS and "maskable" (the system rounds it; the mark stays inside the central 80%), rounded for the others
+const { PATH } = require('./brand-mark');
 const svg = (size, kind) => {
   const k = size / 24;
   const rr = kind === 'rounded' ? `<rect x="${2.5 * k}" y="${2.5 * k}" width="${19 * k}" height="${19 * k}" rx="${5.5 * k}" fill="${ACC}"/>` : '';
-  const m = kind === 'rounded' ? 1 : 0.95, c = 12 * k;
+  const m = kind === 'rounded' ? 1 : 1.13; // the mark is 15 of 24 units wide; larger on full-bleed icons (17 of 24, inside the 80% safe zone)
   const full = kind === 'rounded' ? '' : `<rect width="${size}" height="${size}" fill="${ACC}"/>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${full}${rr}<rect x="${c - 3.4 * k * m}" y="${c - 3.4 * k * m}" width="${6.8 * k * m}" height="${6.8 * k * m}" rx="${1 * k * m}" transform="rotate(45 ${c} ${c})" fill="none" stroke="${BG}" stroke-width="${2 * k * m}"/></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${full}${rr}<path transform="scale(${k}) translate(12 12) scale(${m}) translate(-12 -12)" fill="${BG}" d="${PATH}"/></svg>`;
 };
 (async () => {
   const b = await chromium.launch(), p = await b.newPage();

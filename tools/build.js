@@ -57,7 +57,7 @@ const shell = fs.readFileSync(path.join(ROOT, 'src', 'shell.html'), 'utf8');
 const marker = '/*@@MAIN@@*/';
 if (shell.split(marker).length !== 2) throw new Error('shell.html must contain exactly one ' + marker);
 fs.mkdirSync(path.dirname(out), { recursive: true });
-const WEBHEAD = WEB ? '<link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#1b1a18"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="WODBLOK">' : '';
+const WEBHEAD = WEB ? '<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#1b1a18"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="WODBLOK">' : '';
 fs.writeFileSync(out, shell.replace('<!--@@WEBHEAD@@-->', () => WEBHEAD).replace('/*@@FONTS@@*/', () => require('./fonts')()).replace(marker, () => body).replace(/<title>Wodblok v[\d.]+<\/title>/, '<title>Wodblok v' + VER + '</title>'));
 console.log('version', VER, 'built', BUILT);
 console.log('built', path.relative(ROOT, out), fs.statSync(out).size, 'bytes from', manifest.length, 'modules + main.js');
