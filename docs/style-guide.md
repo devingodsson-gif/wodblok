@@ -1,142 +1,484 @@
-# Wodblok Application Style Guide
+# WODBLOK UI Standard
 
-**Scope:** The editor in `src/`, especially `src/shell.html` and `src/modules/`. The marketing site is a separate surface. This guide records the existing editor styling and gives future contributors rules for extending it without incidental redesign.
+The rulebook for how every part of the editor looks and behaves. Read it before adding or changing any UI. When a rule here and the code disagree, the rule wins and the code is a bug to fix (section 15 lists the known ones).
 
-**Baseline inspected:** Wodblok 1.6.0. If this guide and implementation disagree, inspect the current source and update the guide when a styling change is intentional.
+**Scope:** the editor (`src/shell.html`, `src/modules/`). The marketing site is separate.
+**Status:** written Oct 16 2026 against 1.11.0. Sections 2–14 are the standard. Section 15 is the measured gap between that standard and the code today; closing it is a separate release (section 16).
+**Words:** MUST and MUST NOT are rules. SHOULD is a default you can break only with a stated reason in the pull request.
 
-## Design intent
+## 1. Principles
 
-Wodblok is a focused creative tool for stamped patterns and artwork. The editor combines warm paper-like surfaces, restrained brass/gold accents, compact controls, subtle borders, and a stage that keeps the artwork as the focus. The interface should feel crafted, calm, precise, and professional. Preserve the existing visual language; do not redesign neighboring panels just to make a new feature stand out.
+1. **One way to do each thing.** If a control, list, dialog or heading already exists, reuse it. A second version of the same thing is a bug, even if it looks nicer.
+2. **Few values, used everywhere.** Every size, radius, colour and duration comes from a short scale (sections 3–8). New numbers are not allowed in a feature; if the scale is missing something, change the scale first, in this document.
+3. **Quiet chrome, loud artwork.** Warm paper surfaces, one brass accent, thin lines. The pattern is the only thing allowed to be bold.
+4. **Labels, not words.** No explanatory text, helper paragraphs or tooltips in panels. Clear grouping and short labels do the work.
+5. **Nothing is hover-only.** Hover may add feedback, never the only way to find or use something.
+6. **Speed is part of the look.** A style that slows drawing, dragging or sliders is rejected (`npm run perf`).
 
-## Theme tokens
+## 2. How to use this guide
 
-The editor supports explicit light and dark themes. Theme preference is stored using the existing `wb60_theme` key and reflected through `data-theme` on the root element. Reuse CSS custom properties from `src/shell.html`; do not add one-off colors for ordinary UI chrome.
+- **Tokens, not numbers.** In CSS, write `var(--r-md)`, never `8px`; `var(--fs-m)`, never `12.5px`. The token names are defined in sections 3–8. Until the standardisation release lands (section 16), the table beside each token gives the literal value to use.
+- **Roles, not look.** Choose a component by what it is for (section 9), not by which one looks closest.
+- **No inline styles for chrome.** Colour, size, radius and font belong in CSS classes that use tokens. JavaScript may set only position and size that are computed (floating panel coordinates, the swatch colour variable `--c`).
+- **Change the guide with the code.** A pull request that adds a reusable pattern updates this document in the same commit.
+- **The user decides the standard.** Do not change a scale value, add a step or retire a component without asking.
+
+## 3. Colour
+
+The editor supports light and dark. Both must be correct for every screen. Theme is stored in `wb60_theme` and applied as `data-theme` on `:root`; the dark values are defined for the system preference and for the explicit setting. Keep both paths.
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--stage` | `#eae4d8` | `#1b1a18` | Work stage |
-| `--stage-dot` | `rgba(60,40,10,.07)` | `rgba(255,255,255,.04)` | Subtle stage texture |
-| `--panel` | `#f6f2e9` | `#242220` | Panels and app surfaces |
-| `--raise` | `#ffffff` | `#2e2b28` | Raised surfaces and popovers |
-| `--field` | `#ffffff` | `#1e1c1a` | Input backgrounds |
-| `--line` | `#ddd5c6` | `#37332f` | Quiet borders and separators |
-| `--line2` | `#cbc2b0` | `#4a453f` | Stronger outlines |
+| `--stage` | `#eae4d8` | `#1b1a18` | Work stage behind the artwork |
+| `--stage-dot` | `rgba(60,40,10,.07)` | `rgba(255,255,255,.04)` | Stage dots (off with `body.plain`) |
+| `--panel` | `#f6f2e9` | `#242220` | Panels, docks, dialogs |
+| `--raise` | `#ffffff` | `#2e2b28` | Raised surfaces, menus, hovered rows, buttons |
+| `--field` | `#ffffff` | `#1e1c1a` | Input and dropdown backgrounds |
+| `--line` | `#ddd5c6` | `#37332f` | Quiet dividers and card borders |
+| `--line2` | `#cbc2b0` | `#4a453f` | Control edges, menu and dialog borders |
 | `--fg` | `#26221d` | `#ede6da` | Primary text |
-| `--mut` | `#706858` | `#a39b8e` | Secondary text |
-| `--faint` | `#766d60` | `#8f887c` | Tertiary text and group labels |
-| `--acc` | `#b8914f` | `#c9a66b` | Primary accent and focus |
-| `--acc-ink` | `#8a6528` | `#c9a66b` | Text on soft active states |
-| `--acc-fg` | `#1b1a18` | `#1b1a18` | Text on solid accent |
-| `--acc-soft` | `rgba(184,145,79,.16)` | `rgba(201,166,107,.16)` | Selected/active background |
-| `--warn` | `#c0532e` | `#e8895c` | Warnings and dirty state |
-| `--ok` | `#3f8f66` | `#7fb08a` | Success state |
-| `--shadow` | Warm layered shadow | Dark layered shadow | Floating UI |
-| `--paper-shadow` | Warm broad shadow | Dark broad shadow | Artwork/paper elevation |
-
-The dark tokens are set for both system dark preference and explicit `data-theme="dark"`; preserve both paths. The explicit light theme uses `data-theme="light"`.
+| `--mut` | `#706858` | `#a39b8e` | Secondary text, idle icons |
+| `--faint` | `#766d60` | `#8f887c` | Group labels, counts, hints |
+| `--acc` | `#b8914f` | `#c9a66b` | Accent: focus, selection edge, fills of key actions |
+| `--acc-ink` | `#8a6528` | `#c9a66b` | Text and icons on a soft accent background |
+| `--acc-fg` | `#1b1a18` | `#1b1a18` | Text on a solid accent fill |
+| `--acc-soft` | `rgba(184,145,79,.16)` | `rgba(201,166,107,.16)` | Selected and active background, slider halo |
+| `--warn` | `#c0532e` | `#e8895c` | Unsaved dot, warnings, destructive confirm |
+| `--ok` | `#3f8f66` | `#7fb08a` | Success |
+| `--shadow` | layered, warm | layered, dark | Floating surfaces only |
+| `--paper-shadow` | broad, warm | broad, dark | The artwork sheet only |
 
 Rules:
-- Prefer semantic tokens over literal colors.
-- Literal colors are appropriate for artwork, color picker values, or data-specific comparisons—not ordinary UI chrome.
-- Keep brass/gold accents restrained; warning and success colors are semantic, not decorative.
-- Check contrast in both themes, especially muted labels, disabled controls, and selected rows.
+- Chrome MUST use these tokens. No literal hex or `rgb()` in chrome CSS or inline styles.
+- Literal colours are allowed only for: the artwork and colours the user chose; the colour picker's own hue bar and handles; the swatch fallback `var(--c,#888)`; scrims (`rgba(10,11,14,.45)`).
+- A swatch of the user's colour MUST have the swatch edge (`inset 0 0 0 1px rgba(0,0,0,.2)`) so pale colours stay visible. One value, everywhere.
+- The accent is for selection, focus and the one key action in a view. Never use it as decoration, and never for more than one primary action per view.
+- `--warn` and `--ok` carry meaning only.
+- Contrast: check muted and disabled text in both themes. State is never carried by colour alone (add the edge, weight or icon).
+- Compare colours: `--ca` (blue) is A and `--cb` (amber) is B in Before/After; they mean nothing else.
 
-## Typography
+## 4. Type
 
-- **Primary UI font:** Hanken Grotesk, with system fallbacks: `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
-- **Display accent:** Fraunces, with Georgia/serif fallback. It is used selectively for brand/splash and some panel headings, not for all UI.
-- **Base UI size:** `12.5px / 1.4` in the main shell.
-- Use tabular numerals for measurements, dimensions, counts, and values users compare.
-- Use the sans-serif UI face for controls and most panel content. Keep hierarchy compact and functional.
-- Fonts are injected by the build at `/*@@FONTS@@*/`; do not add remote font requests. The app must not rely on runtime network access.
+| Token | Size | Use |
+|---|---|---|
+| `--fs-s` | 11px | Labels, hints, counts, group labels, tab text, meta |
+| `--fs-m` | 12.5px | Body, buttons, fields, list rows, menus. The base size |
+| `--fs-l` | 14px | Panel, group and dialog titles (Fraunces) |
 
-## Spacing, shapes, borders, and elevation
+Brand sizes are separate and fixed: wordmark 15px, splash 20px. Nothing else uses another size.
 
-The interface uses compact, rounded controls, not oversized web-app cards. Existing conventions include:
-- Common control corners around 6–8px; menus and popovers around 10–12px.
-- Thin borders: `--line` for quiet separators and `--line2` for clearer control edges.
-- Swatches have rounded corners and an inset edge so pale colors remain visible.
-- Panel headers are compact and often separated by a thin divider.
-- Shadows are reserved for floating surfaces and artwork/paper; do not shadow every panel or row.
-- Reuse dimensions and classes from a neighboring control instead of inventing new measurements for every feature.
+Fonts:
+- **Hanken Grotesk** for all UI text, fallback `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
+- **Fraunces** (fallback Georgia, serif) only for: the wordmark and splash; panel titles; collapsible group titles; dialog titles. Never for buttons, labels, fields or lists.
+- Both are bundled; no remote fonts, no runtime network.
 
-## Controls and states
+Weights: 400 body; 500 titles, tabs and segmented buttons; 600 emphasis, selected row text and the primary button. Nothing else (no 300, no 700).
 
-- Match existing button, icon-button, tab, field, slider, and menu patterns. Avoid a new visual treatment for one feature.
-- Hover/focus/active transitions are subtle; common transitions are about 120ms.
-- Standard visible focus is `:focus-visible { outline: 2px solid var(--acc); outline-offset: 1px; }`. Do not remove focus indicators.
-- Icons use current-color strokes and rounded caps/joins; common stroke width is about 1.7, with some toolbar controls around 2.1–2.6. Prefer the established line-icon style over emoji.
-- Icon-only controls need an accessible name/title and keyboard access.
-- Fields use `--field`, `--line2`, and the existing type scale.
-- Color swatches should have a visible boundary for light colors.
-- Sliders have a subtle hover-thumb scale and accent-soft active halo; preserve responsiveness.
-- Selected items typically use `--acc-soft`, accent border and/or accent text. Do not communicate state by color alone when it needs to be unambiguous.
-- Disabled controls commonly reduce opacity and become non-interactive. Dirty/unsaved status uses `--warn`.
-- Do not add explanatory text or tooltips inside panels. Use concise labels and clear grouping instead.
+Other type rules:
+- Numbers users compare (sizes, counts, values, dimensions) MUST be tabular (`font-variant-numeric: tabular-nums`; already set on `body`).
+- Group labels: `--fs-s`, uppercase, `letter-spacing: .06em`, `--faint`. One style (section 11.2).
+- Line height 1.4 unless a control sets a fixed height.
+- Text in a control or row that can be long MUST truncate with an ellipsis, never wrap or push neighbours.
 
-## Panels, docks, menus, and workspaces
+## 5. Shape
 
-The workspace supports docked groups, tabbed panels, floating panels, and resizable docks. Panel naming and mode groupings are defined in `src/modules/34-desktop-shell.js` (look for `PNAME`, `MODEP`, and `wsDef`).
+Radius follows the role and size of the element, never taste.
 
-- Add new tools to the existing workspace/panel model, not a separate window system.
-- Reuse panel headings, tabs, dock, floating-panel, and resize conventions.
-- Keep controls usable in narrow panels; avoid fixed widths that cause overflow.
-- Group related controls and align labels/values predictably.
-- Respect Pattern and Stamp modes and saved workspaces.
-- Do not open tool windows at launch; the app launches in Pattern mode, cleared.
-- Hover may enhance feedback but must never be the only way to discover or use an action.
-- Avoid browser `alert`, `confirm`, and `prompt`; use existing in-app interaction patterns.
+| Token | Value | Use |
+|---|---|---|
+| `--r-xs` | 4px | Elements 20px tall or less: chips, checkboxes, tiny swatches, tags |
+| `--r-sm` | 6px | List rows, menu items, hover highlights, controls 22–28px tall, segmented buttons |
+| `--r-md` | 8px | Controls 30px and taller: buttons, fields, dropdown buttons, swatch wells, thumbnails, cards, the segmented container |
+| `--r-lg` | 12px | Surfaces that float or contain: menus, popovers, dialogs, floating panels |
+| `50%` | circle | Dots, radio marks, round handles |
 
-## Motion and canvas
+- A shape nested inside another with padding MUST use outer radius minus the padding (minimum `--r-xs`): a swatch well of 8px with 3px padding holds a 5px→`--r-xs` swatch.
+- Slider and progress tracks use half their height.
+- Docked panels, panel headers, tab strips and dock edges are square (radius 0). Only floating panels use `--r-lg`.
+- Border: 1px, `--line` for dividers and cards, `--line2` for the edge of anything you click or type in. No 2px outlines except focus and selection (section 10).
 
-- Motion should be short and purposeful. Menus and color popovers use a quick entrance of about 130ms; transitions are generally around 120ms.
-- Respect `prefers-reduced-motion: reduce`; disable nonessential animation and transitions.
-- Use `--stage` and `--stage-dot` for the work area; `body.plain` intentionally removes stage dots.
-- Use `--paper-shadow` for paper/artwork elevation where appropriate.
-- Keep selection outlines, guides, masks, grid lines, and previews distinguishable without overpowering the artwork.
-- Panel styling must not change artwork rendering or export output.
-- Check canvas-adjacent UI at multiple zoom levels and viewport sizes.
+## 6. Size, spacing and layers
 
-## Language and layout
+**Control heights** (anything you click or type in):
 
-- Use concise labels that describe the action or setting; avoid redundant helper paragraphs and panel tooltips.
-- Match existing terminology and spelling. The editor uses British spelling in labels such as **Colours** and **Colour grading**.
-- Use sentence case for normal controls unless an existing convention (such as uppercase group labels) applies.
-- Keep naming, capitalization, units, and number formatting consistent within a panel.
-- Avoid novelty gradients, glassmorphism, large marketing-style cards, or heavy outlines unless a deliberate product-wide design decision changes the system.
-- Safe-area insets are supported. Keep the current web-first layout usable at narrow and short viewport sizes without starting a broader responsive redesign as part of a small feature.
+| Token | Height | Use |
+|---|---|---|
+| `--h-xs` | 22px | Compact buttons inside rows and chips that act |
+| `--h-sm` | 26px | Toolbar and panel-header icon buttons, small inline buttons |
+| `--h-md` | 30px | **Default.** Buttons, fields, dropdowns, icon buttons, swatch wells, segmented control |
+| `--h-row` | 32px | List rows and folder headers |
+| `--h-touch` | 40px | Rail buttons and any new control that needs a touch target |
 
-## Styling workflow
+Elements under 22px are indicators (dots, chips that do not act, handles), not controls. Mixed heights in one row are not allowed: a row of controls shares one height.
 
-1. Read this guide and inspect the nearest existing control in `src/shell.html` and the relevant UI module.
-2. Search for existing tokens, classes, icons, and interaction patterns before adding new ones.
-3. Prefer small, local CSS changes; avoid broad selectors that unintentionally affect other tools.
-4. Check explicit light and dark themes, focus, disabled/selected states, reduced motion, narrow widths, and short viewports.
-5. Do not add panel tooltips, remote fonts, runtime network calls, or dependencies without approval.
-6. Run relevant tests. For drawing, dragging, or slider changes, follow `CLAUDE.md` and run `npm run perf`; no performance regression over 10% is acceptable.
-7. Inspect intentional screenshot changes; never regenerate snapshots just to make tests pass. Follow the approval rules in `CLAUDE.md`.
-8. Update this guide when a deliberate change establishes a reusable convention.
+**Spacing** (gap, margin and padding steps): 2, 4, 6, 8, 12, 16 px (`--sp-1` … `--sp-6`). 6 and 8 are the workhorses (control rows use gap 6; field groups gap 8).
+- Between control rows in a group: 6.
+- Between groups: 12.
+- Panel and group inset: 14 on the left and right, matching the header; rows inside lists use 8.
+- A control's internal horizontal padding: 8 for fields, 12 for buttons with text.
 
-## Source-of-truth map
+**Elevation:** `--shadow` on menus, popovers, dialogs, floating panels and dragged ghosts. `--paper-shadow` on the artwork only. Docked panels, rows and cards have no shadow.
+
+**Layers (z-index)** use these bands only; a new layer picks a band, never a new number:
+
+| Band | Value | What |
+|---|---|---|
+| In a component | 1–9 | Overlap inside one control |
+| Stage overlays | 40–45 | Bars, labels and handles over the stage |
+| Menus and popovers | 50–60 | Anchored menus, dropdown lists, rail flyouts |
+| Drag ghosts, modals | 70–80 | Dock ghosts, dialogs with scrim |
+| Floating panels | 9000+ | Managed by script, raised on focus |
+| Pickers | 9100 | Colour picker, always above floating panels |
+| Command search | 9500 | Mod+K |
+| Transient | 9999 | Messages that must be seen |
+| Splash | 10000 | Launch only |
+
+## 7. Motion
+
+| Token | Value | Use |
+|---|---|---|
+| `--t-fast` | 120ms | Hover, press, selection, chevron turns, slider thumb |
+| `--t-slow` | 200ms | Fades and the unsaved dot |
+
+- Menus, dropdown lists and popovers enter with `popin` (fade, 4px rise, scale .98→1) at `--t-fast`, ease-out. Nothing else animates on entry.
+- Panels do not animate open, close or dock (deferred; see the roadmap).
+- Animate only `opacity`, `transform` and colour properties. Never animate `width`, `height`, `top` or `left` of anything over the artwork.
+- `prefers-reduced-motion: reduce` MUST remove every animation and transition.
+- Nothing may block or delay input for the sake of motion.
+
+## 8. Icons
+
+- One icon family: line icons, `stroke="currentColor"`, round caps and joins, no fill, no emoji, no text glyphs as icons.
+- Sizes: 13px in dense rows, 15px in panel headers and toolbars, 18px in the rail. Nothing else.
+- Stroke weight is set once, by icon size, in the `.ic` rules; a new icon takes the class and the size and sets no stroke width of its own.
+- Idle icons `--mut`; hover `--fg`; selected `--acc-ink`.
+- Every icon-only control has an `aria-label` and a keyboard route. The label is not shown as a tooltip.
+- Texture, brand and drawn shapes are artwork, not icons, and are exempt.
+
+## 9. Components
+
+Each component has one definition. If a screen needs a variant, it uses the closest one; it does not invent a look.
+
+### 9.1 Buttons
+
+| Role | Looks | Use |
+|---|---|---|
+| **Primary** | `--acc` fill, `--acc-fg` text, 600, `--h-md`, `--r-md` | The one key action of a view or dialog (Save, Open, Replace). At most one per view |
+| **Secondary** | `--raise` fill, `--line2` border, 400, `--h-md`, `--r-md` | Every other text button |
+| **Quiet** | Transparent, no border, `--mut` text | Rows, headers and toolbars where a bordered button would be noisy |
+| **Icon** | Transparent until hover, `--h-md` square (`--h-sm` in a panel header, `--h-xs` in a row), `--r-md` / `--r-sm` by size | One action, no text |
+| **Toggle** | Secondary that stays selected: `--acc-soft` fill, `--acc` edge, `--acc-ink` text, `aria-pressed` | On/off settings |
+| **Destructive confirm** | Secondary whose label turns to the verb with `--warn` text on the first tap | Second tap does it (sections 12.6 and 12.7) |
+
+- Button text: sentence case, a verb or a short noun ("Save", "Add colour"). A trailing `…` means it opens a dialog or asks for more input, and only then.
+- Buttons in a row sit 8px apart; icon buttons 4px apart.
+- Buttons do not change size when their state changes.
+
+### 9.2 Sliders (the value row)
+
+One row layout for every slider: **label | track | value**, in a grid of `104px  1fr  52px`, gap 8, rows 6px apart.
+- Label: `--fs-s`, `--mut`. Dragging the label scrubs the value (`ew-resize`).
+- Track: 3px tall, `--line2`, filled part `--acc`. Thumb: 13px circle, `--raise` fill with an accent edge.
+- Thumb grows to 1.15× on hover; while pressed it gets a 5px `--acc-soft` halo. These two effects are the only slider motion.
+- Value: right-aligned, tabular, `--fs-s`; it is editable by clicking. Units appear in the value (`12 px`, `45%`), never in the label.
+- Slider steps and ranges are chosen so a drag feels continuous; never fewer than about 100 positions across the track unless the setting is discrete.
+- A slider MUST NOT rebuild the whole picture when only an overlay opacity changed (see the speed audit).
+
+### 9.3 Fields
+
+- Text and number fields: `--h-md`, `--r-md`, `--field` fill, `--line2` border, `--fs-m`, padding 5 / 8. Number fields are tabular and right-aligned.
+- Focus shows the standard outline (section 10); no glow.
+- An invalid value shows `--warn` edge and keeps the typed text. It does not clear the field.
+- Colour fields (hex, RGB, HSB) are uppercase and tabular.
+- Search fields are fields with a leading icon; they appear when a list can pass about 20 items.
+
+### 9.4 Dropdowns
+
+- Native `<select>` is never shown. Use the custom dropdown (`.dd2`, which hides the native select).
+- Button: `--h-md` minimum, `--r-md`, `--field` fill, text left, chevron right that turns 180° when open.
+- List: `--r-lg`, `--raise`, `--line2` border, `--shadow`, padding 5, enters with `popin`.
+- Item: padding 6 / 9, `--r-sm`; current item `--acc-soft`, `--acc-ink`, 600; disabled item opacity .4.
+- Opens below the button; flips above when there is no room. Esc closes; arrow keys move; Enter picks.
+
+### 9.5 Segmented control
+
+A row of two to four mutually exclusive options. Container `--r-md`, `--panel` fill, `--line` border, padding 2, gap 2; buttons `--r-sm`, 500; selected = `--raise` fill with `--line2` edge (or `--acc-soft` when it shows a mode of the whole app). Use it instead of a dropdown when there are four options or fewer and the choice should be visible.
+
+### 9.6 Colour wells and the picker
+
+- Well (`.ccb`): 38 × 30, `--r-md`, padding 3, the swatch inside fills it and has the swatch edge. It opens the picker directly.
+- Linked or locked state: the lock icon sits beside the well, `--h-md` square icon button; open lock = linked to a tray slot, closed lock = fixed. Same place on every colour control.
+- Picker (`.cpop`): 224px wide, `--r-lg`, padding 10, gap 10, `--shadow`. Saturation square 132px tall `--r-md`; hue bar 12px tall; fields below; recent colours last.
+- Dropper is part of the picker, never a separate window.
+- Never write a one-off colour input; every colour in the app is chosen through the picker.
+
+### 9.7 Tabs and rail
+
+- Rail buttons: `--h-touch`, icon only, `--r-md` selected highlight with `--acc-soft`.
+- Panel tabs (`.wtab`): `--fs-s`, 500, `--mut`, 11px side padding, square; the active tab `--fg` with a 2px `--acc` bar on top.
+- A tool opens a panel; a panel never opens by itself at launch.
+
+### 9.8 Swatches, thumbnails and cards
+
+- Swatch: 18–30px square, `--r-xs` (≤20px) or `--r-sm`, with the swatch edge.
+- Thumbnail: keeps the picture's aspect, `--r-md`, `--line` border. Lazy-loaded; never rendered on open.
+- Card (a thumbnail with a name): `--r-md`, `--line` border, name `--fs-m` truncated below the picture; hover `--raise`; selected `--acc` edge + `--acc-soft`.
+
+### 9.9 Status
+
+- One status line at the bottom of the window. Messages are short past-tense sentences with the name in curly quotes: `Saved template “Rose”`, `Started from “Brick”`, `Could not read that file`. Library messages are in section 12.9.
+- The unsaved state is an 8px dot (`--warn`) beside the name; no text.
+- No toasts, no `alert`, `confirm` or `prompt`.
+
+## 10. States
+
+| State | Rule |
+|---|---|
+| Rest | Token colours, no shadow |
+| Hover | Fill `--raise` (on `--panel`) or edge `--line2`; icons to `--fg`. `--t-fast` |
+| Pressed | One step darker/lighter fill; never a size change |
+| Selected / on | `--acc-soft` fill, `--acc` edge or 2px accent bar, `--acc-ink` text. Plus a non-colour cue (edge or weight 600) |
+| Focus | `:focus-visible { outline: 2px solid var(--acc); outline-offset: 1px }`. Never removed. On a coloured fill use `0 0 0 2px var(--panel), 0 0 0 4px var(--acc)` |
+| Disabled | Opacity .4, not clickable, still readable. No tooltip explaining why |
+| Dirty / unsaved | 8px `--warn` dot |
+| Error | `--warn` edge and a status-line message; content is kept |
+| Loading | Keep the old picture; show the busy state in the status line. No spinners over the artwork |
+
+## 11. Panels, headings and groups
+
+### 11.1 Panel structure
+
+- **Panel header:** min-height 40, padding 6 / 10 / 6 / 14, bottom border `--line`; title Fraunces `--fs-l` 500; header actions on the right are `--h-sm` icon buttons or one `--h-sm` quiet text button, gap 8.
+- **Body:** scrolls; inset 14 left and right.
+- **Group (`details.g`):** summary padding 10 / 14, Fraunces `--fs-l` 500, chevron left, bottom border `--line`; hover tints with `--raise`. Group content aligns to the same 14px inset.
+- **Group label** (a sub-heading inside a group): section 11.2.
+- **Panel bar** (the compact bar under a header with a setting, e.g. Auto-open): padding 7 / 10, `--fs-s`, `--mut`, bottom border `--line`.
+- Panels MUST work at narrow widths: no fixed widths that overflow; labels truncate; the slider grid keeps its columns.
+- A panel works docked left, right, top or bottom, tabbed and floating. Test all three before shipping.
+
+### 11.2 Headings (the complete list)
+
+| Level | Style | Use |
+|---|---|---|
+| Panel / dialog title | Fraunces `--fs-l` 500 | Once per panel or dialog |
+| Group title | Fraunces `--fs-l` 500 in a `details.g` summary | Collapsible groups |
+| Group label | `--fs-s`, uppercase, `.06em`, `--faint`, padding 8 / 10 / 2 | Dividing a group inside a panel ("Showing", "All"). Libraries do not use it; their folders are rows (section 12) |
+
+There is no fourth heading. `h1`–`h6` tags are used for structure, then styled as one of these three.
+
+### 11.3 Mode and launch
+
+- Launch: Pattern mode, fully cleared, no tool window open.
+- Pattern and Stamp editor each have their own set of panels; a new tool says which mode it belongs to.
+- Workspaces save the layout; they are applied on demand and never at launch.
+
+## 12. Libraries and the folder system
+
+**The motif (shapes) library is the model.** Its folder system is the one way to organise anything a person picks from a saved collection. Every other library works exactly like it: the same tree, the same rows, the same menus, the same words. Only the item (tile, card or row) differs.
+
+### 12.1 What is a library
+
+A library is any collection a person saves things into and later chooses from. Today and planned:
+
+| Library | Items | Item shown as |
+|---|---|---|
+| Shapes (motifs) | Imported and built-in shapes | Tiles |
+| Stamps (saved stamps) | Stamps | Tiles |
+| Textures | Imported and built-in textures | Tiles |
+| Colours (saved trays) | Trays of colours | Rows with a swatch strip |
+| Colourways (saved colourways) | Named colour sets | Cards |
+| Templates | Template projects | Cards |
+| Workspaces | Panel layouts | Rows |
+| Export recipes | Export presets | Rows |
+
+Rule: if someone chooses one of many saved things from a list or a menu, it is a library and it uses this tree. No library gets its own list design, its own folder design or its own words. A short list is still the tree, just with no folders made yet.
+Not libraries: the layers list, the tray's 16 colour places, history, and **this project's colourways** (a handful of cards that belong to the document, so no folders). A colourway becomes a library item only when it is saved to the Colourways library.
+
+### 12.2 One tree
+
+Words (use these and no others):
+- **Item:** one saved thing (a shape, a stamp, a texture, a tray, a colourway, a template).
+- **Folder:** a container the user makes. It holds folders and items, to any depth.
+- **Set:** a built-in folder that ships with the app (for example a shape set, Wada's tray sets, Starting points). Sets sit in the same list as your folders.
+- **Home:** the folder that holds your own items that are not in a folder. It is the first row of every library and is always shown. Its name is **Yours** in every library. (Shapes still say "My imports" until the standardisation release renames it.)
+- **Active folder:** the last folder opened, or the last one whose menu was used. New items, imports and new folders go there; with none active they go to Home.
+
+Structure:
+- The top level is one list: **Home first, then your folders and the sets together, A to Z** (case-insensitive, numbers sorted as numbers). Inside a folder: its folders first (A to Z), then its items.
+- A folder is known by its **path** (`Florals/Roses`); an item stores that one path string, so nesting needs no file-format change. A set is known by its original name, so renaming the set changes nothing underneath.
+- Folder names: up to 30 characters; no `\ " < > & | /`; unique among siblings, case-insensitive. Making a name that exists opens the existing folder; renaming onto an existing name merges the two ("Merged “A” into “B”").
+- Sets can hold your folders and items you file into them; an item filed into a set also stays in its own set. Sets can be renamed (**Reset name** puts it back) or hidden, **never deleted**. Hidden sets collect in a **Hidden sets** row at the bottom of the list, closed by default, with a count.
+- Items you made can be deleted. Built-in items and items in use in the project cannot (a status message says so).
+
+### 12.3 The folder row
+
+One row design for every folder, set, Home and the Hidden sets row (`.lfr`, `.lfh`):
+- Height `--h-row` (32), `--r-sm`, gap 6, padding 0 4, indented 14px per level of depth (`--d`).
+- In order: **chevron** (13px, turns 90° open, `--t-fast`) · **icon** (closed folder, open folder, or the Home icon; hidden sets are dimmed) · **name** (truncates) · **count** (`--fs-s`, `--faint`, tabular: items inside it and every folder inside it, each counted once) · **"…" button** (always visible, `--h-xs`).
+- Hover fills the row `--raise`. The **active folder** has the `--raise` fill and a 2px `--acc` bar on its left edge; this is the selected state for every row in a tree.
+- The whole row is the target: **click opens or closes in place**; Right arrow opens, Left arrow closes (rows are focusable); right-click opens the same menu as "…".
+- **Many folders can be open at once.** Which are open is remembered between sessions (a per-library key). Opening makes a folder active; closing the active one hands "active" to the folder above it.
+- Under an open folder: its folders, then its items in the item style of the library, then nothing else. An open folder with nothing in it shows one line, `Empty folder` (Home: `No <items> yet`), in `--faint`.
+- Drilling into a folder with a Back button is not allowed; the tree opens in place.
+
+### 12.4 Items
+
+- **Tiles** (shapes, stamps, textures): square (`aspect-ratio: 1`), `--r-md`, `--field` fill, `--line` border, padding 5, gap 6, in a grid indented under the folder (14px per level plus 8). The size slider sets items per row (remembered per library). The tile in use has the accent edge; select mode shows a check.
+- **Cards** (templates, colourways): section 9.8.
+- **Rows** (saved trays, workspaces, recipes): `--h-row`, the same anatomy as a folder row but with a swatch strip, thumbnail or name instead of the chevron.
+- Items always have an `aria-label` with their name. A tile or card never shows its name as a tooltip.
+- The remove (×) button on your own items is always visible (never hover-only).
+
+### 12.5 The toolbar (top of every library)
+
+Same order, same icons, in the library's header row: **Expand/Collapse all** (one toggle; its label says which) · **Select** (toggle, `aria-pressed`) · **New folder** · **size slider** (tiles and cards only) · **Import / Add** (a menu: Image…, Sheet…, From file… as the library allows). Search appears when a library can pass about 20 items and is a normal field (9.3) under the toolbar.
+
+### 12.6 Folder menu and the folder form
+
+The "…" menu (Export… is disabled for an empty folder). Items in this order, leaving out what does not apply:
+
+| Row | Menu |
+|---|---|
+| Your folder | New folder inside · Rename · Move to… · Export… · Delete folder |
+| Set | New folder inside · Rename · Reset name (disabled until renamed) · Hide from the list / Show in the list · Export… |
+| Home | Export… |
+
+Choosing New folder inside, Rename, Move to… or Delete folder opens the **folder form inline, directly under the active folder** (not a dialog, not a prompt):
+- **New / rename:** a name field and a button (Create, Rename). Enter confirms, Esc cancels. The new folder opens and becomes active. When items are selected, New folder offers **Create and move**.
+- **Move to…:** a destination dropdown (Top level, then every folder by full path `A / B`, excluding itself and its own children) and **Move**. Moving a folder moves everything inside it and everything filed in it.
+- **Delete folder:** one line, `Delete “Name” and 2 folders inside?` and a `--warn` **Delete** button. Items are not deleted: they return to Home and the status line says so.
+- Cancel is always there; the form never covers other rows.
+
+### 12.7 Select mode (many items at once)
+
+- **Select** toggles select mode. Clicking items toggles them; **Shift-click** selects the range from the last click; **Select all / Select none** works on the items visible (only open folders count). Esc leaves select mode.
+- A bar shows `N selected` or `None selected` with: **Move to…** (a dropdown of every folder by full path, and `＋ New folder…` to make one and move into it) · **Take out of folder** · **Delete N**.
+- **Delete N is two-tap in place:** the first tap changes the label to `Click to confirm` for 3 seconds; the second tap deletes. Built-in items and items in use are skipped, and the status line says how many.
+- **Drag an item onto a folder row** moves it (the whole selection if the dragged item is selected). The row highlights while you hover over it. A drop never copies.
+
+### 12.8 Where things are saved
+
+- Folder list, each item's path, set renames and hidden sets, open folders and tile size are saved with the library, through `src/platform` (never `localStorage` directly in new code). Open and active state are per-person settings, not part of a project.
+- A project file keeps each item's folder as a plain path string.
+- Export, Randomize and every "Save to" or "Move to" picker use the same flat list of folders by full path (`A / B / C`), in tree order, indented by depth.
+- A library always supports **Export** (a folder, with its folders) and **Import from file**, so people can move data between browsers and back it up. Until Export everything exists, this is the backup route.
+
+### 12.9 Messages
+
+Short past-tense sentences, names in curly quotes, paths with ` / `, in the status line:
+`Made the folder “A / B”.` · `Renamed the folder to “Name”.` · `Moved “Name” to “A / B”.` · `Moved 3 shapes to “A / B”.` · `Deleted the folder “Name”. Its items went back to Yours.` · `Merged “A” into “B”.` · `“Name” is back in the list.` · `Those shapes are used on your stamps. Remove them from the stamps first.`
+Replace “shapes” with the library's own word (stamps, textures, trays, colourways, templates).
+
+### 12.10 Starting points
+
+Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray sets) are **sets**: they appear in the same list as your folders, can be hidden, can hold your folders, and have no delete. A library with only a few built-ins can show them as one set called **Starting points**; it is still a set, with the set menu, not a separate heading style.
+
+## 13. Dialogs and menus
+
+### 13.1 Dialogs
+
+- Backdrop: `rgba(10,11,14,.45)` scrim, `--z` 80, padding 30 (8 on a phone). Clicking the scrim or pressing Esc closes (unless a destructive step is mid-way).
+- Surface: `--panel`, `--line2` border, `--r-lg`, `--shadow`; width `min(<design width>, 100%)`.
+- Header: title (Fraunces `--fs-l`) left; a `--h-sm` close icon button right.
+- Body: scrolls; inset 14.
+- Footer: actions right-aligned, gap 8; **Cancel** (secondary) then the **primary** on the far right. Enter triggers the primary; Esc cancels.
+- Focus moves into the dialog on open and returns to the opener on close.
+- A dialog asks for input or shows a library. It does not show instructions, and it does not ask yes/no questions; use two-tap instead.
+
+### 13.2 Menus
+
+- Anchored to the control that opened them. `--raise`, `--line2`, `--r-lg`, padding 5, `--shadow`, `popin`.
+- Item: `--fs-m`, about 30px tall (padding 6 / 9), `--r-sm`; icon (optional) 15px at the left; shortcut right, `--fs-s` `--faint`.
+- Divider: 1px `--line`, 4px above and below.
+- A menu item that opens a dialog ends with `…`. Disabled items stay visible at opacity .4.
+- Keyboard: arrows move, Enter picks, Esc closes and returns focus.
+- The File menu order is fixed: New project, New from template…, Clear, divider, Open…, Save as template…, then the rest. Add to a menu at the end of its logical group, and ask before reordering.
+
+### 13.3 Commands and shortcuts
+
+- Every action is a named command in the registry (id, label, shortcut, enabled check, run). Menus, shortcuts and command search all read it.
+- Shortcuts use Mod (Cmd on Mac, Ctrl elsewhere). Single-key tools stay single keys. Do not use a key a browser tab keeps for itself (Mod+N, Mod+W, Mod+T).
+- Command labels are the same words as the menu items.
+
+## 14. Words
+
+- **British spelling:** Colours, Colourways, Colour grading, Grey.
+- **Sentence case** for every label, button, menu item and title. Uppercase only for group labels (done by CSS, so the source text stays in sentence case).
+- **Vocabulary:** Tray (the working colours), Saved trays, Colourways, Folder, Set, Yours (the home folder), Hidden sets, Starting points (a set), Untitled pattern, Stamp, Layer, Canvas, Project, Template. Use these words and no synonyms (not "palette", "category", "collection", "preset pack", "my items").
+- Verbs on buttons: Save, Open, Add, Rename, Duplicate, Download, Delete, Replace, Clear, Import, Export. Not "OK", "Yes", "Submit".
+- Units: a space between number and unit (`12 px`, `300 dpi`), `%` without a space, `×` for sizes (`6 × 9 in`).
+- No exclamation marks, no emoji, no first person in the UI.
+- Accessible names (`aria-label`) say the same words as the visible label; icon-only controls use the command name.
+
+## 15. Where the code does not follow this yet (measured on 1.11.0)
+
+Counts are occurrences of a declared value in `src/shell.html` and `src/modules/`.
+
+| Area | Standard | Today |
+|---|---|---|
+| Font sizes | 3 (11, 12.5, 14) | 11 (11, 11.5, 12, 12.5, 13, 13.5, 14, 15, 18, 20, 28). 11px ×58, 11.5px ×26, 12px ×27, 12.5px ×24 |
+| Font weights | 400, 500, 600 | also 300, 700, and `inherit` |
+| Radii | 4, 6, 8, 12, 50% | 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 20 plus tracks (1, 2, 3). 5px ×20, 7px ×19, 9px ×13, 10px ×7 |
+| Control heights | 22, 26, 30, 32, 40 | 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 40, 44, 46, 54. 28px ×13, 24px ×8, 34px ×4 |
+| Same-size controls with different radii | one radius per size | 30px tall controls use 6, 7, 8 and 15 |
+| Gaps | 2, 4, 6, 8, 12, 16 | also 1, 3, 5, 7, 9, 10, 14. 9px ×8, 5px ×8 |
+| Group labels | one style | duplicated as `.wxh` (workspaces), `.xrh` (export recipes), `h3` uppercase, with different paddings |
+| Shapes library | the model (section 12) | Complete: nested tree, many open, select mode, drag to folder, hidden sets. Home is called "My imports" and an old "Drawn by Claude" folder shows only for old projects (do not copy it) |
+| Saved trays (colours) | the tree | One level of folders only; you drill in and use a Back button; its own rows (`.stf`), search and rename; no nesting, no select mode, no Move to…, no drag; Wada sets sit in three fixed folders instead of being sets in the list |
+| Saved stamps | the tree | No folders |
+| Textures | the tree | No library yet (imports are planned) |
+| Colourways | the tree for saved colourways | Only this project's colourways exist (flat cards); no saved colourways library |
+| Templates, workspaces, export recipes | the tree | Flat list under two headings ("Starting points", "Yours"), three separate heading classes, no folders, no select mode |
+| Folder "…" button | always visible (rule 5) | Shapes library shows it only on hover, on the active row or on focus (`.lmo`); right-click is the other way in. Fix in the standardisation release |
+| Deleting | items two-tap in place; folders by the inline form | Folder delete is a form; item delete is two-tap; trays and templates use their own confirm styles |
+| Heading styles | 3 | panel title (Fraunces 14/500), group title (Fraunces 14/500), `h3` 12px/600 with a border, `h3` uppercase 11px, dialog `h2` 14/600 in the UI font |
+| Icon stroke | one weight per size | five widths (1.7, 2.1, 2.25, 2.4, 2.6) assigned per control class |
+| Motion | 120 ms and 200 ms | .1, .12, .13, .15, .16, .2, .25, .28 s |
+| Layers | bands in section 6 | 30 distinct values, from 2 to 99999 (`.tdl` 9999, a one-off 99999) |
+| Literal colours in chrome | none | `#fff` ×69, `#000` ×33, plus one-off `#e33`, `#215`, `#176` |
+| Swatch edge | one value | `rgba(0,0,0,.18)` ×8 and `rgba(0,0,0,.2)` ×4 |
+| Disabled opacity | .4 | .4 and .5 (`.hr.fut`) |
+| Dialog titles | Fraunces `--fs-l` | UI font, 14/600 |
+| Tokens | `--r-*`, `--fs-*`, `--h-*`, `--sp-*`, `--t-*`, `--z-*` | None of these exist yet; only colour, shadow and `--tl` do |
+
+## 16. Closing the gap (proposed release)
+
+A single "standardisation" release changes appearance only, no behaviour:
+1. Add the tokens from sections 4–8 to `:root`, with the literal values above.
+2. Replace literals with tokens file by file, mapping each old value to the nearest standard one **by role** (a 5px radius on a 22px control becomes `--r-sm`; on a 16px chip it becomes `--r-xs`).
+3. Merge `.wxh` and `.xrh` into one group-label class; give dialogs the Fraunces title.
+3b. **Extract the folder tree** from `06-motif-library-folders.js` and `21-motif-library-ui.js` into one shared component. A library supplies only: its items, its built-in sets, its Home name, how an item is drawn (tile, card or row), what "Export" writes, and the key it saves under. Then move each library onto it: saved trays first (they have the most to gain), then stamps, templates, workspaces and recipes; textures and saved colourways are born on it. This is the biggest item in the release and can be its own release before the visual pass.
+4. Reduce icon stroke weights to the set in section 8, and layers and durations to the bands above.
+5. Add `npm run check:style`, a script that fails on a literal colour, a radius, font size, height, duration or z-index outside the scales in changed CSS. New code has to pass it.
+
+Expected side effects, to be shown before anything is regenerated: small pixel shifts on controls that move one or two pixels (28 → 26 or 30; 34 → 32). Per `CLAUDE.md`, pixel goldens that change for this reason are listed and explained; state and SVG snapshots should not change at all. Full-suite importance about 60%: no logic changes, but every screen moves slightly. Run `npm run perf` as a guard.
+
+## 17. New UI checklist
+
+- [ ] Uses tokens for colour, size, radius, spacing, motion and layer; no new numbers.
+- [ ] Reuses a component from section 9; anything chosen from a saved collection is a library on the shared folder tree (section 12), not a new list.
+- [ ] Looks right in light and dark.
+- [ ] Heights in a row match; radii follow section 5.
+- [ ] Headings are one of the three levels.
+- [ ] Hover, focus-visible, selected, disabled and error states exist; nothing depends on hover.
+- [ ] No explanatory text, no tooltips, no `alert`/`confirm`/`prompt`; destructive actions use two-tap.
+- [ ] Every action is a registry command; icon-only controls have `aria-label`.
+- [ ] Works docked, tabbed and floating, at narrow width, and on touch (pointer events).
+- [ ] Wording follows section 14 (British, sentence case, standard words).
+- [ ] Respects reduced motion; no animation of layout properties over the artwork.
+- [ ] Does not change artwork rendering or export.
+- [ ] Tests pass; screenshot changes are explained, not regenerated to go green.
+- [ ] This guide updated if a new reusable pattern was added.
+
+## 18. Source-of-truth map
 
 | Concern | Source |
 |---|---|
-| Theme initialization, tokens, global typography/focus/control/motion CSS | `src/shell.html` |
-| Docking, panel groups, workspace behavior | `src/modules/34-desktop-shell.js` and shell CSS |
-| Tool-specific controls | Relevant file in `src/modules/` |
-| Module startup order | `src/main.js` |
+| Tokens, global type, focus, controls, motion | `src/shell.html` |
+| Docking, panel groups, workspaces | `src/modules/34-desktop-shell.js`, `src/modules/42-workspaces.js` |
+| Menus and commands | `src/modules/37-command-list.js`, `src/modules/40-command-search.js` |
+| Colour tray, picker, wells | `src/modules/50-tray-core.js`, `51-colour-picker.js`, `52-tray-ui.js` |
+| Library folder tree (the model) | `06-motif-library-folders.js` (data, paths, sets), `21-motif-library-ui.js` (rows, menu, form, select mode) |
+| Other libraries (to move onto the tree) | `27-stamp-library.js`, `52-tray-ui.js` (saved trays), `53-colourways.js`, `42-workspaces.js`, `43-export-recipes.js`, `54-templates.js` |
 | Engineering constraints | `CLAUDE.md` |
-| Existing UI audit/screenshots | `docs/ux-review.md` and `docs/ux-review/` |
-
-## New UI checklist
-
-- [ ] Uses existing theme tokens where possible.
-- [ ] Works in light and dark themes.
-- [ ] Matches nearby typography, spacing, corner radii, borders, and icons.
-- [ ] Has suitable hover, focus-visible, selected, disabled, and error/dirty states.
-- [ ] Does not rely on hover or add panel tooltips/explanatory copy.
-- [ ] Fits docked, tabbed, and floating panel layouts.
-- [ ] Respects reduced motion and keyboard use.
-- [ ] Does not unintentionally alter artwork rendering.
-- [ ] Relevant tests pass and screenshot changes are explained.
-- [ ] This guide is updated if a new reusable convention is introduced.
+| UI audit and screenshots | `docs/ux-review.md`, `docs/ux-review/` |
