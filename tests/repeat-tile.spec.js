@@ -10,7 +10,7 @@ const tile = async (page, on = true) => { await openPanel(page, 'canvas'); await
 // The "Repeat 3 x 3" view draws the tile and its neighbours for real. If the piece repeats, the middle tile and the one to its right (or
 // below) are the same picture; a tile moved half a tile across is not, which is what makes the comparison meaningful.
 async function periodic(page) {
-  await page.click('#tpv'); await settle(page); await page.waitForTimeout(500);
+  await page.click('#tpv'); await settle(page, { quiet: 25, max: 60000 }); await page.waitForTimeout(500); await settle(page, { quiet: 25, max: 60000 });   // the stamp prints are drawn in small steps now: wait until they are all there
   const buf = await page.locator('#art').screenshot();
   await page.click('#tpv'); await settle(page);
   return page.evaluate(async b64 => {
