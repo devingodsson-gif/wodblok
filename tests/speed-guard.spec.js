@@ -25,7 +25,7 @@ for (const name of Object.keys(FIXTURES)) {
   test(`${name}: the pattern on screen stays light and every reference resolves`, async ({ page }) => {
     const { errors } = await openApp(page, { seed: 21 });
     await openProjectFile(page, FIXTURES[name]);
-    await settle(page, { quiet: 25 });                                   // while the stamps are still being printed after opening, a few of them point at outlines that are not on the page yet (see known-issues)
+    await settle(page);                                   // while the stamps are still being printed after opening, a few of them point at outlines that are not on the page yet (see known-issues)
     const c = await patternCounters(page);
     const d = await danglingRefs(page);
     report[name] = { dynChars: c.dynChars, dynNodes: c.dynNodes, artChars: c.artChars, tabs: c.tabs.length, dangling: d };

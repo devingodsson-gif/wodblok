@@ -92,7 +92,7 @@ async function settle(page, { quiet = 4, step = 120, max = 15000 } = {}) {
   while (Date.now() - t0 < max) {
     const sig = await page.evaluate(() => {
       const art = document.getElementById('art'), ed = document.getElementById('ed');
-      const busy = document.body.classList.contains('babusy') || !!document.querySelector('.rzbusy,.lding:not([hidden])');
+      const busy = document.body.classList.contains('babusy') || !!document.querySelector('.rzbusy,.lding:not([hidden])') || !!(window.__wbTest && window.__wbTest.printsBusy && window.__wbTest.printsBusy());   // stamp prints still being drawn
       // a content hash, not just lengths: a redraw that rebuilds the same amount of markup in a different shape still counts as change
       const h = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0).toString(36); };
       return h(window.__wbTest ? window.__wbTest.state() : coreStr()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + (ed ? h(ed.innerHTML) : 0) + '|' + busy;

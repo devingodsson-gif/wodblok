@@ -25,3 +25,8 @@ Speed work from the Oct 15 audit (`docs/known-issues.md` lists the two old quirk
 - Textures tool, Amount slider on a relief or stain texture that only the canvas uses: while it moves, the picture is made once at full strength and Amount is its opacity; when it is let go, the exact picture is drawn as before. Nothing rebuilds the pattern (it does not depend on a relief or stain texture). Wear textures, and textures that stamps or layers also use, still rebuild it. Scale, angle and type changes on a canvas-only texture skip the pattern rebuild too.
 - Busy test project (Chromium, 1x, sandbox), per slider step: 163 → 17 ms; freezes over 50 ms during the drag 39 → 5; pattern redraws 34 → 2. The picture after letting go is pixel-identical to 1.7.0 (`picture-compare` has a texture step now).
 - New test: `tests/texture-amount-fast.spec.js`. Not done from the pass 4 plan: texture pictures as blob URLs (B3); it only matters at the moment of letting go.
+
+## 1.9.1 (test follow-ups to 1.9)
+- Test hook `__wbTest.printsBusy()`; `settle` waits for the stamp prints, so the quiet-25 workarounds in speed-guard and repeat-tile are gone.
+- The temporary picture-compare tolerance (`WB_PICTURE_TOLERANCE` in the workflow) is removed; main is now the 1.9 baseline.
+- Seamless-tile right/down limit is 0.12*half+0.25 (was +0.15): 1.9's smaller print sheets move grain by about 1 of 255 on the CI renderer.

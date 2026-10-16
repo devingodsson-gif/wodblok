@@ -10,7 +10,7 @@ const tile = async (page, on = true) => { await openPanel(page, 'canvas'); await
 // The "Repeat 3 x 3" view draws the tile and its neighbours for real. If the piece repeats, the middle tile and the one to its right (or
 // below) are the same picture; a tile moved half a tile across is not, which is what makes the comparison meaningful.
 async function periodic(page) {
-  await page.click('#tpv'); await settle(page, { quiet: 25, max: 60000 }); await page.waitForTimeout(500); await settle(page, { quiet: 25, max: 60000 });   // the stamp prints are drawn in small steps now: wait until they are all there
+  await page.click('#tpv'); await settle(page, { max: 60000 }); await page.waitForTimeout(500);
   const buf = await page.locator('#art').screenshot();
   await page.click('#tpv'); await settle(page);
   return page.evaluate(async b64 => {
@@ -84,7 +84,7 @@ for (const seed of [1, 2, 3, 4, 6]) {
     await tile(page); await roll(page);
     const p = await periodic(page);
     expect(p.half, 'the piece has something in it').toBeGreaterThan(1);
-    expect(p.right, JSON.stringify(p)).toBeLessThan(0.12 * p.half + 0.25);   // 0.15 -> 0.25 in 1.9: prints are packed in smaller sheets, so their grain moves a little (about 1 of 255 on the CI renderer); a real seam is far above this
+    expect(p.right, JSON.stringify(p)).toBeLessThan(0.12 * p.half + 0.25);   // 0.25, not 0.15, since 1.9: prints are packed in smaller sheets, so their grain moves a little (about 1 of 255 on the CI renderer); a real seam is far above this
     expect(p.down, JSON.stringify(p)).toBeLessThan(0.12 * p.half + 0.15);
     const e = await exported(page);
     expect(e.colSeam, JSON.stringify(e)).toBeLessThanOrEqual(2.2 * e.colTop + 2);

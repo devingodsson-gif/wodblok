@@ -50,7 +50,7 @@ Not fixed (no bug fixes in this phase). The speed-guard test leaves both out by 
 `tests/export-recipes.spec.js` "TIFF export is a real RGBA TIFF…" times out in `page.selectOption('#xrdpi', …)`: the DPI select is not visible when the test tries to use it. Fails on the 1.6.0 build too, so it is not from a speed release. Not fixed here.
 
 ## While the stamps are printed after opening a file, a few stamps point at outlines that are not on the page yet (found in 1.9, also in 1.8.0)
-For about half a second after opening the busy test project (`project-4`), 18 `<use href="#s…">` in the pattern point at ids that do not exist yet, so those stamps draw nothing until the next redraw. Seen in 1.8.0 too (about 0.4 s). The speed-guard test now waits for the prints before it checks. Not fixed (no bug fixes in this phase).
+For about half a second after opening the busy test project (`project-4`), 18 `<use href="#s…">` in the pattern point at ids that do not exist yet, so those stamps draw nothing until the next redraw. Seen in 1.8.0 too (about 0.4 s). The test helper `settle` now also waits until the print queue is empty (test hook `printsBusy`), so no test measures a half-drawn piece. Not fixed (no bug fixes in this phase).
 
 ## The stamp-zoom test "a motif can still be picked and Ctrl + wheel zooms…" fails (found in 1.9, also in 1.8.0)
 `tests/stamp-zoom.spec.js:33` fails on `toBeVisible` ("element(s) not found") on both the 1.8.0 and 1.9.0 builds. Not caused by a speed release as far as checked; not investigated or fixed.
