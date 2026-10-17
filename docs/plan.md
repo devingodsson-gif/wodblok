@@ -159,3 +159,7 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - Brick offset: 1/4, 1/3, 1/2, 2/3 or 3/4 for Brick and Half-drop (layer setting bo, default 1/2).
 - Position across / down for the selected placed item(s) (Free place, Pictures, Text); a group moves together.
 - Not in this release: Area for Repeat on a book cover (whole cover, front, back, spine); it needs the Repeat renderer to clip to a region and goes in its own release.
+
+## 1.31.0: Rare Motion and Book Cover templates
+- **Rare Motion** (a repeating pattern) and **Book Cover** (a book) are projects supplied by the owner, added as starting points through `CUSTOM` in `tools/templates/recipes.js` like Logo 1 and Sidon album cover. Each is first after Blank in its kind and carries its own picture.
+- Tests: `tests/templates.spec.js` (counts, order, both open clean).

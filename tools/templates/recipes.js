@@ -20,5 +20,7 @@ const RECIPES = [
 const CUSTOM = [
   { id: 'logo-1', kind: 'canvas', n: 'Logo 1', file: 'logo-1.wodblok' },
   { id: 'sidon-album-cover', kind: 'canvas', n: 'Sidon album cover', file: 'sidon-album-cover.wodblok' },
+  { id: 'rare-motion', kind: 'tile', n: 'Rare Motion', file: 'rare-motion.wodblok' },
+  { id: 'book-cover', kind: 'book', n: 'Book Cover', file: 'book-cover.wodblok' },
 ];
 module.exports = { RECIPES, CUSTOM };
