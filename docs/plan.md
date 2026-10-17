@@ -78,3 +78,10 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 - The swatches are in hue order (Rosewood, Walnut, Oak, Eucalyptus, Ironwood, Purpleheart, Maple), with the grey Birch last.
 - The Accent row shows the chosen name (Custom for a picked colour). A colour saved by 1.14.0 that is not one of these eight shows as Custom.
 - Code: `stACCENTS` and `stAccentName` in `55-settings.js`. Test: `tests/settings-menu.spec.js`.
+
+## 1.16.0: Export watermark
+- A **Watermark** checkbox at the top of the Export panel (off by default, kept in this browser as `wb116_watermark`). When on, PNG, JPG and TIFF pictures get the Wodblok mark in the top-left corner and "Made with Wodblok" in the bottom-right. This covers custom export, recipes, Export all, colourway zips and the Quick PNG.
+- The mark and "Wodblok" use the current accent colour. "Wodblok" is set in IM Fell English (the top bar wordmark font) and "Made with" in Hanken Grotesk at 600, the heaviest bundled weight. "Made with" turns white or near-black to suit the picture under it, and both marks carry a faint soft shadow so they stay readable on busy patterns. Sizes follow the shorter side of the picture.
+- SVG files are never watermarked (a vector file cannot carry the fonts), and the checkbox is greyed out while SVG is the chosen format. The Print cover PDF/PNG and the print proof are not watermarked.
+- The mark is drawn from the top bar logo's own outline, so there is no second copy of the logo in the code.
+- Code: `src/modules/56-watermark.js` (`wmGet`, `wmSet`, `wmReady`, `wmDraw`); hooks in `xrRender` (43) and the Quick PNG handler (14). Test: `tests/watermark.spec.js`.

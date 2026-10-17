@@ -5,6 +5,7 @@ import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
+import {wmGet,wmSet,wmReady,wmDraw} from './56-watermark.js';
 // ===== Export recipes =====
 // A recipe is a saved set of export settings: format, long side in pixels, TIFF DPI, and file-name ending.
 // Click a recipe to export with it. "Export all" makes every recipe in one zip. With more than one colourway, "Colourways: All" makes each
@@ -36,21 +37,22 @@ const frames=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(
 async function xrWays(all,fn){const o=WBS.proj;if(!all||o.cw.length<2)return fn(null);const keep=o.cwa;WBX.wbNoCap=1;
   try{for(let i=0;i<o.cw.length;i++){o.cwa=i;upd();await frames();await fn(o.cw[i])}}finally{const q=WBS.proj;q.cwa=Math.min(keep,q.cw.length-1);upd();await frames();WBX.wbNoCap=0}}
 // the picture itself, as a Blob
-function xrRender(r){
+function xrRender(r){return(r.fmt!='svg'&&wmGet()?wmReady():Promise.resolve()).then(()=>xrRender0(r))}
+function xrRender0(r){
   return new Promise((res,rej)=>{
     if(r.fmt=='svg')return res(new Blob([ser()],{type:'image/svg+xml'}));
     const [w,h]=xrDims(xrPx(r.px));if(w*h>XR_AREA)return rej(new Error('That size is too large for this browser. Try a smaller long side.'));
     const img=new Image();
-    img.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d',{willReadFrequently:r.fmt=='tiff'});ctx.drawImage(img,0,0,w,h);if(r.fmt=='tiff'){const im=ctx.getImageData(0,0,w,h);res(xrTiff(im.data,w,h,r.dpi||300));return}c.toBlob(b=>b?res(b):rej(new Error('The picture could not be made at that size.')),r.fmt=='jpg'?'image/jpeg':'image/png',.92)}catch(e){rej(e)}};
+    img.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d',{willReadFrequently:r.fmt=='tiff'});ctx.drawImage(img,0,0,w,h);if(wmGet())wmDraw(ctx,w,h);if(r.fmt=='tiff'){const im=ctx.getImageData(0,0,w,h);res(xrTiff(im.data,w,h,r.dpi||300));return}c.toBlob(b=>b?res(b):rej(new Error('The picture could not be made at that size.')),r.fmt=='jpg'?'image/jpeg':'image/png',.92)}catch(e){rej(e)}};
     img.onerror=()=>rej(new Error('The picture could not be made.'));
     img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser());
   });
 }
 function init43(){
-  const list=$('xrl'),px=$('xrpx'),sfx=$('xrsfx'),nm=$('xrn');let fmt='png',ren=null,dpi=300,all=false,busy=false;const dpiEl=$('xrdpi'),dpiRow=$('xrdpirow');
+  const list=$('xrl'),px=$('xrpx'),sfx=$('xrsfx'),nm=$('xrn'),wmEl=$('xrwm');wmEl.checked=wmGet();wmEl.addEventListener('change',()=>wmSet(wmEl.checked));let fmt='png',ren=null,dpi=300,all=false,busy=false;const dpiEl=$('xrdpi'),dpiRow=$('xrdpirow');
   const cur=()=>({fmt,px:xrPx(px.value),sfx:sfx.value.trim(),...(fmt=='tiff'?{dpi:+(dpiEl&&dpiEl.value)||300}:{})});
   const sum=r=>r.fmt=='svg'?'SVG':r.fmt.toUpperCase()+' · '+xrPx(r.px)+' px'+(r.fmt=='tiff'?' · '+(r.dpi||300)+' DPI':'');
-  function dims(){const r=cur();$('xrd').textContent=fmt=='svg'?'Vector, any size':xrDims(r.px).join(' × ')+' px';px.disabled=fmt=='svg';if(dpiRow)dpiRow.hidden=fmt!='tiff'}
+  function dims(){const r=cur();$('xrd').textContent=fmt=='svg'?'Vector, any size':xrDims(r.px).join(' × ')+' px';px.disabled=fmt=='svg';wmEl.disabled=fmt=='svg';if(dpiRow)dpiRow.hidden=fmt!='tiff'}
   function setFmt(f){fmt=f;$('xrf').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.f==f));dims()}
   $('xrf').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setFmt(b.dataset.f)});
   px.addEventListener('input',dims);px.addEventListener('change',()=>{px.value=xrPx(px.value);dims()});
