@@ -76,7 +76,7 @@ test('an account host that says "not signed in" but is not gated (a preview) ask
 
 test('signed in: a name chip, File > Account… and File > Send feedback…, with commands', async ({ page }) => {
   const { errors } = await open(page, { '/api/me': ME() });
-  await expect(page.locator('#pacct')).toHaveText('Hi Ana');
+  await expect(page.locator('#pacct')).toHaveText('Hi Ana!');
   await expect(await fileMenu(page)).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save as template…', 'Settings…', 'Account…', 'Send feedback…']);
   const c = await page.evaluate(() => ['account.open', 'feedback.open'].map(id => { const x = window.__wbTest.commands.get(id); return x && [x.label, x.enabled()]; }));
   expect(c).toEqual([['Account', true], ['Send feedback', true]]);
@@ -96,7 +96,7 @@ test('signed in: a name chip, File > Account… and File > Send feedback…, wit
 
 test('a name with markup is shown as text', async ({ page }) => {
   await open(page, { '/api/me': ME({ firstName: '<img src=x onerror=window.__x=1>' }) });
-  await expect(page.locator('#pacct')).toHaveText('Hi <img src=x onerror=window.__x=1>');
+  await expect(page.locator('#pacct')).toHaveText('Hi <img src=x onerror=window.__x=1>!');
   await page.click('#pacct');
   expect(await page.evaluate(() => window.__x)).toBeUndefined();
 });
@@ -165,7 +165,7 @@ test('signed out on a gated host: the locked screen, no way around it with Escap
   await set(page, '/api/me', ME());
   await page.click('#aclre');
   await expect(page.locator('#aclk')).toBeHidden();
-  await expect(page.locator('#pacct')).toHaveText('Hi Ana');
+  await expect(page.locator('#pacct')).toHaveText('Hi Ana!');
 });
 
 test('signed in but not approved on a gated host: says so', async ({ page }) => {

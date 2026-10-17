@@ -31,7 +31,7 @@ function axMenu(on){let after=$('stgo');
   if(on&&!cmdGet(cmd))cmdRegister({id:cmd,label,run,enabled:()=>axS.state==='ok'})}}
 function axApply(s){axS=s||{state:'off'};const ok=axS.state==='ok';
  axMenu(ok);
- const chip=$('pacct');chip.hidden=!(ok&&axS.name);chip.textContent=ok&&axS.name?'Hi '+axS.name:'';
+ const chip=$('pacct');chip.hidden=!(ok&&axS.name);chip.textContent=ok&&axS.name?'Hi '+axS.name+'!':'';
  if(axS.state==='locked')axLockShow();else if(axShown('aclk')){$('aclk').hidden=true}
  if(ok&&!axUsing)axUsageStart();
  if(!ok&&axShown('acdlg'))axClose('acdlg');if(!ok&&axShown('fbdlg'))axClose('fbdlg')}
