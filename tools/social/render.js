@@ -1,4 +1,4 @@
-// Renders the batch: opens the built app headless (like tests/make-templates.spec.js), makes one square design per image with Randomize,
+// Renders the batch: opens the built app headless, makes one square design per image with Randomize,
 // sets one of the plain palettes, and exports a PNG through the app's own Export recipes panel, so the files match what a user gets.
 // Nothing here changes the app. Needs `npm run build` first (dist/wodblok.html).
 const fs = require('fs');

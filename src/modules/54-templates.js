@@ -8,7 +8,7 @@ import {fileUnlink,thumbPng} from './33-clear.js';
 // ===== Templates =====
 // A template is an ordinary saved project (a .wodblok file). "New from template" opens one as a new, unsaved project and never changes the
 // template. Three kinds, found from the project itself: a book (the book cover is on), a repeating pattern (the canvas is a repeat tile), or a
-// normal canvas. "Starting points" are built in (src/data/templates.js, made by `npm run templates`); "Yours" are saved here with
+// normal canvas. "Starting points" are built in (the .wodblok files in the templates/ folders, added to src/data/templates.js by the build); "Yours" are saved here with
 // "Save as template". The list (name, kind, a small picture) is kept in settings so the picker opens without reading any project; each
 // project's bytes are kept in the records store and read only when it is opened.
 const TP_INDEX='wb111_templates',TP_START='wb111_tplstart',TP_TYPE='wb111_tptype',TP_KINDS=[['canvas','Normal canvas'],['tile','Repeating pattern'],['book','Book']];
