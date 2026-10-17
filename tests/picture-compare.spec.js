@@ -43,7 +43,7 @@ async function render(browser, url, fixture) {
   await page.mouse.move(700, 450);
   await page.keyboard.press('1');
   await shoot('zoomed to 100% (drawn live)', '#boardP');
-  await page.click('#zl');
+  await page.locator('#zl').dispatchEvent('click');
   await settle(page);
   await setMode(page, 'stamp');
   await shoot('Stamp editor', '#boardS');

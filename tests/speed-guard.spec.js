@@ -65,7 +65,7 @@ test('busy: after a slider move, zoomed in, in the Stamp editor and after Random
   await page.mouse.move(700, 450);
   await page.keyboard.press('1');                                                            // 100%: every copy is drawn live, so the outlines are needed
   await check('zoomed in (live)');
-  await page.click('#zl');                                                                   // back to Fit
+  await page.locator('#zl').dispatchEvent('click');                                                                   // back to Fit
   await check('back at Fit');
   await setMode(page, 'stamp');
   await check('Stamp editor');

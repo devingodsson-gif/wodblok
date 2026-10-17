@@ -171,7 +171,7 @@ const stage=document.querySelector('.stage');
 {const f=stage.querySelector('.film'),b=$('filmt');if(f&&b){const ap=(m,save)=>{f.classList.toggle('min',m);b.setAttribute('aria-expanded',String(!m));b.setAttribute('aria-label',m?'Show stamp tray':'Hide stamp tray');b.title=b.getAttribute('aria-label');stage.style.setProperty('--film-h',f.offsetHeight+'px');if(save){try{kv.set('wb_film_min',m?'1':'0')}catch(e){}}};
  let m0=false;try{m0=kv.get('wb_film_min')==='1'}catch(e){}b.onclick=()=>ap(!f.classList.contains('min'),true);ap(m0,false);try{new ResizeObserver(()=>stage.style.setProperty('--film-h',f.offsetHeight+'px')).observe(f)}catch(e){}}}
 function setView(v){const was=view;view=v;WBS.curView=v;if(WBX.wbEmptyCue)WBX.wbEmptyCue();if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
-$('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display='';$('gtb').style.display=v=='stamp'?'':'none';$('itb').style.display='';if(v=='pattern')requestAnimationFrame(applyZ);else applyZE();tbSync();if(was!=v||!wsReady)wsRender()}
+$('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display='';$('gtb').style.display=v=='stamp'?'':'none';if(v=='pattern')requestAnimationFrame(applyZ);else applyZE();tbSync();if(was!=v||!wsReady)wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
 const L=wsL();let g=wsFind(p);
 // a tool that is not open yet opens docked on the right: Randomize beside the colour tools, anything else as a tab in the first group
@@ -413,7 +413,7 @@ function fin(ok){const inp=sl.querySelector('input');if(inp&&ren>=0&&snaps[ren])
 sl.addEventListener('keydown',e=>{if(!e.target.matches('input'))return;if(e.key=='Enter'){e.preventDefault();fin(1)}else if(e.key=='Escape'){e.stopPropagation();fin(0)}});
 sl.addEventListener('focusout',e=>{if(e.target.matches&&e.target.matches('input')&&ren>=0)setTimeout(()=>{if(ren>=0)fin(1)},0)});
 new MutationObserver(()=>{if(!sec.hidden)paint()}).observe(sec,{attributes:true,attributeFilter:['hidden']});
-WBX.wbBAPaint=()=>{const m=wbBA.mode;$('bab').setAttribute('aria-pressed',String(m==1));$('bas').setAttribute('aria-pressed',String(m==2));const lb=wbBA.label;$('barst').hidden=!wbBA.custom;if(!sec.hidden&&$('bal').dataset.l!==lb){$('bal').dataset.l=lb;$('bal').innerHTML=`<div class="hr"><b><u class="ab a">A</u>${esc2(lb)}</b><i>Compared to</i><span></span></div><div class="hr"><b><u class="ab b">B</u>Current</b><i>Now</i><span></span></div>`}
+WBX.wbBAPaint=()=>{const m=wbBA.mode;$('bacmp').hidden=!m;$('bab').setAttribute('aria-pressed',String(m==1));$('bas').setAttribute('aria-pressed',String(m==2));const lb=wbBA.label;$('barst').hidden=!wbBA.custom;if(!sec.hidden&&$('bal').dataset.l!==lb){$('bal').dataset.l=lb;$('bal').innerHTML=`<div class="hr"><b><u class="ab a">A</u>${esc2(lb)}</b><i>Compared to</i><span></span></div><div class="hr"><b><u class="ab b">B</u>Current</b><i>Now</i><span></span></div>`}
  if(sec.hidden)return;const c=wbBA.core;hl.querySelectorAll('[data-h]').forEach(r=>{const i=+r.dataset.h;r.classList.toggle('ra',c!=null&&hist[i]===c);r.classList.toggle('rb',i==hi)});sl.querySelectorAll('[data-sn]').forEach(r=>{const n=snaps[+r.dataset.sn];r.classList.toggle('ra',!!n&&n.s===c)})};
 $('barst').onclick=()=>wbBA.clearRef();
 $('bab').onclick=()=>{$('bab').blur();wbBA.toggle()};$('bas').onclick=()=>{$('bas').blur();wbBA.split()};
@@ -459,7 +459,6 @@ $('gq').onclick=()=>{const t=WBS.tiles[WBS.cur];if(!t.items.length)return;let mo
 $('gtg').onclick=()=>{grid.on=!grid.on;saveGrid();upd()};$('gtq').onclick=()=>$('gq').click();
 $('gti').onclick=()=>{WBS.edInk=!WBS.edInk;tbSync();upd()};
 $('gtx').onclick=()=>{WBS.edTx=!WBS.edTx;tbSync();upd()};
-{const w=$('itbw'),b=$('itbb'),set=o=>{w.classList.toggle('open',o);b.setAttribute('aria-expanded',String(o))};b.onclick=e=>{e.stopPropagation();set(!w.classList.contains('open'))};document.addEventListener('click',e=>{if(!e.target.closest('#itbw'))set(false)});document.addEventListener('keydown',e=>{if(e.key=='Escape')set(false)})}
 $('gtm').onclick=()=>{WBS.edMk=!WBS.edMk;$('gtm').classList.toggle('on',WBS.edMk);$('gtm').setAttribute('aria-pressed',String(WBS.edMk));upd()};
 document.addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input,select,textarea'))return;if(!e.metaKey&&!e.ctrlKey&&e.key.toLowerCase()=='g'){grid.on=!grid.on;saveGrid();upd()}});
 const _draw2=WBH.draw;WBH.draw=function(){_draw2();syncGrid()};

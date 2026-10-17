@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CM,CP,PL,col,okC,placeFloat,rowMenu} from './04-canvas-and-stamp-outlines.js';
+import {C,CM,CP,PL,col,okC,placeFloat,rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
@@ -23,9 +23,13 @@ const tyP=()=>WBS.proj;
 // the label a well shows for a reference, and the small number of its tray place
 const hexText=h=>h.slice(0,7).toUpperCase()+(hexAlpha(h)<1?' · '+Math.round(hexAlpha(h)*100)+'%':'');
 const wellText=r=>{if(!r)return'';if(isLink(r)){const id=r.slice(1);return slotName(id)||hexText(slotHex(id))}return hexText(col(r))};
+// the colours the picker offers in its "Saved colours" dropdown: every colour in your saved trays, then Wada's colours
+function tySaved(){const seen=new Set(),own=[];stLoad().t.forEach(t=>t.c.forEach(([h,n])=>{const k=h+'|'+n;if(seen.has(k))return;seen.add(k);own.push({n:n||h.slice(0,7).toUpperCase(),h,t:t.n})}));
+ return[{g:'Your trays',items:own},{g:'Wada colours',items:C.map(([n,h])=>({n,h:normHexA(h)||h}))}].filter(g=>g.items.length)}
 // ---------------------------------------------------------------- picker for one tray slot
 function editSlot(id,anchor){const o=tyP();if(!o.ts.includes(id))return;
- openPicker(anchor,{value:slotHex(id),alpha:true,name:slotName(id),namePh:slotHex(id).toUpperCase(),
+ openPicker(anchor,{value:slotHex(id),alpha:true,name:slotName(id),namePh:slotHex(id).toUpperCase(),saved:tySaved,
+  onPick:(h,n)=>{traySet(id,h,null);const w=cwNow();if(n)w.m[id]=n.slice(0,40);else delete w.m[id];WBS.trayEdit=id;trayDone('Tray colour');upd();paintAll()},
   onName:n=>{const w=cwNow();if(n)w.m[id]=n.slice(0,40);else delete w.m[id];trayDone('Renamed tray colour')},
   onInput:h=>{traySet(id,h,null);WBS.trayEdit=id;upd();paintAll()},
   onChange:()=>{trayDone('Tray colour')},
@@ -102,7 +106,7 @@ function openWell(W){closeWell();closePicker();const o=tyP(),w=cwNow(o),r=W.spec
   if(b.dataset.adopt){const h0=col(r),id=trayAdd(h0,'');if(!id)return;W.spec.set('@'+id);closeWell();trayDone('Added tray colour');return}
   if(b.dataset.fix){closeWell();const start=col(r||(W.spec.defRef&&W.spec.defRef())||o.ink);
    const set=h=>{const r0=W.spec.get(),s=refSlot(r0);W.spec.set(h+(s&&tyP().ts.includes(s)?'|'+s:''))};
-   openPicker(W.sb,{value:start,alpha:true,onInput:h=>{set(h);upd();paintWells()},onChange:()=>trayDone('Fixed '+W.spec.what+' colour')})}});
+   openPicker(W.sb,{value:start,alpha:true,saved:tySaved,onInput:h=>{set(h);upd();paintWells()},onChange:()=>trayDone('Fixed '+W.spec.what+' colour')})}});
  el.addEventListener('keydown',e=>{if(e.key=='Escape'){e.stopPropagation();const b=W.sb;closeWell();b.focus()}});
  const f=el.querySelector('.on')||el.querySelector('button');if(f)f.focus({preventScroll:true})}
 function paintWells(force){WELLS.forEach(W=>paintWell(W,force))}
