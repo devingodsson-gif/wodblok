@@ -11,5 +11,6 @@ http.createServer((q, r) => {
   if (u === '/' || u === '/index.html') { r.writeHead(200, { 'content-type': 'text/html' }); return r.end(shellOf()); }
   const f = path.join(SRC, path.normalize(u));
   if (!f.startsWith(SRC) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); }
-  r.writeHead(200, { 'content-type': f.endsWith('.js') ? 'text/javascript' : 'application/octet-stream' }); r.end(fs.readFileSync(f));
+  const body = f === path.join(SRC, 'data', 'templates.js') ? require('./templates/folders').withFolders(fs.readFileSync(f, 'utf8')) : fs.readFileSync(f);   // the templates/ folders join the built-in list
+  r.writeHead(200, { 'content-type': f.endsWith('.js') ? 'text/javascript' : 'application/octet-stream' }); r.end(body);
 }).listen(port, '127.0.0.1', () => console.log('serving src/ as ES modules on http://127.0.0.1:' + port + '/'));

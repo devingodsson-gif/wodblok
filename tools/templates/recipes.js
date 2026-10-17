@@ -14,13 +14,5 @@ const RECIPES = [
   { id: 'book-6x9', kind: 'book', n: 'Book 6 × 9 in', seed: 9, trim: '6x9', look: { layout: true } },
   { id: 'book-8-5x11', kind: 'book', n: 'Book 8.5 × 11 in (Letter)', seed: 1, trim: '8.5x11', look: { layout: true } },
 ];
-// Templates that were made by hand (a saved project the owner supplied) and not played from a recipe. The source file (with its own picture)
-// is kept in tools/templates/custom/; `node tools/templates/add-custom.js` stores it in src/templates/<kind>/ and puts them FIRST in their kind, in this order
-// in src/data/templates.js. `npm run templates` runs it again at the end, so a regenerate keeps these.
-const CUSTOM = [
-  { id: 'logo-1', kind: 'canvas', n: 'Logo 1', file: 'logo-1.wodblok' },
-  { id: 'sidon-album-cover', kind: 'canvas', n: 'Sidon album cover', file: 'sidon-album-cover.wodblok' },
-  { id: 'rare-motion', kind: 'tile', n: 'Rare Motion', file: 'rare-motion.wodblok' },
-  { id: 'book-cover', kind: 'book', n: 'Book Cover', file: 'book-cover.wodblok' },
-];
-module.exports = { RECIPES, CUSTOM };
+// Templates made by hand are not listed here: put the .wodblok file in templates/canvas, templates/tile or templates/book (tools/templates/folders.js).
+module.exports = { RECIPES };

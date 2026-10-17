@@ -28,7 +28,10 @@ for (const f of fs.readdirSync(path.join(ROOT, 'src', 'vendor')).filter(f => f.e
 }
 for (const sub of ['data', 'platform', 'format', 'commands']) {                    // shared layers first, in this order
   const d = path.join(ROOT, 'src', sub);
-  for (const f of fs.readdirSync(d).filter(f => f.endsWith('.js')).sort()) parts.push(strip(sub + '/' + f, fs.readFileSync(path.join(d, f), 'utf8')));
+  for (const f of fs.readdirSync(d).filter(f => f.endsWith('.js')).sort()) {
+    const t = fs.readFileSync(path.join(d, f), 'utf8');
+    parts.push(strip(sub + '/' + f, sub + '/' + f === 'data/templates.js' ? require('./templates/folders').withFolders(t) : t));   // the templates/ folders join the built-in list
+  }
 }
 parts.push(...manifest.map(f => strip(f, fs.readFileSync(path.join(dir, f), 'utf8'))));
 parts.push(strip('main.js', fs.readFileSync(path.join(ROOT, 'src', 'main.js'), 'utf8')));
