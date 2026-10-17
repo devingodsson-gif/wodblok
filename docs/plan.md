@@ -159,3 +159,7 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - Brick offset: 1/4, 1/3, 1/2, 2/3 or 3/4 for Brick and Half-drop (layer setting bo, default 1/2).
 - Position across / down for the selected placed item(s) (Free place, Pictures, Text); a group moves together.
 - Not in this release: Area for Repeat on a book cover (whole cover, front, back, spine); it needs the Repeat renderer to clip to a region and goes in its own release.
+
+## 1.31.0 Randomize uses the new layout controls
+- Stamps: two new moves, "Round arrangements" and "Size, gaps and offset" (ticked by default, in the Stamps kinds list).
+- Layout: the same two kinds, so a Layout roll can give a repeating layer a round arrangement (not on a layer others link to), random size and gap variation, and a brick offset when the pattern is Brick or Half-drop.

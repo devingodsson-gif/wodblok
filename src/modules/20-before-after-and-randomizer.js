@@ -7,7 +7,7 @@ import {CATS} from './05-motif-data.js';
 import {cust,it,mkL,selOne,store} from './06-motif-library-folders.js';
 import {gModel} from './08-grid-shapes.js';
 import {hx3} from './09-stamp-editor-grid-and-motif-ops.js';
-import {arrOpts,fitTs} from './10-layer-grids.js';
+import {GRAD,arrOpts,fitTs,gArrAll} from './10-layer-grids.js';
 import {raf,upd} from './11-pressure-flooding-block-edges.js';
 import {TXF,TXMD,txMake,txRid} from './16-texture-generators.js';
 import {txMerge} from './17-texture-panel-and-previews.js';
@@ -39,10 +39,10 @@ if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.shape||FT.fr
 const dim0=JSON.parse(JSON.stringify(WBS.dim));
 if(!fresh&&WBX.wbCap)WBX.wbCap();
 // --- the bold moves for this roll (only used when Stamps is on)
-const MOVES=[['sym','new symmetry',1.3],['link','accents in the gaps',1.2],['shape','accent shapes',1],['mix','mixed shapes',.7],['rot','turned grid',.8],['inks','extra inks',.7],['motif','shape tweaks',.8],['swap','light on dark',.6],['blend','soft blending',.5],['text','lettering',1],['frame','frame',1.1]];
+const MOVES=[['sym','new symmetry',1.3],['link','accents in the gaps',1.2],['shape','accent shapes',1],['mix','mixed shapes',.7],['rot','turned grid',.8],['inks','extra inks',.7],['motif','shape tweaks',.8],['swap','light on dark',.6],['blend','soft blending',.5],['radial','round arrangements',.7],['vary','size, gaps and offset',.6],['text','lettering',1],['frame','frame',1.1]];
 const RZ={mv:null,n:0,keep:{col:!FT.col,gr:!FT.gr,tx:!FT.tx,pr:!FT.pr}};
 let inkMap={};const noAcc=!FT.col||!sOn('col','acc'),noPal=!FT.col||!sOn('col','pal');RZ.keep.col=noPal;
-const MV=MOVES.filter(x=>FT.stamps&&x[0]!='frame'&&!(x[0]=='text'&&!FT.text)&&!(x[0]=='swap'&&noPal)&&!(x[0]=='inks'&&noAcc)&&(x[0]=='text'||sOn('stamps',x[0])));
+const MV=MOVES.filter(x=>FT.stamps&&x[0]!='frame'&&!(x[0]=='text'&&!FT.text)&&!(x[0]=='swap'&&noPal)&&!(x[0]=='inks'&&noAcc)&&!(x[0]=='radial'&&WBS.dim.rt&&!WBS.book.on)&&(x[0]=='text'||sOn('stamps',x[0])));
 const F=new Set(),nf=Math.min(RZ.n||wpick([[1,.55],[2,.45]]),MV.length);while(F.size<nf){const m=wpick(MV.filter(x=>!F.has(x[0])).map(x=>[x[0],x[2]]));F.add(m)}
 // lettering takes over the main stamp, so it doesn't pair with moves that rework that stamp
 if(F.has('text')&&!WBX.wbTxPlace)F.delete('text');if(F.has('text'))['sym','mix','motif'].forEach(x=>F.delete(x));if(!F.size&&FT.stamps)F.add('link');if(FT.frame&&!(WBS.dim.rt&&!WBS.book.on))F.add('frame');
@@ -100,7 +100,7 @@ for(let q=0;q<n;q++){const sh=q&&mixK?mkSh(mixK,ri(70,95)):{...sh0,s:[...sh0.s],
  const c=comp(sh,q>0&&!mixK&&ch(.3));tl.push({id:q+1,sh,items:c.items,sym:c.sym,et:+wpick([[0,.25],[rr(1,3),.45],[rr(3,6),.3]]).toFixed(1),er:+rr(0,6).toFixed(1),es:ri(0,999),neg:ch(.12),ink:q&&on('inks')&&ch(.6)?inkFor():null})}
 if(mixK&&!tl.some((t,i)=>i&&t.sh.k==mixK))tl[1].sh=mkSh(mixK,85);
 const g0=geom(sh0),L=mkL('Layer 1',tl.map(t=>t.id),'check',180);
-L.ak={[g0.SK]:pick(arrOpts(g0))[0]};L.lead=1;L.fit=!on('rot')&&ch(.35)?pick(['h','v']):'';L.size=Math.round(rr(110,250));L.gap=ch(.65)?0:ri(-6,22);
+L.ak={[g0.SK]:pick(arrOpts(g0))[0]};if(on('radial')&&!on('link'))L.ak={[g0.SK]:pick(GRAD)[0]};if(on('vary')){if(ch(.7))L.rsz=ri(15,45);if(ch(.6)||!L.rsz)L.rgp=ri(8,28);const am=gArrAll(g0).find(o=>o[0]==L.ak[g0.SK]);if(am&&(am[2]=='brick'||am[2]=='drop'))L.bo=pick([25,33.333,50,66.667,75])}L.lead=1;L.fit=!on('rot')&&ch(.35)?pick(['h','v']):'';L.size=Math.round(rr(110,250));L.gap=ch(.65)?0:ri(-6,22);
 L.pst=ch(.5)?0:ri(1,6);L.pfl=ch(.65)?0:ri(1,3);L.rot=on('rot')?pick([45,45,30,-30,15,-15,60,90]):0;L.man=false;L.ov={};
 const TXFK=TXF.map(f=>Object.keys(f[1]));
 // --- extra printing passes: overprinted (multiply/darken) accent layers on their own offset grid
@@ -216,12 +216,13 @@ if(c.layers.some(l=>LS.includes(l)))LS.forEach(l=>{if(c.layers.includes(l)&&l.fi
 // Layout: pattern type, stamp size, spacing and scatter, offset, rotation and flips of the layers that repeat. Works on whatever layers the project has now.
 if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('layout','rot'),lty=sOn('layout','type'),lof=sOn('layout','offset'),
  lays=WBS.layers.filter(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.art&&!l.txt),lnk=new Set(WBS.layers.filter(l=>l.gl).map(l=>l.gl)),
- EN=[...(lsp?[['scatter',1.2]]:[]),...(lrt?[['tilt',1.1],['spread',1],['flips',1]]:[])],E=new Set();
+ lrd=sOn('layout','radial')&&!(WBS.dim.rt&&!WBS.book.on),lvr=sOn('layout','vary'),
+ EN=[...(lsp?[['scatter',1.2]]:[]),...(lrt?[['tilt',1.1],['spread',1],['flips',1]]:[]),...(lvr?[['sizevar',1],['gaps',.8]]:[])],E=new Set();
  // at most two energetic effects per roll (position scatter, turned grid, rotation spread, flips), so a piece stays coherent
  for(let q=wpick([[1,.55],[2,.45]]);q>0&&E.size<EN.length;q--)E.add(wpick(EN.filter(x=>!E.has(x[0]))));
  lays.forEach((l,i)=>{const lk=!!l.gl;
   if(!lk){const lead=WBS.tiles.find(t=>t.id==(l.lead!=null?l.lead:(l.st||[])[0]));
-   if(lty&&lead){const g=geom(shOf(lead));l.ak={...(l.ak||{}),[g.SK]:pick(arrOpts(g))[0]}}
+   if(lty&&lead){const g=geom(shOf(lead));let key=pick(arrOpts(g))[0];if(lrd&&!lnk.has(l.u)&&ch(.3))key=pick(GRAD)[0];l.ak={...(l.ak||{}),[g.SK]:key};const am=gArrAll(g).find(o=>o[0]==key);if(lvr&&am&&(am[2]=='brick'||am[2]=='drop'))l.bo=pick([25,33.333,50,66.667,75]);else delete l.bo}
    if(lsz){l.fit='';l.size=Math.round(i?rr(70,200):rr(110,250))}
    if(lsp)l.gap=ch(.6)?0:ri(-6,28);
    if(lof){l.ox=ri(0,99);l.oy=ri(0,99)}
@@ -232,7 +233,8 @@ if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('
   if(lrt){
    if(E.has('spread')){l.rrot=wpick([[ri(8,25),.45],[ri(25,60),.4],[ri(60,150),.15]]);if(ch(.55))l.rtn=true;else delete l.rtn}else{delete l.rrot;delete l.rtn}
    if(E.has('flips')){const h=ch(.75),v=ch(.5)||!h;if(h)l.rfh=true;else delete l.rfh;if(v)l.rfv=true;else delete l.rfv}else{delete l.rfh;delete l.rfv}}
-  if(lsp||lrt)l.rsd=1+Math.floor(R()*99999);
+  if(lvr){if(E.has('sizevar'))l.rsz=ri(15,45);else delete l.rsz;if(E.has('gaps')&&!lnk.has(l.u))l.rgp=ri(8,28);else delete l.rgp}
+  if(lsp||lrt||lvr)l.rsd=1+Math.floor(R()*99999);
   if(lsz&&!lk&&i==0&&!l.rot&&ch(.3)){l.fit=pick(['h','v']);try{l.size=+fitTs(l).toFixed(3)}catch(e){}}
  });useT(WBS.tiles[WBS.cur]);store();upd()}
 // Layer opacity and blend: the first layer stays mostly solid; the ones above can turn see-through or blend
