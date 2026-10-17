@@ -1,7 +1,7 @@
 // Clerk webhooks (set up in the Clerk dashboard to POST here). Signature checked on every call.
 //   user.created  email the site owner (NOTIFY_TO) with the new account and any waitlist answers
 //   user.updated  when the account type becomes early_access / tester / subscriber for the first time, email the user "You're in"
-//   user.deleted  delete that user's usage, feedback and approval rows
+//   user.deleted  delete that user's usage, feedback, approval and preference rows
 // Replies 2xx when the event is handled so Clerk stops retrying; replies 500 only when a retry is worth it.
 
 import { ensureSchema } from '../../../server/accounts/db.js';
@@ -39,6 +39,7 @@ export async function onRequestPost({ request, env }) {
         env.DB.prepare('DELETE FROM usage_daily WHERE user_id = ?1').bind(userId),
         env.DB.prepare('DELETE FROM feedback WHERE user_id = ?1').bind(userId),
         env.DB.prepare('DELETE FROM approvals WHERE user_id = ?1').bind(userId),
+        env.DB.prepare('DELETE FROM prefs WHERE user_id = ?1').bind(userId),
       ]);
       return json({ ok: true });
     }

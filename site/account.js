@@ -87,7 +87,10 @@
     // approved accounts get the link into the app; everyone else sees that they are on the list
     fetch('/api/me', { credentials: 'same-origin', headers: { accept: 'application/json' } })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { if (j && j.approved) { app.hidden = false; pending.hidden = true; heroSet('open'); } })
+      .then(function (j) {
+        if (j && j.approved) { app.hidden = false; pending.hidden = true; heroSet('open'); }
+        if (j && typeof j.accent === 'string' && window.WBAccent) window.WBAccent.sync(j.accent);   // the colour saved with the account
+      })
       .catch(function () {});
 
     function close() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }

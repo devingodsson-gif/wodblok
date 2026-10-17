@@ -13,6 +13,7 @@ import { onRequestPost as gateCookiePost, onRequestDelete as gateCookieDelete } 
 import { signGate, verifyGate, signPass } from '../server/accounts/pass.js';
 import { onRequestPost as usage } from '../functions/api/usage.js';
 import { onRequestPost as feedback } from '../functions/api/feedback.js';
+import { onRequestPost as accent } from '../functions/api/accent.js';
 import { onRequestPost as webhook } from '../functions/api/webhooks/clerk.js';
 
 const ISS = 'https://clerk.example.test';
@@ -160,6 +161,35 @@ test('usage: only tracked types are stored; the larger total wins; bad input is 
   assert.equal((await usage({ request: await req('/api/usage', { method: 'POST', body: { day: today(), seconds: 1, sessions: 1 } }), env: baseEnv() })).status, 503);
 });
 
+// ---------- /api/accent ----------
+test('accent: saved per account, returned by /api/me, Oak is remembered as a choice, bad input and strangers are refused', async () => {
+  const env = withDb();
+  await ensureSchema(env);
+  const post = async (body, o = {}) => accent({ request: await req('/api/accent', { method: 'POST', body, ...o }), env });
+  const mine = async (o = {}) => (await (await me({ request: await req('/api/me', o), env })).json()).accent;
+
+  assert.equal(await mine(), null);   // never saved
+  assert.equal((await post({ accent: '#86629A' }, { bearer: false })).status, 401);
+  assert.equal((await post({ accent: '#86629A' }, { claims: { type: '' } })).status, 403);
+  assert.equal((await post({ accent: '#86629A' })).status, 200);
+  assert.equal(await mine(), '#86629a');   // stored in lower case
+  assert.equal(await mine({ claims: { sub: 'user_2' } }), null);   // somebody else sees nothing
+  assert.equal((await post({ accent: '#a85a52' })).status, 200);
+  assert.equal(await mine(), '#a85a52');
+  assert.equal(env.DB.raw.prepare('SELECT COUNT(*) n FROM prefs').get().n, 1);   // one row per person
+  assert.equal((await post({ accent: '' })).status, 200);
+  assert.equal(await mine(), '');   // Oak chosen on purpose: different from never saved
+
+  for (const bad of [{ accent: 'red' }, { accent: '#fff' }, { accent: '#86629a; x' }, { accent: 5 }, {}, { accent: null }]) assert.equal((await post(bad)).status, 400, JSON.stringify(bad));
+  const cross = await accent({ request: await req('/api/accent', { method: 'POST', body: { accent: '#86629a' }, headers: { origin: 'https://evil.example' } }), env });
+  assert.equal(cross.status, 403);
+  assert.equal((await accent({ request: await req('/api/accent', { method: 'POST', body: { accent: '#86629a' } }), env: baseEnv() })).status, 503);
+  // a database that cannot be read never breaks sign-in
+  const broken = { ...env, DB: { prepare() { throw new Error('down'); }, batch() { throw new Error('down'); } } };
+  const r = await (await me({ request: await req('/api/me'), env: broken })).json();
+  assert.deepEqual([r.ok, r.approved, r.accent], [true, true, null]);
+});
+
 // ---------- /api/feedback ----------
 test('feedback: stored and emailed once; the same key twice does nothing more', async () => {
   const f = mockFetch();
@@ -284,7 +314,7 @@ test('webhook: if the email fails the event is retried and then sends', async ()
   }
 });
 
-test('webhook: deleting an account removes its usage, feedback and approval rows and nobody else\'s', async () => {
+test('webhook: deleting an account removes its usage, feedback, approval and preference rows and nobody else\'s', async () => {
   const env = withDb();
   const f = mockFetch();
   try {
@@ -292,10 +322,12 @@ test('webhook: deleting an account removes its usage, feedback and approval rows
     const db = env.DB.raw;
     db.prepare("INSERT INTO usage_daily VALUES ('user_9', '2026-10-01', 5, 1, 'v', 'b', 'now'), ('user_2', '2026-10-01', 5, 1, 'v', 'b', 'now')").run();
     db.prepare("INSERT INTO feedback (user_id, created_at, category, message, idem) VALUES ('user_9', 'now', 'bug', 'm', 'k1'), ('user_2', 'now', 'bug', 'm', 'k1')").run();
+    db.prepare("INSERT INTO prefs VALUES ('user_9', '#86629a', 'now'), ('user_2', '#a85a52', 'now')").run();
     assert.equal((await hook(env, 'user.deleted', { id: 'user_9', deleted: true })).status, 200);
-    for (const t of ['usage_daily', 'feedback', 'approvals']) assert.equal(db.prepare(`SELECT COUNT(*) n FROM ${t} WHERE user_id = 'user_9'`).get().n, 0, t);
+    for (const t of ['usage_daily', 'feedback', 'approvals', 'prefs']) assert.equal(db.prepare(`SELECT COUNT(*) n FROM ${t} WHERE user_id = 'user_9'`).get().n, 0, t);
     assert.equal(db.prepare("SELECT COUNT(*) n FROM usage_daily WHERE user_id = 'user_2'").get().n, 1);
     assert.equal(db.prepare("SELECT COUNT(*) n FROM feedback WHERE user_id = 'user_2'").get().n, 1);
+    assert.equal(db.prepare("SELECT COUNT(*) n FROM prefs WHERE user_id = 'user_2'").get().n, 1);
   } finally {
     f.restore();
   }
