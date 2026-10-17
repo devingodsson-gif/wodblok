@@ -232,7 +232,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 - One status line at the bottom of the window. Messages are short past-tense sentences with the name in curly quotes: `Saved template “Rose”`, `Started from “Brick”`, `Could not read that file`. Library messages are in section 12.9.
 - The unsaved state is an 8px dot (`--warn`) beside the name; no text.
 - No toasts, no `alert`, `confirm` or `prompt`.
-- The account chip (a first name preceded by "Hi", `--fs-s`, `--mut`, a quiet button) sits at the right of the status line and exists only while signed in.
+- The account chip ("Hi Devin!", the one place an exclamation mark is allowed: the owner asked for it to match the website; `--fs-s`, `--mut`, a quiet button) sits at the right of the status line and exists only while signed in.
 
 ## 10. States
 
@@ -419,7 +419,7 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 - **Vocabulary:** Tray (the working colours), Saved trays, Colourways, Folder, Set, Yours (the home folder), Hidden sets, Starting points (a set), Untitled pattern, Stamp, Layer, Canvas, Project, Template. Use these words and no synonyms (not "palette", "category", "collection", "preset pack", "my items").
 - Verbs on buttons: Save, Open, Add, Rename, Duplicate, Download, Delete, Replace, Clear, Import, Export. Not "OK", "Yes", "Submit".
 - Units: a space between number and unit (`12 px`, `300 dpi`), `%` without a space, `×` for sizes (`6 × 9 in`).
-- No exclamation marks, no emoji, no first person in the UI.
+- No exclamation marks (except the account chip, 9.9), no emoji, no first person in the UI.
 - Accessible names (`aria-label`) say the same words as the visible label; icon-only controls use the command name.
 
 ## 15. Where the code does not follow this yet (measured on 1.11.0)
