@@ -3,6 +3,11 @@
 const { test, expect } = require('@playwright/test');
 const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
 
+const { folderTemplates } = require('../tools/templates/folders');
+const BUILT = { canvas: 3, tile: 3, book: 3 };                                 // made by `npm run templates`
+const FOLDER = folderTemplates(), HAND = { canvas: 0, tile: 0, book: 0 };       // every .wodblok file in templates/<kind>/
+for (const t of FOLDER) HAND[t.type]++;
+
 test.beforeEach(() => { test.skip(TARGET !== 'build' && TARGET !== 'esm', 'new in the repo build'); });
 
 const openPicker = async page => { await page.click('#fileb'); await page.click('#tpnew'); await expect(page.locator('#tpdlg')).toBeVisible(); };
@@ -19,7 +24,7 @@ test('the File menu has both template items and the picker lists three kinds wit
   await expect(page.locator('#tpty button')).toHaveText(['Normal canvas', 'Repeating pattern', 'Book']);
   for (const k of ['canvas', 'tile', 'book']) {
     await kind(page, k);
-    await expect(cards(page)).toHaveCount(k === 'canvas' ? 6 : 5);          // Normal canvas also has Logo 1 and Sidon album cover; Repeating pattern has Rare Motion; Book has Book Cover
+    await expect(cards(page)).toHaveCount(1 + BUILT[k] + HAND[k]);          // Blank, the generated ones, and one for every file in the templates/ folder of that kind
     await expect(cards(page).first()).toHaveAttribute('aria-label', 'Blank');
     await expect(page.locator('#tpyh')).toBeHidden();
   }
@@ -36,7 +41,7 @@ test('both commands exist', async ({ page }) => {
 
 test('every built-in opens clean, matches its kind and opens the same twice', async ({ page }) => {
   const { errors } = await openApp(page);
-  for (const [k, n] of [['canvas', 5], ['tile', 4], ['book', 4]]) {
+  for (const [k, n] of Object.keys(BUILT).map(k => [k, BUILT[k] + HAND[k]])) {
     for (let i = 1; i <= n; i++) {
       await openPicker(page); await kind(page, k);
       await cards(page).nth(i).click();
@@ -127,7 +132,7 @@ test('Logo 1 and Sidon album cover are the first starting points after Blank in 
   const { errors } = await openApp(page);
   await openPicker(page); await kind(page, 'canvas');
   await expect(cards(page).nth(1)).toHaveAttribute('aria-label', 'Logo 1');
-  await expect(cards(page).nth(2)).toHaveAttribute('aria-label', 'Sidon album cover');
+  await expect(cards(page).nth(2)).toHaveAttribute('aria-label', 'Sidon Album Cover');
   await cards(page).nth(1).click();
   await expect(page.locator('#tpdlg')).toBeHidden();
   await settle(page, { max: 60000, quiet: 6 });
@@ -146,6 +151,18 @@ test('Rare Motion is the first repeating-pattern starting point and Book Cover t
     await settle(page, { max: 60000, quiet: 6 });
     const st = JSON.parse(await getState(page));
     expect(st.tiles.reduce((n, t) => n + (t.items || []).length, 0), name + ' has its shapes').toBeGreaterThan(5);
+  }
+  expect(errors).toEqual([]);
+});
+
+test('every file in the templates/ folders is a starting point under the kind of its folder, by name, before the generated ones', async ({ page }) => {
+  expect(FOLDER.length, 'the four supplied templates are in the folders').toBeGreaterThanOrEqual(4);
+  const { errors } = await openApp(page);
+  for (const k of Object.keys(BUILT)) {
+    await openPicker(page); await kind(page, k);
+    const want = ['Blank', ...FOLDER.filter(t => t.type === k).map(t => t.n)];
+    expect(await cards(page).evaluateAll((els, n) => els.slice(0, n).map(e => e.getAttribute('aria-label')), want.length)).toEqual(want);
+    await page.keyboard.press('Escape');
   }
   expect(errors).toEqual([]);
 });

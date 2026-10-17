@@ -167,3 +167,9 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 ## 1.31.0 Randomize uses the new layout controls
 - Stamps: two new moves, "Round arrangements" and "Size, gaps and offset" (ticked by default, in the Stamps kinds list).
 - Layout: the same two kinds, so a Layout roll can give a repeating layer a round arrangement (not on a layer others link to), random size and gap variation, and a brick offset when the pattern is Brick or Half-drop.
+
+## 1.33.0: Templates from folders
+- **Add a template by putting its `.wodblok` file in a folder**: `templates/canvas/` (Normal canvas), `templates/tile/` (Repeating pattern) or `templates/book/` (Book). Nothing else to edit or run. The card name is the project's own name; the id is `tpl-` plus the file name, so keep a file's name if you replace it. In each kind they come after Blank, sorted by name, before the generated starting points.
+- Done in the build (`tools/templates/folders.js`, called by `tools/build.js` and by `tools/serve-esm.js` for `npm run dev`; uses the existing `fflate`). The card picture is the file's own picture as it is (no image library), so each adds about 100 KB to the page.
+- Logo 1, Sidon album cover (now shown as "Sidon Album Cover", its project name), Rare Motion and Book Cover moved from `tools/templates/custom/` to these folders. `CUSTOM`, `add-custom.js` and the copies in `src/templates/` for them are gone; `npm run templates` makes only the generated ones.
+- Tests: `tests/templates.spec.js` counts the cards from the folders and checks name and order.
