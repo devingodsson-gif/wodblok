@@ -232,6 +232,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 - One status line at the bottom of the window. Messages are short past-tense sentences with the name in curly quotes: `Saved template “Rose”`, `Started from “Brick”`, `Could not read that file`. Library messages are in section 12.9.
 - The unsaved state is an 8px dot (`--warn`) beside the name; no text.
 - No toasts, no `alert`, `confirm` or `prompt`.
+- The account chip (a first name preceded by "Hi", `--fs-s`, `--mut`, a quiet button) sits at the right of the status line and exists only while signed in.
 
 ## 10. States
 
@@ -387,6 +388,7 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 - Footer: actions right-aligned, gap 8; **Cancel** (secondary) then the **primary** on the far right. Enter triggers the primary; Esc cancels.
 - Focus moves into the dialog on open and returns to the opener on close.
 - A dialog asks for input or shows a library. It does not show instructions, and it does not ask yes/no questions; use two-tap instead.
+- The locked screen (signed out, not approved, offline too long) is a dialog with no close button and no Escape: its title says why, its buttons are Sign in (primary), Try again and Save project, so work can always be saved.
 
 ### 13.2 Menus
 
