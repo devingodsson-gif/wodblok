@@ -19,7 +19,7 @@ test('the File menu has both template items and the picker lists three kinds wit
   await expect(page.locator('#tpty button')).toHaveText(['Normal canvas', 'Repeating pattern', 'Book']);
   for (const k of ['canvas', 'tile', 'book']) {
     await kind(page, k);
-    await expect(cards(page)).toHaveCount(k === 'canvas' ? 5 : 4);          // Normal canvas also has Logo 1
+    await expect(cards(page)).toHaveCount(k === 'canvas' ? 6 : 4);          // Normal canvas also has Logo 1 and Sidon album cover
     await expect(cards(page).first()).toHaveAttribute('aria-label', 'Blank');
     await expect(page.locator('#tpyh')).toBeHidden();
   }
@@ -36,7 +36,7 @@ test('both commands exist', async ({ page }) => {
 
 test('every built-in opens clean, matches its kind and opens the same twice', async ({ page }) => {
   const { errors } = await openApp(page);
-  for (const [k, n] of [['canvas', 4], ['tile', 3], ['book', 3]]) {
+  for (const [k, n] of [['canvas', 5], ['tile', 3], ['book', 3]]) {
     for (let i = 1; i <= n; i++) {
       await openPicker(page); await kind(page, k);
       await cards(page).nth(i).click();
@@ -123,10 +123,11 @@ test('no id appears twice on the page, and the picker\'s own X closes it and is 
   expect(errors).toEqual([]);
 });
 
-test('Logo 1 is the first starting point after Blank in Normal canvas, and opens with its artwork', async ({ page }) => {
+test('Logo 1 and Sidon album cover are the first starting points after Blank in Normal canvas, and Logo 1 opens with its artwork', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPicker(page); await kind(page, 'canvas');
   await expect(cards(page).nth(1)).toHaveAttribute('aria-label', 'Logo 1');
+  await expect(cards(page).nth(2)).toHaveAttribute('aria-label', 'Sidon album cover');
   await cards(page).nth(1).click();
   await expect(page.locator('#tpdlg')).toBeHidden();
   await settle(page, { max: 60000, quiet: 6 });

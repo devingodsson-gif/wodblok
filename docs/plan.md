@@ -105,3 +105,7 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 - **Logo 1** (a project supplied by the owner) is the first starting point after Blank in Normal canvas. Hand-made built-ins are listed in `CUSTOM` in `tools/templates/recipes.js`, kept in `tools/templates/custom/`, and added by `tools/templates/add-custom.js` (which `npm run templates` runs at the end, so regenerating keeps them).
 - **Launch**: the New from template picker opens when the app starts (Normal canvas kind unless another was last used). Closing it leaves the blank project. Settings > General > Templates at launch turns it off (`wb111_tplstart`).
 - Tests: `tests/templates.spec.js` (Logo 1, launch picker and the setting); the test harness turns the picker off unless a test passes `templates: true`.
+
+## 1.26.0: Sidon album cover template
+- **Sidon album cover** (a project supplied by the owner, a diamond canvas with three pictures) is the second starting point after Blank in Normal canvas, right after Logo 1. Added through `CUSTOM` in `tools/templates/recipes.js` like Logo 1.
+- Tests: `tests/templates.spec.js` (order, count, opens clean like the other built-ins).
