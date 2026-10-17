@@ -130,3 +130,10 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - Snapping is chosen only in the Grid tool and applies to every Free place, Pictures and Text layer (placing, dragging, arrow keys, Alt skips it). The per-layer snap boxes are gone from Layout.
 - Older projects that chose snapping per layer open with Snap to grid on (read from the layers until the switch is first touched; opening changes nothing in the file). New optional fields in the pattern grid: snap, ss. Stamp grid gains ss and op in its saved settings.
 - "Guides" (Pattern) and "Stamp grid" (Stamp editor) are renamed Grid.
+
+## 1.30.0 New settings
+- Repeat: ten radial arrangements in the Pattern list under "Round the middle" (Rings, Spiral, Spiral arms, Sunflower, Spokes, each turned outward or upright). They use the layer's size, spacing, offset and rotation; they are not part of Randomize's pick, so Randomize is unchanged.
+- Variation: Size (random size change, Repeat and Free place) and Gaps (random prints left out, Repeat only). New optional layer settings rsz, rgp.
+- Brick offset: 1/4, 1/3, 1/2, 2/3 or 3/4 for Brick and Half-drop (layer setting bo, default 1/2).
+- Position across / down for the selected placed item(s) (Free place, Pictures, Text); a group moves together.
+- Not in this release: Area for Repeat on a book cover (whole cover, front, back, spine); it needs the Repeat renderer to clip to a region and goes in its own release.
