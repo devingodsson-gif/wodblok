@@ -8,6 +8,7 @@
   var openApp = document.getElementById('open-app');
   if (!nav || !openApp) return;
   var appUrl = openApp.href;
+  var hero = document.getElementById('hero-cta');   // the big button under the title: Create account / Open Wodblok / hidden
 
   // The publishable key holds the address of Clerk's server for this site (base64, ends with "$").
   var host;
@@ -17,7 +18,8 @@
   // Hide the plain "Open Wodblok" button until Clerk has decided what to show, so it does not flash and swap.
   // If Clerk cannot load, the button comes back (on an error, or after a few seconds).
   openApp.style.visibility = 'hidden';
-  function showPlain() { openApp.style.visibility = ''; }
+  if (hero) hero.style.visibility = 'hidden';
+  function showPlain() { openApp.style.visibility = ''; if (hero) hero.style.visibility = ''; }
   var failsafe = setTimeout(showPlain, 6000);
 
   var script = document.createElement('script');
@@ -85,7 +87,7 @@
     // approved accounts get the link into the app; everyone else sees that they are on the list
     fetch('/api/me', { credentials: 'same-origin', headers: { accept: 'application/json' } })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { if (j && j.approved) { app.hidden = false; pending.hidden = true; } })
+      .then(function (j) { if (j && j.approved) { app.hidden = false; pending.hidden = true; heroSet('open'); } })
       .catch(function () {});
 
     function close() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
@@ -117,14 +119,35 @@
       .then(function () {}, function () {});
   }
 
+  // the hero button follows the account: signed out -> Create account, approved -> Open Wodblok, signed in but not approved -> hidden
+  var heroClick = null;
+  function heroSet(mode) {
+    if (!hero) return;
+    if (heroClick) { hero.removeEventListener('click', heroClick); heroClick = null; }
+    hero.style.visibility = '';
+    if (mode === 'signup') {
+      hero.textContent = 'Create account';
+      hero.href = '#';   // a link keeps Enter and focus working; the click opens the sign-up box instead
+      heroClick = function (e) { e.preventDefault(); window.Clerk.openSignUp({}); };
+      hero.addEventListener('click', heroClick);
+    } else if (mode === 'open') {
+      hero.textContent = 'Open Wodblok';
+      hero.href = appUrl;
+    } else {
+      hero.style.visibility = 'hidden';
+    }
+  }
+
   var minted = false;
   function render() {
     clear();
     openApp.hidden = true; // the sign-in buttons or the menu take its place
     if (window.Clerk.user) {
+      heroSet('none');
       signedIn();
       if (!minted) { minted = true; mintGate(); }
     } else {
+      heroSet('signup');
       signedOut();
       if (minted) { minted = false; clearGate(); }
     }

@@ -123,16 +123,4 @@ test('email delivery failure does not fail or discard a saved signup', async () 
     console.error = originalError;
   }
 });
-
-test('landing page leads with pattern and print design and prioritizes the waitlist', async () => {
-  const html = await readFile(new URL('../site/index.html', import.meta.url), 'utf8');
-  assert.match(html, /<title>Wodblok — Pattern &amp; Print Design for Artists<\/title>/);
-  assert.match(html, /Make a mark\. <em>Build a pattern\.<\/em>/);
-  assert.match(html, /href="#waitlist">Get early access/);
-  assert.match(html, /From a single mark to a world of pattern\./);
-  assert.doesNotMatch(html, /A focused creative workspace|01 \/ MOTIF|02 \/ REPEAT|03 \/ MAKE/);
-  assert.match(html, /Linocut or block printing/);
-  assert.match(html, /Stamp design/);
-  assert.match(html, /https:\/\/wodblok\.com\/img\/gallery\/image-10\.webp/);
-  assert.match(html, /\.pillars\s*\{[^}]*grid-template-columns:minmax\(0,1fr\)/);
-});
+// The page itself (copy, hero, video slot, footer) is checked in tests/site-marketing-page.test.mjs; the waitlist API is checked above.

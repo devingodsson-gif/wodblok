@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy — Wodblok</title>
+<meta name="description" content="What Wodblok collects and why.">
+<link rel="canonical" href="https://wodblok.com/privacy.html">
+<meta name="theme-color" content="#1b1a18">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="/favicon.ico" sizes="any">
+<style>
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:500 600;font-display:swap;src:url("/fonts/fraunces-latin.woff2") format("woff2")}
+@font-face{font-family:"Hanken Grotesk";font-style:normal;font-weight:400 600;font-display:swap;src:url("/fonts/hanken-grotesk-latin.woff2") format("woff2")}
+:root{--bg:#1b1a18;--raise:#242220;--line:#37332f;--fg:#ede6da;--mut:#a39b8e;--acc:#c9a66b;--acc-ink:#c9a66b;--acc-fg:#1b1a18;--display:"Fraunces",Georgia,serif;--body:"Hanken Grotesk",system-ui,sans-serif;color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f2e9;--raise:#eae4d8;--line:#ddd5c6;--fg:#26221d;--mut:#706858;--acc:#b8914f;--acc-ink:#8a6528;color-scheme:light}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 17px/1.65 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:28px clamp(18px,4vw,44px) 64px}
+a{color:var(--acc-ink);text-underline-offset:.22em}
+.back{display:inline-block;margin-bottom:32px;color:var(--mut);font-size:14px}
+h1{font:500 clamp(32px,5vw,44px)/1.1 var(--display);letter-spacing:-.02em;margin:0 0 8px}
+h2{font:500 22px/1.2 var(--display);margin:40px 0 10px}
+p,li{margin:0 0 12px}
+ul{padding-left:1.2em;margin:0 0 12px}
+.date{color:var(--mut);font-size:14px}
+footer{border-top:1px solid var(--line);margin-top:56px;padding-top:20px;color:var(--mut);font-size:14px}
+</style>
+<script src="/accent.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">Wodblok</a>
+  <h1>Privacy</h1>
+  <p class="date">Updated October 2026</p>
+
+  <h2>Your projects</h2>
+  <p>Projects and files stay on your device. Wodblok does not upload them and cannot see them.</p>
+
+  <h2>Account</h2>
+  <p>Creating an account stores your email address, first name and password with Clerk, the sign-in service. Wodblok stores your account ID, your account type and whether you are approved.</p>
+
+  <h2>Usage time</h2>
+  <p>For early-access and tester accounts, the app records the time it was in active use each day, the number of sessions, the app version and the browser name. It records nothing from a project or a file. Other account types are not tracked.</p>
+
+  <h2>Feedback</h2>
+  <p>If you send feedback from the app, Wodblok stores the message, its category, the app version and the browser name, and emails the message to the owner.</p>
+
+  <h2>Waitlist</h2>
+  <p>Earlier visitors who joined the waitlist gave an email address, what they will use Wodblok for and where they heard of it. Ask to be removed at any time.</p>
+
+  <h2>Cookies and device storage</h2>
+  <ul>
+    <li>Clerk sets cookies to keep you signed in on this site.</li>
+    <li>When you are approved, a sign-in cookie lets the app open for 24 hours.</li>
+    <li>The app saves its settings, and a seven-day pass for working offline, on your device.</li>
+    <li>The app saves your accent colour as a cookie so this site can use it.</li>
+  </ul>
+
+  <h2>Services used</h2>
+  <p>Clerk (sign-in), Cloudflare (hosting and database) and Resend (email). Wodblok has no advertising and does not sell data.</p>
+
+  <h2>Delete your data</h2>
+  <p>Delete your account from Account in the website menu or in the app. This removes your usage, feedback and approval records. To remove a waitlist entry or ask anything else, use the contact link below.</p>
+
+  <footer><a data-contact-link href="mailto:">Contact</a></footer>
+</div>
+<script src="/contact.js"></script>
+</body>
+</html>
