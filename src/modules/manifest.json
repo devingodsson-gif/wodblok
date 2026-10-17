@@ -53,5 +53,6 @@
  "53-colourways.js",
  "54-templates.js",
  "55-settings.js",
- "56-watermark.js"
+ "56-watermark.js",
+ "57-saved-colours.js"
 ]

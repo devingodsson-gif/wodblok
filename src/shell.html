@@ -807,6 +807,10 @@ body.eyedrop{cursor:crosshair}
 .str.ren,.stf.ren{grid-template-columns:auto minmax(0,1fr)}.str.ren input,.stf.ren input{height:26px}
 .sts{display:flex;border-radius:var(--r-s);overflow:hidden;box-shadow:0 0 0 1px rgba(128,128,128,.35)}.sts i{display:block;width:12px;height:20px}
 .stno{padding:8px 8px;color:var(--faint);font-size:var(--fs-m)}
+.sctb{display:flex;align-items:center;gap:6px;margin-bottom:6px}.sctb .alt{margin-left:auto;width:auto}.sctb .ic,.scl .ib .ic{width:16px;height:16px}.scl .lfi .ic{width:16px;height:16px}
+.scl{max-height:560px}.scl .lfr{margin-left:calc(var(--d,0)*12px);width:calc(100% - var(--d,0)*12px);flex:none}.scl .lfr.act{background:var(--raise);box-shadow:inset 2px 0 0 var(--acc)}.scl .lfr .ib{width:26px;height:26px}.scl .lfa{transition:transform var(--t-fast)}.scl .lfr[aria-expanded="true"] .lfa{transform:rotate(90deg)}
+.scr{margin-left:calc(var(--d,0)*12px + 8px);grid-template-columns:auto minmax(0,1fr) auto auto auto}.scr.ren{grid-template-columns:auto minmax(0,1fr)}.scl .stno{margin-left:calc(var(--d,0)*12px + 8px)}
+.scform{display:flex;align-items:center;gap:6px;margin:2px 0 2px calc(var(--d,0)*12px + 8px);font-size:var(--fs-m)}.scform input{flex:1;min-width:0}.scform span{flex:1}
 #stq{width:100%}
 /* colourways */
 .cwx{padding:12px 12px;border-bottom:1px solid var(--line)}
@@ -1021,6 +1025,11 @@ body.eyedrop{cursor:crosshair}
   <details class="g" open><summary>Paper and ink</summary><div class="gb">
    <div class="cwrow"><span class="cwk">Paper</span><div class="cwell" id="wl_pb"></div></div>
    <div class="cwrow"><span class="cwk">Ink</span><div class="cwell" id="wl_pi"></div></div>
+  </div></details>
+  <details class="g" open><summary>Saved colours <span class="aux" id="scn"></span></summary><div class="gb">
+   <div class="sctb"><button type="button" class="ib" id="scall" aria-pressed="false" aria-label="Expand all"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5 5 5-5M7 4l5 5 5-5" transform="translate(0 4)"/></svg></button><button type="button" class="ib" id="scnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5V18a1.5 1.5 0 0 0 1.5 1.5h14a1.5 1.5 0 0 0 1.5-1.5V9.5A1.5 1.5 0 0 0 19 8h-7l-2-2.5H5A1.5 1.5 0 0 0 3.5 7zM12 11.5v5M9.5 14h5"/></svg></button><button type="button" class="alt" id="scadd"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add colour</button></div>
+   <input type="text" id="scq" maxlength="40" placeholder="Find a colour" aria-label="Find a colour">
+   <div class="stl scl" id="scl" role="tree" aria-label="Saved colours"></div>
   </div></details>
   <details class="g" open><summary>Saved trays <span class="aux" id="stcnt"></span></summary><div class="gb">
    <input type="text" id="stq" maxlength="40" placeholder="Find a tray" aria-label="Find a tray">
