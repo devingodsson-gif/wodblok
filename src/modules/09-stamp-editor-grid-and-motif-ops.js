@@ -12,16 +12,17 @@ import {paintGhost,renderML,sync} from './13-preview-and-stamp-tool.js';
 import {isOf} from './16-texture-generators.js';
 import {buildTex,inkCatch,surfFor,texNorm} from './17-texture-panel-and-previews.js';
  // the Stamp texture / Canvas texture view switches: one setting shared by the Pattern view and the Stamp editor
-let grid={on:false,n:6,sp:'c',sd:false,sh:'rect'};const saveGrid=()=>{try{kv.set('wb33_grid',JSON.stringify(grid))}catch(e){}};
-const gDim=()=>{const n=Math.max(1,Math.min(24,Math.round(grid.n)));return[n,Math.max(1,Math.round(n*SH/SW))]};
+let grid={on:false,n:6,sp:'c',sd:false,ss:false,op:70,sh:'rect'};const saveGrid=()=>{try{kv.set('wb33_grid',JSON.stringify(grid))}catch(e){}};
+const gDim=()=>{const n=Math.max(2,Math.min(60,Math.round(grid.n)));return[n,Math.max(1,Math.round(n*SH/SW))]};
 function snapPt(x,y){if(grid.sh&&grid.sh!='rect'){const M=gModel(grid.sh,SW,SH,gDim()[0],true),[ux,uy]=wrapP(x,y),b=gNear((grid.sp!='l'?M.cents:[]).concat(grid.sp!='c'?M.verts:[]),ux,uy,SW,SH,true);if(b)return wrapP(b[0],b[1])}
 const[n,m]=gDim(),cw=SW/n,ch=SH/m,[wx,wy]=wrapP(x,y);const cands=[];
 if(grid.sp!='l')cands.push([(Math.floor(wx/cw)+.5)*cw,(Math.floor(wy/ch)+.5)*ch]);if(grid.sp!='c')cands.push([Math.round(wx/cw)*cw,Math.round(wy/ch)*ch]);
 let b=cands[0],bd=1e9;cands.forEach(c=>{const d=(c[0]-wx)**2+(c[1]-wy)**2;if(d<bd){bd=d;b=c}});return wrapP(b[0],b[1])}
-function gridSVG(){if(!grid.on)return'';if(grid.sh&&grid.sh!='rect'){const M=gModel(grid.sh,SW,SH,gDim()[0],true),f=v=>v.toFixed(2);let dots='';if(grid.sp!='l')M.cents.forEach(q=>dots+=`<circle cx="${f(q[0])}" cy="${f(q[1])}" r="1.1"/>`);if(grid.sp!='c')M.verts.forEach(q=>dots+=`<circle cx="${f(q[0])}" cy="${f(q[1])}" r=".9"/>`);
- return`<g pointer-events="none" clip-path="url(#ec)" color="#6f8cff"><path d="${M.items.join('')}" fill="none" stroke="currentColor" stroke-width=".7" opacity=".55"/><rect width="${SW}" height="${SH}" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><g fill="currentColor" opacity=".7">${dots}</g></g>`}const[n,m]=gDim(),cw=SW/n,ch=SH/m,f=v=>v.toFixed(2);let d='';for(let i=1;i<n;i++)d+=`M${f(i*cw)},0V${SH}`;for(let j=1;j<m;j++)d+=`M0,${f(j*ch)}H${SW}`;
+const snapSize=(q,s)=>{const cw=SW/gDim()[0],base=96*(q.sx||1),w=Math.max(cw,Math.round(base*s/cw)*cw);return Math.min(4,Math.max(.02,+(w/base).toFixed(3)))};
+function gridSVG(){if(!grid.on)return'';const lo=(.55*Math.max(10,Math.min(100,+grid.op||70))/70).toFixed(2),dop=(.7*Math.max(10,Math.min(100,+grid.op||70))/70).toFixed(2);if(grid.sh&&grid.sh!='rect'){const M=gModel(grid.sh,SW,SH,gDim()[0],true),f=v=>v.toFixed(2);let dots='';if(grid.sp!='l')M.cents.forEach(q=>dots+=`<circle cx="${f(q[0])}" cy="${f(q[1])}" r="1.1"/>`);if(grid.sp!='c')M.verts.forEach(q=>dots+=`<circle cx="${f(q[0])}" cy="${f(q[1])}" r=".9"/>`);
+ return`<g pointer-events="none" clip-path="url(#ec)" color="#6f8cff"><path d="${M.items.join('')}" fill="none" stroke="currentColor" stroke-width=".7" opacity="${lo}"/><rect width="${SW}" height="${SH}" fill="none" stroke="currentColor" stroke-width="1.4" opacity="${lo}"/><g fill="currentColor" opacity="${dop}">${dots}</g></g>`}const[n,m]=gDim(),cw=SW/n,ch=SH/m,f=v=>v.toFixed(2);let d='';for(let i=1;i<n;i++)d+=`M${f(i*cw)},0V${SH}`;for(let j=1;j<m;j++)d+=`M0,${f(j*ch)}H${SW}`;
 let dots='';if(grid.sp!='l')for(let i=0;i<n;i++)for(let j=0;j<m;j++)dots+=`<circle cx="${f((i+.5)*cw)}" cy="${f((j+.5)*ch)}" r="1.1"/>`;
-return`<g pointer-events="none" clip-path="url(#ec)" color="#6f8cff"><path d="${d}" fill="none" stroke="currentColor" stroke-width=".7" opacity=".55"/><rect width="${SW}" height="${SH}" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><g fill="currentColor" opacity=".7">${dots}</g></g>`}
+return`<g pointer-events="none" clip-path="url(#ec)" color="#6f8cff"><path d="${d}" fill="none" stroke="currentColor" stroke-width=".7" opacity="${lo}"/><rect width="${SW}" height="${SH}" fill="none" stroke="currentColor" stroke-width="1.4" opacity="${lo}"/><g fill="currentColor" opacity="${dop}">${dots}</g></g>`}
 // Split pieces: q.cl is a list of [angle, offset, side] half-planes in the motif's own -50..50 space.
 let clipN=0;
 // the pattern build numbers its ids from a fixed start, so the same stamps give the same text every time and the hosted outlines are only rewritten when something changed
@@ -85,4 +86,4 @@ WBS.edMk=true;WBS.edInk=true;WBS.edTx=true;try{const g=JSON.parse(kv.get('wb33_g
 grid.sh=gShOk(grid.sh);
 ORN.forEach(k=>ARR[k]=ARR.circle);
 }
-export {ARR,clipSeed,clipWrap,gDim,grid,hx3,items,saveGrid,snapPt,init09};
+export {ARR,clipSeed,clipWrap,gDim,grid,hx3,items,saveGrid,snapPt,snapSize,init09};

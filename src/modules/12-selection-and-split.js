@@ -22,6 +22,7 @@ WBS.split=null;WBS.spDrag=null;
 addEventListener('pointerup',()=>{WBS.spDrag=null});
 $('ssp').onclick=()=>{const q=Q();if(!q||WBS.msel.size>1)return;WBS.brush=null;WBS.split=WBS.split?null:{i:WBS.sel,x:q.x,y:q.y,a:q.r+90};WBH.draw()};
 $('spok').onclick=doSplit;$('spno').onclick=()=>{WBS.split=null;WBH.draw()};
+$('lbo').oninput=()=>{LY().bo=+$('lbo').value;store();upd()};
 $('larr').oninput=()=>{const L=LY();if(!L.ak||typeof L.ak!='object')L.ak={};L.ak[latG(L).SK]=$('larr').value;store();upd()};
 // ---- manual arrangement: click an impression on the pattern to cycle which stamp is printed there
 $('man').onchange=()=>{const L=LY();L.man=$('man').checked;if(!L.ov)L.ov={};store();upd()};

@@ -94,7 +94,7 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 ## 1.27.0 (accounts in the app)
 Name chip in the status bar, File > Account…, File > Send feedback…, the 7-day offline pass with a locked screen, active-time totals for early access and testers, Sign out and Manage account through the site. `/api/me` reports `gated`; the gate cookie lasts one day. The network rule in CLAUDE.md now allows `src/platform/account.js` only, and `check:platform` enforces it. Tests: `tests/account.spec.js` (build target), `tests/site-accounts.test.mjs`, `tests/site-account.spec.js`. Fixed a comment that made `check:platform` fail.
 
-## 1.27.4 (accent colour saved with the account)
+## 1.30.1 (accent colour saved with the account)
 - The accent colour is kept with the account, so it follows the person to other devices and browsers. Server: table `prefs` (user id, accent, time; `''` means Oak was chosen on purpose, no row means never saved), `POST /api/accent` (approved accounts, same site, `#rrggbb` or empty), `GET /api/me` returns `accent` (null when never saved or unreadable; sign-in never fails over it). Deleting an account removes the row.
 - App (`src/platform/account.js`, `55-settings.js`, `58-account.js`): a change is saved to the account after a short pause and kept as pending until the server has it (so an offline change goes up later). After each successful check: a pending change wins and is sent; otherwise the saved colour is shown here; with nothing saved, this device's colour is saved. Nothing is read or sent on an offline pass.
 - Site (`site/accent.js`, `site/account.js`): when signed in, the colour from `/api/me` sets the `wb_accent` cookie and recolours the page.
@@ -134,3 +134,28 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 ## 1.26.0: Sidon album cover template
 - **Sidon album cover** (a project supplied by the owner, a diamond canvas with three pictures) is the second starting point after Blank in Normal canvas, right after Logo 1. Added through `CUSTOM` in `tools/templates/recipes.js` like Logo 1.
 - Tests: `tests/templates.spec.js` (order, count, opens clean like the other built-ins).
+
+## 1.27.0 Layout clean-up (first of the Layout redesign, see the project doc wodblok-layout-plan)
+- Layer type is a dropdown whose heading shows the type (Repeat, Frame, Free place, Pictures, Text).
+- Impression and Variation (was Randomness) show only on Repeat, Frame and Free place, where they take effect.
+- Ink edges moved from Layout to the Canvas tool.
+- Next: 1.28.0 Align, 1.29.0 Grid, 1.30.0 new settings.
+
+## 1.28.0 Align
+- New Align group in Layout for Free place, Pictures and Text: a 3 x 3 grid (top left to bottom right), Centre across, Centre down, Distribute across and down (3 or more selected), and Margin.
+- Several selected items move as one group. On a book cover the area is the region the selection sits in (back cover, spine or front cover), inside the safe area; on a canvas or repeat tile it is the whole canvas.
+- Each press is one undo step. Every button is a command (Align: ...) in command search; no default shortcut keys yet.
+- Not done yet: Position X/Y (planned for this release in the plan doc) moves to 1.29.0 with the Grid work.
+
+## 1.29.0 Grid
+- One Grid tool, the same in Pattern mode and in the Stamp editor: same name, icon and controls (Show grid, Snap to grid, Shape, Cells across, Snap points: Crossings / Centres / Both, Snap size to whole cells, Line strength, Snap all to grid, Reset grid). G shows or hides the grid in either mode.
+- Snapping is chosen only in the Grid tool and applies to every Free place, Pictures and Text layer (placing, dragging, arrow keys, Alt skips it). The per-layer snap boxes are gone from Layout.
+- Older projects that chose snapping per layer open with Snap to grid on (read from the layers until the switch is first touched; opening changes nothing in the file). New optional fields in the pattern grid: snap, ss. Stamp grid gains ss and op in its saved settings.
+- "Guides" (Pattern) and "Stamp grid" (Stamp editor) are renamed Grid.
+
+## 1.30.0 New settings
+- Repeat: ten radial arrangements in the Pattern list under "Round the middle" (Rings, Spiral, Spiral arms, Sunflower, Spokes, each turned outward or upright). They use the layer's size, spacing, offset and rotation; they are not part of Randomize's pick, so Randomize is unchanged.
+- Variation: Size (random size change, Repeat and Free place) and Gaps (random prints left out, Repeat only). New optional layer settings rsz, rgp.
+- Brick offset: 1/4, 1/3, 1/2, 2/3 or 3/4 for Brick and Half-drop (layer setting bo, default 1/2).
+- Position across / down for the selected placed item(s) (Free place, Pictures, Text); a group moves together.
+- Not in this release: Area for Repeat on a book cover (whole cover, front, back, spine); it needs the Repeat renderer to clip to a region and goes in its own release.

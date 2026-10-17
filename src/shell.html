@@ -528,7 +528,6 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 .strip svg{width:100%;height:100%}
 .slg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.slc{border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);padding:6px;display:flex;flex-direction:column;gap:6px;min-width:0}.slc .im{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:var(--r-m);background:repeating-conic-gradient(rgba(128,128,128,.14) 0 25%,transparent 0 50%) 0 0/12px 12px,var(--panel)}.slc .im img{max-width:92%;max-height:92%;object-fit:contain}.slc b{font-size:var(--fs-s);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.slc .row{gap:4px;flex-wrap:wrap}.slc button{padding:4px 8px;font-size:var(--fs-s)}
 .strip button img,.ath{display:block;width:100%;height:100%;object-fit:contain}.strip button{position:relative}#lfars button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}#lfars .alk{position:absolute;left:3px;bottom:3px;width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 1.5px var(--field)}#lfars i{position:absolute;top:-5px;right:-5px;width:15px;height:15px;line-height:13px;border-radius:50%;background:var(--panel);border:1px solid var(--line2);font-style:normal;font-size:var(--fs-s);color:var(--mut)}
-#lfgrid{margin-top:8px}#lfgrid .hint{margin-top:6px}.fgk{font-style:normal;color:var(--faint);font-size:var(--fs-s)}
 #lfpst button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}.fpn{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:var(--fs-m);color:var(--mut)}.fpn span{flex:1}.fpn button{margin:0}.fprow{gap:2px}
 .fpl{min-height:0;max-height:210px;overflow:auto;margin-top:6px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);padding:4px}.fpl .mr.on button{visibility:visible}.fpl .mr svg{background:var(--panel)}
 .strip.ls button{opacity:.4}.strip.ls button.on{opacity:1;border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}
@@ -882,14 +881,14 @@ body.eyedrop{cursor:crosshair}
  <button id="rail-canvas" data-pn="canvas" aria-label="Canvas"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M7 3v2.5M17 3v2.5M7 18.5V21M17 18.5V21M3 7h2.5M3 17h2.5M18.5 7H21M18.5 17H21"/></svg><span class="tip">Canvas</span></button>
  <button id="rail-lyrs" data-pn="lyrs" aria-label="Layers"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l8.5 4.5-8.5 4.5L3.5 8z"/><path d="M3.5 12l8.5 4.5 8.5-4.5"/><path d="M3.5 16l8.5 4.5 8.5-4.5"/></svg><span class="tip">Layers</span></button>
  <button id="rail-layers" data-pn="layers" aria-label="Layout"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span class="tip">Layout</span></button>
- <button id="rail-pgrid" data-pn="pgrid" aria-label="Guides"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6.5" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="6.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="6.5" cy="17.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="17.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="17.5" r="1.4" fill="currentColor" stroke="none"/></svg><span class="tip">Guides</span></button>
+ <button id="rail-pgrid" data-pn="pgrid" aria-label="Grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 9.2h17M3.5 14.8h17M9.2 3.5v17M14.8 3.5v17"/></svg><span class="tip">Grid</span></button>
  <button id="rail-nav" data-pn="nav" aria-label="Navigator"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><rect x="7.5" y="8.5" width="6" height="5.5" rx="1"/></svg><span class="tip">Navigator</span></button>
  <button id="rail-vars" data-pn="vars" aria-label="Variations"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="5" height="13" rx="1.2"/><rect x="9.5" y="5.5" width="5" height="13" rx="1.2"/><rect x="15.5" y="5.5" width="5" height="13" rx="1.2"/></svg><span class="tip">Variations</span></button>
  <button id="rail-xrec" data-pn="xrec" aria-label="Export recipes"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 11L12 15.5 16.5 11"/><path d="M4.5 15v3.5a1.5 1.5 0 001.5 1.5h12a1.5 1.5 0 001.5-1.5V15"/></svg><span class="tip">Export recipes</span></button>
  <button id="rail-stamp" data-pn="stamp" aria-label="Stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5a2.5 2.5 0 012.5 2.5c0 1.7-1 2.3-1 3.8V11h-3V9.8c0-1.5-1-2.1-1-3.8A2.5 2.5 0 0112 3.5z"/><rect x="4" y="11" width="16" height="5" rx="2"/><path d="M6 20.5h12"/></svg><span class="tip">Stamp</span></button>
  <button id="rail-motifs" data-pn="motifs" aria-label="Shapes"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8l5.2 8.7H6.8z"/><circle cx="7" cy="17" r="4"/><rect x="12.8" y="13" width="8.4" height="8.4" rx="1.4"/></svg><span class="tip">Shapes</span></button>
  <button id="rail-text" data-pn="text" aria-label="Text"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 7.5V5h13v2.5M12 5v14M9 19h6"/></svg><span class="tip">Text</span></button>
- <button id="rail-grid" data-pn="grid" aria-label="Stamp grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 9.2h17M3.5 14.8h17M9.2 3.5v17M14.8 3.5v17"/></svg><span class="tip">Stamp grid</span></button>
+ <button id="rail-grid" data-pn="grid" aria-label="Grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 9.2h17M3.5 14.8h17M9.2 3.5v17M14.8 3.5v17"/></svg><span class="tip">Grid</span></button>
  <button id="rail-mlist" data-pn="mlist" aria-label="Shape list"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="4" height="4" rx="1.2"/><rect x="3.5" y="10" width="4" height="4" rx="1.2"/><rect x="3.5" y="15.5" width="4" height="4" rx="1.2"/><path d="M11 6.5h9.5M11 12h9.5M11 17.5h9.5"/></svg><span class="tip">Shape list</span></button><button id="rail-sedit" data-pn="sedit" aria-label="Shape editor"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="1"/><rect x="3" y="3" width="3.2" height="3.2" rx=".6"/><rect x="17.8" y="3" width="3.2" height="3.2" rx=".6"/><rect x="3" y="17.8" width="3.2" height="3.2" rx=".6"/><rect x="17.8" y="17.8" width="3.2" height="3.2" rx=".6"/><circle cx="12" cy="12" r="2.6"/></svg><span class="tip">Shape editor</span></button>
  <button id="rail-preview" data-pn="preview" aria-label="Pattern preview"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="tip">Pattern preview</span></button>
  <div class="rsp"></div>
@@ -999,6 +998,10 @@ body.eyedrop{cursor:crosshair}
    <div class="hint" id="cvmsg"></div>
   </div></details>
   </div>
+  <details class="g" open><summary>Ink edges</summary><div class="gb">
+   <label id="pel">Roughness</label><input type="range" id="rgh" min="0" max="10" value="3">
+   <label id="pql">Ink squash</label><input type="range" id="psq" min="0" max="10" value="0">
+  </div></details>
   <details class="g" open><summary>Surface</summary><div class="gb"><div class="txs" id="cv_tex"></div></div></details>
  </section>
 
@@ -1126,12 +1129,14 @@ body.eyedrop{cursor:crosshair}
 
  <section class="pn" data-p="grid" hidden>
   <details class="g" open><summary>Grid <span class="aux" id="gdim"></span></summary><div class="gb">
-   <label class="chk" style="margin-top:2px"><input type="checkbox" id="gon"><span>Show grid (G)</span></label>
+   <label class="chk" style="margin-top:2px"><input type="checkbox" id="gon"><span>Show grid</span></label>
+   <label class="chk"><input type="checkbox" id="gsd"><span>Snap to grid</span></label>
    <label>Shape</label><div class="shg" id="gsh"><button type="button" data-sh="rect" title="Square"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/></svg><span>Square</span></button><button type="button" data-sh="hex" title="Hexagon"><svg viewBox="0 0 24 24"><path d="M12 3.5l7.4 4.25v8.5L12 20.5l-7.4-4.25v-8.5z"/></svg><span>Hexagon</span></button><button type="button" data-sh="tri" title="Triangle"><svg viewBox="0 0 24 24"><path d="M12 4l8 14H4z"/></svg><span>Triangle</span></button><button type="button" data-sh="diamond" title="Diamond"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 8.5-6.5 8.5L5.5 12z"/></svg><span>Diamond</span></button></div>
-   <label>Cells across</label><input type="range" id="gn" min="1" max="24" value="6">
-   <label>Snap points</label><select id="gsp"><option value="c">Cell centres</option><option value="l">Line crossings</option><option value="b">Both</option></select>
-   <label class="chk"><input type="checkbox" id="gsd"><span>Snap while dragging</span></label>
-   <div class="row"><button class="alt" id="gq">Snap all shapes to grid</button></div>
+   <label>Cells across</label><input type="range" id="gn" min="2" max="60" value="8" data-def="8">
+   <label>Snap points</label><div class="seg" id="gsp" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-g="l">Crossings</button><button type="button" data-g="c">Centres</button><button type="button" data-g="b">Both</button></div>
+   <label class="chk"><input type="checkbox" id="gss"><span>Snap size to whole cells</span></label>
+   <label>Line strength</label><input type="range" id="gop" min="10" max="100" value="70" data-u="%" data-def="70">
+   <div class="row"><button class="alt" id="gq">Snap all to grid</button><button class="alt" id="gr">Reset grid</button></div>
   </div></details>
  </section>
  <section class="pn" data-p="preview" hidden><div class="pvbar"><span>Live pattern</span><button type="button" class="pvc" id="pvc" aria-pressed="false" title="Show the book cover text block in the preview">Cover</button><div class="seg pvz" id="pvz"><button type="button" data-z="1" class="on">Fit</button><button type="button" data-z="2">2&#215;</button><button type="button" data-z="4">4&#215;</button></div></div><div class="pvbox"><svg id="pvw" viewBox="0 0 533 800" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><use href="#dyn"/><use href="#texg"/><use href="#covg" id="pvcu" visibility="hidden"/></svg></div></section>
@@ -1156,15 +1161,15 @@ body.eyedrop{cursor:crosshair}
  </div>
 </div></section>
  <section class="pn" data-p="pgrid" hidden>
-  <details class="g" open><summary>Guides</summary><div class="gb">
+  <details class="g" open><summary>Grid <span class="aux" id="pgd"></span></summary><div class="gb">
    <label class="chk" style="margin-top:2px"><input type="checkbox" id="pgs"><span>Show grid</span></label>
+   <label class="chk"><input type="checkbox" id="pgn"><span>Snap to grid</span></label>
    <label>Shape</label><div class="shg" id="pgsh"><button type="button" data-sh="rect" title="Square"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/></svg><span>Square</span></button><button type="button" data-sh="hex" title="Hexagon"><svg viewBox="0 0 24 24"><path d="M12 3.5l7.4 4.25v8.5L12 20.5l-7.4-4.25v-8.5z"/></svg><span>Hexagon</span></button><button type="button" data-sh="tri" title="Triangle"><svg viewBox="0 0 24 24"><path d="M12 4l8 14H4z"/></svg><span>Triangle</span></button><button type="button" data-sh="diamond" title="Diamond"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 8.5-6.5 8.5L5.5 12z"/></svg><span>Diamond</span></button></div>
-   <label>Columns across</label><input type="range" id="pgz" min="2" max="60" value="8" data-def="8">
-   <label>Snap points</label>
-   <div class="seg" id="pgm" style="grid-template-columns:1fr 1fr"><button type="button" data-g="l" title="Stamp centres land on the grid lines">Grid lines</button><button type="button" data-g="c" title="Stamp centres land in the middle of each cell">Cell centres</button></div>
+   <label>Cells across</label><input type="range" id="pgz" min="2" max="60" value="8" data-def="8">
+   <label>Snap points</label><div class="seg" id="pgm" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-g="l">Crossings</button><button type="button" data-g="c">Centres</button><button type="button" data-g="b">Both</button></div>
+   <label class="chk"><input type="checkbox" id="pgss"><span>Snap size to whole cells</span></label>
    <label>Line strength</label><input type="range" id="pgo" min="10" max="100" value="70" data-u="%" data-def="70">
-   <div class="hint" id="pgi"></div>
-   <div class="row"><button class="alt" id="pgr">Reset grid</button></div>
+   <div class="row"><button class="alt" id="pgq">Snap all to grid</button><button class="alt" id="pgr">Reset grid</button></div>
   </div></details>
  </section>
  <section class="pn" data-p="layers" hidden>
@@ -1185,7 +1190,8 @@ body.eyedrop{cursor:crosshair}
    <div class="strip ls" id="lst"></div>
   </div></details>
   <details class="g" open><summary>Layer type <span class="aux" id="lytn"></span></summary><div class="gb">
-   <div class="seg" id="lmode" style="grid-template-columns:repeat(5,auto);margin-bottom:4px"><button type="button" data-m="p" class="on" title="Stamps repeat across the canvas in a pattern">Repeat</button><button type="button" data-m="f" title="A strip stamp walked round the edges">Frame</button><button type="button" data-m="x" title="Place stamps anywhere by hand">Free place</button><button type="button" data-m="a" title="Place imported images or saved WODBLOK projects anywhere by hand">Art</button><button type="button" data-m="t" title="Place text boxes anywhere by hand">Text</button></div>
+   <select id="lmsel" aria-label="Layer type"><option value="p">Repeat</option><option value="f">Frame</option><option value="x">Free place</option><option value="a">Pictures</option><option value="t">Text</option></select>
+   <div id="lmode" hidden><button type="button" data-m="p"></button><button type="button" data-m="f"></button><button type="button" data-m="x"></button><button type="button" data-m="a"></button><button type="button" data-m="t"></button></div>
    <div id="lfree" hidden>
     <div class="hint" id="lfph" style="margin-top:6px"></div>
     <label id="lfpstl">Stamp to place</label><div class="strip" id="lfpst"></div>
@@ -1211,20 +1217,12 @@ body.eyedrop{cursor:crosshair}
      <label>Textures</label><div class="txs" id="tb_tex"></div>
      <div class="row"><button class="primary" id="tb_go" aria-pressed="false">Add text</button></div>
     </div>
-    <div id="lfgrid">
-     <label class="chk"><input type="checkbox" id="lfgn"><span>Snap to grid <em class="fgk">(hold Alt to skip)</em></span></label>
-     <div id="lfgbox" hidden>
-      <label class="chk"><input type="checkbox" id="lfgss"><span>Snap size to whole cells</span></label>
-      <div class="row"><button class="alt" id="lfgall" title="Move every stamp on this layer onto the grid">Snap placed stamps to grid</button></div>
-     </div>
-     <div class="hint" id="lfgi"></div>
-     <div class="row"><button class="alt" id="lfgopen">Open the Grid tool</button></div>
-    </div>
     <div class="fpn"><span id="lfpn"></span><button class="alt" id="lfpclr">Clear all</button></div>
      <div class="mlist fpl" id="lfpl" aria-label="Placed stamps"></div>
     <div id="lfpsel" hidden>
      <label>Size</label><input type="range" id="lfps" min="2" max="300" value="20" data-u="%" data-def="20">
      <label>Rotate</label><input type="range" id="lfpr" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
+     <div id="lfpxy"><label>Position across</label><input type="range" id="lfpx" min="0" max="100" step="0.5" value="50" data-u="%" data-def="50"><label>Position down</label><input type="range" id="lfpy" min="0" max="100" step="0.5" value="50" data-u="%" data-def="50"></div>
      <div class="row fprow"><button class="ib" id="lfpfl" title="Flip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v17" stroke-dasharray="2.4 2.6"/><path d="M9.5 7L4 18h5.5z"/><path d="M14.5 7L20 18h-5.5z"/></svg></button><button class="ib" id="lfpdu" title="Duplicate"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button><button class="ib" id="lfpup" title="Bring to front"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button><button class="ib" id="lfpdn" title="Send to back"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M15.5 8.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5h-7A2.5 2.5 0 018.5 18v-2.5"/></svg></button><button class="ib" id="lfpdl" title="Delete (Del)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button></div>
     </div>
      <div id="lcrop" hidden>
@@ -1263,6 +1261,7 @@ body.eyedrop{cursor:crosshair}
    <div id="lglrow" hidden><label>Print on</label><div class="seg" id="lpa"><button type="button" data-p="c" title="One stamp in the middle of every cell">Centres</button><button type="button" data-p="k" title="Where the shapes of the grid meet">Corners</button><button type="button" data-p="e" title="Halfway along every edge of the grid">Edges</button></div><div class="hint" id="lglh"></div></div>
    <div id="lldrow" hidden><label>Grid shape follows</label><select id="lld"></select></div>
    <label>Pattern</label><select id="larr"></select>
+   <div id="lborow" hidden><label>Offset</label><select id="lbo"><option value="25">1/4</option><option value="33.333">1/3</option><option value="50">1/2</option><option value="66.667">2/3</option><option value="75">3/4</option></select></div>
    <div hidden><select id="lgr"><option value="">Auto (fits the stamp shape)</option><option value="square">Grid</option><option value="brick">Brick (offset rows)</option><option value="drop">Half-drop (offset columns)</option><option value="honey">Honeycomb</option></select>
    <select id="lay"><option value="check">Checker</option><option value="rows">Rows</option><option value="cols">Columns</option><option value="diag">Diagonal stripes</option><option value="rand">Random</option></select></div>
    <label>Stamp size</label><input type="range" id="ts" min="80" max="320" value="180">
@@ -1272,25 +1271,28 @@ body.eyedrop{cursor:crosshair}
    <label id="lrl">Rotation</label><input type="range" id="lrt" min="-180" max="180" value="0" data-u="°">
    </div>
   </div></details>
+  <details class="g" open id="lalsec" hidden><summary>Align</summary><div class="gb">
+   <div class="shg" id="lalg" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
+   <div class="row fprow" id="lalr"></div>
+   <label>Margin</label><input type="range" id="lalm" min="0" max="20" value="0" data-u="%" data-def="0">
+  </div></details>
   <details class="g" open id="lmanbox"><summary>Manual arrangement <span class="aux" id="mancnt"></span></summary><div class="gb">
    <label class="chk" style="margin-top:2px"><input type="checkbox" id="man"><span>Pick stamps by hand</span></label>
    <div class="row"><button class="alt" id="manr">Reset hand-picked stamps</button></div>
   </div></details>
-  <details class="g" open><summary>Impression <span class="aux">this layer</span></summary><div class="gb">
+  <details class="g" open id="lipsec"><summary>Impression <span class="aux">this layer</span></summary><div class="gb">
    <label id="lpl">Uneven pressure</label><input type="range" id="lps" min="0" max="10" value="0">
    <label id="lfl">Ink flooding</label><input type="range" id="lfs" min="0" max="10" value="0">
   </div></details>
-  <details class="g" id="lrsec" open><summary>Randomness <span class="aux">this layer</span></summary><div class="gb">
+  <details class="g" id="lrsec" open><summary>Variation <span class="aux">this layer</span></summary><div class="gb">
    <label>Rotation</label><input type="range" id="lrr" min="0" max="180" value="0" data-u="&#176;" data-def="0">
    <label>Position</label><input type="range" id="lrp" min="0" max="100" value="0" data-u="%" data-def="0">
+   <div id="lrzrow"><label>Size</label><input type="range" id="lrz" min="0" max="100" value="0" data-u="%" data-def="0"></div>
+   <div id="lrgrow"><label>Gaps</label><input type="range" id="lrg" min="0" max="100" value="0" data-u="%" data-def="0"></div>
    <label class="chk"><input type="checkbox" id="lrtn"><span>Turn to fit each shape</span></label>
    <label class="chk"><input type="checkbox" id="lrfh"><span>Flip some left &#8596; right</span></label>
    <label class="chk"><input type="checkbox" id="lrfv"><span>Flip some up &#8597; down</span></label>
    <div class="row"><button class="alt" id="lrsh" title="Roll a new random arrangement">Shuffle</button></div>
-  </div></details>
-  <details class="g" open><summary>Ink edges <span class="aux">whole pattern</span></summary><div class="gb">
-   <label id="pel">Roughness</label><input type="range" id="rgh" min="0" max="10" value="3">
-   <label id="pql">Ink squash</label><input type="range" id="psq" min="0" max="10" value="0">
   </div></details>
  </section>
 
