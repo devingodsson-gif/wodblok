@@ -11,7 +11,7 @@ import {fileUnlink,thumbPng} from './33-clear.js';
 // normal canvas. "Starting points" are built in (src/data/templates.js, made by `npm run templates`); "Yours" are saved here with
 // "Save as template". The list (name, kind, a small picture) is kept in settings so the picker opens without reading any project; each
 // project's bytes are kept in the records store and read only when it is opened.
-const TP_INDEX='wb111_templates',TP_TYPE='wb111_tptype',TP_KINDS=[['canvas','Normal canvas'],['tile','Repeating pattern'],['book','Book']];
+const TP_INDEX='wb111_templates',TP_START='wb111_tplstart',TP_TYPE='wb111_tptype',TP_KINDS=[['canvas','Normal canvas'],['tile','Repeating pattern'],['book','Book']];
 const tpEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const TP_MORE='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
 // the three blank starting points draw their canvas outline instead of a stored picture
@@ -128,5 +128,8 @@ function init54(){
  $('tpsx').onclick=tpSaveHide;$('tpscx').onclick=tpSaveHide;tpSd().addEventListener('click',e=>{if(e.target===tpSd())tpSaveHide()});
  $('tpsn').addEventListener('input',()=>{$('tpsok').dataset.arm='';tpSaveLabel()});
  $('tpsn').addEventListener('keydown',e=>{e.stopPropagation();if(e.key=='Enter'){e.preventDefault();tpSave()}});
- $('tpsok').onclick=tpSave}
+ $('tpsok').onclick=tpSave;
+ // the picker opens when the app starts, so the first choice is what to start from (Settings > General can turn this off)
+ let on=true;try{on=kv.get(TP_START)!=='0'}catch(e){}
+ if(on)requestAnimationFrame(()=>{if(!tpIsOpen())tpShow()})}
 export {init54};

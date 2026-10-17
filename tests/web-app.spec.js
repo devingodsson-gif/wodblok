@@ -37,6 +37,7 @@ test.afterAll(() => server && server.close());
 test('installs, opens offline, finds a new version without reloading, and applies it when asked', async ({ page, context }) => {
   const external = [];
   page.on('request', r => { const u = r.url(); if (!u.startsWith(base) && !/^(data|blob):/.test(u)) external.push(u); });
+  await page.addInitScript(() => { try { if (!sessionStorage.getItem('t_seed')) { sessionStorage.setItem('t_seed', '1'); localStorage.setItem('wb111_tplstart', '0'); localStorage.setItem('wb96_workspaces', '[]'); localStorage.setItem('wb96_ws_seeded', '2'); } } catch (e) {} });   // no template picker or tool windows at launch
   await page.goto(base);
   await page.evaluate(() => navigator.serviceWorker.ready);
   await expect(page.locator('#ver')).toBeVisible();

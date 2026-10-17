@@ -100,3 +100,8 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 - **Not tested against a live Clerk:** see "Things to know" in docs/accounts.md.
 - **Next, 1.21:** name chip in the status bar, File > Account…, File > Send feedback…, the 7-day offline pass, the usage counter, and the CLAUDE.md network rule (only `src/platform/account.js`).
 
+
+## 1.25.0: Logo 1 template; the template picker opens at launch
+- **Logo 1** (a project supplied by the owner) is the first starting point after Blank in Normal canvas. Hand-made built-ins are listed in `CUSTOM` in `tools/templates/recipes.js`, kept in `tools/templates/custom/`, and added by `tools/templates/add-custom.js` (which `npm run templates` runs at the end, so regenerating keeps them).
+- **Launch**: the New from template picker opens when the app starts (Normal canvas kind unless another was last used). Closing it leaves the blank project. Settings > General > Templates at launch turns it off (`wb111_tplstart`).
+- Tests: `tests/templates.spec.js` (Logo 1, launch picker and the setting); the test harness turns the picker off unless a test passes `templates: true`.

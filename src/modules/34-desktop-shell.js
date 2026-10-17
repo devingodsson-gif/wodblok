@@ -170,7 +170,7 @@ const stage=document.querySelector('.stage');
 // the stamp tray can collapse to a thin strip, to give a small window more room for the picture; the choice is remembered
 {const f=stage.querySelector('.film'),b=$('filmt');if(f&&b){const ap=(m,save)=>{f.classList.toggle('min',m);b.setAttribute('aria-expanded',String(!m));b.setAttribute('aria-label',m?'Show stamp tray':'Hide stamp tray');b.title=b.getAttribute('aria-label');stage.style.setProperty('--film-h',f.offsetHeight+'px');if(save){try{kv.set('wb_film_min',m?'1':'0')}catch(e){}}};
  let m0=false;try{m0=kv.get('wb_film_min')==='1'}catch(e){}b.onclick=()=>ap(!f.classList.contains('min'),true);ap(m0,false);try{new ResizeObserver(()=>stage.style.setProperty('--film-h',f.offsetHeight+'px')).observe(f)}catch(e){}}}
-function setView(v){const was=view;view=v;WBS.curView=v;if(WBX.wbEmptyCue)WBX.wbEmptyCue();if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+function setView(v){const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
 $('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display='';$('gtb').style.display=v=='stamp'?'':'none';if(v=='pattern')requestAnimationFrame(applyZ);else applyZE();tbSync();if(was!=v||!wsReady)wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
 const L=wsL();let g=wsFind(p);
@@ -331,14 +331,8 @@ $('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.to
 $('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${WBS.cur+1} of ${WBS.tiles.length}`:'';
 if(WBS.layers[WBS.selL])$('lnmx').textContent=WBS.layers[WBS.selL].name}
 // wrap redraw hooks so the shell stays in sync
-// An empty project shows an "Add a motif" button on the canvas (the Pattern view only); it goes to the Stamp editor and opens Motifs.
-const emptyCue=()=>{const empty=WBS.tiles.every(t=>!(t.items||[]).length)&&!WBS.layers.some(L=>(L.pl||[]).length);const b=$('empc');if(b){const pl=WBS.layers[WBS.selL],placing=!!(pl&&pl.free);   // a Free place or Pictures layer is selected: a click on the canvas places something there, so the + steps aside
-b.hidden=!(empty&&view=='pattern'&&!placing);if(!b.hidden){const a=$('art').getBoundingClientRect(),o=b.offsetParent.getBoundingClientRect();b.style.left=(a.left+a.width/2-o.left)+'px';b.style.top=(a.top+a.height/2-o.top)+'px'}}};
-window.addEventListener('resize',()=>emptyCue());
-$('empc').onclick=()=>{setView('stamp');requestAnimationFrame(()=>{const sec=document.querySelector('section.pn[data-p="motifs"]');if(!sec||sec.hidden)$('rail-motifs').click()})};
 $('rzbar').onclick=()=>$('rzdo').click();
-WBX.wbEmptyCue=emptyCue;
-const _draw=WBH.draw;WBH.draw=function(){_draw();nums();info();emptyCue()};
+const _draw=WBH.draw;WBH.draw=function(){_draw();nums();info()};
 const _sp=WBH.syncPr;WBH.syncPr=function(){_sp();nums()};const _stx=WBH.syncTex;WBH.syncTex=function(){_stx();nums()};
 
 // ---- toast-style status messages
