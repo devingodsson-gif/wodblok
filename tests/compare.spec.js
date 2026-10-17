@@ -13,7 +13,7 @@ for (const [name, btn, mode] of [['Before', '#bab', 1], ['Split', '#bas', 2]]) {
   test(`${name}: the Exit compare pill is inside the stage and the button shows as pressed`, async ({ page }) => {
     const { errors } = await openApp(page, { seed: 11 });
     await roll(page);
-    await page.click(btn);
+    await page.keyboard.press(mode === 1 ? 'Backslash' : 'Shift+Backslash');   // the Before / Split buttons only show while comparing, so the keys start it
     await page.waitForSelector('.baX');
     await page.waitForTimeout(300);
     await expect(page.locator(btn)).toHaveAttribute('aria-pressed', 'true');
@@ -38,15 +38,43 @@ const rollTop = async page => { await page.click('#rzbar'); await settle(page, {
 test('Before compares with the step before this one, and follows the history as it grows', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 11 });
   await rollTop(page);
-  await page.click('#bab'); await page.waitForSelector('.baX');
+  await page.keyboard.press('Backslash'); await page.waitForSelector('.baX');
   await expect(page.locator('.baT.a span')).toHaveText('Start');           // after one roll the step before is the Start
   await page.keyboard.press('Escape');
   await rollTop(page);
-  await page.click('#bab'); await page.waitForSelector('.baX');
+  await page.keyboard.press('Backslash'); await page.waitForSelector('.baX');
   await expect(page.locator('.baT.a span')).toHaveText('Randomize 1');     // after two, it is the first roll
   await page.keyboard.press('Escape');
   await openPanel(page, 'hist');
   await expect(page.locator('#bal b').first()).toContainText('Randomize 1');       // History says the same
   await expect(page.locator('#hhl .hr.ra b')).toHaveText('Randomize 1');
+  expect(errors).toEqual([]);
+});
+
+// 1.17: the Before / Split control is only on screen while a compare is on; the tray sits at the far right of the bar with the zoom just left of it.
+test('the Before / Split control shows only while comparing', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 11 });
+  await roll(page);
+  await expect(page.locator('#bacmp')).toBeHidden();
+  await page.keyboard.press('Backslash');
+  await page.waitForSelector('.baX');
+  await expect(page.locator('#bacmp')).toBeVisible();
+  await page.click('.baX');
+  await expect(page.locator('#bacmp')).toBeHidden();
+  await page.keyboard.press('Shift+Backslash');
+  await page.waitForSelector('.baX');
+  await expect(page.locator('#bacmp')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#bacmp')).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+test('the colour tray is at the far right of the bar and the zoom sits just left of it', async ({ page }) => {
+  const { errors } = await openApp(page);
+  const r = await page.evaluate(() => { const g = id => document.getElementById(id).getBoundingClientRect(), bar = document.querySelector('.viewbar').getBoundingClientRect(), t = g('tyd'), z = g('zoomc'); return { barRight: bar.right, tRight: t.right, tLeft: t.left, zRight: z.right, tShown: t.width > 0 }; });
+  expect(r.tShown, 'the tray is on screen').toBe(true);
+  expect(r.barRight - r.tRight, 'tray reaches the bar padding at the right').toBeLessThanOrEqual(13);
+  expect(r.tLeft - r.zRight, 'zoom is left of the tray, with a small gap').toBeGreaterThanOrEqual(0);
+  expect(r.tLeft - r.zRight).toBeLessThanOrEqual(12);
   expect(errors).toEqual([]);
 });

@@ -40,7 +40,7 @@ test('before / after compare does not change the document', async ({ page }, tes
   const { errors } = await openApp(page, { seed: 5 });
   await randomize(page);
   const rolled = await stateText(page);
-  await page.click('#bab'); await settle(page);
+  await page.keyboard.press('Backslash'); await settle(page);
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'true');
   expect(await stateText(page)).toBe(rolled);
   await checkpoint(page, testInfo, errors, 'before-view');
@@ -52,7 +52,7 @@ test('before / after compare does not change the document', async ({ page }, tes
 test('split compare view', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 5 });
   await randomize(page);
-  await page.click('#bas'); await settle(page);
+  await page.keyboard.press('Shift+Backslash'); await settle(page);
   await expect(page.locator('#bas')).toHaveAttribute('aria-pressed', 'true');
   await checkpoint(page, testInfo, errors, 'split-view');
 });
