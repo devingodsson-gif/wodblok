@@ -191,3 +191,25 @@ test('the video frame stays empty without a file and plays when the file is ther
   await expect(page.locator('#video.has-video')).toHaveCount(1);
   await expect(page.locator('#video .video-empty')).toBeHidden();
 });
+
+const acc = (page) => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--acc').trim());
+
+test('signed in: the colour saved with the account recolours the page and sets the cookie, so a new device gets it', async ({ page }) => {
+  await open(page, { user: { firstName: 'Ana' }, me: { ok: true, approved: true, accent: '#86629a' } });
+  await expect.poll(() => acc(page)).not.toBe('#c9a66b');
+  expect((await page.context().cookies()).find((c) => c.name === 'wb_accent').value).toBe('86629a');
+});
+
+test('signed in with Oak saved: a colour from this browser\'s cookie is cleared', async ({ page }) => {
+  await page.context().addCookies([{ name: 'wb_accent', value: '86629a', domain: '.wodblok.test', path: '/', secure: true }]);
+  await open(page, { user: { firstName: 'Ana' }, me: { ok: true, approved: true, accent: '' } });
+  await expect.poll(async () => (await page.context().cookies()).filter((c) => c.name === 'wb_accent').length).toBe(0);
+  expect(await acc(page)).toBe('#c9a66b');
+});
+
+test('signed in with no colour ever saved: the page and cookie are left alone', async ({ page }) => {
+  await page.context().addCookies([{ name: 'wb_accent', value: '86629a', domain: '.wodblok.test', path: '/', secure: true }]);
+  await open(page, { user: { firstName: 'Ana' }, me: { ok: true, approved: true, accent: null } });
+  await nav(page).getByRole('button', { name: 'Hi Ana!', exact: true }).waitFor();
+  expect((await page.context().cookies()).find((c) => c.name === 'wb_accent').value).toBe('86629a');
+});

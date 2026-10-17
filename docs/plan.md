@@ -94,6 +94,12 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 ## 1.27.0 (accounts in the app)
 Name chip in the status bar, File > Account…, File > Send feedback…, the 7-day offline pass with a locked screen, active-time totals for early access and testers, Sign out and Manage account through the site. `/api/me` reports `gated`; the gate cookie lasts one day. The network rule in CLAUDE.md now allows `src/platform/account.js` only, and `check:platform` enforces it. Tests: `tests/account.spec.js` (build target), `tests/site-accounts.test.mjs`, `tests/site-account.spec.js`. Fixed a comment that made `check:platform` fail.
 
+## 1.27.4 (accent colour saved with the account)
+- The accent colour is kept with the account, so it follows the person to other devices and browsers. Server: table `prefs` (user id, accent, time; `''` means Oak was chosen on purpose, no row means never saved), `POST /api/accent` (approved accounts, same site, `#rrggbb` or empty), `GET /api/me` returns `accent` (null when never saved or unreadable; sign-in never fails over it). Deleting an account removes the row.
+- App (`src/platform/account.js`, `55-settings.js`, `58-account.js`): a change is saved to the account after a short pause and kept as pending until the server has it (so an offline change goes up later). After each successful check: a pending change wins and is sent; otherwise the saved colour is shown here; with nothing saved, this device's colour is saved. Nothing is read or sent on an offline pass.
+- Site (`site/accent.js`, `site/account.js`): when signed in, the colour from `/api/me` sets the `wb_accent` cookie and recolours the page.
+- Tests: `tests/site-accounts.test.mjs` (accent endpoint, /api/me, delete), `tests/site-accent.test.mjs`, `tests/account.spec.js` (six accent cases), `tests/site-account.spec.js` (three). No new Cloudflare setting is needed: the table is created on first use in the existing database.
+
 ## 1.27.3 (accent colour on the loading screen)
 The loading screen showed the built-in Oak for a moment before the chosen accent. The app now keeps the rules it makes for the accent as `wb_accentcss`, and a small script in the page head applies them before anything is shown (`src/shell.html`); the app's own accent code reuses that style element. Oak removes the saved rules. Test: `tests/settings-menu.spec.js` (colour at the moment the loading screen appears).
 

@@ -269,3 +269,60 @@ test('the accent cookie is only for a hosted app: a local copy sets none', async
   expect((await page.context().cookies()).filter(c => c.name === 'wb_accent')).toEqual([]);
   expect(errors).toEqual([]);
 });
+
+// ---- the accent colour follows the account (1.27.4)
+const tok = (page, n) => page.evaluate(n => getComputedStyle(document.documentElement).getPropertyValue(n).trim(), n);
+const OK = { status: 200, body: { ok: true } };
+
+test('accent: a colour saved with the account is shown on this device, kept here and handed to the website', async ({ page }) => {
+  await open(page, { '/api/me': ME({ accent: '#86629a' }), '/api/accent': OK });
+  await expect.poll(() => tok(page, '--acc')).not.toBe('#c9a66b');
+  expect(await page.evaluate(() => window.__wbTest.kv.get('wb114_accent'))).toBe('#86629a');
+  expect((await page.context().cookies()).find(c => c.name === 'wb_accent').value).toBe('86629a');
+  expect(await calls(page, '/api/accent')).toEqual([]);   // nothing is sent back
+});
+
+test('accent: a saved Oak (chosen on purpose) replaces a colour this device had', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('wb_settings', JSON.stringify({ v: 1, values: { wb114_accent: '#86629a' } })));
+  await open(page, { '/api/me': ME({ accent: '' }), '/api/accent': OK });
+  await expect.poll(() => page.evaluate(() => window.__wbTest.kv.get('wb114_accent'))).toBeNull();
+  expect(await tok(page, '--acc')).toBe('#c9a66b');
+  expect(await calls(page, '/api/accent')).toEqual([]);
+});
+
+test('accent: nothing saved yet, so this device\'s colour is saved to the account', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('wb_settings', JSON.stringify({ v: 1, values: { wb114_accent: '#a85a52' } })));
+  await open(page, { '/api/me': ME({ accent: null }), '/api/accent': OK });
+  await expect.poll(async () => (await calls(page, '/api/accent')).map(c => JSON.parse(c.body))).toEqual([{ accent: '#a85a52' }]);
+  expect(await page.evaluate(() => window.__wbTest.kv.get('wb114_accent'))).toBe('#a85a52');   // this device keeps its colour
+});
+
+test('accent: picking a colour in Settings saves it to the account after a short pause; picking Oak saves that too', async ({ page }) => {
+  await open(page, { '/api/me': ME({ accent: null }), '/api/accent': OK });
+  await page.click('#fileb'); await page.click('#stgo');
+  await page.click('.stgab[aria-label="Purpleheart"]');
+  await page.click('.stgab[aria-label="Walnut"]');   // two quick picks: only the last one is sent
+  await expect.poll(async () => (await calls(page, '/api/accent')).map(c => JSON.parse(c.body))).toEqual([{ accent: '#744f3b' }]);
+  await page.click('.stgab[aria-label="Oak"]');
+  await expect.poll(async () => (await calls(page, '/api/accent')).map(c => JSON.parse(c.body).accent)).toEqual(['#744f3b', '']);
+});
+
+test('accent: a change made offline is kept and sent at the next check, and wins over the saved colour', async ({ page }) => {
+  await open(page, { '/api/me': ME({ accent: '#86629a' }), '/api/accent': 'offline' });
+  await expect.poll(() => tok(page, '--acc')).not.toBe('#c9a66b');
+  await page.click('#fileb'); await page.click('#stgo');
+  await page.click('.stgab[aria-label="Rosewood"]');
+  await expect.poll(async () => (await calls(page, '/api/accent')).length).toBeGreaterThan(0);   // tried, and failed
+  expect(await page.evaluate(() => window.__wbTest.kv.get('wb300_acct_accpend'))).toBe('x#a85a52');
+  await set(page, '/api/accent', OK);
+  await page.evaluate(() => window.dispatchEvent(new Event('online')));   // the app checks again
+  await expect.poll(async () => (await calls(page, '/api/accent')).filter(c => c.body).length).toBeGreaterThan(1);
+  expect(await page.evaluate(() => window.__wbTest.kv.get('wb114_accent'))).toBe('#a85a52');   // the server's older colour did not replace it
+  await expect.poll(() => page.evaluate(() => window.__wbTest.kv.get('wb300_acct_accpend'))).toBeNull();
+});
+
+test('accent: on an offline pass the saved colour is neither read nor changed', async ({ page }) => {
+  await open(page, { '/api/me': 'offline' });
+  expect(await page.evaluate(() => window.__wbTest.kv.get('wb114_accent'))).toBeNull();
+  expect(await calls(page, '/api/accent')).toEqual([]);
+});

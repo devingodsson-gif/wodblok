@@ -26,9 +26,10 @@ with no `GATE_HOSTS` variable the app is served exactly as before. Both are set 
 |---|---|
 | `usage_daily` | user id, day, active seconds, sessions, app version, browser. Running totals; the larger value wins, so a retry cannot double count. Two devices on the same day undercount (the larger one is kept). Days are UTC. |
 | `feedback` | user id, time, category (bug / idea / other), message, app version, browser, status. A per-message key makes a retry store and email once. At most 30 a day per person. |
+| `prefs` | user id, the accent colour (`#rrggbb`, or empty for Oak), time. Written by `POST /api/accent`, read by `GET /api/me`. |
 | `approvals` | user id, type, time, and when the "You're in" email went out. |
 Emails and passwords are only in Clerk. Nothing from a person's projects or files is ever sent or stored.
-Deleting an account in Clerk fires `user.deleted`, which removes that person's rows from all three tables.
+Deleting an account in Clerk fires `user.deleted`, which removes that person's rows from all four tables.
 
 ## Routes
 - `functions/_middleware.js`: the gate. Off unless `GATE_HOSTS` is set. Approved (Clerk cookie or `wb_gate`): served. Signed out: 302 to the site. Not approved: 403 page. Non-page requests (service worker, manifest, scripts) get 401. `/api/*` always passes.
@@ -107,3 +108,4 @@ network code in the app; `src/modules/58-account.js` is the interface.
 The privacy page on the site; optional rate limit on `/api/*`.
 
 - **Accent cookie (1.27.2).** The app sets `wb_accent` (six hex digits, domain-wide, one year; cleared for the built-in Oak) so the website can use the same accent colour. It holds only a colour, no id; the privacy page lists it.
+- **Accent colour (1.27.4).** Saved with the account (`prefs`), so it follows the person between devices; the site gets it from `/api/me` and sets the `wb_accent` cookie.
