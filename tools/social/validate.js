@@ -35,11 +35,12 @@ function validate(cfg, { needEmail = false } = {}) {
   if (!r.features || typeof r.features !== 'object') fail('roll.features is missing');
   let on = 0;
   for (const [k, v] of Object.entries(r.features)) {
-    if (!FEATURES.includes(k)) fail(`roll.features has "${k}"; use ${FEATURES.join(' ')} (colours are set by roll.palettes)`);
+    if (!FEATURES.includes(k)) fail(`roll.features has "${k}"; use ${FEATURES.join(' ')} (colours are set by roll.colours)`);
     int(v, 0, 100, 'roll.features.' + k);
     if (v > 0) on++;
   }
   if (!on) fail('roll.features switches nothing on, so there would be nothing to roll');
+  if (!['app', 'plain'].includes(r.colours)) fail(`roll.colours must be "app" or "plain" (got ${JSON.stringify(r.colours)})`);
   if (!Array.isArray(r.palettes) || !r.palettes.length) fail('roll.palettes needs at least one palette');
   r.palettes.forEach((p, i) => {
     if (!Array.isArray(p) || p.length < 2 || p.length > 4) fail(`roll.palettes[${i}] needs 2 to 4 colours`);
@@ -52,7 +53,7 @@ function validate(cfg, { needEmail = false } = {}) {
   int(r.layers[0], 1, 20, 'roll.layers min'); int(r.layers[1], 1, 20, 'roll.layers max');
   if (r.layers[0] > r.layers[1]) fail('roll.layers min is larger than max');
   int(r.maxAttempts, 1, 20, 'roll.maxAttempts');
-  if (cfg.seedBase !== 'date' && !Number.isInteger(cfg.seedBase)) fail('seedBase must be "date" or a whole number');
+  if (!['date', 'random'].includes(cfg.seedBase) && !(Number.isInteger(cfg.seedBase) && cfg.seedBase >= 0 && cfg.seedBase < 40000000)) fail('seedBase must be "random", "date" or a whole number below 40000000');
 
   if (needEmail) {
     const e = cfg.email || {};
