@@ -48,7 +48,9 @@ function accentApply(hex){let el=$('accstyle');if(!stHEX6.test(hex||'')){if(el)e
  if(!el){el=document.createElement('style');el.id='accstyle';document.body.appendChild(el)}   // last in the page, after the app's own colour rules
  const v=accentVars(hex),css=stRule('html:root[data-theme="light"]',v.light)+stRule('html:root[data-theme="dark"]',v.dark);el.textContent=css;try{kv.set('wb_accentcss',css)}catch(e){}}
 const stAccentGet=()=>{let v='';try{v=kv.get(stK_ACC)||''}catch(e){}return stHEX6.test(v)?v.toLowerCase():''};
-const stAccentSet=hex=>{try{if(hex)kv.set(stK_ACC,hex);else kv.remove(stK_ACC)}catch(e){}accentApply(hex);acAccount.shareAccent(hex)};   // the website reads the same colour (platform/account.js)
+const stAccentSet=hex=>{try{if(hex)kv.set(stK_ACC,hex);else kv.remove(stK_ACC)}catch(e){}accentApply(hex);acAccount.shareAccent(hex);acAccount.saveAccent(hex)};   // the website reads the same colour, and the account keeps it for other devices (platform/account.js)
+// the account's saved colour arrived (another device changed it): show it here without sending it back
+const accentFromAccount=hex=>{hex=stHEX6.test(hex||'')?hex.toLowerCase():'';try{if(hex)kv.set(stK_ACC,hex);else kv.remove(stK_ACC)}catch(e){}accentApply(hex);acAccount.shareAccent(hex);stAccentMarks()};
 // ---------------------------------------------------------------- remembered flags
 const stFlag=(k,d)=>{try{const v=kv.get(k);return v==null?d:v==='1'}catch(e){return d}};
 const stFlagSet=(k,on)=>{try{kv.set(k,on?'1':'0')}catch(e){}};
@@ -124,4 +126,4 @@ function init55(){
  // Escape closes the dialog (before the app's own Escape handling), unless the colour picker has it first
  document.addEventListener('keydown',e=>{if(e.key!='Escape'||!stIsOpen())return;if(document.querySelector('.cpk:not([hidden])'))return;if(e.target.matches&&e.target.matches('#stgkq')&&e.target.value){e.target.value='';e.target.dispatchEvent(new Event('input'));e.stopImmediatePropagation();e.preventDefault();return}
   e.stopImmediatePropagation();e.preventDefault();stHide()},true)}
-export {init55,accentVars,accentApply};
+export {init55,accentVars,accentApply,accentFromAccount,stAccentGet};

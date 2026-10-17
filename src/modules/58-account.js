@@ -2,6 +2,7 @@ import {acAccount} from '../platform/account.js';
 import {cmdGet,cmdRegister} from '../commands/registry.js';
 import {$,WBX,WB_VER} from './01-launch-and-version.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
+import {accentFromAccount,stAccentGet} from './55-settings.js';
 // ===== Account =====
 // Only where the account system exists (the hosted app behind the sign-in gate): a name chip in the status bar, File > Account…,
 // File > Send feedback…, the 7-day offline check and the active-time counter. Everywhere else (local, tests, previews) the server does not
@@ -35,7 +36,9 @@ function axApply(s){axS=s||{state:'off'};const ok=axS.state==='ok';
  if(axS.state==='locked')axLockShow();else if(axShown('aclk')){$('aclk').hidden=true}
  if(ok&&!axUsing)axUsageStart();
  if(!ok&&axShown('acdlg'))axClose('acdlg');if(!ok&&axShown('fbdlg'))axClose('fbdlg')}
-async function axRefresh(){axChecked=Date.now();try{axApply(await acAccount.check())}catch(e){}}
+// the colour saved with the account follows the person between devices (only when the server answered, not on an offline pass)
+async function axAccent(s){if(s.state!=='ok'||!s.online)return;try{const a=await acAccount.syncAccent(s.accent,stAccentGet());if(a!==null)accentFromAccount(a)}catch(e){}}
+async function axRefresh(){axChecked=Date.now();try{const s=await acAccount.check();axApply(s);axAccent(s)}catch(e){}}
 // ---------------------------------------------------------------- account dialog
 function axAccountPaint(){const row=(k,v)=>v?`<div class="stgr"><span>${k}</span><b>${axEsc(v)}</b></div>`:'';
  const until=axS.until?new Date(axS.until).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}):'';

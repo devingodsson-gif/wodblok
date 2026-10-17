@@ -1,11 +1,9 @@
 // The website's accent colour follows the one picked in the app (Settings > General > Accent).
 // The app writes the colour as a cookie for the whole domain (src/platform/account.js, wb_accent=<6 hex digits>); this reads it and sets the
-// same four tokens the app derives from it. The block between the two marker lines is the app's own colour maths, copied unchanged from
-// src/modules/55-settings.js (tests/site-accent.test.mjs fails if the two differ). No cookie: the page keeps its built-in colour (Oak).
+// same four tokens the app derives from it. When someone is signed in, site/account.js also hands over the colour saved with the account
+// (WBAccent.sync), so a new device or browser gets it too. The block between the two marker lines is the app's own colour maths, copied
+// unchanged from src/modules/55-settings.js (tests/site-accent.test.mjs fails if the two differ). No colour: the page keeps its built-in one (Oak).
 (function () {
-  var m = /(?:^|; )wb_accent=([0-9a-f]{6})(?:;|$)/i.exec(document.cookie || '');
-  if (!m) return;
-  var hex = '#' + m[1].toLowerCase();
 // ---- begin shared accent maths ----
 const stHEX6=/^#[0-9a-f]{6}$/i;
 // ---------------------------------------------------------------- accent colour maths
@@ -30,12 +28,28 @@ function accentVars(hex){
  const fg=c=>stContrast(c,'#1b1a18')>=stContrast(c,'#ffffff')?'#1b1a18':'#ffffff',soft=c=>{const[r,g,b]=stToRgb(c);return`rgba(${r},${g},${b},.16)`};
  return{light:{acc:lightAcc,ink:lightInk,fg:fg(lightAcc),soft:soft(lightAcc)},dark:{acc:darkAcc,ink:darkInk,fg:fg(darkAcc),soft:soft(darkAcc)}}}
 // ---- end shared accent maths ----
-  var v = accentVars(hex);
-  var rule = function (sel, t) { return sel + '{--acc:' + t.acc + ';--acc-ink:' + t.ink + ';--acc-fg:' + t.fg + ';--acc-soft:' + t.soft + '}'; };
-  var el = document.createElement('style');
-  el.id = 'accstyle';
-  el.textContent = rule(':root', v.dark) +
-    '@media (prefers-color-scheme:light){' + rule(':root:not([data-theme="dark"])', v.light) + '}' +
-    rule(':root[data-theme="light"]', v.light) + rule(':root[data-theme="dark"]', v.dark);
-  document.head.appendChild(el);
+  function apply(hex) {
+    var el = document.getElementById('accstyle');
+    if (!/^#[0-9a-f]{6}$/i.test(hex || '')) { if (el && el.parentNode) el.parentNode.removeChild(el); return; }
+    var v = accentVars(hex.toLowerCase());
+    var rule = function (sel, t) { return sel + '{--acc:' + t.acc + ';--acc-ink:' + t.ink + ';--acc-fg:' + t.fg + ';--acc-soft:' + t.soft + '}'; };
+    if (!el) { el = document.createElement('style'); el.id = 'accstyle'; document.head.appendChild(el); }
+    el.textContent = rule(':root', v.dark) +
+      '@media (prefers-color-scheme:light){' + rule(':root:not([data-theme="dark"])', v.light) + '}' +
+      rule(':root[data-theme="light"]', v.light) + rule(':root[data-theme="dark"]', v.dark);
+  }
+  function cookie() { var m = /(?:^|; )wb_accent=([0-9a-f]{6})(?:;|$)/i.exec(document.cookie || ''); return m ? '#' + m[1].toLowerCase() : ''; }
+  // the colour saved with the account ('' = Oak): keep the cookie in step and show it
+  function sync(saved) {
+    if (saved !== '' && !/^#[0-9a-f]{6}$/i.test(saved || '')) return;
+    var now = saved.toLowerCase();
+    if (cookie() !== now) {
+      var h = String(location.hostname), dom = /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(h) && !/^\d+(\.\d+){3}$/.test(h) ? '; Domain=.' + h.replace(/^www\./, '') : '';
+      try { document.cookie = 'wb_accent=' + now.slice(1) + dom + '; Path=/; Max-Age=' + (now ? 31536000 : 0) + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : ''); } catch (e) { /* cookies blocked */ }
+    }
+    apply(now);
+  }
+  window.WBAccent = { apply: apply, sync: sync };
+  var first = cookie();
+  if (first) apply(first);
 })();

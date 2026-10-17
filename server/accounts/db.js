@@ -12,6 +12,8 @@ const TABLES = [
   'CREATE TABLE IF NOT EXISTS feedback (' +
     'id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, created_at TEXT NOT NULL, category TEXT NOT NULL, message TEXT NOT NULL, ' +
     "app_version TEXT, browser TEXT, status TEXT NOT NULL DEFAULT 'new', idem TEXT NOT NULL, UNIQUE (user_id, idem))",
+  // the accent colour a person picked, so it follows them to other devices. accent is '#rrggbb', or '' for the built-in Oak (a row means "chosen")
+  'CREATE TABLE IF NOT EXISTS prefs (user_id TEXT PRIMARY KEY, accent TEXT NOT NULL, updated_at TEXT NOT NULL)',
   // remembers that the "You're in" email went out, so changing the type later never sends it twice
   'CREATE TABLE IF NOT EXISTS approvals (user_id TEXT PRIMARY KEY, type TEXT NOT NULL, approved_at TEXT NOT NULL, notified_at TEXT)',
 ];

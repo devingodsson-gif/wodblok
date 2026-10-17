@@ -7,7 +7,7 @@ import {kv} from './index.js';
 // The public half of the pass key (made by tools/accounts/make-pass-key.mjs). It can only check a pass, never make one.
 const acPASS_PUBLIC_JWK = {kty: 'EC', crv: 'P-256', x: 'coDfq-RVJxMxT8FK_fCqQUsL96m3u4GybQxojU1cotA', y: 'qsu31uigSzcfJG3jUi6I44e2HPIVGTzexvb2Nu7qeAQ'};
 let acKey = acPASS_PUBLIC_JWK;   // tests swap in a key of their own with setKey; the app never does
-const acK_PASS = 'wb300_acct_pass', acK_SEEN = 'wb300_acct_seen', acK_USE = 'wb300_acct_use';
+const acK_PASS = 'wb300_acct_pass', acK_SEEN = 'wb300_acct_seen', acK_USE = 'wb300_acct_use', acK_ACCPEND = 'wb300_acct_accpend';
 const acTRACKED = ['early_access', 'tester'];
 const acTYPE_NAMES = {early_access: 'Early access', tester: 'Tester', subscriber: 'Subscriber'};
 const acCLOCK_SLACK = 3600_000;   // the clock may be this far behind the last time it was seen before it counts as wound back
@@ -57,7 +57,7 @@ async function acCheck(now = Date.now()) {
     const b = res.body;
     if (res.status === 200 && b.ok && b.approved) {
       if (typeof b.pass === 'string' && (await acPassPayload(b.pass))) { acKset(acK_PASS, b.pass); acKset(acK_SEEN, String(now)); }
-      return {state: 'ok', name: String(b.firstName || ''), email: String(b.email || ''), type: String(b.type || ''), until: null, online: true};
+      return {state: 'ok', name: String(b.firstName || ''), email: String(b.email || ''), type: String(b.type || ''), accent: typeof b.accent === 'string' ? b.accent : null, until: null, online: true};
     }
     if (!b.gated) return {state: 'off'};
     return {state: 'locked', reason: res.status === 401 ? 'signedout' : 'notapproved'};
@@ -135,5 +135,32 @@ function acShareAccent(hex) {
   } catch (e) { /* cookies blocked: the website keeps its own colour */ }
 }
 
-const acAccount = {shareAccent: acShareAccent, check: acCheck, usage: acUsage, sendFeedback: acSendFeedback, newKey: acNewKey, signOut: acSignOut, typeName: acTypeName, siteUrl: acSiteUrl, passPayload: acPassPayload, setKey: j => { acKey = j || acPASS_PUBLIC_JWK; }};
+// The accent colour is kept with the account so it follows the person to other devices (functions/api/accent.js).
+// A change is remembered as pending, sent after a short pause (the colour picker reports every move) and kept until the server has it,
+// so a change made offline goes up with the next check. '' means the built-in Oak.
+let acAccTimer = 0;
+async function acFlushAccent() {
+  const p = acKget(acK_ACCPEND);
+  if (p === null || p === undefined) return false;
+  try {
+    const res = await acCall('/api/accent', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({accent: p.slice(1)})});
+    if (res.status === 200 && res.body && res.body.ok) { if (acKget(acK_ACCPEND) === p) acKdel(acK_ACCPEND); return true; }
+  } catch (e) { /* offline or signed out: it stays pending */ }
+  return false;
+}
+function acSaveAccent(hex) {
+  if (!acHosted()) return;
+  acKset(acK_ACCPEND, 'x' + (/^#[0-9a-f]{6}$/i.test(hex || '') ? hex.toLowerCase() : ''));
+  clearTimeout(acAccTimer);
+  acAccTimer = setTimeout(acFlushAccent, 800);
+}
+// After a successful check: which colour should this device show?  A change not yet sent wins (and is sent now). Otherwise the saved
+// one wins ('' is Oak, a choice). With nothing saved yet, this device's colour is saved. Returns the colour to apply, or null for "leave it".
+async function acSyncAccent(saved, local) {
+  if (acKget(acK_ACCPEND) !== null && acKget(acK_ACCPEND) !== undefined) { await acFlushAccent(); return null; }
+  if (saved === null || saved === undefined) { if (local) { acKset(acK_ACCPEND, 'x' + local); await acFlushAccent(); } return null; }
+  return saved !== (local || '') ? saved : null;
+}
+
+const acAccount = {saveAccent: acSaveAccent, syncAccent: acSyncAccent, shareAccent: acShareAccent, check: acCheck, usage: acUsage, sendFeedback: acSendFeedback, newKey: acNewKey, signOut: acSignOut, typeName: acTypeName, siteUrl: acSiteUrl, passPayload: acPassPayload, setKey: j => { acKey = j || acPASS_PUBLIC_JWK; }};
 export {acAccount};
