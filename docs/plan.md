@@ -187,5 +187,7 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - **Selection box** in the Stamp editor picks only the shapes that lie wholly inside it (it used to pick every shape it touched).
 - **Inverted stamps**: a light line between neighbouring tiles (frames and repeats) is closed by a thin stroke of the tile colour along the outline of inverted tiles only; normal stamps draw exactly as before.
 - Checked and unchanged: click a shape in the library, then click the stamp to place it (no dragging needed); about 60 sliders in both views return to the old value on undo and the new one on redo.
-- Not in this release: Clear/Default on the toolbar (waiting on what Default should do), and the shared text editor with 20 more fonts, fonts shown in their own face and more alignment and text options (own release).
-- Tests: `text-live`, `motif-drop`, `texture-apply`, `marquee`, `frame-inverted`; `art-textures`, `shape-editor`, `small-ones`, `dock-default` updated for the changes above.
+- **Grading sliders** follow Undo and Redo for a stamp's own grade too (the Stamp editor): they used to be read again only when the global grade changed.
+- **File > Clear canvas** turns into **Default** after it has been used (new icon); Default starts from the first starting point of the kind of project that is open (Blank when there is none) and the item goes back to Clear when there is artwork again. Loading it starts a new history, as New from template does.
+- Not in this release: the shared text editor with 20 more fonts, fonts shown in their own face and more alignment and text options (own release).
+- Tests: `text-live`, `motif-drop`, `texture-apply`, `marquee`, `frame-inverted`, `grade-undo`, `clear-default`; `art-textures`, `shape-editor`, `small-ones`, `dock-default` updated for the changes above.
