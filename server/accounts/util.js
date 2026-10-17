@@ -50,3 +50,10 @@ export function sameSite(request) {
 
 export const escapeHtml = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+// Is this host behind the sign-in gate? GATE_HOSTS is a comma list; a leading "*." matches subdomains.
+export function gatedHost(env, host) {
+  const list = String(env.GATE_HOSTS || '').split(',').map((x) => x.trim().toLowerCase()).filter(Boolean);
+  const h = String(host || '').toLowerCase();
+  return list.some((g) => (g.startsWith('*.') ? h.endsWith(g.slice(1)) : h === g));
+}

@@ -105,7 +105,7 @@
   }
 
   // Clerk's cookie only exists on this site, so the app host cannot see who is signed in. For approved accounts the
-  // server trades the Clerk session for a one-hour cookie that covers the whole domain (functions/api/gate-cookie.js).
+  // server trades the Clerk session for a one-day cookie that covers the whole domain (functions/api/gate-cookie.js).
   function mintGate() {
     return fetch('/api/gate-cookie', { method: 'POST', credentials: 'same-origin' })
       .then(function (r) { return r.ok ? r.json() : null; })
@@ -150,6 +150,18 @@
     var q = location.search;
     if (!window.Clerk.user && /[?&](signin|signup)=1/.test(q)) {
       if (/[?&]signup=1/.test(q)) window.Clerk.openSignUp({}); else window.Clerk.openSignIn({});
+    }
+    // the app's "Sign out" sends people here: sign out of Clerk too, then show the plain page
+    if (window.Clerk.user && /[?&]signout=1/.test(q)) {
+      clearGate().then(function () { return window.Clerk.signOut(); }).then(function () {
+        try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) { /* ignore */ }
+      });
+      return;
+    }
+    // the app's "Manage account" opens the account box here
+    if (window.Clerk.user && /[?&]account=1/.test(q)) {
+      window.Clerk.openUserProfile();
+      try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) { /* ignore */ }
     }
     if (window.Clerk.user && /[?&]signin=1/.test(q)) mintGate().then(function (ok) { if (ok) backToApp(); });
     if (/[?&](signin|signup)=1/.test(q)) {
