@@ -112,3 +112,9 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 ## 1.26.0: Sidon album cover template
 - **Sidon album cover** (a project supplied by the owner, a diamond canvas with three pictures) is the second starting point after Blank in Normal canvas, right after Logo 1. Added through `CUSTOM` in `tools/templates/recipes.js` like Logo 1.
 - Tests: `tests/templates.spec.js` (order, count, opens clean like the other built-ins).
+
+## 1.27.0 Layout clean-up (first of the Layout redesign, see the project doc wodblok-layout-plan)
+- Layer type is a dropdown whose heading shows the type (Repeat, Frame, Free place, Pictures, Text).
+- Impression and Variation (was Randomness) show only on Repeat, Frame and Free place, where they take effect.
+- Ink edges moved from Layout to the Canvas tool.
+- Next: 1.28.0 Align, 1.29.0 Grid, 1.30.0 new settings.

@@ -42,7 +42,7 @@ test('the Layers list shows each layer\'s type, and the Layout tool\'s "Layer ty
   await expect(page.locator('#lyl2 .lyr .lym').first()).toHaveText('Frame');
   await expect(page.locator('section.pn[data-p="layers"]')).toBeVisible();      // a non-repeat layer opens its Layout tool
   await expect(page.locator('#lytn')).toHaveText('Frame');
-  await page.click('#lmode [data-m="x"]');
+  await page.locator('#lmsel').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))},'x');
   await settle(page);
   await expect(page.locator('#lyl2 .lyr.on .lym')).toHaveText('Free place');
   expect(errors).toEqual([]);
