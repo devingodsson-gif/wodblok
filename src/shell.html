@@ -418,6 +418,14 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .tpd{width:min(820px,100%)}.tpd .seg{margin-bottom:6px}.tpd .glb{padding:12px 2px 6px}.tpd .pgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
 .tpc{cursor:pointer;position:relative}.tpc:hover,.tpc:focus-visible{border-color:var(--line2);outline:none}.tpc:focus-visible{box-shadow:0 0 0 2px var(--acc-soft);border-color:var(--acc)}.tpc.sure{border-color:var(--acc)}.tpc.sure b{color:var(--acc-ink)}
 .tpc img,.tpc .nt{aspect-ratio:3/4}.tpc .nt svg{width:42%;height:auto}.tpm{display:flex;align-items:center;gap:4px;min-height:26px}.tpm b{flex:1;min-width:0}.tpm input{flex:1;min-width:0;height:26px}.tpm .ib{width:26px;height:26px;flex:none}.tpc .row{margin-top:0}
+.stgd{width:min(640px,100%);height:min(460px,100%)}.stgd .dlg-b{flex:1;min-height:0;padding:0;overflow:hidden}.stgw{display:grid;grid-template-columns:150px minmax(0,1fr);height:100%}
+.stgn{display:flex;flex-direction:column;gap:2px;padding:8px;border-right:1px solid var(--line);overflow-y:auto}.stgn button{height:var(--h-row);padding:0 9px;border:0;border-radius:var(--r-m);background:transparent;color:var(--fg);font-size:var(--fs-m);text-align:left}.stgn button:hover{background:var(--raise)}.stgn button.on{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}
+.stgb{padding:8px 16px 16px;overflow-y:auto;min-width:0}.stgr{display:flex;align-items:center;gap:8px;min-height:var(--h-row);padding:4px 0;border-bottom:1px solid var(--line);font-size:var(--fs-m)}.stgr:last-child{border-bottom:0}.stgr>span,.stgr>label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stgr b{font-weight:500;color:var(--mut);white-space:nowrap}
+.stgr .seg{flex:none;min-width:150px;grid-template-columns:repeat(var(--n,2),1fr)}.stgb .ctl.stgr{display:grid;grid-template-columns:104px minmax(0,1fr) 52px}.stgb .glb{padding:12px 0 4px}
+.stga{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}.stgab{width:var(--h-sm);height:var(--h-sm);padding:0;border-radius:var(--r-m);border:1px solid var(--line2);background:var(--c,#888);box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);color:var(--mut);display:flex;align-items:center;justify-content:center}.stgab[aria-pressed=true]{border-color:var(--acc);box-shadow:inset 0 0 0 1px rgba(0,0,0,.2),0 0 0 2px var(--panel),0 0 0 4px var(--acc)}.stgac svg{width:15px;height:15px}
+.stgk{margin-top:8px}.stgkr{display:flex;align-items:center;gap:8px;min-height:var(--h-row);border-bottom:1px solid var(--line);font-size:var(--fs-m)}.stgkr span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stgkr kbd{flex:none;font:500 var(--fs-s) "Hanken Grotesk",system-ui,sans-serif;color:var(--mut);padding:2px 8px;border:1px solid var(--line2);border-radius:var(--r-s);background:var(--field)}
+body.calm *{transition:none!important;animation:none!important}
+@media (max-width:640px){.stgd{height:min(560px,100%)}.stgw{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}.stgn{flex-direction:row;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:hidden}.stgn button{flex:none}.stga{max-width:none}}
 .tpsd{width:min(380px,100%)}.tpsd .dlg-b{display:flex;flex-direction:column;gap:12px}.tpsd .row{gap:8px}
 .pgrid .hint{grid-column:1/-1;margin:20px 0;text-align:center}
 .status .it{display:inline-flex;gap:6px}.status .it b{font-weight:500;color:var(--fg)}
@@ -837,6 +845,7 @@ body.eyedrop{cursor:crosshair}
    <hr>
    <label id="pop" for="pfile" class="mi" role="button" tabindex="0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/></svg>Open project…</label>
    <button id="tpsave"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg>Save as template…</button>
+   <button id="stgo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4L18 18M6 18l1.6-1.6M16.4 7.6L18 6"/></svg>Settings…</button>
   </div>
   <input type="file" id="pfile" class="vh" accept=".wodblok,.json,application/json,application/zip,text/plain" tabindex="-1">
  </div>
@@ -1480,6 +1489,10 @@ body.eyedrop{cursor:crosshair}
 <div class="modal" id="tpsd" hidden><div class="dlg tpsd" role="dialog" aria-modal="true" aria-labelledby="tpst">
  <div class="dlg-h"><h2 id="tpst">Save as template</h2><button class="ib" id="tpsx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
  <div class="dlg-b"><input type="text" id="tpsn" maxlength="40" aria-label="Template name" placeholder="Template name"><div class="row"><button type="button" class="primary" id="tpsok">Save</button><button type="button" class="alt" id="tpscx">Cancel</button></div></div>
+</div></div>
+<div class="modal" id="stgdlg" hidden><div class="dlg stgd" role="dialog" aria-modal="true" aria-labelledby="stgt">
+ <div class="dlg-h"><h2 id="stgt">Settings</h2><button class="ib" id="stgclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-b"><div class="stgw"><div class="stgn" id="stgnav" role="tablist" aria-orientation="vertical" aria-label="Settings pages"></div><div class="stgb" id="stgbody" role="tabpanel"></div></div></div>
 </div></div>
 <div class="modal" id="plist" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="pdlgt">
  <div class="dlg-h"><h2 id="pdlgt">Projects</h2><button class="alt" id="pnw2">New project</button><button class="alt" id="pcf">Close folder</button><button class="ib" id="pclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>

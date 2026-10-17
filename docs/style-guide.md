@@ -52,6 +52,7 @@ Rules:
 - Chrome MUST use these tokens. No literal hex or `rgb()` in chrome CSS or inline styles.
 - Literal colours are allowed only for: the artwork and colours the user chose; the colour picker's own hue bar and handles; the swatch fallback `var(--c,#888)`; scrims (`rgba(10,11,14,.45)`).
 - A swatch of the user's colour MUST have the swatch edge (`inset 0 0 0 1px rgba(0,0,0,.2)`) so pale colours stay visible. One value, everywhere.
+- The accent colour is the person's choice (Settings > General). The values in the table are the default, Bronze. Chrome uses the tokens, never the literal, so a changed accent reaches every control. The settings code derives the four accent tokens of both themes from the one colour picked and keeps the ink at 4.5:1 or better on the panel.
 - The accent is for selection, focus and the one key action in a view. Never use it as decoration, and never for more than one primary action per view.
 - `--warn` and `--ok` carry meaning only.
 - Contrast: check muted and disabled text in both themes. State is never carried by colour alone (add the edge, weight or icon).
@@ -401,6 +402,13 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 - Every action is a named command in the registry (id, label, shortcut, enabled check, run). Menus, shortcuts and command search all read it.
 - Shortcuts use Mod (Cmd on Mac, Ctrl elsewhere). Single-key tools stay single keys. Do not use a key a browser tab keeps for itself (Mod+N, Mod+W, Mod+T).
 - Command labels are the same words as the menu items.
+
+### 13.4 Settings
+
+- One dialog (`File > Settings…`, command `settings.open`), width 640, a page list on the left (`--h-row` items, the current page `--acc-soft`, `--acc-ink`, 600) and one page at a time on the right. On a phone the list becomes a row across the top.
+- A setting is one row: label left, control right, `--h-row` tall, a `--line` rule between rows. Controls are the standard ones: toggle (`.pvc`, On / Off), segmented control, slider row, button, swatch row. No explanatory text; the label says what it does.
+- A setting changes the app at once, is kept in the settings record (kv, keys `wb114_…`), and has no Apply or Save button.
+- A page lists only what the app can really do today. Do not add a control whose effect is not built.
 
 ## 14. Words
 
