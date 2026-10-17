@@ -1,0 +1,59 @@
+name: social-post
+# Posts the pictures you approved (tools/social/post.js, accounts in tools/social/accounts.js). Run it by hand: Actions > social-post > Run workflow.
+# It re-makes exactly your picks from their seeds (the batch email lists them), uploads them briefly to the media host, posts, then deletes the uploads.
+# "post for real" is OFF by default: a test run renders and checks everything but uploads and posts nothing.
+# Secrets: each account's own (names are written in tools/social/accounts.js), the media host's (WB_R2_*, see docs/social-post.md), and optionally RESEND_API_KEY, WB_SOCIAL_TO, WB_SOCIAL_FROM for the report email.
+# All repo secrets are handed to the script as one value (WB_ALL_SECRETS) so a new account needs no change to this file. Only people with write access to the repo can start this workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      seeds:
+        description: 'Seeds of the pictures to post, comma separated, 1 to 10 (from the batch email). More than one makes a carousel.'
+        required: true
+      caption:
+        description: 'Caption (one line; type \n for a new line)'
+        required: false
+        default: ''
+      accounts:
+        description: 'Account names from accounts.js, comma separated, or all'
+        required: false
+        default: 'all'
+      post_for_real:
+        description: 'Really post (leave off for a test run)'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: social-post
+  cancel-in-progress: false
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container: mcr.microsoft.com/playwright:v1.56.0-noble
+    env:
+      INPUT_SEEDS: ${{ github.event.inputs.seeds }}
+      INPUT_CAPTION: ${{ github.event.inputs.caption }}
+      INPUT_ACCOUNTS: ${{ github.event.inputs.accounts }}
+      INPUT_REAL: ${{ github.event.inputs.post_for_real }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build
+      - name: Post
+        env:
+          WB_ALL_SECRETS: ${{ toJSON(secrets) }}     # only this step sees the secrets, not npm ci or the build
+        # Typed values reach the script only as environment variables, never pasted into the shell line; the script checks every one.
+        run: |
+          args=(--seeds "$INPUT_SEEDS" --caption "$INPUT_CAPTION" --accounts "${INPUT_ACCOUNTS:-all}")
+          if [ "$INPUT_REAL" = "true" ]; then args+=(--real); fi
+          npm run social:post -- "${args[@]}"
+      # Test runs only: keep the re-made pictures for 3 days so you can look at them. A real post leaves nothing behind.
+      - uses: actions/upload-artifact@v4
+        if: ${{ github.event.inputs.post_for_real != 'true' }}
+        with:
+          name: social-post-test
+          path: out
+          retention-days: 3
+          if-no-files-found: ignore
