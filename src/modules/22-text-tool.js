@@ -61,29 +61,32 @@ const D={text:'',f:'cinzel',sz:30,ls:0,lh:115,al:'c',cv:0,rot:0,auto:true};
 // largest size (up to 40%) at which the whole text sits inside the stamp, so it doesn't wrap round the edges
 function fitSz(o){const ps=layout({...o,sz:100});if(!ps.length)return o.sz;const h=Math.min(SW,SH)*.42;let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;ps.forEach(p=>{x0=Math.min(x0,p.x-h);x1=Math.max(x1,p.x+h);y0=Math.min(y0,p.y-h);y1=Math.max(y1,p.y+h)});
 const k=SK=='tri'?.55:SK=='rect'?.86:.74;return Math.max(5,Math.min(o.maxSz||40,Math.floor(100*Math.min(k*SW/(x1-x0),k*SH/(y1-y0)))))}
-const autoFit=()=>{if(!st.auto||edit||!st.text.trim())return;const v=fitSz(st);if(v!=st.sz){st.sz=v;$('tx_sz').value=v;$('tx_sz').dispatchEvent(new Event('input',{bubbles:true}))}};let st={...D},edit=null,tmr=0;
+const autoFit=()=>{if(!st.auto||edit||!st.text.trim())return;const v=fitSz(st);if(v!=st.sz){st.sz=v;$('tx_sz').value=v;$('tx_sz').dispatchEvent(new Event('input',{bubbles:true}))}};let st={...D},edit=null,tmr=0,syncing=0,ltmr=0,lastLive=0;
 const A=(t)=>t.tgm||(t.tgm={});
 const grpOf=()=>{const qs=QS();if(!qs.length)return null;const g=qs[0].tg;if(!g||!qs.every(o=>o.tg==g))return null;const t=WBS.tiles[WBS.cur];return A(t)[g]?g:null};
 const idsOf=g=>WBS.tiles[WBS.cur].items.map((q,i)=>q.tg==g?i:-1).filter(i=>i>=0);
 const mean=ids=>{const it2=WBS.tiles[WBS.cur].items;let x=0,y=0;ids.forEach(i=>{x+=it2[i].x;y+=it2[i].y});return[x/ids.length,y/ids.length]};
 WBX.wbTxGrp=()=>grpOf();WBX.wbTxMeta=g=>A(WBS.tiles[WBS.cur])[g];
 function fillFonts(){const cur0=$('tx_f').value||st.f;$('tx_f').innerHTML=`<optgroup label="Built-in fonts">${FONTS.map(x=>`<option value="${x[0]}">${hx(x[1])}: ${hx(x[4])}</option>`).join('')}</optgroup>`+(UF.length?`<optgroup label="Your fonts">${UF.map(id=>`<option value="${id}">${hx(F[id].lbl)}</option>`).join('')}</optgroup>`:'');$('tx_f').value=F[cur0]?cur0:'cinzel'}
-function toUI(){$('tx_t').value=st.text;$('tx_f').value=F[st.f]?st.f:'cinzel';[['tx_sz','sz'],['tx_ls','ls'],['tx_lh','lh'],['tx_cv','cv'],['tx_rot','rot']].forEach(([id,k])=>{$(id).value=st[k];$(id).dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))});
+function toUI(){syncing++;try{toUI0()}finally{syncing--}}
+function toUI0(){$('tx_t').value=st.text;$('tx_f').value=F[st.f]?st.f:'cinzel';[['tx_sz','sz'],['tx_ls','ls'],['tx_lh','lh'],['tx_cv','cv'],['tx_rot','rot']].forEach(([id,k])=>{$(id).value=st[k];$(id).dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))});
 document.querySelectorAll('#tx_al [data-a]').forEach(b=>b.classList.toggle('on',b.dataset.a==st.al))}
 function fromUI(){st.text=$('tx_t').value.replace(/\r/g,'').slice(0,200);st.f=$('tx_f').value;st.sz=+$('tx_sz').value;st.ls=+$('tx_ls').value;st.lh=+$('tx_lh').value;st.cv=+$('tx_cv').value;st.rot=+$('tx_rot').value}
 async function ready(){const f=F[st.f]||F.cinzel;try{await document.fonts.load(css(f),st.text||'Aa');await document.fonts.ready}catch(e){}}
 async function preview(){await ready();const t=WBS.tiles[WBS.cur];useT(t);autoFit();const[pa]=pal(),ink=inkOf(t),ps=st.text.trim()?layout(st):[],C=cen();
 $('tx_pv').innerHTML=`<svg viewBox="-12 -12 ${SW+24} ${SH+24}"><path d="${shp(0)}" fill="${pa}" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/>`+ps.map(p=>`<g transform="translate(${(C[0]+p.x).toFixed(1)} ${(C[1]+p.y).toFixed(1)}) rotate(${p.r.toFixed(1)}) scale(${p.s})"><path d="${p.g.d}" fill="${ink}" fill-rule="evenodd"/></g>`).join('')+`</svg>`;
-$('tx_go').disabled=!st.text.trim();$('tx_up').disabled=!st.text.trim()}
+$('tx_go').disabled=!st.text.trim()}
 const cen=()=>SK=='tri'?[SW/2,SH*2/3]:[SW/2,SH/2];
 const later=()=>{clearTimeout(tmr);tmr=setTimeout(preview,120)};
 function letters(g,ax,ay){const ps=layout(st),out=[];ps.forEach(p=>{const k=p.g.k;if(!cust[k])cust[k]={n:p.c,svg:`<path d="${p.g.d}" fill="FILL" fill-rule="evenodd"/>`,txt:1};const[x,y]=wrapP(ax+p.x,ay+p.y);const q=it(k,x,y,p.s,+p.r.toFixed(1),1);q.tg=g;out.push(q)});return out}
 async function add(){fromUI();if(!st.text.trim())return;await ready();if(WBX.wbCap)WBX.wbCap();const t=WBS.tiles[WBS.cur];useT(t);autoFit();const g='tx'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),[ax,ay]=cen(),L=letters(g,ax,ay);
 if(!L.length){pmsg('No letters came out. Try another font.');return}const n0=t.items.length;t.items.push(...L);const ids=L.map((_,i)=>n0+i);const[mx,my]=mean(ids);A(t)[g]={...st,ax,ay,mx,my};
 selSet(ids,false);WBS.brush=null;store();upd();if(WBX.wbCap)WBX.wbCap();pmsg(`Added “${st.text.replace(/\n/g,' ')}” as ${L.length} letter${L.length>1?'s':''}. Drag to move them together, or click one in the Shape list to move it alone.`)}
-async function update(){const g=edit;if(!g)return;fromUI();if(!st.text.trim())return;await ready();const t=WBS.tiles[WBS.cur],M=A(t)[g],ids=idsOf(g);if(!M||!ids.length)return;if(WBX.wbCap)WBX.wbCap();useT(t);
+async function update(live){const g=edit;if(!g)return;fromUI();if(!st.text.trim())return;await ready();if(g!==edit)return;const t=WBS.tiles[WBS.cur],M=A(t)[g],ids=idsOf(g);if(!M||!ids.length)return;if(live&&['text','f','sz','ls','lh','al','cv','rot'].every(k=>M[k]===st[k]))return;if(WBX.wbCap&&(!live||performance.now()-lastLive>1500))WBX.wbCap();if(live)lastLive=performance.now();useT(t);
 const[cx0,cy0]=mean(ids),ax=M.ax+(cx0-M.mx),ay=M.ay+(cy0-M.my),pos=Math.min(...ids);delItems(ids);const L=letters(g,ax,ay);t.items.splice(Math.min(pos,t.items.length),0,...L);const nids=L.map((_,i)=>Math.min(pos,t.items.length-L.length)+i);
-const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();upd();if(WBX.wbCap)WBX.wbCap();pmsg(`Updated the text. Hand-moved letters were rebuilt.`)}
+const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();upd();if(!live){if(WBX.wbCap)WBX.wbCap();pmsg(`Updated the text. Hand-moved letters were rebuilt.`)}}
+// the text on the stamp follows every change in the panel while a text is being edited
+const live=()=>{if(!edit||syncing)return;clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
 // used by Randomize: set text on a stamp (fonts load first; a newer roll cancels an older one)
 WBX.wbTxFonts=FONTS.map(x=>x[0]);
 WBX.wbTxPlace=async(t,o,tok)=>{const f=F[o.f]||F.cinzel;try{await document.fonts.load(css(f),o.text);await document.fonts.ready}catch(e){}
@@ -95,16 +98,15 @@ return true}finally{st=keep;useT(WBS.tiles[WBS.cur])}};
 WBX.wbTxXf=(g,fn)=>{const t=WBS.tiles[WBS.cur],M=A(t)[g];if(!M)return;fn(M)};
 // sync the panel with the selection: selecting a text group puts it into edit mode
 WBX.wbTxSync=()=>{if(!$('tx_t'))return;const g=grpOf();if(g===edit)return;edit=g;const box=$('tx_ed');
-if(g){const M=A(WBS.tiles[WBS.cur])[g];st={...D,...M,auto:false};delete st.ax;delete st.ay;delete st.mx;delete st.my;toUI();box.hidden=false;$('tx_edn').textContent=st.text.replace(/\n/g,' ');$('tx_go').textContent='Add as new text';$('tx_up').hidden=false}
-else{box.hidden=true;$('tx_go').textContent='Add to stamp';$('tx_up').hidden=true;st.auto=true}later()};
+if(g){const M=A(WBS.tiles[WBS.cur])[g];st={...D,...M,auto:false};delete st.ax;delete st.ay;delete st.mx;delete st.my;toUI();box.hidden=false;$('tx_edn').textContent=st.text.replace(/\n/g,' ');$('tx_go').textContent='Add as new text'}
+else{box.hidden=true;$('tx_go').textContent='Add to stamp';st.auto=true}later()};
 fillFonts();toUI();
-$('tx_t').addEventListener('input',()=>{fromUI();later()});
-$('tx_t').addEventListener('keydown',e=>{if(e.key=='Enter'&&!e.shiftKey){e.preventDefault();edit?update():add()}});
-['tx_f','tx_sz','tx_ls','tx_lh','tx_cv','tx_rot'].forEach(id=>$(id).addEventListener('input',e=>{if(id=='tx_sz'&&e.isTrusted)st.auto=false;fromUI();later()}));
+$('tx_t').addEventListener('input',()=>{fromUI();later();live()});
+['tx_f','tx_sz','tx_ls','tx_lh','tx_cv','tx_rot'].forEach(id=>$(id).addEventListener('input',e=>{if(id=='tx_sz'&&e.isTrusted)st.auto=false;fromUI();later();live()}));
 ['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(!e.isTrusted)return;const w=$('tx_sz').closest('.ctl');if(e.target===$('tx_sz')||(w&&w.contains(e.target)))st.auto=false},true));
-$('tx_al').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;st.al=b.dataset.a;document.querySelectorAll('#tx_al [data-a]').forEach(x=>x.classList.toggle('on',x==b));later()};
-$('tx_go').onclick=add;$('tx_up').onclick=update;
-$('tx_new').onclick=()=>{selOne(-1);edit=null;$('tx_ed').hidden=true;$('tx_go').textContent='Add to stamp';$('tx_up').hidden=true;st={...D,f:st.f};toUI();upd();later();$('tx_t').focus()};
+$('tx_al').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;st.al=b.dataset.a;document.querySelectorAll('#tx_al [data-a]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
+$('tx_go').onclick=add;
+$('tx_new').onclick=()=>{selOne(-1);edit=null;$('tx_ed').hidden=true;$('tx_go').textContent='Add to stamp';st={...D,f:st.f};toUI();upd();later();$('tx_t').focus()};
 $('tx_file').onchange=async()=>{const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl)return;try{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';
 const id=await addUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();$('tx_f').value=id;fromUI();later();pmsg(`Loaded “${nm}”.`+(fl.size>=900000?' It is large, so it will not be kept for next time.':''))}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}};
 // text boxes in the pattern: lay the text out at canvas scale, returning the letter paths (centred on the box)
