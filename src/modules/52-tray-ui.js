@@ -202,4 +202,4 @@ function init52(){
  {const mo=new MutationObserver(()=>paintWells(false));document.querySelectorAll('section.pn').forEach(sc=>{if(sc.querySelector('.cwl'))mo.observe(sc,{attributes:true,attributeFilter:['hidden']})})}
  const sec=document.querySelector('section.pn[data-p="colors"]');new MutationObserver(()=>{if(!sec.hidden){paintList(true);paintST(false)}}).observe(sec,{attributes:true,attributeFilter:['hidden']});
  paintAll(true)}
-export {init52,mkWell,paintWell,paintWells};
+export {init52,mkWell,paintDock,paintWell,paintWells};

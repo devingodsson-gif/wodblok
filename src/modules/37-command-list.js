@@ -19,6 +19,7 @@ const COMMANDS = [
   ['file.clear', 'Clear canvas', 'clr'],
   ['template.new', 'New from template', 'tpnew'],
   ['template.save', 'Save as template', 'tpsave'],
+  ['settings.open', 'Settings', 'stgo'],
   ['file.open', 'Open project', 'pfile', null, 'input'],
   ['file.save', 'Save project', 'psv', 'Mod+S'],
   ['export.png', 'Export PNG', 'png'],

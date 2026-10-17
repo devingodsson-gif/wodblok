@@ -12,7 +12,8 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 // A colourway is one set of colours for the slots: proj.cw = [{id, n name, c:{slotId:'#hex'}, m:{slotId:'colour name'}}], proj.cwa = the
 // one in use. Every colourway has every slot, so links stay valid whichever colourway is showing; only the colours differ.
 // The tray lives in the document (WBS.proj), so history, saving, crash recovery and compare all carry it without anything extra.
-const TRAY_MAX=16,TRAY_VIEW=7;
+const TRAY_MAX=16;let TRAY_VIEW=7;   // places shown in the dock (Settings > Colour); an exported let, so every importer sees the change
+const setTrayView=n=>{TRAY_VIEW=Math.max(7,Math.min(TRAY_MAX,n|0||7))};
 const HEXRE=/^#[0-9a-f]{6}([0-9a-f]{2})?$/;
 // '#rrggbb' / '#rrggbbaa' / 'rgb' forms in; '#rrggbb' (opaque) or '#rrggbbaa' out, lower case. null when it is not a colour.
 function normHexA(v){const m=/^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(String(v||'').trim());if(!m)return null;let h=m[1].toLowerCase();if(h.length==3)h=h.split('').map(c=>c+c).join('');if(h.length==8&&h.slice(6)=='ff')h=h.slice(0,6);return'#'+h}
@@ -108,4 +109,4 @@ function cwMove(i,to){const o=WBS.proj;if(!o.cw[i])return;const cur=o.cw[o.cwa],
 function trayHexes(){const o=WBS.proj;return o.ts.map(id=>slotHex(id))}
 function fixedInUse(){const s=new Set();refsAll().forEach(x=>{const r=x.get();if(isFixed(r))s.add(col(r))});return[...s]}
 // ---- recently used colours (settings, not the document)
-export {trayLive,TRAY_MAX,TRAY_VIEW,HEXRE,cwAdd,cwDel,cwMove,cwNow,cwUse,fixedInUse,hexAlpha,hexOpaque,hexRGB,isFixed,isLink,lockRef,normHexA,refAdopt,refLabel,refSlot,refsAll,slotHex,slotName,slotNo,slotRef,trayAdd,trayDefault,trayDone,trayFromLegacy,trayGuard,trayHexes,trayIn,trayLoad,trayMove,trayNew,trayRemove,traySet,trayUses,unlockRef,withAlpha};
+export {trayLive,TRAY_MAX,TRAY_VIEW,setTrayView,HEXRE,cwAdd,cwDel,cwMove,cwNow,cwUse,fixedInUse,hexAlpha,hexOpaque,hexRGB,isFixed,isLink,lockRef,normHexA,refAdopt,refLabel,refSlot,refsAll,slotHex,slotName,slotNo,slotRef,trayAdd,trayDefault,trayDone,trayFromLegacy,trayGuard,trayHexes,trayIn,trayLoad,trayMove,trayNew,trayRemove,traySet,trayUses,unlockRef,withAlpha};

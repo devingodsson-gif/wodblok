@@ -10,7 +10,7 @@ function init02(){// ---- v65 speed-ups, shared parts.
 WBS.DRAFT=0;WBS.WBDRG=0;WBS._bkS=0;WBS._edRR=null;
 NODRAFT=new Set(['rgh','psq','lps','lfs','let','ler','tink','tsc','tin','taz']);
 document.addEventListener('pointerdown',e=>{const t=e.target,r=t&&t.matches&&t.matches('input[type=range]');DRA=t&&((r&&!NODRAFT.has(t.id))||(!r&&t.closest&&(t.closest('#ed')||t.closest('#art'))))?{x:e.clientX,y:e.clientY}:null},true);
-document.addEventListener('pointermove',e=>{if(DRA&&!WBS.DRAFT&&e.buttons&&Math.abs(e.clientX-DRA.x)+Math.abs(e.clientY-DRA.y)>3){WBS.DRAFT=1;clearTimeout(DRT)}},true);
+document.addEventListener('pointermove',e=>{if(DRA&&!WBS.DRAFT&&!WBS.NODR&&e.buttons&&Math.abs(e.clientX-DRA.x)+Math.abs(e.clientY-DRA.y)>3){WBS.DRAFT=1;clearTimeout(DRT)}},true);
 ['pointerup','pointercancel'].forEach(k=>document.addEventListener(k,drOff,true));addEventListener('blur',drOff);
 }
 export {DRT,NODRAFT,drOff,init02};

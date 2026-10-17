@@ -6,7 +6,7 @@ import {coreStr,dirty,openData,paintPst,pmsg,snapshot} from './18-projects-and-c
 // While there is unsaved work, a copy is written to a recovery slot every few seconds. The app still starts blank; if a copy
 // from an earlier session is waiting, "Restore unsaved work" appears in the status bar. The old copy is kept (in its own slot)
 // until the person restores or dismisses it, so starting to work does not overwrite it.
-const RC_EVERY=8000;
+let RC_EVERY=8000,rcTimer=null;   // Settings > Files changes it
 let rcBlank='',rcLast='',rcPrev=null,rcQ=Promise.resolve();
 function rcShow(on){$('rcv').hidden=!on;$('rcx').hidden=!on}   // the status bar only
 // Is there work that would be lost by restarting now? (a project still blank from launch does not count)
@@ -39,6 +39,8 @@ async function rcFind(){
 function init38(){
   rcBlank=coreStr();
   $('rcv').onclick=rcRestore;$('rcx').onclick=rcDismiss;
-  rcFind().then(()=>{setInterval(rcTick,RC_EVERY)});
+  rcFind().then(()=>{rcStart()});
 }
-export {init38,rcTick,rcUnsaved};
+function rcStart(){clearInterval(rcTimer);rcTimer=setInterval(rcTick,RC_EVERY)}
+function setAutosaveEvery(ms){RC_EVERY=ms>=8000?ms:8000;if(rcTimer)rcStart()}
+export {init38,rcTick,rcUnsaved,setAutosaveEvery};
