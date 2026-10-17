@@ -120,5 +120,20 @@ async function acSignOut() {
   return s ? s + '/?signout=1' : null;
 }
 
-const acAccount = {check: acCheck, usage: acUsage, sendFeedback: acSendFeedback, newKey: acNewKey, signOut: acSignOut, typeName: acTypeName, siteUrl: acSiteUrl, passPayload: acPassPayload, setKey: j => { acKey = j || acPASS_PUBLIC_JWK; }};
+// The accent colour the person picked, handed to the website so it can use the same colour. A plain cookie for the whole domain
+// (wodblok.com and app.wodblok.com): six hex digits and nothing else, no id and no project data. No colour (the built-in Oak) clears it.
+// Only on the hosted app; local copies, tests and previews set nothing.
+let acLastAccent = null;
+function acShareAccent(hex) {
+  if (!acHosted() || !acSiteUrl()) return;
+  const ok = /^#[0-9a-f]{6}$/i.test(hex || '');
+  if (acLastAccent === (ok ? hex.toLowerCase() : '')) return;   // the colour picker calls this on every move
+  acLastAccent = ok ? hex.toLowerCase() : '';
+  try {
+    document.cookie = 'wb_accent=' + (ok ? hex.slice(1).toLowerCase() : '') + '; Domain=.' + location.hostname.replace(/^app\./, '') +
+      '; Path=/; Max-Age=' + (ok ? 31536000 : 0) + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+  } catch (e) { /* cookies blocked: the website keeps its own colour */ }
+}
+
+const acAccount = {shareAccent: acShareAccent, check: acCheck, usage: acUsage, sendFeedback: acSendFeedback, newKey: acNewKey, signOut: acSignOut, typeName: acTypeName, siteUrl: acSiteUrl, passPayload: acPassPayload, setKey: j => { acKey = j || acPASS_PUBLIC_JWK; }};
 export {acAccount};

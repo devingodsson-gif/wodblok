@@ -41,7 +41,8 @@ const calls = (page) => page.evaluate(() => window.Clerk.calls);
 
 test('no key: the header is exactly as before', async ({ page }) => {
   await open(page, { key: '' });
-  await expect(page.getByRole('link', { name: /Open Wodblok/ })).toBeVisible();
+  await expect(nav(page).getByRole('link', { name: /Open Wodblok/ })).toBeVisible();
+  await expect(page.locator('#hero-cta')).toHaveText('Open Wodblok');
   await expect(nav(page).getByText('Create account')).toHaveCount(0);
   await expect(nav(page).getByText('Sign in')).toHaveCount(0);
 });
@@ -151,4 +152,42 @@ test('the app\'s "Manage account" arrives with ?account=1: the account box opens
   await open(page, { user: { firstName: 'Ana' }, query: '?account=1' });
   await expect.poll(() => calls(page)).toEqual(['profile']);
   expect(new URL(page.url()).search).toBe('');
+});
+
+const hero = (page) => page.locator('#hero-cta');
+
+test('the big button under the title: Create account when signed out, and it opens sign-up', async ({ page }) => {
+  await open(page);
+  await expect(hero(page)).toHaveText('Create account');
+  await hero(page).click();
+  expect(await calls(page)).toEqual(['signup']);
+  expect(new URL(page.url()).hash).toBe('');   // the link does not move the page
+});
+
+test('the big button: Open Wodblok when approved, gone when signed in but not approved', async ({ page }) => {
+  await open(page, { user: { firstName: 'Ana' }, me: { ok: true, approved: true } });
+  await expect(hero(page)).toHaveText('Open Wodblok');
+  await expect(hero(page)).toHaveAttribute('href', /^https:\/\/app\.wodblok\.com\/?$/);
+});
+
+test('the big button is hidden for someone signed in but not approved', async ({ page }) => {
+  await open(page, { user: { firstName: 'Bo' }, me: { ok: true, approved: false } });
+  await nav(page).getByRole('button', { name: 'Hi Bo!', exact: true }).waitFor();
+  await expect(hero(page)).toBeHidden();
+});
+
+test('if sign-in cannot load, the big button comes back as a plain Open Wodblok link', async ({ page }) => {
+  await open(page, { clerk: 'fail' });
+  await expect(hero(page)).toBeVisible();
+  await expect(hero(page)).toHaveText('Open Wodblok');
+});
+
+test('the video frame stays empty without a file and plays when the file is there', async ({ page }) => {
+  await open(page, { key: '' });
+  await expect(page.locator('#video .video-empty')).toBeVisible();
+  await expect(page.locator('#timelapse')).toBeHidden();
+  await page.route('https://wodblok.test/video/timelapse.mp4', (r) => r.fulfill({ status: 200, contentType: 'video/mp4', body: Buffer.alloc(16) }));
+  await page.reload();
+  await expect(page.locator('#video.has-video')).toHaveCount(1);
+  await expect(page.locator('#video .video-empty')).toBeHidden();
 });

@@ -5,6 +5,7 @@ import {openPicker,closePicker} from './51-colour-picker.js';
 import {setTrayView,TRAY_MAX} from './50-tray-core.js';
 import {setAutosaveEvery} from './38-crash-recovery.js';
 import {paintDock} from './52-tray-ui.js';
+import {acAccount} from '../platform/account.js';
 // ===== Settings =====
 // One dialog, six pages (General, Colour, Speed, Files, Shortcuts, About). Every control here changes something that already exists in the
 // app and is remembered in the settings record (kv). Nothing opens at launch; the dialog opens from File > Settings… or the command.
@@ -46,7 +47,7 @@ function accentApply(hex){let el=$('accstyle');if(!stHEX6.test(hex||'')){if(el)e
  if(!el){el=document.createElement('style');el.id='accstyle';document.body.appendChild(el)}   // last in the page, after the app's own colour rules
  const v=accentVars(hex);el.textContent=stRule('html:root[data-theme="light"]',v.light)+stRule('html:root[data-theme="dark"]',v.dark)}
 const stAccentGet=()=>{let v='';try{v=kv.get(stK_ACC)||''}catch(e){}return stHEX6.test(v)?v.toLowerCase():''};
-const stAccentSet=hex=>{try{if(hex)kv.set(stK_ACC,hex);else kv.remove(stK_ACC)}catch(e){}accentApply(hex)};
+const stAccentSet=hex=>{try{if(hex)kv.set(stK_ACC,hex);else kv.remove(stK_ACC)}catch(e){}accentApply(hex);acAccount.shareAccent(hex)};   // the website reads the same colour (platform/account.js)
 // ---------------------------------------------------------------- remembered flags
 const stFlag=(k,d)=>{try{const v=kv.get(k);return v==null?d:v==='1'}catch(e){return d}};
 const stFlagSet=(k,on)=>{try{kv.set(k,on?'1':'0')}catch(e){}};
@@ -112,7 +113,7 @@ function stShow(){try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}
  stKeyQ='';stPaint();stD().hidden=false;const t=$('stgnav').querySelector('.on');if(t)t.focus()}
 function stHide(){if(stD().hidden)return;closePicker();stD().hidden=true;const b=stOpener&&stOpener.isConnected?stOpener:$('fileb');if(b&&b.focus)b.focus()}
 function init55(){
- accentApply(stAccentGet());stDraftApply(stFlag(stK_DRAFT,true));stCalmApply(stFlag(stK_CALM,false));
+ accentApply(stAccentGet());acAccount.shareAccent(stAccentGet());stDraftApply(stFlag(stK_DRAFT,true));stCalmApply(stFlag(stK_CALM,false));
  {const tv=stNumGet(stK_TRAY,7,7,TRAY_MAX);setTrayView(tv);if(tv>7)try{paintDock(true)}catch(e){}}setAutosaveEvery(stNumGet(stK_SAVE,8,8,120)*1000);
  $('stgo').onclick=stShow;$('stgclose').onclick=stHide;stD().addEventListener('click',e=>{if(e.target===stD())stHide()});
  $('stgnav').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b){stSetPage(b.dataset.p);const n=$('stgnav').querySelector('.on');if(n)n.focus()}});

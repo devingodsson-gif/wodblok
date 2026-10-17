@@ -105,3 +105,5 @@ network code in the app; `src/modules/58-account.js` is the interface.
 
 ## Still to do
 The privacy page on the site; optional rate limit on `/api/*`.
+
+- **Accent cookie (1.27.2).** The app sets `wb_accent` (six hex digits, domain-wide, one year; cleared for the built-in Oak) so the website can use the same accent colour. It holds only a colour, no id; the privacy page lists it.

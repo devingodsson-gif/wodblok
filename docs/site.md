@@ -30,7 +30,7 @@ not appear at app.wodblok.com. Save anything worth keeping to a file (projects a
 
 ## Waitlist
 
-The sign-up form at the bottom of the page posts to `/api/waitlist`, a Cloudflare Pages Function in `functions/api/waitlist.js`.
+Since 1.27.2 the page no longer has the sign-up form (Create account in the header and under the title puts people on the list). `/api/waitlist` is kept and still works for an old link or a form posted by hand. It was the form at the bottom of the page that posted to `/api/waitlist`, a Cloudflare Pages Function in `functions/api/waitlist.js`.
 It stores each sign-up in a D1 database: email, what they will use it for, how they heard, why they want it, and the dates.
 Signing up again with the same email updates that row. It creates its own table on first use. No keys are stored in the repo.
 
@@ -50,6 +50,12 @@ The page has a hidden trap field and checks the sign-up comes from the same site
 
 "Coming next" lists the first four items of the future-features list (colourways, print size, separations, mockups) and the
 smaller ones as chips. Keep the wording to what is actually planned; edit the list in `site/index.html`.
+
+## Product video
+Put the file at `site/video/timelapse.mp4` (H.264, no sound needed; keep it under 25 MiB, Cloudflare Pages' limit per file) and, if you like, a still at `site/video/timelapse.jpg`. The page checks for the file when it loads: if it is there the frame plays it muted on a loop, if not the frame stays empty. To hide the frame completely, delete the "Video" section and the "Video" link in `site/index.html`.
+
+## Accent colour
+The site's accent follows the one picked in the app (Settings > General > Accent): see `site/accent.js` and docs/plan.md 1.27.2.
 
 ## Adding pictures to the gallery
 

@@ -248,3 +248,24 @@ test('no account code runs on the drawing path: no pointer-move listener is adde
   });
   expect(kinds.filter(k => /move|drag/.test(k))).toEqual([]);
 });
+
+test('the accent colour picked in Settings is handed to the website as a cookie; Oak clears it', async ({ page }) => {
+  await open(page, { '/api/me': ME() });
+  const cookie = async () => (await page.context().cookies()).find(c => c.name === 'wb_accent');
+  expect(await cookie()).toBeUndefined();   // the built-in Oak: nothing is set
+  await page.click('#fileb'); await page.click('#stgo');
+  await page.click('.stgab[aria-label="Purpleheart"]');
+  const c = await cookie();
+  expect(c).toMatchObject({ value: '86629a', domain: '.wodblok.test', path: '/' });
+  expect(c.expires).toBeGreaterThan(0);
+  await page.click('.stgab[aria-label="Oak"]');
+  expect(await cookie()).toBeUndefined();
+});
+
+test('the accent cookie is only for a hosted app: a local copy sets none', async ({ page }) => {
+  const { errors } = await openApp(page);   // file:// here
+  await page.click('#fileb'); await page.click('#stgo');
+  await page.click('.stgab[aria-label="Purpleheart"]');
+  expect((await page.context().cookies()).filter(c => c.name === 'wb_accent')).toEqual([]);
+  expect(errors).toEqual([]);
+});
