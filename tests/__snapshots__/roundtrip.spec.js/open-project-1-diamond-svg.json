@@ -1,6 +1,6 @@
 {
- "length": 629918,
- "sha256": "8a925eb96d4eeb1256ce6d02941d078c1030681a77df550a18199eb41713a757",
+ "length": 630101,
+ "sha256": "f961069ef364ea6309124349ee76da6934f53649a9ba14c89eed44cb6b2c8cdb",
  "tags": {
   "clipPath": 11,
   "defs": 6,
@@ -19,10 +19,10 @@
   "feMorphology": 1,
   "feTurbulence": 1,
   "filter": 10,
-  "g": 100,
+  "g": 101,
   "image": 50,
   "mask": 74,
-  "path": 72,
+  "path": 73,
   "polygon": 8,
   "rect": 76,
   "svg": 1,

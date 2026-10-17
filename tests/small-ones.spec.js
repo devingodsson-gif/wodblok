@@ -15,9 +15,9 @@ test('the Stamp editor has no reserved band under it; the shape controls live in
   const pt = await motifPoint(page);
   expect(pt, 'a motif can be clicked').not.toBeNull();
   await page.mouse.click(pt.x, pt.y);
-  await page.click('#rail-sedit');                                   // opens as a floating panel
+  await page.click('#rail-sedit');                                   // opens docked at the bottom
   await expect(page.locator('#sel')).toBeVisible();
-  expect(await page.evaluate(() => !!document.getElementById('sel').closest('.wg.fl'))).toBe(true);
+  expect(await page.evaluate(() => !!document.getElementById('sel').closest('.dk-b'))).toBe(true);
   await expect(page.locator('#sel')).not.toHaveClass(/none/);
   expect(errors).toEqual([]);
 });

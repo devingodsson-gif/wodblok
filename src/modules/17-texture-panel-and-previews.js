@@ -72,7 +72,7 @@ const sig=JSON.stringify([uses,c.md,o.map(x=>[x.id,x.name,x.t,x.a,x.sc,x.az,x.sd
 let h='';uses.forEach((u,i)=>{const L=txLib(u.x),md=TXMD.includes(u.md)?u.md:c.md;h+=`<div class="txr" data-i="${i}">${L?txThumb(L,u,md):'<span class="txt"></span>'}<select aria-label="Texture">${o.map(x=>`<option value="${hx(x.id)}"${x.id===u.x?' selected':''}>${hx(x.name)}</option>`).join('')}${o.some(x=>x.id===u.x)?'':`<option value="${hx(u.x)}" selected>Missing texture</option>`}</select><div class="txa"><button type="button" class="txb" data-a="v" aria-label="New variation" title="New variation">${TXIC.dice}</button><button type="button" class="txb" data-a="e" aria-label="Edit texture" title="Edit texture">${TXIC.edit}</button><button type="button" class="txb" data-a="x" aria-label="Remove texture" title="Remove">${TXIC.x}</button></div><div class="txm" role="group" aria-label="Mode">${TXMD.map(m=>`<button type="button" data-a="m" data-m="${m}" class="${m===md?'on':''}" aria-pressed="${m===md}">${TXMN[m]}</button>`).join('')}</div></div>`});
 if(uses.length<(c.max||6))h+=`<div class="row tight"><button type="button" class="alt" data-a="add">Add texture</button></div>`;
 const fi=document.activeElement&&document.activeElement.tagName=='SELECT'&&el.contains(document.activeElement)?[...el.querySelectorAll('select')].indexOf(document.activeElement):-1;el.innerHTML=h;if(fi>=0){const s=el.querySelectorAll('select')[fi];if(s)s.focus()}}
-function txRefresh(force){TXH.forEach(H=>txRender(H,force));txPaintLib(force)}
+function txRefresh(force){TXH.forEach(H=>txRender(H,force));txPaintLib(force);if(WBX.wbTxApplySync)WBX.wbTxApplySync()}
 // ---- the Textures panel ----
 let txLd=false,txSig='';const txCur=()=>txLib(WBS.txSel);
 const txSetR=(id,v)=>{const el=$(id);if(el&&+el.value!=+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};
@@ -147,6 +147,13 @@ $('tx_type').addEventListener('input',()=>{const L=txCur();if(!L||txLd)return;co
 txReg('st_tex',{md:'wear',def:'pinholes',get:()=>{const t=WBS.tiles[WBS.cur];return t&&t.tu||[]},set:a=>{const t=WBS.tiles[WBS.cur];if(!t)return;t.tu=a;txCommit()}});
 txReg('ly_tex',{md:'wear',def:'pinholes',get:()=>{const l=LY();return l&&l.tu||[]},set:a=>{const l=LY();if(!l)return;l.tu=a;txCommit()}});
 txReg('cv_tex',{md:'relief',def:'cotton',max:4,get:()=>Array.isArray(WBS.tex.u)?WBS.tex.u:[],set:a=>{WBS.tex.u=a;texNorm();saveTex();buildTex();store();txCap();txRefresh()}});
+// ---- Apply: put the texture chosen in the library on the Canvas, on the open stamp (Stamps) or on the selected layer (Layers) ----
+{let to='cv_tex';const hostOk=()=>to=='ly_tex'?!!LY():to=='st_tex'?!!WBS.tiles[WBS.cur]:true;
+const paint=()=>{document.querySelectorAll('#tx_to [data-t]').forEach(b=>{const on=b.dataset.t==to;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});const a=$('tx_apply');if(a)a.disabled=!txCur()||!hostOk()};
+$('tx_to').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;to=b.dataset.t;paint()};
+$('tx_apply').onclick=()=>{const L=txCur(),H=TXH.find(h=>h.id==to);if(!L||!H||!hostOk())return;const c=H.cfg,uses=(c.get()||[]).map(u=>({...u}));
+if(uses.length>=(c.max||6)){pmsg('That one already has the most textures it can hold. Remove one first.');return}uses.push({x:L.id,sd:txRid(),md:c.md});c.set(uses);pmsg(`Applied “${L.name}” to the ${to=='cv_tex'?'canvas':to=='st_tex'?'stamp':'layer'}.`)};
+WBX.wbTxApplySync=paint;paint()}
 
 WBH.syncTex();buildTex();WBX.wbTexReady=1;
 }

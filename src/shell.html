@@ -1081,7 +1081,7 @@ body.eyedrop{cursor:crosshair}
  <section class="pn" data-p="text" hidden>
   <details class="g" open><summary>Text</summary><div class="gb">
    <div class="txed" id="tx_ed" hidden><span>Editing <b id="tx_edn"></b></span><button class="alt" id="tx_new">New text</button></div>
-   <textarea id="tx_t" rows="2" maxlength="200" placeholder="Type your text, then press Enter" aria-label="Text"></textarea>
+   <textarea id="tx_t" rows="2" maxlength="200" placeholder="Text" aria-label="Text"></textarea>
    <label>Font</label><select id="tx_f"></select>
    <div class="row" style="margin-top:6px"><label class="btn alt" for="tx_file" role="button" tabindex="0">Load a font file&#8230;</label></div><input type="file" id="tx_file" class="vh" accept=".ttf,.otf,.woff,.woff2,font/*" tabindex="-1">
    <div class="txpv" id="tx_pv"></div>
@@ -1091,7 +1091,7 @@ body.eyedrop{cursor:crosshair}
    <label>Align</label><div class="seg" id="tx_al"><button type="button" data-a="l">Left</button><button type="button" data-a="c" class="on">Centre</button><button type="button" data-a="r">Right</button></div>
    <label>Curve</label><input type="range" id="tx_cv" min="-100" max="100" value="0" data-u="%" data-def="0">
    <label>Rotate</label><input type="range" id="tx_rot" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
-   <div class="row"><button class="primary" id="tx_go">Add to stamp</button><button class="primary" id="tx_up" hidden>Update text</button></div>
+   <div class="row"><button class="primary" id="tx_go">Add to stamp</button></div>
   </div></details>
  </section>
  <section class="pn" data-p="motifs" hidden>
@@ -1311,6 +1311,10 @@ body.eyedrop{cursor:crosshair}
    <label>Scale</label><input type="range" id="tx_sc" min="25" max="300" value="100" data-u="%" data-def="100">
    <label>Light from</label><input type="range" id="tx_az" min="0" max="359" value="225" data-u="&#176;" data-def="225">
    <div class="row"><button class="alt" id="tx_del">Delete texture</button></div>
+  </div></details>
+  <details class="g" open id="tx_apg"><summary>Apply</summary><div class="gb">
+   <label>To</label><div class="seg" id="tx_to" role="group" aria-label="Apply to"><button type="button" data-t="cv_tex" class="on" aria-pressed="true">Canvas</button><button type="button" data-t="st_tex" aria-pressed="false">Stamps</button><button type="button" data-t="ly_tex" aria-pressed="false">Layers</button></div>
+   <div class="row"><button class="primary" id="tx_apply">Apply</button></div>
   </div></details>
 
  </section>

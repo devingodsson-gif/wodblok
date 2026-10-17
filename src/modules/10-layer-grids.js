@@ -1,6 +1,6 @@
 import {$,WBH,WBS,WBX,mod} from './01-launch-and-version.js';
 import {DRS,bkPre,bkShow,bkTile} from './03-stamp-prints-and-drawing.js';
-import {CH,CM,CW,ORN,SH,SHN,SK,SW,cOut,col,geom,hasOut,rng,shOf,shp,tileExt,tileOn,useT,okC} from './04-canvas-and-stamp-outlines.js';
+import {shBleed,CH,CM,CW,ORN,SH,SHN,SK,SW,cOut,col,geom,hasOut,rng,shOf,shp,tileExt,tileOn,useT,okC} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,luid,pal} from './06-motif-library-folders.js';
 import {tbSync} from './07-symmetry.js';
 import {ARR,clipSeed,items} from './09-stamp-editor-grid-and-motif-ops.js';
@@ -86,7 +86,7 @@ const bhStrip=x=>x.replace(/ opacity="[^"]*"/g,'');
 function build(){bkPre();const _cn=clipSeed(1e7);
 const[pa,pb]=pal();
 let defs='',lg='',sd='';
-WBS.tiles.forEach(t=>{useT(t);surfFor(t);const ci=inkOf(t),sA=`<clipPath id="shc${t.id}"><path d="${shp(0)}"/></clipPath>`,eD=`<!--@E:${t.id}-->`+edgeDefs(t)+'<!--@-->';const sB=`<mask id="m${t.id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${t.neg?`<rect width="${SW}" height="${SH}" fill="#fff"/>${items(t,{c:'#000',d:'#fff'},0,0)}`:items(t,{c:'#fff',d:'#000'},0,0)}</mask><g id="s${t.id}" clip-path="url(#shc${t.id})">${isOf(t)?`<g mask="url(#is${t.id})">`:''}<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#m${t.id})"/>${txoG(t,'m'+t.id)}${isOf(t)?'</g>':''}</g>`;defs+=eD;sd+=sA+sB;bkTile(t,sA+eD+sB)});useT(WBS.tiles[WBS.cur]);
+WBS.tiles.forEach(t=>{useT(t);surfFor(t);const ci=inkOf(t),sA=`<clipPath id="shc${t.id}"><path d="${shp(0)}"/></clipPath>`,eD=`<!--@E:${t.id}-->`+edgeDefs(t)+'<!--@-->';const sB=`<mask id="m${t.id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${t.neg?`<rect width="${SW}" height="${SH}" fill="#fff"/>${items(t,{c:'#000',d:'#fff'},0,0)}`:items(t,{c:'#fff',d:'#000'},0,0)}</mask>${t.neg?`<g id="s${t.id}">${shBleed(ci)}<g clip-path="url(#shc${t.id})">`:`<g id="s${t.id}" clip-path="url(#shc${t.id})">`}${isOf(t)?`<g mask="url(#is${t.id})">`:''}<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#m${t.id})"/>${txoG(t,'m'+t.id)}${isOf(t)?'</g>':''}${t.neg?'</g></g>':'</g>'}`;defs+=eD;sd+=sA+sB;bkTile(t,sA+eD+sB)});useT(WBS.tiles[WBS.cur]);
 WBS.layers.forEach((L,li)=>{if(!L.vis)return;const lgB=lg;(()=>{const ls=WBS.tiles.filter(t=>L.st.includes(t.id)),n=ls.length;const lw=h=>{const lf=WBX.wbGrade?WBX.wbGrade.layF(L.u):'';let o=lf?`<g filter="url(#${lf})">${h}</g>`:h;const tm=layTexMask(L,li);if(tm){defs+=tm;o=`<g mask="url(#lt${li})">${o}</g>`}const ov=layTexOv(L);return ov[0]+o+ov[1]};if(L.free){const r=L.art?artLayer(L,li):L.txt?txtLayer(L,li):freeLayer(L,li,pa,lgB);defs+=r[0];lg+=lw(tileWrap(li,r[1]));return}if(L.fr&&L.fr.on){if(tileOn())return;const r=frameLayer(L,li,ls,pa);defs+=r[0];lg+=lw(r[1]);return}if(!n)return;
 const T=lattice(L),{ts,th,rot,px,py,P,ox,oy,gm,NI,NJ,tile}=T,amt=0,S=rng(11+li*977),RR=Math.hypot(CW,CH)/2,[ex,ey]=tileExt(),X0=rot?CW/2-RR:-ex,Y0=rot?CH/2-RR:-ey,XW=rot?2*RR:CW+2*ex,YH=rot?2*RR:CH+2*ey;
 // each stamp's own outline and print scale on this grid

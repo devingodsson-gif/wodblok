@@ -19,7 +19,9 @@ test.beforeEach(() => { test.skip(TARGET === 'legacy' || !BASE, 'needs WB_BASELI
 // "busy" has layers with an ink saved in the file ("Moon Ivory" on layers 2-4). Before 1.10 those inks were left out when the file opened; the colour tray
 // brings them back (docs/known-issues.md), so the layers print in that colour now. That is a deliberate change: this one file is compared loosely
 // (a mean difference of 2.5 of 255, and at most 1 pixel in 100 off by more than 48); the other files must still match.
-const LOOSE = { busy: { mean: 2.5, big: 0.01 } };
+// 1.35.0: "diamond" has inverted stamps. Their tiles now overlap by a hair of their own colour, so the light line between neighbouring tiles is gone; the outline of
+// each inverted tile also grows by half a pixel, so its edge pixels differ (mean about 0.45 of 255). Nothing else in that picture may differ.
+const LOOSE = { busy: { mean: 2.5, big: 0.01 }, diamond: { mean: 0.8, big: 0.01 } };
 const CTX = { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce', acceptDownloads: true };
 
 async function render(browser, url, fixture) {

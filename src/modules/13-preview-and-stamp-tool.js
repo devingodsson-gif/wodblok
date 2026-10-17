@@ -73,6 +73,14 @@ $('srt').oninput=e=>{const q=Q();if(!q)return;const v=+e.target.value,d=v-q.r;{c
 $('sko').onclick=()=>{const q=Q();if(!q)return;const on=!q.k;QS().forEach(o=>{if(on)o.k=1;else delete o.k});store();upd()};
 $('sfl').onclick=()=>{if(Q()){QS().forEach(o=>o.f*=-1);store();upd()}};
 $('scp').onclick=()=>{if(!Q())return;const a=WBS.tiles[WBS.cur].items,src=QS(),p=src.indexOf(Q()),ids=[];src.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+20,q.y+20);a.push(q);ids.push(a.length-1)});WBS.msel=new Set(ids);WBS.sel=ids[p];store();upd()};
+// Copy and paste of shapes in the Stamp editor: Cmd/Ctrl+C keeps the selected shapes, Cmd/Ctrl+V puts copies on the open stamp (also another stamp),
+// each paste a little further along; a picture on the clipboard still goes to the importer.
+{let mclip=null,mpaste=0;const typingIn=t=>!!(t&&t.matches&&t.matches('input,select,textarea,[contenteditable]'));
+document.addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey)||e.altKey||e.shiftKey||e.key.toLowerCase()!='c'||typingIn(e.target)||WBS.curView!='stamp')return;if(String(getSelection&&getSelection()||'').length)return;const src=QS();if(!src.length)return;
+mclip=src.map(o=>{const q=JSON.parse(JSON.stringify(o));delete q.tg;return q});mpaste=0});
+document.addEventListener('paste',e=>{if(WBS.curView!='stamp'||!mclip||typingIn(e.target))return;if([...(e.clipboardData&&e.clipboardData.items||[])].some(i=>/^image\//.test(i.type)))return;e.preventDefault();
+const t=WBS.tiles[WBS.cur],a=t.items,ids=[];mpaste++;const d=20*mpaste;mclip.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+d,q.y+d);a.push(q);ids.push(a.length-1)});
+WBS.msel=new Set(ids);WBS.sel=ids[0];store();upd()});}
 $('sfr').onclick=()=>{if(!Q())return;const a=WBS.tiles[WBS.cur].items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...rest,...mv);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
 $('ssb').onclick=()=>{if(!Q())return;const a=WBS.tiles[WBS.cur].items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...mv,...rest);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
 $('sym').onclick=e=>{const b=e.target.closest('[data-y]');if(!b)return;const t=WBS.tiles[WBS.cur],d=SYM.find(x=>x[0]==b.dataset.y);t.sym={m:d[0],n:d[2]?(t.sym&&t.sym.m==d[0]?t.sym.n:d[4]):0,...(t.sym&&t.sym.tx?{tx:1}:{})};store();upd()};

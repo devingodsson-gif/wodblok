@@ -178,3 +178,16 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - The generated starting points (Portrait poster, Circle badge, Random design, Half-drop, Brick, Hexagon, the three Book sizes) are removed. The picker lists Blank plus the files in `templates/canvas`, `templates/tile` and `templates/book`.
 - Removed with them: `tools/templates/recipes.js`, `tests/make-templates.spec.js`, `npm run templates`, `src/templates/`. `src/data/templates.js` is now an empty list that the build fills from the folders.
 - Tests: `tests/templates.spec.js` counts everything from the folders.
+
+## 1.35.0: Orion user-testing fixes (first part)
+- **Text tool**: the text on the stamp follows the panel as you edit (text, font, size, spacing, align, curve, rotate); the Update text button is gone. Enter makes a new line. Add to stamp stays as the one step that places new text; once placed, the text is in edit mode.
+- **Shapes**: Ctrl/Cmd+C and Ctrl/Cmd+V copy and paste the selected shapes in the Stamp editor (each paste a little further along; a picture on the clipboard still opens the importer). A picture dropped on the Stamp editor becomes a shape on the stamp at once (Pattern view still opens the import window).
+- **Textures tool**: Apply block back (Apply + To: Canvas, Stamps = the open stamp, Layers = the selected layer). It was removed in 1.0.18 (D13); the test now expects it.
+- **Shape editor** opens docked along the bottom (it used to float). Pop-out still works.
+- **Selection box** in the Stamp editor picks only the shapes that lie wholly inside it (it used to pick every shape it touched).
+- **Inverted stamps**: a light line between neighbouring tiles (frames and repeats) is closed by a thin stroke of the tile colour along the outline of inverted tiles only; normal stamps draw exactly as before.
+- Checked and unchanged: click a shape in the library, then click the stamp to place it (no dragging needed); about 60 sliders in both views return to the old value on undo and the new one on redo.
+- **Grading sliders** follow Undo and Redo for a stamp's own grade too (the Stamp editor): they used to be read again only when the global grade changed.
+- **Close all panels** (top of the tool bar) turns into **Default panels** (new icon) when no tool window is open and a Default workspace exists: pressing it opens the Default workspace layout, and the button goes back to Close all panels. With any window open it closes them all, as before.
+- Not in this release: the shared text editor with 20 more fonts, fonts shown in their own face and more alignment and text options (own release).
+- Tests: `text-live`, `motif-drop`, `texture-apply`, `marquee`, `frame-inverted`, `grade-undo`, `panels-default`; `art-textures`, `shape-editor`, `small-ones`, `dock-default` updated for the changes above.

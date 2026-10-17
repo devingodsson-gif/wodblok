@@ -130,9 +130,10 @@ test('no id appears twice on the page, and the picker\'s own X closes it and is 
 test('Logo 1 and Sidon album cover are the first starting points after Blank in Normal canvas, and Logo 1 opens with its artwork', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPicker(page); await kind(page, 'canvas');
-  await expect(cards(page).nth(1)).toHaveAttribute('aria-label', 'Logo 1');
-  await expect(cards(page).nth(2)).toHaveAttribute('aria-label', 'Sidon Album Cover');
-  await cards(page).nth(1).click();
+  // the templates/ folder files are listed by name after Blank, so other uploaded templates may come first: look the two up by name
+  await expect(page.locator('#tpg .tpc[aria-label="Logo 1"]')).toHaveCount(1);
+  await expect(page.locator('#tpg .tpc[aria-label="Sidon Album Cover"]')).toHaveCount(1);
+  await page.locator('#tpg .tpc[aria-label="Logo 1"]').click();
   await expect(page.locator('#tpdlg')).toBeHidden();
   await settle(page, { max: 60000, quiet: 6 });
   const st = JSON.parse(await getState(page));
@@ -144,8 +145,9 @@ test('Rare Motion is the first repeating-pattern starting point and Book Cover t
   const { errors } = await openApp(page);
   for (const [k, name] of [['tile', 'Rare Motion'], ['book', 'Book Cover']]) {
     await openPicker(page); await kind(page, k);
-    await expect(cards(page).nth(1)).toHaveAttribute('aria-label', name);
-    await cards(page).nth(1).click();
+    const card = page.locator(`#tpg .tpc[aria-label="${name}"]`);   // listed by name, so other uploaded templates may come first
+    await expect(card).toHaveCount(1);
+    await card.click();
     await expect(page.locator('#tpdlg')).toBeHidden();
     await settle(page, { max: 60000, quiet: 6 });
     const st = JSON.parse(await getState(page));

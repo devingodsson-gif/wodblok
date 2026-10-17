@@ -88,6 +88,9 @@ const ang=Math.acos(Math.max(-1,Math.min(1,(v1[0]*v2[0]+v1[1]*v2[1])/(l1*l2))));
 const p1=[b[0]+v1[0]/l1*t,b[1]+v1[1]/l1*t],p2=[b[0]+v2[0]/l2*t,b[1]+v2[1]/l2*t];d+=(i?'L':'M')+f(p1[0])+' '+f(p1[1])+'Q'+f(b[0])+' '+f(b[1])+' '+f(p2[0])+' '+f(p2[1])}
 return d+'Z'}
 // Outline path of the stamp, inset by e
+// An inverted stamp is a solid tile with the shapes carved out. Next to each other, two tiles each fade out at the shared edge, so a thin light line of the
+// background shows between them. A thin stroke of the tile's own colour along the outline closes it (normal stamps do not need it: they are the background colour).
+const shBleed=ci=>`<path d="${shp(0)}" fill="none" stroke="${ci}" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
 function shp(e){const f=v=>(+v).toFixed(2);let P;
 if(SK=='circle'){const rx=SW/2-e,ry=SH/2-e;return`M${f(e)} ${f(SH/2)}A${f(rx)} ${f(ry)} 0 1 0 ${f(SW-e)} ${f(SH/2)}A${f(rx)} ${f(ry)} 0 1 0 ${f(e)} ${f(SH/2)}Z`}
 if(SK=='diamond'){const A=SW/2,B=SH/2,h=Math.hypot(A,B),dx=e*h/B,dy=e*h/A;P=[[A,dy],[SW-dx,B],[A,SH-dy],[dx,B]]}
@@ -180,4 +183,4 @@ CP=cpLoad().filter(p=>p.s[0]&&p.s[1]&&p.s.every(n=>!n||CM[n]));
 let CP=[];
 const CP_KEY='wb110_cpal',escH=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cpLoad=()=>{try{const a=JSON.parse(kv.get(CP_KEY)||'[]');return Array.isArray(a)?a.filter(p=>p&&typeof p.id=='string'&&/^[a-z0-9]+$/.test(p.id)&&typeof p.name=='string'&&Array.isArray(p.s)&&p.s.length==4&&p.s.every(n=>typeof n=='string')).slice(0,100):[]}catch(e){return[]}};
-export {C,CASP,CC,CP,LEG_HEX,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,closeRowMenu,col,csN,csk,fixC,geom,hasOut,inShape,init04,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
+export {shBleed,C,CASP,CC,CP,LEG_HEX,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,closeRowMenu,col,csN,csk,fixC,geom,hasOut,inShape,init04,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};

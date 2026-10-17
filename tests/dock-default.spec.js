@@ -17,7 +17,7 @@ test('Randomize opens docked on the right in the Pattern view and in the Stamp e
   expect(errors).toEqual([]);
 });
 
-test('no tool starts as a floating window (except the Shape editor, which is floating by design), in either view, and every other tool opens in the right dock', async ({ page }) => {
+test('no tool starts as a floating window (the Shape editor docks along the bottom), in either view, and every other tool opens in the right dock', async ({ page }) => {
   const { errors } = await openApp(page);
   for (const mode of ['pattern', 'stamp']) {
     await setMode(page, mode);
@@ -25,7 +25,7 @@ test('no tool starts as a floating window (except the Shape editor, which is flo
     const tools = await page.locator('.rail [data-pn]:not([hidden])').evaluateAll(b => b.map(x => x.dataset.pn));
     expect(tools.length).toBeGreaterThan(8);
     for (const p of tools) {
-      if (p === 'sedit') continue;   // the Shape editor floats by default: see shape-editor.spec.js
+      if (p === 'sedit') continue;   // the Shape editor docks at the bottom: see shape-editor.spec.js
       await openPanel(page, p);
       await expect(page.locator(`.dk-r .wg:has(section.pn[data-p="${p}"]:not([hidden]))`), `${mode}: ${p}`).toHaveCount(1);
     }
