@@ -60,3 +60,15 @@ Export recipes now has four groups (Recipes, Custom export, Quick, Print proof) 
 ## 1.12.0: UI standard (appearance only)
 Applies docs/style-guide.md to the page CSS: tokens, three radii (4/8/12), three font sizes (11/12.5/14), one spacing scale, two durations, one group-label style, one sans-serif font (Fraunces removed). `npm run check:style` guards sizes, radii and fonts. No behaviour changes. Not done yet (own releases): shared folder-tree component and moving every library onto it ("Yours" home folder), icon stroke weights, `#fff`/`#000` literals, saved colourways and textures libraries.
 Next: imported textures (was planned as 1.12.0; now 1.13.0).
+
+## 1.14.0: Settings
+- **File > Settings…** (command `settings.open`; last item of the File menu). One dialog, six pages, remembered page. Nothing opens at launch.
+- **General:** Light / Dark (the existing top-bar toggle), Stage dots (the existing Display switch), **Accent**: eight presets (Bronze is the built-in default) plus Custom from the colour picker. One colour becomes `--acc`, `--acc-ink`, `--acc-fg` and `--acc-soft` for both themes, with the ink kept at 4.5:1 on the panel. Bronze writes nothing, so the stylesheet values stay exactly as they were. Kept in `wb114_accent`.
+- **Colour:** Places shown in the tray dock (7 to 16, `setTrayView`), Clear recent colours.
+- **Speed:** Draft while dragging (on by default; off skips the drafting while sliders and the stamp editor are dragged), Reduce motion (`body.calm`).
+- **Files:** Autosave every 8 s / 30 s / 2 min (crash-recovery slot), storage used, Keep my data (the browser's persistent-storage request).
+- **Shortcuts:** a searchable, read-only list built from the command registry.
+- **About:** version and licences (Hanken Grotesk and IM Fell English under the SIL OFL, fflate under MIT).
+- Not in this release: **Export everything / Import everything** (still not built, so Files cannot offer it), a units setting (the app has no inch/cm switch), and **rebinding shortcuts** (the key handler in `34-desktop-shell.js` is written key by key, so the registry's shortcuts only document it).
+- Code: `src/modules/55-settings.js`; `setAutosaveEvery` in 38, `setTrayView` in 50, `paintDock` exported from 52, one `!WBS.NODR` check in 02. Ids and classes of the dialog start with `stg` (the saved-trays list already owns `st…`).
+- Tests: `tests/settings-menu.spec.js`; the File menu lists in `save-project.spec.js` and `templates.spec.js` now end with Settings….
