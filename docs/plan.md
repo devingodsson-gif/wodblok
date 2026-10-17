@@ -188,9 +188,9 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - **Inverted stamps**: a light line between neighbouring tiles (frames and repeats) is closed by a thin stroke of the tile colour along the outline of inverted tiles only; normal stamps draw exactly as before.
 - Checked and unchanged: click a shape in the library, then click the stamp to place it (no dragging needed); about 60 sliders in both views return to the old value on undo and the new one on redo.
 - **Grading sliders** follow Undo and Redo for a stamp's own grade too (the Stamp editor): they used to be read again only when the global grade changed.
-- **File > Clear canvas** turns into **Default** after it has been used (new icon); Default starts from the first starting point of the kind of project that is open (Blank when there is none) and the item goes back to Clear when there is artwork again. Loading it starts a new history, as New from template does.
+- **Close all panels** (top of the tool bar) turns into **Default panels** (new icon) when no tool window is open and a Default workspace exists: pressing it opens the Default workspace layout, and the button goes back to Close all panels. With any window open it closes them all, as before.
 - Not in this release: the shared text editor with 20 more fonts, fonts shown in their own face and more alignment and text options (own release).
-- Tests: `text-live`, `motif-drop`, `texture-apply`, `marquee`, `frame-inverted`, `grade-undo`, `clear-default`; `art-textures`, `shape-editor`, `small-ones`, `dock-default` updated for the changes above.
+- Tests: `text-live`, `motif-drop`, `texture-apply`, `marquee`, `frame-inverted`, `grade-undo`, `panels-default`; `art-textures`, `shape-editor`, `small-ones`, `dock-default` updated for the changes above.
 
 ## 1.36.0: One text editor, 20 more fonts
 - **One editor for both**: the Text tool (Stamp editor) and the Text layer have exactly the same controls, in the same order (text, font, load a font file, size, letter spacing, word spacing, line spacing, align, case, curve, rotate letters). Only what belongs to one of them differs (preview and Add to stamp; ink, textures, Split into letters). `tests/text-editor-shared.spec.js` compares the two panels, so they cannot drift apart. Enter is a new line in both.

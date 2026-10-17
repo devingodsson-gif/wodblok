@@ -99,7 +99,7 @@ gs.forEach((g,i)=>{if(i){const sp=document.createElement('div');sp.className='ws
 dk.hidden=!gs.length;if(nar){dk.style.width='';dk.style.height=''}else if(gs.length){const ac=gs.every(g=>g.col);if(k=='l'||k=='r')dk.style.width=(ac?Math.min(200,wsClampSz(k,wsSz(k))):wsClampSz(k,wsSz(k)))+'px';else dk.style.height=(ac?34:wsClampSz(k,wsSz(k)))+'px'}});
 if(!nar)L.float.forEach(g=>wsFl.appendChild(wsEl(g,true)));
 document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=wsFind(p);b.hidden=!MODEP[view].includes(p)||RO.off.includes(p);const fr=!!g&&g.a==p&&!g.col;b.classList.toggle('on',fr);b.classList.toggle('op',!!g&&!fr);b.title=fr?'':(g?'Open in a tab. Click to bring it to the front':'')});
-wsTabFit();nums();if(railHook)railHook()}
+wsTabFit();nums();if(railHook)railHook();if(WBX.wbRcls)WBX.wbRcls()}
 // a panel with more tabs than fit: the chosen tab is scrolled into view and the edge that hides more tabs fades
 function wsTabEdge(t){const h=t.parentElement;h.classList.toggle('ovr',t.scrollLeft+t.clientWidth<t.scrollWidth-1);h.classList.toggle('ovl',t.scrollLeft>1)}
 function wsTabFit(){document.querySelectorAll('.wh .wt').forEach(t=>{const a=t.querySelector('.wtab.on');if(a){if(a.offsetLeft+a.offsetWidth>t.scrollLeft+t.clientWidth)t.scrollLeft=a.offsetLeft+a.offsetWidth-t.clientWidth;else if(a.offsetLeft<t.scrollLeft)t.scrollLeft=a.offsetLeft}wsTabEdge(t)})}
@@ -186,7 +186,11 @@ WBX.wbWsSet=o=>{const had=!!wsFind('wspc');['pattern','stamp'].forEach(m=>{const
  const c=JSON.parse(JSON.stringify(L));WS[m]={dock:(c.dock||[]).filter(ok),float:(c.float||[]).filter(ok)}});
  // applying a workspace sets exactly that arrangement: the Workspaces tool closes with the rest, so a starting workspace never opens more than its own groups
  wsSave();wsRender();info();nums()};
-$('rcls').onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length)return;L.dock=[];L.float=[];wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')};
+// The Close all panels button turns into Default when no panel is open and a Default workspace exists: pressing it opens that layout, and it turns back into Close.
+{const b=$('rcls'),CL=b.querySelector('svg').outerHTML,tp=b.querySelector('.tip'),DF='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M14.5 4.5v15"/><path d="M7 12h4M9 10v4"/></svg>';let dm=false;
+const paint=()=>{const L=wsL(),e=!L.dock.length&&!L.float.length,d=e&&!!(WBX.wbWsDefault&&WBX.wbWsDefault());if(d===dm&&b.dataset.m)return;dm=d;b.dataset.m=d?'d':'c';b.setAttribute('aria-label',d?'Default panels':'Close all panels');b.querySelector('svg').outerHTML=d?DF:CL;tp.textContent=d?'Default panels':'Close all panels'};
+WBX.wbRcls=paint;
+b.onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length){const w=WBX.wbWsDefault&&WBX.wbWsDefault();if(w){WBX.wbWsSet(w.layout);pmsg('Default panels.')}return}L.dock=[];L.float=[];wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')}}
 document.querySelector('.rail').onclick=e=>{const b=e.target.closest('[data-pn]');if(!b)return;const p=b.dataset.pn,g=wsFind(p);
 // double-clicking the Randomize tool rolls a new piece, the same as pressing the Randomize button in its window (the window is left open)
 if(p=='rand'&&e.isTrusted&&e.detail>1){const g2=wsFind('rand');if(!(g2&&g2.a=='rand'&&!g2.col))setPanel('rand');$('rzdo').click();return}

@@ -51,13 +51,7 @@ if(tok!=plTok)return;if(pk.name)c.querySelector('b').textContent=pk.name;if(pk.t
 catch(e){if(tok==plTok)g.innerHTML='<div class="hint">Could not read the folder: '+hx((e&&e.message)||'unknown error')+'</div>'}}
 let plList=[];
 function init33(){
-// The Clear item turns into Default once the canvas has been cleared: Default starts from the first starting point of the kind of project that is open
-// (Blank when there is none). It goes back to Clear as soon as there is artwork again.
-{const b=$('clr'),CIC=b.querySelector('svg').outerHTML,DIC='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5"/><path d="M4.5 4.5v4h4"/></svg>',T0=b.title;let m='c';
-const blank=()=>WBS.tiles.every(t=>!t.items.length)&&WBS.layers.every(L=>!(L.pl||[]).length);
-const paint=()=>{b.dataset.m=m;b.innerHTML=(m=='d'?DIC:CIC)+(m=='d'?'Default':'Clear canvas');b.title=m=='d'?'Start again from the first starting point':T0};
-b.onclick=async()=>{if(m=='d'){m='c';paint();if(WBX.wbTplDefault)await WBX.wbTplDefault();return}clearAll(false);m='d';paint()};
-setInterval(()=>{if(m=='d'&&!blank()){m='c';paint()}},500)}
+$('clr').onclick=()=>clearAll(false);
 $('psv').onclick=saveProject;
 
 const openFile=async(fl,handle)=>{

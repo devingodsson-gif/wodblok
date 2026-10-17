@@ -143,5 +143,6 @@ function init42(){
   paint(true);
   // open the launch workspace now (the shell has just cleared every panel and chosen the Pattern view)
   {const w=wxLaunchPick();if(w)WBX.wbWsSet(w.layout)}
+  WBX.wbWsDefault=()=>wxLaunchPick();
 }
 export {init42};

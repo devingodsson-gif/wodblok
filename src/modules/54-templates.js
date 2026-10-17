@@ -63,8 +63,6 @@ async function tpStart(id){
  if(bi){bytes=tpBytes(bi.b);name=bi.n}
  else{const st=await tpOpenStore();if(!st)return pmsg('This browser does not keep templates.');const r=await st.doc(id).get();const v=r&&r.exists?r.data():null;if(!v||typeof v.b!='string')return pmsg('That template could not be read.');bytes=tpBytes(v.b);name=v.n||''}
  const r=await fmtOpen(bytes);openData(r.project,null,'');await tpFinish(name)}
-// File > Default (after Clear): the first starting point of the kind of project that is open, or a blank one
-WBX.wbTplDefault=async()=>{const k=tpNow(),t=TPL_BUILTIN.find(x=>x.type===k);try{await tpStart(t?t.id:'blank:'+k)}catch(e){pmsg((e&&e.message)||'Could not start from that template.')}};
 // the card was chosen: with unsaved work it asks once
 async function tpPick(id){
  if(dirty()&&TPS.arm!==id){TPS.arm=id;tpPaint();setTimeout(()=>{if(TPS.arm===id){TPS.arm=null;tpPaint()}},3500);return}
