@@ -1,0 +1,107 @@
+// 1.29.0 Grid: one tool in Pattern mode and in the Stamp editor (same panel, same icon, same controls); snapping is chosen there,
+// for every Free place, Pictures and Text layer; older projects that chose snapping per layer come in with it on.
+const { test, expect } = require('@playwright/test');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const { openApp, openPanel, settle, getState, setMode, openProjectFile } = require('./helpers/harness');
+
+const pick = (page, v) => page.locator('#lmsel').evaluate((e, x) => { e.value = x; e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+const outline = (page, panel) => page.evaluate(p => {
+  const s = document.querySelector(`section.pn[data-p="${p}"]`);
+  const rows = [...s.querySelectorAll('summary, label, button, input')].map(e => e.tagName === 'INPUT' ? 'input:' + e.type + (e.min ? ':' + e.min + '-' + e.max : '') : e.tagName === 'SUMMARY' ? 'summary:' + e.firstChild.textContent.trim() : e.tagName.toLowerCase() + ':' + e.textContent.trim());
+  return rows;
+}, panel);
+
+test('the Grid tool is the same in Pattern mode and in the Stamp editor: name, icon and controls', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 3 });
+  const rail = await page.evaluate(() => ['rail-pgrid', 'rail-grid'].map(id => { const b = document.getElementById(id); return [b.getAttribute('aria-label'), b.querySelector('svg').outerHTML, b.querySelector('.tip').textContent]; }));
+  expect(rail[0]).toEqual(rail[1]);
+  expect(rail[0][0]).toBe('Grid');
+  const a = await outline(page, 'pgrid'), b = await outline(page, 'grid');
+  expect(a.length).toBeGreaterThan(14);
+  expect(a).toEqual(b);
+  expect(errors).toEqual([]);
+});
+
+async function placeAt(page, fx, fy) {
+  const box = await page.locator('#art').boundingBox();
+  await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
+  await settle(page);
+}
+
+test('Snap to grid in the Grid tool snaps every placed stamp, and off leaves them alone', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'layers'); await pick(page, 'x'); await settle(page);
+  await openPanel(page, 'pgrid');
+  await expect(page.locator('#pgn')).not.toBeChecked();
+  await placeAt(page, 0.337, 0.411);
+  const free = JSON.parse(await getState(page)).layers[0].pl[0];
+  await page.click('#pgn'); await settle(page);
+  await expect(page.locator('#pgs')).toBeChecked();                       // snapping shows the grid
+  await page.click('#pgm [data-g="l"]'); await settle(page);
+  const d = await page.locator('#art').evaluate(e => (e.getAttribute('viewBox') || '0 0 1000 1000').split(/[ ,]+/).map(Number));
+  const cell = d[2] / 8;
+  await placeAt(page, 0.6221, 0.3333);
+  const pl = JSON.parse(await getState(page)).layers[0].pl;
+  expect(pl.length).toBe(2);
+  expect(pl[1].x / cell).toBeCloseTo(Math.round(pl[1].x / cell), 1);       // on a crossing
+  expect(pl[1].y / cell).toBeCloseTo(Math.round(pl[1].y / cell), 1);
+  expect(Math.abs(free.x / cell - Math.round(free.x / cell))).toBeGreaterThan(0.01);   // the one placed before stayed where it was
+  // Snap all to grid brings the first one in
+  await page.click('#pgq'); await settle(page);
+  const all = JSON.parse(await getState(page)).layers[0].pl;
+  all.forEach(p => { expect(p.x / cell).toBeCloseTo(Math.round(p.x / cell), 1); expect(p.y / cell).toBeCloseTo(Math.round(p.y / cell), 1); });
+  // Cell centres
+  await page.click('#pgm [data-g="c"]'); await settle(page);
+  await placeAt(page, 0.8, 0.7);
+  const q = JSON.parse(await getState(page)).layers[0].pl[2];
+  expect(q.x / cell - 0.5).toBeCloseTo(Math.round(q.x / cell - 0.5), 1);
+  // off: free again
+  await page.click('#pgn'); await settle(page);
+  await placeAt(page, 0.15, 0.85);
+  const r = JSON.parse(await getState(page)).layers[0].pl[3];
+  expect(Math.abs((r.x / cell - 0.5) - Math.round(r.x / cell - 0.5)) > 0.01 || Math.abs((r.y / cell - 0.5) - Math.round(r.y / cell - 0.5)) > 0.01).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('Layout no longer has its own snap boxes; Pictures and Text layers use the same Grid switch', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'layers');
+  for (const m of ['x', 'a', 't']) { await pick(page, m); await settle(page); await expect(page.locator('section.pn[data-p="layers"] :text("Snap to grid")')).toHaveCount(0); }
+  expect(errors).toEqual([]);
+});
+
+test('older projects that snapped per layer open with Snap to grid on, and turning it off sticks', async ({ page }, testInfo) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'project-4-rect-4x3.wodblok.json'), 'utf8'));
+  const core = fx.core || fx;
+  const L = core.layers[0]; L.free = true; L.pl = []; L.fg = { snap: true, ss: true };
+  if (core.pg) { delete core.pg.snap; delete core.pg.ss; }
+  const f = path.join(os.tmpdir(), 'wb-old-snap-' + process.pid + '.wodblok.json');
+  fs.writeFileSync(f, JSON.stringify(fx));
+  await openProjectFile(page, f);
+  expect(JSON.parse(await getState(page)).pg.snap).toBeUndefined();     // opening changes nothing in the file
+  await openPanel(page, 'pgrid');
+  await expect(page.locator('#pgn')).toBeChecked();
+  await expect(page.locator('#pgss')).toBeChecked();
+  await page.click('#pgn'); await settle(page);
+  expect(JSON.parse(await getState(page)).pg.snap).toBe(false);
+  fs.unlinkSync(f);
+  expect(errors).toEqual([]);
+});
+
+test('Stamp editor Grid: same switch, snap points and size snapping', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await setMode(page, 'stamp');
+  await openPanel(page, 'grid');
+  await page.click('#gsd'); await settle(page);
+  await expect(page.locator('#gon')).toBeChecked();
+  await page.click('#gsp [data-g="b"]'); await settle(page);
+  await expect(page.locator('#gsp [data-g="b"]')).toHaveClass(/on/);
+  await page.click('#gr'); await settle(page);                          // Reset grid keeps it showing and snapping
+  await expect(page.locator('#gsd')).toBeChecked();
+  await expect(page.locator('#gsp [data-g="c"]')).toHaveClass(/on/);
+  await expect(page.locator('#gq')).toBeDisabled();                       // nothing on the stamp to snap yet
+  expect(errors).toEqual([]);
+});
