@@ -4,7 +4,6 @@ const { test, expect } = require('@playwright/test');
 const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const { folderTemplates } = require('../tools/templates/folders');
-const BUILT = { canvas: 3, tile: 3, book: 3 };                                 // made by `npm run templates`
 const FOLDER = folderTemplates(), HAND = { canvas: 0, tile: 0, book: 0 };       // every .wodblok file in templates/<kind>/
 for (const t of FOLDER) HAND[t.type]++;
 
@@ -24,7 +23,7 @@ test('the File menu has both template items and the picker lists three kinds wit
   await expect(page.locator('#tpty button')).toHaveText(['Normal canvas', 'Repeating pattern', 'Book']);
   for (const k of ['canvas', 'tile', 'book']) {
     await kind(page, k);
-    await expect(cards(page)).toHaveCount(1 + BUILT[k] + HAND[k]);          // Blank, the generated ones, and one for every file in the templates/ folder of that kind
+    await expect(cards(page)).toHaveCount(1 + HAND[k]);          // Blank, and one for every file in the templates/ folder of that kind
     await expect(cards(page).first()).toHaveAttribute('aria-label', 'Blank');
     await expect(page.locator('#tpyh')).toBeHidden();
   }
@@ -41,7 +40,7 @@ test('both commands exist', async ({ page }) => {
 
 test('every built-in opens clean, matches its kind and opens the same twice', async ({ page }) => {
   const { errors } = await openApp(page);
-  for (const [k, n] of Object.keys(BUILT).map(k => [k, BUILT[k] + HAND[k]])) {
+  for (const [k, n] of Object.keys(HAND).map(k => [k, HAND[k]])) {
     for (let i = 1; i <= n; i++) {
       await openPicker(page); await kind(page, k);
       await cards(page).nth(i).click();
@@ -155,10 +154,10 @@ test('Rare Motion is the first repeating-pattern starting point and Book Cover t
   expect(errors).toEqual([]);
 });
 
-test('every file in the templates/ folders is a starting point under the kind of its folder, by name, before the generated ones', async ({ page }) => {
+test('every file in the templates/ folders is a starting point under the kind of its folder, by name', async ({ page }) => {
   expect(FOLDER.length, 'the four supplied templates are in the folders').toBeGreaterThanOrEqual(4);
   const { errors } = await openApp(page);
-  for (const k of Object.keys(BUILT)) {
+  for (const k of Object.keys(HAND)) {
     await openPicker(page); await kind(page, k);
     const want = ['Blank', ...FOLDER.filter(t => t.type === k).map(t => t.n)];
     expect(await cards(page).evaluateAll((els, n) => els.slice(0, n).map(e => e.getAttribute('aria-label')), want.length)).toEqual(want);

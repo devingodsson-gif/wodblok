@@ -173,3 +173,8 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - Done in the build (`tools/templates/folders.js`, called by `tools/build.js` and by `tools/serve-esm.js` for `npm run dev`; uses the existing `fflate`). The card picture is the file's own picture as it is (no image library), so each adds about 100 KB to the page.
 - Logo 1, Sidon album cover (now shown as "Sidon Album Cover", its project name), Rare Motion and Book Cover moved from `tools/templates/custom/` to these folders. `CUSTOM`, `add-custom.js` and the copies in `src/templates/` for them are gone; `npm run templates` makes only the generated ones.
 - Tests: `tests/templates.spec.js` counts the cards from the folders and checks name and order.
+
+## 1.34.0: Only the templates in the folders
+- The generated starting points (Portrait poster, Circle badge, Random design, Half-drop, Brick, Hexagon, the three Book sizes) are removed. The picker lists Blank plus the files in `templates/canvas`, `templates/tile` and `templates/book`.
+- Removed with them: `tools/templates/recipes.js`, `tests/make-templates.spec.js`, `npm run templates`, `src/templates/`. `src/data/templates.js` is now an empty list that the build fills from the folders.
+- Tests: `tests/templates.spec.js` counts everything from the folders.
