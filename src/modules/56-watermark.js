@@ -10,21 +10,21 @@ const wmSet=on=>{try{if(on)kv.set(WM_KEY,'1');else kv.remove(WM_KEY)}catch(e){}}
 // the fonts are bundled but only fetched from their data when first used, so ask for them before drawing
 let ready=null;
 const wmReady=()=>ready||(ready=Promise.all([document.fonts.load('400 40px "IM Fell English"','Wodblok'),document.fonts.load('600 40px "Hanken Grotesk"','Made with')]).then(()=>{},()=>{}));
-// Draw the watermark onto a finished picture (a 2D canvas context of w x h pixels). Sizes follow the shorter side.
+// Draw the watermark onto a finished picture (a 2D canvas context of w x h pixels). Sizes follow the shorter side (logo 11%, text 4.2%).
 function wmDraw(ctx,w,h){
-  const u=Math.min(w,h)/100,m=3*u,acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()||'#b8914f';
+  const u=Math.min(w,h)/100,m=4*u,acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()||'#b8914f';
   ctx.save();
   try{
     // top-left: the logo, drawn from the same outline as the top bar
     const svg=document.querySelector('.brand svg'),p=svg&&svg.querySelector('path');
     if(svg&&p){
-      const vb=svg.viewBox.baseVal,lw=7*u,k=lw/vb.width;
+      const vb=svg.viewBox.baseVal,lw=11*u,k=lw/vb.width;
       ctx.save();ctx.translate(m,m);ctx.scale(k,k);ctx.translate(-vb.x,-vb.y);
       ctx.shadowColor='rgba(0,0,0,.28)';ctx.shadowBlur=.5*u/k;ctx.fillStyle=acc;ctx.fill(new Path2D(p.getAttribute('d')));
       ctx.restore();
     }
     // bottom-right: "Made with" then "Wodblok", right-aligned on one baseline
-    const fs=2.6*u,fw=`400 ${fs*1.3}px "IM Fell English",Georgia,serif`,fm=`600 ${fs}px "Hanken Grotesk",system-ui,sans-serif`;
+    const fs=4.2*u,fw=`400 ${fs*1.3}px "IM Fell English",Georgia,serif`,fm=`600 ${fs}px "Hanken Grotesk",system-ui,sans-serif`;
     ctx.textAlign='right';ctx.textBaseline='alphabetic';
     ctx.font=fw;const ww=ctx.measureText('Wodblok').width;
     ctx.font=fm;const mw=ctx.measureText('Made with').width,gap=fs*.32,x1=w-m,x0=x1-ww-gap-mw,y=h-m;
