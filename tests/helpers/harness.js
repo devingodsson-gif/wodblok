@@ -73,13 +73,14 @@ function initScript({ seed, runtime, workspaces, templates }) {
 }
 
 // Open the app with controlled randomness, time and network. Returns { errors } (page errors and console errors).
-async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, workspaces = false, templates = false } = {}) {
+async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, workspaces = false, templates = false, before = null } = {}) {
   const errors = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
   await page.addInitScript(initScript({ seed, runtime, workspaces, templates }));
   // No network: the app asks Google Fonts for two stylesheets; answer them empty so layout is the same everywhere.
   await page.route(/^https?:\/\/(?!127\.0\.0\.1:5199\/)/, r => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+  if (before) await before(page);     // a test may add its own routes here, after the ones above (the last one added is asked first)
   await page.clock.setFixedTime(FIXED_TIME);
   await page.goto(url);
   await page.waitForFunction(() => typeof (window.__wbTest ? 1 : coreStr) !== 'undefined' && document.fonts.status === 'loaded');

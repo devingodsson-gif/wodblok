@@ -91,6 +91,22 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 - Chrome keeps favicons for a long time. If a tab still shows an old icon after this goes live, close the tab and reopen the site.
 - Code: `WEBHEAD` in `tools/build.js`, `src/web/sw.js`, `src/web/_headers`. Test: `tests/web-app.spec.js`.
 
+## 1.27.0 (accounts in the app)
+Name chip in the status bar, File > Account…, File > Send feedback…, the 7-day offline pass with a locked screen, active-time totals for early access and testers, Sign out and Manage account through the site. `/api/me` reports `gated`; the gate cookie lasts one day. The network rule in CLAUDE.md now allows `src/platform/account.js` only, and `check:platform` enforces it. Tests: `tests/account.spec.js` (build target), `tests/site-accounts.test.mjs`, `tests/site-account.spec.js`. Fixed a comment that made `check:platform` fail.
+
+## 1.27.3 (accent colour on the loading screen)
+The loading screen showed the built-in Oak for a moment before the chosen accent. The app now keeps the rules it makes for the accent as `wb_accentcss`, and a small script in the page head applies them before anything is shown (`src/shell.html`); the app's own accent code reuses that style element. Oak removes the saved rules. Test: `tests/settings-menu.spec.js` (colour at the moment the loading screen appears).
+
+## 1.27.2 (site simplified, product video slot, privacy page, accent colour on the site)
+- **Site copy** cut to plain statements: title "Stamped-pattern editor", one line under it, section labels "Video" and "Artwork", footer "Privacy" and "Contact". The waitlist form is gone from the page (Create account already puts people on the list; `/api/waitlist` and its tests stay). One way in: the big button reads Create account when signed out, Open Wodblok when approved, and is hidden when signed in but not approved.
+- **Video slot:** a 16:9 frame under the title. Put the time-lapse at `site/video/timelapse.mp4` (an optional still at `site/video/timelapse.jpg`); it autoplays muted on a loop, with controls if reduced motion is on. Until the file exists the frame stays empty. Cloudflare Pages allows 25 MiB per file.
+- **Privacy page:** `site/privacy.html`, linked from the footer and listed in the sitemap. The owner should read it once: it states what is stored (docs/accounts.md) and that nothing from a project is uploaded.
+- **Accent colour:** the app writes the colour picked in Settings > General > Accent as a cookie for the whole domain (`wb_accent`, six hex digits; Oak clears it; hosted app only, in `src/platform/account.js`). `site/accent.js` reads it and sets the same four tokens, using the app's own colour maths copied unchanged (`tests/site-accent.test.mjs` fails if the copies differ). It follows the browser, not the account, so a different browser shows the default colour until the app has been opened there.
+- Tests: `tests/site-marketing-page.test.mjs`, `tests/site-accent.test.mjs`, `tests/account.spec.js` (cookie set, cleared, none from a local copy).
+
+## 1.26.3 (header polish)
+The plain "Open Wodblok" button no longer flashes before the account header appears (hidden while Clerk loads, back if Clerk cannot load); the signed-in button reads "Hi <name>!".
+
 ## 1.26.2 (gate cookie)
 The app host never received Clerk's session cookie, so the gate bounced signed-in people back to the site. The site now sets a one-hour signed cookie (`wb_gate`) for the whole domain; the gate and `/api/*` accept it. Tests: `tests/site-accounts.test.mjs`, `tests/site-account.spec.js`. Also restores `npm run test:site` to include the accounts tests.
 
