@@ -11,7 +11,7 @@ with no `GATE_HOSTS` variable the app is served exactly as before. Both are set 
 1. **Create account** (top right of wodblok.com): first name, email, password; Clerk emails a verification code.
 2. Until approved, opening the app shows a short "you're on the list" page.
 3. The owner sets their type in the Clerk dashboard. They get an automatic "You're in" email.
-4. The header then reads **Hi <name>**, with a menu: Open Wodblok, Account (Clerk's page: password, email, delete account), Sign out.
+4. The header then reads **Hi <name>!**, with a menu: Open Wodblok, Account (Clerk's page: password, email, delete account), Sign out.
 5. Signed-out visitors who open the app are sent to `wodblok.com/?signin=1`, which opens the sign-in box.
 
 ## What the owner does

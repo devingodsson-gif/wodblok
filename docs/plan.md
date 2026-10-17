@@ -91,6 +91,9 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 - Chrome keeps favicons for a long time. If a tab still shows an old icon after this goes live, close the tab and reopen the site.
 - Code: `WEBHEAD` in `tools/build.js`, `src/web/sw.js`, `src/web/_headers`. Test: `tests/web-app.spec.js`.
 
+## 1.26.3 (header polish)
+The plain "Open Wodblok" button no longer flashes before the account header appears (hidden while Clerk loads, back if Clerk cannot load); the signed-in button reads "Hi <name>!".
+
 ## 1.26.2 (gate cookie)
 The app host never received Clerk's session cookie, so the gate bounced signed-in people back to the site. The site now sets a one-hour signed cookie (`wb_gate`) for the whole domain; the gate and `/api/*` accept it. Tests: `tests/site-accounts.test.mjs`, `tests/site-account.spec.js`. Also restores `npm run test:site` to include the accounts tests.
 

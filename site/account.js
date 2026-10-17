@@ -14,14 +14,21 @@
   try { host = atob(key.split('_')[2]).replace(/\$$/, ''); } catch (e) { return; }
   if (!/^[a-z0-9.-]+$/i.test(host)) return;
 
+  // Hide the plain "Open Wodblok" button until Clerk has decided what to show, so it does not flash and swap.
+  // If Clerk cannot load, the button comes back (on an error, or after a few seconds).
+  openApp.style.visibility = 'hidden';
+  function showPlain() { openApp.style.visibility = ''; }
+  var failsafe = setTimeout(showPlain, 6000);
+
   var script = document.createElement('script');
   script.async = true;
   script.crossOrigin = 'anonymous';
   script.setAttribute('data-clerk-publishable-key', key);
   script.src = 'https://' + host + '/npm/@clerk/clerk-js@5/dist/clerk.browser.js';
   script.onload = function () {
-    window.Clerk.load().then(start).catch(function () { /* the plain page stays usable */ });
+    window.Clerk.load().then(start).catch(showPlain); // the plain page stays usable
   };
+  script.onerror = showPlain;
   document.head.appendChild(script);
 
   var mine = [];
@@ -50,7 +57,7 @@
 
   function signedIn() {
     var wrap = el('div', 'acct');
-    var btn = el('button', 'btn btn-secondary top-app', 'Hi ' + (window.Clerk.user.firstName || 'there'));
+    var btn = el('button', 'btn btn-secondary top-app', 'Hi ' + (window.Clerk.user.firstName || 'there') + '!');
     btn.type = 'button';
     btn.setAttribute('aria-haspopup', 'menu');
     btn.setAttribute('aria-expanded', 'false');
@@ -134,6 +141,7 @@
   }
 
   function start() {
+    clearTimeout(failsafe);
     render();
     window.Clerk.addListener(render);
     // keep the app's cookie fresh while this page stays open
