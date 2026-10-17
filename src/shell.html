@@ -72,7 +72,7 @@ button,.ddi,.wtab,.lyr,.rail button{transition:background-color var(--t-fast),bo
 .ab.a,.hr.ra b::before{background:var(--ca);content:"A"}.ab.b,.hr.rb b::before{background:var(--cb);content:"B"}.hr.ra.rb b::before{content:"A=B";background:linear-gradient(90deg,var(--ca) 50%,var(--cb) 50%)}
 .hr.ra{box-shadow:inset 3px 0 0 var(--ca)}.hr.rb{box-shadow:inset 3px 0 0 var(--cb)}.hr.ra.rb{box-shadow:inset 3px 0 0 var(--ca),inset 6px 0 0 var(--cb)}
 .baT{display:inline-flex;align-items:center;max-width:46%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.baT .ab{flex:none;margin-right:6px}.baT.a{border-color:var(--ca)}.baT.b{border-color:var(--cb)}
-.baX,#tpx,#empc{position:absolute;z-index:44;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 8px 0 12px;border-radius:var(--r-m);border:0;background:var(--acc);color:var(--acc-fg);font-weight:600;font-size:var(--fs-m);box-shadow:var(--shadow);cursor:pointer}.baX:hover,#tpx:hover,#empc:hover{filter:brightness(1.08)}.baX kbd,#tpx kbd{font:600 11px "Hanken Grotesk",system-ui,sans-serif;padding:2px 6px;border-radius:var(--r-s);background:rgba(0,0,0,.18);color:inherit}
+.baX,#tpx{position:absolute;z-index:44;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 8px 0 12px;border-radius:var(--r-m);border:0;background:var(--acc);color:var(--acc-fg);font-weight:600;font-size:var(--fs-m);box-shadow:var(--shadow);cursor:pointer}.baX:hover,#tpx:hover,#empc:hover{filter:brightness(1.08)}.baX kbd,#tpx kbd{font:600 11px "Hanken Grotesk",system-ui,sans-serif;padding:2px 6px;border-radius:var(--r-s);background:rgba(0,0,0,.18);color:inherit}
 .babusy .dock,.babusy .film,.babusy .rail{opacity:.55;pointer-events:none}.dock,.film,.rail{transition:opacity var(--t-fast)}
 .baT{position:absolute;z-index:42;font-size:var(--fs-s);font-weight:600;padding:4px 8px;border-radius:var(--r-l);background:var(--panel);border:1px solid var(--line2);color:var(--fg);pointer-events:none;box-shadow:var(--shadow)}.baT.r{transform:translateX(-100%)}
 .baH{position:absolute;z-index:43;width:20px;margin-left:-8px;cursor:ew-resize;touch-action:none}.baH::before{content:"";position:absolute;left:9px;top:0;bottom:0;width:2px;background:var(--acc);box-shadow:0 0 0 1px rgba(0,0,0,.25)}.baH i{position:absolute;left:1px;top:50%;width:18px;height:30px;margin-top:-12px;border-radius:var(--r-m);background:var(--acc);box-shadow:0 1px 4px rgba(0,0,0,.4)}
@@ -110,7 +110,6 @@ button,.ddi,.wtab,.lyr,.rail button{transition:background-color var(--t-fast),bo
 .nvc button.alt{padding:4px 8px}
 #nvhand[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink);box-shadow:0 0 0 1px var(--acc)}
 body.handtool #boardP,body.handtool #boardP *{cursor:grab!important}
-body.handtool #empc,body.panning #empc{pointer-events:none}   /* the round + on an empty canvas sits in the middle: with the hand tool on, a drag that starts there pans like anywhere else */
 body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-select:none}
 /* workspaces */
 .wx{padding:0 0 12px}.wxl{padding:6px 8px}.wxs{display:flex;gap:8px;padding:6px 12px 0}.wxs input{flex:1;min-width:0}
@@ -139,8 +138,6 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 #tpv[aria-pressed=true]{background:var(--raise);color:var(--acc-ink);font-weight:600;box-shadow:0 0 0 1px var(--acc)}
 #tpx{top:52px;left:50%}
 #mqb{position:fixed;display:none;z-index:60;pointer-events:none;border:1px solid var(--acc);background:var(--acc-soft);border-radius:2px}
-#empc{top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;padding:0;gap:0;justify-content:center;border-radius:50%}
-#empc::before{content:"+";font-size:28px;font-weight:300;line-height:1;margin:-2px 0 0 0}
 /* an empty stamp in the tray shows a plus: click it to start drawing it */
 #tabs button.empty{position:relative}
 #tabs button.empty::after{content:"+";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:300;color:#fff;mix-blend-mode:difference;pointer-events:none}
@@ -899,7 +896,6 @@ body.eyedrop{cursor:crosshair}
  </nav>
 
 <main class="stage">
-  <button type="button" id="empc" aria-label="Add a shape" hidden></button>
  <button type="button" id="tpx" hidden>Exit 3 × 3 preview<kbd>Esc</kbd></button>
  <div id="tbar" role="toolbar" aria-label="Task bar" hidden></div>
  <div class="viewbar">
