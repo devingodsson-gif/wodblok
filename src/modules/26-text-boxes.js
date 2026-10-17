@@ -63,7 +63,7 @@ WBX.wbTbRelay=tbRelay;WBX.wbTxUses=()=>tbSty.tu;WBX.wbTxCut=id=>{tbSty.tu=tbSty.
 $('tb_split').onclick=async()=>{const L=fpL();if(!L||!L.txt)return;const grp=fpGrp().filter(q=>q.tx);if(!grp.length)return;if(WBX.wbCap)WBX.wbCap();const cache=new Map(),made=[];let total=0;
 for(const p of grp){const ra=p.s/Math.max(p.n||1,.01),k=ra,rr=(+p.r||0)*Math.PI/180,cs=Math.cos(rr),sn=Math.sin(rr),fl=p.f||1,out=[];
 for(const l of (p.Lt||[])){const key=String(l[0]),cp=parseInt(key.split('|').pop(),36);if(!isFinite(cp))continue;let ch;try{ch=String.fromCodePoint(cp)}catch(e){continue}
-const o={...p.tx,text:ch,cv:0,rot:0,sz:+(p.tx.sz*ra).toFixed(2)},ck=[o.f,o.sz,ch].join('|');let R=cache.get(ck);if(R===undefined){R=await WBX.wbTxLay(o);cache.set(ck,R)}if(!R)continue;
+const o={...p.tx,text:ch,cv:0,rot:0,wd:0,ht:0,sz:+(p.tx.sz*ra).toFixed(2)},ck=[o.f,o.sz,ch].join('|');let R=cache.get(ck);if(R===undefined){R=await WBX.wbTxLay(o);cache.set(ck,R)}if(!R)continue;
 const lx=(+l[1])*k*fl,ly=(+l[2])*k,n=Math.max(R.bw,R.bh);
 out.push({u:fpU(),tx:o,G:R.G,Lt:R.Lt,bw:R.bw,bh:R.bh,n,x:+((+p.x)+lx*cs-ly*sn).toFixed(1),y:+((+p.y)+lx*sn+ly*cs).toFixed(1),s:+n.toFixed(2),r:+(((+p.r||0)+fl*(+l[3]||0))%360).toFixed(1),f:fl,...(Array.isArray(p.tu)&&p.tu.length?{tu:p.tu.map(u=>({x:u.x,sd:txRid()}))}:{}),...(p.ink?{ink:p.ink}:{})})}
 if(!out.length)continue;const i=L.pl.indexOf(p);if(i<0)continue;L.pl.splice(i,1,...out);made.push(...out);total+=out.length}
