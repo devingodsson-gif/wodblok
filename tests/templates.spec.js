@@ -19,7 +19,7 @@ test('the File menu has both template items and the picker lists three kinds wit
   await expect(page.locator('#tpty button')).toHaveText(['Normal canvas', 'Repeating pattern', 'Book']);
   for (const k of ['canvas', 'tile', 'book']) {
     await kind(page, k);
-    await expect(cards(page)).toHaveCount(k === 'canvas' ? 6 : 4);          // Normal canvas also has Logo 1 and Sidon album cover
+    await expect(cards(page)).toHaveCount(k === 'canvas' ? 6 : 5);          // Normal canvas also has Logo 1 and Sidon album cover; Repeating pattern has Rare Motion; Book has Book Cover
     await expect(cards(page).first()).toHaveAttribute('aria-label', 'Blank');
     await expect(page.locator('#tpyh')).toBeHidden();
   }
@@ -36,7 +36,7 @@ test('both commands exist', async ({ page }) => {
 
 test('every built-in opens clean, matches its kind and opens the same twice', async ({ page }) => {
   const { errors } = await openApp(page);
-  for (const [k, n] of [['canvas', 5], ['tile', 3], ['book', 3]]) {
+  for (const [k, n] of [['canvas', 5], ['tile', 4], ['book', 4]]) {
     for (let i = 1; i <= n; i++) {
       await openPicker(page); await kind(page, k);
       await cards(page).nth(i).click();
@@ -133,6 +133,20 @@ test('Logo 1 and Sidon album cover are the first starting points after Blank in 
   await settle(page, { max: 60000, quiet: 6 });
   const st = JSON.parse(await getState(page));
   expect(st.tiles.reduce((n, t) => n + (t.items || []).length, 0), 'the logo has its shapes').toBeGreaterThan(20);
+  expect(errors).toEqual([]);
+});
+
+test('Rare Motion is the first repeating-pattern starting point and Book Cover the first book one', async ({ page }) => {
+  const { errors } = await openApp(page);
+  for (const [k, name] of [['tile', 'Rare Motion'], ['book', 'Book Cover']]) {
+    await openPicker(page); await kind(page, k);
+    await expect(cards(page).nth(1)).toHaveAttribute('aria-label', name);
+    await cards(page).nth(1).click();
+    await expect(page.locator('#tpdlg')).toBeHidden();
+    await settle(page, { max: 60000, quiet: 6 });
+    const st = JSON.parse(await getState(page));
+    expect(st.tiles.reduce((n, t) => n + (t.items || []).length, 0), name + ' has its shapes').toBeGreaterThan(5);
+  }
   expect(errors).toEqual([]);
 });
 
