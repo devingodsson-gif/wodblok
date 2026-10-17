@@ -1,6 +1,6 @@
 import {$,WBH,WBS,WBX,mod} from './01-launch-and-version.js';
 import {BK,bkH} from './03-stamp-prints-and-drawing.js';
-import {HO,OFFS,ORN,SH,SK,SW,col,ornPts,rng,shp,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {shBleed,HO,OFFS,ORN,SH,SK,SW,col,ornPts,rng,shp,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,it,selOne,store} from './06-motif-library-folders.js';
 import {symOps} from './07-symmetry.js';
 import {grid,items,snapPt,snapSize} from './09-stamp-editor-grid-and-motif-ops.js';
@@ -86,7 +86,7 @@ shape=P>0?`<g filter="url(#pt${x})"><rect x="-12" y="-12" width="${SW+24}" heigh
 nf=(id,fq,oc,sd,m)=>`<filter id="${id}${k}" filterUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="${fq}" numOctaves="${oc}" seed="${sd}"/><feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ${m}"/></filter>`,
 fd=FL>0?nf('na',.07,3,seed,'4 0 0 0 -1.6')+nf('nb',.035,2,seed+13,'8 0 0 0 -4.4'):'',
 tone=FL>0?`<rect width="${SW}" height="${SH}" fill="#fff" filter="url(#na${k})" mask="url(#tn1${x}_${b})"/><rect width="${SW}" height="${SH}" fill="#fff" filter="url(#nb${k})" mask="url(#tn2${x}_${b})"/>`:'';
-o+=fd+`<mask id="mp${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shape}</mask><g id="q${k}" clip-path="url(#shc${t.id})">${isOf(t)?`<g mask="url(#is${t.id})">`:''}<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k})"/>${txoG(t,'mp'+k)}${isOf(t)?'</g>':''}</g>`;{const _pc=o.slice(_ob);BK.PC[k]=_pc;BK.P[k]=bkH(_pc+'|'+(BK.PF[x]||''));o=o.slice(0,_ob)+'<!--@P:'+k+'-->'+_pc+'<!--@-->'}});BK.PD.set(x,{k:_ck,o:o.slice(_o0),pf:BK.PF[x],pc:_bt.map(b=>{const k=x+'_'+b;return[k,BK.PC[k],BK.P[k]]})})});
+o+=fd+`<mask id="mp${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shape}</mask>${t.neg?`<g id="q${k}">${shBleed(ci)}<g clip-path="url(#shc${t.id})">`:`<g id="q${k}" clip-path="url(#shc${t.id})">`}${isOf(t)?`<g mask="url(#is${t.id})">`:''}<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k})"/>${txoG(t,'mp'+k)}${isOf(t)?'</g>':''}${t.neg?'</g></g>':'</g>'}`;{const _pc=o.slice(_ob);BK.PC[k]=_pc;BK.P[k]=bkH(_pc+'|'+(BK.PF[x]||''));o=o.slice(0,_ob)+'<!--@P:'+k+'-->'+_pc+'<!--@-->'}});BK.PD.set(x,{k:_ck,o:o.slice(_o0),pf:BK.PF[x],pc:_bt.map(b=>{const k=x+'_'+b;return[k,BK.PC[k],BK.P[k]]})})});
 useT(WBS.tiles[WBS.cur]);return o}
 function renderL(){const L=WBS.layers[WBS.selL],pa=col(WBS.proj.bg);
 $('lyl').innerHTML=WBS.layers.map((l,i)=>i).reverse().map(i=>{const l=WBS.layers[i];return`<div class="lr${lyGrp().includes(i)?' on':''}" data-l="${i}"><input type="checkbox" title="Show or hide"${l.vis?' checked':''}><span class="ln">${hx(l.name)}</span><button class="alt" data-up title="Bring forward">&#9650;</button><button class="alt" data-dn title="Send back">&#9660;</button></div>`}).join('');
