@@ -8,7 +8,9 @@ const SITE = path.join(__dirname, '..', 'site');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.json': 'application/json', '.xml': 'application/xml', '.txt': 'text/plain' };
 const KEY = 'pk_test_' + Buffer.from('clerk.wodblok.test$').toString('base64');
 
-async function open(page, { key = KEY, user = null, me = { ok: true, approved: true }, query = '' } = {}) {
+async function open(page, { key = KEY, user = null, me = { ok: true, approved: true }, query = '', gate = { ok: true, approved: true } } = {}) {
+  const gateCalls = [];
+  page.gateCalls = gateCalls;
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());
     if (url.host === 'clerk.wodblok.test') {
@@ -18,8 +20,13 @@ async function open(page, { key = KEY, user = null, me = { ok: true, approved: t
         openUserProfile() { this.calls.push('profile'); }, signOut() { this.calls.push('signout'); } };`;
       return route.fulfill({ contentType: 'text/javascript', body });
     }
+    if (url.host === 'app.wodblok.com') return route.fulfill({ contentType: 'text/html', body: '<title>app</title>' });
     if (url.host !== 'wodblok.test') return route.abort();
     if (url.pathname === '/account-config.js') return route.fulfill({ contentType: 'text/javascript', body: `window.WB_ACCOUNTS = { publishableKey: ${JSON.stringify(key)} };` });
+    if (url.pathname === '/api/gate-cookie') {
+      gateCalls.push(route.request().method());
+      return route.fulfill({ contentType: 'application/json', body: JSON.stringify(gate) });
+    }
     if (url.pathname === '/api/me') return route.fulfill({ contentType: 'application/json', body: JSON.stringify(me) });
     const file = path.join(SITE, url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname));
     if (!file.startsWith(SITE) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) return route.fulfill({ status: 404, body: '' });
@@ -66,7 +73,8 @@ test('signed in and approved: "Hi <name>" with a menu that opens the app, accoun
   await page.getByRole('menuitem', { name: 'Account' }).click();
   await hi.click();
   await page.getByRole('menuitem', { name: 'Sign out' }).click();
-  expect(await calls(page)).toEqual(['profile', 'signout']);
+  await expect.poll(() => calls(page)).toEqual(['profile', 'signout']);
+  expect(page.gateCalls).toContain('DELETE'); // the app's cookie is cleared before signing out
 });
 
 test('signed in but not approved: the menu says they are on the list and has no link into the app', async ({ page }) => {
@@ -99,4 +107,21 @@ test('header fits a phone screen without sideways scrolling', async ({ page }) =
   await open(page, { user: { firstName: 'Ana' } });
   await nav(page).getByRole('button', { name: 'Hi Ana' }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('signed in and approved: the site asks for the app cookie', async ({ page }) => {
+  await open(page, { user: { firstName: 'Ana' } });
+  await expect.poll(() => page.gateCalls).toContain('POST');
+});
+
+test('signed in but not approved: no bounce back to the app', async ({ page }) => {
+  await open(page, { user: { firstName: 'Bo' }, gate: { ok: true, approved: false }, query: '?signin=1' });
+  await expect.poll(() => page.gateCalls).toContain('POST');
+  await page.waitForTimeout(300);
+  expect(new URL(page.url()).host).toBe('wodblok.test');
+});
+
+test('sent here by the app while signed in and approved: goes straight back, once', async ({ page }) => {
+  await open(page, { user: { firstName: 'Ana' }, query: '?signin=1' });
+  await page.waitForURL(/^https:\/\/app\.wodblok\.com\/?$/);
 });

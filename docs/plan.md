@@ -91,6 +91,9 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 - Chrome keeps favicons for a long time. If a tab still shows an old icon after this goes live, close the tab and reopen the site.
 - Code: `WEBHEAD` in `tools/build.js`, `src/web/sw.js`, `src/web/_headers`. Test: `tests/web-app.spec.js`.
 
+## 1.26.2 (gate cookie)
+The app host never received Clerk's session cookie, so the gate bounced signed-in people back to the site. The site now sets a one-hour signed cookie (`wb_gate`) for the whole domain; the gate and `/api/*` accept it. Tests: `tests/site-accounts.test.mjs`, `tests/site-account.spec.js`. Also restores `npm run test:site` to include the accounts tests.
+
 ## 1.20.0: Accounts, server side and website (the app side is 1.21)
 - **What:** sign-up and sign-in with Clerk; the owner approves people by setting `type` (`early_access`, `tester`, `subscriber`) in the Clerk dashboard; only approved accounts can open the hosted app; an automatic "You're in" email on first approval; a new-account alert to the owner; usage time and feedback stored in D1 for the app to send (1.21). Full description and the dashboard set-up steps: docs/accounts.md.
 - **Switched off until configured:** the header buttons need a Clerk key in `site/account-config.js`; the gate needs `GATE_HOSTS` in Cloudflare. Merging changes nothing visible by itself.
