@@ -118,3 +118,9 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - Impression and Variation (was Randomness) show only on Repeat, Frame and Free place, where they take effect.
 - Ink edges moved from Layout to the Canvas tool.
 - Next: 1.28.0 Align, 1.29.0 Grid, 1.30.0 new settings.
+
+## 1.28.0 Align
+- New Align group in Layout for Free place, Pictures and Text: a 3 x 3 grid (top left to bottom right), Centre across, Centre down, Distribute across and down (3 or more selected), and Margin.
+- Several selected items move as one group. On a book cover the area is the region the selection sits in (back cover, spine or front cover), inside the safe area; on a canvas or repeat tile it is the whole canvas.
+- Each press is one undo step. Every button is a command (Align: ...) in command search; no default shortcut keys yet.
+- Not done yet: Position X/Y (planned for this release in the plan doc) moves to 1.29.0 with the Grid work.

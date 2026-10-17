@@ -54,5 +54,6 @@
  "54-templates.js",
  "55-settings.js",
  "56-watermark.js",
- "57-saved-colours.js"
+ "57-saved-colours.js",
+ "58-align.js"
 ]
