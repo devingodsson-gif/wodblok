@@ -56,4 +56,5 @@ test.afterAll(() => {
   made.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
   const body = '// Built-in templates ("Starting points"): made by `npm run templates` from tools/templates/recipes.js. Do not edit by hand.\n// Each is {id, type: canvas | tile | book, n: name, th: small picture (data URL), b: the .wodblok file as base64}.\nconst TPL_BUILTIN=' + JSON.stringify(made) + ';\nexport {TPL_BUILTIN};\n';
   fs.writeFileSync(path.join(ROOT, 'src', 'data', 'templates.js'), body);
+  require('child_process').execFileSync('node', [path.join(ROOT, 'tools', 'templates', 'add-custom.js')]);   // the hand-made ones go back in, first
 });

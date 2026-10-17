@@ -9,7 +9,7 @@ import {paintDock} from './52-tray-ui.js';
 // One dialog, six pages (General, Colour, Speed, Files, Shortcuts, About). Every control here changes something that already exists in the
 // app and is remembered in the settings record (kv). Nothing opens at launch; the dialog opens from File > Settings… or the command.
 // The accent colour is made here: one picked colour becomes the four accent tokens of both themes (see accentVars).
-const stK_ACC='wb114_accent',stK_DRAFT='wb114_draft',stK_CALM='wb114_calm',stK_TRAY='wb114_trayview',stK_SAVE='wb114_autosave',stK_PAGE='wb114_page';
+const stK_ACC='wb114_accent',stK_DRAFT='wb114_draft',stK_CALM='wb114_calm',stK_TRAY='wb114_trayview',stK_SAVE='wb114_autosave',stK_PAGE='wb114_page',stK_TPL='wb111_tplstart';
 const stPAGES=[['general','General'],['colour','Colour'],['speed','Speed'],['files','Files'],['keys','Shortcuts'],['about','About']];
 // Accent presets. They are the person's colours, not chrome, so literal values are allowed (style guide 3). The first is the built-in bronze
 // and stays the stylesheet's own values (no override is written for it).
@@ -69,7 +69,7 @@ const stDotsNow=()=>!document.body.classList.contains('plain');
 function stAccentRow(){const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur);
  return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div></div>`}
 function stPageHtml(p){
- if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stViewToggles()+stAccentRow();
+ if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stTgl('stgtl',stFlag(stK_TPL,true),'Templates at launch')+stViewToggles()+stAccentRow();
  if(p=='colour')return`<div class="ctl stgr"><label for="stgtv">Places shown</label><input type="range" id="stgtv" min="7" max="${TRAY_MAX}" step="1" value="${stNumGet(stK_TRAY,7,7,TRAY_MAX)}"><output id="stgtvo">${stNumGet(stK_TRAY,7,7,TRAY_MAX)}</output></div><div class="stgr"><span>Recent colours</span><button type="button" class="alt" id="stgrc">Clear</button></div>`;
  if(p=='speed')return stTgl('stgdr',stFlag(stK_DRAFT,true),'Draft while dragging')+stTgl('stgca',stFlag(stK_CALM,false),'Reduce motion');
  if(p=='files')return stSegH('stgas','Autosave every',stSAVE_EVERY,stNumGet(stK_SAVE,8,8,120))+`<div class="stgr"><span>Storage</span><b id="stguse">…</b></div><div class="stgr"><span>Keep my data</span><button type="button" class="pvc" id="stgkp" aria-pressed="false" aria-label="Keep my data">…</button></div>`;
@@ -97,7 +97,7 @@ function stWire(){const b=$('stgbody');
   closePicker();stAccentSet(x.dataset.h);stAccentMarks()});
  const tv=$('stgtv');if(tv)tv.addEventListener('input',()=>{const n=+tv.value;$('stgtvo').textContent=n;try{kv.set(stK_TRAY,String(n))}catch(e){}setTrayView(n);try{paintDock(true)}catch(e){}});
  on('stgrc',()=>{try{kv.remove('wb200_recent')}catch(e){}const c=$('stgrc');c.textContent='Cleared';c.disabled=true});
- flip('stgdr',stK_DRAFT,stDraftApply);flip('stgca',stK_CALM,stCalmApply);
+ flip('stgtl',stK_TPL,()=>{});flip('stgdr',stK_DRAFT,stDraftApply);flip('stgca',stK_CALM,stCalmApply);
  seg('stgas',v=>{const n=+v;try{kv.set(stK_SAVE,String(n))}catch(e){}setAutosaveEvery(n*1000)});
  on('stgkp',async()=>{try{await storage.persist()}catch(e){}stStoragePaint()});
  const q=$('stgkq');if(q)q.addEventListener('input',()=>{stKeyQ=q.value;const m=/Mac|iPhone|iPad/.test(navigator.platform||'');
