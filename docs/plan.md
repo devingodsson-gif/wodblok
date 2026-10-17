@@ -75,5 +75,6 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 
 ## 1.15.0: Wood accents
 - The Settings accent presets are named after woods and tuned to sit with Oak: **Oak** (the bronze default), **Birch** (silver grey), **Rosewood** (red), **Ironwood** (metallic blue), **Eucalyptus** (green), **Purpleheart** (purple), **Walnut** (dark brown), **Maple** (pink). All are desaturated and warm; the accent tokens of each theme are still derived from the one base colour, ink at 4.5:1 or better on the panel.
+- The swatches are in hue order (Rosewood, Walnut, Oak, Eucalyptus, Ironwood, Purpleheart, Maple), with the grey Birch last.
 - The Accent row shows the chosen name (Custom for a picked colour). A colour saved by 1.14.0 that is not one of these eight shows as Custom.
 - Code: `stACCENTS` and `stAccentName` in `55-settings.js`. Test: `tests/settings-menu.spec.js`.

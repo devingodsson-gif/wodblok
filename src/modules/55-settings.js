@@ -14,7 +14,8 @@ const stPAGES=[['general','General'],['colour','Colour'],['speed','Speed'],['fil
 // Accent presets. They are the person's colours, not chrome, so literal values are allowed (style guide 3). The first is the built-in bronze
 // and stays the stylesheet's own values (no override is written for it).
 // Named after woods, desaturated and warm so they sit with Oak. Each is the base colour; the accent tokens of each theme are derived from it.
-const stACCENTS=[['Oak',''],['Birch','#a3a09a'],['Rosewood','#a85a52'],['Ironwood','#5f7f9a'],['Eucalyptus','#72977f'],['Purpleheart','#86629a'],['Walnut','#744f3b'],['Maple','#c48a96']];
+// Shown in hue order (red, brown, bronze, green, blue, purple, pink); Birch, the grey, has no hue and comes last.
+const stACCENTS=[['Rosewood','#a85a52'],['Walnut','#744f3b'],['Oak',''],['Eucalyptus','#72977f'],['Ironwood','#5f7f9a'],['Purpleheart','#86629a'],['Maple','#c48a96'],['Birch','#a3a09a']];
 const stAccentName=cur=>{const a=stACCENTS.find(x=>x[1]===(cur||''));return a?a[0]:'Custom'};
 const stSAVE_EVERY=[[8,'8 s'],[30,'30 s'],[120,'2 min']];
 const stHEX6=/^#[0-9a-f]{6}$/i;

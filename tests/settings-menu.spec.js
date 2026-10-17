@@ -88,11 +88,19 @@ test('accent: a preset recolours both themes, stays readable, is remembered, and
   expect(errors).toEqual([]);
 });
 
-test('accent: the presets are named after woods, in order, and the row shows the chosen name', async ({ page }) => {
+test('accent: the presets are named after woods, in hue order, and the row shows the chosen name', async ({ page }) => {
   await openApp(page);
   await open(page);
   const names = await page.$$eval('#stgacc .stgab:not(.stgac)', bs => bs.map(b => b.getAttribute('aria-label')));
-  expect(names).toEqual(['Oak', 'Birch', 'Rosewood', 'Ironwood', 'Eucalyptus', 'Purpleheart', 'Walnut', 'Maple']);
+  expect(names).toEqual(['Rosewood', 'Walnut', 'Oak', 'Eucalyptus', 'Ironwood', 'Purpleheart', 'Maple', 'Birch']);
+  // the order is by hue, measured from the swatch colours; the grey (Birch) is last
+  const hues = await page.$$eval('#stgacc .stgab:not(.stgac)', bs => bs.map(b => {
+    const m = b.style.getPropertyValue('--c').trim(), n = [1, 3, 5].map(i => parseInt(m.slice(i, i + 2), 16) / 255), mx = Math.max(...n), mn = Math.min(...n), d = mx - mn;
+    if (d < .08) return 999;
+    const h = mx === n[0] ? ((n[1] - n[2]) / d + (n[1] < n[2] ? 6 : 0)) : mx === n[1] ? (n[2] - n[0]) / d + 2 : (n[0] - n[1]) / d + 4;
+    return h * 60;
+  }));
+  expect(hues).toEqual([...hues].sort((a, b) => a - b));
   await expect(page.locator('#stgan')).toHaveText('Oak');
   await expect(page.locator('#stgacc [aria-label="Oak"]')).toHaveAttribute('aria-pressed', 'true');
   await page.click('#stgacc [aria-label="Walnut"]');
