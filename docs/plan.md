@@ -85,3 +85,8 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 - SVG files are never watermarked (a vector file cannot carry the fonts), and the checkbox is greyed out while SVG is the chosen format. The Print cover PDF/PNG and the print proof are not watermarked.
 - The mark is drawn from the top bar logo's own outline, so there is no second copy of the logo in the code.
 - Code: `src/modules/56-watermark.js` (`wmGet`, `wmSet`, `wmReady`, `wmDraw`); hooks in `xrRender` (43) and the Quick PNG handler (14). Test: `tests/watermark.spec.js`.
+
+## 1.16.1: Favicon links for the hosted app
+- The hosted page (app.wodblok.com) now links `favicon.ico` and a new 32 px PNG (`icon-32.png`, cut from the existing icon) next to the inline SVG icon, so Chrome has plain files to fall back on and a new address to fetch. Both files are in the offline cache and served with `no-cache`, so a changed icon is picked up. The artwork is unchanged: the same WB mark.
+- Chrome keeps favicons for a long time. If a tab still shows an old icon after this goes live, close the tab and reopen the site.
+- Code: `WEBHEAD` in `tools/build.js`, `src/web/sw.js`, `src/web/_headers`. Test: `tests/web-app.spec.js`.

@@ -92,3 +92,12 @@ test('favicon.ico is shipped and kept for offline use, so browsers that ask for 
   expect(fs.existsSync(path.join(OUT, 'a', 'favicon.ico'))).toBe(true);
   expect(fs.readFileSync(path.join(OUT, 'a', 'sw.js'), 'utf8')).toContain("'favicon.ico'");
 });
+
+test('the hosted page links its icon files, and they exist and are cached for offline use (1.16.1)', async () => {
+  const html = fs.readFileSync(path.join(OUT, 'a', 'index.html'), 'utf8');
+  expect(html).toContain('<link rel="icon" href="favicon.ico" sizes="any">');
+  expect(html).toContain('<link rel="icon" href="icon-32.png" type="image/png" sizes="32x32">');
+  expect(fs.existsSync(path.join(OUT, 'a', 'icon-32.png'))).toBe(true);
+  expect(fs.readFileSync(path.join(OUT, 'a', 'sw.js'), 'utf8')).toContain("'icon-32.png'");
+  expect(fs.readFileSync(path.join(OUT, 'a', '_headers'), 'utf8')).toMatch(/\/favicon\.ico\s+Cache-Control: no-cache/);
+});

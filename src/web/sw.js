@@ -3,7 +3,7 @@
 // A new version installs in the background and WAITS: it takes over the next time the app is opened, or when the page asks
 // for it (the update dot), so it never changes the app under someone who is working.
 const CACHE = '@@CACHE@@';
-const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'favicon.ico'];
+const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'favicon.ico', 'icon-32.png'];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))));
 self.addEventListener('activate', e => e.waitUntil(
   caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('wodblok-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));
