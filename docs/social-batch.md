@@ -33,3 +33,6 @@ GitHub > Settings > Secrets and variables > Actions > New repository secret:
 - Each image takes about 5 to 8 seconds; 12 images about 80 seconds on a 2-core machine, plus install and build in the workflow.
 - The hourly gate is about 24 short runs a day: free while the repo is public. If the repo goes private, narrow the cron in `.github/workflows/social-batch.yml` to the hours that matter.
 - The inline contact sheet uses a `cid:` image and is also attached as a file, so it shows either way.
+
+## After approving
+Posting the pictures you pick is a separate tool: see docs/social-post.md.

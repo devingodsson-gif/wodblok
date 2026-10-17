@@ -86,7 +86,7 @@ async function exportPng(page, size) {
 const pngSize = b => (b.length > 24 && b.toString('latin1', 1, 4) === 'PNG') ? [b.readUInt32BE(16), b.readUInt32BE(20)] : [0, 0];
 
 // One image from one seed. Returns { ok:true, ... } or { ok:false, why }
-async function renderOne(browser, cfg, seed, size) {
+async function renderOne(browser, cfg, seed, size, wantJpeg = false) {
   const t0 = Date.now();
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce', acceptDownloads: true });
   const page = await ctx.newPage();
@@ -114,9 +114,17 @@ async function renderOne(browser, cfg, seed, size) {
       im.src = 'data:image/png;base64,' + b64;
     }), [png.toString('base64'), THUMB]);
     if (!thumb) return { ok: false, seed, why: 'the picture could not be read back' };
+    // a full-size JPEG for posting (Instagram takes JPEG only); drawn on white so any see-through corner stays clean
+    const jpg = wantJpeg ? Buffer.from(await page.evaluate(([b64, n]) => new Promise(res => {
+      const im = new Image();
+      im.onload = () => { const c = document.createElement('canvas'); c.width = c.height = n; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, n, n); x.drawImage(im, 0, 0, n, n); res(c.toDataURL('image/jpeg', .93).split(',')[1]); };
+      im.onerror = () => res('');
+      im.src = 'data:image/png;base64,' + b64;
+    }), [png.toString('base64'), size]), 'base64') : null;
+    if (wantJpeg && !jpg.length) return { ok: false, seed, why: 'the JPEG could not be made' };
     const title = await page.title();
     if (errors.length) return { ok: false, seed, why: 'page error: ' + errors[0].slice(0, 120) };
-    return { ok: true, seed, png, thumb, palette, stateHash: crypto.createHash('sha256').update(JSON.stringify(st)).digest('hex').slice(0, 12), layers: st.layers.length, fits: [...new Set(st.layers.map(l => l.grid || 'auto'))], app: title, ms: Date.now() - t0 };
+    return { ok: true, seed, png, jpg, thumb, palette, stateHash: crypto.createHash('sha256').update(JSON.stringify(st)).digest('hex').slice(0, 12), layers: st.layers.length, fits: [...new Set(st.layers.map(l => l.grid || 'auto'))], app: title, ms: Date.now() - t0 };
   } finally {
     await ctx.close();
   }
@@ -149,7 +157,7 @@ async function contactSheet(browser, thumbs, cols) {
 
 const CHROMIUM = process.env.WB_CHROMIUM || (fs.existsSync('/opt/pw-browsers/chromium-1194/chrome-linux/chrome') ? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' : undefined);
 
-// opts: { count, seeds (exact seeds to re-render), size, outDir, log }
+// opts: { count, seeds (exact seeds to re-render), size, outDir, jpeg (also make full-size JPEGs for posting), log }
 async function renderBatch(cfg, opts = {}) {
   if (!fs.existsSync(APP)) throw new Error('dist/wodblok.html is missing: run `npm run build` first');
   const log = opts.log || (() => {});
@@ -169,13 +177,14 @@ async function renderBatch(cfg, opts = {}) {
       for (let a = 0; a < attempts && !got; a++) {
         const seed = exact ? exact[i] : seedFor(base, i + 1, a);
         let r;
-        try { r = await renderOne(browser, cfg, seed, size); } catch (e) { r = { ok: false, seed, why: 'error: ' + String(e.message || e).split('\n')[0].slice(0, 160) }; }
+        try { r = await renderOne(browser, cfg, seed, size, !!opts.jpeg); } catch (e) { r = { ok: false, seed, why: 'error: ' + String(e.message || e).split('\n')[0].slice(0, 160) }; }
         if (r.ok) got = r; else { skipped.push({ n: i + 1, seed, why: r.why }); log(`  #${i + 1} seed ${seed} skipped: ${r.why}`); }
       }
       if (!got) { log(`#${i + 1}: no usable design after ${attempts} tries`); continue; }
       const n = items.length + 1, file = String(n).padStart(2, '0') + '.png';
       fs.writeFileSync(path.join(outDir, file), got.png);
-      items.push({ n, file, seed: got.seed, palette: got.palette, stateHash: got.stateHash, layers: got.layers, layouts: got.fits, ms: got.ms, thumb: got.thumb, app: got.app });
+      if (got.jpg) fs.writeFileSync(path.join(outDir, file.replace('.png', '.jpg')), got.jpg);
+      items.push({ n, file, seed: got.seed, palette: got.palette, stateHash: got.stateHash, layers: got.layers, layouts: got.fits, ms: got.ms, thumb: got.thumb, jpg: got.jpg, app: got.app });
       log(`#${n} seed ${got.seed} ok in ${(got.ms / 1000).toFixed(1)} s`);
     }
     let sheet = null;
@@ -188,7 +197,7 @@ async function renderBatch(cfg, opts = {}) {
       made: new Date().toISOString(), seedBase: base, seconds: Math.round((Date.now() - t0) / 1000), app: items[0] ? items[0].app : '', size,
       wanted: count, got: items.length, rerender: 'npm run build && npm run social -- --dry --seeds <seed>[,<seed>...] [--size <px>]',
       roll: cfg.roll, skipped,
-      images: items.map(({ thumb, png, ...rest }) => rest),
+      images: items.map(({ thumb, png, jpg, ...rest }) => rest),
     };
     fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
     return { outDir, items, sheet, manifest };
