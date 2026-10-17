@@ -94,6 +94,9 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 ## 1.27.0 (accounts in the app)
 Name chip in the status bar, File > Account…, File > Send feedback…, the 7-day offline pass with a locked screen, active-time totals for early access and testers, Sign out and Manage account through the site. `/api/me` reports `gated`; the gate cookie lasts one day. The network rule in CLAUDE.md now allows `src/platform/account.js` only, and `check:platform` enforces it. Tests: `tests/account.spec.js` (build target), `tests/site-accounts.test.mjs`, `tests/site-account.spec.js`. Fixed a comment that made `check:platform` fail.
 
+## 1.27.3 (accent colour on the loading screen)
+The loading screen showed the built-in Oak for a moment before the chosen accent. The app now keeps the rules it makes for the accent as `wb_accentcss`, and a small script in the page head applies them before anything is shown (`src/shell.html`); the app's own accent code reuses that style element. Oak removes the saved rules. Test: `tests/settings-menu.spec.js` (colour at the moment the loading screen appears).
+
 ## 1.27.2 (site simplified, product video slot, privacy page, accent colour on the site)
 - **Site copy** cut to plain statements: title "Stamped-pattern editor", one line under it, section labels "Video" and "Artwork", footer "Privacy" and "Contact". The waitlist form is gone from the page (Create account already puts people on the list; `/api/waitlist` and its tests stay). One way in: the big button reads Create account when signed out, Open Wodblok when approved, and is hidden when signed in but not approved.
 - **Video slot:** a 16:9 frame under the title. Put the time-lapse at `site/video/timelapse.mp4` (an optional still at `site/video/timelapse.jpg`); it autoplays muted on a loop, with controls if reduced motion is on. Until the file exists the frame stays empty. Cloudflare Pages allows 25 MiB per file.

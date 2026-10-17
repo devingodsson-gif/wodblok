@@ -43,9 +43,10 @@ function accentVars(hex){
  return{light:{acc:lightAcc,ink:lightInk,fg:fg(lightAcc),soft:soft(lightAcc)},dark:{acc:darkAcc,ink:darkInk,fg:fg(darkAcc),soft:soft(darkAcc)}}}
 const stRule=(sel,v)=>`${sel}{--acc:${v.acc};--acc-ink:${v.ink};--acc-fg:${v.fg};--acc-soft:${v.soft}}`;
 // A style element written after the page's own rules. The theme is always set on :root (light or dark), so these two selectors cover both.
-function accentApply(hex){let el=$('accstyle');if(!stHEX6.test(hex||'')){if(el)el.textContent='';return}
+// The rules are also kept as wb_accentcss, which a small script in the page head applies before anything shows (so the loading screen has the colour too).
+function accentApply(hex){let el=$('accstyle');if(!stHEX6.test(hex||'')){if(el)el.textContent='';try{kv.remove('wb_accentcss')}catch(e){}return}
  if(!el){el=document.createElement('style');el.id='accstyle';document.body.appendChild(el)}   // last in the page, after the app's own colour rules
- const v=accentVars(hex);el.textContent=stRule('html:root[data-theme="light"]',v.light)+stRule('html:root[data-theme="dark"]',v.dark)}
+ const v=accentVars(hex),css=stRule('html:root[data-theme="light"]',v.light)+stRule('html:root[data-theme="dark"]',v.dark);el.textContent=css;try{kv.set('wb_accentcss',css)}catch(e){}}
 const stAccentGet=()=>{let v='';try{v=kv.get(stK_ACC)||''}catch(e){}return stHEX6.test(v)?v.toLowerCase():''};
 const stAccentSet=hex=>{try{if(hex)kv.set(stK_ACC,hex);else kv.remove(stK_ACC)}catch(e){}accentApply(hex);acAccount.shareAccent(hex)};   // the website reads the same colour (platform/account.js)
 // ---------------------------------------------------------------- remembered flags
