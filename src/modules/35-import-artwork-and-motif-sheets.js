@@ -29,10 +29,11 @@ $('sfile').onchange=()=>{const f=$('sfile').files[0];$('sfile').value='';if(f)lo
 document.addEventListener('dragover',e=>{if([...(e.dataTransfer&&e.dataTransfer.items||[])].some(i=>i.kind=='file')){e.preventDefault();document.body.classList.add('dropping')}});
 document.addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.classList.remove('dropping')});
 const onCover=()=>{const b=document.querySelector('.rail [data-pn="canvas"]');return !!(WBS.book.on&&b&&b.classList.contains('on'))};
-document.addEventListener('drop',e=>{document.body.classList.remove('dropping');const f=[...(e.dataTransfer&&e.dataTransfer.files||[])].find(f=>/^image\//.test(f.type));if(f){e.preventDefault();onCover()?WBX.wbCoverFile(f):loadFile(f,null,'one')}});
+document.addEventListener('drop',e=>{document.body.classList.remove('dropping');const f=[...(e.dataTransfer&&e.dataTransfer.files||[])].find(f=>/^image\//.test(f.type));if(f){e.preventDefault();onCover()?WBX.wbCoverFile(f):loadFile(f,null,'one',WBS.curView=='stamp')}});
 document.addEventListener('paste',e=>{if(e.target.matches&&e.target.matches('input,textarea')||e.target.closest&&e.target.closest('#cvpaste'))return;const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();onCover()?WBX.wbCoverFile(it.getAsFile()):loadFile(it.getAsFile(),'Pasted image','one')}});
-function loadFile(f,nm,m){if(f.type&&!/^image\//.test(f.type))return say2('That file is not an image. Use a PNG, JPG or WebP.');
-const url=URL.createObjectURL(f),img=new Image();img.onload=()=>{URL.revokeObjectURL(url);openImg(img,(nm||f.name||'').replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' '),m)};
+// auto: in the Stamp editor a dropped picture becomes a shape at once (traced with the usual settings, placed on the stamp); if no ink is found the window stays open
+function loadFile(f,nm,m,auto){if(f.type&&!/^image\//.test(f.type))return say2('That file is not an image. Use a PNG, JPG or WebP.');
+const url=URL.createObjectURL(f),img=new Image();img.onload=()=>{URL.revokeObjectURL(url);openImg(img,(nm||f.name||'').replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' '),m);if(auto&&last&&!$('iadd').disabled)addOne()};
 img.onerror=()=>{URL.revokeObjectURL(url);say2('That image could not be read. Try a PNG or JPG (some phones save photos as HEIC).')};img.src=url}
 // ---- the window
 const sc=document.createElement('canvas');
