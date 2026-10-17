@@ -88,6 +88,31 @@ test('accent: a preset recolours both themes, stays readable, is remembered, and
   expect(errors).toEqual([]);
 });
 
+test('accent: the colour is in place before the loading screen shows, and Oak removes the saved rules', async ({ page }) => {
+  // sample --acc at the moment the page's loading screen is added to the document (before the app script has run)
+  await page.addInitScript(() => {
+    window.__accAtSplash = null;
+    new MutationObserver((_, o) => { if (document.getElementById('splash')) { window.__accAtSplash = getComputedStyle(document.documentElement).getPropertyValue('--acc').trim(); o.disconnect(); } })
+      .observe(document, { childList: true, subtree: true });
+  });
+  await openApp(page);
+  expect(await page.evaluate(() => window.__accAtSplash)).toBe('#c9a66b');   // Oak: the page's own colour
+  await open(page);
+  await page.click('#stgacc [aria-label="Purpleheart"]');
+  const plum = await tok(page, '--acc');
+  expect(await page.evaluate(() => localStorage.getItem('wb_accentcss'))).toContain('--acc:');
+  await page.reload();
+  await page.waitForFunction(() => window.__wbTest && document.fonts.status === 'loaded');
+  expect(await page.evaluate(() => window.__accAtSplash)).toBe(plum);   // already the chosen colour, not Oak, when the loading screen appears
+  expect(await page.evaluate(() => document.querySelectorAll('#accstyle').length)).toBe(1);
+  await open(page);
+  await page.click('#stgacc [aria-label="Oak"]');
+  expect(await page.evaluate(() => localStorage.getItem('wb_accentcss'))).toBeNull();
+  await page.reload();
+  await page.waitForFunction(() => window.__wbTest && document.fonts.status === 'loaded');
+  expect(await page.evaluate(() => window.__accAtSplash)).toBe('#c9a66b');
+});
+
 test('accent: the presets are named after woods, in hue order, and the row shows the chosen name', async ({ page }) => {
   await openApp(page);
   await open(page);
