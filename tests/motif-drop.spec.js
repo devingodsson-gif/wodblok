@@ -30,3 +30,23 @@ test('in the Pattern view a dropped picture still opens the import window', asyn
   await expect(page.locator('#idlg')).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test('Ctrl+C then Ctrl+V in the Stamp editor puts a copy of the selected shape on the stamp, further along each time', async ({ page }) => {
+  const { errors } = await openApp(page);
+  await setMode(page, 'stamp');
+  await drop(page);                                   // leaves one shape selected
+  await expect.poll(() => count(page), { timeout: 15000 }).toBe(1);
+  await settle(page);
+  const items = async () => JSON.parse(await getState(page)).tiles[0].items.map(i => [i.m || i.k, Math.round(i.x), Math.round(i.y)]);
+  await page.locator('body').click({ position: { x: 3, y: 3 } }).catch(() => {});
+  await page.evaluate(() => document.activeElement && document.activeElement.blur());
+  await page.keyboard.press('Control+c');
+  await page.keyboard.press('Control+v');
+  await expect.poll(() => count(page)).toBe(2);
+  await page.keyboard.press('Control+v');
+  await expect.poll(() => count(page)).toBe(3);
+  const it = await items();
+  expect(it[1][0]).toBe(it[0][0]);                    // the same shape
+  expect(new Set(it.map(i => i[1] + ',' + i[2])).size).toBe(3); // three different places
+  expect(errors).toEqual([]);
+});
