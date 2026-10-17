@@ -1,0 +1,102 @@
+// The account buttons in the website header (site/account.js). Clerk is replaced by a small stub, and the site is
+// served from site/ at a made-up address, so nothing here touches the network or the app.
+const { test, expect } = require('@playwright/test');
+const fs = require('fs');
+const path = require('path');
+
+const SITE = path.join(__dirname, '..', 'site');
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.json': 'application/json', '.xml': 'application/xml', '.txt': 'text/plain' };
+const KEY = 'pk_test_' + Buffer.from('clerk.wodblok.test$').toString('base64');
+
+async function open(page, { key = KEY, user = null, me = { ok: true, approved: true }, query = '' } = {}) {
+  await page.route('**/*', async (route) => {
+    const url = new URL(route.request().url());
+    if (url.host === 'clerk.wodblok.test') {
+      const body = `window.Clerk = { user: ${JSON.stringify(user)}, calls: [], listeners: [],
+        async load() {}, addListener(fn) { this.listeners.push(fn); },
+        openSignIn() { this.calls.push('signin'); }, openSignUp() { this.calls.push('signup'); },
+        openUserProfile() { this.calls.push('profile'); }, signOut() { this.calls.push('signout'); } };`;
+      return route.fulfill({ contentType: 'text/javascript', body });
+    }
+    if (url.host !== 'wodblok.test') return route.abort();
+    if (url.pathname === '/account-config.js') return route.fulfill({ contentType: 'text/javascript', body: `window.WB_ACCOUNTS = { publishableKey: ${JSON.stringify(key)} };` });
+    if (url.pathname === '/api/me') return route.fulfill({ contentType: 'application/json', body: JSON.stringify(me) });
+    const file = path.join(SITE, url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname));
+    if (!file.startsWith(SITE) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) return route.fulfill({ status: 404, body: '' });
+    return route.fulfill({ contentType: TYPES[path.extname(file)] || 'application/octet-stream', body: fs.readFileSync(file) });
+  });
+  await page.goto('https://wodblok.test/' + query);
+}
+const nav = (page) => page.locator('#top-nav');
+const calls = (page) => page.evaluate(() => window.Clerk.calls);
+
+test('no key: the header is exactly as before', async ({ page }) => {
+  await open(page, { key: '' });
+  await expect(page.getByRole('link', { name: /Open Wodblok/ })).toBeVisible();
+  await expect(nav(page).getByText('Create account')).toHaveCount(0);
+  await expect(nav(page).getByText('Sign in')).toHaveCount(0);
+});
+
+test('signed out: Sign in and Create account replace Open Wodblok, and open Clerk', async ({ page }) => {
+  await open(page);
+  await expect(nav(page).getByRole('button', { name: 'Create account' })).toBeVisible();
+  await expect(nav(page).getByRole('button', { name: 'Sign in' })).toBeVisible();
+  await expect(page.locator('#open-app')).toBeHidden();
+  await nav(page).getByRole('button', { name: 'Sign in' }).click();
+  await nav(page).getByRole('button', { name: 'Create account' }).click();
+  expect(await calls(page)).toEqual(['signin', 'signup']);
+});
+
+test('the app sends signed-out visitors here with ?signin=1: the dialog opens once and the address is cleaned', async ({ page }) => {
+  await open(page, { query: '?signin=1' });
+  await expect.poll(() => calls(page)).toEqual(['signin']);
+  expect(new URL(page.url()).search).toBe('');
+});
+
+test('signed in and approved: "Hi <name>" with a menu that opens the app, account and sign out', async ({ page }) => {
+  await open(page, { user: { firstName: 'Ana' }, me: { ok: true, approved: true } });
+  const hi = nav(page).getByRole('button', { name: 'Hi Ana' });
+  await expect(hi).toBeVisible();
+  await expect(nav(page).getByRole('button', { name: 'Sign in' })).toHaveCount(0);
+  await hi.click();
+  const app = page.getByRole('menuitem', { name: 'Open Wodblok' });
+  await expect(app).toBeVisible();
+  await expect(app).toHaveAttribute('href', /^https:\/\/app\.wodblok\.com\/?$/);
+  await expect(page.getByText('On the list')).toBeHidden();
+  await page.getByRole('menuitem', { name: 'Account' }).click();
+  await hi.click();
+  await page.getByRole('menuitem', { name: 'Sign out' }).click();
+  expect(await calls(page)).toEqual(['profile', 'signout']);
+});
+
+test('signed in but not approved: the menu says they are on the list and has no link into the app', async ({ page }) => {
+  await open(page, { user: { firstName: 'Bo' }, me: { ok: true, approved: false } });
+  await nav(page).getByRole('button', { name: 'Hi Bo' }).click();
+  await expect(page.getByText('On the list')).toBeVisible();
+  await expect(page.getByRole('menuitem', { name: 'Open Wodblok' })).toBeHidden();
+});
+
+test('the menu closes with Escape and when clicking elsewhere', async ({ page }) => {
+  await open(page, { user: { firstName: 'Ana' } });
+  const hi = nav(page).getByRole('button', { name: 'Hi Ana' });
+  await hi.click();
+  await expect(hi).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('Escape');
+  await expect(hi).toHaveAttribute('aria-expanded', 'false');
+  await hi.click();
+  await page.locator('h1').first().click();
+  await expect(hi).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('a first name with markup is shown as text', async ({ page }) => {
+  await open(page, { user: { firstName: '<img src=x onerror=window.__x=1>' } });
+  await expect(nav(page).locator('button.btn-secondary')).toHaveText('Hi <img src=x onerror=window.__x=1>');
+  expect(await page.evaluate(() => window.__x)).toBeUndefined();
+});
+
+test('header fits a phone screen without sideways scrolling', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 700 });
+  await open(page, { user: { firstName: 'Ana' } });
+  await nav(page).getByRole('button', { name: 'Hi Ana' }).click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});

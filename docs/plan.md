@@ -90,3 +90,13 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 - The hosted page (app.wodblok.com) now links `favicon.ico` and a new 32 px PNG (`icon-32.png`, cut from the existing icon) next to the inline SVG icon, so Chrome has plain files to fall back on and a new address to fetch. Both files are in the offline cache and served with `no-cache`, so a changed icon is picked up. The artwork is unchanged: the same WB mark.
 - Chrome keeps favicons for a long time. If a tab still shows an old icon after this goes live, close the tab and reopen the site.
 - Code: `WEBHEAD` in `tools/build.js`, `src/web/sw.js`, `src/web/_headers`. Test: `tests/web-app.spec.js`.
+
+## 1.20.0: Accounts, server side and website (the app side is 1.21)
+- **What:** sign-up and sign-in with Clerk; the owner approves people by setting `type` (`early_access`, `tester`, `subscriber`) in the Clerk dashboard; only approved accounts can open the hosted app; an automatic "You're in" email on first approval; a new-account alert to the owner; usage time and feedback stored in D1 for the app to send (1.21). Full description and the dashboard set-up steps: docs/accounts.md.
+- **Switched off until configured:** the header buttons need a Clerk key in `site/account-config.js`; the gate needs `GATE_HOSTS` in Cloudflare. Merging changes nothing visible by itself.
+- **Code:** `functions/_middleware.js` (gate), `functions/api/{me,usage,feedback}.js`, `functions/api/webhooks/clerk.js`, shared code in `server/accounts/`, header buttons `site/account.js`, `site/account.css`, `site/account-config.js`; `tools/accounts/make-pass-key.mjs` makes the offline pass key. The app itself (`src/`) is not touched.
+- **Email:** through Resend, which the waitlist already uses (no Cloudflare Email Service, so no Workers Paid plan is needed for email).
+- **Tests:** `tests/site-accounts.test.mjs` (token checks, gate, usage, feedback, webhook; real SQLite, generated keys, run by `npm run test:site`) and `tests/site-account.spec.js` (header with Clerk stubbed). CI's site job now runs on `functions/**` and `server/**` changes and uses Node 22.
+- **Not tested against a live Clerk:** see "Things to know" in docs/accounts.md.
+- **Next, 1.21:** name chip in the status bar, File > Account…, File > Send feedback…, the 7-day offline pass, the usage counter, and the CLAUDE.md network rule (only `src/platform/account.js`).
+

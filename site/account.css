@@ -1,0 +1,10 @@
+/* Account buttons in the website header (site/account.js). Uses the page's own colour tokens. */
+.acct{position:relative;display:inline-flex}
+.acct-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:20;min-width:200px;padding:6px;background:var(--raise);border:1px solid var(--line);border-radius:var(--radius-md);box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.acct-menu[hidden]{display:none}
+.acct-item{display:block;width:100%;box-sizing:border-box;text-align:left;padding:10px 12px;border:0;border-radius:var(--radius-sm);background:transparent;color:var(--fg);font:400 14px/1.3 var(--body);text-decoration:none;cursor:pointer}
+.acct-item:hover,.acct-item:focus-visible{background:var(--bg)}
+.acct-item[aria-disabled="true"]{color:var(--mut);cursor:default}
+.acct-item[aria-disabled="true"]:hover{background:transparent}
+.acct-signin{background:none;border:0;cursor:pointer;font-family:var(--body)}
+@media (max-width:640px){.acct-menu{min-width:176px}}
