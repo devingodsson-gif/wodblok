@@ -21,8 +21,10 @@ const FIXED_TIME = Date.UTC(2026, 9, 8, 12, 0, 0);   // 2026-10-08 12:00:00 UTC,
 
 // Injected before any page script runs: seeded Math.random, plus (optionally) a stand-in for the claude.ai
 // artifact runtime (`window.claude.use('db'|'user'|'downloads')`).
-function initScript({ seed, runtime }) {
+function initScript({ seed, runtime, workspaces }) {
   return `(() => {
+    // Tests start with no workspaces saved (so no tool window opens at launch) unless a test asks for the starting ones.
+    try { if (!${!!workspaces} && !sessionStorage.getItem('wb_t_ws')) { localStorage.setItem('wb96_workspaces', '[]'); localStorage.setItem('wb96_ws_seeded', '2'); sessionStorage.setItem('wb_t_ws', '1'); } } catch (e) {}
     let a = ${seed >>> 0};
     Math.random = function () {              // mulberry32
       a |= 0; a = (a + 0x6D2B79F5) | 0;
@@ -67,11 +69,11 @@ function initScript({ seed, runtime }) {
 }
 
 // Open the app with controlled randomness, time and network. Returns { errors } (page errors and console errors).
-async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL } = {}) {
+async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, workspaces = false } = {}) {
   const errors = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
-  await page.addInitScript(initScript({ seed, runtime }));
+  await page.addInitScript(initScript({ seed, runtime, workspaces }));
   // No network: the app asks Google Fonts for two stylesheets; answer them empty so layout is the same everywhere.
   await page.route(/^https?:\/\/(?!127\.0\.0\.1:5199\/)/, r => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
   await page.clock.setFixedTime(FIXED_TIME);

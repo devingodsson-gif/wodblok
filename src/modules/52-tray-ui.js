@@ -25,7 +25,7 @@ const hexText=h=>h.slice(0,7).toUpperCase()+(hexAlpha(h)<1?' · '+Math.round(hex
 const wellText=r=>{if(!r)return'';if(isLink(r)){const id=r.slice(1);return slotName(id)||hexText(slotHex(id))}return hexText(col(r))};
 // the colours the picker offers in its "Saved colours" dropdown: every colour in your saved trays, then Wada's colours
 function tySaved(){const seen=new Set(),own=[];stLoad().t.forEach(t=>t.c.forEach(([h,n])=>{const k=h+'|'+n;if(seen.has(k))return;seen.add(k);own.push({n:n||h.slice(0,7).toUpperCase(),h,t:t.n})}));
- return[{g:'Your trays',items:own},{g:'Wada colours',items:C.map(([n,h])=>({n,h:normHexA(h)||h}))}].filter(g=>g.items.length)}
+ return[...(WBX.scList?WBX.scList():[]),{g:'Your trays',items:own},{g:'Wada colours',items:C.map(([n,h])=>({n,h:normHexA(h)||h}))}].filter(g=>g.items.length)}
 // ---------------------------------------------------------------- picker for one tray slot
 function editSlot(id,anchor){const o=tyP();if(!o.ts.includes(id))return;
  openPicker(anchor,{value:slotHex(id),alpha:true,name:slotName(id),namePh:slotHex(id).toUpperCase(),saved:tySaved,

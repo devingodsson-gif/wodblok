@@ -219,7 +219,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 
 - Rail buttons: `--h-touch`, icon only, `--r-m` selected highlight with `--acc-soft`.
 - Panel tabs (`.wtab`): `--fs-s`, 500, `--mut`, 11px side padding, square; the active tab `--fg` with a 2px `--acc` bar on top.
-- A tool opens a panel; a panel never opens by itself at launch.
+- A tool opens a panel; a panel never opens by itself at launch, except through the launch workspace (the one called Default, else the first workspace).
 
 ### 9.8 Swatches, thumbnails and cards
 
@@ -273,7 +273,7 @@ There is no fourth heading. `h1`–`h6` tags are used for structure, then styled
 
 - Launch: Pattern mode, fully cleared, no tool window open.
 - Pattern and Stamp editor each have their own set of panels; a new tool says which mode it belongs to.
-- Workspaces save the layout; they are applied on demand and never at launch.
+- Workspaces save the layout. They are applied on demand, and the launch workspace (the one called Default, else the first) is applied once at launch. Every workspace, including the starting ones, can be changed, replaced or deleted.
 
 ## 12. Libraries and the folder system
 
