@@ -139,3 +139,16 @@ test('if Clerk cannot load, the plain "Open Wodblok" button comes back', async (
   await open(page, { clerk: 'fail' });
   await expect(page.locator('#open-app')).toBeVisible();
 });
+
+test('the app\'s "Sign out" arrives with ?signout=1: the app cookie is cleared, Clerk signs out, the address is cleaned', async ({ page }) => {
+  await open(page, { user: { firstName: 'Ana' }, query: '?signout=1' });
+  await expect.poll(() => calls(page)).toEqual(['signout']);
+  expect(page.gateCalls).toContain('DELETE');
+  expect(new URL(page.url()).search).toBe('');
+});
+
+test('the app\'s "Manage account" arrives with ?account=1: the account box opens and the address is cleaned', async ({ page }) => {
+  await open(page, { user: { firstName: 'Ana' }, query: '?account=1' });
+  await expect.poll(() => calls(page)).toEqual(['profile']);
+  expect(new URL(page.url()).search).toBe('');
+});

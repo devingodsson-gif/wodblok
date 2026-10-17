@@ -16,7 +16,7 @@ const PROMPT=s=>`Create a single ${s||'[subject]'} designed as a bold woodblock 
 const SPROMPT=(sub,c,r)=>`Create a sheet of ${c*r} different ${sub||'[subject]'} designed as bold woodblock stamp shapes, arranged in a neat grid of ${c} columns and ${r} rows. Every shape: pure solid black shapes on a plain white background, no gray, no shading, no gradients, no texture, with a few thin white carved lines for detail, clean smooth edges and a simple readable silhouette. Each shape is about the same size and centered in its own cell. Leave wide empty white space between all shapes (at least a fifth of a cell); nothing may touch, overlap or cross into a neighbouring cell. No grid lines, no borders, no frames, no labels, no numbers, no text. ${c>r?'Wide landscape image.':c<r?'Tall portrait image.':'Square image.'}`;
 const say2=t=>{$('imsg').textContent=t};
 const pm=t=>{$('pmsg').textContent=t};
-// ---- ChatGPT prompt (a single shape or a whole sheet)
+// ---- ChatGPT request text (a single shape or a whole sheet)
 let ptype='1';
 $('iptype').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;ptype=b.dataset.t;$('iptype').querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b));$('ipsz').hidden=ptype!='s'};
 $('ipr').onclick=async()=>{const sub=$('isub').value.trim();let t,msg;

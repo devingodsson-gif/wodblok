@@ -427,6 +427,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .stgk{margin-top:8px}.stgkr{display:flex;align-items:center;gap:8px;min-height:var(--h-row);border-bottom:1px solid var(--line);font-size:var(--fs-m)}.stgkr span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stgkr kbd{flex:none;font:500 var(--fs-s) "Hanken Grotesk",system-ui,sans-serif;color:var(--mut);padding:2px 8px;border:1px solid var(--line2);border-radius:var(--r-s);background:var(--field)}
 body.calm *{transition:none!important;animation:none!important}
 @media (max-width:640px){.stgd{height:min(560px,100%)}.stgw{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}.stgn{flex-direction:row;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:hidden}.stgn button{flex:none}.stga{max-width:none}}
+.dlg.acd,.dlg.fbd,.dlg.aclk{width:min(380px,100%)}.acd .dlg-b,.fbd .dlg-b,.aclk .dlg-b{display:flex;flex-direction:column;gap:12px}.acd .dlg-b{gap:0}.acd .row{margin-top:12px}.fbd textarea{margin-top:0;min-height:120px;font-family:inherit;font-size:var(--fs-m)}
+#pacct{flex:none;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-flex;align-items:center;height:18px;padding:0 8px;border:0;border-radius:var(--r-s);background:transparent;color:var(--mut);font-size:var(--fs-s);cursor:pointer}#pacct:hover,#pacct:focus-visible{color:var(--fg)}
 .tpsd{width:min(380px,100%)}.tpsd .dlg-b{display:flex;flex-direction:column;gap:12px}.tpsd .row{gap:8px}
 .pgrid .hint{grid-column:1/-1;margin:20px 0;text-align:center}
 .status .it{display:inline-flex;gap:6px}.status .it b{font-weight:500;color:var(--fg)}
@@ -1461,7 +1463,7 @@ body.eyedrop{cursor:crosshair}
 </aside>
 
 <div id="cmdk" hidden><div class="ckbd"></div><div class="ckbox" role="dialog" aria-modal="true" aria-label="Search commands"><input id="cmdki" type="text" autocomplete="off" spellcheck="false" placeholder="Search commands" aria-label="Search commands" role="combobox" aria-expanded="true" aria-controls="cmdkl" aria-autocomplete="list"><div id="cmdkl" role="listbox" aria-label="Commands"></div></div></div>
-<footer class="status"><span id="sinfo" style="display:flex;gap:16px"></span><span class="grow" id="pmsg" role="status"></span><button id="rcv" class="rcb primary" hidden>Restore unsaved work</button><button id="rcx" class="rcb" hidden>Dismiss</button><span id="fzst" aria-live="polite"><span id="fzt">Randomizing…</span><b><i id="fzsb"></i></b></span><button id="pupd" type="button" hidden aria-label="Update ready">Update ready</button><span id="pstore" hidden></span><span id="pbuilt" hidden></span></footer>
+<footer class="status"><span id="sinfo" style="display:flex;gap:16px"></span><span class="grow" id="pmsg" role="status"></span><button id="rcv" class="rcb primary" hidden>Restore unsaved work</button><button id="rcx" class="rcb" hidden>Dismiss</button><span id="fzst" aria-live="polite"><span id="fzt">Randomizing…</span><b><i id="fzsb"></i></b></span><button id="pacct" type="button" hidden aria-label="Account"></button><button id="pupd" type="button" hidden aria-label="Update ready">Update ready</button><span id="pstore" hidden></span><span id="pbuilt" hidden></span></footer>
 </div>
 
 <div class="modal" id="idlg" hidden><div class="dlg idl" role="dialog" aria-modal="true" aria-labelledby="idlgt">
@@ -1512,6 +1514,18 @@ body.eyedrop{cursor:crosshair}
 <div class="modal" id="stgdlg" hidden><div class="dlg stgd" role="dialog" aria-modal="true" aria-labelledby="stgt">
  <div class="dlg-h"><h2 id="stgt">Settings</h2><button class="ib" id="stgclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
  <div class="dlg-b"><div class="stgw"><div class="stgn" id="stgnav" role="tablist" aria-orientation="vertical" aria-label="Settings pages"></div><div class="stgb" id="stgbody" role="tabpanel"></div></div></div>
+</div></div>
+<div class="modal" id="acdlg" hidden><div class="dlg acd" role="dialog" aria-modal="true" aria-labelledby="actt">
+ <div class="dlg-h"><h2 id="actt">Account</h2><button class="ib" id="acclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-b" id="acbody"></div>
+</div></div>
+<div class="modal" id="fbdlg" hidden><div class="dlg fbd" role="dialog" aria-modal="true" aria-labelledby="fbt">
+ <div class="dlg-h"><h2 id="fbt">Send feedback</h2><button class="ib" id="fbx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-b"><div class="seg" id="fbcat" role="group" aria-label="Kind of feedback" style="--n:3"><button type="button" data-v="bug">Bug</button><button type="button" data-v="idea" class="on" aria-pressed="true">Idea</button><button type="button" data-v="other">Other</button></div><textarea id="fbmsg" rows="6" maxlength="4000" aria-label="Message" placeholder="Message"></textarea><div class="row"><button type="button" class="primary" id="fbok" disabled>Send</button><button type="button" class="alt" id="fbcx">Cancel</button></div></div>
+</div></div>
+<div class="modal" id="aclk" hidden><div class="dlg aclk" role="dialog" aria-modal="true" aria-labelledby="aclt">
+ <div class="dlg-h"><h2 id="aclt">Signed out</h2></div>
+ <div class="dlg-b"><div class="row"><button type="button" class="primary" id="aclin">Sign in</button><button type="button" class="alt" id="aclre">Try again</button><button type="button" class="alt" id="aclsv">Save project</button></div></div>
 </div></div>
 <div class="modal" id="plist" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="pdlgt">
  <div class="dlg-h"><h2 id="pdlgt">Projects</h2><button class="alt" id="pnw2">New project</button><button class="alt" id="pcf">Close folder</button><button class="ib" id="pclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>

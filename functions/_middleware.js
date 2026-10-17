@@ -7,15 +7,11 @@
 // /api/* always passes through; each function there checks the session itself.
 
 import { getSession, isApproved } from '../server/accounts/clerk.js';
-import { escapeHtml } from '../server/accounts/util.js';
-
-const matches = (host, list) =>
-  list.some((h) => (h.startsWith('*.') ? host.endsWith(h.slice(1)) : host === h));
+import { escapeHtml, gatedHost } from '../server/accounts/util.js';
 
 export async function onRequest({ request, env, next }) {
-  const list = String(env.GATE_HOSTS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
   const url = new URL(request.url);
-  if (!list.length || !matches(url.hostname.toLowerCase(), list) || url.pathname.startsWith('/api/')) return next();
+  if (!gatedHost(env, url.hostname) || url.pathname.startsWith('/api/')) return next();
 
   const session = await getSession(request, env);
   if (isApproved(session)) return next();

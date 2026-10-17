@@ -91,6 +91,9 @@ Next: imported textures (was planned as 1.12.0; now 1.13.0).
 - Chrome keeps favicons for a long time. If a tab still shows an old icon after this goes live, close the tab and reopen the site.
 - Code: `WEBHEAD` in `tools/build.js`, `src/web/sw.js`, `src/web/_headers`. Test: `tests/web-app.spec.js`.
 
+## 1.27.0 (accounts in the app)
+Name chip in the status bar, File > Account…, File > Send feedback…, the 7-day offline pass with a locked screen, active-time totals for early access and testers, Sign out and Manage account through the site. `/api/me` reports `gated`; the gate cookie lasts one day. The network rule in CLAUDE.md now allows `src/platform/account.js` only, and `check:platform` enforces it. Tests: `tests/account.spec.js` (build target), `tests/site-accounts.test.mjs`, `tests/site-account.spec.js`. Fixed a comment that made `check:platform` fail.
+
 ## 1.26.3 (header polish)
 The plain "Open Wodblok" button no longer flashes before the account header appears (hidden while Clerk loads, back if Clerk cannot load); the signed-in button reads "Hi <name>!".
 

@@ -349,16 +349,16 @@ const siteReq = async (method, claims = {}, origin) =>
   new Request('https://wodblok.com/api/gate-cookie', { method, headers: { authorization: 'Bearer ' + (await token(claims)), ...(origin ? { origin } : {}) } });
 const cookieValue = (res) => /wb_gate=([^;]*)/.exec(res.headers.get('set-cookie'))[1];
 
-test('gate cookie: an approved Clerk session gets a one-hour domain-wide cookie; others get none', async () => {
+test('gate cookie: an approved Clerk session gets a one-day domain-wide cookie; others get none', async () => {
   const env = baseEnv();
   const res = await gateCookiePost({ request: await siteReq('POST'), env });
   assert.equal(res.status, 200);
   const set = res.headers.get('set-cookie');
   assert.match(set, /^wb_gate=/);
-  for (const bit of ['Domain=.wodblok.com', 'Path=/', 'Max-Age=3600', 'Secure', 'HttpOnly', 'SameSite=Lax']) assert.ok(set.includes(bit), bit);
+  for (const bit of ['Domain=.wodblok.com', 'Path=/', 'Max-Age=86400', 'Secure', 'HttpOnly', 'SameSite=Lax']) assert.ok(set.includes(bit), bit);
   const p = await verifyGate(env, cookieValue(res));
   assert.equal(p.sub, 'user_1');
-  assert.equal(p.exp - p.iat, 3600);
+  assert.equal(p.exp - p.iat, 86400);
 
   const wl = await gateCookiePost({ request: await siteReq('POST', { type: '' }), env });
   assert.deepEqual(await wl.json(), { ok: true, approved: false });
@@ -395,7 +395,7 @@ test('gate cookie: tampering, expiry, a pass, another key and a missing key are 
   const [head, sig] = good.split('.');
   const forged = textToB64u(JSON.stringify({ ...JSON.parse(b64uToText(head)), type: 'subscriber', sub: 'u2' }));
   assert.equal(await verifyGate(env, forged + '.' + sig), null);
-  assert.equal(await verifyGate(env, await signGate(env, { sub: 'u1', type: 'tester' }, Date.now() - 2 * 3600_000)), null);
+  assert.equal(await verifyGate(env, await signGate(env, { sub: 'u1', type: 'tester' }, Date.now() - 2 * 86400_000)), null);
   assert.equal(await verifyGate(env, await signPass(env, { sub: 'u1', type: 'tester' })), null); // the 7-day pass is not a gate cookie
   const otherEc = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
   const otherEnv = baseEnv({ PASS_PRIVATE_JWK: JSON.stringify(await crypto.subtle.exportKey('jwk', otherEc.privateKey)) });
@@ -412,4 +412,14 @@ test('gate cookie: signing out clears it', async () => {
   const res = await gateCookieDelete({ request: new Request('https://wodblok.com/api/gate-cookie', { method: 'DELETE' }), env: baseEnv() });
   assert.equal(res.status, 200);
   assert.match(res.headers.get('set-cookie'), /^wb_gate=; Domain=\.wodblok\.com; Path=\/; Max-Age=0/);
+});
+
+test('/api/me says whether the host is behind the gate, so the app only insists on an account where one is needed', async () => {
+  const gatedEnv = baseEnv({ GATE_HOSTS: 'app.wodblok.com' });
+  const out = await me({ request: new Request('https://app.wodblok.com/api/me'), env: gatedEnv });
+  assert.deepEqual([out.status, (await out.json()).gated], [401, true]);
+  const open = await me({ request: new Request('https://feat.pages.dev/api/me'), env: gatedEnv });
+  assert.deepEqual([open.status, (await open.json()).gated], [401, false]);
+  const ok = await (await me({ request: new Request('https://app.wodblok.com/api/me', { headers: { authorization: 'Bearer ' + (await token()) } }), env: gatedEnv })).json();
+  assert.deepEqual([ok.approved, ok.gated], [true, true]);
 });
