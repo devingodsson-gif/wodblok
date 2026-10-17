@@ -52,5 +52,6 @@
  "52-tray-ui.js",
  "53-colourways.js",
  "54-templates.js",
- "55-settings.js"
+ "55-settings.js",
+ "56-watermark.js"
 ]

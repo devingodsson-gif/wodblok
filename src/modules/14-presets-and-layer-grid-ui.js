@@ -8,6 +8,7 @@ import {SURFC} from './17-texture-panel-and-previews.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {lyGrp} from './24-free-place-layers.js';
 import {libDest,libG,libPath} from './21-motif-library-ui.js';
+import {wmDraw,wmGet,wmReady} from './56-watermark.js';
 // ---- Canvas & stamp shape presets
 const ASP={c:[['2:3',2,3],['3:4',3,4],['4:5',4,5],['5:7',5,7],['1:1 square',1,1],['A4 / A-series',1,1.4142],['US Letter',8.5,11],['6×9 book',6,9],['9:16 tall',9,16],['3:2',3,2],['4:3',4,3],['16:9 wide',16,9]],
 s:[['1:1 square',1,1],['2:3',2,3],['3:2',3,2],['3:4',3,4],['4:3',4,3],['1:2',1,2],['2:1',2,1],['1:3',1,3],['3:1',3,1],['6:1 frame strip',6,1],['8:1 frame strip',8,1],['12:1 frame strip',12,1],['16:1 frame strip',16,1]]};
@@ -97,7 +98,8 @@ try{await d.save({filename:expName('svg'),data:ser()})}catch(e){if(e&&e.code!='d
 $('png').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
 let h0=null;try{h0=d.pick?await d.pick({filename:expName('png')}):null}catch(e){return}   // ask where to save first: making the picture takes a while
 pmsg('Making the PNG…');await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));   // let the message show before the page is busy
-const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=CW*3;c.height=CH*3;c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+if(wmGet())await wmReady();
+const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=CW*3;c.height=CH*3;const x=c.getContext('2d');x.drawImage(img,0,0,c.width,c.height);if(wmGet())wmDraw(x,c.width,c.height);
 c.toBlob(async b=>{try{await d.save({filename:expName('png'),data:b,handle:h0});pmsg('')}catch(e){pmsg('');if(e&&e.code!='declined')say('Could not save: '+e.message)}},'image/png')};
 img.onerror=()=>{pmsg('');say('PNG export failed.')};
 img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())};
