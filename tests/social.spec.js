@@ -8,7 +8,7 @@ const { execFileSync } = require('child_process');
 const { validate } = require('../tools/social/validate');
 const { isDue, isoWeek } = require('../tools/social/due');
 const { parseArgs } = require('../tools/social/run');
-const { checkRoll, strayColours, seedFor } = require('../tools/social/render');
+const { checkRoll, strayColours, seedFor, seedBaseOf } = require('../tools/social/render');
 const { buildEmail, sendEmail } = require('../tools/social/email');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -37,6 +37,8 @@ test.describe('settings', () => {
     rejects(c => { c.roll.layouts = ['spiral']; }, /roll.layouts has "spiral"/);
     rejects(c => { c.roll.layers = [3, 1]; }, /min is larger/);
     rejects(c => { c.seedBase = 'today'; }, /seedBase/);
+    rejects(c => { c.seedBase = 40000000; }, /seedBase/);
+    rejects(c => { c.roll.colours = 'wada'; }, /roll.colours/);
   });
   test('sending needs the address settings and the key, and names the secret that is missing', () => {
     const keep = { ...process.env };
@@ -168,6 +170,18 @@ test.describe('email', () => {
   });
 });
 
+test.describe('seeds', () => {
+  test('random gives a new base each run, date and a number stay put', () => {
+    const cfg = validate(base());
+    expect(cfg.seedBase).toBe('random');
+    const bases = new Set(Array.from({ length: 20 }, () => seedBaseOf(cfg)));
+    expect(bases.size).toBeGreaterThan(15);
+    for (const b of bases) { expect(b).toBeGreaterThanOrEqual(1000000); expect(b).toBeLessThan(40000000); expect(seedFor(b, 50, 5)).toBe(b * 100 + 50 + 5 * 100003); }
+    expect(seedBaseOf({ seedBase: 'date' }, new Date('2026-10-19T12:00:00Z'))).toBe(20261019);
+    expect(seedBaseOf({ seedBase: 777 })).toBe(777);
+  });
+});
+
 test.describe('dry run of the real thing', () => {
   const dist = path.join(ROOT, 'dist', 'wodblok.html');
   test.skip(!fs.existsSync(dist), 'run `npm run build` first');
@@ -187,7 +201,7 @@ test.describe('dry run of the real thing', () => {
     for (const im of m.images) {
       expect(png(path.join(out, im.file))).toEqual({ w: 512, h: 512, sig: 'PNG' });
       expect(im.seed).toBeGreaterThan(0);
-      expect(im.palette.length).toBeGreaterThanOrEqual(2);
+      expect(im.palette).toEqual([]);     // the app's own colours
     }
     expect(fs.statSync(path.join(out, 'contact-sheet.jpg')).size).toBeGreaterThan(5000);
     expect(new Set(m.images.map(i => i.seed)).size).toBe(3);

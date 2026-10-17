@@ -20,13 +20,14 @@ module.exports = {
     maxAttachmentMB: 25,             // full-size PNGs are attached only while the total stays under this; the contact sheet is always sent
   },
 
-  // How each design is made. Each image is one Randomize roll on a square canvas, then the tray gets one of the plain palettes below.
+  // How each design is made. Each image is one Randomize roll on a square canvas.
   roll: {
     // Randomize switches, 0 (off) to 100 (always). Keys: stamps text layout frame shape size free gr masks tx pr look.
-    // Left out or 0 means off. Colours are never rolled here: the palettes below decide them (Randomize's own colours come from the Wada sets).
+    // Left out or 0 means off. Colours are set by the `colours` line below, not here.
     features: { stamps: 100, layout: 100 },
     // Plain colour sets (hex), paper first, then ink, then accents. Every design uses exactly one set. Add your own; 2 to 4 colours each.
-    palettes: [
+    colours: 'app',                  // 'app' = the app's own Randomize colours (includes the Wada sets); 'plain' = one of the plain palettes below
+    palettes: [   // used only when colours is 'plain'
       ['#f4ecd8', '#23395b', '#d1603d', '#e8b04a'],
       ['#e9efe6', '#2f4f3e', '#c2553f', '#d9b86c'],
       ['#1f2a44', '#f2e8cf', '#e07a5f', '#81b29a'],
@@ -42,5 +43,5 @@ module.exports = {
     maxAttempts: 6,
   },
 
-  seedBase: 'date',                  // 'date' (today as YYYYMMDD, so each week differs) or a fixed whole number
+  seedBase: 'random',                // 'random' (new every run; the seeds are saved in manifest.json so any pick can be re-made), 'date' (today as YYYYMMDD), or a fixed whole number
 };

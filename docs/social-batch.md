@@ -7,7 +7,8 @@ Everything is in `tools/social/config.js` (checked on every run; a wrong value s
 - `count`, `size`: how many images, and the square size in pixels.
 - `schedule`: `every` (`day`, `week`, `fortnight`), `days`, `hour`, `tz`.
 - `roll.features`: which Randomize switches are on, 0 to 100 (stamps, layout, frame, shape, free, gr, masks, tx, pr, look, text, size). Off unless listed.
-- `roll.palettes`: plain colour sets, paper first, then ink. Each design uses one. Randomize's own colours are switched off because they come from the Wada sets.
+- `roll.colours`: `app` (default) uses the app's own Randomize colours, Wada sets included (fine while this is only for your own review; rights are not cleared, so check before posting publicly). `plain` uses one of `roll.palettes` instead (paper first, then ink), which never contains Wada colours.
+- `seedBase`: `random` (default) is new on every run, so every batch differs; the seeds are saved in `manifest.json` (and `seedBase` too), so any pick can be re-made with `--seeds`. `date` repeats within a day; a fixed number always repeats.
 - `roll.layouts`, `roll.layers`, `roll.maxAttempts`: a roll is kept only if its layers and layouts are allowed; otherwise the next seed is tried.
 - `email.subjectPrefix`, `email.maxAttachmentMB`.
 

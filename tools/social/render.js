@@ -14,7 +14,8 @@ const HEX = /#[0-9a-f]{6}(?:[0-9a-f]{2})?\b/gi;
 const THUMB = 360;
 
 const utcDate = (now = new Date()) => now.toISOString().slice(0, 10);
-const seedBaseOf = (cfg, now = new Date()) => cfg.seedBase === 'date' ? +utcDate(now).replace(/-/g, '') : cfg.seedBase;
+// 'random' gives a new base every run (seeds stay below 2^32 because base * 100 is used); 'date' and a fixed number repeat on purpose
+const seedBaseOf = (cfg, now = new Date()) => cfg.seedBase === 'date' ? +utcDate(now).replace(/-/g, '') : cfg.seedBase === 'random' ? crypto.randomInt(1000000, 40000000) : cfg.seedBase;
 // attempt 0 is the image's own seed; each retry moves to a far-away seed
 const seedFor = (base, index, attempt) => (base * 100 + index + attempt * 100003) >>> 0;
 const paletteFor = (cfg, seed) => cfg.roll.palettes[(Math.imul(seed, 2654435761) >>> 0) % cfg.roll.palettes.length];
@@ -49,10 +50,11 @@ async function setAspectSquare(page) {
   await settle(page, { max: 60000 });
 }
 
-async function rollWithFeatures(page, features) {
+async function rollWithFeatures(page, features, appColours) {
   await openPanel(page, 'rand');
   await page.click('#rznone');                                   // everything off, colours included
   for (const [k, v] of Object.entries(features)) if (v > 0) await page.locator(`[data-ft="${k}"]`).fill(String(v));
+  if (appColours) await page.locator('[data-ft="col"]').check();     // the app's own colour roll
   await page.click('#rzdo');
   await settle(page, { max: 90000 });
 }
@@ -91,15 +93,17 @@ async function renderOne(browser, cfg, seed, size) {
   try {
     const { errors } = await openApp(page, { seed, url: 'file://' + APP });
     await setAspectSquare(page);
-    await rollWithFeatures(page, cfg.roll.features);
+    await rollWithFeatures(page, cfg.roll.features, cfg.roll.colours === 'app');
     const roll = JSON.parse(await page.evaluate(() => window.__wbTest.state()));
     const why = checkRoll(cfg, roll);
     if (why) return { ok: false, seed, why };
-    const palette = paletteFor(cfg, seed);
-    await applyPalette(page, palette);
+    let palette = [];     // empty = the app's own colours
+    if (cfg.roll.colours === 'plain') { palette = paletteFor(cfg, seed); await applyPalette(page, palette); }
     const st = JSON.parse(await page.evaluate(() => window.__wbTest.state()));
-    const stray = strayColours(st, palette);
-    if (stray.length) return { ok: false, seed, why: 'colours outside the palette: ' + stray.slice(0, 4).join(' ') };
+    if (palette.length) {
+      const stray = strayColours(st, palette);
+      if (stray.length) return { ok: false, seed, why: 'colours outside the palette: ' + stray.slice(0, 4).join(' ') };
+    }
     const png = await exportPng(page, size);
     const [w, h] = pngSize(png);
     if (w !== size || h !== size) return { ok: false, seed, why: `picture is ${w} x ${h}, wanted ${size} x ${size}` };
@@ -181,7 +185,7 @@ async function renderBatch(cfg, opts = {}) {
       fs.writeFileSync(path.join(outDir, 'contact-sheet.jpg'), sheet);
     }
     const manifest = {
-      made: new Date().toISOString(), seconds: Math.round((Date.now() - t0) / 1000), app: items[0] ? items[0].app : '', size,
+      made: new Date().toISOString(), seedBase: base, seconds: Math.round((Date.now() - t0) / 1000), app: items[0] ? items[0].app : '', size,
       wanted: count, got: items.length, rerender: 'npm run build && npm run social -- --dry --seeds <seed>[,<seed>...] [--size <px>]',
       roll: cfg.roll, skipped,
       images: items.map(({ thumb, png, ...rest }) => rest),
