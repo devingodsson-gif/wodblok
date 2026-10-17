@@ -25,7 +25,7 @@ function alSpread(ax){const bs=alItems();if(bs.length<3)return;const lo=ax=='x'?
  for(let i=1;i<s.length-1;i++){const b=s[i],d=pos-b[lo];if(Math.abs(d)>1e-6){b.p[k]+=d;ch=true}pos+=(b[hi]-b[lo])+gap}if(ch)alDone()}
 function alSync(){const n=alItems().length,g=$('lalsec');if(!g)return;g.querySelectorAll('button').forEach(b=>{b.disabled=b.dataset.k=='d'?n<3:!n})}
 const alIc=b=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${b}</svg>`;
-function init58(){
+function init59(){
  const g=$('lalg');if(!g)return;
  g.innerHTML=ALN.map((t,i)=>{const r=Math.floor(i/3),c=i%3;return`<button type="button" id="al_${r}${c}" data-k="a" data-x="${c/2}" data-y="${r/2}" disabled aria-label="${t}" title="${t}">${alIc(`<rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><rect x="${5+c*4.5}" y="${5+r*4.5}" width="5" height="5" rx="1" fill="currentColor" fill-opacity=".55"/>`)}</button>`}).join('');
  g.onclick=e=>{const b=e.target.closest('button[data-k="a"]');if(b&&!b.disabled)alTo(+b.dataset.x,+b.dataset.y)};
@@ -39,4 +39,4 @@ function init58(){
  for(const [id,label,elId] of cmds)cmdRegister({id,label,elId,enabled:()=>{const b=$(elId);return!!b&&!b.hidden&&!b.disabled},run:()=>$(elId).click()});
  WBX.alSync=alSync;
 }
-export {init58};
+export {init59};

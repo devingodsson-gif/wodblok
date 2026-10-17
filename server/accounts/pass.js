@@ -23,9 +23,9 @@ export async function signPass(env, { sub, type, fn }, nowMs = Date.now()) {
 }
 
 // The gate cookie: Clerk's own session cookie only exists on the host that ran Clerk's script (wodblok.com), so the app host
-// never sees it. The site trades a valid Clerk session for this short-lived signed note, set for the whole domain.
-// Same key as the pass, but marked gate:1, so a pass can never be used as a gate cookie. One hour; the site renews it.
-export const GATE_SECONDS = 3600;
+// never sees it. The site trades a valid Clerk session for this signed note, set for the whole domain.
+// Same key as the pass, but marked gate:1, so a pass can never be used as a gate cookie. One day; the site renews it each time it is opened.
+export const GATE_SECONDS = 24 * 3600;
 export const GATE_COOKIE = 'wb_gate';
 
 export async function signGate(env, { sub, type, fn, em }, nowMs = Date.now()) {

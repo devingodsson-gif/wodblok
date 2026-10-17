@@ -1,4 +1,4 @@
-# Accounts (1.20.0: server side and website; the app side is 1.21)
+# Accounts (1.20.0 server side and website; 1.27.0 the app)
 
 People create an account on wodblok.com, the owner approves them, and only approved accounts can open the hosted app.
 Sign-in itself is **Clerk** (email, password, verification, reset, account page, account deletion). Everything else is in
@@ -11,7 +11,7 @@ with no `GATE_HOSTS` variable the app is served exactly as before. Both are set 
 1. **Create account** (top right of wodblok.com): first name, email, password; Clerk emails a verification code.
 2. Until approved, opening the app shows a short "you're on the list" page.
 3. The owner sets their type in the Clerk dashboard. They get an automatic "You're in" email.
-4. The header then reads **Hi <name>**, with a menu: Open Wodblok, Account (Clerk's page: password, email, delete account), Sign out.
+4. The header then reads **Hi <name>!**, with a menu: Open Wodblok, Account (Clerk's page: password, email, delete account), Sign out.
 5. Signed-out visitors who open the app are sent to `wodblok.com/?signin=1`, which opens the sign-in box.
 
 ## What the owner does
@@ -86,11 +86,24 @@ To switch it off again: delete `GATE_HOSTS` and redeploy. Branch previews (`*.pa
 
 ## Things to know
 - **The gate protects the hosted copy, not the code.** While the repo is public anyone can read and build the source. The gate decides who can use app.wodblok.com.
-- **Clerk's cookie does not reach the app host (found in testing, fixed in 1.26.2).** Clerk only creates its `__session` cookie on the host that runs its script (wodblok.com), so app.wodblok.com always looked signed out. The site now calls `POST /api/gate-cookie` once signed in and approved, and gets back `wb_gate`: a one-hour, signed, HttpOnly cookie for `.wodblok.com` that the gate and the other `/api` routes accept on the app host. It is renewed every 20 minutes while the site is open, and a visitor sent to the site by the app is sent straight back once the cookie is set (at most once a minute, so a fault cannot loop). Sign-out clears it. Only a real Clerk session can renew it, so removing someone's approval stops their access within an hour.
+- **Clerk's cookie does not reach the app host (found in testing, fixed in 1.26.2).** Clerk only creates its `__session` cookie on the host that runs its script (wodblok.com), so app.wodblok.com always looked signed out. The site now calls `POST /api/gate-cookie` once signed in and approved, and gets back `wb_gate`: a one-day, signed, HttpOnly cookie for `.wodblok.com` that the gate and the other `/api` routes accept on the app host. It is renewed every 20 minutes while the site is open and each time it is opened, and a visitor sent to the site by the app is sent straight back once the cookie is set (at most once a minute, so a fault cannot loop). Sign-out clears it. Only a real Clerk session can renew it, so removing someone's approval stops their access within a day.
 - **Clerk details to verify while setting up** (written from Clerk's documented behaviour, not tested against a live instance): the session-token template syntax, the browser script address built in `site/account.js`, and the exact name of the account-deletion setting.
 - **Offline.** Once the app is installed and cached, the browser can open it without asking the server, so the 7-day pass check is done in the app itself (1.21). Until then a cached copy keeps opening.
 - **Free plan limit.** `functions/_middleware.js` makes every request to both Pages projects run a Function. Cloudflare's free plan allows 100,000 Function requests a day across the account, plenty for a beta.
 - **Email.** Clerk sends its own verification and reset emails (from its address until its custom email domain is set up). This repo's emails go through Resend.
 
-## Next: 1.21 (the app)
-Name chip in the status bar; File > Account…; File > Send feedback…; the offline pass; the usage counter; the CLAUDE.md "no runtime network" rule changed to allow only `src/platform/account.js`.
+## The app (1.27.0)
+All of it is inert unless an account server answers, so local copies, previews and tests are unchanged. `src/platform/account.js` is the only
+network code in the app; `src/modules/58-account.js` is the interface.
+- **Name chip** ("Hi Devin!", matching the website; the one exclamation mark the style guide allows in the app) at the right of the status bar. It opens the Account dialog.
+- **File > Account…** (name, email, account type, "Works offline until" when on a pass; Manage account opens the site's account box, Sign out clears the app's cookie and signs out of the site) and **File > Send feedback…** (Bug / Idea / Other and a message; Send posts once, a retry reuses the same key). Both items and their commands (`account.open`, `feedback.open`) exist only while signed in.
+- **Checks** run at launch, when the connection returns, when the tab becomes visible after 30 minutes and every 30 minutes. `GET /api/me` now also says `gated` (whether the host is behind the gate) so the app only insists on an account where one is needed.
+- **Offline pass.** Each good answer carries a signed 7-day pass that the app checks against the public key pinned in `platform/account.js` and keeps. With no connection the pass decides: valid means the app opens as usual; expired, tampered, or a clock wound back more than an hour behind the last time it was seen means the **locked screen** (title says why: Signed out, Not approved yet, Offline too long, Check the date and time). The locked screen has Sign in, Try again and Save project, so no work is lost. No pass stored and no answer means nothing is asked (a copy cached before accounts, or a server hiccup).
+- **Active time** (early access and tester only): every 15 s the app adds 15 s if the page is visible and the person pressed, typed or scrolled in the last minute. No pointer-move listeners, nothing on the drawing path. Running totals for the day are kept on the device and sent every 5 minutes and when the tab is hidden; offline they wait.
+- **Cookie lifetime.** The gate cookie lasts one day (the app needs it to send usage and feedback while open), renewed whenever the site is opened. Removing someone's approval stops their access within a day of their last visit to the site, and within 7 days offline at the latest.
+- **If the pass key is ever replaced,** put the new PUBLIC line in `acPASS_PUBLIC_JWK` in `src/platform/account.js` and ship a release; until then apps check against the old key.
+
+## Still to do
+The privacy page on the site; optional rate limit on `/api/*`.
+
+- **Accent cookie (1.27.2).** The app sets `wb_accent` (six hex digits, domain-wide, one year; cleared for the built-in Oak) so the website can use the same accent colour. It holds only a colour, no id; the privacy page lists it.

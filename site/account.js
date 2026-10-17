@@ -8,11 +8,19 @@
   var openApp = document.getElementById('open-app');
   if (!nav || !openApp) return;
   var appUrl = openApp.href;
+  var hero = document.getElementById('hero-cta');   // the big button under the title: Create account / Open Wodblok / hidden
 
   // The publishable key holds the address of Clerk's server for this site (base64, ends with "$").
   var host;
   try { host = atob(key.split('_')[2]).replace(/\$$/, ''); } catch (e) { return; }
   if (!/^[a-z0-9.-]+$/i.test(host)) return;
+
+  // Hide the plain "Open Wodblok" button until Clerk has decided what to show, so it does not flash and swap.
+  // If Clerk cannot load, the button comes back (on an error, or after a few seconds).
+  openApp.style.visibility = 'hidden';
+  if (hero) hero.style.visibility = 'hidden';
+  function showPlain() { openApp.style.visibility = ''; if (hero) hero.style.visibility = ''; }
+  var failsafe = setTimeout(showPlain, 6000);
 
   var script = document.createElement('script');
   script.async = true;
@@ -20,8 +28,9 @@
   script.setAttribute('data-clerk-publishable-key', key);
   script.src = 'https://' + host + '/npm/@clerk/clerk-js@5/dist/clerk.browser.js';
   script.onload = function () {
-    window.Clerk.load().then(start).catch(function () { /* the plain page stays usable */ });
+    window.Clerk.load().then(start).catch(showPlain); // the plain page stays usable
   };
+  script.onerror = showPlain;
   document.head.appendChild(script);
 
   var mine = [];
@@ -50,7 +59,7 @@
 
   function signedIn() {
     var wrap = el('div', 'acct');
-    var btn = el('button', 'btn btn-secondary top-app', 'Hi ' + (window.Clerk.user.firstName || 'there'));
+    var btn = el('button', 'btn btn-secondary top-app', 'Hi ' + (window.Clerk.user.firstName || 'there') + '!');
     btn.type = 'button';
     btn.setAttribute('aria-haspopup', 'menu');
     btn.setAttribute('aria-expanded', 'false');
@@ -78,7 +87,7 @@
     // approved accounts get the link into the app; everyone else sees that they are on the list
     fetch('/api/me', { credentials: 'same-origin', headers: { accept: 'application/json' } })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) { if (j && j.approved) { app.hidden = false; pending.hidden = true; } })
+      .then(function (j) { if (j && j.approved) { app.hidden = false; pending.hidden = true; heroSet('open'); } })
       .catch(function () {});
 
     function close() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
@@ -98,7 +107,7 @@
   }
 
   // Clerk's cookie only exists on this site, so the app host cannot see who is signed in. For approved accounts the
-  // server trades the Clerk session for a one-hour cookie that covers the whole domain (functions/api/gate-cookie.js).
+  // server trades the Clerk session for a one-day cookie that covers the whole domain (functions/api/gate-cookie.js).
   function mintGate() {
     return fetch('/api/gate-cookie', { method: 'POST', credentials: 'same-origin' })
       .then(function (r) { return r.ok ? r.json() : null; })
@@ -110,14 +119,35 @@
       .then(function () {}, function () {});
   }
 
+  // the hero button follows the account: signed out -> Create account, approved -> Open Wodblok, signed in but not approved -> hidden
+  var heroClick = null;
+  function heroSet(mode) {
+    if (!hero) return;
+    if (heroClick) { hero.removeEventListener('click', heroClick); heroClick = null; }
+    hero.style.visibility = '';
+    if (mode === 'signup') {
+      hero.textContent = 'Create account';
+      hero.href = '#';   // a link keeps Enter and focus working; the click opens the sign-up box instead
+      heroClick = function (e) { e.preventDefault(); window.Clerk.openSignUp({}); };
+      hero.addEventListener('click', heroClick);
+    } else if (mode === 'open') {
+      hero.textContent = 'Open Wodblok';
+      hero.href = appUrl;
+    } else {
+      hero.style.visibility = 'hidden';
+    }
+  }
+
   var minted = false;
   function render() {
     clear();
     openApp.hidden = true; // the sign-in buttons or the menu take its place
     if (window.Clerk.user) {
+      heroSet('none');
       signedIn();
       if (!minted) { minted = true; mintGate(); }
     } else {
+      heroSet('signup');
       signedOut();
       if (minted) { minted = false; clearGate(); }
     }
@@ -134,6 +164,7 @@
   }
 
   function start() {
+    clearTimeout(failsafe);
     render();
     window.Clerk.addListener(render);
     // keep the app's cookie fresh while this page stays open
@@ -142,6 +173,18 @@
     var q = location.search;
     if (!window.Clerk.user && /[?&](signin|signup)=1/.test(q)) {
       if (/[?&]signup=1/.test(q)) window.Clerk.openSignUp({}); else window.Clerk.openSignIn({});
+    }
+    // the app's "Sign out" sends people here: sign out of Clerk too, then show the plain page
+    if (window.Clerk.user && /[?&]signout=1/.test(q)) {
+      clearGate().then(function () { return window.Clerk.signOut(); }).then(function () {
+        try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) { /* ignore */ }
+      });
+      return;
+    }
+    // the app's "Manage account" opens the account box here
+    if (window.Clerk.user && /[?&]account=1/.test(q)) {
+      window.Clerk.openUserProfile();
+      try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) { /* ignore */ }
     }
     if (window.Clerk.user && /[?&]signin=1/.test(q)) mintGate().then(function (ok) { if (ok) backToApp(); });
     if (/[?&](signin|signup)=1/.test(q)) {

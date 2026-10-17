@@ -1,7 +1,7 @@
 // Lets the app host know who is signed in. Clerk's session cookie is only on wodblok.com, so the site calls this
-// (with that cookie) and gets back a one-hour signed cookie for the whole domain, which the gate on app.wodblok.com reads.
+// (with that cookie) and gets back a one-day signed cookie for the whole domain, which the gate on app.wodblok.com reads.
 //   POST  approved Clerk session -> sets the cookie.   DELETE  -> clears it (sign out).
-// Only a real Clerk session can renew it, never the gate cookie itself, so access ends within an hour of an account losing approval.
+// Only a real Clerk session can renew it, never the gate cookie itself, so access ends within a day of an account losing approval.
 //   GATE_COOKIE_DOMAIN  optional, default .wodblok.com on wodblok.com hosts (no Domain attribute elsewhere, e.g. previews and tests)
 
 import { getClerkSession, isApproved } from '../../server/accounts/clerk.js';
