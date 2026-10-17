@@ -13,7 +13,10 @@ const stK_ACC='wb114_accent',stK_DRAFT='wb114_draft',stK_CALM='wb114_calm',stK_T
 const stPAGES=[['general','General'],['colour','Colour'],['speed','Speed'],['files','Files'],['keys','Shortcuts'],['about','About']];
 // Accent presets. They are the person's colours, not chrome, so literal values are allowed (style guide 3). The first is the built-in bronze
 // and stays the stylesheet's own values (no override is written for it).
-const stACCENTS=[['Bronze',''],['Clay','#b5654a'],['Rose','#b8627a'],['Plum','#8a5aa6'],['Indigo','#5a6fb8'],['Teal','#3f8f8a'],['Moss','#6b8f4a'],['Graphite','#7a7670']];
+// Named after woods, desaturated and warm so they sit with Oak. Each is the base colour; the accent tokens of each theme are derived from it.
+// Shown in hue order (red, brown, bronze, green, blue, purple, pink); Birch, the grey, has no hue and comes last.
+const stACCENTS=[['Rosewood','#a85a52'],['Walnut','#744f3b'],['Oak',''],['Eucalyptus','#72977f'],['Ironwood','#5f7f9a'],['Purpleheart','#86629a'],['Maple','#c48a96'],['Birch','#a3a09a']];
+const stAccentName=cur=>{const a=stACCENTS.find(x=>x[1]===(cur||''));return a?a[0]:'Custom'};
 const stSAVE_EVERY=[[8,'8 s'],[30,'30 s'],[120,'2 min']];
 const stHEX6=/^#[0-9a-f]{6}$/i;
 // ---------------------------------------------------------------- accent colour maths
@@ -36,8 +39,8 @@ function accentVars(hex){
  const lightAcc=stToHex(stHsl2rgb([h,s,lAcc])),darkAcc=stToHex(stHsl2rgb([h,s,dAcc]));
  const lightInk=stInkOn(h,s,Math.min(lAcc,.4),stPANEL.light,-1),darkInk=stInkOn(h,s,dAcc,stPANEL.dark,1);
  const fg=c=>stContrast(c,'#1b1a18')>=stContrast(c,'#ffffff')?'#1b1a18':'#ffffff',soft=c=>{const[r,g,b]=stToRgb(c);return`rgba(${r},${g},${b},.16)`};
- return{light:{stga:lightAcc,ink:lightInk,fg:fg(lightAcc),soft:soft(lightAcc)},dark:{stga:darkAcc,ink:darkInk,fg:fg(darkAcc),soft:soft(darkAcc)}}}
-const stRule=(sel,v)=>`${sel}{--acc:${v.stga};--acc-ink:${v.ink};--acc-fg:${v.fg};--acc-soft:${v.soft}}`;
+ return{light:{acc:lightAcc,ink:lightInk,fg:fg(lightAcc),soft:soft(lightAcc)},dark:{acc:darkAcc,ink:darkInk,fg:fg(darkAcc),soft:soft(darkAcc)}}}
+const stRule=(sel,v)=>`${sel}{--acc:${v.acc};--acc-ink:${v.ink};--acc-fg:${v.fg};--acc-soft:${v.soft}}`;
 // A style element written after the page's own rules. The theme is always set on :root (light or dark), so these two selectors cover both.
 function accentApply(hex){let el=$('accstyle');if(!stHEX6.test(hex||'')){if(el)el.textContent='';return}
  if(!el){el=document.createElement('style');el.id='accstyle';document.body.appendChild(el)}   // last in the page, after the app's own colour rules
@@ -60,7 +63,7 @@ const stSegH=(id,label,opts,cur)=>`<div class="stgr"><span>${label}</span><div c
 const stThemeNow=()=>document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
 const stDotsNow=()=>!document.body.classList.contains('plain');
 function stAccentRow(){const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur);
- return`<div class="stgr stgacc"><span>Accent</span><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div></div>`}
+ return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div></div>`}
 function stPageHtml(p){
  if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stTgl('stgdt',stDotsNow(),'Stage dots')+stAccentRow();
  if(p=='colour')return`<div class="ctl stgr"><label for="stgtv">Places shown</label><input type="range" id="stgtv" min="7" max="${TRAY_MAX}" step="1" value="${stNumGet(stK_TRAY,7,7,TRAY_MAX)}"><output id="stgtvo">${stNumGet(stK_TRAY,7,7,TRAY_MAX)}</output></div><div class="stgr"><span>Recent colours</span><button type="button" class="alt" id="stgrc">Clear</button></div>`;
@@ -97,7 +100,7 @@ function stWire(){const b=$('stgbody');
   const rows=cmdList().filter(c=>c.shortcut).filter(c=>!stKeyQ||(c.label+' '+c.shortcut).toLowerCase().includes(stKeyQ.toLowerCase()));
   $('stgkl').innerHTML=rows.map(c=>`<div class="stgkr"><span>${stEsc(c.label)}</span><kbd>${stEsc(cmdFormatShortcut(c.shortcut,m))}</kbd></div>`).join('')||'<div class="stgkr"><span>No match</span></div>'})}
 // the swatch row follows the stored accent (the picker changes it live)
-function stAccentMarks(){const g=$('stgacc');if(!g)return;const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur);
+function stAccentMarks(){const g=$('stgacc');if(!g)return;const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur),n=$('stgan');if(n)n.textContent=stAccentName(cur);
  g.querySelectorAll('.stgab').forEach(b=>{const c=b.dataset.custom;b.setAttribute('aria-pressed',String(c?!!custom:(b.dataset.h||'')===cur));if(c)b.style.setProperty('--c',custom?cur:'transparent')})}
 function stShow(){try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}catch(e){}
  {const a=document.activeElement;stOpener=a&&a!==document.body&&a.focus&&a.offsetParent!==null&&!a.closest('#filem')?a:$('fileb')}

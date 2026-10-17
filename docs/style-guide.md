@@ -52,7 +52,7 @@ Rules:
 - Chrome MUST use these tokens. No literal hex or `rgb()` in chrome CSS or inline styles.
 - Literal colours are allowed only for: the artwork and colours the user chose; the colour picker's own hue bar and handles; the swatch fallback `var(--c,#888)`; scrims (`rgba(10,11,14,.45)`).
 - A swatch of the user's colour MUST have the swatch edge (`inset 0 0 0 1px rgba(0,0,0,.2)`) so pale colours stay visible. One value, everywhere.
-- The accent colour is the person's choice (Settings > General). The values in the table are the default, Bronze. Chrome uses the tokens, never the literal, so a changed accent reaches every control. The settings code derives the four accent tokens of both themes from the one colour picked and keeps the ink at 4.5:1 or better on the panel.
+- The accent colour is the person's choice (Settings > General). The values in the table are the default, Oak. The eight named accents are woods: Oak, Birch, Rosewood, Ironwood, Eucalyptus, Purpleheart, Walnut, Maple. Chrome uses the tokens, never the literal, so a changed accent reaches every control. The settings code derives the four accent tokens of both themes from the one colour picked and keeps the ink at 4.5:1 or better on the panel.
 - The accent is for selection, focus and the one key action in a view. Never use it as decoration, and never for more than one primary action per view.
 - `--warn` and `--ok` carry meaning only.
 - Contrast: check muted and disabled text in both themes. State is never carried by colour alone (add the edge, weight or icon).
