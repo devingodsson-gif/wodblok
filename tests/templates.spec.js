@@ -145,8 +145,9 @@ test('Rare Motion is the first repeating-pattern starting point and Book Cover t
   const { errors } = await openApp(page);
   for (const [k, name] of [['tile', 'Rare Motion'], ['book', 'Book Cover']]) {
     await openPicker(page); await kind(page, k);
-    await expect(cards(page).nth(1)).toHaveAttribute('aria-label', name);
-    await cards(page).nth(1).click();
+    const card = page.locator(`#tpg .tpc[aria-label="${name}"]`);   // listed by name, so other uploaded templates may come first
+    await expect(card).toHaveCount(1);
+    await card.click();
     await expect(page.locator('#tpdlg')).toBeHidden();
     await settle(page, { max: 60000, quiet: 6 });
     const st = JSON.parse(await getState(page));
