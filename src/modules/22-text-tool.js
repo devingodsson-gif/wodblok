@@ -16,7 +16,7 @@ const FONTS=[['cinzel','Cinzel','Cinzel',700,'Roman capitals'],['cinzeld','Cinze
 ['pirata','Pirata One','Pirata+One',400,'Narrow blackletter'],['uncial','Uncial Antiqua','Uncial+Antiqua',400,'Uncial'],
 ['medieval','MedievalSharp','MedievalSharp',400,'Hand-cut medieval'],['alfa','Alfa Slab One','Alfa+Slab+One',400,'Heavy slab'],
 ['holtwood','Holtwood One SC','Holtwood+One+SC',400,'Wood type'],['rye','Rye','Rye',400,'Ornamental wood type'],
-['abril','Abril Fatface','Abril+Fatface',400,'Fat face'],['bebas','Bebas Neue','Bebas+Neue',400,'Condensed poster']];
+['abril','Abril Fatface','Abril+Fatface',400,'Fat face'],['bebas','Bebas Neue','Bebas+Neue',400,'Condensed poster'],['playfair','Playfair Display','Playfair+Display',700,'High-contrast serif'],['bodoni','Bodoni Moda','Bodoni+Moda',700,'Fashion serif'],['dmserif','DM Serif Display','DM+Serif+Display',400,'Display serif'],['oswald','Oswald','Oswald',700,'Tall condensed sans'],['anton','Anton','Anton',400,'Heavy condensed'],['leaguegothic','League Gothic','League+Gothic',400,'Narrow gothic'],['montserrat','Montserrat','Montserrat',800,'Geometric sans'],['lobster','Lobster','Lobster',400,'Bold script'],['pacifico','Pacifico','Pacifico',400,'Surf script'],['dancing','Dancing Script','Dancing+Script',700,'Lively script'],['caveat','Caveat','Caveat',700,'Handwriting'],['marker','Permanent Marker','Permanent+Marker',400,'Marker pen'],['elite','Special Elite','Special+Elite',400,'Typewriter'],['bungee','Bungee','Bungee',400,'Signage'],['ultra','Ultra','Ultra',400,'Fat slab'],['vastshadow','Vast Shadow','Vast+Shadow',400,'Slab with shadow'],['limelight','Limelight','Limelight',400,'Art deco'],['almendra','Almendra','Almendra',700,'Calligraphic'],['metamorph','Metamorphous','Metamorphous',400,'Fantasy serif'],['grenze','Grenze Gotisch','Grenze+Gotisch',700,'Gothic blackletter']];
 const F={};FONTS.forEach(([id,fam,q,w,d])=>F[id]={id,fam,w,d,lbl:fam});
 // the lettering fonts are bundled with the page (@font-face rules in the shell), so nothing is fetched
 // your own fonts (kept in this browser when they fit)
@@ -47,9 +47,9 @@ const n=q.length;if(n<3)return;const Pp=q.map(([x,y])=>[(x-gcx)*u,(y-gcy)*u]),mi
 for(let i=1;i<=n;i++){const p=Pp[i%n],mm=mid(i);path+='Q'+fm(p[0])+','+fm(p[1])+' '+fm(mm[0])+','+fm(mm[1])}path+='Z'});
 const r={k:key,cx:gcx-ox,cy:gcy-oy,d:path};GL.set(key,r);return r}
 // --- layout: letters on straight lines, or bent around a circle (curve = % of a full circle; negative curves down)
-function layout(o){const f=F[o.f]||F.cinzel;cx.font=css(f);const lines=o.text.split('\n'),em=o.sz/100*Math.min(SW,SH),k=em/P,ls=o.ls/100*P,capH=cx.measureText('H').actualBoundingBoxAscent||P*.7,lhp=o.lh/100*P;
-const L=lines.map(line=>{const ch=[...line],out=[];ch.forEach((c,i)=>{if(/\s/.test(c))return;const g=glyph(f,c);if(!g)return;const pen=cx.measureText(ch.slice(0,i).join('')).width+ls*i;out.push({g,c,x:pen+g.cx,y:g.cy})});cx.font=css(f);return{out,W:cx.measureText(line).width+ls*Math.max(0,ch.length-1)}});
-const maxW=Math.max(1,...L.map(l=>l.W)),pts=[];L.forEach((l,j)=>{const sh=o.al=='l'?-maxW/2:o.al=='r'?maxW/2-l.W:-l.W/2,by=(j-(lines.length-1)/2)*lhp+capH/2;l.out.forEach(c=>pts.push({g:c.g,c:c.c,px:sh+c.x,py:by+c.y}))});
+function layout(o){const f=F[o.f]||F.cinzel;cx.font=css(f);const T0=o.tc=='u'?o.text.toUpperCase():o.tc=='l'?o.text.toLowerCase():o.tc=='t'?o.text.toLowerCase().replace(/(^|[\s(\-])(\S)/g,(m,a,b)=>a+b.toUpperCase()):o.text,lines=T0.split('\n'),em=o.sz/100*Math.min(SW,SH),k=em/P,ls=o.ls/100*P,wsp=(o.ws||0)/100*P,capH=cx.measureText('H').actualBoundingBoxAscent||P*.7,lhp=o.lh/100*P;
+const L=lines.map(line=>{const ch=[...line],out=[];let sp=0;ch.forEach((c,i)=>{if(/\s/.test(c)){sp++;return}const g=glyph(f,c);if(!g)return;const pen=cx.measureText(ch.slice(0,i).join('')).width+ls*i+wsp*sp;out.push({g,c,x:pen+g.cx,y:g.cy,sp})});cx.font=css(f);return{out,ns:sp,W:cx.measureText(line).width+ls*Math.max(0,ch.length-1)+wsp*sp}});
+const maxW=Math.max(1,...L.map(l=>l.W)),pts=[];L.forEach((l,j)=>{const ex=o.al=='j'&&j<L.length-1&&l.ns>0?(maxW-l.W)/l.ns:0,sh=o.al=='l'||o.al=='j'?-maxW/2:o.al=='r'?maxW/2-l.W:-l.W/2,by=(j-(lines.length-1)/2)*lhp+capH/2;l.out.forEach(c=>pts.push({g:c.g,c:c.c,px:sh+c.x+ex*c.sp,py:by+c.y}))});
 const cvv=Math.max(-1,Math.min(1,o.cv/100)),rt=(o.rot||0)*Math.PI/180,cs=Math.cos(rt),sn=Math.sin(rt);let res;
 if(Math.abs(cvv)<.005)res=pts.map(c=>({g:c.g,c:c.c,x:c.px,y:c.py,r:0}));
 else{const phi=Math.abs(cvv)*2*Math.PI,R=maxW/phi,off=R*Math.max(0,Math.min(1,1-phi/Math.PI));
@@ -57,7 +57,7 @@ res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c
 const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI}})}
 return res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0),s:+(em/E).toFixed(4)}))}
 // --- panel state
-const D={text:'',f:'cinzel',sz:30,ls:0,lh:115,al:'c',cv:0,rot:0,auto:true};
+const D={text:'',f:'cinzel',sz:30,ls:0,ws:0,lh:115,al:'c',tc:'',cv:0,rot:0,auto:true};
 // largest size (up to 40%) at which the whole text sits inside the stamp, so it doesn't wrap round the edges
 function fitSz(o){const ps=layout({...o,sz:100});if(!ps.length)return o.sz;const h=Math.min(SW,SH)*.42;let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;ps.forEach(p=>{x0=Math.min(x0,p.x-h);x1=Math.max(x1,p.x+h);y0=Math.min(y0,p.y-h);y1=Math.max(y1,p.y+h)});
 const k=SK=='tri'?.55:SK=='rect'?.86:.74;return Math.max(5,Math.min(o.maxSz||40,Math.floor(100*Math.min(k*SW/(x1-x0),k*SH/(y1-y0)))))}
@@ -67,11 +67,11 @@ const grpOf=()=>{const qs=QS();if(!qs.length)return null;const g=qs[0].tg;if(!g|
 const idsOf=g=>WBS.tiles[WBS.cur].items.map((q,i)=>q.tg==g?i:-1).filter(i=>i>=0);
 const mean=ids=>{const it2=WBS.tiles[WBS.cur].items;let x=0,y=0;ids.forEach(i=>{x+=it2[i].x;y+=it2[i].y});return[x/ids.length,y/ids.length]};
 WBX.wbTxGrp=()=>grpOf();WBX.wbTxMeta=g=>A(WBS.tiles[WBS.cur])[g];
-function fillFonts(){const cur0=$('tx_f').value||st.f;$('tx_f').innerHTML=`<optgroup label="Built-in fonts">${FONTS.map(x=>`<option value="${x[0]}">${hx(x[1])}: ${hx(x[4])}</option>`).join('')}</optgroup>`+(UF.length?`<optgroup label="Your fonts">${UF.map(id=>`<option value="${id}">${hx(F[id].lbl)}</option>`).join('')}</optgroup>`:'');$('tx_f').value=F[cur0]?cur0:'cinzel'}
+function fillFonts(){const cur0=$('tx_f').value||st.f;$('tx_f').innerHTML=`<optgroup label="Built-in fonts">${FONTS.map(x=>`<option value="${x[0]}" data-font="${hx(x[1])}" data-w="${x[3]}">${hx(x[1])}</option>`).join('')}</optgroup>`+(UF.length?`<optgroup label="Your fonts">${UF.map(id=>`<option value="${id}" data-font="${hx(F[id].fam)}" data-w="400">${hx(F[id].lbl)}</option>`).join('')}</optgroup>`:'');$('tx_f').value=F[cur0]?cur0:'cinzel'}
 function toUI(){syncing++;try{toUI0()}finally{syncing--}}
-function toUI0(){$('tx_t').value=st.text;$('tx_f').value=F[st.f]?st.f:'cinzel';[['tx_sz','sz'],['tx_ls','ls'],['tx_lh','lh'],['tx_cv','cv'],['tx_rot','rot']].forEach(([id,k])=>{$(id).value=st[k];$(id).dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))});
-document.querySelectorAll('#tx_al [data-a]').forEach(b=>b.classList.toggle('on',b.dataset.a==st.al))}
-function fromUI(){st.text=$('tx_t').value.replace(/\r/g,'').slice(0,200);st.f=$('tx_f').value;st.sz=+$('tx_sz').value;st.ls=+$('tx_ls').value;st.lh=+$('tx_lh').value;st.cv=+$('tx_cv').value;st.rot=+$('tx_rot').value}
+function toUI0(){$('tx_t').value=st.text;$('tx_f').value=F[st.f]?st.f:'cinzel';[['tx_sz','sz'],['tx_ls','ls'],['tx_ws','ws'],['tx_lh','lh'],['tx_cv','cv'],['tx_rot','rot']].forEach(([id,k])=>{$(id).value=st[k];$(id).dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))});
+document.querySelectorAll('#tx_al [data-a]').forEach(b=>b.classList.toggle('on',b.dataset.a==st.al));document.querySelectorAll('#tx_tc [data-c]').forEach(b=>b.classList.toggle('on',b.dataset.c==(st.tc||'')))}
+function fromUI(){st.text=$('tx_t').value.replace(/\r/g,'').slice(0,200);st.f=$('tx_f').value;st.sz=+$('tx_sz').value;st.ls=+$('tx_ls').value;st.ws=+$('tx_ws').value;st.lh=+$('tx_lh').value;st.cv=+$('tx_cv').value;st.rot=+$('tx_rot').value}
 async function ready(){const f=F[st.f]||F.cinzel;try{await document.fonts.load(css(f),st.text||'Aa');await document.fonts.ready}catch(e){}}
 async function preview(){await ready();const t=WBS.tiles[WBS.cur];useT(t);autoFit();const[pa]=pal(),ink=inkOf(t),ps=st.text.trim()?layout(st):[],C=cen();
 $('tx_pv').innerHTML=`<svg viewBox="-12 -12 ${SW+24} ${SH+24}"><path d="${shp(0)}" fill="${pa}" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/>`+ps.map(p=>`<g transform="translate(${(C[0]+p.x).toFixed(1)} ${(C[1]+p.y).toFixed(1)}) rotate(${p.r.toFixed(1)}) scale(${p.s})"><path d="${p.g.d}" fill="${ink}" fill-rule="evenodd"/></g>`).join('')+`</svg>`;
@@ -82,7 +82,7 @@ function letters(g,ax,ay){const ps=layout(st),out=[];ps.forEach(p=>{const k=p.g.
 async function add(){fromUI();if(!st.text.trim())return;await ready();if(WBX.wbCap)WBX.wbCap();const t=WBS.tiles[WBS.cur];useT(t);autoFit();const g='tx'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),[ax,ay]=cen(),L=letters(g,ax,ay);
 if(!L.length){pmsg('No letters came out. Try another font.');return}const n0=t.items.length;t.items.push(...L);const ids=L.map((_,i)=>n0+i);const[mx,my]=mean(ids);A(t)[g]={...st,ax,ay,mx,my};
 selSet(ids,false);WBS.brush=null;store();upd();if(WBX.wbCap)WBX.wbCap();pmsg(`Added “${st.text.replace(/\n/g,' ')}” as ${L.length} letter${L.length>1?'s':''}. Drag to move them together, or click one in the Shape list to move it alone.`)}
-async function update(live){const g=edit;if(!g)return;fromUI();if(!st.text.trim())return;await ready();if(g!==edit)return;const t=WBS.tiles[WBS.cur],M=A(t)[g],ids=idsOf(g);if(!M||!ids.length)return;if(live&&['text','f','sz','ls','lh','al','cv','rot'].every(k=>M[k]===st[k]))return;if(WBX.wbCap&&(!live||performance.now()-lastLive>1500))WBX.wbCap();if(live)lastLive=performance.now();useT(t);
+async function update(live){const g=edit;if(!g)return;fromUI();if(!st.text.trim())return;await ready();if(g!==edit)return;const t=WBS.tiles[WBS.cur],M=A(t)[g],ids=idsOf(g);if(!M||!ids.length)return;if(live&&['text','f','sz','ls','ws','lh','al','tc','cv','rot'].every(k=>M[k]===st[k]))return;if(WBX.wbCap&&(!live||performance.now()-lastLive>1500))WBX.wbCap();if(live)lastLive=performance.now();useT(t);
 const[cx0,cy0]=mean(ids),ax=M.ax+(cx0-M.mx),ay=M.ay+(cy0-M.my),pos=Math.min(...ids);delItems(ids);const L=letters(g,ax,ay);t.items.splice(Math.min(pos,t.items.length),0,...L);const nids=L.map((_,i)=>Math.min(pos,t.items.length-L.length)+i);
 const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();upd();if(!live){if(WBX.wbCap)WBX.wbCap();pmsg(`Updated the text. Hand-moved letters were rebuilt.`)}}
 // the text on the stamp follows every change in the panel while a text is being edited
@@ -102,9 +102,10 @@ if(g){const M=A(WBS.tiles[WBS.cur])[g];st={...D,...M,auto:false};delete st.ax;de
 else{box.hidden=true;$('tx_go').textContent='Add to stamp';st.auto=true}later()};
 fillFonts();toUI();
 $('tx_t').addEventListener('input',()=>{fromUI();later();live()});
-['tx_f','tx_sz','tx_ls','tx_lh','tx_cv','tx_rot'].forEach(id=>$(id).addEventListener('input',e=>{if(id=='tx_sz'&&e.isTrusted)st.auto=false;fromUI();later();live()}));
+['tx_f','tx_sz','tx_ls','tx_ws','tx_lh','tx_cv','tx_rot'].forEach(id=>$(id).addEventListener('input',e=>{if(id=='tx_sz'&&e.isTrusted)st.auto=false;fromUI();later();live()}));
 ['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(!e.isTrusted)return;const w=$('tx_sz').closest('.ctl');if(e.target===$('tx_sz')||(w&&w.contains(e.target)))st.auto=false},true));
 $('tx_al').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;st.al=b.dataset.a;document.querySelectorAll('#tx_al [data-a]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
+$('tx_tc').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;st.tc=b.dataset.c;document.querySelectorAll('#tx_tc [data-c]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
 $('tx_go').onclick=add;
 $('tx_new').onclick=()=>{selOne(-1);edit=null;$('tx_ed').hidden=true;$('tx_go').textContent='Add to stamp';st={...D,f:st.f};toUI();upd();later();$('tx_t').focus()};
 $('tx_file').onchange=async()=>{const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl)return;try{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';

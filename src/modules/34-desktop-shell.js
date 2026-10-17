@@ -472,16 +472,17 @@ store();upd();if(WBX.wbCap)WBX.wbCap();$('pmsg').textContent=`Randomized ${qs.le
 const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'),SEL_SKIP=s=>s.style.display==='none'||s.classList.contains('ddsel')||s.dataset.native!=null;
 const desc=Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value');
 const all=[];
-function optList(s){const out=[];[...s.children].forEach(c=>{if(c.tagName=='OPTGROUP'){out.push({g:c.label});[...c.children].forEach(o=>out.push({v:o.value,t:o.textContent,d:o.disabled||c.disabled}))}else if(c.tagName=='OPTION')out.push({v:c.value,t:c.textContent,d:c.disabled})});return out}
+function optList(s){const out=[];[...s.children].forEach(c=>{if(c.tagName=='OPTGROUP'){out.push({g:c.label});[...c.children].forEach(o=>out.push({v:o.value,t:o.textContent,d:o.disabled||c.disabled,f:o.dataset.font||'',w:o.dataset.w||''}))}else if(c.tagName=='OPTION')out.push({v:c.value,t:c.textContent,d:c.disabled,f:c.dataset.font||'',w:c.dataset.w||''})});return out}   // data-font: the item is written in that typeface (the font list)
+const ffOf=(f,w)=>f?`font-family:'${f.replace(/['"<>&]/g,'')}',Georgia,serif${w?';font-weight:'+(+w||400):''}`:''
 function mk(sel){if(sel._dd||SEL_SKIP(sel))return;
 const w=document.createElement('div');w.className='dd dd2';w.innerHTML='<button type="button" class="ddb"><span class="ddt"></span><em>▾</em></button><div class="ddl" hidden role="listbox"></div>';
 sel.after(w);sel.classList.add('ddsel');const b=w.firstChild,l=w.lastChild,t=b.firstChild;
 if(sel.getAttribute('aria-label'))b.setAttribute('aria-label',sel.getAttribute('aria-label'));
 let key='',hi=-1;
 const st={sel,w,b,l,sync(force){const k=sel.selectedIndex+'|'+sel.options.length+'|'+(sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].textContent:'')+'|'+sel.disabled+'|'+(sel.hidden?1:0);if(!force&&k===key)return;key=k;
- const o=sel.options[sel.selectedIndex];t.textContent=o?o.textContent:'';b.disabled=sel.disabled;w.hidden=sel.hidden;if(!l.hidden)fill()},
+ const o=sel.options[sel.selectedIndex];t.textContent=o?o.textContent:'';t.style.cssText=o&&o.dataset.font?ffOf(o.dataset.font,o.dataset.w):'';b.disabled=sel.disabled;w.hidden=sel.hidden;if(!l.hidden)fill()},
  fill};
-function fill(){const items=optList(sel),cv=sel.value;l.innerHTML=items.map((o,i)=>o.g!=null?`<div class="ddg">${esc(o.g)}</div>`:`<div class="ddi${o.v===cv?' cur':''}${o.d?' dis':''}" role="option" data-i="${i}" data-v="${esc(o.v).replace(/"/g,'&quot;')}">${esc(o.t)}</div>`).join('')}
+function fill(){const items=optList(sel),cv=sel.value;l.innerHTML=items.map((o,i)=>o.g!=null?`<div class="ddg">${esc(o.g)}</div>`:`<div class="ddi${o.v===cv?' cur':''}${o.d?' dis':''}" role="option" data-i="${i}" data-v="${esc(o.v).replace(/"/g,'&quot;')}"${o.f?` style="${ffOf(o.f,o.w)}"`:''}>${esc(o.t)}</div>`).join('')}
 function pick(v){desc.set.call(sel,v);key='';st.sync(true);close();sel.dispatchEvent(new Event('input',{bubbles:true}));sel.dispatchEvent(new Event('change',{bubbles:true}))}
 function close(){l.hidden=true;b.setAttribute('aria-expanded','false')}
 function open(){closeDD();if(typeof closeMenus=='function')closeMenus();fill();l.hidden=false;b.setAttribute('aria-expanded','true');placeFloat(l,b,false,320);const c=l.querySelector('.cur');if(c){l.scrollTop=c.offsetTop-(l.clientHeight-c.offsetHeight)/2;hi=+c.dataset.i}}
