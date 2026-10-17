@@ -69,12 +69,11 @@ test('the Before / Split control shows only while comparing', async ({ page }) =
   expect(errors).toEqual([]);
 });
 
-test('the colour tray is at the far right of the bar and the zoom sits just left of it', async ({ page }) => {
+test('the colour tray is at the far right of the bar; the Display tab and the zoom buttons are gone', async ({ page }) => {
   const { errors } = await openApp(page);
-  const r = await page.evaluate(() => { const g = id => document.getElementById(id).getBoundingClientRect(), bar = document.querySelector('.viewbar').getBoundingClientRect(), t = g('tyd'), z = g('zoomc'); return { barRight: bar.right, tRight: t.right, tLeft: t.left, zRight: z.right, tShown: t.width > 0 }; });
+  const r = await page.evaluate(() => { const g = id => document.getElementById(id).getBoundingClientRect(), bar = document.querySelector('.viewbar').getBoundingClientRect(), t = g('tyd'); return { barRight: bar.right, tRight: t.right, tShown: t.width > 0, ctl: document.getElementById('viewctl').getBoundingClientRect().width }; });
   expect(r.tShown, 'the tray is on screen').toBe(true);
   expect(r.barRight - r.tRight, 'tray reaches the bar padding at the right').toBeLessThanOrEqual(13);
-  expect(r.tLeft - r.zRight, 'zoom is left of the tray, with a small gap').toBeGreaterThanOrEqual(0);
-  expect(r.tLeft - r.zRight).toBeLessThanOrEqual(12);
+  expect(r.ctl, 'no Display tab or zoom buttons in the bar').toBe(0);
   expect(errors).toEqual([]);
 });

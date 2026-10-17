@@ -7,17 +7,17 @@ test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build');
 
 const size = page => page.evaluate(() => { const r = document.getElementById('ed').getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height) }; });
 
-test('zoom controls show in the Stamp editor; in grows the editor, Fit and Ctrl+0 bring it back; Ctrl + = and Ctrl + - work', async ({ page }) => {
+test('zoom (no bar buttons now; keys and commands) works in the Stamp editor; in grows the editor, Fit and Ctrl+0 bring it back; Ctrl + = and Ctrl + - work', async ({ page }) => {
   const { errors } = await openApp(page);
   await setMode(page, 'stamp');
-  await expect(page.locator('#zoomc')).toBeVisible();
+  await expect(page.locator('#zoomc')).toBeHidden();
   await expect(page.locator('#zl')).toHaveText('Fit');
   const fit = await size(page);
-  await page.click('#zi'); await page.click('#zi');
+  await page.locator('#zi').dispatchEvent('click'); await page.locator('#zi').dispatchEvent('click');
   await expect(page.locator('#zl')).toHaveText('156%');
   const big = await size(page);
   expect(big.w / fit.w).toBeGreaterThan(1.5);
-  await page.click('#zl');
+  await page.locator('#zl').dispatchEvent('click');
   await expect(page.locator('#zl')).toHaveText('Fit');
   expect(await size(page)).toEqual(fit);
   await page.keyboard.press('Control+=');
@@ -35,7 +35,7 @@ test('a motif can still be picked and Ctrl + wheel zooms under the pointer while
   await openProjectFile(page, path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok.json'));
   await setMode(page, 'stamp');
   await openPanel(page, 'mlist');
-  for (let i = 0; i < 3; i++) await page.click('#zi');
+  for (let i = 0; i < 3; i++) await page.locator('#zi').dispatchEvent('click');
   const pt = await motifPoint(page, { bottom: 20 });      // a point on a motif that is inside the visible part of the editor
   expect(pt, 'a motif is visible at this zoom').not.toBeNull();
   await page.mouse.click(pt.x, pt.y);

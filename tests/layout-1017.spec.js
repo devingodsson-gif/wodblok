@@ -21,12 +21,12 @@ test('the stamp tray collapses to a thin strip, gives the picture the room, and 
   expect(errors).toEqual([]);
 });
 
-test('a panel floated from the dock lands below the zoom controls, not on them', async ({ page }) => {
+test('a panel floated from the dock lands clear of the colour tray, not on it', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'canvas');
   await page.locator('.dock .wb[data-act="float"], .wg [data-act="float"]').first().click();
   await expect(page.locator('.wg.fl')).toBeVisible();
-  const r = await page.evaluate(() => { const f = document.querySelector('.wg.fl').getBoundingClientRect(), z = document.getElementById('zoomc').getBoundingClientRect(); return { fTop: f.top, zBottom: z.bottom, overlap: f.right > z.left && f.left < z.right && f.bottom > z.top && f.top < z.bottom }; });
+  const r = await page.evaluate(() => { const f = document.querySelector('.wg.fl').getBoundingClientRect(), z = document.getElementById('tyd').getBoundingClientRect(); return { fTop: f.top, zBottom: z.bottom, overlap: f.right > z.left && f.left < z.right && f.bottom > z.top && f.top < z.bottom }; });
   expect(r.overlap, 'the floated panel covers the zoom controls').toBe(false);
   expect(errors).toEqual([]);
 });

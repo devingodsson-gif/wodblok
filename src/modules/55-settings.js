@@ -60,12 +60,16 @@ const stD=()=>$('stgdlg'),stIsOpen=()=>!stD().hidden;
 let stPage='general',stKeyQ='',stOpener=null;
 const stTgl=(id,on,label)=>`<div class="stgr"><span>${label}</span><button type="button" class="pvc" id="${id}" aria-pressed="${on}" aria-label="${label}">${on?'On':'Off'}</button></div>`;
 const stSegH=(id,label,opts,cur)=>`<div class="stgr"><span>${label}</span><div class="seg" id="${id}" role="group" aria-label="${label}" style="--n:${opts.length}">${opts.map(([v,t])=>`<button type="button" data-v="${v}" class="${String(v)===String(cur)?'on':''}" aria-pressed="${String(v)===String(cur)}">${t}</button>`).join('')}</div></div>`;
+// The four view-only toggles (formerly the Display menu). Each one drives the existing hidden button, so the state, keys and commands stay shared.
+const stVIEW=[['stgti','gti','Stamp texture'],['stgtx','gtx','Canvas texture'],['stgtm','gtm','Grading masks'],['stgdt','gdt','Stage dots']];
+const stViewOn=id=>$(id)?.getAttribute('aria-pressed')==='true';
+const stViewToggles=()=>stVIEW.map(([sid,bid,t])=>stTgl(sid,stViewOn(bid),t)).join('');
 const stThemeNow=()=>document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
 const stDotsNow=()=>!document.body.classList.contains('plain');
 function stAccentRow(){const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur);
  return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div></div>`}
 function stPageHtml(p){
- if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stTgl('stgdt',stDotsNow(),'Stage dots')+stAccentRow();
+ if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stViewToggles()+stAccentRow();
  if(p=='colour')return`<div class="ctl stgr"><label for="stgtv">Places shown</label><input type="range" id="stgtv" min="7" max="${TRAY_MAX}" step="1" value="${stNumGet(stK_TRAY,7,7,TRAY_MAX)}"><output id="stgtvo">${stNumGet(stK_TRAY,7,7,TRAY_MAX)}</output></div><div class="stgr"><span>Recent colours</span><button type="button" class="alt" id="stgrc">Clear</button></div>`;
  if(p=='speed')return stTgl('stgdr',stFlag(stK_DRAFT,true),'Draft while dragging')+stTgl('stgca',stFlag(stK_CALM,false),'Reduce motion');
  if(p=='files')return stSegH('stgas','Autosave every',stSAVE_EVERY,stNumGet(stK_SAVE,8,8,120))+`<div class="stgr"><span>Storage</span><b id="stguse">…</b></div><div class="stgr"><span>Keep my data</span><button type="button" class="pvc" id="stgkp" aria-pressed="false" aria-label="Keep my data">…</button></div>`;
@@ -87,7 +91,7 @@ function stWire(){const b=$('stgbody');
  const seg=(id,fn)=>{const g=$(id);if(g)g.addEventListener('click',e=>{const x=e.target.closest('[data-v]');if(!x)return;fn(x.dataset.v);g.querySelectorAll('[data-v]').forEach(y=>{y.classList.toggle('on',y===x);y.setAttribute('aria-pressed',String(y===x))})})};
  const flip=(id,k,fn)=>on(id,()=>{const e=$(id),v=e.getAttribute('aria-pressed')!=='true';e.setAttribute('aria-pressed',String(v));e.textContent=v?'On':'Off';stFlagSet(k,v);fn(v)});
  seg('stgth',v=>{if(stThemeNow()!==v)$('thm').click()});
- on('stgdt',()=>{const e=$('stgdt'),want=e.getAttribute('aria-pressed')!=='true';if(stDotsNow()!==want)$('gdt').click();const v=stDotsNow();e.setAttribute('aria-pressed',String(v));e.textContent=v?'On':'Off'});
+ stVIEW.forEach(([sid,bid])=>on(sid,()=>{$(bid).click();const v=stViewOn(bid),e=$(sid);e.setAttribute('aria-pressed',String(v));e.textContent=v?'On':'Off'}));
  const g=$('stgacc');if(g)g.addEventListener('click',e=>{const x=e.target.closest('.stgab');if(!x)return;
   if(x.dataset.custom){const cur=stAccentGet()||'#b8914f';openPicker(x,{value:cur,alpha:false,onInput:h=>{const v=String(h).slice(0,7).toLowerCase();if(stHEX6.test(v)){stAccentSet(v);stAccentMarks()}},onClose:()=>stAccentMarks()});return}
   closePicker();stAccentSet(x.dataset.h);stAccentMarks()});

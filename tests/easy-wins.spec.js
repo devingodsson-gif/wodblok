@@ -26,12 +26,20 @@ test('every starting Look has a picture, made from its own settings', async ({ p
   expect(errors).toEqual([]);
 });
 
-test('the Display menu has a heading and a check mark on what is switched on', async ({ page }) => {
+test('the four view toggles live in Settings (General) and the Display tab is gone', async ({ page }) => {
   const { errors } = await openApp(page);
-  await page.click('#itbb');
-  await expect(page.locator('#itb .itbh')).toHaveText('Show while editing');
-  const on = await page.evaluate(() => [...document.querySelectorAll('#itb button')].map(b => [b.id, b.getAttribute('aria-pressed'), getComputedStyle(b, '::before').content]));
-  for (const [id, pressed, content] of on) expect(content, id).toBe(pressed === 'true' ? '"✓"' : '""');
+  await expect(page.locator('#itbb')).toHaveCount(0);
+  await page.evaluate(() => document.getElementById('stgo').click());
+  await expect(page.locator('#stgdlg')).toBeVisible();
+  await page.click('#stgnav [data-p="general"]');
+  for (const [sid, bid] of [['stgti', 'gti'], ['stgtx', 'gtx'], ['stgtm', 'gtm'], ['stgdt', 'gdt']]) {
+    const want = await page.evaluate(b => document.getElementById(b).getAttribute('aria-pressed'), bid);
+    await expect(page.locator('#' + sid), sid).toHaveAttribute('aria-pressed', want);
+    await page.click('#' + sid);
+    const now = await page.evaluate(b => document.getElementById(b).getAttribute('aria-pressed'), bid);
+    expect(now, bid + ' follows').not.toBe(want);
+    await expect(page.locator('#' + sid)).toHaveAttribute('aria-pressed', now);
+  }
   expect(errors).toEqual([]);
 });
 
