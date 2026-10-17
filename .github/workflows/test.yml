@@ -38,8 +38,10 @@ jobs:
               - 'tsconfig.json'
             site:
               - 'site/**'
-              - 'functions/api/waitlist.js'
+              - 'functions/**'
+              - 'server/**'
               - 'tests/site-*.mjs'
+              - 'tests/site-account.spec.js'
               - '.github/workflows/test.yml'
   site:
     name: site
@@ -49,6 +51,10 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      # the account tests use Node's built-in SQLite (Node 22 or newer)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - run: npm run test:site
       - run: node --test tests/site-marketing-page.test.mjs
   # The Chromium suite is split in four parts that run at the same time (Playwright --shard, by test file). Each part rebuilds the app, which is quick.
