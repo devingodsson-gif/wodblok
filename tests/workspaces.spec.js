@@ -8,36 +8,29 @@ test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build');
 const groups = page => page.evaluate(() => [...document.querySelectorAll('.wg')].map(g => [...g.querySelectorAll('.wtab')].map(t => t.dataset.t)));
 const row = (page, name) => page.locator('#wxl .wxr', { hasText: name });
 
-test('the starting workspaces set exactly their own arrangement (at most two groups) and the Workspaces tool closes', async ({ page }) => {
+test('Default is the only starting workspace; choosing it sets exactly its arrangement and the Workspaces tool closes', async ({ page }) => {
   const { errors } = await openApp(page, { workspaces: true });
   await openPanel(page, 'wspc');
-  await expect(row(page, 'Colour work')).toBeVisible();
-  await expect(page.locator('#wxl .wxf', { hasText: 'Starting points' })).toHaveCount(0);   // they are yours now: change or delete any of them
-  await row(page, 'Colour work').click();
-  await expect(page.locator('#pmsg')).toContainText('Colour work');
-  const g = await groups(page);
-  expect(g).toEqual([['colors', 'grade', 'tex'], ['rand']]);                  // the colour tools together, Randomize on its own, and the list has closed
-  expect(g.length).toBeLessThanOrEqual(2);
-  await openPanel(page, 'wspc');
-  await row(page, 'Layout work').click();
-  expect((await groups(page)).length).toBeLessThanOrEqual(2);
-  await openPanel(page, 'wspc');
-  await row(page, 'Everything closed').click();
-  expect(await groups(page)).toEqual([]);
+  await expect(row(page, 'Default')).toBeVisible();
+  await expect(page.locator('#wxl .wxr')).toHaveCount(1);                       // no other starting workspaces
+  await expect(page.locator('#wxl .wxf', { hasText: 'Starting points' })).toHaveCount(0);
+  await row(page, 'Default').click();
+  expect((await groups(page)).map(g => g.join()).sort()).toEqual(['canvas,colors', 'lyrs,layers']);   // and the list has closed
   expect(errors).toEqual([]);
 });
 
 test('save the current arrangement, set it again, rename it, keep it after a reload, delete it', async ({ page }) => {
   const { errors } = await openApp(page, { workspaces: true });
+  await openPanel(page, 'hist');                                                  // Default is open; add the History tool to it
   await openPanel(page, 'wspc');
   const mine = (await groups(page)).flat().filter(t => t != 'wspc').sort();
-  expect(mine).toEqual(['canvas', 'colors', 'layers', 'lyrs']);                  // the Default workspace is open
+  expect(mine).toEqual(['canvas', 'colors', 'hist', 'layers', 'lyrs']);
   await page.fill('#wxn', 'Mine');
   await page.click('#wxsave');
   await expect(row(page, 'Mine')).toBeVisible();
   await expect(page.locator('#wxl .wxf').first()).toContainText('Yours');
-  await row(page, 'Everything closed').click();
-  expect((await groups(page)).flat()).toEqual([]);
+  await row(page, 'Default').click();
+  expect((await groups(page)).flat().sort()).toEqual(['canvas', 'colors', 'layers', 'lyrs']);
   await openPanel(page, 'wspc');
   await row(page, 'Mine').click();
   expect((await groups(page)).flat().sort()).toEqual(mine);
@@ -51,7 +44,7 @@ test('save the current arrangement, set it again, rename it, keep it after a rel
   // it is kept with the settings: still there after a reload (the app starts with no tools open)
   await page.reload();
   await page.waitForFunction(() => window.__wbTest);
-  expect((await groups(page)).flat().sort()).toEqual(mine);                      // Default opens again
+  expect((await groups(page)).flat().sort()).toEqual(['canvas', 'colors', 'layers', 'lyrs']);   // Default opens again
   await openPanel(page, 'wspc');
   await expect(row(page, 'Mine two')).toBeVisible();
   await row(page, 'Mine two').locator('[data-act="del"]').click();
@@ -63,12 +56,11 @@ test('the Stamp editor has its own arrangement in each workspace', async ({ page
   const { errors } = await openApp(page, { workspaces: true });
   await setMode(page, 'stamp');
   await openPanel(page, 'wspc');
-  await row(page, 'Layout work').click();
-  const g = await groups(page);
-  expect(g.flat()).toEqual(expect.arrayContaining(['motifs', 'mlist', 'stamp', 'grid']));
+  await row(page, 'Default').click();
+  expect((await groups(page)).flat()).toEqual(expect.arrayContaining(['stamp', 'colors', 'text', 'mlist', 'motifs', 'sedit']));
   await setMode(page, 'pattern');
-  // the Pattern view keeps what it had: Layout work sets it as well, in the same click
-  expect((await groups(page)).flat()).toEqual(expect.arrayContaining(['lyrs', 'layers', 'canvas', 'pgrid']));
+  // the Pattern view has its own half of the same workspace, set in the same click
+  expect((await groups(page)).flat()).toEqual(expect.arrayContaining(['canvas', 'colors', 'lyrs', 'layers']));
   expect(errors).toEqual([]);
 });
 
@@ -143,13 +135,48 @@ test('Default can be replaced, then deleted: the first workspace opens, and with
   await page.reload(); await page.waitForFunction(() => window.__wbTest);
   expect((await groups(page)).flat()).toContain('hist');            // the replaced Default opens
   await openPanel(page, 'wspc');
+  await page.fill('#wxn', 'Alpha');
+  await page.click('#wxsave');
   await row(page, 'Default').locator('[data-act="del"]').click();
   await page.reload(); await page.waitForFunction(() => window.__wbTest);
-  // the first workspace left in the list opens (Colour work)
-  expect(await groups(page)).toEqual([['colors', 'grade', 'tex'], ['rand']]);
+  expect((await groups(page)).flat()).toContain('hist');            // Alpha, the first one left, opens (it kept the History tool)
   await openPanel(page, 'wspc');
-  for (const n of ['Colour work', 'Layout work', 'Everything closed']) await row(page, n).locator('[data-act="del"]').click();
+  await row(page, 'Alpha').locator('[data-act="del"]').click();
   await page.reload(); await page.waitForFunction(() => window.__wbTest);
   expect(await groups(page)).toEqual([]);                           // no workspaces: no tool window opens
+  expect(errors).toEqual([]);
+});
+
+test('Restore defaults brings Default back, or puts a changed Default back as it was', async ({ page }) => {
+  const { errors } = await openApp(page, { workspaces: true });
+  await openPanel(page, 'wspc');
+  await row(page, 'Default').locator('[data-act="del"]').click();
+  await expect(row(page, 'Default')).toHaveCount(0);
+  await page.click('#wxrst');
+  await expect(row(page, 'Default')).toBeVisible();
+  await expect(page.locator('#pmsg')).toContainText('Restored the Default workspace');
+  await page.fill('#wxn', 'Default');                               // change it, then restore again
+  await page.click('#wxsave');
+  await page.click('#wxrst');
+  await expect(page.locator('#wxl .wxr')).toHaveCount(1);           // still one Default, not two
+  await row(page, 'Default').click();
+  expect((await groups(page)).map(g => g.join()).sort()).toEqual(['canvas,colors', 'lyrs,layers']);
+  expect(errors).toEqual([]);
+});
+
+test('the older starting workspaces are removed once, unless you changed them', async ({ page }) => {
+  const g = (tabs) => ({ tabs, a: tabs[0] });
+  const old = [
+    { id: 'a1', name: 'Colour work', f: '', layout: { pattern: { dock: [g(['colors', 'grade', 'tex']), g(['rand'])], float: [] }, stamp: { dock: [g(['stamp', 'colors', 'grade', 'tex'])], float: [] } } },
+    { id: 'a2', name: 'Layout work', f: '', layout: { pattern: { dock: [g(['lyrs'])], float: [] }, stamp: { dock: [], float: [] } } },   // changed by the person: kept
+    { id: 'a3', name: 'Everything closed', f: '', layout: { pattern: { dock: [], float: [] }, stamp: { dock: [], float: [] } } },
+  ];
+  await page.addInitScript(o => { if (!sessionStorage.getItem('t_mig')) { sessionStorage.setItem('t_mig', '1'); localStorage.setItem('wb96_workspaces', JSON.stringify(o)); localStorage.setItem('wb96_ws_seeded', '1'); } }, old);
+  const { errors } = await openApp(page, { workspaces: true });
+  await openPanel(page, 'wspc');
+  await expect(row(page, 'Default')).toBeVisible();
+  await expect(row(page, 'Layout work')).toBeVisible();
+  await expect(row(page, 'Colour work')).toHaveCount(0);
+  await expect(row(page, 'Everything closed')).toHaveCount(0);
   expect(errors).toEqual([]);
 });

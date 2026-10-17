@@ -24,7 +24,7 @@ const FIXED_TIME = Date.UTC(2026, 9, 8, 12, 0, 0);   // 2026-10-08 12:00:00 UTC,
 function initScript({ seed, runtime, workspaces }) {
   return `(() => {
     // Tests start with no workspaces saved (so no tool window opens at launch) unless a test asks for the starting ones.
-    try { if (!${!!workspaces} && !sessionStorage.getItem('wb_t_ws')) { localStorage.setItem('wb96_workspaces', '[]'); localStorage.setItem('wb96_ws_seeded', '1'); sessionStorage.setItem('wb_t_ws', '1'); } } catch (e) {}
+    try { if (!${!!workspaces} && !sessionStorage.getItem('wb_t_ws')) { localStorage.setItem('wb96_workspaces', '[]'); localStorage.setItem('wb96_ws_seeded', '2'); sessionStorage.setItem('wb_t_ws', '1'); } } catch (e) {}
     let a = ${seed >>> 0};
     Math.random = function () {              // mulberry32
       a |= 0; a = (a + 0x6D2B79F5) | 0;

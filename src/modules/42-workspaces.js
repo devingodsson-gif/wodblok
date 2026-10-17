@@ -10,12 +10,13 @@ import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 // Export writes a workspace, a folder or the whole library to a file; Import adds a file's workspaces and folders to yours.
 const WX_KEY='wb96_workspaces';
 const wxG=(tabs,o={})=>({tabs,a:tabs[0],...o});
-// The starting workspaces. They are copied into Yours the first time (see wxSeed), so each one can be changed, replaced or deleted like your own.
-// Default is the one the app opens at launch.
-const WX_SEED=[
-  {name:'Default',layout:{
+// The starting workspace is Default; it opens at launch. It is copied into Yours the first time (see wxSeed), so it can be changed,
+// replaced or deleted like your own, and "Restore defaults" puts the original back. WX_OLD are the three starting workspaces of 1.21 and 1.22:
+// they are taken out again, unless you changed them.
+const WX_DEFAULT={name:'Default',layout:{
     pattern:{dock:[wxG(['canvas','colors'],{e:'l'}),wxG(['lyrs','layers'],{e:'r'})],float:[]},
-    stamp:{dock:[wxG(['stamp','colors','text','mlist'],{e:'l'}),wxG(['motifs'],{e:'r'}),wxG(['sedit'],{e:'b'})],float:[]}}},
+    stamp:{dock:[wxG(['stamp','colors','text','mlist'],{e:'l'}),wxG(['motifs'],{e:'r'}),wxG(['sedit'],{e:'b'})],float:[]}}};
+const WX_OLD=[
   {name:'Colour work',layout:{pattern:{dock:[wxG(['colors','grade','tex']),wxG(['rand'])],float:[]},stamp:{dock:[wxG(['stamp','colors','grade','tex'])],float:[]}}},
   {name:'Layout work',layout:{pattern:{dock:[wxG(['lyrs']),wxG(['layers','canvas','pgrid'])],float:[]},stamp:{dock:[wxG(['motifs','mlist']),wxG(['stamp','grid'])],float:[]}}},
   {name:'Everything closed',layout:{pattern:{dock:[],float:[]},stamp:{dock:[],float:[]}}},
@@ -27,10 +28,13 @@ const wxFOLDER=wxIC('<path d="M3.5 7.5V18a1.5 1.5 0 0 0 1.5 1.5h14a1.5 1.5 0 0 0
 const wxHOME=wxIC('<path d="M4 11l8-6.5 8 6.5M6 9.5V19h12V9.5"/>'),wxCHEV='<svg class="lfa" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l6 6-6 6"/></svg>';
 const wxMORE='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>',wxTRASH=wxIC('<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>');
 const wxLoad=()=>{try{const a=JSON.parse(kv.get(WX_KEY)||'[]');return Array.isArray(a)?a.filter(w=>w&&typeof w.id=='string'&&typeof w.name=='string'&&w.layout).map(w=>({...w,f:typeof w.f=='string'?w.f:''})):[]}catch(e){return[]}};
-// first run: the starting workspaces become yours (a workspace you already named the same is kept as it is)
-function wxSeed(){let done=false;try{done=kv.get(WX_SEEDED)==='1'}catch(e){}if(done)return;
-  const a=wxLoad(),add=WX_SEED.filter(x=>!a.some(w=>w.name.toLowerCase()==x.name.toLowerCase())).map(x=>({id:newId(),name:x.name,f:'',layout:JSON.parse(JSON.stringify(x.layout))}));
-  try{kv.set(WX_KEY,JSON.stringify([...add,...a]));kv.set(WX_SEEDED,'1')}catch(e){}}
+// first run: Default becomes yours (a workspace you already named Default is kept as it is). Version 2 also removes the old starting
+// workspaces that were never changed.
+function wxSeed(){let v='';try{v=kv.get(WX_SEEDED)||''}catch(e){}if(v==='2')return;
+  let a=wxLoad();
+  if(v==='1')a=a.filter(w=>!WX_OLD.some(o=>o.name==w.name&&JSON.stringify(o.layout)==JSON.stringify(w.layout)));
+  if(!a.some(w=>w.name.toLowerCase()=='default'))a.unshift({id:newId(),name:WX_DEFAULT.name,f:'',layout:JSON.parse(JSON.stringify(WX_DEFAULT.layout))});
+  try{kv.set(WX_KEY,JSON.stringify(a));kv.set(WX_SEEDED,'2')}catch(e){}}
 // the workspace the app opens with: the one called Default (in Yours first), else the first one in the list; none, nothing opens
 function wxLaunchPick(){const a=wxLoad(),d=a.filter(w=>w.name.toLowerCase()=='default');return d.find(w=>!w.f)||d[0]||a[0]||null}
 const wxStore=a=>{try{kv.set(WX_KEY,JSON.stringify(a))}catch(e){pmsg('Could not keep the workspaces in this browser.')}};
@@ -90,6 +94,9 @@ function init42(){
     const a=wxLoad();let n=0;r.items.forEach(x=>{let name=x.name,k=2;while(a.some(w=>w.f===x.f&&w.name.toLowerCase()==name.toLowerCase()))name=x.name.slice(0,36)+' '+(k++);a.push({id:newId(),name,f:x.f,layout:x.layout});n++});
     wxStore(a);r.f.forEach(p=>{if(!UI.d.f.includes(p))UI.d.f.push(p)});save();paint(true);pmsg('Added '+n+' workspace'+(n==1?'':'s')+' from “'+fname+'”.')}
   $('wxfile').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(f.size>5e6)return pmsg('That file is too big to be a workspace file.');try{importText(await f.text(),f.name)}catch(err){pmsg('Could not read that file.')}});
+  $('wxrst').onclick=()=>{const a=wxLoad(),d=a.find(w=>w.f===''&&w.name.toLowerCase()=='default');const lay=JSON.parse(JSON.stringify(WX_DEFAULT.layout));
+    if(d){d.layout=lay;d.name=WX_DEFAULT.name}else a.unshift({id:newId(),name:WX_DEFAULT.name,f:'',layout:lay});
+    wxStore(a);setOpen('',true);save();paint(true);pmsg('Restored the Default workspace.')};
   $('wximp').onclick=()=>$('wxfile').click();$('wxexp').onclick=exportAll;
   // ---- the tree
   const folderMenu=(btn,p)=>rowMenu(btn,[['New folder inside',()=>{setOpen(p,true);UI.d.a=p;save();UI.form={t:'new',p,v:''};paint(true)}],['Rename',()=>{UI.form={t:'ren',p,v:wxLeaf(p)};paint(true)}],['Export…',()=>exportFolder(p)],['Delete folder',()=>{UI.form={t:'del',p};paint(true)}]]);
