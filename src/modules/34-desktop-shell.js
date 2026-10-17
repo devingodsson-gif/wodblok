@@ -7,7 +7,7 @@ import {trayIn} from './50-tray-core.js';
 import {selOne,store} from './06-motif-library-folders.js';
 import {nr,symOf,tbSync} from './07-symmetry.js';
 import {gModel,gShOk} from './08-grid-shapes.js';
-import {gDim,grid,saveGrid,snapPt} from './09-stamp-editor-grid-and-motif-ops.js';
+import {gDim,grid,saveGrid,snapPt,snapSize} from './09-stamp-editor-grid-and-motif-ops.js';
 import {fitTs,migLayers} from './10-layer-grids.js';
 import {Q,drag,upd} from './11-pressure-flooding-block-edges.js';
 import {QS,doSplit,selSet} from './12-selection-and-split.js';
@@ -29,7 +29,7 @@ let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'ca
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Shapes',mlist:'Shape list',sedit:'Shape editor',preview:'Pattern preview',grid:'Stamp grid',layers:'Layout',pgrid:'Guides',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
+const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Shapes',mlist:'Shape list',sedit:'Shape editor',preview:'Pattern preview',grid:'Grid',layers:'Layout',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
 const MODEP={pattern:['lyrs','layers','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec','pres','vars'],stamp:['wspc','pres','motifs','text','mlist','sedit','preview','grid','stamp','colors','cways','grade','tex','rand','hist','slib']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
@@ -443,18 +443,21 @@ document.addEventListener('dblclick',e=>{const r=rowRange(e.target);if(r&&resetR
 let lastTap={r:null,t:0};document.addEventListener('pointerup',e=>{if(e.pointerType!='touch')return;const r=rowRange(e.target);if(!r)return;const now=Date.now();if(lastTap.r===r&&now-lastTap.t<320){resetRange(r);lastTap={r:null,t:0}}else lastTap={r,t:now}});
 const rs=document.createElement('style');rs.textContent='.ctl.rst{animation:rstf .5s ease-out}@keyframes rstf{0%{background:var(--acc-soft)}100%{background:transparent}}.ctl{border-radius:var(--r-m)}.ctl label{cursor:default}';document.head.appendChild(rs);
 const tipRows=()=>document.querySelectorAll('.ctl').forEach(row=>{const r=row.querySelector('input[type=range]');if(r&&!row.title)row.title='Double-click to reset'});
-function syncGrid(){$('gtg').classList.toggle('on',grid.on);$('gtg').setAttribute('aria-pressed',String(grid.on));$('gon').checked=grid.on;$('gn').value=grid.n;$('gsp').value=grid.sp;$('gsd').checked=grid.sd;document.querySelectorAll('#gsh [data-sh]').forEach(b=>b.classList.toggle('on',b.dataset.sh==(grid.sh||'rect')));const[n,m0]=gDim(),m=grid.sh&&grid.sh!='rect'?gModel(grid.sh,SW,SH,n,true).m:m0;$('gdim').textContent=`${n} × ${m}`;paint($('gn'))}
+function syncGrid(){$('gtg').classList.toggle('on',grid.on);$('gtg').setAttribute('aria-pressed',String(grid.on));$('gon').checked=grid.on;$('gsd').checked=grid.sd;$('gss').checked=!!grid.ss;if(+$('gn').value!=grid.n)$('gn').value=grid.n;if(+$('gop').value!=(grid.op||70)){$('gop').value=grid.op||70;paint($('gop'))}document.querySelectorAll('#gsp [data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g==grid.sp));document.querySelectorAll('#gsh [data-sh]').forEach(b=>b.classList.toggle('on',b.dataset.sh==(grid.sh||'rect')));const[n,m0]=gDim(),m=grid.sh&&grid.sh!='rect'?gModel(grid.sh,SW,SH,n,true).m:m0;$('gdim').textContent=`${n} × ${m}`;paint($('gn'));$('gq').disabled=!WBS.tiles[WBS.cur].items.length}
 $('gsh').onclick=e=>{const b=e.target.closest('[data-sh]');if(!b)return;grid.sh=gShOk(b.dataset.sh);grid.on=true;saveGrid();upd()};
 $('gon').addEventListener('input',()=>{grid.on=$('gon').checked;saveGrid();upd()});
-$('gn').addEventListener('input',()=>{grid.n=+$('gn').value;if(!grid.on){grid.on=true}saveGrid();upd()});
-$('gsp').addEventListener('input',()=>{grid.sp=$('gsp').value;saveGrid();upd()});
+$('gn').addEventListener('input',()=>{grid.n=+$('gn').value;grid.on=true;saveGrid();upd()});
+$('gsp').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;grid.sp=b.dataset.g=='c'||b.dataset.g=='b'?b.dataset.g:'l';grid.on=true;saveGrid();upd()};
 $('gsd').addEventListener('input',()=>{grid.sd=$('gsd').checked;if(grid.sd)grid.on=true;saveGrid();upd()});
-$('gq').onclick=()=>{const t=WBS.tiles[WBS.cur];if(!t.items.length)return;let moved=0;t.items.forEach(q=>{const[x,y]=snapPt(q.x,q.y);if(Math.abs(x-q.x)>.01||Math.abs(y-q.y)>.01)moved++;q.x=x;q.y=y});grid.on=true;saveGrid();store();upd();$('pmsg').textContent=moved?`Snapped ${moved} shape${moved>1?'s':''} to the grid.`:'Every shape is already on the grid.'};
+$('gss').addEventListener('input',()=>{grid.ss=$('gss').checked;if(grid.ss){grid.sd=true;grid.on=true}saveGrid();upd()});
+$('gop').addEventListener('input',()=>{grid.op=+$('gop').value;saveGrid();upd()});
+$('gr').onclick=()=>{const k={on:grid.on,sd:grid.sd,ss:grid.ss};Object.assign(grid,{n:6,sp:'c',op:70,sh:'rect'},k);saveGrid();upd()};
+$('gq').onclick=()=>{const t=WBS.tiles[WBS.cur];if(!t.items.length)return;let moved=0;t.items.forEach(q=>{const[x,y]=snapPt(q.x,q.y);let ch=Math.abs(x-q.x)>.01||Math.abs(y-q.y)>.01;q.x=x;q.y=y;if(grid.ss){const s=snapSize(q,q.s);if(s!==q.s){q.s=s;ch=true}}if(ch)moved++});grid.on=true;saveGrid();store();upd();$('pmsg').textContent=moved?`Snapped ${moved} shape${moved>1?'s':''} to the grid.`:'Every shape is already on the grid.'};
 $('gtg').onclick=()=>{grid.on=!grid.on;saveGrid();upd()};$('gtq').onclick=()=>$('gq').click();
 $('gti').onclick=()=>{WBS.edInk=!WBS.edInk;tbSync();upd()};
 $('gtx').onclick=()=>{WBS.edTx=!WBS.edTx;tbSync();upd()};
 $('gtm').onclick=()=>{WBS.edMk=!WBS.edMk;$('gtm').classList.toggle('on',WBS.edMk);$('gtm').setAttribute('aria-pressed',String(WBS.edMk));upd()};
-document.addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input,select,textarea'))return;if(!e.metaKey&&!e.ctrlKey&&e.key.toLowerCase()=='g'){grid.on=!grid.on;saveGrid();upd()}});
+document.addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input,select,textarea'))return;if(!e.metaKey&&!e.ctrlKey&&e.key.toLowerCase()=='g'){if($('boardS').hidden){WBS.pgrid.show=!WBS.pgrid.show;upd();if(WBX.wbCap)WBX.wbCap()}else{grid.on=!grid.on;saveGrid();upd()}}});
 const _draw2=WBH.draw;WBH.draw=function(){_draw2();syncGrid()};
 // ---- randomize motifs on the current stamp
 try{const z=JSON.parse(kv.get('wb36_rz')||'null');if(z){$('rzp').value=z.p;$('rzr').value=z.r;$('rzs').value=z.s}}catch(e){}

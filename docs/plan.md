@@ -124,3 +124,9 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - Several selected items move as one group. On a book cover the area is the region the selection sits in (back cover, spine or front cover), inside the safe area; on a canvas or repeat tile it is the whole canvas.
 - Each press is one undo step. Every button is a command (Align: ...) in command search; no default shortcut keys yet.
 - Not done yet: Position X/Y (planned for this release in the plan doc) moves to 1.29.0 with the Grid work.
+
+## 1.29.0 Grid
+- One Grid tool, the same in Pattern mode and in the Stamp editor: same name, icon and controls (Show grid, Snap to grid, Shape, Cells across, Snap points: Crossings / Centres / Both, Snap size to whole cells, Line strength, Snap all to grid, Reset grid). G shows or hides the grid in either mode.
+- Snapping is chosen only in the Grid tool and applies to every Free place, Pictures and Text layer (placing, dragging, arrow keys, Alt skips it). The per-layer snap boxes are gone from Layout.
+- Older projects that chose snapping per layer open with Snap to grid on (read from the layers until the switch is first touched; opening changes nothing in the file). New optional fields in the pattern grid: snap, ss. Stamp grid gains ss and op in its saved settings.
+- "Guides" (Pattern) and "Stamp grid" (Stamp editor) are renamed Grid.
