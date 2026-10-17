@@ -47,7 +47,7 @@ function init41(){
   // on document (not the board) so a middle-button drag that starts on the round + of an empty canvas pans too
   document.addEventListener('pointerdown',e=>{
     if(!(e.button==1||(e.button==0&&(hand||space))))return;
-    if(!(board.contains(e.target)||(e.target.closest&&e.target.closest('#empc'))))return;
+    if(!board.contains(e.target))return;
     e.preventDefault();e.stopPropagation();board.setPointerCapture(e.pointerId);
     pan={x:e.clientX,y:e.clientY,l:board.scrollLeft,t:board.scrollTop,id:e.pointerId};document.body.classList.add('panning');
   },true);
