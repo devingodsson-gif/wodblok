@@ -8,12 +8,14 @@ const SITE = path.join(__dirname, '..', 'site');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.json': 'application/json', '.xml': 'application/xml', '.txt': 'text/plain' };
 const KEY = 'pk_test_' + Buffer.from('clerk.wodblok.test$').toString('base64');
 
-async function open(page, { key = KEY, user = null, me = { ok: true, approved: true }, query = '', gate = { ok: true, approved: true } } = {}) {
+async function open(page, { clerk = 'ok', key = KEY, user = null, me = { ok: true, approved: true }, query = '', gate = { ok: true, approved: true } } = {}) {
   const gateCalls = [];
   page.gateCalls = gateCalls;
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());
     if (url.host === 'clerk.wodblok.test') {
+      if (clerk === 'fail') return route.abort();
+      if (clerk === 'slow') await new Promise((r) => setTimeout(r, 1500));
       const body = `window.Clerk = { user: ${JSON.stringify(user)}, calls: [], listeners: [],
         async load() {}, addListener(fn) { this.listeners.push(fn); },
         openSignIn() { this.calls.push('signin'); }, openSignUp() { this.calls.push('signup'); },
@@ -62,7 +64,7 @@ test('the app sends signed-out visitors here with ?signin=1: the dialog opens on
 
 test('signed in and approved: "Hi <name>" with a menu that opens the app, account and sign out', async ({ page }) => {
   await open(page, { user: { firstName: 'Ana' }, me: { ok: true, approved: true } });
-  const hi = nav(page).getByRole('button', { name: 'Hi Ana' });
+  const hi = nav(page).getByRole('button', { name: 'Hi Ana!', exact: true });
   await expect(hi).toBeVisible();
   await expect(nav(page).getByRole('button', { name: 'Sign in' })).toHaveCount(0);
   await hi.click();
@@ -79,14 +81,14 @@ test('signed in and approved: "Hi <name>" with a menu that opens the app, accoun
 
 test('signed in but not approved: the menu says they are on the list and has no link into the app', async ({ page }) => {
   await open(page, { user: { firstName: 'Bo' }, me: { ok: true, approved: false } });
-  await nav(page).getByRole('button', { name: 'Hi Bo' }).click();
+  await nav(page).getByRole('button', { name: 'Hi Bo!', exact: true }).click();
   await expect(page.getByText('On the list')).toBeVisible();
   await expect(page.getByRole('menuitem', { name: 'Open Wodblok' })).toBeHidden();
 });
 
 test('the menu closes with Escape and when clicking elsewhere', async ({ page }) => {
   await open(page, { user: { firstName: 'Ana' } });
-  const hi = nav(page).getByRole('button', { name: 'Hi Ana' });
+  const hi = nav(page).getByRole('button', { name: 'Hi Ana!', exact: true });
   await hi.click();
   await expect(hi).toHaveAttribute('aria-expanded', 'true');
   await page.keyboard.press('Escape');
@@ -98,14 +100,14 @@ test('the menu closes with Escape and when clicking elsewhere', async ({ page })
 
 test('a first name with markup is shown as text', async ({ page }) => {
   await open(page, { user: { firstName: '<img src=x onerror=window.__x=1>' } });
-  await expect(nav(page).locator('button.btn-secondary')).toHaveText('Hi <img src=x onerror=window.__x=1>');
+  await expect(nav(page).locator('button.btn-secondary')).toHaveText('Hi <img src=x onerror=window.__x=1>!');
   expect(await page.evaluate(() => window.__x)).toBeUndefined();
 });
 
 test('header fits a phone screen without sideways scrolling', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 700 });
   await open(page, { user: { firstName: 'Ana' } });
-  await nav(page).getByRole('button', { name: 'Hi Ana' }).click();
+  await nav(page).getByRole('button', { name: 'Hi Ana!', exact: true }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
@@ -124,4 +126,16 @@ test('signed in but not approved: no bounce back to the app', async ({ page }) =
 test('sent here by the app while signed in and approved: goes straight back, once', async ({ page }) => {
   await open(page, { user: { firstName: 'Ana' }, query: '?signin=1' });
   await page.waitForURL(/^https:\/\/app\.wodblok\.com\/?$/);
+});
+
+test('the plain "Open Wodblok" button never flashes: hidden while Clerk loads, replaced by the real header', async ({ page }) => {
+  await open(page, { clerk: 'slow', user: { firstName: 'Ana' } });
+  await expect(page.locator('#open-app')).toBeHidden(); // Clerk has not answered yet
+  await expect(nav(page).getByRole('button', { name: 'Hi Ana!', exact: true })).toBeVisible();
+  await expect(page.locator('#open-app')).toBeHidden();
+});
+
+test('if Clerk cannot load, the plain "Open Wodblok" button comes back', async ({ page }) => {
+  await open(page, { clerk: 'fail' });
+  await expect(page.locator('#open-app')).toBeVisible();
 });
