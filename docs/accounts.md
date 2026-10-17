@@ -31,8 +31,9 @@ Emails and passwords are only in Clerk. Nothing from a person's projects or file
 Deleting an account in Clerk fires `user.deleted`, which removes that person's rows from all three tables.
 
 ## Routes
-- `functions/_middleware.js`: the gate. Off unless `GATE_HOSTS` is set. Approved: served. Signed out: 302 to the site. Not approved: 403 page. Non-page requests (service worker, manifest, scripts) get 401. `/api/*` always passes.
+- `functions/_middleware.js`: the gate. Off unless `GATE_HOSTS` is set. Approved (Clerk cookie or `wb_gate`): served. Signed out: 302 to the site. Not approved: 403 page. Non-page requests (service worker, manifest, scripts) get 401. `/api/*` always passes.
 - `GET /api/me`: first name, email, type, `approved`, and a signed 7-day pass for offline use (needs `PASS_PRIVATE_JWK`).
+- `POST /api/gate-cookie` (sets `wb_gate` for approved Clerk sessions), `DELETE /api/gate-cookie` (clears it). Needs `PASS_PRIVATE_JWK`, the same key that signs the pass.
 - `POST /api/usage`, `POST /api/feedback`: used by the app from 1.21. Same-site only, size capped, approved accounts only.
 - `POST /api/webhooks/clerk`: signature-checked; `user.created`, `user.updated`, `user.deleted`.
 Tests: `npm run test:site` (real SQLite and generated keys, no network) and `tests/site-account.spec.js` (header, with Clerk stubbed).
@@ -85,7 +86,7 @@ To switch it off again: delete `GATE_HOSTS` and redeploy. Branch previews (`*.pa
 
 ## Things to know
 - **The gate protects the hosted copy, not the code.** While the repo is public anyone can read and build the source. The gate decides who can use app.wodblok.com.
-- **Cookie sharing is unchecked.** The design assumes Clerk's session cookie, set when signing in on wodblok.com, is also sent to app.wodblok.com (same parent domain, Clerk production instance). If step 5's `/api/me` works on wodblok.com but the app still bounces you to sign in, check that first; Clerk's satellite-domain feature is the fallback.
+- **Clerk's cookie does not reach the app host (found in testing, fixed in 1.26.2).** Clerk only creates its `__session` cookie on the host that runs its script (wodblok.com), so app.wodblok.com always looked signed out. The site now calls `POST /api/gate-cookie` once signed in and approved, and gets back `wb_gate`: a one-hour, signed, HttpOnly cookie for `.wodblok.com` that the gate and the other `/api` routes accept on the app host. It is renewed every 20 minutes while the site is open, and a visitor sent to the site by the app is sent straight back once the cookie is set (at most once a minute, so a fault cannot loop). Sign-out clears it. Only a real Clerk session can renew it, so removing someone's approval stops their access within an hour.
 - **Clerk details to verify while setting up** (written from Clerk's documented behaviour, not tested against a live instance): the session-token template syntax, the browser script address built in `site/account.js`, and the exact name of the account-deletion setting.
 - **Offline.** Once the app is installed and cached, the browser can open it without asking the server, so the 7-day pass check is done in the app itself (1.21). Until then a cached copy keeps opening.
 - **Free plan limit.** `functions/_middleware.js` makes every request to both Pages projects run a Function. Cloudflare's free plan allows 100,000 Function requests a day across the account, plenty for a beta.

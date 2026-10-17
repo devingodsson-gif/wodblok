@@ -90,23 +90,60 @@
     document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
     wrap.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); btn.focus(); } });
     account.addEventListener('click', function () { close(); window.Clerk.openUserProfile(); });
-    out.addEventListener('click', function () { close(); window.Clerk.signOut(); });
+    out.addEventListener('click', function () {
+      close();
+      // clear the app's cookie first, then sign out (signing out may leave the page)
+      clearGate().then(function () { window.Clerk.signOut(); });
+    });
   }
 
+  // Clerk's cookie only exists on this site, so the app host cannot see who is signed in. For approved accounts the
+  // server trades the Clerk session for a one-hour cookie that covers the whole domain (functions/api/gate-cookie.js).
+  function mintGate() {
+    return fetch('/api/gate-cookie', { method: 'POST', credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { return !!(j && j.approved); })
+      .catch(function () { return false; });
+  }
+  function clearGate() {
+    return fetch('/api/gate-cookie', { method: 'DELETE', credentials: 'same-origin' })
+      .then(function () {}, function () {});
+  }
+
+  var minted = false;
   function render() {
     clear();
     openApp.hidden = true; // the sign-in buttons or the menu take its place
-    if (window.Clerk.user) signedIn(); else signedOut();
+    if (window.Clerk.user) {
+      signedIn();
+      if (!minted) { minted = true; mintGate(); }
+    } else {
+      signedOut();
+      if (minted) { minted = false; clearGate(); }
+    }
+  }
+
+  // sent here by the app: once the cookie is set, go straight back (once a minute at most, so a fault cannot loop)
+  function backToApp() {
+    try {
+      var last = Number(sessionStorage.getItem('wb_bounce')) || 0;
+      if (Date.now() - last < 60000) return;
+      sessionStorage.setItem('wb_bounce', String(Date.now()));
+    } catch (e) { return; }
+    location.replace(appUrl);
   }
 
   function start() {
     render();
     window.Clerk.addListener(render);
+    // keep the app's cookie fresh while this page stays open
+    setInterval(function () { if (window.Clerk.user) mintGate(); }, 20 * 60 * 1000);
     // the app sends signed-out visitors here with ?signin=1
     var q = location.search;
     if (!window.Clerk.user && /[?&](signin|signup)=1/.test(q)) {
       if (/[?&]signup=1/.test(q)) window.Clerk.openSignUp({}); else window.Clerk.openSignIn({});
     }
+    if (window.Clerk.user && /[?&]signin=1/.test(q)) mintGate().then(function (ok) { if (ok) backToApp(); });
     if (/[?&](signin|signup)=1/.test(q)) {
       try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) { /* ignore */ }
     }

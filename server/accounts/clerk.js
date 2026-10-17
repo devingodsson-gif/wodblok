@@ -7,6 +7,7 @@
 //   { "type": "{{user.public_metadata.type}}", "fn": "{{user.first_name}}", "em": "{{user.primary_email_address}}" }
 
 import { APPROVED, b64uToBytes, b64uToText } from './util.js';
+import { GATE_COOKIE, verifyGate } from './pass.js';
 
 const SKEW = 5; // seconds of clock difference tolerated
 let jwks = { at: 0, keys: [] };
@@ -87,14 +88,28 @@ function tokenFrom(request) {
   return m ? decodeURIComponent(m[1]) : '';
 }
 
-// { userId, type, firstName, email } for a valid token, or null.
+const typeOf = (v) => {
+  const raw = String(v || '').toLowerCase();
+  return APPROVED.includes(raw) ? raw : raw === 'none' ? 'none' : 'waitlist';
+};
+
+// { userId, type, firstName, email } for a valid Clerk token (Authorization header or the __session cookie), or null.
 // type is one of early_access | tester | subscriber | none | waitlist (no value set yet).
-export async function getSession(request, env, nowMs) {
+export async function getClerkSession(request, env, nowMs) {
   const claims = await verifyToken(tokenFrom(request), env, nowMs);
   if (!claims) return null;
-  const raw = String(claims.type || '').toLowerCase();
-  const type = APPROVED.includes(raw) ? raw : raw === 'none' ? 'none' : 'waitlist';
-  return { userId: claims.sub, type, firstName: String(claims.fn || '').slice(0, 80), email: String(claims.em || '').slice(0, 254) };
+  return { userId: claims.sub, type: typeOf(claims.type), firstName: String(claims.fn || '').slice(0, 80), email: String(claims.em || '').slice(0, 254) };
+}
+
+// Same, and when there is no Clerk token (the app host never gets Clerk's cookie), the gate cookie the site set (pass.js).
+export async function getSession(request, env, nowMs) {
+  const clerk = await getClerkSession(request, env, nowMs);
+  if (clerk) return clerk;
+  const m = (request.headers.get('cookie') || '').match(new RegExp('(?:^|;\\s*)' + GATE_COOKIE + '=([^;]+)'));
+  if (!m) return null;
+  const p = await verifyGate(env, decodeURIComponent(m[1]), nowMs);
+  if (!p) return null;
+  return { userId: p.sub, type: typeOf(p.type), firstName: String(p.fn || '').slice(0, 80), email: String(p.em || '').slice(0, 254) };
 }
 
 export const isApproved = (s) => !!s && APPROVED.includes(s.type);
