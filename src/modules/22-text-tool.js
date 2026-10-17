@@ -47,9 +47,13 @@ const n=q.length;if(n<3)return;const Pp=q.map(([x,y])=>[(x-gcx)*u,(y-gcy)*u]),mi
 for(let i=1;i<=n;i++){const p=Pp[i%n],mm=mid(i);path+='Q'+fm(p[0])+','+fm(p[1])+' '+fm(mm[0])+','+fm(mm[1])}path+='Z'});
 const r={k:key,cx:gcx-ox,cy:gcy-oy,d:path};GL.set(key,r);return r}
 // --- layout: letters on straight lines, or bent around a circle (curve = % of a full circle; negative curves down)
-function layout(o){const f=F[o.f]||F.cinzel;cx.font=css(f);const T0=o.tc=='u'?o.text.toUpperCase():o.tc=='l'?o.text.toLowerCase():o.tc=='t'?o.text.toLowerCase().replace(/(^|[\s(\-])(\S)/g,(m,a,b)=>a+b.toUpperCase()):o.text,lines=T0.split('\n'),em=o.sz/100*Math.min(SW,SH),k=em/P,ls=o.ls/100*P,wsp=(o.ws||0)/100*P,capH=cx.measureText('H').actualBoundingBoxAscent||P*.7,lhp=o.lh/100*P;
+function layout(o){const f=F[o.f]||F.cinzel;cx.font=css(f);const T0=o.tc=='u'?o.text.toUpperCase():o.tc=='l'?o.text.toLowerCase():o.tc=='t'?o.text.toLowerCase().replace(/(^|[\s(\-])(\S)/g,(m,a,b)=>a+b.toUpperCase()):o.text,lines0=T0.split('\n'),em=o.sz/100*Math.min(SW,SH),k=em/P,ls=o.ls/100*P,wsp=(o.ws||0)/100*P,capH=cx.measureText('H').actualBoundingBoxAscent||P*.7,lhp=o.lh/100*P;
+// Box width: lines are broken at spaces so none is wider than the box (a single long word is left whole). Box height + Vertical: where the block of lines sits in a box of that height.
+const limP=o.wd>0?o.wd/100*Math.min(SW,SH)/k:0,wd1=s=>{let n=0,sp=0;for(const c of s){n++;if(/\s/.test(c))sp++}return cx.measureText(s).width+ls*Math.max(0,n-1)+wsp*sp};let lines=lines0;
+if(limP){lines=[];lines0.forEach(ln=>{if(!ln.trim()){lines.push(ln);return}let cur='';ln.split(' ').forEach(w=>{const t=cur?cur+' '+w:w;if(cur&&wd1(t)>limP){lines.push(cur);cur=w}else cur=t});lines.push(cur)})}
+const hbP=o.ht>0?o.ht/100*Math.min(SW,SH)/k:0,fr2=hbP?(hbP-lines.length*lhp)/2:0,vOff=hbP?(o.va=='b'?fr2:o.va=='m'?0:-fr2):0;
 const L=lines.map(line=>{const ch=[...line],out=[];let sp=0;ch.forEach((c,i)=>{if(/\s/.test(c)){sp++;return}const g=glyph(f,c);if(!g)return;const pen=cx.measureText(ch.slice(0,i).join('')).width+ls*i+wsp*sp;out.push({g,c,x:pen+g.cx,y:g.cy,sp})});cx.font=css(f);return{out,ns:sp,W:cx.measureText(line).width+ls*Math.max(0,ch.length-1)+wsp*sp}});
-const maxW=Math.max(1,...L.map(l=>l.W)),pts=[];L.forEach((l,j)=>{const ex=o.al=='j'&&j<L.length-1&&l.ns>0?(maxW-l.W)/l.ns:0,sh=o.al=='l'||o.al=='j'?-maxW/2:o.al=='r'?maxW/2-l.W:-l.W/2,by=(j-(lines.length-1)/2)*lhp+capH/2;l.out.forEach(c=>pts.push({g:c.g,c:c.c,px:sh+c.x+ex*c.sp,py:by+c.y}))});
+const maxW=limP||Math.max(1,...L.map(l=>l.W)),pts=[];L.forEach((l,j)=>{const ex=o.al=='j'&&j<L.length-1&&l.ns>0?(maxW-l.W)/l.ns:0,sh=o.al=='l'||o.al=='j'?-maxW/2:o.al=='r'?maxW/2-l.W:-l.W/2,by=(j-(lines.length-1)/2)*lhp+capH/2+vOff;l.out.forEach(c=>pts.push({g:c.g,c:c.c,px:sh+c.x+ex*c.sp,py:by+c.y}))});
 const cvv=Math.max(-1,Math.min(1,o.cv/100)),rt=(o.rot||0)*Math.PI/180,cs=Math.cos(rt),sn=Math.sin(rt);let res;
 if(Math.abs(cvv)<.005)res=pts.map(c=>({g:c.g,c:c.c,x:c.px,y:c.py,r:0}));
 else{const phi=Math.abs(cvv)*2*Math.PI,R=maxW/phi,off=R*Math.max(0,Math.min(1,1-phi/Math.PI));
@@ -57,7 +61,7 @@ res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c
 const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI}})}
 return res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0),s:+(em/E).toFixed(4)}))}
 // --- panel state
-const D={text:'',f:'cinzel',sz:30,ls:0,ws:0,lh:115,al:'c',tc:'',cv:0,rot:0,auto:true};
+const D={text:'',f:'cinzel',sz:30,ls:0,ws:0,lh:115,al:'c',tc:'',cv:0,rot:0,wd:0,ht:0,va:'t',auto:true};
 // largest size (up to 40%) at which the whole text sits inside the stamp, so it doesn't wrap round the edges
 function fitSz(o){const ps=layout({...o,sz:100});if(!ps.length)return o.sz;const h=Math.min(SW,SH)*.42;let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;ps.forEach(p=>{x0=Math.min(x0,p.x-h);x1=Math.max(x1,p.x+h);y0=Math.min(y0,p.y-h);y1=Math.max(y1,p.y+h)});
 const k=SK=='tri'?.55:SK=='rect'?.86:.74;return Math.max(5,Math.min(o.maxSz||40,Math.floor(100*Math.min(k*SW/(x1-x0),k*SH/(y1-y0)))))}
@@ -69,9 +73,9 @@ const mean=ids=>{const it2=WBS.tiles[WBS.cur].items;let x=0,y=0;ids.forEach(i=>{
 WBX.wbTxGrp=()=>grpOf();WBX.wbTxMeta=g=>A(WBS.tiles[WBS.cur])[g];
 function fillFonts(){const cur0=$('tx_f').value||st.f;$('tx_f').innerHTML=`<optgroup label="Built-in fonts">${FONTS.map(x=>`<option value="${x[0]}" data-font="${hx(x[1])}" data-w="${x[3]}">${hx(x[1])}</option>`).join('')}</optgroup>`+(UF.length?`<optgroup label="Your fonts">${UF.map(id=>`<option value="${id}" data-font="${hx(F[id].fam)}" data-w="400">${hx(F[id].lbl)}</option>`).join('')}</optgroup>`:'');$('tx_f').value=F[cur0]?cur0:'cinzel'}
 function toUI(){syncing++;try{toUI0()}finally{syncing--}}
-function toUI0(){$('tx_t').value=st.text;$('tx_f').value=F[st.f]?st.f:'cinzel';[['tx_sz','sz'],['tx_ls','ls'],['tx_ws','ws'],['tx_lh','lh'],['tx_cv','cv'],['tx_rot','rot']].forEach(([id,k])=>{$(id).value=st[k];$(id).dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))});
-document.querySelectorAll('#tx_al [data-a]').forEach(b=>b.classList.toggle('on',b.dataset.a==st.al));document.querySelectorAll('#tx_tc [data-c]').forEach(b=>b.classList.toggle('on',b.dataset.c==(st.tc||'')))}
-function fromUI(){st.text=$('tx_t').value.replace(/\r/g,'').slice(0,200);st.f=$('tx_f').value;st.sz=+$('tx_sz').value;st.ls=+$('tx_ls').value;st.ws=+$('tx_ws').value;st.lh=+$('tx_lh').value;st.cv=+$('tx_cv').value;st.rot=+$('tx_rot').value}
+function toUI0(){$('tx_t').value=st.text;$('tx_f').value=F[st.f]?st.f:'cinzel';[['tx_sz','sz'],['tx_ls','ls'],['tx_ws','ws'],['tx_lh','lh'],['tx_wd','wd'],['tx_ht','ht'],['tx_cv','cv'],['tx_rot','rot']].forEach(([id,k])=>{$(id).value=st[k]||0;$(id).dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))});
+document.querySelectorAll('#tx_al [data-a]').forEach(b=>b.classList.toggle('on',b.dataset.a==st.al));document.querySelectorAll('#tx_tc [data-c]').forEach(b=>b.classList.toggle('on',b.dataset.c==(st.tc||'')));document.querySelectorAll('#tx_va [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v==(st.va||'t')))}
+function fromUI(){st.text=$('tx_t').value.replace(/\r/g,'').slice(0,200);st.f=$('tx_f').value;st.sz=+$('tx_sz').value;st.ls=+$('tx_ls').value;st.ws=+$('tx_ws').value;st.lh=+$('tx_lh').value;st.wd=+$('tx_wd').value;st.ht=+$('tx_ht').value;st.cv=+$('tx_cv').value;st.rot=+$('tx_rot').value}
 async function ready(){const f=F[st.f]||F.cinzel;try{await document.fonts.load(css(f),st.text||'Aa');await document.fonts.ready}catch(e){}}
 async function preview(){await ready();const t=WBS.tiles[WBS.cur];useT(t);autoFit();const[pa]=pal(),ink=inkOf(t),ps=st.text.trim()?layout(st):[],C=cen();
 $('tx_pv').innerHTML=`<svg viewBox="-12 -12 ${SW+24} ${SH+24}"><path d="${shp(0)}" fill="${pa}" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/>`+ps.map(p=>`<g transform="translate(${(C[0]+p.x).toFixed(1)} ${(C[1]+p.y).toFixed(1)}) rotate(${p.r.toFixed(1)}) scale(${p.s})"><path d="${p.g.d}" fill="${ink}" fill-rule="evenodd"/></g>`).join('')+`</svg>`;
@@ -82,7 +86,7 @@ function letters(g,ax,ay){const ps=layout(st),out=[];ps.forEach(p=>{const k=p.g.
 async function add(){fromUI();if(!st.text.trim())return;await ready();if(WBX.wbCap)WBX.wbCap();const t=WBS.tiles[WBS.cur];useT(t);autoFit();const g='tx'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),[ax,ay]=cen(),L=letters(g,ax,ay);
 if(!L.length){pmsg('No letters came out. Try another font.');return}const n0=t.items.length;t.items.push(...L);const ids=L.map((_,i)=>n0+i);const[mx,my]=mean(ids);A(t)[g]={...st,ax,ay,mx,my};
 selSet(ids,false);WBS.brush=null;store();upd();if(WBX.wbCap)WBX.wbCap();pmsg(`Added “${st.text.replace(/\n/g,' ')}” as ${L.length} letter${L.length>1?'s':''}. Drag to move them together, or click one in the Shape list to move it alone.`)}
-async function update(live){const g=edit;if(!g)return;fromUI();if(!st.text.trim())return;await ready();if(g!==edit)return;const t=WBS.tiles[WBS.cur],M=A(t)[g],ids=idsOf(g);if(!M||!ids.length)return;if(live&&['text','f','sz','ls','ws','lh','al','tc','cv','rot'].every(k=>M[k]===st[k]))return;if(WBX.wbCap&&(!live||performance.now()-lastLive>1500))WBX.wbCap();if(live)lastLive=performance.now();useT(t);
+async function update(live){const g=edit;if(!g)return;fromUI();if(!st.text.trim())return;await ready();if(g!==edit)return;const t=WBS.tiles[WBS.cur],M=A(t)[g],ids=idsOf(g);if(!M||!ids.length)return;if(live&&['text','f','sz','ls','ws','lh','al','tc','cv','rot','wd','ht','va'].every(k=>(M[k]||0)===(st[k]||0)))return;if(WBX.wbCap&&(!live||performance.now()-lastLive>1500))WBX.wbCap();if(live)lastLive=performance.now();useT(t);
 const[cx0,cy0]=mean(ids),ax=M.ax+(cx0-M.mx),ay=M.ay+(cy0-M.my),pos=Math.min(...ids);delItems(ids);const L=letters(g,ax,ay);t.items.splice(Math.min(pos,t.items.length),0,...L);const nids=L.map((_,i)=>Math.min(pos,t.items.length-L.length)+i);
 const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();upd();if(!live){if(WBX.wbCap)WBX.wbCap();pmsg(`Updated the text. Hand-moved letters were rebuilt.`)}}
 // the text on the stamp follows every change in the panel while a text is being edited
@@ -102,9 +106,10 @@ if(g){const M=A(WBS.tiles[WBS.cur])[g];st={...D,...M,auto:false};delete st.ax;de
 else{box.hidden=true;$('tx_go').textContent='Add to stamp';st.auto=true}later()};
 fillFonts();toUI();
 $('tx_t').addEventListener('input',()=>{fromUI();later();live()});
-['tx_f','tx_sz','tx_ls','tx_ws','tx_lh','tx_cv','tx_rot'].forEach(id=>$(id).addEventListener('input',e=>{if(id=='tx_sz'&&e.isTrusted)st.auto=false;fromUI();later();live()}));
+['tx_f','tx_sz','tx_ls','tx_ws','tx_lh','tx_wd','tx_ht','tx_cv','tx_rot'].forEach(id=>$(id).addEventListener('input',e=>{if(id=='tx_sz'&&e.isTrusted)st.auto=false;fromUI();later();live()}));
 ['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(!e.isTrusted)return;const w=$('tx_sz').closest('.ctl');if(e.target===$('tx_sz')||(w&&w.contains(e.target)))st.auto=false},true));
 $('tx_al').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;st.al=b.dataset.a;document.querySelectorAll('#tx_al [data-a]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
+$('tx_va').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;st.va=b.dataset.v;document.querySelectorAll('#tx_va [data-v]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
 $('tx_tc').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;st.tc=b.dataset.c;document.querySelectorAll('#tx_tc [data-c]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
 $('tx_go').onclick=add;
 $('tx_new').onclick=()=>{selOne(-1);edit=null;$('tx_ed').hidden=true;$('tx_go').textContent='Add to stamp';st={...D,f:st.f};toUI();upd();later();$('tx_t').focus()};
@@ -117,8 +122,10 @@ const G={},Lt=[];let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
 ps.forEach(p=>{const d=p.g.d;if(!/^[MLQZ0-9.,\- ]+$/.test(d))return;G[p.g.k]=d;const nm=(d.match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);let a=1e9,b=1e9,c=-1e9,e=-1e9;for(let i=0;i+1<nm.length;i+=2){a=Math.min(a,nm[i]);c=Math.max(c,nm[i]);b=Math.min(b,nm[i+1]);e=Math.max(e,nm[i+1])}
 const r=p.r*Math.PI/180,cs=Math.cos(r),sn=Math.sin(r),X=p.x*kk,Y=p.y*kk,S=p.s*kk;[[a,b],[c,b],[c,e],[a,e]].forEach(([u,v])=>{const px=X+(u*cs-v*sn)*S,py=Y+(u*sn+v*cs)*S;x0=Math.min(x0,px);x1=Math.max(x1,px);y0=Math.min(y0,py);y1=Math.max(y1,py)});
 Lt.push([p.g.k,X,Y,+p.r.toFixed(1),+S.toFixed(4)])});
-if(!Lt.length)return null;const mx=(x0+x1)/2,my=(y0+y1)/2;Lt.forEach(l=>{l[1]=+(l[1]-mx).toFixed(2);l[2]=+(l[2]-my).toFixed(2)});
-return{G,Lt,bw:+(x1-x0).toFixed(2),bh:+(y1-y0).toFixed(2)}};
+if(!Lt.length)return null;const U=kk*Math.min(SW,SH)/100,boxW=q.wd>0,boxH=q.ht>0,mx=boxW?0:(x0+x1)/2,my=boxH?0:(y0+y1)/2;Lt.forEach(l=>{l[1]=+(l[1]-mx).toFixed(2);l[2]=+(l[2]-my).toFixed(2)});
+// with a box width or height, the box (not the letters) is what the piece measures, so Align and Vertical sit inside it
+return{G,Lt,bw:+(boxW?q.wd*U:x1-x0).toFixed(2),bh:+(boxH?q.ht*U:y1-y0).toFixed(2)}};
+WBX.wbTxUnit=()=>Math.min(CW,CH)/100;
 WBX.wbTxAddFont=async fl=>{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';const id=await addUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();return id};
 WBX.wbTxFontHTML=()=>$('tx_f').innerHTML;
 try{new MutationObserver(()=>{if(WBX.wbTbFonts)WBX.wbTbFonts()}).observe($('tx_f'),{childList:true})}catch(e){}
