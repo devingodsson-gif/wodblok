@@ -42,7 +42,7 @@ if(!fresh&&WBX.wbCap)WBX.wbCap();
 const MOVES=[['sym','new symmetry',1.3],['link','accents in the gaps',1.2],['shape','accent shapes',1],['mix','mixed shapes',.7],['rot','turned grid',.8],['inks','extra inks',.7],['motif','shape tweaks',.8],['swap','light on dark',.6],['blend','soft blending',.5],['radial','round arrangements',.7],['vary','size, gaps and offset',.6],['text','lettering',1],['frame','frame',1.1]];
 const RZ={mv:null,n:0,keep:{col:!FT.col,gr:!FT.gr,tx:!FT.tx,pr:!FT.pr}};
 let inkMap={};const noAcc=!FT.col||!sOn('col','acc'),noPal=!FT.col||!sOn('col','pal');RZ.keep.col=noPal;
-const MV=MOVES.filter(x=>FT.stamps&&x[0]!='frame'&&!(x[0]=='text'&&!FT.text)&&!(x[0]=='swap'&&noPal)&&!(x[0]=='inks'&&noAcc)&&(x[0]=='text'||sOn('stamps',x[0])));
+const MV=MOVES.filter(x=>FT.stamps&&x[0]!='frame'&&!(x[0]=='text'&&!FT.text)&&!(x[0]=='swap'&&noPal)&&!(x[0]=='inks'&&noAcc)&&!(x[0]=='radial'&&WBS.dim.rt&&!WBS.book.on)&&(x[0]=='text'||sOn('stamps',x[0])));
 const F=new Set(),nf=Math.min(RZ.n||wpick([[1,.55],[2,.45]]),MV.length);while(F.size<nf){const m=wpick(MV.filter(x=>!F.has(x[0])).map(x=>[x[0],x[2]]));F.add(m)}
 // lettering takes over the main stamp, so it doesn't pair with moves that rework that stamp
 if(F.has('text')&&!WBX.wbTxPlace)F.delete('text');if(F.has('text'))['sym','mix','motif'].forEach(x=>F.delete(x));if(!F.size&&FT.stamps)F.add('link');if(FT.frame&&!(WBS.dim.rt&&!WBS.book.on))F.add('frame');
@@ -216,7 +216,7 @@ if(c.layers.some(l=>LS.includes(l)))LS.forEach(l=>{if(c.layers.includes(l)&&l.fi
 // Layout: pattern type, stamp size, spacing and scatter, offset, rotation and flips of the layers that repeat. Works on whatever layers the project has now.
 if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('layout','rot'),lty=sOn('layout','type'),lof=sOn('layout','offset'),
  lays=WBS.layers.filter(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.art&&!l.txt),lnk=new Set(WBS.layers.filter(l=>l.gl).map(l=>l.gl)),
- lrd=sOn('layout','radial'),lvr=sOn('layout','vary'),
+ lrd=sOn('layout','radial')&&!(WBS.dim.rt&&!WBS.book.on),lvr=sOn('layout','vary'),
  EN=[...(lsp?[['scatter',1.2]]:[]),...(lrt?[['tilt',1.1],['spread',1],['flips',1]]:[]),...(lvr?[['sizevar',1],['gaps',.8]]:[])],E=new Set();
  // at most two energetic effects per roll (position scatter, turned grid, rotation spread, flips), so a piece stays coherent
  for(let q=wpick([[1,.55],[2,.45]]);q>0&&E.size<EN.length;q--)E.add(wpick(EN.filter(x=>!E.has(x[0]))));
