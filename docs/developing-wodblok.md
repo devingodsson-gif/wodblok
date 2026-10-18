@@ -2,7 +2,7 @@
 
 The one document for anyone (a person or a Claude agent) who changes WODBLOK. It holds the working rules, the way a release is made, the code and test conventions, and, as Part 9, the complete UI and CSS standard. Read Parts 1 to 3 before touching anything, and Part 9 before touching any UI.
 
-Written Oct 18 2026 at version 1.46.0, from the project's CLAUDE.md, the docs in this folder, and the owner's standing instructions. `CLAUDE.md` stays as the short list of rules that every session loads; this document is the long form. When they disagree, ask the owner. The layer update (a large rewrite of the editor, not started) has its own plan and is not part of this document.
+Written Oct 18 2026 at version 1.46.0, from the project's CLAUDE.md, the docs in this folder, and the owner's standing instructions. `CLAUDE.md` stays as the short list of rules that every session loads; this document is the long form. When they disagree, ask the owner. The layer update (a large rewrite of the editor, in progress) has its own plan, `docs/layer-update-plan.md`.
 
 **Contents**
 1. What WODBLOK is, and the owner
@@ -25,7 +25,7 @@ It is a **commercial product**. The owner plans to sell it and wants it to feel 
 
 The owner is the only person who decides product questions: what a feature does, what the standard is, when something goes live. If a rule, a scale or a plan does not cover something, **ask and change the document first**; do not invent. Keep questions short and ask them only when the answer changes what you build.
 
-Current state (Oct 18 2026): `main` is at **1.46.0**. The text update (1.39 to 1.46) is finished and live. Next is the **layer update** (planned, on hold until the owner says he is ready; it will take versions 1.46.1 and up and finish as 1.47.0).
+Current state (Oct 18 2026): `main` is at **1.46.0**. The text update (1.39 to 1.46) is finished and live. The **layer update** has started (steps 1.46.1 and up; it finishes as 1.47.0); see `docs/layer-update-plan.md`.
 
 ## 2. Rules that are never broken
 
@@ -65,6 +65,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 - **Always work from the newest `main` on GitHub.** At the start of every session: fetch, state the newest version on `main` (package.json) and the latest tag, and work from that, never from an older checkout or branch. Older versions and `legacy/` are never touched, rebuilt, archived or modified unless the owner explicitly says so. (The owner calls "check out the repo and go to wodblok.com to get up to date" the **refresher**.)
 - **One preview artifact, never a copy.** Any preview is built from the repo and published to the one existing preview artifact (Part 4, step 5). Never publish a parallel or separate version; the owner worries about version fragmentation.
 - **Going live is the owner's call**, per release: never merge to `main` until he says so. Say before going live if the release touches saving, opening files or the file format.
+- **Memory in the repo:** anything about WODBLOK that is saved to a Claude's own memory (a decision, a preference, a standing instruction) is also written to `docs/agent-memory.md` in the same session, so every agent has the same context. Read that file at the start of a session.
 - Write for a person who is not watching: finish, then give the result and one natural next step. No recap of the steps.
 - Nothing personal in the repo (Part 8).
 
@@ -147,6 +148,8 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 
 | File | What it is |
 |---|---|
+| `agent-memory.md` | What the owner's Claude memory knows: standing preferences, decisions by date (read at the start of a session) |
+| `layer-update-plan.md` | The layer update: the plan, the decisions and the progress log, updated after every step |
 | `plan.md` | The current plan and the outcome of each release since 1.1.0 (add yours here) |
 | `fix-plan.md` | The closed UX fix plan, 1.0.1 to 1.0.20 |
 | `known-issues.md` | Bugs and test flakes found and not fixed, with what is known |
@@ -158,7 +161,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 | `palette-names.md` | The Wada colour names |
 | `social-batch.md` | The automated social image batch |
 
-**Plans that live outside the repo** (the owner's Claude Project): the text plan, the layer (unified editor) plan, accounts plan, beta-week plan, speed audit, future features and premium roadmap. Ask the owner for any you need.
+**Plans that live outside the repo** (the owner's Claude Project): the text plan, accounts plan, beta-week plan, speed audit, future features and premium roadmap. Ask the owner for any you need.
 
 ---
 

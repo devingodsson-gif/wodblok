@@ -1,5 +1,5 @@
 # WODBLOK
-The full developer guide is docs/developing-wodblok.md (rules, workflow, code, tests, CI, UI standard). This file is the short list every session loads.
+The full developer guide is docs/developing-wodblok.md (rules, workflow, code, tests, CI, UI standard). This file is the short list every session loads. Also read docs/agent-memory.md (standing preferences and decisions) and, for the layer update, docs/layer-update-plan.md. Anything saved to Claude memory about WODBLOK is also written to docs/agent-memory.md.
 Stamped-pattern editor, web app first. Commercial product. The repo is PUBLIC while it is developed (since Oct 11 2026) and goes private again before it is sold: see "Public repo rules" below and docs/public-repo.md.
 
 ## Commands
