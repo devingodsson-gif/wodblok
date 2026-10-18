@@ -24,25 +24,25 @@ test('the Textures tool has an Apply block (Canvas, Stamps, Layers) and textures
   expect(errors).toEqual([]);
 });
 
-test('"Paper shows through" puts a light-colour filter on the Pictures layer and saves it in the layer', async ({ page }) => {
+test('"Paper shows through" puts a light-colour filter on the layer that holds pictures and saves it in the layer', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
   await page.click('#ly_add');
-  await page.click('#ly_menu [data-lt="a"]');
+  await openPanel(page, 'layers');
   await settle(page);
   await page.setInputFiles('#lfafile', { name: 'a.png', mimeType: 'image/png', buffer: PNG });
   await settle(page);
   const bb = await page.locator('#art').boundingBox();
   await page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2);
   await settle(page);
-  expect(JSON.parse(await getState(page)).layers.some(l => l.art && (l.pl || []).length)).toBe(true);
+  expect(JSON.parse(await getState(page)).layers.some(l => (l.pl || []).some(p => p.a))).toBe(true);
   const box = page.locator('#lfaak');
   await expect(box).toBeVisible();
   await expect(box).not.toBeChecked();
   expect(await page.locator('#art filter[id^="ak"]').count()).toBe(0);
   await box.check();
   await settle(page);
-  expect(JSON.parse(await getState(page)).layers.some(l => l.art && l.akk === true)).toBe(true);
+  expect(JSON.parse(await getState(page)).layers.some(l => l.akk === true)).toBe(true);
   expect(await page.locator('#art filter[id^="ak"]').count()).toBe(1);
   expect(await page.locator('#art g[filter^="url(#ak"]').count()).toBe(1);
   await box.uncheck();

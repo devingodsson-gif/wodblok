@@ -19,6 +19,7 @@ const canvasClick = async (page, fx, fy) => {
 test('there is no layer type: the dropdown is Arrangement (None, Repeat, Frame) and "+" adds a plain layer', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
+  await openPanel(page, 'lyrs');
   await expect(page.locator('#lmsel option')).toHaveText(['None', 'Repeat', 'Frame']);
   await expect(page.locator('#ly_menu')).toHaveCount(0);
   await page.click('#ly_add');
@@ -52,7 +53,7 @@ test('a picture and then a stamp go onto the same layer; each is its own placed 
   await page.setInputFiles('#lfafile', f);
   await settle(page);
   await expect(page.locator('#lfars [data-a]')).toHaveCount(1);
-  await page.click('#lfars [data-a]');
+  await expect(page.locator('#lfars [data-a].on')).toHaveCount(1);          // importing a picture arms it
   await canvasClick(page, 0.3, 0.3);
   await page.click('#lfars [data-a]');            // stop placing the picture
   await page.click('#lfpst [data-t]');
@@ -100,5 +101,18 @@ test('the Layers list says how many items a layer holds', async ({ page }) => {
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   await expect(page.locator('#lyl2 .lyr .lym')).toContainText('1 placed');
+  expect(errors).toEqual([]);
+});
+
+test('the Arrangement heading names the selected layer\'s arrangement', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'layers');
+  await expect(page.locator('#lytn')).toHaveText('Repeat');
+  await setSel(page, '#lmsel', 'f');
+  await settle(page);
+  await expect(page.locator('#lytn')).toHaveText('Frame');
+  await setSel(page, '#lmsel', 'x');
+  await settle(page);
+  await expect(page.locator('#lytn')).toHaveText('None');
   expect(errors).toEqual([]);
 });
