@@ -1,4 +1,5 @@
 # WODBLOK
+The full developer guide is docs/developing-wodblok.md (rules, workflow, code, tests, CI, UI standard). This file is the short list every session loads.
 Stamped-pattern editor, web app first. Commercial product. The repo is PUBLIC while it is developed (since Oct 11 2026) and goes private again before it is sold: see "Public repo rules" below and docs/public-repo.md.
 
 ## Commands
@@ -8,7 +9,7 @@ Source of truth for the app is src/: ES modules in src/modules (order in manifes
 ## Never break (what the app must always be)
 - No explanatory text or tooltips in panels. At launch the Default workspace opens its tool windows (the first workspace if none is called Default; none if there are no workspaces). The template picker (New from template) also opens at launch unless Settings > General > Templates at launch is off. Launch in Pattern mode, fully cleared. Tests start with no workspaces saved and the picker off (tests/helpers/harness.js), so they still see an empty launch unless a test asks for them (`workspaces: true`, `templates: true`).
 - No brush masks.
-- UI follows docs/style-guide.md (tokens and scales, one component per role, and one folder tree for every library). Do not invent a size, radius, colour, duration or list design; if the scale lacks something, ask and change the guide first.
+- UI follows docs/developing-wodblok.md Part 9 (the UI standard; tokens and scales, one component per role, and one folder tree for every library). Do not invent a size, radius, colour, duration or list design; if the scale lacks something, ask and change the guide first.
 - Speed first: run `npm run perf` before committing anything that touches drawing, dragging or sliders. No perf regression over 10%.
 - Old .wodblok.json files (format v:18 and earlier) must always open; never overwrite a file on first open of an older format.
 - Platform access only through src/platform/. User actions are commands in the registry. The document is plain data with stable ids. No runtime network, with one exception: `src/platform/account.js` may talk to the app's own host (`/api/me`, `/api/usage`, `/api/feedback`, `/api/gate-cookie`, docs/accounts.md) and makes no request from a file or a local dev server (`npm run check:platform` fails on `fetch` and friends anywhere else). Fonts bundled. Usage tracking is active-time totals per day for early_access and tester accounts only, never anything from a project or a file; nothing on the drawing or dragging path. Pointer events; nothing hover-only in new code. No alert/confirm/prompt.

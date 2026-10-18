@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Rule: UI follows docs/style-guide.md. Fails on a font size, radius or font family outside the standard scales,
+// Rule: UI follows docs/developing-wodblok.md Part 9 (the UI standard). Fails on a font size, radius or font family outside the standard scales,
 // in the page CSS (src/shell.html) and in styles written by modules.
 const fs = require('fs'), path = require('path');
 const SRC = path.join(__dirname, '..', 'src');
