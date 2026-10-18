@@ -9,6 +9,7 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {mkWell,paintWell} from './52-tray-ui.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
+import {TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
 // ===== Text boxes (Layout > Text). A layer in Text mode has L.free = true, L.txt = true and L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
 // The letters are stored as outlines (centred on the box), so the project needs no fonts to show them. s = the box's long side on the canvas.
 const fx1=v=>(+v).toFixed(1);
@@ -27,10 +28,9 @@ pl.forEach(p=>{const[w,h]=fpWH(p),k=p.s/Math.max(p.n||1,.01),mid='tm'+li+'_'+Str
 out+=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x)} ${f(+p.y)})">${hit}<g transform="rotate(${+p.r||0}) scale(${(k*(p.f||1)).toFixed(4)} ${k.toFixed(4)})"${fo?` filter="url(#${fo})"`:''}${mk?` mask="url(#${mid})"`:''}>${txtGl(p,pf,'tg'+li+'_'+String(p.u).replace(/[^\w-]/g,''))}</g></g>`});
 const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'';
 return[defs,`<g${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}
-var tbSty={tu:[],ink:''},tbKey='',tbLoad=false,tbT=0,tbAl='c',tbTc='',tbVa='t',tbOv='',tbSc='',tbSd=0,tbRelTok=0;var tbG=null,tbGT=0;
-const tbSet=(id,v)=>{const el=$(id);if(+el.value!=+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};
+var tbSty={tu:[],ink:''},tbKey='',tbLoad=false,tbT=0,tbRelTok=0;var tbG=null,tbGT=0;
 const tbSel=()=>{const L=fpL();return L&&L.txt?(L.pl||[]).find(q=>q.u==WBS.fpSel&&q.tx)||null:null};
-function tbRead(){return{text:$('tx_t').value.replace(/\r/g,'').slice(0,200),f:$('tx_f').value||'cinzel',sz:+$('tx_sz').value,ls:+$('tx_ls').value,ws:+$('tx_ws').value,lh:+$('tx_lh').value,al:tbAl,tc:tbTc,va:tbVa,wd:+$('tx_wd').value,ht:+$('tx_ht').value,cv:+$('tx_cv').value,rot:+$('tx_rot').value,...(+$('tx_pd').value?{pd:+$('tx_pd').value}:{}),...($('tx_ft').value?{ft:$('tx_ft').value}:{}),...(tbOv?{ov:tbOv}:{}),...['rp','rr','rs','bb'].reduce((a,k)=>+$('tx_'+k).value?{...a,[k]:+$('tx_'+k).value}:a,{}),...(tbSc?{sc:tbSc}:{}),...(tbSd?{sd:tbSd}:{})}}
+const tbRead=()=>txoRead();
 // A placed text after its box width or height was pulled with a handle: the letters keep their size and the lines break again. keepTop keeps the top edge where it is while the height follows the lines.
 async function tbRelay(p,keepTop,drag){const tok=++tbRelTok,R=await WBX.wbTxLay(p.tx);if(tok!==tbRelTok||!R)return;const L=fpL();if(!L||!(L.pl||[]).includes(p))return;const ra=p.s/Math.max(p.n||1,.01),dh=(R.bh-p.bh)*ra/2,r=(+p.r||0)*Math.PI/180;p.G=R.G;p.Lt=R.Lt;p.bw=R.bw;p.bh=R.bh;p.n=Math.max(R.bw,R.bh);p.s=+(ra*p.n).toFixed(2);if(keepTop){p.x=+(p.x-dh*Math.sin(r)).toFixed(1);p.y=+(p.y+dh*Math.cos(r)).toFixed(1);if(drag){drag.x0-=dh*Math.sin(r);drag.y0+=dh*Math.cos(r)}}tbKey='';upd()}
 function tbArmUI(){const b=$('tx_go');if(b){b.classList.toggle('on',WBS.txArm);b.setAttribute('aria-pressed',String(WBS.txArm))}}
@@ -43,8 +43,8 @@ function tbStySet(a){const grp=fpGrp().filter(q=>q.tx);tbSty.tu=a.map(u=>({...u}
 function tbStyVary(i){const grp=fpGrp().filter(q=>q.tx);if(tbSty.tu[i])tbSty.tu[i]={...tbSty.tu[i],sd:txRid()};grp.forEach(q=>{if(q.tu&&q.tu[i])q.tu[i]={...q.tu[i],sd:txRid()}});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();txRefresh()}
 function txbSync(L){if(!L.txt)WBS.txArm=false;else if(WBS.txArm&&tbSel()){WBS.txArm=false;tbArmUI()}
 if(L.txt&&WBS.curView=='pattern'&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;sw.style.display=L.txt?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=L.txt?'none':''}if(!L.txt||!$('tx_t')||WBS.curView!='pattern')return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
-const key=p?p.u+'|'+Math.round(p.s*10)+'|'+(p.tx.wd||0)+'|'+(p.tx.ht||0)+'|'+(p.tx.va||'t')+'|'+(p.tx.pd||0)+(p.tx.ft||'')+(p.tx.ov||'')+(p.tx.rp||0)+(p.tx.rr||0)+(p.tx.rs||0)+(p.tx.bb||0)+(p.tx.sc||'')+(p.tx.sd||0):'-';if(key===tbKey)return;tbKey=key;if(!p)return;
-tbSty={tu:(Array.isArray(p.tu)?p.tu:[]).map(u=>({...u})),ink:p.ink||''};tbStyUI();tbLoad=true;try{const o=p.tx,ra=p.s/Math.max(p.n||1,.01);if($('tx_t').value!==o.text)$('tx_t').value=o.text;$('tx_f').value=o.f;tbSet('tx_sz',Math.max(2,Math.min(60,+(o.sz*ra).toFixed(1))));tbSet('tx_ls',o.ls);tbSet('tx_ws',o.ws||0);tbSet('tx_lh',o.lh);tbSet('tx_wd',Math.max(0,Math.min(400,Math.round((o.wd||0)*ra))));tbSet('tx_ht',Math.max(0,Math.min(400,Math.round((o.ht||0)*ra))));tbVa=o.va||'t';document.querySelectorAll('#tx_va [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v==tbVa));tbSet('tx_pd',o.pd||0);['rp','rr','rs','bb'].forEach(k=>tbSet('tx_'+k,o[k]||0));tbSc=o.sc||'';tbSd=o.sd||0;document.querySelectorAll('#tx_sc [data-s]').forEach(b=>b.classList.toggle('on',b.dataset.s==tbSc));$('tx_ft').value=o.ft||'';tbOv=o.ov||'';document.querySelectorAll('#tx_ov [data-o]').forEach(b=>b.classList.toggle('on',b.dataset.o==tbOv));tbSet('tx_cv',o.cv);tbSet('tx_rot',o.rot);tbAl=o.al||'c';tbTc=o.tc||'';document.querySelectorAll('#tx_al [data-a]').forEach(b=>b.classList.toggle('on',b.dataset.a==tbAl));document.querySelectorAll('#tx_tc [data-c]').forEach(b=>b.classList.toggle('on',b.dataset.c==tbTc))}finally{tbLoad=false}}
+const key=p?p.u+'|'+Math.round(p.s*10)+'|'+(p.tx.wd||0)+'|'+(p.tx.ht||0)+'|'+(p.tx.va||'t')+'|'+(p.tx.pd||0)+(p.tx.ft||'')+(p.tx.ov||'')+(p.tx.rp||0)+(p.tx.rr||0)+(p.tx.rs||0)+(p.tx.bb||0)+(p.tx.sc||'')+(p.tx.sd||0)+'|'+(p.tx.ind||0)+'|'+(p.tx.psp||0)+(p.tx.bal||'')+JSON.stringify(p.tx.sty||0):'-';if(key===tbKey)return;tbKey=key;if(!p)return;
+tbSty={tu:(Array.isArray(p.tu)?p.tu:[]).map(u=>({...u})),ink:p.ink||''};tbStyUI();tbLoad=true;try{const o=p.tx,ra=p.s/Math.max(p.n||1,.01);txoWrite(o,{sz:Math.max(2,Math.min(60,+(o.sz*ra).toFixed(1))),wd:Math.max(0,Math.min(400,Math.round((o.wd||0)*ra))),ht:Math.max(0,Math.min(400,Math.round((o.ht||0)*ra)))},false)}finally{tbLoad=false}}
 // the Text tool in the Pattern editor: with no Text layer selected, typing makes one
 function tbEnsure(){let L=fpL();if(L&&L.txt)return L;if(!WBX.wbAddLayer)return null;if(WBX.wbCap)WBX.wbCap();WBX.wbAddLayer('t');if(WBX.wbOpenPanel)WBX.wbOpenPanel('text');L=fpL();return L&&L.txt?L:null}
 function tbLive(){if(tbLoad||WBS.curView!='pattern')return;let p=tbSel(),L=fpL();if(!p){if(!(L&&L.txt)){if(!tbRead().text.trim())return;L=tbEnsure();if(!L)return}if(!WBS.txArm&&tbRead().text.trim()){tbArm(true)}else if(WBS.txArm)tbGhost();return}clearTimeout(tbT);tbT=setTimeout(async()=>{const o=tbRead();if(!o.text.trim())return;const R=await WBX.wbTxLay(o);if(!R||!L.pl.includes(p))return;
@@ -54,13 +54,9 @@ L.pl=L.pl||[];const c=L.pl.filter(z=>z.tx).length,n=Math.max(R.bw,R.bh),q={u:fpU
 L.pl.push(q);WBS.fpSel=q.u;WBS.fpMS=new Set();WBS.fpB=null;WBS.fpGhost=null;tbKey='';store();upd();if(WBX.wbCap)WBX.wbCap()}
 function init26(){
 TXM=new Map();WBS.txArm=false;
-{['tx_t','tx_f','tx_sz','tx_ls','tx_ws','tx_lh','tx_wd','tx_ht','tx_cv','tx_rot','tx_pd','tx_ft','tx_rp','tx_rr','tx_rs','tx_bb'].forEach(id=>$(id).addEventListener('input',tbLive));
-$('tx_al').addEventListener('click',e=>{if(WBS.curView!='pattern')return;const b=e.target.closest('[data-a]');if(!b)return;tbAl=b.dataset.a;document.querySelectorAll('#tx_al [data-a]').forEach(x=>x.classList.toggle('on',x==b));tbLive()});
-$('tx_ov').addEventListener('click',e=>{if(WBS.curView!='pattern')return;const b=e.target.closest('[data-o]');if(!b)return;tbOv=b.dataset.o;document.querySelectorAll('#tx_ov [data-o]').forEach(x=>x.classList.toggle('on',x==b));tbLive()});
-$('tx_sc').addEventListener('click',e=>{if(WBS.curView!='pattern')return;const b=e.target.closest('[data-s]');if(!b)return;tbSc=b.dataset.s;document.querySelectorAll('#tx_sc [data-s]').forEach(x=>x.classList.toggle('on',x==b));tbLive()});
-$('tx_vary').addEventListener('click',()=>{if(WBS.curView!='pattern')return;tbSd=1+Math.floor(Math.random()*1e6);tbLive()});
-$('tx_va').addEventListener('click',e=>{if(WBS.curView!='pattern')return;const b=e.target.closest('[data-v]');if(!b)return;tbVa=b.dataset.v;document.querySelectorAll('#tx_va [data-v]').forEach(x=>x.classList.toggle('on',x==b));tbLive()});
-$('tx_tc').addEventListener('click',e=>{if(WBS.curView!='pattern')return;const b=e.target.closest('[data-c]');if(!b)return;tbTc=b.dataset.c;document.querySelectorAll('#tx_tc [data-c]').forEach(x=>x.classList.toggle('on',x==b));tbLive()});
+{['tx_t',...TXO_IDS].forEach(id=>$(id).addEventListener('input',tbLive));
+txoBind(()=>WBS.curView=='pattern',()=>tbLive());txoSelBind(()=>WBS.curView=='pattern',()=>tbLive());
+$('tx_vary').addEventListener('click',()=>{if(WBS.curView!='pattern')return;txoSeed(1+Math.floor(Math.random()*1e6));tbLive()});
 TBW=mkWell($('wl_tx'),{label:'Text colour',what:'Text',def:'Layer colour',defRef:()=>{const L=fpL();return L&&okC(L.ink)?L.ink:WBS.proj.ink},get:()=>okC(tbSty.ink)?tbSty.ink:'',set:v=>{if(!tbLoad)tbStyle('ink',v||'')}});
 txReg('tx_tex',{md:'wear',def:'pinholes',get:()=>{const p=tbSel();return p?(Array.isArray(p.tu)?p.tu:[]):tbSty.tu},set:tbStySet,vary:tbStyVary});
 WBX.wbTbRelay=tbRelay;WBX.wbTxUses=()=>tbSty.tu;WBX.wbTxCut=id=>{tbSty.tu=tbSty.tu.filter(u=>u.x!==id)};
@@ -77,6 +73,6 @@ $('tx_go').addEventListener('click',()=>{if(WBS.curView!='pattern')return;if(WBS
 $('tx_t').addEventListener('keydown',e=>{if(WBS.curView=='pattern')e.stopPropagation()});   // Enter is a new line, as in the Text tool
 $('tx_new').addEventListener('click',()=>{if(WBS.curView!='pattern')return;WBS.fpSel=-1;WBS.fpMS=new Set();tbKey='';WBS.txArm=false;tbG=null;tbArmUI();$('tx_t').value='';upd();$('tx_t').focus()});
 $('tx_file').addEventListener('change',async()=>{if(WBS.curView!='pattern')return;const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl||!WBX.wbTxAddFont)return;try{const id=await WBX.wbTxAddFont(fl);$('tx_f').value=id;tbLive();pmsg(`Loaded “${fl.name.replace(/\.[a-z0-9]+$/i,'')}”.`)}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}});
-WBX.wbTbMode=()=>{tbKey='';const L=fpL();if(L&&L.txt)txbSync(L);else{$('tx_ed').hidden=true;$('tx_sprow').hidden=true}tbArmUI()};if(WBX.wbTxMode)WBX.wbTxMode(WBS.curView||'pattern')}
+WBX.wbTbHas=()=>!!tbSel();WBX.wbTbMode=()=>{tbKey='';const L=fpL();if(L&&L.txt)txbSync(L);else{$('tx_ed').hidden=true;$('tx_sprow').hidden=true}tbArmUI()};if(WBX.wbTxMode)WBX.wbTxMode(WBS.curView||'pattern')}
 }
 export {fx1,tbG,tbRead,tbSty,txbSync,txtGl,txtLayer,init26};

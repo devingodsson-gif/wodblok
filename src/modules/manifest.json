@@ -57,5 +57,6 @@
  "57-saved-colours.js",
  "58-account.js",
  "59-align.js",
-  "60-text-engine.js"
+  "60-text-engine.js",
+  "61-text-panel.js"
 ]

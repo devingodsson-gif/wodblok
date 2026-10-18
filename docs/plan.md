@@ -263,3 +263,13 @@ Fifth step of the text upgrade (project doc `claude/wodblok-text-plan.md`). Same
 - Not in this release: mixed fonts, colour per letter, worn ink, misprint, outline, inline and knockout.
 - Tests: `text-effects`.
 
+
+## 1.44.0: Styled letters and paragraph options
+Sixth step of the text upgrade (project doc `claude/wodblok-text-plan.md`). Same controls in the Stamp editor and the Text layer.
+- **One reader/writer for the panel** (`src/modules/61-text-panel.js`): the Stamp editor and the Text layer both read and write the Text panel through it, so a new option is added in one place plus the engine. No behaviour change.
+- **Selected letters:** select letters in the text field, then set Size, Raise and Spacing for just those letters (stored as `sty`: runs of `[from, to, size %, raise %, spacing %]`). Super and Sub are presets; Clear removes the styles from the selection (or all of them with nothing selected). Styles stay with their letters when the words are edited; new letters take the style of the letter before them.
+- **Paragraph options:** First-line indent (`ind`, left and justified text), Paragraph spacing (`psp`), Balance lines (`bal`). Each line break starts a new paragraph.
+- **Typing on the canvas:** double-click a text on the canvas and the Text panel opens with the words selected; typing replaces them and the canvas follows. (Not a caret drawn on the canvas.)
+- **Data:** `sty`, `ind`, `psp`, `bal` are saved on a text only when set. Old files and snapshots are unchanged.
+- Not in this release: drop caps, hyphenation, justify variants, a caret on the canvas, hand-moved letters on Text layers (Split into letters still does it).
+- Tests: `text-paragraph`.

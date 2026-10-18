@@ -1098,6 +1098,13 @@ body.eyedrop{cursor:crosshair}
    <label>Align</label><div class="seg" id="tx_al" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-a="l">Left</button><button type="button" data-a="c" class="on">Centre</button><button type="button" data-a="r">Right</button><button type="button" data-a="j">Justify</button></div>
    <label>Vertical</label><div class="seg" id="tx_va" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-v="t" class="on">Top</button><button type="button" data-v="m">Middle</button><button type="button" data-v="b">Bottom</button><button type="button" data-v="s">Spread</button></div>
    <label>Case</label><div class="seg" id="tx_tc" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-c="" class="on">Typed</button><button type="button" data-c="u">UPPER</button><button type="button" data-c="l">lower</button><button type="button" data-c="t">Title</button></div>
+    <label>First-line indent</label><input type="range" id="tx_ind" min="0" max="300" value="0" data-u="%" data-def="0">
+    <label>Paragraph spacing</label><input type="range" id="tx_psp" min="0" max="300" value="0" data-u="%" data-def="0">
+    <label>Balance lines</label><div class="seg" id="tx_bal" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-b="" class="on">Off</button><button type="button" data-b="1">On</button></div>
+    <label>Selected letters: size</label><input type="range" id="tx_zs" min="30" max="300" value="100" data-u="%" data-def="100">
+    <label>Selected letters: raise</label><input type="range" id="tx_dy" min="-60" max="100" value="0" data-u="%" data-def="0">
+    <label>Selected letters: spacing</label><input type="range" id="tx_sl" min="-30" max="100" value="0" data-u="%" data-def="0">
+    <div class="row"><button class="alt" id="tx_sup">Super</button><button class="alt" id="tx_sub">Sub</button><button class="alt" id="tx_clr">Clear</button></div>
    <label>Curve</label><input type="range" id="tx_cv" min="-100" max="100" value="0" data-u="%" data-def="0">
    <label>Rotate letters</label><input type="range" id="tx_rot" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
    <label>Random position</label><input type="range" id="tx_rp" min="0" max="100" value="0" data-u="%" data-def="0">
