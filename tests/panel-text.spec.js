@@ -52,7 +52,7 @@ test('nor do the layout modes, a grade mask, the repeat tile or the book cover',
     sentences.forEach(s => found.push(`${tag}: ${s}`));
   };
   await page.click('.rail [data-pn="layers"]');
-  for (const m of ['f', 'x', 'a', 't']) { await page.locator('#lmsel').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))},m); await scan('layers', 'layout ' + m); }
+  for (const m of ['f', 'x', 'p']) { await page.click(`#lmode [data-m="${m}"]`); await scan('layers', 'layout ' + m); }
   await page.click('#rcls');
   await page.click('.rail [data-pn="grade"]');
   for (const t of ['rad', 'lin', 'lay', 'col', 'lum']) { await page.click('#gm_add'); await page.click(`#gm_menu [data-gt="${t}"]`); await scan('grade', 'mask ' + t); }

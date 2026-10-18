@@ -4,7 +4,7 @@ const fs = require('fs'), os = require('os'), path = require('path');
 const { openApp, openPanel, settle, getState, openProjectFile } = require('./helpers/harness');
 
 const setv = (page, id, v, ev = 'input') => page.locator('#' + id).evaluate((e, [v, ev]) => { e.value = v; e.dispatchEvent(new Event(ev, { bubbles: true })); }, [v, ev]);
-const pick = (page, v) => setv(page, 'lmsel', v, 'change');
+const pick = (page, v) => page.click(`#lmode [data-m="${v}"]`);
 
 // one plain Repeat layer: no jitter, no offset, so the points are exactly where the arrangement puts them
 async function oneLayer(page, name) {

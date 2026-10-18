@@ -4,7 +4,7 @@ const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harn
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
-const pick = (page, v) => page.locator('#lmsel').evaluate((e, x) => { e.value = x; e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+const pick = (page, v) => page.click(`#lmode [data-m="${v}"]`);
 const piece = async page => JSON.parse(await getState(page)).layers[0].pl[0];
 const box = p => { const w = p.s * (p.wx || 1), h = p.s * (p.wy || 1); return { l: p.x - w / 2, r: p.x + w / 2, t: p.y - h / 2, b: p.y + h / 2, w, h }; };   // a stamp's tile is square here
 async function setup(page) {

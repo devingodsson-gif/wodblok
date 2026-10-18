@@ -6,7 +6,7 @@ const path = require('path');
 const os = require('os');
 const { openApp, openPanel, settle, getState, setMode, openProjectFile } = require('./helpers/harness');
 
-const pick = (page, v) => page.locator('#lmsel').evaluate((e, x) => { e.value = x; e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+const pick = (page, v) => page.click(`#lmode [data-m="${v}"]`);
 const outline = (page, panel) => page.evaluate(p => {
   const s = document.querySelector(`section.pn[data-p="${p}"]`);
   const rows = [...s.querySelectorAll('summary, label, button, input')].map(e => e.tagName === 'INPUT' ? 'input:' + e.type + (e.min ? ':' + e.min + '-' + e.max : '') : e.tagName === 'SUMMARY' ? 'summary:' + e.firstChild.textContent.trim() : e.tagName.toLowerCase() + ':' + e.textContent.trim());
@@ -68,7 +68,7 @@ test('Snap to grid in the Grid tool snaps every placed stamp, and off leaves the
 test('Layout no longer has its own snap boxes; Pictures and Text layers use the same Grid switch', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
-  for (const m of ['x', 'a', 't']) { await pick(page, m); await settle(page); await expect(page.locator('section.pn[data-p="layers"] :text("Snap to grid")')).toHaveCount(0); }
+  for (const m of ['x', 'p', 'f']) { await pick(page, m); await settle(page); await expect(page.locator('section.pn[data-p="layers"] :text("Snap to grid")')).toHaveCount(0); }
   expect(errors).toEqual([]);
 });
 
