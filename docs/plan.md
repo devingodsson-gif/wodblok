@@ -211,3 +211,6 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - **Stamp editor Text tool works like the Text layer**: typing puts the text on the cursor as a faint copy, a click on the stamp puts it down there, and it stays on the cursor so you can put it down again. Esc or right-click stops (the button is pressed while the text is on the cursor). The "Add to stamp" button is now **Add text**, the same as the layer one; selecting a placed text still edits it live.
 - **Both editors draw the box of the text while it is on the cursor**: the Stamp editor and the Text layer show a dashed outline round the text that follows Box width and Box height (it is the size of the letters when those are Auto).
 - Tests: `text-place`; `text-live`, `text-symmetry`, `text-editor-shared`, `text-box-wrap` and the text smoke test in `scenarios` now put the text down with a click (helper `putText`).
+
+## 1.38.1: Tests follow 1.37.0
+- The selection-handle tests count the four side squares; the Randomize seed-1 snapshot gains `wd`, `ht` and `va` on its random text (approved).
