@@ -398,7 +398,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 - One status line at the bottom of the window. Messages are short past-tense sentences with the name in curly quotes: `Saved template “Rose”`, `Started from “Brick”`, `Could not read that file`. Library messages are in section 12.9.
 - The unsaved state is an 8px dot (`--warn`) beside the name; no text.
 - No toasts, no `alert`, `confirm` or `prompt`.
-- The account chip ("Hi Devin!", the one place an exclamation mark is allowed: the owner asked for it to match the website; `--fs-s`, `--mut`, a quiet button) sits at the right of the status line and exists only while signed in.
+- The account chip ("Hi <first name>!", the one place an exclamation mark is allowed: the owner asked for it to match the website; `--fs-s`, `--mut`, a quiet button) sits at the right of the status line and exists only while signed in.
 
 ### 10. States
 

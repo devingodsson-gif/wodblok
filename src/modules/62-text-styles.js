@@ -36,7 +36,7 @@ function tsNameOk(s){s=String(s||'').trim();return s&&s.length<=30&&!/[\\"<>&|/]
 function tsSnap(){const o=txoRead();delete o.text;delete o.sty;return o}
 function tsApply(c){const cur=txoRead(),keep=teF[c.o.f]?{}:{f:cur.f},o={text:cur.text,f:cur.f,sz:cur.sz,wd:cur.wd,ht:cur.ht,ls:0,ws:0,lh:115,al:'c',tc:'',va:'t',cv:0,rot:0,...c.o,...keep};if(cur.sty)o.sty=cur.sty;o.text=cur.text;
  txoWrite(o,null,false);$('tx_f').dispatchEvent(new Event('input',{bubbles:true}));pmsg('Applied the style “'+tsNameOf(c)+'”.')}
-function tsRow(c,depth,own){const f=teF[c.o.f]||teF.cinzel,pv=`<span class="tsa" style="font-family:${tsEsc(f.fam||'serif')},serif;font-weight:${f.w||400}" aria-hidden="true">Aa</span>`;
+function tsRow(c,depth,own){const f=teF[c.o.f]||teF.cinzel,pv=`<span class="tsa" style="font-family:'${tsEsc(f.fam||'Cinzel')}',sans-serif;font-weight:${f.w||400}" aria-hidden="true">Aa</span>`;
  if(TS.ren===c.id)return`<div class="str scr ren" data-c="${c.id}" style="--d:${depth}">${pv}<input type="text" maxlength="40" value="${tsEsc(c.n)}" placeholder="Text style" aria-label="Style name"></div>`;
  return`<div class="str scr" data-c="${c.id}" role="listitem" tabindex="0" style="--d:${depth}" aria-label="${tsEsc(tsNameOf(c))}">${pv}<b>${tsEsc(tsNameOf(c))}</b><small>${tsEsc(f.lbl||f.fam||'')}</small><button type="button" class="ib" data-more aria-haspopup="menu" aria-expanded="false" aria-label="Style menu">${tsMORE}</button>${own?`<button type="button" class="ib" data-del aria-label="Delete ${tsEsc(tsNameOf(c))}">${tsX}</button>`:''}</div>`}
 function tsFrow(key,label,count,depth,o){const open=TS.open.has(key);
