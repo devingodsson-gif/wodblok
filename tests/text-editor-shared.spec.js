@@ -1,7 +1,7 @@
 // 1.36.0: the Text tool (Stamp editor) and the Text layer use the same controls; 20 more fonts, each shown in its own face;
 // word spacing, justify and case; Enter is a new line in both.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle, getState } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, setMode, settle, getState, putText } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -46,8 +46,7 @@ test('case, word spacing and justify change the letters on the stamp; Enter is a
   const keys = async () => JSON.parse(await getState(page)).tiles[0].items.map(i => i.m);
   const xs = async () => JSON.parse(await getState(page)).tiles[0].items.map(i => i.x);
   await page.fill('#tx_t', 'ab');
-  await page.click('#tx_go');
-  await settle(page, { max: 30000 });
+  await putText(page);
   const k0 = await keys();
   await page.click('#tx_tc [data-c="u"]');
   await expect.poll(keys, { timeout: 15000 }).not.toEqual(k0);       // A and B instead of a and b

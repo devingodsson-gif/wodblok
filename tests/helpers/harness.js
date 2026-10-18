@@ -185,4 +185,15 @@ function motifPoint(page, { pad = 20, bottom = 120, c0 = false } = {}) {
     return null;
   }, { pad, bottom, c0 });
 }
-module.exports = { motifPoint, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, setMode, checkpoint };
+// Stamp editor Text tool (1.38.0): typing puts the text on the cursor; a click on the stamp puts it down. This clicks the middle of the stamp, then lets go of the cursor
+// (right-click) and selects everything (Ctrl+A), so the placed text is the selected one and the panel edits it.
+async function putText(page, { select = true } = {}) {
+  const b = await page.locator('#ed').boundingBox(), x = b.x + b.width / 2, y = b.y + b.height / 2;
+  await page.mouse.move(x - 6, y - 6); await page.mouse.move(x, y); await page.mouse.click(x, y);
+  await settle(page, { max: 30000 });
+  await page.mouse.click(b.x + 4, b.y + 4, { button: 'right' }); await settle(page, { max: 30000 });
+  if (select) {
+    await page.keyboard.press('Control+a'); await settle(page, { max: 30000 });   // everything on the stamp is the text, so it is selected as one text
+  }
+}
+module.exports = { motifPoint, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, setMode, checkpoint, putText };
