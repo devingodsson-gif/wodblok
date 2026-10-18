@@ -1,6 +1,6 @@
 # WODBLOK layer update: one continuous editing environment
 
-Written Oct 18, 2026 against 1.43.0. Status: **started Oct 18 2026** (the owner said to start). The text update (1.46.0) is finished and live. The update is called the **layer update**. Work is done one complete step at a time; after each step this document gets the outcome (see "Progress log" at the end), and anything learned goes into docs/agent-memory.md.
+Written Oct 18, 2026 (updated through the day). Status: **started Oct 18 2026** (the owner said to start). The text update (1.46.0) is finished and live. The update is called the **layer update**. Work is done one complete step at a time; after each step this document gets the outcome (see "Progress log" at the end), and anything learned goes into docs/agent-memory.md.
 
 ## What you asked for (repeated back)
 
@@ -43,8 +43,8 @@ None of this is a reason not to do it. It is a reason to build it in small steps
 
 **Tools** (left rail), one for everything a layer type used to be (owner's note, Oct 18): **Select**, **Arrange** (was the Repeat layer: choose the stamps and the layout, one arrangement per layer), **Frame** (was the Frame layer: a border arrangement; the same arrangement data with the frame kind chosen), **Stamp** (the stamp library: pick, New, Save, Load, Duplicate, locks, Zoom to stamp; also free placing a stamp), **Shape** (was part of Free place), **Image** (was the Art/Pictures layer: import, crop, saved-project links), **Text**, **Grid** (snapping). Panels stay as now (Layers, Colours, Textures, Navigator...). Every tool works on the current layer whatever else the layer holds. Arrange and Frame edit the layer's one arrangement, so choosing Frame on a layer that already has a Repeat arrangement replaces it (undoable). The stamp outlines with the opacity slider show whenever the layer has an arrangement, whichever tool is active.
 
-**Stamp tool, on a layer**
-- Panel: the stamps in the project (pick several to be active), **New stamp** (choose the outline), **Save** and **Load** stamps (the stamp library as today), and the arrangement controls we have now.
+**Arrange and Stamp tools, on a layer** (the Arrange tool holds the layout; the Stamp tool holds the stamps; both draw the same outlines)
+- Stamp panel: the stamps in the project, **New stamp** (choose the outline), **Save** and **Load** stamps (the stamp library as today), locks, Zoom to stamp. Arrange panel: pick which stamps are active (several) and the arrangement controls we have now.
 - On the canvas it draws the arrangement of the chosen stamps with their **outlines visible even when empty**, so a triangle and a square with nothing in them still show as shapes laid out in a brick pattern. **Outline opacity** slider.
 - **Lock icon on every stamp** (in the Stamp tool's stamp list, and on the stamp's outline on the canvas). **Unlocked = editable.** Stamps start locked, so nothing changes a stamp by accident.
 - **Place a shape over an unlocked stamp's outline:** it lands in that stamp, in the stamp's own coordinates (mapped back through the instance you placed it over), and every instance in the arrangement shows it, live. On another layer, picking the same stamp again shows the same contents.
