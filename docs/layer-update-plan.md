@@ -65,7 +65,7 @@ None of this is a reason not to do it. It is a reason to build it in small steps
 |---|---|
 | Stamp editor mode | Gone. The owner's view: most of its tools duplicate the Canvas-mode tools, so only the few unique ones need a new home (step 0 lists them). They work on unlocked stamps |
 | Shapes panel (motif library) | Stays, as the source for placing shapes |
-| Shape editor | Stays; opens on a shape selected in a stamp or free |
+| Shape editor | Renamed the **Element editor** (owner, Oct 18). It edits whatever is selected, the same way the old Shape editor did: a shape, an image, a text or a stamp, free on the layer or inside an unlocked stamp. Its controls follow the kind of element (a shape's colour and flips, an image's crop, a text's size and rotation, a stamp's size and flip). It floats, opens when an element is placed, and has the same small toggle to turn the automatic opening off |
 | Stamp panel (outline, size, symmetry, carve, textures) | Becomes the Stamp settings panel for the unlocked stamp |
 | Pattern preview panel | Gone (decided): the canvas is the preview. Navigator stays |
 | Grid tool | Stays (snapping), works the same inside an unlocked stamp |
@@ -132,7 +132,7 @@ So for 1.44.0 to 1.46.0: (a) first make one shared reader/writer for the text op
 | 3 | **Arrangement on any layer.** The Layout panel becomes the arrangement section of a Stamp tool; frame becomes a kind of arrangement | high |
 | 4 | **Stamp instances on the canvas.** Outlines (with the opacity slider), picking several stamps, hit-testing an instance, the transform from the canvas into a stamp's own space, the lock icons and what an unlocked stamp accepts | high |
 | 5 | **Drawing into a stamp:** placing shapes, images and text into an unlocked stamp from the canvas, clipped to its outline; select, move, handles, rotate, delete; live update of every instance | high |
-| 6 | **The unique Stamp-editor tools on the canvas** (from the step 0 audit): for example symmetry, wrap, the shape editor, grid snapping inside a stamp. Tools that duplicate Canvas mode are dropped | medium |
+| 6 | **The unique Stamp-editor tools on the canvas** (from the step 0 audit): for example symmetry, wrap, the Element editor, grid snapping inside a stamp. Tools that duplicate Canvas mode are dropped | medium |
 | 7 | **Stamp settings:** outline shape and size, carved edges, pressure, textures, stamp ink colours, multiple colours per stamp | medium |
 | 8 | **Stamp library:** New stamp, Save, Load, Duplicate, delete (see "Behaviours to settle") | medium |
 | 9 | **Retire the Stamp editor.** One panel list for the whole app, workspaces migrated, commands, shortcuts, rail, Pattern preview removed | high |
@@ -162,7 +162,7 @@ One entry per finished step: version, what changed, what was tested, anything th
 
 ### Step 0 audit: Stamp editor panels against Canvas mode (Oct 18 2026, read from `MODEP` in `34-desktop-shell.js`)
 - **Shared today** (same panel in both modes, no work): Workspaces, Presets, Text, Colours, Colourways, Grade, Textures, Randomize, History, Stamp library.
-- **Stamp editor only:** Shapes library (`motifs`) stays as the source for placing shapes; the shape list of a stamp (`mlist`) becomes the layer's item list (the Layers panel shows items); Shape editor (`sedit`) stays and opens on any selected shape; Stamp settings (`stamp`: outline, size, symmetry, wrap, carve, pressure, textures) becomes the settings of the unlocked stamp; Stamp grid (`grid`) is dropped in favour of the one grid tool (`pgrid`); **Pattern preview (`preview`) is dropped** (decided).
+- **Stamp editor only:** Shapes library (`motifs`) stays as the source for placing shapes; the shape list of a stamp (`mlist`) becomes the layer's item list (the Layers panel shows items); Shape editor (`sedit`) becomes the **Element editor** and opens on any selected element (shape, image, text or stamp); Stamp settings (`stamp`: outline, size, symmetry, wrap, carve, pressure, textures) becomes the settings of the unlocked stamp; Stamp grid (`grid`) is dropped in favour of the one grid tool (`pgrid`); **Pattern preview (`preview`) is dropped** (decided).
 - **Canvas mode only:** Layers, Layout (becomes the Stamp tool's arrangement section), Canvas, Navigator, Export recipes, Variations stay.
 - **Unique tools to move onto the canvas (step 6):** symmetry, wrap at the edges, carved edges, uneven pressure, marquee on stamp contents, snapping inside a stamp. Everything else the Stamp editor does is already a Canvas-mode tool.
 - Still to do in step 0: the clickable mock-up of the unified screen, for the owner to approve before any code.

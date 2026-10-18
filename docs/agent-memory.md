@@ -35,4 +35,5 @@ Last updated Oct 18 2026 (version 1.46.0).
 - **Public repo:** public while developed; see `docs/public-repo.md` and Part 8 of `docs/developing-wodblok.md`.
 
 ## The layer update (started Oct 18 2026)
+Owner additions (Oct 18): the tool rail has one tool per old layer type (Select, Arrange, Frame, Stamp, Shape, Image, Text, Grid); the Shape editor is renamed the **Element editor** and edits any selected shape, image, text or stamp.
 The owner's decisions are in `docs/layer-update-plan.md`: no layer types, one continuous editing environment, a Stamp tool with outlines and an opacity slider, stamps are global, each stamp has a lock (locked by default; unlocked stamps take edits, locked ones don't), stamp contents are clipped at the outline, one arrangement per layer, Duplicate stamp yes, "Make unique" no, Pattern preview panel removed, Zoom to stamp with a Solo layer button, no Labs switch and no old editor kept, **no backwards compatibility at all** (old project files and templates need not open; the "old files must open" rule is removed when step 1 starts).
