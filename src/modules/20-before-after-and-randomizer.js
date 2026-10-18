@@ -15,6 +15,8 @@ import {coreStr,pmsg} from './18-projects-and-cover-overlay.js';
 import {wbHold} from './19-randomize-and-hold.js';
 import {fpU} from './24-free-place-layers.js';
 import {SL,libColors,libMotifs} from './27-stamp-library.js';
+// a layer that holds pictures or text boxes: Randomize keeps these
+const rzPic=l=>(l.pl||[]).some(p=>p.a||p.tx);
 // ===== v96 Before / after. `\` flips between the picture and the "before" (tap to stay, hold to peek); Shift+`\` splits the view with a draggable line.
 // The "before" is the first state of this project in the History panel unless another history step or snapshot is chosen there.
 let wbBA;function randomize(fresh){if(WBX.wbBA)wbBA.off();wbHold.start();let r;try{r=randomize0(fresh)}catch(e){wbHold.arm();throw e}if(r&&typeof r.then=="function")r.then(()=>wbHold.arm(),()=>wbHold.arm());else wbHold.arm();return r}
@@ -162,15 +164,15 @@ rzUse=(pool,md)=>{const t=pick(pool),L=txMake(t,{a:md=='wear'?ri(18,60):md=='sta
 rzList=(m,w,n)=>{const pool=rzPool(m),u=[];if(!pool.length||!rzMds(m).length)return u;for(let i=0;i<n;i++){const md=rzMd(m,w);if(md)u.push(rzUse(pool,md))}return u},
 WCV={relief:3,stain:1,wear:1.4},WST={wear:4,relief:1.5,stain:1},
 rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u:(sOn('tx','none')&&ch(.2)?[]:rzList('tx',WCV,ch(.3)?2:1));
-const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(l=>l.art)?[]:WBS.layers.filter(l=>l.art||l.txt)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:rzCv(),v:87}};
+const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(rzPic)?[]:WBS.layers.filter(rzPic)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:rzCv(),v:87}};
 if(RZ.keep.pr)c.pr={...WBS.pr};
 if(FT.pr&&!sOn('pr','edges')){c.pr.e=WBS.pr.e;c.pr.q=WBS.pr.q}
 if(FT.pr&&sOn('pr','edges')&&AM('pr')<1){c.pr.e=Math.round(c.pr.e*AM('pr'));c.pr.q=Math.round(c.pr.q*AM('pr'))}
 // textures: a Print effects roll gives each stamp (and layer, and text box) its own textures, each in its own mode
 if(FT.pr&&sOn('pr','surf')){c.tiles.forEach(t=>{t.tu=sOn('pr','t_clean')&&ch(.25)?[]:rzList('pr',WST,ch(.3)?2:1);delete t.is})}
 else{const src=(WBS.tiles.find(t=>t.tu&&t.tu.length)||{}).tu;c.tiles.forEach(t=>{if(t.is===undefined&&t.tu===undefined)t.tu=src?src.map(u=>({x:u.x,sd:txRid(),md:u.md})):[]})}
-if(FT.pr&&sOn('pr','lay'))c.layers.forEach(l=>{if(!l.art&&!l.txt&&ch(.3))l.tu=rzList('pr',WST,1)});
-if(FT.pr&&sOn('pr','txt'))c.layers=c.layers.map(l=>{if(!l.txt||!(l.pl||[]).length)return l;const q=JSON.parse(JSON.stringify(l));q.pl.forEach(p=>{if(p.tx&&ch(.6))p.tu=rzList('pr',WST,1)});return q});
+if(FT.pr&&sOn('pr','lay'))c.layers.forEach(l=>{if(!rzPic(l)&&ch(.3))l.tu=rzList('pr',WST,1)});
+if(FT.pr&&sOn('pr','txt'))c.layers=c.layers.map(l=>{if(!(l.pl||[]).some(p=>p.tx))return l;const q=JSON.parse(JSON.stringify(l));q.pl.forEach(p=>{if(p.tx&&ch(.6))p.tu=rzList('pr',WST,1)});return q});
 c.pr.t='';
 // Colours: when the palette changes (a new palette, or paper and ink swapped), kept stamps and layers that carry their own accent ink move to the new palette too
 if(FT.col&&(sOn('col','pal')||newPal)&&!noAcc){const keepN=new Set(PC),mapInk=n=>{if(!n||!okC(n)||isFixed(n)||keepN.has(n)||acc.includes(n))return n;if(!(n in inkMap))inkMap[n]=inkFor()||n;return inkMap[n]};
@@ -215,7 +217,7 @@ if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:
 if(c.layers.some(l=>LS.includes(l)))LS.forEach(l=>{if(c.layers.includes(l)&&l.fit&&!l.gl)l.size=+fitTs(l).toFixed(3)});store();upd();
 // Layout: pattern type, stamp size, spacing and scatter, offset, rotation and flips of the layers that repeat. Works on whatever layers the project has now.
 if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('layout','rot'),lty=sOn('layout','type'),lof=sOn('layout','offset'),
- lays=WBS.layers.filter(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.art&&!l.txt),lnk=new Set(WBS.layers.filter(l=>l.gl).map(l=>l.gl)),
+ lays=WBS.layers.filter(l=>!l.free&&!(l.fr&&l.fr.on)),lnk=new Set(WBS.layers.filter(l=>l.gl).map(l=>l.gl)),
  lrd=sOn('layout','radial')&&!(WBS.dim.rt&&!WBS.book.on),lvr=sOn('layout','vary'),
  EN=[...(lsp?[['scatter',1.2]]:[]),...(lrt?[['tilt',1.1],['spread',1],['flips',1]]:[]),...(lvr?[['sizevar',1],['gaps',.8]]:[])],E=new Set();
  // at most two energetic effects per roll (position scatter, turned grid, rotation spread, flips), so a piece stays coherent
@@ -243,9 +245,9 @@ if(FT.look){const bl=['multiply','darken','screen','lighten','overlay','soft-lig
   if(sOn('look','op')){if(ch(i?.7:.3))l.op=ri(i?45:75,i?92:96);else delete l.op}
   if(bl.length&&i>0){if(ch(.65))l.bl=pick(bl);else if(l.bl&&l.bl!='behind'&&l.bl!='cancel'&&l.bl!='replace')delete l.bl}});store();upd()}
 // Print effects, Impression: uneven pressure and ink flooding on the layers you already had as well as the new ones
-if(FT.pr&&sOn('pr','press')){WBS.layers.forEach(l=>{if(l.art||l.txt||l.rz=='free')return;l.pst=ch(.5)?0:ri(1,6);l.pfl=l.fr&&l.fr.on?0:ch(.65)?0:ri(1,3)});store();upd()}
+if(FT.pr&&sOn('pr','press')){WBS.layers.forEach(l=>{if(l.free&&rzPic(l)||l.rz=='free')return;l.pst=ch(.5)?0:ri(1,6);l.pfl=l.fr&&l.fr.on?0:ch(.65)?0:ri(1,3)});store();upd()}
 // Stamp library, mixed into the pattern: one or two saved stamps join the repeating layer
-if(libPat){const L0=WBS.layers.find(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.art&&!l.txt&&!l.gl),lead0=L0&&WBS.tiles.find(t=>t.id==(L0.lead!=null?L0.lead:(L0.st||[])[0]));
+if(libPat){const L0=WBS.layers.find(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.gl),lead0=L0&&WBS.tiles.find(t=>t.id==(L0.lead!=null?L0.lead:(L0.st||[])[0]));
  if(L0){const n=ri(1,Math.min(2,window.SLC.length));let nx=Math.max(0,...WBS.tiles.map(t=>+t.id||0));for(let i=0;i<n;i++){const t=libTile(++nx);if(!t)continue;if(lead0&&t.sh&&lead0.sh&&t.sh.k!=lead0.sh.k)t.sh={...t.sh,z:85};WBS.tiles.push(t);L0.st=[...(L0.st||[]),t.id];libDone=true}
   WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));store();upd()}}
 // Free-placed stamps: a single feature, or a few stamps, set on the pattern grid and snapped to it, often with lettering. Added as their own Free place layer on top.

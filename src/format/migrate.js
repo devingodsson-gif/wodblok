@@ -6,8 +6,9 @@ const FMT_STEPS = {
   18: p => ({ ...p, v: 19 }),   // 18 -> 19: same content; images move out of the JSON into assets/ when packed (see container.js)
   19: p => ({ ...p, v: 20 }),   // 19 -> 20: colours live in the tray (proj.ts / proj.cw). Colour names from older files are turned into tray colours
                                 //   by the app when it opens the project (src/modules/50-tray-core.js, trayIn): that needs the app's colour tables.
-  20: p => ({ ...p, v: 21 }),   // 20 -> 21 (layer update, step 1): any layer may hold items (layer.pl: free stamps t, pictures a, text boxes tx) in any mix, whether
-                                //   or not it has an arrangement. Nothing in an old file moves; the number changes so an older app opens a file that uses this read-only.
+  20: p => ({ ...p, v: 21, layers: Array.isArray(p.layers) ? p.layers.map(L => { if (!L || typeof L !== 'object') return L; const { art, txt, ...r } = L; return r; }) : p.layers }),
+                                // 20 -> 21 (layer update): any layer may hold items (layer.pl: free stamps t, pictures a, text boxes tx) in any mix, whether or not it has an
+                                //   arrangement (layer.free: true means none). The layer kind flags art and txt are gone: what a layer holds is what is in layer.pl.
 };
 // Returns { project, newer }. A file from a newer app is returned untouched with newer:true (open read-only, never rewrite).
 function fmtMigrate(p) {

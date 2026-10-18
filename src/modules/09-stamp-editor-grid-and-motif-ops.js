@@ -50,7 +50,7 @@ function edTxR(t){const G=geom(shOf(t)),k=edTexK(t),w=k*G.SW,h=k*G.SH,m=Math.max
 function edRgnSet(s,id,r){const f=v=>(+v).toFixed(3);return s.replace(new RegExp('(<filter id="'+id+'"[^>]*?) x="[^"]*" y="[^"]*" width="[^"]*" height="[^"]*"'),`$1 x="${f(r.x)}" y="${f(r.y)}" width="${f(r.w)}" height="${f(r.h)}"`)}
 // Texture view: the canvas texture lives in canvas units, so it is mapped at the size this stamp prints in the pattern (same maths as the stamp PNG export)
 function edTexK(t){const G=geom(shOf(t));let k=180/Math.max(G.SW,G.SH);
-try{const li=WBS.layers.findIndex(l=>l.vis!==false&&(l.st||[]).includes(t.id)&&!l.art&&!l.txt&&!(l.fr&&l.fr.on));if(li>=0){const L=WBS.layers[li];if(!L.free){const T=lattice(L);k=T.ts*(shOf(t).z||100)/(T.g.SW*T.z)*1.004}else{const q=(L.pl||[]).find(z=>z.t==t.id);if(q)k=q.s/Math.max(G.SW,G.SH)}}}catch(e){}
+try{const li=WBS.layers.findIndex(l=>l.vis!==false&&(l.st||[]).includes(t.id)&&!(l.fr&&l.fr.on));if(li>=0){const L=WBS.layers[li];if(!L.free){const T=lattice(L);k=T.ts*(shOf(t).z||100)/(T.g.SW*T.z)*1.004}else{const q=(L.pl||[]).find(z=>z.t==t.id);if(q)k=q.s/Math.max(G.SW,G.SH)}}}catch(e){}
 k=Math.min(k,.95*Math.min(CW,CH)/Math.max(G.SW,G.SH));return k>0?k:1}
 function edInkOn(t,cl){const bg=`<path class="edbg" d="${shp(0)}" fill="${cl.bg}"/>`,it=`<g clip-path="url(#ec)">${items(t,cl,1,24)}</g>`,si=WBS.edInk&&isOf(t),tx=WBS.edTx&&!!WBS.tex.t;
 if(!si&&!tx)return bg+'<g class="gw gi">'+it+'</g>';
