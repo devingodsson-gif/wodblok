@@ -243,3 +243,14 @@ Third step of the text upgrade (project doc `claude/wodblok-text-plan.md`). Same
 - Not in this release (still planned): Stretch to box, box shapes, Fit to stamp, columns, and a marker on a placed text that overflows.
 - Tests: `text-fit`; `text-editor-shared` checks the Text panel stays open.
 
+## 1.42.0: Real font outlines
+Fourth step of the text upgrade (project doc `claude/wodblok-text-plan.md`).
+- **Letters come from the font file itself** (opentype.js 2.0.0, MIT, vendored in `src/vendor/` with its licence; approved as a new dependency). A letter is now a handful of exact curves instead of a traced picture (a few dozen path commands instead of hundreds): no softened corners, no broken hairlines, the same in every browser.
+- **Fallback**: a letter the font file cannot give (a font opentype.js cannot read, such as a .woff2 you load yourself, or a missing letter) is traced from the browser's drawing as before.
+- **Fonts**: the 34 lettering fonts are now `.woff` files with overlapping contours merged (`tools/fonts-to-woff.py`; opentype.js cannot read `.woff2`). The browser uses the same files for display. About +0.4 MB in the built page (13.04 to 13.43 MB). Licences unchanged (OFL, Apache).
+- **Layout is unchanged**: line breaks, kerning and widths still come from the browser's measuring, so existing texts keep their positions.
+- **Files**: no format change. Letters already stored in a project keep their stored shape; new letters use the new outlines.
+- **Snapshot**: `randomize-seed-1-state.json` changes in four lines (a letter's position moves by 0.04 because its ink centre is now exact). Needs approval.
+- Not in this release: kerning modes, ligatures, small caps and other OpenType features, variable-font sliders (the outlines now allow them).
+- Tests: `text-outlines`.
+
