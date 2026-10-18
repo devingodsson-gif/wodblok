@@ -68,6 +68,7 @@ const COMMANDS = [
   ['panel.sedit', 'Open Shape editor', 'rail-sedit'],
   ['panel.lyrs', 'Open Layers', 'rail-lyrs'],
   ['panel.layers', 'Open Layout', 'rail-layers'],
+  ['panel.stmp', 'Open Stamps', 'rail-stmp'],
   ['panel.pgrid', 'Open Grid', 'rail-pgrid'],
   ['panel.grade', 'Open Colour grading', 'rail-grade'],
   ['panel.tex', 'Open Textures', 'rail-tex'],

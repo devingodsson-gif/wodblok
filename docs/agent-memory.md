@@ -60,3 +60,13 @@ The owner's decisions are in `docs/layer-update-plan.md`: no layer types, one co
 **Known failures that are not the layer update's.** `scenarios` "randomize with seed 1" (a letter's y 120 vs 120.038; pending snapshot approval, differs locally on `main` too) and `templates` "no id appears twice" (`tx_sc` used twice since 1.43.0; in known-issues.md). Everything else in the areas tested so far passed.
 
 **Open questions for step 4 (the Stamp tool) to put to the owner before building.** How an outline looks (proposed: unlocked in the accent colour with an open-lock icon, locked plain and dim); where the opacity slider lives; one unlocked stamp at a time (proposed) or several; whether the lock icon sits on the canvas outline, in the stamp list, or both (plan says both); how a stamp is chosen for the arrangement (several at once, as the Stamp strip does now).
+
+## Layer update step 4: owner's answers (Oct 18 2026)
+- Unlocked stamp outline: accent colour with an open-lock icon; locked outlines plain and dim. The Stamp tool panel shows "Editing: Stamp N (used on K layers)" while one is unlocked.
+- Only one stamp is unlocked at a time; unlocking another locks the previous one. Not saved: a file opens with every stamp locked, and switching layer locks again.
+- The lock icon sits **only in the stamp list** of the Stamp tool, not on the canvas outline (this replaces the plan's "both").
+- Several stamps can be picked for the arrangement at once (as the Stamp strip does now).
+- The outline opacity slider lives in the Stamp tool panel (my placement; the owner said the proposals were good).
+- All new UI follows the CSS guidelines in docs/developing-wodblok.md Part 9 (tokens, three radii, three font sizes, `--h-*` heights, one row design, no explanatory text); run `npm run check:style`.
+- Step 4 is built (1.46.4, same branch): Stamps panel and rail tool, outlines in a sibling overlay svg (never inside `#art`, or the SVG snapshots change), one-at-a-time unlock, hit test and canvas-to-stamp transform. Lesson: anything added inside `#art` changes every SVG summary snapshot; draw overlays outside it. Lesson: New stamp (`#addT`) switches to the Stamp editor, so tests go back with `setMode(page, 'pattern')`. Next is step 5 (drawing into an unlocked stamp from the canvas); see docs/layer-update-plan.md "Step 4 outcome".
+

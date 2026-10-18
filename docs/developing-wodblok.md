@@ -465,7 +465,7 @@ A library is any collection a person saves things into and later chooses from. T
 | Export recipes | Export presets | Rows |
 
 Rule: if someone chooses one of many saved things from a list or a menu, it is a library and it uses this tree. No library gets its own list design, its own folder design or its own words. A short list is still the tree, just with no folders made yet.
-Not libraries: the layers list, the tray's 16 colour places, history, and **this project's colourways** (a handful of cards that belong to the document, so no folders). A colourway becomes a library item only when it is saved to the Colourways library.
+Not libraries: the layers list, the Stamps tool's list of this project's stamps, the tray's 16 colour places, history, and **this project's colourways** (a handful of cards that belong to the document, so no folders). A colourway becomes a library item only when it is saved to the Colourways library.
 
 #### 12.2 One tree
 
