@@ -57,3 +57,6 @@ For about half a second after opening the busy test project (`project-4`), 18 `<
 
 ## Old files' layer inks (fixed in 1.10.0 by the tray)
 Since the colour library became Wada's colours, a layer ink saved with an older colour name (for example "Moon Ivory" on layers 2-4 of `project-4-rect-4x3`) was left out when the file opened, so those layers printed in their stamps' own colours. 1.10.0 turns the file's colour names into tray colours (a name from the first 100-colour palette becomes the nearest palette colour, as it always did for paper, ink and stamps), so these layers print in their ink again, as they did when the file was made. Only files with layer inks differ from 1.9 (`project-4-rect-4x3` of the test files: picture-compare compares it loosely, the other two exactly), and the slider-drag perf ratio on that file moves from about 0.8 to about 1.0 of legacy: the layer ink filters are drawn again, as legacy draws them.
+
+## Two controls share the id `tx_sc` (found in the layer update step 2; on `main` since the text update, 1.43.0)
+The Stamp editor's text Scatter control (`<div class="seg" id="tx_sc">`) and the text Scale slider (`<input id="tx_sc">`) have the same id. `tests/templates.spec.js` "no id appears twice on the page" fails on it. Not caused by the layer update; not fixed in it.

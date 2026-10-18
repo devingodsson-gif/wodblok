@@ -296,3 +296,9 @@ First step of the layer update (docs/layer-update-plan.md). Data and drawing onl
 - File format 21 (the number changes so older apps open such files read-only). Pictures used by items on any layer are saved. A layer with damaged pieces is refused.
 - The "old files must open" rule is removed; the 18 to 21 migration and v18 fixtures stay for now.
 - Tests: `layer-items`; `format` expects v21.
+
+## 1.46.2: Layer update, step 2 (any item on any layer)
+Second step of the layer update (docs/layer-update-plan.md). Screens and data.
+- Any layer takes stamps, pictures and text placed by hand, whatever its arrangement. The Layer type dropdown and buttons become Arrangement (None, Repeat, Frame), which keeps what was placed. "+" adds a plain layer. A new Placed items group, and "N placed" in the Layers list.
+- Typing in the Text tool places text on the selected layer. The `art` and `txt` layer flags are dropped when a file is opened (format 21).
+- Tests: `any-layer-items` (new); `layer-types` deleted; several specs updated (listed in the plan).
