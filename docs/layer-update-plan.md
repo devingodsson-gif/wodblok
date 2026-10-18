@@ -153,6 +153,7 @@ My honest estimate is that this is about 12 to 16 patch steps and several times 
 - Public repo rules unchanged.
 
 ## Progress log
+**Start here when picking this up:** the branch is `feat/1.46.1-layers-hold-anything` (steps 1 to 3 = 1.46.1 to 1.46.3, not merged); the handoff notes, lessons and open questions for step 4 are at the end of docs/agent-memory.md.
 One entry per finished step: version, what changed, what was tested, anything the next step must know. Newest last.
 
 | Step | Version | State |
