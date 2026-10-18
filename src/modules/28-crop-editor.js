@@ -4,7 +4,7 @@ import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {txRid} from './16-texture-generators.js';
 import {fpCell,fpFG,fpGrp,fpL,fpPoolOk,fpSnap,fpSnapS,fpTog,fpU} from './24-free-place-layers.js';
-import {artBU,crBox,crPts,crRef,fpBox,fpFlip,fpHandles,fpHit,fpPt,fpRot,fpSz} from './25-art-layers.js';
+import {artBU,crBox,crPts,crRef,fpBox,fpFlip,fpHandles,fpHit,fpPt,fpRot,fpSz,fpWH} from './25-art-layers.js';
 import {tbG,tbRead,tbSty} from './26-text-boxes.js';
 // ===== Crop editor for Art pieces. CR = {u piece, A picture, pts, m 'r'|'p', lv ratio, osw, all, sel vertex, drag, cu/cv middle of the crop the piece was placed by}
 function crP(){const L=fpL();return L&&WBS.CR?(L.pl||[]).find(q=>q.u==WBS.CR.u):null}
@@ -12,9 +12,9 @@ const crC=v=>Math.max(0,Math.min(1,v)),crRect=(a,b,c,d)=>[[a,b],[c,b],[c,d],[a,d
 function crRatio(){if(!WBS.CR||WBS.CR.lv=='free')return null;if(WBS.CR.lv=='orig'){const R=WBS.CR.A.w/WBS.CR.A.h;return WBS.CR.osw?1/R:R}const[a,b]=WBS.CR.lv.split(':').map(Number);return a/b}
 function crFit(){const R=crRatio();if(!R)return;const[b0,b1,b2,b3]=crBox(WBS.CR.pts),A=WBS.CR.A,cx=(b0+b2)/2,cy=(b1+b3)/2,bw=(b2-b0)*A.w,bh=(b3-b1)*A.h;let w,h;if(bw/bh>R){h=bh;w=h*R}else{w=bw;h=w/R}const hw=w/A.w/2,hh=h/A.h/2;WBS.CR.pts=crRect(cx-hw,cy-hh,cx+hw,cy+hh)}
 function crToRect(){const[a,b,c,d]=crBox(WBS.CR.pts);WBS.CR.pts=crRect(a,b,c,d);WBS.CR.m='r'}
-function crLocal(x,y){const p=crP(),A=WBS.CR.A,k=p.s/Math.max(A.w,A.h),f=p.f||1,a=-(+p.r||0)*Math.PI/180,dx=x-p.x,dy=y-p.y,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a);return[WBS.CR.cu+lx/(k*f)/A.w,WBS.CR.cv+ly/k/A.h]}
+function crLocal(x,y){const p=crP(),A=WBS.CR.A,k=p.s/Math.max(A.w,A.h),f=(p.f||1)*(p.wx||1),a=-(+p.r||0)*Math.PI/180,dx=x-p.x,dy=y-p.y,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a);return[WBS.CR.cu+lx/(k*f)/A.w,WBS.CR.cv+ly/(k*(p.wy||1))/A.h]}
 // put a crop on a piece. The visible picture stays exactly where it is on the canvas; only the piece's anchor moves to the middle of the new crop.
-function crSet(q,pts,m){const A=WBS.ARTS[q.a];if(!A)return;const o=crRef(q),bb=crBox(pts),full=m=='r'&&bb[0]<.0005&&bb[1]<.0005&&bb[2]>.9995&&bb[3]>.9995,nu=full?.5:(bb[0]+bb[2])/2,nv=full?.5:(bb[1]+bb[3])/2,k=q.s/Math.max(A.w,A.h),f=q.f||1,r=(+q.r||0)*Math.PI/180,lx=(nu-o.cu)*A.w*k*f,ly=(nv-o.cv)*A.h*k;
+function crSet(q,pts,m){const A=WBS.ARTS[q.a];if(!A)return;const o=crRef(q),bb=crBox(pts),full=m=='r'&&bb[0]<.0005&&bb[1]<.0005&&bb[2]>.9995&&bb[3]>.9995,nu=full?.5:(bb[0]+bb[2])/2,nv=full?.5:(bb[1]+bb[3])/2,k=q.s/Math.max(A.w,A.h),f=(q.f||1)*(q.wx||1),r=(+q.r||0)*Math.PI/180,lx=(nu-o.cu)*A.w*k*f,ly=(nv-o.cv)*A.h*k*(q.wy||1);
 q.x=+(q.x+lx*Math.cos(r)-ly*Math.sin(r)).toFixed(1);q.y=+(q.y+lx*Math.sin(r)+ly*Math.cos(r)).toFixed(1);if(full)delete q.c;else q.c={m:m=='p'?'p':'r',pts}}
 function crDragRect(hn,u,v,alt){const A=WBS.CR.A,R=crRatio(),thr=alt?0:.012,sn=q=>q<thr?0:q>1-thr?1:q;let[u0,v0,u1,v1]=crBox(WBS.CR.pts);const cx=(u0+u1)/2,cy=(v0+v1)/2,mn=.01;u=sn(crC(u));v=sn(crC(v));
 const W=hn.includes('w'),E=hn.includes('e'),N=hn.includes('n'),S=hn.includes('s');
@@ -34,8 +34,8 @@ if(k=='ell'){P=[];for(let i=0;i<36;i++){const t=2*Math.PI*i/36-Math.PI/2;P.push(
 else if(k=='tri')P=[[cx,b1],[b2,b3],[b0,b3]];else if(k=='dia')P=[[cx,b1],[b2,cy],[cx,b3],[b0,cy]];else P=[[b0+.25*w,b1],[b2-.25*w,b1],[b2,cy],[b2-.25*w,b3],[b0+.25*w,b3],[b0,cy]];
 WBS.CR.pts=P;WBS.CR.m='p';WBS.CR.sel=-1}
 function crOv(){if(!WBS.CR)return;const ov=$('fpov'),p=crP();if(!ov||!p||WBS.fpSel!=WBS.CR.u||$('boardP').classList.contains('off'))return;
-const A=WBS.CR.A,k=p.s/Math.max(A.w,A.h),f=p.f||1,hs=Math.max(CW,CH)/95/k,lw=hs/5,n=v=>(+v).toFixed(2),P=WBS.CR.pts.map(q=>n(q[0]*A.w)+','+n(q[1]*A.h)).join(' '),src=artBU(A);
-let g=`<g transform="translate(${n(p.x)} ${n(p.y)}) rotate(${+p.r||0}) scale(${n(k*f)} ${n(k)}) translate(${n(-WBS.CR.cu*A.w)} ${n(-WBS.CR.cv*A.h)})">`;
+const A=WBS.CR.A,k=p.s/Math.max(A.w,A.h),f=(p.f||1)*(p.wx||1),hs=Math.max(CW,CH)/95/k,lw=hs/5,n=v=>(+v).toFixed(2),P=WBS.CR.pts.map(q=>n(q[0]*A.w)+','+n(q[1]*A.h)).join(' '),src=artBU(A);
+let g=`<g transform="translate(${n(p.x)} ${n(p.y)}) rotate(${+p.r||0}) scale(${n(k*f)} ${n(k*(p.wy||1))}) translate(${n(-WBS.CR.cu*A.w)} ${n(-WBS.CR.cv*A.h)})">`;
 g+=`<image href="${src}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none" opacity=".32" pointer-events="none"/><rect x="0" y="0" width="${A.w}" height="${A.h}" fill="none" stroke="#e33" stroke-opacity=".45" stroke-width="${n(lw)}" stroke-dasharray="${n(lw*4)} ${n(lw*3)}" pointer-events="none"/>`;
 g+=`<clipPath id="crcl"><polygon points="${P}"/></clipPath><image href="${src}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none" clip-path="url(#crcl)" pointer-events="none"/>`;
 g+=`<polygon data-ch="mv" points="${P}" fill="#e33" fill-opacity=".001" stroke="#e33" stroke-width="${n(lw*1.4)}" pointer-events="all" style="cursor:move"/>`;
@@ -48,8 +48,8 @@ ov.innerHTML=g+'</g>';crBarUpd()}
 // Apply / Cancel buttons that float next to the crop box, so you never have to scroll back to the panel to confirm.
 function crBarUpd(){let b=$('crbar');if(!b){b=document.createElement('div');b.id='crbar';b.hidden=true;b.innerHTML='<button type="button" class="primary" id="crbok" title="Apply crop (Enter)">Apply crop</button><button type="button" class="alt" id="crbno" title="Cancel (Esc)">Cancel</button>';document.body.appendChild(b);$('crbok').onclick=crApply;$('crbno').onclick=()=>{WBS.CR=null;upd()}}
 const p=WBS.CR&&crP();if(!WBS.CR||!p||WBS.fpSel!=WBS.CR.u||$('boardP').classList.contains('off')){b.hidden=true;return}
-const A=WBS.CR.A,k=p.s/Math.max(A.w,A.h),f=p.f||1,r=(+p.r||0)*Math.PI/180,c=Math.cos(r),sn=Math.sin(r),bb=crBox(WBS.CR.pts),art=$('art'),m=art.getScreenCTM();if(!m){b.hidden=true;return}
-let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;[[bb[0],bb[1]],[bb[2],bb[1]],[bb[2],bb[3]],[bb[0],bb[3]]].forEach(([u,v])=>{const lx=(u-WBS.CR.cu)*A.w*k*f,ly=(v-WBS.CR.cv)*A.h*k,q=art.createSVGPoint();q.x=p.x+lx*c-ly*sn;q.y=p.y+lx*sn+ly*c;const t=q.matrixTransform(m);x0=Math.min(x0,t.x);y0=Math.min(y0,t.y);x1=Math.max(x1,t.x);y1=Math.max(y1,t.y)});
+const A=WBS.CR.A,k=p.s/Math.max(A.w,A.h),f=(p.f||1)*(p.wx||1),r=(+p.r||0)*Math.PI/180,c=Math.cos(r),sn=Math.sin(r),bb=crBox(WBS.CR.pts),art=$('art'),m=art.getScreenCTM();if(!m){b.hidden=true;return}
+let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;[[bb[0],bb[1]],[bb[2],bb[1]],[bb[2],bb[3]],[bb[0],bb[3]]].forEach(([u,v])=>{const lx=(u-WBS.CR.cu)*A.w*k*f,ly=(v-WBS.CR.cv)*A.h*k*(p.wy||1),q=art.createSVGPoint();q.x=p.x+lx*c-ly*sn;q.y=p.y+lx*sn+ly*c;const t=q.matrixTransform(m);x0=Math.min(x0,t.x);y0=Math.min(y0,t.y);x1=Math.max(x1,t.x);y1=Math.max(y1,t.y)});
 b.hidden=false;const bw=b.offsetWidth,bh=b.offsetHeight,br=$('boardP').getBoundingClientRect();let y=y1+12;if(y+bh>br.bottom-6){y=y0-bh-12;if(y<br.top+6)y=Math.max(br.top+6,Math.min(y1-bh-10,br.bottom-bh-6))}
 const x=Math.max(br.left+6,Math.min((x0+x1)/2-bw/2,br.right-bw-6));b.style.left=Math.round(x)+'px';b.style.top=Math.round(y)+'px'}
 function crSync(){const L=fpL(),p=L&&L.art?(L.pl||[]).find(q=>q.u==WBS.fpSel):null;if(WBS.CR&&(!p||p.u!=WBS.CR.u))WBS.CR=null;const box=$('lcrop');if(!box)return;box.hidden=!(p&&p.a);if(!p||!p.a)return;
@@ -90,7 +90,7 @@ if(e.key=='Delete'||e.key=='Backspace'){e.stopImmediatePropagation();e.preventDe
 {const o1=WBH.fpSync;WBH.fpSync=function(){o1.apply(this,arguments);crSync()};const o2=WBH.fpOverlay;WBH.fpOverlay=function(){o2.apply(this,arguments);crOv();crBarUpd()}}
 // --- canvas: place, select, drag
 $('art').addEventListener('pointerdown',e=>{const L=fpL();if(!L||e.button!==0||$('boardP').classList.contains('off'))return;const[x,y]=fpPt(e);if(!inShape(x,y)&&!(e.target.closest&&e.target.closest('[data-fh]')))return;
-const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,moved:false};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
+const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,x0:hp.x,y0:hp.y,wx0:hp.wx||1,wy0:hp.wy||1,wh0:fpWH(hp)||[1,1],moved:false};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
 if(WBS.txArm&&L.txt&&tbG){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),n=Math.max(tbG.bw,tbG.bh,.01);L.pl.push({u:fpU(),tx:{...tbRead()},G:tbG.G,Lt:tbG.Lt,bw:tbG.bw,bh:tbG.bh,n,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+n.toFixed(2),r:0,f:1,...(tbSty.tu.length?{tu:tbSty.tu.map(u=>({x:u.x,sd:txRid()}))}:{}),...(tbSty.ink?{ink:tbSty.ink}:{})});store();upd();if(WBX.wbCap)WBX.wbCap();return}
 if(WBS.fpB&&(L.art?WBS.ARTS[WBS.fpB]:WBS.tiles.some(t=>t.id==WBS.fpB))){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),q={u:fpU(),[L.art?'a':'t']:WBS.fpB,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+fpSnapS(L,fpSz(),e).toFixed(2),r:fpRot,f:fpFlip};L.pl.push(q);if(fpPoolOk()){const a=[...WBS.fpPool],nx=a[Math.floor(Math.random()*a.length)];WBS.fpB=L.art?nx:+nx}store();upd();if(WBX.wbCap)WBX.wbCap();return}
 const p=fpHit(L,x,y);if(!p){if(WBS.fpSel!==-1||WBS.fpMS.size){WBS.fpSel=-1;WBS.fpMS=new Set();upd()}return}
@@ -100,8 +100,16 @@ $('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBS.fp
 p.x=+nx.toFixed(1);p.y=+ny.toFixed(1);
 const g=document.querySelector(`#art [data-fp="${p.u}"]`);if(g)g.setAttribute('transform',`translate(${p.x} ${p.y})`);$('fpov').innerHTML=fpBox(p,'sel')+fpHandles(p);return}
 if(WBS.fpB||(WBS.txArm&&L.txt)){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpPt(e),e);WBH.fpOverlay()}});
+// Pulling a corner or a side square of a placed piece: the opposite corner or side stays where it is; with Shift it grows from the middle. Corners keep the proportions, sides pull only the width or the height.
+function fpResize(h,x,y,e){const p=h.p,S0=Math.min(CW,CH),a=-(+p.r||0)*Math.PI/180,dx=x-h.x0,dy=y-h.y0,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),[w0,h0]=h.wh0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ox=0,oy=0;
+if(h.k.length==2){const cx=h.k[1]=='e'?1:-1,cy=h.k[0]=='s'?1:-1,Cx=cx*w0/2,Cy=cy*h0/2,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy),s=cl(h.s0*k,S0*.02,S0*3);s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);WBS.fpLast=p.s;k=p.s/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
+else if(p.tx&&h.k.length==1){// a text: the sides pull its box (width wraps the lines, height makes it a fixed box)
+const ra=p.s/Math.max(p.n||1,.01),U=WBX.wbTxUnit(),side=h.k=='e'||h.k=='w',d=h.k=='e'||h.k=='s'?1:-1;if(side){const w=Math.max(U*3*ra,mid?Math.abs(lx)*2:d*lx+w0/2);p.tx={...p.tx,wd:+(w/ra/U).toFixed(2)};if(!mid)ox=d*(w-w0)/2}else{const hh=Math.max(U*3*ra,mid?Math.abs(ly)*2:d*ly+h0/2);p.tx={...p.tx,ht:+(hh/ra/U).toFixed(2)};if(!mid)oy=d*(hh-h0)/2}h.rel=[p,side&&!mid&&!(p.tx.ht>0)]}
+else if(h.k=='e'||h.k=='w'){const d=h.k=='e'?1:-1,w=Math.max(w0*.02,mid?Math.abs(lx)*2:d*lx+w0/2),nx=cl(+(h.wx0*w/w0).toFixed(3),.05,20);if(nx!=1||p.wx)p.wx=nx;if(!mid)ox=d*(w0*nx/h.wx0-w0)/2}
+else{const d=h.k=='s'?1:-1,hh=Math.max(h0*.02,mid?Math.abs(ly)*2:d*ly+h0/2),ny=cl(+(h.wy0*hh/h0).toFixed(3),.05,20);if(ny!=1||p.wy)p.wy=ny;if(!mid)oy=d*(h0*ny/h.wy0-h0)/2}
+const r=-a;p.x=+(h.x0+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(1);p.y=+(h.y0+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(1);if(h.rel&&WBX.wbTbRelay)WBX.wbTbRelay(h.rel[0],h.rel[1],h)}
 $('art').addEventListener('pointermove',e=>{if(!WBS.fpXf)return;const[x,y]=fpPt(e),p=WBS.fpXf.p,S0=Math.min(CW,CH);
-if(WBS.fpXf.k=='sc'){let s=Math.max(S0*.02,Math.min(S0*3,WBS.fpXf.s0*Math.hypot(x-p.x,y-p.y)/WBS.fpXf.d0));s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);WBS.fpLast=p.s}
+if(WBS.fpXf.k!='rot')fpResize(WBS.fpXf,x,y,e);
 else{let r=Math.atan2(y-p.y,x-p.x)*180/Math.PI+90;r=((r+180)%360+360)%360-180;if(e.shiftKey)r=Math.round(r/15)*15;p.r=Math.round(r)}
 WBS.fpXf.moved=true;upd()});$('art').addEventListener('pointerup',xfEnd);$('art').addEventListener('pointercancel',xfEnd);
 $('art').addEventListener('pointerleave',()=>{if(WBS.fpGhost){WBS.fpGhost=null;WBH.fpOverlay()}});$('art').addEventListener('pointerup',fpEnd);$('art').addEventListener('pointercancel',fpEnd);
