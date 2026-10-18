@@ -273,3 +273,11 @@ Sixth step of the text upgrade (project doc `claude/wodblok-text-plan.md`). Same
 - **Data:** `sty`, `ind`, `psp`, `bal` are saved on a text only when set. Old files and snapshots are unchanged.
 - Not in this release: drop caps, hyphenation, justify variants, a caret on the canvas, hand-moved letters on Text layers (Split into letters still does it).
 - Tests: `text-paragraph`.
+
+## 1.45.0: Paths and warp
+Seventh step of the text upgrade (project doc `claude/wodblok-text-plan.md`). Same controls in the Stamp editor and the Text layer.
+- **Path:** None, Wave or Spiral. Path amount (how tall the wave is, or how tightly the spiral closes in) and Path length (wavelength as a share of the line, or the number of turns). A path replaces the Curve arc; Rotate letters still applies.
+- **Warp:** None, Bulge, Rise or Flag, with an amount from -100 to 100. Bulge swells the middle (a negative amount pinches it), Rise grows the letters towards the right and lifts them, Flag is a wave that grows towards the right.
+- **Data:** `pt, pa, pw` and `wp, wa` are saved on a text only when set. Old files and snapshots are unchanged.
+- Not in this release: text on a drawn path, text along the stamp's edge, warp styles beyond these three.
+- Tests: `text-warp`.

@@ -81,11 +81,15 @@ L.forEach((l,j)=>{const q=fj[j],Wj=l.W*q,id=l.fi?indP:0,ex=o.al=='j'&&j<L.length
 if(cut&&(yc-hj[j]/2<-hbP/2-.5||yc+hj[j]/2>hbP/2+.5))return;l.out.forEach((c,k)=>pts.push({g:c.g,c:c.c,px:sh+c.x*q+ex*c.sp,py:by+c.y*q,q:q*c.z,i:n0+k}))});
 if(o.rp||o.rr||o.rs||o.bb||o.sc){const sd=o.sd||1,sw=limP||maxW,sh2=hbP||Math.max(H,lhp);pts.forEach(c=>{const i=c.i,R=k=>teRnd(sd,i,k);if(o.sc=='f'){c.px=(R(1)-.5)*sw;c.py=(R(2)-.5)*sh2}else if(o.sc=='l'){c.px+=(R(1)-.5)*sw*.3;c.py+=(R(2)-.5)*sh2*.3}
 if(o.rp){const a=o.rp/100*teP*.5;c.px+=(R(3)-.5)*2*a;c.py+=(R(4)-.5)*2*a}if(o.bb)c.py+=(i%2?1:-1)*o.bb/100*teP*.3;if(o.rs)c.q*=1+(R(5)-.5)*o.rs/100;c.rr=o.rr?(R(6)-.5)*2*o.rr:0})}
-const cvv=Math.max(-1,Math.min(1,o.cv/100)),rt=(o.rot||0)*Math.PI/180,cs=Math.cos(rt),sn=Math.sin(rt);let res;
-if(Math.abs(cvv)<.005)res=pts.map(c=>({g:c.g,c:c.c,x:c.px,y:c.py,r:0,q:c.q,rr:c.rr}));
+// Warp (wp: 'b' bulge, 'r' rise, 'f' flag; wa = amount, -100 to 100) changes the size and height of letters along the line; Path (pt: 'w' wave, 's' spiral; pa = amount, pw = length) lays the line on a curve instead of the Curve arc.
+if(o.wp&&o.wa){const a=o.wa/100;pts.forEach(c=>{const u=Math.max(-.5,Math.min(.5,c.px/maxW));if(o.wp=='b'){const f=1+a*.9*(1-4*u*u);c.q*=f;c.py*=f}else if(o.wp=='r'){const f=1+a*u*1.2;c.q*=f;c.py=c.py*f-a*u*maxW*.12}else if(o.wp=='f'){const f=1+a*(u+.5)*.5,w=(u+.5)*Math.PI*3;c.q*=f;c.py=c.py*f+a*lhp*.45*Math.sin(w);c.rw=Math.atan(a*lhp*.45*3*Math.PI*Math.cos(w)/maxW)*180/Math.PI}})}
+const cvv=o.pt?0:Math.max(-1,Math.min(1,o.cv/100)),rt=(o.rot||0)*Math.PI/180,cs=Math.cos(rt),sn=Math.sin(rt);let res;
+if(Math.abs(cvv)<.005)res=pts.map(c=>({g:c.g,c:c.c,x:c.px,y:c.py,r:c.rw||0,q:c.q,rr:c.rr}));
 else{const phi=Math.abs(cvv)*2*Math.PI,R=maxW/phi,off=R*Math.max(0,Math.min(1,1-phi/Math.PI));
-res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:off+rho*Math.sin(th),r:(th+Math.PI/2)*180/Math.PI,q:c.q,rr:c.rr}}
-const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI,q:c.q,rr:c.rr}})}
+res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:off+rho*Math.sin(th),r:(th+Math.PI/2)*180/Math.PI+(c.rw||0),q:c.q,rr:c.rr}}
+const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI+(c.rw||0),q:c.q,rr:c.rr}})}
+if(o.pt=='w'){const A=(o.pa==null?50:o.pa)/100*teP*.9,lam=Math.max(teP*.5,maxW*Math.max(5,o.pw==null?50:o.pw)/100);res.forEach(c=>{const ph=2*Math.PI*c.x/lam;c.y+=A*Math.sin(ph);c.r+=Math.atan(A*2*Math.PI/lam*Math.cos(ph))*180/Math.PI})}
+else if(o.pt=='s'){const n=.4+(o.pw==null?50:o.pw)/100*2,d=(o.pa==null?50:o.pa)/100*.7,F=d>0?-Math.log(1-d)/d:1,r0=maxW*F/(2*Math.PI*n);res.forEach(c=>{const t=Math.max(0,Math.min(1,(c.x+maxW/2)/maxW)),Gt=d>0?-Math.log(1-d*t)/d:t,t0=2*Math.PI*n*Gt/F,r=r0*(1-d*t),th=-Math.PI/2+t0,rho=Math.max(.0001,r-c.y);c.x=rho*Math.cos(th);c.y=rho*Math.sin(th);c.r+=t0*180/Math.PI})}
 const out=res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0)+(p.rr||0),s:+(em/teE*p.q).toFixed(4)}));out.over=over;out.tw=Math.max(0,...L.map((l,j)=>l.W*fj[j]))*k;return out}
 // The layout, with the fit modes: Shrink to fit and Fill the box look for the size that fits (about 12 tries); Fit the width scales one run of lines to the box width.
 function teLayout(o){const bx=o.wd>0||o.ht>0,ft=bx?(o.ft||''):'';if(!ft)return teCore({...o,ft:''});if(ft=='l')return teCore(o);

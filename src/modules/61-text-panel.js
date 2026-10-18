@@ -1,10 +1,11 @@
 import {$} from './01-launch-and-version.js';
 // ===== The Text panel's controls, read and written in ONE place. The Stamp editor (22) and the Text layer (26) both use these, so a new text option is added here and in the engine only.
 // Optional options are saved on a text only when set, so old files and snapshots do not change.
-const TXO_NUM=[['sz','tx_sz'],['ls','tx_ls'],['ws','tx_ws'],['lh','tx_lh']],TXO_BOX=[['wd','tx_wd'],['ht','tx_ht'],['cv','tx_cv'],['rot','tx_rot']],TXO_OPT=[['pd','tx_pd'],['rp','tx_rp'],['rr','tx_rr'],['rs','tx_rs'],['bb','tx_bb'],['ind','tx_ind'],['psp','tx_psp']];
+const TXO_NUM=[['sz','tx_sz'],['ls','tx_ls'],['ws','tx_ws'],['lh','tx_lh']],TXO_BOX=[['wd','tx_wd'],['ht','tx_ht'],['cv','tx_cv'],['rot','tx_rot']],TXO_OPT=[['pd','tx_pd'],['rp','tx_rp'],['rr','tx_rr'],['rs','tx_rs'],['bb','tx_bb'],['ind','tx_ind'],['psp','tx_psp'],['wa','tx_wa']];
 const TXO_SEG=[['al','tx_al','a',1],['tc','tx_tc','c',1],['va','tx_va','v',1],['ov','tx_ov','o',0],['sc','tx_sc','s',0],['bal','tx_bal','b',0]];
-const TXO_KEYS=['pd','ft','ov','rp','rr','rs','bb','sc','sd','ind','psp','bal','sty'];   // every optional key a text can carry
-const TXO_IDS=['tx_f','tx_ft',...TXO_NUM.map(a=>a[1]),...TXO_BOX.map(a=>a[1]),...TXO_OPT.map(a=>a[1])];
+const TXO_SELV=[['ft','tx_ft'],['wp','tx_wp'],['pt','tx_pt']],TXO_PATH=[['pa','tx_pa'],['pw','tx_pw']];
+const TXO_KEYS=['pd','ft','ov','rp','rr','rs','bb','sc','sd','ind','psp','bal','sty','wp','wa','pt','pa','pw'];   // every optional key a text can carry
+const TXO_IDS=['tx_f','tx_ft','tx_wp','tx_pt','tx_pa','tx_pw',...TXO_NUM.map(a=>a[1]),...TXO_BOX.map(a=>a[1]),...TXO_OPT.map(a=>a[1])];
 let txoSd=0,txoSty=[],txoPrev='',txoQuiet=0;
 const txoSeed=v=>{if(v!==undefined)txoSd=v;return txoSd};
 const txoSegV=(id,dk,d)=>{const b=document.querySelector('#'+id+' .on');return b&&b.dataset[dk]!=null?b.dataset[dk]:d};
@@ -20,13 +21,13 @@ function txoShift(sty,o,n){if(!sty.length||o===n)return sty;const A=[...o],B=[..
 function txoRead(){const t=$('tx_t').value.replace(/\r/g,'').slice(0,200);if(txoSty.length&&t!==txoPrev)txoSty=txoShift(txoSty,txoPrev,t);txoPrev=t;const n=id=>+$(id).value,o={text:t,f:$('tx_f').value||'cinzel'};
 TXO_NUM.forEach(([k,id])=>o[k]=n(id));o.al=txoSegV('tx_al','a','c');o.tc=txoSegV('tx_tc','c','');o.va=txoSegV('tx_va','v','t');TXO_BOX.forEach(([k,id])=>o[k]=n(id));
 if(n('tx_pd'))o.pd=n('tx_pd');if($('tx_ft').value)o.ft=$('tx_ft').value;const ov=txoSegV('tx_ov','o','');if(ov)o.ov=ov;['rp','rr','rs','bb'].forEach(k=>{if(n('tx_'+k))o[k]=n('tx_'+k)});const sc=txoSegV('tx_sc','s','');if(sc)o.sc=sc;if(txoSd)o.sd=txoSd;
-if(n('tx_ind'))o.ind=n('tx_ind');if(n('tx_psp'))o.psp=n('tx_psp');if(txoSegV('tx_bal','b',''))o.bal=1;if(txoSty.length)o.sty=txoSty.map(r=>r.slice());return o}
+if($('tx_wp').value&&n('tx_wa')){o.wp=$('tx_wp').value;o.wa=n('tx_wa')}if($('tx_pt').value){o.pt=$('tx_pt').value;o.pa=n('tx_pa');o.pw=n('tx_pw')}if(n('tx_ind'))o.ind=n('tx_ind');if(n('tx_psp'))o.psp=n('tx_psp');if(txoSegV('tx_bal','b',''))o.bal=1;if(txoSty.length)o.sty=txoSty.map(r=>r.slice());return o}
 const txoSetR=(id,v,force)=>{const el=$(id);if(force||+el.value!=+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))}};
 const txoSetS=(id,dk,v)=>document.querySelectorAll('#'+id+' [data-'+dk+']').forEach(b=>b.classList.toggle('on',b.dataset[dk]==v));
 // put a text's options into the controls. ov = values to show instead for some controls (a layer text shows sizes in canvas units); force = always send the input event
 function txoWrite(o,ov,force){ov=ov||{};if($('tx_t').value!==o.text)$('tx_t').value=o.text;txoPrev=o.text;$('tx_f').value=o.f;
 [...TXO_NUM,...TXO_BOX].forEach(([k,id])=>txoSetR(id,ov[k]!=null?ov[k]:(o[k]||0),force));TXO_OPT.forEach(([k,id])=>txoSetR(id,o[k]||0,force));
-$('tx_ft').value=o.ft||'';TXO_SEG.forEach(([k,id,dk])=>txoSetS(id,dk,o[k]!=null?o[k]:txoSegD[k]));txoSd=o.sd||0;txoSty=Array.isArray(o.sty)?o.sty.map(r=>r.slice()):[]}
+TXO_SELV.forEach(([k,id])=>{$(id).value=o[k]||''});TXO_PATH.forEach(([k,id])=>txoSetR(id,o[k]!=null?o[k]:50,force));TXO_SEG.forEach(([k,id,dk])=>txoSetS(id,dk,o[k]!=null?o[k]:txoSegD[k]));txoSd=o.sd||0;txoSty=Array.isArray(o.sty)?o.sty.map(r=>r.slice()):[]}
 // the Size / Raise / Spacing sliders and the Super / Sub / Clear buttons act on the letters selected in the text field
 const TXO_SEL=[['tx_zs','z'],['tx_dy','d'],['tx_sl','l']];
 function txoSel(){const t=$('tx_t');return[txoCp(t.value,t.selectionStart),txoCp(t.value,t.selectionEnd)]}
