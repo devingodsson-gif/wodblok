@@ -159,3 +159,10 @@ One entry per finished step: version, what changed, what was tested, anything th
 |---|---|---|
 | 0 Design review | 1.46.1 | in progress |
 | 1 to 12 | | not started |
+
+### Step 0 audit: Stamp editor panels against Canvas mode (Oct 18 2026, read from `MODEP` in `34-desktop-shell.js`)
+- **Shared today** (same panel in both modes, no work): Workspaces, Presets, Text, Colours, Colourways, Grade, Textures, Randomize, History, Stamp library.
+- **Stamp editor only:** Shapes library (`motifs`) stays as the source for placing shapes; the shape list of a stamp (`mlist`) becomes the layer's item list (the Layers panel shows items); Shape editor (`sedit`) stays and opens on any selected shape; Stamp settings (`stamp`: outline, size, symmetry, wrap, carve, pressure, textures) becomes the settings of the unlocked stamp; Stamp grid (`grid`) is dropped in favour of the one grid tool (`pgrid`); **Pattern preview (`preview`) is dropped** (decided).
+- **Canvas mode only:** Layers, Layout (becomes the Stamp tool's arrangement section), Canvas, Navigator, Export recipes, Variations stay.
+- **Unique tools to move onto the canvas (step 6):** symmetry, wrap at the edges, carved edges, uneven pressure, marquee on stamp contents, snapping inside a stamp. Everything else the Stamp editor does is already a Canvas-mode tool.
+- Still to do in step 0: the clickable mock-up of the unified screen, for the owner to approve before any code.
