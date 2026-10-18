@@ -59,6 +59,9 @@ const r={k:key,cx:gcx-ox,cy:gcy-oy,d:path};teGL.set(key,r);return r}
 // --- layout: letters on straight lines, or bent around a circle (curve = % of a full circle; negative curves down)
 // Box and fit options (all optional, saved only when set): pd = padding inside the box (% of the short side), ft = how the text fits the box
 // ('' off, 's' shrink to fit, 'f' fill the box, 'l' fit each line to the width, 'w' fit the width), ov = 'h' hides what runs past the box, va 's' = Spread.
+// A repeatable random number for letter i (the seed sd and a purpose number k): the same text and seed always give the same letters, and a new letter never moves the others.
+function teRnd(sd,i,k){let h=(Math.imul(sd|0,374761393)+Math.imul(i+1,668265263)+Math.imul(k,2147483647))|0;h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;h=Math.imul(h,2246822519);h^=h>>>13;return((h>>>0)%100000)/100000}
+// Letter effects (all optional, saved only when set): rp random position, rr random rotation (degrees), rs random size, bb baseline bounce (all 0 to 100), sc scatter in the box ('l' loose, 'f' full), sd the seed (Vary picks a new one).
 function teCore(o){teEns();const f=teF[o.f]||teF.cinzel;teCx.font=teCss(f);const T0=o.tc=='u'?o.text.toUpperCase():o.tc=='l'?o.text.toLowerCase():o.tc=='t'?o.text.toLowerCase().replace(/(^|[\s(\-])(\S)/g,(m,a,b)=>a+b.toUpperCase()):o.text,lines0=T0.split('\n'),em=o.sz/100*Math.min(SW,SH),k=em/teP,ls=o.ls/100*teP,wsp=(o.ws||0)/100*teP,capH=teCx.measureText('H').actualBoundingBoxAscent||teP*.7,lhp=o.lh/100*teP;
 // Box width: lines are broken at spaces so none is wider than the box (a single long word is left whole). Box height + Vertical: where the block of lines sits in a box of that height.
 const U=Math.min(SW,SH)/100,pdc=(o.pd||0)*U,limP=o.wd>0?Math.max(1,o.wd*U-2*pdc)/k:0,wd1=s=>{let n=0,sp=0;for(const c of s){n++;if(/\s/.test(c))sp++}return teCx.measureText(s).width+ls*Math.max(0,n-1)+wsp*sp};let lines=lines0;
@@ -66,15 +69,17 @@ if(limP&&!o.nw&&o.ft!='l'){lines=[];lines0.forEach(ln=>{if(!ln.trim()){lines.pus
 const hbP=o.ht>0?Math.max(1,o.ht*U-2*pdc)/k:0;
 const L=lines.map(line=>{const ch=[...line],out=[];let sp=0;ch.forEach((c,i)=>{if(/\s/.test(c)){sp++;return}const g=teGlyph(f,c);if(!g)return;const pen=teCx.measureText(ch.slice(0,i).join('')).width+ls*i+wsp*sp;out.push({g,c,x:pen+g.cx,y:g.cy,sp})});teCx.font=teCss(f);return{out,ns:sp,W:teCx.measureText(line).width+ls*Math.max(0,ch.length-1)+wsp*sp}});
 const fj=L.map(l=>o.ft=='l'&&limP&&l.W>0?Math.min(8,limP/l.W):1),hj=fj.map(q=>lhp*q),H=hj.reduce((a,b)=>a+b,0),n=lines.length,fr2=hbP?(hbP-H)/2:0,vOff=hbP?(o.va=='b'?fr2:o.va=='m'?0:-fr2):0,spr=hbP&&o.va=='s'&&n>1,gap=spr?Math.max(0,hbP-H)/(n-1):0;
-const maxW=limP||Math.max(1,...L.map((l,j)=>l.W*fj[j])),pts=[];let cum=hbP?(spr?-hbP/2:-H/2+vOff):-H/2,over=!!((hbP&&H>hbP+.5)||(limP&&Math.max(0,...L.map((l,j)=>l.W*fj[j]))>limP+.5));const cut=o.ov=='h'&&hbP;
-L.forEach((l,j)=>{const q=fj[j],Wj=l.W*q,ex=o.al=='j'&&j<L.length-1&&l.ns>0&&q==1?(maxW-l.W)/l.ns:0,sh=o.al=='l'||o.al=='j'?-maxW/2:o.al=='r'?maxW/2-Wj:-Wj/2,yc=cum+hj[j]/2,by=yc+capH*q/2;cum+=hj[j]+gap;
-if(cut&&(yc-hj[j]/2<-hbP/2-.5||yc+hj[j]/2>hbP/2+.5))return;l.out.forEach(c=>pts.push({g:c.g,c:c.c,px:sh+c.x*q+ex*c.sp,py:by+c.y*q,q}))});
+const maxW=limP||Math.max(1,...L.map((l,j)=>l.W*fj[j])),pts=[];let cum=hbP?(spr?-hbP/2:-H/2+vOff):-H/2,over=!!((hbP&&H>hbP+.5)||(limP&&Math.max(0,...L.map((l,j)=>l.W*fj[j]))>limP+.5));const cut=o.ov=='h'&&hbP;let ix=0;
+L.forEach((l,j)=>{const q=fj[j],Wj=l.W*q,ex=o.al=='j'&&j<L.length-1&&l.ns>0&&q==1?(maxW-l.W)/l.ns:0,sh=o.al=='l'||o.al=='j'?-maxW/2:o.al=='r'?maxW/2-Wj:-Wj/2,yc=cum+hj[j]/2,by=yc+capH*q/2,n0=ix;ix+=l.out.length;cum+=hj[j]+gap;
+if(cut&&(yc-hj[j]/2<-hbP/2-.5||yc+hj[j]/2>hbP/2+.5))return;l.out.forEach((c,k)=>pts.push({g:c.g,c:c.c,px:sh+c.x*q+ex*c.sp,py:by+c.y*q,q,i:n0+k}))});
+if(o.rp||o.rr||o.rs||o.bb||o.sc){const sd=o.sd||1,sw=limP||maxW,sh2=hbP||Math.max(H,lhp);pts.forEach(c=>{const i=c.i,R=k=>teRnd(sd,i,k);if(o.sc=='f'){c.px=(R(1)-.5)*sw;c.py=(R(2)-.5)*sh2}else if(o.sc=='l'){c.px+=(R(1)-.5)*sw*.3;c.py+=(R(2)-.5)*sh2*.3}
+if(o.rp){const a=o.rp/100*teP*.5;c.px+=(R(3)-.5)*2*a;c.py+=(R(4)-.5)*2*a}if(o.bb)c.py+=(i%2?1:-1)*o.bb/100*teP*.3;if(o.rs)c.q*=1+(R(5)-.5)*o.rs/100;c.rr=o.rr?(R(6)-.5)*2*o.rr:0})}
 const cvv=Math.max(-1,Math.min(1,o.cv/100)),rt=(o.rot||0)*Math.PI/180,cs=Math.cos(rt),sn=Math.sin(rt);let res;
-if(Math.abs(cvv)<.005)res=pts.map(c=>({g:c.g,c:c.c,x:c.px,y:c.py,r:0,q:c.q}));
+if(Math.abs(cvv)<.005)res=pts.map(c=>({g:c.g,c:c.c,x:c.px,y:c.py,r:0,q:c.q,rr:c.rr}));
 else{const phi=Math.abs(cvv)*2*Math.PI,R=maxW/phi,off=R*Math.max(0,Math.min(1,1-phi/Math.PI));
-res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:off+rho*Math.sin(th),r:(th+Math.PI/2)*180/Math.PI,q:c.q}}
-const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI,q:c.q}})}
-const out=res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0),s:+(em/teE*p.q).toFixed(4)}));out.over=over;out.tw=Math.max(0,...L.map((l,j)=>l.W*fj[j]))*k;return out}
+res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:off+rho*Math.sin(th),r:(th+Math.PI/2)*180/Math.PI,q:c.q,rr:c.rr}}
+const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI,q:c.q,rr:c.rr}})}
+const out=res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0)+(p.rr||0),s:+(em/teE*p.q).toFixed(4)}));out.over=over;out.tw=Math.max(0,...L.map((l,j)=>l.W*fj[j]))*k;return out}
 // The layout, with the fit modes: Shrink to fit and Fill the box look for the size that fits (about 12 tries); Fit the width scales one run of lines to the box width.
 function teLayout(o){const bx=o.wd>0||o.ht>0,ft=bx?(o.ft||''):'';if(!ft)return teCore({...o,ft:''});if(ft=='l')return teCore(o);
 if(ft=='w'){if(!(o.wd>0))return teCore({...o,ft:''});const r0=teCore({...o,ft:'',sz:100,nw:1});if(!r0.length)return r0;const U=Math.min(SW,SH)/100,inner=Math.max(1,o.wd*U-2*(o.pd||0)*U);return teCore({...o,ft:'',sz:Math.max(1,100*inner/Math.max(1,r0.tw)),nw:1})}
