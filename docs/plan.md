@@ -254,3 +254,12 @@ Fourth step of the text upgrade (project doc `claude/wodblok-text-plan.md`).
 - Not in this release: kerning modes, ligatures, small caps and other OpenType features, variable-font sliders (the outlines now allow them).
 - Tests: `text-outlines`.
 
+## 1.43.0: Letter effects
+Fifth step of the text upgrade (project doc `claude/wodblok-text-plan.md`). Same controls in the Stamp editor and the Text layer.
+- **Random position, Random rotation, Random size, Bounce** (all 0 = off): every letter is nudged, turned or resized by a random amount; Bounce lifts and drops every other letter.
+- **Scatter**: Off, Loose (letters wander a little from their place) or Full (letters land anywhere in the box; with no box, in the area of the text).
+- **Vary** picks a new seed. The same text and seed always give the same letters, and adding a letter never moves the others.
+- **Data**: `rp`, `rr`, `rs`, `bb`, `sc`, `sd` are saved on a text only when set. Old files and the Randomize snapshot are unchanged.
+- Not in this release: mixed fonts, colour per letter, worn ink, misprint, outline, inline and knockout.
+- Tests: `text-effects`.
+

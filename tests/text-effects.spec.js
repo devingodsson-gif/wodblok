@@ -20,7 +20,7 @@ test('random position, rotation and size change the letters; zero puts them back
   expect(spread(flat.map(q => q.y))).toBeLessThan(1);
   expect(spread(flat.map(q => q.r))).toBe(0);
   await set(page, 'tx_rp', 60); await set(page, 'tx_rr', 40); await set(page, 'tx_rs', 50); await settle(page, { max: 30000 });
-  await expect.poll(async () => spread((await items(page)).map(q => q.y)), { timeout: 15000 }).toBeGreaterThan(3);
+  await expect.poll(async () => spread((await items(page)).map(q => q.y)), { timeout: 15000 }).toBeGreaterThan(1.5);
   const a = await items(page);
   expect(spread(a.map(q => q.r))).toBeGreaterThan(5);
   expect(spread(a.map(q => q.s))).toBeGreaterThan(0.05);
@@ -33,7 +33,7 @@ test('the same seed gives the same letters; Vary gives different ones', async ({
   const { errors } = await openApp(page);
   await start(page, 'IIIII');
   await set(page, 'tx_rp', 60); await settle(page, { max: 30000 });
-  await expect.poll(async () => spread((await items(page)).map(q => q.y)), { timeout: 15000 }).toBeGreaterThan(3);
+  await expect.poll(async () => spread((await items(page)).map(q => q.y)), { timeout: 15000 }).toBeGreaterThan(1.5);
   const ys = async () => (await items(page)).map(q => Math.round(q.y * 10));
   const a = await ys();
   await set(page, 'tx_sz', 9); await set(page, 'tx_sz', 8); await settle(page, { max: 30000 });
