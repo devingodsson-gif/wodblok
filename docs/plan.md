@@ -302,3 +302,10 @@ Second step of the layer update (docs/layer-update-plan.md). Screens and data.
 - Any layer takes stamps, pictures and text placed by hand, whatever its arrangement. The Layer type dropdown and buttons become Arrangement (None, Repeat, Frame), which keeps what was placed. "+" adds a plain layer. A new Placed items group, and "N placed" in the Layers list.
 - Typing in the Text tool places text on the selected layer. The `art` and `txt` layer flags are dropped when a file is opened (format 21).
 - Tests: `any-layer-items` (new); `layer-types` deleted; several specs updated (listed in the plan).
+
+## 1.46.3: Layer update, step 3 (arrangement on any layer)
+Third step of the layer update (docs/layer-update-plan.md). Screen only; no data change.
+- Arrangement (None, Repeat, Frame) is a visible segmented control. The Layout panel is regrouped: Arrangement, its stamps, Manual arrangement, Variation, Placed items, Align, Impression.
+- A layer with no stamps that gets a Repeat or Frame arrangement takes the current stamp.
+- The speed test (`perf.spec.js`) now scrolls its slider into view; before, it had been measuring an idle page.
+- Tests: `any-layer-items` extended; specs that drove the old dropdown updated.
