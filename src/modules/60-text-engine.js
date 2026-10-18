@@ -1,4 +1,5 @@
 import {kv} from '../platform/index.js';
+import {opentype} from '../vendor/opentype.js';
 import {CH,CW,SH,SK,SW} from './04-canvas-and-stamp-outlines.js';
 // ===== Text engine (no panels, no document): fonts, letter outlines traced from the browser's own rendering, and the teLayout of lines,
 // boxes and curves. The Text panel (22) and the Text layer (26) both use it, so a text looks the same in a stamp and in a layer.
@@ -16,7 +17,7 @@ const teF={};teFonts.forEach(([id,fam,q,w,d])=>teF[id]={id,fam,w,d,lbl:fam});
 
 // your own fonts (kept in this browser when they fit)
 const teUF=[];const teAddUF=async(name,buf,save)=>{const id='u-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30);if(teF[id])return id;
-const ff=new FontFace('wbu-'+id,buf);await ff.load();document.fonts.add(ff);teF[id]={id,fam:'wbu-'+id,w:400,d:'Your font',lbl:name,u:1};teUF.push(id);
+const ff=new FontFace('wbu-'+id,buf);await ff.load();document.fonts.add(ff);teF[id]={id,fam:'wbu-'+id,w:400,d:'Your font',lbl:name,u:1,buf:buf.slice(0)};teUF.push(id);
 if(save){try{const b=new Uint8Array(buf);let s='';for(let i=0;i<b.length;i+=8192)s+=String.fromCharCode.apply(null,b.subarray(i,i+8192));const all=JSON.parse(kv.get('wb17_fonts')||'{}');all[name]=btoa(s);kv.set('wb17_fonts',JSON.stringify(all))}catch(e){teNotify(`“${name}” is loaded for now, but it's too big to keep in this browser. Load it again next time.`)}}return id};
 const teLoadFonts=done=>{try{const all=JSON.parse(kv.get('wb17_fonts')||'{}');Object.entries(all).forEach(([n,b64])=>{const s=atob(b64),b=new Uint8Array(s.length);for(let i=0;i<s.length;i++)b[i]=s.charCodeAt(i);teAddUF(n,b.buffer,false).then(()=>done&&done()).catch(()=>{})})}catch(e){}};
 
@@ -32,7 +33,20 @@ for(let i=a+1;i<z;i++){const d=Math.abs(dy*p[i][0]-dx*p[i][1]+zx*ay-zy*ax)/L;if(
 function teDens(l,step){const o=[];for(let i=0;i<l.length;i++){const a=l[i],b=l[(i+1)%l.length],n=Math.max(1,Math.floor(Math.hypot(b[0]-a[0],b[1]-a[1])/step));for(let k=0;k<n;k++)o.push([a[0]+(b[0]-a[0])*k/n,a[1]+(b[1]-a[1])*k/n])}return o}
 // one letter -> {k: motif key, teCx, cy: ink centre relative to the pen position on the baseline, in px}
 const teFok=f=>[...document.fonts].some(x=>x.family.replace(/["']/g,'')==f.fam&&x.status=='loaded');
-function teGlyph(f,ch){teEns();const ok=teFok(f),key='t|'+f.id+(ok?'':'~')+'|'+ch.codePointAt(0).toString(36);if(teGL.has(key))return teGL.get(key);
+// --- real outlines: the letter's shape is read from the font file itself (opentype.js). Letters the file cannot give (a font it cannot read, a missing letter) are traced instead, below.
+const teOT=new Map();
+function teBytes(f){if(f.buf)return f.buf;for(const ss of document.styleSheets){let rs;try{rs=ss.cssRules}catch(e){continue}for(const r of rs){if(r.type!==5||r.style.getPropertyValue('font-family').replace(/["']/g,'')!==f.fam)continue;const m=/base64,([^")]+)/.exec(r.style.getPropertyValue('src'));if(m){const s=atob(m[1]),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u.buffer}}}return null}
+function teParsed(f){if(teOT.has(f.id))return teOT.get(f.id);let o=null;try{const b=teBytes(f);if(b)o=opentype.parse(b)}catch(e){o=null}teOT.set(f.id,o);return o}
+// a cubic curve (fonts with PostScript outlines) as four quadratic pieces, the only curve the stored letters use
+function teCubic(x0,y0,x1,y1,x2,y2,x3,y3,out){const L=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t],P=[[x0,y0],[x1,y1],[x2,y2],[x3,y3]],bl=(t,u,v)=>{const a=L(P[0],P[1],t),b=L(P[1],P[2],t),c=L(P[2],P[3],t),d=L(a,b,u),e=L(b,c,u);return L(d,e,v)};
+for(let i=0;i<4;i++){const t0=i/4,t1=(i+1)/4,p0=bl(t0,t0,t0),c1=bl(t0,t0,t1),c2=bl(t0,t1,t1),p3=bl(t1,t1,t1);out.push([(3*c1[0]+3*c2[0]-p0[0]-p3[0])/4,(3*c1[1]+3*c2[1]-p0[1]-p3[1])/4,p3[0],p3[1]])}}
+function teReal(f,ch,key){const fo=teParsed(f);if(!fo)return null;let gl;try{gl=fo.charToGlyph(ch)}catch(e){return null}if(!gl||!gl.index)return null;
+const pa=gl.getPath(0,0,teP),bb=pa.getBoundingBox();if(!(bb.x2>bb.x1&&bb.y2>bb.y1))return null;const gcx=(bb.x1+bb.x2)/2,gcy=(bb.y1+bb.y2)/2,u=teE/teP,fm=v=>{const r=Math.round(v*100)/100;return String(r===0?0:r)},X=x=>fm((x-gcx)*u),Y=y=>fm((y-gcy)*u);let d='',px=0,py=0;
+for(const c of pa.commands){if(c.type=='M'){d+='M'+X(c.x)+','+Y(c.y);px=c.x;py=c.y}else if(c.type=='L'){d+='L'+X(c.x)+','+Y(c.y);px=c.x;py=c.y}else if(c.type=='Q'){d+='Q'+X(c.x1)+','+Y(c.y1)+' '+X(c.x)+','+Y(c.y);px=c.x;py=c.y}
+else if(c.type=='C'){const q=[];teCubic(px,py,c.x1,c.y1,c.x2,c.y2,c.x,c.y,q);q.forEach(a=>{d+='Q'+X(a[0])+','+Y(a[1])+' '+X(a[2])+','+Y(a[3])});px=c.x;py=c.y}else if(c.type=='Z')d+='Z'}
+return d?{k:key,cx:gcx,cy:gcy,d}:null}
+function teGlyph(f,ch){teEns();const kr='t|'+f.id+'|'+ch.codePointAt(0).toString(36);if(teGL.has(kr))return teGL.get(kr);{const R=teReal(f,ch,kr);if(R){teGL.set(kr,R);return R}}
+const ok=teFok(f),key='t|'+f.id+(ok?'':'~')+'|'+ch.codePointAt(0).toString(36);if(teGL.has(key))return teGL.get(key);
 teCx.font=teCss(f);const m=teCx.measureText(ch),pad=Math.ceil(teP*.5),w=Math.ceil(Math.max(m.width,(m.actualBoundingBoxLeft||0)+(m.actualBoundingBoxRight||0)))+pad*2,h=Math.ceil(teP*2.1),ox=pad,oy=Math.round(teP*1.4);
 teCv.width=w;teCv.height=h;teCx.font=teCss(f);teCx.textBaseline='alphabetic';teCx.fillStyle='#000';teCx.fillText(ch,ox,oy);const d=teCx.getImageData(0,0,w,h).data,b=new Uint8Array(w*h);let x0=w,y0=h,x1=-1,y1=-1;
 for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>110){b[y*w+x]=1;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
