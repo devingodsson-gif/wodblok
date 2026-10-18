@@ -56,5 +56,6 @@
  "56-watermark.js",
  "57-saved-colours.js",
  "58-account.js",
- "59-align.js"
+ "59-align.js",
+  "60-text-engine.js"
 ]

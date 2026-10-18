@@ -224,3 +224,11 @@ First step of the text upgrade (project doc `claude/wodblok-text-plan.md`).
 - No file format change: stamp text groups and Text layers are stored as before. The shared engine module and the single stored text object (file format 21) are the next release (1.40.0), then Box and fit (1.41.0); the rest of the plan moves down by one.
 - Tests: `text-editor-shared` (one panel in both, a Text layer is made on typing), `rail`; `text-box`, `text-box-wrap`, `text-place` use the shared ids.
 
+## 1.40.0: Text engine module, hand edits kept
+Second step of the text upgrade (project doc `claude/wodblok-text-plan.md`).
+- **The text engine is its own module** (`src/modules/60-text-engine.js`, no panels and nothing from the document): fonts and your loaded fonts, tracing of letter outlines, line layout, boxes and curves, fit-to-stamp size, and the layout of a text for a Text layer. The Text panel (22) and the Text layer (26) both call it.
+- **Letters you moved, turned or scaled by hand stay that way** when you edit the text in the Stamp editor (words, font, size, spacing, case...). Each letter keeps how far it was from where the layout puts it; moving the whole text still moves it as one.
+- **Convert to shapes** (Stamp editor, shown while a text is selected): the letters become plain shapes with no link to the text (undo brings it back).
+- No file format change (still 20): a text is still stored as its letters plus the settings on the stamp, and a Text layer as before. Old files open unchanged. The planned format 21 is not needed for this; it comes with the first change that stores something new.
+- Tests: `text-adjust`; the text tests run on the engine module unchanged.
+
