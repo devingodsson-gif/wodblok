@@ -122,7 +122,7 @@ So for 1.44.0 to 1.46.0: (a) first make one shared reader/writer for the text op
 
 ## The steps
 
-**Numbering** (your rule): each step is a patch on the last finished minor, 1.46.1, 1.46.2 and so on. When the whole layer update is done it becomes 1.47.0.
+**Numbering** (your rule): each step is a patch on the last finished minor, 1.46.1, 1.46.2 and so on. When the whole layer update is done it becomes **2.0.0** (owner, Oct 18: this update is the new major version).
 
 | Step | What | Risk |
 |---|---|---|
@@ -138,7 +138,7 @@ So for 1.44.0 to 1.46.0: (a) first make one shared reader/writer for the text op
 | 9 | **Retire the Stamp editor.** One panel list for the whole app, workspaces migrated, commands, shortcuts, rail, Pattern preview removed | high |
 | 10 | **Rewrite what depends on it:** Randomize, templates, presets, variations, colourways, export recipes, print proof, book covers | high |
 | 11 | **Tests and speed:** rewrite the mode and layer-type tests, new tests for every step above, `npm run perf` against the baseline | |
-| 12 | **Final check and release.** Delete leftover old-editor code, full suite, going live when the owner says | |
+| 12 | **Final check and release 2.0.0.** Delete leftover old-editor code, full suite, going live when the owner says | |
 
 Steps 1 to 3 give you something real early: no layer types, anything on any layer. Steps 4 and 5 are the core of what you described. Steps 9 and 10 are the long tail.
 
@@ -146,7 +146,7 @@ My honest estimate is that this is about 12 to 16 patch steps and several times 
 
 ## Tests and safety
 
-- Every step: the quick tests for what changed, and the full suite for steps 1, 3, 4, 5, 9 and 10 (file format, rendering, shared code).
+- Every step: the quick tests for what changed. When a step is risky enough that the whole suite should run (likely steps 1, 3, 4, 5, 9 and 10: file format, rendering, shared code), I **suggest it with an importance percentage and one sentence of why**, and the run is the **CI shard suite** (the pull request's four Chromium shards, WebKit and the picture comparison), never the slow local full run. It runs only when the owner says so.
 - Old fixtures: no compatibility test (decision 10). New made-up sample projects in the new format replace them.
 - Perf: `npm run perf` at every step that touches drawing or dragging; no regression over 10%. Editing an unlocked stamp with many instances on screen gets its own perf test.
 - A file saved in the new format opens read-only in an older app (existing newer-file rule).

@@ -12,6 +12,8 @@ Last updated Oct 18 2026 (version 1.46.0).
 - Do not mention stop-hook "unpushed commits" warnings unless one is real.
 - Every release is double-checked to be actually live.
 - Versioning: a multi-step update is one update. Each step raises only the patch (0.0.x); the minor (0.x.0) rises once when the whole update is finished. (The text update 1.39-1.46 predates the rule.)
+- The layer update, when finished, is **version 2.0.0** (a new major, by the owner's choice), not 1.47.0. Its steps are 1.46.1, 1.46.2 and so on.
+- When suggesting the full test suite, give an importance percentage with one sentence of why, and run it as the CI shard suite (PR ready: four Chromium shards, WebKit, picture comparison), not the slow local run; only when the owner says so.
 - Layer update: one complete step at a time; the plan document (`docs/layer-update-plan.md`) is updated after each step; anything saved to memory is also written to this file.
 - Going live (merging to `main`) only when the owner says; he sometimes says "just merge" without CI, which is his call. Say before going live if saving, opening files or the file format is touched.
 - Snapshots: state and SVG snapshots only with his approval. Pending: `tests/__snapshots__/scenarios.spec.js/randomize-seed-1-state.json` (a letter's y changes by a fraction since 1.42.0's real font outlines; also differs locally on `main`).
