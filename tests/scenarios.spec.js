@@ -2,7 +2,7 @@
 // SVG, and a picture. Randomness is seeded and time is fixed (see helpers/harness.js), so results repeat exactly.
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, openApp, openProjectFile, openPanel, setMode, settle, getState, stateText, checkpoint } = require('./helpers/harness');
+const { ROOT, openApp, openProjectFile, openPanel, setMode, settle, getState, stateText, checkpoint, putText } = require('./helpers/harness');
 
 const FIX = n => path.join(ROOT, 'tests', 'fixtures', n);
 const PANEL_FIXTURE = 'project-4-rect-4x3.wodblok.json';   // frames, free place, textures, grade, blends, five layers
@@ -114,8 +114,7 @@ test('text tool turns typed text into a motif (smoke; glyph shapes depend on ins
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Wod');
   const before = JSON.parse(await getState(page)).tiles.reduce((n, t) => n + t.items.length, 0);
-  await page.click('#tx_go');
-  await settle(page, { max: 30000 });
+  await putText(page, { select: false });
   const after = JSON.parse(await getState(page)).tiles.reduce((n, t) => n + t.items.length, 0);
   expect(after).toBeGreaterThan(before);
   expect(errors).toEqual([]);

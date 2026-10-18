@@ -206,3 +206,8 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 - On a placed text the side squares pull those two values: east/west set the box width and the lines wrap (the top edge stays while the height follows the lines), north/south set a fixed height. Corners still scale the text.
 - Not in this release: "Fit text" (shrink the letters to fill a fixed box) and handles on the text of a Stamp editor text group (use the Box width and Box height sliders there).
 - Tests: `resize-handles`, `resize-handles-pattern`, `text-box-wrap`.
+
+## 1.38.0: Text goes down where you click
+- **Stamp editor Text tool works like the Text layer**: typing puts the text on the cursor as a faint copy, a click on the stamp puts it down there, and it stays on the cursor so you can put it down again. Esc or right-click stops (the button is pressed while the text is on the cursor). The "Add to stamp" button is now **Add text**, the same as the layer one; selecting a placed text still edits it live.
+- **Both editors draw the box of the text while it is on the cursor**: the Stamp editor and the Text layer show a dashed outline round the text that follows Box width and Box height (it is the size of the letters when those are Auto).
+- Tests: `text-place`; `text-live`, `text-symmetry`, `text-editor-shared`, `text-box-wrap` and the text smoke test in `scenarios` now put the text down with a click (helper `putText`).

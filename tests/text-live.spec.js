@@ -1,6 +1,6 @@
 // Text tool: the text on the stamp follows the panel while it is edited (no Update button), and Enter makes a new line.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle, getState } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, setMode, settle, getState, putText } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -12,8 +12,7 @@ test('typing, changing the font or a slider updates the stamp without an Update 
   await openPanel(page, 'text');
   await expect(page.locator('#tx_up')).toHaveCount(0);
   await page.fill('#tx_t', 'Wod');
-  await page.click('#tx_go');
-  await settle(page, { max: 30000 });
+  await putText(page);
   const n3 = await count(page);
   expect(n3).toBeGreaterThan(0);
   // typing more letters shows up on the stamp by itself

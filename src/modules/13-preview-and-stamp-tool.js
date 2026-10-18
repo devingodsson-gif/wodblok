@@ -16,11 +16,13 @@ import {fpL,tGrp} from './24-free-place-layers.js';
 let pvZ=1;
 function pvView(){const w=CW/pvZ,h=CH/pvZ;$('pvw').setAttribute('viewBox',`${((CW-w)/2).toFixed(1)} ${((CH-h)/2).toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`);document.querySelectorAll('#pvz [data-z]').forEach(b=>b.classList.toggle('on',+b.dataset.z==pvZ))}
 function paintGhost(){let g=ed.querySelector('#ghost');ed.classList.toggle('brush',!!WBS.brush&&!!WBS.gp);
-$('edh1').textContent=WBS.brush?'Click to stamp. Scroll to resize, [ and ] to rotate. Esc or right-click to stop.':'Drag to move. Click to select, Shift+click to add.';$('wrh').hidden=!!WBS.brush;
-if(!WBS.brush||!WBS.gp){if(g)g.remove();return}
+$('edh1').textContent=WBS.brush?(WBS.brush.txt?'Click to put the text down. Esc or right-click to stop.':'Click to stamp. Scroll to resize, [ and ] to rotate. Esc or right-click to stop.'):'Drag to move. Click to select, Shift+click to add.';$('wrh').hidden=!!WBS.brush;
+if(!WBS.brush||!WBS.gp||(WBS.brush.txt&&!WBS.txg)){if(g)g.remove();return}
 if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='ghost';g.setAttribute('pointer-events','none');g.setAttribute('opacity','.6');ed.appendChild(g)}
-const cl=cols(WBS.tiles[WBS.cur]),key=WBS.brush.m+'|'+cl.c+'|'+cl.d;if(g.dataset.k!==key){g.innerHTML=mk(WBS.brush.m,cl.c,cl.d);g.dataset.k=key}
-let x=WBS.gp.x,y=WBS.gp.y;if(grid.sd)[x,y]=snapPt(x,y);g.setAttribute('transform',`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${WBS.brush.r}) scale(${WBS.brush.s.toFixed(4)})`)}
+const cl=cols(WBS.tiles[WBS.cur]),tg=WBS.brush.txt,key=(tg?'t'+WBS.txg.id:WBS.brush.m)+'|'+cl.c+'|'+cl.d;if(g.dataset.k!==key){g.innerHTML=tg?txGhostSVG(WBS.txg,cl.c):mk(WBS.brush.m,cl.c,cl.d);g.dataset.k=key}
+let x=WBS.gp.x,y=WBS.gp.y;if(grid.sd)[x,y]=snapPt(x,y);g.setAttribute('transform',tg?`translate(${x.toFixed(1)} ${y.toFixed(1)})`:`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${WBS.brush.r}) scale(${WBS.brush.s.toFixed(4)})`)}
+// the faint copy of a text that follows the cursor, with its box drawn round it
+const txGhostSVG=(G,fill)=>G.gl.map(p=>`<path d="${p.d}" transform="translate(${p.x} ${p.y}) rotate(${p.r}) scale(${p.s})" fill="${fill}" fill-rule="evenodd"/>`).join('')+(r=>`<rect ${r} fill="none" stroke="#fff" stroke-width="4" vector-effect="non-scaling-stroke"/><rect ${r} fill="none" style="stroke:var(--acc)" stroke-width="2" stroke-dasharray="6 4" vector-effect="non-scaling-stroke"/>`)(`x="${G.box[0].toFixed(1)}" y="${G.box[1].toFixed(1)}" width="${(G.box[2]-G.box[0]).toFixed(1)}" height="${(G.box[3]-G.box[1]).toFixed(1)}"`);
 const mName=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
 let mlFold;
 const CHEV='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3l3 3-3 3"/></svg>';
@@ -58,7 +60,7 @@ WBS.brush=null;WBS.gp=null;
 ed.addEventListener('pointerleave',()=>{WBS.gp=null;paintGhost()});
 document.addEventListener('contextmenu',e=>{if(WBS.brush){e.preventDefault();WBS.brush=null;upd();return}
 if(typeof WBS.fpB!='undefined'&&(WBS.fpB||WBS.txArm||WBS.fpSel!==-1)&&fpL()){e.preventDefault();WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}e.preventDefault()},true);
-ed.addEventListener('wheel',e=>{if(!WBS.brush||e.ctrlKey||e.metaKey)return;e.preventDefault();WBS.brush.s=Math.min(2.6,Math.max(.08,WBS.brush.s*(e.deltaY<0?1.08:1/1.08)));paintGhost()},{passive:false});
+ed.addEventListener('wheel',e=>{if(!WBS.brush||WBS.brush.txt||e.ctrlKey||e.metaKey)return;e.preventDefault();WBS.brush.s=Math.min(2.6,Math.max(.08,WBS.brush.s*(e.deltaY<0?1.08:1/1.08)));paintGhost()},{passive:false});
 mlFold=new Set();try{mlFold=new Set(JSON.parse(kv.get('wb18_mlfold')||'[]'))}catch(e){}
 $('mlist').onmousedown=e=>{if(e.shiftKey&&e.target.closest('.mr'))e.preventDefault()};
 $('mlist').onclick=e=>{const ML=$('mlist'),C=q=>{const x=e.target.closest(q);return x&&ML.contains(x)?x:null},t=WBS.tiles[WBS.cur],add=e.shiftKey||e.ctrlKey||e.metaKey,rng=e.shiftKey,ofName=nm=>t.items.map((q,i)=>(q.tg?'txt:'+q.tg:mName(q.m))==nm?i:-1).filter(i=>i>=0);

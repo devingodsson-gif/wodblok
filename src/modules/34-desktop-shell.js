@@ -430,8 +430,8 @@ else if(!typing&&(e.key=='Delete'||e.key=='Backspace')&&q&&view=='stamp'){e.prev
 else if(!typing&&WBS.split&&e.key=='Enter'){e.preventDefault();doSplit()}
 else if(!typing&&WBS.split&&e.key=='Escape'){WBS.split=null;WBH.draw()}
 else if(!typing&&!e.ctrlKey&&!e.metaKey&&e.key.toLowerCase()=='s'&&view=='stamp'&&Q()){e.preventDefault();cmdGet('stamp.split').run()}
-else if(!typing&&WBS.brush&&(e.key=='['||e.key==']')){e.preventDefault();WBS.brush.r=((WBS.brush.r+(e.key==']'?15:-15)+540)%360)-180;paintGhost()}
-else if(e.key=='Escape'&&WBS.brush&&!typing){WBS.brush=null;upd()}
+else if(!typing&&WBS.brush&&!WBS.brush.txt&&(e.key=='['||e.key==']')){e.preventDefault();WBS.brush.r=((WBS.brush.r+(e.key==']'?15:-15)+540)%360)-180;paintGhost()}
+else if(e.key=='Escape'&&WBS.brush&&!typing){WBS.brush=null;WBS.txg=null;upd()}
 else if(e.key=='Escape'){closeMenus();if(!$('plist').hidden)closeDlg();else if(WBS.sel>=0){selOne(-1);upd()}}
 else if(!typing&&!m&&q&&view=='stamp'&&e.key.startsWith('Arrow')){e.preventDefault();const d=e.shiftKey?10:1,dx=e.key=='ArrowLeft'?-d:e.key=='ArrowRight'?d:0,dy=e.key=='ArrowUp'?-d:e.key=='ArrowDown'?d:0;QS().forEach(o=>{o.x+=dx;o.y+=dy;[o.x,o.y]=wrapP(o.x,o.y)});store();upd()}
 else if(!typing&&!m&&k=='k'&&q&&view=='stamp'){e.preventDefault();cmdGet('stamp.knockout').run()}

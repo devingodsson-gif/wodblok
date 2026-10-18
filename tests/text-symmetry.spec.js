@@ -1,6 +1,6 @@
 // Text on a stamp stays readable under symmetry; mirroring it is a choice (UX review D6).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle, getState } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, setMode, settle, getState, putText } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -9,8 +9,7 @@ test('with 4-way symmetry the letters are drawn once; Mirror text with symmetry 
   await setMode(page, 'stamp');
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Ab');
-  await page.click('#tx_go');
-  await settle(page, { max: 30000 });
+  await putText(page);
   await openPanel(page, 'stamp');
   await page.click('#sym [data-y="quad"]');
   await settle(page);

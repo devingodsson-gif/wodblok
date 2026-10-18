@@ -1,6 +1,6 @@
 // Text: Box width wraps the lines, Box height + Vertical place them in a fixed box, and the side squares of a placed text pull those two (1.37.0).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle, getState } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, setMode, settle, getState, putText } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -13,7 +13,7 @@ test('Stamp editor text: a Box width breaks the lines; Box height with Top or Bo
   await setMode(page, 'stamp'); await openPanel(page, 'text');
   await page.fill('#tx_t', 'Wod lok mark here');
   await set(page, 'tx_sz', 12);
-  await page.click('#tx_go'); await settle(page, { max: 30000 });
+  await putText(page);
   const one = rows(await tileYs(page));
   await set(page, 'tx_wd', 40); await settle(page, { max: 30000 });
   await expect.poll(async () => rows(await tileYs(page)), { timeout: 15000 }).toBeGreaterThan(one);
