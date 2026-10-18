@@ -98,6 +98,7 @@ const Q=()=>WBS.tiles[WBS.cur].items[WBS.sel];
 function init11(){
 EDC=new Map();
 ed=$('ed');
+WBX.hdResize=hdResize;
 try{let _edr=0,_edw='';new ResizeObserver(()=>{const r=ed.getBoundingClientRect(),k=Math.round(r.width)+'x'+Math.round(r.height);if(k==_edw||!r.width)return;_edw=k;clearTimeout(_edr);_edr=setTimeout(()=>{if(WBX.wbGrade&&ed.classList.contains('graded'))WBX.wbGrade.refresh()},120)}).observe(ed)}catch(e){}
 // Pulling a corner or a side square: the opposite corner or side stays where it is; with Shift the motif grows from its middle. Works in the motif's own (turned) frame.
 function hdResize(h,p,e){const q=h.q,a=-h.r0*Math.PI/180,dx=p.x-h.cx,dy=p.y-h.cy,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),rx0=48*h.s0*h.sx0,ry0=48*h.s0*h.sy0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ns=h.s0,nx=h.sx0,ny=h.sy0,ox=0,oy=0;

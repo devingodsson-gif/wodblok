@@ -6,7 +6,7 @@ Last updated Oct 18 2026 (version 1.46.0 on main; layer update steps 1 to 3 = 1.
 
 ## How the owner wants Claude to work
 - Show a task list, and an approximate percentage complete on short status updates, in the chat. No separate progress page.
-- Work only from the newest `main` on GitHub. Any preview is built from the repo and published to the one preview artifact (https://claude.ai/artifact/AkEURvCERNYJmNPWwiEduB); never a parallel copy.
+- Work only from the newest `main` on GitHub. Any preview is built from the repo and published to the one preview artifact (https://claude.ai/artifact/Y7qKSU4gbU9sCdQYNmBH93); never a parallel copy.
 - The "refresher": check out the repo to get up to date and look at wodblok.com.
 - Do not run the full test suite unless told to.
 - Do not mention stop-hook "unpushed commits" warnings unless one is real.
@@ -69,4 +69,5 @@ The owner's decisions are in `docs/layer-update-plan.md`: no layer types, one co
 - The outline opacity slider lives in the Stamp tool panel (my placement; the owner said the proposals were good).
 - All new UI follows the CSS guidelines in docs/developing-wodblok.md Part 9 (tokens, three radii, three font sizes, `--h-*` heights, one row design, no explanatory text); run `npm run check:style`.
 - Step 4 is built (1.46.4, same branch): Stamps panel and rail tool, outlines in a sibling overlay svg (never inside `#art`, or the SVG snapshots change), one-at-a-time unlock, hit test and canvas-to-stamp transform. Lesson: anything added inside `#art` changes every SVG summary snapshot; draw overlays outside it. Lesson: New stamp (`#addT`) switches to the Stamp editor, so tests go back with `setMode(page, 'pattern')`. Next is step 5 (drawing into an unlocked stamp from the canvas); see docs/layer-update-plan.md "Step 4 outcome".
+- Step 5 is built (1.46.5, same branch): Shapes panel in the Pattern view, placing, selecting, moving, resizing, turning and deleting shapes in an unlocked stamp from the canvas, text into the stamp. Lesson: clicking a library tile used to switch to the Stamp editor (`34-desktop-shell.js`); with a stamp unlocked it now stays in Pattern. Pictures and one-item text inside stamps are not done (a stamp holds shapes only today). The preview artifact is now https://claude.ai/artifact/Y7qKSU4gbU9sCdQYNmBH93 (the old link was not visible to this account; the owner agreed to the change). Next is step 6; the CI shard suite is due at this milestone when the owner says so (importance about 75%).
 
