@@ -12,11 +12,11 @@ async function selectOne(page) {
   const pt = await motifPoint(page, { pad: 60, bottom: 200, c0: true });
   expect(pt, 'a motif can be clicked').not.toBeNull();
   await page.mouse.click(pt.x, pt.y);
-  await expect(page.locator('#ed [data-hd]')).toHaveCount(5);
+  await expect(page.locator('#ed [data-hd]')).toHaveCount(9);   // four corners, four sides (1.37.0) and the round one
 }
 const centre = async (page, sel) => { const b = await page.locator(sel).first().boundingBox(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; };
 
-test('four corners and a round handle show on one selected motif, and not on several', async ({ page }) => {
+test('four corners, four sides and a round handle show on one selected motif, and not on several', async ({ page }) => {
   const { errors } = await openApp(page);
   await selectOne(page);
   expect(await page.locator('#ed [data-hd="rot"]').count()).toBe(1);
