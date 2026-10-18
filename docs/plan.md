@@ -214,3 +214,13 @@ The app host never received Clerk's session cookie, so the gate bounced signed-i
 
 ## 1.38.1: Tests follow 1.37.0
 - The selection-handle tests count the four side squares; the Randomize seed-1 snapshot gains `wd`, `ht` and `va` on its random text (approved).
+
+## 1.39.0: One Text panel for both editors
+First step of the text upgrade (project doc `claude/wodblok-text-plan.md`).
+- **One Text panel** in the Stamp editor and the Pattern editor (a Text button on the Pattern rail). The same controls drive a stamp's letters in one and a Text layer in the other.
+- **Text controls leave the Layers panel.** A Text layer keeps the list, Size, Rotate, Position and Align there; the text, font, size, spacing, box, align, case, curve, ink, textures and Split into letters are in the Text panel (Ink, Textures and Split show only in the Pattern editor).
+- **Typing with no Text layer selected makes one**, and arms the text on the cursor.
+- Size slider range is 2 to 100 in both; its reset value is 30 in the Stamp editor and 10 in the Pattern editor.
+- No file format change: stamp text groups and Text layers are stored as before. The shared engine module and the single stored text object (file format 21) are the next release (1.40.0), then Box and fit (1.41.0); the rest of the plan moves down by one.
+- Tests: `text-editor-shared` (one panel in both, a Text layer is made on typing), `rail`; `text-box`, `text-box-wrap`, `text-place` use the shared ids.
+

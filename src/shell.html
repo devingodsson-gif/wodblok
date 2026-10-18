@@ -1095,7 +1095,12 @@ body.eyedrop{cursor:crosshair}
    <label>Case</label><div class="seg" id="tx_tc" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-c="" class="on">Typed</button><button type="button" data-c="u">UPPER</button><button type="button" data-c="l">lower</button><button type="button" data-c="t">Title</button></div>
    <label>Curve</label><input type="range" id="tx_cv" min="-100" max="100" value="0" data-u="%" data-def="0">
    <label>Rotate letters</label><input type="range" id="tx_rot" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
+   <div id="tx_lay" hidden>
+    <label>Ink</label><div class="cwell" id="wl_tx"></div>
+    <label>Textures</label><div class="txs" id="tx_tex"></div>
+   </div>
    <div class="txpv" id="tx_pv"></div>
+   <div class="row" id="tx_sprow" hidden><button class="alt" id="tx_split">Split into letters</button></div>
    <div class="row"><button class="primary" id="tx_go" aria-pressed="false">Add text</button></div>
   </div></details>
  </section>
@@ -1205,27 +1210,6 @@ body.eyedrop{cursor:crosshair}
      <label class="chk"><input type="checkbox" id="lfaak"><span>Paper shows through</span></label>
      <div class="row"><button class="alt" id="lfaimp" title="Import a PNG, JPG, WebP or SVG image">Import image&#8230;</button><button class="alt" id="lfaprj" title="Use a .wodblok project file as a picture">Use a project&#8230;</button></div>
      <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".wodblok,.json,application/json,application/zip" tabindex="-1">
-    </div>
-    <div id="lftx" hidden>
-     <div class="txed" id="tb_ed" hidden><span>Editing <b id="tb_edn"></b></span><button class="alt" id="tb_new">New text</button></div>
-     <div class="row" id="tb_sprow" hidden><button class="alt" id="tb_split" title="Turn every letter into its own text box">Split into letters</button></div>
-     <textarea id="tb_t" rows="2" maxlength="200" placeholder="Text" aria-label="Text"></textarea>
-     <label>Font</label><select id="tb_f"></select>
-     <div class="row" style="margin-top:6px"><label class="btn alt" for="tb_file" role="button" tabindex="0">Load a font file&#8230;</label></div><input type="file" id="tb_file" class="vh" accept=".ttf,.otf,.woff,.woff2,font/*" tabindex="-1">
-     <label>Size</label><input type="range" id="tb_sz" min="2" max="60" value="10" data-u="%" data-def="10">
-     <label>Letter spacing</label><input type="range" id="tb_ls" min="-20" max="100" value="0" data-u="%" data-def="0">
-     <label>Word spacing</label><input type="range" id="tb_ws" min="-50" max="200" value="0" data-u="%" data-def="0">
-     <label>Line spacing</label><input type="range" id="tb_lh" min="60" max="220" value="115" data-u="%" data-def="115">
-     <label>Box width</label><input type="range" id="tb_wd" min="0" max="400" value="0" data-u="%" data-def="0">
-     <label>Box height</label><input type="range" id="tb_ht" min="0" max="400" value="0" data-u="%" data-def="0">
-     <label>Align</label><div class="seg" id="tb_al" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-a="l">Left</button><button type="button" data-a="c" class="on">Centre</button><button type="button" data-a="r">Right</button><button type="button" data-a="j">Justify</button></div>
-     <label>Vertical</label><div class="seg" id="tb_va" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-v="t" class="on">Top</button><button type="button" data-v="m">Middle</button><button type="button" data-v="b">Bottom</button></div>
-     <label>Case</label><div class="seg" id="tb_tc" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-c="" class="on">Typed</button><button type="button" data-c="u">UPPER</button><button type="button" data-c="l">lower</button><button type="button" data-c="t">Title</button></div>
-     <label>Curve</label><input type="range" id="tb_cv" min="-100" max="100" value="0" data-u="%" data-def="0">
-     <label>Rotate letters</label><input type="range" id="tb_rot" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
-     <label>Ink</label><div class="cwell" id="wl_tb"></div>
-     <label>Textures</label><div class="txs" id="tb_tex"></div>
-     <div class="row"><button class="primary" id="tb_go" aria-pressed="false">Add text</button></div>
     </div>
     <div class="fpn"><span id="lfpn"></span><button class="alt" id="lfpclr">Clear all</button></div>
      <div class="mlist fpl" id="lfpl" aria-label="Placed stamps"></div>

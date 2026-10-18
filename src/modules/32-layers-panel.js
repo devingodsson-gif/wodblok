@@ -37,6 +37,7 @@ let to=above?t+1:t;const L=WBS.layers.splice(lyDrag,1)[0];if(lyDrag<to)to--;WBS.
 $('lyl2').addEventListener('dragend',()=>{lyDrag=-1;lyClr()});
 // "+" asks what kind of layer to add; the new layer goes above the selected one, holds the current stamp, and is made the selected layer.
 const LT={p:'Layer',f:'Frame',x:'Free stamps',a:'Pictures',t:'Text'};
+WBX.wbAddLayer=addLayer;
 $('ly_add').onclick=e=>{e.stopPropagation();const l=$('ly_menu'),open=l.hidden;closeDD();if(WBX.wbCloseMenus)WBX.wbCloseMenus();l.hidden=!open;if(open)placeFloat(l,$('ly_add'),true)};
 $('ly_menu').onclick=e=>{const it=e.target.closest('[data-lt]');if(!it)return;$('ly_menu').hidden=true;addLayer(it.dataset.lt)};
 function addLayer(m){const base=LT[m]||'Layer',n=WBS.layers.filter(x=>x.name==base||x.name.startsWith(base+' ')).length,cur=WBS.tiles[WBS.cur],

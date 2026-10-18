@@ -46,8 +46,8 @@ test('Stamp editor: the box on the cursor follows Box width and Box height', asy
 test('Text layer: the text on the cursor has its box drawn round it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add'); await page.click('#ly_menu [data-lt="t"]'); await settle(page);
-  await page.fill('#tb_t', 'ONE TWO');
+  await page.click('#ly_add'); await page.click('#ly_menu [data-lt="t"]'); await openPanel(page, 'text'); await settle(page);
+  await page.fill('#tx_t', 'ONE TWO');
   await page.waitForTimeout(500);
   const b = await page.locator('#art').boundingBox();
   await page.mouse.move(b.x + b.width / 2 - 5, b.y + b.height / 2 - 5); await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);

@@ -5,21 +5,32 @@ const { TARGET, openApp, openPanel, setMode, settle, getState, putText } = requi
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
-const SUFFIX = ['t', 'f', 'file', 'sz', 'ls', 'ws', 'lh', 'al', 'tc', 'cv', 'rot'];
-const shape = (page, p) => page.evaluate(([p, sfx]) => sfx.map(k => {
-  const e = document.getElementById(p + '_' + k); if (!e) return k + ': missing';
-  const at = [...e.attributes].filter(a => !['id', 'for', 'min', 'max', 'value', 'data-def', 'style', 'class'].includes(a.name)).map(a => a.name + '=' + a.value).join(' ');
-  return k + ': ' + e.tagName + ' ' + at + ' | ' + [...e.querySelectorAll('button')].map(b => b.textContent).join(',') + ' | ' + (k === 't' || !e.previousElementSibling ? '' : e.previousElementSibling.textContent);
-}), [p, SUFFIX]);
-
-test('the Text tool and the Text layer have the same controls', async ({ page }) => {
+test('one Text panel in both editors: the controls are the same, the Layers panel has none of them', async ({ page }) => {
   const { errors } = await openApp(page);
-  const tx = await shape(page, 'tx'), tb = await shape(page, 'tb');
-  expect(tx.filter(x => x.includes('missing'))).toEqual([]);
-  expect(tb).toEqual(tx);
-  expect(tx.join('\n')).toContain('Word spacing');
-  expect(tx.join('\n')).toContain('Justify');
-  expect(tx.join('\n')).toContain('UPPER');
+  await setMode(page, 'pattern');
+  await openPanel(page, 'text');
+  for (const k of ['t', 'f', 'file', 'sz', 'ls', 'ws', 'lh', 'wd', 'ht', 'al', 'va', 'tc', 'cv', 'rot', 'go'])
+    await expect(page.locator('#tx_' + k), k).toHaveCount(1);
+  expect(await page.locator('#tb_t, #tb_f, #tb_go, #lftx').count()).toBe(0);
+  await expect(page.locator('#tx_lay')).toBeVisible();     // ink and textures belong to a Text layer
+  await expect(page.locator('#tx_pv')).toBeHidden();
+  await setMode(page, 'stamp');
+  await openPanel(page, 'text');
+  await expect(page.locator('#tx_lay')).toBeHidden();
+  await expect(page.locator('#tx_pv')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('in the Pattern editor, typing in the Text panel with no Text layer makes one', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await setMode(page, 'pattern');
+  await openPanel(page, 'text');
+  const n0 = JSON.parse(await getState(page)).layers.length;
+  await page.fill('#tx_t', 'HELLO');
+  await expect(page.locator('#tx_go')).toHaveAttribute('aria-pressed', 'true');
+  const L = async () => JSON.parse(await getState(page)).layers;
+  expect((await L()).length).toBe(n0 + 1);
+  expect((await L()).filter(l => l.txt).length).toBe(1);
   expect(errors).toEqual([]);
 });
 
@@ -79,10 +90,10 @@ test('Enter is a new line in the Text layer too', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
   await page.click('#ly_add');
-  await page.click('#ly_menu [data-lt="t"]');
+  await page.click('#ly_menu [data-lt="t"]'); await openPanel(page, 'text');
   await settle(page);
-  await page.fill('#tb_t', 'ab');
-  await page.click('#tb_t'); await page.keyboard.press('End'); await page.keyboard.press('Enter'); await page.keyboard.type('c');
-  await expect(page.locator('#tb_t')).toHaveValue('ab\nc');
+  await page.fill('#tx_t', 'ab');
+  await page.click('#tx_t'); await page.keyboard.press('End'); await page.keyboard.press('Enter'); await page.keyboard.type('c');
+  await expect(page.locator('#tx_t')).toHaveValue('ab\nc');
   expect(errors).toEqual([]);
 });

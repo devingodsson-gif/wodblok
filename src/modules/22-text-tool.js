@@ -81,7 +81,7 @@ async function preview(){await ready();const t=WBS.tiles[WBS.cur];useT(t);autoFi
 $('tx_pv').innerHTML=`<svg viewBox="-12 -12 ${SW+24} ${SH+24}"><path d="${shp(0)}" fill="${pa}" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/>`+ps.map(p=>`<g transform="translate(${(C[0]+p.x).toFixed(1)} ${(C[1]+p.y).toFixed(1)}) rotate(${p.r.toFixed(1)}) scale(${p.s})"><path d="${p.g.d}" fill="${ink}" fill-rule="evenodd"/></g>`).join('')+`</svg>`;
 $('tx_go').disabled=!st.text.trim()}
 const cen=()=>SK=='tri'?[SW/2,SH*2/3]:[SW/2,SH/2];
-const later=()=>{clearTimeout(tmr);tmr=setTimeout(preview,120)};
+const later=()=>{if(WBS.curView=='pattern')return;clearTimeout(tmr);tmr=setTimeout(preview,120)};
 function letters(g,ax,ay){const ps=layout(st),out=[];ps.forEach(p=>{const k=p.g.k;if(!cust[k])cust[k]={n:p.c,svg:`<path d="${p.g.d}" fill="FILL" fill-rule="evenodd"/>`,txt:1};const[x,y]=wrapP(ax+p.x,ay+p.y);const q=it(k,x,y,p.s,+p.r.toFixed(1),1);q.tg=g;out.push(q)});return out}
 // The text follows the cursor as a faint copy with its box drawn round it; a click puts it down there and it stays on the cursor to put down again (Esc or right-click stops), like the Text layer.
 const txArmed=()=>!!(WBS.brush&&WBS.brush.txt);
@@ -96,7 +96,7 @@ async function update(live){const g=edit;if(!g)return;fromUI();if(!st.text.trim(
 const[cx0,cy0]=mean(ids),ax=M.ax+(cx0-M.mx),ay=M.ay+(cy0-M.my),pos=Math.min(...ids);delItems(ids);const L=letters(g,ax,ay);t.items.splice(Math.min(pos,t.items.length),0,...L);const nids=L.map((_,i)=>Math.min(pos,t.items.length-L.length)+i);
 const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();upd();if(!live){if(WBX.wbCap)WBX.wbCap();pmsg(`Updated the text. Hand-moved letters were rebuilt.`)}}
 // the text on the stamp follows every change in the panel while a text is being edited
-const live=()=>{if(syncing)return;if(!edit){if(txArmed())txGhost();else if(st.text.trim())txArm(true);return}clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
+const live=()=>{if(syncing||WBS.curView=='pattern')return;if(!edit){if(txArmed())txGhost();else if(st.text.trim())txArm(true);return}clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
 // used by Randomize: set text on a stamp (fonts load first; a newer roll cancels an older one)
 WBX.wbTxFonts=FONTS.map(x=>x[0]);
 WBX.wbTxPlace=async(t,o,tok)=>{const f=F[o.f]||F.cinzel;try{await document.fonts.load(css(f),o.text);await document.fonts.ready}catch(e){}
@@ -107,19 +107,19 @@ return true}finally{st=keep;useT(WBS.tiles[WBS.cur])}};
 // keep a group's anchor in step when it's moved, turned or scaled as a whole
 WBX.wbTxXf=(g,fn)=>{const t=WBS.tiles[WBS.cur],M=A(t)[g];if(!M)return;fn(M)};
 // sync the panel with the selection: selecting a text group puts it into edit mode
-WBX.wbTxSync=()=>{if(!$('tx_t'))return;txArmUI();const g=grpOf();if(g===edit)return;edit=g;const box=$('tx_ed');
+WBX.wbTxSync=()=>{if(!$('tx_t')||WBS.curView=='pattern')return;txArmUI();const g=grpOf();if(g===edit)return;edit=g;const box=$('tx_ed');
 if(g){const M=A(WBS.tiles[WBS.cur])[g];st={...D,...M,auto:false};delete st.ax;delete st.ay;delete st.mx;delete st.my;toUI();box.hidden=false;$('tx_edn').textContent=st.text.replace(/\n/g,' ');$('tx_go').textContent='Add text'}
 else{box.hidden=true;$('tx_go').textContent='Add text';st.auto=true}later()};
 fillFonts();toUI();
 $('tx_t').addEventListener('input',()=>{fromUI();later();live()});
 ['tx_f','tx_sz','tx_ls','tx_ws','tx_lh','tx_wd','tx_ht','tx_cv','tx_rot'].forEach(id=>$(id).addEventListener('input',e=>{if(id=='tx_sz'&&e.isTrusted)st.auto=false;fromUI();later();live()}));
 ['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(!e.isTrusted)return;const w=$('tx_sz').closest('.ctl');if(e.target===$('tx_sz')||(w&&w.contains(e.target)))st.auto=false},true));
-$('tx_al').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;st.al=b.dataset.a;document.querySelectorAll('#tx_al [data-a]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
-$('tx_va').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;st.va=b.dataset.v;document.querySelectorAll('#tx_va [data-v]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
-$('tx_tc').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;st.tc=b.dataset.c;document.querySelectorAll('#tx_tc [data-c]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
-$('tx_go').onclick=()=>{if(txArmed())txArm(false);else{fromUI();txArm(true)}};
-$('tx_new').onclick=()=>{selOne(-1);edit=null;$('tx_ed').hidden=true;$('tx_go').textContent='Add text';st={...D,f:st.f};toUI();upd();later();$('tx_t').focus()};
-$('tx_file').onchange=async()=>{const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl)return;try{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';
+$('tx_al').onclick=e=>{if(WBS.curView=='pattern')return;const b=e.target.closest('[data-a]');if(!b)return;st.al=b.dataset.a;document.querySelectorAll('#tx_al [data-a]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
+$('tx_va').onclick=e=>{if(WBS.curView=='pattern')return;const b=e.target.closest('[data-v]');if(!b)return;st.va=b.dataset.v;document.querySelectorAll('#tx_va [data-v]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
+$('tx_tc').onclick=e=>{if(WBS.curView=='pattern')return;const b=e.target.closest('[data-c]');if(!b)return;st.tc=b.dataset.c;document.querySelectorAll('#tx_tc [data-c]').forEach(x=>x.classList.toggle('on',x==b));later();live()};
+$('tx_go').onclick=()=>{if(WBS.curView=='pattern')return;if(txArmed())txArm(false);else{fromUI();txArm(true)}};
+$('tx_new').onclick=()=>{if(WBS.curView=='pattern')return;selOne(-1);edit=null;$('tx_ed').hidden=true;$('tx_go').textContent='Add text';st={...D,f:st.f};toUI();upd();later();$('tx_t').focus()};
+$('tx_file').onchange=async()=>{if(WBS.curView=='pattern')return;const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl)return;try{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';
 const id=await addUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();$('tx_f').value=id;fromUI();later();pmsg(`Loaded “${nm}”.`+(fl.size>=900000?' It is large, so it will not be kept for next time.':''))}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}};
 // text boxes in the pattern: lay the text out at canvas scale, returning the letter paths (centred on the box)
 WBX.wbTxLay=async o=>{const f=F[o.f]||F.cinzel;try{await document.fonts.load(css(f),o.text||'Aa');await document.fonts.ready}catch(e){}
@@ -133,8 +133,8 @@ if(!Lt.length)return null;const U=kk*Math.min(SW,SH)/100,boxW=q.wd>0,boxH=q.ht>0
 return{G,Lt,bw:+(boxW?q.wd*U:x1-x0).toFixed(2),bh:+(boxH?q.ht*U:y1-y0).toFixed(2)}};
 WBX.wbTxUnit=()=>Math.min(CW,CH)/100;
 WBX.wbTxAddFont=async fl=>{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';const id=await addUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();return id};
-WBX.wbTxFontHTML=()=>$('tx_f').innerHTML;
-try{new MutationObserver(()=>{if(WBX.wbTbFonts)WBX.wbTbFonts()}).observe($('tx_f'),{childList:true})}catch(e){}
+// one Text panel for both editors: the Stamp editor builds letters on the stamp, the Pattern editor fills a Text layer
+WBX.wbTxMode=v=>{const pat=v=='pattern';$('tx_lay').hidden=!pat;$('tx_pv').hidden=pat;$('tx_sz').dataset.def=pat?'10':'30';if(pat){if(txArmed())txArm(false);if(WBX.wbTbMode)WBX.wbTbMode()}else{WBS.txArm=false;toUI();$('tx_ed').hidden=!edit;$('tx_sprow').hidden=true;txArmUI()}};
 // redraw the preview whenever the panel is shown
 new MutationObserver(()=>{const s=document.querySelector('section.pn[data-p="text"]');if(s&&!s.hidden)later()}).observe(document.querySelector('section.pn[data-p="text"]'),{attributes:true,attributeFilter:['hidden']});
 later();

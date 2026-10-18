@@ -29,13 +29,13 @@ test('Stamp editor text: a Box width breaks the lines; Box height with Top or Bo
 test('Text layer: the side squares set the box width (lines wrap, top stays) and the box height', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add'); await page.click('#ly_menu [data-lt="t"]'); await settle(page);
-  await page.fill('#tb_t', 'ONE TWO THREE FOUR');
-  await set(page, 'tb_sz', 6);
+  await page.click('#ly_add'); await page.click('#ly_menu [data-lt="t"]'); await openPanel(page, 'text'); await settle(page);
+  await page.fill('#tx_t', 'ONE TWO THREE FOUR');
+  await set(page, 'tx_sz', 6);
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
-  await page.click('#tb_go'); await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);   // put the text down, then select it
+  await page.click('#tx_go'); await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);   // put the text down, then select it
   const piece = async () => JSON.parse(await getState(page)).layers.flatMap(l => l.pl || []).find(p => p.tx);
   const a = await piece();
   expect(rows(a.Lt.map(l => l[2]))).toBe(1);
@@ -53,6 +53,6 @@ test('Text layer: the side squares set the box width (lines wrap, top stays) and
   expect(b.bh).toBeGreaterThan(a.bh);
   await pull('s', 0, box.height * 0.05);
   await expect.poll(async () => (await piece()).tx.ht, { timeout: 15000 }).toBeGreaterThan(0);
-  await expect(page.locator('#tb_wd')).not.toHaveValue('0');
+  await expect(page.locator('#tx_wd')).not.toHaveValue('0');
   expect(errors).toEqual([]);
 });
