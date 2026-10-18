@@ -34,6 +34,7 @@ svg[stroke="currentColor"]:not([width]):not(.ic){stroke-width:1.7;stroke-linecap
 .ddl{border-radius:var(--r-l);padding:6px}.ddi{border-radius:var(--r-m);padding:6px 8px}.ddi.cur{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}.ddi.dis{opacity:.4;cursor:default}.rowm .ddi{display:flex;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);font:inherit;cursor:pointer}.rowm .ddi:hover:not(:disabled),.rowm .ddi:focus-visible{background:var(--acc-soft)}.rowm .ddi:disabled{opacity:.4;cursor:default}.ddg{padding:8px 8px 4px;font-size:var(--fs-s);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .sw .dd2,.asp .dd2,.lyo .dd2,.gmc .dd2{flex:1;min-width:0}
 .ccb{flex:none;width:38px;height:30px;padding:4px;margin:0;border:1px solid var(--line2);border-radius:var(--r-m);background:var(--field)}.ccb::before{content:"";display:block;width:100%;height:100%;border-radius:var(--r-s);background:var(--c,#888);box-shadow:var(--edge)}.ccb:hover{border-color:var(--faint)}.gmc .ccb{width:30px;height:30px}
+#fpov rect.gh.ov{stroke:var(--warn)}
 .cpop{position:fixed;z-index:9100;width:224px;padding:8px;background:var(--raise);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;touch-action:none}.cpop[hidden]{display:none}
 .cpsv{position:relative;height:132px;border-radius:var(--r-m);cursor:crosshair;box-shadow:var(--edge)}.cpsv i,.cph i{position:absolute;width:14px;height:14px;margin:-8px 0 0 -8px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);pointer-events:none}
 .cph{position:relative;height:12px;border-radius:var(--r-m);cursor:pointer;background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}.cph i{top:50%}
@@ -1091,8 +1092,11 @@ body.eyedrop{cursor:crosshair}
    <label>Line spacing</label><input type="range" id="tx_lh" min="60" max="220" value="115" data-u="%" data-def="115">
    <label>Box width</label><input type="range" id="tx_wd" min="0" max="400" value="0" data-u="%" data-def="0">
    <label>Box height</label><input type="range" id="tx_ht" min="0" max="400" value="0" data-u="%" data-def="0">
+   <label>Padding</label><input type="range" id="tx_pd" min="0" max="40" value="0" data-u="%" data-def="0">
+   <label>Fit to box</label><select id="tx_ft"><option value="">Off</option><option value="s">Shrink to fit</option><option value="f">Fill the box</option><option value="l">Fit each line to width</option><option value="w">Fit width</option></select>
+   <label>Overflow</label><div class="seg" id="tx_ov" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-o="" class="on">Show</button><button type="button" data-o="h">Hide</button></div>
    <label>Align</label><div class="seg" id="tx_al" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-a="l">Left</button><button type="button" data-a="c" class="on">Centre</button><button type="button" data-a="r">Right</button><button type="button" data-a="j">Justify</button></div>
-   <label>Vertical</label><div class="seg" id="tx_va" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-v="t" class="on">Top</button><button type="button" data-v="m">Middle</button><button type="button" data-v="b">Bottom</button></div>
+   <label>Vertical</label><div class="seg" id="tx_va" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-v="t" class="on">Top</button><button type="button" data-v="m">Middle</button><button type="button" data-v="b">Bottom</button><button type="button" data-v="s">Spread</button></div>
    <label>Case</label><div class="seg" id="tx_tc" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-c="" class="on">Typed</button><button type="button" data-c="u">UPPER</button><button type="button" data-c="l">lower</button><button type="button" data-c="t">Title</button></div>
    <label>Curve</label><input type="range" id="tx_cv" min="-100" max="100" value="0" data-u="%" data-def="0">
    <label>Rotate letters</label><input type="range" id="tx_rot" min="-180" max="180" value="0" data-u="&#176;" data-def="0">

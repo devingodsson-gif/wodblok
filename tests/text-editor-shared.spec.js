@@ -31,6 +31,7 @@ test('in the Pattern editor, typing in the Text panel with no Text layer makes o
   const L = async () => JSON.parse(await getState(page)).layers;
   expect((await L()).length).toBe(n0 + 1);
   expect((await L()).filter(l => l.txt).length).toBe(1);
+  await expect(page.locator('section.pn[data-p="text"]')).toBeVisible();      // the Text panel stays open
   expect(errors).toEqual([]);
 });
 

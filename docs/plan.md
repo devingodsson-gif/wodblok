@@ -232,3 +232,14 @@ Second step of the text upgrade (project doc `claude/wodblok-text-plan.md`).
 - No file format change (still 20): a text is still stored as its letters plus the settings on the stamp, and a Text layer as before. Old files open unchanged. The planned format 21 is not needed for this; it comes with the first change that stores something new.
 - Tests: `text-adjust`; the text tests run on the engine module unchanged.
 
+## 1.41.0: Box and fit
+Third step of the text upgrade (project doc `claude/wodblok-text-plan.md`). Same controls in the Stamp editor and the Text layer.
+- **Padding** (0 to 40% of the short side): the room kept clear inside the box.
+- **Vertical: Spread** joins Top, Middle and Bottom: the first line sits at the top of the box, the last at the bottom, the others spread evenly (a box that is too small behaves like Top).
+- **Fit to box**: Off; **Shrink to fit** (smaller only when the text would run past the box, never larger than Size); **Fill the box** (the largest size that fits); **Fit each line to width** (every line scaled to the box width, so lines get different sizes); **Fit width** (one size so the longest line fills the width, no wrapping). Fit needs a Box width (and a Box height for Shrink and Fill).
+- **Overflow**: Show (default) or Hide (lines that run past the box are left out). While the text is on the cursor its dashed box turns the warning colour when the text runs past it.
+- **Data**: `pd`, `ft`, `ov` and `va: 's'` are saved on a text only when set, so older files and the Randomize snapshots are unchanged.
+- Also fixed: typing in the Text panel with no Text layer made the Layout panel replace the Text panel; the Text panel stays open.
+- Not in this release (still planned): Stretch to box, box shapes, Fit to stamp, columns, and a marker on a placed text that overflows.
+- Tests: `text-fit`; `text-editor-shared` checks the Text panel stays open.
+

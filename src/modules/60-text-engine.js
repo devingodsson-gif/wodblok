@@ -43,19 +43,28 @@ const n=q.length;if(n<3)return;const Pp=q.map(([x,y])=>[(x-gcx)*u,(y-gcy)*u]),mi
 for(let i=1;i<=n;i++){const p=Pp[i%n],mm=mid(i);path+='Q'+fm(p[0])+','+fm(p[1])+' '+fm(mm[0])+','+fm(mm[1])}path+='Z'});
 const r={k:key,cx:gcx-ox,cy:gcy-oy,d:path};teGL.set(key,r);return r}
 // --- layout: letters on straight lines, or bent around a circle (curve = % of a full circle; negative curves down)
-function teLayout(o){teEns();const f=teF[o.f]||teF.cinzel;teCx.font=teCss(f);const T0=o.tc=='u'?o.text.toUpperCase():o.tc=='l'?o.text.toLowerCase():o.tc=='t'?o.text.toLowerCase().replace(/(^|[\s(\-])(\S)/g,(m,a,b)=>a+b.toUpperCase()):o.text,lines0=T0.split('\n'),em=o.sz/100*Math.min(SW,SH),k=em/teP,ls=o.ls/100*teP,wsp=(o.ws||0)/100*teP,capH=teCx.measureText('H').actualBoundingBoxAscent||teP*.7,lhp=o.lh/100*teP;
+// Box and fit options (all optional, saved only when set): pd = padding inside the box (% of the short side), ft = how the text fits the box
+// ('' off, 's' shrink to fit, 'f' fill the box, 'l' fit each line to the width, 'w' fit the width), ov = 'h' hides what runs past the box, va 's' = Spread.
+function teCore(o){teEns();const f=teF[o.f]||teF.cinzel;teCx.font=teCss(f);const T0=o.tc=='u'?o.text.toUpperCase():o.tc=='l'?o.text.toLowerCase():o.tc=='t'?o.text.toLowerCase().replace(/(^|[\s(\-])(\S)/g,(m,a,b)=>a+b.toUpperCase()):o.text,lines0=T0.split('\n'),em=o.sz/100*Math.min(SW,SH),k=em/teP,ls=o.ls/100*teP,wsp=(o.ws||0)/100*teP,capH=teCx.measureText('H').actualBoundingBoxAscent||teP*.7,lhp=o.lh/100*teP;
 // Box width: lines are broken at spaces so none is wider than the box (a single long word is left whole). Box height + Vertical: where the block of lines sits in a box of that height.
-const limP=o.wd>0?o.wd/100*Math.min(SW,SH)/k:0,wd1=s=>{let n=0,sp=0;for(const c of s){n++;if(/\s/.test(c))sp++}return teCx.measureText(s).width+ls*Math.max(0,n-1)+wsp*sp};let lines=lines0;
-if(limP){lines=[];lines0.forEach(ln=>{if(!ln.trim()){lines.push(ln);return}let cur='';ln.split(' ').forEach(w=>{const t=cur?cur+' '+w:w;if(cur&&wd1(t)>limP){lines.push(cur);cur=w}else cur=t});lines.push(cur)})}
-const hbP=o.ht>0?o.ht/100*Math.min(SW,SH)/k:0,fr2=hbP?(hbP-lines.length*lhp)/2:0,vOff=hbP?(o.va=='b'?fr2:o.va=='m'?0:-fr2):0;
+const U=Math.min(SW,SH)/100,pdc=(o.pd||0)*U,limP=o.wd>0?Math.max(1,o.wd*U-2*pdc)/k:0,wd1=s=>{let n=0,sp=0;for(const c of s){n++;if(/\s/.test(c))sp++}return teCx.measureText(s).width+ls*Math.max(0,n-1)+wsp*sp};let lines=lines0;
+if(limP&&!o.nw&&o.ft!='l'){lines=[];lines0.forEach(ln=>{if(!ln.trim()){lines.push(ln);return}let cur='';ln.split(' ').forEach(w=>{const t=cur?cur+' '+w:w;if(cur&&wd1(t)>limP){lines.push(cur);cur=w}else cur=t});lines.push(cur)})}
+const hbP=o.ht>0?Math.max(1,o.ht*U-2*pdc)/k:0;
 const L=lines.map(line=>{const ch=[...line],out=[];let sp=0;ch.forEach((c,i)=>{if(/\s/.test(c)){sp++;return}const g=teGlyph(f,c);if(!g)return;const pen=teCx.measureText(ch.slice(0,i).join('')).width+ls*i+wsp*sp;out.push({g,c,x:pen+g.cx,y:g.cy,sp})});teCx.font=teCss(f);return{out,ns:sp,W:teCx.measureText(line).width+ls*Math.max(0,ch.length-1)+wsp*sp}});
-const maxW=limP||Math.max(1,...L.map(l=>l.W)),pts=[];L.forEach((l,j)=>{const ex=o.al=='j'&&j<L.length-1&&l.ns>0?(maxW-l.W)/l.ns:0,sh=o.al=='l'||o.al=='j'?-maxW/2:o.al=='r'?maxW/2-l.W:-l.W/2,by=(j-(lines.length-1)/2)*lhp+capH/2+vOff;l.out.forEach(c=>pts.push({g:c.g,c:c.c,px:sh+c.x+ex*c.sp,py:by+c.y}))});
+const fj=L.map(l=>o.ft=='l'&&limP&&l.W>0?Math.min(8,limP/l.W):1),hj=fj.map(q=>lhp*q),H=hj.reduce((a,b)=>a+b,0),n=lines.length,fr2=hbP?(hbP-H)/2:0,vOff=hbP?(o.va=='b'?fr2:o.va=='m'?0:-fr2):0,spr=hbP&&o.va=='s'&&n>1,gap=spr?Math.max(0,hbP-H)/(n-1):0;
+const maxW=limP||Math.max(1,...L.map((l,j)=>l.W*fj[j])),pts=[];let cum=hbP?(spr?-hbP/2:-H/2+vOff):-H/2,over=!!((hbP&&H>hbP+.5)||(limP&&Math.max(0,...L.map((l,j)=>l.W*fj[j]))>limP+.5));const cut=o.ov=='h'&&hbP;
+L.forEach((l,j)=>{const q=fj[j],Wj=l.W*q,ex=o.al=='j'&&j<L.length-1&&l.ns>0&&q==1?(maxW-l.W)/l.ns:0,sh=o.al=='l'||o.al=='j'?-maxW/2:o.al=='r'?maxW/2-Wj:-Wj/2,yc=cum+hj[j]/2,by=yc+capH*q/2;cum+=hj[j]+gap;
+if(cut&&(yc-hj[j]/2<-hbP/2-.5||yc+hj[j]/2>hbP/2+.5))return;l.out.forEach(c=>pts.push({g:c.g,c:c.c,px:sh+c.x*q+ex*c.sp,py:by+c.y*q,q}))});
 const cvv=Math.max(-1,Math.min(1,o.cv/100)),rt=(o.rot||0)*Math.PI/180,cs=Math.cos(rt),sn=Math.sin(rt);let res;
-if(Math.abs(cvv)<.005)res=pts.map(c=>({g:c.g,c:c.c,x:c.px,y:c.py,r:0}));
+if(Math.abs(cvv)<.005)res=pts.map(c=>({g:c.g,c:c.c,x:c.px,y:c.py,r:0,q:c.q}));
 else{const phi=Math.abs(cvv)*2*Math.PI,R=maxW/phi,off=R*Math.max(0,Math.min(1,1-phi/Math.PI));
-res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:off+rho*Math.sin(th),r:(th+Math.PI/2)*180/Math.PI}}
-const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI}})}
-return res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0),s:+(em/teE).toFixed(4)}))}
+res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:off+rho*Math.sin(th),r:(th+Math.PI/2)*180/Math.PI,q:c.q}}
+const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI,q:c.q}})}
+const out=res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0),s:+(em/teE*p.q).toFixed(4)}));out.over=over;out.tw=Math.max(0,...L.map((l,j)=>l.W*fj[j]))*k;return out}
+// The layout, with the fit modes: Shrink to fit and Fill the box look for the size that fits (about 12 tries); Fit the width scales one run of lines to the box width.
+function teLayout(o){const bx=o.wd>0||o.ht>0,ft=bx?(o.ft||''):'';if(!ft)return teCore({...o,ft:''});if(ft=='l')return teCore(o);
+if(ft=='w'){if(!(o.wd>0))return teCore({...o,ft:''});const r0=teCore({...o,ft:'',sz:100,nw:1});if(!r0.length)return r0;const U=Math.min(SW,SH)/100,inner=Math.max(1,o.wd*U-2*(o.pd||0)*U);return teCore({...o,ft:'',sz:Math.max(1,100*inner/Math.max(1,r0.tw)),nw:1})}
+const c0={...o,ft:''};if(ft=='s'){const r=teCore(c0);if(!r.over)return r}let lo=1,hi=ft=='s'?o.sz:400;for(let i=0;i<12;i++){const mid=(lo+hi)/2;if(teCore({...c0,sz:mid}).over)hi=mid;else lo=mid}return teCore({...c0,sz:lo})}
 // --- text options and defaults
 const teD={text:'',f:'cinzel',sz:30,ls:0,ws:0,lh:115,al:'c',tc:'',cv:0,rot:0,wd:0,ht:0,va:'t',auto:true};
 // largest size (up to 40%) at which the whole text sits inside the stamp, so it doesn't wrap round the edges
@@ -65,13 +74,13 @@ const k=SK=='tri'?.55:SK=='rect'?.86:.74;return Math.max(5,Math.min(o.maxSz||40,
 async function teReady(st){const f=teF[st.f]||teF.cinzel;try{await document.fonts.load(teCss(f),st.text||'Aa');await document.fonts.ready}catch(e){}}
 
 async function teLayBox(o){const f=teF[o.f]||teF.cinzel;try{await document.fonts.load(teCss(f),o.text||'Aa');await document.fonts.ready}catch(e){}
-const q={...teD,...o};if(!q.text.trim())return null;const kk=Math.min(CW,CH)/Math.min(SW,SH),ps=teLayout(q);if(!ps.length)return null;
+const q={...teD,...o};if(!q.text.trim())return null;const kk=Math.min(CW,CH)/Math.min(SW,SH),ps=teLayout(q);if(!ps.length)return null;const over=!!ps.over;
 const G={},Lt=[];let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
 ps.forEach(p=>{const d=p.g.d;if(!/^[MLQZ0-9.,\- ]+$/.test(d))return;G[p.g.k]=d;const nm=(d.match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);let a=1e9,b=1e9,c=-1e9,e=-1e9;for(let i=0;i+1<nm.length;i+=2){a=Math.min(a,nm[i]);c=Math.max(c,nm[i]);b=Math.min(b,nm[i+1]);e=Math.max(e,nm[i+1])}
 const r=p.r*Math.PI/180,cs=Math.cos(r),sn=Math.sin(r),X=p.x*kk,Y=p.y*kk,S=p.s*kk;[[a,b],[c,b],[c,e],[a,e]].forEach(([u,v])=>{const px=X+(u*cs-v*sn)*S,py=Y+(u*sn+v*cs)*S;x0=Math.min(x0,px);x1=Math.max(x1,px);y0=Math.min(y0,py);y1=Math.max(y1,py)});
 Lt.push([p.g.k,X,Y,+p.r.toFixed(1),+S.toFixed(4)])});
 if(!Lt.length)return null;const U=kk*Math.min(SW,SH)/100,boxW=q.wd>0,boxH=q.ht>0,mx=boxW?0:(x0+x1)/2,my=boxH?0:(y0+y1)/2;Lt.forEach(l=>{l[1]=+(l[1]-mx).toFixed(2);l[2]=+(l[2]-my).toFixed(2)});
 // with a box width or height, the box (not the letters) is what the piece measures, so Align and Vertical sit inside it
-return{G,Lt,bw:+(boxW?q.wd*U:x1-x0).toFixed(2),bh:+(boxH?q.ht*U:y1-y0).toFixed(2)}}
+return{G,Lt,bw:+(boxW?q.wd*U:x1-x0).toFixed(2),bh:+(boxH?q.ht*U:y1-y0).toFixed(2),over}}
 
 export {teFonts,teF,teUF,teCss,teGlyph,teLayout,teD,teFitSz,teReady,teAddUF,teLoadFonts,teLayBox,teSetNotify};
