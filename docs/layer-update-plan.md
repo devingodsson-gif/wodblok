@@ -41,7 +41,7 @@ None of this is a reason not to do it. It is a reason to build it in small steps
 
 ## How it works on the canvas
 
-**Tools** (left rail): Select, Stamp, Shape, Image, Text, Grid, plus the panels we have now (Layers, Colours, Textures, Navigator...).
+**Tools** (left rail), one for everything a layer type used to be (owner's note, Oct 18): **Select**, **Arrange** (was the Repeat layer: choose the stamps and the layout, one arrangement per layer), **Frame** (was the Frame layer: a border arrangement; the same arrangement data with the frame kind chosen), **Stamp** (the stamp library: pick, New, Save, Load, Duplicate, locks, Zoom to stamp; also free placing a stamp), **Shape** (was part of Free place), **Image** (was the Art/Pictures layer: import, crop, saved-project links), **Text**, **Grid** (snapping). Panels stay as now (Layers, Colours, Textures, Navigator...). Every tool works on the current layer whatever else the layer holds. Arrange and Frame edit the layer's one arrangement, so choosing Frame on a layer that already has a Repeat arrangement replaces it (undoable). The stamp outlines with the opacity slider show whenever the layer has an arrangement, whichever tool is active.
 
 **Stamp tool, on a layer**
 - Panel: the stamps in the project (pick several to be active), **New stamp** (choose the outline), **Save** and **Load** stamps (the stamp library as today), and the arrangement controls we have now.
