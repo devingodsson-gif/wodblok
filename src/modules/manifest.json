@@ -58,5 +58,6 @@
  "58-account.js",
  "59-align.js",
   "60-text-engine.js",
-  "61-text-panel.js"
+  "61-text-panel.js",
+  "62-text-styles.js"
 ]

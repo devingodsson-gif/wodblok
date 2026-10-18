@@ -113,4 +113,4 @@ if(!Lt.length)return null;const U=kk*Math.min(SW,SH)/100,boxW=q.wd>0,boxH=q.ht>0
 // with a box width or height, the box (not the letters) is what the piece measures, so Align and Vertical sit inside it
 return{G,Lt,bw:+(boxW?q.wd*U:x1-x0).toFixed(2),bh:+(boxH?q.ht*U:y1-y0).toFixed(2),over}}
 
-export {teFonts,teF,teUF,teCss,teGlyph,teLayout,teD,teFitSz,teReady,teAddUF,teLoadFonts,teLayBox,teSetNotify};
+export {teRnd,teFonts,teF,teUF,teCss,teGlyph,teLayout,teD,teFitSz,teReady,teAddUF,teLoadFonts,teLayBox,teSetNotify};

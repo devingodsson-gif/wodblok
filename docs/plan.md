@@ -281,3 +281,11 @@ Seventh step of the text upgrade (project doc `claude/wodblok-text-plan.md`). Sa
 - **Data:** `pt, pa, pw` and `wp, wa` are saved on a text only when set. Old files and snapshots are unchanged.
 - Not in this release: text on a drawn path, text along the stamp's edge, warp styles beyond these three.
 - Tests: `text-warp`.
+
+## 1.46.0: Text styles, and Randomize uses the new text options
+Eighth and last step of the text update (project doc `claude/wodblok-text-plan.md`).
+- **Text styles library** (below the Text panel, same tree as Saved colours, style guide section 12): Yours, your folders and a built-in set, **Starter styles** (Wood type poster, Seal, Wavy, Typewriter, Bold block, Swell, Spiral, Bounce, Flag, Stacked lines). Click a style to apply it to the text being made or edited; the words, the styled letters and (unless the style sets them) the size and box stay. **Save style** keeps every Text panel setting except the words and the styled letters, in the active folder, and opens the name for editing. Row menu: Apply, Rename, Update from the panel, Move to; built-in styles: Copy to Yours. Folders: new, rename, delete, expand all, search.
+- **Randomize** now gives some lettering (four or more letters) a wave path, a bulge, random placement or bounce. The choice comes from the words, not from `Math.random`, so a roll draws the same random numbers as before.
+- **Data:** styles are kept in the browser settings (`wb200_textstyles`), not in the project file; format unchanged.
+- Not in this release: styles kept inside the project file, sharing styles between people.
+- Tests: `text-styles`, `text-randomize`.

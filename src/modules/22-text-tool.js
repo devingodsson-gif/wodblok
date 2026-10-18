@@ -7,7 +7,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS,delItems,selSet} from './12-selection-and-split.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {TXO_KEYS,TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
-import {teD,teF,teFonts,teUF,teAddUF,teCss,teFitSz,teLayBox,teLayout,teLoadFonts,teReady,teSetNotify} from './60-text-engine.js';
+import {teRnd,teD,teF,teFonts,teUF,teAddUF,teCss,teFitSz,teLayBox,teLayout,teLoadFonts,teReady,teSetNotify} from './60-text-engine.js';
 
 function init22(){// ===== Text tool: type text, it's traced into carved letter shapes. Each letter becomes its own shape on the stamp,
 // grouped under the text in the Motif list. The original text and settings are kept on the group, so it can be edited.
@@ -50,8 +50,11 @@ const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();u
 const live=()=>{if(syncing||WBS.curView=='pattern')return;if(!edit){if(txArmed())txGhost();else if(st.text.trim())txArm(true);return}clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
 // used by Randomize: set text on a stamp (fonts load first; a newer roll cancels an older one)
 WBX.wbTxFonts=teFonts.map(x=>x[0]);
+// Randomize uses the newer text options now and then. They come from the words themselves (not from Math.random), so a Randomize roll draws the same random numbers as before.
+function txRandom(o){if(o.inner||[...o.text].length<4||o.pt||o.wp||o.rp||o.bb)return;const h=[...o.text].reduce((a,c)=>(Math.imul(a,31)+c.codePointAt(0))|0,7),R=k=>teRnd(h,0,k);
+if(R(1)<.14){o.pt='w';o.pa=20+Math.floor(R(2)*25);o.pw=40+Math.floor(R(3)*30)}else if(R(4)<.16){o.wp='b';o.wa=30+Math.floor(R(5)*40)}else if(R(6)<.15){o.rp=5+Math.floor(R(7)*10);o.rr=3+Math.floor(R(8)*10)}else if(R(9)<.08)o.bb=20+Math.floor(R(10)*20)}
 WBX.wbTxPlace=async(t,o,tok)=>{const f=teF[o.f]||teF.cinzel;try{await document.fonts.load(teCss(f),o.text);await document.fonts.ready}catch(e){}
-if(tok!=null&&tok!==WBX.wbRndTok)return false;if(!WBS.tiles.includes(t))return false;const keep=st;st={...teD,...o,auto:false};try{useT(t);st.sz=teFitSz(st);const g='tx'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),[ax,ay]=cen(),L=letters(g,ax,ay);if(!L.length)return false;
+if(tok!=null&&tok!==WBX.wbRndTok)return false;if(!WBS.tiles.includes(t))return false;const keep=st;st={...teD,...o,auto:false};txRandom(st);try{useT(t);st.sz=teFitSz(st);const g='tx'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),[ax,ay]=cen(),L=letters(g,ax,ay);if(!L.length)return false;
 t.items.push(...L);const[mx,my]=(()=>{let x=0,y=0;L.forEach(q=>{x+=q.x;y+=q.y});return[x/L.length,y/L.length]})();const M={...st,ax,ay,mx,my};delete M.maxSz;delete M.inner;A(t)[g]=M;
 if(o.inner){let rm=1e9;L.forEach(q=>{rm=Math.min(rm,Math.hypot(q.x-ax,q.y-ay)-26*q.s)});t.items.forEach(q=>{if(q.cz){q.s=+Math.min(q.s,.85*Math.max(8,rm)/48).toFixed(3);delete q.cz}})}
 return true}finally{st=keep;useT(WBS.tiles[WBS.cur])}};
