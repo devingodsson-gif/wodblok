@@ -157,8 +157,9 @@ One entry per finished step: version, what changed, what was tested, anything th
 
 | Step | Version | State |
 |---|---|---|
-| 0 Design review | 1.46.1 | in progress |
-| 1 to 12 | | not started |
+| 0 Design review | none | audit done (below); the clickable mock-up was skipped by the owner on Oct 18 |
+| 1 Layers hold anything (data) | 1.46.1 | done on branch `feat/1.46.1-layers-hold-anything`, not merged |
+| 2 to 12 | | not started |
 
 ### Step 0 audit: Stamp editor panels against Canvas mode (Oct 18 2026, read from `MODEP` in `34-desktop-shell.js`)
 - **Shared today** (same panel in both modes, no work): Workspaces, Presets, Text, Colours, Colourways, Grade, Textures, Randomize, History, Stamp library.
@@ -166,3 +167,11 @@ One entry per finished step: version, what changed, what was tested, anything th
 - **Canvas mode only:** Layers, Layout (becomes the Stamp tool's arrangement section), Canvas, Navigator, Export recipes, Variations stay.
 - **Unique tools to move onto the canvas (step 6):** symmetry, wrap at the edges, carved edges, uneven pressure, marquee on stamp contents, snapping inside a stamp. Everything else the Stamp editor does is already a Canvas-mode tool.
 - Still to do in step 0: the clickable mock-up of the unified screen, for the owner to approve before any code.
+
+### Step 1 outcome: layers hold anything (1.46.1, Oct 18 2026)
+- **Model, as built.** A layer's items are `layer.pl`: free stamps (`t`), pictures (`a`) and text boxes (`tx`), in any mix. A layer has an arrangement (repeat or frame) unless it has `free: true`; so every layer may now hold items, with or without an arrangement. The three item drawers (`freeLayer`, `artLayer`, `txtLayer`) already picked their own kind of item, so a new `itemsLayer` in `10-layer-grids.js` calls all three; items are drawn after the layer's arrangement (and for a frame layer, after the frame), wrapped like a free layer (grade, texture mask, opacity, blend, ink).
+- **Pictures** are collected for saving from items on any layer (`artUsed`), not only on layers in Pictures mode; the art list and its delete check also look at every layer.
+- **File format 21.** `FMT_LATEST` is 21 (the plan said 22; 21 was never used, because the text update needed no format change). Step 20 to 21 changes only the number, so an older app opens such a file read-only. `validate.js` refuses a layer whose `pl` is not a list of pieces with numeric x and y ("A layer in that project has damaged pieces on it.").
+- **Old files.** The "old files must open" rule is removed (CLAUDE.md, developing-wodblok.md). I kept the 18 to 21 migration and the v18 fixtures for now: they cost nothing, the built-in templates are still v20 files, and they are the safety net for the later steps. They go at step 12 or once the owner's new templates exist.
+- **Not changed (on purpose, later steps):** the screens still make one kind of layer at a time (the layer type buttons, `fpL()` only returns free layers, so items on an arrangement layer cannot be selected or moved on the canvas yet: step 2); `L.free`, `L.art`, `L.txt` still pick the screen. Items are drawn by kind (stamps, then pictures, then text), not in one mixed order, and each kind is wrapped on its own, so a layer with opacity under 100 and overlapping items of different kinds blends each kind separately. Step 2 should merge these into one ordered list and one wrapper.
+- **Tests:** new `tests/layer-items.spec.js` (items drawn on an arrangement layer and on a free layer; saved file keeps pictures used by items on any layer and reopens identical; damaged pieces refused). `format.spec.js` now expects v21.

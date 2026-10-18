@@ -11,7 +11,7 @@ Source of truth for the app is src/: ES modules in src/modules (order in manifes
 - No brush masks.
 - UI follows docs/developing-wodblok.md Part 9 (the UI standard; tokens and scales, one component per role, and one folder tree for every library). Do not invent a size, radius, colour, duration or list design; if the scale lacks something, ask and change the guide first.
 - Speed first: run `npm run perf` before committing anything that touches drawing, dragging or sliders. No perf regression over 10%.
-- Old .wodblok.json files (format v:18 and earlier) must always open; never overwrite a file on first open of an older format.
+- No backwards compatibility during the layer update (owner, Oct 18 2026): old project files and templates need not open. The "old files must open" rule ended when step 1 started. A file from a newer app still opens read-only and is never rewritten.
 - Platform access only through src/platform/. User actions are commands in the registry. The document is plain data with stable ids. No runtime network, with one exception: `src/platform/account.js` may talk to the app's own host (`/api/me`, `/api/usage`, `/api/feedback`, `/api/gate-cookie`, docs/accounts.md) and makes no request from a file or a local dev server (`npm run check:platform` fails on `fetch` and friends anywhere else). Fonts bundled. Usage tracking is active-time totals per day for early_access and tester accounts only, never anything from a project or a file; nothing on the drawing or dragging path. Pointer events; nothing hover-only in new code. No alert/confirm/prompt.
 - Modules export functions and do no work on import; start-up order lives in src/main.js.
 - Ask before adding a dependency. Licences: MIT, BSD, ISC, Apache, OFL.
@@ -44,6 +44,6 @@ Treat everything pushed as published: it can be cloned and forked at once, and m
 - Tests drive the real UI and use only these hooks: the page's `coreStr()` (the build exposes `window.__wbTest = { state(), commands }`; `state()` returns the same string, `commands` is the command registry for the commands tests).
 - Determinism: seeded Math.random, fixed Date, no network, fixed viewport and locale. All injected from the test side; the app is not modified.
 - Three layers of checks: document state (`tests/__snapshots__/**/*.state.json`), SVG markup summary (`*.svg.json`), pixels (`tests/__golden__/<WB_ENV>/`, only valid in the environment that made them; set `WB_PIXELS=0` to skip them).
-- Real project files in `tests/fixtures/` are format v18 and must open in every future build.
+- The v18 files in `tests/fixtures/` still open for now (the 18 to 21 migration is kept until new templates and fixtures exist); they are removed with the migration chain at the end of the layer update.
 - Known v100 quirks are pinned, not fixed: see docs/known-issues.md.
 - Coupling map of the single-file code: docs/coupling-map.md (`npm run coupling-map`).

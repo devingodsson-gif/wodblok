@@ -289,3 +289,10 @@ Eighth and last step of the text update (project doc `claude/wodblok-text-plan.m
 - **Data:** styles are kept in the browser settings (`wb200_textstyles`), not in the project file; format unchanged.
 - Not in this release: styles kept inside the project file, sharing styles between people.
 - Tests: `text-styles`, `text-randomize`.
+
+## 1.46.1: Layer update, step 1 (layers hold anything)
+First step of the layer update (docs/layer-update-plan.md). Data and drawing only; the screens are unchanged.
+- Any layer may hold free stamps, pictures and text boxes (`layer.pl`) in any mix, with or without an arrangement. Items draw after the arrangement.
+- File format 21 (the number changes so older apps open such files read-only). Pictures used by items on any layer are saved. A layer with damaged pieces is refused.
+- The "old files must open" rule is removed; the 18 to 21 migration and v18 fixtures stay for now.
+- Tests: `layer-items`; `format` expects v21.

@@ -2,7 +2,7 @@
 
 For any Claude agent that works on WODBLOK without access to the owner's Claude memory or Project. It is the development-relevant part of that memory, kept in the repo so every agent has the same context. **Rule: whenever something about WODBLOK is saved to Claude's memory (a decision, a preference, a standing instruction), add it here too, in the same session, with the date.** Keep it free of anything personal (no names, emails, accounts, prices or business plans; this repo is public). The rules themselves are in `CLAUDE.md` and `docs/developing-wodblok.md`; this file is the history and the standing preferences behind them.
 
-Last updated Oct 18 2026 (version 1.46.0).
+Last updated Oct 18 2026 (version 1.46.0 on main; layer update step 1 = 1.46.1 on a branch).
 
 ## How the owner wants Claude to work
 - Show a task list, and an approximate percentage complete on short status updates, in the chat. No separate progress page.
@@ -39,3 +39,4 @@ Last updated Oct 18 2026 (version 1.46.0).
 ## The layer update (started Oct 18 2026)
 Owner additions (Oct 18): the tool rail has one tool per old layer type (Select, Arrange, Frame, Stamp, Shape, Image, Text, Grid); the Shape editor is renamed the **Element editor** and edits any selected shape, image, text or stamp.
 The owner's decisions are in `docs/layer-update-plan.md`: no layer types, one continuous editing environment, a Stamp tool with outlines and an opacity slider, stamps are global, each stamp has a lock (locked by default; unlocked stamps take edits, locked ones don't), stamp contents are clipped at the outline, one arrangement per layer, Duplicate stamp yes, "Make unique" no, Pattern preview panel removed, Zoom to stamp with a Solo layer button, no Labs switch and no old editor kept, **no backwards compatibility at all** (old project files and templates need not open; the "old files must open" rule is removed when step 1 starts).
+- Oct 18: the owner skipped the step 0 mock-up and said to start step 1 directly. Step 1 is 1.46.1. The old-files rule was removed from the docs at that point; the 18 to 21 migration and v18 fixtures were kept for now as a test safety net (say so if asked).
