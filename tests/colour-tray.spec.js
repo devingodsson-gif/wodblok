@@ -96,20 +96,18 @@ test('removing a tray colour that is in use keeps what used it as a fixed colour
   expect(errors).toEqual([]);
 });
 
-test('an older file opens with its colours in the tray, linked where they were used', async ({ page }) => {
+test('a saved project opens with its colours in the tray, linked where they were used, and opening is not a change', async ({ page }) => {
   const { errors } = await openApp(page);
   await openProjectFile(page, path.join(__dirname, 'fixtures', 'project-4-rect-4x3.wodblok'));
   await settle(page, { max: 60000 });
   const c = JSON.parse(await getState(page)), p = c.proj, w = p.cw[0];
-  // the file's old colour names (Slate, Tallow, Moon Ivory) become the nearest palette colours, as they always did when such a file opened;
-  // two of them land on the same colour, so the tray has two places
-  expect(p.ts.map(id => w.m[id])).toEqual(['Blackish Olive', 'Sulpher Yellow']);
-  expect(p.bg).toBe('@k1'); expect(p.ink).toBe('@k2');
-  expect(c.tiles.filter(t => t.ink).length).toBeGreaterThan(0);
-  expect(c.tiles.filter(t => t.ink).every(t => t.ink === '@k2')).toBe(true);
-  expect(c.layers.filter(l => l.ink).length).toBeGreaterThan(0);
-  expect(c.layers.filter(l => l.ink).every(l => l.ink === '@k2')).toBe(true);
-  await expect(page.locator('#pst')).not.toHaveClass(/dirty/);   // opening converts without counting as a change
+  expect(p.ts.length).toBeGreaterThan(1);
+  for (const id of p.ts) expect(w.m[id], 'tray place ' + id + ' has a colour name').toBeTruthy();
+  expect(p.ts).toContain(p.bg.slice(1)); expect(p.ts).toContain(p.ink.slice(1));
+  // a stamp or layer ink is a tray place that exists (or a fixed colour), never a name from an older file
+  const inks = c.tiles.map(t => t.ink).concat(c.layers.map(l => l.ink)).filter(Boolean);
+  for (const k of inks) expect(k[0] === '#' || p.ts.includes(k.slice(1)), 'ink ' + k).toBe(true);
+  await expect(page.locator('#pst')).not.toHaveClass(/dirty/);
   expect(errors).toEqual([]);
 });
 

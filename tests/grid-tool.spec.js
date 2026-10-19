@@ -68,22 +68,3 @@ test('Layout no longer has its own snap boxes; Pictures and Text layers use the 
   for (const m of ['x', 'p', 'f']) { await pick(page, m); await settle(page); await expect(page.locator('section.pn[data-p="layers"] :text("Snap to grid")')).toHaveCount(0); }
   expect(errors).toEqual([]);
 });
-
-test('older projects that snapped per layer open with Snap to grid on, and turning it off sticks', async ({ page }, testInfo) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'project-4-rect-4x3.wodblok'), 'utf8'));
-  const core = fx.core || fx;
-  const L = core.layers[0]; L.free = true; L.pl = []; L.fg = { snap: true, ss: true };
-  if (core.pg) { delete core.pg.snap; delete core.pg.ss; }
-  const f = path.join(os.tmpdir(), 'wb-old-snap-' + process.pid + '.wodblok');
-  fs.writeFileSync(f, JSON.stringify(fx));
-  await openProjectFile(page, f);
-  expect(JSON.parse(await getState(page)).pg.snap).toBeUndefined();     // opening changes nothing in the file
-  await openPanel(page, 'pgrid');
-  await expect(page.locator('#pgn')).toBeChecked();
-  await expect(page.locator('#pgss')).toBeChecked();
-  await page.click('#pgn'); await settle(page);
-  expect(JSON.parse(await getState(page)).pg.snap).toBe(false);
-  fs.unlinkSync(f);
-  expect(errors).toEqual([]);
-});

@@ -20,6 +20,8 @@ test('busy project: dragging Amount does not rebuild the pattern, and letting go
   await openProjectFile(page, FIXTURES.busy);
   await openPanel(page, 'tex');
   await settle(page, { quiet: 25 });                                                      // let the stamp prints from opening the file finish
+  await page.click('#tx_add'); await settle(page);                                        // a new texture that nothing else uses...
+  await page.click('#tx_apply'); await settle(page, { quiet: 25 });                       // ...put on the Canvas (the default target); it is the selected one
   const sel = JSON.parse(await getState(page)).tex.u.map(u => u.x);
   await watch(page);
   await drag(page, 'tx_a', [30, 35, 40, 45, 50, 55, 60, 65, 70]);                            // nine steps; 1.7.0 rebuilt the pattern on every one

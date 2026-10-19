@@ -1,27 +1,22 @@
-// Phase 3: opening project files in the app: zip (format 19), old JSON (v18), files from a newer app, and damaged files.
+// Opening project files in the app: .wodblok zips (format 21), files from a newer app, damaged files, snapshots, stamp files and Art from a project file.
 const fs = require('fs'), os = require('os'), path = require('path');
 const { test, expect } = require('@playwright/test');
 const { ROOT, openApp, settle, getState } = require('./helpers/harness');
 const FX = path.join(ROOT, 'tests', 'fixtures');
+const { zipSync, unzipSync, strToU8, strFromU8 } = require('fflate');
+// a copy of a sample file with its project.json changed by fn (mimetype first and stored, as the app writes it)
+function variant(f, fn) {
+  const files = unzipSync(new Uint8Array(fs.readFileSync(path.join(FX, f)))), p = JSON.parse(strFromU8(files['project.json'])); fn(p);
+  const out = {}; for (const [k, v] of Object.entries({ ...files, 'project.json': strToU8(JSON.stringify(p)) })) out[k] = [v, { level: k === 'mimetype' || k.startsWith('assets/') ? 0 : 6 }];
+  return Buffer.from(zipSync(out));
+}
 
 async function openFile(page, file) { await page.setInputFiles('#pfile', file); await settle(page); return page.locator('#pmsg').textContent(); }
 const tmp = (name, data) => { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'wb-pf-')), f = path.join(d, name); fs.writeFileSync(f, data); return f; };
 
-test('a v19 zip file opens and gives the same document as the v18 file it was made from', async ({ browser }) => {
-  const c1 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p1 = await c1.newPage(), a = await openApp(p1);
-  await openFile(p1, path.join(FX, 'project-1-diamond.wodblok'));
-  const fromJson = await getState(p1);
-  const c2 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p2 = await c2.newPage(), b = await openApp(p2);
-  expect(await openFile(p2, path.join(FX, 'project-1-diamond.wodblok'))).toContain('Opened');
-  expect(await getState(p2)).toBe(fromJson);
-  expect(a.errors.concat(b.errors)).toEqual([]);
-  await c1.close(); await c2.close();
-});
-
 test('a file from a newer app opens as an unsaved copy and nothing is written back', async ({ page }) => {
   const { errors } = await openApp(page);
-  const base = JSON.parse(fs.readFileSync(path.join(FX, 'project-1-diamond.wodblok'), 'utf8'));
-  const msg = await openFile(page, tmp('future.wodblok', JSON.stringify({ ...base, v: 99, name: 'Future' })));
+  const msg = await openFile(page, tmp('future.wodblok', variant('project-1-diamond.wodblok', p => { p.v = 99; p.name = 'Future'; })));
   expect(msg).toContain('newer WODBLOK');
   await expect(page.locator('#pst')).toHaveClass(/dirty/);
   expect(errors).toEqual([]);
@@ -84,7 +79,7 @@ test('a library stamp can be saved as its own file and imported into another bro
 test('a downloaded project file can be used as Art in another project', async ({ browser }) => {
   const c1 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p1 = await c1.newPage(), a = await openApp(p1);
   await p1.setInputFiles('#lfapfile', path.join(FX, 'project-1-diamond.wodblok')); await settle(p1);
-  // this fixture was saved before projects carried a picture for Art, and the message must say so plainly (not "could not read")
+  // a project file becomes a picture for Art; if it carries none the message says so plainly (not "could not read")
   await expect(p1.locator('#pmsg')).toContainText(/saved before Art existed|added/);
   expect(a.errors).toEqual([]);
   await c1.close();

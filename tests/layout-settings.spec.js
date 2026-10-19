@@ -1,6 +1,7 @@
 // 1.30.0: radial arrangements (rings, spiral, spiral arms, sunflower, spokes), Variation Size and Gaps, Brick offset, Position across / down.
 const { test, expect } = require('@playwright/test');
 const fs = require('fs'), os = require('os'), path = require('path');
+const { zipSync, unzipSync, strToU8, strFromU8 } = require('fflate');
 const { openApp, openPanel, settle, getState, openProjectFile } = require('./helpers/harness');
 
 const setv = (page, id, v, ev = 'input') => page.locator('#' + id).evaluate((e, [v, ev]) => { e.value = v; e.dispatchEvent(new Event(ev, { bubbles: true })); }, [v, ev]);
@@ -8,10 +9,15 @@ const pick = (page, v) => page.click(`#lmode [data-m="${v}"]`);
 
 // one plain Repeat layer: no jitter, no offset, so the points are exactly where the arrangement puts them
 async function oneLayer(page, name) {
-  const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'project-3-rect-16x9.wodblok'), 'utf8'));
+  // the wide sample project (a .wodblok zip) with its project.json cut down to one plain Repeat layer
+  const files = unzipSync(new Uint8Array(fs.readFileSync(path.join(__dirname, 'fixtures', 'project-3-rect-16x9.wodblok'))));
+  const fx = JSON.parse(strFromU8(files['project.json']));
   fx.layers = [fx.layers[0]]; fx.layers[0].st = [fx.tiles[0].id];
+  fx.tiles[0].sh = { k: 'rect', o: 'p', s: [1, 1], z: 100 };            // the arrangements below are the ones for a rectangular stamp
   Object.assign(fx.layers[0], { rpos: 0, rrot: 0, rtn: false, rfh: false, rfv: false, ox: 0, oy: 0, rot: 0, fit: '', pst: 0, pfl: 0, gap: 20, size: 90 });
-  const f = path.join(os.tmpdir(), name + process.pid + '.wodblok'); fs.writeFileSync(f, JSON.stringify(fx));
+  const entries = {};
+  for (const [k, v] of Object.entries({ ...files, 'project.json': strToU8(JSON.stringify(fx)) })) entries[k] = [v, { level: k === 'mimetype' || k.startsWith('assets/') ? 0 : 6 }];
+  const f = path.join(os.tmpdir(), name + process.pid + '.wodblok'); fs.writeFileSync(f, Buffer.from(zipSync(entries)));
   await openProjectFile(page, f); fs.unlinkSync(f);
   await openPanel(page, 'layers');
 }

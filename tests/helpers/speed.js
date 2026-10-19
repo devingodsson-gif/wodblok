@@ -3,9 +3,9 @@ const path = require('path');
 const { ROOT } = require('./harness');
 
 const FIXTURES = {
-  diamond: path.join(ROOT, 'tests', 'fixtures', 'project-1-diamond.wodblok.json'),
-  wide: path.join(ROOT, 'tests', 'fixtures', 'project-3-rect-16x9.wodblok.json'),
-  busy: path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok.json'),
+  diamond: path.join(ROOT, 'tests', 'fixtures', 'project-1-diamond.wodblok'),
+  wide: path.join(ROOT, 'tests', 'fixtures', 'project-3-rect-16x9.wodblok'),
+  busy: path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok'),
 };
 
 // Every reference inside the page's SVG that points at an id that does not exist (href="#x", url(#x) in mask/clip-path/filter/fill/stroke/style).

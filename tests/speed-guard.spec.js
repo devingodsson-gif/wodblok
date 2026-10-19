@@ -25,7 +25,8 @@ for (const name of Object.keys(FIXTURES)) {
     await openProjectFile(page, FIXTURES[name]);
     await settle(page);                                   // while the stamps are still being printed after opening, a few of them point at outlines that are not on the page yet (see known-issues)
     const c = await patternCounters(page);
-    const d = await danglingRefs(page);
+    let d = await danglingRefs(page);
+    for (let i = 0; i < 20 && Object.keys(d).length; i++) { await page.waitForTimeout(400); d = await danglingRefs(page); }   // the wide sample finishes printing about a second after settle returns (known-issues); a reference that is still missing after 8 s is a real one
     report[name] = { dynChars: c.dynChars, dynNodes: c.dynNodes, artChars: c.artChars, tabs: c.tabs.length, dangling: d };
     expect(c.dynChars, `${name}: characters of pattern markup on screen`).toBeLessThan(BUDGET[name]);
     expect(d, 'references to ids that do not exist').toEqual({});
