@@ -1,6 +1,6 @@
 // Layer update, step 7 (1.46.7): Stamp settings from the Pattern view, and stamps with several colours (each shape can have a colour of its own).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState, setMode } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -120,7 +120,7 @@ test('a colour that is a tray colour follows the tray: another colourway recolou
   expect(errors).toEqual([]);
 });
 
-test('shape colours show in the printed pattern, also under uneven pressure, and in the Stamp editor', async ({ page }) => {
+test('shape colours show in the printed pattern, also under uneven pressure', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await twoShapes(page);
   expect(await redPixels(page)).toBe(0);
@@ -132,10 +132,5 @@ test('shape colours show in the printed pattern, also under uneven pressure, and
   await settle(page);
   expect((await state(page)).layers[0].pst).toBe(6);
   expect(await redPixels(page)).toBeGreaterThan(100);
-  // the Stamp editor draws each shape in its own colour
-  await setMode(page, 'stamp');
-  await settle(page);
-  const colours = await page.evaluate(() => new Set([...document.querySelectorAll('#ed [data-i] [fill]')].map(e => e.getAttribute('fill')).filter(f => f && f !== 'none')).size);
-  expect(colours).toBeGreaterThan(1);
   expect(errors).toEqual([]);
 });

@@ -2,15 +2,14 @@
 // This opens every tool in both views and looks for sentences (several words ending in a full stop, ? or !). Data lines ("Last roll: …", the
 // palette's "No. 60 · …") are not sentences of this kind.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, setMode } = require('./helpers/harness');
+const { TARGET, openApp } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'the v100 file has these sentences by design'); });
 
 test('no tool panel opens with an explanatory sentence', async ({ page }) => {
   const { errors } = await openApp(page);
   const found = [];
-  for (const mode of ['pattern', 'stamp']) {
-    await setMode(page, mode);
+  for (const mode of ['pattern']) {
     const tools = await page.locator('.rail [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn).filter(p => !(p === 'mlist' && document.getElementById('boardS').hidden)));   // the Shape list is empty in Pattern until a stamp is unlocked
     for (const pn of tools) {
       await page.click('#rcls');
@@ -59,7 +58,6 @@ test('nor do the layout modes, a grade mask, the repeat tile or the book cover',
   await page.click('#rcls');
   await page.click('.rail [data-pn="canvas"]');
   for (const f of ['Repeat tile', 'Book cover']) { await page.locator('section.pn[data-p="canvas"] button', { hasText: f }).first().click(); await scan('canvas', f); }
-  await setMode(page, 'stamp');
   await page.click('#rcls');
   await page.click('.rail [data-pn="stamp"]');
   for (const sym of ['lr', 'quad', 'rot', 'grid']) { const b = page.locator(`#sym [data-m="${sym}"], .sym [data-m="${sym}"]`).first(); if (await b.count()) { await b.click(); await scan('stamp', 'symmetry ' + sym); } }

@@ -1,6 +1,18 @@
 // 1.46.0: the Text styles library: built-in Starter styles, Save style, folders, apply, rename, delete (same tree as Saved colours).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle, getState, putText } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
+// Canvas flow: the text typed in the Text panel is put on the first printed instance of the unlocked stamp, then one of its letters is clicked so the whole text is selected (the panel edits it)
+async function putTextCanvas(page) {
+  const p = await stampInstance(page);
+  await clickStamp(page, p);
+  const tg = async () => JSON.parse(await getState(page)).tiles[0].items.filter(q => q.tg);
+  await expect.poll(async () => (await tg()).length, { timeout: 15000 }).toBeGreaterThan(0);
+  await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await settle(page, { max: 30000 });
+  const q0 = (await tg())[0];
+  const c = await page.evaluate(([i, u, v]) => __wbTest.stampToCanvas(i, u, v), [p.i, q0.x, q0.y]);
+  const cl = await canvasToClient(page, c.x, c.y);
+  await page.mouse.click(cl.x, cl.y); await settle(page, { max: 30000 });
+}
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -9,8 +21,8 @@ const items = async page => JSON.parse(await getState(page)).tiles[0].items;
 const spread = a => Math.max(...a) - Math.min(...a);
 const stored = page => page.evaluate(() => JSON.parse(window.__wbTest.kv.get('wb200_textstyles') || 'null'));
 async function start(page, text, size = 8) {
-  await setMode(page, 'stamp'); await openPanel(page, 'text');
-  await page.fill('#tx_t', text); await putText(page);
+  await unlockStamp(page); await openPanel(page, 'text');
+  await page.fill('#tx_t', text); await putTextCanvas(page);
   await set(page, 'tx_sz', size); await settle(page, { max: 30000 });
 }
 
@@ -54,7 +66,7 @@ test('Save style keeps the panel, can be renamed and applied again', async ({ pa
 
 test('Folders: a new folder is made, becomes active, and the next saved style goes into it', async ({ page }) => {
   const { errors } = await openApp(page);
-  await setMode(page, 'stamp'); await openPanel(page, 'text');
+  await openPanel(page, 'text');
   await page.click('#tsnew');
   await page.fill('#tsl .scform input', 'Posters'); await page.keyboard.press('Enter');
   await expect(page.locator('#tsl .scf[data-k="Posters"]')).toBeVisible();
