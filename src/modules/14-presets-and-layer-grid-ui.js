@@ -67,31 +67,8 @@ $('neg').oninput=()=>{WBS.tiles[WBS.cur].neg=$('neg').checked;store();upd()};
 [['lrtn','rtn'],['lrfh','rfh'],['lrfv','rfv']].forEach(([id,k])=>$(id).oninput=()=>{const L=LY();if($(id).checked)L[k]=true;else delete L[k];store();upd()});
 $('lrsh').onclick=()=>{LY().rsd=1+Math.floor(Math.random()*99999);store();upd();if(WBX.wbCap)WBX.wbCap()};
 $('let').oninput=()=>{WBS.tiles[WBS.cur].et=+$('let').value;store();upd()};$('ler').oninput=()=>{WBS.tiles[WBS.cur].er=+$('ler').value;store();upd()};$('lers').onclick=()=>{WBS.tiles[WBS.cur].es=(WBS.tiles[WBS.cur].es||0)+1;store();upd()};
-$('lyl').onclick=e=>{const r=e.target.closest('[data-l]');if(!r)return;const i=+r.dataset.l;
-const grp=lyGrp(),inG=grp.length>1&&grp.includes(i);
-const mv=d=>{if(inG){const pl=WBS.layers[WBS.selL],set=new Set(grp),it=WBS.layers.map((l,k)=>({l,s:set.has(k)}));if(d>0){for(let k=it.length-2;k>=0;k--)if(it[k].s&&!it[k+1].s){const t=it[k];it[k]=it[k+1];it[k+1]=t}}else{for(let k=1;k<it.length;k++)if(it[k].s&&!it[k-1].s){const t=it[k];it[k]=it[k-1];it[k-1]=t}}WBS.layers.splice(0,WBS.layers.length,...it.map(x=>x.l));WBS.selL=WBS.layers.indexOf(pl);return}
-const k=i+d;if(k<0||k>=WBS.layers.length)return;[WBS.layers[i],WBS.layers[k]]=[WBS.layers[k],WBS.layers[i]];if(WBS.selL==i)WBS.selL=k;else if(WBS.selL==k)WBS.selL=i};
-if(e.target.matches('input')){if(inG)grp.forEach(k=>{WBS.layers[k].vis=e.target.checked});else WBS.layers[i].vis=e.target.checked}
-else if(e.target.closest('[data-up]'))mv(1);else if(e.target.closest('[data-dn]'))mv(-1);
-else if(e.shiftKey){const a0=WBS.lAnc!=null?WBS.layers.findIndex(l=>l.u==WBS.lAnc):WBS.selL,a=a0<0?WBS.selL:a0;WBS.selLM=new Set(WBS.layers.slice(Math.min(a,i),Math.max(a,i)+1).map(l=>l.u));WBS.selL=i}
-else if(e.ctrlKey||e.metaKey){const st=new Set(grp.map(k=>WBS.layers[k].u)),u=WBS.layers[i].u;if(st.has(u)&&st.size>1){st.delete(u);WBS.selL=WBS.layers.findIndex(l=>st.has(l.u))}else{st.add(u);WBS.selL=i}WBS.selLM=st;WBS.lAnc=u}
-else{WBS.selLM=new Set();WBS.selL=i;WBS.lAnc=WBS.layers[i].u}
-store();upd()};
-$('lyl').onmousedown=e=>{if(e.shiftKey)e.preventDefault()};
 $('lst').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;const id=+b.dataset.s,a=LY().st,k=a.indexOf(id);if(k<0)a.push(id);else a.splice(k,1);store();upd()};
-$('addL').onclick=()=>{const L=mkL('Layer '+(WBS.layers.length+1),[],'check',180);L.ak={};WBS.layers.push(L);WBS.selL=WBS.layers.length-1;store();upd()};
-$('dupL').onclick=()=>{const g=lyGrp(),pu=WBS.layers[WBS.selL].u,cps=[];let pc=null;g.slice().reverse().forEach(k=>{const c=JSON.parse(JSON.stringify(WBS.layers[k]));c.u=luid();c.name+=' copy';WBS.layers.splice(k+1,0,c);cps.push(c.u);if(WBS.layers[k].u==pu)pc=c.u});WBS.selL=WBS.layers.findIndex(l=>l.u==pc);WBS.selLM=cps.length>1?new Set(cps):new Set();store();upd()};
-$('delL').onclick=()=>{const g=lyGrp();if(WBS.layers.length<=g.length)return;g.slice().reverse().forEach(k=>WBS.layers.splice(k,1));WBS.selLM=new Set();WBS.selL=Math.min(g[0],WBS.layers.length-1);store();upd()};
 $('cov').addEventListener('input',upd);
-$('gen').onclick=async()=>{const ws=$('txt').value.split(',').map(s=>s.trim()).filter(Boolean).slice(0,4);if(!ws.length)return;
-const sample=await use('sample');if(!sample)return say('Claude drawing is not available in this view.');
-$('gen').disabled=true;say('Claude is drawing your shapes… this can take up to a minute.');
-const prompt=`You are an expert in medieval Bible illumination and early woodcut. Style: ${STY}\n\nDraw each shape below as a carved printing-block stamp in that spirit: solemn and devotional, never cartoonish. Keep the set cohesive (same detail level and line weights). Technical rules: centered at 0,0 inside a -50..50 box (stay within radius 48). Use only path, circle, ellipse, rect, polygon, polyline, line, g. Solid silhouette shapes use fill="FILL". Incised detail lines over them use stroke="CUT" with fill="none", stroke-width 2 to 3.5, stroke-linecap="round". Every element must set fill explicitly. No other colors, gradients, text, filters or images. Strong silhouette that reads when small, under 1800 characters each. Return ONLY JSON: {"motifs":[{"name":"...","svg":"inner markup only"}]} in this order:\n${ws.map((w,i)=>`${i+1}. ${w}`).join('\n')}`;
-try{const r=await sample.json(prompt,{cache:false});let n=0;
-(r.motifs||[]).forEach((m,i)=>{const s=clean(m.svg||'');if(s){const nm=String(m.name||ws[i]||'shape').replace(/["<>&|]/g,''),fg=libG(libDest());cust['c|u|'+nm]={n:nm,svg:s,...(fg?{g:fg}:{})};n++}});
-store();const inF=!!libG(libDest()),dn=libPath(libDest());if(n&&!inF){WBS.mcat='d';mcSave()}say(n?`${n} shape${n>1?'s':''} added to ${inF?'“'+dn+'”':'Drawn by Claude'}. Click to place.`:'Nothing usable came back. Try again.');build()}
-catch(e){say(e&&e.code=='not_granted'?'Permission to ask Claude was declined.':e&&e.code=='rate_limited'?'Rate limited. Try again in a bit.':'Drawing failed: '+((e&&e.message)||'unknown error'))}
-$('gen').disabled=false};
 $('cpy').onclick=async()=>{try{await clipboard.writeText(ser());say('SVG copied.')}catch(e){say('Copy was blocked here.')}};
 $('sv').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
 try{await d.save({filename:expName('svg'),data:ser()})}catch(e){if(e&&e.code!='declined')say('Could not save: '+e.message)}};

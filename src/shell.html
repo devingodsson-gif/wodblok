@@ -164,7 +164,6 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 .lys{background:var(--panel)}.lys .lyt{cursor:default}.lys .lyl2{max-height:none}.lyh{display:flex;align-items:center;gap:2px;height:32px;padding:0 6px 0 4px;background:color-mix(in srgb,var(--stage) 50%,var(--panel));border-bottom:1px solid var(--line)}.lyt{flex:1;display:flex;align-items:center;gap:6px;border:0;background:transparent;font-weight:600;font-size:var(--fs-m);padding:0 4px;margin:0;cursor:pointer;color:var(--fg)}.lyt svg{width:13px;height:13px;transition:transform var(--t-fast)}.lyt[aria-expanded=false] svg{transform:rotate(-90deg)}.lyt span{color:var(--mut);font-weight:500}.lyh .ib{width:26px;height:26px}.lyh .ib svg{width:15px;height:15px}.lyo{display:flex;align-items:center;gap:8px;padding:8px 8px 0}.lyo select{flex:1;min-width:0}.lyo .sw{flex:1;min-width:0}.lyop{padding:6px 8px 0}.lyop .ctl{grid-template-columns:50px minmax(0,1fr) 52px;gap:8px}.lyop .ctl label{font-size:var(--fs-m);color:var(--fg);font-weight:400}.lyk{font-size:var(--fs-m);color:var(--fg);width:50px;flex:none}.lyl2{margin:8px 6px 4px;max-height:210px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field)}.lyr{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--line);cursor:pointer;font-size:var(--fs-m);user-select:none}.lyr:last-child{border-bottom:0}.lyr:hover{background:var(--raise)}.lyr.on{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}.lyr.off .lyn,.lyr.off .lysw{opacity:.4}.lyr .eye{width:22px;height:22px;padding:0;margin:0;border:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center;border-radius:var(--r-m)}.lyr .eye:hover{background:var(--line)}
 .lyr .lyact{display:flex;gap:2px;flex:none;margin-left:auto}.lyr .lyb{width:22px;height:22px;padding:0;margin:0;border:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center;border-radius:var(--r-m);opacity:.55}.lyr .lyb svg{width:15px;height:15px}.lyr:hover .lyb,.lyr.on .lyb,.lyr .lyb:focus-visible{opacity:1}.lyr .lyb:hover{background:var(--line);color:var(--fg)}.lyr .lyb[disabled]{opacity:.22!important;cursor:default;pointer-events:none}.lyr .eye svg{width:15px;height:15px}.lysw{width:26px;height:26px;border-radius:var(--r-m);border:1px solid var(--line2);flex:none;overflow:hidden}.lysw svg{width:100%;height:100%;display:block}.lyn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lyn input{width:100%;font:inherit;padding:2px 4px}.lym{font-size:var(--fs-s);color:var(--faint);font-weight:400}.lyr.dragover-t{box-shadow:inset 0 2px 0 var(--acc)}.lyr.dragover-b{box-shadow:inset 0 -2px 0 var(--acc)}.lyhint{font-size:var(--fs-s);color:var(--faint);padding:0 8px 8px}#lybody[hidden]{display:none}
 /* ---------- workspace: dockable / floating / tabbed panels ---------- */
-.dock-h{display:none!important}
 .wg{display:flex;flex-direction:column;min-height:0;background:var(--panel)}
 .wsd .wg{flex:1 1 0;min-height:110px}
 .wsd .wg.col{flex:none!important;min-height:0}
@@ -395,9 +394,6 @@ button.alt{background:var(--raise)}
 #sel .rzg{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;justify-content:center}#sel .rzg .ctl{grid-template-columns:auto 70px 46px}#sel .rzl{font-size:var(--fs-s);font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}#rzgo{margin:0;display:inline-flex;align-items:center;gap:6px;padding:6px 8px}#rzgo svg{width:15px;height:15px}
 
 /* ---------- dock ---------- */
-.dock-h{display:flex;align-items:center;gap:8px;padding:12px 12px 8px;border-bottom:1px solid var(--line);flex:none}
-.dock-h h1{margin:0;font-size:var(--fs-m);font-weight:600}
-.dock-h small{color:var(--mut);font-size:var(--fs-s);margin-left:auto}
 .dock-b{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0}
 .pn[hidden]{display:none}
 details.g{border-bottom:1px solid var(--line)}
@@ -958,7 +954,6 @@ body.eyedrop{cursor:crosshair}
 </main>
 
 <aside class="dock">
- <div class="dock-h"><h1 id="dockt">Canvas</h1><small id="docks"></small></div>
  <div class="dock-b">
 
  <section class="pn" data-p="canvas">
@@ -1163,10 +1158,6 @@ body.eyedrop{cursor:crosshair}
    <div class="row"><button class="alt" id="ipr">Copy prompt</button></div>
    <textarea id="iprt" hidden readonly rows="6"></textarea>
   </div></details>
-  <details class="g" id="dwc" hidden><summary>Draw with Claude</summary><div class="gb">
-   <label>Describe shapes, separated by commas</label><input type="text" id="txt" value="lion, olive branch, amphora">
-   <div class="row"><button class="primary" id="gen">Draw shapes</button></div><div id="msg"></div>
-  </div></details>
  </section>
 
  <section class="pn" data-p="mlist" hidden><div class="mlist" id="mlist" aria-label="Shapes on this stamp"></div></section>
@@ -1214,19 +1205,6 @@ body.eyedrop{cursor:crosshair}
   </div></details>
  </div></section>
  <section class="pn" data-p="layers" hidden>
-  <div hidden>  <div><summary>Layers</summary><div class="gb">
-   <div class="lhead"><span>Top of the list prints last</span>
-    <button class="ib" id="addL" title="New layer" aria-label="New layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
-    <button class="ib" id="dupL" title="Duplicate layer" aria-label="Duplicate layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button>
-    <button class="ib" id="delL" title="Delete layer" aria-label="Delete layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button>
-   </div>
-   <div class="lyl" id="lyl"></div>
-  </div></div>
-  <div><summary>Selected layer <span class="aux" id="lnmx"></span></summary><div class="gb">
-   <label>Name</label><input type="text" id="lnm">
-   <label>Stamps on this layer</label>
-  </div></div>
-</div>
   <details class="g" open><summary>Arrangement</summary><div class="gb">
    <div class="seg" id="lmode" role="group" aria-label="Arrangement" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-m="x">None</button><button type="button" data-m="p">Repeat</button><button type="button" data-m="f">Frame</button></div>
    <div id="lfrm" hidden>

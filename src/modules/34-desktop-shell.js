@@ -319,8 +319,7 @@ document.addEventListener('input',e=>{if(e.target.type=='range')paint(e.target)}
 // ---- status line + dock subtitle
 function info(){const ks=new Set(WBS.tiles.map(t=>shOf(t).k)),k=ks.size>1?'Mixed':SHN[[...ks][0]]||'Rectangle',c=WBS.dim.c;
 $('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(()=>{const k=csk(),r=(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2));return k=='rect'?r:CSN[k]+(CASP.includes(k)?' '+r:'')})()}</b></span>`}<span class="it">Block <b>${k}</b></span><span class="it">Stamps <b>${WBS.tiles.length}</b></span><span class="it">Layers <b>${WBS.layers.length}</b></span>`;
-$('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${WBS.cur+1} of ${WBS.tiles.length}`:'';
-if(WBS.layers[WBS.selL])$('lnmx').textContent=WBS.layers[WBS.selL].name}
+}
 // wrap redraw hooks so the shell stays in sync
 $('rzbar').onclick=()=>$('rzdo').click();
 const _draw=WBH.draw;WBH.draw=function(){_draw();nums();info()};
