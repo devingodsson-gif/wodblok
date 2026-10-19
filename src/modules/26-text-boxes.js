@@ -10,6 +10,7 @@ import {mkWell,paintWell} from './52-tray-ui.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
 import {TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
+import {stTxMode} from './63-stamp-tool.js';
 // ===== Text boxes. Any layer may hold them, in L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
 // The letters are stored as outlines (centred on the box), so the project needs no fonts to show them. s = the box's long side on the canvas.
 const fx1=v=>(+v).toFixed(1);
@@ -42,12 +43,12 @@ function tbStyle(k,v){const grp=fpGrp().filter(q=>q.tx);if(k=='ink'){tbSty.ink=v
 function tbStySet(a){const grp=fpGrp().filter(q=>q.tx);tbSty.tu=a.map(u=>({...u}));grp.forEach(q=>{q.tu=a.map((u,i)=>{const o=(q.tu||[])[i];return o&&o.x===u.x?o:{x:u.x,sd:grp.length>1?txRid():u.sd}})});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();if(WBS.txArm)WBH.fpOverlay();txRefresh()}
 function tbStyVary(i){const grp=fpGrp().filter(q=>q.tx);if(tbSty.tu[i])tbSty.tu[i]={...tbSty.tu[i],sd:txRid()};grp.forEach(q=>{if(q.tu&&q.tu[i])q.tu[i]={...q.tu[i],sd:txRid()}});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();txRefresh()}
 function txbSync(L){if(WBS.txArm&&(tbSel()||WBS.fpB)){WBS.txArm=false;tbG=null;tbArmUI()}
-if(WBS.curView=='pattern'&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;const tx=tbSel()||WBS.txArm;sw.style.display=tx?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=tx?'none':''}if(!$('tx_t')||WBS.curView!='pattern')return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
+if(!stTxMode()&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;const tx=tbSel()||WBS.txArm;sw.style.display=tx?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=tx?'none':''}if(!$('tx_t')||stTxMode())return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
 const key=p?p.u+'|'+Math.round(p.s*10)+'|'+(p.tx.wd||0)+'|'+(p.tx.ht||0)+'|'+(p.tx.va||'t')+'|'+(p.tx.pd||0)+(p.tx.ft||'')+(p.tx.ov||'')+(p.tx.rp||0)+(p.tx.rr||0)+(p.tx.rs||0)+(p.tx.bb||0)+(p.tx.sc||'')+(p.tx.sd||0)+'|'+(p.tx.ind||0)+'|'+(p.tx.psp||0)+(p.tx.bal||'')+JSON.stringify(p.tx.sty||0)+(p.tx.wp||'')+(p.tx.wa||0)+(p.tx.pt||'')+(p.tx.pa||0)+(p.tx.pw||0):'-';if(key===tbKey)return;tbKey=key;if(!p)return;
 tbSty={tu:(Array.isArray(p.tu)?p.tu:[]).map(u=>({...u})),ink:p.ink||''};tbStyUI();tbLoad=true;try{const o=p.tx,ra=p.s/Math.max(p.n||1,.01);txoWrite(o,{sz:Math.max(2,Math.min(60,+(o.sz*ra).toFixed(1))),wd:Math.max(0,Math.min(400,Math.round((o.wd||0)*ra))),ht:Math.max(0,Math.min(400,Math.round((o.ht||0)*ra)))},false)}finally{tbLoad=false}}
 // the Text tool in the Pattern editor: with no Text layer selected, typing makes one
 function tbEnsure(){return fpL()}
-function tbLive(){if(tbLoad||WBS.curView!='pattern')return;let p=tbSel(),L=fpL();if(!p){if(!L)return;if(!WBS.txArm&&tbRead().text.trim()){tbArm(true)}else if(WBS.txArm)tbGhost();return}clearTimeout(tbT);tbT=setTimeout(async()=>{const o=tbRead();if(!o.text.trim())return;const R=await WBX.wbTxLay(o);if(!R||!L.pl.includes(p))return;
+function tbLive(){if(tbLoad||stTxMode())return;let p=tbSel(),L=fpL();if(!p){if(!L)return;if(!WBS.txArm&&tbRead().text.trim()){tbArm(true)}else if(WBS.txArm)tbGhost();return}clearTimeout(tbT);tbT=setTimeout(async()=>{const o=tbRead();if(!o.text.trim())return;const R=await WBX.wbTxLay(o);if(!R||!L.pl.includes(p))return;
 p.tx=o;p.G=R.G;p.Lt=R.Lt;p.bw=R.bw;p.bh=R.bh;p.n=Math.max(R.bw,R.bh);p.s=+p.n.toFixed(2);tbKey=p.u+'|'+Math.round(p.s*10);store();upd();if(WBX.wbCap)WBX.wbCap()},160)}
 async function tbAdd(){const L=fpL();if(!L)return;const o=tbRead();if(!o.text.trim())return;const R=await WBX.wbTxLay(o);if(!R){pmsg('No letters came out. Try another font.');return}
 L.pl=L.pl||[];const c=L.pl.filter(z=>z.tx).length,n=Math.max(R.bw,R.bh),q={u:fpU(),tx:o,G:R.G,Lt:R.Lt,bw:R.bw,bh:R.bh,n,x:+(CW/2+((c%4)-1.5)*CW*.03).toFixed(1),y:+(CH/2+((c%4)-1.5)*CW*.03).toFixed(1),s:+n.toFixed(2),r:0,f:1};
@@ -55,12 +56,12 @@ L.pl.push(q);WBS.fpSel=q.u;WBS.fpMS=new Set();WBS.fpB=null;WBS.fpGhost=null;tbKe
 function init26(){
 TXM=new Map();WBS.txArm=false;
 {['tx_t',...TXO_IDS].forEach(id=>$(id).addEventListener('input',tbLive));
-txoBind(()=>WBS.curView=='pattern',()=>tbLive());txoSelBind(()=>WBS.curView=='pattern',()=>tbLive());
-$('tx_vary').addEventListener('click',()=>{if(WBS.curView!='pattern')return;txoSeed(1+Math.floor(Math.random()*1e6));tbLive()});
+txoBind(()=>!stTxMode(),()=>tbLive());txoSelBind(()=>!stTxMode(),()=>tbLive());
+$('tx_vary').addEventListener('click',()=>{if(stTxMode())return;txoSeed(1+Math.floor(Math.random()*1e6));tbLive()});
 TBW=mkWell($('wl_tx'),{label:'Text colour',what:'Text',def:'Layer colour',defRef:()=>{const L=fpL();return L&&okC(L.ink)?L.ink:WBS.proj.ink},get:()=>okC(tbSty.ink)?tbSty.ink:'',set:v=>{if(!tbLoad)tbStyle('ink',v||'')}});
 txReg('tx_tex',{md:'wear',def:'pinholes',get:()=>{const p=tbSel();return p?(Array.isArray(p.tu)?p.tu:[]):tbSty.tu},set:tbStySet,vary:tbStyVary});
 WBX.wbTbRelay=tbRelay;WBX.wbTxUses=()=>tbSty.tu;WBX.wbTxCut=id=>{tbSty.tu=tbSty.tu.filter(u=>u.x!==id)};
-$('tx_split').addEventListener('click',async()=>{if(WBS.curView!='pattern')return;const L=fpL();if(!L)return;const grp=fpGrp().filter(q=>q.tx);if(!grp.length)return;if(WBX.wbCap)WBX.wbCap();const cache=new Map(),made=[];let total=0;
+$('tx_split').addEventListener('click',async()=>{if(stTxMode())return;const L=fpL();if(!L)return;const grp=fpGrp().filter(q=>q.tx);if(!grp.length)return;if(WBX.wbCap)WBX.wbCap();const cache=new Map(),made=[];let total=0;
 for(const p of grp){const ra=p.s/Math.max(p.n||1,.01),k=ra,rr=(+p.r||0)*Math.PI/180,cs=Math.cos(rr),sn=Math.sin(rr),fl=p.f||1,out=[];
 for(const l of (p.Lt||[])){const key=String(l[0]),cp=parseInt(key.split('|').pop(),36);if(!isFinite(cp))continue;let ch;try{ch=String.fromCodePoint(cp)}catch(e){continue}
 const o={...p.tx,text:ch,cv:0,rot:0,wd:0,ht:0,sz:+(p.tx.sz*ra).toFixed(2)},ck=[o.f,o.sz,ch].join('|');let R=cache.get(ck);if(R===undefined){R=await WBX.wbTxLay(o);cache.set(ck,R)}if(!R)continue;
@@ -69,10 +70,10 @@ out.push({u:fpU(),tx:o,G:R.G,Lt:R.Lt,bw:R.bw,bh:R.bh,n,x:+((+p.x)+lx*cs-ly*sn).t
 if(!out.length)continue;const i=L.pl.indexOf(p);if(i<0)continue;L.pl.splice(i,1,...out);made.push(...out);total+=out.length}
 if(!made.length){pmsg('There were no letters to split.');return}
 WBS.fpMS=new Set(made.map(q=>String(q.u)));WBS.fpSel=made[made.length-1].u;WBS.fpB=null;WBS.txArm=false;tbArmUI();tbKey='';store();upd();if(WBX.wbCap)WBX.wbCap();pmsg(`Split into ${total} letter${total>1?'s':''}. They are selected, so you can move them together or click one to change it alone.`)});
-$('tx_go').addEventListener('click',()=>{if(WBS.curView!='pattern')return;if(WBS.txArm){tbArm(false);return}if(!tbRead().text.trim()){$('tx_t').focus();return}if(!tbEnsure())return;tbArm(true)});
-$('tx_t').addEventListener('keydown',e=>{if(WBS.curView=='pattern')e.stopPropagation()});   // Enter is a new line, as in the Text tool
-$('tx_new').addEventListener('click',()=>{if(WBS.curView!='pattern')return;WBS.fpSel=-1;WBS.fpMS=new Set();tbKey='';WBS.txArm=false;tbG=null;tbArmUI();$('tx_t').value='';upd();$('tx_t').focus()});
-$('tx_file').addEventListener('change',async()=>{if(WBS.curView!='pattern')return;const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl||!WBX.wbTxAddFont)return;try{const id=await WBX.wbTxAddFont(fl);$('tx_f').value=id;tbLive();pmsg(`Loaded “${fl.name.replace(/\.[a-z0-9]+$/i,'')}”.`)}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}});
+$('tx_go').addEventListener('click',()=>{if(stTxMode())return;if(WBS.txArm){tbArm(false);return}if(!tbRead().text.trim()){$('tx_t').focus();return}if(!tbEnsure())return;tbArm(true)});
+$('tx_t').addEventListener('keydown',e=>{if(!stTxMode())e.stopPropagation()});   // Enter is a new line, as in the Text tool
+$('tx_new').addEventListener('click',()=>{if(stTxMode())return;WBS.fpSel=-1;WBS.fpMS=new Set();tbKey='';WBS.txArm=false;tbG=null;tbArmUI();$('tx_t').value='';upd();$('tx_t').focus()});
+$('tx_file').addEventListener('change',async()=>{if(stTxMode())return;const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl||!WBX.wbTxAddFont)return;try{const id=await WBX.wbTxAddFont(fl);$('tx_f').value=id;tbLive();pmsg(`Loaded “${fl.name.replace(/\.[a-z0-9]+$/i,'')}”.`)}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}});
 WBX.wbTbHas=()=>!!tbSel();WBX.wbTbMode=()=>{tbKey='';const L=fpL();if(L)txbSync(L);else{$('tx_ed').hidden=true;$('tx_sprow').hidden=true}tbArmUI()};if(WBX.wbTxMode)WBX.wbTxMode(WBS.curView||'pattern')}
 }
 export {fx1,tbG,tbRead,tbSty,txbSync,txtGl,txtLayer,init26};

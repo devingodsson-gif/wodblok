@@ -2,7 +2,7 @@
 // link to a tray colour or keep a fixed colour of their own (the lock). Colourways are named sets of colours for the same tray places.
 const { test, expect } = require('@playwright/test');
 const path = require('path');
-const { openApp, openPanel, settle, getState, openProjectFile } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, openProjectFile, setMode } = require('./helpers/harness');
 
 const proj = async page => JSON.parse(await getState(page)).proj;
 const colours = async page => { const p = await proj(page); return p.ts.map(id => p.cw[p.cwa].c[id]); };
@@ -62,7 +62,7 @@ test('the picker keeps hex, RGB, HSB and opacity in step, and remembers recent c
 test('lock: a stamp keeps its colour when the tray changes; unlock links it back', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 60000 });
-  await page.click('.seg2 [data-v="stamp"]'); await settle(page);
+  await setMode(page, 'stamp');
   await openPanel(page, 'stamp');
   // link the stamp to tray colour 1, then lock it
   await page.click('#wl_st .cwsb'); await page.click('.cwp .cwpc[data-s] >> nth=0'); await settle(page);

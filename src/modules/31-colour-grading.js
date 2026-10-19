@@ -6,6 +6,7 @@ import {store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
+import {stUnlocked} from './63-stamp-tool.js';
 // ===== Colour grading: a render-only filter (palette untouched). Global sliders, plus Lightroom-style masks that add their own
 // adjustments to part of the print: linear/radial gradients (over the whole canvas, or inside every print of a stamp), one layer,
 // a colour range or a luminance range. Applied to the pattern, texture, stamp editor and exports.
@@ -25,8 +26,8 @@ if(o.sp!==undefined&&o.sp!='s')o.sp='c';if(!o.sc&&o.sp=='s'&&o.st)o.sc=o.st;if(o
 const gFix=o=>{const g={...zA(),cov:false,masks:[]};if(o&&typeof o=='object'){GK.forEach(k=>{if(isFinite(+o[k]))g[k]=+o[k]});g.cov=!!o.cov;if(Array.isArray(o.masks))g.masks=o.masks.map(mFix).filter(Boolean)}return g};
 let grd;
 let gdLast='',gdBypass=false,gmSel=-1,gmOv=false,gmRen=-1,OVX=true,gBuilt='',gmVis=false;
-const gmVisM=m=>{if(!m)return false;if(vw()=='stamp'){const t=WBS.tiles[WBS.cur];return !!t&&((m.sc&&m.sc==String(t.id))||(!m.sc&&isPos(m)&&m.sp=='s'&&!m.st))}return !m.sc};
-const gmCur=()=>{const m=gmSel>=0?grd.masks[gmSel]||null:null;return m&&gmVisM(m)?m:null},tgtA=w=>{const m=gmCur();if(m)return m.a;if(vw()=='stamp'){const t=WBS.tiles[WBS.cur];if(t)return w?(t.gr||(t.gr=zA())):(t.gr||zA())}return grd};
+const gmVisM=m=>{if(!m)return false;if(inSt()){const t=WBS.tiles[WBS.cur];return !!t&&((m.sc&&m.sc==String(t.id))||(!m.sc&&isPos(m)&&m.sp=='s'&&!m.st))}return !m.sc};
+const gmCur=()=>{const m=gmSel>=0?grd.masks[gmSel]||null:null;return m&&gmVisM(m)?m:null},tgtA=w=>{const m=gmCur();if(m)return m.a;if(inSt()){const t=WBS.tiles[WBS.cur];if(t)return w?(t.gr||(t.gr=zA())):(t.gr||zA())}return grd};
 const ovOf=m=>OVX&&gmOv&&m===gmCur()&&m.on;
 const isPos=m=>m&&(m.t=='lin'||m.t=='rad');
 const stMasks=tid=>grd.masks.filter(m=>m.on&&WBS.edMk&&m.t!='lay'&&((m.sc&&m.sc==String(tid))||(!m.sc&&isPos(m)&&m.sp=='s'&&(!m.st||m.st==String(tid)))));
@@ -66,7 +67,7 @@ return[`<feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0 0 0 0 
 function colP(m,res){const h=m.c,t=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255),w=.03+m.rg/100*.42,tab=c=>{const v=[];for(let i=0;i<=128;i++)v.push(f4(cl01(1-Math.abs(i/128-c)/w)));return v.join(' ')};
 const k=.04+m.sm/100*.96,sv=[];for(let i=0;i<=32;i++)sv.push(f4(sst((i/32-(1-k))/k)));
 return[`<feComponentTransfer in="SourceGraphic" result="${res}d"><feFuncR type="table" tableValues="${tab(t[0])}"/><feFuncG type="table" tableValues="${tab(t[1])}"/><feFuncB type="table" tableValues="${tab(t[2])}"/></feComponentTransfer><feColorMatrix in="${res}d" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 -2" result="${res}s"/><feComponentTransfer in="${res}s" result="${res}"><feFuncA type="table" tableValues="${sv.join(' ')}"/></feComponentTransfer>`,res]}
-const vw=()=>$('boardS').hidden?'pattern':'stamp';
+const vw=()=>$('boardS').hidden?'pattern':'stamp',inSt=()=>vw()=='stamp'||stUnlocked()!=null;
 const OVC='#ff2d55',GEYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>',GNOEYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 5.7A8.6 8.6 0 0112 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 01-2.9 3.7M6.3 7.6C3.6 9.3 2.5 12 2.5 12S6 18.5 12 18.5c1.5 0 2.8-.3 4-.9"/><path d="M4 4l16 16"/></svg>';
 function maskStep(m,i,cur,ctx){const p='k'+i+ctx.k,ov=ovOf(m);if(!hasA(m.a)&&!ov)return['',cur];
 let o='',aR=cur;if(hasA(m.a)){const r=adjP(m.a,cur,p+'a');o+=r[0];aR=r[1]}
@@ -119,8 +120,8 @@ const colName=h=>{const e=C.find(c=>c[1].toLowerCase()==h.toLowerCase());return 
 function gmMeta(m){let s=m.t=='lay'?((WBS.layers.find(L=>L.u==m.lay)||{}).name||'Pick a layer'):m.t=='col'?colName(m.c):m.t=='lum'?`${m.lo}–${m.hi}%`:m.sp=='s'?(m.st?tileN(m.st)||'Each stamp':'Each stamp'):'Canvas';
 if(m.inv&&m.t!='lay')s+=', inverted';if(!hasA(m.a))s+=' · no changes yet';return s}
 function renderGM(){if(gmSel>=grd.masks.length)gmSel=grd.masks.length-1;if(gmSel>=0&&!gmVisM(grd.masks[gmSel]))gmSel=-1;const m=gmCur();
-$('gm_list').innerHTML=`<div class="lyr${gmSel<0?' on':''}" data-gm="-1"><span class="gmsp"></span><span class="gmi">${MIC.glob}</span><span class="lyn">${vw()=='stamp'?'Stamp '+(WBS.cur+1)+' <span class="lym">This stamp only</span>':'Global <span class="lym">Whole print</span>'}</span></div>`+grd.masks.map((q,i)=>!gmVisM(q)?'':`<div class="lyr${i==gmSel?' on':''}${q.on?'':' off'}" data-gm="${i}"><button type="button" class="eye" data-eye title="${q.on?'Hide':'Show'}">${q.on?GEYE:GNOEYE}</button><span class="gmi">${MIC[q.t]}</span><span class="lyn">${i==gmRen?`<input value="${hx(q.name)}" maxlength="30">`:hx(q.name)} <span class="lym">${hx(gmMeta(q))}</span></span></div>`).join('');
-{const nv=grd.masks.filter(gmVisM).length;$('gm_cnt').textContent=nv?String(nv):''}$('gm_dup').disabled=$('gm_del').disabled=!m;$('gd_who').textContent=m?m.name:(vw()=='stamp'?'Stamp '+(WBS.cur+1):'Global');{const co=$('gdcov');if(co&&co.closest('label'))co.closest('label').hidden=vw()=='stamp'}$('gm_body').hidden=!m;
+$('gm_list').innerHTML=`<div class="lyr${gmSel<0?' on':''}" data-gm="-1"><span class="gmsp"></span><span class="gmi">${MIC.glob}</span><span class="lyn">${inSt()?'Stamp '+(WBS.cur+1)+' <span class="lym">This stamp only</span>':'Global <span class="lym">Whole print</span>'}</span></div>`+grd.masks.map((q,i)=>!gmVisM(q)?'':`<div class="lyr${i==gmSel?' on':''}${q.on?'':' off'}" data-gm="${i}"><button type="button" class="eye" data-eye title="${q.on?'Hide':'Show'}">${q.on?GEYE:GNOEYE}</button><span class="gmi">${MIC[q.t]}</span><span class="lyn">${i==gmRen?`<input value="${hx(q.name)}" maxlength="30">`:hx(q.name)} <span class="lym">${hx(gmMeta(q))}</span></span></div>`).join('');
+{const nv=grd.masks.filter(gmVisM).length;$('gm_cnt').textContent=nv?String(nv):''}$('gm_dup').disabled=$('gm_del').disabled=!m;$('gd_who').textContent=m?m.name:(inSt()?'Stamp '+(WBS.cur+1):'Global');{const co=$('gdcov');if(co&&co.closest('label'))co.closest('label').hidden=inSt()}$('gm_body').hidden=!m;
 const inp=$('gm_list').querySelector('input');if(inp){inp.focus();inp.select();const done=ok=>{if(gmRen<0)return;const q=grd.masks[gmRen];if(ok&&q&&inp.value.trim())q.name=inp.value.trim().slice(0,30);gmRen=-1;gdSave();renderGM();gCap()};inp.onkeydown=e=>{if(e.key=='Enter')done(1);else if(e.key=='Escape')done(0);e.stopPropagation()};inp.onblur=()=>done(1)}
 if(!m)return;const T=m.t,show=(id,on)=>$(id).hidden=!on;
 show('gm_sp_r',isPos(m)&&!m.sc&&m.sp=='s');show('gm_st_r',isPos(m)&&m.sp=='s'&&!m.sc&&WBS.tiles.length>1);show('gm_eye',!m.sc);show('gm_lay_r',T=='lay');show('gm_col_r',T=='col');show('gm_lo_r',T=='lum');show('gm_hi_r',T=='lum');show('gm_rg_r',T=='col');show('gm_sm_r',T=='col'||T=='lum');show('gm_fe_r',T=='rad');show('gm_inv_r',T!='lay');
@@ -131,7 +132,7 @@ if(T=='col'){const used=[...new Set([...WBS.proj.ts.map(id=>'@'+id),WBS.proj.bg,
  $('gm_col').innerHTML=hs.map(([n,h])=>`<option value="${h}">${hx(n)}</option>`).join('')+(hs.some(x=>x[1]==cur0)?'':`<option value="${cur0}">${hx(colName(cur0))}</option>`);$('gm_col').value=cur0;$('gm_cc').value=cur0}
 ['lo','hi','rg','sm','fe','amt'].forEach(k=>{const r=$('gm_'+k);if(m[k]!==undefined&&+r.value!=+m[k]){r.value=m[k];r.dispatchEvent(new Event('input',{bubbles:true}))}});
 $('gm_inv').checked=!!m.inv;$('gm_ov').checked=gmOv;
-const inEd=vw()=='stamp';$('gm_hint').textContent='';
+const inEd=inSt();$('gm_hint').textContent='';
 $('gm_go').hidden=!(isPos(m)&&m.sp=='s'&&!inEd)}
 function gradeSync(){const A=tgtA();GK.forEach(k=>{const r=$('gd_'+k);if(+r.value!=+(A[k]||0)){r.value=A[k]||0;r.dispatchEvent(new Event('input',{bubbles:true}))}});$('gdcov').checked=!!grd.cov;renderGM()}
 const gmSet=(k,v)=>{const m=gmCur();if(!m)return;m[k]=v;gdSave();applyGrade();renderGM();gCap()};
@@ -173,9 +174,9 @@ document.addEventListener('keydown',e=>{if(e.key=='Escape'&&gmPick)gmPickEnd()})
 $('gm_inv').onchange=()=>gmSet('inv',$('gm_inv').checked);
 $('gm_ov').onchange=()=>{gmOv=$('gm_ov').checked;refreshG()};
 $('gm_go').onclick=()=>{const m=gmCur();if(m&&m.st){const i=WBS.tiles.findIndex(t=>String(t.id)==m.st);if(i>=0)WBS.cur=i}const vb=document.querySelector('button[data-v="stamp"]');if(vb)vb.click();upd();setTimeout(()=>{const rb=document.querySelector('.rail [data-pn="grade"]');if(rb&&!gmShown())rb.click();setTimeout(()=>{renderGM();gmHandles()},60)},60)};
-$('gm_add').onclick=e=>{e.stopPropagation();{const li=$('gm_menu').querySelector('[data-gt=lay]');if(li)li.hidden=vw()=='stamp'}const l=$('gm_menu'),open=l.hidden;closeDD();if(WBX.wbCloseMenus)WBX.wbCloseMenus();l.hidden=!open;if(open)placeFloat(l,$('gm_add'),true)};
+$('gm_add').onclick=e=>{e.stopPropagation();{const li=$('gm_menu').querySelector('[data-gt=lay]');if(li)li.hidden=inSt()}const l=$('gm_menu'),open=l.hidden;closeDD();if(WBX.wbCloseMenus)WBX.wbCloseMenus();l.hidden=!open;if(open)placeFloat(l,$('gm_add'),true)};
 $('gm_menu').onclick=e=>{const it=e.target.closest('[data-gt]');if(!it)return;$('gm_menu').hidden=true;const t=it.dataset.gt,n=grd.masks.filter(q=>q.t==t).length+1,o={t,name:MS[t]+' '+n};
-if(t=='lay')o.lay=(LY()||{}).u||'';if(t=='col')o.c=col(WBS.proj.ink).slice(0,7);if(vw()=='stamp'){const tt=WBS.tiles[WBS.cur];if(tt){o.sc=String(tt.id);if(isPos(o)){o.sp='s';o.st=o.sc}}}
+if(t=='lay')o.lay=(LY()||{}).u||'';if(t=='col')o.c=col(WBS.proj.ink).slice(0,7);if(inSt()){const tt=WBS.tiles[WBS.cur];if(tt){o.sc=String(tt.id);if(isPos(o)){o.sp='s';o.st=o.sc}}}
 grd.masks.push(mFix(o));gmSel=grd.masks.length-1;gdSave();gradeSync();applyGrade();gCap()};
 $('gm_dup').onclick=()=>{const m=gmCur();if(!m)return;const c=mFix({...JSON.parse(JSON.stringify(m)),id:'',name:(m.name+' copy').slice(0,30)});grd.masks.splice(gmSel+1,0,c);gmSel++;gdSave();gradeSync();applyGrade();gCap()};
 $('gm_del').onclick=()=>{if(!gmCur())return;grd.masks.splice(gmSel,1);gmSel=Math.min(gmSel,grd.masks.length-1);gdSave();gradeSync();applyGrade();gCap()};
@@ -198,7 +199,7 @@ if(m.t=='lin'){if(h=='p1'||h=='mv'){m.x1=c(o.x1+dx);m.y1=c(o.y1+dy)}if(h=='p2'||
 else{if(h=='mv'){m.cx=c(o.cx+dx);m.cy=c(o.cy+dy)}else if(h=='rx')m.rx=Math.max(.01,Math.min(3,Math.abs(x-m.cx)));else if(h=='ry')m.ry=Math.max(.01,Math.min(3,Math.abs(y-m.cy)))}
 if(!gmRaf)gmRaf=requestAnimationFrame(()=>{gmRaf=0;refreshG()})});window.addEventListener('pointerup',gmUp);window.addEventListener('pointercancel',gmUp);
 WBX.wbGrade={get:()=>JSON.parse(JSON.stringify(grd)),set:o=>{grd=gFix(o);if(gmSel>=grd.masks.length)gmSel=grd.masks.length-1;gdSave();gradeSync();applyGrade()},
-sync:()=>gradeSync(),defs:ov=>gDefs(!!ov),stF,layF,refresh:()=>{refreshG();const k=vw()+'|'+WBS.cur+'|'+gmSel;if(gmCur()||k!==gdLast){gdLast=k;gradeSync()}},edH:()=>edH()};
+sync:()=>gradeSync(),defs:ov=>gDefs(!!ov),stF,layF,refresh:()=>{refreshG();const k=vw()+'|'+stUnlocked()+'|'+WBS.cur+'|'+gmSel;if(gmCur()||k!==gdLast){gdLast=k;gradeSync()}},edH:()=>edH()};
 gradeSync();applyGrade();
 }
 export {init31};

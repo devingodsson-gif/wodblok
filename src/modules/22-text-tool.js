@@ -8,6 +8,7 @@ import {QS,delItems,selSet} from './12-selection-and-split.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {TXO_KEYS,TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
 import {teRnd,teD,teF,teFonts,teUF,teAddUF,teCss,teFitSz,teLayBox,teLayout,teLoadFonts,teReady,teSetNotify} from './60-text-engine.js';
+import {stTxMode} from './63-stamp-tool.js';
 
 function init22(){// ===== Text tool: type text, it's traced into carved letter shapes. Each letter becomes its own shape on the stamp,
 // grouped under the text in the Motif list. The original text and settings are kept on the group, so it can be edited.
@@ -27,7 +28,7 @@ async function preview(){await teReady(st);const t=WBS.tiles[WBS.cur];useT(t);au
 $('tx_pv').innerHTML=`<svg viewBox="-12 -12 ${SW+24} ${SH+24}"><path d="${shp(0)}" fill="${pa}" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/>`+ps.map(p=>`<g transform="translate(${(C[0]+p.x).toFixed(1)} ${(C[1]+p.y).toFixed(1)}) rotate(${p.r.toFixed(1)}) scale(${p.s})"><path d="${p.g.d}" fill="${ink}" fill-rule="evenodd"/></g>`).join('')+`</svg>`;
 $('tx_go').disabled=!st.text.trim()}
 const cen=()=>SK=='tri'?[SW/2,SH*2/3]:[SW/2,SH/2];
-const later=()=>{if(WBS.curView=='pattern')return;clearTimeout(tmr);tmr=setTimeout(preview,120)};
+const later=()=>{if(!stTxMode())return;clearTimeout(tmr);tmr=setTimeout(preview,120)};
 // Letters moved, turned or scaled by hand: how far each differs from where the layout puts it (the median offset is the group having been moved as a whole)
 function adjOf(t,M,ids){const old=teLayout({...teD,...M}),its=ids.map(i=>t.items[i]);if(old.length!==its.length)return null;const nm=(d,P)=>d-Math.round(d/P)*P,
 off=its.map((q,i)=>{const p=old[i],[ex,ey]=wrapP(M.ax+p.x,M.ay+p.y);return[nm(q.x-ex,SW),nm(q.y-ey,SH),q.r-+p.r.toFixed(1),q.s/p.s]}),med=a=>a.slice().sort((x,y)=>x-y)[a.length>>1],sx=med(off.map(o=>o[0])),sy=med(off.map(o=>o[1])),
@@ -47,7 +48,7 @@ const[cx0,cy0]=mean(ids),AJ=adjOf(t,M,ids),ax=M.ax+(AJ?AJ.sx:cx0-M.mx),ay=M.ay+(
 if(AJ&&AJ.ad)L.forEach((q,i)=>{const a=AJ.ad[i];if(!a)return;[q.x,q.y]=wrapP(q.x+a[0],q.y+a[1]);q.r=+(q.r+a[2]).toFixed(1);q.s=+(q.s*a[3]).toFixed(4)});t.items.splice(Math.min(pos,t.items.length),0,...L);const nids=L.map((_,i)=>Math.min(pos,t.items.length-L.length)+i);
 const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();upd();if(!live){if(WBX.wbCap)WBX.wbCap();pmsg(`Updated the text.`)}}
 // the text on the stamp follows every change in the panel while a text is being edited
-const live=()=>{if(syncing||WBS.curView=='pattern')return;if(!edit){if(txArmed())txGhost();else if(st.text.trim())txArm(true);return}clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
+const live=()=>{if(syncing||!stTxMode())return;if(!edit){if(txArmed())txGhost();else if(st.text.trim())txArm(true);return}clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
 // used by Randomize: set text on a stamp (fonts load first; a newer roll cancels an older one)
 WBX.wbTxFonts=teFonts.map(x=>x[0]);
 // Randomize uses the newer text options now and then. They come from the words themselves (not from Math.random), so a Randomize roll draws the same random numbers as before.
@@ -61,19 +62,19 @@ return true}finally{st=keep;useT(WBS.tiles[WBS.cur])}};
 // keep a group's anchor in step when it's moved, turned or scaled as a whole
 WBX.wbTxXf=(g,fn)=>{const t=WBS.tiles[WBS.cur],M=A(t)[g];if(!M)return;fn(M)};
 // sync the panel with the selection: selecting a text group puts it into edit mode
-WBX.wbTxSync=()=>{if(!$('tx_t')||WBS.curView=='pattern')return;txArmUI();const g=grpOf();if(g===edit)return;edit=g;const box=$('tx_ed');
+WBX.wbTxSync=()=>{if(!$('tx_t')||!stTxMode())return;txArmUI();const g=grpOf();if(g===edit)return;edit=g;const box=$('tx_ed');
 if(g){const M=A(WBS.tiles[WBS.cur])[g];st={...teD,...M,auto:false};delete st.ax;delete st.ay;delete st.mx;delete st.my;toUI();box.hidden=false;$('tx_convrow').hidden=false;$('tx_edn').textContent=st.text.replace(/\n/g,' ');$('tx_go').textContent='Add text'}
 else{box.hidden=true;$('tx_convrow').hidden=true;$('tx_go').textContent='Add text';st.auto=true}later()};
 teSetNotify(pmsg);teLoadFonts(fillFonts);fillFonts();toUI();
 $('tx_t').addEventListener('input',()=>{fromUI();later();live()});
 TXO_IDS.forEach(id=>$(id).addEventListener('input',e=>{if(id=='tx_sz'&&e.isTrusted)st.auto=false;fromUI();later();live()}));
 ['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(!e.isTrusted)return;const w=$('tx_sz').closest('.ctl');if(e.target===$('tx_sz')||(w&&w.contains(e.target)))st.auto=false},true));
-txoBind(()=>WBS.curView!='pattern',()=>{fromUI();later();live()});txoSelBind(()=>WBS.curView!='pattern',()=>{fromUI();later();live()});
-$('tx_vary').onclick=()=>{if(WBS.curView=='pattern')return;txoSeed(1+Math.floor(Math.random()*1e6));fromUI();later();live()};
-$('tx_go').onclick=()=>{if(WBS.curView=='pattern')return;if(txArmed())txArm(false);else{fromUI();txArm(true)}};
-$('tx_conv').onclick=()=>{if(WBS.curView=='pattern'||!edit)return;const g=edit,t=WBS.tiles[WBS.cur];if(WBX.wbCap)WBX.wbCap();t.items.forEach(q=>{if(q.tg==g)delete q.tg});delete A(t)[g];edit=null;$('tx_ed').hidden=true;$('tx_convrow').hidden=true;store();upd();if(WBX.wbCap)WBX.wbCap();pmsg('Turned the text into plain shapes.')};
-$('tx_new').onclick=()=>{if(WBS.curView=='pattern')return;selOne(-1);edit=null;$('tx_ed').hidden=true;$('tx_convrow').hidden=true;$('tx_go').textContent='Add text';st={...teD,f:st.f};toUI();upd();later();$('tx_t').focus()};
-$('tx_file').onchange=async()=>{if(WBS.curView=='pattern')return;const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl)return;try{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';
+txoBind(()=>stTxMode(),()=>{fromUI();later();live()});txoSelBind(()=>stTxMode(),()=>{fromUI();later();live()});
+$('tx_vary').onclick=()=>{if(!stTxMode())return;txoSeed(1+Math.floor(Math.random()*1e6));fromUI();later();live()};
+$('tx_go').onclick=()=>{if(!stTxMode())return;if(txArmed())txArm(false);else{fromUI();txArm(true)}};
+$('tx_conv').onclick=()=>{if(!stTxMode()||!edit)return;const g=edit,t=WBS.tiles[WBS.cur];if(WBX.wbCap)WBX.wbCap();t.items.forEach(q=>{if(q.tg==g)delete q.tg});delete A(t)[g];edit=null;$('tx_ed').hidden=true;$('tx_convrow').hidden=true;store();upd();if(WBX.wbCap)WBX.wbCap();pmsg('Turned the text into plain shapes.')};
+$('tx_new').onclick=()=>{if(!stTxMode())return;selOne(-1);edit=null;$('tx_ed').hidden=true;$('tx_convrow').hidden=true;$('tx_go').textContent='Add text';st={...teD,f:st.f};toUI();upd();later();$('tx_t').focus()};
+$('tx_file').onchange=async()=>{if(!stTxMode())return;const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl)return;try{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';
 const id=await teAddUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();$('tx_f').value=id;fromUI();later();pmsg(`Loaded “${nm}”.`+(fl.size>=900000?' It is large, so it will not be kept for next time.':''))}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}};
 // text boxes in the pattern: lay the text out at canvas scale, returning the letter paths (centred on the box)
 WBX.wbTxLay=teLayBox;
@@ -82,7 +83,7 @@ WBX.wbTxAddFont=async fl=>{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(
 // one Text panel for both editors: the Stamp editor builds letters on the stamp, the Pattern editor fills a Text layer
 WBX.wbTxMode=v=>{const pat=v=='pattern';$('tx_lay').hidden=!pat;$('tx_pv').hidden=pat;if(pat)$('tx_convrow').hidden=true;$('tx_sz').dataset.def=pat?'10':'30';if(pat){if(txArmed())txArm(false);if(WBX.wbTbMode)WBX.wbTbMode()}else{WBS.txArm=false;toUI();$('tx_ed').hidden=!edit;$('tx_convrow').hidden=!edit;$('tx_sprow').hidden=true;txArmUI()}};
 // double-click a text on the canvas: the Text panel opens with the words selected, so typing replaces them and the canvas follows as you type
-document.addEventListener('dblclick',e=>{const t=e.target;if(!t||!t.closest)return;const stamp=WBS.curView!='pattern'&&t.closest('#ed')&&grpOf(),lay=WBS.curView=='pattern'&&t.closest('#boardP')&&WBX.wbTbHas&&WBX.wbTbHas();if(!stamp&&!lay)return;if(WBX.wbOpenPanel)WBX.wbOpenPanel('text');const f=$('tx_t');f.focus();f.select()});
+document.addEventListener('dblclick',e=>{const t=e.target;if(!t||!t.closest)return;const stamp=stTxMode()&&(t.closest('#ed')||t.closest('#artwrap'))&&grpOf(),lay=!stTxMode()&&t.closest('#boardP')&&WBX.wbTbHas&&WBX.wbTbHas();if(!stamp&&!lay)return;if(WBX.wbOpenPanel)WBX.wbOpenPanel('text');const f=$('tx_t');f.focus();f.select()});
 // redraw the preview whenever the panel is shown
 new MutationObserver(()=>{const s=document.querySelector('section.pn[data-p="text"]');if(s&&!s.hidden)later()}).observe(document.querySelector('section.pn[data-p="text"]'),{attributes:true,attributeFilter:['hidden']});
 later();

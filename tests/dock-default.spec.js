@@ -25,6 +25,7 @@ test('no tool starts as a floating window (the Shape editor docks along the bott
     const tools = await page.locator('.rail [data-pn]:not([hidden])').evaluateAll(b => b.map(x => x.dataset.pn));
     expect(tools.length).toBeGreaterThan(8);
     for (const p of tools) {
+      if (p === 'mlist' && mode === 'pattern') continue;   // empty until a stamp is unlocked
       if (p === 'sedit') continue;   // the Shape editor docks at the bottom: see shape-editor.spec.js
       await openPanel(page, p);
       await expect(page.locator(`.dk-r .wg:has(section.pn[data-p="${p}"]:not([hidden]))`), `${mode}: ${p}`).toHaveCount(1);

@@ -152,7 +152,9 @@ async function openProjectFile(page, filePath) {
 }
 
 async function openPanel(page, id) { await page.click(`.rail [data-pn="${id}"]`); await page.waitForSelector(`section.pn[data-p="${id}"]:not([hidden])`); }
-async function setMode(page, v) { await page.click(`.seg2 [data-v="${v}"]`); await settle(page); }
+// The Stamp editor has no button any more (layer update step 9b); tests that still exercise its dormant code reach it through this hook until step 12 removes it
+// (an older build, such as the baseline in picture-compare, has the switch but no hook)
+async function setMode(page, v) { await page.evaluate(m => { if (window.__wbTest.setView) window.__wbTest.setView(m); else document.querySelector(`.seg2 [data-v="${m}"]`).click(); }, v); await settle(page); }
 
 // The standard checks every scenario ends with: state, markup summary, no errors.
 async function checkpoint(page, testInfo, errors, name, { shot = true, selector = '#art' } = {}) {

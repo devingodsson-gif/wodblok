@@ -85,8 +85,9 @@ test('a click selects a shape, dragging moves it, a handle resizes it, the round
   const { errors } = await openApp(page, { seed: 4 });
   await unlock(page);
   await pick(page);
-  const p = await inst(page);
+  let p = await inst(page);
   await click(page, p);
+  p = await inst(page);   // the Element editor docks along the bottom when a shape is placed, so the canvas moves
   let it = await items(page);
   const n = it.length;
   // click empty paper of the instance far from the shape (a corner): selection goes
@@ -153,5 +154,110 @@ test('text typed in the Text panel goes into the unlocked stamp as letters, on e
   const it = await items(page);
   expect(it.slice(-2).every(q => q.tg)).toBe(true);
   expect((await state(page)).layers[0].pl || []).toHaveLength(0);
+  expect(errors).toEqual([]);
+});
+
+// ---- step 6 (1.46.6): the Element editor and Stamp settings in the Pattern view, symmetry copies, marquee, snapping ----
+const at = async (page, p, dx, dy) => { const c = await toClient(page, p.cx + dx, p.cy + dy); return { x: c.x, y: c.y, k: c.k }; };
+
+test('the Element editor opens by itself when a shape is placed in the unlocked stamp, and its controls act on the selected shape', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await unlock(page);
+  await pick(page);
+  await expect(page.locator('.wtab', { hasText: 'Element editor' })).toHaveCount(0);
+  await click(page, await inst(page));
+  await expect(page.locator('.wtab.on', { hasText: 'Element editor' })).toHaveCount(1, { timeout: 10000 });
+  await page.evaluate(() => { const r = document.getElementById('ssz'); r.value = 50; r.dispatchEvent(new Event('input', { bubbles: true })); });
+  await settle(page);
+  const it = await items(page);
+  expect(Math.abs(it[it.length - 1].s - 0.5)).toBeLessThan(0.01);
+  expect(errors).toEqual([]);
+});
+
+test('Stamp settings is a Pattern tool: symmetry makes copies that can be selected and dragged on the canvas', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await unlock(page);
+  await openPanel(page, 'stamp');
+  await page.click('#sym [data-y="lr"]');
+  await settle(page);
+  expect((await state(page)).tiles[0].sym.m).toBe('lr');
+  await pick(page);
+  let p = await inst(page);
+  await click(page, await at(page, p, -30, 0));
+  p = await inst(page);
+  const n = (await items(page)).length;
+  const x0 = (await items(page))[n - 1].x;
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+  // the mirror copy is on the other side: a click there selects the shape it came from
+  const copy = await at(page, p, 30, 0);
+  await click(page, copy);
+  await expect(page.locator('#stoh .steh')).toHaveCount(9);
+  // dragging the copy to the right moves the shape itself to the left
+  await drag(page, copy, { x: copy.x + 15 * copy.k, y: copy.y });
+  const x1 = (await items(page))[n - 1].x;
+  expect(x0 - x1).toBeGreaterThan(8);
+  expect(errors).toEqual([]);
+});
+
+test('a box dragged round shapes selects those that lie wholly inside it', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await unlock(page);
+  await pick(page);
+  let p = await inst(page);
+  await click(page, await at(page, p, -30, 0));
+  p = await inst(page);
+  await click(page, await at(page, p, 30, 0));
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#stoh .stes')).toHaveCount(0);
+  await drag(page, await at(page, p, -85, -60), await at(page, p, 85, 60));
+  await expect(page.locator('#stoh polygon.stes')).toHaveCount(2);
+  await expect(page.locator('#stoh .steh')).toHaveCount(0);
+  // a box that holds only one of them picks only that one
+  await page.keyboard.press('Escape');
+  await drag(page, await at(page, p, -85, -60), await at(page, p, -2, 60));
+  await expect(page.locator('#stoh polygon.stes')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
+test('the Grid tool snaps shapes put into the unlocked stamp, and Alt skips it', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'pgrid');
+  await page.check('#pgn');
+  await page.click('#pgm [data-g="l"]');
+  await unlock(page);
+  await pick(page);
+  const cell = 533 / 8;
+  let p = await inst(page);
+  const off = async n => { const it = await items(page); const q = it[it.length - 1]; return page.evaluate(([i, u, v]) => __wbTest.stampToCanvas(i, u, v), [p.i, q.x, q.y]).then(c => ({ rx: ((c.x % cell) + cell) % cell, ry: ((c.y % cell) + cell) % cell })); };
+  const near = v => Math.min(v, cell - v);
+  await click(page, await at(page, p, 13, 9));
+  let o = await off();
+  expect(near(o.rx)).toBeLessThan(0.6);
+  expect(near(o.ry)).toBeLessThan(0.6);
+  p = await inst(page);
+  await page.keyboard.down('Alt');
+  await click(page, await at(page, p, -33, 21));
+  await page.keyboard.up('Alt');
+  o = await off();
+  expect(near(o.rx) > 0.6 || near(o.ry) > 0.6).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('a shape that runs over the stamp edge shows on the other side, and a click on that part selects it', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await unlock(page);
+  await pick(page);
+  let p = await inst(page);
+  await click(page, await at(page, p, 80, 0));
+  p = await inst(page);
+  const n = (await items(page)).length;
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#stoh .steh')).toHaveCount(0);
+  await click(page, await at(page, p, -86, 0));
+  await expect(page.locator('#stoh .steh')).toHaveCount(9);
+  expect((await items(page)).length).toBe(n);
   expect(errors).toEqual([]);
 });

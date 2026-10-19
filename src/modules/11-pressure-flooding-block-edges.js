@@ -3,7 +3,7 @@ import {BK,bkH} from './03-stamp-prints-and-drawing.js';
 import {shBleed,HO,OFFS,ORN,SH,SK,SW,col,ornPts,rng,shp,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,it,selOne,store} from './06-motif-library-folders.js';
 import {symOps} from './07-symmetry.js';
-import {grid,items,snapPt,snapSize} from './09-stamp-editor-grid-and-motif-ops.js';
+import {grid,inkRuns,items,snapPt,snapSize} from './09-stamp-editor-grid-and-motif-ops.js';
 import {build,hx} from './10-layer-grids.js';
 import {selToggle} from './12-selection-and-split.js';
 import {paintGhost} from './13-preview-and-stamp-tool.js';
@@ -82,11 +82,12 @@ if(FL>0)o+=gr('gn1',p=>Fn*.6*Math.pow(Math.max(0,(p+.15)/1.15),1.3))+gr('gn2',p=
 const k=`${li}_${t.id}_${b}`,ci=inkOf(t),seed=((li+1)*7919+t.id*104729+b*31)%9973,
 frame=eT(t)?`<use href="#e${t.id}_${b%eNV(t)}" fill="#fff"/>`:'',
 base=(t.neg?`<rect x="-12" y="-12" width="${SW+24}" height="${SH+24}" fill="#fff"/>${items(t,{c:'#000',d:'#fff'},0,12)}`:`<rect x="-12" y="-12" width="${SW+24}" height="${SH+24}" fill="#000"/>${items(t,{c:'#fff',d:'#000'},0,12)}`)+frame,
-shape=P>0?`<g filter="url(#pt${x})"><rect x="-12" y="-12" width="${SW+24}" height="${SH+24}" fill="#fff" mask="url(#pfl${x}_${b})"/><g filter="url(#pb${x})" mask="url(#pmc${x}_${b})">${base}</g></g>`:base,
+shapeOf=bs=>P>0?`<g filter="url(#pt${x})"><rect x="-12" y="-12" width="${SW+24}" height="${SH+24}" fill="#fff" mask="url(#pfl${x}_${b})"/><g filter="url(#pb${x})" mask="url(#pmc${x}_${b})">${bs}</g></g>`:bs,shape=shapeOf(base),rn=inkRuns(t),blk=`<rect x="-12" y="-12" width="${SW+24}" height="${SH+24}" fill="#000"/>`,
 nf=(id,fq,oc,sd,m)=>`<filter id="${id}${k}" filterUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="${fq}" numOctaves="${oc}" seed="${sd}"/><feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ${m}"/></filter>`,
 fd=FL>0?nf('na',.07,3,seed,'4 0 0 0 -1.6')+nf('nb',.035,2,seed+13,'8 0 0 0 -4.4'):'',
 tone=FL>0?`<rect width="${SW}" height="${SH}" fill="#fff" filter="url(#na${k})" mask="url(#tn1${x}_${b})"/><rect width="${SW}" height="${SH}" fill="#fff" filter="url(#nb${k})" mask="url(#tn2${x}_${b})"/>`:'';
-o+=fd+`<mask id="mp${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shape}</mask>${t.neg?`<g id="q${k}">${shBleed(ci)}<g clip-path="url(#shc${t.id})">`:`<g id="q${k}" clip-path="url(#shc${t.id})">`}${isOf(t)?`<g mask="url(#is${t.id})">`:''}<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k})"/>${txoG(t,'mp'+k)}${isOf(t)?'</g>':''}${t.neg?'</g></g>':'</g>'}`;{const _pc=o.slice(_ob);BK.PC[k]=_pc;BK.P[k]=bkH(_pc+'|'+(BK.PF[x]||''));o=o.slice(0,_ob)+'<!--@P:'+k+'-->'+_pc+'<!--@-->'}});BK.PD.set(x,{k:_ck,o:o.slice(_o0),pf:BK.PF[x],pc:_bt.map(b=>{const k=x+'_'+b;return[k,BK.PC[k],BK.P[k]]})})});
+const mkm=(id,body)=>`<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shapeOf(body)}</mask>`,rm=rn?rn.map((r,j)=>mkm('mp'+k+'r'+j,blk+items(t,{c:'#fff',d:'#000'},0,12,r.sel))).join('')+(frame?mkm('mp'+k+'rr',blk+frame):''):'';
+o+=fd+`<mask id="mp${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shape}</mask>${rm}${t.neg?`<g id="q${k}">${shBleed(ci)}<g clip-path="url(#shc${t.id})">`:`<g id="q${k}" clip-path="url(#shc${t.id})">`}${isOf(t)?`<g mask="url(#is${t.id})">`:''}${rn?rn.map((r,j)=>`<rect width="${SW}" height="${SH}" fill="${r.c?col(r.c):ci}" mask="url(#mp${k}r${j})"/>`).join('')+(frame?`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k}rr)"/>`:''):`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k})"/>`}${txoG(t,'mp'+k)}${isOf(t)?'</g>':''}${t.neg?'</g></g>':'</g>'}`;{const _pc=o.slice(_ob);BK.PC[k]=_pc;BK.P[k]=bkH(_pc+'|'+(BK.PF[x]||''));o=o.slice(0,_ob)+'<!--@P:'+k+'-->'+_pc+'<!--@-->'}});BK.PD.set(x,{k:_ck,o:o.slice(_o0),pf:BK.PF[x],pc:_bt.map(b=>{const k=x+'_'+b;return[k,BK.PC[k],BK.P[k]]})})});
 useT(WBS.tiles[WBS.cur]);return o}
 function renderL(){const L=WBS.layers[WBS.selL],pa=col(WBS.proj.bg);
 $('lyl').innerHTML=WBS.layers.map((l,i)=>i).reverse().map(i=>{const l=WBS.layers[i];return`<div class="lr${lyGrp().includes(i)?' on':''}" data-l="${i}"><input type="checkbox" title="Show or hide"${l.vis?' checked':''}><span class="ln">${hx(l.name)}</span><button class="alt" data-up title="Bring forward">&#9650;</button><button class="alt" data-dn title="Send back">&#9660;</button></div>`}).join('');

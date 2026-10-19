@@ -1,12 +1,12 @@
 // The first minute (UX review B4): Randomize is in the top bar, an empty project has no button on the canvas, and an empty stamp in the tray shows a plus.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle, getState, setMode } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 test('launch is still fully cleared: Pattern view, no panel open, no stamps printed', async ({ page }) => {
   const { errors } = await openApp(page);
-  await expect(page.locator('.seg2 [data-v="pattern"]')).toHaveClass(/on/);
+  await expect(page.locator('#boardS')).toBeHidden();
   expect(await page.evaluate(() => [...document.querySelectorAll('.dock.dk')].filter(d => d.offsetWidth * d.offsetHeight > 0).length), 'no tool windows open at launch').toBe(0);
   expect(JSON.parse(await getState(page)).tiles.every(t => !t.items.length)).toBe(true);
   expect(errors).toEqual([]);
@@ -30,7 +30,7 @@ test('an empty canvas has no "+" button on it; shapes are added from the Stamp e
   const { errors } = await openApp(page);
   await expect(page.locator('#empc')).toHaveCount(0);
   await expect(page.locator('#tabs button.empty')).toHaveCount(1);
-  await page.click('.seg2 [data-v="stamp"]');
+  await setMode(page, 'stamp');
   await settle(page);
   await openPanel(page, 'motifs');
   await expect(page.locator('section.pn[data-p="motifs"]')).toBeVisible();
@@ -39,7 +39,7 @@ test('an empty canvas has no "+" button on it; shapes are added from the Stamp e
   await page.mouse.click(590, 390);
   await page.keyboard.press('Escape');
   await settle(page);
-  await page.click('.seg2 [data-v="pattern"]');
+  await setMode(page, 'pattern');
   await settle(page);
   await expect(page.locator('#tabs button.empty')).toHaveCount(0);
   expect(errors).toEqual([]);

@@ -3,6 +3,7 @@ import {$,WBS,WBX} from './01-launch-and-version.js';
 import {C,CM,CP,PL,col,okC,placeFloat,rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
+import {QS} from './12-selection-and-split.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
 import {TRAY_MAX,TRAY_VIEW,cwAdd,cwNow,cwUse,hexAlpha,isFixed,isLink,lockRef,normHexA,refAdopt,refLabel,refSlot,slotHex,slotName,trayAdd,trayDone,trayLoad,trayMove,trayRemove,traySet,trayUses,unlockRef} from './50-tray-core.js';
@@ -113,7 +114,7 @@ function paintWells(force){WELLS.forEach(W=>paintWell(W,force))}
 // ---------------------------------------------------------------- 3. the Colours tool: the tray as a list
 const USEW={paper:'Paper',ink:'Ink'};
 function usesText(id){const u=trayUses(id),n={};u.forEach(x=>{n[x.k]=(n[x.k]||0)+1});const out=[];if(n.paper)out.push('Paper');if(n.ink)out.push('Ink');
- const pl=(k,a,b)=>{if(n[k])out.push(n[k]+' '+(n[k]>1?b:a))};pl('stamp','stamp','stamps');pl('layer','layer','layers');pl('replace','replace','replaces');pl('text','text','texts');return out.join(' · ')}
+ const pl=(k,a,b)=>{if(n[k])out.push(n[k]+' '+(n[k]>1?b:a))};pl('stamp','stamp','stamps');pl('shape','shape','shapes');pl('layer','layer','layers');pl('replace','replace','replaces');pl('text','text','texts');return out.join(' · ')}
 let listK='';
 function paintList(force){const box=$('tyl');if(!box||!box.isConnected||(!force&&!shown(box)))return;const o=tyP(),w=cwNow(o);
  const k=JSON.stringify([o.ts,o.ts.map(id=>[w.c[id],w.m[id]]),o.bg,o.ink,WBS.tiles.map(t=>t.ink),WBS.layers.map(L=>[L.ink,L.rp,(L.pl||[]).map(q=>q&&q.ink)]),WBS.trayEdit]);if(!force&&k===listK)return;listK=k;
@@ -194,6 +195,7 @@ function init52(){
  mkWell($('wl_pb'),{label:'Paper',what:'Paper',get:()=>o().bg,set:v=>{o().bg=v||o().bg}});
  mkWell($('wl_pi'),{label:'Ink',what:'Ink',get:()=>o().ink,set:v=>{o().ink=v||o().ink}});
  mkWell($('wl_st'),{label:'Stamp ink',what:'Stamp ink',def:'Default ink',defRef:()=>o().ink,get:()=>{const t=WBS.tiles[WBS.cur];return t&&t.ink||''},set:v=>{const t=WBS.tiles[WBS.cur];if(!t)return;if(v)t.ink=v;else delete t.ink}});
+ mkWell($('wl_sh'),{label:'Shape colour',what:'Shape',def:'Stamp ink',defRef:()=>{const t=WBS.tiles[WBS.cur];return t&&t.ink||o().ink},get:()=>{const q=QS()[0];return q&&q.ic||''},set:v=>{QS().forEach(q=>{if(v)q.ic=v;else delete q.ic})}});
  mkWell($('wl_ly'),{label:'Layer ink',what:'Layer ink',def:'Stamp colours',defSwatch:()=>`linear-gradient(135deg,${col(o().ink)} 50%,${col(o().bg)} 50%)`,get:()=>{const L=LY();return L&&L.ink||''},set:v=>{const L=LY();if(!L)return;if(v)L.ink=v;else delete L.ink}});
  mkWell($('wl_rp'),{label:'Replace colour',what:'Replace',defRef:()=>o().ink,get:()=>{const L=LY();return L&&L.rp||o().ink},set:v=>{const L=LY();if(L&&v)L.rp=v}});
  {const prev=WBX.wbTrayPaint;WBX.wbTrayPaint=f=>{if(prev)prev(f);paintAll(f);paintST(f)}}   // earlier tools (Export recipes) listen too
