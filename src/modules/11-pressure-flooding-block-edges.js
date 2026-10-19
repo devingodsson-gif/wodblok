@@ -6,7 +6,6 @@ import {symOps} from './07-symmetry.js';
 import {grid,inkRuns,items,snapPt,snapSize} from './09-stamp-editor-grid-and-motif-ops.js';
 import {build,hx} from './10-layer-grids.js';
 import {selToggle} from './12-selection-and-split.js';
-import {paintGhost} from './13-preview-and-stamp-tool.js';
 import {isOf} from './16-texture-generators.js';
 import {txoG} from './17-texture-panel-and-previews.js';
 import {lyGrp} from './24-free-place-layers.js';
@@ -93,30 +92,16 @@ function renderL(){const L=WBS.layers[WBS.selL],pa=col(WBS.proj.bg);
 $('lyl').innerHTML=WBS.layers.map((l,i)=>i).reverse().map(i=>{const l=WBS.layers[i];return`<div class="lr${lyGrp().includes(i)?' on':''}" data-l="${i}"><input type="checkbox" title="Show or hide"${l.vis?' checked':''}><span class="ln">${hx(l.name)}</span><button class="alt" data-up title="Bring forward">&#9650;</button><button class="alt" data-dn title="Send back">&#9660;</button></div>`}).join('');
 $('lst').innerHTML=WBS.tiles.map(t=>{useT(t);return`<button data-s="${t.id}" class="${L.st.includes(t.id)?'on':''}" title="Use on this layer"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button>`}).join('');useT(WBS.tiles[WBS.cur])}
 let raf=0,_lb=0,_lbt=0;const upd=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;WBH.draw();if(drag&&WBS.DRAFT&&performance.now()-_lb<400){clearTimeout(_lbt);_lbt=setTimeout(upd,420)}else{_lb=performance.now();build()}if(typeof WBH.syncPr=='function')WBH.syncPr()})};
-let ed;let drag=null,mq=null,hdr=null;
-let ptM=null;const pt=e=>{const p=ed.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(ptM||ed.getScreenCTM().inverse())};
+let drag=null;
 const Q=()=>WBS.tiles[WBS.cur].items[WBS.sel];
 function init11(){
 EDC=new Map();
-ed=$('ed');
 WBX.hdResize=hdResize;
-try{let _edr=0,_edw='';new ResizeObserver(()=>{const r=ed.getBoundingClientRect(),k=Math.round(r.width)+'x'+Math.round(r.height);if(k==_edw||!r.width)return;_edw=k;clearTimeout(_edr);_edr=setTimeout(()=>{if(WBX.wbGrade&&ed.classList.contains('graded'))WBX.wbGrade.refresh()},120)}).observe(ed)}catch(e){}
 // Pulling a corner or a side square: the opposite corner or side stays where it is; with Shift the motif grows from its middle. Works in the motif's own (turned) frame.
 function hdResize(h,p,e){const q=h.q,a=-h.r0*Math.PI/180,dx=p.x-h.cx,dy=p.y-h.cy,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),rx0=48*h.s0*h.sx0,ry0=48*h.s0*h.sy0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ns=h.s0,nx=h.sx0,ny=h.sy0,ox=0,oy=0;
 if(h.k.length==2){const cx=h.k[1]=='e'?1:-1,cy=h.k[0]=='s'?1:-1,Cx=cx*rx0,Cy=cy*ry0,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy);ns=cl(+(h.s0*k).toFixed(3),.02,4);if(grid.sd&&grid.ss&&!e.altKey){q.s=h.s0;q.sx=h.sx0;q.sy=h.sy0;ns=snapSize(q,ns)}k=ns/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
 else if(h.k=='e'||h.k=='w'){const d=h.k=='e'?1:-1,w=mid?Math.abs(lx)*2:d*lx+rx0;nx=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)ox=-d*rx0+d*48*h.s0*nx}
 else{const d=h.k=='s'?1:-1,w=mid?Math.abs(ly)*2:d*ly+ry0;ny=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)oy=-d*ry0+d*48*h.s0*ny}
 q.s=ns;if(nx!=1||q.sx)q.sx=nx;if(ny!=1||q.sy)q.sy=ny;const r=-a;q.x=+(h.cx+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(2);q.y=+(h.cy+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(2)}
-ed.onpointerdown=e=>{{const hd=e.target.closest&&e.target.closest('[data-hd]');if(hd&&e.button===0&&WBS.msel.size==1&&WBS.sel>=0&&!WBS.split&&!WBS.brush){const q=WBS.tiles[WBS.cur].items[WBS.sel];if(q){e.preventDefault();ed.setPointerCapture(e.pointerId);ptM=ed.getScreenCTM().inverse();const p=pt(e);hdr={k:hd.dataset.hd,q,cx:+q.x,cy:+q.y,s0:q.s,sx0:q.sx||1,sy0:q.sy||1,r0:+q.r||0,d0:Math.hypot(p.x-q.x,p.y-q.y)||1};WBS.WBDRG=1;$('texg').style.display='none';return}}}
-if(WBS.split){const h=e.target.closest('[data-sp]');if(h){e.preventDefault();ed.setPointerCapture(e.pointerId);const p=pt(e);WBS.spDrag={k:h.dataset.sp,ox:WBS.split.x-p.x,oy:WBS.split.y-p.y}}return}
-if(WBS.brush){if(e.button!==0)return;e.preventDefault();let[x,y]=(()=>{const p=pt(e);return[p.x,p.y]})();if(grid.sd)[x,y]=snapPt(x,y);[x,y]=wrapP(x,y);if(WBS.brush.txt){if(WBX.wbTxStampAt)WBX.wbTxStampAt(x,y);return}const a=WBS.tiles[WBS.cur].items;a.push(it(WBS.brush.m,x,y,WBS.brush.s,WBS.brush.r));selOne(a.length-1);store();upd();return}
-const g=e.target.closest('[data-i]');if(!g){const add=e.shiftKey||e.ctrlKey||e.metaKey;if(!add)selOne(-1);WBH.draw();if(e.button===0){mq={x:e.clientX,y:e.clientY,add,on:false};ed.setPointerCapture(e.pointerId)}return}
-{const gi=+g.dataset.i;if(e.shiftKey||e.ctrlKey||e.metaKey){e.preventDefault();selToggle(gi);upd();return}if(WBS.msel.has(gi))WBS.sel=gi;else selOne(gi)}const c=+g.dataset.c||0,q=WBS.tiles[WBS.cur].items[WBS.sel],p=pt(e),o=c?symOps(WBS.tiles[WBS.cur])[c-1]:null,cp=o?o.p(mod(q.x,SW),mod(q.y,SH)):[q.x,q.y];let dx=cp[0]-p.x,dy=cp[1]-p.y;if(!o){let bd=1e18;OFFS.forEach(([ax,ay])=>{const ex=q.x+ax-p.x,ey=q.y+ay-p.y,d=ex*ex+ey*ey;if(d<bd){bd=d;dx=ex;dy=ey}})}drag={dx,dy,o,px:q.x,py:q.y,st:[...WBS.msel].filter(j=>j!=WBS.sel).map(j=>{const w=WBS.tiles[WBS.cur].items[j];return[w,w.x,w.y]})};ed.setPointerCapture(e.pointerId);ptM=ed.getScreenCTM().inverse();WBS.WBDRG=1;$('texg').style.display='none';e.preventDefault();upd()};
-ed.onpointermove=e=>{if(hdr){const p=pt(e);if(hdr.k=='rot'){let a=Math.atan2(p.y-hdr.cy,p.x-hdr.cx)*180/Math.PI+90;if(e.shiftKey)a=Math.round(a/15)*15;hdr.q.r=+(((a+540)%360)-180).toFixed(1)}else hdResize(hdr,p,e);upd();return}
-if(mq){const dx=e.clientX-mq.x,dy=e.clientY-mq.y;if(!mq.on&&dx*dx+dy*dy<25)return;mq.on=true;let b=$('mqb');if(!b){b=document.createElement('div');b.id='mqb';document.body.appendChild(b)}Object.assign(b.style,{display:'block',left:Math.min(mq.x,e.clientX)+'px',top:Math.min(mq.y,e.clientY)+'px',width:Math.abs(dx)+'px',height:Math.abs(dy)+'px'});return}if(WBS.spDrag){const p=pt(e);if(WBS.spDrag.k=='m'){WBS.split.x=p.x+WBS.spDrag.ox;WBS.split.y=p.y+WBS.spDrag.oy}else{let a=Math.atan2(p.y-WBS.split.y,p.x-WBS.split.x)*180/Math.PI;if(e.shiftKey)a=Math.round(a/15)*15;WBS.split.a=a}WBH.draw();return}
-if(WBS.brush){WBS.gp=pt(e);paintGhost();return}if(!drag)return;const q=WBS.tiles[WBS.cur].items[WBS.sel],p=pt(e),x=p.x+drag.dx,y=p.y+drag.dy;[q.x,q.y]=drag.o?drag.o.i(x,y):[x,y];if(grid.sd)[q.x,q.y]=snapPt(q.x,q.y);const ddx=q.x-drag.px,ddy=q.y-drag.py;drag.st.forEach(([w,ox,oy])=>{w.x=ox+ddx;w.y=oy+ddy});upd()};
-// the selection box picks only the shapes that lie wholly inside it
-ed.onpointerup=ed.onpointercancel=e=>{if(hdr){hdr=null;ptM=null;WBS.WBDRG=0;$('texg').style.display='';store();upd();return}
-if(mq){const m=mq;mq=null;const b=$('mqb');if(b)b.style.display='none';if(m.on&&e.type=='pointerup'){const x0=Math.min(m.x,e.clientX),x1=Math.max(m.x,e.clientX),y0=Math.min(m.y,e.clientY),y1=Math.max(m.y,e.clientY),hit=new Set();ed.querySelectorAll('[data-i]').forEach(n=>{const r=n.getBoundingClientRect();if(r.width&&r.height&&r.left>=x0-1&&r.right<=x1+1&&r.top>=y0-1&&r.bottom<=y1+1)hit.add(+n.dataset.i)});hit.forEach(i=>{if(!WBS.msel.has(i))selToggle(i)});upd()}return}ptM=null;WBS.WBDRG=0;if(!drag)return;const q=WBS.tiles[WBS.cur].items[WBS.sel];[q.x,q.y]=wrapP(q.x,q.y);drag.st.forEach(([w])=>{[w.x,w.y]=wrapP(w.x,w.y)});drag=null;$('texg').style.display='';store();upd()};
 }
-export {Q,drag,eNV,eR,eSeed,eT,ed,edgeDef,edgeDefs,migEdges,pressDefs,raf,renderL,upd,init11};
+export {Q,drag,eNV,eR,eSeed,eT,edgeDef,edgeDefs,migEdges,pressDefs,raf,renderL,upd,init11};

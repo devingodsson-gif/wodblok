@@ -1,6 +1,7 @@
 import {$,WBH,WBS,WBX,mod} from './01-launch-and-version.js';
 import {OFFS,SH,SW,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {it,selOne,store} from './06-motif-library-folders.js';
+import {DOTK} from './05-motif-data.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {symOps} from './07-symmetry.js';
 import {delItems,selSet,selToggle} from './12-selection-and-split.js';
@@ -84,7 +85,7 @@ function sceDraw(){const g=$('stoh');if(!g)return;const t=sceRO();if(!t||!WBS.ms
  if(WBS.split&&WBS.split.i===WBS.sel){const q2=t.items[WBS.split.i];if(q2){const L=52*q2.s*Math.max(q2.sx||1,q2.sy||1)+14,a=WBS.split.a*Math.PI/180,ux=Math.cos(a)*L,uy=Math.sin(a)*L,p1=P(WBS.split.x-ux,WBS.split.y-uy),p2=P(WBS.split.x+ux,WBS.split.y+uy),pc=P(WBS.split.x,WBS.split.y),ln=(c,x)=>`<line class="${c}" ${x} x1="${f(p1[0])}" y1="${f(p1[1])}" x2="${f(p2[0])}" y2="${f(p2[1])}"/>`;
   h+=ln('stsp','')+ln('stsph','data-sp="m"')+`<circle class="steh" data-sp="m" cx="${f(pc[0])}" cy="${f(pc[1])}" r="${f(hs*1.15)}" cursor="move"/><circle class="steh" data-sp="r" cx="${f(p2[0])}" cy="${f(p2[1])}" r="${f(hs*1.4)}" cursor="grab"/>`}}
  g.innerHTML=h}
-function sceKey(e){if(WBS.curView!=='pattern'||WBS.brush&&e.key!=='Delete')return;const tg=e.target;if(tg&&tg.matches&&tg.matches('input,select,textarea,[contenteditable]'))return;const t=sceRO();if(!t||!WBS.msel.size)return;
+function sceKey(e){if(WBS.brush&&e.key!=='Delete')return;const tg=e.target;if(tg&&tg.matches&&tg.matches('input,select,textarea,[contenteditable]'))return;const t=sceRO();if(!t||!WBS.msel.size)return;
  if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();delItems([...WBS.msel]);selOne(-1);store();upd()}else if(e.key=='Escape'){selOne(-1);sceSel()}}
 function init64(){
  STP.after=sceDraw;WBX.wbSceDraw=sceDraw;
@@ -92,4 +93,8 @@ function init64(){
  document.addEventListener('pointermove',sceMove);document.addEventListener('pointerup',sceUp);document.addEventListener('pointercancel',sceUp);
  document.addEventListener('keydown',sceKey);
  try{new ResizeObserver(sceDraw).observe($('art'))}catch(e){}}
-export {SCE,init64,sceItemAt};
+// a shape dragged from the Shapes panel and let go over an instance of the unlocked stamp is put in the stamp at that point
+function sceDropShape(k,e){const t0=stUnlocked();if(t0==null)return false;const c=scePt(e);if(!c)return false;const h=stampAt(c.x,c.y,t0);if(!h)return false;const t=sceOpen();if(!t)return false;
+ const M=stMatrix(STP.items[h.i]),sn=sceSnap(M,h.u,h.v,e),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0,r=+(((( flip?th:-th)+540)%360)-180).toFixed(1),[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));
+ t.items.push(it(k,+x.toFixed(2),+y.toFixed(2),DOTK.has(k)?.22:.8,r));selOne(t.items.length-1);sceFree();store();upd();if(WBX.wbCap)WBX.wbCap();return true}
+export {SCE,init64,sceItemAt,sceDropShape};

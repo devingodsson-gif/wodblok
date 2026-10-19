@@ -1,6 +1,6 @@
 // No visible text is smaller than 11 px, in the panels of either view (UX review C13).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, unlockStamp, settle } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -15,10 +15,10 @@ const small = page => page.evaluate(() => {
   return [...out];
 });
 
-for (const view of ['pattern', 'stamp']) {
+for (const view of ['pattern', 'unlocked stamp']) {
   test(`${view}: every tool panel opens with text of at least 11 px`, async ({ page }) => {
     const { errors } = await openApp(page, { seed: 4 });
-    await setMode(page, view);
+    if (view !== 'pattern') await unlockStamp(page);
     const tools = await page.evaluate(() => [...document.querySelectorAll('.rail [data-pn]')].filter(b => !b.hidden && b.offsetParent).filter(b => !(b.dataset.pn === 'mlist' && document.getElementById('boardS').hidden)).map(b => b.dataset.pn));   // the Shape list is empty in Pattern until a stamp is unlocked
     const bad = [];
     for (const t of tools) { await openPanel(page, t); await settle(page); bad.push(...(await small(page)).map(x => t + ': ' + x)); await page.click(`.rail [data-pn="${t}"]`).catch(() => {}); }

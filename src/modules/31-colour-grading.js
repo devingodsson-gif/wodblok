@@ -67,7 +67,7 @@ return[`<feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0 0 0 0 
 function colP(m,res){const h=m.c,t=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255),w=.03+m.rg/100*.42,tab=c=>{const v=[];for(let i=0;i<=128;i++)v.push(f4(cl01(1-Math.abs(i/128-c)/w)));return v.join(' ')};
 const k=.04+m.sm/100*.96,sv=[];for(let i=0;i<=32;i++)sv.push(f4(sst((i/32-(1-k))/k)));
 return[`<feComponentTransfer in="SourceGraphic" result="${res}d"><feFuncR type="table" tableValues="${tab(t[0])}"/><feFuncG type="table" tableValues="${tab(t[1])}"/><feFuncB type="table" tableValues="${tab(t[2])}"/></feComponentTransfer><feColorMatrix in="${res}d" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 -2" result="${res}s"/><feComponentTransfer in="${res}s" result="${res}"><feFuncA type="table" tableValues="${sv.join(' ')}"/></feComponentTransfer>`,res]}
-const vw=()=>$('boardS').hidden?'pattern':'stamp',inSt=()=>vw()=='stamp'||stUnlocked()!=null;
+const inSt=()=>stUnlocked()!=null;
 const OVC='#ff2d55',GEYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>',GNOEYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 5.7A8.6 8.6 0 0112 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 01-2.9 3.7M6.3 7.6C3.6 9.3 2.5 12 2.5 12S6 18.5 12 18.5c1.5 0 2.8-.3 4-.9"/><path d="M4 4l16 16"/></svg>';
 function maskStep(m,i,cur,ctx){const p='k'+i+ctx.k,ov=ovOf(m);if(!hasA(m.a)&&!ov)return['',cur];
 let o='',aR=cur;if(hasA(m.a)){const r=adjP(m.a,cur,p+'a');o+=r[0];aR=r[1]}
@@ -95,14 +95,7 @@ return flt('wbgl'+u,...gRg(),o)}
 // stamp editor: the current stamp's gradients, then the global grade, then colour/luminance masks
 // (bg=1: the stamp's paper, which stamp gradients leave alone, as in the pattern where they only touch the ink)
 // the editor's grade covers what is on screen (the stamp, its margin and the side areas), not three stamps' width all round
-function edRgn(W,H){const X=-W,Y=-H;let X2=2*W,Y2=2*H;try{const r=(WBS.WBDRG&&WBS._edRR)||(WBS._edRR=document.getElementById('ed').getBoundingClientRect());if(!WBS.WBDRG)WBS._edRR=null;if(r.width>0&&r.height>0){const vw=W+48,vh=H+48,s=Math.min(r.width/vw,r.height/vh),uw=r.width/s,uh=r.height/s,x0=-24-(uw-vw)/2,y0=-24-(uh-vh)/2,m=8;X2=Math.max(W,Math.min(X2,Math.ceil(x0+uw+m)));Y2=Math.max(H,Math.min(Y2,Math.ceil(y0+uh+m)))}}catch(e){}return{W,H,X,Y,RW:X2-X,RH:Y2-Y,k:'e'}}
-function edF(bg,ink){const t=WBS.tiles[WBS.cur];if(!t)return'';const g=geom(shOf(t)),W=g.SW,H=g.SH,ctx=(bg||ink)?{W,H,X:-W,Y:-H,RW:2*W+8,RH:2*H+8,k:'e'}:edRgn(W,H),ms=bg?[]:stMasks(t.id);let o='',c='SourceGraphic';
-if(!bg&&hasA(t.gr)){const r=adjP(t.gr,c,'T');o+=r[0];c=r[1]}
-grd.masks.forEach((m,i)=>{if(!ms.includes(m))return;const r=maskStep(m,i,c,ctx);o+=r[0];c=r[1]});
-if(hasA(grd)){const r=adjP(grd,c,'G');o+=r[0];c=r[1]}
-grd.masks.forEach((m,i)=>{if(!m.on||!WBS.edMk||(m.t!='col'&&m.t!='lum'))return;const r=maskStep(m,i,c,ctx);o+=r[0];c=r[1]});
-return o||bg?flt(bg?'wbgradeEB':ink?'wbgradeEI':'wbgradeE',ctx.X,ctx.Y,ctx.RW,ctx.RH,o):''}
-function gDefs(ov){OVX=ov;let o='';try{if(!gdBypass){const e=edF(0);o+=canvasF('wbgrade',0)+canvasF('wbgradeT',1)+(e?e+edF(1)+edF(0,1):'')}
+function gDefs(ov){OVX=ov;let o='';try{if(!gdBypass){o+=canvasF('wbgrade',0)+canvasF('wbgradeT',1)}
 WBS.tiles.forEach(t=>{if(stF(t.id))o+=stampF(t)});new Set(grd.masks.filter(m=>m.on&&WBS.edMk&&m.t=='lay'&&m.lay).map(m=>m.lay)).forEach(u=>o+=layerF(u))}finally{OVX=true}return o}
 const gKey=()=>JSON.stringify([WBS.tiles.map(t=>stF(t.id)),grd.masks.filter(m=>m.on&&WBS.edMk&&m.t=='lay').map(m=>m.lay)]);
 // structural changes (which stamps / layers carry a mask filter) need a rebuild; slider moves only refresh the filters
@@ -110,7 +103,7 @@ function applyGrade(){if(gKey()!==gBuilt&&typeof upd=='function'){gBuilt=gKey();
 function refreshG(){gBuilt=gKey();const d=gDefs(true),has=id=>d.includes(`id="${id}"`);{const G=$('grdf');if(G._d!==d){G.innerHTML=d;G._d=d}}
 has('wbgrade')?$('dyn').setAttribute('filter','url(#wbgrade)'):$('dyn').removeAttribute('filter');
 has('wbgradeT')?$('texg').setAttribute('filter','url(#wbgradeT)'):$('texg').removeAttribute('filter');
-if(has('wbgrade')&&grd.cov)$('covg').setAttribute('filter','url(#wbgrade)');else $('covg').removeAttribute('filter');$('ed').classList.toggle('graded',has('wbgradeE'));
+if(has('wbgrade')&&grd.cov)$('covg').setAttribute('filter','url(#wbgrade)');else $('covg').removeAttribute('filter');
 document.querySelector('.rail [data-pn="grade"]').classList.toggle('gdon',hasA(grd)||grd.masks.some(m=>m.on&&hasA(m.a)));gmHandles()}
 const gdSave=()=>{try{kv.set('wb41_grade',JSON.stringify(grd))}catch(e){}};
 const gCap=()=>{if(WBX.wbCap)WBX.wbCap()};
@@ -147,9 +140,7 @@ if(m.t=='lin'){const x1=m.x1*W,y1=m.y1*H,x2=m.x2*W,y2=m.y2*H,L=Math.hypot(x2-x1,
 const cx=m.cx*W,cy=m.cy*H,rx=Math.abs(m.rx)*W,ry=Math.abs(m.ry)*H,inr=Math.min(.99,cl01(1-m.fe/100)),el=(a,b,dash)=>`<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(a)}" ry="${f(b)}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="${f(lw*2.2)}"/><ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(a)}" ry="${f(b)}" fill="none" stroke="#fff" stroke-width="${f(lw)}"${dash?` stroke-dasharray="${f(6*k)} ${f(5*k)}"`:''}/>`;
 return`<g pointer-events="none">${el(rx,ry,0)}${el(rx*inr,ry*inr,1)}</g>`+dot(cx+rx,cy,'rx','','ew-resize')+dot(cx-rx,cy,'rx','','ew-resize')+dot(cx,cy+ry,'ry','','ns-resize')+dot(cx,cy-ry,'ry','','ns-resize')+dot(cx,cy,'mv',1)}
 let gmSec;const gmShown=()=>!!(gmSec&&!gmSec.hidden&&gmSec.offsetParent);
-function gmHandles(){gmVis=gmShown();const m=gmCur(),G=$('gmov');if(G){let h='';if(gmVis&&m&&m.on&&isPos(m)&&m.sp!='s'&&vw()=='pattern'){const ctm=$('art').getScreenCTM();h=hSVG(m,CW,CH,ctm&&ctm.a?1/ctm.a:1)}G.innerHTML=h}edH()}
-function edH(){const ed=$('ed');ed.querySelectorAll('.gmh').forEach(x=>x.remove());const m=gmCur(),t=WBS.tiles[WBS.cur];if(!gmVis||!m||!m.on||!isPos(m)||m.sp!='s'||vw()!='stamp'||!t||(m.st&&m.st!=String(t.id)))return;
-const g=geom(shOf(t)),ctm=ed.getScreenCTM();ed.insertAdjacentHTML('beforeend',`<g class="gmh">${hSVG(m,g.SW,g.SH,ctm&&ctm.a?1/ctm.a:1)}</g>`)}
+function gmHandles(){gmVis=gmShown();const m=gmCur(),G=$('gmov');if(G){let h='';if(gmVis&&m&&m.on&&isPos(m)&&m.sp!='s'){const ctm=$('art').getScreenCTM();h=hSVG(m,CW,CH,ctm&&ctm.a?1/ctm.a:1)}G.innerHTML=h}}
 let gmDrag=null,gmRaf=0;
 function gmDown(e,svg,W,H){const h=e.target.closest('[data-gh]');if(!h||e.button!==0)return;const m=gmCur();if(!m)return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
 const P=ev=>{const p=svg.createSVGPoint();p.x=ev.clientX;p.y=ev.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse());return[q.x/W,q.y/H]};gmDrag={m,h:h.dataset.gh,P,p0:P(e),o:{...m},moved:false}}
@@ -162,7 +153,7 @@ GK.forEach(k=>{const r=$('gd_'+k);r.addEventListener('input',e=>{const v=+e.targ
 $('gm_sp').onclick=e=>{const b=e.target.closest('[data-gs]');if(b)gmSet('sp',b.dataset.gs)};
 $('gm_st').onchange=()=>gmSet('st',$('gm_st').value);$('gm_lay').onchange=()=>gmSet('lay',$('gm_lay').value);
 $('gm_col').onchange=()=>gmSet('c',$('gm_col').value);$('gm_cc').addEventListener('input',()=>{const m=gmCur();if(!m)return;m.c=$('gm_cc').value;gdSave();applyGrade()});$('gm_cc').addEventListener('change',()=>{renderGM();gCap()});
-$('gm_eye').onclick=()=>{if(gmPick){gmPickEnd();return}if(vw()!='pattern'){const vb=document.querySelector('button[data-v="pattern"]');if(vb)vb.click()}
+$('gm_eye').onclick=()=>{if(gmPick){gmPickEnd();return}
 const c=$('art').cloneNode(true);WBX.wbVec(c);['#texg','#covg','#guig','#gmov','#fpov'].forEach(q=>{const e=c.querySelector(q);if(e)e.remove()});c.querySelector('#dyn').removeAttribute('filter');c.querySelector('#grdf').innerHTML=gDefs(false);c.setAttribute('width',CW);c.setAttribute('height',CH);
 const W=Math.round(CW),H=Math.round(CH),img=new Image();gmPick={d:null,W,H};$('art').classList.add('gmpick');$('gm_eye').setAttribute('aria-pressed','true');$('gm_hint').textContent='Click the print to pick the colour to mask. Esc cancels.';
 img.onload=()=>{if(!gmPick)return;try{const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');x.drawImage(img,0,0,W,H);gmPick.d=x.getImageData(0,0,W,H).data}catch(e){gmPickEnd()}};img.onerror=gmPickEnd;
@@ -190,16 +181,14 @@ b.addEventListener('pointerdown',dn);['pointerup','pointerleave','pointercancel'
 document.addEventListener('keydown',e=>{if(e.key.toLowerCase()!='o'||e.ctrlKey||e.metaKey||e.altKey||!gmCur()||!gmVis)return;const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)&&t.type!='range'&&t.type!='checkbox'))return;e.preventDefault();gmOv=!gmOv;$('gm_ov').checked=gmOv;refreshG()});
 gmSec=document.querySelector('section.pn[data-p="grade"]');
 try{new IntersectionObserver(()=>gmHandles()).observe(gmSec)}catch(e){}
-document.querySelectorAll('button[data-v]').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>{if(gmSel>=0&&!gmVisM(grd.masks[gmSel]))gmSel=-1;gdLast=vw()+'|'+WBS.cur+'|'+gmSel;gradeSync();gmHandles()},40)));
 try{new ResizeObserver(()=>{if(gmCur())gmHandles()}).observe($('art'))}catch(e){}
 $('art').addEventListener('pointerdown',e=>{if(e.target.closest('#gmov'))gmDown(e,$('art'),CW,CH)},true);
-$('ed').addEventListener('pointerdown',e=>{if(!e.target.closest('.gmh'))return;const g=geom(shOf(WBS.tiles[WBS.cur]));gmDown(e,$('ed'),g.SW,g.SH)},true);
 window.addEventListener('pointermove',e=>{if(!gmDrag)return;const{m,h,o,p0}=gmDrag,[x,y]=gmDrag.P(e),dx=x-p0[0],dy=y-p0[1],c=v=>Math.max(-1,Math.min(2,v));gmDrag.moved=true;
 if(m.t=='lin'){if(h=='p1'||h=='mv'){m.x1=c(o.x1+dx);m.y1=c(o.y1+dy)}if(h=='p2'||h=='mv'){m.x2=c(o.x2+dx);m.y2=c(o.y2+dy)}}
 else{if(h=='mv'){m.cx=c(o.cx+dx);m.cy=c(o.cy+dy)}else if(h=='rx')m.rx=Math.max(.01,Math.min(3,Math.abs(x-m.cx)));else if(h=='ry')m.ry=Math.max(.01,Math.min(3,Math.abs(y-m.cy)))}
 if(!gmRaf)gmRaf=requestAnimationFrame(()=>{gmRaf=0;refreshG()})});window.addEventListener('pointerup',gmUp);window.addEventListener('pointercancel',gmUp);
 WBX.wbGrade={get:()=>JSON.parse(JSON.stringify(grd)),set:o=>{grd=gFix(o);if(gmSel>=grd.masks.length)gmSel=grd.masks.length-1;gdSave();gradeSync();applyGrade()},
-sync:()=>gradeSync(),defs:ov=>gDefs(!!ov),stF,layF,refresh:()=>{refreshG();const k=vw()+'|'+stUnlocked()+'|'+WBS.cur+'|'+gmSel;if(gmCur()||k!==gdLast){gdLast=k;gradeSync()}},edH:()=>edH()};
+sync:()=>gradeSync(),defs:ov=>gDefs(!!ov),stF,layF,refresh:()=>{refreshG();const k=stUnlocked()+'|'+WBS.cur+'|'+gmSel;if(gmCur()||k!==gdLast){gdLast=k;gradeSync()}}};
 gradeSync();applyGrade();
 }
 export {init31};

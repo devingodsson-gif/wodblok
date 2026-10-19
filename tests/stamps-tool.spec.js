@@ -2,14 +2,13 @@
 // panel), several stamps can be picked for the arrangement, each stamp has a lock in the stamp list (one unlocked at a time, never saved,
 // ends when another layer is selected), and a point on the canvas can be mapped into the stamp printed under it.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle, getState } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 const st = async page => JSON.parse(await getState(page));
 const outlines = (page, cls = '') => page.locator('#stol path' + cls).count();
-// New stamp opens the Stamp editor, so go back to the Pattern view
-const addStamp = async page => { await page.click('#addT'); await settle(page); await setMode(page, 'pattern'); };
+const addStamp = async page => { await page.click('#addT'); await settle(page); };
 const addLayer = async page => { await openPanel(page, 'lyrs'); await page.click('#ly_add'); await settle(page); };
 
 test('the Stamps panel is on the rail and lists every stamp, with the layers it is used on', async ({ page }) => {

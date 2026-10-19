@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, TARGET, openApp, openProjectFile, getState, stateText, checkpoint, settle, setMode } = require('./helpers/harness');
+const { ROOT, TARGET, openApp, openProjectFile, getState, stateText, checkpoint, settle } = require('./helpers/harness');
 
 const DIR = path.join(ROOT, 'tests', 'fixtures');
 const FIXTURES = fs.readdirSync(DIR).filter(f => f.endsWith('.wodblok.json')).sort();

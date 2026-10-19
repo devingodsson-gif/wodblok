@@ -1,7 +1,7 @@
 // One spelling (UX review P1): British, as the colour names and the print proof already are. No panel, button, title or label says "color" or "center".
 // (The title of Wada's book, "Dictionary of Color Combinations", is a title and stays as printed.)
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, setMode } = require('./helpers/harness');
+const { TARGET, openApp, unlockStamp } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'the v100 file is American by design'); });
 
@@ -22,11 +22,11 @@ async function visibleWords(page) {
   });
 }
 
-test('no American spelling in the panels of either view', async ({ page }) => {
+test('no American spelling in the panels, also with a stamp unlocked', async ({ page }) => {
   const { errors } = await openApp(page);
   const bad = new Set();
-  for (const mode of ['pattern', 'stamp']) {
-    await setMode(page, mode);
+  for (const mode of ['pattern', 'unlocked stamp']) {
+    if (mode !== 'pattern') await unlockStamp(page);
     const tools = await page.locator('.rail [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn).filter(p => !(p === 'mlist' && document.getElementById('boardS').hidden)));   // the Shape list is empty in Pattern until a stamp is unlocked
     for (const pn of tools) {
       await page.click('#rcls');

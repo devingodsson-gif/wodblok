@@ -1,6 +1,6 @@
 // Workspaces (Phase 5): save the arrangement of the tools under a name, set it again with one click.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode } = require('./helpers/harness');
+const { TARGET, openApp, openPanel } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 

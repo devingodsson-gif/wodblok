@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { openApp, openPanel, settle, getState, setMode, openProjectFile } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, openProjectFile } = require('./helpers/harness');
 
 const pick = (page, v) => page.click(`#lmode [data-m="${v}"]`);
 const outline = (page, panel) => page.evaluate(p => {

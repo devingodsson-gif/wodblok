@@ -27,7 +27,7 @@ function stOlBegin(){const L=stSel();STP.on=!!L&&!!L.vis&&!L.free&&!(L.fr&&L.fr.
 function stOlPath(id,d){STP.p[id]={d,p2:null}}
 function stOlAdd(id,tr,rot,w,h){if(!STP.on)return;const m=STTRRE.exec(tr);if(!m)return;STP.rot=rot||0;STP.items.push([id,+m[1],+m[2],+m[3],+m[4],+m[5],w,h])}
 // The Text panel builds letters in the stamp (the Stamp editor's way) while a stamp is unlocked, and fills a Text layer otherwise
-const stTxMode=()=>WBS.curView!='pattern'||stUnlocked()!=null;
+const stTxMode=()=>stUnlocked()!=null;
 function stTextSync(){if(!WBX.wbTxMode)return;const m=stTxMode();if(STP.txm===m)return;STP.txm=m;WBX.wbTxMode(m?'stamp':'pattern')}
 function stOlEnd(){stOlPaint();stPanel();stTextSync()}
 function stOlFit(){const a=$('art'),v=$('stolsvg');if(!a||!v)return;v.style.width=a.style.width;v.style.height=a.style.height;const vb=a.getAttribute('viewBox');if(vb)v.setAttribute('viewBox',vb)}

@@ -5,13 +5,11 @@ import {DRT,NODRAFT,drOff} from './02-draft-mode-speedups.js';
 import {CASP,CH,CSN,CW,SH,SHN,SW,bk,closeDD,csk,placeFloat,rowMenu,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {trayIn} from './50-tray-core.js';
 import {selOne,store} from './06-motif-library-folders.js';
-import {nr,symOf,tbSync} from './07-symmetry.js';
-import {gModel,gShOk} from './08-grid-shapes.js';
-import {gDim,grid,saveGrid,snapPt,snapSize} from './09-stamp-editor-grid-and-motif-ops.js';
+import {nr,symOf} from './07-symmetry.js';
 import {fitTs,migLayers} from './10-layer-grids.js';
 import {Q,drag,upd} from './11-pressure-flooding-block-edges.js';
 import {QS,doSplit,selSet} from './12-selection-and-split.js';
-import {paintGhost,sync} from './13-preview-and-stamp-tool.js';
+import {sync} from './13-preview-and-stamp-tool.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
 import {savePr} from './15-print-effects-and-stamp-texture.js';
 import {txClean} from './16-texture-generators.js';
@@ -25,23 +23,23 @@ import {stUnlocked} from './63-stamp-tool.js';
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
 const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shapes',sedit:'Element editor',layers:'Layout',cover:'Book cover'};
-let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
+let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shapes',mlist:'Shape list',sedit:'Element editor',preview:'Pattern preview',grid:'Grid',layers:'Layout',stmp:'Stamps',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
-const MODEP={pattern:['lyrs','layers','stmp','stamp','motifs','mlist','sedit','text','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec','pres','vars'],stamp:['wspc','pres','motifs','text','mlist','sedit','preview','grid','stamp','colors','cways','grade','tex','rand','hist','slib']};
+const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shapes',mlist:'Shape list',sedit:'Element editor',layers:'Layout',stmp:'Stamps',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
+const MODEP={pattern:['lyrs','layers','stmp','stamp','motifs','mlist','sedit','text','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec','pres','vars']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
-const wsDef=m=>m=='pattern'?{dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]}:{dock:[wsG(['motifs']),wsG(['stamp','colors','grade','tex','rand'])],float:[wsG(['mlist'],{x:null,y:null,w:230,h:440}),wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}),wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'})]};
-let WS={pattern:wsDef('pattern'),stamp:wsDef('stamp')};
+const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]});
+let WS={pattern:wsDef()};
 try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}})}catch(e){}
 try{const sv0=JSON.parse(kv.get('wb30_ws')||'null');if(sv0&&!sv0.ly&&!WS.pattern.dock.concat(WS.pattern.float).some(g=>g.tabs.includes('lyrs')))WS.pattern.dock.unshift(wsG(['lyrs'],{f:.85}))}catch(e){}
 try{const sv2=JSON.parse(kv.get('wb30_ws')||'null');if(sv2&&!sv2.tx)['pattern'].forEach(m=>{if(!WS[m].dock.concat(WS[m].float).some(g=>g.tabs.includes('tex'))){const g=WS[m].dock.find(g=>g.tabs.includes('grade'))||WS[m].dock[0];if(g)g.tabs.push('tex');else WS[m].dock.push(wsG(['tex']))}})}catch(e){}
 WS.pv=1;WS.gr=1;WS.ly=1;WS.rs=1;WS.tx=1;
-const wsSave=()=>{try{const {stamp,...rest}=WS;kv.set('wb30_ws',JSON.stringify(rest))}catch(e){}};
-const wsL=()=>WS[view]||WS.pattern;
+const wsSave=()=>{try{kv.set('wb30_ws',JSON.stringify(WS))}catch(e){}};
+const wsL=()=>WS.pattern;
 const wsAll=()=>[...wsL().dock,...wsL().float];
 const wsFind=p=>wsAll().find(g=>g.tabs.includes(p))||null;
 const wsGroup=id=>wsAll().find(g=>g.id==id)||null;
@@ -98,7 +96,7 @@ document.querySelectorAll('section.pn').forEach(sc=>wsStash.appendChild(sc));wsF
 gs.forEach((g,i)=>{if(i){const sp=document.createElement('div');sp.className='wsp';sp.dataset.i=i;box.appendChild(sp)}box.appendChild(wsEl(g,false))});
 dk.hidden=!gs.length;if(nar){dk.style.width='';dk.style.height=''}else if(gs.length){const ac=gs.every(g=>g.col);if(k=='l'||k=='r')dk.style.width=(ac?Math.min(200,wsClampSz(k,wsSz(k))):wsClampSz(k,wsSz(k)))+'px';else dk.style.height=(ac?34:wsClampSz(k,wsSz(k)))+'px'}});
 if(!nar)L.float.forEach(g=>wsFl.appendChild(wsEl(g,true)));
-document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=wsFind(p);b.hidden=!MODEP[view].includes(p)||RO.off.includes(p);const fr=!!g&&g.a==p&&!g.col;b.classList.toggle('on',fr);b.classList.toggle('op',!!g&&!fr);b.title=fr?'':(g?'Open in a tab. Click to bring it to the front':'')});
+document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=wsFind(p);b.hidden=!MODEP.pattern.includes(p)||RO.off.includes(p);const fr=!!g&&g.a==p&&!g.col;b.classList.toggle('on',fr);b.classList.toggle('op',!!g&&!fr);b.title=fr?'':(g?'Open in a tab. Click to bring it to the front':'')});
 wsTabFit();nums();if(railHook)railHook();if(WBX.wbRcls)WBX.wbRcls()}
 // a panel with more tabs than fit: the chosen tab is scrolled into view and the edge that hides more tabs fades
 function wsTabEdge(t){const h=t.parentElement;h.classList.toggle('ovr',t.scrollLeft+t.clientWidth<t.scrollWidth-1);h.classList.toggle('ovl',t.scrollLeft>1)}
@@ -170,10 +168,8 @@ const stage=document.querySelector('.stage');
 // the stamp tray can collapse to a thin strip, to give a small window more room for the picture; the choice is remembered
 {const f=stage.querySelector('.film'),b=$('filmt');if(f&&b){const ap=(m,save)=>{f.classList.toggle('min',m);b.setAttribute('aria-expanded',String(!m));b.setAttribute('aria-label',m?'Show stamp tray':'Hide stamp tray');b.title=b.getAttribute('aria-label');stage.style.setProperty('--film-h',f.offsetHeight+'px');if(save){try{kv.set('wb_film_min',m?'1':'0')}catch(e){}}};
  let m0=false;try{m0=kv.get('wb_film_min')==='1'}catch(e){}b.onclick=()=>ap(!f.classList.contains('min'),true);ap(m0,false);try{new ResizeObserver(()=>stage.style.setProperty('--film-h',f.offsetHeight+'px')).observe(f)}catch(e){}}}
-function setView(v){if(v=='stamp'&&!WBX.wbAllowStamp)v='pattern';const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
-$('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display='';$('gtb').style.display=v=='stamp'?'':'none';if(v=='pattern')requestAnimationFrame(applyZ);else applyZE();tbSync();if(WBX.wbTxMode)WBX.wbTxMode(v=='pattern'&&stUnlocked()==null?'pattern':'stamp');if(was!=v||!wsReady)wsRender()}
-WBX.wbSetView=setView;
-function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
+function setView(){if(window.bkZ)requestAnimationFrame(()=>bkZ());$('boardP').classList.remove('off');stage.classList.add('pv');$('zoomc').style.display='';requestAnimationFrame(applyZ);if(WBX.wbTxMode)WBX.wbTxMode(stUnlocked()==null?'pattern':'stamp');wsRender()}
+function setPanel(p){if(!PNAME[p])p='canvas';if(!wsReady)setView();
 const L=wsL();let g=wsFind(p);
 // a tool that is not open yet opens docked on the right: Randomize beside the colour tools, anything else as a tab in the first group
 if(!g&&p=='sedit'){g=wsG([p],{e:'b'});L.dock.push(g)}   // the Shape editor opens docked along the bottom
@@ -202,8 +198,8 @@ setPanel(p)};
 // tool bar editing: the three-line button lists the tools that are off the bar; while it is open each tool on the bar shows an X to take it off; tools drag to a new place
 {const more=$('rmore'),menu=$('rmenu');let ed=false,drag=null,jus=0;
 const xsvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
-const vis=()=>railBtns().filter(b=>!MODEP[view].includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)?false:true);
-function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP[view].includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn));
+const vis=()=>railBtns().filter(b=>!MODEP.pattern.includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)?false:true);
+function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP.pattern.includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn));
 {const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML+'<span class="tip">'+b.getAttribute('aria-label')+'</span>';if(wsFind(b.dataset.pn))m.classList.add('on');g.appendChild(m)});menu.append(g)}
 menu.hidden=!ed;if(!menu.hidden){const w=railEl.getBoundingClientRect(),row=w.width>w.height;menu.style.left=(row?w.left:w.left-52)+'px';menu.style.top=(row?w.bottom:w.top)+'px';menu.style.width=w.width+'px';menu.style.height=w.height+'px';menu.style.bottom=''}}
 function edit(on){ed=on;document.body.classList.toggle('rtray',on);more.classList.toggle('on',on);more.setAttribute('aria-expanded',String(on));fill()}
@@ -299,16 +295,11 @@ function fitZ(){const b=$('boardP');if(b.classList.contains('off'))return;const 
 function applyZ(){fitZ();const s=z||fitS;$('art').style.width=Math.round(CW*s)+'px';$('art').style.height=Math.round(CH*s)+'px';$('artsh').style.width=$('art').style.width;$('artsh').style.height=$('art').style.height;$('zl').textContent=Math.round(s*100)+'%';$('zl').title=z?'Fit to screen':'Fitted to screen';if(window.bkZ)bkZ();if(WBX.wbZoomed)WBX.wbZoomed()}
 function zoomAt(ns,cx,cy){const b=$('boardP'),a=$('art'),r0=a.getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);z=Math.min(8,Math.max(.1,ns));applyZ();const r1=a.getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
 const zoomMid=f=>{const r=$('boardP').getBoundingClientRect();zoomAt((z||fitS)*f,r.left+r.width/2,r.top+r.height/2)};
-WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbZoomTo=s=>{const r=$('boardP').getBoundingClientRect();zoomAt(s,r.left+r.width/2,r.top+r.height/2)};WBX.wbZoomNow=()=>z||fitS;WBX.wbZoomIn=()=>view=='pattern'&&!!z&&z>fitS*1.001;
+WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbZoomTo=s=>{const r=$('boardP').getBoundingClientRect();zoomAt(s,r.left+r.width/2,r.top+r.height/2)};WBX.wbZoomNow=()=>z||fitS;WBX.wbZoomIn=()=>!!z&&z>fitS*1.001;
 // ---- zoom in the Stamp editor: at Fit the editor is the size of its box; zooming makes it larger inside a scrolling box (1x to 8x)
-let zE=1;const edBox=()=>$('boardS').firstElementChild;
-function applyZE(){const e=$('ed'),big=zE>1;e.style.flex=big?'none':'';e.style.width=big?(zE*100)+'%':'';e.style.height=big?(zE*100)+'%':'';edBox().style.overflow=big?'auto':'';$('zl').textContent=big?Math.round(zE*100)+'%':'Fit';$('zl').title=big?'Fit to screen':'Fitted to screen'}
-function zoomE(ns,cx,cy){const b=edBox(),r0=$('ed').getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);zE=Math.min(8,Math.max(1,ns));applyZE();const r1=$('ed').getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
-const zoomMidE=f=>{const r=edBox().getBoundingClientRect();zoomE(zE*f,r.left+r.width/2,r.top+r.height/2)};
-$('boardS').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomE(zE*(e.deltaY<0?1.1:1/1.1),e.clientX,e.clientY)},{passive:false});
-$('zi').onclick=()=>view=='stamp'?zoomMidE(1.25):zoomMid(1.25);$('zo').onclick=()=>view=='stamp'?zoomMidE(1/1.25):zoomMid(1/1.25);$('zl').onclick=()=>{if(view=='stamp'){zE=1;applyZE();edBox().scrollLeft=0;edBox().scrollTop=0}else{z=0;applyZ()}};
+$('zi').onclick=()=>zoomMid(1.25);$('zo').onclick=()=>zoomMid(1/1.25);$('zl').onclick=()=>{z=0;applyZ()};
 $('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomAt((z||fitS)*(e.deltaY<0?1.1:1/1.1),e.clientX,e.clientY)},{passive:false});
-try{new ResizeObserver(()=>{if(view=='pattern')applyZ()}).observe($('boardP'))}catch(e){window.addEventListener('resize',applyZ)}
+try{new ResizeObserver(()=>applyZ()).observe($('boardP'))}catch(e){window.addEventListener('resize',applyZ)}
 new MutationObserver(()=>applyZ()).observe($('art'),{attributes:true,attributeFilter:['viewBox']});
 
 // ---- slider rows with editable number fields
@@ -371,7 +362,7 @@ const navDirty=()=>{if(WBX.wbNavDirty)WBX.wbNavDirty();if(WBX.wbVarDirty)WBX.wbV
 let thT=0,thWant=null;
 function thRun(){if(drag||WBS.WBDRG||WBX.wbHoldOn||WBX.wbRollHold||(WBX.wbTxBusy||0)>0||document.body.classList.contains('babusy')){thT=setTimeout(thRun,800);return}
  const s=thWant;if(!s||s!==coreStr())return;thWant=null;thumb(120).then(u=>{const i=hist.lastIndexOf(s);if(u&&i>=0){histTh[i]=u;if(WBX.wbHistPaint)WBX.wbHistPaint()}})}
-function cap(){if(drag||WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));if((view=='stamp'||stUnlocked()!=null)&&!named&&/^Added shape/.test(histL[histL.length-1])&&seAuto()&&!wsFind('sedit'))setPanel('sedit');if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
+function cap(){if(drag||WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));if(stUnlocked()!=null&&!named&&/^Added shape/.test(histL[histL.length-1])&&seAuto()&&!wsFind('sedit'))setPanel('sedit');if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
 function applyCore(c){trayIn(c);WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
 WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
@@ -421,19 +412,13 @@ document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.mat
 if(m&&k=='z'){if(typing&&(t.type=='text'||t.type=='number'))return;e.preventDefault();e.shiftKey?redo():undo()}
 else if(m&&k=='y'){e.preventDefault();redo()}
 else if(m&&k=='s'){e.preventDefault();cmdGet('file.save').run()}
-else if(m&&k=='a'&&!typing&&view=='stamp'&&WBS.tiles[WBS.cur].items.length){e.preventDefault();selSet(WBS.tiles[WBS.cur].items.map((_,i)=>i));upd()}
 else if(m&&k=='d'&&!typing&&q){e.preventDefault();cmdGet('stamp.duplicateMotif').run()}
-else if(!typing&&(e.key=='Delete'||e.key=='Backspace')&&q&&view=='stamp'){e.preventDefault();cmdGet('stamp.deleteMotif').run()}
 else if(!typing&&WBS.split&&e.key=='Enter'){e.preventDefault();doSplit()}
 else if(!typing&&WBS.split&&e.key=='Escape'){WBS.split=null;WBH.draw()}
-else if(!typing&&!e.ctrlKey&&!e.metaKey&&e.key.toLowerCase()=='s'&&view=='stamp'&&Q()){e.preventDefault();cmdGet('stamp.split').run()}
-else if(!typing&&WBS.brush&&!WBS.brush.txt&&(e.key=='['||e.key==']')){e.preventDefault();WBS.brush.r=((WBS.brush.r+(e.key==']'?15:-15)+540)%360)-180;paintGhost()}
+else if(!typing&&WBS.brush&&!WBS.brush.txt&&(e.key=='['||e.key==']')){e.preventDefault();WBS.brush.r=((WBS.brush.r+(e.key==']'?15:-15)+540)%360)-180}
 else if(e.key=='Escape'&&WBS.brush&&!typing){WBS.brush=null;WBS.txg=null;upd()}
 else if(e.key=='Escape'){closeMenus();if(!$('plist').hidden)closeDlg();else if(WBS.sel>=0){selOne(-1);upd()}}
-else if(!typing&&!m&&q&&view=='stamp'&&e.key.startsWith('Arrow')){e.preventDefault();const d=e.shiftKey?10:1,dx=e.key=='ArrowLeft'?-d:e.key=='ArrowRight'?d:0,dy=e.key=='ArrowUp'?-d:e.key=='ArrowDown'?d:0;QS().forEach(o=>{o.x+=dx;o.y+=dy;[o.x,o.y]=wrapP(o.x,o.y)});store();upd()}
-else if(!typing&&!m&&k=='k'&&q&&view=='stamp'){e.preventDefault();cmdGet('stamp.knockout').run()}
-else if(!typing&&!m&&k=='p'){setView('pattern')}
-else if(!typing&&!m&&k=='0'&&view=='pattern'){z=0;applyZ()}});
+else if(!typing&&!m&&k=='0'){z=0;applyZ()}});
 
 document.querySelectorAll('label[role=button]').forEach(l=>l.addEventListener('keydown',e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();l.click()}}));
 // ---- double-click (or double-tap) a slider or its label to reset it to its default (double-click the number box instead to type a value)
@@ -444,22 +429,7 @@ document.addEventListener('dblclick',e=>{const r=rowRange(e.target);if(r&&resetR
 let lastTap={r:null,t:0};document.addEventListener('pointerup',e=>{if(e.pointerType!='touch')return;const r=rowRange(e.target);if(!r)return;const now=Date.now();if(lastTap.r===r&&now-lastTap.t<320){resetRange(r);lastTap={r:null,t:0}}else lastTap={r,t:now}});
 const rs=document.createElement('style');rs.textContent='.ctl.rst{animation:rstf .5s ease-out}@keyframes rstf{0%{background:var(--acc-soft)}100%{background:transparent}}.ctl{border-radius:var(--r-m)}.ctl label{cursor:default}';document.head.appendChild(rs);
 const tipRows=()=>document.querySelectorAll('.ctl').forEach(row=>{const r=row.querySelector('input[type=range]');if(r&&!row.title)row.title='Double-click to reset'});
-function syncGrid(){$('gtg').classList.toggle('on',grid.on);$('gtg').setAttribute('aria-pressed',String(grid.on));$('gon').checked=grid.on;$('gsd').checked=grid.sd;$('gss').checked=!!grid.ss;if(+$('gn').value!=grid.n)$('gn').value=grid.n;if(+$('gop').value!=(grid.op||70)){$('gop').value=grid.op||70;paint($('gop'))}document.querySelectorAll('#gsp [data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g==grid.sp));document.querySelectorAll('#gsh [data-sh]').forEach(b=>b.classList.toggle('on',b.dataset.sh==(grid.sh||'rect')));const[n,m0]=gDim(),m=grid.sh&&grid.sh!='rect'?gModel(grid.sh,SW,SH,n,true).m:m0;$('gdim').textContent=`${n} × ${m}`;paint($('gn'));$('gq').disabled=!WBS.tiles[WBS.cur].items.length}
-$('gsh').onclick=e=>{const b=e.target.closest('[data-sh]');if(!b)return;grid.sh=gShOk(b.dataset.sh);grid.on=true;saveGrid();upd()};
-$('gon').addEventListener('input',()=>{grid.on=$('gon').checked;saveGrid();upd()});
-$('gn').addEventListener('input',()=>{grid.n=+$('gn').value;grid.on=true;saveGrid();upd()});
-$('gsp').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;grid.sp=b.dataset.g=='c'||b.dataset.g=='b'?b.dataset.g:'l';grid.on=true;saveGrid();upd()};
-$('gsd').addEventListener('input',()=>{grid.sd=$('gsd').checked;if(grid.sd)grid.on=true;saveGrid();upd()});
-$('gss').addEventListener('input',()=>{grid.ss=$('gss').checked;if(grid.ss){grid.sd=true;grid.on=true}saveGrid();upd()});
-$('gop').addEventListener('input',()=>{grid.op=+$('gop').value;saveGrid();upd()});
-$('gr').onclick=()=>{const k={on:grid.on,sd:grid.sd,ss:grid.ss};Object.assign(grid,{n:6,sp:'c',op:70,sh:'rect'},k);saveGrid();upd()};
-$('gq').onclick=()=>{const t=WBS.tiles[WBS.cur];if(!t.items.length)return;let moved=0;t.items.forEach(q=>{const[x,y]=snapPt(q.x,q.y);let ch=Math.abs(x-q.x)>.01||Math.abs(y-q.y)>.01;q.x=x;q.y=y;if(grid.ss){const s=snapSize(q,q.s);if(s!==q.s){q.s=s;ch=true}}if(ch)moved++});grid.on=true;saveGrid();store();upd();$('pmsg').textContent=moved?`Snapped ${moved} shape${moved>1?'s':''} to the grid.`:'Every shape is already on the grid.'};
-$('gtg').onclick=()=>{grid.on=!grid.on;saveGrid();upd()};$('gtq').onclick=()=>$('gq').click();
-$('gti').onclick=()=>{WBS.edInk=!WBS.edInk;tbSync();upd()};
-$('gtx').onclick=()=>{WBS.edTx=!WBS.edTx;tbSync();upd()};
-$('gtm').onclick=()=>{WBS.edMk=!WBS.edMk;$('gtm').classList.toggle('on',WBS.edMk);$('gtm').setAttribute('aria-pressed',String(WBS.edMk));upd()};
-document.addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input,select,textarea'))return;if(!e.metaKey&&!e.ctrlKey&&e.key.toLowerCase()=='g'){if($('boardS').hidden){WBS.pgrid.show=!WBS.pgrid.show;upd();if(WBX.wbCap)WBX.wbCap()}else{grid.on=!grid.on;saveGrid();upd()}}});
-const _draw2=WBH.draw;WBH.draw=function(){_draw2();syncGrid()};
+document.addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input,select,textarea'))return;if(!e.metaKey&&!e.ctrlKey&&e.key.toLowerCase()=='g'){WBS.pgrid.show=!WBS.pgrid.show;upd();if(WBX.wbCap)WBX.wbCap()}});
 // ---- randomize motifs on the current stamp
 try{const z=JSON.parse(kv.get('wb36_rz')||'null');if(z){$('rzp').value=z.p;$('rzr').value=z.r;$('rzs').value=z.s}}catch(e){}
 ['rzp','rzr','rzs'].forEach(id=>$(id).addEventListener('input',()=>{try{kv.set('wb36_rz',JSON.stringify({p:+$('rzp').value,r:+$('rzr').value,s:+$('rzs').value}))}catch(e){}}));
@@ -536,7 +506,7 @@ f.innerHTML=`<label>Fit to frame</label><div class="seg" id="tsfit">`+
 row.after(f);
 f.onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const L=LY();L.fit=b.dataset.f;if(L.fit)L.size=+fitTs(L).toFixed(3);store();upd();sync();nums()};
 r.oninput=()=>{const L=LY();L.size=L.fit?+fitTs(L,+r.value).toFixed(3):+r.value;if(L.fit){r.value=L.size;paint(r)}store();upd()}}
-tipRows();WS.stamp={dock:[],float:[]};WS.pattern={dock:[],float:[]};setView('pattern');info();nums();requestAnimationFrame(()=>{applyZ();nums()});
+tipRows();WS.pattern={dock:[],float:[]};setView();info();nums();requestAnimationFrame(()=>{applyZ();nums()});
 
 {const sp=document.getElementById('splash'),t0=performance.now();if(sp){const go=()=>{const w=Math.max(0,520-(performance.now()-t0));setTimeout(()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),320)},w)};const f=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1400))]):Promise.resolve();requestAnimationFrame(()=>requestAnimationFrame(()=>f.then(go)))}}
 {const b=$('gdt');let on=true;try{on=kv.get('wb93_dots')!=='0'}catch(e){}const ap=()=>{document.body.classList.toggle('plain',!on);b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))};ap();b.onclick=()=>{on=!on;try{kv.set('wb93_dots',on?'1':'0')}catch(e){}ap()}}
