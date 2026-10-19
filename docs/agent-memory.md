@@ -57,7 +57,7 @@ The owner's decisions are in `docs/layer-update-plan.md`: no layer types, one co
 - A new feature branch needs `git config --add remote.origin.fetch '+refs/heads/<branch>:refs/remotes/origin/<branch>'` and a fetch, or the stop hook says the branch has unpushed commits even when it is pushed.
 - Setup in a fresh container: `npm ci --ignore-scripts`, then `npm run build`; Chromium is preinstalled. Run tests with `WB_TARGET=build WB_PIXELS=0 npx playwright test <files> --project=chromium --reporter=list`.
 
-**Known failures that are not the layer update's.** `scenarios` "randomize with seed 1" (a letter's y 120 vs 120.038; pending snapshot approval, differs locally on `main` too) and `templates` "no id appears twice" (`tx_sc` used twice since 1.43.0; in known-issues.md). Everything else in the areas tested so far passed.
+**Known failures that are not the layer update's.** `scenarios` "randomize with seed 1" (a letter's y 120 vs 120.038; approved and updated Oct 19 2026) and `templates` "no id appears twice" (`tx_sc` used twice since 1.43.0; in known-issues.md). Everything else in the areas tested so far passed.
 
 **Open questions for step 4 (the Stamp tool) to put to the owner before building.** How an outline looks (proposed: unlocked in the accent colour with an open-lock icon, locked plain and dim); where the opacity slider lives; one unlocked stamp at a time (proposed) or several; whether the lock icon sits on the canvas outline, in the stamp list, or both (plan says both); how a stamp is chosen for the arrangement (several at once, as the Stamp strip does now).
 
