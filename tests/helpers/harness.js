@@ -198,4 +198,20 @@ async function putText(page, { select = true } = {}) {
     await page.keyboard.press('Control+a'); await settle(page, { max: 30000 });   // everything on the stamp is the text, so it is selected as one text
   }
 }
-module.exports = { motifPoint, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, setMode, checkpoint, putText };
+// Canvas flow (layer update step 11): the Stamp editor is gone, so a test that edits a stamp unlocks it in the Stamps panel and works on the Pattern canvas.
+const showPanel = async (page, id) => { if (await page.locator(`section.pn[data-p="${id}"]:not([hidden])`).count() === 0) await openPanel(page, id); };
+// unlock a stamp (the first in the list by default) so shapes, text and pictures placed on the canvas go into it
+const unlockStamp = async (page, n = 0) => { await showPanel(page, 'stmp'); const b = page.locator('#stmpl .smklk').nth(n); if ((await b.getAttribute('aria-pressed')) !== 'true') await b.click(); await settle(page); };
+// pick the first library shape as the brush (opens the first folder if none is open)
+const pickShape = async page => { await showPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
+// canvas units (the artwork's viewBox) to client pixels
+const canvasToClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height, k: r.width / vb.width }; }, [x, y]);
+// the middle of a printed instance of the stamp, clear of the edges of the canvas: { i, cx, cy } in canvas units
+const stampInstance = async page => {
+  const c = await page.evaluate(() => { const vb = document.getElementById('art').viewBox.baseVal;
+    for (let i = 0; i < 400; i++) { const p = __wbTest.stampToCanvas(i, 120, 120); if (!p) break; if (p.x > 90 && p.x < vb.width - 90 && p.y > 90 && p.y < vb.height - 90) return { i, ...p }; } return null; });
+  return { i: c.i, cx: c.x, cy: c.y };
+};
+// press and release on the canvas at a point of an instance (offset in canvas units)
+const clickStamp = async (page, p, dx = 0, dy = 0) => { const c = await canvasToClient(page, p.cx + dx, p.cy + dy); await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.up(); await settle(page); };
+module.exports = { motifPoint, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, setMode, checkpoint, putText, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
