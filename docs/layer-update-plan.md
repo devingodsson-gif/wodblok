@@ -166,7 +166,8 @@ One entry per finished step: version, what changed, what was tested, anything th
 | 5 Drawing into a stamp from the canvas | 1.46.5 | done, merged and live (Oct 19 2026, pull request 103) |
 | 6 The unique Stamp-editor tools on the canvas | 1.46.6 | done on branch `feat/1.46.1-layers-hold-anything` (restarted from `main`), draft pull request |
 | 7 Stamp settings and several colours per stamp | 1.46.7 | done on branch `feat/1.46.7-stamp-settings` (stacked on step 6), draft pull request |
-| 8 to 12 | | not started |
+| 8 Stamp library tools | 1.46.8 | done on branch `feat/1.46.8-stamp-library` (stacked on step 7), draft pull request |
+| 9 to 12 | | not started |
 
 ### Step 0 audit: Stamp editor panels against Canvas mode (Oct 18 2026, read from `MODEP` in `34-desktop-shell.js`)
 - **Shared today** (same panel in both modes, no work): Workspaces, Presets, Text, Colours, Colourways, Grade, Textures, Randomize, History, Stamp library.
@@ -262,4 +263,17 @@ Built on the Pattern canvas with an unlocked stamp (steps 4 and 5). The branch w
 - **Tests.** New `tests/stamp-settings.spec.js` (five specs: Stamp settings from the Pattern view; the colour well, the runs and the tray count; following the tray through a colourway; pixel checks of the colour in the plain and the pressure print; the Stamp editor). Regression on the build (147 tests across the stamp tools, colour tray, palettes, presets, print, export, Randomize, textures, shape editor, scenarios, round trip, speed-guard, save, undo, rail, commands, selection): all pass except Randomize seed 1 locally (the snapshot holds CI's values) and a rail drag test that passed on re-run (pointer timing under load). No snapshot or golden changed. Picture compare against `main`: identical.
 - **Perf.** slider drag ratio 0.93; Randomize roll plus settle 1292 ms.
 - **Not run:** the CI shard suite and WebKit (the milestone is after step 9).
+
+### Step 8 outcome: the project's stamps and the stamp library (1.46.8, Oct 19 2026)
+All in the **Stamps** panel (a row of `--h-sm` icon buttons above the list; every button is also a command in command search).
+- **Open stamp.** Clicking a stamp's name in the list makes it the open stamp (accent bar, weight 600); choosing another one locks the stamp that was unlocked. The thumbnail now means "used on the selected layer" (accent edge, `aria-pressed`) and still toggles it, so several stamps can be picked at once; the lock is unchanged (list only).
+- **New stamp** (`stamp.new`, button with a menu of outlines: Rectangle, Hexagon, Circle, Diamond, Triangle, Arch, Octagon, Star, Quatrefoil, Lancet). The stamp is added to the selected layer's arrangement, becomes the open stamp, starts locked, and the app stays in the Pattern view (the old tray "+" still opens the Stamp editor until step 9). The outline is chosen through the Stamp settings Shape control, so it gets the same defaults.
+- **Duplicate stamp** (`stamp.duplicate`): a deep copy that edits separately, added to the layer and made the open stamp.
+- **Delete stamp** (`stamp.delete`): two taps in place (the button turns `--warn`, the status line says "Click again to delete Stamp N"; three seconds to confirm). It removes the stamp from every layer's arrangement, lead, hand-picked cell overrides and every free item that points at it, in one history step (tested with Undo); a project keeps at least one stamp.
+- **Save to library / Load.** "Save to library" (`stamp.saveToLibrary`) uses the existing library save (name field and status messages in the Stamp library panel); the library button opens that panel. A stamp loaded from the library now joins the selected layer's arrangement and becomes the open stamp.
+- **Zoom to stamp** (`stamp.zoom`): the camera goes to the printed copy of the open stamp nearest the middle of the canvas and fits it (80 percent of the board); only the zoom and scroll change, the layers stay on screen, and Fit or the zoom buttons bring you back. **Solo layer is not built**: hiding the other layers safely needs a way to tell a layer's markup apart without changing the SVG snapshots; it can come with the Arrange tool.
+- **Not in this step.** The Stamp editor's own tray (New, Duplicate, Delete buttons and its stamp tabs) is unchanged; it goes with the editor in step 9.
+- **Tests.** New `tests/stamp-library-tool.spec.js` (six specs: New stamp with an outline, open stamp and locks, Duplicate edits separately, Delete with a free item and Undo, save and load, Zoom to stamp). Regression on the build (194 tests: stamp tools, commands, rail, library, panels, workspaces, scenarios, round trip, speed-guard, save, undo, layout, shape editor, selection, templates, settings, presets, free place, grid, align): all pass except Randomize seed 1 locally (the snapshot holds CI's values). No snapshot or golden changed.
+- **Perf.** slider drag ratio 0.97; Randomize roll plus settle 1703 ms.
+- **Not run:** the CI shard suite and WebKit (milestone: after step 9).
 

@@ -1,7 +1,8 @@
 import {kv} from '../platform/index.js';
 import {$,WBS} from './01-launch-and-version.js';
-import {CH,CW,SH,SW,useT,shp} from './04-canvas-and-stamp-outlines.js';
-import {pal,selOne} from './06-motif-library-folders.js';
+import {CH,CW,SH,SHN,SW,rowMenu,useT,shp} from './04-canvas-and-stamp-outlines.js';
+import {pal,selOne,store} from './06-motif-library-folders.js';
+import {pmsg} from './18-projects-and-cover-overlay.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 // ===== Stamps tool (layer update, step 4) =====
 // The Stamps panel lists the project's stamps. A stamp is used on the selected layer when its thumbnail is on (several at once), and each
@@ -44,20 +45,50 @@ function stampToCanvas(i,u,v){const it=STP.items[i];if(!it)return null;const q=s
 // ----- the panel -----
 function stLock(id){if(stUnlocked()===id){STP.un=null;STP.unL=null}else{STP.un=id;STP.unL=(stSel()||{}).u||null;const k=WBS.tiles.findIndex(t=>t.id==id);if(k>=0&&WBS.cur!=k){WBS.cur=k;selOne(-1)}}STP.ai=null;stOlPaint();stPanel(true)}
 function stPick(id){const L=stSel();if(!L)return;const a=L.st=L.st||[],k=a.indexOf(id);if(k<0)a.push(id);else a.splice(k,1);upd()}
-function stSig(){const L=stSel()||{},un=stUnlocked();return[WBS.selL,(L.st||[]).join(),un,WBS.tiles.map(t=>t.id+':'+(t.items||[]).length).join(),WBS.layers.map(l=>(l.st||[]).length+'/'+(l.pl||[]).length).join(),WBS.proj&&WBS.proj.bg].join('|')}
+function stSig(){const L=stSel()||{},un=stUnlocked();return[WBS.cur,WBS.selL,(L.st||[]).join(),un,WBS.tiles.map(t=>t.id+':'+(t.items||[]).length).join(),WBS.layers.map(l=>(l.st||[]).length+'/'+(l.pl||[]).length).join(),WBS.proj&&WBS.proj.bg].join('|')}
 function stPanel(force){const list=$('stmpl');if(!list||!list.offsetParent)return;const sig=stSig();if(!force&&sig===STP.sig&&list.childElementCount)return;STP.sig=sig;
  const L=stSel(),un=stUnlocked(),[pa]=pal(),cur=WBS.tiles[WBS.cur];let h='';
  WBS.tiles.forEach((t,k)=>{useT(t);const on=!!L&&(L.st||[]).includes(t.id),lk=un===t.id,n=stUses(t.id);
-  h+=`<div class="smkr${on?' on':''}" data-t="${t.id}"><button type="button" class="smkth" aria-pressed="${on}" aria-label="Use Stamp ${k+1} on this layer"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button><span class="smkn">Stamp ${k+1}</span><span class="smkc" aria-label="Used on ${n} ${n==1?'layer':'layers'}">${n}</span><button type="button" class="ib smklk" data-lk aria-pressed="${lk}" aria-label="${lk?'Lock':'Unlock'} Stamp ${k+1}">${lk?STLK_OFF:STLK_ON}</button></div>`});
+  h+=`<div class="smkr${WBS.cur===k?' cur':''}" data-t="${t.id}"><button type="button" class="smkth" aria-pressed="${on}" aria-label="Use Stamp ${k+1} on this layer"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button><span class="smkn">Stamp ${k+1}</span><span class="smkc" aria-label="Used on ${n} ${n==1?'layer':'layers'}">${n}</span><button type="button" class="ib smklk" data-lk aria-pressed="${lk}" aria-label="${lk?'Lock':'Unlock'} Stamp ${k+1}">${lk?STLK_OFF:STLK_ON}</button></div>`});
  if(cur)useT(cur);list.innerHTML=h;
  const ed=$('smked');if(ed){ed.hidden=un==null;ed.textContent=un==null?'':`Editing: ${stName(un)} (used on ${stUses(un)} ${stUses(un)==1?'layer':'layers'})`}}
+// ----- the project's stamps: choose one, make a new one, copy one, delete one, keep one in the library, bring the camera to one -----
+const stLabel=t=>{WBX.wbLabelPlain={t,at:performance.now()}};
+const stAddTo=id=>{const L=stSel();if(L&&!(L.st||[]).includes(id)){L.st=L.st||[];L.st.push(id)}};
+const stNo=id=>WBS.tiles.findIndex(t=>t.id==id)+1;
+function stCurrent(id){const k=WBS.tiles.findIndex(t=>t.id==id);if(k<0||WBS.cur===k)return;if(STP.un!=null&&STP.un!==id){STP.un=null;STP.unL=null}WBS.cur=k;selOne(-1);STP.ai=null;upd()}
+// a new stamp (an outline can be chosen) is added to the selected layer's arrangement, becomes the open stamp and starts locked
+function stNew(kind){const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:0,er:0,es:Math.floor(Math.random()*999),tu:[]};WBS.tiles.push(t);stAddTo(t.id);WBS.cur=WBS.tiles.length-1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;
+ if(kind&&kind!='rect'){const b=document.querySelector('#skind [data-k="'+kind+'"]');if(b)b.click()}stLabel('New stamp');store();upd();pmsg('Added Stamp '+stNo(t.id)+'.')}
+// a copy edits separately from the original
+function stDup(){const k=WBS.cur,src=WBS.tiles[k];if(!src)return;const t=JSON.parse(JSON.stringify(src));t.id=WBS.nid++;WBS.tiles.splice(k+1,0,t);stAddTo(t.id);WBS.cur=k+1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;stLabel('Duplicated stamp');store();upd();pmsg('Duplicated Stamp '+(k+1)+' as Stamp '+(k+2)+'.')}
+// deleting a stamp that is in use takes it out of every arrangement and every free item that points at it, in one step
+function stDelete(id){if(WBS.tiles.length<2)return false;const k=WBS.tiles.findIndex(t=>t.id==id);if(k<0)return false;WBS.tiles.splice(k,1);
+ WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(x=>x!=id);if(L.lead==id)delete L.lead;if(L.pl)L.pl=L.pl.filter(p=>p.t!=id);if(L.ov)Object.keys(L.ov).forEach(c=>{if(L.ov[c]==id)delete L.ov[c]})});
+ WBS.tM=new Set();WBS.cur=Math.min(k,WBS.tiles.length-1);selOne(-1);if(STP.un===id){STP.un=null;STP.unL=null}STP.ai=null;stLabel('Deleted stamp');store();upd();return true}
+// the camera goes to one printed copy of the open stamp (the one nearest the middle of the canvas); the layers stay as they are
+function stZoom(){const t=WBS.tiles[WBS.cur];if(!t||!WBX.wbZoomTo)return;let best=-1,bd=1e18;STP.items.forEach((it,i)=>{if(it[0]!==t.id)return;const p=stMatrix(it).transformPoint({x:it[6]/2,y:it[7]/2}),d=Math.hypot(p.x-CW/2,p.y-CH/2);if(d<bd){bd=d;best=i}});
+ if(best<0)return pmsg('Stamp '+(WBS.cur+1)+' is not on this layer.');
+ const it=STP.items[best],M=stMatrix(it),xs=[],ys=[];[[0,0],[it[6],0],[it[6],it[7]],[0,it[7]]].forEach(([u,v])=>{const q=M.transformPoint({x:u,y:v});xs.push(q.x);ys.push(q.y)});
+ const w=Math.max(...xs)-Math.min(...xs),h=Math.max(...ys)-Math.min(...ys),b=$('boardP'),s=Math.min(8,Math.max(.1,Math.min(b.clientWidth,b.clientHeight)*.8/Math.max(w,h,1)));
+ WBX.wbZoomTo(s);const a=$('art'),m=a.getScreenCTM(),P=a.createSVGPoint();P.x=(Math.min(...xs)+Math.max(...xs))/2;P.y=(Math.min(...ys)+Math.max(...ys))/2;const c=P.matrixTransform(m),r=b.getBoundingClientRect();b.scrollLeft+=c.x-(r.left+r.width/2);b.scrollTop+=c.y-(r.top+r.height/2)}
+function stBar(){const on=(id,f)=>{const b=$(id);if(b)b.addEventListener('click',f)};
+ on('smknew',e=>{e.stopPropagation();const kinds=[...document.querySelectorAll('#skind [data-k]')].map(b=>b.dataset.k);rowMenu($('smknew'),kinds.map(k=>[SHN[k]||k,()=>stNew(k)]))});
+ on('smkdup',()=>stDup());
+ {const d=$('smkdel');if(d){let tm=0;d.addEventListener('click',()=>{const t=WBS.tiles[WBS.cur];if(!t)return;if(WBS.tiles.length<2){pmsg('A project keeps at least one stamp.');return}
+  if(!d.classList.contains('sure')){d.classList.add('sure');d.setAttribute('aria-label','Click to confirm');pmsg('Click again to delete Stamp '+(WBS.cur+1)+'.');tm=setTimeout(()=>{d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp')},3000);return}
+  clearTimeout(tm);d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp');const n=WBS.cur+1;if(stDelete(t.id))pmsg('Deleted Stamp '+n+'.')})}}
+ on('smkzoom',()=>stZoom());
+ on('smksave',()=>{const b=$('slsave');if(b)b.click()});
+ on('smklib',()=>{const r=$('rail-slib');if(r)r.click()})}
 function stSetOp(v,save){STP.op=Math.max(0,Math.min(100,Math.round(+v)));if(save){try{kv.set(STOLK,String(STP.op))}catch(e){}}stOlPaint()}
 function init63(){
  try{const s=kv.get(STOLK);if(s!=null&&s!==''&&isFinite(+s))STP.op=Math.max(0,Math.min(100,+s))}catch(e){}
  try{new ResizeObserver(stOlFit).observe($('art'))}catch(e){}
  const op=$('stmpop');if(op){op.value=STP.op;op.addEventListener('input',()=>stSetOp(op.value,true))}
  const list=$('stmpl');if(list){
-  list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r)return;const id=+r.dataset.t;if(e.target.closest('[data-lk]'))stLock(id);else stPick(id)});
+  list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r)return;const id=+r.dataset.t;if(e.target.closest('[data-lk]'))stLock(id);else if(e.target.closest('.smkth'))stPick(id);else stCurrent(id)});
+ stBar();
   if(typeof IntersectionObserver=='function')new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting))stPanel(true)}).observe(list)}
 }
-export {STP,stMatrix,init63,stAccepts,stLock,stOlAdd,stOlBegin,stOlEnd,stOlPaint,stOlPath,stPanel,stSetOp,stUnlocked,stampAt,stampToCanvas};
+export {STP,stMatrix,stDelete,stDup,stNew,stZoom,init63,stAccepts,stLock,stOlAdd,stOlBegin,stOlEnd,stOlPaint,stOlPath,stPanel,stSetOp,stUnlocked,stampAt,stampToCanvas};
