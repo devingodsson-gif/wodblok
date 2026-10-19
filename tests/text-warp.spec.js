@@ -1,6 +1,19 @@
 // 1.45.0: text on a wave or spiral, and warp (Bulge, Rise, Flag). Same controls in the Stamp editor and the Text layer.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle, getState, putText } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
+// Canvas flow: the text typed in the Text panel is put on the first printed instance of the unlocked stamp, then one of its letters is clicked so the whole text is selected (the panel edits it)
+async function putTextCanvas(page) {
+  const p = await stampInstance(page);
+  await clickStamp(page, p);
+  const tg = async () => JSON.parse(await getState(page)).tiles[0].items.filter(q => q.tg);
+  await expect.poll(async () => (await tg()).length, { timeout: 15000 }).toBeGreaterThan(0);
+  await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await settle(page, { max: 30000 });
+  const q0 = (await tg())[0];
+  const c = await page.evaluate(([i, u, v]) => __wbTest.stampToCanvas(i, u, v), [p.i, q0.x, q0.y]);
+  const cl = await canvasToClient(page, c.x, c.y);
+  await page.mouse.click(cl.x, cl.y); await settle(page, { max: 30000 });
+}
+
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -8,8 +21,8 @@ const set = (page, id, v) => page.evaluate(([id, v]) => { const r = document.get
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;
 const spread = a => Math.max(...a) - Math.min(...a);
 async function start(page, text, size = 8) {
-  await setMode(page, 'stamp'); await openPanel(page, 'text');
-  await page.fill('#tx_t', text); await putText(page);
+  await unlockStamp(page); await openPanel(page, 'text');
+  await page.fill('#tx_t', text); await putTextCanvas(page);
   await set(page, 'tx_sz', size); await settle(page, { max: 30000 });
 }
 

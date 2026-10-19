@@ -1,21 +1,17 @@
-// Stamp editor: four side squares pull the width or height; a corner or side grows away from the opposite one; Shift grows from the middle (1.37.0).
+// Canvas, with a stamp unlocked: four side squares pull the width or height; a corner or side grows away from the opposite one; Shift grows from the middle (1.37.0, moved from the Stamp editor to the Pattern canvas in step 11).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle, getState } = require('./helpers/harness');
+const { TARGET, openApp, settle, getState, unlockStamp, pickShape, stampInstance, clickStamp } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
-const item = async page => JSON.parse(await getState(page)).tiles[0].items[0];
+const item = async page => { const it = JSON.parse(await getState(page)).tiles[0].items; return it[it.length - 1]; };
 const box = q => { const rx = 48 * q.s * (q.sx || 1), ry = 48 * q.s * (q.sy || 1); return { l: q.x - rx, r: q.x + rx, t: q.y - ry, b: q.y + ry, w: 2 * rx, h: 2 * ry }; };
 const place = async page => {
-  await setMode(page, 'stamp'); await openPanel(page, 'motifs');
-  await page.click('#lib .lfr[data-f="b:Flowers"]');
-  await page.locator('#lib button[data-m]').first().click();
-  await page.mouse.move(500, 300); await page.mouse.move(520, 310); await page.mouse.click(520, 310); await settle(page);
-  await page.mouse.click(700, 500, { button: 'right' }); await settle(page);   // put the brush down so the handles can be used
-  await page.evaluate(() => { const r = document.getElementById('ssz'); r.value = 25; r.dispatchEvent(new Event('input', { bubbles: true })); }); await settle(page);
+  await unlockStamp(page); await pickShape(page);
+  await clickStamp(page, await stampInstance(page));   // the placed shape is selected, with its handles
 };
 const pull = async (page, h, dx, dy, shift) => {
-  const b = await page.locator(`#boardS [data-hd="${h}"]`).boundingBox();
+  const b = await page.locator(`#stoh [data-hd="${h}"]`).boundingBox();
   const x = b.x + b.width / 2, y = b.y + b.height / 2;
   await page.mouse.move(x, y); await page.mouse.down();
   if (shift) await page.keyboard.down('Shift');
@@ -25,7 +21,7 @@ const pull = async (page, h, dx, dy, shift) => {
 
 test('eight squares: the side ones pull only the width or the height, and the far side stays put', async ({ page }) => {
   const { errors } = await openApp(page); await place(page);
-  await expect(page.locator('#boardS [data-hd]')).toHaveCount(9);   // four corners, four sides, the round one
+  await expect(page.locator('#stoh [data-hd]')).toHaveCount(9);   // four corners, four sides, the round one
   const a = box(await item(page));
   await pull(page, 'e', 40, 0);
   let q = await item(page), b = box(q);
@@ -62,6 +58,7 @@ test('a turned motif is stretched along its own width', async ({ page }) => {
   const { errors } = await openApp(page); await place(page);
   await page.evaluate(() => { const r = document.getElementById('srt'); r.value = 90; r.dispatchEvent(new Event('input', { bubbles: true })); }); await settle(page);
   const a = await item(page);
+  expect(a.r).toBe(90);
   await pull(page, 'e', 0, 40);   // its east side now points down the screen
   const b = await item(page);
   expect(b.sx).toBeGreaterThan((a.sx || 1) + .01); expect(b.sy || 1).toBeCloseTo(a.sy || 1, 2);

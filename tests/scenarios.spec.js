@@ -2,7 +2,7 @@
 // SVG, and a picture. Randomness is seeded and time is fixed (see helpers/harness.js), so results repeat exactly.
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, openApp, openProjectFile, openPanel, setMode, settle, getState, stateText, checkpoint, putText } = require('./helpers/harness');
+const { ROOT, openApp, openProjectFile, openPanel, settle, getState, stateText, checkpoint, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
 
 const FIX = n => path.join(ROOT, 'tests', 'fixtures', n);
 const PANEL_FIXTURE = 'project-4-rect-4x3.wodblok.json';   // frames, free place, textures, grade, blends, five layers
@@ -77,13 +77,6 @@ test('light theme', async ({ page }, testInfo) => {
   await checkpoint(page, testInfo, errors, 'theme-light');
 });
 
-test('stamp editor view', async ({ page }, testInfo) => {
-  const { errors } = await openApp(page);
-  await openProjectFile(page, FIX(PANEL_FIXTURE));
-  await setMode(page, 'stamp');
-  await checkpoint(page, testInfo, errors, 'stamp-editor', { selector: '#ed' });
-});
-
 // The tool windows with a real project open: the whole window is compared, so chrome changes show up too.
 for (const [panel, label] of [['canvas', 'canvas'], ['colors', 'colors'], ['lyrs', 'layers'], ['layers', 'arrangement'], ['grade', 'grade'], ['tex', 'textures'], ['hist', 'history'], ['rand', 'randomize'], ['pgrid', 'pattern-grid']]) {
   test(`panel: ${label}`, async ({ page }, testInfo) => {
@@ -109,14 +102,14 @@ test('history records a randomize and goes back to Start', async ({ page }) => {
 });
 
 test('text tool turns typed text into a motif (smoke; glyph shapes depend on installed fonts)', async ({ page }) => {
-  const { errors } = await openApp(page);
-  await setMode(page, 'stamp');                            // the Text tool only exists in the Stamp editor
+  const { errors } = await openApp(page, { seed: 4 });
+  await unlockStamp(page);                                 // the text goes into the unlocked stamp, from the canvas
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Wod');
+  await settle(page);
   const before = JSON.parse(await getState(page)).tiles.reduce((n, t) => n + t.items.length, 0);
-  await putText(page, { select: false });
-  const after = JSON.parse(await getState(page)).tiles.reduce((n, t) => n + t.items.length, 0);
-  expect(after).toBeGreaterThan(before);
+  await clickStamp(page, await stampInstance(page));
+  await expect.poll(async () => JSON.parse(await getState(page)).tiles.reduce((n, t) => n + t.items.length, 0), { timeout: 15000 }).toBeGreaterThan(before);
   expect(errors).toEqual([]);
 });
 

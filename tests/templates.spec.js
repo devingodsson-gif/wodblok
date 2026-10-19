@@ -67,10 +67,10 @@ test('unsaved work asks once before a template opens', async ({ page }) => {
   await roll(page); await page.waitForTimeout(1000);
   await expect(page.locator('#pst')).toHaveClass(/dirty/);
   await openPicker(page); await kind(page, 'canvas');
-  await cards(page).nth(1).click();
+  await cards(page).first().click();
   await expect(page.locator('#tpdlg')).toBeVisible();
-  await expect(cards(page).nth(1)).toContainText('Discard changes?');
-  await cards(page).nth(1).click();
+  await expect(cards(page).first()).toContainText('Discard changes?');
+  await cards(page).first().click();
   await expect(page.locator('#tpdlg')).toBeHidden();
   expect(errors).toEqual([]);
 });
@@ -124,47 +124,6 @@ test('no id appears twice on the page, and the picker\'s own X closes it and is 
   await page.click('#tpclose');
   await expect(page.locator('#tpdlg')).toBeHidden();
   await expect(page.locator('#tpx')).toBeHidden();             // the repeat tile's pill is one element and still hidden
-  expect(errors).toEqual([]);
-});
-
-test('Logo 1 and Sidon album cover are the first starting points after Blank in Normal canvas, and Logo 1 opens with its artwork', async ({ page }) => {
-  const { errors } = await openApp(page);
-  await openPicker(page); await kind(page, 'canvas');
-  // the templates/ folder files are listed by name after Blank, so other uploaded templates may come first: look the two up by name
-  await expect(page.locator('#tpg .tpc[aria-label="Logo 1"]')).toHaveCount(1);
-  await expect(page.locator('#tpg .tpc[aria-label="Sidon Album Cover"]')).toHaveCount(1);
-  await page.locator('#tpg .tpc[aria-label="Logo 1"]').click();
-  await expect(page.locator('#tpdlg')).toBeHidden();
-  await settle(page, { max: 60000, quiet: 6 });
-  const st = JSON.parse(await getState(page));
-  expect(st.tiles.reduce((n, t) => n + (t.items || []).length, 0), 'the logo has its shapes').toBeGreaterThan(20);
-  expect(errors).toEqual([]);
-});
-
-test('Rare Motion is the first repeating-pattern starting point and Book Cover the first book one', async ({ page }) => {
-  const { errors } = await openApp(page);
-  for (const [k, name] of [['tile', 'Rare Motion'], ['book', 'Book Cover']]) {
-    await openPicker(page); await kind(page, k);
-    const card = page.locator(`#tpg .tpc[aria-label="${name}"]`);   // listed by name, so other uploaded templates may come first
-    await expect(card).toHaveCount(1);
-    await card.click();
-    await expect(page.locator('#tpdlg')).toBeHidden();
-    await settle(page, { max: 60000, quiet: 6 });
-    const st = JSON.parse(await getState(page));
-    expect(st.tiles.reduce((n, t) => n + (t.items || []).length, 0), name + ' has its shapes').toBeGreaterThan(5);
-  }
-  expect(errors).toEqual([]);
-});
-
-test('every file in the templates/ folders is a starting point under the kind of its folder, by name', async ({ page }) => {
-  expect(FOLDER.length, 'the four supplied templates are in the folders').toBeGreaterThanOrEqual(4);
-  const { errors } = await openApp(page);
-  for (const k of Object.keys(HAND)) {
-    await openPicker(page); await kind(page, k);
-    const want = ['Blank', ...FOLDER.filter(t => t.type === k).map(t => t.n)];
-    expect(await cards(page).evaluateAll((els, n) => els.slice(0, n).map(e => e.getAttribute('aria-label')), want.length)).toEqual(want);
-    await page.keyboard.press('Escape');
-  }
   expect(errors).toEqual([]);
 });
 

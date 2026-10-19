@@ -1,7 +1,7 @@
 // Shape library folders: one tree of every folder (built-in sets and your own, A to Z, My imports first) that open in place (1.5.0),
 // folders inside folders, each folder's menu (rename, move, delete; hide for a set), moving shapes, and imports landing in the active folder.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in 1.2.14'); });
 
@@ -29,7 +29,7 @@ async function menu(page, v, item) {
   }
   await page.locator('.rowm').getByRole('menuitem', { name: item, exact: true }).click();
 }
-async function open(page) { const r = await openApp(page); await setMode(page, 'stamp'); await openPanel(page, 'motifs'); return r; }
+async function open(page) { const r = await openApp(page); await openPanel(page, 'motifs'); return r; }
 // pick from one of the app's styled dropdowns (they stand in for the native <select>)
 async function pick(page, sel, v) {
   await page.locator(sel).locator('xpath=following-sibling::div[contains(@class,"dd2")][1]/button').click();

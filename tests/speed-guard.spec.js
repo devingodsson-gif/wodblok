@@ -1,14 +1,14 @@
 // Speed guard (1.7). Counts the work a redraw does instead of timing it, so it gives the same answer on a slow CI machine and on a fast Mac.
 //  - The on-screen pattern does not carry the full outline of every stamp: every copy is a ready-made print, so those outlines are not drawn.
 //    They live once in a hidden block that is rewritten only when a stamp changes. (Before 1.7 the busy project held 2.7 MB of them on screen.)
-//  - Nothing the page draws points at an id that does not exist, in the Pattern view, zoomed in (every copy drawn live), in the Stamp editor,
+//  - Nothing the page draws points at an id that does not exist, in the Pattern view, zoomed in (every copy drawn live),
 //    after a slider move, and after Randomize. The tabs along the top and the stamp buttons in the Layers panel borrow the stamp outlines, so
 //    they are checked by name.
 // Numbers are written to test-results/speed-guard-<target>.json.
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, TARGET, openApp, openProjectFile, openPanel, setMode, settle } = require('./helpers/harness');
+const { ROOT, TARGET, openApp, openProjectFile, openPanel, settle } = require('./helpers/harness');
 const { FIXTURES, danglingRefs, patternCounters } = require('./helpers/speed');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
@@ -37,7 +37,7 @@ for (const name of Object.keys(FIXTURES)) {
   });
 }
 
-test('busy: after a slider move, zoomed in, in the Stamp editor and after Randomize, nothing points at a missing id', async ({ page }) => {
+test('busy: after a slider move, zoomed in and after Randomize, nothing points at a missing id', async ({ page }) => {
   test.setTimeout(5 * 60 * 1000);
   const { errors } = await openApp(page, { seed: 21 });
   await openProjectFile(page, FIXTURES.busy);
@@ -67,9 +67,6 @@ test('busy: after a slider move, zoomed in, in the Stamp editor and after Random
   await check('zoomed in (live)');
   await page.locator('#zl').dispatchEvent('click');                                                                   // back to Fit
   await check('back at Fit');
-  await setMode(page, 'stamp');
-  await check('Stamp editor');
-  await setMode(page, 'pattern');
   await openPanel(page, 'rand');
   await page.click('#rzdo');
   await check('after Randomize', 30);                                                        // Randomize finishes in stages; wait for the last one (3 s without change)

@@ -1,30 +1,25 @@
 // The tool rail (UX review C4): shared tools sit in the same slots in both views, every tool has one name (rail, tab and command search),
 // and the names show beside the icons in wide windows.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, setMode } = require('./helpers/harness');
+const { TARGET, openApp } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 const labels = page => page.locator('.rail button:visible').evaluateAll(b => b.map(x => x.getAttribute('aria-label')));
 const SHARED = ['Close all panels', 'Randomize', 'Colours', 'Colourways', 'Presets', 'Stamp library', 'Colour grading', 'Textures', 'History', 'Workspaces'];
 
-test('the shared tools are the first ten rail buttons, in the same order, in Pattern and in the Stamp editor', async ({ page }) => {
+test('the shared tools are the first ten rail buttons, in the same order', async ({ page }) => {
   const { errors } = await openApp(page);
   const pattern = await labels(page);
-  await setMode(page, 'stamp');
-  const stamp = await labels(page);
   expect(pattern.slice(0, 10)).toEqual(SHARED);
-  expect(stamp.slice(0, 10)).toEqual(SHARED);
   expect(pattern.slice(10)).toEqual(['Canvas', 'Layers', 'Layout', 'Stamps', 'Grid', 'Navigator', 'Variations', 'Export recipes', 'Stamp settings', 'Shapes', 'Text', 'Shape list', 'Element editor', 'More tools']);
-  expect(stamp.slice(10)).toEqual(['Stamp settings', 'Shapes', 'Text', 'Shape list', 'Element editor', 'More tools']);
   expect(errors).toEqual([]);
 });
 
 test('each tool has one name: the rail, the tab it opens, and "Open …" in command search agree', async ({ page }) => {
   const { errors } = await openApp(page);
   const cmds = await page.evaluate(() => window.__wbTest.commands.list().map(c => c.label));
-  for (const mode of ['pattern', 'stamp']) {
-    await setMode(page, mode);
+  for (const mode of ['pattern']) {
     for (const b of await page.locator('.rail [data-pn]:visible').all()) {
       const name = await b.getAttribute('aria-label');
       await page.click('#rcls');

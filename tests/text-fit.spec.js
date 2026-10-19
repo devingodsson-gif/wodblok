@@ -1,15 +1,27 @@
 // 1.41.0: Box and fit. Padding, Spread, Fit to box (Shrink to fit, Fill the box, Fit each line to width, Fit width) and Overflow Hide.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle, getState, putText } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 const set = (page, id, v) => page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); }, [id, v]);
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;
+// text goes into the unlocked stamp: set it up in the Text panel, then click an instance of the stamp on the canvas (the placed text is then selected)
+const putStampText = async page => {
+  const p = await stampInstance(page); await clickStamp(page, p);
+  await expect.poll(async () => JSON.parse(await getState(page)).tiles[0].items.filter(q => q.tg).length, { timeout: 15000 }).toBeGreaterThan(0);
+  await settle(page, { max: 30000 });
+  await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
+  const q = JSON.parse(await getState(page)).tiles[0].items.find(x => x.tg);
+  const c = await page.evaluate(([i, u, v]) => __wbTest.stampToCanvas(i, u, v), [p.i, q.x, q.y]), cl = await canvasToClient(page, c.x, c.y);
+  await page.mouse.click(cl.x, cl.y); await settle(page);
+  await expect(page.locator('#tx_ed')).toBeVisible();
+  return p;
+};
 async function start(page, text, sz) {
-  await setMode(page, 'stamp'); await openPanel(page, 'text');
+  await unlockStamp(page); await showPanel(page, 'text');
   await page.fill('#tx_t', text);
-  await putText(page);
+  await putStampText(page);
   await set(page, 'tx_sz', sz); await settle(page, { max: 30000 });      // the size after the text is down, so it is not fitted to the stamp again
 }
 const sizeNow = async page => (await items(page))[0].s;
@@ -68,7 +80,7 @@ test('Overflow Hide drops the lines that run past the box; padding shrinks the r
 
 test('Text layer: the new options are saved only when set', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await setMode(page, 'pattern'); await openPanel(page, 'text');
+  await openPanel(page, 'text');
   await page.fill('#tx_t', 'HELLO WORLD');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();

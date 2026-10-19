@@ -1,10 +1,10 @@
 // Shape library tree (1.5.0): every folder opens and closes in place, one button opens or closes them all, what is open is
 // remembered, folders answer the arrow keys and a right-click, Import is a menu in the toolbar, and a slider sets the shape size.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in 1.5.0'); });
-async function open(page) { const r = await openApp(page); await setMode(page, 'stamp'); await openPanel(page, 'motifs'); return r; }
+async function open(page) { const r = await openApp(page); await openPanel(page, 'motifs'); return r; }
 const tiles = page => page.locator('#lib button[data-m]');
 const cols = page => page.evaluate(() => getComputedStyle(document.querySelector('#lib .lib')).gridTemplateColumns.split(' ').length);
 
@@ -17,7 +17,7 @@ test('one button opens every folder, and again closes them all; what is open is 
   await page.click('#ltog');
   await expect(tiles(page)).toHaveCount(0);
   await page.locator('#lib .lfr[data-f="b:Birds"]').click();
-  await page.reload(); await setMode(page, 'stamp'); await openPanel(page, 'motifs');
+  await page.reload(); await openPanel(page, 'motifs');
   await expect(page.locator('#lib .lfr[data-f="b:Birds"]')).toHaveAttribute('aria-expanded', 'true');
   await expect(tiles(page)).toHaveCount(37);
   expect(errors).toEqual([]);
@@ -62,7 +62,7 @@ test('the size slider changes how many shapes fit in a row and is remembered', a
   await page.locator('#lsz').fill('0');
   expect(await cols(page)).toBe(10);
   await page.locator('#lsz').fill('8');
-  await page.reload(); await setMode(page, 'stamp'); await openPanel(page, 'motifs');
+  await page.reload(); await openPanel(page, 'motifs');
   await expect(page.locator('#lsz')).toHaveValue('8');
   expect(await cols(page)).toBe(2);
   await expect(page.locator('#lsz')).not.toHaveAttribute('title', /.+/);

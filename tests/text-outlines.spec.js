@@ -1,7 +1,7 @@
 // 1.42.0: letters come from the font file's own outlines (opentype.js), not from a traced picture.
 const { test, expect } = require('@playwright/test');
 const path = require('path');
-const { TARGET, openApp, openPanel, setMode, settle, getState, putText } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -10,9 +10,9 @@ const shapes = page => page.evaluate(() => [...document.querySelectorAll('#tx_pv
 
 test('a bundled font gives exact outlines: a few curves per letter, not hundreds of traced steps', async ({ page }) => {
   const { errors } = await openApp(page);
-  await setMode(page, 'stamp'); await openPanel(page, 'text');
+  await unlockStamp(page); await openPanel(page, 'text');
   await page.fill('#tx_t', 'Og');
-  await putText(page);
+  await clickStamp(page, await stampInstance(page));
   await page.waitForTimeout(600);
   const s = await shapes(page);
   expect(s.length).toBeGreaterThanOrEqual(2);
@@ -23,7 +23,7 @@ test('a bundled font gives exact outlines: a few curves per letter, not hundreds
 
 test('a font file you load gives exact outlines too', async ({ page }) => {
   const { errors } = await openApp(page);
-  await setMode(page, 'stamp'); await openPanel(page, 'text');
+  await unlockStamp(page); await openPanel(page, 'text');
   await page.setInputFiles('#tx_file', path.join(__dirname, '..', 'src', 'fonts', 'text', 'cinzel.woff'));
   await expect(page.locator('#tx_f option[value^="u-"]')).toHaveCount(1, { timeout: 10000 });
   await page.fill('#tx_t', 'Q');

@@ -1,6 +1,6 @@
 // New stamp (+) used to throw "isDef is not defined" and add nothing (UX review B1; the bug is also in v100).
 const { test, expect } = require('@playwright/test');
-const { openApp, settle, getState, setMode } = require('./helpers/harness');
+const { openApp, settle, getState, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
 
 test('New stamp adds a blank stamp, selects it, and raises no page error', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 3 });
@@ -18,25 +18,28 @@ test('New stamp adds a blank stamp, selects it, and raises no page error', async
 
 test('Send to back puts the selected motif behind the others (UX review D8)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 3 });
-  await setMode(page, 'stamp');
+  await unlockStamp(page);
   await page.click('.rail [data-pn="motifs"]');
   await page.click('#lib .lfr[data-f="b:Flowers"]');                // folders open in place (1.5.0)
   const lib = page.locator('#lib button[data-m]');
-  const ids = [];
+  const p = await stampInstance(page);
+  const n0 = JSON.parse(await getState(page)).tiles[0].items.length;
   for (const n of [0, 1]) {
     await lib.nth(n).click();
-    await page.mouse.click(n ? 700 : 480, 400);
+    await clickStamp(page, p, n ? 55 : -55, 0);
     await page.keyboard.press('Escape');
     await settle(page);
   }
-  const before = JSON.parse(await getState(page)).tiles[0].items.map(i => i.m);
+  const before = JSON.parse(await getState(page)).tiles[0].items.map(i => i.m).slice(n0);
   expect(before.length).toBe(2);
-  await page.mouse.click(700, 400);   // select the second, front-most motif
+  await clickStamp(page, p, 55, 0);   // select the second, front-most motif
   await expect(page.locator('#ssb')).toBeVisible();
   await page.click('#ssb');
   await settle(page);
   const after = JSON.parse(await getState(page)).tiles[0].items.map(i => i.m);
-  expect(after).toEqual([before[1], before[0]]);
+  expect(before[1]).not.toBe(before[0]);
+  expect(after.length).toBe(n0 + 2);
+  expect(after[0]).toBe(before[1]);                               // to the back of the stamp: first in the list
   expect(errors).toEqual([]);
 });
 

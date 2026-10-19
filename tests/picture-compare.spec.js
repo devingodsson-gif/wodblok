@@ -1,11 +1,11 @@
 // Picture compare. Draws the same projects in an older build and in this one, in the same run on the same machine, and checks that the pictures are
-// identical: the Pattern at Fit, after a stamp size change, zoomed in (every copy drawn live), the Stamp editor, and a PNG export (which draws the full
+// identical: the Pattern at Fit, after a stamp size change, zoomed in (every copy drawn live), and a PNG export (which draws the full
 // vector picture). Pixel goldens cannot do this in CI because they only match the machine that made them; two builds in one run can.
 // Needs WB_BASELINE=<absolute path to the older dist/wodblok.html>; skipped without it. CI builds `main` for this (see .github/workflows/test.yml).
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, TARGET, APP_URL, openApp, openProjectFile, openPanel, setMode, settle } = require('./helpers/harness');
+const { ROOT, TARGET, APP_URL, openApp, openProjectFile, openPanel, settle } = require('./helpers/harness');
 const { FIXTURES } = require('./helpers/speed');
 
 const BASE = process.env.WB_BASELINE;
@@ -48,9 +48,6 @@ async function render(browser, url, fixture) {
   await shoot('zoomed to 100% (drawn live)', '#boardP');
   await page.locator('#zl').dispatchEvent('click');
   await settle(page);
-  await setMode(page, 'stamp');
-  await shoot('Stamp editor', '#boardS');
-  await setMode(page, 'pattern');
   // the Textures tool's Amount slider, dragged and let go: the exact picture comes back once it is let go
   await openPanel(page, 'tex');
   await settle(page);

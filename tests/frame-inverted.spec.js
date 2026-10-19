@@ -1,6 +1,6 @@
 // An inverted stamp used as a frame: no light line between neighbouring tiles (1.35.0).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle, unlockStamp, pickShape, stampInstance, clickStamp, getState } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -19,17 +19,12 @@ const lines = async (page) => {
 
 test('an inverted stamp as a frame shows no light line between its tiles', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await setMode(page, 'stamp');
-  await page.evaluate(async () => {
-    const c = document.createElement('canvas'); c.width = 160; c.height = 160; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 160, 160); x.fillStyle = '#000'; x.beginPath(); x.arc(80, 80, 55, 0, 7); x.fill();
-    const blob = await new Promise(r => c.toBlob(r, 'image/png')); const dt = new DataTransfer(); dt.items.add(new File([blob], 'a.png', { type: 'image/png' }));
-    document.dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
-  });
-  await settle(page);
+  await unlockStamp(page); await pickShape(page);
+  await clickStamp(page, await stampInstance(page));   // a shape in the middle of the stamp, which the inversion carves out
   await openPanel(page, 'stamp');
   await page.evaluate(() => { const c = document.getElementById('neg'); c.checked = true; c.dispatchEvent(new Event('input', { bubbles: true })); });
   await settle(page);
-  await setMode(page, 'pattern');
+  expect(JSON.parse(await getState(page)).tiles[0].neg, 'the stamp is inverted').toBeTruthy();
   await openPanel(page, 'lyrs');
   await page.evaluate(() => document.querySelector('#lmode [data-m="f"]').click());
   await settle(page);
