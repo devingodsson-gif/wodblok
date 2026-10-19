@@ -27,7 +27,7 @@ test('no American spelling in the panels, also with a stamp unlocked', async ({ 
   const bad = new Set();
   for (const mode of ['pattern', 'unlocked stamp']) {
     if (mode !== 'pattern') await unlockStamp(page);
-    const tools = await page.locator('.rail [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn).filter(p => !(p === 'mlist' && document.getElementById('boardS').hidden)));   // the Shape list is empty in Pattern until a stamp is unlocked
+    const tools = await page.locator('.rail [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn).filter(p => !(p === 'mlist' && __wbTest.unlockedStamp() == null)));   // the Shape list is empty in Pattern until a stamp is unlocked
     for (const pn of tools) {
       await page.click('#rcls');
       await page.click(`.rail [data-pn="${pn}"]`);

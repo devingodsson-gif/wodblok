@@ -49,7 +49,7 @@ const COMMANDS = [
   ['export.proofPng', 'Print proof (PNG)', 'xppng'],
   ['view.before', 'Before', 'bab', '\\'],
   ['view.split', 'Split view', 'bas', 'Shift+\\'],
-  ['view.grid', 'Show grid', 'gtg', 'G'],
+  ['view.grid', 'Show grid', 'pgs', 'G'],
   ['panels.closeAll', 'Close all panels', 'rcls'],
   ['panel.canvas', 'Open Canvas', 'rail-canvas'],
   ['panel.colors', 'Open Colours', 'rail-colors'],

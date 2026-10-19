@@ -95,7 +95,14 @@ return flt('wbgl'+u,...gRg(),o)}
 // stamp editor: the current stamp's gradients, then the global grade, then colour/luminance masks
 // (bg=1: the stamp's paper, which stamp gradients leave alone, as in the pattern where they only touch the ink)
 // the editor's grade covers what is on screen (the stamp, its margin and the side areas), not three stamps' width all round
-function gDefs(ov){OVX=ov;let o='';try{if(!gdBypass){o+=canvasF('wbgrade',0)+canvasF('wbgradeT',1)}
+function edRgn(W,H){const X=-W,Y=-H;let X2=2*W,Y2=2*H;try{const r=(WBS.WBDRG&&WBS._edRR)||(WBS._edRR=document.getElementById('ed').getBoundingClientRect());if(!WBS.WBDRG)WBS._edRR=null;if(r.width>0&&r.height>0){const vw=W+48,vh=H+48,s=Math.min(r.width/vw,r.height/vh),uw=r.width/s,uh=r.height/s,x0=-24-(uw-vw)/2,y0=-24-(uh-vh)/2,m=8;X2=Math.max(W,Math.min(X2,Math.ceil(x0+uw+m)));Y2=Math.max(H,Math.min(Y2,Math.ceil(y0+uh+m)))}}catch(e){}return{W,H,X,Y,RW:X2-X,RH:Y2-Y,k:'e'}}
+function edF(bg,ink){const t=WBS.tiles[WBS.cur];if(!t)return'';const g=geom(shOf(t)),W=g.SW,H=g.SH,ctx=(bg||ink)?{W,H,X:-W,Y:-H,RW:2*W+8,RH:2*H+8,k:'e'}:edRgn(W,H),ms=bg?[]:stMasks(t.id);let o='',c='SourceGraphic';
+if(!bg&&hasA(t.gr)){const r=adjP(t.gr,c,'T');o+=r[0];c=r[1]}
+grd.masks.forEach((m,i)=>{if(!ms.includes(m))return;const r=maskStep(m,i,c,ctx);o+=r[0];c=r[1]});
+if(hasA(grd)){const r=adjP(grd,c,'G');o+=r[0];c=r[1]}
+grd.masks.forEach((m,i)=>{if(!m.on||!WBS.edMk||(m.t!='col'&&m.t!='lum'))return;const r=maskStep(m,i,c,ctx);o+=r[0];c=r[1]});
+return o||bg?flt(bg?'wbgradeEB':ink?'wbgradeEI':'wbgradeE',ctx.X,ctx.Y,ctx.RW,ctx.RH,o):''}
+function gDefs(ov){OVX=ov;let o='';try{if(!gdBypass){const e=edF(0);o+=canvasF('wbgrade',0)+canvasF('wbgradeT',1)+(e?e+edF(1)+edF(0,1):'')}
 WBS.tiles.forEach(t=>{if(stF(t.id))o+=stampF(t)});new Set(grd.masks.filter(m=>m.on&&WBS.edMk&&m.t=='lay'&&m.lay).map(m=>m.lay)).forEach(u=>o+=layerF(u))}finally{OVX=true}return o}
 const gKey=()=>JSON.stringify([WBS.tiles.map(t=>stF(t.id)),grd.masks.filter(m=>m.on&&WBS.edMk&&m.t=='lay').map(m=>m.lay)]);
 // structural changes (which stamps / layers carry a mask filter) need a rebuild; slider moves only refresh the filters

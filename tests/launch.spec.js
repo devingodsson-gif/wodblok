@@ -12,15 +12,13 @@ for (const runtime of ['artifact', 'none']) {
 
     const facts = await page.evaluate(() => ({
       title: document.title,
-      pattern: String(document.getElementById('boardS').hidden),
-      stamp: String(!document.getElementById('boardS').hidden),
+      oldEditor: !!document.getElementById('boardS') || !!document.getElementById('ed'),
       openDocks: [...document.querySelectorAll('.dock.dk')].filter(d => d.offsetWidth * d.offsetHeight > 0).length,
       theme: document.documentElement.dataset.theme,
       name: document.getElementById('pnm').value,
     }));
     expect(facts.title).toMatch(/^Wodblok v\d+(\.\d+)*$/);
-    expect(facts.pattern).toBe('true');
-    expect(facts.stamp).toBe('false');
+    expect(facts.oldEditor, 'the Stamp editor is gone').toBe(false);
     expect(facts.openDocks, 'no tool windows open at launch').toBe(0);
     expect(facts.theme).toBe('dark');
     expect(facts.name).toBe('');
