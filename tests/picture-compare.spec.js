@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, TARGET, APP_URL, openApp, openPanel, settle } = require('./helpers/harness');
+const { ROOT, TARGET, APP_URL, openApp, openProjectFile, openPanel, settle } = require('./helpers/harness');
 const { FIXTURES } = require('./helpers/speed');
 
 const BASE = process.env.WB_BASELINE;
@@ -18,21 +18,20 @@ test.beforeEach(() => { test.skip(!BASE, 'needs WB_BASELINE=<older dist/wodblok.
 // (a mean difference of 2.5 of 255, and at most 1 pixel in 100 off by more than 48); the other files must still match.
 // 1.35.0: "diamond" has inverted stamps. Their tiles now overlap by a hair of their own colour, so the light line between neighbouring tiles is gone; the outline of
 // each inverted tile also grows by half a pixel, so its edge pixels differ (mean about 0.45 of 255). Nothing else in that picture may differ.
-const LOOSE = { busy: { mean: 2.5, big: 0.01 }, diamond: { mean: 0.8, big: 0.01 } };
+// 2.0.4: the stamp tray is gone, so the Fit picture of "wide" sits a fraction of a pixel differently from the baseline's (mean 0.24 of 255, 7 pixels off by more than 48). Drop the "wide" entry once the baseline is 2.0.4 or later.
+const LOOSE = { busy: { mean: 2.5, big: 0.01 }, diamond: { mean: 0.8, big: 0.01 }, wide: { mean: 0.5, big: 0.001 } };
 const CTX = { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce', acceptDownloads: true };
 
 async function render(browser, url, fixture) {
   const ctx = await browser.newContext(CTX);
   const page = await ctx.newPage();
   const { errors } = await openApp(page, { seed: 21, url });
-  // a baseline whose file format is older than the fixtures cannot open them (the format number went up in 2.0.2): there is nothing to compare then
-  await page.setInputFiles('#pfile', fixture);
-  await page.waitForFunction(() => /Opened|newer WODBLOK/.test((document.getElementById('pmsg') || {}).textContent || ''), null, { timeout: 30000 });
-  if (/newer WODBLOK/.test(await page.locator('#pmsg').textContent())) { await ctx.close(); return { unreadable: true, errors }; }
-  await settle(page);
+  await openProjectFile(page, fixture);
   const shots = {};
   // the rail's name labels move when a tool is added to the rail, and the stamp outlines (1.46.4, drawn over the artwork in their own overlay, never part of it) are an editing aid: neither is part of the picture. The PNG export still compares the artwork itself.
-  await page.addStyleTag({ content: '.tip,#stolsvg{display:none!important}' });
+  await page.addStyleTag({ content: '.tip,#stolsvg,.film{display:none!important}' });
+  await page.evaluate(() => window.dispatchEvent(new Event('resize')));   // the baseline still has its stamp tray (hidden above): fit again, as it would without it
+  await settle(page);
   const shoot = async (label, sel) => { await settle(page, { quiet: 8 });
     // a build before 1.9.1 cannot say when its prints are done: give it time
     if (!(await page.evaluate(() => !!(window.__wbTest && window.__wbTest.printsBusy)))) { await page.waitForTimeout(2500); await settle(page, { quiet: 8 }); }
@@ -91,7 +90,6 @@ for (const name of Object.keys(FIXTURES)) {
   test(`${name}: this build draws the same pictures as the baseline build`, async ({ browser }) => {
     test.setTimeout(8 * 60 * 1000);
     const was = await render(browser, 'file://' + path.resolve(BASE), FIXTURES[name]);
-    test.skip(!!was.unreadable, 'the baseline build is older than the fixtures\' file format and cannot open them');
     const now = await render(browser, APP_URL, FIXTURES[name]);
     const out = {};
     for (const label of Object.keys(was.shots)) {
