@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, TARGET, APP_URL, openApp, openProjectFile, openPanel, settle } = require('./helpers/harness');
+const { ROOT, TARGET, APP_URL, openApp, openPanel, settle } = require('./helpers/harness');
 const { FIXTURES } = require('./helpers/speed');
 
 const BASE = process.env.WB_BASELINE;
@@ -25,7 +25,11 @@ async function render(browser, url, fixture) {
   const ctx = await browser.newContext(CTX);
   const page = await ctx.newPage();
   const { errors } = await openApp(page, { seed: 21, url });
-  await openProjectFile(page, fixture);
+  // a baseline whose file format is older than the fixtures cannot open them (the format number went up in 2.0.2): there is nothing to compare then
+  await page.setInputFiles('#pfile', fixture);
+  await page.waitForFunction(() => /Opened|newer WODBLOK/.test((document.getElementById('pmsg') || {}).textContent || ''), null, { timeout: 30000 });
+  if (/newer WODBLOK/.test(await page.locator('#pmsg').textContent())) { await ctx.close(); return { unreadable: true, errors }; }
+  await settle(page);
   const shots = {};
   // the rail's name labels move when a tool is added to the rail, and the stamp outlines (1.46.4, drawn over the artwork in their own overlay, never part of it) are an editing aid: neither is part of the picture. The PNG export still compares the artwork itself.
   await page.addStyleTag({ content: '.tip,#stolsvg{display:none!important}' });
@@ -87,6 +91,7 @@ for (const name of Object.keys(FIXTURES)) {
   test(`${name}: this build draws the same pictures as the baseline build`, async ({ browser }) => {
     test.setTimeout(8 * 60 * 1000);
     const was = await render(browser, 'file://' + path.resolve(BASE), FIXTURES[name]);
+    test.skip(!!was.unreadable, 'the baseline build is older than the fixtures\' file format and cannot open them');
     const now = await render(browser, APP_URL, FIXTURES[name]);
     const out = {};
     for (const label of Object.keys(was.shots)) {
