@@ -26,7 +26,7 @@ const luid=()=>'l'+Math.random().toString(36).slice(2,9);
 const mkL=(name,st,lay,size)=>({u:luid(),name,vis:true,st,lay,size,ox:0,oy:0,rot:0,pst:0,pfl:0});
 let _stT=0;const store=()=>{clearTimeout(_stT);_stT=setTimeout(store0,400)};
 const store0=()=>{_stT=0;try{kv.set('wb4_layers',JSON.stringify({layers:WBS.layers}));kv.set('wb2_proj',JSON.stringify(WBS.proj));kv.set('wb2_cust',JSON.stringify(cust));kv.set('wb2_tiles',JSON.stringify(WBS.tiles))}catch(e){}};
-const say=t=>$('msg').textContent=t;
+const say=t=>{$('pmsg').textContent=t};
 const pal=()=>[col(WBS.proj.bg),col(WBS.proj.ink)];
 const inkOf=t=>col(t.ink||WBS.proj.ink);
 const cols=t=>{const b0=col(WBS.proj.bg),c0=inkOf(t);return t.neg?{bg:c0,c:b0,d:c0}:{bg:b0,c:c0,d:b0}};
