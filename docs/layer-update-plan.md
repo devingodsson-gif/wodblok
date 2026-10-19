@@ -170,7 +170,8 @@ One entry per finished step: version, what changed, what was tested, anything th
 | 9a Port the last Stamp-editor tools | 1.46.9 | done on branch `feat/1.46.9-port-editor-tools` (stacked on step 8), draft pull request |
 | 9b Retire the Stamp editor | 1.46.10 | done, merged and live (Oct 19 2026, pull request 108, with steps 6 to 9a) |
 | 10 Rewrite what depends on it | 1.46.11 | done on branch `feat/1.46.11-randomize-templates`(pull request 109) |
-| 11 Tests on the canvas flow | 1.46.12 | done on branch `feat/1.46.12-tests-canvas-flow` (stacked on step 10) |
+| 11 Tests on the canvas flow | 1.46.12 | done, merged and live (Oct 19 2026, pull request 110, with step 10) |
+| 12 Final check, 2.0.0 | 2.0.0 | built on branch `feat/2.0.0-final`; not live until the owner says |
 | 9 to 12 | | not started |
 
 ### Step 0 audit: Stamp editor panels against Canvas mode (Oct 18 2026, read from `MODEP` in `34-desktop-shell.js`)
@@ -296,3 +297,8 @@ Removed: the Pattern / Stamp editor switch, the `v` key, the New/Duplicate/tab/l
 Every spec that opened the Stamp editor (`setMode(page,'stamp')`) was moved to the canvas flow: `unlockStamp`, `pickShape`, `stampInstance`, `clickStamp` (new in tests/helpers/harness.js), text typed in the Text panel with a stamp unlocked, results read from the state's `tiles[0].items`. 39 files; 11 tests were deleted because the feature is gone or already covered: the editor zoom bar (stamp-zoom, whole file), the box-on-cursor preview, the editor's picture drop and copy/paste, two selection-box specs covered by stamp-canvas-edit, the rank-in-Stamp-editor command-search block, and the `stamp editor view` scenario. `setMode(page,'stamp')` and `__wbTest.setView` are now unused by any spec (step 12 removes the hook).
 **Two app gaps found by the rewrite, one fixed:** a dropped picture now becomes a shape in an unlocked stamp at once (it only did in the editor); unlocking a stamp now switches the Text panel to the stamp's options (`stLock` did not call `stTextSync`). **Open, owner's call:** dragging a shape from the Shapes list onto the canvas places nothing (it worked onto the editor only; a click still arms the brush), and text armed over an unlocked stamp shows no box on the cursor (a Text layer does).
 **Orphaned snapshots, need the owner's OK to delete:** `tests/__snapshots__/scenarios.spec.js/stamp-editor-state.json`, `stamp-editor-svg.json`, and the golden `tests/__golden__/sandbox/scenarios.spec.js/stamp-editor.png`.
+
+### Step 12 outcome: the old editor is deleted (2.0.0, Oct 19 2026)
+**Removed:** the hidden Stamp editor page (`#boardS`, `#ed`, its hint and grid toolbar), the Grid (editor) and Pattern preview panels with their JS, the editor's pointer, wheel and key handlers (select, drag, marquee, handles, split line, ghost, drop), the editor zoom, `setView` and the per-view plumbing (`view`, `MODEP.stamp`, `WS.stamp`, `WBS.curView`, `tbSync`, the `__wbTest.setView` hook and `setMode` in the test harness), the editor's grade filters (`edF`, `edRgn`) and its render helpers (`gridSVG`, `edInkDef`, `edInkOn`, `hdlSVG`, `snapPt`). Workspaces and the panel list are one for the whole app.
+**New with it:** a shape dragged from the Shapes list and let go over an instance of the unlocked stamp is put in that stamp (`sceDropShape`), replacing the old drop onto the editor.
+**Not removed (still used by the canvas or by files):** the per-letter text form (`tg`, `tgm`) and the dormant `expand`, `items` and symmetry helpers that the canvas, the print and the export share; `grid`, `snapSize` and `WBS.edInk` / `edTx` / `edMk` (the last three are fixed at their defaults). A list of unused top-level names left from older releases is in `docs/known-issues.md`.

@@ -66,3 +66,5 @@ The Stamp editor's text Scatter control (`<div class="seg" id="tx_sc">`) and the
 ## Test flake: speed-guard "busy" dangling references (seen again, layer update step 5)
 `tests/speed-guard.spec.js` "busy: the pattern on screen stays light and every reference resolves" now and then reports `use -> #s#` (18) and `g[filter] -> #lk#` (3): stamp prints and layer ink filters that are not on the page yet when the check runs. It passes alone on re-run (4 of 4 on the step 5 build; one failure in three runs of the step 3 build too), so it is not from the layer update. Same family as the "stamps point at outlines that are not on the page yet" note above. Snapshots untouched.
 
+## Unused top-level names left in the build (found in layer update step 12)
+`mkdd`, `cItem`, `PDESC`, `sBlob`, `surfVec`, `PGD`, `shapeInfo`, `FRD`, `gRg`, `xsvg`, `fKids`, `HEXRE`, `hexRGB`, `slotRef`, `slotNo`, `trayHexes`, `USEW`, `stDotsNow`, `axCATS`, `teD`, `stAccepts` are declared and never used (older than the layer update). Not removed here; a later clean-up release can delete them.
