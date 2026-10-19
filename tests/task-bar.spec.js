@@ -1,8 +1,6 @@
 // Task bar (Phase 5): pin commands from command search, run them from the bar, unpin, keep after reload.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, settle } = require('./helpers/harness');
 
 const pin = async (page, text) => {
   await page.click('#cmdkb'); await page.fill('#cmdki', text);

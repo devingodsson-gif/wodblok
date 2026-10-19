@@ -1,8 +1,6 @@
 // 1.0.12: the shape controls are the Element editor panel (then the Shape editor), docked, not a band under the canvas; the Layers ink default shows a two-colour swatch.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, unlockStamp, pickShape, stampInstance, clickStamp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, unlockStamp, pickShape, stampInstance, clickStamp } = require('./helpers/harness');
 
 test('the Element editor is the floating panel for a placed shape: docked at the bottom, empty until a shape is selected', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });

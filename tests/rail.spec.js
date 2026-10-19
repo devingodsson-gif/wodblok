@@ -1,9 +1,7 @@
 // The tool rail (UX review C4): shared tools sit in the same slots in both views, every tool has one name (rail, tab and command search),
 // and the names show beside the icons in wide windows.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp } = require('./helpers/harness');
 
 const labels = page => page.locator('.rail button:visible').evaluateAll(b => b.map(x => x.getAttribute('aria-label')));
 const SHARED = ['Close all panels', 'Randomize', 'Colours', 'Colourways', 'Presets', 'Stamp library', 'Colour grading', 'Textures', 'History', 'Workspaces'];

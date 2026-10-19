@@ -7,13 +7,13 @@ import {trayIn} from './50-tray-core.js';
 import {selOne,store} from './06-motif-library-folders.js';
 import {nr,symOf,tbSync} from './07-symmetry.js';
 import {fitTs,migLayers} from './10-layer-grids.js';
-import {Q,drag,upd} from './11-pressure-flooding-block-edges.js';
-import {QS,doSplit,selSet} from './12-selection-and-split.js';
+import {upd} from './11-pressure-flooding-block-edges.js';
+import {QS,doSplit} from './12-selection-and-split.js';
 import {sync} from './13-preview-and-stamp-tool.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
 import {savePr} from './15-print-effects-and-stamp-texture.js';
 import {txClean} from './16-texture-generators.js';
-import {buildTex,migInk,saveTex,texNorm} from './17-texture-panel-and-previews.js';
+import {buildTex,saveTex,texNorm} from './17-texture-panel-and-previews.js';
 import {coreStr,dirty,paintPst,pgFix,pmsg,thumb} from './18-projects-and-cover-overlay.js';
 import {libRz} from './21-motif-library-ui.js';
 import {randomize,wbBA} from './20-before-after-and-randomizer.js';
@@ -25,7 +25,7 @@ function init34(){// ===== Desktop shell: panels, views, zoom, number fields, me
 const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shapes',sedit:'Element editor',layers:'Layout',cover:'Book cover'};
 let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
-// ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
+// ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
 const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shapes',mlist:'Shape list',sedit:'Element editor',layers:'Layout',stmp:'Stamps',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
@@ -34,11 +34,8 @@ let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]});
 let WS={pattern:wsDef()};
-for(let i=0;i<5;i++)Math.random();   // the five panel groups of the retired Stamp editor drew their ids here; drawing the same count keeps every seeded Randomize result (and its snapshot) as before
 try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}})}catch(e){}
-try{const sv0=JSON.parse(kv.get('wb30_ws')||'null');if(sv0&&!sv0.ly&&!WS.pattern.dock.concat(WS.pattern.float).some(g=>g.tabs.includes('lyrs')))WS.pattern.dock.unshift(wsG(['lyrs'],{f:.85}))}catch(e){}
-try{const sv2=JSON.parse(kv.get('wb30_ws')||'null');if(sv2&&!sv2.tx)['pattern'].forEach(m=>{if(!WS[m].dock.concat(WS[m].float).some(g=>g.tabs.includes('tex'))){const g=WS[m].dock.find(g=>g.tabs.includes('grade'))||WS[m].dock[0];if(g)g.tabs.push('tex');else WS[m].dock.push(wsG(['tex']))}})}catch(e){}
-WS.pv=1;WS.gr=1;WS.ly=1;WS.rs=1;WS.tx=1;
+
 const wsSave=()=>{try{kv.set('wb30_ws',JSON.stringify(WS))}catch(e){}};
 const wsL=()=>WS.pattern;
 const wsAll=()=>[...wsL().dock,...wsL().float];
@@ -82,7 +79,7 @@ function wsClamp(g){const st=document.querySelector('.stage').getBoundingClientR
 g.w=Math.max(200,Math.min(+g.w||300,innerWidth-20));g.h=Math.max(120,Math.min(+g.h||420,innerHeight-60));g.x=Math.max(-g.w+80,Math.min(g.x,innerWidth-80));g.y=Math.max(0,Math.min(g.y,innerHeight-36));if(g.y+g.h>innerHeight-8)g.y=Math.max(0,innerHeight-8-g.h);g.h=Math.min(g.h,innerHeight-8-g.y)}
 function wsEl(g,fl){const el=document.createElement('div');el.className='wg'+(fl?' fl':'')+(g.col?' col':'');el.dataset.g=g.id;
 if(fl){wsClamp(g);el.style.cssText=`left:${g.x}px;top:${g.y}px;width:${g.w}px;${g.col?'':`height:${g.h}px;`}z-index:${++wsZ}`}else el.style.flexGrow=g.f;
-el.innerHTML=`<div class="wh" title="Drag to move. Drop on another panel's tabs to group it, on a dock to stack it there, or at any edge of the window to dock it."><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
+el.innerHTML=`<div class="wh" title="Drag to move"><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
 `<button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button><button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close (reopen from the left bar)">${IC.x}</button></div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
 const bd=el.querySelector('.wbd');g.tabs.forEach(p=>{const sc=wsSec(p);if(sc){sc.classList.toggle('mc',!!sc.querySelector(':scope>details.g'));sc.hidden=p!=g.a;bd.appendChild(sc)}});return el}
 // the tool bar: the user's own order and the tools they took off it (kept in settings)
@@ -166,10 +163,7 @@ const typing=()=>{const a=document.activeElement;if(!a||a===document.body)return
 let wsRT=0,wsPend=false;addEventListener('resize',()=>{clearTimeout(wsRT);wsRT=setTimeout(()=>{if(!wsReady)return;if(typing()){wsPend=true;return}wsRender()},150)});
 addEventListener('focusout',()=>{setTimeout(()=>{if(wsPend&&!typing()){wsPend=false;if(wsReady)wsRender()}},300)});
 const stage=document.querySelector('.stage');
-// the stamp tray can collapse to a thin strip, to give a small window more room for the picture; the choice is remembered
-{const f=stage.querySelector('.film'),b=$('filmt');if(f&&b){const ap=(m,save)=>{f.classList.toggle('min',m);b.setAttribute('aria-expanded',String(!m));b.setAttribute('aria-label',m?'Show stamp tray':'Hide stamp tray');b.title=b.getAttribute('aria-label');stage.style.setProperty('--film-h',f.offsetHeight+'px');if(save){try{kv.set('wb_film_min',m?'1':'0')}catch(e){}}};
- let m0=false;try{m0=kv.get('wb_film_min')==='1'}catch(e){}b.onclick=()=>ap(!f.classList.contains('min'),true);ap(m0,false);try{new ResizeObserver(()=>stage.style.setProperty('--film-h',f.offsetHeight+'px')).observe(f)}catch(e){}}}
-function setView(){if(window.bkZ)requestAnimationFrame(()=>bkZ());$('boardP').classList.remove('off');stage.classList.add('pv');$('zoomc').style.display='';requestAnimationFrame(applyZ);tbSync();if(WBX.wbTxMode)WBX.wbTxMode(stUnlocked()==null?'pattern':'stamp');wsRender()}
+function setView(){if(window.bkZ)requestAnimationFrame(()=>bkZ());$('boardP').classList.remove('off');$('zoomc').style.display='';requestAnimationFrame(applyZ);tbSync();if(WBX.wbTxMode)WBX.wbTxMode(stUnlocked()==null?'pattern':'stamp');wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';if(!wsReady)setView();
 const L=wsL();let g=wsFind(p);
 // a tool that is not open yet opens docked on the right: Randomize beside the colour tools, anything else as a tab in the first group
@@ -198,7 +192,6 @@ setPanel(p)};
 
 // tool bar editing: the three-line button lists the tools that are off the bar; while it is open each tool on the bar shows an X to take it off; tools drag to a new place
 {const more=$('rmore'),menu=$('rmenu');let ed=false,drag=null,jus=0;
-const xsvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 const vis=()=>railBtns().filter(b=>!MODEP.pattern.includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)?false:true);
 function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP.pattern.includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn));
 {const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML+'<span class="tip">'+b.getAttribute('aria-label')+'</span>';if(wsFind(b.dataset.pn))m.classList.add('on');g.appendChild(m)});menu.append(g)}
@@ -250,8 +243,6 @@ railEl.addEventListener('pointermove',e=>{if(e.pointerType!='mouse'||D&&D.on)ret
 railEl.addEventListener('pointerleave',hvClear);
 railOrder();
 }
-// hide the motif bar outside the stamp editor
-const st=document.createElement('style');st.textContent='.stage.pv #sel{display:none!important}';document.head.appendChild(st);
 
 // ===== Randomize panel: which main features a roll may change. Anything switched off stays exactly as it is. Settings are remembered.
 (()=>{const sec=document.querySelector('section.pn[data-p="rand"]'),fts=[...sec.querySelectorAll('[data-ft]')],subs=[...sec.querySelectorAll('[data-sub]')],KEY='wb38_rzft',SKEY='wb50_rzsub',by=k=>fts.find(c=>c.dataset.ft==k),sk=m=>subs.filter(c=>c.dataset.sub.startsWith(m+'.'));
@@ -278,10 +269,10 @@ const amt=k=>{const c=by(k);return c&&eff(c)?amtOf(c):0};
 const FK='wb160_rzfold',fbox=sec.querySelector('[data-rzfbox]'),flist=sec.querySelector('[data-rzflist]'),fbtn=sec.querySelector('[data-rzfx]');
 let foff=new Set(),FS=[];try{const z=JSON.parse(kv.get(FK)||'[]');if(Array.isArray(z))foff=new Set(z.filter(v=>typeof v=='string'))}catch(e){}
 const fPick=()=>FS.filter(x=>x.c>0),fOn=x=>!foff.has(x.v),fHas=()=>FS.some(x=>x.ks.length&&fOn(x));
-const fKids=i=>{const o=[];for(let j=i+1;j<FS.length&&FS[j].d>FS[i].d;j++)o.push(FS[j]);return o};
 const fLabel=()=>{try{FS=libRz()}catch(e){return}const p=fPick(),n=p.filter(fOn).length,all=n==p.length;fbtn.querySelector('.rzn').textContent=all?'All':n+'/'+p.length;fbtn.classList.toggle('part',!all)};
 const fSaveOff=()=>{try{kv.set(FK,JSON.stringify([...foff]))}catch(e){}};
 function fPaint(){try{FS=libRz()}catch(e){FS=[]}flist.textContent='';FS.forEach(x=>{const l=document.createElement('label'),c=document.createElement('input'),s=document.createElement('span');l.className='chk sub';l.style.marginLeft=(x.d*14)+'px';if(!x.c)l.style.opacity='.45';c.type='checkbox';c.dataset.fv=x.v;c.checked=x.c>0&&fOn(x);c.disabled=!x.c;s.textContent=x.n;l.append(c,s);flist.appendChild(l)});fLabel()}
+const fKids=i=>{const o=[];for(let j=i+1;j<FS.length&&FS[j].d>FS[i].d;j++)o.push(FS[j]);return o};
 flist.addEventListener('change',e=>{const c=e.target.closest('[data-fv]');if(!c)return;const i=FS.findIndex(x=>x.v==c.dataset.fv);if(i<0)return;const prev=new Set(foff);[FS[i],...fKids(i)].forEach(x=>{if(!x.c)return;if(c.checked)foff.delete(x.v);else foff.add(x.v)});if(!fHas())foff=prev;fSaveOff();fPaint()});
 fbox.addEventListener('click',e=>{if(e.target.closest('[data-rzfall]')){foff.clear();fSaveOff();fPaint()}else if(e.target.closest('[data-rzfno]')){try{FS=libRz()}catch(e2){return}const keep=FS.find(x=>x.ks.length);foff=new Set(fPick().filter(x=>x!==keep).map(x=>x.v));fSaveOff();fPaint()}});
 fbtn.onclick=()=>{const open=fbox.hidden;if(open)fPaint();fbox.hidden=!open;fbtn.setAttribute('aria-expanded',open?'true':'false')};
@@ -297,7 +288,6 @@ function applyZ(){fitZ();const s=z||fitS;$('art').style.width=Math.round(CW*s)+'
 function zoomAt(ns,cx,cy){const b=$('boardP'),a=$('art'),r0=a.getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);z=Math.min(8,Math.max(.1,ns));applyZ();const r1=a.getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
 const zoomMid=f=>{const r=$('boardP').getBoundingClientRect();zoomAt((z||fitS)*f,r.left+r.width/2,r.top+r.height/2)};
 WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbZoomTo=s=>{const r=$('boardP').getBoundingClientRect();zoomAt(s,r.left+r.width/2,r.top+r.height/2)};WBX.wbZoomNow=()=>z||fitS;WBX.wbZoomIn=()=>!!z&&z>fitS*1.001;
-// ---- zoom in the Stamp editor: at Fit the editor is the size of its box; zooming makes it larger inside a scrolling box (1x to 8x)
 $('zi').onclick=()=>zoomMid(1.25);$('zo').onclick=()=>zoomMid(1/1.25);$('zl').onclick=()=>{z=0;applyZ()};
 $('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomAt((z||fitS)*(e.deltaY<0?1.1:1/1.1),e.clientX,e.clientY)},{passive:false});
 try{new ResizeObserver(()=>applyZ()).observe($('boardP'))}catch(e){window.addEventListener('resize',applyZ)}
@@ -316,13 +306,13 @@ const hasL=lb&&lb.tagName=='LABEL';r.parentNode.insertBefore(row,hasL?lb:r);if(h
 document.querySelectorAll('#sel input[type=range]').forEach(r=>{const row=r.closest('.ctl');if(row&&!row.querySelector('.num')){row.querySelector('label').htmlFor=r.id;addNum(row,r)}})}
 function paint(r){const lo=+r.min,hi=+r.max,p=hi>lo?(r.value-lo)/(hi-lo)*100:0;r.style.setProperty('--p',p.toFixed(1)+'%');if(r._n&&document.activeElement!==r._n)r._n.value=+(+r.value).toFixed(2)}
 function nums(){document.querySelectorAll('input[type=range]').forEach(paint)}
+WBX.wbNums=nums;
 document.addEventListener('input',e=>{if(e.target.type=='range')paint(e.target)});
 
 // ---- status line + dock subtitle
 function info(){const ks=new Set(WBS.tiles.map(t=>shOf(t).k)),k=ks.size>1?'Mixed':SHN[[...ks][0]]||'Rectangle',c=WBS.dim.c;
 $('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(()=>{const k=csk(),r=(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2));return k=='rect'?r:CSN[k]+(CASP.includes(k)?' '+r:'')})()}</b></span>`}<span class="it">Block <b>${k}</b></span><span class="it">Stamps <b>${WBS.tiles.length}</b></span><span class="it">Layers <b>${WBS.layers.length}</b></span>`;
-$('docks').textContent=panel=='stamp'||panel=='motifs'?`Stamp ${WBS.cur+1} of ${WBS.tiles.length}`:'';
-if(WBS.layers[WBS.selL])$('lnmx').textContent=WBS.layers[WBS.selL].name}
+}
 // wrap redraw hooks so the shell stays in sync
 $('rzbar').onclick=()=>$('rzdo').click();
 const _draw=WBH.draw;WBH.draw=function(){_draw();nums();info()};
@@ -361,11 +351,11 @@ const navDirty=()=>{if(WBX.wbNavDirty)WBX.wbNavDirty();if(WBX.wbVarDirty)WBX.wbV
 // A step named by whoever made it (a Randomize roll, a look, a palette) gets a small picture, taken once from the finished piece when nothing is happening
 // (never during a drag or a roll). Steps made by hand have none.
 let thT=0,thWant=null;
-function thRun(){if(drag||WBS.WBDRG||WBX.wbHoldOn||WBX.wbRollHold||(WBX.wbTxBusy||0)>0||document.body.classList.contains('babusy')){thT=setTimeout(thRun,800);return}
+function thRun(){if(WBS.WBDRG||WBX.wbHoldOn||WBX.wbRollHold||(WBX.wbTxBusy||0)>0||document.body.classList.contains('babusy')){thT=setTimeout(thRun,800);return}
  const s=thWant;if(!s||s!==coreStr())return;thWant=null;thumb(120).then(u=>{const i=hist.lastIndexOf(s);if(u&&i>=0){histTh[i]=u;if(WBX.wbHistPaint)WBX.wbHistPaint()}})}
-function cap(){if(drag||WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));if(stUnlocked()!=null&&!named&&/^Added shape/.test(histL[histL.length-1])&&seAuto()&&!wsFind('sedit'))setPanel('sedit');if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
+function cap(){if(WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));if(stUnlocked()!=null&&!named&&/^Added shape/.test(histL[histL.length-1])&&seAuto()&&!wsFind('sedit'))setPanel('sedit');if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
-function applyCore(c){trayIn(c);WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;migInk();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
+function applyCore(c){trayIn(c);WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
 WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
 store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd();if(WBX.wbGrade&&WBX.wbGrade.sync)WBX.wbGrade.sync()}   // a stamp's own grade is part of the stamp, so the Grading sliders are read again after every step
 // Loading a step normalises the document a little (for example every stamp gets an empty texture list), so the entry is re-read
@@ -413,7 +403,7 @@ document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.mat
 if(m&&k=='z'){if(typing&&(t.type=='text'||t.type=='number'))return;e.preventDefault();e.shiftKey?redo():undo()}
 else if(m&&k=='y'){e.preventDefault();redo()}
 else if(m&&k=='s'){e.preventDefault();cmdGet('file.save').run()}
-else if(m&&k=='d'&&!typing&&q){e.preventDefault();cmdGet('stamp.duplicateMotif').run()}
+else if(m&&k=='d'&&!typing&&q&&stUnlocked()!=null){e.preventDefault();cmdGet('stamp.duplicateMotif').run()}
 else if(!typing&&WBS.split&&e.key=='Enter'){e.preventDefault();doSplit()}
 else if(!typing&&WBS.split&&e.key=='Escape'){WBS.split=null;WBH.draw()}
 else if(!typing&&WBS.brush&&!WBS.brush.txt&&(e.key=='['||e.key==']')){e.preventDefault();WBS.brush.r=((WBS.brush.r+(e.key==']'?15:-15)+540)%360)-180}
@@ -505,8 +495,8 @@ enhance();{const r=$('ts'),row=r.closest('.ctl'),f=document.createElement('div')
 const ic=(d)=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 f.innerHTML=`<label>Fit to frame</label><div class="seg" id="tsfit">`+
 `<button type="button" data-f="" title="Off: stamps run off the frame edges">${ic('<circle cx="12" cy="12" r="7.5"/><path d="M6.7 17.3l10.6-10.6"/>')}Off</button>`+
-`<button type="button" data-f="h" title="Fit width: a whole number of stamps spans the width exactly; stamps may run off the top and bottom">${ic('<path d="M3.5 12h17M7 8.5L3.5 12 7 15.5M17 8.5l3.5 3.5-3.5 3.5"/><path d="M3.5 5v2.5M20.5 5v2.5M3.5 16.5V19M20.5 16.5V19"/>')}Width</button>`+
-`<button type="button" data-f="v" title="Fit height: a whole number of stamps spans the height exactly; stamps may run off the sides">${ic('<path d="M12 3.5v17M8.5 7L12 3.5 15.5 7M8.5 17l3.5 3.5 3.5-3.5"/><path d="M5 3.5h2.5M16.5 3.5H19M5 20.5h2.5M16.5 20.5H19"/>')}Height</button></div>`;
+`<button type="button" data-f="h" title="Fit width">${ic('<path d="M3.5 12h17M7 8.5L3.5 12 7 15.5M17 8.5l3.5 3.5-3.5 3.5"/><path d="M3.5 5v2.5M20.5 5v2.5M3.5 16.5V19M20.5 16.5V19"/>')}Width</button>`+
+`<button type="button" data-f="v" title="Fit height">${ic('<path d="M12 3.5v17M8.5 7L12 3.5 15.5 7M8.5 17l3.5 3.5 3.5-3.5"/><path d="M5 3.5h2.5M16.5 3.5H19M5 20.5h2.5M16.5 20.5H19"/>')}Height</button></div>`;
 row.after(f);
 f.onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const L=LY();L.fit=b.dataset.f;if(L.fit)L.size=+fitTs(L).toFixed(3);store();upd();sync();nums()};
 r.oninput=()=>{const L=LY();L.size=L.fit?+fitTs(L,+r.value).toFixed(3):+r.value;if(L.fit){r.value=L.size;paint(r)}store();upd()}}

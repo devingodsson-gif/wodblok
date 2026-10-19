@@ -1,6 +1,6 @@
 // 1.46.0: the Text styles library: built-in Starter styles, Save style, folders, apply, rename, delete (same tree as Saved colours).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
 // Canvas flow: the text typed in the Text panel is put on the first printed instance of the unlocked stamp, then one of its letters is clicked so the whole text is selected (the panel edits it)
 async function putTextCanvas(page) {
   const p = await stampInstance(page);
@@ -13,8 +13,6 @@ async function putTextCanvas(page) {
   const cl = await canvasToClient(page, c.x, c.y);
   await page.mouse.click(cl.x, cl.y); await settle(page, { max: 30000 });
 }
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 const set = (page, id, v) => page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); }, [id, v]);
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;

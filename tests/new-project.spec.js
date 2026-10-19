@@ -34,7 +34,7 @@ test('first click with unsaved work keeps the menu open and says what the next c
 test('the New project button in the Projects dialog shows the same cue', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
   await roll(page);
-  await installFolder(page, [{ name: 'x.wodblok', path: path.join(ROOT, 'tests', 'fixtures', 'project-1-diamond-v19.wodblok') }]);
+  await installFolder(page, [{ name: 'x.wodblok', path: path.join(ROOT, 'tests', 'fixtures', 'project-1-diamond.wodblok') }]);
   await page.click('#pls');
   await page.click('#pnw2');
   await expect(page.locator('#pnw2')).toHaveText('Click again: can’t be undone');

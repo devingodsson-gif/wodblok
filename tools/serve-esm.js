@@ -9,6 +9,7 @@ if (!shellOf().includes('src="/main.js"')) throw new Error('shell marker not fou
 http.createServer((q, r) => {
   const u = q.url.split('?')[0];
   if (u === '/' || u === '/index.html') { r.writeHead(200, { 'content-type': 'text/html' }); return r.end(shellOf()); }
+  if (u === '/sw.js') { r.writeHead(200, { 'content-type': 'text/javascript' }); return r.end('// no service worker in the dev server: the page registers one, and a missing script is a console error'); }
   const f = path.join(SRC, path.normalize(u));
   if (!f.startsWith(SRC) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); }
   const body = f === path.join(SRC, 'data', 'templates.js') ? require('./templates/folders').withFolders(fs.readFileSync(f, 'utf8')) : fs.readFileSync(f);   // the templates/ folders join the built-in list

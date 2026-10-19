@@ -3,9 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const layers = async page => JSON.parse(await getState(page)).layers;
@@ -139,14 +137,17 @@ test('changing the Arrangement can be undone and redone', async ({ page }) => {
 
 test('turning an arrangement on for a layer with no stamps picks the current stamp', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
-  const FIX = path.join(__dirname, 'fixtures', 'project-3-rect-16x9.wodblok.json');
-  const p = JSON.parse(fs.readFileSync(FIX, 'utf8'));
+  const FIX = path.join(__dirname, 'fixtures', 'project-3-rect-16x9.wodblok');
+  const { zipSync, unzipSync, strToU8, strFromU8 } = require('fflate');
+  const read = f => unzipSync(new Uint8Array(fs.readFileSync(f)));
+  const p = JSON.parse(strFromU8(read(FIX)['project.json']));
   const bare = JSON.parse(JSON.stringify(p.layers[0]));
   bare.u = 'bareLayer'; bare.name = 'Bare'; bare.free = true; bare.st = []; bare.pl = [];
   p.layers.push(bare);
   fs.mkdirSync(testInfo.outputDir, { recursive: true });
-  const file = path.join(testInfo.outputDir, 'bare.wodblok.json');
-  fs.writeFileSync(file, JSON.stringify(p));
+  const file = path.join(testInfo.outputDir, 'bare.wodblok');
+  const out = {}; for (const [k, v] of Object.entries({ ...read(FIX), 'project.json': strToU8(JSON.stringify(p)) })) out[k] = [v, { level: k === 'mimetype' || k.startsWith('assets/') ? 0 : 6 }];
+  fs.writeFileSync(file, Buffer.from(zipSync(out)));
   await page.setInputFiles('#pfile', file);
   await page.waitForFunction(() => /Opened/.test((document.getElementById('pmsg') || {}).textContent || ''), null, { timeout: 30000 });
   await settle(page);

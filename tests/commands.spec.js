@@ -1,9 +1,7 @@
 // The command registry (Phase 2e): every user action is a named command. These tests keep the registry and the buttons it
 // drives in step, and keep the documented shortcuts honest (a shortcut listed in the table must really do that today).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build; v100 has no command registry'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 const cmds = page => page.evaluate(() => window.__wbTest.commands.list().map(c => ({ id: c.id, label: c.label, shortcut: c.shortcut || null, elId: c.elId })));
 
@@ -56,6 +54,7 @@ test('documented shortcuts really work', async ({ page }) => {
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'false');
   await page.keyboard.down('Backslash');
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'true');   // it takes a moment to get the other picture ready
+  await page.waitForSelector('.baov');   // the other picture is on screen (the button reads pressed while it is still being made; letting go before it is ready leaves Before on, as a tap does)
   await page.waitForTimeout(500);
   await page.keyboard.up('Backslash');
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'false');

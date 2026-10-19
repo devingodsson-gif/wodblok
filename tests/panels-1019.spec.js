@@ -1,8 +1,6 @@
 // 1.0.19 (UX review 2: N2, N4 label, N7): no "Last roll" paragraph, no step numbers in Import artwork, a labelled Save snapshot button, shape names not clipped.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 test('Randomize shows no "Last roll" paragraph after a roll (the status line reports it)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });

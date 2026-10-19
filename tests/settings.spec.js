@@ -1,9 +1,7 @@
 // Phase 2c: the ~36 wbNN_ keys live in one versioned record (`wb_settings`). The old keys are migrated on first read and are
 // left in place; big values (fonts, projects, the autosave) keep their own keys.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, settle } = require('./helpers/harness');
 
 async function freshPage(browser, seedKeys) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });

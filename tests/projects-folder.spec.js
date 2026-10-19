@@ -2,15 +2,13 @@
 // .wodblok files in that folder; "Close folder" forgets it. (UX review C1: projects are files, not browser storage.)
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, TARGET, openApp, settle, getState } = require('./helpers/harness');
+const { ROOT, openApp, settle, getState } = require('./helpers/harness');
 const { installFolder } = require('./helpers/fake-folder');
 const FX = path.join(ROOT, 'tests', 'fixtures');
 
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
-
 const FILES = [
-  { name: 'diamond.wodblok', path: path.join(FX, 'project-1-diamond-v19.wodblok') },
-  { name: 'old-rect.wodblok.json', path: path.join(FX, 'project-4-rect-4x3.wodblok.json') },
+  { name: 'diamond.wodblok', path: path.join(FX, 'project-1-diamond.wodblok') },
+  { name: 'old-rect.wodblok', path: path.join(FX, 'project-4-rect-4x3.wodblok') },
 ];
 
 test('the button names the next step, the folder lists its projects, a project opens, and Close folder forgets it', async ({ page }) => {

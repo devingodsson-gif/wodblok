@@ -1,8 +1,6 @@
 // A Randomize roll and a snapshot get a small picture in History, taken once the piece is finished and the page is quiet; steps made by hand have none (UX review C2).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 const roll = async page => { await page.click('#rzbar'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
 

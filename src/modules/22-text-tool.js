@@ -1,4 +1,3 @@
-import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,SH,SK,SW,shp,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {cust,inkOf,it,pal,selOne,store} from './06-motif-library-folders.js';
@@ -7,7 +6,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS,delItems,selSet} from './12-selection-and-split.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {TXO_KEYS,TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
-import {teRnd,teD,teF,teFonts,teUF,teAddUF,teCss,teFitSz,teLayBox,teLayout,teLoadFonts,teReady,teSetNotify} from './60-text-engine.js';
+import {teRnd,teF,teFonts,teUF,teAddUF,teCss,teFitSz,teLayBox,teLayout,teLoadFonts,teReady,teSetNotify} from './60-text-engine.js';
 import {stTxMode} from './63-stamp-tool.js';
 
 function init22(){// ===== Text tool: type text, it's traced into carved letter shapes. Each letter becomes its own shape on the stamp,
@@ -80,7 +79,7 @@ const id=await teAddUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();$('
 WBX.wbTxLay=teLayBox;
 WBX.wbTxUnit=()=>Math.min(CW,CH)/100;
 WBX.wbTxAddFont=async fl=>{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';const id=await teAddUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();return id};
-// one Text panel for both editors: the Stamp editor builds letters on the stamp, the Pattern editor fills a Text layer
+// one Text panel: with a stamp unlocked it builds letters in the stamp, otherwise it fills a Text layer
 WBX.wbTxMode=v=>{const pat=v=='pattern';$('tx_lay').hidden=!pat;$('tx_pv').hidden=pat;if(pat)$('tx_convrow').hidden=true;$('tx_sz').dataset.def=pat?'10':'30';if(pat){if(txArmed())txArm(false);if(WBX.wbTbMode)WBX.wbTbMode()}else{WBS.txArm=false;toUI();$('tx_ed').hidden=!edit;$('tx_convrow').hidden=!edit;$('tx_sprow').hidden=true;txArmUI()}};
 // double-click a text on the canvas: the Text panel opens with the words selected, so typing replaces them and the canvas follows as you type
 document.addEventListener('dblclick',e=>{const t=e.target;if(!t||!t.closest)return;const stamp=stTxMode()&&t.closest('#artwrap')&&grpOf(),lay=!stTxMode()&&t.closest('#boardP')&&WBX.wbTbHas&&WBX.wbTbHas();if(!stamp&&!lay)return;if(WBX.wbOpenPanel)WBX.wbOpenPanel('text');const f=$('tx_t');f.focus();f.select()});

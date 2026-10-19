@@ -65,11 +65,12 @@ let stPage='general',stKeyQ='',stOpener=null;
 const stTgl=(id,on,label)=>`<div class="stgr"><span>${label}</span><button type="button" class="pvc" id="${id}" aria-pressed="${on}" aria-label="${label}">${on?'On':'Off'}</button></div>`;
 const stSegH=(id,label,opts,cur)=>`<div class="stgr"><span>${label}</span><div class="seg" id="${id}" role="group" aria-label="${label}" style="--n:${opts.length}">${opts.map(([v,t])=>`<button type="button" data-v="${v}" class="${String(v)===String(cur)?'on':''}" aria-pressed="${String(v)===String(cur)}">${t}</button>`).join('')}</div></div>`;
 // The four view-only toggles (formerly the Display menu). Each one drives the existing hidden button, so the state, keys and commands stay shared.
+// the keys that work but are not commands, listed with the commands that have one
+const stKeys=()=>cmdList().filter(c=>c.shortcut).concat([['Redo (also)','Mod+Y'],['Copy shape','Mod+C'],['Paste shape','Mod+V'],['Hand (hold)','Space'],['Turn the picked shape','[ ]'],['Split shape: apply','Enter'],['Split shape: cancel','Escape'],['Zoom in','Mod+='],['Zoom out','Mod+-'],['Zoom to fit','Mod+0']].map(([label,shortcut])=>({label,shortcut})));
 const stVIEW=[['stgti','gti','Stamp texture'],['stgtx','gtx','Canvas texture'],['stgtm','gtm','Grading masks'],['stgdt','gdt','Stage dots']];
 const stViewOn=id=>$(id)?.getAttribute('aria-pressed')==='true';
 const stViewToggles=()=>stVIEW.map(([sid,bid,t])=>stTgl(sid,stViewOn(bid),t)).join('');
 const stThemeNow=()=>document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
-const stDotsNow=()=>!document.body.classList.contains('plain');
 function stAccentRow(){const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur);
  return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div></div>`}
 function stPageHtml(p){
@@ -78,7 +79,7 @@ function stPageHtml(p){
  if(p=='speed')return stTgl('stgdr',stFlag(stK_DRAFT,true),'Draft while dragging')+stTgl('stgca',stFlag(stK_CALM,false),'Reduce motion');
  if(p=='files')return stSegH('stgas','Autosave every',stSAVE_EVERY,stNumGet(stK_SAVE,8,8,120))+`<div class="stgr"><span>Storage</span><b id="stguse">…</b></div><div class="stgr"><span>Keep my data</span><button type="button" class="pvc" id="stgkp" aria-pressed="false" aria-label="Keep my data">…</button></div>`;
  if(p=='keys'){const m=/Mac|iPhone|iPad/.test(navigator.platform||'');
-  const rows=cmdList().filter(c=>c.shortcut).filter(c=>!stKeyQ||(c.label+' '+c.shortcut).toLowerCase().includes(stKeyQ.toLowerCase()));
+  const rows=stKeys().filter(c=>!stKeyQ||(c.label+' '+c.shortcut).toLowerCase().includes(stKeyQ.toLowerCase()));
   return`<input type="text" id="stgkq" aria-label="Search shortcuts" placeholder="Search" value="${stEsc(stKeyQ)}"><div class="stgk" id="stgkl">${rows.map(c=>`<div class="stgkr"><span>${stEsc(c.label)}</span><kbd>${stEsc(cmdFormatShortcut(c.shortcut,m))}</kbd></div>`).join('')||'<div class="stgkr"><span>No match</span></div>'}</div>`}
  const lic=[['Hanken Grotesk','SIL OFL 1.1'],['IM Fell English','SIL OFL 1.1'],['fflate','MIT']];
  return`<div class="stgr"><span>Version</span><b>v${stEsc(WB_VER)}</b></div><div class="glb">Licences</div>${lic.map(([n,l])=>`<div class="stgr"><span>${n}</span><b>${l}</b></div>`).join('')}`}
@@ -105,7 +106,7 @@ function stWire(){const b=$('stgbody');
  seg('stgas',v=>{const n=+v;try{kv.set(stK_SAVE,String(n))}catch(e){}setAutosaveEvery(n*1000)});
  on('stgkp',async()=>{try{await storage.persist()}catch(e){}stStoragePaint()});
  const q=$('stgkq');if(q)q.addEventListener('input',()=>{stKeyQ=q.value;const m=/Mac|iPhone|iPad/.test(navigator.platform||'');
-  const rows=cmdList().filter(c=>c.shortcut).filter(c=>!stKeyQ||(c.label+' '+c.shortcut).toLowerCase().includes(stKeyQ.toLowerCase()));
+  const rows=stKeys().filter(c=>!stKeyQ||(c.label+' '+c.shortcut).toLowerCase().includes(stKeyQ.toLowerCase()));
   $('stgkl').innerHTML=rows.map(c=>`<div class="stgkr"><span>${stEsc(c.label)}</span><kbd>${stEsc(cmdFormatShortcut(c.shortcut,m))}</kbd></div>`).join('')||'<div class="stgkr"><span>No match</span></div>'})}
 // the swatch row follows the stored accent (the picker changes it live)
 function stAccentMarks(){const g=$('stgacc');if(!g)return;const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur),n=$('stgan');if(n)n.textContent=stAccentName(cur);

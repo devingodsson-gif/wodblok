@@ -1,7 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp } = require('./helpers/harness');
 
 const mode = page => page.evaluate(() => document.getElementById('rcls').dataset.m);
 const open = page => page.evaluate(() => document.querySelectorAll('.wg').length);

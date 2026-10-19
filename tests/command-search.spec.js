@@ -1,8 +1,6 @@
 // Command search (Mod+K): finds any command in the registry and runs it, by keyboard or by pointer.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build; v100 has no command registry'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 const rowsOf = page => page.locator('#cmdkl .ckr b').allTextContents();
 

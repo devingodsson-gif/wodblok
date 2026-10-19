@@ -1,9 +1,7 @@
 // The shape controls are their own tool: the Shape editor panel. It is docked along the bottom of the Stamp editor (1.35.0; it used to float), opens by itself when a shape is placed
 // (unless Auto-open at the top is switched off), dims when nothing is selected, and moves like any floating panel.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
 
 // pick the first library shape and place it in the unlocked stamp, at an offset (canvas units) from the middle of an instance
 const place = async (page, dx, dy) => { await page.locator('#lib button[data-m]').first().click(); await clickStamp(page, await stampInstance(page), dx, dy); };

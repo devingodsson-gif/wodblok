@@ -1,7 +1,7 @@
 {
   "name": "wodblok",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.0.4",
   "description": "WODBLOK stamped-pattern editor (web app first). Phase 0: safety net around the v100 baseline.",
   "scripts": {
     "build": "node tools/build.js",
@@ -9,16 +9,15 @@
     "build:web": "node tools/build.js --web",
     "dev": "node tools/serve-esm.js",
     "test": "playwright test --project=chromium",
-    "test:legacy": "WB_TARGET=legacy playwright test --project=chromium",
     "test:update-golden": "playwright test --project=chromium --update-snapshots",
     "test:webkit": "playwright test --project=webkit --grep @smoke",
     "perf-baseline": "WB_PERF=1 playwright test --project=chromium tests/perf-baseline.spec.js",
-    "perf": "WB_PERF=1 playwright test --project=chromium tests/perf.spec.js",
+    "perf": "node tools/perf.js",
     "typecheck": "tsc -p .",
     "check:platform": "node tools/check-platform.js",
     "check:style": "node tools/check-style.js",
-    "coupling-map": "node tools/coupling-map.js legacy/wodblok-v100.html > docs/coupling-map.md",
-    "test:build": "node tools/build.js && WB_TARGET=build playwright test --project=chromium",
+    "coupling-map": "node tools/coupling-map.js dist/wodblok.html > docs/coupling-map.md",
+    "test:build": "node tools/build.js && playwright test --project=chromium",
     "test:site": "node --disable-warning=ExperimentalWarning --test tests/site-waitlist.test.mjs tests/site-accounts.test.mjs tests/site-accent.test.mjs",
     "social": "node tools/social/run.js"
   },

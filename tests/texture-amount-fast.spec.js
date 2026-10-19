@@ -4,10 +4,8 @@
 //  - when it is let go, the exact picture is drawn (no leftover opacity), the document holds the new Amount, and the pattern is still not rebuilt;
 //  - changing a texture the stamps or layers also use still rebuilds the pattern.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openProjectFile, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openProjectFile, openPanel, settle, getState } = require('./helpers/harness');
 const { FIXTURES } = require('./helpers/speed');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 // counts how many times the pattern (#dyn) is redrawn from now on
 const watch = page => page.evaluate(() => { window.__dynBuilds = 0; new MutationObserver(m => { window.__dynBuilds += m.length; }).observe(document.getElementById('dyn'), { childList: true }); });
@@ -22,6 +20,8 @@ test('busy project: dragging Amount does not rebuild the pattern, and letting go
   await openProjectFile(page, FIXTURES.busy);
   await openPanel(page, 'tex');
   await settle(page, { quiet: 25 });                                                      // let the stamp prints from opening the file finish
+  await page.click('#tx_add'); await settle(page);                                        // a new texture that nothing else uses...
+  await page.click('#tx_apply'); await settle(page, { quiet: 25 });                       // ...put on the Canvas (the default target); it is the selected one
   const sel = JSON.parse(await getState(page)).tex.u.map(u => u.x);
   await watch(page);
   await drag(page, 'tx_a', [30, 35, 40, 45, 50, 55, 60, 65, 70]);                            // nine steps; 1.7.0 rebuilt the pattern on every one

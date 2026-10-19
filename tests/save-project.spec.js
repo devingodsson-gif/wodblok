@@ -1,9 +1,7 @@
 // 1.0.4: Save project writes the .wodblok file (and nothing else); the top bar has no Export button (images are exported from the Export
 // tool); a new, untouched document shows no unsaved dot.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 async function roll(page) {
   await page.click('#rzbar');

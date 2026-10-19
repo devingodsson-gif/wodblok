@@ -1,23 +1,29 @@
-// Phase 3a: the project format (zip container, migrations, validation, SVG cleaning). Pure code: no browser needed.
+// The project format (zip container, version check, validation, SVG cleaning). Pure code: no browser needed. Only the current format (21) opens: an older
+// project is refused, a newer one opens read-only.
 const { test, expect } = require('@playwright/test');
 const fs = require('fs'), path = require('path'), { pathToFileURL } = require('url');
 const FX = path.join(__dirname, 'fixtures');
 const nativeImport = new Function('u', 'return import(u)');                       // Playwright rewrites import(); this keeps the real one
 const load = async f => nativeImport(pathToFileURL(path.join(__dirname, '..', 'src', 'format', f)).href);
-const fixtures = fs.readdirSync(FX).filter(f => f.endsWith('.wodblok.json'));
+const fixtures = fs.readdirSync(FX).filter(f => f.endsWith('.wodblok'));
+const { zipSync, unzipSync, strToU8, strFromU8 } = require('fflate');
+const MIME = 'application/vnd.wodblok+zip';
+// the project.json of a sample file, and a zip built from a project object (mimetype first and stored, as the app writes it)
+const baseOf = f => JSON.parse(strFromU8(unzipSync(new Uint8Array(fs.readFileSync(path.join(FX, f))))['project.json']));
+const zipOf = p => zipSync({ mimetype: [strToU8(MIME), { level: 0 }], 'project.json': strToU8(JSON.stringify(p)) });
 
-test('every real v18 project opens as the latest format (21 since the layer update) and the original bytes are not touched', async () => {
+test('every sample project opens as the current format (21) and the original bytes are not touched', async () => {
   const { fmtOpen } = await load('container.js');
   expect(fixtures.length).toBeGreaterThan(0);
   for (const f of fixtures) {
     const bytes = new Uint8Array(fs.readFileSync(path.join(FX, f))), before = Buffer.from(bytes).toString('base64');
     const r = await fmtOpen(bytes);
-    expect(r.from, f).toBe('json'); expect(r.newer).toBe(false); expect(r.project.v).toBe(21); expect(r.project.app).toBe('WODBLOK');
+    expect(r.newer).toBe(false); expect(r.project.v).toBe(21); expect(r.project.app).toBe('WODBLOK');
     expect(Buffer.from(bytes).toString('base64')).toBe(before);
   }
 });
 
-test('v18 json -> zip -> back gives the same project (apart from the format number), and the zip starts with the mimetype', async () => {
+test('open -> pack -> open gives the same project, and the zip starts with the mimetype', async () => {
   const { fmtOpen, fmtPack, FMT_MIME } = await load('container.js');
   for (const f of fixtures) {
     const a = await fmtOpen(new Uint8Array(fs.readFileSync(path.join(FX, f))));
@@ -25,7 +31,7 @@ test('v18 json -> zip -> back gives the same project (apart from the format numb
     expect(Buffer.from(zip.subarray(30, 38)).toString()).toBe('mimetype');          // first entry, name right after the 30-byte header
     expect(Buffer.from(zip.subarray(38, 38 + FMT_MIME.length)).toString()).toBe(FMT_MIME);   // stored, so readable as plain bytes
     const b = await fmtOpen(zip);
-    expect(b.from).toBe('zip'); expect(b.missingAssets).toBe(0);
+    expect(b.missingAssets).toBe(0);
     expect(b.project).toEqual(a.project);
     const zip2 = await fmtPack(b.project), c = await fmtOpen(zip2);    // zip to zip
     expect(c.project).toEqual(a.project);
@@ -34,11 +40,10 @@ test('v18 json -> zip -> back gives the same project (apart from the format numb
 
 test('an image used many times is stored once, big images survive, unknown fields are kept', async () => {
   const { fmtOpen, fmtPack } = await load('container.js');
-  const { unzipSync } = require('fflate');
   const px = Buffer.alloc(3_000_000); for (let i = 0; i < px.length; i++) px[i] = (i * 7919) % 251;   // not compressible, like a photo
   const png = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47]), px]);
   const url = 'data:image/png;base64,' + png.toString('base64');
-  const base = JSON.parse(fs.readFileSync(path.join(FX, fixtures[0]), 'utf8'));
+  const base = baseOf(fixtures[0]);
   const p = { ...base, futureField: { keep: [1, 2, 3] }, arts: { a1: { n: 'A', src: url }, a2: { n: 'B', src: url } }, cover: { img: url, back: { img: url }, spine: { img: '' } } };
   const zip = await fmtPack(p), names = Object.keys(unzipSync(zip));
   expect(names.filter(n => n.startsWith('assets/') && n.endsWith('.png'))).toHaveLength(1);
@@ -50,26 +55,29 @@ test('an image used many times is stored once, big images survive, unknown field
 
 test('a file from a newer app is flagged read-only and left as it is', async () => {
   const { fmtOpen } = await load('container.js');
-  const base = JSON.parse(fs.readFileSync(path.join(FX, fixtures[0]), 'utf8'));
-  const r = await fmtOpen(new TextEncoder().encode(JSON.stringify({ ...base, v: 99, brandNew: true })));
+  const base = baseOf(fixtures[0]);
+  const r = await fmtOpen(zipOf({ ...base, v: 99, brandNew: true }));
   expect(r.newer).toBe(true); expect(r.project.v).toBe(99); expect(r.project.brandNew).toBe(true);
 });
 
 test('damaged and hostile files give a friendly error, never a crash', async () => {
   const { fmtOpen, fmtPack } = await load('container.js');
   const { FormatError } = await load('errors.js');
-  const base = JSON.parse(fs.readFileSync(path.join(FX, fixtures[0]), 'utf8'));
+  const base = baseOf(fixtures[0]);
   const good = Buffer.from(await fmtPack(base));
   const cases = [
     ['empty', new Uint8Array(0)], ['text', new TextEncoder().encode('hello')], ['json array', new TextEncoder().encode('[1,2]')],
-    ['other app', new TextEncoder().encode('{"app":"X","v":1}')], ['no stamps', new TextEncoder().encode('{"app":"WODBLOK","v":18,"tiles":[],"layers":[]}')],
-    ['bad item', new TextEncoder().encode(JSON.stringify({ ...base, tiles: [{ items: [{ m: 5 }] }] }))],
+    ['json project (the old file kind)', new TextEncoder().encode(JSON.stringify(base))],
+    ['other app', zipOf({ app: 'X', v: 21 })], ['no stamps', zipOf({ app: 'WODBLOK', v: 21, tiles: [], layers: [] })],
+    ['bad item', zipOf({ ...base, tiles: [{ items: [{ m: 5 }] }] })], ['older format (20)', zipOf({ ...base, v: 20 })], ['no format number', zipOf((({ v, ...r }) => r)(base))],
     ['truncated zip', good.subarray(0, Math.floor(good.length / 2))], ['zip header only', good.subarray(0, 30)],
   ];
   for (const [name, bytes] of cases) {
     const e = await fmtOpen(new Uint8Array(bytes)).then(() => null, e => e);
     expect(e, name).toBeInstanceOf(FormatError); expect(e.message.length, name).toBeGreaterThan(10);
   }
+  const old = await fmtOpen(zipOf({ ...base, v: 20 })).then(() => null, e => e);
+  expect(old.code).toBe('old'); expect(old.message).toMatch(/older WODBLOK/);
   // fuzz: flip random bytes in a real file; the only allowed outcomes are "opens" or a FormatError
   let seed = 12345; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
   for (let n = 0; n < 300; n++) {
@@ -81,9 +89,9 @@ test('damaged and hostile files give a friendly error, never a crash', async () 
 
 test('a project that points at a missing picture still opens, and says so', async () => {
   const { fmtOpen } = await load('container.js');
-  const { zipSync, strToU8 } = require('fflate');
-  const base = JSON.parse(fs.readFileSync(path.join(FX, fixtures[0]), 'utf8'));
-  const p = { ...base, v: 19, arts: { a: { n: 'A', src: 'wbasset:assets/' + 'a'.repeat(64) + '.png' } } };
+  const base = baseOf(fixtures[0]);
+  delete base.cover; delete base.art;                                                         // the sample's own pictures are not in this file
+  const p = { ...base, v: 21, arts: { a: { n: 'A', src: 'wbasset:assets/' + 'a'.repeat(64) + '.png' } } };
   const zip = zipSync({ mimetype: [strToU8('application/vnd.wodblok+zip'), { level: 0 }], 'project.json': strToU8(JSON.stringify(p)) });
   const r = await fmtOpen(zip);
   expect(r.missingAssets).toBe(1); expect(r.project.arts.a.src).toBe('');
@@ -114,8 +122,7 @@ test('SVG from files is cleaned: scripts, handlers, outside references and unkno
 
 test('snapshots round-trip inside the zip, and a damaged snapshot is left out without stopping the project opening', async () => {
   const { fmtOpen, fmtPack } = await load('container.js');
-  const { zipSync, unzipSync, strToU8 } = require('fflate');
-  const base = JSON.parse(fs.readFileSync(path.join(FX, fixtures[0]), 'utf8'));
+  const base = baseOf(fixtures[0]);
   const snaps = [{ n: 'First', t: 1, s: '{"a":1}' }, { n: 'Second', t: 2, s: '{"a":2}' }, { n: 5, t: 'x', s: 1 }];
   const zip = await fmtPack(base, { snapshots: snaps });
   expect(Object.keys(unzipSync(zip)).filter(k => k.startsWith('snapshots/'))).toHaveLength(2);       // the invalid one was never written

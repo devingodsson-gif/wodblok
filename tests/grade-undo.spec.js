@@ -1,8 +1,6 @@
 // Grading sliders follow Undo and Redo: the slider, its number and the picture go back and forward together (1.35.0).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, unlockStamp, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, unlockStamp, settle } = require('./helpers/harness');
 
 const val = (page, id) => page.evaluate(id => { const r = document.getElementById(id); return { v: +r.value, n: r._n ? +r._n.value : null }; }, id);
 const move = async (page, id, v) => { await page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); }, [id, v]); await page.waitForTimeout(700); };

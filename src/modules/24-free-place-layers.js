@@ -1,12 +1,11 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {DRS} from './03-stamp-prints-and-drawing.js';
-import {CH,CM,CW,col,geom,rng,shOf,okC} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,col,geom,rng,shOf,okC} from './04-canvas-and-stamp-outlines.js';
 import {inkOf} from './06-motif-library-folders.js';
 import {gModel,gNear} from './08-grid-shapes.js';
 import {bhStrip,flipVOk,turnFit} from './10-layer-grids.js';
 import {eNV,eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
 
-function lyGrp(){const g=WBS.layers.map((l,i)=>i).filter(i=>WBS.selLM.has(WBS.layers[i].u));return g.length>1&&WBS.layers[WBS.selL]&&WBS.selLM.has(WBS.layers[WBS.selL].u)?g:[WBS.selL]}
 function tGrp(){const g=WBS.tiles.map((t,i)=>i).filter(i=>WBS.tM.has(WBS.tiles[i].id));return g.length>1&&WBS.tiles[WBS.cur]&&WBS.tM.has(WBS.tiles[WBS.cur].id)?g:[WBS.cur]}
 function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(WBS.fpMS.size>1&&WBS.fpMS.has(String(WBS.fpSel))){const g=pl.filter(q=>WBS.fpMS.has(String(q.u)));if(g.length>1)return g}const p=pl.find(q=>q.u==WBS.fpSel);return p?[p]:[]}
 function fpPoolOk(){return!!(WBS.fpB&&WBS.fpPool.size>1&&WBS.fpPool.has(String(WBS.fpB)))}
@@ -14,8 +13,7 @@ function fpTog(u){u=String(u);let cur=fpGrp().map(q=>String(q.u));if(!cur.length
 function fpRange(u){u=String(u);const L=fpL();if(!L)return;const order=(L.pl||[]).slice().reverse().map(q=>String(q.u)),a0=WBS.fpAnc!=null&&order.includes(String(WBS.fpAnc))?String(WBS.fpAnc):(WBS.fpSel!==-1?String(WBS.fpSel):u),a=order.indexOf(a0),b=order.indexOf(u);if(a<0||b<0){WBS.fpMS=new Set();WBS.fpSel=u;WBS.fpAnc=u;upd();return}WBS.fpMS=new Set(order.slice(Math.min(a,b),Math.max(a,b)+1));WBS.fpSel=u;WBS.fpB=null;WBS.fpGhost=null;upd()}
 function fpPick(k,e,order,art){const same=!WBS.fpB||(typeof WBS.fpB=='string')==!!art;let cur=!same?[]:fpPoolOk()?[...WBS.fpPool]:(WBS.fpB?[String(WBS.fpB)]:[]);if(e.shiftKey&&WBS.fpPA!=null&&order.includes(WBS.fpPA)){const a=order.indexOf(WBS.fpPA),b=order.indexOf(k);cur=order.slice(Math.min(a,b),Math.max(a,b)+1)}else{const st=new Set(cur);st.has(k)?st.delete(k):st.add(k);cur=[...st];WBS.fpPA=k}WBS.fpPool=new Set(cur);if(!cur.length)WBS.fpB=null;else{const pk=cur.includes(String(WBS.fpB))?String(WBS.fpB):cur[cur.length-1];WBS.fpB=art?pk:+pk}WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpLast=null;upd()}
 // snapping: one switch for the whole pattern, in the Grid tool (WBS.pgrid.snap, .ss for snapping sizes); the same grid is used by every Free place, Pictures and Text layer
-// older projects chose snapping per layer (L.fg): until the switch is first touched here, it is on if any layer had it on
-const pgSnap=()=>WBS.pgrid.snap!==undefined?!!WBS.pgrid.snap:WBS.layers.some(l=>l&&l.fg&&l.fg.snap),pgSs=()=>WBS.pgrid.ss!==undefined?!!WBS.pgrid.ss:WBS.layers.some(l=>l&&l.fg&&l.fg.snap&&l.fg.ss);
+const pgSnap=()=>!!WBS.pgrid.snap,pgSs=()=>!!WBS.pgrid.ss;
 const fpFG=L=>({snap:pgSnap(),ss:pgSs(),show:WBS.pgrid.show,n:WBS.pgrid.n,m:WBS.pgrid.m});
 const fpCell=L=>CW/Math.max(2,fpFG(L).n);
 function fpSnap(L,x,y,e,force){const g=fpFG(L);if(!force&&(!g.snap||(e&&e.altKey)))return[x,y];if(WBS.pgrid.sh&&WBS.pgrid.sh!='rect'){const M=gModel(WBS.pgrid.sh,CW,CH,Math.max(2,WBS.pgrid.n),false),b=gNear((g.m!='l'?M.cents:[]).concat(g.m!='c'?M.verts:[]),x,y,CW,CH,false);if(b)return[b[0],b[1]]}
@@ -46,8 +44,8 @@ const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind
 return[defs,`<g${ink?` filter="url(#lk${li})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}
 function init24(){// ===== Free-place layers: no arrangement, just stamps put down by hand anywhere on the canvas.
 // L.pl = [{u, t: stamp id, x, y (canvas units), s: long side (canvas units), r: degrees, f: 1 | -1}]
-WBS.selLM=new Set();WBS.lAnc=null;WBS.tM=new Set();WBS.tAnc=null;WBS.mAnc=null;WBS.pSel=new Set();WBS.pAnc=null;
+WBS.selLM=new Set();WBS.lAnc=null;WBS.tM=new Set();WBS.tAnc=null;WBS.mAnc=null;
 WBS.fpMS=new Set();WBS.fpAnc=null;WBS.fpPool=new Set();WBS.fpPA=null;
 WBS.CR=null;WBS.fpB=null;WBS.fpSel=-1;WBS.fpDrag=null;WBS.fpGhost=null;WBS.fpXf=null;WBS.fpSyncing=0;WBS.fpTh={};WBS.fpAlt=false;
 }
-export {pgSnap,pgSs,fpCell,fpFG,fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnap,fpSnapS,fpTog,fpU,freeLayer,lyGrp,tGrp,init24};
+export {pgSnap,pgSs,fpCell,fpFG,fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnap,fpSnapS,fpTog,fpU,freeLayer,tGrp,init24};

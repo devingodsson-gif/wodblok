@@ -1,9 +1,7 @@
 // Every tool opens docked on the right by default (Randomize used to open as a floating window, and the Stamp editor started
 // with three floating windows). Pop out still floats any tool on request.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'the v100 baseline opens Randomize as a floating window'); });
+const { openApp, openPanel } = require('./helpers/harness');
 
 test('Randomize opens docked on the right', async ({ page }) => {
   const { errors } = await openApp(page);

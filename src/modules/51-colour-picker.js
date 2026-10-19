@@ -120,7 +120,7 @@ function closePicker(){const p=PK;if(!p)return;svClose();commit();PK=null;EL.hid
 // pointer is read from it. A magnifier follows the pointer; click picks (Alt+click keeps the colour's opacity), Esc or a right-click cancels.
 let DROP=null;
 function artTargets(){const t=[];const a=$('art');if(a&&a.getClientRects().length&&!$('boardP').hidden)t.push(a);return t}
-function startDropper(cb){if(DROP)return;const tg=artTargets();if(!tg.length){pmsg('Show the Pattern view or the pattern preview to pick a colour from the picture.');return}
+function startDropper(cb){if(DROP)return;const tg=artTargets();if(!tg.length){pmsg('The pattern is not on screen, so there is no picture to pick a colour from.');return}
  const ov=document.createElement('div');ov.className='edrov';ov.innerHTML='<div class="edrl"><canvas width="132" height="132"></canvas><b></b></div>';document.body.appendChild(ov);
  const lp=ov.firstChild,lc=lp.firstChild,lx=lc.getContext('2d'),lb=lp.lastChild;lx.imageSmoothingEnabled=false;
  DROP={ov,cb,img:null,W:0,H:0,data:null,busy:true};document.body.classList.add('eyedrop');

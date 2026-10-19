@@ -1,5 +1,5 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW} from './04-canvas-and-stamp-outlines.js';
+import {CW} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC} from './17-texture-panel-and-previews.js';
 // ---- v66 stamp prints. Every distinct impression (a stamp, its pressure side, its rim variant) is printed once into an image by the

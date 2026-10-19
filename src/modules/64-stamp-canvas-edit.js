@@ -11,9 +11,8 @@ import {STP,stMatrix,stUnlocked,stampAt} from './63-stamp-tool.js';
 // With a stamp unlocked, the Pattern canvas edits that stamp through the instance printed under the pointer: a click with a shape picked in the
 // Shapes panel puts the shape in the stamp, a click on a shape inside an instance selects it, dragging moves it, the square handles resize it and
 // the round one turns it. Every point is moved from the canvas into the stamp's own space with the inverse of the instance's matrix (see 63-stamp-tool.js),
-// so the shape lands where it was pointed at whatever the layer's rotation, turn, flip or size variation. The stamp's items are the same list the
-// Stamp editor edits, so every instance and every layer that uses the stamp shows the edit. Clicks that do not land on an instance of the unlocked stamp
-// are left to the layer, as before. Text typed in the Text panel is put into the stamp the same way (as the letters the Stamp editor makes); a click on a
+// so the shape lands where it was pointed at whatever the layer's rotation, turn, flip or size variation. The stamp's items are one list, so every instance and every layer that uses the stamp shows the edit. Clicks that do not land on an instance of the unlocked stamp
+// are left to the layer, as before. Text typed in the Text panel is put into the stamp the same way (as letters tagged tg); a click on a
 // letter of such a text selects the whole text (Alt-click one letter), which puts the text into the Text panel to be edited live.
 const SCE={d:null,h:null,m:null,sp:null,ai:null};
 // the unlocked stamp, if it is also the open stamp (the selection indexes belong to the open stamp)
@@ -86,7 +85,9 @@ function sceDraw(){const g=$('stoh');if(!g)return;const t=sceRO();if(!t||!WBS.ms
   h+=ln('stsp','')+ln('stsph','data-sp="m"')+`<circle class="steh" data-sp="m" cx="${f(pc[0])}" cy="${f(pc[1])}" r="${f(hs*1.15)}" cursor="move"/><circle class="steh" data-sp="r" cx="${f(p2[0])}" cy="${f(p2[1])}" r="${f(hs*1.4)}" cursor="grab"/>`}}
  g.innerHTML=h}
 function sceKey(e){if(WBS.brush&&e.key!=='Delete')return;const tg=e.target;if(tg&&tg.matches&&tg.matches('input,select,textarea,[contenteditable]'))return;const t=sceRO();if(!t||!WBS.msel.size)return;
- if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();delItems([...WBS.msel]);selOne(-1);store();upd()}else if(e.key=='Escape'){selOne(-1);sceSel()}}
+ if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();delItems([...WBS.msel]);selOne(-1);store();upd()}else if(e.key=='Escape'){selOne(-1);sceSel()}
+ else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='s'||e.key=='S')){e.preventDefault();$('ssp').click()}
+ else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='k'||e.key=='K')){e.preventDefault();$('sko').click()}}
 function init64(){
  STP.after=sceDraw;WBX.wbSceDraw=sceDraw;
  const w=$('artwrap');if(w)w.addEventListener('pointerdown',sceDown,true);

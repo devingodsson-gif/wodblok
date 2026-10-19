@@ -159,20 +159,19 @@ One entry per finished step: version, what changed, what was tested, anything th
 | Step | Version | State |
 |---|---|---|
 | 0 Design review | none | audit done (below); the clickable mock-up was skipped by the owner on Oct 18 |
-| 1 Layers hold anything (data) | 1.46.1 | done on branch `feat/1.46.1-layers-hold-anything`, not merged |
-| 2 Any item on any layer (UI) | 1.46.2 | done on the same branch, not merged |
-| 3 Arrangement on any layer | 1.46.3 | done on the same branch, not merged |
-| 4 Stamp instances on the canvas | 1.46.4 | done on the same branch, not merged |
+| 1 Layers hold anything (data) | 1.46.1 | done, merged and live (pull request 103) |
+| 2 Any item on any layer (UI) | 1.46.2 | done, merged and live (pull request 103) |
+| 3 Arrangement on any layer | 1.46.3 | done, merged and live (pull request 103) |
+| 4 Stamp instances on the canvas | 1.46.4 | done, merged and live (pull request 103) |
 | 5 Drawing into a stamp from the canvas | 1.46.5 | done, merged and live (Oct 19 2026, pull request 103) |
-| 6 The unique Stamp-editor tools on the canvas | 1.46.6 | done on branch `feat/1.46.1-layers-hold-anything` (restarted from `main`), draft pull request |
-| 7 Stamp settings and several colours per stamp | 1.46.7 | done on branch `feat/1.46.7-stamp-settings` (stacked on step 6), draft pull request |
-| 8 Stamp library tools | 1.46.8 | done on branch `feat/1.46.8-stamp-library` (stacked on step 7), draft pull request |
-| 9a Port the last Stamp-editor tools | 1.46.9 | done on branch `feat/1.46.9-port-editor-tools` (stacked on step 8), draft pull request |
+| 6 The unique Stamp-editor tools on the canvas | 1.46.6 | done, merged and live (pull request 108) |
+| 7 Stamp settings and several colours per stamp | 1.46.7 | done, merged and live (pull request 108) |
+| 8 Stamp library tools | 1.46.8 | done, merged and live (pull request 108) |
+| 9a Port the last Stamp-editor tools | 1.46.9 | done, merged and live (pull request 108) |
 | 9b Retire the Stamp editor | 1.46.10 | done, merged and live (Oct 19 2026, pull request 108, with steps 6 to 9a) |
 | 10 Rewrite what depends on it | 1.46.11 | done on branch `feat/1.46.11-randomize-templates`(pull request 109) |
 | 11 Tests on the canvas flow | 1.46.12 | done, merged and live (Oct 19 2026, pull request 110, with step 10) |
-| 12 Final check, 2.0.0 | 2.0.0 | built on branch `feat/2.0.0-final`; not live until the owner says |
-| 9 to 12 | | not started |
+| 12 Final check, 2.0.0 | 2.0.0 | done, merged and live (pull request 111, Oct 19 2026) |
 
 ### Step 0 audit: Stamp editor panels against Canvas mode (Oct 18 2026, read from `MODEP` in `34-desktop-shell.js`)
 - **Shared today** (same panel in both modes, no work): Workspaces, Presets, Text, Colours, Colourways, Grade, Textures, Randomize, History, Stamp library.

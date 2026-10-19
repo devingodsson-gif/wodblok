@@ -4,7 +4,7 @@ const path = require('path');
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle } = require('./helpers/harness');
 
-const FIX = path.join(__dirname, 'fixtures', 'project-1-diamond.wodblok.json');
+const FIX = path.join(__dirname, 'fixtures', 'project-1-diamond.wodblok');
 
 test('opening a file shows the progress bar while it draws, then removes it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 2 });

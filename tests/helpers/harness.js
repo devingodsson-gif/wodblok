@@ -1,19 +1,17 @@
 // Shared helpers for every spec. Everything here drives the app through the DOM (plus one state hook),
-// never through its internal function names, so the same tests run on legacy/wodblok-v100.html now and on
-// the modular build later.
+// never through its internal function names. The target is the built app (dist/wodblok.html, the default) or, with WB_TARGET=esm, the
+// unbundled modules served by `node tools/serve-esm.js`.
 //
-// State hook: the legacy page exposes `coreStr()` (the JSON of the document). The repo build must expose
-// `window.__wbTest = { state() }` returning the same string; getState() prefers it.
+// State hook: the app exposes `window.__wbTest = { state() }`, the JSON of the document; getState() reads it.
 const path = require('path');
 const crypto = require('crypto');
 const { expect } = require('@playwright/test');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const TARGETS = {
-  legacy: path.join(ROOT, 'legacy', 'wodblok-v100.html'),
   build: path.join(ROOT, 'dist', 'wodblok.html'),
 };
-const TARGET = process.env.WB_TARGET || 'legacy';
+const TARGET = process.env.WB_TARGET || 'build';
 // WB_TARGET=esm loads the unbundled ES modules from `node tools/serve-esm.js` (http://127.0.0.1:5199/)
 const ESM_URL = 'http://127.0.0.1:5199/';
 const APP_URL = TARGET === 'esm' ? ESM_URL : 'file://' + TARGETS[TARGET];
@@ -83,13 +81,13 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, wo
   if (before) await before(page);     // a test may add its own routes here, after the ones above (the last one added is asked first)
   await page.clock.setFixedTime(FIXED_TIME);
   await page.goto(url);
-  await page.waitForFunction(() => typeof (window.__wbTest ? 1 : coreStr) !== 'undefined' && document.fonts.status === 'loaded');
+  await page.waitForFunction(() => !!window.__wbTest && document.fonts.status === 'loaded');
   await settle(page);
   return { errors };
 }
 
 async function getState(page) {
-  return page.evaluate(() => (window.__wbTest ? window.__wbTest.state() : coreStr()));
+  return page.evaluate(() => window.__wbTest.state());
 }
 
 // Wait until the document state and the drawing stop changing (async stamp prints, textures, loading bar).
@@ -98,11 +96,13 @@ async function settle(page, { quiet = 4, step = 120, max = 15000 } = {}) {
   let last = null, same = 0;
   while (Date.now() - t0 < max) {
     const sig = await page.evaluate(() => {
-      const art = document.getElementById('art'), ed = document.getElementById('ed');
+      const art = document.getElementById('art');
       const busy = document.body.classList.contains('babusy') || !!document.querySelector('.rzbusy,.lding:not([hidden])') || !!(window.__wbTest && window.__wbTest.printsBusy && window.__wbTest.printsBusy());   // stamp prints still being drawn
+      // a stamp print that is not on the page yet leaves its <use> pointing at nothing: the pattern is not finished, however still it looks
+      const missing = [...document.querySelectorAll('#art use')].some(u => { const h = u.getAttribute('href'); return h && h[0] === '#' && !document.getElementById(h.slice(1)); });
       // a content hash, not just lengths: a redraw that rebuilds the same amount of markup in a different shape still counts as change
       const h = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0).toString(36); };
-      return h(window.__wbTest ? window.__wbTest.state() : coreStr()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + (ed ? h(ed.innerHTML) : 0) + '|' + busy;
+      return h(window.__wbTest.state()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + busy + missing;
     });
     if (sig === last) { if (++same >= quiet) return; } else { same = 0; last = sig; }
     await page.waitForTimeout(step);
@@ -162,39 +162,11 @@ async function checkpoint(page, testInfo, errors, name, { shot = true, selector 
   expect(sum.text).toMatchSnapshot(`${name}.svg.json`);
   await testInfo.attach(`${name}.svg`, { body: sum.norm, contentType: 'image/svg+xml' });
   if (shot && process.env.WB_PIXELS !== '0') {
-    await expect(page.locator(selector === '#ed' ? '#boardS' : '#boardP').first()).toHaveScreenshot(`${name}.png`);   // compare view clones the board: first() is the live one
+    await expect(page.locator('#boardP').first()).toHaveScreenshot(`${name}.png`);   // compare view clones the board: first() is the live one
   }
   expect(errors, 'page errors').toEqual([]);
 }
 
-// A point on the screen that really lands on a motif in the Stamp editor (the centre of a thin shape can fall in a gap, where a click hits the background).
-// Looks at the motifs in order and tries a grid of points inside each one; { pad, bottom } keep the point inside the board, { c0: true } only takes motifs of the first copy.
-function motifPoint(page, { pad = 20, bottom = 120, c0 = false } = {}) {
-  return page.evaluate(({ pad, bottom, c0 }) => {
-    const h = document.getElementById('boardS').getBoundingClientRect();
-    for (const n of document.querySelectorAll(c0 ? '#ed [data-i][data-c="0"]' : '#ed [data-i]')) {
-      const r = n.getBoundingClientRect();
-      for (let i = 0; i <= 8; i++) for (let j = 0; j <= 8; j++) {
-        const x = r.x + r.width * (0.5 + (i - 4) / 10), y = r.y + r.height * (0.5 + (j - 4) / 10);
-        if (!(x > h.x + pad && x < h.right - pad && y > h.y + pad && y < h.bottom - bottom)) continue;
-        const e = document.elementFromPoint(x, y);
-        if (e && e.closest('[data-i]') === n) return { x, y };
-      }
-    }
-    return null;
-  }, { pad, bottom, c0 });
-}
-// Stamp editor Text tool (1.38.0): typing puts the text on the cursor; a click on the stamp puts it down. This clicks the middle of the stamp, then lets go of the cursor
-// (right-click) and selects everything (Ctrl+A), so the placed text is the selected one and the panel edits it.
-async function putText(page, { select = true } = {}) {
-  const b = await page.locator('#ed').boundingBox(), x = b.x + b.width / 2, y = b.y + b.height / 2;
-  await page.mouse.move(x - 6, y - 6); await page.mouse.move(x, y); await page.mouse.click(x, y);
-  await settle(page, { max: 30000 });
-  await page.mouse.click(b.x + 4, b.y + 4, { button: 'right' }); await settle(page, { max: 30000 });
-  if (select) {
-    await page.keyboard.press('Control+a'); await settle(page, { max: 30000 });   // everything on the stamp is the text, so it is selected as one text
-  }
-}
 // Canvas flow (layer update step 11): the Stamp editor is gone, so a test that edits a stamp unlocks it in the Stamps panel and works on the Pattern canvas.
 const showPanel = async (page, id) => { const sec = page.locator(`section.pn[data-p="${id}"]:not([hidden])`).first(); if (!(await sec.isVisible())) await openPanel(page, id); };
 // unlock a stamp (the first in the list by default) so shapes, text and pictures placed on the canvas go into it
@@ -211,4 +183,12 @@ const stampInstance = async page => {
 };
 // press and release on the canvas at a point of an instance (offset in canvas units)
 const clickStamp = async (page, p, dx = 0, dy = 0) => { const c = await canvasToClient(page, p.cx + dx, p.cy + dy); await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.up(); await settle(page); };
-module.exports = { motifPoint, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, putText, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// New stamp from the Stamps panel (the bottom tray is gone).
+async function addStamp(page) {
+  if (await page.locator('section.pn[data-p="stmp"]').isHidden()) await openPanel(page, 'stmp');
+  await page.click('#smknew');
+  await page.click('.rowm .ddi >> nth=0');
+  await settle(page);
+}
+
+module.exports = { addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

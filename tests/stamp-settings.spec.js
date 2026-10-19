@@ -1,8 +1,6 @@
 // Layer update, step 7 (1.46.7): Stamp settings from the Pattern view, and stamps with several colours (each shape can have a colour of its own).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const tile = async page => (await state(page)).tiles[0];

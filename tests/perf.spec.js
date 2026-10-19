@@ -4,18 +4,18 @@
 // Two kinds of numbers:
 //  - work counters (DOM nodes added per move, redraws per move). They vary a little from run to run because
 //    the app drafts while dragging and the number of redraws depends on timing, so they are NOT snapshotted
-//    exactly. They are written down, and a build is compared against legacy (nodes per move may not grow by
-//    more than 25%).
+//    exactly. They are written down, and the build is compared against a baseline build, normally the last release on `main`
+//    (nodes per move may not grow by more than 25%).
 //  - times (total drag time, slowest frame, p95 frame). Machines are noisy, so times are never compared to a
-//    stored number. They are written to test-results/perf-<target>.json, and when a built version exists
-//    (WB_TARGET=build) it is measured side by side with the legacy file in the same run: it fails if its median
-//    drag time is more than 10% slower. Run `npm run perf` on the Mac before each release for felt speed.
+//    stored number. They are written to test-results/perf-<target>.json, and the build is measured side by side with the baseline
+//    (WB_BASELINE=<path to the older dist/wodblok.html>; `npm run perf` builds `main` for it) in the same run: it fails if its median
+//    drag time is more than 10% slower. Run `npm run perf` before each release for felt speed.
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
 const { ROOT, TARGET, APP_URL, openApp, openProjectFile, openPanel, settle } = require('./helpers/harness');
 
-const FIXTURE = path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok.json');
+const FIXTURE = path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok');
 const STEPS = 40, RUNS = 5;
 
 async function measureDrag(page) {
@@ -70,31 +70,29 @@ const per = (t, k) => +(median(t.runs, k) / STEPS).toFixed(2);
 
 test('slider drag: work done and speed', async ({ browser }, testInfo) => {
   test.setTimeout(15 * 60 * 1000);
-  const legacyUrl = 'file://' + path.join(ROOT, 'legacy', 'wodblok-v100.html');
-  const compare = TARGET === 'build';
-  // Runs alternate (legacy, build, legacy, build, ...) so slow drift on the machine hits both the same way.
+  test.skip(!process.env.WB_BASELINE, 'needs WB_BASELINE=<older dist/wodblok.html> (npm run perf builds main for it)');
+  const baseUrl = 'file://' + process.env.WB_BASELINE;
+  // Runs alternate (baseline, build, baseline, build, ...) so slow drift on the machine hits both the same way.
   const L = [], B = [];
   for (let i = 0; i < RUNS; i++) {
-    L.push(await measureOnce(browser, legacyUrl, 'legacy'));
-    if (compare) B.push(await measureOnce(browser, APP_URL, 'build'));
+    L.push(await measureOnce(browser, baseUrl, 'baseline'));
+    B.push(await measureOnce(browser, APP_URL, 'build'));
   }
-  const legacy = summary('legacy', L);
-  const results = { steps: STEPS, runs: RUNS, legacy };
+  const baseline = summary('baseline', L);
+  const results = { steps: STEPS, runs: RUNS, baseline };
   fs.mkdirSync(path.join(ROOT, 'test-results'), { recursive: true });
-  results.legacyPerMove = { nodesAdded: per(legacy, 'nodesAdded'), mutations: per(legacy, 'mutations') };
-  expect(results.legacyPerMove.mutations, 'the drag redraws the pattern').toBeGreaterThan(0);
+  results.baselinePerMove = { nodesAdded: per(baseline, 'nodesAdded'), mutations: per(baseline, 'mutations') };
+  expect(results.baselinePerMove.mutations, 'the drag redraws the pattern').toBeGreaterThan(0);
 
-  if (compare) {
-    results.build = summary('build', B);
-    const ratio = results.build.median.wallMs / legacy.median.wallMs;
-    results.ratio = +ratio.toFixed(3);
-    results.buildPerMove = { nodesAdded: per(results.build, 'nodesAdded'), mutations: per(results.build, 'mutations') };
-    expect(results.buildPerMove.nodesAdded, 'DOM nodes added per move').toBeLessThanOrEqual(results.legacyPerMove.nodesAdded * 1.25 + 0.5);
-    expect(ratio, `build drag time / legacy drag time (median of ${RUNS} alternating runs)`).toBeLessThanOrEqual(1.10);
-  }
+  results.build = summary('build', B);
+  const ratio = results.build.median.wallMs / baseline.median.wallMs;
+  results.ratio = +ratio.toFixed(3);
+  results.buildPerMove = { nodesAdded: per(results.build, 'nodesAdded'), mutations: per(results.build, 'mutations') };
+  expect(results.buildPerMove.nodesAdded, 'DOM nodes added per move').toBeLessThanOrEqual(results.baselinePerMove.nodesAdded * 1.25 + 0.5);
+  expect(ratio, `build drag time / baseline drag time (median of ${RUNS} alternating runs)`).toBeLessThanOrEqual(1.10);
   fs.writeFileSync(path.join(ROOT, 'test-results', `perf-${TARGET}.json`), JSON.stringify(results, null, 1));
   await testInfo.attach('perf', { body: JSON.stringify(results, null, 1), contentType: 'application/json' });
-  console.log('perf', JSON.stringify({ legacy: legacy.median, build: results.build && results.build.median, ratio: results.ratio }));
+  console.log('perf', JSON.stringify({ baseline: baseline.median, build: results.build.median, ratio: results.ratio }));
 });
 
 test('randomize roll time', async ({ page }) => {

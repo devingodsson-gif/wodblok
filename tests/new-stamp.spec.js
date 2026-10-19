@@ -1,12 +1,11 @@
 // New stamp (+) used to throw "isDef is not defined" and add nothing (UX review B1; the bug is also in v100).
 const { test, expect } = require('@playwright/test');
-const { openApp, settle, getState, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
+const { openApp, addStamp, settle, getState, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
 
 test('New stamp adds a blank stamp, selects it, and raises no page error', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 3 });
   const before = JSON.parse(await getState(page)).tiles.length;
-  await page.click('#addT');
-  await settle(page);
+  await addStamp(page);
   const s = JSON.parse(await getState(page));
   expect(s.tiles.length).toBe(before + 1);
   expect(s.tiles[s.tiles.length - 1].items.length).toBe(0);
@@ -47,12 +46,11 @@ test('a new or duplicated stamp is added to the current layer, and Undo takes it
   const { errors } = await openApp(page, { seed: 3 });
   const st = async () => { const s = JSON.parse(await getState(page)); return { tiles: s.tiles.map(t => t.id), layer: s.layers[0].st }; };
   const before = await st();
-  await page.click('#addT');
-  await settle(page);
+  await addStamp(page);
   const afterNew = await st();
   expect(afterNew.tiles.length).toBe(before.tiles.length + 1);
   expect(afterNew.layer).toContain(afterNew.tiles[afterNew.tiles.length - 1]);
-  await page.click('#dupT');
+  await page.click('#smkdup');
   await settle(page);
   const afterDup = await st();
   expect(afterDup.tiles.length).toBe(afterNew.tiles.length + 1);
@@ -69,8 +67,7 @@ test('a new or duplicated stamp is added to the current layer, and Undo takes it
 
 test('A new stamp starts with no block edge (thickness and roughness 0)', async ({ page }) => {
   await openApp(page, { seed: 3 });
-  await page.click('#addT');
-  await settle(page);
+  await addStamp(page);
   const s = JSON.parse(await getState(page));
   const t = s.tiles[s.tiles.length - 1];
   expect(t.et).toBe(0);

@@ -2,10 +2,8 @@
 // every printed sheet on the busy project (after opening it, and after a stamp size change) is at most about 1.3 megapixels, or is a single stamp print
 // (one impression can be larger than that by itself). 1.8.0 made sheets of up to 4096 x 4096 (16.7 megapixels). The picture stays the same (see picture-compare).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openProjectFile, openPanel, settle } = require('./helpers/harness');
+const { openApp, openProjectFile, openPanel, settle } = require('./helpers/harness');
 const { FIXTURES } = require('./helpers/speed');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 const sheets = page => page.evaluate(() => Array.from(document.querySelectorAll('#dyn symbol image')).map(i => [+i.getAttribute('width'), +i.getAttribute('height')]).filter(s => s[0] > 0));
 

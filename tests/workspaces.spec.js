@@ -1,8 +1,6 @@
 // Workspaces (Phase 5): save the arrangement of the tools under a name, set it again with one click.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel } = require('./helpers/harness');
 
 // the tools that are open, group by group (each group is a set of tabs)
 const groups = page => page.evaluate(() => [...document.querySelectorAll('.wg')].map(g => [...g.querySelectorAll('.wtab')].map(t => t.dataset.t)));
@@ -141,23 +139,6 @@ test('Restore defaults brings Default back, or puts a changed Default back as it
   await expect(page.locator('#wxl .wxr')).toHaveCount(1);           // still one Default, not two
   await row(page, 'Default').click();
   expect((await groups(page)).map(g => g.join()).sort()).toEqual(['canvas,colors', 'lyrs,layers']);
-  expect(errors).toEqual([]);
-});
-
-test('the older starting workspaces are removed once, unless you changed them', async ({ page }) => {
-  const g = (tabs) => ({ tabs, a: tabs[0] });
-  const old = [
-    { id: 'a1', name: 'Colour work', f: '', layout: { pattern: { dock: [g(['colors', 'grade', 'tex']), g(['rand'])], float: [] } } },
-    { id: 'a2', name: 'Layout work', f: '', layout: { pattern: { dock: [g(['lyrs'])], float: [] } } },   // changed by the person: kept
-    { id: 'a3', name: 'Everything closed', f: '', layout: { pattern: { dock: [], float: [] } } },
-  ];
-  await page.addInitScript(o => { if (!sessionStorage.getItem('t_mig')) { sessionStorage.setItem('t_mig', '1'); localStorage.setItem('wb96_workspaces', JSON.stringify(o)); localStorage.setItem('wb96_ws_seeded', '1'); } }, old);
-  const { errors } = await openApp(page, { workspaces: true });
-  await openPanel(page, 'wspc');
-  await expect(row(page, 'Default')).toBeVisible();
-  await expect(row(page, 'Layout work')).toBeVisible();
-  await expect(row(page, 'Colour work')).toHaveCount(0);
-  await expect(row(page, 'Everything closed')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 

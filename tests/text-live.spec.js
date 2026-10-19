@@ -1,8 +1,6 @@
 // Text tool: the text on the stamp follows the panel while it is edited (no Update button), and Enter makes a new line.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
 
 // text goes into the unlocked stamp: set it up in the Text panel, then click an instance of the stamp on the canvas (the placed text stays selected)
 const putStampText = async page => {

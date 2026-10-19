@@ -1,25 +1,6 @@
-// 1.0.17: a floated panel does not cover the zoom controls; the stamp tray collapses to a thin strip (and is remembered); the book cover guide labels sit on solid chips.
+// 1.0.17: a floated panel does not cover the zoom controls; the book cover guide labels sit on solid chips.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
-
-test('the stamp tray collapses to a thin strip, gives the picture the room, and stays collapsed after a reload', async ({ page }) => {
-  const { errors } = await openApp(page);
-  const h = () => page.evaluate(() => Math.round(document.querySelector('.stage .film').getBoundingClientRect().height));
-  const board = () => page.evaluate(() => Math.round(document.getElementById('boardP').getBoundingClientRect().height));
-  const full = await h(), boardFull = await board();
-  expect(full).toBeGreaterThan(60);
-  await page.click('#filmt');
-  expect(await h()).toBeLessThan(40);
-  await expect(page.locator('#filmt')).toHaveAttribute('aria-expanded', 'false');
-  await expect.poll(board).toBeGreaterThan(boardFull + 30);
-  await page.reload(); await page.waitForFunction(() => document.fonts.status === 'loaded'); await settle(page);
-  expect(await h()).toBeLessThan(40);
-  await page.click('#filmt');
-  expect(await h()).toBe(full);
-  expect(errors).toEqual([]);
-});
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 test('a panel floated from the dock lands clear of the colour tray, not on it', async ({ page }) => {
   const { errors } = await openApp(page);

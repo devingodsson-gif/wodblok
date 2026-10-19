@@ -1,14 +1,14 @@
 import {kv} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {C,CC,CH,CM,CSN,CW,PCOL,SHN,bk,fixC,paintColors,saveCC,setDim,shOf} from './04-canvas-and-stamp-outlines.js';
+import {C,CC,CH,CM,CW,bk,paintColors,saveCC,setDim,shOf} from './04-canvas-and-stamp-outlines.js';
 import {DEF_TILES,clean,cust,mkL,selOne,store} from './06-motif-library-folders.js';
 import {gShOk} from './08-grid-shapes.js';
 import {migLayers} from './10-layer-grids.js';
-import {migEdges,upd} from './11-pressure-flooding-block-edges.js';
+import {upd} from './11-pressure-flooding-block-edges.js';
 import {ser} from './14-presets-and-layer-grid-ui.js';
 import {savePr} from './15-print-effects-and-stamp-texture.js';
 import {txClean} from './16-texture-generators.js';
-import {buildTex,migInk,saveTex,texNorm} from './17-texture-panel-and-previews.js';
+import {buildTex,saveTex,texNorm} from './17-texture-panel-and-previews.js';
 import {artLoad,artSnap,artUsed} from './25-art-layers.js';
 import {clearAll} from './33-clear.js';
 import {trayIn} from './50-tray-core.js';
@@ -16,9 +16,8 @@ import {trayIn} from './50-tray-core.js';
 const PDEF={pr:{e:3,q:0,t:'speckle',a:35,sc:100,sd:811},tex:{}};
 // The pattern grid (its own tool in Pattern mode): show/hide, columns across, which points stamps snap to, line strength.
 const PGD={show:false,n:8,m:'l',op:70,sh:'rect'};
-const pgFix=(o,ls)=>{let g={...PGD};const nn=v=>Math.max(2,Math.min(60,Math.round(+v)||8));
+const pgFix=o=>{let g={...PGD};const nn=v=>Math.max(2,Math.min(60,Math.round(+v)||8));
  if(o&&typeof o=='object'){g={show:!!o.show,n:nn(o.n),m:o.m=='c'||o.m=='b'?o.m:'l',op:Math.max(10,Math.min(100,Math.round(+o.op)||70)),sh:gShOk(o.sh)};if(o.snap!==undefined)g.snap=!!o.snap;if(o.ss!==undefined)g.ss=!!o.ss}
- else{const L=(ls||[]).find(l=>l&&l.fg&&(l.fg.show||l.fg.n!=null));if(L)g={...g,show:!!L.fg.show,n:nn(L.fg.n),m:L.fg.m=='c'?'c':'l'}} // projects from before: take the grid the first layer had
  return g};
 const core=()=>({tiles:WBS.tiles,layers:WBS.layers,proj:WBS.proj,dim:WBS.dim,pr:WBS.pr,tex:WBS.tex,texLib:WBS.texLib,pg:{...WBS.pgrid},grade:WBX.wbGrade?WBX.wbGrade.get():null});
 const coreStr=()=>JSON.stringify(core());
@@ -33,7 +32,7 @@ function renderCover(){const on=$('cov').checked,k=[on,CW,CH,WBS.book.on?JSON.st
 const put=(c,x,y,w,hh)=>{if(!c.img||!c.iw)return'';const f=Math.min(w/c.iw,hh/c.ih)*c.sc/100,iw=c.iw*f,ih=c.ih*f;return`<image href="${c.img}" x="${(x+(w-iw)/2).toFixed(1)}" y="${(y+(hh-ih)/2).toFixed(1)}" width="${iw.toFixed(1)}" height="${ih.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`};
 if(on){if(WBS.book.on){const g=bk(),u=CW/g.W,y=g.b*u,hh=g.th*u;h=put(covB,g.b*u,y,g.tw*u,hh)+put(covS,(g.b+g.tw)*u,y,g.sw*u,hh)+put(cov,(g.b+g.tw+g.sw)*u,y,g.tw*u,hh)}else h=put(cov,0,0,CW,CH)}
 drawGuides();
-$('covg').innerHTML=h;paintCov();covOrder()}
+$('covg').innerHTML=h;covOrder()}
 function drawGuides(){const G=$('guig');if(!WBS.book.on||!WBS.book.gd){G.innerHTML='';return}const g=bk(),u=CW/g.W,f=v=>(v*u).toFixed(2),lw=(CW/1000).toFixed(2),b=g.b,x1=b+g.tw,x2=x1+g.sw,sf=.125,ss=.0625;
 const R=(x,y,w,h,st,da)=>`<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="none" stroke="${st}" stroke-width="${lw}"${da?` stroke-dasharray="${da}"`:''}/>`,T=(x,y,t,r)=>{const fs=CW/70,w=t.length*fs*.66+fs*1.1,h=fs*1.5,tr=r?` transform="rotate(90 ${f(x)} ${f(y)})"`:'';return`<g${tr}><rect x="${(x*u-w/2).toFixed(2)}" y="${(y*u-fs*1.05).toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}" rx="${(h/4).toFixed(2)}" fill="#fff" fill-opacity=".94" stroke="#e0006e" stroke-width="${lw}"/><text x="${f(x)}" y="${f(y)}" font-family="system-ui,sans-serif" font-size="${fs.toFixed(1)}" font-weight="600" fill="#e0006e" text-anchor="middle" letter-spacing="1">${t}</text></g>`};
 let o=`<path d="M0 0H${CW}V${CH}H0Z M${f(b)} ${f(b)}V${f(b+g.th)}H${f(g.W-b)}V${f(b)}Z" fill="rgba(224,0,110,.16)" fill-rule="evenodd"/>`;
@@ -41,13 +40,6 @@ o+=R(b,b,g.W-2*b,g.th,'#00a3c4');o+=`<line x1="${f(x1)}" y1="0" x2="${f(x1)}" y2
 o+=R(b+sf,b+sf,g.tw-2*sf,g.th-2*sf,'#1a9a4a','4 3')+R(x2+sf,b+sf,g.tw-2*sf,g.th-2*sf,'#1a9a4a','4 3');if(g.sw>2*ss)o+=R(x1+ss,b+sf,g.sw-2*ss,g.th-2*sf,'#1a9a4a','4 3');
 o+=R(x1-.25-2,b+g.th-.25-1.2,2,1.2,'#e0006e','6 3')+T(x1-1.25,b+g.th-.25-.55,'BARCODE');
 o+=T(b+g.tw/2,b+.4,'BACK')+T(x2+g.tw/2,b+.4,'FRONT');if(g.sw>.15)o+=T(x1+g.sw/2,b+g.th/2,'SPINE',1);G.innerHTML=o}
-function paintCov(){if(!WBS.book.on)WBS.cslot='f';const c=slotC(),nm={f:'front',b:'back',s:'spine'}[WBS.cslot];document.querySelectorAll('#cvslot [data-s]').forEach(b=>b.classList.toggle('on',b.dataset.s==WBS.cslot));$('cvslot').hidden=!WBS.book.on;
-$('cvp').innerHTML=c.img?`<img src="${c.img}" alt="Cover image">`:`<span>No ${WBS.book.on?nm+' ':'cover '}image yet</span>`;$('cvrm').hidden=!c.img;if(+$('cvs').value!=c.sc){$('cvs').value=c.sc;$('cvs').dispatchEvent(new Event('input',{bubbles:true}))}}
-function setCoverImg(img){const MX=1400,s0=Math.min(1,MX/Math.max(img.naturalWidth,img.naturalHeight)),w=Math.max(1,Math.round(img.naturalWidth*s0)),h=Math.max(1,Math.round(img.naturalHeight*s0)),c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(img,0,0,w,h);
-let u=c.toDataURL('image/webp',.88);if(!u.startsWith('data:image/webp'))u=c.toDataURL('image/png');if(u.length>1500000){const q=c.toDataURL('image/jpeg',.85);if(q.length<u.length)u=q}
-if(!okImg(u)){$('cvmsg').textContent='That image could not be used. Try a PNG or JPG.';return}
-const c0=slotC(),was=!c0.img;setSlotC({img:u,iw:w,ih:h,sc:was?(WBS.cslot=='f'?70:90):c0.sc,...(WBS.cslot=='f'?{tx:cov.tx}:{})});$('cov').checked=true;saveCov();WBS.covKey='';renderCover();$('cvmsg').textContent=`Cover image added (${Math.round(u.length*.75/1024)} KB).`;const cb=document.querySelector('.rail [data-pn="canvas"]');if(cb&&!cb.classList.contains('on'))cb.click()}
-function coverFile(f){if(f.type&&!/^image\//.test(f.type)){$('cvmsg').textContent='That file is not an image.';return}const url=URL.createObjectURL(f),img=new Image();img.onload=()=>{setCoverImg(img);URL.revokeObjectURL(url)};img.onerror=()=>{URL.revokeObjectURL(url);$('cvmsg').textContent='That image could not be read. Try a PNG or JPG.'};img.src=url}
 function snapshot(){const c=JSON.parse(coreStr()),used=new Set();c.tiles.forEach(t=>t.items.forEach(q=>used.add(q.m)));
 const cm={};Object.keys(cust).forEach(k=>{if(used.has(k))cm[k]=cust[k]});
 return{app:'WODBLOK',v:21,...c,arts:artUsed(),cover:{img:cov.img,iw:cov.iw,ih:cov.ih,sc:cov.sc,tx:cov.tx!==false,on:$('cov').checked,back:covB,spine:covS,book:WBS.book},grade:WBX.wbGrade?WBX.wbGrade.get():null,lib:{motifs:cm,colors:C.filter(x=>CC.includes(x[0]))}}}
@@ -55,19 +47,18 @@ function applySnap(d){if(!d||!Array.isArray(d.tiles)||!d.tiles.length||!Array.is
 WBS.ARTS=artLoad(d.arts);const L=d.lib||{};Object.entries(L.motifs||{}).forEach(([k,v])=>{if(!v||typeof v.svg!='string')return;if(k.startsWith('t|')){if(/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test(v.svg))cust[k]={n:String(v.n||'?').replace(/["<>&|]/g,'').slice(0,4),svg:v.svg,txt:1};return}if(k.startsWith('i|')){if(WBX.wbImpOk&&WBX.wbImpOk(k,v))cust[k]={n:String(v.n||'Imported shape').replace(/["<>&|]/g,'').slice(0,40),svg:v.svg,imp:1,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,200)}:{})}}else{const c=clean(v.svg);if(c)cust[k]={n:String(v.n||'shape').replace(/["<>&|]/g,'').slice(0,40),svg:c,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,200)}:{})}}});
 (L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();
 WBS.tiles=JSON.parse(JSON.stringify(d.tiles));WBS.layers=JSON.parse(JSON.stringify(d.layers));
-WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(id=>WBS.tiles.some(t=>t.id==id));if(L.lay=='brick'){L.lay='cols';if(!L.grid)L.grid='brick'}});if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];
+WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(id=>WBS.tiles.some(t=>t.id==id));});if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];
 WBS.proj=trayIn({proj:d.proj&&typeof d.proj=='object'?JSON.parse(JSON.stringify(d.proj)):{},tiles:WBS.tiles,layers:WBS.layers}).proj;
 if(d.cover&&d.cover.book&&typeof d.cover.book=='object')WBS.book={...WBS.book,...d.cover.book};else WBS.book={...WBS.book,on:false};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}
-WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,3]};WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pgrid=pgFix(d.pg,WBS.layers);
+WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,3]};WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pgrid=pgFix(d.pg);
 WBS.pr={...PDEF.pr,...(d.pr||{})};WBS.tex={...PDEF.tex,...(d.tex||{})};WBS.texLib=txClean(d.texLib);texNorm();if(WBX.wbGrade)WBX.wbGrade.set(d.grade||null);{const c2=d.cover||{};cov={img:okImg(c2.img)?c2.img:'',iw:+c2.iw||0,ih:+c2.ih||0,sc:+c2.sc||100,tx:c2.tx!==false};if(!cov.iw||!cov.ih)cov.img='';const sl=o=>o&&okImg(o.img)&&+o.iw&&+o.ih?{img:o.img,iw:+o.iw,ih:+o.ih,sc:+o.sc||100}:blank();covB=sl(c2.back);covS=sl(c2.spine);WBS.cslot='f';$('cov').checked=c2.on!==false;saveCov();WBS.covKey='';if(WBX.wbBookSync)WBX.wbBookSync()}
-migEdges();migInk();WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));WBS.cur=0;selOne(-1);WBS.selL=WBS.layers.length-1;WBS.symKey='';$('sasp').dataset.custom='';$('casp').dataset.custom='';
+WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));WBS.cur=0;selOne(-1);WBS.selL=WBS.layers.length-1;WBS.symKey='';$('sasp').dataset.custom='';$('casp').dataset.custom='';
 try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd()}
 // The status line fades after a while so an old message is not mistaken for the result of the last action; progress notes (ending in …) stay until replaced.
 let pmT=0;const pmsg=t=>{if(typeof t=='string'&&/Mac|iPhone|iPad/.test(navigator.platform||''))t=t.replace(/Ctrl\+/g,'Cmd+');$('pmsg').textContent=t;clearTimeout(pmT);if(t&&!/…$/.test(t))pmT=setTimeout(()=>{$('pmsg').textContent=''},12000);return t};
 const dirty=()=>coreStr()!==WBS.cp.saved||$('pnm').value.trim()!==WBS.cp.name;
 function paintPst(){const u=dirty(),e=$('pst');e.textContent='';e.className=u?'dirty':'';e.title=u?'Unsaved changes':'';if(u)e.setAttribute('role','img'),e.setAttribute('aria-label',e.title);else e.removeAttribute('aria-label')}
 const newId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-const shapeInfo=d=>{const k=d.dim&&d.dim.k||'rect',c=d.dim&&d.dim.c||[2,3];return`${d.dim&&CSN[d.dim.cs]&&d.dim.cs!='rect'?CSN[d.dim.cs]:(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2))} canvas · ${({hex:'hex',circle:'circle',diamond:'diamond',tri:'triangle'})[k]||(SHN[k]||'Rectangle').toLowerCase()} stamps · ${d.tiles.length} stamp${d.tiles.length>1?'s':''}`};
 function thumb(w0){return new Promise(res=>{try{const img=new Image(),to=setTimeout(()=>res(''),5000);img.onload=()=>{try{const w=w0||200,h=Math.round(w*CH/CW),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);clearTimeout(to);res(c.toDataURL('image/jpeg',.7))}catch(e){res('')}};img.onerror=()=>res('');img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())}catch(e){res('')}})}
 // The project as it is written to a file: the document plus the pictures Art layers use (so another project can take this one as a picture).
 async function fileSnap(){const sn=snapshot(),a=await artSnap();if(a)sn.art=a;return sn}
@@ -80,13 +71,6 @@ try{const q=JSON.parse(kv.get('wb40_coverB')||'null');if(q&&typeof q.sc=='number
 try{const q=JSON.parse(kv.get('wb40_coverS')||'null');if(q&&typeof q.sc=='number')covS={...covS,...q}}catch(e){}try{const q=JSON.parse(kv.get('wb31_cover')||'null');if(q&&typeof q.sc=='number')cov={...cov,...q};if(q&&q.on===false)$('cov').checked=false}catch(e){}if(!okImg(cov.img))cov.img='';if(!okImg(covB.img))covB.img='';if(!okImg(covS.img))covS.img='';
 $('covtx').onchange=()=>{cov.tx=$('covtx').checked;saveCov();covOrder()};
 WBS.covKey='';
-WBX.wbCoverFile=coverFile;
-$('cvfile').onchange=()=>{const f=$('cvfile').files[0];$('cvfile').value='';if(f)coverFile(f)};
-$('cvs').addEventListener('input',()=>{slotC().sc=+$('cvs').value;saveCov();renderCover()});
-$('cvrm').onclick=()=>{setSlotC(WBS.cslot=='f'?{img:'',iw:0,ih:0,sc:100,tx:cov.tx}:blank());saveCov();WBS.covKey='';renderCover();$('cvmsg').textContent='Cover image removed.'};
-{const pz=$('cvpaste'),PZ=pz.innerHTML;pz.addEventListener('focus',()=>{if(pz.innerHTML==PZ)pz.innerHTML=''});pz.addEventListener('blur',()=>{if(!pz.textContent.trim()&&!pz.querySelector('img'))pz.innerHTML=PZ});
-pz.addEventListener('paste',e=>{const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();e.stopPropagation();pz.innerHTML=PZ;pz.blur();coverFile(it.getAsFile())}else setTimeout(chk,60)});
-const chk=()=>{const im=pz.querySelector('img');if(im&&im.src){const i2=new Image();i2.onload=()=>setCoverImg(i2);i2.src=im.src;pz.innerHTML=PZ;pz.blur()}else if(pz.textContent.trim()&&pz.innerHTML!=PZ){pz.innerHTML='';$('cvmsg').textContent='That was text, not an image.'}};pz.addEventListener('input',()=>setTimeout(chk,30))}
 $('cov').addEventListener('input',()=>{saveCov();renderCover()});
 WBS.cp={id:null,name:'',saved:''};
 $('pnm').value=WBS.cp.name||'';setInterval(paintPst,800);paintPst();
@@ -95,4 +79,4 @@ openData({tiles:t,layers:[mkL('Layer 1',t.map(x=>x.id),'check',180)],proj:{...PC
 // first click with unsaved work: the button says so (the File menu stays open, see 34-desktop-shell) and the status bar explains
 if($('pnw').dataset.sure)pmsg('Starting a new project can’t be undone. Click New project again to discard this one.')};
 }
-export {PGD,fileSnap,thumb,confirm2,coreStr,covOrder,covS,dirty,newId,openData,paintCov,paintPst,pgFix,pmsg,renderCover,snapshot,init18};
+export {PGD,fileSnap,thumb,confirm2,coreStr,covOrder,covS,dirty,newId,openData,paintPst,pgFix,pmsg,renderCover,snapshot,init18};

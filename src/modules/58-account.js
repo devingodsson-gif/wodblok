@@ -11,7 +11,6 @@ import {accentFromAccount,stAccentGet} from './55-settings.js';
 // pointer moves, so drawing and dragging are untouched.
 const axTICK=15000,axIDLE=60000,axSEND=5*60000,axRECHECK=30*60000;
 const axLOCK={signedout:'Signed out',notapproved:'Not approved yet',expired:'Offline too long',clock:'Check the date and time'};
-const axCATS=[['bug','Bug'],['idea','Idea'],['other','Other']];
 const axFB_ERR={signedout:'Signed out, so feedback was not sent',notapproved:'Not approved yet, so feedback was not sent',limit:'Too much feedback today',invalid:'Could not send feedback',failed:'Could not send feedback',offline:'No connection, feedback not sent'};
 let axS={state:'off'},axOpener=null,axKey='',axCat='idea',axBusy=false,axAct=0,axLastTick=0,axTicks=0,axTimer=0,axUsing=false,axChecked=0;
 const axEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

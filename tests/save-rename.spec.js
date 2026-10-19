@@ -2,12 +2,10 @@
 // and Save makes a new file and leaves the original alone (1.0.6).
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, TARGET, openApp, settle } = require('./helpers/harness');
+const { ROOT, openApp, settle } = require('./helpers/harness');
 const { installFolder } = require('./helpers/fake-folder');
 const FX = path.join(ROOT, 'tests', 'fixtures');
-const FILES = [{ name: 'diamond.wodblok', path: path.join(FX, 'project-1-diamond-v19.wodblok') }];
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const FILES = [{ name: 'diamond.wodblok', path: path.join(FX, 'project-1-diamond.wodblok') }];
 
 async function openFromFolder(page) {
   await page.click('#pls');

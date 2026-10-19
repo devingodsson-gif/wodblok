@@ -1,9 +1,7 @@
 // 1.0.16: colour slots named Paper / Ink / Accent / Accent 2 (as the print proof says), the add-colour tile first in the library, previews for the
 // starting Looks, check marks and a heading in the Display menu, and the stamp library's own default name (UX review C9, C16, C20, D15).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 test('the Colours tool holds the tray, paper and ink, and the saved trays (1.10)', async ({ page }) => {
   const { errors } = await openApp(page);

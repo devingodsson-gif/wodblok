@@ -1,9 +1,7 @@
 // Layer update, step 9a (1.46.9): the four things only the Stamp editor did, now on the Pattern canvas with a stamp unlocked:
 // copy and paste of shapes, editing text that is already in a stamp, Split shape, and grade masks that belong to one stamp.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const items = async page => (await state(page)).tiles[0].items;

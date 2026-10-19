@@ -1,9 +1,8 @@
 // Shape library tree (1.5.0): every folder opens and closes in place, one button opens or closes them all, what is open is
 // remembered, folders answer the arrow keys and a right-click, Import is a menu in the toolbar, and a slider sets the shape size.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in 1.5.0'); });
 async function open(page) { const r = await openApp(page); await openPanel(page, 'motifs'); return r; }
 const tiles = page => page.locator('#lib button[data-m]');
 const cols = page => page.evaluate(() => getComputedStyle(document.querySelector('#lib .lib')).gridTemplateColumns.split(' ').length);

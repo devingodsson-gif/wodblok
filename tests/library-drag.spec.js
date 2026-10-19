@@ -1,8 +1,6 @@
 // Clicking a library shape arms it for stamping (UX review C7). Dragging one onto the stamp worked only in the Stamp editor, which is gone; on the canvas a shape is placed with the brush.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 test('a click on a library shape arms it as the brush and adds nothing; dragging it from the list drops nothing on the canvas', async ({ page }) => {
   const { errors } = await openApp(page);

@@ -1,9 +1,7 @@
 // 1.42.0: letters come from the font file's own outlines (opentype.js), not from a traced picture.
 const { test, expect } = require('@playwright/test');
 const path = require('path');
-const { TARGET, openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
 
 // the letter shapes drawn in the Text panel preview: number of path commands of each
 const shapes = page => page.evaluate(() => [...document.querySelectorAll('#tx_pv path[fill-rule]')].map(p => { const d = p.getAttribute('d'); return [(d.match(/[MLQZ]/g) || []).length, d]; }));

@@ -1,9 +1,9 @@
 import {tbSync} from './07-symmetry.js';
 import {$,WBH,WBS,WBX,mod} from './01-launch-and-version.js';
 import {DRS,bkPre,bkShow,bkTile} from './03-stamp-prints-and-drawing.js';
-import {shBleed,CH,CM,CW,ORN,SH,SHN,SK,SW,cOut,col,geom,hasOut,rng,shOf,shp,tileExt,tileOn,useT,okC} from './04-canvas-and-stamp-outlines.js';
+import {shBleed,CH,CW,ORN,SH,SHN,SK,SW,cOut,col,geom,hasOut,rng,shOf,shp,tileExt,tileOn,useT,okC} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,luid,pal} from './06-motif-library-folders.js';
-import {ARR,clipSeed,inkRuns,items} from './09-stamp-editor-grid-and-motif-ops.js';
+import {ARR,clipSeed,inkRuns,items} from './09-stamp-items-and-print-runs.js';
 import {eNV,eT,edgeDefs,pressDefs,renderL} from './11-pressure-flooding-block-edges.js';
 import {isOf} from './16-texture-generators.js';
 import {SURFC,inkCatch,layTexMask,layTexOv,roughFilter,surfFor,txRefresh,txoG} from './17-texture-panel-and-previews.js';
@@ -116,7 +116,7 @@ const f=WBS.DRAFT?'':roughFilter();clipSeed(_cn);
 renderCover();
 $('art').setAttribute('viewBox',tileOn()&&WBS.tilePv?`${-CW} ${-CH} ${3*CW} ${3*CH}`:`0 0 ${CW} ${CH}`);const ikc=typeof inkCatch=='function'&&!WBS.DRAFT?inkCatch():null;{const sk=WBS.tiles.map(t=>SURFC[t.id]?t.id+'#'+SURFC[t.id].k:'').join(';')+(WBS.edInk?'':'|plain');if(sk!==WBS.SURFK){WBS.SURFK=sk;$('surfd').innerHTML=WBS.tiles.map(t=>SURFC[t.id]?(WBS.edInk?SURFC[t.id].s:`<mask id="is${t.id}" maskUnits="userSpaceOnUse" x="-100000" y="-100000" width="200000" height="200000"><rect x="-100000" y="-100000" width="200000" height="200000" fill="#fff"/></mask>`):'').join('')}}bkShow(f,defs,ikc?ikc.defs:'',lg,L=>`${tileOn()?`<rect x="${-tileExt()[0]}" y="${-tileExt()[1]}" width="${CW+2*tileExt()[0]}" height="${CH+2*tileExt()[1]}" fill="${pa}"/>`:`<rect width="${CW}" height="${CH}" fill="${pa}"/>`}<g${ikc?(WBS.edTx?' mask="url(#cw)"':' data-tki="1"'):''}><g ${f?'filter="url(#rf)"':''}>${L}</g></g>`,sd);$('texg').style.display=WBS.edTx?'':'none';tbSync();txRefresh();
 {const ci=hasOut(),O=ci?cOut():null;$('cvdefs').innerHTML=ci?`<clipPath id="cvclip" clipPathUnits="userSpaceOnUse"><path d="${O.d}"/></clipPath>`:'';['dyn','texg','covg'].forEach(id=>ci?$(id).setAttribute('clip-path','url(#cvclip)'):$(id).removeAttribute('clip-path'));$('art').classList.toggle('shp',ci);const sh=$('artsh');sh.style.display=ci?'block':'none';sh.setAttribute('viewBox',`0 0 ${CW} ${CH}`);sh.innerHTML=ci?`<path d="${O.d}" fill="${pa}"/>`:''}
-$('tabs').innerHTML=WBS.tiles.map((t,k)=>{useT(t);return`<button data-k="${k}" class="${(k==WBS.cur||tGrp().includes(k)?'on':'')+((t.items||[]).length?'':' empty')}" title="Stamp ${k+1}: ${SHN[SK]}"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button>`}).join('');useT(WBS.tiles[WBS.cur]);
+useT(WBS.tiles[WBS.cur]);
 renderL();if(typeof renderLayers=='function')renderLayers();stOlEnd();
 renderLib();frSync();WBH.fpSync();WBH.fpOverlay();if(WBX.wbGrade)WBX.wbGrade.refresh();if(WBX.wbTileUi)WBX.wbTileUi()}
 const hx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));

@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {C,CH,CM,CW,closeDD,col,geom,okC,placeFloat,shOf} from './04-canvas-and-stamp-outlines.js';
+import {C,CH,CW,closeDD,col,geom,okC,placeFloat,shOf} from './04-canvas-and-stamp-outlines.js';
 import {refLabel} from './50-tray-core.js';
 import {store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
@@ -9,7 +9,7 @@ import {LY} from './14-presets-and-layer-grid-ui.js';
 import {stUnlocked} from './63-stamp-tool.js';
 // ===== Colour grading: a render-only filter (palette untouched). Global sliders, plus Lightroom-style masks that add their own
 // adjustments to part of the print: linear/radial gradients (over the whole canvas, or inside every print of a stamp), one layer,
-// a colour range or a luminance range. Applied to the pattern, texture, stamp editor and exports.
+// a colour range or a luminance range. Applied to the pattern, texture and exports.
 const GK=['ex','ct','hi','sh','wh','bl','tp','tn','sat','vib','hue','fd'],zA=()=>Object.fromEntries(GK.map(k=>[k,0]));
 const MT={lin:'Linear gradient',rad:'Radial gradient',lay:'Layer',col:'Colour range',lum:'Luminance range'},MS={lin:'Linear',rad:'Radial',lay:'Layer',col:'Colour',lum:'Luminance'};
 const MD={lin:{sp:'c',st:'',x1:.5,y1:.1,x2:.5,y2:.5},rad:{sp:'c',st:'',cx:.5,cy:.5,rx:.32,ry:.22,fe:50},lay:{lay:''},col:{c:'#000000',rg:20,sm:50},lum:{lo:0,hi:35,sm:25}};
@@ -92,17 +92,10 @@ function layerF(u){let o='',c='SourceGraphic';if(!gdBypass)grd.masks.forEach((m,
  if(hasA(m.a)){const r=adjP(m.a,c,p+'a'),k=m.amt/100;o+=r[0];if(k<1){o+=`<feComposite in="${r[1]}" in2="${c}" operator="arithmetic" k1="0" k2="${f4(k)}" k3="${f4(1-k)}" k4="0" result="${p}b"/>`;c=p+'b'}else c=r[1]}
  if(ovOf(m)){o+=`<feFlood flood-color="${OVC}" flood-opacity="${f4(.55*m.amt/100)}" result="${p}F"/><feComposite in="${p}F" in2="SourceAlpha" operator="in" result="${p}G"/><feComposite in="${p}G" in2="${c}" operator="over" result="${p}O"/>`;c=p+'O'}});
 return flt('wbgl'+u,...gRg(),o)}
-// stamp editor: the current stamp's gradients, then the global grade, then colour/luminance masks
+// the current stamp's gradients, then the global grade, then colour/luminance masks
 // (bg=1: the stamp's paper, which stamp gradients leave alone, as in the pattern where they only touch the ink)
-// the editor's grade covers what is on screen (the stamp, its margin and the side areas), not three stamps' width all round
-function edRgn(W,H){const X=-W,Y=-H;let X2=2*W,Y2=2*H;try{const r=(WBS.WBDRG&&WBS._edRR)||(WBS._edRR=document.getElementById('ed').getBoundingClientRect());if(!WBS.WBDRG)WBS._edRR=null;if(r.width>0&&r.height>0){const vw=W+48,vh=H+48,s=Math.min(r.width/vw,r.height/vh),uw=r.width/s,uh=r.height/s,x0=-24-(uw-vw)/2,y0=-24-(uh-vh)/2,m=8;X2=Math.max(W,Math.min(X2,Math.ceil(x0+uw+m)));Y2=Math.max(H,Math.min(Y2,Math.ceil(y0+uh+m)))}}catch(e){}return{W,H,X,Y,RW:X2-X,RH:Y2-Y,k:'e'}}
-function edF(bg,ink){const t=WBS.tiles[WBS.cur];if(!t)return'';const g=geom(shOf(t)),W=g.SW,H=g.SH,ctx=(bg||ink)?{W,H,X:-W,Y:-H,RW:2*W+8,RH:2*H+8,k:'e'}:edRgn(W,H),ms=bg?[]:stMasks(t.id);let o='',c='SourceGraphic';
-if(!bg&&hasA(t.gr)){const r=adjP(t.gr,c,'T');o+=r[0];c=r[1]}
-grd.masks.forEach((m,i)=>{if(!ms.includes(m))return;const r=maskStep(m,i,c,ctx);o+=r[0];c=r[1]});
-if(hasA(grd)){const r=adjP(grd,c,'G');o+=r[0];c=r[1]}
-grd.masks.forEach((m,i)=>{if(!m.on||!WBS.edMk||(m.t!='col'&&m.t!='lum'))return;const r=maskStep(m,i,c,ctx);o+=r[0];c=r[1]});
-return o||bg?flt(bg?'wbgradeEB':ink?'wbgradeEI':'wbgradeE',ctx.X,ctx.Y,ctx.RW,ctx.RH,o):''}
-function gDefs(ov){OVX=ov;let o='';try{if(!gdBypass){const e=edF(0);o+=canvasF('wbgrade',0)+canvasF('wbgradeT',1)+(e?e+edF(1)+edF(0,1):'')}
+// the grade covers what is on screen (the stamp, its margin and the side areas), not three stamps' width all round
+function gDefs(ov){OVX=ov;let o='';try{if(!gdBypass){o+=canvasF('wbgrade',0)+canvasF('wbgradeT',1)}
 WBS.tiles.forEach(t=>{if(stF(t.id))o+=stampF(t)});new Set(grd.masks.filter(m=>m.on&&WBS.edMk&&m.t=='lay'&&m.lay).map(m=>m.lay)).forEach(u=>o+=layerF(u))}finally{OVX=true}return o}
 const gKey=()=>JSON.stringify([WBS.tiles.map(t=>stF(t.id)),grd.masks.filter(m=>m.on&&WBS.edMk&&m.t=='lay').map(m=>m.lay)]);
 // structural changes (which stamps / layers carry a mask filter) need a rebuild; slider moves only refresh the filters

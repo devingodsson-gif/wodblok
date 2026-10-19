@@ -1,8 +1,6 @@
 // In a Text layer, typing edits the selected text box and "Add text" starts a new one (UX review D5).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 test('typing changes the selected text box; Add text then arms a second one', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });

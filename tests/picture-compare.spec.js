@@ -9,19 +9,17 @@ const { ROOT, TARGET, APP_URL, openApp, openProjectFile, openPanel, settle } = r
 const { FIXTURES } = require('./helpers/speed');
 
 const BASE = process.env.WB_BASELINE;
-// WB_PICTURE_LAYOUT_CHANGED=1: only for a release that moves the chrome on purpose (1.12.0: the type dock is 32 high, so the stage is ~2px smaller). A board
-// picture whose size differs is then not compared; the PNG export (the artwork itself) and any board picture of equal size must still match exactly.
-const LAYOUT = process.env.WB_PICTURE_LAYOUT_CHANGED === '1';
 // WB_PICTURE_TOLERANCE=<mean difference, 0-255>: only for a release that changes how prints are packed (their grain moves a little). Unset = exactly equal.
 const TOL = +process.env.WB_PICTURE_TOLERANCE || 0;
-test.beforeEach(() => { test.skip(TARGET === 'legacy' || !BASE, 'needs WB_BASELINE=<older dist/wodblok.html> and the build as target'); });
+test.beforeEach(() => { test.skip(!BASE, 'needs WB_BASELINE=<older dist/wodblok.html> and the build as target'); });
 
 // "busy" has layers with an ink saved in the file ("Moon Ivory" on layers 2-4). Before 1.10 those inks were left out when the file opened; the colour tray
 // brings them back (docs/known-issues.md), so the layers print in that colour now. That is a deliberate change: this one file is compared loosely
 // (a mean difference of 2.5 of 255, and at most 1 pixel in 100 off by more than 48); the other files must still match.
 // 1.35.0: "diamond" has inverted stamps. Their tiles now overlap by a hair of their own colour, so the light line between neighbouring tiles is gone; the outline of
 // each inverted tile also grows by half a pixel, so its edge pixels differ (mean about 0.45 of 255). Nothing else in that picture may differ.
-const LOOSE = { busy: { mean: 2.5, big: 0.01 }, diamond: { mean: 0.8, big: 0.01 } };
+// 2.0.4: the stamp tray is gone, so the Fit picture of "wide" sits a fraction of a pixel differently from the baseline's (mean 0.24 of 255, 7 pixels off by more than 48). Drop the "wide" entry once the baseline is 2.0.4 or later.
+const LOOSE = { busy: { mean: 2.5, big: 0.01 }, diamond: { mean: 0.8, big: 0.01 }, wide: { mean: 0.5, big: 0.001 } };
 const CTX = { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'dark', reducedMotion: 'reduce', acceptDownloads: true };
 
 async function render(browser, url, fixture) {
@@ -31,7 +29,9 @@ async function render(browser, url, fixture) {
   await openProjectFile(page, fixture);
   const shots = {};
   // the rail's name labels move when a tool is added to the rail, and the stamp outlines (1.46.4, drawn over the artwork in their own overlay, never part of it) are an editing aid: neither is part of the picture. The PNG export still compares the artwork itself.
-  await page.addStyleTag({ content: '.tip,#stolsvg{display:none!important}' });
+  await page.addStyleTag({ content: '.tip,#stolsvg,.film{display:none!important}' });
+  await page.evaluate(() => window.dispatchEvent(new Event('resize')));   // the baseline still has its stamp tray (hidden above): fit again, as it would without it
+  await settle(page);
   const shoot = async (label, sel) => { await settle(page, { quiet: 8 });
     // a build before 1.9.1 cannot say when its prints are done: give it time
     if (!(await page.evaluate(() => !!(window.__wbTest && window.__wbTest.printsBusy)))) { await page.waitForTimeout(2500); await settle(page, { quiet: 8 }); }
@@ -106,7 +106,6 @@ for (const name of Object.keys(FIXTURES)) {
     for (const [label, r] of Object.entries(out)) {
       const what = `${name}: ${label}: pixels that differ (size ${JSON.stringify(r.size || [r.sizeA, r.sizeB])}, biggest step ${r.maxDelta}, mean ${r.meanDelta})`;
       const lo = LOOSE[name], tol = lo ? Math.max(TOL, lo.mean) : TOL;
-      if (LAYOUT && r.diff === -1 && !/^PNG export/.test(label)) continue;
       if (!tol || r.diff === -1) expect(r.diff, what).toBe(0);
       else { expect(r.meanDelta, what).toBeLessThanOrEqual(tol); expect(r.over48, what + ': pixels off by more than 48').toBeLessThanOrEqual(r.size[0] * r.size[1] * (lo ? lo.big : 0.001)); }
     }

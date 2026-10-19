@@ -1,8 +1,6 @@
 // 1.46.0: Randomize uses the newer text options (wave path, bulge, random placement, bounce) on some lettering. The options come from the words, so rolls stay repeatable.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 async function roll(page) {
   await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 30000 });

@@ -6,7 +6,7 @@ const { test } = require('@playwright/test');
 const { ROOT, TARGET, openApp, openProjectFile, openPanel, settle } = require('./helpers/harness');
 
 test.skip(!process.env.WB_PERF, 'WB_PERF=1 only');
-const FIXTURE = path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok.json');
+const FIXTURE = path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok');
 const SLIDERS = [['layers', 'lrp', 'layer pattern'], ['layers', 'lox', 'layer offset'], ['grade', 'gd_ex', 'grade exposure'], ['grade', 'gm_amt', 'grade mask amount'], ['tex', 'tx_a', 'texture amount'], ['canvas', 'ccr', 'canvas corner']];
 const STEPS = 20;
 

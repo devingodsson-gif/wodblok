@@ -2,9 +2,7 @@
 // This opens every tool in both views and looks for sentences (several words ending in a full stop, ? or !). Data lines ("Last roll: …", the
 // palette's "No. 60 · …") are not sentences of this kind.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'the v100 file has these sentences by design'); });
+const { openApp } = require('./helpers/harness');
 
 test('no tool panel opens with an explanatory sentence', async ({ page }) => {
   const { errors } = await openApp(page);

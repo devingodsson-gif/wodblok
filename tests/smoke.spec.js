@@ -16,7 +16,7 @@ test('loads, opens a project, randomizes, no errors @smoke', async ({ page, brow
   timings.loadMs = Date.now() - t;
 
   t = Date.now();
-  await openProjectFile(page, path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok.json'));
+  await openProjectFile(page, path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok'));
   timings.openProjectMs = Date.now() - t;
 
   await openPanel(page, 'rand');

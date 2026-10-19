@@ -1,8 +1,6 @@
 // Navigator, hand tool and zoom keys (Phase 5): see the whole piece small, move around a zoomed piece without the scroll bars.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const board = page => page.locator('#boardP');
 const scroll = page => board(page).evaluate(b => [b.scrollLeft, b.scrollTop]);

@@ -1,9 +1,7 @@
 // A single selected motif shows four corner handles that scale it and a round handle above it that turns it; one drag is one undo step (UX review C7).
 // Since step 11 the motif is a shape in an unlocked stamp on the Pattern canvas; its handles are in the overlay (#stoh).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, settle, getState, unlockStamp, pickShape, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, settle, getState, unlockStamp, pickShape, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
 
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;
 async function selectOne(page) {

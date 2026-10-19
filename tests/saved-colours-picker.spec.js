@@ -1,9 +1,7 @@
 // 1.18: the picker that opens from a tray colour has a "Saved colours" dropdown with a search field. It lists the colours in your saved
 // trays, then Wada's colours; choosing one sets the colour and its name in one history step.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, settle, getState } = require('./helpers/harness');
 
 const proj = async page => JSON.parse(await getState(page)).proj;
 const slot0 = async page => { const p = await proj(page); const w = p.cw[p.cwa]; return { hex: w.c.k1, name: (w.m || {}).k1 || '' }; };

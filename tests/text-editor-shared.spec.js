@@ -1,9 +1,7 @@
 // 1.36.0: the Text tool (a stamp unlocked on the canvas) and the Text layer use the same controls; 20 more fonts, each shown in its own face;
 // word spacing, justify and case; Enter is a new line in both.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
 
 // text goes into the unlocked stamp: set it up in the Text panel, then click an instance of the stamp on the canvas (the placed text is then selected)
 const putStampText = async page => {

@@ -1,5 +1,5 @@
 import {WBS,WBX} from './01-launch-and-version.js';
-import {CM,PCOL,col,fixC,okC} from './04-canvas-and-stamp-outlines.js';
+import {CM,PCOL,col,okC} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 // ===== The colour tray: the project's working colours =====
@@ -14,11 +14,9 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 // The tray lives in the document (WBS.proj), so history, saving, crash recovery and compare all carry it without anything extra.
 const TRAY_MAX=16;let TRAY_VIEW=7;   // places shown in the dock (Settings > Colour); an exported let, so every importer sees the change
 const setTrayView=n=>{TRAY_VIEW=Math.max(7,Math.min(TRAY_MAX,n|0||7))};
-const HEXRE=/^#[0-9a-f]{6}([0-9a-f]{2})?$/;
 // '#rrggbb' / '#rrggbbaa' / 'rgb' forms in; '#rrggbb' (opaque) or '#rrggbbaa' out, lower case. null when it is not a colour.
 function normHexA(v){const m=/^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(String(v||'').trim());if(!m)return null;let h=m[1].toLowerCase();if(h.length==3)h=h.split('').map(c=>c+c).join('');if(h.length==8&&h.slice(6)=='ff')h=h.slice(0,6);return'#'+h}
 const hexAlpha=h=>h&&h.length==9?parseInt(h.slice(7,9),16)/255:1;
-const hexRGB=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 const hexOpaque=h=>h?h.slice(0,7):h;
 const withAlpha=(h,a)=>{h=hexOpaque(h);const n=Math.round(Math.max(0,Math.min(1,a))*255);return n>=255?h:h+n.toString(16).padStart(2,'0')};
 const P=()=>WBS.proj;
@@ -26,13 +24,11 @@ const cwNow=(p=P())=>p.cw[Math.min(p.cw.length-1,Math.max(0,p.cwa|0))];
 const isLink=r=>typeof r=='string'&&r.charCodeAt(0)===64;
 const isFixed=r=>typeof r=='string'&&r.charCodeAt(0)===35;
 const refSlot=r=>isLink(r)?r.slice(1):isFixed(r)&&r.indexOf('|')>0?r.slice(r.indexOf('|')+1):null;
-const slotRef=id=>'@'+id;
 const slotHex=(id,p=P())=>{const w=cwNow(p);return(w&&w.c[id])||'#888888'};
 const slotName=(id,p=P())=>{const w=cwNow(p);return(w&&w.m&&w.m[id])||''};
-const slotNo=(id,p=P())=>p.ts.indexOf(id)+1;
 const nextId=(used,pre)=>{let i=1;while(used.has(pre+i))i++;return pre+i};
 // an old colour name as the app has always shown it: a palette colour is itself; a name from the first 100-colour palette becomes the nearest palette colour
-const nameOf=n=>{if(!n||typeof n!='string')return null;if(CM[n])return n;const m=fixC(n,null);return m&&CM[m]?m:null};
+const nameOf=n=>{if(!n||typeof n!='string')return null;return CM[n]?n:null};
 const hexOfName=n=>{const m=nameOf(n);return m?CM[m]:null};
 // what a colour reference shows as words: the slot's colour name, else the hex
 function refLabel(r){if(!r)return'';if(isLink(r)){const id=r.slice(1);return slotName(id)||slotHex(id).toUpperCase()}if(isFixed(r))return col(r).toUpperCase();return r}
@@ -106,7 +102,6 @@ function cwDel(i){const o=WBS.proj;if(o.cw.length<=1||!o.cw[i])return;o.cw.splic
 function cwUse(i){const o=WBS.proj;if(o.cw[i])o.cwa=i}
 function cwMove(i,to){const o=WBS.proj;if(!o.cw[i])return;const cur=o.cw[o.cwa],[w]=o.cw.splice(i,1);o.cw.splice(Math.max(0,Math.min(o.cw.length,to)),0,w);o.cwa=o.cw.indexOf(cur)}
 // ---- colours as a short list for other tools: the tray colours in order (hex), then fixed colours in use
-function trayHexes(){const o=WBS.proj;return o.ts.map(id=>slotHex(id))}
 function fixedInUse(){const s=new Set();refsAll().forEach(x=>{const r=x.get();if(isFixed(r))s.add(col(r))});return[...s]}
 // ---- recently used colours (settings, not the document)
-export {trayLive,TRAY_MAX,TRAY_VIEW,setTrayView,HEXRE,cwAdd,cwDel,cwMove,cwNow,cwUse,fixedInUse,hexAlpha,hexOpaque,hexRGB,isFixed,isLink,lockRef,normHexA,refAdopt,refLabel,refSlot,refsAll,slotHex,slotName,slotNo,slotRef,trayAdd,trayDefault,trayDone,trayFromLegacy,trayGuard,trayHexes,trayIn,trayLoad,trayMove,trayNew,trayRemove,traySet,trayUses,unlockRef,withAlpha};
+export {trayLive,TRAY_MAX,TRAY_VIEW,setTrayView,cwAdd,cwDel,cwMove,cwNow,cwUse,fixedInUse,hexAlpha,hexOpaque,isFixed,isLink,lockRef,normHexA,refAdopt,refLabel,refSlot,refsAll,slotHex,slotName,trayAdd,trayDefault,trayDone,trayFromLegacy,trayGuard,trayIn,trayLoad,trayMove,trayNew,trayRemove,traySet,trayUses,unlockRef,withAlpha};

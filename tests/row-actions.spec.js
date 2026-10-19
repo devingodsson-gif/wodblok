@@ -1,8 +1,6 @@
 // Row buttons are never reachable by hover alone: the selected row shows them, and so does keyboard focus (UX review D16, C14).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 test('History: every row shows its Compare button without hovering', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });

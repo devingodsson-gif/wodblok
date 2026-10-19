@@ -1,5 +1,5 @@
 import {kv} from '../platform/index.js';
-import {$,WBS} from './01-launch-and-version.js';
+import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,SH,SHN,SW,rowMenu,useT,shp} from './04-canvas-and-stamp-outlines.js';
 import {pal,selOne,store} from './06-motif-library-folders.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
@@ -21,12 +21,11 @@ const stName=id=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==id)+1);
 function stUnlocked(){if(STP.un==null)return null;const L=stSel();if(!L||L.u!==STP.unL||!WBS.tiles.some(t=>t.id==STP.un)){STP.un=null;STP.unL=null;return null}return STP.un}
 // stamps in this layer's arrangement plus stamps placed freely on the layer, counted once per layer
 const stUses=id=>WBS.layers.filter(L=>(L.st||[]).includes(id)||(L.pl||[]).some(p=>p.t==id)).length;
-function stAccepts(id){return stUnlocked()===id}
 // build() calls these three: begin before the layers are drawn, add for every printed stamp of the selected layer, end after
 function stOlBegin(){const L=stSel();STP.on=!!L&&!!L.vis&&!L.free&&!(L.fr&&L.fr.on);STP.items=[];STP.rot=0}
 function stOlPath(id,d){STP.p[id]={d,p2:null}}
 function stOlAdd(id,tr,rot,w,h){if(!STP.on)return;const m=STTRRE.exec(tr);if(!m)return;STP.rot=rot||0;STP.items.push([id,+m[1],+m[2],+m[3],+m[4],+m[5],w,h])}
-// The Text panel builds letters in the stamp (the Stamp editor's way) while a stamp is unlocked, and fills a Text layer otherwise
+// The Text panel builds letters in the stamp (letters tagged tg) while a stamp is unlocked, and fills a Text layer otherwise
 const stTxMode=()=>stUnlocked()!=null;
 function stTextSync(){if(!WBX.wbTxMode)return;const m=stTxMode();if(STP.txm===m)return;STP.txm=m;WBX.wbTxMode(m?'stamp':'pattern')}
 function stOlEnd(){stOlPaint();stPanel();stTextSync()}
@@ -46,7 +45,7 @@ function stampAt(x,y,only){for(let i=STP.items.length-1;i>=0;i--){const it=STP.i
 // the other way: a point in a printed instance's own space -> canvas coordinates
 function stampToCanvas(i,u,v){const it=STP.items[i];if(!it)return null;const q=stMatrix(it).transformPoint({x:u,y:v});return{x:q.x,y:q.y}}
 // ----- the panel -----
-function stLock(id){if(stUnlocked()===id){STP.un=null;STP.unL=null}else{STP.un=id;STP.unL=(stSel()||{}).u||null;const k=WBS.tiles.findIndex(t=>t.id==id);if(k>=0&&WBS.cur!=k){WBS.cur=k;selOne(-1)}}STP.ai=null;stOlPaint();stPanel(true);stTextSync();if(WBX.wbGrade)WBX.wbGrade.refresh()}
+function stLock(id){if(stUnlocked()===id){STP.un=null;STP.unL=null;selOne(-1)}else{STP.un=id;STP.unL=(stSel()||{}).u||null;const k=WBS.tiles.findIndex(t=>t.id==id);if(k>=0&&WBS.cur!=k){WBS.cur=k;selOne(-1)}}STP.ai=null;stOlPaint();stPanel(true);stTextSync();if(WBX.wbGrade)WBX.wbGrade.refresh();WBH.draw()}
 function stPick(id){const L=stSel();if(!L)return;const a=L.st=L.st||[],k=a.indexOf(id);if(k<0)a.push(id);else a.splice(k,1);upd()}
 function stSig(){const L=stSel()||{},un=stUnlocked();return[WBS.cur,WBS.selL,(L.st||[]).join(),un,WBS.tiles.map(t=>t.id+':'+(t.items||[]).length).join(),WBS.layers.map(l=>(l.st||[]).length+'/'+(l.pl||[]).length).join(),WBS.proj&&WBS.proj.bg].join('|')}
 function stPanel(force){const list=$('stmpl');if(!list||!list.offsetParent)return;const sig=stSig();if(!force&&sig===STP.sig&&list.childElementCount)return;STP.sig=sig;
@@ -94,4 +93,4 @@ function init63(){
  stBar();
   if(typeof IntersectionObserver=='function')new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting))stPanel(true)}).observe(list)}
 }
-export {STP,stTxMode,stMatrix,stDelete,stDup,stNew,stZoom,init63,stAccepts,stLock,stOlAdd,stOlBegin,stOlEnd,stOlPaint,stOlPath,stPanel,stSetOp,stUnlocked,stampAt,stampToCanvas};
+export {STP,stTxMode,stMatrix,stDelete,stDup,stNew,stZoom,init63,stLock,stOlAdd,stOlBegin,stOlEnd,stOlPaint,stOlPath,stPanel,stSetOp,stUnlocked,stampAt,stampToCanvas};

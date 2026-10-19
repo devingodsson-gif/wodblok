@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CM,LEG_HEX,PL,col} from './04-canvas-and-stamp-outlines.js';
+import {CM,PL,col} from './04-canvas-and-stamp-outlines.js';
 import {normHexA,trayIn,trayLoad} from './50-tray-core.js';
 import {txEnsure} from './16-texture-generators.js';
 import {coreStr,newId,pmsg,thumb} from './18-projects-and-cover-overlay.js';
@@ -36,7 +36,6 @@ function lkDo(label,mut){
 // a look's or a palette's colours go into the first places of the tray (the colourway showing); everything linked to those places follows
 const lkSetTray=(c,cols)=>{trayIn(c);trayLoad(cols.filter(x=>x&&x[0]),c.proj)};
 // looks saved before the tray kept colour names in paper, ink, accent, accent 2 order
-const lkOldCols=p=>[p.bg,p.ink,p.c3,p.c4].filter(Boolean).map(n=>[CM[n]||LEG_HEX(n),n]).filter(x=>x[0]);
 function lkSetGrade(c,g){
   const z=Object.fromEntries(LK_GK.map(k=>[k,0])),keep=((c.grade&&c.grade.masks)||[]).filter(m=>m.lay||m.sc);
   c.grade={...z,...(g||{}),cov:!!(c.grade&&c.grade.cov),masks:[...(g&&g.masks?g.masks.map(m=>JSON.parse(JSON.stringify(m))):[]),...keep]};
@@ -44,7 +43,7 @@ function lkSetGrade(c,g){
 function lkApplyUser(rec){
   const L=rec.look;
   lkDo('Look “'+rec.name+'”.',c=>{
-    if(Array.isArray(L.tray))lkSetTray(c,L.tray.map(x=>[normHexA(x[0]),x[1]]));else if(L.proj)lkSetTray(c,lkOldCols(L.proj));
+    if(Array.isArray(L.tray))lkSetTray(c,L.tray.map(x=>[normHexA(x[0]),x[1]]));
     if(L.pr)c.pr={...c.pr,...L.pr};
     if('grade' in L)lkSetGrade(c,L.grade);
     if(L.tex){c.tex={...c.tex,u:L.tex.u.map(x=>({...x}))};const have=new Set((c.texLib||[]).map(x=>x.id));c.texLib=c.texLib||[];(L.texLib||[]).forEach(x=>{if(!have.has(x.id))c.texLib.push({...x})})}

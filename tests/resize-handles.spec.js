@@ -1,8 +1,6 @@
 // Canvas, with a stamp unlocked: four side squares pull the width or height; a corner or side grows away from the opposite one; Shift grows from the middle (1.37.0, moved from the Stamp editor to the Pattern canvas in step 11).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, settle, getState, unlockStamp, pickShape, stampInstance, clickStamp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, settle, getState, unlockStamp, pickShape, stampInstance, clickStamp } = require('./helpers/harness');
 
 const item = async page => { const it = JSON.parse(await getState(page)).tiles[0].items; return it[it.length - 1]; };
 const box = q => { const rx = 48 * q.s * (q.sx || 1), ry = 48 * q.s * (q.sy || 1); return { l: q.x - rx, r: q.x + rx, t: q.y - ry, b: q.y + ry, w: 2 * rx, h: 2 * ry }; };

@@ -1,8 +1,6 @@
 // 1.0.20 (UX review 2: N1, N6): a panel group with more tabs than fit scrolls the chosen tab into view and fades the hidden edge; the top-bar text buttons have an outline.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 test('with many tabs open the newest tab is fully visible and the strip shows it can scroll back', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });

@@ -4,17 +4,23 @@ const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
 const { pathToFileURL } = require('url');
-const { ROOT, TARGET, openApp, openProjectFile, getState, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { ROOT, openApp, openProjectFile, getState, settle } = require('./helpers/harness');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const nativeImport = new Function('u', 'return import(u)');
-const FIX = path.join(ROOT, 'tests', 'fixtures', 'project-3-rect-16x9.wodblok.json');
+const FIX = path.join(ROOT, 'tests', 'fixtures', 'project-3-rect-16x9.wodblok');
+const { zipSync, unzipSync, strToU8, strFromU8 } = require('fflate');
+// the sample projects are .wodblok zips: read the project object out of one, and write a copy of a sample with another project object in it
+const readProject = f => JSON.parse(strFromU8(unzipSync(new Uint8Array(fs.readFileSync(f)))['project.json']));
+function writeProject(file, p, base) {
+  const out = {}; for (const [k, v] of Object.entries({ ...unzipSync(new Uint8Array(fs.readFileSync(base))), 'project.json': strToU8(JSON.stringify(p)) })) out[k] = [v, { level: k === 'mimetype' || k.startsWith('assets/') ? 0 : 6 }];
+  fs.writeFileSync(file, Buffer.from(zipSync(out)));
+}
+const projectZip = p => zipSync({ mimetype: [strToU8('application/vnd.wodblok+zip'), { level: 0 }], 'project.json': strToU8(JSON.stringify(p)) });
 
 // A project whose first layer (an arrangement) and a second, free layer both hold a stamp, a picture and a text box.
 function mixed(outDir) {
-  const p = JSON.parse(fs.readFileSync(FIX, 'utf8'));
+  const p = readProject(FIX);
   const tid = p.layers[0].st[0];
   const items = k => [
     { u: k + 'a', t: tid, x: 200, y: 200, s: 160, r: 0, f: 1 },
@@ -27,8 +33,8 @@ function mixed(outDir) {
   free.u = 'freeMixed'; free.name = 'Mixed free'; free.free = true; free.st = []; free.pl = items('f');
   p.layers.push(free);
   fs.mkdirSync(outDir, { recursive: true });
-  const file = path.join(outDir, 'mixed.wodblok.json');
-  fs.writeFileSync(file, JSON.stringify(p));
+  const file = path.join(outDir, 'mixed.wodblok');
+  writeProject(file, p, FIX);
   return { file, tid };
 }
 
@@ -84,9 +90,9 @@ test('the pictures used by items on any layer are saved with the project, and a 
 
 test('a layer whose pieces are damaged is refused with a friendly message', async () => {
   const { fmtOpen } = await nativeImport(pathToFileURL(path.join(ROOT, 'src', 'format', 'container.js')).href);
-  const p = JSON.parse(fs.readFileSync(FIX, 'utf8'));
+  const p = readProject(FIX);
   p.layers[0].pl = [{ t: 1, x: 'nope', y: 3 }];
-  await expect(fmtOpen(new TextEncoder().encode(JSON.stringify(p)))).rejects.toThrow(/damaged pieces/);
+  await expect(fmtOpen(projectZip(p))).rejects.toThrow(/damaged pieces/);
   p.layers[0].pl = 'x';
-  await expect(fmtOpen(new TextEncoder().encode(JSON.stringify(p)))).rejects.toThrow(/damaged pieces/);
+  await expect(fmtOpen(projectZip(p))).rejects.toThrow(/damaged pieces/);
 });

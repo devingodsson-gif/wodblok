@@ -1,8 +1,6 @@
 // An inverted stamp used as a frame: no light line between neighbouring tiles (1.35.0).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, unlockStamp, pickShape, stampInstance, clickStamp, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, unlockStamp, pickShape, stampInstance, clickStamp, getState } = require('./helpers/harness');
 
 const lines = async (page) => {
   const buf = await page.locator('#art').screenshot();
