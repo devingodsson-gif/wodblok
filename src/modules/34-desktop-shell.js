@@ -173,6 +173,7 @@ const stage=document.querySelector('.stage');
  let m0=false;try{m0=kv.get('wb_film_min')==='1'}catch(e){}b.onclick=()=>ap(!f.classList.contains('min'),true);ap(m0,false);try{new ResizeObserver(()=>stage.style.setProperty('--film-h',f.offsetHeight+'px')).observe(f)}catch(e){}}}
 function setView(v){if(v=='stamp'&&!WBX.wbAllowStamp)v='pattern';const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
 $('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display='';$('gtb').style.display=v=='stamp'?'':'none';if(v=='pattern')requestAnimationFrame(applyZ);else applyZE();tbSync();if(WBX.wbTxMode)WBX.wbTxMode(v=='pattern'&&stUnlocked()==null?'pattern':'stamp');if(was!=v||!wsReady)wsRender()}
+WBX.wbSetView=setView;
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
 const L=wsL();let g=wsFind(p);
 // a tool that is not open yet opens docked on the right: Randomize beside the colour tools, anything else as a tab in the first group
@@ -545,4 +546,4 @@ clearAll(true);WBS.cp={id:null,name:'',saved:coreStr()};$('pnm').value='';paintP
 {addEventListener('beforeunload',e=>{if(dirty()){e.preventDefault();e.returnValue=''}})}
 })();
 }
-export {init34,setView};
+export {init34};
