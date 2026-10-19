@@ -154,6 +154,7 @@ try{const q=JSON.parse(kv.get('wb40_book')||'null');if(q&&typeof q=='object')WBS
 GC=new Map();
 CSN=Object.fromEntries(CSH);
 setDim();
+WADA_COLORS.forEach(c=>C.push([c[0],c[1]]));
 {const grp=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255),ch=Math.max(...v)-Math.min(...v),l=hsl(h)[2];return l>=.78?1:ch>=.17?0:2};
 C.sort((a,b)=>{const ga=grp(a[1]),gb=grp(b[1]),A=hsl(a[1]),B=hsl(b[1]);if(ga!=gb)return ga-gb;if(ga==2)return B[2]-A[2];const ha=Math.floor(((A[0]+12)%360)/24),hb=Math.floor(((B[0]+12)%360)/24);return ha-hb||B[2]-A[2]})}
 CM=Object.fromEntries(C);
