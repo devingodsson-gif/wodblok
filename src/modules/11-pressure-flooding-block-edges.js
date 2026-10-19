@@ -16,7 +16,6 @@ import {lyGrp} from './24-free-place-layers.js';
 // ---- Block edges: the raised rim of the block, printed as a ribbon along the stamp outline.
 // Thickness sets the ribbon width; roughness adds width swell, ragged sides, per-side misalignment and worn gaps.
 const eT=t=>t.et!=null?+t.et:3,eR=t=>t.er!=null?+t.er:3,eNV=t=>eR(t)>0?6:1;
-const migEdges=()=>WBS.tiles.forEach(t=>{if(t.et==null){const L=WBS.layers.find(L=>(L.st||[]).includes(t.id));t.et=L?(L.et!=null?+L.et:(L.edg===false?0:3)):3;t.er=L&&L.er!=null?+L.er:(L&&L.et!=null?0:3);if(L&&L.es)t.es=L.es}});
 // Block edge artifact, modelled on how a real block prints its rim:
 // - the outer edge is the straight cut edge of the block (clipped exactly to the stamp outline);
 // - the inner edge is ragged where the ink stops;
@@ -103,4 +102,4 @@ else if(h.k=='e'||h.k=='w'){const d=h.k=='e'?1:-1,w=mid?Math.abs(lx)*2:d*lx+rx0;
 else{const d=h.k=='s'?1:-1,w=mid?Math.abs(ly)*2:d*ly+ry0;ny=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)oy=-d*ry0+d*48*h.s0*ny}
 q.s=ns;if(nx!=1||q.sx)q.sx=nx;if(ny!=1||q.sy)q.sy=ny;const r=-a;q.x=+(h.cx+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(2);q.y=+(h.cy+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(2)}
 }
-export {Q,eNV,eR,eSeed,eT,edgeDef,edgeDefs,migEdges,pressDefs,raf,renderL,upd,init11};
+export {Q,eNV,eR,eSeed,eT,edgeDef,edgeDefs,pressDefs,raf,renderL,upd,init11};

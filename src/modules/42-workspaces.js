@@ -11,15 +11,9 @@ import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 const WX_KEY='wb96_workspaces';
 const wxG=(tabs,o={})=>({tabs,a:tabs[0],...o});
 // The starting workspace is Default; it opens at launch. It is copied into Yours the first time (see wxSeed), so it can be changed,
-// replaced or deleted like your own, and "Restore defaults" puts the original back. WX_OLD are the three starting workspaces of 1.21 and 1.22:
-// they are taken out again, unless you changed them.
+// replaced or deleted like your own, and "Restore defaults" puts the original back.
 const WX_DEFAULT={name:'Default',layout:{
     pattern:{dock:[wxG(['canvas','colors'],{e:'l'}),wxG(['lyrs','layers'],{e:'r'})],float:[]}}};
-const WX_OLD=[
-  {name:'Colour work',layout:{pattern:{dock:[wxG(['colors','grade','tex']),wxG(['rand'])],float:[]}}},
-  {name:'Layout work',layout:{pattern:{dock:[wxG(['lyrs']),wxG(['layers','canvas','pgrid'])],float:[]}}},
-  {name:'Everything closed',layout:{pattern:{dock:[],float:[]}}},
-];
 const WX_UI='wb96_workspaces_ui',WX_SEEDED='wb96_ws_seeded',WX_FILE='wodblok-workspaces';
 const wxEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const wxIC=(d,w)=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||1.8}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
@@ -27,11 +21,9 @@ const wxFOLDER=wxIC('<path d="M3.5 7.5V18a1.5 1.5 0 0 0 1.5 1.5h14a1.5 1.5 0 0 0
 const wxHOME=wxIC('<path d="M4 11l8-6.5 8 6.5M6 9.5V19h12V9.5"/>'),wxCHEV='<svg class="lfa" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l6 6-6 6"/></svg>';
 const wxMORE='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>',wxTRASH=wxIC('<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>');
 const wxLoad=()=>{try{const a=JSON.parse(kv.get(WX_KEY)||'[]');return Array.isArray(a)?a.filter(w=>w&&typeof w.id=='string'&&typeof w.name=='string'&&w.layout).map(w=>({...w,f:typeof w.f=='string'?w.f:''})):[]}catch(e){return[]}};
-// first run: Default becomes yours (a workspace you already named Default is kept as it is). Version 2 also removes the old starting
-// workspaces that were never changed.
+// first run: Default becomes yours (a workspace you already named Default is kept as it is).
 function wxSeed(){let v='';try{v=kv.get(WX_SEEDED)||''}catch(e){}if(v==='2')return;
   let a=wxLoad();
-  if(v==='1')a=a.filter(w=>!WX_OLD.some(o=>o.name==w.name&&JSON.stringify(o.layout)==JSON.stringify(w.layout)));
   if(!a.some(w=>w.name.toLowerCase()=='default'))a.unshift({id:newId(),name:WX_DEFAULT.name,f:'',layout:JSON.parse(JSON.stringify(WX_DEFAULT.layout))});
   try{kv.set(WX_KEY,JSON.stringify(a));kv.set(WX_SEEDED,'2')}catch(e){}}
 // the workspace the app opens with: the one called Default (in Yours first), else the first one in the list; none, nothing opens

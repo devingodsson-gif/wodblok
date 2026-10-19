@@ -4,8 +4,6 @@ import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {PCOL,shOf} from './04-canvas-and-stamp-outlines.js';
 import {mkL,selOne,store} from './06-motif-library-folders.js';
 import {build,hx,migLayers} from './10-layer-grids.js';
-import {migEdges} from './11-pressure-flooding-block-edges.js';
-import {migInk} from './17-texture-panel-and-previews.js';
 import {trayDefault} from './50-tray-core.js';
 import {fileSnap,thumb,confirm2,coreStr,newId,openData,paintPst,pmsg} from './18-projects-and-cover-overlay.js';
 // ===== Clear: one blank square stamp, default palette, plain arrangement, no print effects. Canvas size and cover are kept. Undoable.
@@ -38,7 +36,7 @@ try{if(await dl(name,await fileSnap(),await thumb(),id)){WBS.cp={id,name,saved:c
 // The projects folder: a folder on this computer that holds .wodblok files (Chrome and Edge). Its handle is remembered, so the next visit lists it again.
 let folder=null,plTok=0,plUrls=[];
 const folderPaint=()=>{const b=$('pls');b.textContent=folder?'Projects':'Open projects folder';b.classList.toggle('on',!$('plist').hidden)};
-const stem=n=>n.replace(/\.wodblok(\.json)?$/i,'');
+const stem=n=>n.replace(/\.wodblok$/i,'');
 async function renderPL(){const g=$('pgrid'),tok=++plTok;plUrls.forEach(u=>URL.revokeObjectURL(u));plUrls=[];$('pdlgt').textContent=folder?folder.name:'Projects';
 g.innerHTML='<div class="hint">Loading…</div>';
 try{if(!await files.folderAccess(folder)){g.innerHTML='<div class="hint">Allow access to the folder to see its projects.</div>';return}
@@ -56,7 +54,7 @@ $('psv').onclick=saveProject;
 
 const openFile=async(fl,handle)=>{
 try{const r=await fmtOpen(new Uint8Array(await fl.arrayBuffer())),d=r.project;
-const name=(d.name||fl.name.replace(/\.wodblok(\.json)?$|\.json$/i,'')).slice(0,60);
+const name=(d.name||fl.name.replace(/\.wodblok$/i,'')).slice(0,60);
 // a file from a newer app opens as an unsaved copy: nothing is written back
 if(r.newer){openData(d,null,name);WBS.cp.saved='';paintPst();link=null;putSnaps(null,r.snapshots);pmsg('“'+name+'” was made by a newer WODBLOK, so it is open as a copy that is not saved. Update the app to work on the original.');return}
 const id=newId();openData(d,id,name);link=handle?{id,name,handle}:null;putSnaps(id,r.snapshots);await new Promise(r2=>setTimeout(r2,50));WBS.cp.saved=coreStr();paintPst();pmsg('Opened “'+name+'”.'+(r.missingAssets?' '+r.missingAssets+' picture'+(r.missingAssets>1?'s were':' was')+' missing from the file.':''))}
@@ -76,6 +74,6 @@ $('plist').hidden=false;folderPaint();renderPL()};
 $('pcf').onclick=async()=>{try{await files.forgetFolder()}catch(e){}folder=null;plTok++;closeList()};
 $('pgrid').onclick=async e=>{const c=e.target.closest('[data-p]');if(!c)return;const b=c.querySelector('[data-a="open"]'),it=plList[+c.dataset.p];if(!it)return;
 try{confirm2(b,'Discard changes?',async()=>{const f=await it.handle.getFile();await openFile(f,it.handle);closeList()})}catch(err){pmsg('Something went wrong: '+((err&&err.message)||'unknown error'))}};
-WBS.tiles.forEach(shOf);migLayers();migEdges();migInk();store();WBH.draw();build();
+WBS.tiles.forEach(shOf);migLayers();store();WBH.draw();build();
 }
 export {clearAll,fileUnlink,renderPL,thumbPng,init33};

@@ -10,7 +10,6 @@ const TXF=[['Paper and board',{cotton:'Cotton Rag',cold:'Cold Press',laid:'Laid 
 const TXN={};
 const TXMD=['wear','relief','stain'],TXMN={wear:'Wear',relief:'Relief',stain:'Stain'};
 // textures from before v87 become their closest new one
-const TXLEG={ink:{speckle:'pinholes',grain:'wood',dry:'dry',mottle:'blotchy',laid:'laid',linen:'linen',worn:'worn'},surf:{cotton:'cotton',cold:'cold',laid:'laid',washi:'washi',kraft:'kraft',parch:'washi',crumple:'crumple',linen:'linen',canvas:'canvas',burlap:'burlap',leather:'leather',wood:'wood',plaster:'plaster',stone:'plaster',concrete:'concrete',grit:'plaster',metal:'brushed',stain:'foxing'}};
 const txRid=()=>1+Math.floor(Math.random()*99999),txUid=()=>'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const txLib=id=>id?WBS.texLib.find(x=>x.id===id)||null:null;
 function txUniq(b){let n=b,i=2;while(WBS.texLib.some(x=>x.name===n))n=b+' '+i++;return n}
@@ -18,10 +17,10 @@ function txMake(t,o){return{id:txUid(),name:txUniq(TXN[t]||'Texture'),t,a:40,sc:
 const txSame=(x,s)=>x.t===s.t&&+x.a===+s.a&&+x.sc===+s.sc&&+x.az===+s.az;
 function txEnsure(s){const m=WBS.texLib.find(x=>txSame(x,s));if(m)return m.id;const L=txMake(s.t,{...s,auto:true});WBS.texLib.push(L);return L.id}
 function txClean(a){if(!Array.isArray(a))return[];const ok=[],ids=new Set(),n=(v,lo,hi,d)=>{v=+v;return isFinite(v)?Math.max(lo,Math.min(hi,v)):d};
-a.slice(0,200).forEach(x=>{if(!x||typeof x!='object')return;let t=x.t,leg=0;if(x.fam==='ink'||x.fam==='surf'){t=TXLEG[x.fam][x.t];leg=1}if(!t||!Object.prototype.hasOwnProperty.call(TXN,t))return;
+a.slice(0,200).forEach(x=>{if(!x||typeof x!='object')return;const t=x.t;if(!t||!Object.prototype.hasOwnProperty.call(TXN,t))return;
 const id=String(x.id||'').replace(/[^\w-]/g,'').slice(0,24);if(!id||ids.has(id))return;ids.add(id);
-const L={id,name:String(x.name||TXN[t]).replace(/[<>&"]/g,'').slice(0,40),t,a:n(leg&&x.fam==='surf'?x.it:x.a,0,100,40),sc:n(x.sc,25,300,100),az:n(x.az,0,359,225),sd:n(x.sd,1,99999,1)|0,auto:!!x.auto};
-if(leg&&x.fam==='surf'&&+x.ink>0)L._k=n(x.ink,0,100,0);if(+x._k>0)L._k=n(x._k,0,100,0);ok.push(L)});return ok}
+const L={id,name:String(x.name||TXN[t]).replace(/[<>&"]/g,'').slice(0,40),t,a:n(x.a,0,100,40),sc:n(x.sc,25,300,100),az:n(x.az,0,359,225),sd:n(x.sd,1,99999,1)|0,auto:!!x.auto};
+ok.push(L)});return ok}
 // a use -> everything the renderer needs (null = nothing to draw). def = the mode a use gets when it has none
 const txSpec=(u,def)=>{const L=u&&typeof u=='object'?txLib(u.x):null;if(!L||!TXN[L.t]||!(+L.a>0))return null;return{x:L.id,t:L.t,a:+L.a,sc:+L.sc||100,az:isFinite(+L.az)?+L.az:225,sd:((+u.sd||+L.sd||1)|0)||1,md:TXMD.includes(u.md)?u.md:def}};
 const txSpecs=(l,def)=>(Array.isArray(l)?l:[]).slice(0,6).map(u=>txSpec(u,def)).filter(Boolean);
@@ -130,4 +129,4 @@ TXB=new Map();
 TXHS=new Set();
 TXFL=new Map();
 }
-export {TXF,TXLEG,TXMD,TXMN,TXN,isOf,txClean,txEnsure,txFilt,txImgs,txIsO,txIsW,txKey,txLib,txMake,txPix,txRid,txSame,txSpecs,txUid,txUniq,init16};
+export {TXF,TXMD,TXMN,TXN,isOf,txClean,txEnsure,txFilt,txImgs,txIsO,txIsW,txKey,txLib,txMake,txPix,txRid,txSame,txSpecs,txUid,txUniq,init16};

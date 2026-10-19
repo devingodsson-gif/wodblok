@@ -6,7 +6,7 @@ import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
 import {savePr} from './15-print-effects-and-stamp-texture.js';
-import {TXF,TXLEG,TXMD,TXMN,TXN,isOf,txClean,txEnsure,txFilt,txImgs,txIsO,txIsW,txKey,txLib,txMake,txPix,txRid,txSame,txSpecs,txUid,txUniq} from './16-texture-generators.js';
+import {TXF,TXMD,TXMN,TXN,isOf,txClean,txEnsure,txFilt,txImgs,txIsO,txIsW,txKey,txLib,txMake,txPix,txRid,txSame,txSpecs,txUid,txUniq} from './16-texture-generators.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 
 // ---- where each target gets its pictures ----
@@ -27,12 +27,8 @@ function txRefs(){const m=new Map(),add=u=>(Array.isArray(u)?u:[]).forEach(z=>{i
 // Returns true when the canvas texture changed and has to be rebuilt.
 let TEXK='';
 function texNorm(){if(!Array.isArray(WBS.texLib))WBS.texLib=[];let ch=0;
-const cv=o=>{const q=o.is;if(q&&q.t&&+q.a>0&&TXLEG.ink[q.t]){if(!Array.isArray(o.tu))o.tu=[];o.tu.push({x:txEnsure({t:TXLEG.ink[q.t],a:Math.max(0,Math.min(100,+q.a)),sc:Math.max(25,Math.min(300,+q.sc||100)),az:225}),sd:((+q.sd||1)|0)||1,md:'wear'})}delete o.is;if(!Array.isArray(o.tu))o.tu=[];ch=1};
-WBS.tiles.forEach(t=>{if(t.is!==undefined||!Array.isArray(t.tu))cv(t)});WBS.layers.forEach(L=>{(L.pl||[]).forEach(p=>{if(p.is!==undefined)cv(p)})});
-if(WBS.tex&&WBS.tex.v!==87){const u=[],Lx=txLib(WBS.tex.x),sd=((+WBS.tex.sd||1)|0)||1;
-if(Lx){u.push({x:Lx.id,sd,md:'relief'});if(+Lx._k>0)u.push({x:txEnsure({t:Lx.t,a:Lx._k,sc:Lx.sc,az:Lx.az}),sd,md:'wear'})}
-else if(WBS.tex.t&&TXLEG.surf[WBS.tex.t]){const t=TXLEG.surf[WBS.tex.t],sc=Math.max(25,Math.min(300,+WBS.tex.sc||100)),az=WBS.tex.az==null?225:+WBS.tex.az;u.push({x:txEnsure({t,a:Math.max(0,Math.min(100,WBS.tex.it==null?50:+WBS.tex.it)),sc,az}),sd,md:'relief'});if(+WBS.tex.ink>0)u.push({x:txEnsure({t,a:Math.min(100,+WBS.tex.ink),sc,az}),sd,md:'wear'})}
-['t','sc','it','az','ink','x','age'].forEach(k=>delete WBS.tex[k]);WBS.tex.u=u;WBS.tex.v=87;ch=1}
+WBS.tiles.forEach(t=>{if(!Array.isArray(t.tu)){t.tu=[];ch=1}});
+if(WBS.tex&&WBS.tex.v!==87){WBS.tex.u=[];WBS.tex.v=87;ch=1}
 if(WBS.tex&&!Array.isArray(WBS.tex.u)){WBS.tex.u=[];ch=1}
 if(WBS.tex&&WBS.tex.v===87){WBS.tex.u=WBS.tex.u.filter(u=>u&&typeof u=='object'&&txLib(u.x)).slice(0,4).map(u=>({x:u.x,sd:((+u.sd||1)|0)||1,md:TXMD.includes(u.md)?u.md:'relief'}));WBS.tex.t=WBS.tex.u.length?'1':''}
 WBS.texLib.forEach(L=>{if(L._k!==undefined){delete L._k;ch=1}});
@@ -99,7 +95,6 @@ txSetR('tx_a',L.a);txSetR('tx_sc',L.sc);txSetR('tx_az',L.az);
 function txDelete(id){const L=txLib(id);if(!L)return;txCap();let n=0;const cut=o=>{if(Array.isArray(o.tu)){const b=o.tu.length;o.tu=o.tu.filter(z=>z&&z.x!==id);n+=b-o.tu.length}};WBS.tiles.forEach(cut);WBS.layers.forEach(l=>{cut(l);(l.pl||[]).forEach(cut)});if(WBX.wbTxCut)WBX.wbTxCut(id);
 if(WBS.tex&&Array.isArray(WBS.tex.u)){const b=WBS.tex.u.length;WBS.tex.u=WBS.tex.u.filter(z=>z&&z.x!==id);n+=b-WBS.tex.u.length}WBS.texLib=WBS.texLib.filter(x=>x.id!==id);if(WBS.txSel===id)WBS.txSel=(WBS.texLib[0]||{}).id||'';texNorm();store();saveTex();buildTex();upd();txCap();txRefresh(true);pmsg(`Deleted “${L.name}”${n?` and took it off ${n} place${n>1?'s':''}`:''}.`)}
 // projects made before this: the one canvas-wide surface is handed to every stamp (each with its own variation), then retired
-const migInk=()=>{if(WBS.pr&&WBS.pr.t&&WBS.tiles.some(t=>(t.is===undefined&&t.tu===undefined))){WBS.tiles.forEach((t,i)=>{if((t.is===undefined&&t.tu===undefined))t.is={t:WBS.pr.t,a:WBS.pr.a,sc:WBS.pr.sc,sd:((+WBS.pr.sd||1)+i*131)%99999+1}});WBS.pr.t=''}};
 function roughFilter(){
 const E=WBS.pr.e,Q=WBS.pr.q,A=WBS.pr.a/100,k=100/Math.max(25,WBS.pr.sc),f=v=>+(v*k).toFixed(5),S=WBS.pr.sd;
 if(!E&&!Q)return'';
@@ -157,4 +152,4 @@ WBX.wbTxApplySync=paint;paint()}
 
 WBH.syncTex();buildTex();WBX.wbTexReady=1;
 }
-export {SURFC,buildTex,inkCatch,layTexMask,layTexOv,migInk,roughFilter,saveTex,surfFor,texNorm,txMerge,txPack,txRefresh,txReg,txoG,init17};
+export {SURFC,buildTex,inkCatch,layTexMask,layTexOv,roughFilter,saveTex,surfFor,texNorm,txMerge,txPack,txRefresh,txReg,txoG,init17};

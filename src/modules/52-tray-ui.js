@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {C,CM,CP,PL,col,okC,placeFloat,rowMenu} from './04-canvas-and-stamp-outlines.js';
+import {C,CM,PL,col,okC,placeFloat,rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS} from './12-selection-and-split.js';
@@ -140,8 +140,6 @@ const ST_KEY='wb200_trays';
 const ST={f:'',q:'',ren:null};   // the folder open ('' = the top), the search words, the tray or folder being renamed
 function stLoad(){let d=null;try{d=JSON.parse(kv.get(ST_KEY)||'null')}catch(e){}
  if(!d||typeof d!='object'||!Array.isArray(d.t)){d={f:[],t:[]};
-  // custom palettes from before the tray become saved trays
-  (CP||[]).forEach(p=>{const c=[p.s[0],p.s[1],p.s[2],p.s[3]].filter(Boolean).map(n=>[CM[n],n]).filter(x=>x[0]);if(c.length)d.t.push({id:p.id,n:String(p.name).slice(0,40),f:'',c})});
   try{kv.set(ST_KEY,JSON.stringify(d))}catch(e){}}
  d.f=(Array.isArray(d.f)?d.f:[]).filter(f=>f&&typeof f.id=='string'&&typeof f.n=='string');
  d.t=d.t.filter(t=>t&&typeof t.id=='string'&&typeof t.n=='string'&&Array.isArray(t.c)).map(t=>({...t,c:t.c.map(x=>Array.isArray(x)?[normHexA(x[0]),String(x[1]||'')]:null).filter(x=>x&&x[0]).slice(0,TRAY_MAX)})).filter(t=>t.c.length);

@@ -94,7 +94,7 @@ async function tpDownload(t){const st=await tpOpenStore(),d=await use('downloads
 async function tpAddFile(fl){const st=await tpOpenStore();if(!st)return pmsg('This browser does not keep templates.');
  try{const bytes=new Uint8Array(await fl.arrayBuffer()),r=await fmtOpen(bytes);
   if(r.newer)return pmsg('That project was made by a newer WODBLOK, so it cannot be added here.');
-  const pk=fmtPeek(bytes),name=(r.project.name||fl.name.replace(/\.wodblok(\.json)?$|\.json$/i,'')||'Template').slice(0,40),type=tpKind(r.project),id=newId(),t=Date.now(),th=await tpSmall(pk.thumbnail);
+  const pk=fmtPeek(bytes),name=(r.project.name||fl.name.replace(/\.wodblok$/i,'')||'Template').slice(0,40),type=tpKind(r.project),id=newId(),t=Date.now(),th=await tpSmall(pk.thumbnail);
   // always keep it as the current container format
   const packed=await fmtPack({...r.project,name},{thumbnail:pk.thumbnail||undefined});
   await st.doc(id).set({id,n:name,type,t,b:tpB64(packed)});

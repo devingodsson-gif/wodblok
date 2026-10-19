@@ -1,5 +1,5 @@
 import {WBS,WBX} from './01-launch-and-version.js';
-import {CM,PCOL,col,fixC,okC} from './04-canvas-and-stamp-outlines.js';
+import {CM,PCOL,col,okC} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 // ===== The colour tray: the project's working colours =====
@@ -32,7 +32,7 @@ const slotName=(id,p=P())=>{const w=cwNow(p);return(w&&w.m&&w.m[id])||''};
 const slotNo=(id,p=P())=>p.ts.indexOf(id)+1;
 const nextId=(used,pre)=>{let i=1;while(used.has(pre+i))i++;return pre+i};
 // an old colour name as the app has always shown it: a palette colour is itself; a name from the first 100-colour palette becomes the nearest palette colour
-const nameOf=n=>{if(!n||typeof n!='string')return null;if(CM[n])return n;const m=fixC(n,null);return m&&CM[m]?m:null};
+const nameOf=n=>{if(!n||typeof n!='string')return null;return CM[n]?n:null};
 const hexOfName=n=>{const m=nameOf(n);return m?CM[m]:null};
 // what a colour reference shows as words: the slot's colour name, else the hex
 function refLabel(r){if(!r)return'';if(isLink(r)){const id=r.slice(1);return slotName(id)||slotHex(id).toUpperCase()}if(isFixed(r))return col(r).toUpperCase();return r}

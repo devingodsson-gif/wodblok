@@ -54,7 +54,7 @@ const files = {
   /** The Open dialog, keeping the file's handle so Save can write back to it. Resolves null when the person cancels. */
   open: async () => {
     try {
-      const [h] = await /** @type {any} */ (window).showOpenFilePicker({ multiple: false, types: [{ description: 'WODBLOK projects', accept: { 'application/zip': ['.wodblok'], 'application/json': ['.json'] } }] });
+      const [h] = await /** @type {any} */ (window).showOpenFilePicker({ multiple: false, types: [{ description: 'WODBLOK projects', accept: { 'application/zip': ['.wodblok'] } }] });
       return { file: await h.getFile(), handle: h };
     } catch (e) { if (e && e.name === 'AbortError') return null; throw e; }
   },
@@ -81,8 +81,8 @@ const files = {
     const fh = await h.getFileHandle(n, { create: true }), w = await fh.createWritable(); await w.write(data); await w.close();
     return { name: n, handle: fh };
   },
-  /** The project files directly inside the folder (.wodblok and the older .wodblok.json), newest name last. */
-  listFolder: async h => { const out = []; for await (const [n, fh] of /** @type {any} */ (h).entries()) if (fh.kind === 'file' && /\.wodblok(\.json)?$/i.test(n)) out.push({ name: n, handle: fh }); return out.sort((a, b) => a.name.localeCompare(b.name)); },
+  /** The project files directly inside the folder (.wodblok), newest name last. */
+  listFolder: async h => { const out = []; for await (const [n, fh] of /** @type {any} */ (h).entries()) if (fh.kind === 'file' && /\.wodblok$/i.test(n)) out.push({ name: n, handle: fh }); return out.sort((a, b) => a.name.localeCompare(b.name)); },
   /** Files the system opens this app with (the installed app as the .wodblok opener). Calls cb(file, handle) for each. */
   onLaunch: cb => {
     const q = /** @type {any} */ (window).launchQueue;

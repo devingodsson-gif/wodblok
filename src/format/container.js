@@ -1,10 +1,12 @@
 import {zipSync,unzipSync,strToU8,strFromU8} from '../vendor/fflate.js';
 import {FormatError} from './errors.js';
-import {fmtMigrate,FMT_LATEST} from './migrate.js';
 import {fmtValidate} from './validate.js';
 // The .wodblok container: a zip with `mimetype` first (stored, not compressed), `project.json`, `assets/<hash>.<ext>` (each image once,
 // however often it is used) and an optional `thumbnail.png`. Images are stored as they are (no recompression); JSON is compressed.
 // In memory, a project keeps its images as data URLs, as the app always has; the container only moves them out of the JSON.
+// Format 21 is the only one the app opens. A file made by an older app is refused with a message, never converted (owner, Oct 19 2026); a file made by a newer
+// app opens read-only and is never written back.
+const FMT_LATEST = 21;
 const FMT_MIME = 'application/vnd.wodblok+zip', FMT_REF = 'wbasset:';
 const FMT_EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' };
 const FMT_TYPE = Object.fromEntries(Object.entries(FMT_EXT).map(([k, v]) => [v, k]));
@@ -25,7 +27,8 @@ function fmtImageSlots(p) {
   return s;
 }
 async function fmtPack(project, { thumbnail, snapshots } = {}) {
-  const p = JSON.parse(JSON.stringify(fmtMigrate(project).project)), files = {}, seen = new Map();
+  const p = JSON.parse(JSON.stringify(project)), files = {}, seen = new Map();
+  p.v = FMT_LATEST;
   for (const [o, k] of fmtImageSlots(p)) {
     const m = typeof o[k] === 'string' && FMT_DATA_URL.exec(o[k]);
     if (!m) continue;
@@ -39,22 +42,17 @@ async function fmtPack(project, { thumbnail, snapshots } = {}) {
   (Array.isArray(snapshots) ? snapshots : []).slice(0, 30).forEach((n, i) => { if (fmtSnapOk(n)) out['snapshots/' + String(i).padStart(2, '0') + '.json'] = strToU8(JSON.stringify({ n: n.n, t: n.t, s: n.s })); });
   return zipSync({ ...out, ...files });
 }
-// Accepts the bytes of a .wodblok zip or of an older .wodblok.json. Returns { project (images as data URLs, format 19), newer, from, missingAssets }.
-// Opening never changes the file: the caller saves to a new file, and an older file is only replaced when the person says so.
+// Accepts the bytes of a .wodblok zip. Returns { project (images as data URLs), newer, missingAssets, snapshots }. Opening never changes the file.
 async function fmtOpen(bytes) {
-  let raw, files = null, from, missingAssets = 0;
-  if (fmtIsZip(bytes)) {
-    try { files = unzipSync(bytes); } catch (e) { throw new FormatError('zip', 'That file looks damaged: it could not be unpacked.'); }
-    if (!files.mimetype || strFromU8(files.mimetype) !== FMT_MIME) throw new FormatError('mime', 'That zip file is not a WODBLOK project.');
-    if (!files['project.json']) throw new FormatError('missing', 'That project file is missing its main part, so it may be damaged.');
-    try { raw = JSON.parse(strFromU8(files['project.json'])); } catch (e) { throw new FormatError('json', 'That project file is damaged and could not be read.'); }
-    from = 'zip';
-  } else {
-    try { raw = JSON.parse(strFromU8(bytes)); } catch (e) { throw new FormatError('json', 'That file is not a WODBLOK project.'); }
-    from = 'json';
-  }
+  let raw, files = null, missingAssets = 0;
+  if (!fmtIsZip(bytes)) throw new FormatError('format', 'That file is not a WODBLOK project.');
+  try { files = unzipSync(bytes); } catch (e) { throw new FormatError('zip', 'That file looks damaged: it could not be unpacked.'); }
+  if (!files.mimetype || strFromU8(files.mimetype) !== FMT_MIME) throw new FormatError('mime', 'That zip file is not a WODBLOK project.');
+  if (!files['project.json']) throw new FormatError('missing', 'That project file is missing its main part, so it may be damaged.');
+  try { raw = JSON.parse(strFromU8(files['project.json'])); } catch (e) { throw new FormatError('json', 'That project file is damaged and could not be read.'); }
   fmtValidate(raw);
-  const { project, newer } = fmtMigrate(raw);
+  if (!Number.isInteger(raw.v) || raw.v < FMT_LATEST) throw new FormatError('old', 'That project was made with an older WODBLOK and cannot be opened.');
+  const project = raw, newer = raw.v > FMT_LATEST;
   if (files) {
     let missing = 0;
     for (const [o, k] of fmtImageSlots(project)) {
@@ -70,18 +68,15 @@ async function fmtOpen(bytes) {
   if (files) for (const k of Object.keys(files).filter(k => /^snapshots\/\d+\.json$/.test(k)).sort().slice(0, 30)) {
     try { const n = JSON.parse(strFromU8(files[k])); if (fmtSnapOk(n)) { JSON.parse(n.s); snapshots.push({ n: n.n.slice(0, 40), t: +n.t, s: n.s }); } } catch (e) { /* a damaged snapshot is left out; the project still opens */ }
   }
-  return { project, newer, from, missingAssets, snapshots };
+  return { project, newer, missingAssets, snapshots };
 }
 // For a list of files: just the project's name and its small preview picture, without unpacking the images. Never throws; a file that cannot be read gives {}.
 function fmtPeek(bytes) {
   try {
-    if (fmtIsZip(bytes)) {
-      const f = unzipSync(bytes, { filter: e => e.name === 'project.json' || e.name === 'thumbnail.png' });
-      const raw = f['project.json'] ? JSON.parse(strFromU8(f['project.json'])) : {};
-      return { name: typeof raw.name === 'string' ? raw.name : '', thumbnail: f['thumbnail.png'] || null };
-    }
-    const raw = JSON.parse(strFromU8(bytes));
-    return { name: raw && typeof raw.name === 'string' ? raw.name : '', thumbnail: null };
+    if (!fmtIsZip(bytes)) return {};
+    const f = unzipSync(bytes, { filter: e => e.name === 'project.json' || e.name === 'thumbnail.png' });
+    const raw = f['project.json'] ? JSON.parse(strFromU8(f['project.json'])) : {};
+    return { name: typeof raw.name === 'string' ? raw.name : '', thumbnail: f['thumbnail.png'] || null };
   } catch (e) { return {}; }
 }
 export {fmtPack,fmtOpen,fmtPeek,fmtIsZip,FMT_MIME,FMT_LATEST};

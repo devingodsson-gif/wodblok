@@ -871,7 +871,7 @@ body.eyedrop{cursor:crosshair}
    <button id="tpsave"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg>Save as template…</button>
    <button id="stgo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4L18 18M6 18l1.6-1.6M16.4 7.6L18 6"/></svg>Settings…</button>
   </div>
-  <input type="file" id="pfile" class="vh" accept=".wodblok,.json,application/json,application/zip,text/plain" tabindex="-1">
+  <input type="file" id="pfile" class="vh" accept=".wodblok,application/zip" tabindex="-1">
  </div>
  <button id="psv" title="Save project (Ctrl+S)">Save project</button>
 </header>
@@ -1283,7 +1283,7 @@ body.eyedrop{cursor:crosshair}
      <label>Art to place</label><div class="strip" id="lfars"></div>
      <label class="chk"><input type="checkbox" id="lfaak"><span>Paper shows through</span></label>
      <div class="row"><button class="alt" id="lfaimp" title="Import a PNG, JPG, WebP or SVG image">Import image&#8230;</button><button class="alt" id="lfaprj" title="Use a .wodblok project file as a picture">Use a project&#8230;</button></div>
-     <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".wodblok,.json,application/json,application/zip" tabindex="-1">
+     <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".wodblok,application/zip" tabindex="-1">
     </div>
     <div class="fpn"><span id="lfpn"></span><button class="alt" id="lfpclr">Clear all</button></div>
      <div class="mlist fpl" id="lfpl" aria-label="Placed stamps"></div>
@@ -1537,7 +1537,7 @@ body.eyedrop{cursor:crosshair}
   <div class="seg" id="tpty" role="group" aria-label="Kind"><button type="button" data-k="canvas">Normal canvas</button><button type="button" data-k="tile">Repeating pattern</button><button type="button" data-k="book">Book</button></div>
   <div class="glb">Starting points</div><div class="pgrid" id="tpg" role="list"></div>
   <div class="glb" id="tpyh" hidden>Yours</div><div class="pgrid" id="tpy" role="list" hidden></div>
-  <input type="file" id="tpfile" class="vh" accept=".wodblok,.json,application/json,application/zip" tabindex="-1">
+  <input type="file" id="tpfile" class="vh" accept=".wodblok,application/zip" tabindex="-1">
  </div>
 </div></div>
 <div class="modal" id="tpsd" hidden><div class="dlg tpsd" role="dialog" aria-modal="true" aria-labelledby="tpst">
