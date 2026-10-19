@@ -17,7 +17,8 @@ import {stUnlocked} from './63-stamp-tool.js';
 const mName=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
 let mlFold;
 const CHEV='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3l3 3-3 3"/></svg>';
-let _mlK='';function renderML(){const t=WBS.tiles[WBS.cur],pa=col(WBS.proj.bg),pb=inkOf(t),el=$('mlist'),sc=el.querySelector('.ml')?el.querySelector('.ml').scrollTop:0;{const k=JSON.stringify([WBS.cur,pa,pb,[...WBS.msel],[...mlFold],t.items.map(q=>[q.m,q.k,q.cl,q.tg,cust[q.m]?[cust[q.m].n,cust[q.m].svg.length]:0]),t.tgm||0]);if(k===_mlK&&el.firstChild){if(WBX.wbTxSync)WBX.wbTxSync();return}_mlK=k}
+let _mlK='';function renderML(){const el=$('mlist');if(stUnlocked()==null){if(_mlK){el.innerHTML='';_mlK=''}return}   // a locked stamp does not change, so its shapes are not listed
+const t=WBS.tiles[WBS.cur],pa=col(WBS.proj.bg),pb=inkOf(t),sc=el.querySelector('.ml')?el.querySelector('.ml').scrollTop:0;{const k=JSON.stringify([WBS.cur,pa,pb,[...WBS.msel],[...mlFold],t.items.map(q=>[q.m,q.k,q.cl,q.tg,cust[q.m]?[cust[q.m].n,cust[q.m].svg.length]:0]),t.tgm||0]);if(k===_mlK&&el.firstChild){if(WBX.wbTxSync)WBX.wbTxSync();return}_mlK=k}
 const thumb=q=>`<svg viewBox="-50 -50 100 100" style="background:${q.k?pb:pa}">${clipWrap(q,q.k?mk(q.m,pa,pb):mk(q.m,pb,pa))}</svg>`;
 const tags=q=>`${q.cl&&q.cl.length?' <i>piece</i>':''}${q.k?'<i title="Knocks out the shapes under it">knockout</i>':''}`;
 const gk=q=>q.tg?'txt:'+q.tg:mName(q.m),gnm=k=>{if(k.startsWith('txt:')){const M=(t.tgm||{})[k.slice(4)];const s=M?M.text.replace(/\n/g,' '):'Text';return '“'+(s.length>24?s.slice(0,23)+'…':s)+'”'}return k};

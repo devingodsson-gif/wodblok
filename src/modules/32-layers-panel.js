@@ -35,17 +35,12 @@ $('lyl2').addEventListener('drop',e=>{if(lyDrag<0)return;e.preventDefault();cons
 // list is shown top-first: "above" a row means printed after it (higher index)
 let to=above?t+1:t;const L=WBS.layers.splice(lyDrag,1)[0];if(lyDrag<to)to--;WBS.layers.splice(Math.max(0,Math.min(WBS.layers.length,to)),0,L);WBS.selL=WBS.layers.indexOf(L);lyDrag=-1;store();upd()});
 $('lyl2').addEventListener('dragend',()=>{lyDrag=-1;lyClr()});
-// "+" asks what kind of layer to add; the new layer goes above the selected one, holds the current stamp, and is made the selected layer.
-const LT={p:'Layer',f:'Frame',x:'Free stamps',a:'Pictures',t:'Text'};
-WBX.wbAddLayer=addLayer;
-$('ly_add').onclick=e=>{e.stopPropagation();addLayer('p')};
-function addLayer(m){const base=LT[m]||'Layer',n=WBS.layers.filter(x=>x.name==base||x.name.startsWith(base+' ')).length,cur=WBS.tiles[WBS.cur],
- L=mkL(m=='p'?'Layer '+(WBS.layers.length+1):(n?base+' '+(n+1):base),cur?[cur.id]:[],'check',180);L.ak={};
+// "+" adds a plain layer above the selected one: it holds the current stamp and becomes the selected layer.
+$('ly_add').onclick=e=>{e.stopPropagation();addLayer()};
+function addLayer(){const cur=WBS.tiles[WBS.cur],L=mkL('Layer '+(WBS.layers.length+1),cur?[cur.id]:[],'check',180);L.ak={};
  WBS.layers.splice(WBS.selL+1,0,L);WBS.selL++;
- if(m!='p'){const b=$('lmode').querySelector('[data-m="'+m+'"]');if(b)b.click()}   // the same switch the Layer type buttons use, on the new layer
  store();upd();
- $('pmsg').textContent='Layer added above the selected one.';
- if(m!='p'){const sec=document.querySelector('section.pn[data-p="layers"]');if(sec&&sec.hidden){const r=$('rail-layers');if(r)r.click()}}}
+ $('pmsg').textContent='Layer added above the selected one.'}
 $('ly_bl').onchange=()=>{const v=$('ly_bl').value;if(v)LY().bl=v;else delete LY().bl;store();upd()};
 $('ly_op').addEventListener('input',()=>{const v=+$('ly_op').value;if(v<100)LY().op=v;else delete LY().op;store();upd()});
 
