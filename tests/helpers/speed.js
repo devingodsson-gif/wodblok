@@ -29,7 +29,7 @@ function danglingRefs(page) {
   });
 }
 
-// How much markup the pattern holds right now, and whether the stamp thumbnails (tabs along the top, stamp buttons in the Layers panel) resolve.
+// How much markup the pattern holds right now, and whether the stamp thumbnails (stamp buttons in the Layers panel) resolve.
 function patternCounters(page) {
   return page.evaluate(() => {
     const dyn = document.getElementById('dyn');
@@ -43,7 +43,6 @@ function patternCounters(page) {
       dynChars: dyn ? dyn.innerHTML.length : 0,
       dynNodes: dyn ? dyn.getElementsByTagName('*').length : 0,
       artChars: document.getElementById('art').innerHTML.length,
-      tabs: thumbs('#tabs'),
       layerButtons: thumbs('#lst'),
     };
   });

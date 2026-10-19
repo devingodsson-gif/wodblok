@@ -2,11 +2,10 @@
 // panel), several stamps can be picked for the arrangement, each stamp has a lock in the stamp list (one unlocked at a time, never saved,
 // ends when another layer is selected), and a point on the canvas can be mapped into the stamp printed under it.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, addStamp, openPanel, settle, getState } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const outlines = (page, cls = '') => page.locator('#stol path' + cls).count();
-const addStamp = async page => { await page.click('#addT'); await settle(page); };
 const addLayer = async page => { await openPanel(page, 'lyrs'); await page.click('#ly_add'); await settle(page); };
 
 test('the Stamps panel is on the rail and lists every stamp, with the layers it is used on', async ({ page }) => {
@@ -25,7 +24,6 @@ test('the Stamps panel is on the rail and lists every stamp, with the layers it 
 test('several stamps can be picked for the arrangement of the selected layer', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addStamp(page);
-  await openPanel(page, 'stmp');
   const used = async () => (await st(page)).layers[0].st.length;
   const before = await used();
   await page.locator('#stmpl .smkr .smkth').nth(1).click();
@@ -70,7 +68,6 @@ test('a layer with no arrangement, or a frame, draws no outlines', async ({ page
 test('the lock is in the stamp list only; one stamp is unlocked at a time and the outline turns to the accent', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addStamp(page);
-  await openPanel(page, 'stmp');
   await page.locator('#stmpl .smkr .smkth').nth(1).click();
   await settle(page);
   const locks = page.locator('#stmpl .smklk');

@@ -4,7 +4,7 @@ import {PAPER,TRIMS,bk,col,setDim} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {ser} from './14-presets-and-layer-grid-ui.js';
 import {buildTex} from './17-texture-panel-and-previews.js';
-import {covS,paintCov,renderCover} from './18-projects-and-cover-overlay.js';
+import {covS,renderCover} from './18-projects-and-cover-overlay.js';
 
 function bookSync(){const g=bk(),on=WBS.book.on,px=v=>Math.round(v*300);$('bkon').checked=on;$('bkc').hidden=!on;$('bktr').value=TRIMS.some(t=>t[0]==WBS.book.trim)?WBS.book.trim:'custom';$('bkcu').hidden=WBS.book.trim!='custom';
 if(document.activeElement!==$('bktw'))$('bktw').value=+g.tw.toFixed(3);if(document.activeElement!==$('bkth'))$('bkth').value=+g.th.toFixed(3);if(document.activeElement!==$('bkpg'))$('bkpg').value=WBS.book.pages;$('bkpp').value=WBS.book.paper;$('bkman').checked=!!WBS.book.man;
@@ -12,7 +12,7 @@ $('bksw').disabled=!WBS.book.man;if(document.activeElement!==$('bksw'))$('bksw')
 const mm=v=>(v*25.4).toFixed(1);let w='';if(!WBS.book.man&&(WBS.book.pages<24||WBS.book.pages>828))w='<div class="w">KDP paperbacks take 24 to 828 pages.</div>';if(covS.img&&!WBS.book.man&&WBS.book.pages<100)w+='<div class="w">KDP only allows spine text on books with 100 or more pages.</div>';
 $('bkinfo').innerHTML=`<b>Full cover</b> ${g.W.toFixed(3)} × ${g.H.toFixed(3)} in (${mm(g.W)} × ${mm(g.H)} mm)<br><b>At 300 DPI</b> ${px(g.W)} × ${px(g.H)} px<br><b>Spine</b> ${g.sw.toFixed(3)} in (${mm(g.sw)} mm)${w}`;
 $('bksum').textContent=on?`${g.W.toFixed(2)} × ${g.H.toFixed(2)} in`:'';
-['bkpdf','bkpng'].forEach(id=>$(id).hidden=!on);$('cfree').hidden=on;$('bkgrp').hidden=!on;document.querySelectorAll('#cfmt [data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==(on?'book':WBS.dim.rt?'tile':'free')));['casp','cswp','caw','cah'].forEach(id=>{if($(id))$(id).disabled=on});paintCov()}
+['bkpdf','bkpng'].forEach(id=>$(id).hidden=!on);$('cfree').hidden=on;$('bkgrp').hidden=!on;document.querySelectorAll('#cfmt [data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==(on?'book':WBS.dim.rt?'tile':'free')));['casp','cswp','caw','cah'].forEach(id=>{if($(id))$(id).disabled=on})}
 const bookSet=o=>{WBS.book={...WBS.book,...o};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}WBX.wbBookSync()};
 // --- export at 300 DPI (PNG, or a PDF sized to the full cover with trim and bleed boxes)
 function coverRaster(cb){const g=bk(),W=Math.round(g.W*300),H=Math.round(g.H*300);$('pmsg').textContent='Rendering the print cover at 300 DPI…';
@@ -40,7 +40,6 @@ $('bktw').onchange=()=>bookSet({trim:'custom',tw:+$('bktw').value});$('bkth').on
 $('bkpg').oninput=()=>{const v=Math.round(+$('bkpg').value);if(v>0)bookSet({pages:v})};$('bkpp').onchange=()=>bookSet({paper:$('bkpp').value});
 $('bkman').onchange=()=>bookSet({man:$('bkman').checked,sw:+bk().sw.toFixed(4)});$('bksw').oninput=()=>{if($('bksw').value!=='')bookSet({sw:+$('bksw').value})};
 $('bkbl').oninput=()=>{if($('bkbl').value!=='')bookSet({bleed:+$('bkbl').value})};$('bkgd').onchange=()=>bookSet({gd:$('bkgd').checked});
-$('cvslot').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;WBS.cslot=b.dataset.s;$('cvmsg').textContent='';paintCov()};
 $('bkpng').onclick=async()=>{const d=await use('downloads');if(!d)return $('pmsg').textContent='Saving is not available here.';let h0=null;try{h0=d.pick?await d.pick({filename:bkName('png')}):null}catch(e){return}coverRaster(c=>c.toBlob(async bl=>{try{await d.save({filename:bkName('png'),data:bl,handle:h0});$('pmsg').textContent='Print cover PNG saved.'}catch(e){if(e&&e.code!='declined')$('pmsg').textContent='Could not save: '+e.message}},'image/png'))};
 $('bkpdf').onclick=async()=>{const d=await use('downloads');if(!d)return $('pmsg').textContent='Saving is not available here.';let h0=null;try{h0=d.pick?await d.pick({filename:bkName('pdf')}):null}catch(e){return}coverRaster((c,g,W,H)=>c.toBlob(async jb=>{const jpg=new Uint8Array(await jb.arrayBuffer());try{await d.save({filename:bkName('pdf'),data:pdfJpeg(jpg,W,H,g),handle:h0});$('pmsg').textContent='Print cover PDF saved.'}catch(e){if(e&&e.code!='declined')$('pmsg').textContent='Could not save: '+e.message}},'image/jpeg',.95))};
 WBX.wbCoverPDF=(cb)=>coverRaster((c,g,W,H)=>c.toBlob(async jb=>cb(pdfJpeg(new Uint8Array(await jb.arrayBuffer()),W,H,g),W,H),'image/jpeg',.95));

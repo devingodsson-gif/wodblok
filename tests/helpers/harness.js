@@ -183,4 +183,12 @@ const stampInstance = async page => {
 };
 // press and release on the canvas at a point of an instance (offset in canvas units)
 const clickStamp = async (page, p, dx = 0, dy = 0) => { const c = await canvasToClient(page, p.cx + dx, p.cy + dy); await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.up(); await settle(page); };
-module.exports = { ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// New stamp from the Stamps panel (the bottom tray is gone).
+async function addStamp(page) {
+  if (await page.locator('section.pn[data-p="stmp"]').isHidden()) await openPanel(page, 'stmp');
+  await page.click('#smknew');
+  await page.click('.rowm .ddi >> nth=0');
+  await settle(page);
+}
+
+module.exports = { addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

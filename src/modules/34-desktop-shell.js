@@ -79,7 +79,7 @@ function wsClamp(g){const st=document.querySelector('.stage').getBoundingClientR
 g.w=Math.max(200,Math.min(+g.w||300,innerWidth-20));g.h=Math.max(120,Math.min(+g.h||420,innerHeight-60));g.x=Math.max(-g.w+80,Math.min(g.x,innerWidth-80));g.y=Math.max(0,Math.min(g.y,innerHeight-36));if(g.y+g.h>innerHeight-8)g.y=Math.max(0,innerHeight-8-g.h);g.h=Math.min(g.h,innerHeight-8-g.y)}
 function wsEl(g,fl){const el=document.createElement('div');el.className='wg'+(fl?' fl':'')+(g.col?' col':'');el.dataset.g=g.id;
 if(fl){wsClamp(g);el.style.cssText=`left:${g.x}px;top:${g.y}px;width:${g.w}px;${g.col?'':`height:${g.h}px;`}z-index:${++wsZ}`}else el.style.flexGrow=g.f;
-el.innerHTML=`<div class="wh" title="Drag to move. Drop on another panel's tabs to group it, on a dock to stack it there, or at any edge of the window to dock it."><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
+el.innerHTML=`<div class="wh" title="Drag to move"><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
 `<button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button><button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close (reopen from the left bar)">${IC.x}</button></div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
 const bd=el.querySelector('.wbd');g.tabs.forEach(p=>{const sc=wsSec(p);if(sc){sc.classList.toggle('mc',!!sc.querySelector(':scope>details.g'));sc.hidden=p!=g.a;bd.appendChild(sc)}});return el}
 // the tool bar: the user's own order and the tools they took off it (kept in settings)
@@ -163,9 +163,6 @@ const typing=()=>{const a=document.activeElement;if(!a||a===document.body)return
 let wsRT=0,wsPend=false;addEventListener('resize',()=>{clearTimeout(wsRT);wsRT=setTimeout(()=>{if(!wsReady)return;if(typing()){wsPend=true;return}wsRender()},150)});
 addEventListener('focusout',()=>{setTimeout(()=>{if(wsPend&&!typing()){wsPend=false;if(wsReady)wsRender()}},300)});
 const stage=document.querySelector('.stage');
-// the stamp tray can collapse to a thin strip, to give a small window more room for the picture; the choice is remembered
-{const f=stage.querySelector('.film'),b=$('filmt');if(f&&b){const ap=(m,save)=>{f.classList.toggle('min',m);b.setAttribute('aria-expanded',String(!m));b.setAttribute('aria-label',m?'Show stamp tray':'Hide stamp tray');b.title=b.getAttribute('aria-label');stage.style.setProperty('--film-h',f.offsetHeight+'px');if(save){try{kv.set('wb_film_min',m?'1':'0')}catch(e){}}};
- let m0=false;try{m0=kv.get('wb_film_min')==='1'}catch(e){}b.onclick=()=>ap(!f.classList.contains('min'),true);ap(m0,false);try{new ResizeObserver(()=>stage.style.setProperty('--film-h',f.offsetHeight+'px')).observe(f)}catch(e){}}}
 function setView(){if(window.bkZ)requestAnimationFrame(()=>bkZ());$('boardP').classList.remove('off');$('zoomc').style.display='';requestAnimationFrame(applyZ);tbSync();if(WBX.wbTxMode)WBX.wbTxMode(stUnlocked()==null?'pattern':'stamp');wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';if(!wsReady)setView();
 const L=wsL();let g=wsFind(p);
@@ -497,8 +494,8 @@ enhance();{const r=$('ts'),row=r.closest('.ctl'),f=document.createElement('div')
 const ic=(d)=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 f.innerHTML=`<label>Fit to frame</label><div class="seg" id="tsfit">`+
 `<button type="button" data-f="" title="Off: stamps run off the frame edges">${ic('<circle cx="12" cy="12" r="7.5"/><path d="M6.7 17.3l10.6-10.6"/>')}Off</button>`+
-`<button type="button" data-f="h" title="Fit width: a whole number of stamps spans the width exactly; stamps may run off the top and bottom">${ic('<path d="M3.5 12h17M7 8.5L3.5 12 7 15.5M17 8.5l3.5 3.5-3.5 3.5"/><path d="M3.5 5v2.5M20.5 5v2.5M3.5 16.5V19M20.5 16.5V19"/>')}Width</button>`+
-`<button type="button" data-f="v" title="Fit height: a whole number of stamps spans the height exactly; stamps may run off the sides">${ic('<path d="M12 3.5v17M8.5 7L12 3.5 15.5 7M8.5 17l3.5 3.5 3.5-3.5"/><path d="M5 3.5h2.5M16.5 3.5H19M5 20.5h2.5M16.5 20.5H19"/>')}Height</button></div>`;
+`<button type="button" data-f="h" title="Fit width">${ic('<path d="M3.5 12h17M7 8.5L3.5 12 7 15.5M17 8.5l3.5 3.5-3.5 3.5"/><path d="M3.5 5v2.5M20.5 5v2.5M3.5 16.5V19M20.5 16.5V19"/>')}Width</button>`+
+`<button type="button" data-f="v" title="Fit height">${ic('<path d="M12 3.5v17M8.5 7L12 3.5 15.5 7M8.5 17l3.5 3.5 3.5-3.5"/><path d="M5 3.5h2.5M16.5 3.5H19M5 20.5h2.5M16.5 20.5H19"/>')}Height</button></div>`;
 row.after(f);
 f.onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const L=LY();L.fit=b.dataset.f;if(L.fit)L.size=+fitTs(L).toFixed(3);store();upd();sync();nums()};
 r.oninput=()=>{const L=LY();L.size=L.fit?+fitTs(L,+r.value).toFixed(3):+r.value;if(L.fit){r.value=L.size;paint(r)}store();upd()}}

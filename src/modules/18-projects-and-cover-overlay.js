@@ -32,7 +32,7 @@ function renderCover(){const on=$('cov').checked,k=[on,CW,CH,WBS.book.on?JSON.st
 const put=(c,x,y,w,hh)=>{if(!c.img||!c.iw)return'';const f=Math.min(w/c.iw,hh/c.ih)*c.sc/100,iw=c.iw*f,ih=c.ih*f;return`<image href="${c.img}" x="${(x+(w-iw)/2).toFixed(1)}" y="${(y+(hh-ih)/2).toFixed(1)}" width="${iw.toFixed(1)}" height="${ih.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`};
 if(on){if(WBS.book.on){const g=bk(),u=CW/g.W,y=g.b*u,hh=g.th*u;h=put(covB,g.b*u,y,g.tw*u,hh)+put(covS,(g.b+g.tw)*u,y,g.sw*u,hh)+put(cov,(g.b+g.tw+g.sw)*u,y,g.tw*u,hh)}else h=put(cov,0,0,CW,CH)}
 drawGuides();
-$('covg').innerHTML=h;paintCov();covOrder()}
+$('covg').innerHTML=h;covOrder()}
 function drawGuides(){const G=$('guig');if(!WBS.book.on||!WBS.book.gd){G.innerHTML='';return}const g=bk(),u=CW/g.W,f=v=>(v*u).toFixed(2),lw=(CW/1000).toFixed(2),b=g.b,x1=b+g.tw,x2=x1+g.sw,sf=.125,ss=.0625;
 const R=(x,y,w,h,st,da)=>`<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="none" stroke="${st}" stroke-width="${lw}"${da?` stroke-dasharray="${da}"`:''}/>`,T=(x,y,t,r)=>{const fs=CW/70,w=t.length*fs*.66+fs*1.1,h=fs*1.5,tr=r?` transform="rotate(90 ${f(x)} ${f(y)})"`:'';return`<g${tr}><rect x="${(x*u-w/2).toFixed(2)}" y="${(y*u-fs*1.05).toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}" rx="${(h/4).toFixed(2)}" fill="#fff" fill-opacity=".94" stroke="#e0006e" stroke-width="${lw}"/><text x="${f(x)}" y="${f(y)}" font-family="system-ui,sans-serif" font-size="${fs.toFixed(1)}" font-weight="600" fill="#e0006e" text-anchor="middle" letter-spacing="1">${t}</text></g>`};
 let o=`<path d="M0 0H${CW}V${CH}H0Z M${f(b)} ${f(b)}V${f(b+g.th)}H${f(g.W-b)}V${f(b)}Z" fill="rgba(224,0,110,.16)" fill-rule="evenodd"/>`;
@@ -40,13 +40,6 @@ o+=R(b,b,g.W-2*b,g.th,'#00a3c4');o+=`<line x1="${f(x1)}" y1="0" x2="${f(x1)}" y2
 o+=R(b+sf,b+sf,g.tw-2*sf,g.th-2*sf,'#1a9a4a','4 3')+R(x2+sf,b+sf,g.tw-2*sf,g.th-2*sf,'#1a9a4a','4 3');if(g.sw>2*ss)o+=R(x1+ss,b+sf,g.sw-2*ss,g.th-2*sf,'#1a9a4a','4 3');
 o+=R(x1-.25-2,b+g.th-.25-1.2,2,1.2,'#e0006e','6 3')+T(x1-1.25,b+g.th-.25-.55,'BARCODE');
 o+=T(b+g.tw/2,b+.4,'BACK')+T(x2+g.tw/2,b+.4,'FRONT');if(g.sw>.15)o+=T(x1+g.sw/2,b+g.th/2,'SPINE',1);G.innerHTML=o}
-function paintCov(){if(!WBS.book.on)WBS.cslot='f';const c=slotC(),nm={f:'front',b:'back',s:'spine'}[WBS.cslot];document.querySelectorAll('#cvslot [data-s]').forEach(b=>b.classList.toggle('on',b.dataset.s==WBS.cslot));$('cvslot').hidden=!WBS.book.on;
-$('cvp').innerHTML=c.img?`<img src="${c.img}" alt="Cover image">`:`<span>No ${WBS.book.on?nm+' ':'cover '}image yet</span>`;$('cvrm').hidden=!c.img;if(+$('cvs').value!=c.sc){$('cvs').value=c.sc;$('cvs').dispatchEvent(new Event('input',{bubbles:true}))}}
-function setCoverImg(img){const MX=1400,s0=Math.min(1,MX/Math.max(img.naturalWidth,img.naturalHeight)),w=Math.max(1,Math.round(img.naturalWidth*s0)),h=Math.max(1,Math.round(img.naturalHeight*s0)),c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(img,0,0,w,h);
-let u=c.toDataURL('image/webp',.88);if(!u.startsWith('data:image/webp'))u=c.toDataURL('image/png');if(u.length>1500000){const q=c.toDataURL('image/jpeg',.85);if(q.length<u.length)u=q}
-if(!okImg(u)){$('cvmsg').textContent='That image could not be used. Try a PNG or JPG.';return}
-const c0=slotC(),was=!c0.img;setSlotC({img:u,iw:w,ih:h,sc:was?(WBS.cslot=='f'?70:90):c0.sc,...(WBS.cslot=='f'?{tx:cov.tx}:{})});$('cov').checked=true;saveCov();WBS.covKey='';renderCover();$('cvmsg').textContent=`Cover image added (${Math.round(u.length*.75/1024)} KB).`;const cb=document.querySelector('.rail [data-pn="canvas"]');if(cb&&!cb.classList.contains('on'))cb.click()}
-function coverFile(f){if(f.type&&!/^image\//.test(f.type)){$('cvmsg').textContent='That file is not an image.';return}const url=URL.createObjectURL(f),img=new Image();img.onload=()=>{setCoverImg(img);URL.revokeObjectURL(url)};img.onerror=()=>{URL.revokeObjectURL(url);$('cvmsg').textContent='That image could not be read. Try a PNG or JPG.'};img.src=url}
 function snapshot(){const c=JSON.parse(coreStr()),used=new Set();c.tiles.forEach(t=>t.items.forEach(q=>used.add(q.m)));
 const cm={};Object.keys(cust).forEach(k=>{if(used.has(k))cm[k]=cust[k]});
 return{app:'WODBLOK',v:21,...c,arts:artUsed(),cover:{img:cov.img,iw:cov.iw,ih:cov.ih,sc:cov.sc,tx:cov.tx!==false,on:$('cov').checked,back:covB,spine:covS,book:WBS.book},grade:WBX.wbGrade?WBX.wbGrade.get():null,lib:{motifs:cm,colors:C.filter(x=>CC.includes(x[0]))}}}
@@ -78,13 +71,6 @@ try{const q=JSON.parse(kv.get('wb40_coverB')||'null');if(q&&typeof q.sc=='number
 try{const q=JSON.parse(kv.get('wb40_coverS')||'null');if(q&&typeof q.sc=='number')covS={...covS,...q}}catch(e){}try{const q=JSON.parse(kv.get('wb31_cover')||'null');if(q&&typeof q.sc=='number')cov={...cov,...q};if(q&&q.on===false)$('cov').checked=false}catch(e){}if(!okImg(cov.img))cov.img='';if(!okImg(covB.img))covB.img='';if(!okImg(covS.img))covS.img='';
 $('covtx').onchange=()=>{cov.tx=$('covtx').checked;saveCov();covOrder()};
 WBS.covKey='';
-WBX.wbCoverFile=coverFile;
-$('cvfile').onchange=()=>{const f=$('cvfile').files[0];$('cvfile').value='';if(f)coverFile(f)};
-$('cvs').addEventListener('input',()=>{slotC().sc=+$('cvs').value;saveCov();renderCover()});
-$('cvrm').onclick=()=>{setSlotC(WBS.cslot=='f'?{img:'',iw:0,ih:0,sc:100,tx:cov.tx}:blank());saveCov();WBS.covKey='';renderCover();$('cvmsg').textContent='Cover image removed.'};
-{const pz=$('cvpaste'),PZ=pz.innerHTML;pz.addEventListener('focus',()=>{if(pz.innerHTML==PZ)pz.innerHTML=''});pz.addEventListener('blur',()=>{if(!pz.textContent.trim()&&!pz.querySelector('img'))pz.innerHTML=PZ});
-pz.addEventListener('paste',e=>{const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();e.stopPropagation();pz.innerHTML=PZ;pz.blur();coverFile(it.getAsFile())}else setTimeout(chk,60)});
-const chk=()=>{const im=pz.querySelector('img');if(im&&im.src){const i2=new Image();i2.onload=()=>setCoverImg(i2);i2.src=im.src;pz.innerHTML=PZ;pz.blur()}else if(pz.textContent.trim()&&pz.innerHTML!=PZ){pz.innerHTML='';$('cvmsg').textContent='That was text, not an image.'}};pz.addEventListener('input',()=>setTimeout(chk,30))}
 $('cov').addEventListener('input',()=>{saveCov();renderCover()});
 WBS.cp={id:null,name:'',saved:''};
 $('pnm').value=WBS.cp.name||'';setInterval(paintPst,800);paintPst();
@@ -93,4 +79,4 @@ openData({tiles:t,layers:[mkL('Layer 1',t.map(x=>x.id),'check',180)],proj:{...PC
 // first click with unsaved work: the button says so (the File menu stays open, see 34-desktop-shell) and the status bar explains
 if($('pnw').dataset.sure)pmsg('Starting a new project can’t be undone. Click New project again to discard this one.')};
 }
-export {PGD,fileSnap,thumb,confirm2,coreStr,covOrder,covS,dirty,newId,openData,paintCov,paintPst,pgFix,pmsg,renderCover,snapshot,init18};
+export {PGD,fileSnap,thumb,confirm2,coreStr,covOrder,covS,dirty,newId,openData,paintPst,pgFix,pmsg,renderCover,snapshot,init18};

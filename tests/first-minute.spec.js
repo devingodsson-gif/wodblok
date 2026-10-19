@@ -45,6 +45,5 @@ test('Randomize fills the canvas', async ({ page }) => {
   await page.click('#rzbar');
   await settle(page, { max: 60000 });
   await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)'));
-  await expect(page.locator('#tabs button.empty')).toHaveCount(0);
   expect(errors).toEqual([]);
 });

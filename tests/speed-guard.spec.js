@@ -2,7 +2,7 @@
 //  - The on-screen pattern does not carry the full outline of every stamp: every copy is a ready-made print, so those outlines are not drawn.
 //    They live once in a hidden block that is rewritten only when a stamp changes. (Before 1.7 the busy project held 2.7 MB of them on screen.)
 //  - Nothing the page draws points at an id that does not exist, in the Pattern view, zoomed in (every copy drawn live),
-//    after a slider move, and after Randomize. The tabs along the top and the stamp buttons in the Layers panel borrow the stamp outlines, so
+//    after a slider move, and after Randomize. The stamp buttons in the Layers panel borrow the stamp outlines, so
 //    they are checked by name.
 // Numbers are written to test-results/speed-guard-<target>.json.
 const fs = require('fs');
@@ -27,11 +27,9 @@ for (const name of Object.keys(FIXTURES)) {
     let d = await danglingRefs(page);
     for (let i = 0; i < 20 && Object.keys(d).length; i++) { await page.waitForTimeout(400); d = await danglingRefs(page); }   // the wide sample finishes printing about a second after settle returns (known-issues); a reference that is still missing after 8 s is a real one
     const c = await patternCounters(page);
-    report[name] = { dynChars: c.dynChars, dynNodes: c.dynNodes, artChars: c.artChars, tabs: c.tabs.length, dangling: d };
+    report[name] = { dynChars: c.dynChars, dynNodes: c.dynNodes, artChars: c.artChars, dangling: d };
     expect(c.dynChars, `${name}: characters of pattern markup on screen`).toBeLessThan(BUDGET[name]);
     expect(d, 'references to ids that do not exist').toEqual({});
-    expect(c.tabs.length, 'one thumbnail per stamp along the top').toBeGreaterThan(0);
-    for (const t of c.tabs) { expect(t.found, `tab thumbnail ${t.href} resolves`).toBe(true); expect(t.width, `tab thumbnail ${t.href} has a size`).toBeGreaterThan(0); }
     expect(errors).toEqual([]);
   });
 }
@@ -51,7 +49,7 @@ test('busy: after a slider move, zoomed in and after Randomize, nothing points a
     const d = await danglingRefs(page);
     steps[label] = { dynChars: c.dynChars, dangling: d };
     expect(d, `${label}: references to ids that do not exist`).toEqual({});
-    for (const t of [...c.tabs, ...c.layerButtons]) expect(t.found, `${label}: thumbnail ${t.href} resolves`).toBe(true);
+    for (const t of c.layerButtons) expect(t.found, `${label}: thumbnail ${t.href} resolves`).toBe(true);
     return c;
   };
   // the stamp size slider, a handful of real input events (the pattern redraws each time)
