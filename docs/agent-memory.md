@@ -2,7 +2,7 @@
 
 For any Claude agent that works on WODBLOK without access to the owner's Claude memory or Project. It is the development-relevant part of that memory, kept in the repo so every agent has the same context. **Rule: whenever something about WODBLOK is saved to Claude's memory (a decision, a preference, a standing instruction), add it here too, in the same session, with the date.** Keep it free of anything personal (no names, emails, accounts, prices or business plans; this repo is public). The rules themselves are in `CLAUDE.md` and `docs/developing-wodblok.md`; this file is the history and the standing preferences behind them.
 
-Last updated Oct 18 2026 (version 1.46.0 on main; layer update steps 1 to 3 = 1.46.1 to 1.46.3 on one branch, not merged).
+Last updated Oct 19 2026 (version 2.0.0 live on main; the clean-up plan 2.0.1 to 2.0.3 is on branches, not merged).
 
 ## How the owner wants Claude to work
 - Show a task list, and an approximate percentage complete on short status updates, in the chat. No separate progress page.
@@ -78,3 +78,6 @@ The owner's decisions are in `docs/layer-update-plan.md`: no layer types, one co
 - Step 10 (1.46.11): audit found Randomize, templates, presets, variations, colourways, recipes, proof and covers do not depend on the editor view, so only workspaces changed (one layout, `pattern` only). Randomize is NOT rewritten on purpose (it would change every seeded result).
 - All built-in templates were deleted (owner, Oct 19 2026): the eight files in templates/{canvas,tile,book} are gone, so the picker lists only Blank per kind plus the person's own. The loader (tools/templates/folders.js) still picks up any .wodblok file put in those folders; the owner makes new ones for 2.0.
 - Step 11 (1.46.12): specs run on the canvas flow; helpers `unlockStamp`, `pickShape`, `stampInstance`, `clickStamp` live in tests/helpers/harness.js. Open for the owner: drag-from-list onto the canvas, text box preview over an unlocked stamp, three orphaned stamp-editor snapshots.
+- 2.0.0 (layer update finished) is live. The clean-up plan in docs/plan.md: 2.0.1 (audit bugs), 2.0.2 (no old files, honest tests), 2.0.3 (tidy screen, code, docs) are done on stacked branches `fix/2.0.1-audit-bugs`, `fix/2.0.2-no-old-files`, `fix/2.0.3-tidy`; not merged.
+- Owner's standing preferences (Oct 19 2026): do not open pull requests, run CI or merge unless asked; local tests are enough, and CI only when the owner says so for that release. Old project files are never converted (refused with a message). Keep the stamp tray under the canvas (it is a main part of the screen).
+- Tests run on the build by default; `npm run perf` compares with a build of `main`. A seeded Randomize result depends on the number of `Math.random` draws before it: do not add or remove draws at start-up without regenerating the Randomize snapshots.

@@ -11,7 +11,7 @@ The skipped test is the WebKit smoke test (WebKit is not installed in this sandb
 ## Speed (this machine; use ratios, not absolute numbers)
 - Drag the layer "lrp" slider 40 steps on the 4:3 project (5 layers, textures, blends, grading): median **7.0 s** (runs 8.2 / 7.0 / 6.7 s). About 190 ms per step, 34 long tasks per drag, 2.1 DOM nodes added per move.
 - Randomize roll (seed 21) until the drawing is quiet: **2.0 s**.
-- Stamp-editor motif dragging is not measured yet (see docs/test-plan.md).
+- Stamp-editor motif dragging is not measured yet.
 
 ## What had to be neutralised to make runs repeat
 These are v100 behaviours that differ run to run even with the same random seed and a fixed clock. They are not in the document or the picture; the tests ignore them, and Phase 1 must not rely on them:

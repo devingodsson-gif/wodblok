@@ -1,8 +1,11 @@
-# Known issues in v100 (kept as-is through Phases 1-3)
+# Known issues
 
-Phases 1-3 move code and add the capabilities each phase lists; they do not fix bugs, so the tests can
-prove nothing else changed. Each item here is pinned by a test, so a fix shows up as a deliberate snapshot
-change. Fix them after Phase 3 as normal releases.
+Things found by tests, audits or by hand that are not fixed. Each is either pinned by a test (a fix then shows up as a deliberate
+snapshot change) or listed here with what is known. Closed items stay, marked, so the history is readable.
+
+**Closed in 2.0.3 (Oct 19 2026):** the stamp-zoom test (the file went with the Stamp editor), the TIFF export test (it passes), "Switching a layer
+between Free place, Art and Text clears its placed items" (there are no layer kinds now), the `tx_sc` duplicate id (renamed), "Before did not turn
+on after Ctrl+S" (never reproduced; not seen since), and the list of unused top-level names (deleted).
 
 Fixed in v107: Undo after Clear leaving the colour grade blank (the grade was reset before the step was saved), and
 opening a file nudging a frame inset from 9.6 to 9.5 (the panel wrote the slider's rounded value back). Also fixed in
@@ -44,13 +47,13 @@ On the first CI run that tested the built app, `roundtrip open-project-4-rect-4x
 ## After Randomize, two things point at ids that no longer exist (found in the 1.7 speed work, in 1.6.0 and earlier)
 - The free-stamps strip and list in the Layers panel (`#lfpst`, `#lfpl`) keep buttons for stamps that Randomize removed (busy test project: `#s7`, `#s8`), so those thumbnails are blank.
 - A texture overlay asks for a texture image that is not there (`#txi12_800` on the busy test project, Randomize with seed 21), so that overlay draws nothing.
-Not fixed (no bug fixes in this phase). The speed-guard test leaves both out by name (`tests/helpers/speed.js`) so it only flags new ones.
+Not fixed. The speed-guard test leaves both out by name (`tests/helpers/speed.js`) so it only flags new ones.
 
 ## The TIFF export test fails (found in the 1.8 work, in 1.6.0 and later)
-`tests/export-recipes.spec.js` "TIFF export is a real RGBA TIFF…" times out in `page.selectOption('#xrdpi', …)`: the DPI select is not visible when the test tries to use it. Fails on the 1.6.0 build too, so it is not from a speed release. Not fixed here.
+`tests/export-recipes.spec.js` "TIFF export is a real RGBA TIFF…" times out in `page.selectOption('#xrdpi', …)`: the DPI select is not visible when the test tries to use it. Fails on the 1.6.0 build too, so it is not from a speed release. Not fixed.
 
 ## While the stamps are printed after opening a file, a few stamps point at outlines that are not on the page yet (found in 1.9, also in 1.8.0)
-For about half a second after opening the busy test project (`project-4`), 18 `<use href="#s…">` in the pattern point at ids that do not exist yet, so those stamps draw nothing until the next redraw. Seen in 1.8.0 too (about 0.4 s). The test helper `settle` now also waits until the print queue is empty (test hook `printsBusy`), so no test measures a half-drawn piece. Not fixed (no bug fixes in this phase).
+For about half a second after opening the busy test project (`project-4`), 18 `<use href="#s…">` in the pattern point at ids that do not exist yet, so those stamps draw nothing until the next redraw. Seen in 1.8.0 too (about 0.4 s). The test helper `settle` now also waits until the print queue is empty (test hook `printsBusy`), so no test measures a half-drawn piece. Not fixed.
 
 ## The stamp-zoom test "a motif can still be picked and Ctrl + wheel zooms…" fails (found in 1.9, also in 1.8.0)
 `tests/stamp-zoom.spec.js:33` fails on `toBeVisible` ("element(s) not found") on both the 1.8.0 and 1.9.0 builds. Not caused by a speed release as far as checked; not investigated or fixed.
@@ -65,6 +68,3 @@ The Stamp editor's text Scatter control (`<div class="seg" id="tx_sc">`) and the
 
 ## Test flake: speed-guard "busy" dangling references (seen again, layer update step 5)
 `tests/speed-guard.spec.js` "busy: the pattern on screen stays light and every reference resolves" now and then reports `use -> #s#` (18) and `g[filter] -> #lk#` (3): stamp prints and layer ink filters that are not on the page yet when the check runs. It passes alone on re-run (4 of 4 on the step 5 build; one failure in three runs of the step 3 build too), so it is not from the layer update. Same family as the "stamps point at outlines that are not on the page yet" note above. Snapshots untouched.
-
-## Unused top-level names left in the build (found in layer update step 12)
-`mkdd`, `cItem`, `PDESC`, `sBlob`, `surfVec`, `PGD`, `shapeInfo`, `FRD`, `gRg`, `xsvg`, `fKids`, `HEXRE`, `hexRGB`, `slotRef`, `slotNo`, `trayHexes`, `USEW`, `stDotsNow`, `axCATS`, `teD`, `stAccepts` are declared and never used (older than the layer update). Not removed here; a later clean-up release can delete them.

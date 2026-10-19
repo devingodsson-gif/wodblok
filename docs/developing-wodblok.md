@@ -2,7 +2,7 @@
 
 The one document for anyone (a person or a Claude agent) who changes WODBLOK. It holds the working rules, the way a release is made, the code and test conventions, and, as Part 9, the complete UI and CSS standard. Read Parts 1 to 3 before touching anything, and Part 9 before touching any UI.
 
-Written Oct 18 2026 at version 1.46.0, from the project's CLAUDE.md, the docs in this folder, and the owner's standing instructions. `CLAUDE.md` stays as the short list of rules that every session loads; this document is the long form. When they disagree, ask the owner. The layer update (a large rewrite of the editor, in progress) has its own plan, `docs/layer-update-plan.md`.
+Written Oct 18 2026 at version 1.46.0 and brought up to 2.0.3 on Oct 19 2026, from the project's CLAUDE.md, the docs in this folder, and the owner's standing instructions. `CLAUDE.md` stays as the short list of rules that every session loads; this document is the long form. When they disagree, ask the owner. The layer update (the rewrite of the editor, finished as 2.0.0) is recorded in `docs/layer-update-plan.md`; the open plan is `docs/plan.md`.
 
 **Contents**
 1. What WODBLOK is, and the owner
@@ -25,7 +25,7 @@ It is a **commercial product**. The owner plans to sell it and wants it to feel 
 
 The owner is the only person who decides product questions: what a feature does, what the standard is, when something goes live. If a rule, a scale or a plan does not cover something, **ask and change the document first**; do not invent. Keep questions short and ask them only when the answer changes what you build.
 
-Current state (Oct 18 2026): `main` is at **1.46.0**. The text update (1.39 to 1.46) is finished and live. The **layer update** has started (steps 1.46.1 and up; it finishes as 2.0.0); see `docs/layer-update-plan.md`.
+Current state (Oct 19 2026): `main` is at **2.0.0** and live (the layer update and the text update are finished). The clean-up plan in `docs/plan.md` (2.0.1 to 2.0.3, then 2.1.0) is done on its branches.
 
 ## 2. Rules that are never broken
 
@@ -37,11 +37,10 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 - **No brush masks** (masks are linear, radial, layer, colour range and luminance range only).
 - **UI follows the standard in Part 9**: tokens and scales, one component per role, one folder tree for every library. Do not invent a size, radius, colour, duration or list design. If the scale lacks something, ask, and change the guide first.
 - **Speed first.** Run `npm run perf` before committing anything that touches drawing, dragging or sliders. No perf regression over 10%.
-- **No backwards compatibility during the layer update** (owner, Oct 18 2026): old project files and templates need not open. The old rule (format v:18 files always open) ended when step 1 started. A file from a newer app still opens read-only and is never rewritten. The 18 to 21 migration and the v18 fixtures stay until new templates and fixtures exist, then go.
+- **No backwards compatibility** (owner, Oct 18 and 19 2026): a project file or template made by an older WODBLOK is refused with a message and never converted; the 18 to 21 migration and the v18 fixtures are gone (2.0.2). A file from a newer app still opens read-only and is never rewritten.
 - **Platform access only through `src/platform/`.** User actions are commands in the registry. The document is plain data with stable ids. **No runtime network**, with one exception: `src/platform/account.js` may talk to the app's own host (`/api/me`, `/api/usage`, `/api/feedback`, `/api/gate-cookie`; see docs/accounts.md) and makes no request from a file or a local dev server. `npm run check:platform` fails on `fetch` and friends anywhere else. Fonts are bundled. Usage tracking is active-time totals per day for early-access and tester accounts only, never anything from a project or file, and nothing on the drawing or dragging path. Pointer events only; **nothing hover-only in new code**. **No `alert`, `confirm` or `prompt`.**
 - **Modules export functions and do no work on import.** Start-up order lives in `src/main.js`.
 - **Ask before adding a dependency.** Allowed licences: MIT, BSD, ISC, Apache, OFL. (The font parser opentype.js, MIT, was approved for 1.42.0.)
-- **Phases:** Phase 1 had no behaviour or visual change; Phases 2-3 only what the phase listed; Phases 1-3 had no bug fixes (bugs are logged in docs/known-issues.md). All of these phases are over; normal releases now fix bugs.
 - **Snapshots and golden screenshots are never updated just to make tests pass.**
   - **Pixel goldens** (`tests/__golden__/`): when a full-suite run fails some, look at each diff. If it is exactly the change this release made on purpose (new labels, text size, layout, a new control), regenerate those goldens (`--update-snapshots=changed` on just those tests, then re-run them) and say in the report which ones and why. A golden that fails for a reason the release does not explain is a bug: fix it or ask, never regenerate it.
   - **State and SVG snapshots** (`tests/__snapshots__/`) need the owner's approval first: say which changed and why, and ask.
@@ -85,7 +84,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 
 **Layout**
 - `src/modules/*.js`: ES modules, in the order listed in `src/modules/manifest.json`. Source of truth for the app. `src/main.js` imports them and calls each module's `initNN()` in start-up order. `src/shell.html` is the page (markup, CSS). `src/platform/` is the only place that talks to the browser or network; `src/format/` is the project file container, migration and validation; `src/data/` holds the Wada colours, built-in shapes and templates; `src/vendor/` holds third-party code; `src/fonts/` bundled fonts (text fonts as `.woff`); `src/commands/` the command registry.
-- `legacy/` is the untouched v100 single file and its hash. **Never edit it.**
+- `legacy/` is the old v100 single file and its hash, kept only as history; no test uses it. Do not edit it.
 - `tools/` build and check scripts (`build.js`, `check-platform.js`, `check-style.js`, fonts, icons, templates, social batch, site tools).
 - `dist/` is build output (`dist/wodblok.html` plus an identical `dist/index.html` for hosting).
 
@@ -111,13 +110,13 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 
 - **Playwright**, driving the real UI. The only hooks are `window.__wbTest = { state(), commands, kv, ... }` (document state as a string; the command registry; the settings store). Helpers are in `tests/helpers/harness.js`: `openApp`, `openPanel`, `setMode`, `settle`, `getState`, `putText`, `checkpoint`.
 - Determinism is injected from the test side: seeded `Math.random`, fixed `Date`, no network, fixed viewport and locale. The app is not modified for tests.
-- **Targets:** `WB_TARGET=legacy` (default; the untouched v100 baseline, now differs by design), `WB_TARGET=build` (`dist/wodblok.html`; use this), `WB_TARGET=esm` (unbundled modules from `npm run dev`). Typical run: `WB_TARGET=build WB_PIXELS=0 npx playwright test tests/<file> --project=chromium --reporter=list`. `WB_PIXELS=0` skips pixel compares.
+- **Targets:** `WB_TARGET=build` (default: `dist/wodblok.html`; run `npm run build` first), `WB_TARGET=esm` (unbundled modules from `node tools/serve-esm.js`, which must be running). Typical run: `WB_TARGET=build WB_PIXELS=0 npx playwright test tests/<file> --project=chromium --reporter=list`. `WB_PIXELS=0` skips pixel compares.
 - **Three layers of checks:** document state (`tests/__snapshots__/**/*.state.json`), SVG markup summary (`*.svg.json`), pixels (`tests/__golden__/<WB_ENV>/`, only valid in the environment that made them). **CI is the reference for fonts and pixels**: a local run can differ slightly (for example the Randomize seed-1 snapshot differs by a fraction of a pixel locally, even on `main`).
 - **Do not rebuild `dist/` while tests are running against it.** Build first, then test.
-- **Writing a test:** one spec per feature, named for the release (`text-warp.spec.js`); start with `test.skip(TARGET === 'legacy', 'new in the repo build')` for new features; assert `errors` is empty (`const { errors } = await openApp(page)`); drive controls through the DOM (a `set(page, id, value)` helper that sets `.value` and dispatches `input` works for ranges and selects); use `expect.poll` for anything that updates after a delay. Stamp-editor letters are readable in `getState` (`tiles[0].items`, group data in `tiles[0].tgm`); text layer pieces are in `layers[].pl`.
+- **Writing a test:** one spec per feature, named for the release (`text-warp.spec.js`); assert `errors` is empty (`const { errors } = await openApp(page)`); drive controls through the DOM (a `set(page, id, value)` helper that sets `.value` and dispatches `input` works for ranges and selects); use `expect.poll` for anything that updates after a delay. Letters of a text in a stamp are readable in `getState` (`tiles[0].items`, group data in `tiles[0].tgm`); text layer pieces are in `layers[].pl`.
 - **Known flakes** (docs/known-issues.md): SVG summaries taken a moment too early on slow machines; a re-run alone passes. `speed-guard` once reported "dangling references" in a full run and passed alone. Do not "fix" a flake by regenerating a snapshot.
 - **Speed:** `npm run perf` (counters and timings on a fixed project, compared with `docs/perf-baseline.md`). `tests/helpers/speed.js` guards against new dangling references.
-- What the tests do not cover is listed in docs/test-plan.md; add tests when you touch an uncovered area.
+- Edit a stamp in a test through the canvas: `unlockStamp(page)`, `pickShape(page)`, `stampInstance(page)`, `clickStamp(page, p)` in `tests/helpers/harness.js`. Add tests when you touch an area without any.
 - In a Claude Code session, a foreground command is limited to about 10 minutes: run long test runs in the background and wait with an until-loop on the log.
 
 ## 7. Git, pull requests, CI, going live, undoing
@@ -155,7 +154,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 | `known-issues.md` | Bugs and test flakes found and not fixed, with what is known |
 | `going-live.md`, `ci-budget-rules.md` | Release and CI procedure |
 | `public-repo.md`, `hosting.md`, `accounts.md`, `site.md` | Public repo, hosting, accounts, the marketing site |
-| `perf-baseline.md`, `baseline.md`, `test-plan.md`, `coupling-map.md` | Speed numbers, v100 baseline, test coverage, map of the original single file |
+| `perf-baseline.md`, `baseline.md`, `coupling-map.md` | Speed numbers, the v100 baseline (history), map of the built app |
 | `ux-review.md`, `ux-review/` | The Oct 2026 UX review and its pictures |
 | `wodblok-repo-plan.md`, `phase5-spec.md` | The repo plan and the phase 5 spec (history) |
 | `palette-names.md` | The Wada colour names |
