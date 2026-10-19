@@ -26,7 +26,11 @@ test('one Text panel for a layer and for an unlocked stamp: the controls are the
   expect(await page.locator('#tb_t, #tb_f, #tb_go, #lftx').count()).toBe(0);
   await expect(page.locator('#tx_lay')).toBeVisible();     // ink and textures belong to a Text layer
   await expect(page.locator('#tx_pv')).toBeHidden();
-  // TODO (step 11 note): with a stamp unlocked #tx_lay should hide and #tx_pv show; today the lock alone does not switch the Text panel (stLock does not call stTextSync), so that half is not asserted yet
+  await unlockStamp(page);
+  await expect(page.locator('#tx_lay')).toBeHidden();
+  await expect(page.locator('#tx_pv')).toBeVisible();
+  await page.locator('#stmpl .smklk').first().click(); await settle(page);   // locked again: the layer's options are back
+  await expect(page.locator('#tx_lay')).toBeVisible();
   expect(errors).toEqual([]);
 });
 
