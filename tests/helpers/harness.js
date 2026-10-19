@@ -96,11 +96,11 @@ async function settle(page, { quiet = 4, step = 120, max = 15000 } = {}) {
   let last = null, same = 0;
   while (Date.now() - t0 < max) {
     const sig = await page.evaluate(() => {
-      const art = document.getElementById('art'), ed = document.getElementById('ed');
+      const art = document.getElementById('art');
       const busy = document.body.classList.contains('babusy') || !!document.querySelector('.rzbusy,.lding:not([hidden])') || !!(window.__wbTest && window.__wbTest.printsBusy && window.__wbTest.printsBusy());   // stamp prints still being drawn
       // a content hash, not just lengths: a redraw that rebuilds the same amount of markup in a different shape still counts as change
       const h = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0).toString(36); };
-      return h(window.__wbTest.state()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + (ed ? h(ed.innerHTML) : 0) + '|' + busy;
+      return h(window.__wbTest.state()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + busy;
     });
     if (sig === last) { if (++same >= quiet) return; } else { same = 0; last = sig; }
     await page.waitForTimeout(step);
@@ -160,39 +160,11 @@ async function checkpoint(page, testInfo, errors, name, { shot = true, selector 
   expect(sum.text).toMatchSnapshot(`${name}.svg.json`);
   await testInfo.attach(`${name}.svg`, { body: sum.norm, contentType: 'image/svg+xml' });
   if (shot && process.env.WB_PIXELS !== '0') {
-    await expect(page.locator(selector === '#ed' ? '#boardS' : '#boardP').first()).toHaveScreenshot(`${name}.png`);   // compare view clones the board: first() is the live one
+    await expect(page.locator('#boardP').first()).toHaveScreenshot(`${name}.png`);   // compare view clones the board: first() is the live one
   }
   expect(errors, 'page errors').toEqual([]);
 }
 
-// A point on the screen that really lands on a motif in the Stamp editor (the centre of a thin shape can fall in a gap, where a click hits the background).
-// Looks at the motifs in order and tries a grid of points inside each one; { pad, bottom } keep the point inside the board, { c0: true } only takes motifs of the first copy.
-function motifPoint(page, { pad = 20, bottom = 120, c0 = false } = {}) {
-  return page.evaluate(({ pad, bottom, c0 }) => {
-    const h = document.getElementById('boardS').getBoundingClientRect();
-    for (const n of document.querySelectorAll(c0 ? '#ed [data-i][data-c="0"]' : '#ed [data-i]')) {
-      const r = n.getBoundingClientRect();
-      for (let i = 0; i <= 8; i++) for (let j = 0; j <= 8; j++) {
-        const x = r.x + r.width * (0.5 + (i - 4) / 10), y = r.y + r.height * (0.5 + (j - 4) / 10);
-        if (!(x > h.x + pad && x < h.right - pad && y > h.y + pad && y < h.bottom - bottom)) continue;
-        const e = document.elementFromPoint(x, y);
-        if (e && e.closest('[data-i]') === n) return { x, y };
-      }
-    }
-    return null;
-  }, { pad, bottom, c0 });
-}
-// Stamp editor Text tool (1.38.0): typing puts the text on the cursor; a click on the stamp puts it down. This clicks the middle of the stamp, then lets go of the cursor
-// (right-click) and selects everything (Ctrl+A), so the placed text is the selected one and the panel edits it.
-async function putText(page, { select = true } = {}) {
-  const b = await page.locator('#ed').boundingBox(), x = b.x + b.width / 2, y = b.y + b.height / 2;
-  await page.mouse.move(x - 6, y - 6); await page.mouse.move(x, y); await page.mouse.click(x, y);
-  await settle(page, { max: 30000 });
-  await page.mouse.click(b.x + 4, b.y + 4, { button: 'right' }); await settle(page, { max: 30000 });
-  if (select) {
-    await page.keyboard.press('Control+a'); await settle(page, { max: 30000 });   // everything on the stamp is the text, so it is selected as one text
-  }
-}
 // Canvas flow (layer update step 11): the Stamp editor is gone, so a test that edits a stamp unlocks it in the Stamps panel and works on the Pattern canvas.
 const showPanel = async (page, id) => { const sec = page.locator(`section.pn[data-p="${id}"]:not([hidden])`).first(); if (!(await sec.isVisible())) await openPanel(page, id); };
 // unlock a stamp (the first in the list by default) so shapes, text and pictures placed on the canvas go into it
@@ -209,4 +181,4 @@ const stampInstance = async page => {
 };
 // press and release on the canvas at a point of an instance (offset in canvas units)
 const clickStamp = async (page, p, dx = 0, dy = 0) => { const c = await canvasToClient(page, p.cx + dx, p.cy + dy); await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.up(); await settle(page); };
-module.exports = { motifPoint, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, putText, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+module.exports = { ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
