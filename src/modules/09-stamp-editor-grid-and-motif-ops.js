@@ -40,8 +40,13 @@ function thick(q,c,d){return +q.w?thickF(q,0,c,d):null}
 // ordinary motifs are ink only: their carved details are see-through, so motifs behind show through the holes
 function solid(q,c,ed){const id='ks'+(clipN++),inner=+q.w?thickF(q,1):mk(q.m,'#fff','#000');
 return`<mask id="${id}" maskUnits="userSpaceOnUse" x="-110" y="-110" width="220" height="220">${inner}</mask><rect x="-110" y="-110" width="220" height="220" fill="${c}" mask="url(#${id})" pointer-events="none"/>`+(ed?`<g opacity="0">${mk(q.m,'#000','#000')}</g>`:'')}
-function items(t,cl,ed,e){let o='';expand(t).forEach(([q,i,c])=>{const SX=q.sx||1,SY=q.sy||1,r=70*q.s*Math.max(SX,SY),m0=q.k?mk(q.m,cl.d,cl.c):mk(q.m,cl.c,cl.d);
-for(const[dx,dy]of OFFS){const m=clipWrap(q,q.k?(thick(q,cl.c,cl.d)||m0):solid(q,cl.c,ed));const x=q.x+dx,y=q.y+dy;if(x+r<-e||x-r>SW+e||y+r<-e||y-r>SH+e)continue;
+// A stamp whose shapes have colours of their own (shape.ic, a colour reference) is printed in runs: neighbouring shapes of the same colour print together,
+// in the order they were put down, so a shape of one colour can lie over a shape of another. A knock-out erases what lies under it, in every run before it.
+// inkRuns gives [{c: colour ref or '' for the stamp's own ink, ix: the shape numbers, sel(i): which shapes a run's mask holds}], or null for a one-colour stamp.
+function inkRuns(t){if(t.neg||!t.items.some(q=>q.ic))return null;const a=t.items,runs=[];a.forEach((q,i)=>{if(q.k)return;const c=q.ic||'',l=runs[runs.length-1];if(l&&l.c===c)l.ix.push(i);else runs.push({c,ix:[i]})});
+ runs.forEach(r=>{const set=new Set(r.ix),end=r.ix[r.ix.length-1];r.sel=i=>set.has(i)||(!!a[i].k&&i>end)});return runs}
+function items(t,cl,ed,e,sel){let o='';expand(t).forEach(([q,i,c])=>{if(sel&&!sel(i))return;const SX=q.sx||1,SY=q.sy||1,r=70*q.s*Math.max(SX,SY),own=ed&&q.ic&&!t.neg&&!q.k?col(q.ic):cl.c,m0=q.k?mk(q.m,cl.d,cl.c):mk(q.m,own,cl.d);
+for(const[dx,dy]of OFFS){const m=clipWrap(q,q.k?(thick(q,cl.c,cl.d)||m0):solid(q,own,ed));const x=q.x+dx,y=q.y+dy;if(x+r<-e||x-r>SW+e||y+r<-e||y-r>SH+e)continue;
 o+=`<g${ed?` data-i="${i}" data-c="${c}"`:''} transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${q.r}) scale(${+(q.s*q.f*SX).toFixed(4)} ${+(q.s*SY).toFixed(4)})">${m}</g>`}});return o}
 // Stamp editor view option: show this stamp's ink surface (view only, nothing is saved to the stamp). Toggle: Ink button in the editor bar.
 const edInkDef=t=>{let o='';if(WBS.edInk&&isOf(t))o+=surfFor(t).replace('id="is'+t.id+'"','id="eis'+t.id+'"');
@@ -86,4 +91,4 @@ WBS.edMk=true;WBS.edInk=true;WBS.edTx=true;try{const g=JSON.parse(kv.get('wb33_g
 grid.sh=gShOk(grid.sh);
 ORN.forEach(k=>ARR[k]=ARR.circle);
 }
-export {ARR,clipSeed,clipWrap,gDim,grid,hx3,items,saveGrid,snapPt,snapSize,init09};
+export {ARR,clipSeed,clipWrap,gDim,grid,hx3,inkRuns,items,saveGrid,snapPt,snapSize,init09};

@@ -62,17 +62,17 @@ function trayIn(c){if(!c||typeof c!='object')return c;const o=c.proj;
  o.cwa=Math.max(0,Math.min(o.cw.length-1,o.cwa|0));
  const fix=(r,d)=>{if(typeof r!='string'||!r)return d;if(isLink(r))return seen.has(r.slice(1))?r:d;if(isFixed(r)){const [h,s]=r.split('|'),n=normHexA(h);return n?(s&&/^\w{1,12}$/.test(s)?n+'|'+s:n):d}const h=hexOfName(r);return h||d};
  o.bg=fix(o.bg,'@'+o.ts[0]);o.ink=fix(o.ink,'@'+(o.ts[1]||o.ts[0]));delete o.c3;delete o.c4;
- (c.tiles||[]).forEach(t=>{if(t&&t.ink!=null){const r=fix(t.ink,null);if(r)t.ink=r;else delete t.ink}});
+ (c.tiles||[]).forEach(t=>{if(t&&t.ink!=null){const r=fix(t.ink,null);if(r)t.ink=r;else delete t.ink}(t&&t.items||[]).forEach(q=>{if(q&&q.ic!=null){const r=fix(q.ic,null);if(r)q.ic=r;else delete q.ic}})});
  (c.layers||[]).forEach(L=>{if(!L)return;if(L.ink!=null){const r=fix(L.ink,null);if(r)L.ink=r;else delete L.ink}if(L.rp!=null){const r=fix(L.rp,null);if(r)L.rp=r;else delete L.rp}(L.pl||[]).forEach(q=>{if(q&&q.ink!=null){const r=fix(q.ink,null);if(r)q.ink=r;else delete q.ink}})});
  return c}
 // keep the live document whole (cheap when nothing is wrong): the draw loop calls it
 function trayGuard(){const o=WBS.proj;if(!o||!Array.isArray(o.ts)||!Array.isArray(o.cw)||!o.cw.length||!okC(o.bg)||!okC(o.ink))trayLive()}
 function trayLive(){WBS.proj=trayIn({proj:WBS.proj||trayDefault(),tiles:WBS.tiles||[],layers:WBS.layers||[]}).proj}
 // ---- everything that uses a slot (for the tray list, and before a slot is removed)
-// returns [{k:'paper'|'ink'|'stamp'|'layer'|'replace'|'text', i, get(), set(v)}]
+// returns [{k:'paper'|'ink'|'stamp'|'shape'|'layer'|'replace'|'text', i, get(), set(v)}]
 function refsAll(){const o=WBS.proj,out=[];
  out.push({k:'paper',get:()=>o.bg,set:v=>{o.bg=v}});out.push({k:'ink',get:()=>o.ink,set:v=>{o.ink=v}});
- WBS.tiles.forEach((t,i)=>{if(t.ink)out.push({k:'stamp',i,get:()=>t.ink,set:v=>{if(v)t.ink=v;else delete t.ink}})});
+ WBS.tiles.forEach((t,i)=>{if(t.ink)out.push({k:'stamp',i,get:()=>t.ink,set:v=>{if(v)t.ink=v;else delete t.ink}});(t.items||[]).forEach(q=>{if(q&&q.ic)out.push({k:'shape',i,get:()=>q.ic,set:v=>{if(v)q.ic=v;else delete q.ic}})})});
  WBS.layers.forEach((L,i)=>{if(L.ink)out.push({k:'layer',i,get:()=>L.ink,set:v=>{if(v)L.ink=v;else delete L.ink}});if(L.rp)out.push({k:'replace',i,get:()=>L.rp,set:v=>{if(v)L.rp=v;else delete L.rp}});
   (L.pl||[]).forEach(q=>{if(q&&q.ink)out.push({k:'text',i,get:()=>q.ink,set:v=>{if(v)q.ink=v;else delete q.ink}})})});
  return out}

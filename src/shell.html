@@ -532,7 +532,7 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 #lfpst button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}.fpn{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:var(--fs-m);color:var(--mut)}.fpn span{flex:1}.fpn button{margin:0}.fprow{gap:2px}
 .fpl{min-height:0;max-height:210px;overflow:auto;margin-top:6px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);padding:4px}.fpl .mr.on button{visibility:visible}.fpl .mr svg{background:var(--panel)}
 .strip.ls button{opacity:.4}.strip.ls button.on{opacity:1;border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}
-.smked{padding:7px 10px;font-size:var(--fs-s);color:var(--mut);border-bottom:1px solid var(--line)}.smked[hidden]{display:none}
+#sel .ctl.cwr{grid-template-columns:auto minmax(0,1fr)}.smked{padding:7px 10px;font-size:var(--fs-s);color:var(--mut);border-bottom:1px solid var(--line)}.smked[hidden]{display:none}
 .smkl{display:flex;flex-direction:column;gap:2px}.smkr{display:flex;align-items:center;gap:6px;min-height:var(--h-row);padding:0 4px;border-radius:var(--r-m);font-size:var(--fs-m);cursor:pointer}.smkr:hover{background:var(--raise)}
 .smkr.on{background:var(--acc-soft);box-shadow:inset 2px 0 0 var(--acc)}.smkr.on .smkn{font-weight:600;color:var(--acc-ink)}
 .smkth{flex:none;width:var(--h-xs);height:var(--h-xs);padding:2px;margin:0;background:var(--field);border:1px solid var(--line);border-radius:var(--r-s)}.smkth svg{display:block;width:100%;height:100%}
@@ -931,6 +931,7 @@ body.eyedrop{cursor:crosshair}
   <div class="ctl"><label>Width</label><input type="range" id="ssx" min="20" max="300" data-u="%" data-def="100"></div>
   <div class="ctl"><label>Height</label><input type="range" id="ssy" min="20" max="300" data-u="%" data-def="100"></div>
   <div class="ctl"><label>Thickness</label><input type="range" id="sth" min="-3" max="3" step="0.1" data-def="0"></div>
+  <div class="ctl cwr"><label>Colour</label><div class="cwell" id="wl_sh"></div></div>
   <span class="sdiv"></span>
   <div class="rzg" title="Nudge the selected shapes by a random amount, up to these limits. Press again for another shuffle, or Ctrl+Z to undo.">
    <span class="rzl">Jitter</span><div class="ctl"><label>Move</label><input type="range" id="rzp" min="0" max="100" value="20" data-u="%" data-def="20"></div>
