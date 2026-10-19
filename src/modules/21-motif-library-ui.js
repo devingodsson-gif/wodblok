@@ -5,7 +5,6 @@ import {CATS} from './05-motif-data.js';
 import {BF,REN,cust,fClean,fSave,lsel,mcSave,mk,pal,store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
-import {selSet} from './12-selection-and-split.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 // ===== Shape library: one list of folders, folders inside folders, multi-select and moving =====
 // Your own folders and the built-in sets sit side by side in one list (A to Z, My imports first), and any of them can hold

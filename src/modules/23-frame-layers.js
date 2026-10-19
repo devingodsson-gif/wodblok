@@ -1,6 +1,6 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {DRS} from './03-stamp-prints-and-drawing.js';
-import {CH,CM,CW,bk,cOut,col,csk,geom,hasOut,offPoly,polyArea,rng,shOf,okC} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,bk,cOut,col,csk,geom,hasOut,offPoly,polyArea,rng,shOf,okC} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,store} from './06-motif-library-folders.js';
 import {flipVOk,turnFit} from './10-layer-grids.js';
 import {eNV,eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';

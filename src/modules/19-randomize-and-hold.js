@@ -2,7 +2,7 @@ import {$,WBX} from './01-launch-and-version.js';
 import {BK,bkFlush} from './03-stamp-prints-and-drawing.js';
 import {raf} from './11-pressure-flooding-block-edges.js';
 
-// ===== v67 Randomize hold. A snapshot of what is on screen now (the pattern, or the stamp editor and its live preview) is laid over
+// ===== v67 Randomize hold. A snapshot of what is on screen now (the pattern) is laid over
 // the view while the new piece is made: its stamps printed, its lettering set. The finished piece then fades in at once, with a
 // progress bar on top of the picture and in the status bar, instead of showing the steps of the build.
 let wbHold;

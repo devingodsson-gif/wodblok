@@ -3,8 +3,8 @@ import {$,WBX} from './01-launch-and-version.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 // ===== Workspaces =====
-// A workspace is a saved arrangement of the tool panels (which tools are open, their tabs, and where they sit) for the Pattern view
-// and the Stamp editor. Pick one to set that arrangement; save the current one under a name. Kept with your settings, not in project
+// A workspace is a saved arrangement of the tool panels (which tools are open, their tabs, and where they sit) 
+// of the app. Pick one to set that arrangement; save the current one under a name. Kept with your settings, not in project
 // files. The app still starts with no tools open: a workspace only applies when you choose it.
 // It is a library (style guide 12): Yours, your folders (a path string per workspace, so folders nest), and Starting points as a built-in set.
 // Export writes a workspace, a folder or the whole library to a file; Import adds a file's workspaces and folders to yours.

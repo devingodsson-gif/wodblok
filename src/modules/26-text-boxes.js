@@ -1,7 +1,6 @@
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {C,CH,CM,CW,col,okC} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,col,okC} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
-import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {txFilt,txImgs,txIsW,txRid,txSpecs} from './16-texture-generators.js';
 import {txRefresh,txReg} from './17-texture-panel-and-previews.js';
@@ -9,7 +8,7 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {mkWell,paintWell} from './52-tray-ui.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
-import {TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
+import {txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
 import {stTxMode} from './63-stamp-tool.js';
 // ===== Text boxes. Any layer may hold them, in L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
 // The letters are stored as outlines (centred on the box), so the project needs no fonts to show them. s = the box's long side on the canvas.

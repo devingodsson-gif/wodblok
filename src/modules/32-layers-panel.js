@@ -1,5 +1,5 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {C,CM,DD,DDset,SH,SW,cItem,closeDD,col,geom,mkdd,placeFloat,rowMenu,shOf,okC} from './04-canvas-and-stamp-outlines.js';
+import {SH,SW,col,geom,rowMenu,shOf,okC} from './04-canvas-and-stamp-outlines.js';
 import {luid,mkL,store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';

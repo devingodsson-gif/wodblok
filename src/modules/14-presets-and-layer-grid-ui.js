@@ -1,13 +1,11 @@
 import {clipboard,kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,SHN,SK,csk,geom,setDim,shOf,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
-import {clean,cust,luid,mcSave,mkL,say,store} from './06-motif-library-folders.js';
-import {build,hx,leadT} from './10-layer-grids.js';
+import {say,store} from './06-motif-library-folders.js';
+import {hx,leadT} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC} from './17-texture-panel-and-previews.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
-import {lyGrp} from './24-free-place-layers.js';
-import {libDest,libG,libPath} from './21-motif-library-ui.js';
 import {wmDraw,wmGet,wmReady} from './56-watermark.js';
 // ---- Canvas & stamp shape presets
 const ASP={c:[['2:3',2,3],['3:4',3,4],['4:5',4,5],['5:7',5,7],['1:1 square',1,1],['A4 / A-series',1,1.4142],['US Letter',8.5,11],['6×9 book',6,9],['9:16 tall',9,16],['3:2',3,2],['4:3',4,3],['16:9 wide',16,9]],
@@ -34,7 +32,6 @@ const ls=WBS.tiles.filter(t=>L.st.includes(t.id)),lt=leadT(L);$('lldrow').hidden
 const k2=ls.map(t=>t.id+shOf(t).k).join('|');if($('lld').dataset.k!=k2){$('lld').innerHTML=ls.map(t=>`<option value="${t.id}">Stamp ${WBS.tiles.indexOf(t)+1} (${SHN[shOf(t).k]})</option>`).join('');$('lld').dataset.k=k2}
 if(ls.length)$('lld').value=lt.id}
 const LY=()=>WBS.layers[WBS.selL];
-const STY="One unified carved-stamp style drawn from medieval sources: the flat, heavy, firmly outlined forms of Romanesque Bible illumination; the spirals, dots and interlace of Insular manuscripts; the bold geometric shapes, stripes and scallops of Mozarabic Beatus pages; and the thick, even outline of 15th-century blockbook woodcuts. No shading, no perspective, frontal or profile poses, strong readable silhouettes.";
 const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'wodblok-pattern';return n+'.'+ext};
 const ser=()=>{const k=WBS.edMk;if(!k){WBS.edMk=true;upd()}try{return ser0()}finally{if(!k){WBS.edMk=false;upd()}}};
 // Knockouts repeat the same shape as a mask once per placement (about 1,300 copies in a busy piece: 10 MB of the 13 MB).

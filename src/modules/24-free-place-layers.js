@@ -1,12 +1,11 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {DRS} from './03-stamp-prints-and-drawing.js';
-import {CH,CM,CW,col,geom,rng,shOf,okC} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,col,geom,rng,shOf,okC} from './04-canvas-and-stamp-outlines.js';
 import {inkOf} from './06-motif-library-folders.js';
 import {gModel,gNear} from './08-grid-shapes.js';
 import {bhStrip,flipVOk,turnFit} from './10-layer-grids.js';
 import {eNV,eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
 
-function lyGrp(){const g=WBS.layers.map((l,i)=>i).filter(i=>WBS.selLM.has(WBS.layers[i].u));return g.length>1&&WBS.layers[WBS.selL]&&WBS.selLM.has(WBS.layers[WBS.selL].u)?g:[WBS.selL]}
 function tGrp(){const g=WBS.tiles.map((t,i)=>i).filter(i=>WBS.tM.has(WBS.tiles[i].id));return g.length>1&&WBS.tiles[WBS.cur]&&WBS.tM.has(WBS.tiles[WBS.cur].id)?g:[WBS.cur]}
 function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(WBS.fpMS.size>1&&WBS.fpMS.has(String(WBS.fpSel))){const g=pl.filter(q=>WBS.fpMS.has(String(q.u)));if(g.length>1)return g}const p=pl.find(q=>q.u==WBS.fpSel);return p?[p]:[]}
 function fpPoolOk(){return!!(WBS.fpB&&WBS.fpPool.size>1&&WBS.fpPool.has(String(WBS.fpB)))}
@@ -45,8 +44,8 @@ const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind
 return[defs,`<g${ink?` filter="url(#lk${li})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}
 function init24(){// ===== Free-place layers: no arrangement, just stamps put down by hand anywhere on the canvas.
 // L.pl = [{u, t: stamp id, x, y (canvas units), s: long side (canvas units), r: degrees, f: 1 | -1}]
-WBS.selLM=new Set();WBS.lAnc=null;WBS.tM=new Set();WBS.tAnc=null;WBS.mAnc=null;WBS.pSel=new Set();WBS.pAnc=null;
+WBS.selLM=new Set();WBS.lAnc=null;WBS.tM=new Set();WBS.tAnc=null;WBS.mAnc=null;
 WBS.fpMS=new Set();WBS.fpAnc=null;WBS.fpPool=new Set();WBS.fpPA=null;
 WBS.CR=null;WBS.fpB=null;WBS.fpSel=-1;WBS.fpDrag=null;WBS.fpGhost=null;WBS.fpXf=null;WBS.fpSyncing=0;WBS.fpTh={};WBS.fpAlt=false;
 }
-export {pgSnap,pgSs,fpCell,fpFG,fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnap,fpSnapS,fpTog,fpU,freeLayer,lyGrp,tGrp,init24};
+export {pgSnap,pgSs,fpCell,fpFG,fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnap,fpSnapS,fpTog,fpU,freeLayer,tGrp,init24};

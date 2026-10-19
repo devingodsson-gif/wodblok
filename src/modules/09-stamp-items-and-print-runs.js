@@ -1,21 +1,13 @@
-import {kv} from '../platform/index.js';
 import {$,WBH,WBS} from './01-launch-and-version.js';
-import {CH,CW,OFFS,ORN,SH,SW,col,geom,okC,shOf,shp,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {OFFS,ORN,SH,SW,col,okC,useT} from './04-canvas-and-stamp-outlines.js';
 import {trayGuard} from './50-tray-core.js';
-import {cols,inkOf,mk,mkL} from './06-motif-library-folders.js';
-import {expand,renderSym,symG,symOf} from './07-symmetry.js';
-import {gModel,gNear,gShOk} from './08-grid-shapes.js';
-import {lattice} from './10-layer-grids.js';
-import {eR,eSeed,eT,edgeDef} from './11-pressure-flooding-block-edges.js';
+import {cols,mk,mkL} from './06-motif-library-folders.js';
+import {expand,renderSym} from './07-symmetry.js';
 import {selFix} from './12-selection-and-split.js';
 import {renderML,sync} from './13-preview-and-stamp-tool.js';
-import {isOf} from './16-texture-generators.js';
-import {buildTex,inkCatch,surfFor,texNorm} from './17-texture-panel-and-previews.js';
+import {buildTex,texNorm} from './17-texture-panel-and-previews.js';
 import {stTxMode} from './63-stamp-tool.js';
- // the Stamp texture / Canvas texture view switches: one setting shared by the Pattern view and the Stamp editor
-let grid={on:false,n:6,sp:'c',sd:false,ss:false,op:70,sh:'rect'};const saveGrid=()=>{try{kv.set('wb33_grid',JSON.stringify(grid))}catch(e){}};
-const gDim=()=>{const n=Math.max(2,Math.min(60,Math.round(grid.n)));return[n,Math.max(1,Math.round(n*SH/SW))]};
-const snapSize=(q,s)=>{const cw=SW/gDim()[0],base=96*(q.sx||1),w=Math.max(cw,Math.round(base*s/cw)*cw);return Math.min(4,Math.max(.02,+(w/base).toFixed(3)))};
+ // the Stamp texture / Canvas texture view switches: one setting for the pattern
 // Split pieces: q.cl is a list of [angle, offset, side] half-planes in the motif's own -50..50 space.
 let clipN=0;
 // the pattern build numbers its ids from a fixed start, so the same stamps give the same text every time and the hosted outlines are only rewritten when something changed
@@ -53,9 +45,7 @@ circle:[['c-three','Packed, three-colour','honey','three'],['c-rows','Packed row
 diamond:[['d-harl','Harlequin','diamond','rows'],['d-cols','Columns','diamond','cols'],['d-diag','Diagonal stripes','diamond','dgd'],['d-pairs','Checkered pairs','diamond','check'],['d-rand','Random','diamond','rand'],['d-randt','Random, flipped','diamond','rand','r180']],
 tri:[['t-ud','Up and down','tri','check'],['t-rows','Rows','tri','rows'],['t-cols','Columns','tri','cols'],['t-diag','Diagonal stripes','tri','diag'],['t-rand','Random','tri','rand']]};
 function init09(){WBH.draw=draw;
-// ---- Stamp editor grid: N cells across, rows chosen so cells stay near-square and always whole.
-WBS.edMk=true;WBS.edInk=true;WBS.edTx=true;try{const g=JSON.parse(kv.get('wb33_grid')||'null');if(g)grid={...grid,...g}}catch(e){}
-grid.sh=gShOk(grid.sh);
+WBS.edMk=true;WBS.edInk=true;WBS.edTx=true;
 ORN.forEach(k=>ARR[k]=ARR.circle);
 }
-export {ARR,clipSeed,clipWrap,gDim,grid,hx3,inkRuns,items,saveGrid,snapSize,init09};
+export {ARR,clipSeed,clipWrap,hx3,inkRuns,items,init09};

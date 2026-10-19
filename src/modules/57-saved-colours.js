@@ -3,7 +3,7 @@ import {$,WBX} from './01-launch-and-version.js';
 import {C,rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
 import {normHexA,trayAdd,trayDone} from './50-tray-core.js';
-import {openPicker,closePicker} from './51-colour-picker.js';
+import {openPicker} from './51-colour-picker.js';
 // ===== Saved colours: one big list of single colours you keep, in folders (style guide 12) =====
 // Yours (home) holds colours that are in no folder; your folders sit beside Wada's colours, a built-in set. A folder is known by its
 // path ("Greens/Moss"); a colour stores that one path string. Kept in the settings record through the platform, like the saved trays.

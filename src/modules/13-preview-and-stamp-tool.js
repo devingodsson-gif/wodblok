@@ -1,11 +1,11 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CASP,CH,CW,DD,HO,N,ORN,SHN,SK,col,csN,csk,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {CASP,DD,HO,N,SK,col,csN,csk,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {DOTK} from './05-motif-data.js';
-import {cols,cust,inkOf,it,mk,selOne,store} from './06-motif-library-folders.js';
+import {cust,inkOf,it,mk,selOne,store} from './06-motif-library-folders.js';
 import {SYM,expand,symOf} from './07-symmetry.js';
-import {clipWrap,grid} from './09-stamp-editor-grid-and-motif-ops.js';
-import {GRAD,gArrAll,arrOf,arrOpts,build,fitTs,hx,lattice} from './10-layer-grids.js';
+import {clipWrap} from './09-stamp-items-and-print-runs.js';
+import {GRAD,arrOf,arrOpts,build,fitTs,hx,lattice} from './10-layer-grids.js';
 import {Q,eR,eT,upd} from './11-pressure-flooding-block-edges.js';
 import {sceDropShape} from './64-stamp-canvas-edit.js';
 import {QS,clampN,delItems,selSet,selToggle,wrapA} from './12-selection-and-split.js';
@@ -45,7 +45,7 @@ sv('lay',L.lay);sv('lgr',L.grid||'');const T=lattice(L),B=T.B,lk=T.linked;{const
 Object.values(DD).forEach(f=>f())}
 function init13(){
 // ---- Stamp tool: pick a motif in the library, then click on the stamp to stamp it. Scroll resizes, [ ] rotates, Esc or right-click stops.
-WBS.brush=null;WBS.gp=null;
+WBS.brush=null;
 document.addEventListener('contextmenu',e=>{if(WBS.brush){e.preventDefault();WBS.brush=null;upd();return}
 if(typeof WBS.fpB!='undefined'&&(WBS.fpB||WBS.txArm||WBS.fpSel!==-1)&&fpL()){e.preventDefault();WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}e.preventDefault()},true);
 mlFold=new Set();try{mlFold=new Set(JSON.parse(kv.get('wb18_mlfold')||'[]'))}catch(e){}
@@ -62,9 +62,9 @@ $('srt').oninput=e=>{const q=Q();if(!q)return;const v=+e.target.value,d=v-q.r;{c
 $('sko').onclick=()=>{const q=Q();if(!q)return;const on=!q.k;QS().forEach(o=>{if(on)o.k=1;else delete o.k});store();upd()};
 $('sfl').onclick=()=>{if(Q()){QS().forEach(o=>o.f*=-1);store();upd()}};
 $('scp').onclick=()=>{if(!Q())return;const a=WBS.tiles[WBS.cur].items,src=QS(),p=src.indexOf(Q()),ids=[];src.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+20,q.y+20);a.push(q);ids.push(a.length-1)});WBS.msel=new Set(ids);WBS.sel=ids[p];store();upd()};
-// Copy and paste of shapes in the Stamp editor: Cmd/Ctrl+C keeps the selected shapes, Cmd/Ctrl+V puts copies on the open stamp (also another stamp),
+// Copy and paste of shapes on an unlocked stamp: Cmd/Ctrl+C keeps the selected shapes, Cmd/Ctrl+V puts copies on the open stamp (also another stamp),
 // each paste a little further along; a picture on the clipboard still goes to the importer.
-// the open stamp takes copy and paste in the Stamp editor and, with a stamp unlocked, on the Pattern canvas
+// the open stamp takes copy and paste, with a stamp unlocked, on the Pattern canvas
 const stEdit=()=>stUnlocked()!=null;
 {let mclip=null,mpaste=0;const typingIn=t=>!!(t&&t.matches&&t.matches('input,select,textarea,[contenteditable]'));
 document.addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey)||e.altKey||e.shiftKey||e.key.toLowerCase()!='c'||typingIn(e.target)||!stEdit())return;if(String(getSelection&&getSelection()||'').length)return;const src=QS();if(!src.length)return;

@@ -1,5 +1,5 @@
 import {kv} from '../platform/index.js';
-import {$,WBX} from './01-launch-and-version.js';
+import {$} from './01-launch-and-version.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
 import {teF} from './60-text-engine.js';

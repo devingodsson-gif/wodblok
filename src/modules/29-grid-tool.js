@@ -3,10 +3,9 @@ import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {gModel,gShOk} from './08-grid-shapes.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
-import {PGD} from './18-projects-and-cover-overlay.js';
 import {fpL,fpSnap,fpSnapS,pgSnap,pgSs} from './24-free-place-layers.js';
 
-function init29(){// ===== Grid tool (Pattern mode): one grid for the whole pattern, and the one switch for snapping Free place, Pictures and Text layers. Same tool as the Stamp editor's.
+function init29(){// ===== Grid tool (Pattern mode): one grid for the whole pattern, and the one switch for snapping Free place, Pictures and Text layers.
 {let pgBusy=0;const gch=()=>{upd();if(WBX.wbCap)WBX.wbCap()};
 window.pgSync=()=>{if(!$('pgs'))return;const G=WBS.pgrid;document.querySelectorAll('#pgsh [data-sh]').forEach(b=>b.classList.toggle('on',b.dataset.sh==(G.sh||'rect')));$('pgs').checked=!!G.show;$('pgn').checked=pgSnap();$('pgss').checked=pgSs();document.querySelectorAll('#pgm [data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g==G.m));
  [['pgz',G.n],['pgo',G.op]].forEach(([id,v])=>{const el=$(id);if(+el.value!=v){el.value=v;pgBusy=1;try{el.dispatchEvent(new Event('input',{bubbles:true}))}finally{pgBusy=0}}});

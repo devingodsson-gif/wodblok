@@ -71,7 +71,6 @@ const stVIEW=[['stgti','gti','Stamp texture'],['stgtx','gtx','Canvas texture'],[
 const stViewOn=id=>$(id)?.getAttribute('aria-pressed')==='true';
 const stViewToggles=()=>stVIEW.map(([sid,bid,t])=>stTgl(sid,stViewOn(bid),t)).join('');
 const stThemeNow=()=>document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
-const stDotsNow=()=>!document.body.classList.contains('plain');
 function stAccentRow(){const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur);
  return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div></div>`}
 function stPageHtml(p){

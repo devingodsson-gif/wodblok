@@ -1,12 +1,11 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {C,CM,PL,col,okC,placeFloat,rowMenu} from './04-canvas-and-stamp-outlines.js';
-import {store} from './06-motif-library-folders.js';
+import {C,CM,PL,col,placeFloat,rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS} from './12-selection-and-split.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
-import {TRAY_MAX,TRAY_VIEW,cwAdd,cwNow,cwUse,hexAlpha,isFixed,isLink,lockRef,normHexA,refAdopt,refLabel,refSlot,slotHex,slotName,trayAdd,trayDone,trayLoad,trayMove,trayRemove,traySet,trayUses,unlockRef} from './50-tray-core.js';
+import {TRAY_MAX,TRAY_VIEW,cwAdd,cwNow,cwUse,hexAlpha,isFixed,isLink,lockRef,normHexA,refSlot,slotHex,slotName,trayAdd,trayDone,trayLoad,trayMove,trayRemove,traySet,trayUses,unlockRef} from './50-tray-core.js';
 import {closePicker,openPicker,swBg} from './51-colour-picker.js';
 // ===== The tray on screen =====
 // 1. The dock: the tray's colours above the canvas in both views (7 places, "+" to add more, up to 16). Click a colour to edit it; drag
@@ -112,7 +111,6 @@ function openWell(W){closeWell();closePicker();const o=tyP(),w=cwNow(o),r=W.spec
  const f=el.querySelector('.on')||el.querySelector('button');if(f)f.focus({preventScroll:true})}
 function paintWells(force){WELLS.forEach(W=>paintWell(W,force))}
 // ---------------------------------------------------------------- 3. the Colours tool: the tray as a list
-const USEW={paper:'Paper',ink:'Ink'};
 function usesText(id){const u=trayUses(id),n={};u.forEach(x=>{n[x.k]=(n[x.k]||0)+1});const out=[];if(n.paper)out.push('Paper');if(n.ink)out.push('Ink');
  const pl=(k,a,b)=>{if(n[k])out.push(n[k]+' '+(n[k]>1?b:a))};pl('stamp','stamp','stamps');pl('shape','shape','shapes');pl('layer','layer','layers');pl('replace','replace','replaces');pl('text','text','texts');return out.join(' · ')}
 let listK='';

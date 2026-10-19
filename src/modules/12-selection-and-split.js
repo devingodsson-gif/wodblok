@@ -18,8 +18,7 @@ const A=+(th*180/Math.PI).toFixed(3),D=+d.toFixed(3),q2=JSON.parse(JSON.stringif
 t.items.splice(WBS.split.i+1,0,q2);selOne(WBS.split.i+1);WBS.split=null;store();upd();pmsg('Split into two pieces. Drag them apart, or select either one to change it.')}
 function init12(){
 // ---- Split: place a line over the selected motif, then cut it into two pieces (each keeps its own half).
-WBS.split=null;WBS.spDrag=null;
-addEventListener('pointerup',()=>{WBS.spDrag=null});
+WBS.split=null;
 $('ssp').onclick=()=>{const q=Q();if(!q||WBS.msel.size>1)return;WBS.brush=null;WBS.split=WBS.split?null:{i:WBS.sel,x:q.x,y:q.y,a:q.r+90};WBH.draw();if(WBX.wbSceDraw)WBX.wbSceDraw()};
 $('spok').onclick=doSplit;$('spno').onclick=()=>{WBS.split=null;WBH.draw();if(WBX.wbSceDraw)WBX.wbSceDraw()};
 $('lbo').oninput=()=>{LY().bo=+$('lbo').value;store();upd()};

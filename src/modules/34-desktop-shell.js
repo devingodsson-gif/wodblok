@@ -7,8 +7,8 @@ import {trayIn} from './50-tray-core.js';
 import {selOne,store} from './06-motif-library-folders.js';
 import {nr,symOf,tbSync} from './07-symmetry.js';
 import {fitTs,migLayers} from './10-layer-grids.js';
-import {Q,upd} from './11-pressure-flooding-block-edges.js';
-import {QS,doSplit,selSet} from './12-selection-and-split.js';
+import {upd} from './11-pressure-flooding-block-edges.js';
+import {QS,doSplit} from './12-selection-and-split.js';
 import {sync} from './13-preview-and-stamp-tool.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
 import {savePr} from './15-print-effects-and-stamp-texture.js';
@@ -25,7 +25,7 @@ function init34(){// ===== Desktop shell: panels, views, zoom, number fields, me
 const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shapes',sedit:'Element editor',layers:'Layout',cover:'Book cover'};
 let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
-// ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
+// ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
 const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shapes',mlist:'Shape list',sedit:'Element editor',layers:'Layout',stmp:'Stamps',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
@@ -35,7 +35,7 @@ const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tab
 const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]});
 let WS={pattern:wsDef()};
 try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}})}catch(e){}
-WS.pv=1;WS.gr=1;WS.ly=1;WS.rs=1;WS.tx=1;
+
 const wsSave=()=>{try{kv.set('wb30_ws',JSON.stringify(WS))}catch(e){}};
 const wsL=()=>WS.pattern;
 const wsAll=()=>[...wsL().dock,...wsL().float];
@@ -166,7 +166,7 @@ const stage=document.querySelector('.stage');
 // the stamp tray can collapse to a thin strip, to give a small window more room for the picture; the choice is remembered
 {const f=stage.querySelector('.film'),b=$('filmt');if(f&&b){const ap=(m,save)=>{f.classList.toggle('min',m);b.setAttribute('aria-expanded',String(!m));b.setAttribute('aria-label',m?'Show stamp tray':'Hide stamp tray');b.title=b.getAttribute('aria-label');stage.style.setProperty('--film-h',f.offsetHeight+'px');if(save){try{kv.set('wb_film_min',m?'1':'0')}catch(e){}}};
  let m0=false;try{m0=kv.get('wb_film_min')==='1'}catch(e){}b.onclick=()=>ap(!f.classList.contains('min'),true);ap(m0,false);try{new ResizeObserver(()=>stage.style.setProperty('--film-h',f.offsetHeight+'px')).observe(f)}catch(e){}}}
-function setView(){if(window.bkZ)requestAnimationFrame(()=>bkZ());$('boardP').classList.remove('off');stage.classList.add('pv');$('zoomc').style.display='';requestAnimationFrame(applyZ);tbSync();if(WBX.wbTxMode)WBX.wbTxMode(stUnlocked()==null?'pattern':'stamp');wsRender()}
+function setView(){if(window.bkZ)requestAnimationFrame(()=>bkZ());$('boardP').classList.remove('off');$('zoomc').style.display='';requestAnimationFrame(applyZ);tbSync();if(WBX.wbTxMode)WBX.wbTxMode(stUnlocked()==null?'pattern':'stamp');wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';if(!wsReady)setView();
 const L=wsL();let g=wsFind(p);
 // a tool that is not open yet opens docked on the right: Randomize beside the colour tools, anything else as a tab in the first group
@@ -195,7 +195,6 @@ setPanel(p)};
 
 // tool bar editing: the three-line button lists the tools that are off the bar; while it is open each tool on the bar shows an X to take it off; tools drag to a new place
 {const more=$('rmore'),menu=$('rmenu');let ed=false,drag=null,jus=0;
-const xsvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 const vis=()=>railBtns().filter(b=>!MODEP.pattern.includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)?false:true);
 function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP.pattern.includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn));
 {const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML+'<span class="tip">'+b.getAttribute('aria-label')+'</span>';if(wsFind(b.dataset.pn))m.classList.add('on');g.appendChild(m)});menu.append(g)}
@@ -247,8 +246,6 @@ railEl.addEventListener('pointermove',e=>{if(e.pointerType!='mouse'||D&&D.on)ret
 railEl.addEventListener('pointerleave',hvClear);
 railOrder();
 }
-// hide the motif bar outside the stamp editor
-const st=document.createElement('style');st.textContent='.stage.pv #sel{display:none!important}';document.head.appendChild(st);
 
 // ===== Randomize panel: which main features a roll may change. Anything switched off stays exactly as it is. Settings are remembered.
 (()=>{const sec=document.querySelector('section.pn[data-p="rand"]'),fts=[...sec.querySelectorAll('[data-ft]')],subs=[...sec.querySelectorAll('[data-sub]')],KEY='wb38_rzft',SKEY='wb50_rzsub',by=k=>fts.find(c=>c.dataset.ft==k),sk=m=>subs.filter(c=>c.dataset.sub.startsWith(m+'.'));
@@ -275,7 +272,6 @@ const amt=k=>{const c=by(k);return c&&eff(c)?amtOf(c):0};
 const FK='wb160_rzfold',fbox=sec.querySelector('[data-rzfbox]'),flist=sec.querySelector('[data-rzflist]'),fbtn=sec.querySelector('[data-rzfx]');
 let foff=new Set(),FS=[];try{const z=JSON.parse(kv.get(FK)||'[]');if(Array.isArray(z))foff=new Set(z.filter(v=>typeof v=='string'))}catch(e){}
 const fPick=()=>FS.filter(x=>x.c>0),fOn=x=>!foff.has(x.v),fHas=()=>FS.some(x=>x.ks.length&&fOn(x));
-const fKids=i=>{const o=[];for(let j=i+1;j<FS.length&&FS[j].d>FS[i].d;j++)o.push(FS[j]);return o};
 const fLabel=()=>{try{FS=libRz()}catch(e){return}const p=fPick(),n=p.filter(fOn).length,all=n==p.length;fbtn.querySelector('.rzn').textContent=all?'All':n+'/'+p.length;fbtn.classList.toggle('part',!all)};
 const fSaveOff=()=>{try{kv.set(FK,JSON.stringify([...foff]))}catch(e){}};
 function fPaint(){try{FS=libRz()}catch(e){FS=[]}flist.textContent='';FS.forEach(x=>{const l=document.createElement('label'),c=document.createElement('input'),s=document.createElement('span');l.className='chk sub';l.style.marginLeft=(x.d*14)+'px';if(!x.c)l.style.opacity='.45';c.type='checkbox';c.dataset.fv=x.v;c.checked=x.c>0&&fOn(x);c.disabled=!x.c;s.textContent=x.n;l.append(c,s);flist.appendChild(l)});fLabel()}
@@ -294,7 +290,6 @@ function applyZ(){fitZ();const s=z||fitS;$('art').style.width=Math.round(CW*s)+'
 function zoomAt(ns,cx,cy){const b=$('boardP'),a=$('art'),r0=a.getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);z=Math.min(8,Math.max(.1,ns));applyZ();const r1=a.getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
 const zoomMid=f=>{const r=$('boardP').getBoundingClientRect();zoomAt((z||fitS)*f,r.left+r.width/2,r.top+r.height/2)};
 WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbZoomTo=s=>{const r=$('boardP').getBoundingClientRect();zoomAt(s,r.left+r.width/2,r.top+r.height/2)};WBX.wbZoomNow=()=>z||fitS;WBX.wbZoomIn=()=>!!z&&z>fitS*1.001;
-// ---- zoom in the Stamp editor: at Fit the editor is the size of its box; zooming makes it larger inside a scrolling box (1x to 8x)
 $('zi').onclick=()=>zoomMid(1.25);$('zo').onclick=()=>zoomMid(1/1.25);$('zl').onclick=()=>{z=0;applyZ()};
 $('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomAt((z||fitS)*(e.deltaY<0?1.1:1/1.1),e.clientX,e.clientY)},{passive:false});
 try{new ResizeObserver(()=>applyZ()).observe($('boardP'))}catch(e){window.addEventListener('resize',applyZ)}

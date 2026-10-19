@@ -1,14 +1,11 @@
 import {$,WBH,WBS,WBX,mod} from './01-launch-and-version.js';
 import {BK,bkH} from './03-stamp-prints-and-drawing.js';
-import {shBleed,HO,OFFS,ORN,SH,SK,SW,col,ornPts,rng,shp,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
-import {inkOf,it,selOne,store} from './06-motif-library-folders.js';
-import {symOps} from './07-symmetry.js';
-import {grid,inkRuns,items,snapSize} from './09-stamp-editor-grid-and-motif-ops.js';
+import {shBleed,HO,ORN,SH,SK,SW,col,ornPts,rng,shp,useT} from './04-canvas-and-stamp-outlines.js';
+import {inkOf,it} from './06-motif-library-folders.js';
+import {inkRuns,items} from './09-stamp-items-and-print-runs.js';
 import {build,hx} from './10-layer-grids.js';
-import {selToggle} from './12-selection-and-split.js';
 import {isOf} from './16-texture-generators.js';
 import {txoG} from './17-texture-panel-and-previews.js';
-import {lyGrp} from './24-free-place-layers.js';
 // Uneven pressure + ink flooding. Each impression uses one of 16 random "heavy side" directions.
 // Thickness: the stamp's ink map is softened, then re-thresholded with a ramp across the stamp
 // (low threshold = thicker on the heavy side, high threshold = thinner on the light side).
@@ -96,7 +93,7 @@ EDC=new Map();
 WBX.hdResize=hdResize;
 // Pulling a corner or a side square: the opposite corner or side stays where it is; with Shift the motif grows from its middle. Works in the motif's own (turned) frame.
 function hdResize(h,p,e){const q=h.q,a=-h.r0*Math.PI/180,dx=p.x-h.cx,dy=p.y-h.cy,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),rx0=48*h.s0*h.sx0,ry0=48*h.s0*h.sy0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ns=h.s0,nx=h.sx0,ny=h.sy0,ox=0,oy=0;
-if(h.k.length==2){const cx=h.k[1]=='e'?1:-1,cy=h.k[0]=='s'?1:-1,Cx=cx*rx0,Cy=cy*ry0,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy);ns=cl(+(h.s0*k).toFixed(3),.02,4);if(grid.sd&&grid.ss&&!e.altKey){q.s=h.s0;q.sx=h.sx0;q.sy=h.sy0;ns=snapSize(q,ns)}k=ns/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
+if(h.k.length==2){const cx=h.k[1]=='e'?1:-1,cy=h.k[0]=='s'?1:-1,Cx=cx*rx0,Cy=cy*ry0,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy);ns=cl(+(h.s0*k).toFixed(3),.02,4);k=ns/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
 else if(h.k=='e'||h.k=='w'){const d=h.k=='e'?1:-1,w=mid?Math.abs(lx)*2:d*lx+rx0;nx=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)ox=-d*rx0+d*48*h.s0*nx}
 else{const d=h.k=='s'?1:-1,w=mid?Math.abs(ly)*2:d*ly+ry0;ny=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)oy=-d*ry0+d*48*h.s0*ny}
 q.s=ns;if(nx!=1||q.sx)q.sx=nx;if(ny!=1||q.sy)q.sy=ny;const r=-a;q.x=+(h.cx+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(2);q.y=+(h.cy+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(2)}

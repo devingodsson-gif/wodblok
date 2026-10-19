@@ -6,7 +6,7 @@ import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
 import {savePr} from './15-print-effects-and-stamp-texture.js';
-import {TXF,TXMD,TXMN,TXN,isOf,txClean,txEnsure,txFilt,txImgs,txIsO,txIsW,txKey,txLib,txMake,txPix,txRid,txSame,txSpecs,txUid,txUniq} from './16-texture-generators.js';
+import {TXF,TXMD,TXMN,TXN,isOf,txClean,txFilt,txImgs,txIsO,txIsW,txKey,txLib,txMake,txPix,txRid,txSame,txSpecs,txUid,txUniq} from './16-texture-generators.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 
 // ---- where each target gets its pictures ----

@@ -1,5 +1,5 @@
 import {$} from './01-launch-and-version.js';
-// ===== The Text panel's controls, read and written in ONE place. The Stamp editor (22) and the Text layer (26) both use these, so a new text option is added here and in the engine only.
+// ===== The Text panel's controls, read and written in ONE place. A stamp's text (22) and the Text layer (26) both use these, so a new text option is added here and in the engine only.
 // Optional options are saved on a text only when set, so old files and snapshots do not change.
 const TXO_NUM=[['sz','tx_sz'],['ls','tx_ls'],['ws','tx_ws'],['lh','tx_lh']],TXO_BOX=[['wd','tx_wd'],['ht','tx_ht'],['cv','tx_cv'],['rot','tx_rot']],TXO_OPT=[['pd','tx_pd'],['rp','tx_rp'],['rr','tx_rr'],['rs','tx_rs'],['bb','tx_bb'],['ind','tx_ind'],['psp','tx_psp'],['wa','tx_wa']];
 const TXO_SEG=[['al','tx_al','a',1],['tc','tx_tc','c',1],['va','tx_va','v',1],['ov','tx_ov','o',0],['sc','tx_scat','s',0],['bal','tx_bal','b',0]];

@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {C,CC,CH,CM,CSN,CW,PCOL,SHN,bk,paintColors,saveCC,setDim,shOf} from './04-canvas-and-stamp-outlines.js';
+import {C,CC,CH,CM,CW,bk,paintColors,saveCC,setDim,shOf} from './04-canvas-and-stamp-outlines.js';
 import {DEF_TILES,clean,cust,mkL,selOne,store} from './06-motif-library-folders.js';
 import {gShOk} from './08-grid-shapes.js';
 import {migLayers} from './10-layer-grids.js';
@@ -66,7 +66,6 @@ let pmT=0;const pmsg=t=>{if(typeof t=='string'&&/Mac|iPhone|iPad/.test(navigator
 const dirty=()=>coreStr()!==WBS.cp.saved||$('pnm').value.trim()!==WBS.cp.name;
 function paintPst(){const u=dirty(),e=$('pst');e.textContent='';e.className=u?'dirty':'';e.title=u?'Unsaved changes':'';if(u)e.setAttribute('role','img'),e.setAttribute('aria-label',e.title);else e.removeAttribute('aria-label')}
 const newId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-const shapeInfo=d=>{const k=d.dim&&d.dim.k||'rect',c=d.dim&&d.dim.c||[2,3];return`${d.dim&&CSN[d.dim.cs]&&d.dim.cs!='rect'?CSN[d.dim.cs]:(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2))} canvas · ${({hex:'hex',circle:'circle',diamond:'diamond',tri:'triangle'})[k]||(SHN[k]||'Rectangle').toLowerCase()} stamps · ${d.tiles.length} stamp${d.tiles.length>1?'s':''}`};
 function thumb(w0){return new Promise(res=>{try{const img=new Image(),to=setTimeout(()=>res(''),5000);img.onload=()=>{try{const w=w0||200,h=Math.round(w*CH/CW),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);clearTimeout(to);res(c.toDataURL('image/jpeg',.7))}catch(e){res('')}};img.onerror=()=>res('');img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())}catch(e){res('')}})}
 // The project as it is written to a file: the document plus the pictures Art layers use (so another project can take this one as a picture).
 async function fileSnap(){const sn=snapshot(),a=await artSnap();if(a)sn.art=a;return sn}

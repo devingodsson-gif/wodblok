@@ -11,9 +11,8 @@ import {STP,stMatrix,stUnlocked,stampAt} from './63-stamp-tool.js';
 // With a stamp unlocked, the Pattern canvas edits that stamp through the instance printed under the pointer: a click with a shape picked in the
 // Shapes panel puts the shape in the stamp, a click on a shape inside an instance selects it, dragging moves it, the square handles resize it and
 // the round one turns it. Every point is moved from the canvas into the stamp's own space with the inverse of the instance's matrix (see 63-stamp-tool.js),
-// so the shape lands where it was pointed at whatever the layer's rotation, turn, flip or size variation. The stamp's items are the same list the
-// Stamp editor edits, so every instance and every layer that uses the stamp shows the edit. Clicks that do not land on an instance of the unlocked stamp
-// are left to the layer, as before. Text typed in the Text panel is put into the stamp the same way (as the letters the Stamp editor makes); a click on a
+// so the shape lands where it was pointed at whatever the layer's rotation, turn, flip or size variation. The stamp's items are one list, so every instance and every layer that uses the stamp shows the edit. Clicks that do not land on an instance of the unlocked stamp
+// are left to the layer, as before. Text typed in the Text panel is put into the stamp the same way (as letters tagged tg); a click on a
 // letter of such a text selects the whole text (Alt-click one letter), which puts the text into the Text panel to be edited live.
 const SCE={d:null,h:null,m:null,sp:null,ai:null};
 // the unlocked stamp, if it is also the open stamp (the selection indexes belong to the open stamp)

@@ -133,15 +133,6 @@ else{const mh=Math.min(h,above);el.style.maxHeight=mh+'px';top=r.top-g-mh}
 const w=el.offsetWidth;let left=right?r.right-w:r.left;left=Math.max(pad,Math.min(left,vw-w-pad));
 el.style.left=left+'px';el.style.top=top+'px'}
 const DD={},DDset={},esc=x=>String(x).replace(/&/g,'&amp;'),closeDD=()=>document.querySelectorAll('.ddl').forEach(l=>l.hidden=true);
-function mkdd(id,items){const sel=$(id),w=document.createElement('div');w.className='dd';
-w.innerHTML='<button type="button" class="ddb"></button><div class="ddl" hidden></div>';sel.after(w);sel.style.display='none';
-const b=w.firstChild,l=w.lastChild;let last;
-const fill=()=>{l.innerHTML=items.map(o=>`<div class="ddi" data-v="${o.v}">${o.h}</div>`).join('')};fill();
-b.onclick=e=>{e.stopPropagation();const open=l.hidden;closeDD();if(typeof closeMenus=='function')closeMenus();l.hidden=!open;if(open){placeFloat(l,b,false,300);const c=l.querySelector('.cur');if(c)l.scrollTop=c.offsetTop-(l.clientHeight-c.offsetHeight)/2}};
-l.onclick=e=>{const i=e.target.closest('.ddi');if(!i)return;sel.value=i.dataset.v;l.hidden=true;last=undefined;DD[id]();sel.dispatchEvent(new Event('input'))};
-DD[id]=()=>{if(sel.value===last)return;last=sel.value;const o=items.find(o=>String(o.v)==sel.value)||items[0];b.innerHTML=o.h+'<em>▾</em>';l.querySelectorAll('.ddi').forEach(i=>i.classList.toggle('cur',i.dataset.v==sel.value))}
-DDset[id]=n=>{items=n;fill();last=undefined;DD[id]()}}
-const cItem=([n,h])=>({v:n,h:`<span class="chip" style="background:${h}"></span>${esc(n)}`});
 function paintColors(){if(window.lyInkOn)lyInkFill();if(WBX.wbTrayPaint)WBX.wbTrayPaint(true)}
 const N=[],M=[];
 function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -161,4 +152,4 @@ CM=Object.fromEntries(C);
 PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return[WADA_NAMES[i]||'No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj=trayDefault();try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 }
-export {shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cItem,cOut,closeDD,closeRowMenu,col,csN,csk,geom,hasOut,inShape,init04,mkdd,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
+export {shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csN,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};

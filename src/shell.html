@@ -45,7 +45,6 @@ input[type=range]::-webkit-slider-thumb{transition:transform var(--t-fast),box-s
 /* v93 chrome */
 .top{padding-left:var(--tl,0px)}
 #pst{flex:none;width:8px;height:8px;border-radius:50%;background:transparent;transition:background var(--t-slow)}#pst.dirty{background:var(--warn)}
-.status #pwhere{display:none!important}
 body.plain{--stage-dot:transparent}
 #splash{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:var(--stage);transition:opacity var(--t-slow) ease}
 #splash.out{opacity:0;pointer-events:none}
@@ -149,8 +148,7 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 .psr:hover,.psr:focus-visible{background:var(--raise)}.psr b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .psr .th{width:32px;height:32px;border-radius:var(--r-m);border:1px solid var(--line);overflow:hidden;background:var(--field);display:flex;align-items:center;justify-content:center}.psr .th img{width:100%;height:100%;object-fit:cover}
 .psr .th i{width:100%;height:100%;background:linear-gradient(135deg,var(--acc-soft),var(--line))}
-.psr .ib{width:26px;height:26px}.psr .ib svg{width:14px;height:14px}.psr input{height:26px}
-.ps #prfind{margin-bottom:6px}.ppl{max-height:340px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);padding:4px}
+.psr .ib{width:26px;height:26px}.psr .ib svg{width:14px;height:14px}.psr input{height:26px}.ppl{max-height:340px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);padding:4px}
 .ppr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;padding:4px 8px;border-radius:var(--r-m);cursor:pointer;font-size:var(--fs-m)}
 .ppr:hover,.ppr:focus-visible{background:var(--acc-soft)}.ppr b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ppr small{color:var(--faint);font-size:var(--fs-s)}
 .ppr .sw4{display:flex;border-radius:var(--r-s);overflow:hidden;border:1px solid rgba(128,128,128,.4)}.ppr .sw4 i{display:block;width:13px;height:20px}
@@ -312,7 +310,7 @@ button.alt{background:var(--raise)}
 
 .gms{border-bottom:1px solid var(--line);margin:-2px 0 2px}.gms .lyl2{max-height:240px}
 .gmi{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--mut)}.gmi svg{width:16px;height:16px}.lyr.on .gmi{color:var(--acc-ink)}.gmsp{width:22px;flex:none}
-.gmadd{flex:none}.gmadd .ddl{left:auto;right:-58px;width:236px}#ly_menu{width:190px;right:-8px}.gmadd .ddi{align-items:flex-start}.gmadd .ddi .gmi{margin-top:2px}
+.gmadd{flex:none}.gmadd .ddl{left:auto;right:-58px;width:236px}.gmadd .ddi{align-items:flex-start}.gmadd .ddi .gmi{margin-top:2px}
 #gm_body{padding-bottom:6px}#gm_body .lyo .seg{flex:1}#gm_body .seg button{padding:0 4px}
 .gmc{display:flex;gap:6px;flex:1;min-width:0}.gmc select{flex:1;min-width:0}.gmc .ib{width:30px;height:30px;flex:none}.gmc .ib[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink)}#art.gmpick,#art.gmpick *{cursor:crosshair!important}.gmc input[type=color]{width:30px;height:30px;padding:2px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);flex:none;cursor:pointer}
 .gmchk{display:flex;flex-wrap:wrap;gap:4px 16px;padding:2px 8px 4px}.gmchk .chk{margin-top:6px}
@@ -386,7 +384,7 @@ button.alt{background:var(--raise)}
 .tdl{position:fixed;width:3px;border-radius:2px;background:var(--acc);pointer-events:none;z-index:9999}.tabs.tdrag{cursor:grabbing}.tabs.tdrag button{cursor:grabbing}.tabs button.tgh{opacity:.45}
 
 /* contextual motif bar */
-/* Stamp editor: the motif controls bar floats over the bottom of the editor while a motif is selected, so no empty band is kept under the stamp. */
+/* The motif controls bar floats over the bottom of the editor while a motif is selected, so no empty band is kept under the stamp. */
 #sel{flex:none;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 12px;padding:8px 12px;white-space:nowrap}#sel.none{opacity:.45;pointer-events:none}
 #sel .ctl{margin:0;width:auto;grid-template-columns:auto 96px 50px}#sel .ctl label{overflow:visible}
 #sel .row{margin:0;flex-wrap:nowrap;gap:2px}
@@ -484,7 +482,6 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 .combo{flex:none;min-width:52px;height:20px;border-radius:var(--r-s);border:1px solid rgba(128,128,128,.4);font:600 11px Georgia,serif;text-align:center;line-height:18px}
 .combo.sws{display:flex;width:52px;overflow:hidden}.combo.sws i{display:block;flex:1 1 0;height:100%}
 .cst{color:var(--acc);margin-right:6px;font-size:var(--fs-s)}
-#pswp{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 8px;font-size:var(--fs-m)}#pswp .ic{width:14px;height:14px}
 
 /* color library */
 .cl{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px;margin-top:8px;max-height:none}
@@ -495,7 +492,6 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 .cl .plus{display:flex;align-items:center;justify-content:center;font-size:18px;font-style:normal;color:var(--mut);height:100%;background:var(--field)}
 .cf{margin-top:8px;padding:8px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field)}
 #cpk{flex:none;width:38px;height:30px;padding:0;border:1px solid var(--line);background:none;border-radius:var(--r-m)}
-#chx{flex:1;min-width:0;width:auto}
 
 /* symmetry */
 .sym{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
@@ -593,7 +589,6 @@ body.dropping::after{content:"Drop the image to import it";position:fixed;inset:
 .lib .dx{position:absolute;top:2px;right:2px;width:18px;height:18px;padding:0;border-radius:50%;font-size:var(--fs-s);line-height:16px;display:none;background:var(--raise);border:1px solid var(--line2);color:var(--mut)}
 /* Shapes library: path bar, one list of folders (built-in sets and your own), folders inside folders */
 .lnav{display:flex;align-items:center;gap:2px;min-height:30px}.lnav .ib{width:30px;height:30px;flex:none}.lnav .ib svg{width:16px;height:16px}.lnav .ib[aria-pressed="true"]{color:var(--acc-ink);background:var(--acc-soft)}.lnav .ib:disabled{opacity:.35}
-#lback{margin-left:-4px}
 .lcr{flex:1;min-width:0;display:flex;align-items:center;gap:2px;font-size:var(--fs-m);overflow:hidden;white-space:nowrap;padding-right:4px}
 .lcb{flex:0 1 auto;min-width:0;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0;padding:4px 4px;border:0;border-radius:var(--r-m);background:transparent;color:var(--mut);font-size:var(--fs-m);font-weight:400}.lcb:hover{background:var(--line);color:var(--fg)}
 .lcs{flex:none;font-style:normal;color:var(--faint);padding:0 2px}
@@ -626,7 +621,7 @@ body.dropping::after{content:"Drop the image to import it";position:fixed;inset:
 button.warn{background:var(--warn);border-color:var(--warn);color:#fff;font-weight:600}
 /* Import: where new shapes go, and the two ways in */
 .idz{display:grid;gap:8px;padding:12px;border:1.5px dashed var(--line2);border-radius:var(--r-l);background:var(--field)}
-.idd{display:flex;align-items:center;gap:8px;min-width:0;font-size:var(--fs-m);color:var(--mut)}.idd .idi{flex:none;width:15px;height:15px}#idest{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg);font-weight:500}
+.idd{display:flex;align-items:center;gap:8px;min-width:0;font-size:var(--fs-m);color:var(--mut)}.idd .idi{flex:none;width:15px;height:15px}
 .idb{display:grid;grid-template-columns:1fr 1fr;gap:6px}.idb .btn{justify-content:center;margin:0}
 .ipt{margin-top:8px;grid-template-columns:1fr 1fr}#ipsz{margin-top:8px}
 .fform{display:flex;gap:6px;margin-top:8px}.fform input{flex:1;min-width:0}.fform button{margin:0}
@@ -639,7 +634,7 @@ button.warn{background:var(--warn);border-color:var(--warn);color:#fff;font-weig
 .txpv{margin-top:8px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);padding:6px;color:var(--fg)}.txpv svg{display:block;width:100%;max-height:220px}
 .lib>div{position:relative}.lib>div:hover .dx,.lib>div:focus-within .dx,.lib>div:has(.ck) .dx{display:block}.lib>div>button:first-child{width:100%}
 @media (max-width:860px){
-#sel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 12px;padding:8px 8px}#sel .ctl{grid-template-columns:auto minmax(0,1fr) 46px;gap:6px}#sel .sdiv{display:none}#sel>.row{grid-column:1/-1;justify-content:center;gap:8px}#sel .rzg{grid-column:1/-1}#edhint.edhint{display:none!important}#sel .ib{width:30px;height:30px}.board{min-height:44vh}.modal.modal{padding:8px;align-items:flex-start}.dlg.dlg{width:100%;max-width:100%;max-height:calc(100vh - 16px);min-width:0}.dlg-b{min-width:0}.icmp>*{min-width:0}.icmp{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.ictl{grid-column:1/-1;min-width:0}.ictl .ctl{grid-template-columns:92px minmax(0,1fr) 30px}.ifoot span{display:none}.ifoot{justify-content:flex-end}.pgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.dlg-h{flex-wrap:wrap}}
+#sel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 12px;padding:8px 8px}#sel .ctl{grid-template-columns:auto minmax(0,1fr) 46px;gap:6px}#sel .sdiv{display:none}#sel>.row{grid-column:1/-1;justify-content:center;gap:8px}#sel .rzg{grid-column:1/-1}#sel .ib{width:30px;height:30px}.board{min-height:44vh}.modal.modal{padding:8px;align-items:flex-start}.dlg.dlg{width:100%;max-width:100%;max-height:calc(100vh - 16px);min-width:0}.dlg-b{min-width:0}.icmp>*{min-width:0}.icmp{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.ictl{grid-column:1/-1;min-width:0}.ictl .ctl{grid-template-columns:92px minmax(0,1fr) 30px}.ifoot span{display:none}.ifoot{justify-content:flex-end}.pgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.dlg-h{flex-wrap:wrap}}
 /* projects dialog */
 .modal{position:fixed;inset:0;background:rgba(10,11,14,.45);display:flex;align-items:center;justify-content:center;z-index:80;padding:30px}
 .dlg{width:min(920px,100%);max-height:100%;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow);overflow:hidden}

@@ -9,7 +9,7 @@ import {init05} from './modules/05-motif-data.js';
 import {init06} from './modules/06-motif-library-folders.js';
 import {init07} from './modules/07-symmetry.js';
 import {init08} from './modules/08-grid-shapes.js';
-import {init09} from './modules/09-stamp-editor-grid-and-motif-ops.js';
+import {init09} from './modules/09-stamp-items-and-print-runs.js';
 import {init11} from './modules/11-pressure-flooding-block-edges.js';
 import {init12} from './modules/12-selection-and-split.js';
 import {init13} from './modules/13-preview-and-stamp-tool.js';

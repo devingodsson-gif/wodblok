@@ -5,7 +5,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {txRid} from './16-texture-generators.js';
 import {fpCell,fpFG,fpGrp,fpL,fpPoolOk,fpSnap,fpSnapS,fpTog,fpU} from './24-free-place-layers.js';
 import {artBU,crBox,crPts,crRef,fpBox,fpFlip,fpHandles,fpHit,fpPt,fpRot,fpSz,fpWH} from './25-art-layers.js';
-import {tbG,tbRead,tbSty} from './26-text-boxes.js';
+import {tbG,tbSty} from './26-text-boxes.js';
 // ===== Crop editor for Art pieces. CR = {u piece, A picture, pts, m 'r'|'p', lv ratio, osw, all, sel vertex, drag, cu/cv middle of the crop the piece was placed by}
 function crP(){const L=fpL();return L&&WBS.CR?(L.pl||[]).find(q=>q.u==WBS.CR.u):null}
 const crC=v=>Math.max(0,Math.min(1,v)),crRect=(a,b,c,d)=>[[a,b],[c,b],[c,d],[a,d]];

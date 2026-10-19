@@ -21,12 +21,11 @@ const stName=id=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==id)+1);
 function stUnlocked(){if(STP.un==null)return null;const L=stSel();if(!L||L.u!==STP.unL||!WBS.tiles.some(t=>t.id==STP.un)){STP.un=null;STP.unL=null;return null}return STP.un}
 // stamps in this layer's arrangement plus stamps placed freely on the layer, counted once per layer
 const stUses=id=>WBS.layers.filter(L=>(L.st||[]).includes(id)||(L.pl||[]).some(p=>p.t==id)).length;
-function stAccepts(id){return stUnlocked()===id}
 // build() calls these three: begin before the layers are drawn, add for every printed stamp of the selected layer, end after
 function stOlBegin(){const L=stSel();STP.on=!!L&&!!L.vis&&!L.free&&!(L.fr&&L.fr.on);STP.items=[];STP.rot=0}
 function stOlPath(id,d){STP.p[id]={d,p2:null}}
 function stOlAdd(id,tr,rot,w,h){if(!STP.on)return;const m=STTRRE.exec(tr);if(!m)return;STP.rot=rot||0;STP.items.push([id,+m[1],+m[2],+m[3],+m[4],+m[5],w,h])}
-// The Text panel builds letters in the stamp (the Stamp editor's way) while a stamp is unlocked, and fills a Text layer otherwise
+// The Text panel builds letters in the stamp (letters tagged tg) while a stamp is unlocked, and fills a Text layer otherwise
 const stTxMode=()=>stUnlocked()!=null;
 function stTextSync(){if(!WBX.wbTxMode)return;const m=stTxMode();if(STP.txm===m)return;STP.txm=m;WBX.wbTxMode(m?'stamp':'pattern')}
 function stOlEnd(){stOlPaint();stPanel();stTextSync()}
@@ -94,4 +93,4 @@ function init63(){
  stBar();
   if(typeof IntersectionObserver=='function')new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting))stPanel(true)}).observe(list)}
 }
-export {STP,stTxMode,stMatrix,stDelete,stDup,stNew,stZoom,init63,stAccepts,stLock,stOlAdd,stOlBegin,stOlEnd,stOlPaint,stOlPath,stPanel,stSetOp,stUnlocked,stampAt,stampToCanvas};
+export {STP,stTxMode,stMatrix,stDelete,stDup,stNew,stZoom,init63,stLock,stOlAdd,stOlBegin,stOlEnd,stOlPaint,stOlPath,stPanel,stSetOp,stUnlocked,stampAt,stampToCanvas};

@@ -4,7 +4,7 @@ import {inkOf,pal,store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {eT,upd} from './11-pressure-flooding-block-edges.js';
 import {ser} from './14-presets-and-layer-grid-ui.js';
-import {fpFG,fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnap,fpSnapS,fpTog,fpU} from './24-free-place-layers.js';
+import {fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnapS,fpTog,fpU} from './24-free-place-layers.js';
 import {fx1,tbG,tbSty,txbSync,txtGl} from './26-text-boxes.js';
 
 // ===== Art layers: imported images and saved WODBLOK projects, placed by hand like Free place stamps =====
