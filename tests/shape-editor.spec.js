@@ -10,28 +10,28 @@ const place = async (page, x, y) => { await page.locator('#lib button[data-m]').
 test('placing a shape opens the Shape editor docked at the bottom; Auto-open off keeps it closed; the rail button opens it; it dims with nothing selected', async ({ page }) => {
   const { errors } = await openApp(page);
   await setMode(page, 'stamp');
-  await expect(page.locator('.wtab', { hasText: 'Shape editor' })).toHaveCount(0);   // nothing open at launch
+  await expect(page.locator('.wtab', { hasText: 'Element editor' })).toHaveCount(0);   // nothing open at launch
   await openPanel(page, 'motifs');
   await page.click('#lib .lfr[data-f="b:Flowers"]');                // folders open in place (1.5.0)
   await place(page, 590, 330);
-  await expect(page.locator('.wtab.on', { hasText: 'Shape editor' })).toHaveCount(1);
+  await expect(page.locator('.wtab.on', { hasText: 'Element editor' })).toHaveCount(1);
   expect(await page.evaluate(() => !!document.getElementById('sel').closest('.dk-b')), 'docked at the bottom by default').toBe(true);
   expect(await page.evaluate(() => !!document.getElementById('sel').closest('.wg.fl')), 'not floating').toBe(false);
   await expect(page.locator('#seauto')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#sel')).not.toHaveClass(/none/);
   // a second shape does not open a second panel
   await place(page, 590, 440);
-  await expect(page.locator('.wtab', { hasText: 'Shape editor' })).toHaveCount(1);
+  await expect(page.locator('.wtab', { hasText: 'Element editor' })).toHaveCount(1);
   // switch Auto-open off, close the panel, place again: it stays closed
   await page.click('#seauto');
   await expect(page.locator('#seauto')).toHaveAttribute('aria-pressed', 'false');
   await page.click('.wg:has(#sel) [data-act="close"]');
-  await expect(page.locator('.wtab', { hasText: 'Shape editor' })).toHaveCount(0);
+  await expect(page.locator('.wtab', { hasText: 'Element editor' })).toHaveCount(0);
   await place(page, 500, 250);
-  await expect(page.locator('.wtab', { hasText: 'Shape editor' })).toHaveCount(0);
+  await expect(page.locator('.wtab', { hasText: 'Element editor' })).toHaveCount(0);
   // the rail button still opens it, and with nothing selected its controls dim
   await page.click('#rail-sedit');
-  await expect(page.locator('.wtab.on', { hasText: 'Shape editor' })).toHaveCount(1);
+  await expect(page.locator('.wtab.on', { hasText: 'Element editor' })).toHaveCount(1);
   await page.keyboard.press('Escape');   // the library click armed the stamp tool: put it down first
   await page.mouse.click(820, 200);   // an empty spot on the stamp: nothing is selected
   await settle(page);

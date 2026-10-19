@@ -163,8 +163,9 @@ One entry per finished step: version, what changed, what was tested, anything th
 | 2 Any item on any layer (UI) | 1.46.2 | done on the same branch, not merged |
 | 3 Arrangement on any layer | 1.46.3 | done on the same branch, not merged |
 | 4 Stamp instances on the canvas | 1.46.4 | done on the same branch, not merged |
-| 5 Drawing into a stamp from the canvas | 1.46.5 | done on the same branch, not merged (shapes and text; see the outcome for what is left) |
-| 6 to 12 | | not started |
+| 5 Drawing into a stamp from the canvas | 1.46.5 | done, merged and live (Oct 19 2026, pull request 103) |
+| 6 The unique Stamp-editor tools on the canvas | 1.46.6 | done on branch `feat/1.46.1-layers-hold-anything` (restarted from `main`), draft pull request |
+| 7 to 12 | | not started |
 
 ### Step 0 audit: Stamp editor panels against Canvas mode (Oct 18 2026, read from `MODEP` in `34-desktop-shell.js`)
 - **Shared today** (same panel in both modes, no work): Workspaces, Presets, Text, Colours, Colourways, Grade, Textures, Randomize, History, Stamp library.
@@ -236,4 +237,17 @@ First run on 6e668ee: WebKit smoke passed; Chromium shards 1 and 2 passed; shard
 
 ### After the CI run (Oct 19 2026)
 Owner approved both fixes and the merge. (1) The Randomize seed 1 state snapshot now holds the values CI reports (a letter's x 103.8926 and y 120.0381, from the real font outlines of 1.42.0); the svg snapshot of the same test, never reached while the state check failed first, was refreshed (it equals what `main` itself gives). (2) The duplicate id is fixed by renaming the Text panel's Scatter control to `tx_scat` (see known-issues.md); this also wires the Textures Scale slider, which had been silent since 1.43.0.
+
+### Step 6 outcome: the Stamp-editor tools on the canvas (1.46.6, Oct 19 2026)
+Built on the Pattern canvas with an unlocked stamp (steps 4 and 5). The branch was restarted from `main` (the old one was merged).
+- **Element editor.** The Shape editor is renamed **Element editor** (owner, Oct 18) and is now a Pattern tool too (rail, tab, command `panel.sedit`). It edits the selected shape of the open stamp (size, rotate, width, height, thickness, jitter, flips, knockout, order, copy, delete), and it opens by itself, docked along the bottom, when a shape is placed in the unlocked stamp (Auto-open at its top, as in the Stamp editor). Because it docks under the canvas, the canvas gets smaller when it opens, as in the Stamp editor.
+- **Stamp settings.** The panel called Stamp is renamed **Stamp settings** and is a Pattern tool (rail, tab, command `panel.stamp`). It already holds block shape and size, ink, invert, block edge and stamp texture, and **symmetry**; it acts on the open stamp, which is the unlocked one. Step 7 reorganises what is in it.
+- **Symmetry copies on the canvas.** A click on a symmetry copy selects the shape it came from, and dragging the copy moves the shape (the point is taken back through the symmetry operation, as the Stamp editor does). Text letters that are not mirrored (no "Mirror text") are not selectable through a copy.
+- **Wrap at the edges.** A shape that runs over the stamp edge shows on the other side (the stamp's own wrap rule, nothing new), and a click on the wrapped part selects the shape; dragging uses the nearest copy.
+- **Marquee.** Dragging a box from an empty part of an instance selects the shapes that lie wholly inside it (Shift or Ctrl adds), the same rule as the Stamp editor (`#mqb`).
+- **Grid snapping inside a stamp.** The one Grid tool (`pgrid`, "Snap to grid", Alt skips it) snaps in canvas units: a shape put into the stamp, or dragged, is snapped on the canvas and then moved back into the stamp's space. The Stamp editor's own grid is untouched (it goes with the Stamp editor in step 9).
+- **Not in this step.** Carved edges and uneven pressure are in Stamp settings (Block edge) and are reworked in step 7; no arrow-key nudge; no ghost of the picked shape; text is still not turned back by a rotated instance.
+- **Tests.** `stamp-canvas-edit.spec.js` grows to 12 specs (the Element editor opening and acting, symmetry copies selected and dragged, marquee, snapping with Alt, wrapped copies); `rail.spec.js` and `shape-editor.spec.js` follow the two renames. Regression on the build (stamp tool and canvas editing, rail, commands, command search, shape editor, docks, panels, workspaces, scenarios, round trip, speed-guard, save, settings, templates, undo, any-layer items, layout, accessibility, library, first minute, marquee, selection, stamp tray, motif drop, text, resize handles, free place, grid, align): all pass except Randomize seed 1 locally (the snapshot now holds CI's values, so a local run differs by a fraction, as before) and a speed-guard timing flake that passed on re-run. No snapshot or golden changed.
+- **Perf.** `tests/perf.spec.js` slider drag ratio 0.97 (step 5: 0.93 to 1.03). Randomize roll plus settle is 1250 to 2660 ms on both this build and the merged step 5 build when run alternately (the container had restarted and was slower and noisy). No regression found.
+- **Not run:** the CI shard suite and WebKit (importance about 50 percent: panels, rail and shared hit testing; the milestones are after step 9 and at step 12).
 

@@ -1,8 +1,10 @@
-import {$,WBS,WBX} from './01-launch-and-version.js';
-import {useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {$,WBS,WBX,mod} from './01-launch-and-version.js';
+import {OFFS,SH,SW,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {it,selOne,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
+import {symOps} from './07-symmetry.js';
 import {delItems,selToggle} from './12-selection-and-split.js';
+import {fpL,fpSnap} from './24-free-place-layers.js';
 import {STP,stMatrix,stUnlocked,stampAt} from './63-stamp-tool.js';
 // ===== Editing the unlocked stamp on the canvas (layer update, step 5) =====
 // With a stamp unlocked, the Pattern canvas edits that stamp through the instance printed under the pointer: a click with a shape picked in the
@@ -11,7 +13,7 @@ import {STP,stMatrix,stUnlocked,stampAt} from './63-stamp-tool.js';
 // so the shape lands where it was pointed at whatever the layer's rotation, turn, flip or size variation. The stamp's items are the same list the
 // Stamp editor edits, so every instance and every layer that uses the stamp shows the edit. Clicks that do not land on an instance of the unlocked stamp
 // are left to the layer, as before. Text typed in the Text panel is put into the stamp the same way (as the letters the Stamp editor makes).
-const SCE={d:null,h:null,ai:null};
+const SCE={d:null,h:null,m:null,ai:null};
 // the unlocked stamp, if it is also the open stamp (the selection indexes belong to the open stamp)
 const sceRO=()=>{const id=stUnlocked();if(id==null)return null;const t=WBS.tiles[WBS.cur];return t&&t.id===id?t:null};
 function sceOpen(){const id=stUnlocked();if(id==null)return null;const k=WBS.tiles.findIndex(t=>t.id===id);if(k<0)return null;if(WBS.cur!==k){WBS.cur=k;selOne(-1)}return WBS.tiles[k]}
@@ -19,10 +21,18 @@ function sceWith(t,fn){const p=WBS.tiles[WBS.cur];useT(t);try{return fn()}finall
 function scePt(e){const a=$('art'),m=a&&a.getScreenCTM();if(!m)return null;const p=a.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(m.inverse());return{x:q.x,y:q.y}}
 const sceTo=(M,x,y)=>{const q=M.transformPoint({x,y});return{x:q.x,y:q.y}};
 const sceInv=i=>stMatrix(STP.items[i]).inverse();
-// the topmost shape of the stamp whose box holds the point (the same box the selection square shows)
-function sceItemAt(t,u,v){for(let i=t.items.length-1;i>=0;i--){const q=t.items[i],r=-(+q.r||0)*Math.PI/180,dx=u-q.x,dy=v-q.y,lx=dx*Math.cos(r)-dy*Math.sin(r),ly=dx*Math.sin(r)+dy*Math.cos(r);
- if(Math.abs(lx)<=48*q.s*(q.sx||1)+3&&Math.abs(ly)<=48*q.s*(q.sy||1)+3)return i}return-1}
+// the topmost shape of the stamp whose box holds the point, also where a symmetry copy or a copy wrapped over the stamp's edge is drawn: the point is moved
+// back into the shape's own frame first. Returns {i, c, ax, ay, o}: the shape, which copy (0 is the shape itself), the wrap offset, the symmetry operation.
+function sceBox(q,x,y){const r=-(+q.r||0)*Math.PI/180,dx=x-q.x,dy=y-q.y,lx=dx*Math.cos(r)-dy*Math.sin(r),ly=dx*Math.sin(r)+dy*Math.cos(r);return Math.abs(lx)<=48*q.s*(q.sx||1)+3&&Math.abs(ly)<=48*q.s*(q.sy||1)+3}
+function sceItemAt(t,u,v){return sceWith(t,()=>{const ops=symOps(t),offs=OFFS.slice();
+ for(let i=t.items.length-1;i>=0;i--){const q=t.items[i],w=wrapP(q.x,q.y),b={...q,x:w[0],y:w[1]};
+  for(const[ax,ay]of offs)if(sceBox(q,u-ax,v-ay))return{i,c:0,ax,ay,o:null};
+  if(q.tg&&!(t.sym&&t.sym.tx))continue;
+  for(let c=0;c<ops.length;c++)for(const[ax,ay]of offs){const[x,y]=ops[c].i(u-ax,v-ay);if(sceBox(b,x,y))return{i,c:c+1,ax,ay,o:ops[c]}}}
+ return null})}
 const sceFree=()=>{WBS.fpSel=-1;WBS.fpMS=new Set()};
+// the Grid tool snaps in canvas units (Alt skips it); a point is snapped there and then moved back into the stamp
+function sceSnap(M,x,y,e){const L=fpL();if(!L)return{x,y};const q=sceTo(M,x,y),n=fpSnap(L,q.x,q.y,e);return sceTo(M.inverse(),n[0],n[1])}
 function sceDown(e){if(e.button!==0)return;const t0=stUnlocked();if(t0==null)return;
  const hand=$('nvhand');if(hand&&hand.getAttribute('aria-pressed')=='true')return;
  const hd=e.target.closest&&e.target.closest('[data-hd]');
@@ -30,21 +40,27 @@ function sceDown(e){if(e.button!==0)return;const t0=stUnlocked();if(t0==null)ret
   SCE.h={k:hd.dataset.hd,q,t,cx:+q.x,cy:+q.y,s0:q.s,sx0:q.sx||1,sy0:q.sy||1,r0:+q.r||0,M:sceInv(SCE.ai)};WBS.WBDRG=1;$('texg').style.display='none';return}
  const c=scePt(e);if(!c)return;const h=stampAt(c.x,c.y,t0);if(!h)return;const t=sceOpen();if(!t)return;
  e.preventDefault();e.stopPropagation();SCE.ai=h.i;
- if(WBS.txArm&&WBX.wbTxStampAt){const[x,y]=sceWith(t,()=>wrapP(h.u,h.v));WBX.wbTxStampAt(+x.toFixed(1),+y.toFixed(1));return}
+ const M0=stMatrix(STP.items[h.i]),sn=sceSnap(M0,h.u,h.v,e);
+ if(WBS.txArm&&WBX.wbTxStampAt){const[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));WBX.wbTxStampAt(+x.toFixed(1),+y.toFixed(1));return}
  if(WBS.brush&&!WBS.brush.txt){const M=stMatrix(STP.items[h.i]),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0;let r=WBS.brush.r+(flip?th:-th);r=+(((r+540)%360)-180).toFixed(1);
-  const[x,y]=sceWith(t,()=>wrapP(h.u,h.v));t.items.push(it(WBS.brush.m,+x.toFixed(2),+y.toFixed(2),WBS.brush.s,r));selOne(t.items.length-1);sceFree();store();upd();return}
- const i=sceItemAt(t,h.u,h.v);
- if(i<0){if(!(e.shiftKey||e.ctrlKey||e.metaKey))selOne(-1);sceDraw();return}
- sceFree();
- if(e.shiftKey||e.ctrlKey||e.metaKey){selToggle(i);if(!WBS.msel.has(i)){sceDraw();return}}else if(!WBS.msel.has(i))selOne(i);
- WBS.sel=i;const q=t.items[i];
- SCE.d={t,q,M:sceInv(h.i),dx:q.x-h.u,dy:q.y-h.v,x0:e.clientX,y0:e.clientY,moved:false,st:[...WBS.msel].filter(j=>j!=i).map(j=>t.items[j]).filter(Boolean).map(w=>[w,w.x,w.y]),px:q.x,py:q.y};
+  const[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));t.items.push(it(WBS.brush.m,+x.toFixed(2),+y.toFixed(2),WBS.brush.s,r));selOne(t.items.length-1);sceFree();store();upd();return}
+ const hit=sceItemAt(t,h.u,h.v),add=e.shiftKey||e.ctrlKey||e.metaKey;
+ if(!hit){if(!add)selOne(-1);SCE.m={x0:e.clientX,y0:e.clientY,add,on:false,ai:h.i,t};sceDraw();return}
+ const i=hit.i;sceFree();
+ if(add){selToggle(i);if(!WBS.msel.has(i)){sceDraw();return}}else if(!WBS.msel.has(i))selOne(i);
+ WBS.sel=i;const q=t.items[i],cp=hit.o?sceWith(t,()=>hit.o.p(mod(q.x,SW),mod(q.y,SH))):null;
+ SCE.d={t,q,o:hit.o,M:sceInv(h.i),dx:(cp?cp[0]:q.x+hit.ax)-h.u,dy:(cp?cp[1]:q.y+hit.ay)-h.v,x0:e.clientX,y0:e.clientY,moved:false,st:[...WBS.msel].filter(j=>j!=i).map(j=>t.items[j]).filter(Boolean).map(w=>[w,w.x,w.y]),px:q.x,py:q.y};
  sceDraw()}
-function sceMove(e){if(!SCE.h&&!SCE.d)return;const c=scePt(e);if(!c)return;
+function sceMove(e){if(SCE.m){const m=SCE.m,dx=e.clientX-m.x0,dy=e.clientY-m.y0;if(!m.on&&dx*dx+dy*dy<25)return;m.on=true;let b=$('mqb');if(!b){b=document.createElement('div');b.id='mqb';document.body.appendChild(b)}Object.assign(b.style,{display:'block',left:Math.min(m.x0,e.clientX)+'px',top:Math.min(m.y0,e.clientY)+'px',width:Math.abs(dx)+'px',height:Math.abs(dy)+'px'});return}
+ if(!SCE.h&&!SCE.d)return;const c=scePt(e);if(!c)return;
  if(SCE.h){const h=SCE.h,p=sceTo(h.M,c.x,c.y);sceWith(h.t,()=>{if(h.k=='rot'){let a=Math.atan2(p.y-h.cy,p.x-h.cx)*180/Math.PI+90;if(e.shiftKey)a=Math.round(a/15)*15;h.q.r=+(((a+540)%360)-180).toFixed(1)}else WBX.hdResize(h,p,e)});upd();return}
  const d=SCE.d;if(!d.moved){const dx=e.clientX-d.x0,dy=e.clientY-d.y0;if(dx*dx+dy*dy<9)return;d.moved=true;WBS.WBDRG=1;$('texg').style.display='none'}
- const p=sceTo(d.M,c.x,c.y);d.q.x=+(p.x+d.dx).toFixed(2);d.q.y=+(p.y+d.dy).toFixed(2);const ax=d.q.x-d.px,ay=d.q.y-d.py;d.st.forEach(([w,ox,oy])=>{w.x=+(ox+ax).toFixed(2);w.y=+(oy+ay).toFixed(2)});upd()}
-function sceUp(){if(SCE.h){SCE.h=null;WBS.WBDRG=0;$('texg').style.display='';store();upd();return}
+ const p=sceTo(d.M,c.x,c.y),sn=sceSnap(d.M,p.x+d.dx,p.y+d.dy,e),np=d.o?d.o.i(sn.x,sn.y):[sn.x,sn.y];d.q.x=+np[0].toFixed(2);d.q.y=+np[1].toFixed(2);const ax=d.q.x-d.px,ay=d.q.y-d.py;d.st.forEach(([w,ox,oy])=>{w.x=+(ox+ax).toFixed(2);w.y=+(oy+ay).toFixed(2)});upd()}
+function sceUp(e){if(SCE.m){const m=SCE.m;SCE.m=null;const b=$('mqb');if(b)b.style.display='none';if(m.on&&e.type=='pointerup'){const x0=Math.min(m.x0,e.clientX),x1=Math.max(m.x0,e.clientX),y0=Math.min(m.y0,e.clientY),y1=Math.max(m.y0,e.clientY),M=STP.items[m.ai]?stMatrix(STP.items[m.ai]):null,a=$('art'),sm=a&&a.getScreenCTM();
+  if(M&&sm){const hit=[];m.t.items.forEach((q,i)=>{const rx=48*q.s*(q.sx||1),ry=48*q.s*(q.sy||1),r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);
+    if([[-rx,-ry],[rx,-ry],[rx,ry],[-rx,ry]].every(([u,v])=>{const p=M.transformPoint({x:+q.x+u*c-v*s,y:+q.y+u*s+v*c}),P=a.createSVGPoint();P.x=p.x;P.y=p.y;const k=P.matrixTransform(sm);return k.x>=x0-1&&k.x<=x1+1&&k.y>=y0-1&&k.y<=y1+1}))hit.push(i)});
+   hit.forEach(i=>{if(!WBS.msel.has(i))selToggle(i)});upd()}}return}
+ if(SCE.h){SCE.h=null;WBS.WBDRG=0;$('texg').style.display='';store();upd();return}
  const d=SCE.d;if(!d)return;SCE.d=null;WBS.WBDRG=0;$('texg').style.display='';if(!d.moved)return;
  sceWith(d.t,()=>{[d.q.x,d.q.y]=wrapP(d.q.x,d.q.y);d.st.forEach(([w])=>{[w.x,w.y]=wrapP(w.x,w.y)})});store();upd()}
 // the selection box (and, for one shape, the handles) drawn on the instance that was last used, in canvas units; handle sizes are fixed on screen
