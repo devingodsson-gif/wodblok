@@ -86,7 +86,9 @@ function sceDraw(){const g=$('stoh');if(!g)return;const t=sceRO();if(!t||!WBS.ms
   h+=ln('stsp','')+ln('stsph','data-sp="m"')+`<circle class="steh" data-sp="m" cx="${f(pc[0])}" cy="${f(pc[1])}" r="${f(hs*1.15)}" cursor="move"/><circle class="steh" data-sp="r" cx="${f(p2[0])}" cy="${f(p2[1])}" r="${f(hs*1.4)}" cursor="grab"/>`}}
  g.innerHTML=h}
 function sceKey(e){if(WBS.brush&&e.key!=='Delete')return;const tg=e.target;if(tg&&tg.matches&&tg.matches('input,select,textarea,[contenteditable]'))return;const t=sceRO();if(!t||!WBS.msel.size)return;
- if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();delItems([...WBS.msel]);selOne(-1);store();upd()}else if(e.key=='Escape'){selOne(-1);sceSel()}}
+ if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();delItems([...WBS.msel]);selOne(-1);store();upd()}else if(e.key=='Escape'){selOne(-1);sceSel()}
+ else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='s'||e.key=='S')){e.preventDefault();$('ssp').click()}
+ else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='k'||e.key=='K')){e.preventDefault();$('sko').click()}}
 function init64(){
  STP.after=sceDraw;WBX.wbSceDraw=sceDraw;
  const w=$('artwrap');if(w)w.addEventListener('pointerdown',sceDown,true);

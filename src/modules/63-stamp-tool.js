@@ -1,5 +1,5 @@
 import {kv} from '../platform/index.js';
-import {$,WBS} from './01-launch-and-version.js';
+import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,SH,SHN,SW,rowMenu,useT,shp} from './04-canvas-and-stamp-outlines.js';
 import {pal,selOne,store} from './06-motif-library-folders.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';

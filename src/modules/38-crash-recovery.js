@@ -1,6 +1,5 @@
 import {recovery} from '../platform/index.js';
 import {$,WBS} from './01-launch-and-version.js';
-import {drag} from './11-pressure-flooding-block-edges.js';
 import {coreStr,dirty,openData,paintPst,pmsg,snapshot} from './18-projects-and-cover-overlay.js';
 // ===== Crash recovery =====
 // While there is unsaved work, a copy is written to a recovery slot every few seconds. The app still starts blank; if a copy
@@ -12,7 +11,7 @@ function rcShow(on){$('rcv').hidden=!on;$('rcx').hidden=!on}   // the status bar
 // Is there work that would be lost by restarting now? (a project still blank from launch does not count)
 const rcUnsaved=()=>(coreStr()!==rcBlank||!!WBS.cp.id)&&dirty();
 // Ticks run one after another: a tick asked for while another is still writing (the timer, or Save finishing) waits its turn, so the last one always sees the latest state.
-function rcTick(){if(drag)return Promise.resolve();rcQ=rcQ.then(rcRun,rcRun);return rcQ}
+function rcTick(){if(WBS.WBDRG)return Promise.resolve();rcQ=rcQ.then(rcRun,rcRun);return rcQ}
 async function rcRun(){
   try{
     const s=coreStr(),need=rcUnsaved(),key=need?s+'|'+$('pnm').value:'';

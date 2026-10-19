@@ -4,7 +4,7 @@ import {CASP,CH,CW,DD,HO,N,ORN,SHN,SK,col,csN,csk,shOf,wrapP} from './04-canvas-
 import {DOTK} from './05-motif-data.js';
 import {cols,cust,inkOf,it,mk,selOne,store} from './06-motif-library-folders.js';
 import {SYM,expand,symOf} from './07-symmetry.js';
-import {clipWrap,grid,snapPt} from './09-stamp-editor-grid-and-motif-ops.js';
+import {clipWrap,grid} from './09-stamp-editor-grid-and-motif-ops.js';
 import {GRAD,gArrAll,arrOf,arrOpts,build,fitTs,hx,lattice} from './10-layer-grids.js';
 import {Q,eR,eT,upd} from './11-pressure-flooding-block-edges.js';
 import {sceDropShape} from './64-stamp-canvas-edit.js';
@@ -37,7 +37,7 @@ const addSt=t=>{const L=WBS.layers[WBS.selL];if(L&&!L.st.includes(t.id))L.st.pus
 const layName=()=>{const L=WBS.layers[WBS.selL];return L?L.name:'the pattern'};
 function sync(){const t=WBS.tiles[WBS.cur],L=WBS.layers[WBS.selL],sv=(id,v)=>{if($(id).value!=v)$(id).value=v};syncAsp('c','c');syncAsp('s','s');{const k=csk();document.querySelectorAll('#cshp [data-s]').forEach(b=>{b.classList.toggle('on',b.dataset.s==k);b.disabled=WBS.book.on});
 $('caspbox').hidden=!CASP.includes(k);$('crrbox').hidden=k!='rrect';$('cngbox').hidden=k!='ngon';$('ccobox').hidden=!['hex','tri','ngon'].includes(k);$('ccirh').hidden=k=='rect';
-{const a=$('ccr'),b=$('cns');if(document.activeElement!==a)a.value=WBS.dim.cr==null?25:WBS.dim.cr;if(document.activeElement!==b)b.value=csN();if(typeof nums=='function')nums()}
+{const a=$('ccr'),b=$('cns');if(document.activeElement!==a)a.value=WBS.dim.cr==null?25:WBS.dim.cr;if(document.activeElement!==b)b.value=csN();if(WBX.wbNums)WBX.wbNums()}
 const ob=document.querySelectorAll('#cor [data-o]');ob.forEach(x=>x.classList.toggle('on',x.dataset.o==(WBS.dim.co=='f'?'f':'p')));if(ob.length){ob[0].textContent=k=='hex'?'Pointy top':'Point up';ob[1].textContent=k=='tri'?'Point down':'Flat top'}
 }document.querySelectorAll('#skind [data-k]').forEach(b=>b.classList.toggle('on',b.dataset.k==SK));$('sasprow').hidden=SK=='hex'||SK=='tri';$('shexrow').hidden=SK!='hex';$('shor').value=HO;
 if(WBX.wbTraySync)WBX.wbTraySync();$('neg').checked=!!t.neg;

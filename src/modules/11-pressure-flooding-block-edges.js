@@ -3,7 +3,7 @@ import {BK,bkH} from './03-stamp-prints-and-drawing.js';
 import {shBleed,HO,OFFS,ORN,SH,SK,SW,col,ornPts,rng,shp,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,it,selOne,store} from './06-motif-library-folders.js';
 import {symOps} from './07-symmetry.js';
-import {grid,inkRuns,items,snapPt,snapSize} from './09-stamp-editor-grid-and-motif-ops.js';
+import {grid,inkRuns,items,snapSize} from './09-stamp-editor-grid-and-motif-ops.js';
 import {build,hx} from './10-layer-grids.js';
 import {selToggle} from './12-selection-and-split.js';
 import {isOf} from './16-texture-generators.js';
@@ -91,8 +91,7 @@ useT(WBS.tiles[WBS.cur]);return o}
 function renderL(){const L=WBS.layers[WBS.selL],pa=col(WBS.proj.bg);
 $('lyl').innerHTML=WBS.layers.map((l,i)=>i).reverse().map(i=>{const l=WBS.layers[i];return`<div class="lr${lyGrp().includes(i)?' on':''}" data-l="${i}"><input type="checkbox" title="Show or hide"${l.vis?' checked':''}><span class="ln">${hx(l.name)}</span><button class="alt" data-up title="Bring forward">&#9650;</button><button class="alt" data-dn title="Send back">&#9660;</button></div>`}).join('');
 $('lst').innerHTML=WBS.tiles.map(t=>{useT(t);return`<button data-s="${t.id}" class="${L.st.includes(t.id)?'on':''}" title="Use on this layer"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button>`}).join('');useT(WBS.tiles[WBS.cur])}
-let raf=0,_lb=0,_lbt=0;const upd=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;WBH.draw();if(drag&&WBS.DRAFT&&performance.now()-_lb<400){clearTimeout(_lbt);_lbt=setTimeout(upd,420)}else{_lb=performance.now();build()}if(typeof WBH.syncPr=='function')WBH.syncPr()})};
-let drag=null;
+let raf=0;const upd=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;WBH.draw();build();if(typeof WBH.syncPr=='function')WBH.syncPr()})};
 const Q=()=>WBS.tiles[WBS.cur].items[WBS.sel];
 function init11(){
 EDC=new Map();
@@ -104,4 +103,4 @@ else if(h.k=='e'||h.k=='w'){const d=h.k=='e'?1:-1,w=mid?Math.abs(lx)*2:d*lx+rx0;
 else{const d=h.k=='s'?1:-1,w=mid?Math.abs(ly)*2:d*ly+ry0;ny=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)oy=-d*ry0+d*48*h.s0*ny}
 q.s=ns;if(nx!=1||q.sx)q.sx=nx;if(ny!=1||q.sy)q.sy=ny;const r=-a;q.x=+(h.cx+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(2);q.y=+(h.cy+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(2)}
 }
-export {Q,drag,eNV,eR,eSeed,eT,edgeDef,edgeDefs,migEdges,pressDefs,raf,renderL,upd,init11};
+export {Q,eNV,eR,eSeed,eT,edgeDef,edgeDefs,migEdges,pressDefs,raf,renderL,upd,init11};

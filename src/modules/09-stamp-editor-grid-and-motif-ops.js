@@ -6,7 +6,7 @@ import {cols,inkOf,mk,mkL} from './06-motif-library-folders.js';
 import {expand,renderSym,symG,symOf} from './07-symmetry.js';
 import {gModel,gNear,gShOk} from './08-grid-shapes.js';
 import {lattice} from './10-layer-grids.js';
-import {drag,eR,eSeed,eT,edgeDef} from './11-pressure-flooding-block-edges.js';
+import {eR,eSeed,eT,edgeDef} from './11-pressure-flooding-block-edges.js';
 import {selFix} from './12-selection-and-split.js';
 import {renderML,sync} from './13-preview-and-stamp-tool.js';
 import {isOf} from './16-texture-generators.js';
@@ -44,7 +44,7 @@ o+=`<g${ed?` data-i="${i}" data-c="${c}"`:''} transform="translate(${x.toFixed(1
 function draw(){if(texNorm())buildTex();useT(WBS.tiles[WBS.cur]);if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];if(WBS.selL<0||WBS.selL>=WBS.layers.length)WBS.selL=WBS.layers.length-1;trayGuard();WBS.tiles.forEach(t=>{if(t.ink&&!okC(t.ink))delete t.ink});sync();const t=WBS.tiles[WBS.cur],cl=cols(t);selFix();const q=t.items[WBS.sel];
 if(WBS.split&&(WBS.split.i!=WBS.sel||!stTxMode()||!q))WBS.split=null;$('spbar').hidden=!WBS.split;
 renderSym(t);
-$('sel').classList.toggle('none',!q);{const n=WBS.msel.size;$('msc').hidden=n<2;$('msc').textContent=n+' selected';$('ssp').disabled=n>1;$('sdl').title=n>1?`Delete ${n} shapes (Del)`:'Delete (Del)';$('scp').title=n>1?`Duplicate ${n} shapes (Ctrl+D)`:'Duplicate (Ctrl+D)'}if(q){$('ssz').value=q.s*100;$('srt').value=q.r;$('ssx').value=(q.sx||1)*100;$('ssy').value=(q.sy||1)*100;$('ssr').disabled=(q.sx||1)==1&&(q.sy||1)==1;$('sko').setAttribute('aria-pressed',q.k?'true':'false');$('sth').value=q.w||0}else{$('ssz').value=80;$('srt').value=0;$('ssx').value=100;$('ssy').value=100;$('sth').value=0;$('ssr').disabled=true;$('sko').setAttribute('aria-pressed','false')}if(stTxMode()&&!(drag&&WBS.DRAFT))renderML()}
+$('sel').classList.toggle('none',!q);{const n=WBS.msel.size;$('msc').hidden=n<2;$('msc').textContent=n+' selected';$('ssp').disabled=n>1;$('sdl').title=n>1?`Delete ${n} shapes (Del)`:'Delete (Del)';$('scp').title=n>1?`Duplicate ${n} shapes (Ctrl+D)`:'Duplicate (Ctrl+D)'}if(q){$('ssz').value=q.s*100;$('srt').value=q.r;$('ssx').value=(q.sx||1)*100;$('ssy').value=(q.sy||1)*100;$('ssr').disabled=(q.sx||1)==1&&(q.sy||1)==1;$('sko').setAttribute('aria-pressed',q.k?'true':'false');$('sth').value=q.w||0}else{$('ssz').value=80;$('srt').value=0;$('ssx').value=100;$('ssy').value=100;$('sth').value=0;$('ssr').disabled=true;$('sko').setAttribute('aria-pressed','false')}if(stTxMode())renderML()}
 // Pattern presets per stamp shape: [key, label, grid, order, turn]. One setting replaces grid type + stamp order.
 const ARR={
 rect:[['r-check','Checkerboard','square','check'],['r-rows','Rows','square','rows'],['r-cols','Columns','square','cols'],['r-diag','Diagonal stripes','square','diag'],['r-brick','Brick','brick','rows'],['r-brickc','Brick, checkered','brick','check'],['r-drop','Half-drop','drop','cols'],['r-dropc','Half-drop, checkered','drop','check'],['r-pin','Pinwheel (turned in fours)','square','pin','pin'],['r-rand','Random','square','rand'],['r-randt','Random, turned','square','rand','r90']],
@@ -58,4 +58,4 @@ WBS.edMk=true;WBS.edInk=true;WBS.edTx=true;try{const g=JSON.parse(kv.get('wb33_g
 grid.sh=gShOk(grid.sh);
 ORN.forEach(k=>ARR[k]=ARR.circle);
 }
-export {ARR,clipSeed,clipWrap,gDim,grid,hx3,inkRuns,items,saveGrid,snapPt,snapSize,init09};
+export {ARR,clipSeed,clipWrap,gDim,grid,hx3,inkRuns,items,saveGrid,snapSize,init09};

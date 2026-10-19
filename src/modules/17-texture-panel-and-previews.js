@@ -76,7 +76,7 @@ function txRefresh(force){TXH.forEach(H=>txRender(H,force));txPaintLib(force);if
 // ---- the Textures panel ----
 let txLd=false,txSig='';const txCur=()=>txLib(WBS.txSel);
 const txSetR=(id,v)=>{const el=$(id);if(el&&+el.value!=+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};
-function txOpenLib(id){WBS.txSel=id;txRefresh(true);setPanel('tex')}
+function txOpenLib(id){WBS.txSel=id;txRefresh(true);if(WBX.wbOpenPanel)WBX.wbOpenPanel('tex')}
 // a relief or stain texture that only the canvas picture uses: changing it redraws that picture and nothing else (the pattern does not depend on it;
 // only a wear texture decides where ink catches, so wear, stamps and layers still rebuild the pattern)
 function txOnlyCanvas(id){const u=WBS.tex&&Array.isArray(WBS.tex.u)?WBS.tex.u:[],n=u.filter(z=>z&&z.x===id).length;if(!n||u.some(z=>z&&z.x===id&&z.md==='wear'))return false;return(txRefs().get(id)||0)===n}
