@@ -171,7 +171,7 @@ const stage=document.querySelector('.stage');
 // the stamp tray can collapse to a thin strip, to give a small window more room for the picture; the choice is remembered
 {const f=stage.querySelector('.film'),b=$('filmt');if(f&&b){const ap=(m,save)=>{f.classList.toggle('min',m);b.setAttribute('aria-expanded',String(!m));b.setAttribute('aria-label',m?'Show stamp tray':'Hide stamp tray');b.title=b.getAttribute('aria-label');stage.style.setProperty('--film-h',f.offsetHeight+'px');if(save){try{kv.set('wb_film_min',m?'1':'0')}catch(e){}}};
  let m0=false;try{m0=kv.get('wb_film_min')==='1'}catch(e){}b.onclick=()=>ap(!f.classList.contains('min'),true);ap(m0,false);try{new ResizeObserver(()=>stage.style.setProperty('--film-h',f.offsetHeight+'px')).observe(f)}catch(e){}}}
-function setView(v){const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+function setView(v){if(v=='stamp'&&!WBX.wbAllowStamp)v='pattern';const was=view;view=v;WBS.curView=v;if(was!=v)requestAnimationFrame(()=>{if(window.bkZ)bkZ()});if(v=='stamp'&&was!=v)setTimeout(()=>{try{WBH.draw()}catch(e){}},0);document.querySelectorAll('[data-v]').forEach(b=>{const on=b.dataset.v==v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
 $('boardP').classList.toggle('off',v!='pattern');$('boardS').hidden=v!='stamp';$('edhint').hidden=v!='stamp';stage.classList.toggle('pv',v=='pattern');$('zoomc').style.display='';$('gtb').style.display=v=='stamp'?'':'none';if(v=='pattern')requestAnimationFrame(applyZ);else applyZE();tbSync();if(WBX.wbTxMode)WBX.wbTxMode(v=='pattern'&&stUnlocked()==null?'pattern':'stamp');if(was!=v||!wsReady)wsRender()}
 function setPanel(p){if(!PNAME[p])p='canvas';const m=MODEP[view].includes(p)?view:MODEP.stamp.includes(p)?'stamp':'pattern';if(m!=view||!wsReady)setView(m);
 const L=wsL();let g=wsFind(p);
@@ -253,10 +253,6 @@ railEl.addEventListener('pointermove',e=>{if(e.pointerType!='mouse'||D&&D.on)ret
 railEl.addEventListener('pointerleave',hvClear);
 railOrder();
 }
-document.querySelector('.seg2').onclick=e=>{const b=e.target.closest('[data-v]');if(b)setView(b.dataset.v)};
-$('tabs').addEventListener('click',e=>{if(e.target.closest('[data-k]'))setView('stamp')});
-$('lib').addEventListener('click',e=>{if(e.target.closest('[data-m]')&&stUnlocked()==null)setView('stamp')});
-$('addT').addEventListener('click',()=>setView('stamp'));$('dupT').addEventListener('click',()=>setView('stamp'));
 // hide the motif bar outside the stamp editor
 const st=document.createElement('style');st.textContent='.stage.pv #sel{display:none!important}';document.head.appendChild(st);
 
@@ -436,7 +432,7 @@ else if(e.key=='Escape'&&WBS.brush&&!typing){WBS.brush=null;WBS.txg=null;upd()}
 else if(e.key=='Escape'){closeMenus();if(!$('plist').hidden)closeDlg();else if(WBS.sel>=0){selOne(-1);upd()}}
 else if(!typing&&!m&&q&&view=='stamp'&&e.key.startsWith('Arrow')){e.preventDefault();const d=e.shiftKey?10:1,dx=e.key=='ArrowLeft'?-d:e.key=='ArrowRight'?d:0,dy=e.key=='ArrowUp'?-d:e.key=='ArrowDown'?d:0;QS().forEach(o=>{o.x+=dx;o.y+=dy;[o.x,o.y]=wrapP(o.x,o.y)});store();upd()}
 else if(!typing&&!m&&k=='k'&&q&&view=='stamp'){e.preventDefault();cmdGet('stamp.knockout').run()}
-else if(!typing&&!m&&(k=='v'||k=='p')){setView(k=='v'?'stamp':'pattern')}
+else if(!typing&&!m&&k=='p'){setView('pattern')}
 else if(!typing&&!m&&k=='0'&&view=='pattern'){z=0;applyZ()}});
 
 document.querySelectorAll('label[role=button]').forEach(l=>l.addEventListener('keydown',e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();l.click()}}));
@@ -549,4 +545,4 @@ clearAll(true);WBS.cp={id:null,name:'',saved:coreStr()};$('pnm').value='';paintP
 {addEventListener('beforeunload',e=>{if(dirty()){e.preventDefault();e.returnValue=''}})}
 })();
 }
-export {init34};
+export {init34,setView};

@@ -1,6 +1,6 @@
 // New stamp (+) used to throw "isDef is not defined" and add nothing (UX review B1; the bug is also in v100).
 const { test, expect } = require('@playwright/test');
-const { openApp, settle, getState } = require('./helpers/harness');
+const { openApp, settle, getState, setMode } = require('./helpers/harness');
 
 test('New stamp adds a blank stamp, selects it, and raises no page error', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 3 });
@@ -18,7 +18,7 @@ test('New stamp adds a blank stamp, selects it, and raises no page error', async
 
 test('Send to back puts the selected motif behind the others (UX review D8)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 3 });
-  await page.click('.seg2 [data-v="stamp"]');
+  await setMode(page, 'stamp');
   await page.click('.rail [data-pn="motifs"]');
   await page.click('#lib .lfr[data-f="b:Flowers"]');                // folders open in place (1.5.0)
   const lib = page.locator('#lib button[data-m]');

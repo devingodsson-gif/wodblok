@@ -41,7 +41,7 @@ test('New stamp asks for an outline, joins the selected layer, becomes the open 
   await expect(rows(page).nth(1).locator('.smkth')).toHaveAttribute('aria-pressed', 'true');
   await expect(rows(page).nth(1).locator('.smklk')).toHaveAttribute('aria-pressed', 'false');
   expect(await page.evaluate(() => __wbTest.unlockedStamp())).toBe(null);
-  await expect(page.locator('.seg2 [data-v="pattern"]')).toHaveClass(/on/);
+  await expect(page.locator('#boardS')).toBeHidden();
   expect(errors).toEqual([]);
 });
 

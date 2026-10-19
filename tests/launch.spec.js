@@ -12,8 +12,8 @@ for (const runtime of ['artifact', 'none']) {
 
     const facts = await page.evaluate(() => ({
       title: document.title,
-      pattern: document.querySelector('.seg2 [data-v="pattern"]').getAttribute('aria-selected'),
-      stamp: document.querySelector('.seg2 [data-v="stamp"]').getAttribute('aria-selected'),
+      pattern: String(document.getElementById('boardS').hidden),
+      stamp: String(!document.getElementById('boardS').hidden),
       openDocks: [...document.querySelectorAll('.dock.dk')].filter(d => d.offsetWidth * d.offsetHeight > 0).length,
       theme: document.documentElement.dataset.theme,
       name: document.getElementById('pnm').value,

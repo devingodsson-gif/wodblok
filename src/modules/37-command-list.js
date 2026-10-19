@@ -62,8 +62,6 @@ const COMMANDS = [
   ['panel.slib', 'Open Stamp library', 'rail-slib'],
   ['panel.motifs', 'Open Shapes', 'rail-motifs'],
   ['panel.text', 'Open Text', 'rail-text'],
-  ['panel.grid', 'Open Grid', 'rail-grid'],
-  ['panel.preview', 'Open Pattern preview', 'rail-preview'],
   ['panel.mlist', 'Open Shape list', 'rail-mlist'],
   ['panel.sedit', 'Open Element editor', 'rail-sedit'],
   ['panel.lyrs', 'Open Layers', 'rail-lyrs'],

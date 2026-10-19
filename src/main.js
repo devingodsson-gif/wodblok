@@ -1,7 +1,7 @@
 // Start-up. Modules do no work when imported; everything that used to run at the top of the single script
 // runs here, in the same order as before.
 import {coreStr} from './modules/18-projects-and-cover-overlay.js';
-import {init01} from './modules/01-launch-and-version.js';
+import {init01,WBX} from './modules/01-launch-and-version.js';
 import {init02} from './modules/02-draft-mode-speedups.js';
 import {init03,BK} from './modules/03-stamp-prints-and-drawing.js';
 import {init04} from './modules/04-canvas-and-stamp-outlines.js';
@@ -33,7 +33,7 @@ import {init30} from './modules/30-print-cover.js';
 import {init31} from './modules/31-colour-grading.js';
 import {init32} from './modules/32-layers-panel.js';
 import {init33} from './modules/33-clear.js';
-import {init34} from './modules/34-desktop-shell.js';
+import {init34,setView} from './modules/34-desktop-shell.js';
 import {init35} from './modules/35-import-artwork-and-motif-sheets.js';
 import {init37} from './modules/37-command-list.js';
 import {init38,rcTick} from './modules/38-crash-recovery.js';
@@ -121,4 +121,4 @@ init59();
 init62();
 init63();
 init64();
-window.__wbTest = { stampAt, stampToCanvas, unlockedStamp: stUnlocked, state: () => coreStr(), kv, account: acAccount, recoveryTick: rcTick, printsBusy: () => !BK.off && !!(BK.busy || BK.q.size), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
+window.__wbTest = { setView: v => { WBX.wbAllowStamp = v == 'stamp'; setView(v) }, stampAt, stampToCanvas, unlockedStamp: stUnlocked, state: () => coreStr(), kv, account: acAccount, recoveryTick: rcTick, printsBusy: () => !BK.off && !!(BK.busy || BK.q.size), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
