@@ -47,7 +47,6 @@ test('documented shortcuts really work', async ({ page }) => {
   await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 30000 });
   await expect(page.locator('#fzst')).not.toHaveClass(/on/);   // the roll's hold is over; a key pressed while it is on is ignored
   await page.locator('body').click({ position: { x: 5, y: 5 } });
-  await settle(page); await page.waitForTimeout(1500);   // let the roll's history step land: it drops the prepared picture, and a hold without one stays on like a tap (this test failed on slow CI machines, and on main too, when it landed late)
   // a tap keeps Before on; holding it is a peek that ends when the key is let go (the picture being compared is the current one after a roll)
   await page.keyboard.press('Backslash');
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'true');
@@ -55,6 +54,7 @@ test('documented shortcuts really work', async ({ page }) => {
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'false');
   await page.keyboard.down('Backslash');
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'true');   // it takes a moment to get the other picture ready
+  await page.waitForSelector('.baov');   // the other picture is on screen (the button reads pressed while it is still being made; letting go before it is ready leaves Before on, as a tap does)
   await page.waitForTimeout(500);
   await page.keyboard.up('Backslash');
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'false');
