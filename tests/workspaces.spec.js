@@ -52,18 +52,6 @@ test('save the current arrangement, set it again, rename it, keep it after a rel
   expect(errors).toEqual([]);
 });
 
-test('the Stamp editor has its own arrangement in each workspace', async ({ page }) => {
-  const { errors } = await openApp(page, { workspaces: true });
-  await setMode(page, 'stamp');
-  await openPanel(page, 'wspc');
-  await row(page, 'Default').click();
-  expect((await groups(page)).flat()).toEqual(expect.arrayContaining(['stamp', 'colors', 'text', 'mlist', 'motifs', 'sedit']));
-  await setMode(page, 'pattern');
-  // the Pattern view has its own half of the same workspace, set in the same click
-  expect((await groups(page)).flat()).toEqual(expect.arrayContaining(['canvas', 'colors', 'lyrs', 'layers']));
-  expect(errors).toEqual([]);
-});
-
 test('folders: make one, save into it, move a workspace, export the folder, delete it and import the file back', async ({ page }) => {
   const { errors } = await openApp(page, { workspaces: true });
   await openPanel(page, 'wspc');
@@ -107,7 +95,7 @@ test('folders: make one, save into it, move a workspace, export the folder, dele
 // where each group sits and which tab shows in it, for the view that is showing
 const layout = page => page.evaluate(() => [...document.querySelectorAll('.wg:not(.fl)')].map(g => ({ edge: g.closest('.dock').dataset.e, tabs: [...g.querySelectorAll('.wtab')].map(t => t.dataset.t), on: (g.querySelector('.wtab.on') || {}).dataset && g.querySelector('.wtab.on').dataset.t })));
 
-test('the app opens with the Default workspace: Pattern and Stamp editor arrangements as described', async ({ page }) => {
+test('the app opens with the Default workspace arranged as described, with one arrangement for the whole app', async ({ page }) => {
   const { errors } = await openApp(page, { workspaces: true });
   const p = await layout(page);
   expect(p).toEqual(expect.arrayContaining([
@@ -115,14 +103,6 @@ test('the app opens with the Default workspace: Pattern and Stamp editor arrange
     { edge: 'r', tabs: ['lyrs', 'layers'], on: 'lyrs' },
   ]));
   expect(p.length).toBe(2);
-  await setMode(page, 'stamp');
-  const st = await layout(page);
-  expect(st).toEqual(expect.arrayContaining([
-    { edge: 'l', tabs: ['stamp', 'colors', 'text', 'mlist'], on: 'stamp' },
-    { edge: 'r', tabs: ['motifs'], on: 'motifs' },
-    { edge: 'b', tabs: ['sedit'], on: 'sedit' },
-  ]));
-  expect(st.length).toBe(3);
   expect(errors).toEqual([]);
 });
 
@@ -167,9 +147,9 @@ test('Restore defaults brings Default back, or puts a changed Default back as it
 test('the older starting workspaces are removed once, unless you changed them', async ({ page }) => {
   const g = (tabs) => ({ tabs, a: tabs[0] });
   const old = [
-    { id: 'a1', name: 'Colour work', f: '', layout: { pattern: { dock: [g(['colors', 'grade', 'tex']), g(['rand'])], float: [] }, stamp: { dock: [g(['stamp', 'colors', 'grade', 'tex'])], float: [] } } },
-    { id: 'a2', name: 'Layout work', f: '', layout: { pattern: { dock: [g(['lyrs'])], float: [] }, stamp: { dock: [], float: [] } } },   // changed by the person: kept
-    { id: 'a3', name: 'Everything closed', f: '', layout: { pattern: { dock: [], float: [] }, stamp: { dock: [], float: [] } } },
+    { id: 'a1', name: 'Colour work', f: '', layout: { pattern: { dock: [g(['colors', 'grade', 'tex']), g(['rand'])], float: [] } } },
+    { id: 'a2', name: 'Layout work', f: '', layout: { pattern: { dock: [g(['lyrs'])], float: [] } } },   // changed by the person: kept
+    { id: 'a3', name: 'Everything closed', f: '', layout: { pattern: { dock: [], float: [] } } },
   ];
   await page.addInitScript(o => { if (!sessionStorage.getItem('t_mig')) { sessionStorage.setItem('t_mig', '1'); localStorage.setItem('wb96_workspaces', JSON.stringify(o)); localStorage.setItem('wb96_ws_seeded', '1'); } }, old);
   const { errors } = await openApp(page, { workspaces: true });
@@ -178,5 +158,17 @@ test('the older starting workspaces are removed once, unless you changed them', 
   await expect(row(page, 'Layout work')).toBeVisible();
   await expect(row(page, 'Colour work')).toHaveCount(0);
   await expect(row(page, 'Everything closed')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test('a workspace holds one arrangement for the whole app: no list for the retired Stamp editor', async ({ page }) => {
+  const { errors } = await openApp(page, { workspaces: true });
+  await openPanel(page, 'wspc');
+  await page.fill('#wxn', 'Mine'); await page.click('#wxsave');
+  const keys = await page.evaluate(() => (JSON.parse(__wbTest.kv.get('wb96_workspaces') || '[]')).map(w => Object.keys(w.layout)));
+  expect(keys.length).toBeGreaterThan(0);
+  for (const k of keys) expect(k).toEqual(['pattern']);
+  const saved = await page.evaluate(() => JSON.parse(__wbTest.kv.get('wb30_ws') || '{}'));
+  expect(Object.keys(saved)).not.toContain('stamp');
   expect(errors).toEqual([]);
 });

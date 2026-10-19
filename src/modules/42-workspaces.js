@@ -14,12 +14,11 @@ const wxG=(tabs,o={})=>({tabs,a:tabs[0],...o});
 // replaced or deleted like your own, and "Restore defaults" puts the original back. WX_OLD are the three starting workspaces of 1.21 and 1.22:
 // they are taken out again, unless you changed them.
 const WX_DEFAULT={name:'Default',layout:{
-    pattern:{dock:[wxG(['canvas','colors'],{e:'l'}),wxG(['lyrs','layers'],{e:'r'})],float:[]},
-    stamp:{dock:[wxG(['stamp','colors','text','mlist'],{e:'l'}),wxG(['motifs'],{e:'r'}),wxG(['sedit'],{e:'b'})],float:[]}}};
+    pattern:{dock:[wxG(['canvas','colors'],{e:'l'}),wxG(['lyrs','layers'],{e:'r'})],float:[]}}};
 const WX_OLD=[
-  {name:'Colour work',layout:{pattern:{dock:[wxG(['colors','grade','tex']),wxG(['rand'])],float:[]},stamp:{dock:[wxG(['stamp','colors','grade','tex'])],float:[]}}},
-  {name:'Layout work',layout:{pattern:{dock:[wxG(['lyrs']),wxG(['layers','canvas','pgrid'])],float:[]},stamp:{dock:[wxG(['motifs','mlist']),wxG(['stamp','grid'])],float:[]}}},
-  {name:'Everything closed',layout:{pattern:{dock:[],float:[]},stamp:{dock:[],float:[]}}},
+  {name:'Colour work',layout:{pattern:{dock:[wxG(['colors','grade','tex']),wxG(['rand'])],float:[]}}},
+  {name:'Layout work',layout:{pattern:{dock:[wxG(['lyrs']),wxG(['layers','canvas','pgrid'])],float:[]}}},
+  {name:'Everything closed',layout:{pattern:{dock:[],float:[]}}},
 ];
 const WX_UI='wb96_workspaces_ui',WX_SEEDED='wb96_ws_seeded',WX_FILE='wodblok-workspaces';
 const wxEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -46,7 +45,7 @@ const wxKids=(fs,p)=>fs.filter(x=>wxPar(x)===p).sort((a,b)=>wxCmp(wxLeaf(a),wxLe
 const wxIn=(w,p)=>w.f===p||w.f.startsWith(p+'/');
 const wxNameOk=s=>{s=String(s||'').trim();return s&&s.length<=30&&!/[\\"<>&|/]/.test(s)?s:''};
 // the file: only plain data, checked on the way in
-function wxCleanLayout(l){if(!l||typeof l!='object')return null;const out={};['pattern','stamp'].forEach(m=>{const L=l[m];if(!L||typeof L!='object')return;const g=k=>(Array.isArray(L[k])?L[k]:[]).filter(x=>x&&Array.isArray(x.tabs)).slice(0,12).map(x=>{const o={...x,tabs:x.tabs.filter(t=>typeof t=='string').slice(0,30)};if(typeof o.a!='string'||!o.tabs.includes(o.a))o.a=o.tabs[0];return o}).filter(x=>x.tabs.length);out[m]={dock:g('dock'),float:g('float')}});return out.pattern||out.stamp?out:null}
+function wxCleanLayout(l){if(!l||typeof l!='object')return null;const out={};['pattern'].forEach(m=>{const L=l[m];if(!L||typeof L!='object')return;const g=k=>(Array.isArray(L[k])?L[k]:[]).filter(x=>x&&Array.isArray(x.tabs)).slice(0,12).map(x=>{const o={...x,tabs:x.tabs.filter(t=>typeof t=='string').slice(0,30)};if(typeof o.a!='string'||!o.tabs.includes(o.a))o.a=o.tabs[0];return o}).filter(x=>x.tabs.length);out[m]={dock:g('dock'),float:g('float')}});return out.pattern?out:null}
 function wxParse(text){let j;try{j=JSON.parse(text)}catch(e){return null}if(!j||j.kind!==WX_FILE||!Array.isArray(j.items))return null;
  const items=j.items.map(x=>x&&typeof x.name=='string'?{name:x.name.trim().slice(0,40),f:typeof x.f=='string'?x.f.split('/').map(wxNameOk).filter(Boolean).join('/'):'',layout:wxCleanLayout(x.layout)}:null).filter(x=>x&&x.name&&x.layout);
  const f=(Array.isArray(j.folders)?j.folders:[]).filter(x=>typeof x=='string').map(p=>p.split('/').map(wxNameOk).filter(Boolean).join('/')).filter(Boolean);return{items,f}}
@@ -82,7 +81,7 @@ function init42(){
     const ri=list.querySelector('.ren input,.wxform input');if(ri&&(UI.ren||UI.form)){ri.focus();ri.select()}
     const all=$('wxall');if(all){const on=UI.d.o.some(Boolean);all.setAttribute('aria-label',on?'Collapse all':'Expand all');all.setAttribute('aria-pressed',String(on))}
   }
-  const layoutNow=()=>{const layout=WBX.wbWsGet();['pattern','stamp'].forEach(m=>{const L=layout[m];if(!L)return;['dock','float'].forEach(k=>{L[k]=(L[k]||[]).map(g=>({...g,tabs:g.tabs.filter(t=>t!='wspc')})).filter(g=>g.tabs.length);L[k].forEach(g=>{if(!g.tabs.includes(g.a))g.a=g.tabs[0]})})});return layout};   // the list you are choosing from is not part of a workspace
+  const layoutNow=()=>{const layout=WBX.wbWsGet();['pattern'].forEach(m=>{const L=layout[m];if(!L)return;['dock','float'].forEach(k=>{L[k]=(L[k]||[]).map(g=>({...g,tabs:g.tabs.filter(t=>t!='wspc')})).filter(g=>g.tabs.length);L[k].forEach(g=>{if(!g.tabs.includes(g.a))g.a=g.tabs[0]})})});return layout};   // the list you are choosing from is not part of a workspace
   const activeHome=()=>UI.d.a||'';
   // ---- files
   const fileOf=(items,folders)=>new Blob([JSON.stringify({kind:WX_FILE,v:1,folders,items:items.map(w=>({name:w.name,f:w.f||'',layout:w.layout}))},null,1)],{type:'application/json'});

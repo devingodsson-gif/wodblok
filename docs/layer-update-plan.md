@@ -168,7 +168,8 @@ One entry per finished step: version, what changed, what was tested, anything th
 | 7 Stamp settings and several colours per stamp | 1.46.7 | done on branch `feat/1.46.7-stamp-settings` (stacked on step 6), draft pull request |
 | 8 Stamp library tools | 1.46.8 | done on branch `feat/1.46.8-stamp-library` (stacked on step 7), draft pull request |
 | 9a Port the last Stamp-editor tools | 1.46.9 | done on branch `feat/1.46.9-port-editor-tools` (stacked on step 8), draft pull request |
-| 9b Retire the Stamp editor | 1.46.10 | done on branch `feat/1.46.10-retire-stamp-editor` (stacked on 9a) |
+| 9b Retire the Stamp editor | 1.46.10 | done, merged and live (Oct 19 2026, pull request 108, with steps 6 to 9a) |
+| 10 Rewrite what depends on it | 1.46.11 | done on branch `feat/1.46.11-randomize-templates` |
 | 9 to 12 | | not started |
 
 ### Step 0 audit: Stamp editor panels against Canvas mode (Oct 18 2026, read from `MODEP` in `34-desktop-shell.js`)
@@ -284,3 +285,8 @@ For the unlocked stamp in the Pattern view: copy and paste of shapes (Ctrl+C/V),
 
 ### Step 9b outcome: the Stamp editor can no longer be reached (1.46.10, Oct 19 2026)
 Removed: the Pattern / Stamp editor switch, the `v` key, the New/Duplicate/tab/library clicks that switched view, the Grid and Pattern preview rail buttons and their two commands. `setView('stamp')` now does nothing (it falls back to Pattern) unless the test hook has allowed it. Kept until step 12: the dormant editor code, the hidden `boardS` DOM, and `__wbTest.setView`, which `setMode(page,'stamp')` uses so the older specs that still exercise text, shapes and library code in the editor keep running; step 12 deletes the dead code and moves those specs to the canvas flow. Specs changed: the Grid spec's stamp-editor test is gone (snapping on the canvas is tested in step 6), rail, launch, first-minute and the panel iterators (panel-text, spelling, text-size, dock-default skip the Shape list in Pattern, where it is empty until a stamp is unlocked). Not done: the per-mode `stamp` workspaces were not dropped (they are inert), and the 43 specs were not all rewritten to the canvas flow.
+
+### Step 10 outcome: what depended on the old editor (1.46.11, Oct 19 2026)
+**Audit first.** Steps 1 to 3 kept the document model (a layer has an arrangement through `free` / `fr.on` / `st`, and items in `pl`), so Randomize, templates, presets, variations, colourways, export recipes, print proof and book covers read and write that model and never read the editor view. A search of those modules for the view (`curView`, `setView`, `boardS`, `vw()`, `'stamp'`) finds nothing; only the workspaces code kept a list per view. Rewriting Randomize to build "layers with both an arrangement and items" would change what a seed produces (every Randomize snapshot) for no gain, so it is not done; it can be a later release if wanted.
+**Done:** a workspace now holds one arrangement for the whole app. The saved layout (`wb30_ws`), the workspaces library (`wb96_workspaces`), Default, the old starter workspaces, import and export, and "Save current" carry only `pattern`; a `stamp` list in an old saved layout is ignored. The live stamp-view arrangement stays in memory for the dormant editor until step 12. Tests: the "Stamp editor has its own arrangement" spec is gone, the Default spec drops its Stamp half, the starter-workspace spec uses pattern-only layouts, and a new spec checks nothing is saved for the Stamp editor.
+**Left for step 12:** delete the dormant editor, `WS.stamp`, `MODEP.stamp`, `__wbTest.setView`.

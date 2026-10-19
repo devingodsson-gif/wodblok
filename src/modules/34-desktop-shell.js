@@ -36,12 +36,11 @@ let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=m=>m=='pattern'?{dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]}:{dock:[wsG(['motifs']),wsG(['stamp','colors','grade','tex','rand'])],float:[wsG(['mlist'],{x:null,y:null,w:230,h:440}),wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}),wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'})]};
 let WS={pattern:wsDef('pattern'),stamp:wsDef('stamp')};
-try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern','stamp'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}});if(sv&&!sv.pv&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('preview')))WS.stamp.float.push(wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}));if(sv&&!sv.gr&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('grid')))WS.stamp.float.push(wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'}))}catch(e){}
+try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}})}catch(e){}
 try{const sv0=JSON.parse(kv.get('wb30_ws')||'null');if(sv0&&!sv0.ly&&!WS.pattern.dock.concat(WS.pattern.float).some(g=>g.tabs.includes('lyrs')))WS.pattern.dock.unshift(wsG(['lyrs'],{f:.85}))}catch(e){}
-try{const sv1=JSON.parse(kv.get('wb30_ws')||'null');if(sv1&&!sv1.rs&&!WS.stamp.dock.concat(WS.stamp.float).some(g=>g.tabs.includes('rand'))){const g=WS.stamp.dock.find(g=>g.tabs.includes('grade'))||WS.stamp.dock[0];if(g)g.tabs.push('rand');else WS.stamp.dock.push(wsG(['rand']))}}catch(e){}
-try{const sv2=JSON.parse(kv.get('wb30_ws')||'null');if(sv2&&!sv2.tx)['pattern','stamp'].forEach(m=>{if(!WS[m].dock.concat(WS[m].float).some(g=>g.tabs.includes('tex'))){const g=WS[m].dock.find(g=>g.tabs.includes('grade'))||WS[m].dock[0];if(g)g.tabs.push('tex');else WS[m].dock.push(wsG(['tex']))}})}catch(e){}
+try{const sv2=JSON.parse(kv.get('wb30_ws')||'null');if(sv2&&!sv2.tx)['pattern'].forEach(m=>{if(!WS[m].dock.concat(WS[m].float).some(g=>g.tabs.includes('tex'))){const g=WS[m].dock.find(g=>g.tabs.includes('grade'))||WS[m].dock[0];if(g)g.tabs.push('tex');else WS[m].dock.push(wsG(['tex']))}})}catch(e){}
 WS.pv=1;WS.gr=1;WS.ly=1;WS.rs=1;WS.tx=1;
-const wsSave=()=>{try{kv.set('wb30_ws',JSON.stringify(WS))}catch(e){}};
+const wsSave=()=>{try{const {stamp,...rest}=WS;kv.set('wb30_ws',JSON.stringify(rest))}catch(e){}};
 const wsL=()=>WS[view]||WS.pattern;
 const wsAll=()=>[...wsL().dock,...wsL().float];
 const wsFind=p=>wsAll().find(g=>g.tabs.includes(p))||null;
@@ -183,8 +182,8 @@ g=(p=='rand'&&L.dock.find(x=>x.tabs.includes('grade')))||L.dock[0];if(g)g.tabs.p
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
 // Workspaces: read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
-WBX.wbWsGet=()=>JSON.parse(JSON.stringify({pattern:WS.pattern,stamp:WS.stamp}));
-WBX.wbWsSet=o=>{const had=!!wsFind('wspc');['pattern','stamp'].forEach(m=>{const L=o&&o[m];if(!L)return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=wsG([]).id;g.f=+g.f||1;g.e=g.e||'r';g.col=false;return g.tabs.length>0};
+WBX.wbWsGet=()=>JSON.parse(JSON.stringify({pattern:WS.pattern}));
+WBX.wbWsSet=o=>{const had=!!wsFind('wspc');['pattern'].forEach(m=>{const L=o&&o[m];if(!L)return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=wsG([]).id;g.f=+g.f||1;g.e=g.e||'r';g.col=false;return g.tabs.length>0};
  const c=JSON.parse(JSON.stringify(L));WS[m]={dock:(c.dock||[]).filter(ok),float:(c.float||[]).filter(ok)}});
  // applying a workspace sets exactly that arrangement: the Workspaces tool closes with the rest, so a starting workspace never opens more than its own groups
  wsSave();wsRender();info();nums()};
