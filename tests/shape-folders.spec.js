@@ -1,9 +1,7 @@
 // Shape library folders: one tree of every folder (built-in sets and your own, A to Z, My imports first) that open in place (1.5.0),
 // folders inside folders, each folder's menu (rename, move, delete; hide for a set), moving shapes, and imports landing in the active folder.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in 1.2.14'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 // a made-up 4 x 4 sheet of black dots, drawn in the page (no image file needed)
 async function sheet(page) {

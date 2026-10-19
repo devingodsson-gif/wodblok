@@ -1,9 +1,7 @@
 // Layers and snapshots each have a "⋯" menu on every row: Rename, Duplicate, Move up/down, Delete (layers); Rename, Delete (snapshots).
 // Rename used to be a double-click nobody could find, and layers could only be reordered by dragging (UX review D16).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const names = async page => JSON.parse(await getState(page)).layers.map(l => l.name);
 const menu = (page, name) => page.locator('.rowm').getByRole('menuitem', { name, exact: true });

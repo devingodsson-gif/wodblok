@@ -1,8 +1,6 @@
 // Variations (Phase 5): six colour alternatives of the current piece. Nothing changes until one is clicked; a click is one undo step.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const roll = async page => { if (!(await page.locator('section.pn[data-p="rand"]:not([hidden])').count())) await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };

@@ -4,13 +4,11 @@ const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
 const { pathToFileURL } = require('url');
-const { ROOT, TARGET, openApp, openProjectFile, getState, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { ROOT, openApp, openProjectFile, getState, settle } = require('./helpers/harness');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const nativeImport = new Function('u', 'return import(u)');
-const FIX = path.join(ROOT, 'tests', 'fixtures', 'project-3-rect-16x9.wodblok.json');
+const FIX = path.join(ROOT, 'tests', 'fixtures', 'project-3-rect-16x9.wodblok');
 
 // A project whose first layer (an arrangement) and a second, free layer both hold a stamp, a picture and a text box.
 function mixed(outDir) {
@@ -27,7 +25,7 @@ function mixed(outDir) {
   free.u = 'freeMixed'; free.name = 'Mixed free'; free.free = true; free.st = []; free.pl = items('f');
   p.layers.push(free);
   fs.mkdirSync(outDir, { recursive: true });
-  const file = path.join(outDir, 'mixed.wodblok.json');
+  const file = path.join(outDir, 'mixed.wodblok');
   fs.writeFileSync(file, JSON.stringify(p));
   return { file, tid };
 }

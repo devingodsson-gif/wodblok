@@ -1,9 +1,7 @@
 // Layer update, step 8 (1.46.8): the project's stamps in the Stamps panel: choose the open stamp, New (with an outline), Duplicate, Delete (two taps),
 // Save to the library, Load from it (joins the selected layer), Zoom to stamp.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 // the rail button of a tool that is already showing closes it, so only click when it is not showing

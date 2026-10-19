@@ -1,8 +1,6 @@
 // 1.20: the Colours panel has a Saved colours library: one list of single colours in folders (Yours, your folders, Wada colours as a built-in set).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel } = require('./helpers/harness');
 
 test('add colours, name them, make a folder, search, move, delete; the picker dropdown lists them first', async ({ page }) => {
   const { errors } = await openApp(page);

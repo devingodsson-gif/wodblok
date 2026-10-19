@@ -11,8 +11,6 @@ const { test, expect } = require('@playwright/test');
 const { ROOT, TARGET, openApp, openProjectFile, openPanel, settle } = require('./helpers/harness');
 const { FIXTURES, danglingRefs, patternCounters } = require('./helpers/speed');
 
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
-
 const BUDGET = { diamond: 120000, wide: 120000, busy: 150000 };     // characters of markup in #dyn at fit; 1.6.0 held 0.4 to 2.7 million
 const report = {};
 test.afterAll(() => {

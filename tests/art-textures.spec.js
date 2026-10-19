@@ -1,8 +1,6 @@
 // 1.0.18 took the Apply block out of the Textures tool (D13); 1.35.0 puts it back as Apply + To (Canvas, Stamps, Layers); D4 a Pictures layer can let the paper show through the light colour of a picture.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAG0lEQVR4nGP4TyJgGOQaGHCAUQ301UAMGIQaAMSCPd+1UKgQAAAAAElFTkSuQmCC', 'base64');
 

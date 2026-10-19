@@ -1,8 +1,6 @@
 // Text: on the canvas the text follows the cursor with its box drawn round it, a click puts it down, and it stays on the cursor to put down again (1.38.0).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState, unlockStamp, stampInstance, canvasToClient } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, canvasToClient } = require('./helpers/harness');
 
 const groups = async page => new Set(JSON.parse(await getState(page)).tiles[0].items.map(i => i.tg)).size;
 // move over the first printed instance of the unlocked stamp, dx/dy in client pixels from its middle

@@ -1,8 +1,6 @@
 // 1.41.0: Box and fit. Padding, Spread, Fit to box (Shrink to fit, Fill the box, Fit each line to width, Fit width) and Overflow Hide.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
 
 const set = (page, id, v) => page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); }, [id, v]);
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;

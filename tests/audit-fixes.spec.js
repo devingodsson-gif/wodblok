@@ -1,9 +1,7 @@
 // 2.0.1: bugs found by the audit after 2.0.0: the Edit texture button, the S (Split) and K (Knock out) keys on an unlocked stamp, Mod+D only
 // on an unlocked stamp, and the unbundled build (WB_TARGET=esm) loading at all.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, showPanel, settle, getState, unlockStamp, pickShape, stampInstance, clickStamp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, pickShape, stampInstance, clickStamp } = require('./helpers/harness');
 
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;
 const shapeOnStamp = async page => { await unlockStamp(page); await pickShape(page); await clickStamp(page, await stampInstance(page)); await page.keyboard.press('Escape'); await clickStamp(page, await stampInstance(page)); };

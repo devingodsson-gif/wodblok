@@ -1,13 +1,12 @@
 // 1.11: templates. File menu items, the picker (3 kinds, Blank first, built-in starting points, Yours), opening a template like New project,
 // saving / renaming / replacing / deleting your own, Download and Add from file, and the commands.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const { folderTemplates } = require('../tools/templates/folders');
 const FOLDER = folderTemplates(), HAND = { canvas: 0, tile: 0, book: 0 };       // every .wodblok file in templates/<kind>/
 for (const t of FOLDER) HAND[t.type]++;
 
-test.beforeEach(() => { test.skip(TARGET !== 'build' && TARGET !== 'esm', 'new in the repo build'); });
 
 const openPicker = async page => { await page.click('#fileb'); await page.click('#tpnew'); await expect(page.locator('#tpdlg')).toBeVisible(); };
 const kind = async (page, k) => { await page.click(`#tpty [data-k="${k}"]`); await settle(page, { quiet: 4 }); };

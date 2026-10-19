@@ -1,8 +1,6 @@
 // 1.43.0: letter effects. Random position, rotation and size, Bounce, Scatter, and Vary. Same text and seed always give the same letters.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
 
 const set = (page, id, v) => page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); }, [id, v]);
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;

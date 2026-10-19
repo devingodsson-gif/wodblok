@@ -1,13 +1,12 @@
 // Shape export (1.3.0): the library as a zip of SVG files, folders inside folders kept.
 const { test, expect } = require('@playwright/test');
 const path = require('path'), { pathToFileURL } = require('url');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 const nativeImport = new Function('u', 'return import(u)');
 const load = f => nativeImport(pathToFileURL(path.join(__dirname, '..', 'src', f)).href);
 
 test.describe('pure zip builder', () => {
-  test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
   test('names are made safe and duplicates are numbered, ignoring case; empty folders are left out', async () => {
     const { buildMotifZip, safeName } = await load('format/motifs.js');
@@ -89,7 +88,6 @@ async function build(page) {
 }
 
 test.describe('library button', () => {
-  test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
   test('the toolbar button exports every shape, folder by folder, with folders inside folders kept', async ({ page }) => {
     const { errors } = await open(page);

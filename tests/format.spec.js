@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), { pathToFileURL } = require('u
 const FX = path.join(__dirname, 'fixtures');
 const nativeImport = new Function('u', 'return import(u)');                       // Playwright rewrites import(); this keeps the real one
 const load = async f => nativeImport(pathToFileURL(path.join(__dirname, '..', 'src', 'format', f)).href);
-const fixtures = fs.readdirSync(FX).filter(f => f.endsWith('.wodblok.json'));
+const fixtures = fs.readdirSync(FX).filter(f => f.endsWith('.wodblok'));
 
 test('every real v18 project opens as the latest format (21 since the layer update) and the original bytes are not touched', async () => {
   const { fmtOpen } = await load('container.js');

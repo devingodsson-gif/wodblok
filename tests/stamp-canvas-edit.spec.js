@@ -2,9 +2,7 @@
 // that stamp where the pointer is (through the instance under it), a click selects a shape inside an instance, dragging moves it, the square handles
 // resize it, the round one turns it, Delete removes it. Locked stamps are not touched.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const items = async page => (await state(page)).tiles[0].items;

@@ -1,9 +1,7 @@
 // Continuity between the tool panels: the same kind of control looks the same in every panel (headings, buttons, dropdowns, text fields,
 // segmented controls, shape pickers). Measured on the real panels, in both views.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp } = require('./helpers/harness');
 
 test('every tool panel uses the same heading, button, dropdown, field and segmented-control styles', async ({ page }) => {
   const { errors } = await openApp(page);

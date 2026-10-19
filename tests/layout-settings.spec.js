@@ -8,10 +8,10 @@ const pick = (page, v) => page.click(`#lmode [data-m="${v}"]`);
 
 // one plain Repeat layer: no jitter, no offset, so the points are exactly where the arrangement puts them
 async function oneLayer(page, name) {
-  const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'project-3-rect-16x9.wodblok.json'), 'utf8'));
+  const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'project-3-rect-16x9.wodblok'), 'utf8'));
   fx.layers = [fx.layers[0]]; fx.layers[0].st = [fx.tiles[0].id];
   Object.assign(fx.layers[0], { rpos: 0, rrot: 0, rtn: false, rfh: false, rfv: false, ox: 0, oy: 0, rot: 0, fit: '', pst: 0, pfl: 0, gap: 20, size: 90 });
-  const f = path.join(os.tmpdir(), name + process.pid + '.wodblok.json'); fs.writeFileSync(f, JSON.stringify(fx));
+  const f = path.join(os.tmpdir(), name + process.pid + '.wodblok'); fs.writeFileSync(f, JSON.stringify(fx));
   await openProjectFile(page, f); fs.unlinkSync(f);
   await openPanel(page, 'layers');
 }

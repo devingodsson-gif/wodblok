@@ -1,9 +1,8 @@
 // 1.14: the Settings dialog. File menu item and command, six pages, accent colour (presets, custom, both themes, contrast, remembered),
 // theme and stage dots, tray places, reduce motion, draft toggle, autosave interval, storage line, searchable shortcuts, About.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp } = require('./helpers/harness');
+const { openApp } = require('./helpers/harness');
 
-test.beforeEach(() => { test.skip(TARGET !== 'build' && TARGET !== 'esm', 'new in the repo build'); });
 
 const open = async page => { await page.click('#fileb'); await page.click('#stgo'); await expect(page.locator('#stgdlg')).toBeVisible(); };
 const go = async (page, p) => { await page.click(`#stgnav [data-p="${p}"]`); await expect(page.locator(`#stgnav [data-p="${p}"]`)).toHaveAttribute('aria-selected', 'true'); };

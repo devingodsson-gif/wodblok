@@ -98,7 +98,7 @@ test('removing a tray colour that is in use keeps what used it as a fixed colour
 
 test('an older file opens with its colours in the tray, linked where they were used', async ({ page }) => {
   const { errors } = await openApp(page);
-  await openProjectFile(page, path.join(__dirname, 'fixtures', 'project-4-rect-4x3.wodblok.json'));
+  await openProjectFile(page, path.join(__dirname, 'fixtures', 'project-4-rect-4x3.wodblok'));
   await settle(page, { max: 60000 });
   const c = JSON.parse(await getState(page)), p = c.proj, w = p.cw[0];
   // the file's old colour names (Slate, Tallow, Moon Ivory) become the nearest palette colours, as they always did when such a file opened;

@@ -1,8 +1,6 @@
 // 1.0.17: a floated panel does not cover the zoom controls; the stamp tray collapses to a thin strip (and is remembered); the book cover guide labels sit on solid chips.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 test('the stamp tray collapses to a thin strip, gives the picture the room, and stays collapsed after a reload', async ({ page }) => {
   const { errors } = await openApp(page);

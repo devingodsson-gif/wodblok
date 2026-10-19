@@ -5,7 +5,7 @@ const { test, expect } = require('@playwright/test');
 const { ROOT, openApp, openProjectFile, openPanel, settle, getState, stateText, checkpoint, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
 
 const FIX = n => path.join(ROOT, 'tests', 'fixtures', n);
-const PANEL_FIXTURE = 'project-4-rect-4x3.wodblok.json';   // frames, free place, textures, grade, blends, five layers
+const PANEL_FIXTURE = 'project-4-rect-4x3.wodblok';   // frames, free place, textures, grade, blends, five layers
 
 async function randomize(page) {
   await openPanel(page, 'rand');
@@ -60,7 +60,7 @@ test('split compare view', async ({ page }, testInfo) => {
 for (const shape of ['rect', 'rrect', 'circle', 'oval', 'arch', 'hex', 'tri', 'diamond', 'ngon']) {
   test(`canvas shape: ${shape}`, async ({ page }, testInfo) => {
     const { errors } = await openApp(page);
-    await openProjectFile(page, FIX('project-3-rect-16x9.wodblok.json'));
+    await openProjectFile(page, FIX('project-3-rect-16x9.wodblok'));
     await openPanel(page, 'canvas');
     await page.click(`#cshp [data-s="${shape}"]`);
     await settle(page);

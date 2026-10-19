@@ -71,11 +71,11 @@ test('Layout no longer has its own snap boxes; Pictures and Text layers use the 
 
 test('older projects that snapped per layer open with Snap to grid on, and turning it off sticks', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
-  const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'project-4-rect-4x3.wodblok.json'), 'utf8'));
+  const fx = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'project-4-rect-4x3.wodblok'), 'utf8'));
   const core = fx.core || fx;
   const L = core.layers[0]; L.free = true; L.pl = []; L.fg = { snap: true, ss: true };
   if (core.pg) { delete core.pg.snap; delete core.pg.ss; }
-  const f = path.join(os.tmpdir(), 'wb-old-snap-' + process.pid + '.wodblok.json');
+  const f = path.join(os.tmpdir(), 'wb-old-snap-' + process.pid + '.wodblok');
   fs.writeFileSync(f, JSON.stringify(fx));
   await openProjectFile(page, f);
   expect(JSON.parse(await getState(page)).pg.snap).toBeUndefined();     // opening changes nothing in the file

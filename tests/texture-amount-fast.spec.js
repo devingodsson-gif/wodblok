@@ -4,10 +4,8 @@
 //  - when it is let go, the exact picture is drawn (no leftover opacity), the document holds the new Amount, and the pattern is still not rebuilt;
 //  - changing a texture the stamps or layers also use still rebuilds the pattern.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openProjectFile, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openProjectFile, openPanel, settle, getState } = require('./helpers/harness');
 const { FIXTURES } = require('./helpers/speed');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 // counts how many times the pattern (#dyn) is redrawn from now on
 const watch = page => page.evaluate(() => { window.__dynBuilds = 0; new MutationObserver(m => { window.__dynBuilds += m.length; }).observe(document.getElementById('dyn'), { childList: true }); });

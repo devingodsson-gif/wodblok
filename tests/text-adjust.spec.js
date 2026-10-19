@@ -1,8 +1,6 @@
 // 1.40.0: a letter moved by hand keeps its move when the text is edited; Convert to shapes makes the letters plain shapes.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, settle, getState, showPanel, unlockStamp, canvasToClient, stampInstance, clickStamp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, settle, getState, showPanel, unlockStamp, canvasToClient, stampInstance, clickStamp } = require('./helpers/harness');
 
 // text goes into the unlocked stamp: type it in the Text panel, then click an instance of the stamp on the canvas
 async function setup(page) {

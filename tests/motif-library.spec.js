@@ -1,9 +1,7 @@
 // UX review C11: no "Draw with Claude" section and no empty "Drawn by Claude" folder in the library.
 // The built-in sets stay (a decision for the owner, Q3): an old project that uses them must still print, and a new one needs something to start with.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'the v100 file has these by design'); });
+const { openApp } = require('./helpers/harness');
 
 test('the Shapes panel has no Draw with Claude section and the folder list has no empty "Drawn by Claude"', async ({ page }) => {
   const { errors } = await openApp(page);

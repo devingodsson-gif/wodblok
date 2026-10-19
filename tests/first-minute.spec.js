@@ -1,8 +1,6 @@
 // The first minute (UX review B4): Randomize is in the top bar, an empty project has no button on the canvas, and an empty stamp in the tray shows a plus.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState, unlockStamp } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState, unlockStamp } = require('./helpers/harness');
 
 test('launch is still fully cleared: Pattern view, no panel open, no stamps printed', async ({ page }) => {
   const { errors } = await openApp(page);

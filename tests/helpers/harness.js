@@ -1,19 +1,17 @@
 // Shared helpers for every spec. Everything here drives the app through the DOM (plus one state hook),
-// never through its internal function names, so the same tests run on legacy/wodblok-v100.html now and on
-// the modular build later.
+// never through its internal function names. The target is the built app (dist/wodblok.html, the default) or, with WB_TARGET=esm, the
+// unbundled modules served by `node tools/serve-esm.js`.
 //
-// State hook: the legacy page exposes `coreStr()` (the JSON of the document). The repo build must expose
-// `window.__wbTest = { state() }` returning the same string; getState() prefers it.
+// State hook: the app exposes `window.__wbTest = { state() }`, the JSON of the document; getState() reads it.
 const path = require('path');
 const crypto = require('crypto');
 const { expect } = require('@playwright/test');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const TARGETS = {
-  legacy: path.join(ROOT, 'legacy', 'wodblok-v100.html'),
   build: path.join(ROOT, 'dist', 'wodblok.html'),
 };
-const TARGET = process.env.WB_TARGET || 'legacy';
+const TARGET = process.env.WB_TARGET || 'build';
 // WB_TARGET=esm loads the unbundled ES modules from `node tools/serve-esm.js` (http://127.0.0.1:5199/)
 const ESM_URL = 'http://127.0.0.1:5199/';
 const APP_URL = TARGET === 'esm' ? ESM_URL : 'file://' + TARGETS[TARGET];
@@ -83,13 +81,13 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, wo
   if (before) await before(page);     // a test may add its own routes here, after the ones above (the last one added is asked first)
   await page.clock.setFixedTime(FIXED_TIME);
   await page.goto(url);
-  await page.waitForFunction(() => typeof (window.__wbTest ? 1 : coreStr) !== 'undefined' && document.fonts.status === 'loaded');
+  await page.waitForFunction(() => !!window.__wbTest && document.fonts.status === 'loaded');
   await settle(page);
   return { errors };
 }
 
 async function getState(page) {
-  return page.evaluate(() => (window.__wbTest ? window.__wbTest.state() : coreStr()));
+  return page.evaluate(() => window.__wbTest.state());
 }
 
 // Wait until the document state and the drawing stop changing (async stamp prints, textures, loading bar).
@@ -102,7 +100,7 @@ async function settle(page, { quiet = 4, step = 120, max = 15000 } = {}) {
       const busy = document.body.classList.contains('babusy') || !!document.querySelector('.rzbusy,.lding:not([hidden])') || !!(window.__wbTest && window.__wbTest.printsBusy && window.__wbTest.printsBusy());   // stamp prints still being drawn
       // a content hash, not just lengths: a redraw that rebuilds the same amount of markup in a different shape still counts as change
       const h = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0).toString(36); };
-      return h(window.__wbTest ? window.__wbTest.state() : coreStr()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + (ed ? h(ed.innerHTML) : 0) + '|' + busy;
+      return h(window.__wbTest.state()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + (ed ? h(ed.innerHTML) : 0) + '|' + busy;
     });
     if (sig === last) { if (++same >= quiet) return; } else { same = 0; last = sig; }
     await page.waitForTimeout(step);

@@ -1,8 +1,6 @@
 // Workspaces (Phase 5): save the arrangement of the tools under a name, set it again with one click.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel } = require('./helpers/harness');
 
 // the tools that are open, group by group (each group is a set of tabs)
 const groups = page => page.evaluate(() => [...document.querySelectorAll('.wg')].map(g => [...g.querySelectorAll('.wtab')].map(t => t.dataset.t)));

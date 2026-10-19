@@ -1,8 +1,6 @@
 // No visible text is smaller than 11 px, in the panels of either view (UX review C13).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, showPanel, unlockStamp, pickShape, stampInstance, clickStamp, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, showPanel, unlockStamp, pickShape, stampInstance, clickStamp, settle } = require('./helpers/harness');
 
 const small = page => page.evaluate(() => {
   const out = new Set();

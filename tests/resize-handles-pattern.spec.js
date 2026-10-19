@@ -1,8 +1,6 @@
 // Pattern editor: a placed stamp has side squares too; corners and sides grow away from the opposite one, Shift from the middle (1.37.0).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const pick = (page, v) => page.click(`#lmode [data-m="${v}"]`);
 const piece = async page => JSON.parse(await getState(page)).layers[0].pl[0];

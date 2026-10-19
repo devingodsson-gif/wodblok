@@ -1,6 +1,6 @@
 // Text on a stamp stays readable under symmetry; mirroring it is a choice (UX review D6).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
 // Canvas flow: the text typed in the Text panel is put on the first printed instance of the unlocked stamp, then one of its letters is clicked so the whole text is selected (the panel edits it)
 async function putTextCanvas(page) {
   const p = await stampInstance(page);
@@ -14,8 +14,6 @@ async function putTextCanvas(page) {
   await page.mouse.click(cl.x, cl.y); await settle(page, { max: 30000 });
 }
 
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 test('with 4-way symmetry the letters are drawn once; Mirror text with symmetry draws the copies', async ({ page }) => {
   const { errors } = await openApp(page);

@@ -1,8 +1,6 @@
 // Randomize: each main switch is a slider from 0 (off) to 100 (fully on); Colours keeps a plain switch (1.0.8, Q6).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const set = (page, k, v) => page.evaluate(([k, v]) => { const c = document.querySelector(`[data-ft="${k}"]`); c.value = v; c.dispatchEvent(new Event('input', { bubbles: true })); }, [k, v]);
 const roll = async page => { await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };

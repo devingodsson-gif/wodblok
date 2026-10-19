@@ -1,10 +1,8 @@
 // Phase 3b: crash recovery. Unsaved work is copied to a recovery slot; after a crash or a closed tab it can be restored.
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { TARGET, ROOT, openApp, openProjectFile, openPanel, settle, getState } = require('./helpers/harness');
-const FIX = path.join(ROOT, 'tests', 'fixtures', 'project-3-rect-16x9.wodblok.json');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { ROOT, openApp, openProjectFile, openPanel, settle, getState } = require('./helpers/harness');
+const FIX = path.join(ROOT, 'tests', 'fixtures', 'project-3-rect-16x9.wodblok');
 
 async function workAndTick(page) {
   await openProjectFile(page, FIX);

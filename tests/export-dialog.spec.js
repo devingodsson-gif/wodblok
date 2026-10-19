@@ -1,9 +1,7 @@
 // Exports ask where to save first and render afterwards, so the browser's Save dialog still counts the click as recent (before, a long export
 // lost the dialog and silently downloaded). Cancelling the dialog stops the export. (1.0.10, Q14)
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 async function mockPicker(page, { cancel = false } = {}) {
   await page.evaluate(cancel => {

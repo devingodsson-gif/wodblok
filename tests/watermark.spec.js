@@ -1,9 +1,7 @@
 // Export watermark (1.16): a checkbox on the Export panel puts the Wodblok mark top-left and "Made with Wodblok" bottom-right of PNG, JPG and TIFF exports.
 const fs = require('fs');
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel } = require('./helpers/harness');
 
 // the n-th download as an ImageData-like summary: size, and where it differs from the first download
 const compare = page => page.evaluate(async () => {

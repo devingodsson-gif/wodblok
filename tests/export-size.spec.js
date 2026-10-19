@@ -1,13 +1,11 @@
 // Phase 6: the saved, copied and exported picture keeps one copy of each identical knockout mask (the busy fixture went from 13 MB to under 3 MB).
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, TARGET, openApp, openProjectFile, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { ROOT, openApp, openProjectFile, settle } = require('./helpers/harness');
 
 test('exported SVG shares identical knockout masks, every reference still resolves, and the stage is untouched', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 21 });
-  await openProjectFile(page, path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok.json'));
+  await openProjectFile(page, path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok'));
   await settle(page);
   const stage = await page.evaluate(() => document.querySelectorAll('#art mask[id^="ks"]').length);
   await page.evaluate(() => document.getElementById('sv').click());

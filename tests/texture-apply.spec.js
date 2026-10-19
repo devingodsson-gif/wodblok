@@ -1,8 +1,6 @@
 // Textures tool: Apply puts the chosen texture on the Canvas, the open stamp or the selected layer, and the picture changes at once.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 

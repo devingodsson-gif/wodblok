@@ -1,8 +1,6 @@
 // Export recipes (Phase 5): saved export settings; click one to export with it; export all as one zip.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
-
-test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+const { openApp, openPanel, settle } = require('./helpers/harness');
 
 const row = (page, name) => page.locator('#xrl .xrr', { hasText: name });
 const downloads = page => page.evaluate(() => window.__wbDownloads.map(d => ({ filename: d.filename, type: d.type, size: (d.base64 || '').length })));
