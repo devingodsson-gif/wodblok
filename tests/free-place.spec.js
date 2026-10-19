@@ -6,7 +6,7 @@ const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 test('Free place: the first click on the canvas places the current stamp', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
-  await page.locator('#lmsel').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))},'x');
+  await page.click('#lmode [data-m="x"]');
   await settle(page);
   await expect(page.locator('#lfpst [data-t].on')).toHaveCount(1);
   const box = await page.locator('#art').boundingBox();
@@ -21,7 +21,7 @@ test('Free place: the first click on the canvas places the current stamp', async
 test('Free place: Esc stops placing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
-  await page.locator('#lmsel').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))},'x');
+  await page.click('#lmode [data-m="x"]');
   await settle(page);
   await page.keyboard.press('Escape');
   await settle(page);
@@ -32,13 +32,13 @@ test('Free place: Esc stops placing', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('Art and Text modes: no explanatory empty-state text in the placed list (UX review D3)', async ({ page }) => {
+test('Placed list: no explanatory empty-state text (UX review D3)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
-  await page.locator('#lmsel').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))},'t');
+  await page.click('#lmode [data-m="p"]');
   await settle(page);
   await expect(page.locator('#lfpl')).not.toContainText('show up here');
-  await page.locator('#lmsel').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))},'a');
+  await page.click('#lmode [data-m="p"]');
   await settle(page);
   await expect(page.locator('#lfpl')).not.toContainText('Stamps you place');
   expect(errors).toEqual([]);

@@ -1,0 +1,157 @@
+// Layer update, step 5 (1.46.5): drawing into an unlocked stamp from the canvas. With a stamp unlocked, a shape picked in the Shapes panel is put into
+// that stamp where the pointer is (through the instance under it), a click selects a shape inside an instance, dragging moves it, the square handles
+// resize it, the round one turns it, Delete removes it. Locked stamps are not touched.
+const { test, expect } = require('@playwright/test');
+const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
+
+test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
+
+const state = async page => JSON.parse(await getState(page));
+const items = async page => (await state(page)).tiles[0].items;
+const unlock = async page => { await openPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); };
+const pick = async page => { await openPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
+const toClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height, k: r.width / vb.width }; }, [x, y]);
+// an instance whose middle is well inside the canvas: its number and where its middle is, in canvas units and on screen
+const inst = async page => {
+  const c = await page.evaluate(() => { const vb = document.getElementById('art').viewBox.baseVal;
+    for (let i = 0; i < 400; i++) { const p = __wbTest.stampToCanvas(i, 120, 120); if (!p) break; if (p.x > 90 && p.x < vb.width - 90 && p.y > 90 && p.y < vb.height - 90) return { i, ...p }; } return null; });
+  expect(c).toBeTruthy();
+  return { i: c.i, cx: c.x, cy: c.y, ...(await toClient(page, c.x, c.y)) };
+};
+const click = async (page, p) => { await page.mouse.move(p.x, p.y); await page.mouse.down(); await page.mouse.up(); await settle(page); };
+const handle = (page, k) => page.locator(`#stoh [data-hd="${k}"]`);
+const centre = async loc => { const b = await loc.boundingBox(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; };
+const drag = async (page, from, to) => { await page.mouse.move(from.x, from.y); await page.mouse.down(); await page.mouse.move((from.x + to.x) / 2, (from.y + to.y) / 2, { steps: 3 }); await page.mouse.move(to.x, to.y, { steps: 3 }); await page.mouse.up(); await settle(page); };
+
+test('the Shapes panel is on the Pattern rail', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await expect(page.locator('#rail-motifs')).toBeVisible();
+  await openPanel(page, 'motifs');
+  expect(await page.locator('#lib .lfr').count()).toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});
+
+test('a picked shape goes into the unlocked stamp where it is pointed at, and every instance shows it', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  const before = (await items(page)).length;
+  await unlock(page);
+  await pick(page);
+  const p = await inst(page);
+  const nUse = await page.locator('#art use[href^="#s1"]').count();
+  await click(page, { x: p.x + p.k * 30, y: p.y + p.k * 20 });
+  const it = await items(page);
+  expect(it.length).toBe(before + 1);
+  // the stamp is 240 wide and the layer prints it at 180, so 0.75 canvas units per stamp unit: 30 and 20 canvas units are 40 and 26.7 stamp units
+  expect(Math.abs(it[it.length - 1].x - 160)).toBeLessThan(3);
+  expect(Math.abs(it[it.length - 1].y - 146.7)).toBeLessThan(3);
+  expect(await page.locator('#art use[href^="#s1"]').count()).toBe(nUse);
+  await expect(page.locator('#stoh .steh')).toHaveCount(9);
+  expect(errors).toEqual([]);
+});
+
+test('with the stamp locked, nothing is put into it', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await pick(page);
+  const before = (await items(page)).length;
+  await click(page, await inst(page));
+  expect((await items(page)).length).toBe(before);
+  await expect(page.locator('#stoh .steh')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test('on a turned layer the shape still lands under the pointer and stands upright', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'layers');
+  await page.evaluate(() => { const r = document.getElementById('lrt'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true })); });
+  await settle(page);
+  await unlock(page);
+  await pick(page);
+  const before = (await items(page)).length;
+  const p = await inst(page);
+  const hit = await page.evaluate(([x, y]) => __wbTest.stampAt(x, y), [p.cx + 6, p.cy + 4]);
+  await click(page, { x: p.x + 6 * p.k, y: p.y + 4 * p.k });
+  const it = await items(page);
+  expect(it.length).toBe(before + 1);
+  const q = it[it.length - 1];
+  const back = await page.evaluate(([i, u, v]) => __wbTest.stampToCanvas(i, u, v), [hit.i, q.x, q.y]);
+  expect(Math.abs(back.x - (p.cx + 6))).toBeLessThan(1);
+  expect(Math.abs(back.y - (p.cy + 4))).toBeLessThan(1);
+  // the shape is turned back by the layer's 30 degrees so it stands upright on the canvas
+  expect(Math.abs(((q.r + 30 + 540) % 360) - 180)).toBeLessThan(1.5);
+  expect(errors).toEqual([]);
+});
+
+test('a click selects a shape, dragging moves it, a handle resizes it, the round handle turns it, Delete removes it', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await unlock(page);
+  await pick(page);
+  const p = await inst(page);
+  await click(page, p);
+  let it = await items(page);
+  const n = it.length;
+  // click empty paper of the instance far from the shape (a corner): selection goes
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+  await click(page, { x: p.x - p.k * 95, y: p.y - p.k * 95 });
+  await expect(page.locator('#stoh .steh')).toHaveCount(0);
+  // click the shape: it is selected again
+  await click(page, p);
+  await expect(page.locator('#stoh .steh')).toHaveCount(9);
+  // move it 30 screen pixels right
+  const x0 = (await items(page))[n - 1].x;
+  await drag(page, p, { x: p.x + 30, y: p.y });
+  it = await items(page);
+  expect(it.length).toBe(n);
+  expect(Math.abs(it[n - 1].x - x0 - 30 / (p.k * 0.75))).toBeLessThan(3);
+  // resize from the south east corner, outwards
+  const s0 = it[n - 1].s, se = await centre(handle(page, 'se'));
+  await drag(page, se, { x: se.x + 25, y: se.y + 25 });
+  expect((await items(page))[n - 1].s).toBeGreaterThan(s0);
+  // turn with the round handle: drag it to the right of the shape's middle
+  it = await items(page);
+  const mc = await page.evaluate(([i, u, v]) => __wbTest.stampToCanvas(i, u, v), [p.i, it[n - 1].x, it[n - 1].y]);
+  const mid = await toClient(page, mc.x, mc.y);
+  const rot = await centre(handle(page, 'rot'));
+  await drag(page, rot, { x: mid.x + 120, y: mid.y });
+  expect(Math.abs((await items(page))[n - 1].r - 90)).toBeLessThan(2);
+  // Delete removes the selected shape
+  await page.keyboard.press('Delete');
+  await settle(page);
+  expect((await items(page)).length).toBe(n - 1);
+  await expect(page.locator('#stoh .steh')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test('placing is one undo step, and locking the stamp hides the selection', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await unlock(page);
+  await pick(page);
+  const before = (await items(page)).length;
+  await click(page, await inst(page));
+  expect((await items(page)).length).toBe(before + 1);
+  await page.keyboard.press('Escape');
+  await openPanel(page, 'stmp');
+  await page.locator('#stmpl .smklk').first().click();
+  await settle(page);
+  await expect(page.locator('#stoh .steh')).toHaveCount(0);
+  await page.keyboard.press('Control+z');
+  await settle(page);
+  expect((await items(page)).length).toBe(before);
+  expect(errors).toEqual([]);
+});
+
+test('text typed in the Text panel goes into the unlocked stamp as letters, on every instance', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await unlock(page);
+  await openPanel(page, 'text');
+  await page.fill('#tx_t', 'AB');
+  await settle(page);
+  const before = (await items(page)).length;
+  const p = await inst(page);
+  await click(page, p);
+  await expect.poll(async () => (await items(page)).length, { timeout: 15000 }).toBe(before + 2);
+  const it = await items(page);
+  expect(it.slice(-2).every(q => q.tg)).toBe(true);
+  expect((await state(page)).layers[0].pl || []).toHaveLength(0);
+  expect(errors).toEqual([]);
+});

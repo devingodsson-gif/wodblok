@@ -44,3 +44,6 @@ Decision: do not build the canvas/WebGL renderer for 1.0. If a Mac with a GPU (o
 - Saved, copied and exported pictures keep one copy of each identical knockout mask: the busy fixture's SVG went from 12.9 MB to 2.85 MB, with identical pixels (0 of 480,000 pixels differ). The stage itself is unchanged. Drawing time barely moves (about 4%), because the browser's cost is in compositing the masks, not reading them.
 - PNG export now shows "Making the PNG…" in the status bar before the page becomes busy, and clears it when saved.
 - Not done, on purpose: workers, canvas/WebGL renderer (measured, would not fix the cost). Open for a Mac/Safari check: `npm run perf-baseline`, `npm run test:webkit`.
+
+## Oct 18 2026 (layer update, step 3): the slider drag test works again
+`tests/perf.spec.js` drags `#lrp`; the Layout panel had grown until that slider was below the 900 px window, so for a while the drag missed it and the test measured an idle page (ratio 0.149). The test now scrolls the slider into view and fails if it is off screen. Same machine, side by side: `main` ratio 0.906, layer update step 3 ratio 0.853; Randomize settle 1.26 s and 1.31 s.

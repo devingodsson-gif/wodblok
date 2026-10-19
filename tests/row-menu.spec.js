@@ -10,7 +10,7 @@ const menu = (page, name) => page.locator('.rowm').getByRole('menuitem', { name,
 
 async function twoLayers(page) {
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add'); await page.click('#ly_menu [data-lt="p"]'); await settle(page);
+  await page.click('#ly_add'); await settle(page);
 }
 
 test('the Layers "⋯" menu renames, duplicates, moves and deletes, and a one-layer project cannot delete its last layer', async ({ page }) => {

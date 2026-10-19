@@ -51,9 +51,9 @@ test('Bounce moves every other letter up and down; Scatter spreads the letters o
   await set(page, 'tx_bb', 0);
   await set(page, 'tx_wd', 80); await set(page, 'tx_ht', 60); await settle(page, { max: 30000 });
   const before = spread((await items(page)).map(q => q.y));
-  await page.click('#tx_sc [data-s="f"]'); await settle(page, { max: 30000 });
+  await page.click('#tx_scat [data-s="f"]'); await settle(page, { max: 30000 });
   await expect.poll(async () => spread((await items(page)).map(q => q.y)), { timeout: 15000 }).toBeGreaterThan(before + 10);
-  await page.click('#tx_sc [data-s=""]'); await settle(page, { max: 30000 });
+  await page.click('#tx_scat [data-s=""]'); await settle(page, { max: 30000 });
   await expect.poll(async () => spread((await items(page)).map(q => q.y)), { timeout: 15000 }).toBeLessThan(before + 1);
   expect(errors).toEqual([]);
 });

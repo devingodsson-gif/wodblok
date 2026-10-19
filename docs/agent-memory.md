@@ -2,11 +2,11 @@
 
 For any Claude agent that works on WODBLOK without access to the owner's Claude memory or Project. It is the development-relevant part of that memory, kept in the repo so every agent has the same context. **Rule: whenever something about WODBLOK is saved to Claude's memory (a decision, a preference, a standing instruction), add it here too, in the same session, with the date.** Keep it free of anything personal (no names, emails, accounts, prices or business plans; this repo is public). The rules themselves are in `CLAUDE.md` and `docs/developing-wodblok.md`; this file is the history and the standing preferences behind them.
 
-Last updated Oct 18 2026 (version 1.46.0).
+Last updated Oct 18 2026 (version 1.46.0 on main; layer update steps 1 to 3 = 1.46.1 to 1.46.3 on one branch, not merged).
 
 ## How the owner wants Claude to work
 - Show a task list, and an approximate percentage complete on short status updates, in the chat. No separate progress page.
-- Work only from the newest `main` on GitHub. Any preview is built from the repo and published to the one preview artifact (https://claude.ai/artifact/AkEURvCERNYJmNPWwiEduB); never a parallel copy.
+- Work only from the newest `main` on GitHub. Any preview is built from the repo and published to the one preview artifact (https://claude.ai/artifact/Y7qKSU4gbU9sCdQYNmBH93); never a parallel copy.
 - The "refresher": check out the repo to get up to date and look at wodblok.com.
 - Do not run the full test suite unless told to.
 - Do not mention stop-hook "unpushed commits" warnings unless one is real.
@@ -39,3 +39,35 @@ Last updated Oct 18 2026 (version 1.46.0).
 ## The layer update (started Oct 18 2026)
 Owner additions (Oct 18): the tool rail has one tool per old layer type (Select, Arrange, Frame, Stamp, Shape, Image, Text, Grid); the Shape editor is renamed the **Element editor** and edits any selected shape, image, text or stamp.
 The owner's decisions are in `docs/layer-update-plan.md`: no layer types, one continuous editing environment, a Stamp tool with outlines and an opacity slider, stamps are global, each stamp has a lock (locked by default; unlocked stamps take edits, locked ones don't), stamp contents are clipped at the outline, one arrangement per layer, Duplicate stamp yes, "Make unique" no, Pattern preview panel removed, Zoom to stamp with a Solo layer button, no Labs switch and no old editor kept, **no backwards compatibility at all** (old project files and templates need not open; the "old files must open" rule is removed when step 1 starts).
+- Oct 18: the owner skipped the step 0 mock-up and said to start step 1 directly. Step 1 is 1.46.1. The old-files rule was removed from the docs at that point; the 18 to 21 migration and v18 fixtures were kept for now as a test safety net (say so if asked).
+
+## Layer update: handoff (written Oct 18 2026, end of step 3)
+**Where things are.** Steps 1, 2 and 3 are done and pushed on ONE branch, `feat/1.46.1-layers-hold-anything` (versions 1.46.1, 1.46.2, 1.46.3 in package.json). The name says 1.46.1 but it holds all three; keep using it for the following steps. It is not merged and no pull request is open (CI only runs on a ready pull request to `main`; a draft does not run it). `main` is still 1.46.0. Next is step 4 (see `docs/layer-update-plan.md`, "Step 3 outcome" and "The steps"). Read the three step outcomes in that file first: they say what was built, what was deliberately left, and what was and was not tested.
+
+**Owner decisions made while building (Oct 18).**
+- Skipped the step 0 clickable mock-up; started building at step 1.
+- Steps 2 to 5 do not go through the CI shard suite. Each step runs only the quick specs for what it changes plus specs for areas it should not touch, and `npm run perf` where drawing or dragging is touched. A test the step made obsolete is rewritten or deleted in the same step and listed in the report. CI shard suite at the milestones: after step 5, after step 9, at step 12, and only when the owner says so (give the importance percentage first). State and SVG snapshots still need the owner's approval; batch those questions at milestones. Pixel goldens will change on purpose (Layout panel changed in steps 2 and 3); look at each at the first CI run, never regenerate unseen.
+- Old project files and templates need not open. The 18 to 21 migration and the v18 fixtures are kept for now as a test safety net and go at the end (step 12) or when the owner's new templates exist.
+- Item order: items still draw by kind (stamps, pictures, text), not as one ordered list, and each kind has its own opacity wrapper. Steps 4 and 5 should fix this when stamps get their own drawing.
+
+**Mistakes to not repeat.**
+- Do not rebuild `dist/` while a test run is using it (it silently tests the wrong build).
+- A foreground command stops at about 10 minutes. Run long test batches in the background, writing a marker file when done, and wait with an `until [ -f marker ]` loop. Do not wait with `pgrep -f "playwright test"`: it matches its own command line.
+- `npm run perf` alone measures the old v100 file. Use `WB_TARGET=build WB_PERF=1 npx playwright test --project=chromium tests/perf.spec.js`, and compare against a `main` worktree on the same machine. The perf test had silently measured nothing (slider off screen) until step 3 fixed it; the step 2 "no regression" was invalid. Check a perf test really moves what it drags.
+- A new feature branch needs `git config --add remote.origin.fetch '+refs/heads/<branch>:refs/remotes/origin/<branch>'` and a fetch, or the stop hook says the branch has unpushed commits even when it is pushed.
+- Setup in a fresh container: `npm ci --ignore-scripts`, then `npm run build`; Chromium is preinstalled. Run tests with `WB_TARGET=build WB_PIXELS=0 npx playwright test <files> --project=chromium --reporter=list`.
+
+**Known failures that are not the layer update's.** `scenarios` "randomize with seed 1" (a letter's y 120 vs 120.038; approved and updated Oct 19 2026) and `templates` "no id appears twice" (`tx_sc` used twice since 1.43.0; in known-issues.md). Everything else in the areas tested so far passed.
+
+**Open questions for step 4 (the Stamp tool) to put to the owner before building.** How an outline looks (proposed: unlocked in the accent colour with an open-lock icon, locked plain and dim); where the opacity slider lives; one unlocked stamp at a time (proposed) or several; whether the lock icon sits on the canvas outline, in the stamp list, or both (plan says both); how a stamp is chosen for the arrangement (several at once, as the Stamp strip does now).
+
+## Layer update step 4: owner's answers (Oct 18 2026)
+- Unlocked stamp outline: accent colour with an open-lock icon; locked outlines plain and dim. The Stamp tool panel shows "Editing: Stamp N (used on K layers)" while one is unlocked.
+- Only one stamp is unlocked at a time; unlocking another locks the previous one. Not saved: a file opens with every stamp locked, and switching layer locks again.
+- The lock icon sits **only in the stamp list** of the Stamp tool, not on the canvas outline (this replaces the plan's "both").
+- Several stamps can be picked for the arrangement at once (as the Stamp strip does now).
+- The outline opacity slider lives in the Stamp tool panel (my placement; the owner said the proposals were good).
+- All new UI follows the CSS guidelines in docs/developing-wodblok.md Part 9 (tokens, three radii, three font sizes, `--h-*` heights, one row design, no explanatory text); run `npm run check:style`.
+- Step 4 is built (1.46.4, same branch): Stamps panel and rail tool, outlines in a sibling overlay svg (never inside `#art`, or the SVG snapshots change), one-at-a-time unlock, hit test and canvas-to-stamp transform. Lesson: anything added inside `#art` changes every SVG summary snapshot; draw overlays outside it. Lesson: New stamp (`#addT`) switches to the Stamp editor, so tests go back with `setMode(page, 'pattern')`. Next is step 5 (drawing into an unlocked stamp from the canvas); see docs/layer-update-plan.md "Step 4 outcome".
+- Step 5 is built (1.46.5, same branch): Shapes panel in the Pattern view, placing, selecting, moving, resizing, turning and deleting shapes in an unlocked stamp from the canvas, text into the stamp. Lesson: clicking a library tile used to switch to the Stamp editor (`34-desktop-shell.js`); with a stamp unlocked it now stays in Pattern. Pictures and one-item text inside stamps are not done (a stamp holds shapes only today). The preview artifact is now https://claude.ai/artifact/Y7qKSU4gbU9sCdQYNmBH93 (the old link was not visible to this account; the owner agreed to the change). Next is step 6; the CI shard suite is due at this milestone when the owner says so (importance about 75%).
+

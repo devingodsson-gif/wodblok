@@ -24,7 +24,9 @@ async function measureDrag(page) {
   await openPanel(page, 'layers');
   await settle(page);
   await page.waitForSelector('#lrp', { state: 'visible' });
+  await page.locator('#lrp').scrollIntoViewIfNeeded();                       // the slider must be on screen, or the drag misses it and nothing is measured
   const box = await page.locator('#lrp').boundingBox();
+  expect(box.y + box.height, 'the slider is inside the window').toBeLessThan(900);
   const y = box.y + box.height / 2;
   await page.mouse.move(box.x + 4, y);
   await page.mouse.down();

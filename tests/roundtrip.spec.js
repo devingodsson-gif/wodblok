@@ -32,14 +32,14 @@ for (const f of FIXTURES) {
     const before = await stateText(page);
 
     const dl = await download(page);
-    // the repo build saves the zip container (format 20 since the colour tray); the untouched v100 baseline still saves v18 JSON.
+    // the repo build saves the zip container (format 21 since the layer update); the untouched v100 baseline still saves v18 JSON.
     const zip = TARGET !== 'legacy';
     expect(dl.filename).toMatch(zip ? /\.wodblok$/ : /\.wodblok\.json$/);
     const bytes = zip ? Buffer.from(dl.base64, 'base64') : null;
     const saved = zip ? JSON.parse(Buffer.from(require('fflate').unzipSync(new Uint8Array(bytes))['project.json']).toString('utf8')) : JSON.parse(dl.data);
     expect(saved.app).toBe('WODBLOK');
     if (zip) expect(Object.keys(require('fflate').unzipSync(new Uint8Array(bytes)))).toContain('thumbnail.png');
-    expect(saved.v).toBe(zip ? 20 : 18);                   // the format number continues from v:18
+    expect(saved.v).toBe(zip ? 21 : 18);                   // the format number continues from v:18
     // What was saved is exactly what the app held after opening (no loss on save)...
     const held = JSON.parse(before);
     for (const k of ['tiles', 'layers', 'proj', 'dim', 'pr', 'tex', 'texLib', 'pg', 'grade'])

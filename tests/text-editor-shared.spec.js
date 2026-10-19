@@ -21,7 +21,7 @@ test('one Text panel in both editors: the controls are the same, the Layers pane
   expect(errors).toEqual([]);
 });
 
-test('in the Pattern editor, typing in the Text panel with no Text layer makes one', async ({ page }) => {
+test('in the Pattern editor, typing in the Text panel arms the text on the selected layer and makes no new layer', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await setMode(page, 'pattern');
   await openPanel(page, 'text');
@@ -29,8 +29,8 @@ test('in the Pattern editor, typing in the Text panel with no Text layer makes o
   await page.fill('#tx_t', 'HELLO');
   await expect(page.locator('#tx_go')).toHaveAttribute('aria-pressed', 'true');
   const L = async () => JSON.parse(await getState(page)).layers;
-  expect((await L()).length).toBe(n0 + 1);
-  expect((await L()).filter(l => l.txt).length).toBe(1);
+  expect((await L()).length).toBe(n0);
+  expect((await L()).filter(l => l.txt).length).toBe(0);
   await expect(page.locator('section.pn[data-p="text"]')).toBeVisible();      // the Text panel stays open
   expect(errors).toEqual([]);
 });
@@ -91,7 +91,7 @@ test('Enter is a new line in the Text layer too', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
   await page.click('#ly_add');
-  await page.click('#ly_menu [data-lt="t"]'); await openPanel(page, 'text');
+  await openPanel(page, 'text');
   await settle(page);
   await page.fill('#tx_t', 'ab');
   await page.click('#tx_t'); await page.keyboard.press('End'); await page.keyboard.press('Enter'); await page.keyboard.type('c');

@@ -37,7 +37,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 - **No brush masks** (masks are linear, radial, layer, colour range and luminance range only).
 - **UI follows the standard in Part 9**: tokens and scales, one component per role, one folder tree for every library. Do not invent a size, radius, colour, duration or list design. If the scale lacks something, ask, and change the guide first.
 - **Speed first.** Run `npm run perf` before committing anything that touches drawing, dragging or sliders. No perf regression over 10%.
-- **Old project files must always open** (format v:18 and earlier), and a file is never overwritten on first open of an older format. (The owner has decided the layer update may drop this; until that update starts, the rule stands.)
+- **No backwards compatibility during the layer update** (owner, Oct 18 2026): old project files and templates need not open. The old rule (format v:18 files always open) ended when step 1 started. A file from a newer app still opens read-only and is never rewritten. The 18 to 21 migration and the v18 fixtures stay until new templates and fixtures exist, then go.
 - **Platform access only through `src/platform/`.** User actions are commands in the registry. The document is plain data with stable ids. **No runtime network**, with one exception: `src/platform/account.js` may talk to the app's own host (`/api/me`, `/api/usage`, `/api/feedback`, `/api/gate-cookie`; see docs/accounts.md) and makes no request from a file or a local dev server. `npm run check:platform` fails on `fetch` and friends anywhere else. Fonts are bundled. Usage tracking is active-time totals per day for early-access and tester accounts only, never anything from a project or file, and nothing on the drawing or dragging path. Pointer events only; **nothing hover-only in new code**. **No `alert`, `confirm` or `prompt`.**
 - **Modules export functions and do no work on import.** Start-up order lives in `src/main.js`.
 - **Ask before adding a dependency.** Allowed licences: MIT, BSD, ISC, Apache, OFL. (The font parser opentype.js, MIT, was approved for 1.42.0.)
@@ -77,7 +77,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 4. **Version and docs.** Bump `package.json` and the lockfile (both version fields in `package-lock.json`). The build writes the version into `WB_VER`, the badge and `<title>` (1.0.0 shows as v1.0, 1.2.1 as v1.2.1). Each release raises the minor; a hotfix raises the patch; the major changes only when the owner says so.
    - **A release made of several steps is one update.** Each step raises only the patch (1.46.1, 1.46.2, ...) and the minor goes up once, when the whole update is done. (The text update 1.39-1.46 was numbered by step, before this rule. The layer update follows it: steps 1.46.1, 1.46.2 ... and the finished update is **2.0.0**, a new major version by the owner's choice.)
    - Write the release's outcome in `docs/plan.md` (the current plan; `docs/fix-plan.md` is the closed 1.0.x UX fix plan). One git tag per release, made by the tag workflow.
-5. **Preview.** After each push that is not docs- or tests-only, rebuild (`npm run build`, from the clean commit so the bottom-bar stamp is the commit date) and publish `dist/wodblok.html` to the preview artifact (https://claude.ai/artifact/AkEURvCERNYJmNPWwiEduB) with the Artifact tool: same URL, same capabilities, without being asked. (Updating it needs access to that artifact; if you cannot, say so and hand over the built file instead.)
+5. **Preview.** After each push that is not docs- or tests-only, rebuild (`npm run build`, from the clean commit so the bottom-bar stamp is the commit date) and publish `dist/wodblok.html` to the preview artifact (https://claude.ai/artifact/Y7qKSU4gbU9sCdQYNmBH93) with the Artifact tool: same URL, same capabilities, without being asked. (Updating it needs access to that artifact; if you cannot, say so and hand over the built file instead.)
 6. **Report** once, in one short block (Part 3).
 7. **Going live.** `main` is hosted on Cloudflare, so whatever lands on `main` is live on wodblok.com. Never go live without the owner saying so for that release. To undo, see Part 7.
 
@@ -465,7 +465,7 @@ A library is any collection a person saves things into and later chooses from. T
 | Export recipes | Export presets | Rows |
 
 Rule: if someone chooses one of many saved things from a list or a menu, it is a library and it uses this tree. No library gets its own list design, its own folder design or its own words. A short list is still the tree, just with no folders made yet.
-Not libraries: the layers list, the tray's 16 colour places, history, and **this project's colourways** (a handful of cards that belong to the document, so no folders). A colourway becomes a library item only when it is saved to the Colourways library.
+Not libraries: the layers list, the Stamps tool's list of this project's stamps, the tray's 16 colour places, history, and **this project's colourways** (a handful of cards that belong to the document, so no folders). A colourway becomes a library item only when it is saved to the Colourways library.
 
 #### 12.2 One tree
 

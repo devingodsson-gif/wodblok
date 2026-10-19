@@ -20,6 +20,7 @@ import {coreStr,dirty,paintPst,pgFix,pmsg,thumb} from './18-projects-and-cover-o
 import {libRz} from './21-motif-library-ui.js';
 import {randomize,wbBA} from './20-before-after-and-randomizer.js';
 import {clearAll} from './33-clear.js';
+import {stUnlocked} from './63-stamp-tool.js';
 
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
@@ -29,8 +30,8 @@ let view='pattern',panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'ca
 // ===== Workspace: each mode (Pattern / Stamp editor) has its own set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Shapes',mlist:'Shape list',sedit:'Shape editor',preview:'Pattern preview',grid:'Grid',layers:'Layout',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
-const MODEP={pattern:['lyrs','layers','text','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec','pres','vars'],stamp:['wspc','pres','motifs','text','mlist','sedit','preview','grid','stamp','colors','cways','grade','tex','rand','hist','slib']};
+const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp',motifs:'Shapes',mlist:'Shape list',sedit:'Shape editor',preview:'Pattern preview',grid:'Grid',layers:'Layout',stmp:'Stamps',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
+const MODEP={pattern:['lyrs','layers','stmp','motifs','text','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec','pres','vars'],stamp:['wspc','pres','motifs','text','mlist','sedit','preview','grid','stamp','colors','cways','grade','tex','rand','hist','slib']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=m=>m=='pattern'?{dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]}:{dock:[wsG(['motifs']),wsG(['stamp','colors','grade','tex','rand'])],float:[wsG(['mlist'],{x:null,y:null,w:230,h:440}),wsG(['preview'],{x:null,y:null,w:260,h:380,pos:'r'}),wsG(['grid'],{x:null,y:null,w:260,h:250,pos:'rb'})]};
@@ -254,7 +255,7 @@ railOrder();
 }
 document.querySelector('.seg2').onclick=e=>{const b=e.target.closest('[data-v]');if(b)setView(b.dataset.v)};
 $('tabs').addEventListener('click',e=>{if(e.target.closest('[data-k]'))setView('stamp')});
-$('lib').addEventListener('click',e=>{if(e.target.closest('[data-m]'))setView('stamp')});
+$('lib').addEventListener('click',e=>{if(e.target.closest('[data-m]')&&stUnlocked()==null)setView('stamp')});
 $('addT').addEventListener('click',()=>setView('stamp'));$('dupT').addEventListener('click',()=>setView('stamp'));
 // hide the motif bar outside the stamp editor
 const st=document.createElement('style');st.textContent='.stage.pv #sel{display:none!important}';document.head.appendChild(st);

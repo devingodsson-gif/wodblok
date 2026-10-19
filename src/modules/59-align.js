@@ -14,7 +14,7 @@ function alBounds(bs){return{x0:Math.min(...bs.map(b=>b.x0)),x1:Math.max(...bs.m
 function alArea(bb){if(!WBS.book.on)return{x0:0,x1:CW,y0:0,y1:CH};const g=bk(),u=CW/g.W,b=g.b*u,tw=g.tw*u,sw=g.sw*u,th=g.th*u,sf=.125*u,ss=.0625*u,cx=(bb.x0+bb.x1)/2;
  const R=[[b,b+tw,sf],[b+tw,b+tw+sw,ss],[b+tw+sw,b+2*tw+sw,sf]].filter(r=>r[1]-r[0]>0),r=R.find(q=>cx>=q[0]&&cx<=q[1])||R.reduce((a,q)=>Math.abs((q[0]+q[1])/2-cx)<Math.abs((a[0]+a[1])/2-cx)?q:a);
  return{x0:r[0]+r[2],x1:r[1]-r[2],y0:b+sf,y1:b+th-sf}}
-function alItems(){const L=WBS.layers[WBS.selL];if(!L||!L.free)return[];return fpGrp().map(alBox).filter(Boolean)}
+function alItems(){const L=WBS.layers[WBS.selL];if(!L)return[];return fpGrp().map(alBox).filter(Boolean)}
 const alMargin=()=>+($('lalm')||{value:0}).value||0;
 function alDone(){store();upd();if(WBX.wbCap)WBX.wbCap()}
 function alTo(fx,fy){const bs=alItems();if(!bs.length)return;const bb=alBounds(bs),A=alArea(bb),m=alMargin()/100*Math.min(A.x1-A.x0,A.y1-A.y0);let dx=0,dy=0;

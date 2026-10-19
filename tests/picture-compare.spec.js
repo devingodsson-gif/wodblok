@@ -30,7 +30,8 @@ async function render(browser, url, fixture) {
   const { errors } = await openApp(page, { seed: 21, url });
   await openProjectFile(page, fixture);
   const shots = {};
-  await page.addStyleTag({ content: '.tip{display:none!important}' });   // the rail's name labels move when a tool is added to the rail: not part of the picture
+  // the rail's name labels move when a tool is added to the rail, and the stamp outlines (1.46.4, drawn over the artwork in their own overlay, never part of it) are an editing aid: neither is part of the picture. The PNG export still compares the artwork itself.
+  await page.addStyleTag({ content: '.tip,#stolsvg{display:none!important}' });
   const shoot = async (label, sel) => { await settle(page, { quiet: 8 });
     // a build before 1.9.1 cannot say when its prints are done: give it time
     if (!(await page.evaluate(() => !!(window.__wbTest && window.__wbTest.printsBusy)))) { await page.waitForTimeout(2500); await settle(page, { quiet: 8 }); }

@@ -2,7 +2,7 @@ import {$} from './01-launch-and-version.js';
 // ===== The Text panel's controls, read and written in ONE place. The Stamp editor (22) and the Text layer (26) both use these, so a new text option is added here and in the engine only.
 // Optional options are saved on a text only when set, so old files and snapshots do not change.
 const TXO_NUM=[['sz','tx_sz'],['ls','tx_ls'],['ws','tx_ws'],['lh','tx_lh']],TXO_BOX=[['wd','tx_wd'],['ht','tx_ht'],['cv','tx_cv'],['rot','tx_rot']],TXO_OPT=[['pd','tx_pd'],['rp','tx_rp'],['rr','tx_rr'],['rs','tx_rs'],['bb','tx_bb'],['ind','tx_ind'],['psp','tx_psp'],['wa','tx_wa']];
-const TXO_SEG=[['al','tx_al','a',1],['tc','tx_tc','c',1],['va','tx_va','v',1],['ov','tx_ov','o',0],['sc','tx_sc','s',0],['bal','tx_bal','b',0]];
+const TXO_SEG=[['al','tx_al','a',1],['tc','tx_tc','c',1],['va','tx_va','v',1],['ov','tx_ov','o',0],['sc','tx_scat','s',0],['bal','tx_bal','b',0]];
 const TXO_SELV=[['ft','tx_ft'],['wp','tx_wp'],['pt','tx_pt']],TXO_PATH=[['pa','tx_pa'],['pw','tx_pw']];
 const TXO_KEYS=['pd','ft','ov','rp','rr','rs','bb','sc','sd','ind','psp','bal','sty','wp','wa','pt','pa','pw'];   // every optional key a text can carry
 const TXO_IDS=['tx_f','tx_ft','tx_wp','tx_pt','tx_pa','tx_pw',...TXO_NUM.map(a=>a[1]),...TXO_BOX.map(a=>a[1]),...TXO_OPT.map(a=>a[1])];
@@ -20,7 +20,7 @@ function txoApply(sty,n,A,B,patch){const a=txoCompile(sty,n);for(let i=Math.max(
 function txoShift(sty,o,n){if(!sty.length||o===n)return sty;const A=[...o],B=[...n];let p=0;while(p<A.length&&p<B.length&&A[p]===B[p])p++;let s=0;while(s<A.length-p&&s<B.length-p&&A[A.length-1-s]===B[B.length-1-s])s++;const a=txoCompile(sty,A.length),ins=Math.max(0,B.length-p-s),fill=p>0?a[p-1]:null;return txoPack(a.slice(0,p).concat(new Array(ins).fill(fill),a.slice(A.length-s)))}
 function txoRead(){const t=$('tx_t').value.replace(/\r/g,'').slice(0,200);if(txoSty.length&&t!==txoPrev)txoSty=txoShift(txoSty,txoPrev,t);txoPrev=t;const n=id=>+$(id).value,o={text:t,f:$('tx_f').value||'cinzel'};
 TXO_NUM.forEach(([k,id])=>o[k]=n(id));o.al=txoSegV('tx_al','a','c');o.tc=txoSegV('tx_tc','c','');o.va=txoSegV('tx_va','v','t');TXO_BOX.forEach(([k,id])=>o[k]=n(id));
-if(n('tx_pd'))o.pd=n('tx_pd');if($('tx_ft').value)o.ft=$('tx_ft').value;const ov=txoSegV('tx_ov','o','');if(ov)o.ov=ov;['rp','rr','rs','bb'].forEach(k=>{if(n('tx_'+k))o[k]=n('tx_'+k)});const sc=txoSegV('tx_sc','s','');if(sc)o.sc=sc;if(txoSd)o.sd=txoSd;
+if(n('tx_pd'))o.pd=n('tx_pd');if($('tx_ft').value)o.ft=$('tx_ft').value;const ov=txoSegV('tx_ov','o','');if(ov)o.ov=ov;['rp','rr','rs','bb'].forEach(k=>{if(n('tx_'+k))o[k]=n('tx_'+k)});const sc=txoSegV('tx_scat','s','');if(sc)o.sc=sc;if(txoSd)o.sd=txoSd;
 if($('tx_wp').value&&n('tx_wa')){o.wp=$('tx_wp').value;o.wa=n('tx_wa')}if($('tx_pt').value){o.pt=$('tx_pt').value;o.pa=n('tx_pa');o.pw=n('tx_pw')}if(n('tx_ind'))o.ind=n('tx_ind');if(n('tx_psp'))o.psp=n('tx_psp');if(txoSegV('tx_bal','b',''))o.bal=1;if(txoSty.length)o.sty=txoSty.map(r=>r.slice());return o}
 const txoSetR=(id,v,force)=>{const el=$(id);if(force||+el.value!=+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))}};
 const txoSetS=(id,dk,v)=>document.querySelectorAll('#'+id+' [data-'+dk+']').forEach(b=>b.classList.toggle('on',b.dataset[dk]==v));

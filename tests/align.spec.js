@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
-const pick = (page, v) => page.locator('#lmsel').evaluate((e, x) => { e.value = x; e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+const pick = (page, v) => page.click(`#lmode [data-m="${v}"]`);
 const pl = async page => JSON.parse(await getState(page)).layers[0].pl;
 const dims = async page => (await page.locator('#art').evaluate(e => (e.getAttribute('viewBox') || '0 0 1000 1000'))).split(/[ ,]+/).map(Number);
 async function place(page, fx, fy) {

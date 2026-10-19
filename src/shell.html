@@ -532,6 +532,13 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 #lfpst button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}.fpn{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:var(--fs-m);color:var(--mut)}.fpn span{flex:1}.fpn button{margin:0}.fprow{gap:2px}
 .fpl{min-height:0;max-height:210px;overflow:auto;margin-top:6px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);padding:4px}.fpl .mr.on button{visibility:visible}.fpl .mr svg{background:var(--panel)}
 .strip.ls button{opacity:.4}.strip.ls button.on{opacity:1;border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}
+.smked{padding:7px 10px;font-size:var(--fs-s);color:var(--mut);border-bottom:1px solid var(--line)}.smked[hidden]{display:none}
+.smkl{display:flex;flex-direction:column;gap:2px}.smkr{display:flex;align-items:center;gap:6px;min-height:var(--h-row);padding:0 4px;border-radius:var(--r-m);font-size:var(--fs-m);cursor:pointer}.smkr:hover{background:var(--raise)}
+.smkr.on{background:var(--acc-soft);box-shadow:inset 2px 0 0 var(--acc)}.smkr.on .smkn{font-weight:600;color:var(--acc-ink)}
+.smkth{flex:none;width:var(--h-xs);height:var(--h-xs);padding:2px;margin:0;background:var(--field);border:1px solid var(--line);border-radius:var(--r-s)}.smkth svg{display:block;width:100%;height:100%}
+.smkn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.smkc{flex:none;min-width:12px;text-align:right;font-size:var(--fs-s);color:var(--faint);font-variant-numeric:tabular-nums}
+.smkp .smklk{width:var(--h-xs);height:var(--h-xs);flex:none}.smkp .smklk .ic{width:13px;height:13px}.smkp .smklk[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink)}
+#stolsvg{position:absolute;left:28px;top:28px;pointer-events:none}.stes{fill:none;stroke:var(--acc);stroke-width:1.5px;vector-effect:non-scaling-stroke;pointer-events:none}.steh{fill:var(--raise);stroke:var(--acc);stroke-width:1.5px;vector-effect:non-scaling-stroke;pointer-events:all}.stol path{fill:none;vector-effect:non-scaling-stroke;stroke-linejoin:round}.stol .olk{stroke:var(--mut);stroke-width:1px}.stol .olu{stroke:var(--acc);stroke-width:2px}
 .lhead{display:flex;align-items:center;gap:2px;margin-bottom:8px}.lhead span{font-size:var(--fs-s);color:var(--mut);margin-right:auto}
 
 /* menus */
@@ -883,6 +890,7 @@ body.eyedrop{cursor:crosshair}
  <button id="rail-canvas" data-pn="canvas" aria-label="Canvas"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M7 3v2.5M17 3v2.5M7 18.5V21M17 18.5V21M3 7h2.5M3 17h2.5M18.5 7H21M18.5 17H21"/></svg><span class="tip">Canvas</span></button>
  <button id="rail-lyrs" data-pn="lyrs" aria-label="Layers"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l8.5 4.5-8.5 4.5L3.5 8z"/><path d="M3.5 12l8.5 4.5 8.5-4.5"/><path d="M3.5 16l8.5 4.5 8.5-4.5"/></svg><span class="tip">Layers</span></button>
  <button id="rail-layers" data-pn="layers" aria-label="Layout"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span class="tip">Layout</span></button>
+ <button id="rail-stmp" data-pn="stmp" aria-label="Stamps"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="10.5" width="9" height="9" rx="2"/><path d="M17 4.5l4 7h-8z"/></svg><span class="tip">Stamps</span></button>
  <button id="rail-pgrid" data-pn="pgrid" aria-label="Grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 9.2h17M3.5 14.8h17M9.2 3.5v17M14.8 3.5v17"/></svg><span class="tip">Grid</span></button>
  <button id="rail-nav" data-pn="nav" aria-label="Navigator"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><rect x="7.5" y="8.5" width="6" height="5.5" rx="1"/></svg><span class="tip">Navigator</span></button>
  <button id="rail-vars" data-pn="vars" aria-label="Variations"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="5" height="13" rx="1.2"/><rect x="9.5" y="5.5" width="5" height="13" rx="1.2"/><rect x="15.5" y="5.5" width="5" height="13" rx="1.2"/></svg><span class="tip">Variations</span></button>
@@ -910,7 +918,7 @@ body.eyedrop{cursor:crosshair}
   <div id="viewctl" hidden><button id="gti" title="Show the stamp texture in the editor (view only)" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M8 16l8-8M8 11l3-3M13 16l3-3"/></svg>Stamp texture</button><button id="gtx" title="Show the canvas texture on the stamp (view only)" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5H7c2 0 3-2 5-2s3 2 5 2h3.5"/><path d="M3.5 12h5.5M15 12h5.5"/><ellipse cx="12" cy="12" rx="3" ry="1.8"/><path d="M3.5 16.5H7c2 0 3 2 5 2s3-2 5-2h3.5"/></svg>Canvas texture</button><button id="gtm" class="on" title="Show the grading masks (view only)" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" stroke-dasharray="2.6 2.4"/><circle cx="12" cy="12" r="3"/></svg>Grading masks</button><button id="gdt" class="on" title="Dotted stage behind the canvas" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 5.5h.01M12 5.5h.01M18.5 5.5h.01M5.5 12h.01M12 12h.01M18.5 12h.01M5.5 18.5h.01M12 18.5h.01M18.5 18.5h.01"/></svg>Stage dots</button><div class="zoom" id="zoomc"><button class="ib" id="zo" title="Zoom out" aria-label="Zoom out"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button><button id="zl" title="Fit to screen">Fit</button><button class="ib" id="zi" title="Zoom in" aria-label="Zoom in"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button></div></div>
   <div class="tyd" id="tyd" role="toolbar" aria-label="Colour tray"><div class="tyc" id="tyc" role="list"></div><button type="button" class="tycw" id="tycw" aria-haspopup="menu" aria-expanded="false" hidden><i></i><span></span><svg class="chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l5 5 5-5"/></svg></button></div>
  </div>
- <div class="board" id="boardP"><div id="artwrap"><svg id="artsh" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"></svg><svg id="art" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><defs id="grdf"></defs><defs id="cvdefs"></defs><defs id="surfd"></defs><defs id="txd"></defs><defs id="stdefs"></defs><g id="dyn"></g><g id="covg"></g><g id="texg"></g><g id="guig" pointer-events="none"></g><g id="fpgrid" pointer-events="none"></g><g id="fpov" pointer-events="none"></g><g id="gmov"></g></svg></div></div>
+ <div class="board" id="boardP"><div id="artwrap"><svg id="artsh" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"></svg><svg id="art" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><defs id="grdf"></defs><defs id="cvdefs"></defs><defs id="surfd"></defs><defs id="txd"></defs><defs id="stdefs"></defs><g id="dyn"></g><g id="covg"></g><g id="texg"></g><g id="guig" pointer-events="none"></g><g id="fpgrid" pointer-events="none"></g><g id="fpov" pointer-events="none"></g><g id="gmov"></g></svg><svg id="stolsvg" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><g id="stol" class="stol" pointer-events="none"></g><g id="stoh" class="stoh"></g></svg></div></div>
  <div class="board" id="boardS" hidden><div><svg id="ed" viewBox="-24 -24 288 288"></svg></div></div>
  <div class="spbar" id="spbar" hidden><span>Drag the line to place it. Drag the round end to turn it (Shift snaps to 15&#176;).</span><button class="alt" id="spno">Cancel</button><button class="pri" id="spok">Split</button></div>
  <div class="edhint" id="edhint" hidden><span id="edh1">Drag to move. Click to select, Shift+click to add.</span> <span id="wrh">Shapes wrap around the stamp edges.</span></div>
@@ -1117,7 +1125,7 @@ body.eyedrop{cursor:crosshair}
    <label>Random rotation</label><input type="range" id="tx_rr" min="0" max="180" value="0" data-u="&#176;" data-def="0">
    <label>Random size</label><input type="range" id="tx_rs" min="0" max="100" value="0" data-u="%" data-def="0">
    <label>Bounce</label><input type="range" id="tx_bb" min="0" max="100" value="0" data-u="%" data-def="0">
-   <label>Scatter</label><div class="seg" id="tx_sc" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-s="" class="on">Off</button><button type="button" data-s="l">Loose</button><button type="button" data-s="f">Full</button></div>
+   <label>Scatter</label><div class="seg" id="tx_scat" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-s="" class="on">Off</button><button type="button" data-s="l">Loose</button><button type="button" data-s="f">Full</button></div>
    <div class="row"><button class="alt" id="tx_vary">Vary</button></div>
    <div id="tx_lay" hidden>
     <label>Ink</label><div class="cwell" id="wl_tx"></div>
@@ -1181,14 +1189,8 @@ body.eyedrop{cursor:crosshair}
  <section class="pn" data-p="preview" hidden><div class="pvbar"><span>Live pattern</span><button type="button" class="pvc" id="pvc" aria-pressed="false" title="Show the book cover text block in the preview">Cover</button><div class="seg pvz" id="pvz"><button type="button" data-z="1" class="on">Fit</button><button type="button" data-z="2">2&#215;</button><button type="button" data-z="4">4&#215;</button></div></div><div class="pvbox"><svg id="pvw" viewBox="0 0 533 800" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><use href="#dyn"/><use href="#texg"/><use href="#covg" id="pvcu" visibility="hidden"/></svg></div></section>
  <section class="pn" data-p="mlist" hidden><div class="mlist" id="mlist" aria-label="Shapes on this stamp"></div></section>
 <section class="pn" data-p="lyrs" hidden><div class="lys" id="lys">
- <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><div class="dd gmadd"><button type="button" class="ib" id="ly_add" title="New layer" aria-label="New layer" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
-  <div class="ddl" id="ly_menu" data-w="190" hidden>
-   <div class="ddi" data-lt="p"><span>Repeat pattern</span></div>
-   <div class="ddi" data-lt="f"><span>Frame</span></div>
-   <div class="ddi" data-lt="x"><span>Free place</span></div>
-   <div class="ddi" data-lt="a"><span>Pictures</span></div>
-   <div class="ddi" data-lt="t"><span>Text</span></div>
-  </div></div></div>
+ <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><div class="dd gmadd"><button type="button" class="ib" id="ly_add" title="New layer" aria-label="New layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  </div></div>
  <div id="lybody">
   <div class="lyo"><span class="lyk">Blend</span><select id="ly_bl" title="Blend mode"><option value="">Normal</option><option value="multiply">Multiply (overprint)</option><option value="darken">Darken</option><option value="screen">Screen</option><option value="lighten">Lighten</option><option value="overlay">Overlay</option><option value="soft-light">Soft light</option><option value="behind">Behind (fills gaps only)</option><option value="cancel">Cancel out (overlap prints nothing)</option><option value="replace">Replace (overlap prints a colour)</option></select></div>
   <div class="lyop"><label>Opacity</label><input type="range" id="ly_op" min="0" max="100" value="100" data-u="%" data-def="100"></div>
@@ -1211,6 +1213,15 @@ body.eyedrop{cursor:crosshair}
    <div class="row"><button class="alt" id="pgq">Snap all to grid</button><button class="alt" id="pgr">Reset grid</button></div>
   </div></details>
  </section>
+ <section class="pn" data-p="stmp" hidden><div class="smkp">
+  <div class="smked" id="smked" hidden></div>
+  <details class="g" open><summary>Stamps</summary><div class="gb">
+   <div class="smkl" id="stmpl"></div>
+  </div></details>
+  <details class="g" open><summary>Outlines</summary><div class="gb">
+   <label>Opacity</label><input type="range" id="stmpop" min="0" max="100" value="60" data-u="%" data-def="60">
+  </div></details>
+ </div></section>
  <section class="pn" data-p="layers" hidden>
   <div hidden>  <div><summary>Layers</summary><div class="gb">
    <div class="lhead"><span>Top of the list prints last</span>
@@ -1225,16 +1236,59 @@ body.eyedrop{cursor:crosshair}
    <label>Stamps on this layer</label>
   </div></div>
 </div>
+  <details class="g" open><summary>Arrangement</summary><div class="gb">
+   <div class="seg" id="lmode" role="group" aria-label="Arrangement" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-m="x">None</button><button type="button" data-m="p">Repeat</button><button type="button" data-m="f">Frame</button></div>
+   <div id="lfrm" hidden>
+    <div class="hint" id="lfh" style="margin-top:6px"></div>
+    <div id="lfscrow"><label>Frame around</label><select id="lfsc"><option value="front">Front cover</option><option value="both">Back and front covers</option><option value="each">Back, spine and front</option><option value="all">The whole cover</option></select>
+     <label class="chk"><input type="checkbox" id="lfsafe"><span>Keep inside the safe area</span></label>
+     <label class="chk" id="lfbarrow"><input type="checkbox" id="lfbar"><span>Leave the barcode area clear</span></label>
+     <div class="hint" id="lfinfo"></div></div>
+    <label>Width</label><input type="range" id="lfw" min="0.3" max="10" step="0.1" value="2.5" data-u="%" data-def="2.5">
+    <label>Inset</label><input type="range" id="lfi" min="0" max="20" step="0.5" value="0" data-u="%" data-def="0">
+    <label>Spacing</label><input type="range" id="lfg" min="0" max="100" value="0" data-u="%" data-def="0">
+    <label>Corners</label><div class="seg" id="lfc"><button type="button" data-c="m" title="Sides cut at 45°, meeting in a diagonal seam">Mitred</button><button type="button" data-c="b" title="A corner stamp in each corner, strips in between">Corner stamp</button><button type="button" data-c="o" title="Strips run past each other">Overlap</button></div>
+    <div id="lfcsrow"><label>Corner stamp</label><select id="lfcs"></select></div>
+    <label>Top of the strip faces</label><div class="seg" id="lffc" style="grid-template-columns:1fr 1fr"><button type="button" data-f="o">Outward</button><button type="button" data-f="i">Inward</button></div>
+    <label class="chk"><input type="checkbox" id="lfclr"><span>Clear the pattern under the frame</span></label>
+   </div>
+   <div id="lpat">
+   <label>Grid</label><select id="lgl"></select>
+   <div id="lglrow" hidden><label>Print on</label><div class="seg" id="lpa"><button type="button" data-p="c" title="One stamp in the middle of every cell">Centres</button><button type="button" data-p="k" title="Where the shapes of the grid meet">Corners</button><button type="button" data-p="e" title="Halfway along every edge of the grid">Edges</button></div><div class="hint" id="lglh"></div></div>
+   <div id="lldrow" hidden><label>Grid shape follows</label><select id="lld"></select></div>
+   <label>Pattern</label><select id="larr"></select>
+   <div id="lborow" hidden><label>Offset</label><select id="lbo"><option value="25">1/4</option><option value="33.333">1/3</option><option value="50">1/2</option><option value="66.667">2/3</option><option value="75">3/4</option></select></div>
+   <div hidden><select id="lgr"><option value="">Auto (fits the stamp shape)</option><option value="square">Grid</option><option value="brick">Brick (offset rows)</option><option value="drop">Half-drop (offset columns)</option><option value="honey">Honeycomb</option></select>
+   <select id="lay"><option value="check">Checker</option><option value="rows">Rows</option><option value="cols">Columns</option><option value="diag">Diagonal stripes</option><option value="rand">Random</option></select></div>
+   <label>Stamp size</label><input type="range" id="ts" min="80" max="320" value="180">
+   <label id="lgpl">Spacing</label><input type="range" id="lgp" min="-20" max="100" value="0" data-u="%">
+   <label>Offset X</label><input type="range" id="lox" min="-50" max="50" value="0">
+   <label>Offset Y</label><input type="range" id="loy" min="-50" max="50" value="0">
+   <label id="lrl">Rotation</label><input type="range" id="lrt" min="-180" max="180" value="0" data-u="°">
+   </div>
+  </div></details>
   <details class="g" open id="lstbox"><summary>Stamps in the pattern</summary><div class="gb">
    <div class="strip ls" id="lst"></div>
   </div></details>
-  <details class="g" open><summary>Layer type <span class="aux" id="lytn"></span></summary><div class="gb">
-   <select id="lmsel" aria-label="Layer type"><option value="p">Repeat</option><option value="f">Frame</option><option value="x">Free place</option><option value="a">Pictures</option><option value="t">Text</option></select>
-   <div id="lmode" hidden><button type="button" data-m="p"></button><button type="button" data-m="f"></button><button type="button" data-m="x"></button><button type="button" data-m="a"></button><button type="button" data-m="t"></button></div>
-   <div id="lfree" hidden>
+  <details class="g" open id="lmanbox"><summary>Manual arrangement <span class="aux" id="mancnt"></span></summary><div class="gb">
+   <label class="chk" style="margin-top:2px"><input type="checkbox" id="man"><span>Pick stamps by hand</span></label>
+   <div class="row"><button class="alt" id="manr">Reset hand-picked stamps</button></div>
+  </div></details>
+  <details class="g" id="lrsec" open><summary>Variation <span class="aux">this layer</span></summary><div class="gb">
+   <label>Rotation</label><input type="range" id="lrr" min="0" max="180" value="0" data-u="&#176;" data-def="0">
+   <label>Position</label><input type="range" id="lrp" min="0" max="100" value="0" data-u="%" data-def="0">
+   <div id="lrzrow"><label>Size</label><input type="range" id="lrz" min="0" max="100" value="0" data-u="%" data-def="0"></div>
+   <div id="lrgrow"><label>Gaps</label><input type="range" id="lrg" min="0" max="100" value="0" data-u="%" data-def="0"></div>
+   <label class="chk"><input type="checkbox" id="lrtn"><span>Turn to fit each shape</span></label>
+   <label class="chk"><input type="checkbox" id="lrfh"><span>Flip some left &#8596; right</span></label>
+   <label class="chk"><input type="checkbox" id="lrfv"><span>Flip some up &#8597; down</span></label>
+   <div class="row"><button class="alt" id="lrsh" title="Roll a new random arrangement">Shuffle</button></div>
+  </div></details>
+  <details class="g" open><summary>Placed items</summary><div class="gb">
+   <div id="lfree">
     <div class="hint" id="lfph" style="margin-top:6px"></div>
     <label id="lfpstl">Stamp to place</label><div class="strip" id="lfpst"></div>
-    <div id="lfart" hidden>
+    <div id="lfart">
      <label>Art to place</label><div class="strip" id="lfars"></div>
      <label class="chk"><input type="checkbox" id="lfaak"><span>Paper shows through</span></label>
      <div class="row"><button class="alt" id="lfaimp" title="Import a PNG, JPG, WebP or SVG image">Import image&#8230;</button><button class="alt" id="lfaprj" title="Use a .wodblok project file as a picture">Use a project&#8230;</button></div>
@@ -1265,57 +1319,15 @@ body.eyedrop{cursor:crosshair}
       </div>
      </div>
    </div>
-   <div id="lfrm" hidden>
-    <div class="hint" id="lfh" style="margin-top:6px"></div>
-    <div id="lfscrow"><label>Frame around</label><select id="lfsc"><option value="front">Front cover</option><option value="both">Back and front covers</option><option value="each">Back, spine and front</option><option value="all">The whole cover</option></select>
-     <label class="chk"><input type="checkbox" id="lfsafe"><span>Keep inside the safe area</span></label>
-     <label class="chk" id="lfbarrow"><input type="checkbox" id="lfbar"><span>Leave the barcode area clear</span></label>
-     <div class="hint" id="lfinfo"></div></div>
-    <label>Width</label><input type="range" id="lfw" min="0.3" max="10" step="0.1" value="2.5" data-u="%" data-def="2.5">
-    <label>Inset</label><input type="range" id="lfi" min="0" max="20" step="0.5" value="0" data-u="%" data-def="0">
-    <label>Spacing</label><input type="range" id="lfg" min="0" max="100" value="0" data-u="%" data-def="0">
-    <label>Corners</label><div class="seg" id="lfc"><button type="button" data-c="m" title="Sides cut at 45°, meeting in a diagonal seam">Mitred</button><button type="button" data-c="b" title="A corner stamp in each corner, strips in between">Corner stamp</button><button type="button" data-c="o" title="Strips run past each other">Overlap</button></div>
-    <div id="lfcsrow"><label>Corner stamp</label><select id="lfcs"></select></div>
-    <label>Top of the strip faces</label><div class="seg" id="lffc" style="grid-template-columns:1fr 1fr"><button type="button" data-f="o">Outward</button><button type="button" data-f="i">Inward</button></div>
-    <label class="chk"><input type="checkbox" id="lfclr"><span>Clear the pattern under the frame</span></label>
-   </div>
-   <div id="lpat">
-   <label>Grid</label><select id="lgl"></select>
-   <div id="lglrow" hidden><label>Print on</label><div class="seg" id="lpa"><button type="button" data-p="c" title="One stamp in the middle of every cell">Centres</button><button type="button" data-p="k" title="Where the shapes of the grid meet">Corners</button><button type="button" data-p="e" title="Halfway along every edge of the grid">Edges</button></div><div class="hint" id="lglh"></div></div>
-   <div id="lldrow" hidden><label>Grid shape follows</label><select id="lld"></select></div>
-   <label>Pattern</label><select id="larr"></select>
-   <div id="lborow" hidden><label>Offset</label><select id="lbo"><option value="25">1/4</option><option value="33.333">1/3</option><option value="50">1/2</option><option value="66.667">2/3</option><option value="75">3/4</option></select></div>
-   <div hidden><select id="lgr"><option value="">Auto (fits the stamp shape)</option><option value="square">Grid</option><option value="brick">Brick (offset rows)</option><option value="drop">Half-drop (offset columns)</option><option value="honey">Honeycomb</option></select>
-   <select id="lay"><option value="check">Checker</option><option value="rows">Rows</option><option value="cols">Columns</option><option value="diag">Diagonal stripes</option><option value="rand">Random</option></select></div>
-   <label>Stamp size</label><input type="range" id="ts" min="80" max="320" value="180">
-   <label id="lgpl">Spacing</label><input type="range" id="lgp" min="-20" max="100" value="0" data-u="%">
-   <label>Offset X</label><input type="range" id="lox" min="-50" max="50" value="0">
-   <label>Offset Y</label><input type="range" id="loy" min="-50" max="50" value="0">
-   <label id="lrl">Rotation</label><input type="range" id="lrt" min="-180" max="180" value="0" data-u="°">
-   </div>
   </div></details>
   <details class="g" open id="lalsec" hidden><summary>Align</summary><div class="gb">
    <div class="shg" id="lalg" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
    <div class="row fprow" id="lalr"></div>
    <label>Margin</label><input type="range" id="lalm" min="0" max="20" value="0" data-u="%" data-def="0">
   </div></details>
-  <details class="g" open id="lmanbox"><summary>Manual arrangement <span class="aux" id="mancnt"></span></summary><div class="gb">
-   <label class="chk" style="margin-top:2px"><input type="checkbox" id="man"><span>Pick stamps by hand</span></label>
-   <div class="row"><button class="alt" id="manr">Reset hand-picked stamps</button></div>
-  </div></details>
   <details class="g" open id="lipsec"><summary>Impression <span class="aux">this layer</span></summary><div class="gb">
    <label id="lpl">Uneven pressure</label><input type="range" id="lps" min="0" max="10" value="0">
    <label id="lfl">Ink flooding</label><input type="range" id="lfs" min="0" max="10" value="0">
-  </div></details>
-  <details class="g" id="lrsec" open><summary>Variation <span class="aux">this layer</span></summary><div class="gb">
-   <label>Rotation</label><input type="range" id="lrr" min="0" max="180" value="0" data-u="&#176;" data-def="0">
-   <label>Position</label><input type="range" id="lrp" min="0" max="100" value="0" data-u="%" data-def="0">
-   <div id="lrzrow"><label>Size</label><input type="range" id="lrz" min="0" max="100" value="0" data-u="%" data-def="0"></div>
-   <div id="lrgrow"><label>Gaps</label><input type="range" id="lrg" min="0" max="100" value="0" data-u="%" data-def="0"></div>
-   <label class="chk"><input type="checkbox" id="lrtn"><span>Turn to fit each shape</span></label>
-   <label class="chk"><input type="checkbox" id="lrfh"><span>Flip some left &#8596; right</span></label>
-   <label class="chk"><input type="checkbox" id="lrfv"><span>Flip some up &#8597; down</span></label>
-   <div class="row"><button class="alt" id="lrsh" title="Roll a new random arrangement">Shuffle</button></div>
   </div></details>
  </section>
 

@@ -8,7 +8,7 @@ test('typing changes the selected text box; Add text then arms a second one', as
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
   await page.click('#ly_add');
-  await page.click('#ly_menu [data-lt="t"]'); await openPanel(page, 'text');
+  await openPanel(page, 'text');
   await settle(page);
   await expect(page.locator('#tx_go')).toHaveText('Add text');
   await page.fill('#tx_t', 'ONE');

@@ -57,3 +57,12 @@ For about half a second after opening the busy test project (`project-4`), 18 `<
 
 ## Old files' layer inks (fixed in 1.10.0 by the tray)
 Since the colour library became Wada's colours, a layer ink saved with an older colour name (for example "Moon Ivory" on layers 2-4 of `project-4-rect-4x3`) was left out when the file opened, so those layers printed in their stamps' own colours. 1.10.0 turns the file's colour names into tray colours (a name from the first 100-colour palette becomes the nearest palette colour, as it always did for paper, ink and stamps), so these layers print in their ink again, as they did when the file was made. Only files with layer inks differ from 1.9 (`project-4-rect-4x3` of the test files: picture-compare compares it loosely, the other two exactly), and the slider-drag perf ratio on that file moves from about 0.8 to about 1.0 of legacy: the layer ink filters are drawn again, as legacy draws them.
+
+## Two controls share the id `tx_sc` (found in the layer update step 2; on `main` since the text update, 1.43.0)
+The Stamp editor's text Scatter control (`<div class="seg" id="tx_sc">`) and the text Scale slider (`<input id="tx_sc">`) have the same id. `tests/templates.spec.js` "no id appears twice on the page" fails on it. Not caused by the layer update; not fixed in it.
+
+**Fixed (Oct 19 2026, layer update):** the text Scatter control is now `tx_scat`. The Textures panel's Scale slider (`tx_sc`) had been reading the Scatter control since 1.43.0, because the Text panel comes first on the page, so the slider's own events were never wired; they are now.
+
+## Test flake: speed-guard "busy" dangling references (seen again, layer update step 5)
+`tests/speed-guard.spec.js` "busy: the pattern on screen stays light and every reference resolves" now and then reports `use -> #s#` (18) and `g[filter] -> #lk#` (3): stamp prints and layer ink filters that are not on the page yet when the check runs. It passes alone on re-run (4 of 4 on the step 5 build; one failure in three runs of the step 3 build too), so it is not from the layer update. Same family as the "stamps point at outlines that are not on the page yet" note above. Snapshots untouched.
+

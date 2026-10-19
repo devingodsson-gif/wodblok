@@ -12,7 +12,7 @@ function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(WBS.fpMS.size
 function fpPoolOk(){return!!(WBS.fpB&&WBS.fpPool.size>1&&WBS.fpPool.has(String(WBS.fpB)))}
 function fpTog(u){u=String(u);let cur=fpGrp().map(q=>String(q.u));if(!cur.length&&WBS.fpSel!==-1)cur=[String(WBS.fpSel)];const st=new Set(cur);if(st.has(u)){st.delete(u);WBS.fpSel=st.size?[...st][st.size-1]:-1}else{st.add(u);WBS.fpSel=u}WBS.fpMS=st;WBS.fpAnc=u;WBS.fpB=null;WBS.fpGhost=null;upd()}
 function fpRange(u){u=String(u);const L=fpL();if(!L)return;const order=(L.pl||[]).slice().reverse().map(q=>String(q.u)),a0=WBS.fpAnc!=null&&order.includes(String(WBS.fpAnc))?String(WBS.fpAnc):(WBS.fpSel!==-1?String(WBS.fpSel):u),a=order.indexOf(a0),b=order.indexOf(u);if(a<0||b<0){WBS.fpMS=new Set();WBS.fpSel=u;WBS.fpAnc=u;upd();return}WBS.fpMS=new Set(order.slice(Math.min(a,b),Math.max(a,b)+1));WBS.fpSel=u;WBS.fpB=null;WBS.fpGhost=null;upd()}
-function fpPick(k,e,order){const L=fpL(),art=!!(L&&L.art);let cur=fpPoolOk()?[...WBS.fpPool]:(WBS.fpB?[String(WBS.fpB)]:[]);if(e.shiftKey&&WBS.fpPA!=null&&order.includes(WBS.fpPA)){const a=order.indexOf(WBS.fpPA),b=order.indexOf(k);cur=order.slice(Math.min(a,b),Math.max(a,b)+1)}else{const st=new Set(cur);st.has(k)?st.delete(k):st.add(k);cur=[...st];WBS.fpPA=k}WBS.fpPool=new Set(cur);if(!cur.length)WBS.fpB=null;else{const pk=cur.includes(String(WBS.fpB))?String(WBS.fpB):cur[cur.length-1];WBS.fpB=art?pk:+pk}WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpLast=null;upd()}
+function fpPick(k,e,order,art){const same=!WBS.fpB||(typeof WBS.fpB=='string')==!!art;let cur=!same?[]:fpPoolOk()?[...WBS.fpPool]:(WBS.fpB?[String(WBS.fpB)]:[]);if(e.shiftKey&&WBS.fpPA!=null&&order.includes(WBS.fpPA)){const a=order.indexOf(WBS.fpPA),b=order.indexOf(k);cur=order.slice(Math.min(a,b),Math.max(a,b)+1)}else{const st=new Set(cur);st.has(k)?st.delete(k):st.add(k);cur=[...st];WBS.fpPA=k}WBS.fpPool=new Set(cur);if(!cur.length)WBS.fpB=null;else{const pk=cur.includes(String(WBS.fpB))?String(WBS.fpB):cur[cur.length-1];WBS.fpB=art?pk:+pk}WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpLast=null;upd()}
 // snapping: one switch for the whole pattern, in the Grid tool (WBS.pgrid.snap, .ss for snapping sizes); the same grid is used by every Free place, Pictures and Text layer
 // older projects chose snapping per layer (L.fg): until the switch is first touched here, it is on if any layer had it on
 const pgSnap=()=>WBS.pgrid.snap!==undefined?!!WBS.pgrid.snap:WBS.layers.some(l=>l&&l.fg&&l.fg.snap),pgSs=()=>WBS.pgrid.ss!==undefined?!!WBS.pgrid.ss:WBS.layers.some(l=>l&&l.fg&&l.fg.snap&&l.fg.ss);
@@ -28,7 +28,8 @@ if(WBS.pgrid.sh&&WBS.pgrid.sh!='rect'){const M=gModel(WBS.pgrid.sh,CW,CH,Math.ma
 let d='',m='';for(let x=0;x<=CW+.01;x+=c)d+=`M${x.toFixed(2)} 0V${CH}`;for(let y=0;y<=CH+.01;y+=c)d+=`M0 ${y.toFixed(2)}H${CW}`;
 if(WBS.pgrid.m!='l'){const a=c*.09;for(let y=c/2;y<CH;y+=c)for(let x=c/2;x<CW;x+=c)m+=`M${(x-a).toFixed(2)} ${y.toFixed(2)}h${(2*a).toFixed(2)}M${x.toFixed(2)} ${(y-a).toFixed(2)}v${(2*a).toFixed(2)}`}
 const w=Math.max(CW,CH)/900,all=d+m,o=WBS.pgrid.op/100;g.innerHTML=`<path d="${all}" fill="none" stroke="#fff" stroke-opacity="${(.6*o).toFixed(2)}" stroke-width="${(w*2.6).toFixed(2)}"/><path d="${all}" fill="none" stroke="#2f6bff" stroke-opacity="${(.9*o).toFixed(2)}" stroke-width="${w.toFixed(2)}"/>`}
-const fpL=()=>{const L=WBS.layers[WBS.selL];return L&&L.free?L:null};
+// every layer can hold items (layer update, step 2)
+const fpL=()=>WBS.layers[WBS.selL]||null;
 const fpU=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const fpSeed=u=>{let h=7;for(const c of String(u))h=(h*31+c.charCodeAt(0))>>>0;return h%100000};
 function freeLayer(L,li,pa,lgB){const pl=(L.pl||[]).filter(p=>WBS.tiles.some(t=>t.id==p.t));if(!pl.length)return['',''];const amt=0,act=!DRS()&&((L.pst||0)>0||(L.pfl||0)>0),pre=act?`#q${li}_`:'#s',need=new Set(),f=v=>v.toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off');let defs='',out='';const bh=L.bl=='behind',prev=[];
@@ -44,7 +45,7 @@ const ink=okC(L.ink)?col(L.ink):'';if(ink)defs+=`<filter id="lk${li}" filterUnit
 const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'';
 return[defs,`<g${ink?` filter="url(#lk${li})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}
 function init24(){// ===== Free-place layers: no arrangement, just stamps put down by hand anywhere on the canvas.
-// L.free = true; L.pl = [{u, t: stamp id, x, y (canvas units), s: long side (canvas units), r: degrees, f: 1 | -1}]
+// L.pl = [{u, t: stamp id, x, y (canvas units), s: long side (canvas units), r: degrees, f: 1 | -1}]
 WBS.selLM=new Set();WBS.lAnc=null;WBS.tM=new Set();WBS.tAnc=null;WBS.mAnc=null;WBS.pSel=new Set();WBS.pAnc=null;
 WBS.fpMS=new Set();WBS.fpAnc=null;WBS.fpPool=new Set();WBS.fpPA=null;
 WBS.CR=null;WBS.fpB=null;WBS.fpSel=-1;WBS.fpDrag=null;WBS.fpGhost=null;WBS.fpXf=null;WBS.fpSyncing=0;WBS.fpTh={};WBS.fpAlt=false;

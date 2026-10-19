@@ -289,3 +289,23 @@ Eighth and last step of the text update (project doc `claude/wodblok-text-plan.m
 - **Data:** styles are kept in the browser settings (`wb200_textstyles`), not in the project file; format unchanged.
 - Not in this release: styles kept inside the project file, sharing styles between people.
 - Tests: `text-styles`, `text-randomize`.
+
+## 1.46.1: Layer update, step 1 (layers hold anything)
+First step of the layer update (docs/layer-update-plan.md). Data and drawing only; the screens are unchanged.
+- Any layer may hold free stamps, pictures and text boxes (`layer.pl`) in any mix, with or without an arrangement. Items draw after the arrangement.
+- File format 21 (the number changes so older apps open such files read-only). Pictures used by items on any layer are saved. A layer with damaged pieces is refused.
+- The "old files must open" rule is removed; the 18 to 21 migration and v18 fixtures stay for now.
+- Tests: `layer-items`; `format` expects v21.
+
+## 1.46.2: Layer update, step 2 (any item on any layer)
+Second step of the layer update (docs/layer-update-plan.md). Screens and data.
+- Any layer takes stamps, pictures and text placed by hand, whatever its arrangement. The Layer type dropdown and buttons become Arrangement (None, Repeat, Frame), which keeps what was placed. "+" adds a plain layer. A new Placed items group, and "N placed" in the Layers list.
+- Typing in the Text tool places text on the selected layer. The `art` and `txt` layer flags are dropped when a file is opened (format 21).
+- Tests: `any-layer-items` (new); `layer-types` deleted; several specs updated (listed in the plan).
+
+## 1.46.3: Layer update, step 3 (arrangement on any layer)
+Third step of the layer update (docs/layer-update-plan.md). Screen only; no data change.
+- Arrangement (None, Repeat, Frame) is a visible segmented control. The Layout panel is regrouped: Arrangement, its stamps, Manual arrangement, Variation, Placed items, Align, Impression.
+- A layer with no stamps that gets a Repeat or Frame arrangement takes the current stamp.
+- The speed test (`perf.spec.js`) now scrolls its slider into view; before, it had been measuring an idle page.
+- Tests: `any-layer-items` extended; specs that drove the old dropdown updated.
