@@ -29,7 +29,7 @@ function syncGrid(L,T){const others=WBS.layers.filter(x=>x!==L&&!(x.fr&&x.fr.on)
 if($('lgl').dataset.k!=ky){$('lgl').innerHTML='<option value="">Its own grid</option>'+others.map(x=>`<option value="${hx(x.u)}">Same grid as ${hx(x.name)}</option>`).join('');$('lgl').dataset.k=ky}
 $('lgl').value=T.linked?L.gl:'';$('lglrow').hidden=!T.linked;
 document.querySelectorAll('#lpa [data-p]').forEach(b=>b.classList.toggle('on',b.dataset.p==(L.pa||'c')));
-if(T.linked)$('lglh').textContent=`Uses the grid of ${T.B.name}: same pattern, spacing and stamp size. Each stamp prints at its own Size from the Stamp panel, so small stamps sit neatly in the gaps.`;
+if(T.linked)$('lglh').textContent=`Uses the grid of ${T.B.name}: same pattern, spacing and stamp size. Each stamp prints at its own Size from Stamp settings, so small stamps sit neatly in the gaps.`;
 const ls=WBS.tiles.filter(t=>L.st.includes(t.id)),lt=leadT(L);$('lldrow').hidden=T.linked||ls.length<2;
 const k2=ls.map(t=>t.id+shOf(t).k).join('|');if($('lld').dataset.k!=k2){$('lld').innerHTML=ls.map(t=>`<option value="${t.id}">Stamp ${WBS.tiles.indexOf(t)+1} (${SHN[shOf(t).k]})</option>`).join('');$('lld').dataset.k=k2}
 if(ls.length)$('lld').value=lt.id}

@@ -47,3 +47,14 @@ test('Ctrl+D duplicates the selected shape of an unlocked stamp and does nothing
   expect((await items(page)).length).toBe(n + 1);
   expect(errors).toEqual([]);
 });
+
+test('Settings > Shortcuts lists the keys that work but are not commands, and no key is listed that does nothing', async ({ page }) => {
+  const { errors } = await openApp(page);
+  await page.evaluate(() => document.getElementById('stgo').click());
+  await page.click('#stgnav [data-p="keys"]');
+  const rows = await page.locator('#stgkl .stgkr').evaluateAll(r => r.map(x => x.textContent));
+  for (const k of ['Copy shape', 'Paste shape', 'Hand (hold)', 'Split shape: apply', 'Zoom to fit']) expect(rows.join('|'), k).toContain(k);
+  await page.fill('#stgkq', 'knock');
+  await expect(page.locator('#stgkl .stgkr')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
