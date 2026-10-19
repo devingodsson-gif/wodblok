@@ -1,6 +1,6 @@
 // Dropping a picture on the Pattern view opens the import window. (Dropping into the Stamp editor made a shape at once; that editor is gone. Copy and paste of shapes is tested in stamp-editor-port.spec.js.)
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, settle, getState } = require('./helpers/harness');
+const { TARGET, openApp, settle, getState, unlockStamp } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -17,5 +17,15 @@ test('in the Pattern view a dropped picture still opens the import window', asyn
   const { errors } = await openApp(page);
   await drop(page);
   await expect(page.locator('#idlg')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('with a stamp unlocked a dropped picture becomes a shape in that stamp at once', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await unlockStamp(page);
+  const n = await count(page);
+  await drop(page);
+  await expect.poll(() => count(page), { timeout: 15000 }).toBe(n + 1);
+  await settle(page);
   expect(errors).toEqual([]);
 });

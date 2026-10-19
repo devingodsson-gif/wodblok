@@ -1,6 +1,6 @@
 // The first minute (UX review B4): Randomize is in the top bar, an empty project has no button on the canvas, and an empty stamp in the tray shows a plus.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle, getState, unlockStamp } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -26,17 +26,19 @@ test('Randomize is a labelled button in the top bar and rolls a piece', async ({
   expect(errors).toEqual([]);
 });
 
-test('an empty canvas has no "+" button on it; shapes are added with the Shapes tool', async ({ page }) => {
+test('an empty canvas has no "+" button on it; shapes are added with the Shapes tool into an unlocked stamp', async ({ page }) => {
   const { errors } = await openApp(page);
   await expect(page.locator('#empc')).toHaveCount(0);
+  await unlockStamp(page);
   await openPanel(page, 'motifs');
   await expect(page.locator('section.pn[data-p="motifs"]')).toBeVisible();
   await page.locator('#lib .lfr[data-f^="b:"]').first().click();      // folders open in place (1.5.0)
   await page.locator('#lib button[data-m]').first().click();
-  await page.mouse.click(590, 390);
+  const b = await page.locator('#art').boundingBox();
+  await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2);
   await page.keyboard.press('Escape');
   await settle(page);
-  expect(JSON.parse(await getState(page)).layers.flatMap(l => l.pl || []).length).toBeGreaterThan(0);
+  expect(JSON.parse(await getState(page)).tiles[0].items.length).toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });
 
