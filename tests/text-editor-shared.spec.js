@@ -27,9 +27,10 @@ test('one Text panel for a layer and for an unlocked stamp: the controls are the
   await expect(page.locator('#tx_lay')).toBeVisible();     // ink and textures belong to a Text layer
   await expect(page.locator('#tx_pv')).toBeHidden();
   await unlockStamp(page);
-  await expect(page.locator('#tx_lay')).toBeHidden();
+  await expect(page.locator('#tx_lay')).toHaveJSProperty('hidden', true);
   await expect(page.locator('#tx_pv')).toHaveJSProperty('hidden', false);   // the live preview has no size until there is text
   await page.locator('#stmpl .smklk').first().click(); await settle(page);   // locked again: the layer's options are back
+  await openPanel(page, 'text');
   await expect(page.locator('#tx_lay')).toBeVisible();
   expect(errors).toEqual([]);
 });
