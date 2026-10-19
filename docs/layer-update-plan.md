@@ -167,6 +167,7 @@ One entry per finished step: version, what changed, what was tested, anything th
 | 6 The unique Stamp-editor tools on the canvas | 1.46.6 | done on branch `feat/1.46.1-layers-hold-anything` (restarted from `main`), draft pull request |
 | 7 Stamp settings and several colours per stamp | 1.46.7 | done on branch `feat/1.46.7-stamp-settings` (stacked on step 6), draft pull request |
 | 8 Stamp library tools | 1.46.8 | done on branch `feat/1.46.8-stamp-library` (stacked on step 7), draft pull request |
+| 9a Port the last Stamp-editor tools | 1.46.9 | done on branch `feat/1.46.9-port-editor-tools` (stacked on step 8), draft pull request |
 | 9 to 12 | | not started |
 
 ### Step 0 audit: Stamp editor panels against Canvas mode (Oct 18 2026, read from `MODEP` in `34-desktop-shell.js`)
@@ -277,3 +278,5 @@ All in the **Stamps** panel (a row of `--h-sm` icon buttons above the list; ever
 - **Perf.** slider drag ratio 0.97; Randomize roll plus settle 1703 ms.
 - **Not run:** the CI shard suite and WebKit (milestone: after step 9).
 
+### Step 9a outcome: the four Stamp-editor-only tools work on the canvas (1.46.9, Oct 19 2026)
+For the unlocked stamp in the Pattern view: copy and paste of shapes (Ctrl+C/V), editing text already in a stamp (live edit, Convert to shapes; the Text panel follows the unlocked stamp through `stTxMode`), Split shape (a line over the selected shape with move and turn handles, Split and Cancel in the bar; the overlay repaints through `WBX.wbSceDraw`), and grade masks that belong to one stamp (the Grade panel lists "Stamp N" and its masks while that stamp is unlocked; locking refreshes it). Positional (`sp='s'`) stamp masks still have no canvas handles; they go with step 12 if wanted. Shape list now sits in the Pattern rail. Tests: tests/stamp-editor-port.spec.js. Perf ratio 0.886. Step 9b removes the Stamp editor.

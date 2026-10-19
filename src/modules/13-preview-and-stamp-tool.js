@@ -12,6 +12,7 @@ import {syncAsp,syncGrid} from './14-presets-and-layer-grid-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {libPick} from './21-motif-library-ui.js';
 import {fpL,tGrp} from './24-free-place-layers.js';
+import {stUnlocked} from './63-stamp-tool.js';
 // ---- live pattern preview panel (stamp editor): <use> mirrors of the pattern board, so it updates with every edit
 let pvZ=1;
 function pvView(){const w=CW/pvZ,h=CH/pvZ;$('pvw').setAttribute('viewBox',`${((CW-w)/2).toFixed(1)} ${((CH-h)/2).toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`);document.querySelectorAll('#pvz [data-z]').forEach(b=>b.classList.toggle('on',+b.dataset.z==pvZ))}
@@ -77,10 +78,12 @@ $('sfl').onclick=()=>{if(Q()){QS().forEach(o=>o.f*=-1);store();upd()}};
 $('scp').onclick=()=>{if(!Q())return;const a=WBS.tiles[WBS.cur].items,src=QS(),p=src.indexOf(Q()),ids=[];src.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+20,q.y+20);a.push(q);ids.push(a.length-1)});WBS.msel=new Set(ids);WBS.sel=ids[p];store();upd()};
 // Copy and paste of shapes in the Stamp editor: Cmd/Ctrl+C keeps the selected shapes, Cmd/Ctrl+V puts copies on the open stamp (also another stamp),
 // each paste a little further along; a picture on the clipboard still goes to the importer.
+// the open stamp takes copy and paste in the Stamp editor and, with a stamp unlocked, on the Pattern canvas
+const stEdit=()=>WBS.curView=='stamp'||stUnlocked()!=null;
 {let mclip=null,mpaste=0;const typingIn=t=>!!(t&&t.matches&&t.matches('input,select,textarea,[contenteditable]'));
-document.addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey)||e.altKey||e.shiftKey||e.key.toLowerCase()!='c'||typingIn(e.target)||WBS.curView!='stamp')return;if(String(getSelection&&getSelection()||'').length)return;const src=QS();if(!src.length)return;
+document.addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey)||e.altKey||e.shiftKey||e.key.toLowerCase()!='c'||typingIn(e.target)||!stEdit())return;if(String(getSelection&&getSelection()||'').length)return;const src=QS();if(!src.length)return;
 mclip=src.map(o=>{const q=JSON.parse(JSON.stringify(o));delete q.tg;return q});mpaste=0});
-document.addEventListener('paste',e=>{if(WBS.curView!='stamp'||!mclip||typingIn(e.target))return;if([...(e.clipboardData&&e.clipboardData.items||[])].some(i=>/^image\//.test(i.type)))return;e.preventDefault();
+document.addEventListener('paste',e=>{if(!stEdit()||!mclip||typingIn(e.target))return;if([...(e.clipboardData&&e.clipboardData.items||[])].some(i=>/^image\//.test(i.type)))return;e.preventDefault();
 const t=WBS.tiles[WBS.cur],a=t.items,ids=[];mpaste++;const d=20*mpaste;mclip.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+d,q.y+d);a.push(q);ids.push(a.length-1)});
 WBS.msel=new Set(ids);WBS.sel=ids[0];store();upd()});}
 $('sfr').onclick=()=>{if(!Q())return;const a=WBS.tiles[WBS.cur].items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...rest,...mv);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};

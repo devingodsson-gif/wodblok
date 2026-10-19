@@ -1,9 +1,9 @@
-import {$,WBS,WBX,mod} from './01-launch-and-version.js';
+import {$,WBH,WBS,WBX,mod} from './01-launch-and-version.js';
 import {OFFS,SH,SW,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {it,selOne,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {symOps} from './07-symmetry.js';
-import {delItems,selToggle} from './12-selection-and-split.js';
+import {delItems,selSet,selToggle} from './12-selection-and-split.js';
 import {fpL,fpSnap} from './24-free-place-layers.js';
 import {STP,stMatrix,stUnlocked,stampAt} from './63-stamp-tool.js';
 // ===== Editing the unlocked stamp on the canvas (layer update, step 5) =====
@@ -12,8 +12,9 @@ import {STP,stMatrix,stUnlocked,stampAt} from './63-stamp-tool.js';
 // the round one turns it. Every point is moved from the canvas into the stamp's own space with the inverse of the instance's matrix (see 63-stamp-tool.js),
 // so the shape lands where it was pointed at whatever the layer's rotation, turn, flip or size variation. The stamp's items are the same list the
 // Stamp editor edits, so every instance and every layer that uses the stamp shows the edit. Clicks that do not land on an instance of the unlocked stamp
-// are left to the layer, as before. Text typed in the Text panel is put into the stamp the same way (as the letters the Stamp editor makes).
-const SCE={d:null,h:null,m:null,ai:null};
+// are left to the layer, as before. Text typed in the Text panel is put into the stamp the same way (as the letters the Stamp editor makes); a click on a
+// letter of such a text selects the whole text (Alt-click one letter), which puts the text into the Text panel to be edited live.
+const SCE={d:null,h:null,m:null,sp:null,ai:null};
 // the unlocked stamp, if it is also the open stamp (the selection indexes belong to the open stamp)
 const sceRO=()=>{const id=stUnlocked();if(id==null)return null;const t=WBS.tiles[WBS.cur];return t&&t.id===id?t:null};
 function sceOpen(){const id=stUnlocked();if(id==null)return null;const k=WBS.tiles.findIndex(t=>t.id===id);if(k<0)return null;if(WBS.cur!==k){WBS.cur=k;selOne(-1)}return WBS.tiles[k]}
@@ -31,32 +32,37 @@ function sceItemAt(t,u,v){return sceWith(t,()=>{const ops=symOps(t),offs=OFFS.sl
   for(let c=0;c<ops.length;c++)for(const[ax,ay]of offs){const[x,y]=ops[c].i(u-ax,v-ay);if(sceBox(b,x,y))return{i,c:c+1,ax,ay,o:ops[c]}}}
  return null})}
 const sceFree=()=>{WBS.fpSel=-1;WBS.fpMS=new Set()};
+const sceSel=()=>{if(WBH.draw)WBH.draw();sceDraw()};
 // the Grid tool snaps in canvas units (Alt skips it); a point is snapped there and then moved back into the stamp
 function sceSnap(M,x,y,e){const L=fpL();if(!L)return{x,y};const q=sceTo(M,x,y),n=fpSnap(L,q.x,q.y,e);return sceTo(M.inverse(),n[0],n[1])}
 function sceDown(e){if(e.button!==0)return;const t0=stUnlocked();if(t0==null)return;
  const hand=$('nvhand');if(hand&&hand.getAttribute('aria-pressed')=='true')return;
+ const spk=e.target.closest&&e.target.closest('[data-sp]');
+ if(spk&&WBS.split&&SCE.ai!=null&&STP.items[SCE.ai]){const c=scePt(e),M=sceInv(SCE.ai);if(!c)return;const p=sceTo(M,c.x,c.y);e.preventDefault();e.stopPropagation();SCE.sp={k:spk.dataset.sp,M,ox:WBS.split.x-p.x,oy:WBS.split.y-p.y};return}
  const hd=e.target.closest&&e.target.closest('[data-hd]');
  if(hd){const t=sceRO();if(!t||WBS.msel.size!=1||WBS.sel<0||SCE.ai==null||!STP.items[SCE.ai])return;const q=t.items[WBS.sel];if(!q)return;e.preventDefault();e.stopPropagation();
   SCE.h={k:hd.dataset.hd,q,t,cx:+q.x,cy:+q.y,s0:q.s,sx0:q.sx||1,sy0:q.sy||1,r0:+q.r||0,M:sceInv(SCE.ai)};WBS.WBDRG=1;$('texg').style.display='none';return}
  const c=scePt(e);if(!c)return;const h=stampAt(c.x,c.y,t0);if(!h)return;const t=sceOpen();if(!t)return;
  e.preventDefault();e.stopPropagation();SCE.ai=h.i;
  const M0=stMatrix(STP.items[h.i]),sn=sceSnap(M0,h.u,h.v,e);
- if(WBS.txArm&&WBX.wbTxStampAt){const[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));WBX.wbTxStampAt(+x.toFixed(1),+y.toFixed(1));return}
+ if((WBS.txArm||(WBS.brush&&WBS.brush.txt))&&WBX.wbTxStampAt){const[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));WBX.wbTxStampAt(+x.toFixed(1),+y.toFixed(1));return}
  if(WBS.brush&&!WBS.brush.txt){const M=stMatrix(STP.items[h.i]),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0;let r=WBS.brush.r+(flip?th:-th);r=+(((r+540)%360)-180).toFixed(1);
   const[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));t.items.push(it(WBS.brush.m,+x.toFixed(2),+y.toFixed(2),WBS.brush.s,r));selOne(t.items.length-1);sceFree();store();upd();return}
  const hit=sceItemAt(t,h.u,h.v),add=e.shiftKey||e.ctrlKey||e.metaKey;
- if(!hit){if(!add)selOne(-1);SCE.m={x0:e.clientX,y0:e.clientY,add,on:false,ai:h.i,t};sceDraw();return}
+ if(!hit){if(!add)selOne(-1);SCE.m={x0:e.clientX,y0:e.clientY,add,on:false,ai:h.i,t};sceSel();return}
  const i=hit.i;sceFree();
- if(add){selToggle(i);if(!WBS.msel.has(i)){sceDraw();return}}else if(!WBS.msel.has(i))selOne(i);
+ if(add){selToggle(i);if(!WBS.msel.has(i)){sceSel();return}}else if(!WBS.msel.has(i)){const g=t.items[i].tg;if(g&&!e.altKey)selSet(t.items.map((x,j)=>x.tg===g?j:-1).filter(j=>j>=0),false);else selOne(i)}
  WBS.sel=i;const q=t.items[i],cp=hit.o?sceWith(t,()=>hit.o.p(mod(q.x,SW),mod(q.y,SH))):null;
  SCE.d={t,q,o:hit.o,M:sceInv(h.i),dx:(cp?cp[0]:q.x+hit.ax)-h.u,dy:(cp?cp[1]:q.y+hit.ay)-h.v,x0:e.clientX,y0:e.clientY,moved:false,st:[...WBS.msel].filter(j=>j!=i).map(j=>t.items[j]).filter(Boolean).map(w=>[w,w.x,w.y]),px:q.x,py:q.y};
- sceDraw()}
-function sceMove(e){if(SCE.m){const m=SCE.m,dx=e.clientX-m.x0,dy=e.clientY-m.y0;if(!m.on&&dx*dx+dy*dy<25)return;m.on=true;let b=$('mqb');if(!b){b=document.createElement('div');b.id='mqb';document.body.appendChild(b)}Object.assign(b.style,{display:'block',left:Math.min(m.x0,e.clientX)+'px',top:Math.min(m.y0,e.clientY)+'px',width:Math.abs(dx)+'px',height:Math.abs(dy)+'px'});return}
+ sceSel()}
+function sceMove(e){if(SCE.sp){const c=scePt(e);if(!c||!WBS.split)return;const p=sceTo(SCE.sp.M,c.x,c.y);if(SCE.sp.k=='m'){WBS.split.x=p.x+SCE.sp.ox;WBS.split.y=p.y+SCE.sp.oy}else{let a=Math.atan2(p.y-WBS.split.y,p.x-WBS.split.x)*180/Math.PI;if(e.shiftKey)a=Math.round(a/15)*15;WBS.split.a=a}sceDraw();return}
+ if(SCE.m){const m=SCE.m,dx=e.clientX-m.x0,dy=e.clientY-m.y0;if(!m.on&&dx*dx+dy*dy<25)return;m.on=true;let b=$('mqb');if(!b){b=document.createElement('div');b.id='mqb';document.body.appendChild(b)}Object.assign(b.style,{display:'block',left:Math.min(m.x0,e.clientX)+'px',top:Math.min(m.y0,e.clientY)+'px',width:Math.abs(dx)+'px',height:Math.abs(dy)+'px'});return}
  if(!SCE.h&&!SCE.d)return;const c=scePt(e);if(!c)return;
  if(SCE.h){const h=SCE.h,p=sceTo(h.M,c.x,c.y);sceWith(h.t,()=>{if(h.k=='rot'){let a=Math.atan2(p.y-h.cy,p.x-h.cx)*180/Math.PI+90;if(e.shiftKey)a=Math.round(a/15)*15;h.q.r=+(((a+540)%360)-180).toFixed(1)}else WBX.hdResize(h,p,e)});upd();return}
  const d=SCE.d;if(!d.moved){const dx=e.clientX-d.x0,dy=e.clientY-d.y0;if(dx*dx+dy*dy<9)return;d.moved=true;WBS.WBDRG=1;$('texg').style.display='none'}
  const p=sceTo(d.M,c.x,c.y),sn=sceSnap(d.M,p.x+d.dx,p.y+d.dy,e),np=d.o?d.o.i(sn.x,sn.y):[sn.x,sn.y];d.q.x=+np[0].toFixed(2);d.q.y=+np[1].toFixed(2);const ax=d.q.x-d.px,ay=d.q.y-d.py;d.st.forEach(([w,ox,oy])=>{w.x=+(ox+ax).toFixed(2);w.y=+(oy+ay).toFixed(2)});upd()}
-function sceUp(e){if(SCE.m){const m=SCE.m;SCE.m=null;const b=$('mqb');if(b)b.style.display='none';if(m.on&&e.type=='pointerup'){const x0=Math.min(m.x0,e.clientX),x1=Math.max(m.x0,e.clientX),y0=Math.min(m.y0,e.clientY),y1=Math.max(m.y0,e.clientY),M=STP.items[m.ai]?stMatrix(STP.items[m.ai]):null,a=$('art'),sm=a&&a.getScreenCTM();
+function sceUp(e){if(SCE.sp){SCE.sp=null;return}
+ if(SCE.m){const m=SCE.m;SCE.m=null;const b=$('mqb');if(b)b.style.display='none';if(m.on&&e.type=='pointerup'){const x0=Math.min(m.x0,e.clientX),x1=Math.max(m.x0,e.clientX),y0=Math.min(m.y0,e.clientY),y1=Math.max(m.y0,e.clientY),M=STP.items[m.ai]?stMatrix(STP.items[m.ai]):null,a=$('art'),sm=a&&a.getScreenCTM();
   if(M&&sm){const hit=[];m.t.items.forEach((q,i)=>{const rx=48*q.s*(q.sx||1),ry=48*q.s*(q.sy||1),r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);
     if([[-rx,-ry],[rx,-ry],[rx,ry],[-rx,ry]].every(([u,v])=>{const p=M.transformPoint({x:+q.x+u*c-v*s,y:+q.y+u*s+v*c}),P=a.createSVGPoint();P.x=p.x;P.y=p.y;const k=P.matrixTransform(sm);return k.x>=x0-1&&k.x<=x1+1&&k.y>=y0-1&&k.y<=y1+1}))hit.push(i)});
    hit.forEach(i=>{if(!WBS.msel.has(i))selToggle(i)});upd()}}return}
@@ -75,11 +81,13 @@ function sceDraw(){const g=$('stoh');if(!g)return;const t=sceRO();if(!t||!WBS.ms
   for(const[k,sx,sy]of hd){const p=b.L(sx*b.rx,sy*b.ry);h+=`<rect class="steh" data-hd="${k}" x="${f(p[0]-hs)}" y="${f(p[1]-hs)}" width="${f(hs*2)}" height="${f(hs*2)}" cursor="${cur[k]}"/>`}
   const T=b.L(0,-b.ry),C=b.L(0,0),dx=T[0]-C[0],dy=T[1]-C[1],n=Math.hypot(dx,dy)||1,R=[T[0]+dx/n*off,T[1]+dy/n*off];
   h+=`<line class="stes" x1="${f(T[0])}" y1="${f(T[1])}" x2="${f(R[0])}" y2="${f(R[1])}"/><circle class="steh" data-hd="rot" cx="${f(R[0])}" cy="${f(R[1])}" r="${f(hs*1.15)}" cursor="grab"/>`}
+ if(WBS.split&&WBS.split.i===WBS.sel){const q2=t.items[WBS.split.i];if(q2){const L=52*q2.s*Math.max(q2.sx||1,q2.sy||1)+14,a=WBS.split.a*Math.PI/180,ux=Math.cos(a)*L,uy=Math.sin(a)*L,p1=P(WBS.split.x-ux,WBS.split.y-uy),p2=P(WBS.split.x+ux,WBS.split.y+uy),pc=P(WBS.split.x,WBS.split.y),ln=(c,x)=>`<line class="${c}" ${x} x1="${f(p1[0])}" y1="${f(p1[1])}" x2="${f(p2[0])}" y2="${f(p2[1])}"/>`;
+  h+=ln('stsp','')+ln('stsph','data-sp="m"')+`<circle class="steh" data-sp="m" cx="${f(pc[0])}" cy="${f(pc[1])}" r="${f(hs*1.15)}" cursor="move"/><circle class="steh" data-sp="r" cx="${f(p2[0])}" cy="${f(p2[1])}" r="${f(hs*1.4)}" cursor="grab"/>`}}
  g.innerHTML=h}
 function sceKey(e){if(WBS.curView!=='pattern'||WBS.brush&&e.key!=='Delete')return;const tg=e.target;if(tg&&tg.matches&&tg.matches('input,select,textarea,[contenteditable]'))return;const t=sceRO();if(!t||!WBS.msel.size)return;
- if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();delItems([...WBS.msel]);selOne(-1);store();upd()}else if(e.key=='Escape'){selOne(-1);sceDraw()}}
+ if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();delItems([...WBS.msel]);selOne(-1);store();upd()}else if(e.key=='Escape'){selOne(-1);sceSel()}}
 function init64(){
- STP.after=sceDraw;
+ STP.after=sceDraw;WBX.wbSceDraw=sceDraw;
  const w=$('artwrap');if(w)w.addEventListener('pointerdown',sceDown,true);
  document.addEventListener('pointermove',sceMove);document.addEventListener('pointerup',sceUp);document.addEventListener('pointercancel',sceUp);
  document.addEventListener('keydown',sceKey);
