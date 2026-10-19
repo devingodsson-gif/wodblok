@@ -1,6 +1,6 @@
 // Command search (Mod+K): finds any command in the registry and runs it, by keyboard or by pointer.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, settle, setMode } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build; v100 has no command registry'); });
 
@@ -83,11 +83,5 @@ test('with nothing typed, the list starts with what you ran last, then commands 
   await page.keyboard.press('Control+k');
   expect((await rowsOf(page))[0]).toBe('Zoom in');
   await page.keyboard.press('Escape');
-  // switch to the Stamp editor: its commands now rank above the Pattern-only tools
-  await setMode(page, 'stamp');
-  await settle(page);
-  await page.keyboard.press('Control+k');
-  const stamp = await rowsOf(page);
-  expect(stamp.indexOf('Open Shapes')).toBeLessThan(stamp.indexOf('Open Layers'));
   expect(errors).toEqual([]);
 });

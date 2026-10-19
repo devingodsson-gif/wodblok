@@ -1,7 +1,7 @@
 // Shape export (1.3.0): the library as a zip of SVG files, folders inside folders kept.
 const { test, expect } = require('@playwright/test');
 const path = require('path'), { pathToFileURL } = require('url');
-const { TARGET, openApp, openPanel, setMode, settle } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
 
 const nativeImport = new Function('u', 'return import(u)');
 const load = f => nativeImport(pathToFileURL(path.join(__dirname, '..', 'src', f)).href);
@@ -62,7 +62,7 @@ const downloaded = async (page, i) => {
   const files = unzipSync(new Uint8Array(Buffer.from(d.base64, 'base64')));
   return { filename: d.filename, files, names: Object.keys(files).sort(), text: n => strFromU8(files[n]) };
 };
-async function open(page) { const r = await openApp(page); await setMode(page, 'stamp'); await openPanel(page, 'motifs'); return r; }
+async function open(page) { const r = await openApp(page); await openPanel(page, 'motifs'); return r; }
 async function pick(page, sel, v) {
   await page.locator(sel).locator('xpath=following-sibling::div[contains(@class,"dd2")][1]/button').click();
   await page.locator(`.ddl:not([hidden]) .ddi[data-v="${v}"]`).click();

@@ -1,7 +1,7 @@
 // 1.0.16: colour slots named Paper / Ink / Accent / Accent 2 (as the print proof says), the add-colour tile first in the library, previews for the
 // starting Looks, check marks and a heading in the Display menu, and the stamp library's own default name (UX review C9, C16, C20, D15).
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
@@ -45,7 +45,6 @@ test('the four view toggles live in Settings (General) and the Display tab is go
 
 test('the stamp library says what an empty name will become, and confirms in the status line', async ({ page }) => {
   const { errors } = await openApp(page);
-  await setMode(page, 'stamp');
   await openPanel(page, 'slib');
   await expect(page.locator('#slname')).toHaveAttribute('placeholder', 'Stamp 1');
   await page.click('#slsave');

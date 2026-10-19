@@ -1,15 +1,14 @@
 // Continuity between the tool panels: the same kind of control looks the same in every panel (headings, buttons, dropdowns, text fields,
 // segmented controls, shape pickers). Measured on the real panels, in both views.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, setMode } = require('./helpers/harness');
+const { TARGET, openApp } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build'); });
 
 test('every tool panel uses the same heading, button, dropdown, field and segmented-control styles', async ({ page }) => {
   const { errors } = await openApp(page);
   const seen = { summary: new Set(), altFont: new Set(), ddRadius: new Set(), fieldRadius: new Set(), segOn: new Set(), segH: new Set(), tileRadius: new Set(), labelInline: new Set() };
-  for (const mode of ['pattern', 'stamp']) {
-    await setMode(page, mode);
+  for (const mode of ['pattern']) {
     const tools = await page.locator('.rail [data-pn]:not([hidden])').evaluateAll(b => b.map(x => x.dataset.pn));
     for (const pn of tools) {
       await page.click('#rcls'); await page.click(`#rail-${pn}`);
@@ -36,7 +35,6 @@ test('every tool panel uses the same heading, button, dropdown, field and segmen
 
 test('the Stamp panel shape picker is the same tile picker as Canvas and the grid tools', async ({ page }) => {
   const { errors } = await openApp(page);
-  await setMode(page, 'stamp');
   await page.click('#rail-stamp');
   await expect(page.locator('#skind')).toHaveClass(/shg/);
   expect(await page.locator('#skind button').count()).toBeGreaterThanOrEqual(5);

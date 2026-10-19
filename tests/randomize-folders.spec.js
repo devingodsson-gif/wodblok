@@ -1,16 +1,15 @@
 // Randomize: shape folders (1.6.0). A roll takes its shapes only from the ticked library folders; all ticked works as before.
 const { test, expect } = require('@playwright/test');
-const { TARGET, openApp, openPanel, setMode, settle, getState } = require('./helpers/harness');
+const { TARGET, openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in 1.6.0'); });
 
 const roll = async page => { await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
 const usedKeys = async page => new Set([...(await getState(page)).matchAll(/"m":"(b\d+|i\|[^"]*)"/g)].map(m => m[1]));
 const birdKeys = async page => {
-  await setMode(page, 'stamp'); await openPanel(page, 'motifs');
+  await openPanel(page, 'motifs');
   await page.locator('#lib .lfr[data-f="b:Birds"]').click();
   const ks = await page.locator('#lib button[data-m]').evaluateAll(b => b.map(x => x.dataset.m));
-  await setMode(page, 'pattern');
   return new Set(ks);
 };
 
