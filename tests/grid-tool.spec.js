@@ -13,14 +13,11 @@ const outline = (page, panel) => page.evaluate(p => {
   return rows;
 }, panel);
 
-test('the Grid tool is the same in Pattern mode and in the Stamp editor: name, icon and controls', async ({ page }) => {
+test('the Grid tool in the Pattern view has the name Grid and an icon', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 3 });
-  const rail = await page.evaluate(() => ['rail-pgrid', 'rail-grid'].map(id => { const b = document.getElementById(id); return [b.getAttribute('aria-label'), b.querySelector('svg').outerHTML, b.querySelector('.tip').textContent]; }));
-  expect(rail[0]).toEqual(rail[1]);
-  expect(rail[0][0]).toBe('Grid');
-  const a = await outline(page, 'pgrid'), b = await outline(page, 'grid');
-  expect(a.length).toBeGreaterThan(14);
-  expect(a).toEqual(b);
+  const rail = await page.evaluate(() => { const b = document.getElementById('rail-pgrid'); return [b.getAttribute('aria-label'), !!b.querySelector('svg')]; });
+  expect(rail).toEqual(['Grid', true]);
+  expect((await outline(page, 'pgrid')).length).toBeGreaterThan(14);
   expect(errors).toEqual([]);
 });
 
@@ -88,20 +85,5 @@ test('older projects that snapped per layer open with Snap to grid on, and turni
   await page.click('#pgn'); await settle(page);
   expect(JSON.parse(await getState(page)).pg.snap).toBe(false);
   fs.unlinkSync(f);
-  expect(errors).toEqual([]);
-});
-
-test('Stamp editor Grid: same switch, snap points and size snapping', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await setMode(page, 'stamp');
-  await openPanel(page, 'grid');
-  await page.click('#gsd'); await settle(page);
-  await expect(page.locator('#gon')).toBeChecked();
-  await page.click('#gsp [data-g="b"]'); await settle(page);
-  await expect(page.locator('#gsp [data-g="b"]')).toHaveClass(/on/);
-  await page.click('#gr'); await settle(page);                          // Reset grid keeps it showing and snapping
-  await expect(page.locator('#gsd')).toBeChecked();
-  await expect(page.locator('#gsp [data-g="c"]')).toHaveClass(/on/);
-  await expect(page.locator('#gq')).toBeDisabled();                       // nothing on the stamp to snap yet
   expect(errors).toEqual([]);
 });

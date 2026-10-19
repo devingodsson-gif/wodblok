@@ -168,6 +168,7 @@ One entry per finished step: version, what changed, what was tested, anything th
 | 7 Stamp settings and several colours per stamp | 1.46.7 | done on branch `feat/1.46.7-stamp-settings` (stacked on step 6), draft pull request |
 | 8 Stamp library tools | 1.46.8 | done on branch `feat/1.46.8-stamp-library` (stacked on step 7), draft pull request |
 | 9a Port the last Stamp-editor tools | 1.46.9 | done on branch `feat/1.46.9-port-editor-tools` (stacked on step 8), draft pull request |
+| 9b Retire the Stamp editor | 1.46.10 | done on branch `feat/1.46.10-retire-stamp-editor` (stacked on 9a) |
 | 9 to 12 | | not started |
 
 ### Step 0 audit: Stamp editor panels against Canvas mode (Oct 18 2026, read from `MODEP` in `34-desktop-shell.js`)
@@ -280,3 +281,6 @@ All in the **Stamps** panel (a row of `--h-sm` icon buttons above the list; ever
 
 ### Step 9a outcome: the four Stamp-editor-only tools work on the canvas (1.46.9, Oct 19 2026)
 For the unlocked stamp in the Pattern view: copy and paste of shapes (Ctrl+C/V), editing text already in a stamp (live edit, Convert to shapes; the Text panel follows the unlocked stamp through `stTxMode`), Split shape (a line over the selected shape with move and turn handles, Split and Cancel in the bar; the overlay repaints through `WBX.wbSceDraw`), and grade masks that belong to one stamp (the Grade panel lists "Stamp N" and its masks while that stamp is unlocked; locking refreshes it). Positional (`sp='s'`) stamp masks still have no canvas handles; they go with step 12 if wanted. Shape list now sits in the Pattern rail. Tests: tests/stamp-editor-port.spec.js. Perf ratio 0.886. Step 9b removes the Stamp editor.
+
+### Step 9b outcome: the Stamp editor can no longer be reached (1.46.10, Oct 19 2026)
+Removed: the Pattern / Stamp editor switch, the `v` key, the New/Duplicate/tab/library clicks that switched view, the Grid and Pattern preview rail buttons and their two commands. `setView('stamp')` now does nothing (it falls back to Pattern) unless the test hook has allowed it. Kept until step 12: the dormant editor code, the hidden `boardS` DOM, and `__wbTest.setView`, which `setMode(page,'stamp')` uses so the older specs that still exercise text, shapes and library code in the editor keep running; step 12 deletes the dead code and moves those specs to the canvas flow. Specs changed: the Grid spec's stamp-editor test is gone (snapping on the canvas is tested in step 6), rail, launch, first-minute and the panel iterators (panel-text, spelling, text-size, dock-default skip the Shape list in Pattern, where it is empty until a stamp is unlocked). Not done: the per-mode `stamp` workspaces were not dropped (they are inert), and the 43 specs were not all rewritten to the canvas flow.
