@@ -27,7 +27,7 @@ const blank=()=>({img:'',iw:0,ih:0,sc:100});let covB;let covS;
 let cov={img:'',iw:0,ih:0,sc:100};
 const okImg=u=>typeof u=='string'&&/^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(u);
 const slotC=()=>WBS.cslot=='b'?covB:WBS.cslot=='s'?covS:cov,setSlotC=o=>{if(WBS.cslot=='b')covB=o;else if(WBS.cslot=='s')covS=o;else cov=o};
-function covOrder(){const on=cov.tx!==false,a=$('art');if(on)a.insertBefore($('covg'),$('texg'));else a.appendChild($('covg'));const pv=$('pvw'),tu=pv.querySelector('use[href="#texg"]');if(on)pv.insertBefore($('pvcu'),tu);else pv.appendChild($('pvcu'));$('covtx').checked=on;a.appendChild($('guig'))}
+function covOrder(){const on=cov.tx!==false,a=$('art');if(on)a.insertBefore($('covg'),$('texg'));else a.appendChild($('covg'));$('covtx').checked=on;a.appendChild($('guig'))}
 const saveCov=()=>{try{kv.set('wb40_coverB',JSON.stringify(covB));kv.set('wb40_coverS',JSON.stringify(covS))}catch(e){}try{kv.set('wb31_cover',JSON.stringify({...cov,on:$('cov').checked}))}catch(e){$('cvmsg').textContent='This image is too large to keep in the browser; it will stay until you reload. Saving the project keeps it.'}};
 function renderCover(){const on=$('cov').checked,k=[on,CW,CH,WBS.book.on?JSON.stringify(WBS.book):'',...[cov,covB,covS].map(c=>[c.sc,c.img.length,c.img.slice(-24)].join(','))].join('|');if(k==WBS.covKey)return;WBS.covKey=k;let h='';
 const put=(c,x,y,w,hh)=>{if(!c.img||!c.iw)return'';const f=Math.min(w/c.iw,hh/c.ih)*c.sc/100,iw=c.iw*f,ih=c.ih*f;return`<image href="${c.img}" x="${(x+(w-iw)/2).toFixed(1)}" y="${(y+(hh-ih)/2).toFixed(1)}" width="${iw.toFixed(1)}" height="${ih.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`};

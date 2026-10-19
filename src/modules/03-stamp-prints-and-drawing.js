@@ -1,7 +1,6 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
-import {pvZ} from './13-preview-and-stamp-tool.js';
 import {SURFC} from './17-texture-panel-and-previews.js';
 // ---- v66 stamp prints. Every distinct impression (a stamp, its pressure side, its rim variant) is printed once into an image by the
 // browser's own SVG engine; the pattern then places those images instead of re-running the masks and filters for every copy.
@@ -14,7 +13,7 @@ const bkQ=x=>+Math.max(.02,x).toPrecision(5);
 function bkScale(){if(WBS.WBDRG&&WBS._bkS>0)return WBS._bkS;return WBS._bkS=bkScale0()}
 function bkScale0(){const d=window.devicePixelRatio||1,a=$('art');let s=0;try{const m=a.getScreenCTM();if(m&&m.a)s=Math.hypot(m.a,m.b)}catch(e){}
  if(!(s>0)){let w=parseFloat(a.style.width);if(!(w>0))w=a.getBoundingClientRect().width;s=(w>0?w:CW)/CW}
- try{if(WBS.curView=='stamp'){const r=$('pvw').getBoundingClientRect();if(r.width>0&&r.height>0)s=Math.max(s,Math.min(r.width/CW,r.height/CH)*pvZ)}}catch(e){}return s*d}
+ return s*d}
 function bkPre(){BK.live=!!(WBX.wbZoomIn&&WBX.wbZoomIn());BK.sc=bkScale()}
 const bkSurf=t=>SURFC[t]?(WBS.edInk?SURFC[t].s:`<mask id="is${t}" maskUnits="userSpaceOnUse" x="-100000" y="-100000" width="200000" height="200000"><rect x="-100000" y="-100000" width="200000" height="200000" fill="#fff"/></mask>`):'';
 // a stamp's fingerprint is only worked out again when its outline text (or its surface) is not the same string as last time

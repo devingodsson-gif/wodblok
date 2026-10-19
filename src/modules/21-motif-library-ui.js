@@ -199,7 +199,6 @@ $('fdelm').onclick=()=>{const dm=$('fdelm'),ks=[...lsel].filter(k=>k[0]!='b'),us
 if(!ok.length){pmsg('Those shapes are used on your stamps. Remove them from the stamps first.');return}
 if(!dm.dataset.sure){dm.dataset.sure=1;dm.textContent='Click to confirm';setTimeout(()=>{if(dm.dataset.sure){delete dm.dataset.sure;renderLib(true)}},3000);return}
 delete dm.dataset.sure;ok.forEach(k=>{delete cust[k];lsel.delete(k)});store();lbDirty();upd();pmsg(`Deleted ${ok.length} shape${ok.length>1?'s':''} from the library.`+(ok.length<ks.length?` ${ks.length-ok.length} in use on your stamps were kept.`:''))};
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&!$('boardS').hidden&&!(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]'))){const n=WBS.tiles[WBS.cur].items.length;if(!n)return;e.preventDefault();selSet([...Array(n).keys()],false);upd();pmsg(`Selected all ${n} shape${n>1?'s':''} on this stamp.`)}});
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&WBS.lsm&&!(e.target.matches&&e.target.matches('input,textarea,select')))libExit()});
 }
 export {libDest,libExportList,libG,libMk,libOpen,libOptions,libPath,libPick,libRz,mNm,renderLib,init21};

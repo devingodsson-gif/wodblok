@@ -6,7 +6,7 @@ test.beforeEach(() => { test.skip(TARGET === 'legacy', 'new in the repo build');
 
 test('launch is still fully cleared: Pattern view, no panel open, no stamps printed', async ({ page }) => {
   const { errors } = await openApp(page);
-  await expect(page.locator('#boardS')).toBeHidden();
+  await expect(page.locator('#boardS')).toHaveCount(0);
   expect(await page.evaluate(() => [...document.querySelectorAll('.dock.dk')].filter(d => d.offsetWidth * d.offsetHeight > 0).length), 'no tool windows open at launch').toBe(0);
   expect(JSON.parse(await getState(page)).tiles.every(t => !t.items.length)).toBe(true);
   expect(errors).toEqual([]);

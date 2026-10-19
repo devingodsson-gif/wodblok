@@ -6,24 +6,14 @@ import {cols,cust,inkOf,it,mk,selOne,store} from './06-motif-library-folders.js'
 import {SYM,expand,symOf} from './07-symmetry.js';
 import {clipWrap,grid,snapPt} from './09-stamp-editor-grid-and-motif-ops.js';
 import {GRAD,gArrAll,arrOf,arrOpts,build,fitTs,hx,lattice} from './10-layer-grids.js';
-import {Q,eR,eT,ed,upd} from './11-pressure-flooding-block-edges.js';
+import {Q,eR,eT,upd} from './11-pressure-flooding-block-edges.js';
+import {sceDropShape} from './64-stamp-canvas-edit.js';
 import {QS,clampN,delItems,selSet,selToggle,wrapA} from './12-selection-and-split.js';
 import {syncAsp,syncGrid} from './14-presets-and-layer-grid-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {libPick} from './21-motif-library-ui.js';
 import {fpL,tGrp} from './24-free-place-layers.js';
 import {stUnlocked} from './63-stamp-tool.js';
-// ---- live pattern preview panel (stamp editor): <use> mirrors of the pattern board, so it updates with every edit
-let pvZ=1;
-function pvView(){const w=CW/pvZ,h=CH/pvZ;$('pvw').setAttribute('viewBox',`${((CW-w)/2).toFixed(1)} ${((CH-h)/2).toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}`);document.querySelectorAll('#pvz [data-z]').forEach(b=>b.classList.toggle('on',+b.dataset.z==pvZ))}
-function paintGhost(){let g=ed.querySelector('#ghost');ed.classList.toggle('brush',!!WBS.brush&&!!WBS.gp);
-$('edh1').textContent=WBS.brush?(WBS.brush.txt?'Click to put the text down. Esc or right-click to stop.':'Click to stamp. Scroll to resize, [ and ] to rotate. Esc or right-click to stop.'):'Drag to move. Click to select, Shift+click to add.';$('wrh').hidden=!!WBS.brush;
-if(!WBS.brush||!WBS.gp||(WBS.brush.txt&&!WBS.txg)){if(g)g.remove();return}
-if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='ghost';g.setAttribute('pointer-events','none');g.setAttribute('opacity','.6');ed.appendChild(g)}
-const cl=cols(WBS.tiles[WBS.cur]),tg=WBS.brush.txt,key=(tg?'t'+WBS.txg.id+(WBS.txg.over?'o':''):WBS.brush.m)+'|'+cl.c+'|'+cl.d;if(g.dataset.k!==key){g.innerHTML=tg?txGhostSVG(WBS.txg,cl.c):mk(WBS.brush.m,cl.c,cl.d);g.dataset.k=key}
-let x=WBS.gp.x,y=WBS.gp.y;if(grid.sd)[x,y]=snapPt(x,y);g.setAttribute('transform',tg?`translate(${x.toFixed(1)} ${y.toFixed(1)})`:`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${WBS.brush.r}) scale(${WBS.brush.s.toFixed(4)})`)}
-// the faint copy of a text that follows the cursor, with its box drawn round it
-const txGhostSVG=(G,fill)=>G.gl.map(p=>`<path d="${p.d}" transform="translate(${p.x} ${p.y}) rotate(${p.r}) scale(${p.s})" fill="${fill}" fill-rule="evenodd"/>`).join('')+(r=>`<rect ${r} fill="none" stroke="#fff" stroke-width="4" vector-effect="non-scaling-stroke"/><rect ${r} fill="none" style="stroke:var(${G.over?'--warn':'--acc'})" stroke-width="2" stroke-dasharray="6 4" vector-effect="non-scaling-stroke"/>`)(`x="${G.box[0].toFixed(1)}" y="${G.box[1].toFixed(1)}" width="${(G.box[2]-G.box[0]).toFixed(1)}" height="${(G.box[3]-G.box[1]).toFixed(1)}"`);
 const mName=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
 let mlFold;
 const CHEV='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3l3 3-3 3"/></svg>';
@@ -49,19 +39,15 @@ function sync(){const t=WBS.tiles[WBS.cur],L=WBS.layers[WBS.selL],sv=(id,v)=>{if
 $('caspbox').hidden=!CASP.includes(k);$('crrbox').hidden=k!='rrect';$('cngbox').hidden=k!='ngon';$('ccobox').hidden=!['hex','tri','ngon'].includes(k);$('ccirh').hidden=k=='rect';
 {const a=$('ccr'),b=$('cns');if(document.activeElement!==a)a.value=WBS.dim.cr==null?25:WBS.dim.cr;if(document.activeElement!==b)b.value=csN();if(typeof nums=='function')nums()}
 const ob=document.querySelectorAll('#cor [data-o]');ob.forEach(x=>x.classList.toggle('on',x.dataset.o==(WBS.dim.co=='f'?'f':'p')));if(ob.length){ob[0].textContent=k=='hex'?'Pointy top':'Point up';ob[1].textContent=k=='tri'?'Point down':'Flat top'}
-}document.querySelectorAll('#skind [data-k]').forEach(b=>b.classList.toggle('on',b.dataset.k==SK));$('sasprow').hidden=SK=='hex'||SK=='tri';$('shexrow').hidden=SK!='hex';$('shor').value=HO;$('wrh').textContent=SK=='circle'||SK=='tri'||ORN.includes(SK)?`Shapes are trimmed to the ${(SHN[SK]||'stamp').toLowerCase()}.`:'Shapes wrap around the stamp edges, so it tiles seamlessly.';
+}document.querySelectorAll('#skind [data-k]').forEach(b=>b.classList.toggle('on',b.dataset.k==SK));$('sasprow').hidden=SK=='hex'||SK=='tri';$('shexrow').hidden=SK!='hex';$('shor').value=HO;
 if(WBX.wbTraySync)WBX.wbTraySync();$('neg').checked=!!t.neg;
 sv('lay',L.lay);sv('lgr',L.grid||'');const T=lattice(L),B=T.B,lk=T.linked;{const op=arrOpts(T.g),ky=T.g.SK+op.length;if($('larr').dataset.k!=ky){$('larr').innerHTML=op.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')+`<optgroup label="Round the middle">${GRAD.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</optgroup>`;$('larr').dataset.k=ky}sv('larr',arrOf(L,T.g).k)}sv('lgp',B.gap||0);sv('ts',B.fit?+fitTs(B).toFixed(1):B.size);document.querySelectorAll('#tsfit [data-f]').forEach(b=>{b.classList.toggle('on',b.dataset.f==(B.fit||''));b.disabled=lk});[['lox',!lk&&L.fit=='h'],['loy',!lk&&L.fit=='v'],['lrt',lk||!!L.fit],['lgp',lk],['ts',lk]].forEach(([id,off])=>{$(id).disabled=off;const n=$(id).parentNode.querySelector('.num input');if(n)n.disabled=off});sv('lox',L.ox);sv('loy',L.oy);sv('lrr',L.rrot||0);$('lborow').hidden=lk||!(T.gm=='brick'||T.gm=='drop');if($('lbo').value!=String(B.bo||50)){const ok=[...$('lbo').options].some(o=>+o.value==(B.bo||50));if(ok)$('lbo').value=[...$('lbo').options].find(o=>+o.value==(B.bo||50)).value}sv('lrp',L.rpos||0);sv('lrz',L.rsz||0);sv('lrg',L.rgp||0);$('lrsec').hidden=false;$('lrtn').checked=!!L.rtn;$('lrfh').checked=!!L.rfh;$('lrfv').checked=!!L.rfv;sv('lrt',B.rot||0);syncGrid(L,T);sv('shz',shOf(t).z||100);{const rr=$('shrad');if(rr){sv('shrad',shOf(t).rad||0);const row=rr.closest('.ctl');if(row)row.hidden=SK=='circle'}}sv('lps',L.pst||0);sv('lfs',L.pfl||0);sv('lnm',L.name);$('man').checked=!!L.man;{const c=Object.keys(L.ov||{}).length;$('mancnt').textContent=c?c+' changed':'';$('manr').disabled=!c}$('art').classList.toggle('man',!!L.man);sv('let',eT(t));sv('ler',eR(t));$('lers').disabled=!eT(t)||!eR(t);
 Object.values(DD).forEach(f=>f())}
-function init13(){try{pvZ=+kv.get('wb31_pvz')||1}catch(e){}
-{let on=false;try{on=kv.get('wb31_pvc')=='1'}catch(e){}const setC=v=>{on=v;$('pvc').setAttribute('aria-pressed',v);$('pvcu').setAttribute('visibility',v?'visible':'hidden');try{kv.set('wb31_pvc',v?'1':'0')}catch(e){}};setC(on);$('pvc').onclick=()=>setC(!on)}
-$('pvz').onclick=e=>{const b=e.target.closest('[data-z]');if(!b)return;pvZ=+b.dataset.z;try{kv.set('wb31_pvz',pvZ)}catch(e){}pvView()};
+function init13(){
 // ---- Stamp tool: pick a motif in the library, then click on the stamp to stamp it. Scroll resizes, [ ] rotates, Esc or right-click stops.
 WBS.brush=null;WBS.gp=null;
-ed.addEventListener('pointerleave',()=>{WBS.gp=null;paintGhost()});
 document.addEventListener('contextmenu',e=>{if(WBS.brush){e.preventDefault();WBS.brush=null;upd();return}
 if(typeof WBS.fpB!='undefined'&&(WBS.fpB||WBS.txArm||WBS.fpSel!==-1)&&fpL()){e.preventDefault();WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}e.preventDefault()},true);
-ed.addEventListener('wheel',e=>{if(!WBS.brush||WBS.brush.txt||e.ctrlKey||e.metaKey)return;e.preventDefault();WBS.brush.s=Math.min(2.6,Math.max(.08,WBS.brush.s*(e.deltaY<0?1.08:1/1.08)));paintGhost()},{passive:false});
 mlFold=new Set();try{mlFold=new Set(JSON.parse(kv.get('wb18_mlfold')||'[]'))}catch(e){}
 $('mlist').onmousedown=e=>{if(e.shiftKey&&e.target.closest('.mr'))e.preventDefault()};
 $('mlist').onclick=e=>{const ML=$('mlist'),C=q=>{const x=e.target.closest(q);return x&&ML.contains(x)?x:null},t=WBS.tiles[WBS.cur],add=e.shiftKey||e.ctrlKey||e.metaKey,rng=e.shiftKey,ofName=nm=>t.items.map((q,i)=>(q.tg?'txt:'+q.tg:mName(q.m))==nm?i:-1).filter(i=>i>=0);
@@ -79,7 +65,7 @@ $('scp').onclick=()=>{if(!Q())return;const a=WBS.tiles[WBS.cur].items,src=QS(),p
 // Copy and paste of shapes in the Stamp editor: Cmd/Ctrl+C keeps the selected shapes, Cmd/Ctrl+V puts copies on the open stamp (also another stamp),
 // each paste a little further along; a picture on the clipboard still goes to the importer.
 // the open stamp takes copy and paste in the Stamp editor and, with a stamp unlocked, on the Pattern canvas
-const stEdit=()=>WBS.curView=='stamp'||stUnlocked()!=null;
+const stEdit=()=>stUnlocked()!=null;
 {let mclip=null,mpaste=0;const typingIn=t=>!!(t&&t.matches&&t.matches('input,select,textarea,[contenteditable]'));
 document.addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey)||e.altKey||e.shiftKey||e.key.toLowerCase()!='c'||typingIn(e.target)||!stEdit())return;if(String(getSelection&&getSelection()||'').length)return;const src=QS();if(!src.length)return;
 mclip=src.map(o=>{const q=JSON.parse(JSON.stringify(o));delete q.tg;return q});mpaste=0});
@@ -98,8 +84,7 @@ $('sdl').onclick=()=>{if(Q()){delItems([...WBS.msel]);selOne(-1);store();upd()}}
 L.addEventListener('pointerdown',e=>{if(e.button!==0||e.shiftKey||e.ctrlKey||e.metaKey||WBS.lsm)return;const b=e.target.closest('button[data-m]');if(!b)return;ld={k:b.dataset.m,x:e.clientX,y:e.clientY,on:false,g:null}});
 document.addEventListener('pointermove',e=>{if(!ld)return;if(!ld.on){if(Math.hypot(e.clientX-ld.x,e.clientY-ld.y)<6)return;ld.on=true;const s=L.querySelector('button[data-m="'+ld.k+'"] svg');if(s){const g=s.cloneNode(true);g.id='mdg';g.style.cssText='position:fixed;width:44px;height:44px;pointer-events:none;z-index:70;opacity:.85;transform:translate(-50%,-50%)';document.body.appendChild(g);ld.g=g}}
 if(ld.g){ld.g.style.left=e.clientX+'px';ld.g.style.top=e.clientY+'px';if(WBX.wbLibOver)WBX.wbLibOver(document.elementFromPoint(e.clientX,e.clientY))}});
-const lend=e=>{if(!ld)return;const x=ld;ld=null;if(x.g)x.g.remove();if(!x.on)return;lsw=true;setTimeout(()=>{lsw=false},0);if(WBX.wbLibOver)WBX.wbLibOver(null);if(e.type!='pointerup')return;if(WBX.wbLibDrop&&WBX.wbLibDrop(x.k,document.elementFromPoint(e.clientX,e.clientY)))return;const r=ed.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;
-const p=ed.createSVGPoint();p.x=e.clientX;p.y=e.clientY;let[px,py]=(q=>[q.x,q.y])(p.matrixTransform(ed.getScreenCTM().inverse()));if(grid.sd)[px,py]=snapPt(px,py);[px,py]=wrapP(px,py);const a=WBS.tiles[WBS.cur].items;a.push(it(x.k,px,py,DOTK.has(x.k)?.22:.8,0));selOne(a.length-1);WBS.brush=null;store();upd();if(WBX.wbCap)WBX.wbCap()};
+const lend=e=>{if(!ld)return;const x=ld;ld=null;if(x.g)x.g.remove();if(!x.on)return;lsw=true;setTimeout(()=>{lsw=false},0);if(WBX.wbLibOver)WBX.wbLibOver(null);if(e.type!='pointerup')return;if(WBX.wbLibDrop&&WBX.wbLibDrop(x.k,document.elementFromPoint(e.clientX,e.clientY)))return;sceDropShape(x.k,e)};
 document.addEventListener('pointerup',lend);document.addEventListener('pointercancel',lend);
 L.addEventListener('click',e=>{if(lsw){e.stopImmediatePropagation();e.preventDefault()}},true)}
 $('lib').onclick=e=>{const x=e.target.closest('[data-x]');if(x){const k=x.dataset.x;if(WBS.tiles.some(t=>t.items.some(q=>q.m==k))){$('pmsg').textContent='That shape is used on a stamp. Remove it from your stamps first.';return}if(!x.dataset.sure){x.dataset.sure=1;x.textContent='?';setTimeout(()=>{if(x.isConnected){delete x.dataset.sure;x.innerHTML='&#215;'}},2500);return}delete cust[k];store();build();$('pmsg').textContent='Removed from the library.';return}const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;if(WBS.lsm||e.ctrlKey||e.metaKey||e.shiftKey){libPick(k,e);return}WBS.brush=WBS.brush&&WBS.brush.m==k?null:{m:k,s:DOTK.has(k)?.22:.8,r:0};selOne(-1);upd()};
@@ -122,4 +107,4 @@ $('addT').onclick=()=>{const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1]
 $('dupT').onclick=()=>{const g=tGrp(),pid=WBS.tiles[WBS.cur].id,cps=[];let pc=null;g.slice().reverse().forEach(k=>{const t=JSON.parse(JSON.stringify(WBS.tiles[k]));t.id=WBS.nid++;WBS.tiles.splice(k+1,0,t);cps.push(t.id);if(WBS.tiles[k].id==pid)pc=t.id});WBS.cur=WBS.tiles.findIndex(t=>t.id==pc);WBS.tM=cps.length>1?new Set(cps):new Set();cps.forEach(id=>addSt({id}));selOne(-1);store();upd();pmsg((cps.length>1?'Stamps duplicated':'Stamp duplicated')+' and added to '+layName()+'.')};
 $('delT').onclick=()=>{const g=tGrp();if(WBS.tiles.length>g.length){const ids=g.map(k=>WBS.tiles[k].id);g.slice().reverse().forEach(k=>WBS.tiles.splice(k,1));WBS.layers.forEach(L=>L.st=L.st.filter(x=>!ids.includes(x)));WBS.tM=new Set();WBS.cur=Math.min(g[0],WBS.tiles.length-1);selOne(-1);store();upd()}};
 }
-export {paintGhost,pvView,pvZ,renderML,sync,init13};
+export {renderML,sync,init13};

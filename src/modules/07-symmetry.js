@@ -31,13 +31,13 @@ else if(m=='rot'){sh=wedge(-90,-90+360/n);for(let j=0;j<n;j++)g+=ray(-90+360*j/n
 else if(m=='rx'||m=='ry'||m=='grid'){const s=SW/n,u=SH/n;sh=m=='rx'?box(0,0,s,SH):m=='ry'?box(0,0,SW,u):box(0,0,s,u);for(let j=1;j<n;j++){if(m!='ry')g+=L(j*s,-30,j*s,SH+30);if(m!='rx')g+=L(-30,j*u,SW+30,j*u)}}
 if(!g)return'';
 return`<g pointer-events="none"${clip?' clip-path="url(#ec)"':''}><g fill="#c8694a" fill-opacity=".12">${sh}</g><g fill="none" stroke="#c8694a" stroke-width="${w}" stroke-dasharray="${w*4} ${w*3}" stroke-linecap="round">${g}</g>${m=='lr'||m=='ud'||m[0]=='r'&&m!='rot'||m=='grid'?'':`<circle cx="${C}" cy="${D}" r="${w*2.2}" fill="#c8694a"/>`}</g>`} // (view only; exports always keep both textures)
-function tbSync(){try{const p=WBS.curView=='pattern',a=WBS.edInk,b=WBS.edTx,gi=$('gti'),gx=$('gtx');if(!gi||!gx)return;gi.classList.toggle('on',a);gi.setAttribute('aria-pressed',String(a));gx.classList.toggle('on',b);gx.setAttribute('aria-pressed',String(b));
+function tbSync(){try{const p=true,a=WBS.edInk,b=WBS.edTx,gi=$('gti'),gx=$('gtx');if(!gi||!gx)return;gi.classList.toggle('on',a);gi.setAttribute('aria-pressed',String(a));gx.classList.toggle('on',b);gx.setAttribute('aria-pressed',String(b));
 if(p){gi.title=WBS.tiles.some(isOf)?'Show the stamp texture in the pattern (view only)':'No stamp has a stamp texture set (see Stamp texture in the stamp panel)';gx.title=WBS.tex.t?'Show the canvas texture in the pattern (view only)':'This project has no canvas texture set'}}catch(e){}}
 function renderSym(t){const{m,n,d}=symOf(t),k=m+n+col(WBS.proj.bg)+SW+'x'+SH+SK+HO+(t.items.some(q=>q.tg)?(t.sym&&t.sym.tx?'T':'t'):'');if(k==WBS.symKey)return;WBS.symKey=k;
 $('sym').innerHTML=SYM.filter(x=>SK=='rect'||!REP.includes(x[0])).map(x=>{const nn=x[0]==m?n:x[4]||0;return`<button type="button" data-y="${x[0]}" class="${x[0]==m?'on':''}"><svg viewBox="-12 -12 ${SW+24} ${SH+24}"><path d="${shp(0)}" fill="none" stroke="currentColor" stroke-width="7" opacity=".35"/>${symG(x[0],nn,9,0)}</svg>${x[1]}</button>`}).join('');
 $('symn').hidden=!d[2];if(d[2]){$('sn').min=d[2];$('sn').max=d[3];$('sn').value=n;$('snl').textContent=d[5]}
 $('symh').textContent='';$('sbkr').hidden=m=='off';{const hasT=t.items.some(q=>q.tg);$('symtxr').hidden=m=='off'||!hasT;$('symtx').checked=!!(t.sym&&t.sym.tx)}}
 function init07(){
-WBS.symKey='';WBS.curView='pattern';
+WBS.symKey='';
 }
 export {SYM,expand,nr,renderSym,symG,symOf,symOps,tbSync,init07};

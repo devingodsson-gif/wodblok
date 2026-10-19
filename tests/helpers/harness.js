@@ -152,9 +152,6 @@ async function openProjectFile(page, filePath) {
 }
 
 async function openPanel(page, id) { await page.click(`.rail [data-pn="${id}"]`); await page.waitForSelector(`section.pn[data-p="${id}"]:not([hidden])`); }
-// The Stamp editor has no button any more (layer update step 9b); tests that still exercise its dormant code reach it through this hook until step 12 removes it
-// (an older build, such as the baseline in picture-compare, has the switch but no hook)
-async function setMode(page, v) { await page.evaluate(m => { if (window.__wbTest.setView) window.__wbTest.setView(m); else document.querySelector(`.seg2 [data-v="${m}"]`).click(); }, v); await settle(page); }
 
 // The standard checks every scenario ends with: state, markup summary, no errors.
 async function checkpoint(page, testInfo, errors, name, { shot = true, selector = '#art' } = {}) {
@@ -199,7 +196,7 @@ async function putText(page, { select = true } = {}) {
   }
 }
 // Canvas flow (layer update step 11): the Stamp editor is gone, so a test that edits a stamp unlocks it in the Stamps panel and works on the Pattern canvas.
-const showPanel = async (page, id) => { if (await page.locator(`section.pn[data-p="${id}"]:not([hidden])`).count() === 0) await openPanel(page, id); };
+const showPanel = async (page, id) => { const sec = page.locator(`section.pn[data-p="${id}"]:not([hidden])`).first(); if (!(await sec.isVisible())) await openPanel(page, id); };
 // unlock a stamp (the first in the list by default) so shapes, text and pictures placed on the canvas go into it
 const unlockStamp = async (page, n = 0) => { await showPanel(page, 'stmp'); const b = page.locator('#stmpl .smklk').nth(n); if ((await b.getAttribute('aria-pressed')) !== 'true') await b.click(); await settle(page); };
 // pick the first library shape as the brush (opens the first folder if none is open)
@@ -214,4 +211,4 @@ const stampInstance = async page => {
 };
 // press and release on the canvas at a point of an instance (offset in canvas units)
 const clickStamp = async (page, p, dx = 0, dy = 0) => { const c = await canvasToClient(page, p.cx + dx, p.cy + dy); await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.up(); await settle(page); };
-module.exports = { motifPoint, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, setMode, checkpoint, putText, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+module.exports = { motifPoint, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, putText, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

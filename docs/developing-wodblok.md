@@ -103,9 +103,9 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 **The text system (1.39-1.46), the part most likely to be extended**
 - `60-text-engine.js` is a pure engine: one options object in, positioned letter outlines out. Real outlines come from font files via opentype.js (`teReal`); the old tracing is the fallback. Layout and kerning use canvas `measureText`. Glyph key `t|<fontId>|<codepoint base36>`. Allowed stored path characters are `[MLQZ0-9.,\- ]`.
 - `61-text-panel.js` reads and writes **all** Text panel controls (`txoRead`, `txoWrite`, `txoBind`, `txoSelBind`). A new text option is added **here, in the engine and in `src/shell.html` only**.
-- `22-text-tool.js` is the Stamp editor side (text on a stamp is stored as one shape per letter, tagged `tg`, with a group record `tgm`); `26-text-boxes.js` is the Text layer side (one record per text `{u,tx,G,Lt,bw,bh,n,x,y,s,r,f}`). `62-text-styles.js` is the Text styles library.
+- `22-text-tool.js` is the unlocked-stamp side (text in a stamp is stored as one shape per letter, tagged `tg`, with a group record `tgm`); `26-text-boxes.js` is the Text layer side (one record per text `{u,tx,G,Lt,bw,bh,n,x,y,s,r,f}`). `62-text-styles.js` is the Text styles library.
 - Options are saved **only when set** (`pd ft ov rp rr rs bb sc sd ind psp bal sty wp wa pt pa pw`, `va:'s'`), so old files and snapshots do not change. Randomness is repeatable (`teRnd(seed, letterIndex, purpose)`): adding a letter never moves the others. Randomize must not draw extra `Math.random` numbers for new options (derive from the words) or every Randomize snapshot shifts.
-- The Stamp editor's per-letter form is to be removed in the layer update; build new text features as options on the text item and in the engine, never only on per-letter shapes.
+- The per-letter form of text in a stamp is a leftover of the old Stamp editor (gone in 2.0.0); build new text features as options on the text item and in the engine, never only on per-letter shapes.
 
 ## 6. Tests
 
@@ -442,7 +442,7 @@ There is no fourth heading. `h1`–`h6` tags are used for structure, then styled
 #### 11.3 Mode and launch
 
 - Launch: Pattern mode, fully cleared, no tool window open.
-- Pattern and Stamp editor each have their own set of panels; a new tool says which mode it belongs to.
+- There is one list of panels for the whole app (the Stamp editor is gone in 2.0.0); a stamp is edited on the canvas by unlocking it in the Stamps panel.
 - Workspaces save the layout. They are applied on demand, and the launch workspace (the one called Default, else the first) is applied once at launch. Every workspace, including the starting ones, can be changed, replaced or deleted.
 
 ### 12. Libraries and the folder system

@@ -119,7 +119,7 @@ function closePicker(){const p=PK;if(!p)return;svClose();commit();PK=null;EL.hid
 // The picture is drawn once into a canvas at the size it shows on screen (the same vector picture exports use), then the pixel under the
 // pointer is read from it. A magnifier follows the pointer; click picks (Alt+click keeps the colour's opacity), Esc or a right-click cancels.
 let DROP=null;
-function artTargets(){const t=[];const a=$('art');if(a&&a.getClientRects().length&&!$('boardP').hidden)t.push(a);const pv=$('pvw');if(pv&&pv.getClientRects().length&&pv.closest('section.pn:not([hidden])'))t.push(pv);return t}
+function artTargets(){const t=[];const a=$('art');if(a&&a.getClientRects().length&&!$('boardP').hidden)t.push(a);return t}
 function startDropper(cb){if(DROP)return;const tg=artTargets();if(!tg.length){pmsg('Show the Pattern view or the pattern preview to pick a colour from the picture.');return}
  const ov=document.createElement('div');ov.className='edrov';ov.innerHTML='<div class="edrl"><canvas width="132" height="132"></canvas><b></b></div>';document.body.appendChild(ov);
  const lp=ov.firstChild,lc=lp.firstChild,lx=lc.getContext('2d'),lb=lp.lastChild;lx.imageSmoothingEnabled=false;

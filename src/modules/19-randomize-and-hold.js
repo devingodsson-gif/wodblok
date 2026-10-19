@@ -38,14 +38,12 @@ wbHold=(()=>{let on=0,t0=0,armed=0,ovs=[],bar=null,prog=0,pr0=0,quiet=0,lastMut=
  function start(){if(on){armed=0;t0=performance.now();quiet=t0;return}
   const st=document.querySelector('.stage'),boards=[...st.querySelectorAll(':scope>.board')].filter(b=>!b.hidden);if(!boards.length)return;
   on=1;WBX.wbHoldOn=1;armed=0;t0=performance.now();lastMut=t0;lastLay=t0;prog=0;pr0=BK.st.printed;view=boards.map(b=>b.id).join();
-  try{boards.forEach((b,i)=>ovs.push(freeze(b,st,'fz'+i+'_',0)));
-   const pv=$('pvw');if(pv&&pv.getClientRects().length&&pv.closest('.pvbox'))ovs.push(freeze(pv,pv.closest('.pvbox'),'fzp_',1))}
+  try{boards.forEach((b,i)=>ovs.push(freeze(b,st,'fz'+i+'_',0)));}
   catch(e){ovs.forEach(o=>o.el.remove());ovs=[];on=0;WBX.wbHoldOn=0;return}
   bar=document.createElement('div');bar.className='fzbar';bar.innerHTML='<i></i>';st.appendChild(bar);ovs.forEach(lay);
   $('fzst').classList.add('on');setP(.06);
   mo=new MutationObserver(()=>{lastMut=performance.now()});
   boards.forEach(b=>mo.observe(b,{childList:true,subtree:true,attributes:true,characterData:true}));
-  const pv=$('pvw');if(pv)mo.observe(pv,{childList:true,subtree:true,attributes:true});
   ['grdf','cvdefs','surfd'].forEach(id=>{const e=$(id);if(e)mo.observe(e,{childList:true,subtree:true,attributes:true})});
   cancelAnimationFrame(loop);loop=requestAnimationFrame(tick)}
  function arm(){if(on){armed=1;quiet=performance.now()}}
