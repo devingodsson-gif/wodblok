@@ -60,7 +60,7 @@ test('split compare view', async ({ page }, testInfo) => {
 for (const shape of ['rect', 'rrect', 'circle', 'oval', 'arch', 'hex', 'tri', 'diamond', 'ngon']) {
   test(`canvas shape: ${shape}`, async ({ page }, testInfo) => {
     const { errors } = await openApp(page);
-    await openProjectFile(page, FIX('project-3-rect-16x9.wodblok'));
+    await openProjectFile(page, FIX('project-1-diamond.wodblok'));
     await openPanel(page, 'canvas');
     await page.click(`#cshp [data-s="${shape}"]`);
     await settle(page);

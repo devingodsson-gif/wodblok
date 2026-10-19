@@ -98,9 +98,11 @@ async function settle(page, { quiet = 4, step = 120, max = 15000 } = {}) {
     const sig = await page.evaluate(() => {
       const art = document.getElementById('art');
       const busy = document.body.classList.contains('babusy') || !!document.querySelector('.rzbusy,.lding:not([hidden])') || !!(window.__wbTest && window.__wbTest.printsBusy && window.__wbTest.printsBusy());   // stamp prints still being drawn
+      // a stamp print that is not on the page yet leaves its <use> pointing at nothing: the pattern is not finished, however still it looks
+      const missing = [...document.querySelectorAll('#art use')].some(u => { const h = u.getAttribute('href'); return h && h[0] === '#' && !document.getElementById(h.slice(1)); });
       // a content hash, not just lengths: a redraw that rebuilds the same amount of markup in a different shape still counts as change
       const h = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0).toString(36); };
-      return h(window.__wbTest.state()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + busy;
+      return h(window.__wbTest.state()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + busy + missing;
     });
     if (sig === last) { if (++same >= quiet) return; } else { same = 0; last = sig; }
     await page.waitForTimeout(step);
