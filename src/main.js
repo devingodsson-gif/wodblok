@@ -60,6 +60,7 @@ import {init65} from './modules/65-element-core.js';
 import {init66} from './modules/66-sheet-element.js';
 import {init67} from './modules/67-pattern-element.js';
 import {init68} from './modules/68-stamp-contents.js';
+import {init69} from './modules/69-effect-stack.js';
 import {init58} from './modules/58-account.js';
 import {init59} from './modules/59-align.js';
 import {acAccount} from './platform/account.js';
@@ -70,6 +71,7 @@ import {cmdConflicts,cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdList,cmdRun} from 
 init01();
 // the element and effect registries are filled first, before anything draws
 init65();
+init69();
 init02();
 init03();
 init04();

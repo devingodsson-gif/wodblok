@@ -22,7 +22,7 @@ const tileCopies=(v,id)=>{let o=`<g id="${id}">${v}</g>`;for(const dx of[-1,0,1]
 function layTexMask(L,li){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return'';const tl=tileOn(),v=txImgs(q,CW,CH,800,'host',txIsW,0,0,tl);if(!v)return'';
 return tl?`<mask id="lt${li}" maskUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"><rect x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" fill="#fff"/>${tileCopies(v,'ltc'+li)}</mask>`:`<mask id="lt${li}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`}
 function layTexOv(L){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return['',''];const f=txFilt(q,0,0,CW,CH,800,tileOn()?tileExt():undefined);return f?[`<g filter="url(#${f})">`,'</g>']:['','']}
-function txRefs(){const m=new Map(),add=u=>(Array.isArray(u)?u:[]).forEach(z=>{if(z&&z.x)m.set(z.x,(m.get(z.x)||0)+1)});WBS.tiles.forEach(t=>add(t.tu));WBS.layers.forEach(L=>{add(L.tu);(L.pl||[]).forEach(p=>add(p.tu))});if(WBS.tex&&Array.isArray(WBS.tex.u))add(WBS.tex.u);if(WBX.wbTxUses)add(WBX.wbTxUses());return m}
+function txRefs(){const m=new Map(),add=u=>(Array.isArray(u)?u:[]).forEach(z=>{if(z&&z.x)m.set(z.x,(m.get(z.x)||0)+1)});WBS.tiles.forEach(t=>add(t.tu));WBS.layers.forEach(L=>{add(L.tu);(L.pl||[]).forEach(p=>{add(p.tu);add(p.fx)})});if(WBS.proj&&WBS.proj.sh)add(WBS.proj.sh.fx);if(WBS.tex&&Array.isArray(WBS.tex.u))add(WBS.tex.u);if(WBX.wbTxUses)add(WBX.wbTxUses());return m}
 // Older projects kept their texture in other places (per-stamp "is", the single canvas surface). They become library textures here.
 // Returns true when the canvas texture changed and has to be rebuilt.
 let TEXK='';

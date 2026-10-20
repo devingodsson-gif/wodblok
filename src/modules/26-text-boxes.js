@@ -10,6 +10,7 @@ import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
 import {txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
 import {stTxMode} from './63-stamp-tool.js';
+import {fxTexUses} from './69-effect-stack.js';
 // ===== Text boxes. Any layer may hold them, in L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
 // The letters are stored as outlines (centred on the box), so the project needs no fonts to show them. s = the box's long side on the canvas.
 const fx1=v=>(+v).toFixed(1);
@@ -18,11 +19,13 @@ for(const l of Lt){if(!Array.isArray(l))continue;const d=G[l[0]];if(typeof d!='s
 const id=pre+'_'+String(l[0]).replace(/[^\w-]/g,'_');if(!seen[id]){seen[id]=1;d0+=`<path id="${id}" d="${d}"/>`}o+=`<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s})"/>`}
 return`<defs>${d0}</defs><g fill="${fill}" fill-rule="evenodd">${o}</g>`}
 let TXM;
-function txMask(id,p){const q=txSpecs(p.tu,'wear');if(!q.length||!WBS.edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1),x=(-W/2).toFixed(2),y=(-H/2).toFixed(2),v=txImgs(q,W,H,384,'host',txIsW,x,y);if(!v)return'';
+// a text's textures: the ones from the Text panel, then the Texture effects on it
+const txAll=p=>(Array.isArray(p.tu)?p.tu:[]).concat(fxTexUses(p));
+function txMask(id,p){const q=txSpecs(txAll(p),'wear');if(!q.length||!WBS.edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1),x=(-W/2).toFixed(2),y=(-H/2).toFixed(2),v=txImgs(q,W,H,384,'host',txIsW,x,y);if(!v)return'';
 const key=id+'|'+v+'|'+W+'|'+H;if(TXM.has(key))return TXM.get(key);
 const m=`<mask id="${id}" maskUnits="userSpaceOnUse" x="${x}" y="${y}" width="${W}" height="${H}"><rect x="${x}" y="${y}" width="${W}" height="${H}" fill="#fff"/>${v}</mask>`;
 if(TXM.size>300)TXM.delete(TXM.keys().next().value);TXM.set(key,m);return m}
-function txOvF(p){const q=txSpecs(p.tu,'wear');if(!q.length||!WBS.edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1);return txFilt(q,-W/2,-H/2,W,H,384)}
+function txOvF(p){const q=txSpecs(txAll(p),'wear');if(!q.length||!WBS.edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1);return txFilt(q,-W/2,-H/2,W,H,384)}
 function txtLayer(L,li){const pl=(L.pl||[]).filter(p=>p.tx&&p.Lt&&p.G);if(!pl.length)return['',''];const fr=new Map();const f=v=>(+v).toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),fill=okC(L.ink)?col(L.ink):col(WBS.proj.ink);let out='',defs='';
 pl.forEach(p=>{const[w,h]=fpWH(p),k=p.s/Math.max(p.n||1,.01),mid='tm'+li+'_'+String(p.u).replace(/[^\w-]/g,''),mk=txMask(mid,p),fo=txOvF(p);if(mk)defs+=mk;const pf=okC(p.ink)?col(p.ink):fill,hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-w/2)}" y="${f(-h/2)}" width="${f(w)}" height="${f(h)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
 const one=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x)} ${f(+p.y)})">${hit}<g transform="rotate(${+p.r||0}) scale(${(k*(p.f||1)).toFixed(4)} ${k.toFixed(4)})"${fo?` filter="url(#${fo})"`:''}${mk?` mask="url(#${mid})"`:''}>${txtGl(p,pf,'tg'+li+'_'+String(p.u).replace(/[^\w-]/g,''))}</g></g>`;out+=one;fr.set(String(p.u),one)});

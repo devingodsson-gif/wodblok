@@ -23,7 +23,7 @@ const patSrcOk=s=>s&&(s.k=='stamp'?WBS.tiles.some(t=>t.id==s.t):s.k=='image'?!!W
 // the elements a pattern stands for
 function patItems(p){const ss=(p.src||[]).filter(patSrcOk);if(!ss.length)return[];const{pts,cell}=patPts(p),r=patRnd(p.sd),sz=cell*patClamp(p.sz||80,5,300)/100,tot=ss.reduce((a,s)=>a+(+s.w>0?+s.w:1),0),out=[];
 pts.forEach((q,i)=>{let s;if(p.ds=='random')s=ss[Math.floor(r()*ss.length)];else if(p.ds=='weight'){let v=r()*tot;s=ss.find(z=>(v-=(+z.w>0?+z.w:1))<0)||ss[ss.length-1]}else s=ss[i%ss.length];
-const b={u:p.u+'.'+i,pu:p.u,x:+q[0].toFixed(1),y:+q[1].toFixed(1),s:+sz.toFixed(2),r:+p.rt||0,f:1};
+const b={u:p.u+'.'+i,pu:p.u,...(p.fx&&p.fx.length?{fx:p.fx}:{}),x:+q[0].toFixed(1),y:+q[1].toFixed(1),s:+sz.toFixed(2),r:+p.rt||0,f:1};
 if(s.k=='stamp')out.push({...b,k:'stamp',t:s.t});else if(s.k=='image')out.push({...b,k:'image',a:s.a});else{const{u,x,y,s:_s,r:_r,f:_f,...it}=s.it;out.push({...it,...b,k:'text'})}});return out}
 // the layer as the kinds should draw it: each pattern replaced, in place, by the elements it stands for
 function patExpand(L){const pl=L.pl||[];if(!pl.some(q=>q.k=='pattern'))return L;const o=[];pl.forEach(q=>{if(q.k=='pattern')o.push(...patItems(q));else o.push(q)});return{...L,pl:o}}
@@ -57,4 +57,4 @@ $('pesel').onclick=()=>{const p=patCur(),q=elSel();if(!p||!q||q.k=='pattern')ret
 $('pesrc').onclick=e=>{const p=patCur(),x=e.target.closest('[data-sx]');if(p&&x){p.src.splice(+x.dataset.sx,1);patCh()}};
 $('pesrc').addEventListener('change',e=>{const p=patCur(),w=e.target.closest('[data-sw]');if(p&&w){p.src[+w.dataset.sw].w=Math.max(1,Math.min(99,Math.round(+w.value||1)));patCh()}});
 WBX.wbPatSync=patSync;patSync()}
-export {init67,patExpand,patItems,patPts,patSync};
+export {init67,patCur,patExpand,patItems,patPts,patSync};
