@@ -79,7 +79,7 @@ test('a pattern\'s effects apply to every placement', async ({ page }) => {
   await page.locator('.fxg[data-fxk="pattern"] .fxadd').scrollIntoViewIfNeeded();
   await page.click('.fxg[data-fxk="pattern"] .fxadd');
   const items = await page.locator(".rowm .ddi").allTextContents();
-  expect(items.map(s => s.trim())).toEqual(['Texture', 'Pressure offset']);
+  expect(items.map(s => s.trim())).toEqual(['Texture', 'Pressure offset', 'Jitter']);
   await page.keyboard.press('Escape');
   expect(errors).toEqual([]);
 });

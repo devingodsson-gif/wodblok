@@ -1,4 +1,5 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
+import {rng} from './04-canvas-and-stamp-outlines.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -21,6 +22,13 @@ const f=txFilt(s,b.x,b.y,b.W,b.H,R);if(f)attrs+=` filter="url(#${f})"`;return at
 // pressure for one element: null when it has none of its own (the layer's setting then applies)
 function fxPress(q){const e=fxOn(q).filter(z=>z.k=='pressure');if(!e.length)return null;return{pst:Math.max(0,Math.min(10,+e[e.length-1].pst||0)),pfl:Math.max(0,Math.min(10,+e[e.length-1].pfl||0))}}
 
+// Jitter {pos: 0 to 100 (% of the element's size), rot: 0 to 180 degrees, sz: 0 to 100 (%), fh, fv: random flips, sd: seed}: a repeatable random nudge for one element; on a pattern every placement gets its own.
+// The result is the change to the element's own place: dx, dy (canvas units), dr (degrees), sz (a scale factor), sx, sy (1 or -1). null = no jitter.
+const fxSeed=u=>{let h=7;for(const c of String(u))h=(h*31+c.charCodeAt(0))>>>0;return h%100000};
+function fxJit(q){const es=fxOn(q).filter(e=>e.k=='jitter');if(!es.length)return null;const J={dx:0,dy:0,dr:0,sz:1,sx:1,sy:1};
+es.forEach(e=>{const Q=rng(fxSeed(q.u)*15485863+(e.sd|0)*104729+101),a=Q(),b=Q(),c=Q(),d=Q(),h=Q(),v=Q(),P=Math.max(0,Math.min(100,+e.pos||0)),R=Math.max(0,Math.min(180,+e.rot||0)),Z=Math.max(0,Math.min(100,+e.sz||0)),s=+q.s||0;
+J.dx+=(a*2-1)*P/100*s*.5;J.dy+=(b*2-1)*P/100*s*.5;J.dr+=(c*2-1)*R;J.sz*=1+(d*2-1)*Z/100*.6;if(e.fh&&h<.5)J.sx=-J.sx;if(e.fv&&v<.5)J.sy=-J.sy});return J}
+
 // ---- the panels
 const KIND_PANEL={stamp:'stmp',image:'elimg',text:'text',pattern:'layers',sheet:'elsheet'};
 const SEL={};   // the effect whose settings show, per kind
@@ -35,6 +43,14 @@ function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hid
 <div class="ctl"><label>Mode</label><select class="fxsm" aria-label="Mode">${TXMD.map(m=>`<option value="${m}">${TXMN[m]}</option>`).join('')}</select></div>
 <div class="row"><button type="button" class="alt fxrr">Reroll</button></div>
 </div>
+<div class="fxs" data-e="jitter" hidden>
+<div class="ctl"><label>Position</label><input type="range" class="fxjp" min="0" max="100" value="20" data-u="%" data-def="20"></div>
+<div class="ctl"><label>Rotate</label><input type="range" class="fxjr2" min="0" max="180" value="15" data-u="&#176;" data-def="15"></div>
+<div class="ctl"><label>Size</label><input type="range" class="fxjz" min="0" max="100" value="0" data-u="%" data-def="0"></div>
+<label class="chk"><input type="checkbox" class="fxjh"><span>Flip across</span></label>
+<label class="chk"><input type="checkbox" class="fxjv"><span>Flip down</span></label>
+<div class="row"><button type="button" class="alt fxjrr">Reroll</button></div>
+</div>
 <div class="fxs" data-e="pressure" hidden>
 <div class="ctl"><label>Pressure</label><input type="range" class="fxpp" min="0" max="10" value="4" data-def="4"></div>
 <div class="ctl"><label>Flooding</label><input type="range" class="fxpf" min="0" max="10" value="0" data-def="0"></div>
@@ -47,10 +63,12 @@ host.innerHTML=list.map((e,i)=>{const d=fxDef(e.k);return`<div class="mr${sel&&e
 const sx=g.querySelector('.fxsx');sx.innerHTML=(lib.length?'':'<option value="">None</option>')+lib.map(x=>`<option value="${fxHx(x.id)}">${fxHx(x.name)}</option>`).join('')}
 g.querySelectorAll('.fxs').forEach(s=>{const on=!!sel&&s.dataset.e==sel.k;if(s.hidden===on)s.hidden=!on});
 if(sel&&sel.k=='texture'){const sx=g.querySelector('.fxsx'),sm=g.querySelector('.fxsm');if(sx.value!==sel.x)sx.value=sel.x||'';if(sm.value!==(sel.md||'wear'))sm.value=sel.md||'wear'}
+if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxjp',+sel.pos||0);set('.fxjr2',+sel.rot||0);set('.fxjz',+sel.sz||0);g.querySelector('.fxjh').checked=!!sel.fh;g.querySelector('.fxjv').checked=!!sel.fv}
 if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxpp',+sel.pst||0);set('.fxpf',+sel.pfl||0)}})}
 function init69(){
 fxRegister('texture',{label:'Texture',kinds:['stamp','image','text','pattern','sheet'],make:()=>{const ids=(WBS.texLib||[]).map(x=>x.id),first=Object.keys(TXN)[0];const x=ids[0]||(first?txEnsure({t:first,a:40,sc:100,az:225}):'');return{k:'texture',on:true,x,sd:txRid(),md:'wear'}}});
 fxRegister('pressure',{label:'Pressure offset',kinds:['stamp','pattern'],make:()=>({k:'pressure',on:true,pst:4,pfl:0})});
+fxRegister('jitter',{label:'Jitter',kinds:['stamp','image','text','pattern'],make:()=>({k:'jitter',on:true,pos:20,rot:15,sz:0,sd:txRid()})});
 Object.entries(KIND_PANEL).forEach(([kind,pn])=>{const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec)return;sec.insertAdjacentHTML('beforeend',fxGroup(kind))});
 document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,tg=()=>fxTarget(kind),cur=()=>{const t=tg();return t?fxOf(t).find(e=>e.u==SEL[kind])||null:null};
 g.querySelector('.fxadd').onclick=e=>{e.stopPropagation();const t=tg();if(!t)return;rowMenu(e.currentTarget,fxFor(kind).map(d=>[d.label,()=>{const t2=tg();if(!t2)return;const f=d.make();f.u=fpU();(t2.fx=t2.fx||[]).push(f);SEL[kind]=f.u;fxCh()}]))};
@@ -63,6 +81,9 @@ SEL[kind]=L[i].u;fxSync()};
 g.querySelector('.fxsx').onchange=()=>{const e=cur();if(e){e.x=g.querySelector('.fxsx').value;fxCh()}};
 g.querySelector('.fxsm').onchange=()=>{const e=cur();if(e){e.md=g.querySelector('.fxsm').value;fxCh()}};
 g.querySelector('.fxrr').onclick=()=>{const e=cur();if(e){e.sd=txRid();fxCh()}};
+[['.fxjp','pos'],['.fxjr2','rot'],['.fxjz','sz']].forEach(([c,f])=>g.querySelector(c).addEventListener('input',()=>{const e=cur();if(!e||e.k!='jitter')return;const v=+g.querySelector(c).value;if(e[f]!==v){e[f]=v;fxCh()}}));
+[['.fxjh','fh'],['.fxjv','fv']].forEach(([c,f])=>g.querySelector(c).onchange=()=>{const e=cur();if(e&&e.k=='jitter'){e[f]=g.querySelector(c).checked;fxCh()}});
+g.querySelector('.fxjrr').onclick=()=>{const e=cur();if(e&&e.k=='jitter'){e.sd=txRid();fxCh()}};
 [['.fxpp','pst'],['.fxpf','pfl']].forEach(([c,f])=>g.querySelector(c).addEventListener('input',()=>{const e=cur();if(!e||e.k!='pressure')return;const v=+g.querySelector(c).value;if(e[f]!==v){e[f]=v;fxCh()}}))});
 WBX.wbFxSync=fxSync}
-export {fxPress,fxSync,fxTex,fxTexUses,init69};
+export {fxJit,fxPress,fxSync,fxTex,fxTexUses,init69};

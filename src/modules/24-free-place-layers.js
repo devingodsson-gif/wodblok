@@ -5,7 +5,7 @@ import {inkOf} from './06-motif-library-folders.js';
 import {gModel,gNear} from './08-grid-shapes.js';
 import {bhStrip,flipVOk,turnFit} from './10-layer-grids.js';
 import {eNV,eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
-import {fxPress,fxTex} from './69-effect-stack.js';
+import {fxJit,fxPress,fxTex} from './69-effect-stack.js';
 
 function tGrp(){const g=WBS.tiles.map((t,i)=>i).filter(i=>WBS.tM.has(WBS.tiles[i].id));return g.length>1&&WBS.tiles[WBS.cur]&&WBS.tM.has(WBS.tiles[WBS.cur].id)?g:[WBS.cur]}
 function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(WBS.fpMS.size>1&&WBS.fpMS.has(String(WBS.fpSel))){const g=pl.filter(q=>WBS.fpMS.has(String(q.u)));if(g.length>1)return g}const p=pl.find(q=>q.u==WBS.fpSel);return p?[p]:[]}
@@ -34,6 +34,7 @@ const fpSeed=u=>{let h=7;for(const c of String(u))h=(h*31+c.charCodeAt(0))>>>0;r
 function freeLayer(L,li,pa,lgB){const pl=(L.pl||[]).filter(p=>WBS.tiles.some(t=>t.id==p.t));if(!pl.length)return['',''];const fr=new Map();const amt=0,PR=new Map(),f=v=>v.toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off');let defs='',out='';const bh=L.bl=='behind',prev=[];
 pl.forEach(p=>{const tt=WBS.tiles.find(t=>t.id==p.t),G=geom(shOf(tt)),k=p.s/Math.max(G.SW,G.SH),sd=fpSeed(p.u),R=rng(sd+li*977),r1=R()-.5,r2=R()-.5,r3=R()-.5,r4=R(),pe=fxPress(p),pP=pe?pe.pst:(L.pst||0),pF=pe?pe.pfl:(L.pfl||0),act=!DRS()&&(pP>0||pF>0),pk=pe?li+1000*(1+pP*11+pF):li,pre=act?`#q${pk}_`:'#s',bin=act?Math.floor(rng(sd*7919+li*1299709+13)()*16):0;if(act){let m=PR.get(pk);if(!m)PR.set(pk,m={P:pP,F:pF,need:new Set()});m.need.add(tt.id+'_'+bin)}
 let drr=0,dxr=0,dyr=0,sx=1,sy=1,szf=1;{const rR=+L.rrot||0,rP=+L.rpos||0,fH=!!L.rfh,fV=!!L.rfv,tN=!!L.rtn,rZ=Math.max(0,Math.min(100,+L.rsz||0));if(rR||rP||fH||fV||tN||rZ){const Q=rng(sd*15485863+li*7919+(L.rsd|0)*104729+101),u1=Q(),u2=Q(),u3=Q(),u4=Q(),u5=Q(),u6=Q(),u7=Q();if(rZ)szf=1+(u7*2-1)*rZ/100*.6;drr=(u1*2-1)*rR;dxr=(u2*2-1)*rP/100*p.s*.5;dyr=(u3*2-1)*rP/100*p.s*.5;if(fH&&u4<.5)sx=-1;if(fV&&u5<.5&&flipVOk(G))sy=-1;if(tN)drr+=turnFit(G,u6)}}
+{const J=fxJit(p);if(J){dxr+=J.dx;dyr+=J.dy;drr+=J.dr;szf*=J.sz;if(J.sx<0)sx=-sx;if(J.sy<0&&flipVOk(G))sy=-sy}}
 const ev=Math.floor(rng(sd*104729+li*15485863+(tt.es||0)*31)()*eNV(tt)),tr=`transform="translate(${f(r2*amt*.6+dxr)} ${f(r3*amt*.6+dyr)}) rotate(${(r1*amt+(+p.r||0)+drr).toFixed(2)}) scale(${(k*(p.f||1)*(p.wx||1)*sx*szf).toFixed(4)} ${(k*(p.wy||1)*sy*szf).toFixed(4)}) translate(${-G.SW/2} ${-G.SH/2})"`,op=`opacity="${(1-r4*amt*.03).toFixed(2)}"`,
 fxT=p.fx&&p.fx.length?fxTex(p,'fm'+li+'_'+String(p.u).replace(/[^\w-]/g,''),{x:0,y:0,W:G.SW,H:G.SH}):null,trU=fxT?'':tr,inner0=act||DRS()||!eT(tt)?`<use href="${pre}${tt.id}${act?'_'+bin:''}" ${op} ${trU}${WBX.wbGrade&&WBX.wbGrade.stF(tt.id)?` filter="url(#${WBX.wbGrade.stF(tt.id)})"`:''}/>`:`<g ${op} ${trU}${WBX.wbGrade&&WBX.wbGrade.stF(tt.id)?` filter="url(#${WBX.wbGrade.stF(tt.id)})"`:''}><use href="#s${tt.id}"/><use href="#e${tt.id}_${ev}" fill="${inkOf(tt)}"/></g>`;
 const inner=fxT?`<g ${tr}${fxT.attrs}>${inner0}</g>`:inner0;if(fxT)defs+=fxT.defs;
