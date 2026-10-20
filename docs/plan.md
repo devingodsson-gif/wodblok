@@ -376,3 +376,8 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - Not done, moved to 2.2.3 with the menus: removing the old arrangement engine (GRAD, gArrAll, arrOpts, fitTs and the layer-level controls are still used by Randomize and the Pattern element's arrangements), Randomize and templates built directly on the flat list, Sheet as an element.
 - Known flake: repeat-tile roll 7 passes alone and fails once under a full parallel load (tolerance 0.12 x half + 0.15).
 
+## 2.2.3 (Oct 20 2026): placing, and the element menu without a list
+- One placing rule for a shape, a stamp, a picture and text (owner, Oct 20 2026). The armed item is a ghost on the pointer: a picked shape now has one too (over a stamp it sits where a click would put it, with the same snap, size and turn; elsewhere on the canvas a fainter one follows the pointer). Using anything in the interface puts the armed item away, so a click on the canvas afterwards cannot place it by accident; a button that arms an item (a shape, a stamp, a picture, Add text) arms it again; a right click puts it away. `src/modules/72-placing.js`, tests/placing.spec.js. Specs that placed stamps after changing a setting arm the stamp again just before clicking (`armStamp` in tests/helpers/harness.js).
+- The Element panel (was a second "Elements") no longer has the placed-items list, its count line, its hint or Clear all; the Elements list is the only list. The rail button and command for the list now say Elements (they said Layers), the element menu is called Element.
+- Plan: 2.2.4 Sheet as an element (format 24), 2.2.5 the rest of the engine clean-up (docs/element-list-plan.md).
+
