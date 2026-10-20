@@ -23,8 +23,8 @@ test('an inverted stamp as a frame shows no light line between its tiles', async
   await page.evaluate(() => { const c = document.getElementById('neg'); c.checked = true; c.dispatchEvent(new Event('input', { bubbles: true })); });
   await settle(page);
   expect(JSON.parse(await getState(page)).tiles[0].neg, 'the stamp is inverted').toBeTruthy();
-  await openPanel(page, 'lyrs');
-  await page.evaluate(() => document.querySelector('#lmode [data-m="f"]').click());
+  await openPanel(page, 'layers');
+  await page.evaluate(() => document.querySelector('#pelay [data-l="frame"]').click());   // the Pattern on the Frame layout (the old Frame layer is gone)
   await settle(page);
   const r = await lines(page);
   expect(r.max - r.min, JSON.stringify(r)).toBeLessThan(25);

@@ -52,12 +52,12 @@ test('busy: after a slider move, zoomed in and after Randomize, nothing points a
     for (const t of c.layerButtons) expect(t.found, `${label}: thumbnail ${t.href} resolves`).toBe(true);
     return c;
   };
-  // the stamp size slider, a handful of real input events (the pattern redraws each time)
+  // the pattern size slider, a handful of real input events (the pattern redraws each time)
   for (const v of [120, 200, 90, 156]) {
-    await page.evaluate(v => { const e = document.getElementById('ts'); e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
+    await page.evaluate(v => { const e = document.getElementById('pesz'); e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
     await settle(page);
   }
-  const moved = await check('after the stamp size slider');
+  const moved = await check('after the pattern size slider');
   expect(moved.dynChars, 'a redraw after a slider move stays light').toBeLessThan(BUDGET.busy);
   await page.mouse.move(700, 450);
   await page.keyboard.press('1');                                                            // 100%: every copy is drawn live, so the outlines are needed

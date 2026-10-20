@@ -1,8 +1,6 @@
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {selOne,store} from './06-motif-library-folders.js';
-import {latG} from './10-layer-grids.js';
 import {Q,upd} from './11-pressure-flooding-block-edges.js';
-import {LY} from './14-presets-and-layer-grid-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 // ---- multi-selection: msel holds every selected index on the current stamp, sel is the one the sliders show
 const QS=()=>[...WBS.msel].sort((a,b)=>a-b).map(i=>WBS.tiles[WBS.cur].items[i]).filter(Boolean);
@@ -21,12 +19,5 @@ function init12(){
 WBS.split=null;
 $('ssp').onclick=()=>{const q=Q();if(!q||WBS.msel.size>1)return;WBS.brush=null;WBS.split=WBS.split?null:{i:WBS.sel,x:q.x,y:q.y,a:q.r+90};WBH.draw();if(WBX.wbSceDraw)WBX.wbSceDraw()};
 $('spok').onclick=doSplit;$('spno').onclick=()=>{WBS.split=null;WBH.draw();if(WBX.wbSceDraw)WBX.wbSceDraw()};
-$('lbo').oninput=()=>{LY().bo=+$('lbo').value;store();upd()};
-$('larr').oninput=()=>{const L=LY();if(!L.ak||typeof L.ak!='object')L.ak={};L.ak[latG(L).SK]=$('larr').value;store();upd()};
-// ---- manual arrangement: click an impression on the pattern to cycle which stamp is printed there
-$('man').onchange=()=>{const L=LY();L.man=$('man').checked;if(!L.ov)L.ov={};store();upd()};
-$('manr').onclick=()=>{LY().ov={};store();upd()};
-$('art').addEventListener('click',e=>{const L=LY();if(!L.man)return;const c=e.target.closest('[data-cell]');if(!c||+c.dataset.l!==WBS.selL)return;const ls=WBS.tiles;if(ls.length<2){$('pmsg').textContent='Make another stamp to swap between them.';return}
-const k=ls.findIndex(t=>t.id==c.dataset.t),nx=ls[(k+(e.shiftKey?-1:1)+ls.length)%ls.length].id;if(!L.ov)L.ov={};if(nx==+c.dataset.d)delete L.ov[c.dataset.cell];else L.ov[c.dataset.cell]=nx;store();upd()});
 }
 export {QS,clampN,delItems,doSplit,selFix,selSet,selToggle,wrapA,init12};

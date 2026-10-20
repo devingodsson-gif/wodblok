@@ -1,9 +1,16 @@
 import {CH,CW,geom,shOf} from './04-canvas-and-stamp-outlines.js';
 import {mkL} from './06-motif-library-folders.js';
-import {GRAD,gArrAll} from './10-layer-grids.js';
+import {ARR} from './09-stamp-items-and-print-runs.js';
 import {txRid} from './16-texture-generators.js';
 import {fpU} from './24-free-place-layers.js';
 
+// The arrangements a roll chooses between (data only, no drawing): for each stamp shape a list of [key, name, grid, layout, rule], plus the radial ones.
+// A roll picks one and turns it into a Pattern layout (rzArrLay below); keeping the lists as they were keeps every seeded roll the same.
+const arrOpts=g=>(ARR[g.SK]||ARR.rect).filter(o=>!(o[4]=='pin'||o[4]=='r90')||Math.abs(g.SW-g.SH)<1);
+// Radial arrangements: stamps sit on rings, a spiral, spiral arms, a sunflower seed head or spokes round the middle of the canvas. They are added to
+// the Pattern list for every stamp shape but are not part of the random pick (arrOpts), so Randomize keeps giving the arrangements it always did.
+const GRAD=[['x-rings','Rings','rings','check','out'],['x-ringu','Rings, upright','rings','check'],['x-spi','Spiral','spiral','cols','out'],['x-spiu','Spiral, upright','spiral','cols'],['x-arm','Spiral arms','arms','cols','out'],['x-armu','Spiral arms, upright','arms','cols'],['x-sun','Sunflower','sunflower','cols','out'],['x-sunu','Sunflower, upright','sunflower','cols'],['x-spk','Spokes','spokes','check','out'],['x-spku','Spokes, upright','spokes','check']];
+const gArrAll=g=>arrOpts(g).concat(GRAD);
 // ===== Randomize on elements (element update, step 11, 2.1.11): a roll builds Pattern elements (and Paint) with effects, not arrangement layers.
 // `o` holds the roll's helpers and switches: {R, pick, ri, rr, ch, pres, jit, tex(): texture uses, grade, sub(k)}.
 const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -51,4 +58,4 @@ function rzPressEls(layers,o){layers.forEach(l=>{if(!l.free||l.rz=='free')return
 function rzTexEls(layers,o){layers.forEach(l=>{if(!l.free)return;(l.pl||[]).forEach(p=>{if(p.k!='pattern'||!o.ch(.35))return;const u=o.tex();if(!u.length)return;p.fx=(p.fx||[]).filter(e=>e.k!='texture').concat([fxT(u[0])])})})}
 // a new layer: an element layer holding one Pattern of the given stamps (the old arrangement layer is no longer made)
 const mkEL=(name,st)=>{const n=mkL(name,st,'check',180);n.free=true;n.ak={};n.man=false;n.ov={};n.fit='';n.gap=0;n.pl=[patOf('Pattern 1',st,'grid',cl(Math.round(CW/180),2,14),cl(Math.round(CH/180),2,20),100,[],null)];return n};
-export {mkEL,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPressEls,rzSheet,rzTexEls};
+export {GRAD,arrOpts,gArrAll,mkEL,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPressEls,rzSheet,rzTexEls};

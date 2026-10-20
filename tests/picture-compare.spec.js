@@ -41,7 +41,7 @@ async function render(browser, url, fixture) {
   await page.locator('#lybody .lyr').last().click({ position: { x: 60, y: 10 } });
   await openPanel(page, 'layers');
   await settle(page);
-  await page.evaluate(() => { const e = document.getElementById('ts'); e.value = 200; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
+  await page.evaluate(() => { const e = document.getElementById('pesz'); e.value = 200; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
   await shoot('after stamp size 200', '#boardP');
   await page.mouse.move(700, 450);
   await page.keyboard.press('1');

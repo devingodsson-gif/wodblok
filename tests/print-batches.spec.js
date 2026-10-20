@@ -21,7 +21,7 @@ test('busy project: printed sheets are small, after opening and after a stamp si
   await page.locator('#lybody .lyr').last().click({ position: { x: 60, y: 10 } });
   await openPanel(page, 'layers');
   await settle(page);
-  await page.evaluate(() => { const e = document.getElementById('ts'); e.value = 200; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
+  await page.evaluate(() => { const e = document.getElementById('pesz'); e.value = 200; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
   await settle(page, { quiet: 25 });
   await check('after stamp size 200');
   expect(errors).toEqual([]);

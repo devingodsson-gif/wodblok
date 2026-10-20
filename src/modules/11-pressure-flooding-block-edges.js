@@ -1,6 +1,6 @@
 import {$,WBH,WBS,WBX,mod} from './01-launch-and-version.js';
 import {BK,bkH} from './03-stamp-prints-and-drawing.js';
-import {shBleed,HO,ORN,SH,SK,SW,col,ornPts,rng,shp,useT} from './04-canvas-and-stamp-outlines.js';
+import {shBleed,HO,ORN,SH,SK,SW,col,ornPts,rng,useT} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,it} from './06-motif-library-folders.js';
 import {inkRuns,items} from './09-stamp-items-and-print-runs.js';
 import {build,hx} from './10-layer-grids.js';
@@ -84,8 +84,6 @@ tone=FL>0?`<rect width="${SW}" height="${SH}" fill="#fff" filter="url(#na${k})" 
 const mkm=(id,body)=>`<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shapeOf(body)}</mask>`,rm=rn?rn.map((r,j)=>mkm('mp'+k+'r'+j,blk+items(t,{c:'#fff',d:'#000'},0,12,r.sel))).join('')+(frame?mkm('mp'+k+'rr',blk+frame):''):'';
 o+=fd+`<mask id="mp${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shape}</mask>${rm}${t.neg?`<g id="q${k}">${shBleed(ci)}<g clip-path="url(#shc${t.id})">`:`<g id="q${k}" clip-path="url(#shc${t.id})">`}${isOf(t)?`<g mask="url(#is${t.id})">`:''}${rn?rn.map((r,j)=>`<rect width="${SW}" height="${SH}" fill="${r.c?col(r.c):ci}" mask="url(#mp${k}r${j})"/>`).join('')+(frame?`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k}rr)"/>`:''):`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k})"/>`}${txoG(t,'mp'+k)}${isOf(t)?'</g>':''}${t.neg?'</g></g>':'</g>'}`;{const _pc=o.slice(_ob);BK.PC[k]=_pc;BK.P[k]=bkH(_pc+'|'+(BK.PF[x]||''));o=o.slice(0,_ob)+'<!--@P:'+k+'-->'+_pc+'<!--@-->'}});BK.PD.set(x,{k:_ck,o:o.slice(_o0),pf:BK.PF[x],pc:_bt.map(b=>{const k=x+'_'+b;return[k,BK.PC[k],BK.P[k]]})})});
 useT(WBS.tiles[WBS.cur]);return o}
-function renderL(){const L=WBS.layers[WBS.selL],pa=col(WBS.proj.bg);
-$('lst').innerHTML=WBS.tiles.map(t=>{useT(t);return`<button data-s="${t.id}" class="${L.st.includes(t.id)?'on':''}" title="Use on this layer"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button>`}).join('');useT(WBS.tiles[WBS.cur])}
 let raf=0;const upd=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;WBH.draw();build();if(typeof WBH.syncPr=='function')WBH.syncPr()})};
 const Q=()=>WBS.tiles[WBS.cur].items[WBS.sel];
 function init11(){
@@ -98,4 +96,4 @@ else if(h.k=='e'||h.k=='w'){const d=h.k=='e'?1:-1,w=mid?Math.abs(lx)*2:d*lx+rx0;
 else{const d=h.k=='s'?1:-1,w=mid?Math.abs(ly)*2:d*ly+ry0;ny=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)oy=-d*ry0+d*48*h.s0*ny}
 q.s=ns;if(nx!=1||q.sx)q.sx=nx;if(ny!=1||q.sy)q.sy=ny;const r=-a;q.x=+(h.cx+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(2);q.y=+(h.cy+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(2)}
 }
-export {Q,eNV,eR,eSeed,eT,edgeDef,edgeDefs,pressDefs,raf,renderL,upd,init11};
+export {Q,eNV,eR,eSeed,eT,edgeDef,edgeDefs,pressDefs,raf,upd,init11};
