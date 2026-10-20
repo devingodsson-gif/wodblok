@@ -187,4 +187,4 @@ Written Oct 19 2026. Status: **started Oct 19 2026** (the owner said to start: s
 - **State and SVG snapshots regenerated with the owner's approval (Oct 20 2026):** `launch` (state and svg: the default layer is now an element layer with Pattern 1), `scenarios` (`randomize-seed-1..3`, `before-view`, `split-view`, the eight `canvas-shape-*` svg summaries) and `roundtrip` `open-project-1-diamond` (svg: the class order on the picture, `fpm shp`). Pixel goldens were not run here (the editor suite and the picture comparison are only run on the owner's word).
 - **Not run:** the full suite and CI (owner's rule). Targeted runs covered about 66 specs.
 - **No 3.0.0:** the owner said the version keeps advancing in 2.x.
-
+- **Release number:** the element update goes out as **2.2.0** (owner, Oct 20 2026): the minor is raised once, when the plan is done. Steps 2.1.7 to 2.1.12 are in it.
