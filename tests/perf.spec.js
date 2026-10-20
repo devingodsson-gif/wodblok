@@ -52,11 +52,11 @@ async function measureDrag(page) {
   }, wall);
 }
 
-async function measureOnce(browser, url, label) {
+async function measureOnce(browser, url, label, fixture = FIXTURE) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
   const page = await ctx.newPage();
   const { errors } = await openApp(page, { url });
-  await openProjectFile(page, FIXTURE);
+  await openProjectFile(page, fixture);
   const r = await measureDrag(page);
   expect(errors, `${label} page errors`).toEqual([]);
   await ctx.close();
@@ -71,10 +71,11 @@ test('slider drag: work done and speed', async ({ browser }, testInfo) => {
   test.setTimeout(15 * 60 * 1000);
   test.skip(!process.env.WB_BASELINE, 'needs WB_BASELINE=<older dist/wodblok.html> (npm run perf builds main for it)');
   const baseUrl = 'file://' + process.env.WB_BASELINE;
+  // A file format bump: the older build refuses the new fixture, so WB_BASELINE_FIXTURE names the same sample from the older checkout.
   // Runs alternate (baseline, build, baseline, build, ...) so slow drift on the machine hits both the same way.
   const L = [], B = [];
   for (let i = 0; i < RUNS; i++) {
-    L.push(await measureOnce(browser, baseUrl, 'baseline'));
+    L.push(await measureOnce(browser, baseUrl, 'baseline', process.env.WB_BASELINE_FIXTURE || FIXTURE));
     B.push(await measureOnce(browser, APP_URL, 'build'));
   }
   const baseline = summary('baseline', L);

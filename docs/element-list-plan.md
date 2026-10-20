@@ -1,6 +1,6 @@
 # The element list (layers become one list of elements)
 
-Written Oct 20 2026, after 2.2.0 (the element update) went live. Status: **planned, not started.** The owner wants it done in one big step or two (Oct 20 2026); this plan makes it two, after a small fix release. Versions keep advancing in 2.x (2.2.1, 2.2.2, 2.2.3); the next minor (2.3.0) is the owner's call.
+Written Oct 20 2026, after 2.2.0 (the element update) went live. Status: **2.2.1 live-ready, 2.2.2 built (Oct 20 2026; engine clean-up moved to 2.2.3), 2.2.3 not started.** The owner wants it done in one big step or two (Oct 20 2026); this plan makes it two, after a small fix release. Versions keep advancing in 2.x (2.2.1, 2.2.2, 2.2.3); the next minor (2.3.0) is the owner's call.
 
 ## The idea (owner, Oct 20 2026)
 There are no layers. The document is **one ordered list of elements**, drawn in list order (first = bottom). Every row has what a layer row has today: eye, name, opacity, blend, drag to reorder, delete. Pressing an element button on the element bar **creates an instance at the top of the list** and opens that kind's menu:
