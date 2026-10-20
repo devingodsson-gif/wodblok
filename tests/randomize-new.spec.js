@@ -10,6 +10,9 @@ async function only(page, ft, subs) {
   }, [ft, subs]);
 }
 const layers = async page => JSON.parse(await getState(page)).layers;
+// the Pattern elements of every layer
+const pats = async page => (await layers(page)).flatMap(l => (l.pl || []).filter(p => p.k === 'pattern'));
+const jits = async page => (await pats(page)).filter(p => (p.fx || []).some(e => e.k === 'jitter' && (e.pos || e.sz)));
 
 test('the Randomize panel lists the new kinds, ticked', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 6 });
@@ -24,14 +27,14 @@ test('Layout can roll round arrangements, and size, gaps and brick offset', asyn
   await page.click('#rzdo'); await settle(page, { max: 90000 });                       // a project with repeating layers to rework
   await only(page, 'layout', ['type', 'radial']);
   let radial = 0;
-  for (let i = 0; i < 12 && !radial; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); radial = (await layers(page)).filter(l => Object.values(l.ak || {}).some(k => /^x-/.test(k))).length; }
+  for (let i = 0; i < 12 && !radial; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); radial = (await pats(page)).filter(p => p.lay === 'radial').length; }
   expect(radial).toBeGreaterThan(0);
   await only(page, 'layout', ['vary']);
   let vary = 0;
-  for (let i = 0; i < 12 && !vary; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); vary = (await layers(page)).filter(l => l.rsz || l.rgp).length; }
+  for (let i = 0; i < 12 && !vary; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); vary = (await jits(page)).length; }
   expect(vary).toBeGreaterThan(0);
   await only(page, 'layout', ['type']);                                                  // without "round arrangements" nothing round is picked
-  for (let i = 0; i < 4; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); (await layers(page)).forEach(l => Object.values(l.ak || {}).forEach(k => expect(k).not.toMatch(/^x-/))); }
+  for (let i = 0; i < 4; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); (await pats(page)).forEach(p => expect(p.lay).not.toBe('radial')); }
   expect(errors).toEqual([]);
 });
 
@@ -40,11 +43,11 @@ test('Stamps can roll round arrangements and size, gaps and offset as moves', as
   await openPanel(page, 'rand');
   await only(page, 'stamps', ['radial']);
   let radial = 0;
-  for (let i = 0; i < 12 && !radial; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); radial = (await layers(page)).filter(l => Object.values(l.ak || {}).some(k => /^x-/.test(k))).length; }
+  for (let i = 0; i < 12 && !radial; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); radial = (await pats(page)).filter(p => p.lay === 'radial').length; }
   expect(radial).toBeGreaterThan(0);
   await only(page, 'stamps', ['vary']);
   let vary = 0;
-  for (let i = 0; i < 12 && !vary; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); vary = (await layers(page)).filter(l => l.rsz || l.rgp).length; }
+  for (let i = 0; i < 12 && !vary; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); vary = (await jits(page)).length; }
   expect(vary).toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });

@@ -15,6 +15,7 @@ import {coreStr,pmsg} from './18-projects-and-cover-overlay.js';
 import {wbHold} from './19-randomize-and-hold.js';
 import {fpU} from './24-free-place-layers.js';
 import {SL,libColors,libMotifs} from './27-stamp-library.js';
+import {rzFrameEls,rzFx,rzLayoutEls,rzMainEls,rzPaint,rzPressEls,rzSheet,rzTexEls} from './71-randomize-elements.js';
 // a layer that holds pictures or text boxes: Randomize keeps these
 const rzPic=l=>(l.pl||[]).some(p=>p.a||p.tx);
 // ===== v96 Before / after. `\` flips between the picture and the "before" (tap to stay, hold to peek); Shift+`\` splits the view with a draggable line.
@@ -24,20 +25,20 @@ function randomize0(fresh){const ft=WBX.wbRZ?WBX.wbRZ.get():null;window.SLC=[];
  if(ft&&ft.lib&&typeof SL!='undefined')return SL.list().then(l=>{window.SLC=(l||[]).filter(r=>r&&typeof r.tile=='string');return randomizeCore(fresh)},()=>randomizeCore(fresh));
  return randomizeCore(fresh)}
 function randomizeCore(fresh){const R=Math.random,pick=a=>a[Math.floor(R()*a.length)],rr=(a,b)=>a+R()*(b-a),ri=(a,b)=>Math.floor(rr(a,b+1)),ch=p=>R()<p,wpick=o=>{let t=R()*o.reduce((x,y)=>x+y[1],0);for(const x of o){if((t-=x[1])<=0)return x[0]}return o[0][0]};
-const FT=WBX.wbRZ?WBX.wbRZ.get():{stamps:1,text:1,frame:1,col:1,gr:1,masks:1,tx:1,pr:1,shape:0,free:1,layout:0,size:0,look:0,lib:0};
+const FT=WBX.wbRZ?WBX.wbRZ.get():{stamps:1,text:1,frame:1,col:1,gr:1,masks:1,tx:1,pr:1,shape:0,free:1,layout:0,size:0,look:0,lib:0,paint:1,jit:1};
 // which kinds of change each switch allows (the arrows in the Randomize panel)
-const SUBS={};['stamps','frame','shape','free','col','gr','masks','tx','pr','layout','size','look','lib'].forEach(m=>SUBS[m]=WBX.wbRZ?WBX.wbRZ.sub(m):null);const sOn=(m,k)=>!SUBS[m]||SUBS[m].has(k);
+const SUBS={};['stamps','frame','shape','free','col','gr','masks','tx','pr','layout','size','look','lib','paint','jit'].forEach(m=>SUBS[m]=WBX.wbRZ?WBX.wbRZ.sub(m):null);const sOn=(m,k)=>!SUBS[m]||SUBS[m].has(k);
 // An amount under 100 (the sliders in the Randomize panel) lets only some of a feature's allowed kinds of change happen on this roll (at least one), or, for a feature
 // without kinds, lets it happen on some rolls. At 100 nothing is drawn here, so a roll comes out exactly as it did before the sliders. Colours keep a plain switch.
 const AM=k=>WBX.wbRZ&&WBX.wbRZ.amt?WBX.wbRZ.amt(k):1;
-{const gated=[];['stamps','text','layout','frame','shape','size','free','gr','masks','tx','pr','look'].forEach(m=>{const a=AM(m);if(!FT[m]||a>=1)return;const S=SUBS[m];
+{const gated=[];['stamps','text','layout','frame','shape','size','free','gr','masks','tx','pr','look','paint','jit'].forEach(m=>{const a=AM(m);if(!FT[m]||a>=1)return;const S=SUBS[m];
  if(S&&S.size>1&&m!='text'){const keep=[...S].filter(()=>ch(a));if(!keep.length)keep.push(pick([...S]));SUBS[m]=new Set(keep)}
  else if(!ch(a)){FT[m]=0;gated.push(m)}});
- if(gated.length&&!['stamps','frame','col','gr','masks','tx','pr','shape','free','layout','size','look','lib'].some(m=>FT[m]))FT[pick(gated)]=1}
+ if(gated.length&&!['stamps','frame','col','gr','masks','tx','pr','shape','free','layout','size','look','lib','paint'].some(m=>FT[m]))FT[pick(gated)]=1}
 const RAT={portrait:[[2,3],[3,4],[4,5],[5,7]],square:[[1,1]],landscape:[[3,2],[4,3],[7,5]],banner:[[1,2],[9,16],[2,1],[16,9]]},ratioPick=()=>{let a=[];if(FT.size)Object.keys(RAT).forEach(g=>{if(sOn('size',g))a=a.concat(RAT[g])});if(!a.length)a=[[2,3],[3,4],[4,5],[5,7],[1,1],[3,2],[4,3]];return pick(a)};
 const SLCn=(window.SLC||[]).length,libFree=!!(FT.lib&&sOn('lib','free')&&SLCn),libPat=!!(FT.lib&&sOn('lib','pat')&&SLCn);let libDone=false;
 const libTile=id=>{const r=pick(window.SLC);let t=null;try{t=JSON.parse(r.tile)}catch(e){}if(!t||!Array.isArray(t.items))return null;try{libMotifs({motifs:r.motifs});libColors({colors:r.colors})}catch(e){}txMerge(t);t.id=id;shOf(t);return t};
-if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.shape||FT.free||FT.layout||FT.size||FT.look||FT.lib)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
+if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.shape||FT.free||FT.layout||FT.size||FT.look||FT.lib||FT.paint)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
 const dim0=JSON.parse(JSON.stringify(WBS.dim));
 if(!fresh&&WBX.wbCap)WBX.wbCap();
 // --- the bold moves for this roll (only used when Stamps is on)
@@ -164,14 +165,18 @@ rzUse=(pool,md)=>{const t=pick(pool),L=txMake(t,{a:md=='wear'?ri(18,60):md=='sta
 rzList=(m,w,n)=>{const pool=rzPool(m),u=[];if(!pool.length||!rzMds(m).length)return u;for(let i=0;i<n;i++){const md=rzMd(m,w);if(md)u.push(rzUse(pool,md))}return u},
 WCV={relief:3,stain:1,wear:1.4},WST={wear:4,relief:1.5,stain:1},
 rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u:(sOn('tx','none')&&ch(.2)?[]:rzList('tx',WCV,ch(.3)?2:1));
-const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(rzPic)?[]:WBS.layers.filter(rzPic)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:rzCv(),v:87}};
+const EO={pick,ri,rr,ch,jit:!!FT.jit,texOn:!!(FT.pr&&sOn('pr','lay')),gradeOn:!!FT.gr,tex:()=>rzList('pr',WST,1)};
+if(usedGen)mL=rzMainEls(mL,mT,EO);if(FT.frame)fL=rzFrameEls(fL,fT,EO);
+const cvU=rzCv(),mkSheet=!WBS.proj.sh&&(FT.stamps||FT.tx||FT.col)||!!WBS.proj.sh;
+const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(rzPic)?[]:WBS.layers.filter(rzPic)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:mkSheet?[]:cvU,v:87}};
+if(mkSheet)c.proj.sh=rzSheet(c.proj,FT.tx&&!RZ.keep.tx?cvU:null,EO);
 if(RZ.keep.pr)c.pr={...WBS.pr};
 if(FT.pr&&!sOn('pr','edges')){c.pr.e=WBS.pr.e;c.pr.q=WBS.pr.q}
 if(FT.pr&&sOn('pr','edges')&&AM('pr')<1){c.pr.e=Math.round(c.pr.e*AM('pr'));c.pr.q=Math.round(c.pr.q*AM('pr'))}
 // textures: a Print effects roll gives each stamp (and layer, and text box) its own textures, each in its own mode
 if(FT.pr&&sOn('pr','surf')){c.tiles.forEach(t=>{t.tu=sOn('pr','t_clean')&&ch(.25)?[]:rzList('pr',WST,ch(.3)?2:1);delete t.is})}
 else{const src=(WBS.tiles.find(t=>t.tu&&t.tu.length)||{}).tu;c.tiles.forEach(t=>{if(t.is===undefined&&t.tu===undefined)t.tu=src?src.map(u=>({x:u.x,sd:txRid(),md:u.md})):[]})}
-if(FT.pr&&sOn('pr','lay'))c.layers.forEach(l=>{if(!rzPic(l)&&ch(.3))l.tu=rzList('pr',WST,1)});
+if(FT.pr&&sOn('pr','lay'))c.layers.forEach(l=>{if(!rzPic(l)&&!l.free&&ch(.3))l.tu=rzList('pr',WST,1)});
 if(FT.pr&&sOn('pr','txt'))c.layers=c.layers.map(l=>{if(!(l.pl||[]).some(p=>p.tx))return l;const q=JSON.parse(JSON.stringify(l));q.pl.forEach(p=>{if(p.tx&&ch(.6))p.tu=rzList('pr',WST,1)});return q});
 c.pr.t='';
 // Colours: when the palette changes (a new palette, or paper and ink swapped), kept stamps and layers that carry their own accent ink move to the new palette too
@@ -238,17 +243,19 @@ if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('
   if(lvr){if(E.has('sizevar'))l.rsz=ri(15,45);else delete l.rsz;if(E.has('gaps')&&!lnk.has(l.u))l.rgp=ri(8,28);else delete l.rgp}
   if(lsp||lrt||lvr)l.rsd=1+Math.floor(R()*99999);
   if(lsz&&!lk&&i==0&&!l.rot&&ch(.3)){l.fit=pick(['h','v']);try{l.size=+fitTs(l).toFixed(3)}catch(e){}}
- });useT(WBS.tiles[WBS.cur]);store();upd()}
+ });
+ rzLayoutEls(WBS.layers,{type:lty,size:lsz,space:lsp,rot:lrt,offset:lof,vary:lvr,rad:lrd,scatter:E.has('scatter'),tilt:E.has('tilt'),spread:E.has('spread'),sizevar:E.has('sizevar'),gaps:E.has('gaps')},EO);
+ useT(WBS.tiles[WBS.cur]);store();upd()}
 // Layer opacity and blend: the first layer stays mostly solid; the ones above can turn see-through or blend
 if(FT.look){const bl=['multiply','darken','screen','lighten','overlay','soft-light'].filter(x=>sOn('look','b_'+x));
  WBS.layers.forEach((l,i)=>{if(l.rz=='free')return;
   if(sOn('look','op')){if(ch(i?.7:.3))l.op=ri(i?45:75,i?92:96);else delete l.op}
   if(bl.length&&i>0){if(ch(.65))l.bl=pick(bl);else if(l.bl&&l.bl!='behind'&&l.bl!='cancel'&&l.bl!='replace')delete l.bl}});store();upd()}
 // Print effects, Impression: uneven pressure and ink flooding on the layers you already had as well as the new ones
-if(FT.pr&&sOn('pr','press')){WBS.layers.forEach(l=>{if(l.free&&rzPic(l)||l.rz=='free')return;l.pst=ch(.5)?0:ri(1,6);l.pfl=l.fr&&l.fr.on?0:ch(.65)?0:ri(1,3)});store();upd()}
+if(FT.pr&&sOn('pr','press')){WBS.layers.forEach(l=>{if(l.free||l.rz=='free')return;l.pst=ch(.5)?0:ri(1,6);l.pfl=l.fr&&l.fr.on?0:ch(.65)?0:ri(1,3)});rzPressEls(WBS.layers,EO);store();upd()}
 // Stamp library, mixed into the pattern: one or two saved stamps join the repeating layer
-if(libPat){const L0=WBS.layers.find(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.gl),lead0=L0&&WBS.tiles.find(t=>t.id==(L0.lead!=null?L0.lead:(L0.st||[])[0]));
- if(L0){const n=ri(1,Math.min(2,window.SLC.length));let nx=Math.max(0,...WBS.tiles.map(t=>+t.id||0));for(let i=0;i<n;i++){const t=libTile(++nx);if(!t)continue;if(lead0&&t.sh&&lead0.sh&&t.sh.k!=lead0.sh.k)t.sh={...t.sh,z:85};WBS.tiles.push(t);L0.st=[...(L0.st||[]),t.id];libDone=true}
+if(libPat){const L0=WBS.layers.find(l=>l.free&&l.rz!='free'&&(l.pl||[]).some(p=>p.k=='pattern'&&p.lay!='frame'&&p.ox==null))||WBS.layers.find(l=>!l.free&&!(l.fr&&l.fr.on)&&!l.gl),PT0=L0&&(L0.pl||[]).find(p=>p.k=='pattern'),lead0=L0&&WBS.tiles.find(t=>t.id==(L0.lead!=null?L0.lead:(L0.st||[])[0]));
+ if(L0){const n=ri(1,Math.min(2,window.SLC.length));let nx=Math.max(0,...WBS.tiles.map(t=>+t.id||0));for(let i=0;i<n;i++){const t=libTile(++nx);if(!t)continue;if(lead0&&t.sh&&lead0.sh&&t.sh.k!=lead0.sh.k)t.sh={...t.sh,z:85};WBS.tiles.push(t);L0.st=[...(L0.st||[]),t.id];if(PT0)PT0.src.push({k:'stamp',t:t.id,w:1});libDone=true}
   WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));store();upd()}}
 // Free-placed stamps: a single feature, or a few stamps, set on the pattern grid and snapped to it, often with lettering. Added as their own Free place layer on top.
 let fzReqs=[],fzDone=false;
@@ -259,7 +266,7 @@ if((FT.free||libFree)&&ch(.65)){
  if(m2=='c'){for(let i=0;i<gn;i++)xs.push((i+.5)*cell);for(let j=0;(j+.5)*cell<CH;j++)ys.push((j+.5)*cell)}else{for(let i=1;i<gn;i++)xs.push(i*cell);for(let j=1;j*cell<CH-.5;j++)ys.push(j*cell)}
  let pts=[];if(WBS.pgrid.sh&&WBS.pgrid.sh!='rect'){const M=gModel(WBS.pgrid.sh,CW,CH,gn,false);pts=(m2=='c'?M.cents:M.verts).filter(q=>q[0]>=0&&q[0]<=CW&&q[1]>=0&&q[1]<=CH)}else xs.forEach(x=>ys.forEach(y=>pts.push([x,y])));
  let nidT=Math.max(0,...WBS.tiles.map(t=>+t.id||0));
- const FL=mkL('Free stamps',[],'check',180);FL.free=true;FL.rz='free';FL.pl=[];FL.fg={snap:true,ss:true};FL.ak={};FL.man=false;FL.ov={};FL.pst=ch(.6)?0:ri(1,4);FL.pfl=0;
+ const FL=mkL('Free stamps',[],'check',180);FL.free=true;FL.rz='free';FL.pl=[];FL.fg={snap:true,ss:true};FL.ak={};FL.man=false;FL.ov={};FL.pst=0;FL.pfl=0;
  const boxes=[],made=[],fits=(x,y,w,h)=>{if(x-w/2<-.5||x+w/2>CW+.5||y-h/2<-.5||y+h/2>CH+.5)return false;if(![[x-w/2,y-h/2],[x+w/2,y-h/2],[x+w/2,y+h/2],[x-w/2,y+h/2]].every(q=>inShape(q[0],q[1])))return false;return!boxes.some(b=>Math.abs(b.x-x)<(b.w+w)/2*.95&&Math.abs(b.y-y)<(b.h+h)/2*.95)};
  const put=(tile,s0,cx,cy,rot,fl)=>{const G=geom(shOf(tile)),asp=G.SW>=G.SH?[1,G.SH/G.SW]:[G.SW/G.SH,1],order=pts.slice().sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy));
   for(let s=s0;s>=cell*.99;s-=cell){const w=s*asp[0],h=s*asp[1],q=order.find(z=>fits(z[0],z[1],rot?Math.max(w,h):w,rot?Math.max(w,h):h));if(q){const bb=rot?Math.max(w,h):0;boxes.push({x:q[0],y:q[1],w:rot?bb:w,h:rot?bb:h});FL.pl.push({u:fpU()+boxes.length,k:'stamp',t:tile.id,x:+q[0].toFixed(1),y:+q[1].toFixed(1),s:+s.toFixed(2),r:rot||0,f:fl||1});if(!made.includes(tile))made.push(tile);return true}}return false};
@@ -278,12 +285,14 @@ if((FT.free||libFree)&&ch(.65)){
  if(single){if(want=='text')addText(CW/2,CH/2);else addMotif(CW/2,CH/2,Math.max(2,Math.round(gn*rr(.4,.65))))}
  else{const n2=ri(2,4);let first=true;for(let i=0;i<n2;i++){const tx=rr(0,CW),ty=rr(0,CH);if(first&&want=='text'){addText(CW/2,CH*pick([.3,.5,.7]))}else addMotif(tx,ty,pick([1,1,2,2,3]));first=false}}
  const usedIds=new Set(FL.pl.map(q=>q.t)),keep=made.filter(t=>usedIds.has(t.id));
- if(keep.length){FL.st=keep.map(t=>t.id);keep.forEach(t=>WBS.tiles.push(t));WBS.layers.push(FL);reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0))}
+ if(keep.length){const fp=ch(.4)?0:ri(1,4);FL.pl.forEach(q=>{const fx=rzFx(EO,fp,0,null);if(fx.length)q.fx=fx});FL.st=keep.map(t=>t.id);keep.forEach(t=>WBS.tiles.push(t));WBS.layers.push(FL);reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0))}
  setDim();useT(WBS.tiles[WBS.cur]);store();upd()}
+let paDone=false;
+if(FT.paint&&ch(.7)){const pl=rzPaint(EO,WBS.tiles.map(t=>t.id),inkFor()||null);pl.name='Paint';WBS.layers.push(pl);paDone=true;store();upd()}
 const txAll=(txReq?[[WBS.tiles[0],txReq]]:[]).concat(fzReqs);
 if(txAll.length){pmsg('Randomized… setting the lettering.');WBX.wbTxBusy=(WBX.wbTxBusy||0)+1;WBX.wbRollHold=tok;(async()=>{try{for(const[t,o] of txAll){try{await WBX.wbTxPlace(t,o,tok)}catch(e){}}if(tok!==WBX.wbRndTok)return;store();upd();if(WBX.wbRollHold===tok)WBX.wbRollHold=0;if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()}}finally{if(WBX.wbRollHold===tok)WBX.wbRollHold=0;WBX.wbTxBusy=Math.max(0,(WBX.wbTxBusy||1)-1)}})()}
 else if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()};
-const fn=[...MOVES.filter(x=>F.has(x[0])).map(x=>x[1]),...(fzDone?['free-placed stamps']:[]),...(libDone?['library stamps']:[]),...[['layout','layout'],['shape','canvas shape'],['size','canvas size'],['look','layer opacity and blend'],['col','colours'],['gr','colour grade'],['masks','grade masks'],['tx','canvas texture'],['pr','textures and print effects']].filter(x=>FT[x[0]]).map(x=>x[1])].join(' + ')||'a calm base';
+const fn=[...MOVES.filter(x=>F.has(x[0])).map(x=>x[1]),...(fzDone?['free-placed stamps']:[]),...(paDone?['paint strokes']:[]),...(libDone?['library stamps']:[]),...[['layout','layout'],['shape','canvas shape'],['size','canvas size'],['look','layer opacity and blend'],['col','colours'],['gr','colour grade'],['masks','grade masks'],['tx','sheet texture'],['jit','jitter'],['pr','textures and print effects']].filter(x=>FT[x[0]]).map(x=>x[1])].join(' + ')||'a calm base';
 
 ['rzdo'].forEach(id=>{const b=$(id);if(b){b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin')}});pmsg((fresh?'Started a new project with a fresh random piece':'Randomized')+` (featuring ${fn}).`+(FT.lib&&!SLCn?' Your stamp library is empty, so no saved stamps were used.':'')+(fresh?'':' Ctrl+Z brings back the previous piece.'))}
 function init20(){

@@ -59,5 +59,5 @@
  "59-align.js",
   "60-text-engine.js",
   "61-text-panel.js",
-  "62-text-styles.js", "63-stamp-tool.js", "64-stamp-canvas-edit.js", "65-element-core.js", "66-sheet-element.js", "67-pattern-element.js", "68-stamp-contents.js", "69-effect-stack.js", "70-paint-element.js"
+  "62-text-styles.js", "63-stamp-tool.js", "64-stamp-canvas-edit.js", "65-element-core.js", "66-sheet-element.js", "67-pattern-element.js", "68-stamp-contents.js", "69-effect-stack.js", "70-paint-element.js", "71-randomize-elements.js"
 ]
