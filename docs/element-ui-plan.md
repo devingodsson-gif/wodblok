@@ -110,7 +110,7 @@ Per-kind tabs; the Sheet on/off switch; Paint's Off/Brush/Eraser switch and its 
 1. **As much like Photoshop as possible**, in how it works and how it looks.
 2. **Every button press makes an element at once** (Paint makes an empty Paint element, Shape, Text and Stamp make one in the middle of the view). The only exception is Image, which needs a picture chosen first.
 3. **A new element goes just above the selected one** (replaces decision 1 of docs/element-list-plan.md, "always at the top").
-4. **The element bar stays where it is** (floating over the canvas, top centre).
+4. **The element bar stays where it is** (floating over the canvas, top centre) for now; the owner may move it later.
 5. **Version 2.3.0** when the plan is done; the steps are 2.2.6, 2.2.7…
 6. **Restyle towards Photoshop as each step goes**: each step restyles what it touches. Before the first restyle, the new tokens (colours, sizes, the row and slider designs) are proposed to the owner and written into docs/developing-wodblok.md Part 9, as the Never-break list requires.
 7. No mock-up: build it.
