@@ -6,7 +6,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {symOps} from './07-symmetry.js';
 import {delItems,selSet,selToggle} from './12-selection-and-split.js';
 import {fpL,fpSnap} from './24-free-place-layers.js';
-import {STP,stMatrix,stUnlocked,stampAt} from './63-stamp-tool.js';
+import {STP,stMatrix,stUnlocked,stampAt,stLock} from './63-stamp-tool.js';
 // ===== Editing the unlocked stamp on the canvas (layer update, step 5) =====
 // With a stamp unlocked, the Pattern canvas edits that stamp through the instance printed under the pointer: a click with a shape picked in the
 // Shapes panel puts the shape in the stamp, a click on a shape inside an instance selects it, dragging moves it, the square handles resize it and
@@ -35,7 +35,9 @@ const sceFree=()=>{WBS.fpSel=-1;WBS.fpMS=new Set()};
 const sceSel=()=>{if(WBH.draw)WBH.draw();sceDraw()};
 // the Grid tool snaps in canvas units (Alt skips it); a point is snapped there and then moved back into the stamp
 function sceSnap(M,x,y,e){const L=fpL();if(!L)return{x,y};const q=sceTo(M,x,y),n=fpSnap(L,q.x,q.y,e);return sceTo(M.inverse(),n[0],n[1])}
-function sceDown(e){if(e.button!==0)return;const t0=stUnlocked();if(t0==null)return;
+function sceDown(e){if(e.button!==0)return;let t0=stUnlocked();
+ if(t0==null&&WBS.brush&&!WBS.brush.txt&&!WBS.txArm&&WBS.fpB==null){const c0=scePt(e),h0=c0&&stampAt(c0.x,c0.y,null);if(h0){stLock(STP.items[h0.i][0]);t0=stUnlocked()}}
+ if(t0==null)return;
  const hand=$('nvhand');if(hand&&hand.getAttribute('aria-pressed')=='true')return;
  const spk=e.target.closest&&e.target.closest('[data-sp]');
  if(spk&&WBS.split&&SCE.ai!=null&&STP.items[SCE.ai]){const c=scePt(e),M=sceInv(SCE.ai);if(!c)return;const p=sceTo(M,c.x,c.y);e.preventDefault();e.stopPropagation();SCE.sp={k:spk.dataset.sp,M,ox:WBS.split.x-p.x,oy:WBS.split.y-p.y};return}

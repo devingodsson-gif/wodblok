@@ -47,13 +47,12 @@ test('a picked shape goes into the unlocked stamp where it is pointed at, and ev
   expect(errors).toEqual([]);
 });
 
-test('with the stamp locked, nothing is put into it', async ({ page }) => {
+test('with the stamp locked, a picked shape unlocks it and lands (2.2.1)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await pick(page);
   const before = (await items(page)).length;
   await click(page, await inst(page));
-  expect((await items(page)).length).toBe(before);
-  await expect(page.locator('#stoh .steh')).toHaveCount(0);
+  expect((await items(page)).length).toBe(before + 1);
   expect(errors).toEqual([]);
 });
 
