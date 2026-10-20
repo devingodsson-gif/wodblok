@@ -1,6 +1,11 @@
 # Development plan
 
-## Open plan: 2.1 clean-up (written Oct 19 2026, after 2.0.0 went live)
+## Open plan: the element update (started Oct 19 2026)
+Elements (Sheet, Paint, Shape, Image, Text, Stamp, Pattern) and effects (Texture, Pressure offset, Jitter, Colour grade; Carved edges, Symmetry, Wrap and Invert stay in the Stamp panel; Morph was removed). The plan, the owner's answers and each step's outcome are in [`element-update-plan.md`](element-update-plan.md). Steps are 2.1.1, 2.1.2... up to 2.1.12, released as 2.2.0 (step 12: new layers are element layers, old arrangement groups retired); the version keeps advancing in 2.x, there is no 3.0.0 (owner, Oct 20 2026).
+
+## Done: 2.1 clean-up (2.0.1 to 2.0.4, live)
+
+### 2.1 clean-up (written Oct 19 2026, after 2.0.0 went live)
 
 2.0.0 finished the layer update ([`layer-update-plan.md`](layer-update-plan.md)). An audit of the code, the screen, the tests and the docs found
 the loose ends below. They are grouped into three steps (2.0.1, 2.0.2, 2.0.3; the minor goes to 2.1.0 when all three are done). Old-file migration

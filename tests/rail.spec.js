@@ -4,13 +4,13 @@ const { test, expect } = require('@playwright/test');
 const { openApp } = require('./helpers/harness');
 
 const labels = page => page.locator('.rail button:visible').evaluateAll(b => b.map(x => x.getAttribute('aria-label')));
-const SHARED = ['Close all panels', 'Randomize', 'Colours', 'Colourways', 'Presets', 'Stamp library', 'Colour grading', 'Textures', 'History', 'Workspaces'];
+const SHARED = ['Close all panels', 'Randomize', 'Colours', 'Colourways', 'Stamp library', 'Colour grading', 'Textures', 'History', 'Workspaces'];
 
-test('the shared tools are the first ten rail buttons, in the same order', async ({ page }) => {
+test('the shared tools are the first nine rail buttons, in the same order', async ({ page }) => {
   const { errors } = await openApp(page);
   const pattern = await labels(page);
-  expect(pattern.slice(0, 10)).toEqual(SHARED);
-  expect(pattern.slice(10)).toEqual(['Canvas', 'Layers', 'Layout', 'Stamps', 'Grid', 'Navigator', 'Variations', 'Export recipes', 'Stamp settings', 'Shapes', 'Text', 'Shape list', 'Element editor', 'More tools']);
+  expect(pattern.slice(0, 9)).toEqual(SHARED);
+  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Grid', 'Navigator', 'Export recipes', 'Elements', 'More tools']);   // the element panels open from the element bar only
   expect(errors).toEqual([]);
 });
 
@@ -66,7 +66,7 @@ test('the tool bar is one list; the three-line button opens a tool repository: t
   await page.click('#rmore');
   await page.click('#rmenu [data-add="hist"]');
   expect(await page.locator('.dock [data-tab="hist"], .wtab:has-text("History")').count()).toBeGreaterThan(0);
-  await drag(page.locator('#rmenu [data-add="hist"]'), page.locator('.rail [data-pn="pres"]'));
+  await drag(page.locator('#rmenu [data-add="hist"]'), page.locator('.rail [data-pn="cways"]'));
   expect((await ids()).length).toBe(n);
   await page.keyboard.press('Escape');
   expect(await page.locator('#rmenu:visible').count()).toBe(0);

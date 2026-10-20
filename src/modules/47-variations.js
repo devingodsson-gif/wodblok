@@ -46,7 +46,7 @@ function init47(){
         c.proj.ts.slice(0,nc.length).forEach((id,k)=>map.set(slotHex(id),nc[k]));
         const img=await vrImg('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(vrRecolor(svg,map)));
         if(!img){im.textContent='';return}
-        const w=220,h=Math.max(1,Math.round(w*img.naturalHeight/img.naturalWidth)),cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
+        const w=220,h=Math.max(1,Math.round(w*img.naturalHeight/img.naturalWidth)),cv=document.createElement('canvas');cv.width=w;cv.height=h;{const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h)}
         const t=document.createElement('img');t.alt='';t.src=cv.toDataURL('image/jpeg',.8);im.textContent='';im.appendChild(t);
       }));
     }finally{busy=false}

@@ -2,11 +2,11 @@
 // that stamp where the pointer is (through the instance under it), a click selects a shape inside an instance, dragging moves it, the square handles
 // resize it, the round one turns it, Delete removes it. Locked stamps are not touched.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const items = async page => (await state(page)).tiles[0].items;
-const unlock = async page => { await openPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); };
+const unlock = async page => { await showPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); };
 const pick = async page => { await openPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
 const toClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height, k: r.width / vb.width }; }, [x, y]);
 // an instance whose middle is well inside the canvas: its number and where its middle is, in canvas units and on screen
@@ -23,7 +23,7 @@ const drag = async (page, from, to) => { await page.mouse.move(from.x, from.y); 
 
 test('the Shapes panel is on the Pattern rail', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await expect(page.locator('#rail-motifs')).toBeVisible();
+  await expect(page.locator('#elb [data-k="shape"]')).toBeVisible();   // the element bar opens it
   await openPanel(page, 'motifs');
   expect(await page.locator('#lib .lfr').count()).toBeGreaterThan(0);
   expect(errors).toEqual([]);
@@ -60,7 +60,8 @@ test('with the stamp locked, nothing is put into it', async ({ page }) => {
 test('on a turned layer the shape still lands under the pointer and stands upright', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
-  await page.evaluate(() => { const r = document.getElementById('lrt'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true })); });
+  await page.click('#pelist .mr >> nth=0');
+  await page.evaluate(() => { const r = document.getElementById('pert'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true })); });
   await settle(page);
   await unlock(page);
   await pick(page);
@@ -85,7 +86,7 @@ test('a click selects a shape, dragging moves it, a handle resizes it, the round
   await pick(page);
   let p = await inst(page);
   await click(page, p);
-  p = await inst(page);   // the Element editor docks along the bottom when a shape is placed, so the canvas moves
+  p = await inst(page);   // measured again after the click, as the canvas can move
   let it = await items(page);
   const n = it.length;
   // click empty paper of the instance far from the shape (a corner): selection goes
@@ -129,7 +130,7 @@ test('placing is one undo step, and locking the stamp hides the selection', asyn
   await click(page, await inst(page));
   expect((await items(page)).length).toBe(before + 1);
   await page.keyboard.press('Escape');
-  await openPanel(page, 'stmp');
+  await showPanel(page, 'stmp');
   await page.locator('#stmpl .smklk').first().click();
   await settle(page);
   await expect(page.locator('#stoh .steh')).toHaveCount(0);
@@ -151,20 +152,20 @@ test('text typed in the Text panel goes into the unlocked stamp as letters, on e
   await expect.poll(async () => (await items(page)).length, { timeout: 15000 }).toBe(before + 2);
   const it = await items(page);
   expect(it.slice(-2).every(q => q.tg)).toBe(true);
-  expect((await state(page)).layers[0].pl || []).toHaveLength(0);
+  expect(((await state(page)).layers[0].pl || []).filter(p => p.k !== 'pattern')).toHaveLength(0);   // only the Pattern is on the layer
   expect(errors).toEqual([]);
 });
 
 // ---- step 6 (1.46.6): the Element editor and Stamp settings in the Pattern view, symmetry copies, marquee, snapping ----
 const at = async (page, p, dx, dy) => { const c = await toClient(page, p.cx + dx, p.cy + dy); return { x: c.x, y: c.y, k: c.k }; };
 
-test('the Element editor opens by itself when a shape is placed in the unlocked stamp, and its controls act on the selected shape', async ({ page }) => {
+test('the Edit group of the Shape panel acts on the shape placed in the unlocked stamp', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await unlock(page);
   await pick(page);
-  await expect(page.locator('.wtab', { hasText: 'Element editor' })).toHaveCount(0);
+  await expect(page.locator('#sel')).toHaveClass(/none/);
   await click(page, await inst(page));
-  await expect(page.locator('.wtab.on', { hasText: 'Element editor' })).toHaveCount(1, { timeout: 10000 });
+  await expect(page.locator('#sel')).not.toHaveClass(/none/, { timeout: 10000 });
   await page.evaluate(() => { const r = document.getElementById('ssz'); r.value = 50; r.dispatchEvent(new Event('input', { bubbles: true })); });
   await settle(page);
   const it = await items(page);
@@ -175,7 +176,7 @@ test('the Element editor opens by itself when a shape is placed in the unlocked 
 test('Stamp settings is a Pattern tool: symmetry makes copies that can be selected and dragged on the canvas', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await unlock(page);
-  await openPanel(page, 'stamp');
+  await showPanel(page, 'stmp');
   await page.click('#sym [data-y="lr"]');
   await settle(page);
   expect((await state(page)).tiles[0].sym.m).toBe('lr');

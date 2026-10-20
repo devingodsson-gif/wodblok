@@ -6,6 +6,7 @@ import {eT,upd} from './11-pressure-flooding-block-edges.js';
 import {ser} from './14-presets-and-layer-grid-ui.js';
 import {fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnapS,fpTog,fpU} from './24-free-place-layers.js';
 import {fx1,tbG,tbSty,txbSync,txtGl} from './26-text-boxes.js';
+import {fxGr,fxJit,fxPad,fxTex} from './69-effect-stack.js';
 
 // ===== Art layers: imported images and saved WODBLOK projects, placed by hand like Free place stamps =====
 // ARTS[id] = {n name, k 'img'|'proj', src data URL, w, h, and for projects pid (source project) + ver (when it was last saved)}.
@@ -13,7 +14,9 @@ import {fx1,tbG,tbSty,txbSync,txtGl} from './26-text-boxes.js';
 const artOk=s=>typeof s=='string'&&s.length<14e6&&/^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+\/=]*$/.test(s);
 const artId=()=>'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 function artBU(A){if(A.bu)return A.bu;try{const s=A.src,i=s.indexOf(','),bin=atob(s.slice(i+1)),u=new Uint8Array(bin.length);for(let j=0;j<bin.length;j++)u[j]=bin.charCodeAt(j);A.bu=URL.createObjectURL(new Blob([u],{type:s.slice(5,s.indexOf(';'))}))}catch(e){A.bu=A.src}return A.bu}
-function artUsed(){const o={};WBS.layers.forEach(L=>{(L.pl||[]).forEach(p=>{const A=p.a&&WBS.ARTS[p.a];if(A&&!o[p.a])o[p.a]={n:A.n,k:A.k,src:A.src,w:A.w,h:A.h,...(A.pid?{pid:A.pid,ver:A.ver||0}:{})}})});return o}
+function artUsed(){const o={},add=p=>{const A=p.a&&WBS.ARTS[p.a];if(A&&!o[p.a])o[p.a]={n:A.n,k:A.k,src:A.src,w:A.w,h:A.h,...(A.pid?{pid:A.pid,ver:A.ver||0}:{})}};WBS.layers.forEach(L=>{(L.pl||[]).forEach(p=>{add(p);(p.src||[]).forEach(s=>{if(s.k=='image')add({a:s.a})})})});WBS.tiles.forEach(t=>{(t.el||[]).forEach(add)});return o}
+// is a picture used by an element, a pattern's source or a stamp's contents
+function artRefd(id){return WBS.layers.some(l=>(l.pl||[]).some(p=>p.a==id||(p.src||[]).some(s=>s.k=='image'&&s.a==id)))||WBS.tiles.some(t=>(t.el||[]).some(p=>p.a==id))}
 function artLoad(o){const r={};Object.entries(o||{}).forEach(([id,A])=>{if(!A||!artOk(A.src)||!(+A.w>0)||!(+A.h>0))return;r[String(id).replace(/[^\w-]/g,'').slice(0,24)]={n:String(A.n||'Art').replace(/["<>&|]/g,'').slice(0,40),k:A.k=='proj'?'proj':'img',src:A.src,w:+A.w,h:+A.h,...(A.k=='proj'&&A.pid?{pid:String(A.pid).slice(0,40),ver:+A.ver||0}:{})}});return r}
 const artEnc=c=>{const w=c.toDataURL('image/webp',.88);return w.startsWith('data:image/webp')?w:c.toDataURL('image/png')};
 // A flat picture of this project as it is now (transparent outside a shaped canvas). It is saved with the project so other projects can use it as art.
@@ -25,17 +28,18 @@ function crBox(P){let a=1,b=1,c=0,d=0;P.forEach(q=>{a=Math.min(a,q[0]);b=Math.mi
 function crRef(p){const P=crPts(p);if(!P)return{cu:.5,cv:.5,w:1,h:1};const[a,b,c,d]=crBox(P);return{cu:(a+c)/2,cv:(b+d)/2,w:Math.max(.005,c-a),h:Math.max(.005,d-b)}}
 function crIn(P,x,y){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>y)!=(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
 function fpWH(p){if(p.tx){const k=p.s/Math.max(p.n||1,.01);return[(+p.bw||1)*k,(+p.bh||1)*k]}if(p.a){const A=WBS.ARTS[p.a];if(!A)return null;const k=p.s/Math.max(A.w,A.h),b=crRef(p);return[A.w*k*b.w*(p.wx||1),A.h*k*b.h*(p.wy||1)]}const tt=WBS.tiles.find(t=>t.id==p.t);if(!tt)return null;const G=geom(shOf(tt)),k=p.s/Math.max(G.SW,G.SH);return[G.SW*k*(p.wx||1),G.SH*k*(p.wy||1)]}
-function artLayer(L,li){const pl=(L.pl||[]).filter(p=>p.a&&WBS.ARTS[p.a]);if(!pl.length)return['',''];const f=v=>v.toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),used=new Set();let defs='',out='';
+function artLayer(L,li){const pl=(L.pl||[]).filter(p=>p.a&&WBS.ARTS[p.a]);if(!pl.length)return['',''];const f=v=>v.toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),used=new Set(),fr=new Map();let defs='',out='';
 pl.forEach(p=>{const A=WBS.ARTS[p.a],id='ar'+li+'_'+String(p.a).replace(/[^\w-]/g,''),[w,h]=fpWH(p);
 if(!used.has(id)){used.add(id);defs+=`<image id="${id}" href="${A.src}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none"/>`}
 if(WBS.CR&&WBS.CR.u==p.u&&li==WBS.selL)return;const R0=crRef(p),k=p.s/Math.max(A.w,A.h),cpt=crPts(p);let clp='';if(cpt){const cid='ac'+li+'_'+String(p.u).replace(/[^\w-]/g,'');defs+=`<clipPath id="${cid}"><polygon points="${cpt.map(q=>f(q[0]*A.w)+','+f(q[1]*A.h)).join(' ')}"/></clipPath>`;clp=` clip-path="url(#${cid})"`}const hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-w/2)}" y="${f(-h/2)}" width="${f(w)}" height="${f(h)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
-out+=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x)} ${f(+p.y)})">${hit}<use href="#${id}"${clp} transform="rotate(${+p.r||0}) scale(${f(k*(p.f||1)*(p.wx||1))} ${f(k*(p.wy||1))}) translate(${f(-R0.cu*A.w)} ${f(-R0.cv*A.h)})"/></g>`});
+const J=fxJit(p)||{dx:0,dy:0,dr:0,sz:1,sx:1,sy:1},utr=`rotate(${(+p.r||0)+J.dr}) scale(${f(k*(p.f||1)*(p.wx||1)*J.sz*J.sx)} ${f(k*(p.wy||1)*J.sz*J.sy)}) translate(${f(-R0.cu*A.w)} ${f(-R0.cv*A.h)})`,fxT=p.fx&&p.fx.length?fxTex(p,'fm'+li+'_'+String(p.u).replace(/[^\w-]/g,''),{x:0,y:0,W:A.w,H:A.h}):null,fxG=p.fx&&p.fx.length?fxGr(p,'fg'+li+'_'+String(p.u).replace(/[^\w-]/g,''),fxPad(0,0,A.w,A.h)):null;if(fxT)defs+=fxT.defs;if(fxG)defs+=fxG.defs;
+const one=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x+J.dx)} ${f(+p.y+J.dy)})">${hit}${fxT||fxG?`<g transform="${utr}"${fxT?fxT.attrs:''}>${fxG?fxG.wrap(`<use href="#${id}"${clp}/>`):`<use href="#${id}"${clp}/>`}</g>`:`<use href="#${id}"${clp} transform="${utr}"/>`}</g>`;out+=one;fr.set(String(p.u),one)});
 const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'';
 const kid='ak'+li;if(L.akk)defs+=`<filter id="${kid}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -.9 -1.77 -.33 0 3"/><feComposite in2="SourceGraphic" operator="in"/></filter>`;
-return[defs,`<g${L.akk?` filter="url(#${kid})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}
+const o0=`<g${L.akk?` filter="url(#${kid})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>`;return[defs,o0+out+'</g>',o0,'</g>',fr]}
 // the Art part of the Free place panel
 function artPanel(L){{const k=$('lfaak');if(k){k.checked=!!L.akk;const lb=k.closest('label');if(lb)lb.hidden=!(L.pl||[]).some(p=>p.a)}}
-const ids=Object.keys(WBS.ARTS),inUse=new Set();WBS.layers.forEach(l=>{(l.pl||[]).forEach(p=>{if(p.a)inUse.add(p.a)})});
+const ids=Object.keys(WBS.ARTS),inUse=new Set();ids.forEach(i=>{if(artRefd(i))inUse.add(i)});
 const ky=ids.map(i=>i+':'+WBS.ARTS[i].src.length+(WBS.ARTS[i].ver||'')+(inUse.has(i)?'u':'')).join('|')+'#'+WBS.fpB+(fpPoolOk()?'#'+[...WBS.fpPool].join('.'):''),st=$('lfars');
 if(st.dataset.k!=ky){st.dataset.k=ky;st.innerHTML=ids.length?ids.map(i=>{const A=WBS.ARTS[i];return`<button type="button" data-a="${hx(i)}" class="${WBS.fpB==i||(fpPoolOk()&&WBS.fpPool.has(String(i)))?'on':''}" title="${hx(A.n)}${A.pid?' (linked project)':''}"><img src="${artBU(A)}" alt="">${A.pid?'<u class="alk"></u>':''}${inUse.has(i)?'':`<i data-ax="${hx(i)}" title="Remove from this project">&#215;</i>`}</button>`}).join(''):'<div class="hint" style="margin:0">Nothing imported yet.</div>'}
 }
@@ -63,7 +67,7 @@ $('lfph').textContent=WBS.fpB?'Set the size and rotation below, then click on th
 if(el.dataset.k!=key){el.dataset.k=key;const sc=el.scrollTop;
 el.innerHTML=pl2.length?pl2.slice().reverse().map(q=>{if(q.a){const A=WBS.ARTS[q.a];if(!A)return'';return`<div class="mr${gs0.has(String(q.u))?' on':''}" data-pu="${q.u}" title="Click to select this piece"><img class="ath" src="${artBU(A)}" alt=""><b>${hx(A.n)}<i>${Math.round(q.s/S1*100)}% · ${Math.round(+q.r||0)}°${q.c?' · cropped':''}</i></b><button type="button" data-px="${q.u}" title="Delete this piece" aria-label="Delete this piece">&#215;</button></div>`}if(q.tx){return`<div class="mr${gs0.has(String(q.u))?' on':''}" data-pu="${q.u}" title="Click to select this text"><svg class="txth" viewBox="${fx1(-(+q.bw||1)/2)} ${fx1(-(+q.bh||1)/2)} ${fx1(+q.bw||1)} ${fx1(+q.bh||1)}" style="width:34px;height:34px;flex:none">${txtGl(q,'currentColor','L'+String(q.u).replace(/[^\w-]/g,''))}</svg><b>${hx(String((q.tx&&q.tx.text)||'').replace(/\n/g,' ').slice(0,28))}<i>${Math.round(q.s/S1*100)}% · ${Math.round(+q.r||0)}°</i></b><button type="button" data-px="${q.u}" title="Delete this text" aria-label="Delete this text">&#215;</button></div>`}const ti=WBS.tiles.findIndex(t=>t.id==q.t);if(ti<0)return'';return`<div class="mr${gs0.has(String(q.u))?' on':''}" data-pu="${q.u}" title="Click to select this stamp">${WBS.fpTh[q.t]||''}<b>Stamp ${ti+1}<i>${Math.round(q.s/S1*100)}% · ${Math.round(+q.r||0)}°</i></b><button type="button" data-px="${q.u}" title="Delete this stamp" aria-label="Delete this stamp">&#215;</button></div>`}).join(''):'';
 el.scrollTop=sc;const on=el.querySelector('.mr.on');if(on){const t0=on.offsetTop-el.offsetTop,t1=t0+on.offsetHeight;if(t0<el.scrollTop)el.scrollTop=t0;else if(t1>el.scrollTop+el.clientHeight)el.scrollTop=t1-el.clientHeight}}}
-if(p||WBS.fpB){const S0=Math.min(CW,CH),sv=(id,v)=>{const el=$(id);if(+el.value!=v){el.value=v;WBS.fpSyncing=1;try{el.dispatchEvent(new Event('input',{bubbles:true}))}finally{WBS.fpSyncing=0}}};sv('lfps',Math.round((p?p.s:fpSz())/S0*100));sv('lfpr',Math.round(p?(+p.r||0):fpRot));$('lfpxy').hidden=!p;if(p){sv('lfpx',+(p.x/CW*100).toFixed(1));sv('lfpy',+(p.y/CH*100).toFixed(1))}}}
+if(p||WBS.fpB){const S0=Math.min(CW,CH),sv=(id,v)=>{const el=$(id);if(+el.value!=v){el.value=v;WBS.fpSyncing=1;try{el.dispatchEvent(new Event('input',{bubbles:true}))}finally{WBS.fpSyncing=0}}};sv('lfps',Math.round((p?p.s:fpSz())/S0*100));sv('lfpr',Math.round(p?(+p.r||0):fpRot));$('lfpxy').hidden=!p;if(p){sv('lfpx',+(p.x/CW*100).toFixed(1));sv('lfpy',+(p.y/CH*100).toFixed(1))}}if(WBX.wbElSync)WBX.wbElSync()}
 function init25(){WBH.fpOverlay=fpOverlay;WBH.fpSync=fpSync;
 WBS.fpLast=null;
 {const ch=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()},cur2=()=>{const L=fpL();return L&&(L.pl||[]).find(q=>q.u==WBS.fpSel)};
@@ -83,4 +87,4 @@ $('lfpdn').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;const g=fpGrp();g.fo
 $('lfpdl').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;fpGrp().forEach(q=>L.pl.splice(L.pl.indexOf(q),1));WBS.fpSel=-1;WBS.fpMS=new Set();ch()};
 $('lfpclr').onclick=()=>{const L=fpL(),b=$('lfpclr');if(!L||!(L.pl||[]).length)return;if(!b.dataset.sure){b.dataset.sure=1;b.textContent='Click again to clear';setTimeout(()=>{delete b.dataset.sure;b.textContent='Clear all'},3000);return}delete b.dataset.sure;b.textContent='Clear all';L.pl=[];WBS.fpSel=-1;WBS.fpMS=new Set();ch()}}
 }
-export {artBU,artEnc,artId,artLayer,artLoad,artOk,artSnap,artUsed,crBox,crPts,crRef,fpBox,fpFlip,fpHandles,fpHit,fpPt,fpRot,fpSz,fpWH,init25};
+export {artRefd,artBU,artEnc,artId,artLayer,artLoad,artOk,artSnap,artUsed,crBox,crPts,crRef,fpBox,fpFlip,fpHandles,fpHit,fpPt,fpRot,fpSz,fpWH,init25};

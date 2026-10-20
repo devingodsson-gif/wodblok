@@ -1,22 +1,6 @@
-// 1.27.0 Layout clean-up: a Layer type dropdown, Impression and Variation only where they take effect, Ink edges in the Canvas tool.
+// 1.27.0 Layout clean-up: Ink edges in the Canvas tool. (The Impression and Variation test went in 2.1.12 with the old Arrangement groups.)
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle } = require('./helpers/harness');
-
-const pick = (page, v) => page.click(`#lmode [data-m="${v}"]`);
-
-test('Impression and Variation show for every arrangement (a layer can always hold placed items)', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 5 });
-  await openPanel(page, 'layers');
-  const want = { p: [true, true], f: [true, true], x: [true, true] };
-  for (const m of ['p', 'f', 'x']) {
-    await pick(page, m);
-    await settle(page);
-    await expect(page.locator(`#lmode [data-m="${m}"]`)).toHaveClass(/\bon\b/);
-    expect([await page.locator('#lipsec').isVisible(), await page.locator('#lrsec').isVisible()], m).toEqual(want[m]);
-  }
-  await expect(page.locator('#lrsec summary')).toContainText('Variation');
-  expect(errors).toEqual([]);
-});
 
 test('Ink edges live in the Canvas tool, not in Layout', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });

@@ -1,15 +1,15 @@
 // Continuity between the tool panels: the same kind of control looks the same in every panel (headings, buttons, dropdowns, text fields,
 // segmented controls, shape pickers). Measured on the real panels, in both views.
 const { test, expect } = require('@playwright/test');
-const { openApp } = require('./helpers/harness');
+const { openApp, openPanel } = require('./helpers/harness');
 
 test('every tool panel uses the same heading, button, dropdown, field and segmented-control styles', async ({ page }) => {
   const { errors } = await openApp(page);
   const seen = { summary: new Set(), altFont: new Set(), ddRadius: new Set(), fieldRadius: new Set(), segOn: new Set(), segH: new Set(), tileRadius: new Set(), labelInline: new Set() };
   for (const mode of ['pattern']) {
-    const tools = await page.locator('.rail [data-pn]:not([hidden])').evaluateAll(b => b.map(x => x.dataset.pn));
+    const tools = (await page.locator('.rail [data-pn]:not([hidden])').evaluateAll(b => b.map(x => x.dataset.pn))).concat(['layers', 'stmp', 'motifs', 'text', 'elimg', 'elsheet', 'elpaint']);
     for (const pn of tools) {
-      await page.click('#rcls'); await page.click(`#rail-${pn}`);
+      await page.click('#rcls'); await openPanel(page, pn);
       const r = await page.evaluate(pn => {
         const sec = document.querySelector(`section.pn[data-p="${pn}"]`); sec.querySelectorAll('details').forEach(d => { d.open = true; });
         const vis = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
@@ -20,7 +20,7 @@ test('every tool panel uses the same heading, button, dropdown, field and segmen
         sec.querySelectorAll('.ddb').forEach(e => vis(e) && o.ddRadius.push(cs(e, 'borderTopLeftRadius')));
         sec.querySelectorAll('input[type=text],textarea,select').forEach(e => vis(e) && o.fieldRadius.push(cs(e, 'borderTopLeftRadius')));
         sec.querySelectorAll('.seg button.on').forEach(e => vis(e) && (o.segOn.push(cs(e, 'color', 'backgroundColor', 'fontWeight')), o.segH.push(Math.round(e.getBoundingClientRect().height))));
-        sec.querySelectorAll('.shg button').forEach(e => vis(e) && o.tileRadius.push(cs(e, 'borderTopLeftRadius') + '|' + Math.round(e.getBoundingClientRect().height)));
+        sec.querySelectorAll('.shg:not(#lalg) button').forEach(e => vis(e) && o.tileRadius.push(cs(e, 'borderTopLeftRadius') + '|' + Math.round(e.getBoundingClientRect().height)));
         sec.querySelectorAll('.ctl>label,.lyop .ctl label').forEach(e => vis(e) && o.labelInline.push(cs(e, 'fontSize', 'color')));
         return o;
       }, pn);
@@ -33,7 +33,7 @@ test('every tool panel uses the same heading, button, dropdown, field and segmen
 
 test('the Stamp panel shape picker is the same tile picker as Canvas and the grid tools', async ({ page }) => {
   const { errors } = await openApp(page);
-  await page.click('#rail-stamp');
+  await openPanel(page, 'stmp');
   await expect(page.locator('#skind')).toHaveClass(/shg/);
   expect(await page.locator('#skind button').count()).toBeGreaterThanOrEqual(5);
   expect(errors).toEqual([]);

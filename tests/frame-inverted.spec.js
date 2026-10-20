@@ -1,6 +1,6 @@
 // An inverted stamp used as a frame: no light line between neighbouring tiles (1.35.0).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, unlockStamp, pickShape, stampInstance, clickStamp, getState } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, unlockStamp, pickShape, stampInstance, clickStamp, getState } = require('./helpers/harness');
 
 const lines = async (page) => {
   const buf = await page.locator('#art').screenshot();
@@ -19,7 +19,7 @@ test('an inverted stamp as a frame shows no light line between its tiles', async
   const { errors } = await openApp(page, { seed: 4 });
   await unlockStamp(page); await pickShape(page);
   await clickStamp(page, await stampInstance(page));   // a shape in the middle of the stamp, which the inversion carves out
-  await openPanel(page, 'stamp');
+  await showPanel(page, 'stmp');
   await page.evaluate(() => { const c = document.getElementById('neg'); c.checked = true; c.dispatchEvent(new Event('input', { bubbles: true })); });
   await settle(page);
   expect(JSON.parse(await getState(page)).tiles[0].neg, 'the stamp is inverted').toBeTruthy();

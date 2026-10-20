@@ -1,0 +1,62 @@
+import {CH,CW,geom,shOf} from './04-canvas-and-stamp-outlines.js';
+import {mkL} from './06-motif-library-folders.js';
+import {GRAD,gArrAll} from './10-layer-grids.js';
+import {txRid} from './16-texture-generators.js';
+import {fpU} from './24-free-place-layers.js';
+
+// ===== Randomize on elements (element update, step 11, 2.1.11): a roll builds Pattern elements (and Paint) with effects, not arrangement layers.
+// `o` holds the roll's helpers and switches: {R, pick, ri, rr, ch, pres, jit, tex(): texture uses, grade, sub(k)}.
+const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fxP=(pst,pfl)=>({u:fpU(),k:'pressure',on:true,pst,pfl});
+const fxJ=(pos,rot,sz)=>({u:fpU(),k:'jitter',on:true,pos,rot,sz,sd:txRid()});
+const fxT=u=>({u:fpU(),k:'texture',on:true,x:u.x,sd:u.sd,md:u.md});
+const fxG=a=>({u:fpU(),k:'grade',on:true,ex:0,ct:0,hi:0,sh:0,wh:0,bl:0,tp:0,tn:0,sat:0,vib:0,hue:0,fd:0,...a});
+// the Pattern layout an old arrangement stands for
+function rzArrLay(g,key){const am=gArrAll(g).find(x=>x[0]==key)||[];if(GRAD.some(x=>x[0]==key))return'radial';if(am[3]=='rand')return'scatter';const t=am[2];return t=='brick'||t=='honey'?'brick':t=='drop'||t=='diamond'?'half':'grid'}
+const eLayer=(l,pl,st)=>{const n=mkL(l.name,st,'check',180);n.u=l.u;n.free=true;n.pl=pl;n.ak={};n.man=false;n.ov={};n.fit='';n.gap=0;if(l.ink)n.ink=l.ink;if(l.bl)n.bl=l.bl;if(l.op!=null)n.op=l.op;return n};
+const patOf=(name,src,lay,cn,rn,sz,fx,sd)=>({u:fpU(),k:'pattern',n:name,lay,cn,rn,sz,rt:0,ds:src.length>1?'cycle':'cycle',sd:sd||1+Math.floor(Math.random()*9998),src:src.map(t=>({k:'stamp',t,w:1})),x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:Math.min(CW,CH),r:0,f:1,...(fx.length?{fx}:{})});
+// effects on a rolled pattern: Pressure offset, Jitter and Texture each by chance (the switches decide what is allowed)
+function rzFx(o,pst,pfl,jp,force){const fx=[];if(pst||pfl)fx.push(fxP(pst||0,pfl||0));if(jp)fx.push(jp);else if(o.jit&&o.ch(.35))fx.push(fxJ(o.ri(4,24),o.ch(.5)?o.ri(4,30):0,o.ch(.4)?o.ri(5,30):0));
+if(o.texOn&&o.ch(.35)){const u=o.tex();if(u.length)fx.push(fxT(u[0]))}if(o.gradeOn&&o.ch(.2))fx.push(fxG(o.pick([{fd:o.ri(8,25)},{sat:-o.ri(10,35)},{tp:o.ri(8,30)},{ex:-o.ri(6,18),ct:o.ri(5,18)}])));return fx}
+// the main and accent layers of a roll -> element layers. `T` = the rolled tiles.
+function rzMainEls(LS,T,o){const out=[];let base=null;
+for(const l of LS){const lead=T.find(t=>t.id==(l.lead!=null?l.lead:(l.st||[])[0]));if(!lead){out.push(l);continue}
+ const g=geom(shOf(lead)),size=Math.max(40,+l.size||180),lay=l.gl?(base&&base.lay)||'grid':rzArrLay(g,(l.ak||{})[g.SK]);
+ let cn=cl(Math.round(CW/size),2,14),rn=cl(Math.round(CH/size),2,20);if(lay=='radial'){cn=o.pick([4,6,8]);rn=cl(Math.round(Math.min(CW,CH)/size),2,6)}
+ if(l.gl&&base){cn=base.cn;rn=base.rn}
+ const sz=cl(Math.round(100*size/(size+(+l.gap||0))),55,125),jp=l.rsz||l.rgp?fxJ(o.ri(4,18),0,+l.rsz||0):null;
+ const p=patOf(l.name,l.st,lay,cn,rn,l.gl?(base?base.sz:sz):sz,rzFx(o,l.pst,l.pfl,jp),null);p.rt=+l.rot||0;
+ if(l.gl&&base){p.rt=base.rt;const k=l.pa;if(k=='e'){if(o.ch(.5)){p.ox=50;p.oy=0}else{p.ox=0;p.oy=50}}else{p.ox=50;p.oy=50}p.sz=cl(Math.round(base.sz*(k=='c'?.6:.45)),20,100)}
+ else if(l.ox||l.oy){p.ox=cl(+l.ox||0,0,100);p.oy=cl(+l.oy||0,0,100)}
+ if(!l.gl&&!base)base=p;out.push(eLayer(l,[p],l.st))}
+return out}
+// frame layers -> a Pattern on the Frame layout (the strip stamp is the source; a corner stamp is not used)
+function rzFrameEls(FL,T,o){return FL.map(l=>{const t=T.find(x=>x.id==(l.st||[])[0]);if(!t)return l;const rule=(l.name||'').startsWith('Frame rule'),R2=(t.sh&&t.sh.s&&+t.sh.s[0])||8,cn=cl(o.ri(3,6),3,6),rn=cl(Math.round(cn*CH/CW),1,10),
+ p=patOf(l.name,[t.id],'frame',cn,rn,rule?40:100,rzFx(o,l.pst,0,null),null);p.in=cl(Math.round(2+(+(l.fr||{}).i||0)*.5+(rule?2:0)),2,12);return eLayer(l,[p],[t.id])})}
+// Sheet: paper, with a Texture (and sometimes a Colour grade) effect
+function rzSheet(proj,texUses,o){const sh={...(proj.sh||{o:100})};let fx=(sh.fx||[]).slice();if(texUses)fx=fx.filter(e=>e.k!='texture').concat(texUses.map(fxT));
+if(o.gradeOn&&o.ch(.25)&&!fx.some(e=>e.k=='grade'))fx.push(fxG({fd:o.ri(5,22),tp:o.ri(-20,24)}));if(fx.length)sh.fx=fx;else delete sh.fx;return sh}
+// Paint: one or two Paint elements with a few strokes (some with a stamp tip, sometimes an eraser stroke), on their own layer
+function rzPaint(o,tileIds,ink){const els=[],n=o.ri(1,2);
+for(let e=0;e<n;e++){const st=[],ns=o.ri(2,5);for(let i=0;i<ns;i++){let x=o.rr(.1,.9)*CW,y=o.rr(.1,.9)*CH,a=o.rr(0,6.28);const pts=[[+x.toFixed(1),+y.toFixed(1)]],len=o.ri(7,16),step=o.rr(.03,.07)*Math.min(CW,CH),bend=o.rr(-.5,.5);
+ for(let k=0;k<len;k++){a+=bend*o.rr(.2,1)+o.rr(-.15,.15);x=cl(x+Math.cos(a)*step,0,CW);y=cl(y+Math.sin(a)*step,0,CH);pts.push([+x.toFixed(1),+y.toFixed(1)])}
+ const s={u:fpU(),w:+o.rr(6,26).toFixed(1),pts};if(i>1&&o.ch(.18))s.er=true;else{if(tileIds.length&&o.ch(.35))s.t=o.pick(tileIds);else if(ink&&o.ch(.4))s.c=ink}st.push(s)}
+ const fx=[];if(o.texOn&&o.ch(.4)){const u=o.tex();if(u.length)fx.push(fxT(u[0]))}if(o.gradeOn&&o.ch(.25))fx.push(fxG({sat:-o.ri(10,30),fd:o.ri(5,20)}));
+ els.push({u:fpU(),k:'paint',n:'Paint '+(e+1),x:0,y:0,st,...(fx.length?{fx}:{})})}
+const L=mkL('Paint',[],'check',180);L.free=true;L.pl=els;L.ak={};L.man=false;L.ov={};L.fit='';L.gap=0;return L}
+// Layout on element layers: type, size, spacing, offset and rotation change the Pattern; scatter, turning and size variation become a Jitter effect
+function rzLayoutEls(layers,f,o){const pats=[];layers.forEach(l=>{if(l.free&&l.rz!='free')(l.pl||[]).forEach(p=>{if(p.k=='pattern'&&p.lay!='frame')pats.push(p)})});
+pats.forEach((p,i)=>{const set=(k,v)=>{if(v==null)delete p[k];else p[k]=v};
+ if(f.type)p.lay=f.rad&&o.ch(.3)?'radial':o.pick(['grid','grid','brick','half','scatter']);
+ if(f.size){const s=Math.round(o.rr(i?70:110,i?200:250));p.cn=cl(Math.round(CW/s),2,14);p.rn=cl(Math.round(CH/s),2,20);if(p.lay=='radial'){p.cn=o.pick([4,6,8]);p.rn=cl(Math.round(Math.min(CW,CH)/s),2,6)}}
+ if(f.space)p.sz=o.ch(.6)?100:o.ri(70,125);
+ if(f.offset&&p.ox!==50&&p.oy!==50){set('ox',o.ri(0,99));set('oy',o.ri(0,99))}
+ if(f.rot)p.rt=f.tilt?o.pick([45,45,30,-30,15,-15,60,90]):0;
+ if(f.space||f.rot||f.vary){const fx=(p.fx||[]).filter(e=>e.k!='jitter'),pos=f.scatter||f.gaps?o.ri(8,30):0,rot=f.spread?o.ri(8,60):0,sz=f.sizevar?o.ri(15,45):0;if(pos||rot||sz)fx.push(fxJ(pos,rot,sz));if(fx.length)p.fx=fx;else delete p.fx;p.sd=1+Math.floor(Math.random()*99999)}})}
+// Print effects, Impression: Pressure offset on every pattern
+function rzPressEls(layers,o){layers.forEach(l=>{if(!l.free||l.rz=='free')return;(l.pl||[]).forEach(p=>{if(p.k!='pattern')return;const fx=(p.fx||[]).filter(e=>e.k!='pressure');if(!o.ch(.5))fx.push(fxP(o.ri(1,6),p.lay=='frame'?0:o.ch(.65)?0:o.ri(1,3)));if(fx.length)p.fx=fx;else delete p.fx})})}
+// Print effects, Textures: some patterns get a Texture effect
+function rzTexEls(layers,o){layers.forEach(l=>{if(!l.free)return;(l.pl||[]).forEach(p=>{if(p.k!='pattern'||!o.ch(.35))return;const u=o.tex();if(!u.length)return;p.fx=(p.fx||[]).filter(e=>e.k!='texture').concat([fxT(u[0])])})})}
+// a new layer: an element layer holding one Pattern of the given stamps (the old arrangement layer is no longer made)
+const mkEL=(name,st)=>{const n=mkL(name,st,'check',180);n.free=true;n.ak={};n.man=false;n.ov={};n.fit='';n.gap=0;n.pl=[patOf('Pattern 1',st,'grid',cl(Math.round(CW/180),2,14),cl(Math.round(CH/180),2,20),100,[],null)];return n};
+export {mkEL,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPaint,rzPressEls,rzSheet,rzTexEls};

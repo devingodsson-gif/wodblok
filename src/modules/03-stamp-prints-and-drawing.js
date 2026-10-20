@@ -39,6 +39,8 @@ function bkSub(s,used,need){
  return s.replace(RXG,(m,dc,op,tr,sx,sy,tw,th,flt,tid,t2,ev,fill)=>{
   const r=bkOne('g'+tid+'_'+ev,`<g><use href="#s${tid}"/><use href="#e${t2}_${ev}" fill="${fill}"/></g>`,tid,'',BK.T[tid]+'|'+ev+'|'+fill,+sx,+sy,+tw,+th,dc,op,tr,flt,used);
   if(!r)need.add('E'+t2);return r||m})}
+// a use that stays live (inside an effect's wrapper the transform is not on the use, so the prints above do not match it) keeps the definitions it points at
+const bkNeed=(s,need)=>{s.replace(/href="#e(\d+)_\d+"/g,(m,t)=>(need.add('E'+t),m));s.replace(/href="#q(\d+)_(\d+)_(\d+)"/g,(m,li,t,b)=>(need.add('P'+li+'_'+t+'_'+b),need.add('F'+li+'_'+t),need.add('E'+t),m))};
 const bkDefs=used=>{let o='';used.forEach(e=>o+=`<symbol id="bk${e.n}" viewBox="${e.cx} ${e.cy} ${e.cw} ${e.ch}" preserveAspectRatio="none"><image href="${e.A.url}" width="${e.A.w}" height="${e.A.h}"/></symbol>`);return o};
 const bkDrop=e=>{if(e&&e.A&&--e.A.live<=0)BK.dead.push(e.A.url)};
 const bkFlush=()=>{if(WBX.wbHoldOn)return;if(BK.dead.length){const d=BK.dead;BK.dead=[];setTimeout(()=>d.forEach(u=>URL.revokeObjectURL(u)),3000)}};
@@ -49,7 +51,7 @@ function bkHost(sd){if(sd!==BK.sd){BK.sd=sd;const h=$('stdefs');if(h)h.innerHTML
 function bkShow(f,defs,ik,lg,body,sd){sd=sd||'';const bd=body(lg);BK.vdefs=f+sd+defs+ik;BK.vdyn='<defs>'+BK.vdefs+'</defs>'+bd;BK.wasLive=BK.live;BK.sc0=BK.sc;
  if(BK.off||BK.live){bkHost(sd);$('dyn').innerHTML='<defs>'+f+defs+ik+'</defs>'+bd;BK.shown=1;BK.defT=0;return}
  const now=performance.now();BK.cont=WBS.DRAFT||now-BK.inT<450;BK.gen++;BK.nHit=BK.nStale=BK.nRes=BK.nMiss=0;const used=new Set(),need=new Set();
- const d2=bkSub(defs,used,need),l2=bkSub(lg,used,need);try{if(WBS.fpB!=null&&WBS.fpB!==false)need.add('E'+WBS.fpB)}catch(e){}
+ const d2=bkSub(defs,used,need),l2=bkSub(lg,used,need);bkNeed(l2,need);try{if(WBS.fpB!=null&&WBS.fpB!==false)need.add('E'+WBS.fpB)}catch(e){}
  BK.st.hit+=BK.nHit;BK.st.stale+=BK.nStale;BK.st.miss+=BK.nMiss;
  // a big one-off change (randomize, undo, a new palette): keep the old picture up for a moment while the new stamps print, rather than flashing
  // a mix of old and new. While something is being dragged or a slider moves, the picture always updates at once.

@@ -69,11 +69,11 @@ test('the Before / Split control shows only while comparing', async ({ page }) =
   expect(errors).toEqual([]);
 });
 
-test('the colour tray is at the far right of the bar; the Display tab and the zoom buttons are gone', async ({ page }) => {
+test('the colour tray fills the right half of the bar (the element bar has the left half); the Display tab and the zoom buttons are gone', async ({ page }) => {
   const { errors } = await openApp(page);
-  const r = await page.evaluate(() => { const g = id => document.getElementById(id).getBoundingClientRect(), bar = document.querySelector('.viewbar').getBoundingClientRect(), t = g('tyd'); return { barRight: bar.right, tRight: t.right, tShown: t.width > 0, ctl: document.getElementById('viewctl').getBoundingClientRect().width }; });
+  const r = await page.evaluate(() => { const g = id => document.getElementById(id).getBoundingClientRect(), bar = document.querySelector('.viewbar').getBoundingClientRect(), t = g('tyd'); return { barMid: (bar.left + bar.right) / 2, tLeft: t.left, tShown: t.width > 0, ctl: document.getElementById('viewctl').getBoundingClientRect().width }; });
   expect(r.tShown, 'the tray is on screen').toBe(true);
-  expect(r.barRight - r.tRight, 'tray reaches the bar padding at the right').toBeLessThanOrEqual(13);
+  expect(r.tLeft, 'the tray starts at the centre line or to its right').toBeGreaterThanOrEqual(r.barMid - 2);
   expect(r.ctl, 'no Display tab or zoom buttons in the bar').toBe(0);
   expect(errors).toEqual([]);
 });

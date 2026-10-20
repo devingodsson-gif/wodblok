@@ -188,7 +188,7 @@ if(m.t=='lin'){if(h=='p1'||h=='mv'){m.x1=c(o.x1+dx);m.y1=c(o.y1+dy)}if(h=='p2'||
 else{if(h=='mv'){m.cx=c(o.cx+dx);m.cy=c(o.cy+dy)}else if(h=='rx')m.rx=Math.max(.01,Math.min(3,Math.abs(x-m.cx)));else if(h=='ry')m.ry=Math.max(.01,Math.min(3,Math.abs(y-m.cy)))}
 if(!gmRaf)gmRaf=requestAnimationFrame(()=>{gmRaf=0;refreshG()})});window.addEventListener('pointerup',gmUp);window.addEventListener('pointercancel',gmUp);
 WBX.wbGrade={get:()=>JSON.parse(JSON.stringify(grd)),set:o=>{grd=gFix(o);if(gmSel>=grd.masks.length)gmSel=grd.masks.length-1;gdSave();gradeSync();applyGrade()},
-sync:()=>gradeSync(),defs:ov=>gDefs(!!ov),stF,layF,refresh:()=>{refreshG();const k=stUnlocked()+'|'+WBS.cur+'|'+gmSel;if(gmCur()||k!==gdLast){gdLast=k;gradeSync()}}};
+sync:()=>gradeSync(),defs:ov=>gDefs(!!ov),stF,layF,elF:(a,id,x,y,w,h)=>!gdBypass&&hasA(a)?flt(id,x,y,w,h,adjP(a,'SourceGraphic','T')[0]):'',refresh:()=>{refreshG();const k=stUnlocked()+'|'+WBS.cur+'|'+gmSel;if(gmCur()||k!==gdLast){gdLast=k;gradeSync()}}};
 gradeSync();applyGrade();
 }
 export {init31};

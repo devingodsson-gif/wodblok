@@ -151,7 +151,10 @@ async function openProjectFile(page, filePath) {
   await settle(page);
 }
 
-async function openPanel(page, id) { await page.click(`.rail [data-pn="${id}"]`); await page.waitForSelector(`section.pn[data-p="${id}"]:not([hidden])`); }
+// the element panels have no rail button: they open from the element bar
+const EL_BAR = { layers: 'pattern', stmp: 'stamp', motifs: 'shape', text: 'text', elimg: 'image', elsheet: 'sheet', elpaint: 'paint' };
+async function openPanel(page, id) { const bar = EL_BAR[id] && await page.locator(`#elb [data-k="${EL_BAR[id]}"]`).count();   // an older build (the perf baseline) has no element bar
+  await page.click(bar ? `#elb [data-k="${EL_BAR[id]}"]` : `.rail [data-pn="${id}"]`); await page.waitForSelector(`section.pn[data-p="${id}"]:not([hidden])`); }
 
 // The standard checks every scenario ends with: state, markup summary, no errors.
 async function checkpoint(page, testInfo, errors, name, { shot = true, selector = '#art' } = {}) {
@@ -191,4 +194,10 @@ async function addStamp(page) {
   await settle(page);
 }
 
-module.exports = { addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// a new layer starts with a Pattern element; this takes it away so the layer holds only what the test places
+async function noPattern(page) {
+  await showPanel(page, 'layers');
+  while (await page.locator('#pelist [data-pd]').count()) { await page.click('#pelist [data-pd] >> nth=0'); await settle(page); }
+}
+
+module.exports = { noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

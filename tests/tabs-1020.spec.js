@@ -4,7 +4,7 @@ const { openApp, openPanel, settle } = require('./helpers/harness');
 
 test('with many tabs open the newest tab is fully visible and the strip shows it can scroll back', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  for (const p of ['lyrs', 'rand', 'hist', 'colors', 'pres', 'canvas']) await openPanel(page, p);
+  for (const p of ['lyrs', 'rand', 'hist', 'colors', 'cways', 'canvas']) await openPanel(page, p);
   await settle(page);
   const r = await page.evaluate(() => {
     const t = document.querySelector('.wh .wt'), a = t.querySelector('.wtab.on'), tr = t.getBoundingClientRect(), ar = a.getBoundingClientRect();

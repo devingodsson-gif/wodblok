@@ -6,8 +6,8 @@ The repo is private on the GitHub Free plan: 2,000 Actions minutes a month. Linu
 GitHub Actions on standard runners are free and unlimited for public repositories, so the minutes limit does not apply now. The rules below stay in place on purpose: they keep CI fast and tidy, and they are what keeps the project inside the 2,000 free minutes if the repo is made private again. If CI on every push ever becomes useful while the repo is public, add `push` to the triggers in `.github/workflows/test.yml`, and remove it again before the repo goes private.
 
 ## Rules
-1. **CI runs once per pull request to `main`**, not on pushes to branches. Work and push to a branch freely; no minutes are used.
-2. **Open the pull request as a draft** while working (a draft does not run CI). Mark it ready when the release is done and local tests pass; that starts the run. Each later push to a ready pull request restarts it, so push fixes in batches.
+1. **The editor suite runs only when the owner asks** (owner, Oct 19 2026): on a pull request labelled `run-suite`, or by hand (rule 10). Opening, pushing to or marking a pull request ready does not start it; its jobs are then skipped, which still satisfies the required `chromium` and `webkit` checks. Only the small site checks run by themselves, on pull requests that change the site.
+2. **Open the pull request as a draft** while working. When the owner asks for the suite, add the `run-suite` label (or run the workflow by hand); each later push to that labelled pull request restarts it, so push fixes in batches, and remove the label when the run is done.
 3. **Cancel superseded runs.** Every workflow has a `concurrency` group with `cancel-in-progress: true`.
 4. **Linux runners only**, except a future release build for the desktop app (macOS or Windows, on version tags only, never on pull requests).
 5. **Timeouts on every job** (`timeout-minutes`) so a hung test cannot burn an hour.

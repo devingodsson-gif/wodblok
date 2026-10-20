@@ -10,7 +10,7 @@ const addLayer = async page => { await openPanel(page, 'lyrs'); await page.click
 
 test('the Stamps panel is on the rail and lists every stamp, with the layers it is used on', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await expect(page.locator('#rail-stmp')).toHaveAttribute('aria-label', 'Stamps');
+  await expect(page.locator('#rail-stmp')).toHaveAttribute('aria-label', 'Stamp');
   await openPanel(page, 'stmp');
   await expect(page.locator('#stmpl .smkr')).toHaveCount(1);
   await expect(page.locator('#stmpl .smkr .smkn')).toHaveText('Stamp 1');
@@ -49,17 +49,14 @@ test('outlines show for a layer with an arrangement, fade with the slider and ar
   expect(errors).toEqual([]);
 });
 
-test('a layer with no arrangement, or a frame, draws no outlines', async ({ page }) => {
+test('a layer with no pattern draws no outlines; a pattern brings them back', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
   expect(await outlines(page)).toBeGreaterThan(0);
-  await page.click('#lmode [data-m="x"]');
+  await page.click('#pelist [data-pd]');
   await settle(page);
   expect(await outlines(page)).toBe(0);
-  await page.click('#lmode [data-m="f"]');
-  await settle(page);
-  expect(await outlines(page)).toBe(0);
-  await page.click('#lmode [data-m="p"]');
+  await page.click('#penew');
   await settle(page);
   expect(await outlines(page)).toBeGreaterThan(0);
   expect(errors).toEqual([]);

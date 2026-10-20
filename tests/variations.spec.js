@@ -1,3 +1,4 @@
+// Shelved Oct 20 2026: the owner is redoing Presets and Variations; the panels are hidden, so these tests are skipped (not deleted).
 // Variations (Phase 5): six colour alternatives of the current piece. Nothing changes until one is clicked; a click is one undo step.
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState } = require('./helpers/harness');
@@ -6,7 +7,7 @@ const state = async page => JSON.parse(await getState(page));
 const roll = async page => { if (!(await page.locator('section.pn[data-p="rand"]:not([hidden])').count())) await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
 const ready = page => page.waitForFunction(() => document.querySelectorAll('#vrg .vrb').length === 6 && document.querySelectorAll('#vrg .vrb .im img').length === 6, null, { timeout: 30000 });
 
-test('opening shows six alternatives with pictures and changes nothing; More makes new ones', async ({ page }) => {
+test.skip('opening shows six alternatives with pictures and changes nothing; More makes new ones', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
   await roll(page);
   const before = await getState(page);
@@ -21,7 +22,7 @@ test('opening shows six alternatives with pictures and changes nothing; More mak
   expect(errors).toEqual([]);
 });
 
-test('clicking one applies that palette as one undo step', async ({ page }) => {
+test.skip('clicking one applies that palette as one undo step', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
   await roll(page);
   const before = await state(page);
@@ -37,7 +38,7 @@ test('clicking one applies that palette as one undo step', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('the command opens the panel', async ({ page }) => {
+test.skip('the command opens the panel', async ({ page }) => {
   const { errors } = await openApp(page);
   await page.evaluate(() => window.__wbTest.commands.run('panel.vars'));
   await expect(page.locator('section.pn[data-p="vars"]')).toBeVisible();

@@ -22,7 +22,7 @@ function stUnlocked(){if(STP.un==null)return null;const L=stSel();if(!L||L.u!==S
 // stamps in this layer's arrangement plus stamps placed freely on the layer, counted once per layer
 const stUses=id=>WBS.layers.filter(L=>(L.st||[]).includes(id)||(L.pl||[]).some(p=>p.t==id)).length;
 // build() calls these three: begin before the layers are drawn, add for every printed stamp of the selected layer, end after
-function stOlBegin(){const L=stSel();STP.on=!!L&&!!L.vis&&!L.free&&!(L.fr&&L.fr.on);STP.items=[];STP.rot=0}
+function stOlBegin(){const L=stSel();STP.on=!!L&&!!L.vis&&(!L.free||(L.pl||[]).some(p=>p.k=='pattern'))&&!(L.fr&&L.fr.on);STP.items=[];STP.rot=0}
 function stOlPath(id,d){STP.p[id]={d,p2:null}}
 function stOlAdd(id,tr,rot,w,h){if(!STP.on)return;const m=STTRRE.exec(tr);if(!m)return;STP.rot=rot||0;STP.items.push([id,+m[1],+m[2],+m[3],+m[4],+m[5],w,h])}
 // The Text panel builds letters in the stamp (letters tagged tg) while a stamp is unlocked, and fills a Text layer otherwise
@@ -30,7 +30,7 @@ const stTxMode=()=>stUnlocked()!=null;
 function stTextSync(){if(!WBX.wbTxMode)return;const m=stTxMode();if(STP.txm===m)return;STP.txm=m;WBX.wbTxMode(m?'stamp':'pattern')}
 function stOlEnd(){stOlPaint();stPanel();stTextSync()}
 function stOlFit(){const a=$('art'),v=$('stolsvg');if(!a||!v)return;v.style.width=a.style.width;v.style.height=a.style.height;const vb=a.getAttribute('viewBox');if(vb)v.setAttribute('viewBox',vb)}
-function stOlPaint(){const g=$('stol');if(!g)return;stOlFit();if(STP.after)STP.after();const op=STP.op;if(!STP.on||!op||!STP.items.length){g.innerHTML='';return}
+function stOlPaint(){const g=$('stol');if(!g)return;stOlFit();if(STP.after)STP.after();const op=STP.op;if(!STP.on||!op||!STP.items.length||WBS.tilePv){g.innerHTML='';return}
  if($('cvclip'))g.setAttribute('clip-path','url(#cvclip)');else g.removeAttribute('clip-path');
  const un=stUnlocked();let h='';
  for(const[id,x,y,a,sx,sy,w,hh]of STP.items){const o=STP.p[id];if(!o)continue;h+=`<path d="${o.d}" class="${id===un?'olu':'olk'}" transform="translate(${x} ${y}) rotate(${a}) scale(${sx} ${sy}) translate(${-w/2} ${-hh/2})"/>`}

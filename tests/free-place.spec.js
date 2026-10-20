@@ -1,13 +1,13 @@
-// Free place opens with the current stamp picked, so the first click on the canvas places it (UX review D2).
-// Before, nothing happened on click until a stamp tile was picked, and nothing said so.
+// Placing a stamp on the canvas: pick it in the Stamp panel, then click the canvas (UX review D2, D3; rewritten for element layers in 2.1.12).
+// A new layer starts with a Pattern; the Pattern is taken away first so the layer holds only what the test places.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
 
-test('Free place: the first click on the canvas places the current stamp', async ({ page }) => {
+test('Placing: the first click on the canvas places the stamp picked in the Stamp panel', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
-  await page.click('#lmode [data-m="x"]');
-  await settle(page);
+  await noPattern(page);
+  await openPanel(page, 'stmp');
+  await page.click('#lfpst [data-t]');
   await expect(page.locator('#lfpst [data-t].on')).toHaveCount(1);
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
@@ -18,11 +18,11 @@ test('Free place: the first click on the canvas places the current stamp', async
   expect(errors).toEqual([]);
 });
 
-test('Free place: Esc stops placing', async ({ page }) => {
+test('Placing: Esc stops placing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
-  await page.click('#lmode [data-m="x"]');
-  await settle(page);
+  await noPattern(page);
+  await openPanel(page, 'stmp');
+  await page.click('#lfpst [data-t]');
   await page.keyboard.press('Escape');
   await settle(page);
   const box = await page.locator('#art').boundingBox();
@@ -34,12 +34,9 @@ test('Free place: Esc stops placing', async ({ page }) => {
 
 test('Placed list: no explanatory empty-state text (UX review D3)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
-  await page.click('#lmode [data-m="p"]');
-  await settle(page);
+  await noPattern(page);
+  await openPanel(page, 'mlist');
   await expect(page.locator('#lfpl')).not.toContainText('show up here');
-  await page.click('#lmode [data-m="p"]');
-  await settle(page);
   await expect(page.locator('#lfpl')).not.toContainText('Stamps you place');
   expect(errors).toEqual([]);
 });

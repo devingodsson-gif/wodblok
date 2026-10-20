@@ -1,6 +1,6 @@
 {
- "length": 234577,
- "sha256": "a25cd15e935594c05f1a9f8be65f11f389581a0524a125e6c8c54ca06f683490",
+ "length": 234529,
+ "sha256": "100ae621c3625640b22a3a92508452edb41b53595a4cbf5230284009a09299d4",
  "tags": {
   "circle": 172,
   "clipPath": 9,
@@ -25,7 +25,7 @@
   "mask": 121,
   "path": 118,
   "polygon": 4,
-  "rect": 123,
+  "rect": 122,
   "svg": 1,
   "symbol": 58,
   "use": 126

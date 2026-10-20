@@ -6,6 +6,9 @@ import {$} from './01-launch-and-version.js';
 // bug-for-bug). A command is enabled when its button exists, is visible and is not disabled.
 const el = id => () => $(id);
 const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled; };
+// the element panels have no rail button on screen (the element bar opens them), but their commands still click it
+const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-elimg', 'rail-elsheet', 'rail-elpaint']);
+const exists = id => () => { const b = $(id); return !!b && !b.disabled; };
 const click = id => () => $(id).click();
 const COMMANDS = [
   ['edit.undo', 'Undo', 'undo', 'Mod+Z'],
@@ -41,10 +44,10 @@ const COMMANDS = [
   ['view.tileRepeat', 'Repeat tile: show 3 × 3', 'tpv'],
   ['export.now', 'Export with the recipe settings', 'xrnow'],
   ['export.allRecipes', 'Export all recipes as one zip', 'xrall'],
-  ['panel.pres', 'Open Presets', 'rail-pres'],
-  ['look.save', 'Save look', 'pssave'],
-  ['panel.vars', 'Open Variations', 'rail-vars'],
-  ['variations.more', 'More variations', 'vrmore'],
+  // shelved Oct 20 2026 (owner is redoing them): ['panel.pres', 'Open Presets', 'rail-pres'],
+  // shelved Oct 20 2026: ['look.save', 'Save look', 'pssave'],
+  // shelved Oct 20 2026 (owner is redoing them): ['panel.vars', 'Open Variations', 'rail-vars'],
+  // shelved Oct 20 2026: ['variations.more', 'More variations', 'vrmore'],
   ['export.proofPdf', 'Print proof (PDF)', 'xppdf'],
   ['export.proofPng', 'Print proof (PNG)', 'xppng'],
   ['view.before', 'Before', 'bab', '\\'],
@@ -58,15 +61,16 @@ const COMMANDS = [
   ['colourway.exportAll', 'Export all colourways', 'cwgo'],
   ['tray.add', 'Add a colour to the tray', 'tyaddl'],
   ['tray.save', 'Save tray', 'tysave'],
-  ['panel.stamp', 'Open Stamp settings', 'rail-stamp'],
   ['panel.slib', 'Open Stamp library', 'rail-slib'],
-  ['panel.motifs', 'Open Shapes', 'rail-motifs'],
+  ['panel.motifs', 'Open Shape', 'rail-motifs'],
   ['panel.text', 'Open Text', 'rail-text'],
-  ['panel.mlist', 'Open Shape list', 'rail-mlist'],
-  ['panel.sedit', 'Open Element editor', 'rail-sedit'],
+  ['panel.mlist', 'Open Elements', 'rail-mlist'],
+  ['panel.elimg', 'Open Image', 'rail-elimg'],
+  ['panel.elsheet', 'Open Sheet', 'rail-elsheet'],
+  ['panel.elpaint', 'Open Paint', 'rail-elpaint'],
   ['panel.lyrs', 'Open Layers', 'rail-lyrs'],
-  ['panel.layers', 'Open Layout', 'rail-layers'],
-  ['panel.stmp', 'Open Stamps', 'rail-stmp'],
+  ['panel.layers', 'Open Pattern', 'rail-layers'],
+  ['panel.stmp', 'Open Stamp', 'rail-stmp'],
   ['stamp.new', 'New stamp', 'smknew'],
   ['stamp.duplicate', 'Duplicate stamp', 'smkdup'],
   ['stamp.delete', 'Delete stamp', 'smkdel'],
@@ -89,7 +93,7 @@ function init37() {
   for (const [id, label, elId, shortcut, kind] of COMMANDS) {
     cmdRegister({id, label, shortcut: shortcut || undefined, elId,
       // file inputs are opened by clicking them (that is what their visible label does); they are hidden on purpose
-      enabled: kind === 'input' ? el(elId) : usable(elId),
+      enabled: kind === 'input' ? el(elId) : ELBTN.has(elId) ? exists(elId) : usable(elId),
       run: click(elId)});
   }
 }

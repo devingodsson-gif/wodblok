@@ -9,7 +9,7 @@ test('every switch is a slider except Colours; the old on/off choices are 100 an
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'rand');
   const kinds = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('[data-ft]')].map(c => [c.dataset.ft, c.type === 'range' ? c.value : c.checked])));
-  expect(kinds).toEqual({ stamps: '100', text: '100', layout: '0', frame: '100', shape: '0', size: '0', free: '100', col: true, gr: '100', masks: '100', tx: '100', pr: '100', look: '0' });
+  expect(kinds).toEqual({ stamps: '100', text: '100', layout: '0', frame: '100', shape: '0', size: '0', free: '100', col: true, gr: '100', masks: '100', tx: '100', pr: '100', look: '0', paint: '100', jit: '100' });
   await set(page, 'frame', 35);
   await page.reload(); await page.waitForFunction(() => document.fonts.status === 'loaded'); await settle(page);
   await openPanel(page, 'rand');
@@ -37,7 +37,7 @@ test('a feature at 0 is left alone; the same roll at 100 changes it', async ({ p
   await roll(page);
   const s = JSON.parse(await getState(page));
   expect(Object.values(s.grade || {}).every(v => v === 0 || v === false || (Array.isArray(v) && !v.length))).toBe(true);   // the grade is still neutral
-  expect(s.tex.u.length).toBeGreaterThan(0);                       // the canvas texture was
+  expect(((s.proj.sh || {}).fx || []).filter(e => e.k === 'texture').length).toBeGreaterThan(0);   // the Sheet texture was
   expect(errors).toEqual([]);
 });
 

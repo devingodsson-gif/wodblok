@@ -1,4 +1,4 @@
-// Speed is a feature. This measures a real drag (the layer "lrp" slider in the Arrangement panel on the 4:3 fixture, which has five
+// Speed is a feature. This measures a real drag (the layer opacity slider "ly_op" in the Layers panel on the 4:3 fixture (it was the Impression slider "lrp" until 2.1.12 retired that group), which has five
 // layers, textures, blends and grading) and a Randomize roll.
 //
 // Two kinds of numbers:
@@ -21,11 +21,10 @@ const STEPS = 40, RUNS = 5;
 async function measureDrag(page) {
   await openPanel(page, 'lyrs');
   await page.locator('#lybody .lyr').first().click({ position: { x: 60, y: 10 } });   // layer 1 (a repeating pattern layer)
-  await openPanel(page, 'layers');
   await settle(page);
-  await page.waitForSelector('#lrp', { state: 'visible' });
-  await page.locator('#lrp').scrollIntoViewIfNeeded();                       // the slider must be on screen, or the drag misses it and nothing is measured
-  const box = await page.locator('#lrp').boundingBox();
+  await page.waitForSelector('#ly_op', { state: 'visible' });
+  await page.locator('#ly_op').scrollIntoViewIfNeeded();                     // the slider must be on screen, or the drag misses it and nothing is measured
+  const box = await page.locator('#ly_op').boundingBox();
   expect(box.y + box.height, 'the slider is inside the window').toBeLessThan(900);
   const y = box.y + box.height / 2;
   await page.mouse.move(box.x + 4, y);

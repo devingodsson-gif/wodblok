@@ -2,7 +2,7 @@
 // link to a tray colour or keep a fixed colour of their own (the lock). Colourways are named sets of colours for the same tray places.
 const { test, expect } = require('@playwright/test');
 const path = require('path');
-const { openApp, openPanel, settle, getState, openProjectFile, unlockStamp } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, openProjectFile, unlockStamp } = require('./helpers/harness');
 
 const proj = async page => JSON.parse(await getState(page)).proj;
 const colours = async page => { const p = await proj(page); return p.ts.map(id => p.cw[p.cwa].c[id]); };
@@ -14,6 +14,9 @@ const zipNames = page => page.evaluate(() => {
   for (let i = 0; i + 30 < u.length; i++) if (dv.getUint32(i, true) === 0x04034b50) { const n = dv.getUint16(i + 26, true), e = dv.getUint16(i + 28, true); out.push(new TextDecoder().decode(u.subarray(i + 30, i + 30 + n))); i += 29 + n + e; }
   return out;
 });
+
+// the canvas is transparent until it has a Sheet; these tests look at the paper, so the Sheet goes on first (no panel opened: that would change the canvas size)
+const sheetOn = page => page.evaluate(() => { const c = document.getElementById('sh_on'); if (!c.checked) c.click(); });
 
 test('a new project has a two-colour tray: paper and ink link to it, the dock shows seven places and a +', async ({ page }) => {
   const { errors } = await openApp(page);
@@ -29,6 +32,7 @@ test('a new project has a two-colour tray: paper and ink link to it, the dock sh
 
 test('editing a tray colour recolours what links to it; one history step; undo brings it back', async ({ page }) => {
   const { errors } = await openApp(page);
+  await sheetOn(page);
   await page.click('#tyc .tys >> nth=0');
   await expect(page.locator('.cpk')).toBeVisible();
   await setHex(page, '#1E4FA3'); await closePicker(page);
@@ -63,9 +67,9 @@ test('lock: a stamp keeps its colour when the tray changes; unlock links it back
   const { errors } = await openApp(page);
   await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 60000 });
   await unlockStamp(page);   // the Stamp settings panel works on the unlocked stamp
-  await openPanel(page, 'stamp');
+  await showPanel(page, 'stmp');
   // link the stamp to tray colour 1, then lock it
-  await page.click('#wl_st .cwsb'); await page.click('.cwp .cwpc[data-s] >> nth=0'); await settle(page);
+  await page.locator('#wl_st .cwsb').scrollIntoViewIfNeeded(); await page.click('#wl_st .cwsb'); await page.click('.cwp .cwpc[data-s] >> nth=0'); await settle(page);
   let t = JSON.parse(await getState(page)).tiles[0];
   const p0 = await proj(page), slot = p0.ts[0], h0 = p0.cw[0].c[slot];
   expect(t.ink).toBe('@' + slot);
@@ -161,6 +165,7 @@ test('colourways: a new one copies the colours; editing it leaves the first alon
 
 test('the dropper picks the colour under the pointer from the finished picture', async ({ page }) => {
   const { errors } = await openApp(page);
+  await sheetOn(page);
   const r = await page.locator('#art').first().boundingBox();
   await page.click('#tyc .tys >> nth=1');
   await page.click('.cpkd');

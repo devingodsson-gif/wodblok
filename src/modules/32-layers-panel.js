@@ -6,6 +6,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
 import {covOrder} from './18-projects-and-cover-overlay.js';
 import {artBU} from './25-art-layers.js';
+import {mkEL} from './71-randomize-elements.js';
 // ===== Layers: each layer is one printing pass (its own stamps, arrangement, ink, opacity and blend). The selected layer is what the tools edit.
 // the default ink is whatever colours each stamp already has: shown as the project's ink and background split in two
 function lyInkFill(){if(WBX.wbPaintWells)WBX.wbPaintWells()}
@@ -37,7 +38,7 @@ let to=above?t+1:t;const L=WBS.layers.splice(lyDrag,1)[0];if(lyDrag<to)to--;WBS.
 $('lyl2').addEventListener('dragend',()=>{lyDrag=-1;lyClr()});
 // "+" adds a plain layer above the selected one: it holds the current stamp and becomes the selected layer.
 $('ly_add').onclick=e=>{e.stopPropagation();addLayer()};
-function addLayer(){const cur=WBS.tiles[WBS.cur],L=mkL('Layer '+(WBS.layers.length+1),cur?[cur.id]:[],'check',180);L.ak={};
+function addLayer(){const cur=WBS.tiles[WBS.cur],L=mkEL('Layer '+(WBS.layers.length+1),cur?[cur.id]:[]);
  WBS.layers.splice(WBS.selL+1,0,L);WBS.selL++;
  store();upd();
  $('pmsg').textContent='Layer added above the selected one.'}

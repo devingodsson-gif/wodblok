@@ -11,7 +11,7 @@ import {SURFC,inkCatch,txMerge,txPack} from './17-texture-panel-and-previews.js'
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
 import {refAdopt} from './50-tray-core.js';
 import {fpPick} from './24-free-place-layers.js';
-import {artEnc,artId,artOk} from './25-art-layers.js';
+import {artEnc,artId,artOk,artRefd} from './25-art-layers.js';
 // ===== Stamp library: keep stamps between projects, and export a stamp as a PNG =====
 // A library record: {name, updated, w, h, img (transparent picture), tile (the stamp, as JSON), motifs (the custom motifs it uses), colors (its custom ink)}.
 // Stored privately with your Claude account when that is available, otherwise in this browser.
@@ -83,7 +83,7 @@ $('slimpf').onchange=async()=>{const f=$('slimpf').files[0];$('slimpf').value=''
 document.querySelector('.rail [data-pn="slib"]').addEventListener('click',()=>setTimeout(slPaint,60));
 $('lfaimp').onclick=()=>$('lfafile').click();
 $('lfafile').onchange=async()=>{const f=$('lfafile').files[0];$('lfafile').value='';if(f)await artImport(f)};
-$('lfars').onclick=e=>{const x=e.target.closest('[data-ax]');if(x){const id=x.dataset.ax;if(!WBS.layers.some(l=>(l.pl||[]).some(p=>p.a==id))){delete WBS.ARTS[id];if(WBS.fpB==id)WBS.fpB=null;upd()}return}const b=e.target.closest('[data-a]');if(!b)return;const id=b.dataset.a;if(e.shiftKey||e.ctrlKey||e.metaKey){fpPick(String(id),e,[...$('lfars').querySelectorAll('[data-a]')].map(x=>x.dataset.a),true);return}WBS.fpPool=new Set();WBS.fpPA=String(id);WBS.fpB=WBS.fpB==id?null:id;if(WBS.fpB){WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpLast=null}upd()};
+$('lfars').onclick=e=>{const x=e.target.closest('[data-ax]');if(x){const id=x.dataset.ax;if(!artRefd(id)){delete WBS.ARTS[id];if(WBS.fpB==id)WBS.fpB=null;upd()}return}const b=e.target.closest('[data-a]');if(!b)return;const id=b.dataset.a;if(e.shiftKey||e.ctrlKey||e.metaKey){fpPick(String(id),e,[...$('lfars').querySelectorAll('[data-a]')].map(x=>x.dataset.a),true);return}WBS.fpPool=new Set();WBS.fpPA=String(id);WBS.fpB=WBS.fpB==id?null:id;if(WBS.fpB){WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpLast=null}upd()};
 $('lfaprj').onclick=()=>$('lfapfile').click();
 $('lfapfile').onchange=async()=>{const f=$('lfapfile').files[0];$('lfapfile').value='';if(!f)return;try{const d=(await fmtOpen(new Uint8Array(await f.arrayBuffer()))).project,a=d&&d.art;if(!d||d.app!='WODBLOK')return pmsg('That is not a WODBLOK project file.');if(!a||!artOk(a.src))return pmsg('That file was saved before Art existed. Open it and save it again.');
 const id=artId();WBS.ARTS[id]={n:String(d.name||f.name).replace(/\.wodblok$/i,'').replace(/["<>&|]/g,'').slice(0,40)||'Project',k:'img',src:a.src,w:+a.w,h:+a.h};WBS.fpB=id;WBS.fpSel=-1;WBS.fpLast=null;pmsg('Project picture added as a fixed image. Click on the canvas to place it.');upd()}catch(er){pmsg((er&&er.name=='FormatError'&&er.message)||'Could not read that file.')}};

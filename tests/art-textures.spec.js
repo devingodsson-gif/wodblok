@@ -26,7 +26,7 @@ test('"Paper shows through" puts a light-colour filter on the layer that holds p
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
   await page.click('#ly_add');
-  await openPanel(page, 'layers');
+  await openPanel(page, 'elimg');
   await settle(page);
   await page.setInputFiles('#lfafile', { name: 'a.png', mimeType: 'image/png', buffer: PNG });
   await settle(page);

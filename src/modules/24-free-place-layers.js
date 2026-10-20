@@ -5,6 +5,8 @@ import {inkOf} from './06-motif-library-folders.js';
 import {gModel,gNear} from './08-grid-shapes.js';
 import {bhStrip,flipVOk,turnFit} from './10-layer-grids.js';
 import {eNV,eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
+import {fxGr,fxJit,fxPad,fxPress,fxTex} from './69-effect-stack.js';
+import {stOlAdd} from './63-stamp-tool.js';
 
 function tGrp(){const g=WBS.tiles.map((t,i)=>i).filter(i=>WBS.tM.has(WBS.tiles[i].id));return g.length>1&&WBS.tiles[WBS.cur]&&WBS.tM.has(WBS.tiles[WBS.cur].id)?g:[WBS.cur]}
 function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(WBS.fpMS.size>1&&WBS.fpMS.has(String(WBS.fpSel))){const g=pl.filter(q=>WBS.fpMS.has(String(q.u)));if(g.length>1)return g}const p=pl.find(q=>q.u==WBS.fpSel);return p?[p]:[]}
@@ -30,18 +32,22 @@ const w=Math.max(CW,CH)/900,all=d+m,o=WBS.pgrid.op/100;g.innerHTML=`<path d="${a
 const fpL=()=>WBS.layers[WBS.selL]||null;
 const fpU=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const fpSeed=u=>{let h=7;for(const c of String(u))h=(h*31+c.charCodeAt(0))>>>0;return h%100000};
-function freeLayer(L,li,pa,lgB){const pl=(L.pl||[]).filter(p=>WBS.tiles.some(t=>t.id==p.t));if(!pl.length)return['',''];const amt=0,act=!DRS()&&((L.pst||0)>0||(L.pfl||0)>0),pre=act?`#q${li}_`:'#s',need=new Set(),f=v=>v.toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off');let defs='',out='';const bh=L.bl=='behind',prev=[];
-pl.forEach(p=>{const tt=WBS.tiles.find(t=>t.id==p.t),G=geom(shOf(tt)),k=p.s/Math.max(G.SW,G.SH),sd=fpSeed(p.u),R=rng(sd+li*977),r1=R()-.5,r2=R()-.5,r3=R()-.5,r4=R(),bin=act?Math.floor(rng(sd*7919+li*1299709+13)()*16):0;if(act)need.add(tt.id+'_'+bin);
+function freeLayer(L,li,pa,lgB){const pl=(L.pl||[]).filter(p=>WBS.tiles.some(t=>t.id==p.t));if(!pl.length)return['',''];const fr=new Map();const amt=0,PR=new Map(),f=v=>v.toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off');let defs='',out='';const bh=L.bl=='behind',prev=[];
+pl.forEach(p=>{const tt=WBS.tiles.find(t=>t.id==p.t),G=geom(shOf(tt)),k=p.s/Math.max(G.SW,G.SH),sd=fpSeed(p.u),R=rng(sd+li*977),r1=R()-.5,r2=R()-.5,r3=R()-.5,r4=R(),pe=fxPress(p),pP=pe?pe.pst:(L.pst||0),pF=pe?pe.pfl:(L.pfl||0),act=!DRS()&&(pP>0||pF>0),pk=pe?li+1000*(1+pP*11+pF):li,pre=act?`#q${pk}_`:'#s',bin=act?Math.floor(rng(sd*7919+li*1299709+13)()*16):0;if(act){let m=PR.get(pk);if(!m)PR.set(pk,m={P:pP,F:pF,need:new Set()});m.need.add(tt.id+'_'+bin)}
 let drr=0,dxr=0,dyr=0,sx=1,sy=1,szf=1;{const rR=+L.rrot||0,rP=+L.rpos||0,fH=!!L.rfh,fV=!!L.rfv,tN=!!L.rtn,rZ=Math.max(0,Math.min(100,+L.rsz||0));if(rR||rP||fH||fV||tN||rZ){const Q=rng(sd*15485863+li*7919+(L.rsd|0)*104729+101),u1=Q(),u2=Q(),u3=Q(),u4=Q(),u5=Q(),u6=Q(),u7=Q();if(rZ)szf=1+(u7*2-1)*rZ/100*.6;drr=(u1*2-1)*rR;dxr=(u2*2-1)*rP/100*p.s*.5;dyr=(u3*2-1)*rP/100*p.s*.5;if(fH&&u4<.5)sx=-1;if(fV&&u5<.5&&flipVOk(G))sy=-1;if(tN)drr+=turnFit(G,u6)}}
+{const J=fxJit(p);if(J){dxr+=J.dx;dyr+=J.dy;drr+=J.dr;szf*=J.sz;if(J.sx<0)sx=-sx;if(J.sy<0&&flipVOk(G))sy=-sy}}
 const ev=Math.floor(rng(sd*104729+li*15485863+(tt.es||0)*31)()*eNV(tt)),tr=`transform="translate(${f(r2*amt*.6+dxr)} ${f(r3*amt*.6+dyr)}) rotate(${(r1*amt+(+p.r||0)+drr).toFixed(2)}) scale(${(k*(p.f||1)*(p.wx||1)*sx*szf).toFixed(4)} ${(k*(p.wy||1)*sy*szf).toFixed(4)}) translate(${-G.SW/2} ${-G.SH/2})"`,op=`opacity="${(1-r4*amt*.03).toFixed(2)}"`,
-inner=act||DRS()||!eT(tt)?`<use href="${pre}${tt.id}${act?'_'+bin:''}" ${op} ${tr}${WBX.wbGrade&&WBX.wbGrade.stF(tt.id)?` filter="url(#${WBX.wbGrade.stF(tt.id)})"`:''}/>`:`<g ${op} ${tr}${WBX.wbGrade&&WBX.wbGrade.stF(tt.id)?` filter="url(#${WBX.wbGrade.stF(tt.id)})"`:''}><use href="#s${tt.id}"/><use href="#e${tt.id}_${ev}" fill="${inkOf(tt)}"/></g>`;
+fxT=p.fx&&p.fx.length?fxTex(p,'fm'+li+'_'+String(p.u).replace(/[^\w-]/g,''),{x:0,y:0,W:G.SW,H:G.SH}):null,fxG=p.fx&&p.fx.length?fxGr(p,'fg'+li+'_'+String(p.u).replace(/[^\w-]/g,''),fxPad(0,0,G.SW,G.SH)):null,trU=fxT||fxG?'':tr,inner0=act||DRS()||!eT(tt)?`<use href="${pre}${tt.id}${act?'_'+bin:''}" ${op} ${trU}${WBX.wbGrade&&WBX.wbGrade.stF(tt.id)?` filter="url(#${WBX.wbGrade.stF(tt.id)})"`:''}/>`:`<g ${op} ${trU}${WBX.wbGrade&&WBX.wbGrade.stF(tt.id)?` filter="url(#${WBX.wbGrade.stF(tt.id)})"`:''}><use href="#s${tt.id}"/><use href="#e${tt.id}_${ev}" fill="${inkOf(tt)}"/></g>`;
+if(p.pu&&li==WBS.selL)stOlAdd(tt.id,`translate(${f(+p.x+dxr)} ${f(+p.y+dyr)}) rotate(${((+p.r||0)+drr).toFixed(2)}) scale(${(k*(p.f||1)*(p.wx||1)*sx*szf).toFixed(4)} ${(k*(p.wy||1)*sy*szf).toFixed(4)})`,0,G.SW,G.SH);   // a pattern's placements are the printed stamps you can edit in place
+const inner=fxT||fxG?`<g ${tr}${fxT?fxT.attrs:''}>${fxG?fxG.wrap(inner0):inner0}</g>`:inner0;if(fxT)defs+=fxT.defs;if(fxG)defs+=fxG.defs;
 const hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-G.SW*k/2)}" y="${f(-G.SH*k/2)}" width="${f(G.SW*k)}" height="${f(G.SH*k)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
 const sg=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x)} ${f(+p.y)})">${hit}${inner}</g>`;
-if(bh&&((lgB||'').length||prev.length)){const mid='bhf'+li+'_'+prev.length;defs+=`<mask id="${mid}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/><g filter="url(#bhk)">${bhStrip((lgB||'')+prev.join(''))}</g></mask>`;out+=`<g mask="url(#${mid})">${sg}</g>`}else out+=sg;prev.push(sg)});
-if(act)defs+=pressDefs(L,li,WBS.tiles,need);
+let one=sg;if(bh&&((lgB||'').length||prev.length)){const mid='bhf'+li+'_'+prev.length;defs+=`<mask id="${mid}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/><g filter="url(#bhk)">${bhStrip((lgB||'')+prev.join(''))}</g></mask>`;one=`<g mask="url(#${mid})">${sg}</g>`}out+=one;fr.set(String(p.u),one);prev.push(sg)});
+PR.forEach((m,pk)=>{defs+=pressDefs({...L,pst:m.P,pfl:m.F},pk,WBS.tiles,m.need)});
 const ink=okC(L.ink)?col(L.ink):'';if(ink)defs+=`<filter id="lk${li}" filterUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" color-interpolation-filters="sRGB"><feFlood flood-color="${ink}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;
-const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'';
-return[defs,`<g${ink?` filter="url(#lk${li})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}
+const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'',o0=`<g${ink?` filter="url(#lk${li})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>`;
+// [defs, everything wrapped, the wrapper's open and close tags, each element's own markup by id] (the element list draws them in list order)
+return[defs,o0+out+'</g>',o0,'</g>',fr]}
 function init24(){// ===== Free-place layers: no arrangement, just stamps put down by hand anywhere on the canvas.
 // L.pl = [{u, t: stamp id, x, y (canvas units), s: long side (canvas units), r: degrees, f: 1 | -1}]
 WBS.selLM=new Set();WBS.lAnc=null;WBS.tM=new Set();WBS.tAnc=null;WBS.mAnc=null;

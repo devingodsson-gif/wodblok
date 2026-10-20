@@ -3,7 +3,9 @@ const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const roll = async page => { if (!(await page.locator('section.pn[data-p="rand"]:not([hidden])').count())) await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
-const tile = async (page, on = true) => { await openPanel(page, 'canvas'); await page.click(`#cfmt [data-f="${on ? 'tile' : 'free'}"]`); await settle(page); };
+// the canvas is transparent (a checkerboard on screen) until it has a Sheet; these tests measure the artwork on paper, so the Sheet goes on first (no panel opened: that would change the canvas size)
+const sheetOn = page => page.evaluate(() => { const c = document.getElementById('sh_on'); if (!c.checked) c.click(); });
+const tile = async (page, on = true) => { await sheetOn(page); await openPanel(page, 'canvas'); await page.click(`#cfmt [data-f="${on ? 'tile' : 'free'}"]`); await settle(page); };
 
 // The "Repeat 3 x 3" view draws the tile and its neighbours for real. If the piece repeats, the middle tile and the one to its right (or
 // below) are the same picture; a tile moved half a tile across is not, which is what makes the comparison meaningful.
@@ -91,7 +93,7 @@ for (const seed of [1, 2, 3, 4, 6]) {
   test(`seamless: roll ${seed}`, async ({ page }) => {
     const { errors } = await openApp(page, { seed });
     await tile(page); await roll(page);
-    const p = await periodic(page);
+    const p = await periodic(page); console.log('PERIODIC '+JSON.stringify(p));
     expect(p.half, 'the piece has something in it').toBeGreaterThan(1);
     expect(p.right, JSON.stringify(p)).toBeLessThan(0.12 * p.half + 0.4);   // 0.4, not 0.15, since 1.9 (0.25 until 2.0.4, when roll 6 came out at 1.11 against 1.07 on the CI renderer): prints are packed in smaller sheets, so their grain moves a little (about 1 of 255 on the CI renderer); a real seam is far above this
     expect(p.down, JSON.stringify(p)).toBeLessThan(0.12 * p.half + 0.15);
