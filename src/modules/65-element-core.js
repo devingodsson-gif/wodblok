@@ -23,9 +23,15 @@ function elDraw(L,li,pa,lgB){let pl=L.pl||[];if(!pl.length)return['',''];// an e
 for(const k of EL_O){const d=EL_K[k];if(d.expand&&pl.some(q=>q.k==k)){L=d.expand(L);pl=L.pl;break}}
 const R={};let defs='';
 EL_O.filter(k=>EL_K[k].draw).sort((a,b)=>(EL_K[a].dz||0)-(EL_K[b].dz||0)).forEach(k=>{const d=EL_K[k];const r=d.draw(L,li,pa,lgB);if(!r||!r[4])return;defs+=r[0];R[k]=r});
-let out='',run='',buf='';const flush=()=>{if(run&&buf){const r=R[run];out+=r[2]+buf+r[3]}buf=''};
-pl.forEach(q=>{const k=elKind(q),r=R[k];if(!r)return;const s=r[4].get(String(q.u));if(s==null)return;if(k!==run){flush();run=k}buf+=s});flush();
+let out='',run='',buf='',wb='',wk=null,wa='';const flush=()=>{if(run&&buf){const r=R[run];out+=r[2]+buf+r[3]}buf='';run=''};
+// an element with its own opacity (op), blend (bl) or eye (v:false) is wrapped on its own; the placements a pattern prints share their pattern's wrapper (key wk)
+const emit=()=>{if(wb)out+=`<g${wa}>${wb}</g>`;wb='';wk=null};
+pl.forEach(q=>{if(q.v===false)return;const k=elKind(q),r=R[k];if(!r)return;const s=r[4].get(String(q.u));if(s==null)return;const a=elOB(q);
+ if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a}wb+=r[2]+s+r[3];return}
+ emit();if(k!==run){flush();run=k}buf+=s});flush();emit();
 return[defs,out]}
+// the opacity and blend attributes of one element ('' when it has neither); behind, cancel and replace stay layer-only
+function elOB(q){const op=q.op!=null?Math.max(0,Math.min(100,+q.op)):100,bl=q.bl&&q.bl!='behind'&&q.bl!='cancel'&&q.bl!='replace'?q.bl:'';return(op<100?` opacity="${(op/100).toFixed(2)}"`:'')+(bl?` style="mix-blend-mode:${bl}"`:'')}
 
 // Effects: an ordered list `fx` on an element, each {u, k, on, sd, ...settings}. An effect registers: label, kinds (the element kinds it works on), defaults.
 // No effect is registered yet; the stack and the effects themselves arrive in steps 7 to 10 of docs/element-update-plan.md.
