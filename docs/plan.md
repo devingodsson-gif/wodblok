@@ -371,7 +371,7 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - The Layers panel is now Elements: reorder by drag, rename, duplicate, delete, eye, opacity and blend for the selection.
 - Repeat tile: each top-level piece (group, wrapped element, run of one kind) is copied to the neighbouring tiles inside its own opacity, blend and ink; before, a translucent group spilling over a tile edge was laid over its neighbour's copy twice (roll 7).
 - A group's ink filter is defined (its defs were read before the group rendered).
-- Snapshots regenerated with the owner's approval: roundtrip, scenarios. The launch state snapshot changes the same way and waits for approval.
+- Snapshots regenerated with the owner's approval: roundtrip, scenarios, launch. The launch state snapshot was regenerated the same way (approved).
 - Perf: drag p95 16 ms on both builds. The ratio against main (0.27) is not like for like: main refuses the new sample file, so each build opened its own copy of the same sample (WB_BASELINE_FIXTURE in tests/perf.spec.js) and the new sample is lighter.
 - Not done, moved to 2.2.3 with the menus: removing the old arrangement engine (GRAD, gArrAll, arrOpts, fitTs and the layer-level controls are still used by Randomize and the Pattern element's arrangements), Randomize and templates built directly on the flat list, Sheet as an element.
 - Known flake: repeat-tile roll 7 passes alone and fails once under a full parallel load (tolerance 0.12 x half + 0.15).
