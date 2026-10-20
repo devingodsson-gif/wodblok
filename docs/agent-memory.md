@@ -2,7 +2,7 @@
 
 For any Claude agent that works on WODBLOK without access to the owner's Claude memory or Project. It is the development-relevant part of that memory, kept in the repo so every agent has the same context. **Rule: whenever something about WODBLOK is saved to Claude's memory (a decision, a preference, a standing instruction), add it here too, in the same session, with the date.** Keep it free of anything personal (no names, emails, accounts, prices or business plans; this repo is public). The rules themselves are in `CLAUDE.md` and `docs/developing-wodblok.md`; this file is the history and the standing preferences behind them.
 
-Last updated Oct 19 2026 (version 2.0.0 live on main; the clean-up plan 2.0.1 to 2.0.3 is on branches, not merged).
+Last updated Oct 19 2026 (2.0.4 live on main; the element update has started, see docs/element-update-plan.md).
 
 ## How the owner wants Claude to work
 - Show a task list, and an approximate percentage complete on short status updates, in the chat. No separate progress page.
@@ -21,7 +21,7 @@ Last updated Oct 19 2026 (version 2.0.0 live on main; the clean-up plan 2.0.1 to
 ## Product decisions (by date)
 - **Direction:** a professional editor (Adobe-like), desktop-first look, web app first; Mac/Windows/mobile later, not blocked. Commercial product, to be sold later.
 - **Panels have no explanatory text, no tooltips.** Plain everyday words for names. "Motif" is now "shape"; "Ink surface" is now "stamp texture".
-- **Canvas shapes** are regular geometric ones only. **No brush masks.** Grade masks: linear, radial, layer, colour range, luminance range, per stamp and over the whole canvas.
+- **Canvas shapes** are regular geometric ones only. (The "no brush masks" rule was removed Oct 19 2026 by the owner for the Paint element.) Grade masks: linear, radial, layer, colour range, luminance range, per stamp and over the whole canvas.
 - **Launch:** always fully cleared, Pattern mode; Clear resets the canvas shape to a rectangle; workspaces open their tool windows; the template picker opens unless switched off in Settings.
 - **Randomize:** a left-rail tool; checkboxes for the main features with dropdown sub-options; with everything off it changes nothing; keeps showing the old picture until the new one is ready; must not bring in saved library stamps (imported shapes are fine); gentle random grading; can place free stamps and text.
 - **Colour:** Wada's *A Dictionary of Color Combinations* is the library; the **tray** (7 slots shown, "+" to 16) replaces fixed palettes; "palettes" are now **trays**, saved in folders; **colourways** are named saved trays (export all colourways as a zip); lock icon on colour selectors (open lock = linked to a tray slot, locked = fixed colour, never alters the slot); colours carry opacity; colour picker with RGB/HSB/hex and a dropper that samples the canvas. Old saved files need not carry over for colour changes.
@@ -81,3 +81,15 @@ The owner's decisions are in `docs/layer-update-plan.md`: no layer types, one co
 - 2.0.0 (layer update finished) is live. The clean-up plan in docs/plan.md: 2.0.1 (audit bugs), 2.0.2 (no old files, honest tests), 2.0.3 (tidy screen, code, docs) are done on stacked branches `fix/2.0.1-audit-bugs`, `fix/2.0.2-no-old-files`, `fix/2.0.3-tidy`; not merged.
 - Owner's standing preferences (Oct 19 2026): do not open pull requests, run CI or merge unless asked; local tests are enough, and CI only when the owner says so for that release. Old project files are never converted (refused with a message). The stamp tray under the canvas is removed (Oct 19 2026; the Stamps panel does new, duplicate and delete). The cover image import is deleted (saved cover images still show). Tooltips are names, not sentences.
 - Tests run on the build by default; `npm run perf` compares with a build of `main`. A seeded Randomize result depends on the number of `Math.random` draws before it: do not add or remove draws at start-up without regenerating the Randomize snapshots.
+
+## The element update (started Oct 19 2026)
+Plan and owner's answers: `docs/element-update-plan.md`. In short:
+- An **Element** is anything created on a layer: Sheet, Paint, Shape, Image, Text, Stamp, Pattern (more kinds later). An element bar sits left of centre at the top, mirroring the colour tray right of centre; each kind has its own panel (Create from the bar, Edit when an element is selected) in the normal panel system; an Element list shows the selected layer's elements.
+- **Effects** (the owner's word, replacing "features"): an ordered, reorderable stack per element, several of a kind allowed, an on/off switch each; each effect lists the kinds it supports. Texture, Pressure offset, **Jitter** (not "Randomize": the rail tool keeps that name; seed plus Reroll), Morph, and the stamp settings carved edges, symmetry, wrap, invert and per-stamp grade.
+- Canvas transparent by default; a Sheet is the background. Exports that cannot be transparent fill white.
+- Stamp is a snapshot of elements; Pattern (the arrangement and Frame) does the repeating, with sources by reference; several Patterns per layer are fine.
+- "No brush masks" is removed (Paint has an eraser).
+- No mock-up; build directly. Steps are 2.1.1, 2.1.2...; the end is 3.0.0.
+- **Never run the full suite or CI unless the owner says so** (Oct 19 2026). CI now runs the editor suite only by hand or with the `run-suite` pull request label.
+- Publish the preview artifact at the end of every step.
+- Session setup when the npm registry is blocked: `src/vendor/fflate.js` copied to `node_modules/fflate/index.mjs` (package.json with `"type":"module"`), and `node_modules/playwright`, `playwright-core`, `espree`, `eslint-scope` symlinked from `/opt/node-tools/node_modules`, with `node_modules/@playwright/test/index.js` re-exporting `playwright/test`. Run tests with `node node_modules/playwright/cli.js test ...`.
