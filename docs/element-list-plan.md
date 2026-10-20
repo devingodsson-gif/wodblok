@@ -63,6 +63,14 @@ Selecting a row opens that element's menu: move, size, rotate, align, effects. *
 - **Sheet as an element:** transparent canvas stays the default for a blank project; templates and Randomize add a Sheet row. Exports that cannot be transparent still fill white.
 - **Clean-up:** the old Layers-only controls, commands and rail entries, the UI standard check (`panel-style`), docs (`docs/developing-wodblok.md`, the coupling map, `CLAUDE.md`), and this plan's outcome.
 
+## How step 1 is built (found while starting 2.2.2, Oct 20 2026)
+A fresh document is already one `free` layer whose `pl` holds a Pattern. Layers are containers, not an arrangement engine, so step 1 goes in working stages on one branch, each ending with a running app:
+- **A.** Opacity, blend and eye (`op`, `bl`, `v`) become fields of every element kind, drawn per element by `elDraw`.
+- **B.** The file stores `proj.els` (format 23). At run time `WBS.layers` is always exactly one free layer whose `pl` is the list, so the ~100 code sites that read `layers[selL]` / `fpL()` keep working while they are removed one by one.
+- **C.** The Layers panel becomes the element list; element buttons create at the top; reorder and delete.
+- **D.** Groups.
+- **E.** Randomize, templates and export build the flat list; the old arrangement engine and layer-only features are deleted; snapshots (owner's approval), perf against `main`, docs, version 2.2.2.
+
 ## Why two steps and not one
 One step is possible, but it would change the file format, drawing, Randomize, every fixture and most snapshots at once, with the panel redesign on top; if something drew wrongly nobody could tell whether the engine or the menu caused it. Step 1 ends with a working app (a list that looks like the old layers panel, with the new model underneath). Step 2 only reshapes menus.
 
