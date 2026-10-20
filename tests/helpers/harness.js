@@ -205,4 +205,6 @@ async function armStamp(page) {
   if (await page.locator('#lfpst [data-t].on').count()) return;
   await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page);
 }
-module.exports = { armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// 2.2.4: the Sheet is a row of the element list ({k:'sheet'}), not proj.sh
+const sheetOf = st => (st.els || []).find(q => q.k === 'sheet');
+module.exports = { sheetOf, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

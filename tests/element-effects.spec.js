@@ -1,7 +1,7 @@
 // Element update, step 7 (2.1.7): the effect stack. An ordered list `fx` on an element, shown at the bottom of its panel: add, switch off, move, delete.
 // Texture (stamp, picture, text, pattern, Sheet) and Pressure offset (stamp, pattern).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern, sheetOf } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const canvasClick = async (page, fx, fy) => {
@@ -25,21 +25,21 @@ test('the Sheet panel has an Effects group once there is a Sheet; Texture is add
   await expect(page.locator('.fxg[data-fxk="sheet"]')).toBeVisible();
   await addEffect(page, 'sheet', 'Texture');
   await addEffect(page, 'sheet', 'Texture');
-  let fx = (await st(page)).proj.sh.fx;
+  let fx = sheetOf(await st(page)).fx;
   expect(fx.map(e => e.k)).toEqual(['texture', 'texture']);
   expect(fx[0].on).toBe(true);
   expect(fx[0].x).toBeTruthy();
   const second = fx[1].u;
   // switch the first off
   await page.locator('.fxg[data-fxk="sheet"] .fxl [data-fon]').first().click();
-  expect((await st(page)).proj.sh.fx[0].on).toBe(false);
+  expect(sheetOf(await st(page)).fx[0].on).toBe(false);
   // move the second one up
   await page.locator('.fxg[data-fxk="sheet"] .fxl [data-fu]').nth(1).locator('[data-fup]').click();
-  expect((await st(page)).proj.sh.fx[0].u).toBe(second);
+  expect(sheetOf(await st(page)).fx[0].u).toBe(second);
   // delete both
   await page.locator('.fxg[data-fxk="sheet"] .fxl [data-fx]').first().click();
   await page.locator('.fxg[data-fxk="sheet"] .fxl [data-fx]').first().click();
-  expect((await st(page)).proj.sh.fx).toBeUndefined();
+  expect(sheetOf(await st(page)).fx).toBeUndefined();
   expect(errors).toEqual([]);
 });
 

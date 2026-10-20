@@ -15,7 +15,7 @@ function fmtValidate(p) {
     for (const q of t.items) if (!q || typeof q !== 'object' || typeof q.m !== 'string' || !Number.isFinite(+q.x) || !Number.isFinite(+q.y)) bad('items', 'A shape in that project is damaged.');
   }
   if (n > FMT_MAX_ITEMS) bad('size', 'That project is far larger than WODBLOK can open.');
-  if (p.els.length > FMT_MAX_ITEMS || p.els.some(q => !q || typeof q !== 'object' || typeof q.k !== 'string' || (q.k !== 'group' && (!Number.isFinite(+q.x) || !Number.isFinite(+q.y))))) bad('items', 'That project has damaged pieces in its element list.');
+  if (p.els.length > FMT_MAX_ITEMS || p.els.some(q => !q || typeof q !== 'object' || typeof q.k !== 'string' || (q.k !== 'group' && q.k !== 'sheet' && (!Number.isFinite(+q.x) || !Number.isFinite(+q.y))))) bad('items', 'That project has damaged pieces in its element list.');
   if (p.arts !== undefined && (p.arts === null || typeof p.arts !== 'object')) bad('arts', 'The pictures in that project are damaged.');
   return p;
 }

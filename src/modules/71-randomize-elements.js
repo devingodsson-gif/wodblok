@@ -34,7 +34,7 @@ return out}
 function rzFrameEls(FL,T,o){return FL.map(l=>{const t=T.find(x=>x.id==(l.st||[])[0]);if(!t)return l;const rule=(l.name||'').startsWith('Frame rule'),R2=(t.sh&&t.sh.s&&+t.sh.s[0])||8,cn=cl(o.ri(3,6),3,6),rn=cl(Math.round(cn*CH/CW),1,10),
  p=patOf(l.name,[t.id],'frame',cn,rn,rule?40:100,rzFx(o,l.pst,0,null),null);p.in=cl(Math.round(2+(+(l.fr||{}).i||0)*.5+(rule?2:0)),2,12);return eLayer(l,[p],[t.id])})}
 // Sheet: paper, with a Texture (and sometimes a Colour grade) effect
-function rzSheet(proj,texUses,o){const sh={...(proj.sh||{o:100})};let fx=(sh.fx||[]).slice();if(texUses)fx=fx.filter(e=>e.k!='texture').concat(texUses.map(fxT));
+function rzSheet(prev,texUses,o){const sh={...(prev||{u:fpU(),k:'sheet',n:'Sheet',o:100})};let fx=(sh.fx||[]).slice();if(texUses)fx=fx.filter(e=>e.k!='texture').concat(texUses.map(fxT));
 if(o.gradeOn&&o.ch(.25)&&!fx.some(e=>e.k=='grade'))fx.push(fxG({fd:o.ri(5,22),tp:o.ri(-20,24)}));if(fx.length)sh.fx=fx;else delete sh.fx;return sh}
 // Layout on element layers: type, size, spacing, offset and rotation change the Pattern; scatter, turning and size variation become a Jitter effect
 function rzLayoutEls(layers,f,o){const pats=[];layers.forEach(l=>{if(l.free&&l.rz!='free')(l.pl||[]).forEach(p=>{if(p.k=='pattern'&&p.lay!='frame')pats.push(p)})});

@@ -381,3 +381,10 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - The Element panel (was a second "Elements") no longer has the placed-items list, its count line, its hint or Clear all; the Elements list is the only list. The rail button and command for the list now say Elements (they said Layers), the element menu is called Element.
 - Plan: 2.2.4 Sheet as an element (format 24), 2.2.5 the rest of the engine clean-up (docs/element-list-plan.md).
 
+
+## 2.2.4 (Oct 20 2026): the Sheet is an element (format 24)
+- The Sheet (paper colour, fill, textures, grade/effects target) is a `sheet` row in the element list instead of `proj.sh`. A Sheet row at the bottom of the list sits under the artwork; it can be hidden, given opacity and a blend, and carries its own effects. The Sheet panel edits the selected Sheet, or the lowest one. Sheet rows are never tiled (they fill the whole tile); a leading Sheet is drawn outside the rough-edge filter as before. `src/modules/66-sheet-element.js`, 65, 10, 69, 17, 20, 71.
+- File format 24 (`FMT_LATEST`); older files are refused as before, no migration. Fixtures regenerated (seeds 56, 4, 7).
+- Randomize makes its Sheet as an element (`rzSheet` returns one).
+- Snapshots regenerated with the owner's approval (Oct 20 2026): roundtrip (3 projects) and scenarios (28 state/SVG files), because the Sheet moved from `proj.sh` into the element list.
+- Plan: 2.2.5 the rest of the engine clean-up and Randomize/templates on the flat list (docs/element-list-plan.md).
