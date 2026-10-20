@@ -123,7 +123,7 @@ test('a colour that is a tray colour follows the tray: another colourway recolou
   expect(errors).toEqual([]);
 });
 
-test('shape colours show in the printed pattern, also under uneven pressure', async ({ page }) => {
+test('shape colours show in the printed pattern', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await twoShapes(page);
   expect(await redPixels(page)).toBe(0);
@@ -131,9 +131,5 @@ test('shape colours show in the printed pattern, also under uneven pressure', as
   expect((await tile(page)).items.pop().ic).toBe('#cc2200');
   const plain = await redPixels(page);
   expect(plain).toBeGreaterThan(200);
-  await set(page, 'lps', 6);
-  await settle(page);
-  expect((await state(page)).layers[0].pst).toBe(6);
-  expect(await redPixels(page)).toBeGreaterThan(100);
   expect(errors).toEqual([]);
 });

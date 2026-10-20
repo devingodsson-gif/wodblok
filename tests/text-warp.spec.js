@@ -79,7 +79,6 @@ test('Warp: Flag makes a wave that grows to the right', async ({ page }) => {
 test('Text layer: a path and a warp are saved on the text', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add');
   await openPanel(page, 'text');
   await settle(page);
   await page.fill('#tx_t', 'WAVE TEXT');

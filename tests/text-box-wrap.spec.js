@@ -41,7 +41,7 @@ test('Stamp text: a Box width breaks the lines; Box height with Top or Bottom mo
 test('Text layer: the side squares set the box width (lines wrap, top stays) and the box height', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add'); await openPanel(page, 'text'); await settle(page);
+  await openPanel(page, 'text'); await settle(page);
   await page.fill('#tx_t', 'ONE TWO THREE FOUR');
   await set(page, 'tx_sz', 6);
   await page.waitForTimeout(500);

@@ -8,7 +8,6 @@ const num = t => (t.match(/-?\d+\.?\d*/g) || []).map(Number);
 test('text Jitter moves every letter differently, not the text as one object', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add');
   await openPanel(page, 'text');
   await settle(page);
   await page.fill('#tx_t', 'ABCD');

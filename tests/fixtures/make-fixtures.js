@@ -9,9 +9,9 @@ const has = (s, f) => f(s);
 const pats = s => s.els.filter(q => q.k === 'pattern').length;
 const texts = s => s.tiles.reduce((n, t) => n + t.items.filter(i => i.tg).length, 0) + s.els.filter(p => p.tx).length;
 const SAMPLES = [
-  { file: 'project-1-diamond.wodblok', name: 'Sample diamond', shape: 'diamond', ok: s => s.dim.k === 'diamond' || s.dim.cs === 'diamond' ? (s.els.length >= 4 && pats(s) >= 2 && s.tiles.some(t => t.neg) && ((s.grade || {}).masks || []).length >= 1) : false },
-  { file: 'project-3-rect-16x9.wodblok', name: 'Sample wide', asp: [16, 9], ok: s => s.els.length >= 3 && s.els.some(q => (q.fx || []).length) },
-  { file: 'project-4-rect-4x3.wodblok', name: 'Sample busy', asp: [4, 3], ok: s => s.tiles.length >= 6 && s.els.length >= 8 && texts(s) >= 1 },
+  { file: 'project-1-diamond.wodblok', name: 'Sample diamond', shape: 'diamond', chars: 90000, ok: s => s.dim.k === 'diamond' || s.dim.cs === 'diamond' ? (s.els.length >= 4 && pats(s) >= 2 && s.tiles.some(t => t.neg) && ((s.grade || {}).masks || []).length >= 1) : false },
+  { file: 'project-3-rect-16x9.wodblok', name: 'Sample wide', asp: [16, 9], chars: 90000, ok: s => s.els.length >= 3 && s.els.some(q => (q.fx || []).length) },
+  { file: 'project-4-rect-4x3.wodblok', name: 'Sample busy', asp: [4, 3], chars: 110000, ok: s => s.tiles.length >= 6 && s.els.length >= 8 && texts(s) >= 1 },
 ];
 
 (async () => {
@@ -29,7 +29,9 @@ const SAMPLES = [
       await page.click('#rzbar'); await settle(page, { max: 60000 });
       await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)'));
       const s = JSON.parse(await getState(page));
-      if (sm.ok(s)) {
+      // the speed guard budgets the markup of the pattern on screen (tests/speed-guard.spec.js); a sample must sit well under it
+      const chars = await page.evaluate(() => document.getElementById('dyn').innerHTML.length);
+      if (sm.ok(s) && chars < sm.chars) {
         await page.fill('#pnm', sm.name); await page.dispatchEvent('#pnm', 'change'); await settle(page);
         await page.evaluate(() => { window.__wbDownloads.length = 0; });
         await page.click('#psv'); await page.waitForFunction(() => window.__wbDownloads.some(d => /\.wodblok$/.test(d.filename)), null, { timeout: 30000 });

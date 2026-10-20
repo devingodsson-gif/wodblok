@@ -110,7 +110,6 @@ test('Balance lines evens out the lines of a paragraph', async ({ page }) => {
 test('Text layer: styled letters and paragraph options are saved on the text, and a double-click starts typing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add');
   await openPanel(page, 'text');
   await settle(page);
   await page.fill('#tx_t', 'ONE TWO');

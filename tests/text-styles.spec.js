@@ -82,7 +82,6 @@ test('Folders: a new folder is made, becomes active, and the next saved style go
 test('Text layer: a style applies to the selected text', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add');
   await openPanel(page, 'text');
   await settle(page);
   await page.fill('#tx_t', 'STYLE ME');

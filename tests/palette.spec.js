@@ -17,7 +17,7 @@ const comboNames = (() => {
 })();
 // the names of the tray's first n colours (n = how many a combination fills)
 const trayNames = (st, n) => { const p = st.proj, w = p.cw[p.cwa]; return p.ts.slice(0, n).map(id => w.m[id]).filter(Boolean); };
-const links = st => [...st.tiles.map(t => t.ink), ...st.layers.map(l => l.ink), st.proj.bg, st.proj.ink].filter(Boolean);
+const links = st => [...st.tiles.map(t => t.ink), ...st.els.map(q => q.ink), st.proj.bg, st.proj.ink].filter(Boolean);
 async function setSub(page, key, on) {
   await page.evaluate(([k, v]) => { const c = document.querySelector(`[data-sub="${k}"]`); c.checked = v; c.dispatchEvent(new Event('change', { bubbles: true })); }, [key, on]);
 }

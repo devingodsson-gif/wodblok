@@ -9,7 +9,7 @@ const look = (page, name) => page.locator('#psl .psr', { hasText: name });
 const pal = (page, name) => page.locator('#stl .str', { hasText: name });
 const findTray = async (page, q) => { await openPanel(page, 'colors'); await page.fill('#stq', q); };
 const undo = async page => { await page.keyboard.press('Control+z'); await settle(page); };
-const inks = st => [...new Set([...st.tiles.map(t => t.ink), ...st.layers.map(l => l.ink)].filter(Boolean))];
+const inks = st => [...new Set([...st.tiles.map(t => t.ink), ...st.els.map(q => q.ink)].filter(Boolean))];
 
 test.skip('the saved trays hold all 348 combinations; typing finds them by name or colour', async ({ page }) => {
   const { errors } = await openApp(page);

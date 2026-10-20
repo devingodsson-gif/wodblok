@@ -6,9 +6,8 @@ const { openApp, addStamp, openPanel, settle, getState } = require('./helpers/ha
 
 const st = async page => JSON.parse(await getState(page));
 const outlines = (page, cls = '') => page.locator('#stol path' + cls).count();
-const addLayer = async page => { await openPanel(page, 'lyrs'); await page.click('#ly_add'); await settle(page); };
 
-test('the Stamps panel is on the rail and lists every stamp, with the layers it is used on', async ({ page }) => {
+test('the Stamps panel is on the rail and lists every stamp, with how many elements use it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await expect(page.locator('#rail-stmp')).toHaveAttribute('aria-label', 'Stamp');
   await openPanel(page, 'stmp');
@@ -18,20 +17,6 @@ test('the Stamps panel is on the rail and lists every stamp, with the layers it 
   await addStamp(page);
   await expect(page.locator('#stmpl .smkr')).toHaveCount(2);
   expect(await page.evaluate(() => __wbTest.commands.isEnabled('panel.stmp'))).toBe(true);
-  expect(errors).toEqual([]);
-});
-
-test('several stamps can be picked for the arrangement of the selected layer', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await addStamp(page);
-  const used = async () => (await st(page)).layers[0].st.length;
-  const before = await used();
-  await page.locator('#stmpl .smkr .smkth').nth(1).click();
-  await settle(page);
-  expect(await used()).toBe(before === 2 ? 1 : 2);
-  await page.locator('#stmpl .smkr .smkth').nth(1).click();
-  await settle(page);
-  expect(await used()).toBe(before);
   expect(errors).toEqual([]);
 });
 
@@ -94,7 +79,7 @@ test('the lock is in the stamp list only; one stamp is unlocked at a time and th
   expect(errors).toEqual([]);
 });
 
-test('the unlocked state is not saved, and selecting another layer locks the stamp again', async ({ page }) => {
+test('the unlocked state is not saved', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   const before = await getState(page);
   await openPanel(page, 'stmp');
@@ -102,11 +87,6 @@ test('the unlocked state is not saved, and selecting another layer locks the sta
   await settle(page);
   expect(await page.evaluate(() => __wbTest.unlockedStamp())).toBeTruthy();
   expect(await getState(page)).toBe(before);
-  await addLayer(page);
-  expect(await page.evaluate(() => __wbTest.unlockedStamp())).toBe(null);
-  await openPanel(page, 'stmp');
-  await expect(page.locator('#stmpl .smklk').first()).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('#stol .olu')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 

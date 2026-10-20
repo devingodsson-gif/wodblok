@@ -25,7 +25,7 @@ test('loads, opens a project, randomizes, no errors @smoke', async ({ page, brow
   await settle(page, { max: 60000 });
   timings.randomizeMs = Date.now() - t;
 
-  expect(JSON.parse(await getState(page)).layers.length).toBeGreaterThan(0);
+  expect(JSON.parse(await getState(page)).els.length).toBeGreaterThan(0);
   expect(errors).toEqual([]);
   fs.mkdirSync(path.join(ROOT, 'test-results'), { recursive: true });
   fs.writeFileSync(path.join(ROOT, 'test-results', 'webkit-timings.json'), JSON.stringify({ browser: browserName, ...timings }, null, 1));

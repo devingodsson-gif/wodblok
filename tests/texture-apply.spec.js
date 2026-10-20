@@ -4,7 +4,7 @@ const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 
-test('Apply adds the selected texture to the target chosen: Canvas, Stamps or Layers', async ({ page }) => {
+test('Apply adds the selected texture to the target chosen: Canvas or Stamps', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'tex');
   await page.click('#tx_add');
@@ -19,10 +19,5 @@ test('Apply adds the selected texture to the target chosen: Canvas, Stamps or La
   await page.click('#tx_apply');
   await settle(page);
   expect((await st(page)).tiles[0].tu.length).toBe(s0 + 1);
-  await page.click('#tx_to [data-t="ly_tex"]');
-  const l0 = (await st(page)).layers.reduce((n, l) => n + (l.tu || []).length, 0);
-  await page.click('#tx_apply');
-  await settle(page);
-  expect((await st(page)).layers.reduce((n, l) => n + (l.tu || []).length, 0)).toBe(l0 + 1);
   expect(errors).toEqual([]);
 });

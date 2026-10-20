@@ -5,7 +5,6 @@ const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 test('typing changes the selected text box; Add text then arms a second one', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add');
   await openPanel(page, 'text');
   await settle(page);
   await expect(page.locator('#tx_go')).toHaveText('Add text');
