@@ -7,6 +7,7 @@ import {TXMD,TXMN,TXN,txEnsure,txFilt,txImgs,txIsW,txRid,txSpecs} from './16-tex
 import {fpU} from './24-free-place-layers.js';
 import {elKind,elSel,fxDef,fxFor,fxOf,fxRegister} from './65-element-core.js';
 import {patCur} from './67-pattern-element.js';
+import {paCur} from './70-paint-element.js';
 
 // ===== The effect stack (element update, step 7, 2.1.7): an ordered list `fx` on an element, each {u, k, on, ...settings}, shown at the bottom of the element's panel.
 // An effect can be switched off, moved up or down, and deleted; several of a kind are allowed. Effects that apply to a pattern apply to every placement.
@@ -35,11 +36,11 @@ es.forEach(e=>{const Q=rng(fxSeed(q.u)*15485863+(e.sd|0)*104729+101),a=Q(),b=Q()
 J.dx+=(a*2-1)*P/100*s*.5;J.dy+=(b*2-1)*P/100*s*.5;J.dr+=(c*2-1)*R;J.sz*=1+(d*2-1)*Z/100*.6;if(e.fh&&h<.5)J.sx=-J.sx;if(e.fv&&v<.5)J.sy=-J.sy});return J}
 
 // ---- the panels
-const KIND_PANEL={stamp:'stmp',image:'elimg',text:'text',pattern:'layers',sheet:'elsheet'};
+const KIND_PANEL={stamp:'stmp',image:'elimg',text:'text',pattern:'layers',sheet:'elsheet',paint:'elpaint'};
 const SEL={};   // the effect whose settings show, per kind
 const fxHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fxCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
-function fxTarget(kind){if(kind=='sheet')return WBS.proj&&WBS.proj.sh||null;if(kind=='pattern')return patCur();const q=elSel();return q&&elKind(q)==kind?q:null}
+function fxTarget(kind){if(kind=='sheet')return WBS.proj&&WBS.proj.sh||null;if(kind=='pattern')return patCur();if(kind=='paint')return paCur();const q=elSel();return q&&elKind(q)==kind?q:null}
 function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hidden><summary>Effects</summary><div class="gb">
 <div class="ml fxl"></div>
 <div class="row"><button type="button" class="alt fxadd" aria-haspopup="menu">Add effect</button></div>
@@ -75,10 +76,10 @@ if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.va
 if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=g.querySelector('.fxg_'+k),v=+sel[k]||0;if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}});
 if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxpp',+sel.pst||0);set('.fxpf',+sel.pfl||0)}})}
 function init69(){
-fxRegister('texture',{label:'Texture',kinds:['stamp','image','text','pattern','sheet'],make:()=>{const ids=(WBS.texLib||[]).map(x=>x.id),first=Object.keys(TXN)[0];const x=ids[0]||(first?txEnsure({t:first,a:40,sc:100,az:225}):'');return{k:'texture',on:true,x,sd:txRid(),md:'wear'}}});
+fxRegister('texture',{label:'Texture',kinds:['stamp','image','text','pattern','sheet','paint'],make:()=>{const ids=(WBS.texLib||[]).map(x=>x.id),first=Object.keys(TXN)[0];const x=ids[0]||(first?txEnsure({t:first,a:40,sc:100,az:225}):'');return{k:'texture',on:true,x,sd:txRid(),md:'wear'}}});
 fxRegister('pressure',{label:'Pressure offset',kinds:['stamp','pattern'],make:()=>({k:'pressure',on:true,pst:4,pfl:0})});
 fxRegister('jitter',{label:'Jitter',kinds:['stamp','image','text','pattern'],make:()=>({k:'jitter',on:true,pos:20,rot:15,sz:0,sd:txRid()})});
-fxRegister('grade',{label:'Colour grade',kinds:['stamp','image','text','pattern','sheet'],make:()=>({k:'grade',on:true,...Object.fromEntries(GRL.map(r=>[r[0],0]))})});
+fxRegister('grade',{label:'Colour grade',kinds:['stamp','image','text','pattern','sheet','paint'],make:()=>({k:'grade',on:true,...Object.fromEntries(GRL.map(r=>[r[0],0]))})});
 Object.entries(KIND_PANEL).forEach(([kind,pn])=>{const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec)return;sec.insertAdjacentHTML('beforeend',fxGroup(kind))});
 document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,tg=()=>fxTarget(kind),cur=()=>{const t=tg();return t?fxOf(t).find(e=>e.u==SEL[kind])||null:null};
 g.querySelector('.fxadd').onclick=e=>{e.stopPropagation();const t=tg();if(!t)return;rowMenu(e.currentTarget,fxFor(kind).map(d=>[d.label,()=>{const t2=tg();if(!t2)return;const f=d.make();f.u=fpU();(t2.fx=t2.fx||[]).push(f);SEL[kind]=f.u;fxCh()}]))};

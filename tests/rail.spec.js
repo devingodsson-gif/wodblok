@@ -10,7 +10,7 @@ test('the shared tools are the first nine rail buttons, in the same order', asyn
   const { errors } = await openApp(page);
   const pattern = await labels(page);
   expect(pattern.slice(0, 9)).toEqual(SHARED);
-  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Pattern', 'Stamp', 'Grid', 'Navigator', 'Export recipes', 'Shape', 'Text', 'Elements', 'Sheet', 'Image', 'More tools']);
+  expect(pattern.slice(9)).toEqual(['Canvas', 'Layers', 'Pattern', 'Stamp', 'Grid', 'Navigator', 'Export recipes', 'Shape', 'Text', 'Elements', 'Sheet', 'Image', 'Paint', 'More tools']);
   expect(errors).toEqual([]);
 });
 

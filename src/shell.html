@@ -889,6 +889,7 @@ body.eyedrop{cursor:crosshair}
  <button id="rail-text" data-pn="text" aria-label="Text"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 7.5V5h13v2.5M12 5v14M9 19h6"/></svg><span class="tip">Text</span></button>
  <button id="rail-mlist" data-pn="mlist" aria-label="Elements"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="4" height="4" rx="1.2"/><rect x="3.5" y="10" width="4" height="4" rx="1.2"/><rect x="3.5" y="15.5" width="4" height="4" rx="1.2"/><path d="M11 6.5h9.5M11 12h9.5M11 17.5h9.5"/></svg><span class="tip">Elements</span></button>
  <button id="rail-elsheet" data-pn="elsheet" aria-label="Sheet"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 13L13 4M9 20L20 9"/></svg><span class="tip">Sheet</span></button> <button id="rail-elimg" data-pn="elimg" aria-label="Image"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5L15 10l-9 9"/></svg><span class="tip">Image</span></button>
+ <button id="rail-elpaint" data-pn="elpaint" aria-label="Paint"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 4.5c-2.6 1-6.4 4.8-8.4 7.9l1.6 1.6c3.1-2 6.9-5.8 7.9-8.4z"/><path d="M10.2 13.6c-2 0-3.5 1.3-3.5 3.2 0 1.4-.8 2.4-2.4 2.7 2.6 1.3 7.4.6 7.4-4.4z"/></svg><span class="tip">Paint</span></button>
  <div class="rsp"></div>
  <button id="rmore" aria-label="More tools" aria-expanded="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
  <div id="rmenu" class="rmenu" hidden></div>
@@ -1145,6 +1146,19 @@ body.eyedrop{cursor:crosshair}
    <label class="chk"><input type="checkbox" id="sh_on"><span>Sheet</span></label>
    <div class="cwrow"><span class="cwk">Colour</span><div class="cwell" id="sh_wl"></div></div>
    <div class="ctl"><label>Opacity</label><input type="range" id="sh_op" min="0" max="100" value="100" data-u="%" data-def="100"></div>
+  </div></details>
+ </section>
+ <section class="pn" data-p="elpaint" hidden>
+  <details class="g" open><summary>Paint</summary><div class="gb">
+   <div class="ml" id="palist"></div>
+   <div class="row"><button class="alt" id="panew">New paint</button></div>
+   <div class="seg" id="pamode" role="group" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-m="off" aria-pressed="true" class="on">Off</button><button type="button" data-m="brush" aria-pressed="false">Brush</button><button type="button" data-m="erase" aria-pressed="false">Eraser</button></div>
+  </div></details>
+  <details class="g" open><summary>Brush</summary><div class="gb">
+   <div class="seg" id="patip" role="group" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-t="round" aria-pressed="true" class="on">Round</button><button type="button" data-t="stamp" aria-pressed="false">Stamp</button></div>
+   <div class="ctl"><label>Size</label><input type="range" id="pasz" min="1" max="200" value="14" data-def="14"></div>
+   <div class="cwrow"><span class="cwk">Colour</span><div class="cwell" id="pawl"></div></div>
+   <div class="row"><button class="alt" id="paund">Undo stroke</button><button class="alt" id="paclr">Clear</button></div>
   </div></details>
  </section>
  <section class="pn" data-p="elimg" hidden>

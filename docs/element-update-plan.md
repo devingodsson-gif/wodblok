@@ -50,7 +50,7 @@ Written Oct 19 2026. Status: **started Oct 19 2026** (the owner said to start: s
 | Texture | the Textures panel's Apply, per-stamp and per-layer texture lists |
 | Pressure offset | uneven pressure and flooding (`pst`, `pfl`) |
 | Jitter | Variation (position, rotation, size, gaps, flips: `rpos rrot rsz rgp rfh rfv rtn rsd`) |
-| Morph | new: wave, bulge, twist, roughen with amount, scale, seed |
+| ~~Morph~~ | removed from the plan (owner, Oct 20 2026) |
 | Carved edges | stamp edges (`et er es`) |
 | Symmetry | stamp symmetry (`sym`) |
 | Wrap | wrap at the edges |
@@ -74,7 +74,7 @@ Written Oct 19 2026. Status: **started Oct 19 2026** (the owner said to start: s
 | 6 | 2.1.6 | **Stamp as composite.** Images, text and paint inside a stamp definition | high |
 | 7 | 2.1.7 | **Effect stack, Texture and Pressure offset.** Add, reorder, switch off, delete; old texture and pressure controls removed | high |
 | 8 | 2.1.8 | **Jitter**, then Carved edges, Symmetry, Wrap, Invert and Colour grade as effects; Stamp settings panel retired | high |
-| 9 | 2.1.9 | **Morph** | medium |
+| 9 | - | ~~**Morph**~~ removed (owner, Oct 20 2026) | - |
 | 10 | 2.1.10 | **Paint element**: strokes, shape brushes, eraser; speed test with many strokes | high (speed) |
 | 11 | 2.1.11 | **Everything that builds documents**: Randomize tool, Presets, Variations, Colourways, export, print proof, book cover. Seeded Randomize snapshots change once (owner's OK first) | high |
 | 12 | 3.0.0 | Tests, perf, docs, old code removed, release | |
@@ -152,3 +152,11 @@ Written Oct 19 2026. Status: **started Oct 19 2026** (the owner said to start: s
 - **Stamp panel:** the Stamp settings panel is retired. Block (shape, size, corner radius, ink, Invert), Block edge (Carved edges), Stamp texture and Symmetry now sit in the Stamp panel, with a new **Wrap at the edges** checkbox (`tile.wr`; off = `false`, on = absent; rect and hex stamps always wrapped before, circles never). The rail button, the `panel.stamp` command and the dock entry are gone.
 - Still open for step 11: the per-stamp Stamp texture group duplicates the Texture effect; it stays because Randomize and Presets write `tile.tu`.
 - Tests: new `element-grade` spec (3 tests); the Wrap checkbox is covered in `stamp-settings`; tests that opened the old panel now open the Stamp panel; two `colour-tray` tests switch the Sheet on first (the canvas is transparent), and one scrolls the colour well into view (a scroll closes its popup). Perf vs main: ratio 0.985. No snapshot or golden changed. The full suite and CI were not run.
+
+### Step 10 outcome: the Paint element (2.1.10, Oct 20 2026)
+- **Morph removed** from the plan (owner, Oct 20 2026). **Presets and Variations shelved** (owner is redoing them): rail buttons hidden, dock list and commands commented out, code and styles kept, their specs skipped. Step 11 leaves them alone.
+- **Paint** is an element `{u, k:'paint', n, x, y, st:[stroke]}`; a stroke is `{u, w, pts, c?, t?, er?}` in canvas units (`src/modules/70-paint-element.js`). The Paint panel (rail button and element bar) has the element list, New paint, a mode (Off, Brush, Eraser), the brush (Round or Stamp tip, size, colour) and Undo stroke / Clear. With a mode on, a drag on the canvas draws into the selected Paint element (one is made if none); New paint starts another. A stamp tip is the current stamp, laid along the stroke.
+- **Eraser** strokes are stored in the same list and cut out of what was drawn before them in the same element (one mask per eraser stroke), never other elements.
+- **Effects** on Paint: Texture and Colour grade (Jitter and Pressure offset are not offered). The live stroke is a temporary path that is removed when the pointer comes up, so nothing of it stays in the picture markup.
+- **Not in this step:** moving, scaling or rotating a Paint element on the canvas (its x, y are 0), selecting it by clicking on the canvas, snapping, and drawing across the repeat tile's edge.
+- Tests: new `element-paint` spec (6 tests, including save and reopen) and `paint-speed` (400 strokes in one element: a new stroke still settles as fast as on an empty one, about 0.6 s either way, and the commit itself takes under 10 ms). Perf vs main: ratio 0.992. The Presets and Variations specs are skipped; the rail spec lists Paint and no Presets or Variations. No snapshot or golden changed. The full suite and CI were not run.

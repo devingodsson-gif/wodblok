@@ -64,6 +64,7 @@ const COMMANDS = [
   ['panel.mlist', 'Open Elements', 'rail-mlist'],
   ['panel.elimg', 'Open Image', 'rail-elimg'],
   ['panel.elsheet', 'Open Sheet', 'rail-elsheet'],
+  ['panel.elpaint', 'Open Paint', 'rail-elpaint'],
   ['panel.lyrs', 'Open Layers', 'rail-lyrs'],
   ['panel.layers', 'Open Pattern', 'rail-layers'],
   ['panel.stmp', 'Open Stamp', 'rail-stmp'],
