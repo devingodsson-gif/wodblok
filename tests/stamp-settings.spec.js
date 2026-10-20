@@ -1,6 +1,6 @@
 // Layer update, step 7 (1.46.7): Stamp settings from the Pattern view, and stamps with several colours (each shape can have a colour of its own).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const tile = async page => (await state(page)).tiles[0];
@@ -29,7 +29,7 @@ async function fixedRed(page) {
   await settle(page);
 }
 
-// two shapes in the stamp, the second one selected; the Element editor has opened under the canvas
+// two shapes in the stamp, the second one selected; the Shape panel's Edit group is live
 async function twoShapes(page) {
   await unlock(page); await pick(page);
   let p = await inst(page);
@@ -87,6 +87,7 @@ test('each shape can have a colour of its own: the stamp prints in runs and the 
   await openPanel(page, 'colors');
   await expect(page.locator('#tyl')).toContainText('1 shape');
   // putting the shape back on the stamp's ink prints one colour again
+  await showPanel(page, 'motifs');
   await page.locator('#wl_sh .cwsb').click();
   await page.locator('.cwp [data-def="1"]').click();
   await settle(page);

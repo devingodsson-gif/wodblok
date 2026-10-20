@@ -85,7 +85,7 @@ test('a click selects a shape, dragging moves it, a handle resizes it, the round
   await pick(page);
   let p = await inst(page);
   await click(page, p);
-  p = await inst(page);   // the Element editor docks along the bottom when a shape is placed, so the canvas moves
+  p = await inst(page);   // measured again after the click, as the canvas can move
   let it = await items(page);
   const n = it.length;
   // click empty paper of the instance far from the shape (a corner): selection goes
@@ -158,13 +158,13 @@ test('text typed in the Text panel goes into the unlocked stamp as letters, on e
 // ---- step 6 (1.46.6): the Element editor and Stamp settings in the Pattern view, symmetry copies, marquee, snapping ----
 const at = async (page, p, dx, dy) => { const c = await toClient(page, p.cx + dx, p.cy + dy); return { x: c.x, y: c.y, k: c.k }; };
 
-test('the Element editor opens by itself when a shape is placed in the unlocked stamp, and its controls act on the selected shape', async ({ page }) => {
+test('the Edit group of the Shape panel acts on the shape placed in the unlocked stamp', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await unlock(page);
   await pick(page);
-  await expect(page.locator('.wtab', { hasText: 'Element editor' })).toHaveCount(0);
+  await expect(page.locator('#sel')).toHaveClass(/none/);
   await click(page, await inst(page));
-  await expect(page.locator('.wtab.on', { hasText: 'Element editor' })).toHaveCount(1, { timeout: 10000 });
+  await expect(page.locator('#sel')).not.toHaveClass(/none/, { timeout: 10000 });
   await page.evaluate(() => { const r = document.getElementById('ssz'); r.value = 50; r.dispatchEvent(new Event('input', { bubbles: true })); });
   await settle(page);
   const it = await items(page);
