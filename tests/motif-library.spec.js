@@ -1,11 +1,11 @@
 // UX review C11: no "Draw with Claude" section and no empty "Drawn by Claude" folder in the library.
 // The built-in sets stay (a decision for the owner, Q3): an old project that uses them must still print, and a new one needs something to start with.
 const { test, expect } = require('@playwright/test');
-const { openApp } = require('./helpers/harness');
+const { openApp, openPanel } = require('./helpers/harness');
 
 test('the Shapes panel has no Draw with Claude section and the folder list has no empty "Drawn by Claude"', async ({ page }) => {
   const { errors } = await openApp(page);
-  await page.click('.rail [data-pn="motifs"]');
+  await openPanel(page, 'motifs');
   await expect(page.locator('summary', { hasText: 'Draw with Claude' })).toBeHidden();
   const folders = await page.locator('#lib .lfr .lfn').allTextContents();        // one tree of folders (1.5.0)
   expect(folders.some(f => /Drawn by Claude/.test(f))).toBe(false);

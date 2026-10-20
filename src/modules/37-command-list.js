@@ -6,6 +6,9 @@ import {$} from './01-launch-and-version.js';
 // bug-for-bug). A command is enabled when its button exists, is visible and is not disabled.
 const el = id => () => $(id);
 const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled; };
+// the element panels have no rail button on screen (the element bar opens them), but their commands still click it
+const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-elimg', 'rail-elsheet', 'rail-elpaint']);
+const exists = id => () => { const b = $(id); return !!b && !b.disabled; };
 const click = id => () => $(id).click();
 const COMMANDS = [
   ['edit.undo', 'Undo', 'undo', 'Mod+Z'],
@@ -90,7 +93,7 @@ function init37() {
   for (const [id, label, elId, shortcut, kind] of COMMANDS) {
     cmdRegister({id, label, shortcut: shortcut || undefined, elId,
       // file inputs are opened by clicking them (that is what their visible label does); they are hidden on purpose
-      enabled: kind === 'input' ? el(elId) : usable(elId),
+      enabled: kind === 'input' ? el(elId) : ELBTN.has(elId) ? exists(elId) : usable(elId),
       run: click(elId)});
   }
 }

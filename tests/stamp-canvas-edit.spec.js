@@ -23,7 +23,7 @@ const drag = async (page, from, to) => { await page.mouse.move(from.x, from.y); 
 
 test('the Shapes panel is on the Pattern rail', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await expect(page.locator('#rail-motifs')).toBeVisible();
+  await expect(page.locator('#elb [data-k="shape"]')).toBeVisible();   // the element bar opens it
   await openPanel(page, 'motifs');
   expect(await page.locator('#lib .lfr').count()).toBeGreaterThan(0);
   expect(errors).toEqual([]);

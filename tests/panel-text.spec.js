@@ -2,16 +2,16 @@
 // This opens every tool in both views and looks for sentences (several words ending in a full stop, ? or !). Data lines ("Last roll: …", the
 // palette's "No. 60 · …") are not sentences of this kind.
 const { test, expect } = require('@playwright/test');
-const { openApp } = require('./helpers/harness');
+const { openApp, openPanel } = require('./helpers/harness');
 
 test('no tool panel opens with an explanatory sentence', async ({ page }) => {
   const { errors } = await openApp(page);
   const found = [];
   for (const mode of ['pattern']) {
-    const tools = await page.locator('.rail [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn).filter(p => !(p === 'mlist' && __wbTest.unlockedStamp() == null)));   // the Shape list is empty in Pattern until a stamp is unlocked
+    const tools = (await page.locator('.rail [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn).filter(p => !(p === 'mlist' && __wbTest.unlockedStamp() == null)))).concat(['layers', 'stmp', 'motifs', 'text', 'elimg', 'elsheet', 'elpaint']);   // the Shape list is empty in Pattern until a stamp is unlocked
     for (const pn of tools) {
       await page.click('#rcls');
-      await page.click(`.rail [data-pn="${pn}"]`);
+      await openPanel(page, pn);
       await page.waitForSelector(`section.pn[data-p="${pn}"]:not([hidden])`);
       const sentences = await page.evaluate(pn => {
         const sec = document.querySelector(`section.pn[data-p="${pn}"]`), out = [];
@@ -48,7 +48,7 @@ test('nor do the layout modes, a grade mask, the repeat tile or the book cover',
     }, pn);
     sentences.forEach(s => found.push(`${tag}: ${s}`));
   };
-  await page.click('.rail [data-pn="layers"]');
+  await openPanel(page, 'layers');
   for (const m of ['f', 'x', 'p']) { await page.click(`#lmode [data-m="${m}"]`); await scan('layers', 'layout ' + m); }
   await page.click('#rcls');
   await page.click('.rail [data-pn="grade"]');
@@ -57,7 +57,7 @@ test('nor do the layout modes, a grade mask, the repeat tile or the book cover',
   await page.click('.rail [data-pn="canvas"]');
   for (const f of ['Repeat tile', 'Book cover']) { await page.locator('section.pn[data-p="canvas"] button', { hasText: f }).first().click(); await scan('canvas', f); }
   await page.click('#rcls');
-  await page.click('.rail [data-pn="stamp"]');
+  await openPanel(page, 'stmp');
   for (const sym of ['lr', 'quad', 'rot', 'grid']) { const b = page.locator(`#sym [data-m="${sym}"], .sym [data-m="${sym}"]`).first(); if (await b.count()) { await b.click(); await scan('stamp', 'symmetry ' + sym); } }
   expect(found).toEqual([]);
   expect(errors).toEqual([]);

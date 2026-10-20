@@ -46,3 +46,11 @@ test('Sheet texture on its own roll puts the Texture effect on the Sheet', async
   expect(fx.length).toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });
+
+test('after rolls nothing points at a missing definition (effects wrap stamps that carry block edges)', async ({ page }) => {
+  const { danglingRefs } = require('./helpers/speed');
+  const { errors } = await openApp(page, { seed: 21 });
+  await openPanel(page, 'rand');
+  for (let i = 0; i < 4; i++) { await page.click('#rzdo'); await settle(page, { quiet: 10, max: 60000 }); expect(await danglingRefs(page)).toEqual({}); }
+  expect(errors).toEqual([]);
+});

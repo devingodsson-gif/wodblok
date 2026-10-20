@@ -55,8 +55,8 @@
    "ink": null,
    "tu": [
     {
-     "x": "xmuzhi800hvz9",
-     "sd": 6543,
+     "x": "xmuzhi800rc1j",
+     "sd": 24196,
      "md": "wear"
     }
    ]
@@ -99,13 +99,7 @@
    "es": 276,
    "neg": false,
    "ink": null,
-   "tu": [
-    {
-     "x": "xmuzhi800padd",
-     "sd": 80204,
-     "md": "wear"
-    }
-   ]
+   "tu": []
   },
   {
    "id": 3,
@@ -147,8 +141,8 @@
    "ink": null,
    "tu": [
     {
-     "x": "xmuzhi800fp27",
-     "sd": 14467,
+     "x": "xmuzhi800rene",
+     "sd": 77312,
      "md": "stain"
     }
    ]
@@ -181,112 +175,7 @@
    "et": 1.9,
    "er": 0.4,
    "es": 640,
-   "tu": [
-    {
-     "x": "xmuzhi800ycvu",
-     "sd": 1250,
-     "md": "wear"
-    }
-   ]
-  },
-  {
-   "id": 5,
-   "sh": {
-    "k": "rect",
-    "o": "p",
-    "s": [
-     4,
-     1
-    ],
-    "z": 100
-   },
-   "items": [
-    {
-     "m": "b78",
-     "x": 30,
-     "y": 30,
-     "s": 0.175,
-     "r": 0,
-     "f": 1
-    },
-    {
-     "m": "b78",
-     "x": 210,
-     "y": 30,
-     "s": 0.175,
-     "r": 0,
-     "f": 1
-    },
-    {
-     "m": "t|medieval|1t",
-     "x": 84.86484374999998,
-     "y": 30.126930743270776,
-     "s": 0.7103,
-     "r": 0,
-     "f": 1,
-     "tg": "txmuzhi800wmm"
-    },
-    {
-     "m": "t|medieval|29",
-     "x": 108.77988281249998,
-     "y": 31.918806168448427,
-     "s": 0.844,
-     "r": 0,
-     "f": 1,
-     "tg": "txmuzhi800wmm"
-    },
-    {
-     "m": "t|medieval|2d",
-     "x": 131.8828125,
-     "y": 30.162840256313487,
-     "s": 0.8422,
-     "r": 0,
-     "f": 1,
-     "tg": "txmuzhi800wmm"
-    },
-    {
-     "m": "t|medieval|1t",
-     "x": 155.06484375000002,
-     "y": 30.12703717136985,
-     "s": 0.7109,
-     "r": 0,
-     "f": 1,
-     "tg": "txmuzhi800wmm"
-    }
-   ],
-   "sym": {
-    "m": "off"
-   },
-   "et": 0,
-   "er": 0,
-   "es": 503,
-   "neg": false,
-   "ink": "@k3",
-   "tu": [],
-   "tgm": {
-    "txmuzhi800wmm": {
-     "text": "AQUA",
-     "f": "medieval",
-     "sz": 60,
-     "ls": 0,
-     "ws": 0,
-     "lh": 115,
-     "al": "c",
-     "tc": "",
-     "cv": 0,
-     "rot": 0,
-     "wd": 0,
-     "ht": 0,
-     "va": "t",
-     "auto": false,
-     "wp": "b",
-     "wa": 48,
-     "ax": 120,
-     "ay": 30,
-     "mx": 120.148095703125,
-     "my": 30.583903584850635
-    }
-   }
+   "tu": []
   }
  ],
  "layers": [
@@ -300,20 +189,72 @@
     3
    ],
    "lay": "check",
-   "size": 195,
+   "size": 180,
    "ox": 0,
    "oy": 0,
    "rot": 0,
    "pst": 0,
-   "pfl": 1,
-   "ak": {
-    "tri": "t-ud"
-   },
-   "lead": 1,
-   "fit": "",
-   "gap": 0,
+   "pfl": 0,
+   "free": true,
+   "pl": [
+    {
+     "u": "pmuzhi800hvz",
+     "k": "pattern",
+     "n": "Layer 1",
+     "lay": "grid",
+     "cn": 3,
+     "rn": 4,
+     "sz": 100,
+     "rt": 0,
+     "ds": "cycle",
+     "sd": 7670,
+     "src": [
+      {
+       "k": "stamp",
+       "t": 1,
+       "w": 1
+      },
+      {
+       "k": "stamp",
+       "t": 2,
+       "w": 1
+      },
+      {
+       "k": "stamp",
+       "t": 3,
+       "w": 1
+      }
+     ],
+     "x": 266.5,
+     "y": 400,
+     "s": 533,
+     "r": 0,
+     "f": 1,
+     "fx": [
+      {
+       "u": "pmuzhi800i88",
+       "k": "jitter",
+       "on": true,
+       "pos": 5,
+       "rot": 0,
+       "sz": 5,
+       "sd": 55066
+      },
+      {
+       "u": "pmuzhi800mzq",
+       "k": "pressure",
+       "on": true,
+       "pst": 4,
+       "pfl": 0
+      }
+     ]
+    }
+   ],
+   "ak": {},
    "man": false,
-   "ov": {}
+   "ov": {},
+   "fit": "",
+   "gap": 0
   },
   {
    "u": "locwukmq",
@@ -327,24 +268,59 @@
    "ox": 0,
    "oy": 0,
    "rot": 0,
-   "pst": 5,
+   "pst": 0,
    "pfl": 0,
+   "free": true,
+   "pl": [
+    {
+     "u": "pmuzhi800c44",
+     "k": "pattern",
+     "n": "Frame",
+     "lay": "frame",
+     "cn": 4,
+     "rn": 6,
+     "sz": 100,
+     "rt": 0,
+     "ds": "cycle",
+     "sd": 9104,
+     "src": [
+      {
+       "k": "stamp",
+       "t": 4,
+       "w": 1
+      }
+     ],
+     "x": 266.5,
+     "y": 400,
+     "s": 533,
+     "r": 0,
+     "f": 1,
+     "fx": [
+      {
+       "u": "pmuzhi800pad",
+       "k": "jitter",
+       "on": true,
+       "pos": 22,
+       "rot": 0,
+       "sz": 9,
+       "sd": 3374
+      },
+      {
+       "u": "pmuzhi800wop",
+       "k": "pressure",
+       "on": true,
+       "pst": 4,
+       "pfl": 0
+      }
+     ],
+     "in": 2
+    }
+   ],
    "ak": {},
-   "fr": {
-    "on": true,
-    "w": 0.7,
-    "i": 0,
-    "g": 0,
-    "c": "m",
-    "cs": null,
-    "fc": "o",
-    "sc": "front",
-    "clr": false,
-    "safe": true,
-    "bar": true
-   },
    "man": false,
-   "ov": {}
+   "ov": {},
+   "fit": "",
+   "gap": 0
   },
   {
    "u": "l0y8svph",
@@ -358,60 +334,188 @@
    "ox": 0,
    "oy": 0,
    "rot": 0,
-   "pst": 3,
+   "pst": 0,
    "pfl": 0,
+   "free": true,
+   "pl": [
+    {
+     "u": "pmuzhi8007ds",
+     "k": "pattern",
+     "n": "Frame rule",
+     "lay": "frame",
+     "cn": 5,
+     "rn": 8,
+     "sz": 40,
+     "rt": 0,
+     "ds": "cycle",
+     "sd": 1447,
+     "src": [
+      {
+       "k": "stamp",
+       "t": 4,
+       "w": 1
+      }
+     ],
+     "x": 266.5,
+     "y": 400,
+     "s": 533,
+     "r": 0,
+     "f": 1,
+     "in": 6
+    }
+   ],
    "ak": {},
-   "fr": {
-    "on": true,
-    "w": 0.3,
-    "i": 3.5,
-    "g": 0,
-    "c": "m",
-    "cs": null,
-    "fc": "o",
-    "sc": "front",
-    "clr": false,
-    "safe": true,
-    "bar": true
-   },
    "man": false,
-   "ov": {}
+   "ov": {},
+   "fit": "",
+   "gap": 0
   },
   {
-   "u": "lzvpv9m5",
-   "name": "Free stamps",
+   "u": "l6h7pnjo",
+   "name": "Paint",
    "vis": true,
-   "st": [
-    5
-   ],
+   "st": [],
    "lay": "check",
    "size": 180,
    "ox": 0,
    "oy": 0,
    "rot": 0,
-   "pst": 1,
+   "pst": 0,
    "pfl": 0,
    "free": true,
-   "rz": "free",
    "pl": [
     {
-     "u": "pmuzhi800t4c1",
-     "k": "stamp",
-     "t": 5,
-     "x": 266.5,
-     "y": 444.2,
-     "s": 355.33,
-     "r": 0,
-     "f": 1
+     "u": "pmuzhi800mh3",
+     "k": "paint",
+     "n": "Paint 1",
+     "x": 0,
+     "y": 0,
+     "st": [
+      {
+       "u": "pmuzhi800b0s",
+       "w": 11.8,
+       "pts": [
+        [
+         268,
+         374.6
+        ],
+        [
+         281.3,
+         344.1
+        ],
+        [
+         302.3,
+         318.4
+        ],
+        [
+         330.7,
+         301.1
+        ],
+        [
+         362.9,
+         292.9
+        ],
+        [
+         395.8,
+         288.1
+        ],
+        [
+         429,
+         287.2
+        ],
+        [
+         462.1,
+         290.3
+        ],
+        [
+         493.7,
+         300.4
+        ],
+        [
+         523,
+         316.1
+        ],
+        [
+         533,
+         333.5
+        ]
+       ]
+      },
+      {
+       "u": "pmuzhi800ch0",
+       "w": 22.8,
+       "pts": [
+        [
+         86.8,
+         329.3
+        ],
+        [
+         107,
+         347.9
+        ],
+        [
+         129.5,
+         363.7
+        ],
+        [
+         152.9,
+         378.2
+        ],
+        [
+         177.7,
+         389.9
+        ],
+        [
+         204.5,
+         396.2
+        ],
+        [
+         232,
+         394.8
+        ],
+        [
+         258.9,
+         389.1
+        ],
+        [
+         282.6,
+         375.4
+        ],
+        [
+         302.1,
+         356
+        ],
+        [
+         320.4,
+         335.5
+        ],
+        [
+         332.3,
+         310.7
+        ],
+        [
+         337.7,
+         283.7
+        ],
+        [
+         339.3,
+         256.3
+        ],
+        [
+         329.8,
+         230.5
+        ]
+       ],
+       "c": "@k3"
+      }
+     ]
     }
    ],
-   "fg": {
-    "snap": true,
-    "ss": true
-   },
    "ak": {},
    "man": false,
-   "ov": {}
+   "ov": {},
+   "fit": "",
+   "gap": 0
   }
  ],
  "proj": {
@@ -438,7 +542,28 @@
     }
    }
   ],
-  "cwa": 0
+  "cwa": 0,
+  "sh": {
+   "o": 100,
+   "fx": [
+    {
+     "u": "pmuzhi800nb8",
+     "k": "texture",
+     "on": true,
+     "x": "xmuzhi8009tql",
+     "sd": 49495,
+     "md": "relief"
+    },
+    {
+     "u": "pmuzhi800vvz",
+     "k": "texture",
+     "on": true,
+     "x": "xmuzhi800mskv",
+     "sd": 78565,
+     "md": "relief"
+    }
+   ]
+  }
  },
  "dim": {
   "s": [
@@ -453,7 +578,7 @@
   "o": "p"
  },
  "pr": {
-  "e": 2,
+  "e": 6,
   "q": 0,
   "t": "",
   "a": 0,
@@ -467,63 +592,63 @@
  },
  "texLib": [
   {
-   "id": "xmuzhi800hvz9",
-   "name": "Leather",
-   "t": "leather",
-   "a": 41,
-   "sc": 136,
-   "az": 315,
-   "sd": 76707,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800padd",
-   "name": "Blotchy Wash",
-   "t": "blotchy",
-   "a": 51,
-   "sc": 70,
-   "az": 225,
-   "sd": 3374,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800fp27",
-   "name": "Pinholes",
-   "t": "pinholes",
-   "a": 53,
-   "sc": 111,
-   "az": 250,
-   "sd": 20509,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800ycvu",
+   "id": "xmuzhi8009tql",
    "name": "Granite",
    "t": "granite",
-   "a": 43,
+   "a": 42,
    "sc": 77,
+   "az": 315,
+   "sd": 1250,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800mskv",
+   "name": "Foxing",
+   "t": "foxing",
+   "a": 67,
+   "sc": 113,
    "az": 225,
-   "sd": 27295,
+   "sd": 3254,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800rc1j",
+   "name": "Granite 2",
+   "t": "granite",
+   "a": 51,
+   "sc": 156,
+   "az": 200,
+   "sd": 71545,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800rene",
+   "name": "Leather",
+   "t": "leather",
+   "a": 54,
+   "sc": 107,
+   "az": 225,
+   "sd": 62756,
    "auto": true
   }
  ],
  "pg": {
   "show": false,
-  "n": 6,
+  "n": 8,
   "m": "l",
   "op": 70,
   "sh": "rect"
  },
  "grade": {
-  "ex": -18,
-  "ct": -22,
+  "ex": 0,
+  "ct": 0,
   "hi": 0,
-  "sh": 18,
-  "wh": 4,
-  "bl": -8,
-  "tp": 10,
+  "sh": 0,
+  "wh": 0,
+  "bl": 0,
+  "tp": 0,
   "tn": 0,
-  "sat": 5,
+  "sat": 0,
   "vib": 0,
   "hue": 0,
   "fd": 0,
@@ -531,7 +656,31 @@
   "masks": [
    {
     "sc": "",
-    "id": "mxqe04s",
+    "id": "mgpaswy",
+    "t": "lay",
+    "name": "Layer tint",
+    "on": true,
+    "inv": false,
+    "amt": 73,
+    "a": {
+     "ex": 0,
+     "ct": 0,
+     "hi": 0,
+     "sh": 0,
+     "wh": 0,
+     "bl": 0,
+     "tp": 0,
+     "tn": 0,
+     "sat": -49,
+     "vib": 0,
+     "hue": 0,
+     "fd": 0
+    },
+    "lay": "locwukmq"
+   },
+   {
+    "sc": "",
+    "id": "mwr4dl1",
     "t": "lin",
     "name": "Edge fade",
     "on": true,
@@ -544,45 +693,19 @@
      "sh": 0,
      "wh": 0,
      "bl": 0,
-     "tp": -37,
+     "tp": 0,
      "tn": 0,
-     "sat": 0,
+     "sat": -35,
      "vib": 0,
      "hue": 0,
      "fd": 0
     },
     "sp": "c",
     "st": "",
-    "x1": 1,
-    "y1": 0.5,
-    "x2": 0.557,
-    "y2": 0.5
-   },
-   {
-    "sc": "",
-    "id": "mbdo7io",
-    "t": "lum",
-    "name": "Shadow tone",
-    "on": true,
-    "inv": false,
-    "amt": 100,
-    "a": {
-     "ex": 0,
-     "ct": 0,
-     "hi": 0,
-     "sh": 0,
-     "wh": 0,
-     "bl": 0,
-     "tp": -33,
-     "tn": -11,
-     "sat": 0,
-     "vib": 0,
-     "hue": 0,
-     "fd": 9
-    },
-    "lo": 0,
-    "hi": 31,
-    "sm": 39
+    "x1": 0.5,
+    "y1": 1,
+    "x2": 0.5,
+    "y2": 0.549
    }
   ]
  }
