@@ -45,7 +45,7 @@ function elSync(){const b=$('elb');if(b)b.querySelectorAll('.elbb').forEach(x=>{
 // the Image panel's Crop group shows only when there is a picture to crop
 {const c=$('lcrop'),g=$('elcrg');if(c&&g&&g.hidden!==c.hidden)g.hidden=c.hidden}
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden
-if(WBX.wbShSync)WBX.wbShSync();if(WBX.wbPatSync)WBX.wbPatSync();
+if(WBX.wbShSync)WBX.wbShSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();
 const q=elSel(),k=elKind(q);document.querySelectorAll('.elmode[data-k]').forEach(m=>{const on=!!q&&m.dataset.k===k,d=EL_K[m.dataset.k];m.hidden=!on;const nb=m.querySelector('b');if(on&&nb&&d&&d.name){const t=d.name(q);if(nb.textContent!==t)nb.textContent=t}})}
 
 function init65(){

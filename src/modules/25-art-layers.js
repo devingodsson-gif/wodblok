@@ -13,7 +13,9 @@ import {fx1,tbG,tbSty,txbSync,txtGl} from './26-text-boxes.js';
 const artOk=s=>typeof s=='string'&&s.length<14e6&&/^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+\/=]*$/.test(s);
 const artId=()=>'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 function artBU(A){if(A.bu)return A.bu;try{const s=A.src,i=s.indexOf(','),bin=atob(s.slice(i+1)),u=new Uint8Array(bin.length);for(let j=0;j<bin.length;j++)u[j]=bin.charCodeAt(j);A.bu=URL.createObjectURL(new Blob([u],{type:s.slice(5,s.indexOf(';'))}))}catch(e){A.bu=A.src}return A.bu}
-function artUsed(){const o={};WBS.layers.forEach(L=>{(L.pl||[]).forEach(p=>{const A=p.a&&WBS.ARTS[p.a];if(A&&!o[p.a])o[p.a]={n:A.n,k:A.k,src:A.src,w:A.w,h:A.h,...(A.pid?{pid:A.pid,ver:A.ver||0}:{})}})});return o}
+function artUsed(){const o={},add=p=>{const A=p.a&&WBS.ARTS[p.a];if(A&&!o[p.a])o[p.a]={n:A.n,k:A.k,src:A.src,w:A.w,h:A.h,...(A.pid?{pid:A.pid,ver:A.ver||0}:{})}};WBS.layers.forEach(L=>{(L.pl||[]).forEach(p=>{add(p);(p.src||[]).forEach(s=>{if(s.k=='image')add({a:s.a})})})});WBS.tiles.forEach(t=>{(t.el||[]).forEach(add)});return o}
+// is a picture used by an element, a pattern's source or a stamp's contents
+function artRefd(id){return WBS.layers.some(l=>(l.pl||[]).some(p=>p.a==id||(p.src||[]).some(s=>s.k=='image'&&s.a==id)))||WBS.tiles.some(t=>(t.el||[]).some(p=>p.a==id))}
 function artLoad(o){const r={};Object.entries(o||{}).forEach(([id,A])=>{if(!A||!artOk(A.src)||!(+A.w>0)||!(+A.h>0))return;r[String(id).replace(/[^\w-]/g,'').slice(0,24)]={n:String(A.n||'Art').replace(/["<>&|]/g,'').slice(0,40),k:A.k=='proj'?'proj':'img',src:A.src,w:+A.w,h:+A.h,...(A.k=='proj'&&A.pid?{pid:String(A.pid).slice(0,40),ver:+A.ver||0}:{})}});return r}
 const artEnc=c=>{const w=c.toDataURL('image/webp',.88);return w.startsWith('data:image/webp')?w:c.toDataURL('image/png')};
 // A flat picture of this project as it is now (transparent outside a shaped canvas). It is saved with the project so other projects can use it as art.
@@ -35,7 +37,7 @@ const kid='ak'+li;if(L.akk)defs+=`<filter id="${kid}" color-interpolation-filter
 const o0=`<g${L.akk?` filter="url(#${kid})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>`;return[defs,o0+out+'</g>',o0,'</g>',fr]}
 // the Art part of the Free place panel
 function artPanel(L){{const k=$('lfaak');if(k){k.checked=!!L.akk;const lb=k.closest('label');if(lb)lb.hidden=!(L.pl||[]).some(p=>p.a)}}
-const ids=Object.keys(WBS.ARTS),inUse=new Set();WBS.layers.forEach(l=>{(l.pl||[]).forEach(p=>{if(p.a)inUse.add(p.a)})});
+const ids=Object.keys(WBS.ARTS),inUse=new Set();ids.forEach(i=>{if(artRefd(i))inUse.add(i)});
 const ky=ids.map(i=>i+':'+WBS.ARTS[i].src.length+(WBS.ARTS[i].ver||'')+(inUse.has(i)?'u':'')).join('|')+'#'+WBS.fpB+(fpPoolOk()?'#'+[...WBS.fpPool].join('.'):''),st=$('lfars');
 if(st.dataset.k!=ky){st.dataset.k=ky;st.innerHTML=ids.length?ids.map(i=>{const A=WBS.ARTS[i];return`<button type="button" data-a="${hx(i)}" class="${WBS.fpB==i||(fpPoolOk()&&WBS.fpPool.has(String(i)))?'on':''}" title="${hx(A.n)}${A.pid?' (linked project)':''}"><img src="${artBU(A)}" alt="">${A.pid?'<u class="alk"></u>':''}${inUse.has(i)?'':`<i data-ax="${hx(i)}" title="Remove from this project">&#215;</i>`}</button>`}).join(''):'<div class="hint" style="margin:0">Nothing imported yet.</div>'}
 }
@@ -83,4 +85,4 @@ $('lfpdn').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;const g=fpGrp();g.fo
 $('lfpdl').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;fpGrp().forEach(q=>L.pl.splice(L.pl.indexOf(q),1));WBS.fpSel=-1;WBS.fpMS=new Set();ch()};
 $('lfpclr').onclick=()=>{const L=fpL(),b=$('lfpclr');if(!L||!(L.pl||[]).length)return;if(!b.dataset.sure){b.dataset.sure=1;b.textContent='Click again to clear';setTimeout(()=>{delete b.dataset.sure;b.textContent='Clear all'},3000);return}delete b.dataset.sure;b.textContent='Clear all';L.pl=[];WBS.fpSel=-1;WBS.fpMS=new Set();ch()}}
 }
-export {artBU,artEnc,artId,artLayer,artLoad,artOk,artSnap,artUsed,crBox,crPts,crRef,fpBox,fpFlip,fpHandles,fpHit,fpPt,fpRot,fpSz,fpWH,init25};
+export {artRefd,artBU,artEnc,artId,artLayer,artLoad,artOk,artSnap,artUsed,crBox,crPts,crRef,fpBox,fpFlip,fpHandles,fpHit,fpPt,fpRot,fpSz,fpWH,init25};
