@@ -92,6 +92,7 @@ test('Position across / down sets where the selected stamp sits, and a group mov
   await page.mouse.click(box.x + box.width * 0.6, box.y + box.height * 0.5); await settle(page);
   await page.keyboard.press('Escape'); await settle(page);
   await page.mouse.click(box.x + box.width * 0.6, box.y + box.height * 0.5); await settle(page);
+  await openPanel(page, 'mlist');
   await expect(page.locator('#lfpx')).toBeVisible();
   const [, , W, H] = await vb(page);
   await setv(page, 'lfpx', 25); await setv(page, 'lfpy', 80); await settle(page);

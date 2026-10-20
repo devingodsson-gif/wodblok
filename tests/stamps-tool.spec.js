@@ -10,7 +10,7 @@ const addLayer = async page => { await openPanel(page, 'lyrs'); await page.click
 
 test('the Stamps panel is on the rail and lists every stamp, with the layers it is used on', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await expect(page.locator('#rail-stmp')).toHaveAttribute('aria-label', 'Stamps');
+  await expect(page.locator('#rail-stmp')).toHaveAttribute('aria-label', 'Stamp');
   await openPanel(page, 'stmp');
   await expect(page.locator('#stmpl .smkr')).toHaveCount(1);
   await expect(page.locator('#stmpl .smkr .smkn')).toHaveText('Stamp 1');

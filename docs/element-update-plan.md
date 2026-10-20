@@ -67,10 +67,10 @@ Written Oct 19 2026. Status: **started Oct 19 2026** (the owner said to start: s
 |---|---|---|---|
 | 0 | 2.1.1 | CI: the editor suite runs only when asked | none |
 | 1 | 2.1.1 | **Element core.** Registries for element kinds and effects; a layer's elements draw in list order; stamp, image and text items registered as the first three kinds; this plan in the docs; "No brush masks" removed. No stored data changes yet, so no format change | medium (rendering) |
-| 2 | 2.1.2 | **Element bar and element panels.** Bar left of centre, tray right of centre; Create/Edit panels for Stamp, Image, Text; Element list (reorder, show/hide, lock, delete) replaces the Shape list; Element editor retired. Format 22: every element stores `k` | high (format, panels) |
+| 2 | 2.1.2 | **Element bar and element panels.** Bar left of centre, tray right of centre; Stamp, Image and Text panels create and edit; the Elements panel (the layer's list and the selected element's controls) replaces the Shape list | medium (panels) |
 | 3 | 2.1.3 | **Transparent canvas and Sheet.** Checkerboard on screen; PNG and SVG keep transparency; JPG, TIFF, proof and book cover fill white | medium |
-| 4 | 2.1.4 | **Shape element** with the Shapes library in its panel | low |
-| 5 | 2.1.5 | **Pattern element.** Arrangement and Frame become Pattern elements with sources and distribution; several per layer; Layout panel retired | high |
+| 4 | 2.1.4 | **Shape element** with the Shapes library in its panel; the Element editor folds into it | medium |
+| 5 | 2.1.5 | **Pattern element.** Arrangement and Frame become Pattern elements with sources and distribution; several per layer. **Format 22**: every element stores `k`; new fixtures; state snapshots regenerated once (owner's OK first) | high (format) |
 | 6 | 2.1.6 | **Stamp as composite.** Images, text and paint inside a stamp definition | high |
 | 7 | 2.1.7 | **Effect stack, Texture and Pressure offset.** Add, reorder, switch off, delete; old texture and pressure controls removed | high |
 | 8 | 2.1.8 | **Jitter**, then Carved edges, Symmetry, Wrap, Invert and Colour grade as effects; Stamp settings panel retired | high |
@@ -83,7 +83,7 @@ Written Oct 19 2026. Status: **started Oct 19 2026** (the owner said to start: s
 
 - Each step: quick specs for what changed and for the areas it must not touch, `npm run perf` where drawing or dragging changes. **No full suite and no CI unless the owner says so.**
 - State and SVG snapshots: only with the owner's approval; a step that changes them on purpose lists them and asks.
-- New made-up fixtures when the format changes (step 2).
+- New made-up fixtures when the format changes (step 5).
 
 ## Progress log
 ### Step 0 outcome: CI only when asked (2.1.1, Oct 19 2026)

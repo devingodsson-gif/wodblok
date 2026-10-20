@@ -3,11 +3,11 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState } = require('./helpers/harness');
 
 const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const layers = async page => JSON.parse(await getState(page)).layers;
-const setArr = (page, v) => page.click(`#lmode [data-m="${v}"]`);
+const setArr = async (page, v) => { await showPanel(page, 'layers'); await page.click(`#lmode [data-m="${v}"]`); };
 const canvasClick = async (page, fx, fy) => {
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
@@ -32,7 +32,7 @@ test('there is no layer type: Arrangement is a control with None, Repeat and Fra
 
 test('a stamp is placed on a layer that has an arrangement, and the arrangement stays', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
+  await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   const l = (await layers(page))[0];
@@ -45,7 +45,7 @@ test('a stamp is placed on a layer that has an arrangement, and the arrangement 
 
 test('a picture and then a stamp go onto the same layer; each is its own placed item', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
+  await openPanel(page, 'elimg');
   const f = path.join(testInfo.outputDir, 'dot.png');
   fs.mkdirSync(testInfo.outputDir, { recursive: true });
   fs.writeFileSync(f, Buffer.from(PNG, 'base64'));
@@ -55,10 +55,12 @@ test('a picture and then a stamp go onto the same layer; each is its own placed 
   await expect(page.locator('#lfars [data-a].on')).toHaveCount(1);          // importing a picture arms it
   await canvasClick(page, 0.3, 0.3);
   await page.click('#lfars [data-a]');            // stop placing the picture
+  await showPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.7, 0.7);
   const l = (await layers(page))[0];
   expect(l.pl.map(q => (q.a ? 'a' : q.t ? 't' : '?'))).toEqual(['a', 't']);
+  await showPanel(page, 'mlist');
   await expect(page.locator('#lfpl .mr')).toHaveCount(2);
   expect(errors).toEqual([]);
 });
@@ -78,7 +80,7 @@ test('typing in the Text tool places text on the selected layer, whatever its ar
 
 test('changing the Arrangement keeps what was placed on the layer', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
+  await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   for (const v of ['x', 'f', 'p']) {
@@ -96,7 +98,7 @@ test('changing the Arrangement keeps what was placed on the layer', async ({ pag
 
 test('the Layers list says how many items a layer holds', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
+  await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   await expect(page.locator('#lyl2 .lyr .lym')).toContainText('1 placed');
@@ -161,14 +163,17 @@ test('turning an arrangement on for a layer with no stamps picks the current sta
   expect(errors).toEqual([]);
 });
 
-test('in the Layout panel the Arrangement comes first, then its stamps, then the placed items', async ({ page }) => {
+test('the Pattern panel holds the arrangement only: Arrangement first, then its stamps; placed items live in the element panels', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
   const titles = await page.locator('section.pn[data-p="layers"] > details.g > summary').evaluateAll(els => els.map(e => e.firstChild.textContent.trim()));
   const i = n => titles.indexOf(n);
   expect(i('Arrangement')).toBeGreaterThanOrEqual(0);
   expect(i('Arrangement')).toBeLessThan(i('Stamps in the pattern'));
-  expect(i('Stamps in the pattern')).toBeLessThan(i('Placed items'));
-  expect(i('Placed items')).toBeLessThan(i('Align'));
+  expect(i('Placed items')).toBe(-1);
+  expect(i('Align')).toBe(-1);
+  for (const [sel, pn] of [['#lfpst', 'stmp'], ['#lfars', 'elimg'], ['#lfpl', 'mlist'], ['#lalg', 'mlist']]) {
+    expect(await page.locator(sel).evaluate(e => e.closest('section.pn').dataset.p), sel).toBe(pn);
+  }
   expect(errors).toEqual([]);
 });

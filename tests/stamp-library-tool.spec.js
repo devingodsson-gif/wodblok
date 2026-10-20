@@ -85,7 +85,7 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   expect((await state(page)).tiles.length).toBe(1);
   await newStamp(page, 'Rectangle');
   // a free copy of stamp 2 placed on the layer
-  await openPanel(page, 'layers');
+  await show(page, 'stmp');
   const id2 = (await state(page)).tiles[1].id;
   await page.locator(`#lfpst [data-t="${id2}"]`).click();
   const box = await page.locator('#art').boundingBox();
@@ -93,7 +93,7 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   await settle(page);
   expect(((await state(page)).layers[0].pl || []).filter(p => p.t === id2).length).toBe(1);
   await page.keyboard.press('Escape');
-  await openPanel(page, 'stmp');
+  await show(page, 'stmp');
   await page.click('#smkdel');
   await expect(page.locator('#smkdel')).toHaveClass(/sure/);
   expect((await state(page)).tiles.length).toBe(2);
