@@ -19,7 +19,7 @@ test('the element bar has one button per kind, left of centre; the tray starts r
   await expect(btn).toHaveCount(7);
   expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Sheet', 'Paint', 'Shape', 'Image', 'Text', 'Stamp', 'Pattern']);
   // not built yet: switched off
-  await expect(page.locator('#elb [data-k="sheet"]')).toBeDisabled();
+  await expect(page.locator('#elb [data-k="sheet"]')).toBeEnabled();
   await expect(page.locator('#elb [data-k="paint"]')).toBeDisabled();
   const vb = await page.locator('.viewbar').boundingBox(), el = await page.locator('#elb').boundingBox(), ty = await page.locator('#tyc').boundingBox();
   const mid = vb.x + vb.width / 2;
@@ -32,7 +32,7 @@ test('the element bar has one button per kind, left of centre; the tray starts r
 
 test('each working button opens its panel and shows pressed while that panel is in front', async ({ page }) => {
   const { errors } = await openApp(page);
-  for (const [k, pn] of [['shape', 'motifs'], ['image', 'elimg'], ['text', 'text'], ['stamp', 'stmp'], ['pattern', 'layers']]) {
+  for (const [k, pn] of [['sheet', 'elsheet'], ['shape', 'motifs'], ['image', 'elimg'], ['text', 'text'], ['stamp', 'stmp'], ['pattern', 'layers']]) {
     await page.click(`#elb [data-k="${k}"]`);
     await settle(page);
     await expect(page.locator(`section.pn[data-p="${pn}"]`)).toBeVisible();

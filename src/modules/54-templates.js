@@ -29,7 +29,7 @@ const tpIndexSet=a=>{try{kv.set(TP_INDEX,JSON.stringify(a));return true}catch(e)
 async function tpOpenStore(){if(tpStore===null)tpStore=(await collection('templates'))||false;return tpStore||null}
 // a small JPEG picture from a PNG (the picture inside a project file)
 const tpSmall=png=>new Promise(res=>{if(!png)return res('');const u=URL.createObjectURL(new Blob([png],{type:'image/png'})),im=new Image(),to=setTimeout(()=>{URL.revokeObjectURL(u);res('')},4000);
- im.onload=()=>{try{const w=240,h=Math.max(1,Math.round(w*im.naturalHeight/Math.max(1,im.naturalWidth))),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);clearTimeout(to);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',.8))}catch(e){res('')}};
+ im.onload=()=>{try{const w=240,h=Math.max(1,Math.round(w*im.naturalHeight/Math.max(1,im.naturalWidth))),c=document.createElement('canvas');c.width=w;c.height=h;{const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h)}clearTimeout(to);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',.8))}catch(e){res('')}};
  im.onerror=()=>{clearTimeout(to);URL.revokeObjectURL(u);res('')};im.src=u});
 // ---------------------------------------------------------------- the picker
 const tpD=()=>$('tpdlg'),tpIsOpen=()=>!tpD().hidden;

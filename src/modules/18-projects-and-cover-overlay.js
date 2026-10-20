@@ -59,7 +59,7 @@ let pmT=0;const pmsg=t=>{if(typeof t=='string'&&/Mac|iPhone|iPad/.test(navigator
 const dirty=()=>coreStr()!==WBS.cp.saved||$('pnm').value.trim()!==WBS.cp.name;
 function paintPst(){const u=dirty(),e=$('pst');e.textContent='';e.className=u?'dirty':'';e.title=u?'Unsaved changes':'';if(u)e.setAttribute('role','img'),e.setAttribute('aria-label',e.title);else e.removeAttribute('aria-label')}
 const newId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-function thumb(w0){return new Promise(res=>{try{const img=new Image(),to=setTimeout(()=>res(''),5000);img.onload=()=>{try{const w=w0||200,h=Math.round(w*CH/CW),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);clearTimeout(to);res(c.toDataURL('image/jpeg',.7))}catch(e){res('')}};img.onerror=()=>res('');img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())}catch(e){res('')}})}
+function thumb(w0){return new Promise(res=>{try{const img=new Image(),to=setTimeout(()=>res(''),5000);img.onload=()=>{try{const w=w0||200,h=Math.round(w*CH/CW),c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);clearTimeout(to);res(c.toDataURL('image/jpeg',.7))}catch(e){res('')}};img.onerror=()=>res('');img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())}catch(e){res('')}})}
 // The project as it is written to a file: the document plus the pictures Art layers use (so another project can take this one as a picture).
 async function fileSnap(){const sn=snapshot(),a=await artSnap();if(a)sn.art=a;return sn}
 // two-tap confirm for actions that would drop unsaved work

@@ -31,7 +31,7 @@ async function make(){if(busy||!isOpen()||WBX.wbHoldOn||document.body.classList.
   const svg=ser();
   for(const [w,,k] of need){const map=new Map();o.ts.forEach(id=>{if(!map.has(cur.c[id]))map.set(cur.c[id],w.c[id])});
    const im=await img('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(w===cur?svg:vrRecolor(svg,map)));if(!im)continue;
-   const W=260,H=Math.max(1,Math.round(W*im.naturalHeight/im.naturalWidth)),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.drawImage(im,0,0,W,H);TH.set(k,c.toDataURL('image/jpeg',.82))}
+   const W=260,H=Math.max(1,Math.round(W*im.naturalHeight/im.naturalWidth)),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);x.drawImage(im,0,0,W,H);TH.set(k,c.toDataURL('image/jpeg',.82))}
   if(TH.size>120)[...TH.keys()].slice(0,TH.size-120).forEach(k=>TH.delete(k))}
  finally{busy=false}if(isOpen())cwPaint()}
 function init53(){const g=$('cwg');

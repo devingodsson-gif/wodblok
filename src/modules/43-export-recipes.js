@@ -43,7 +43,7 @@ function xrRender0(r){
     if(r.fmt=='svg')return res(new Blob([ser()],{type:'image/svg+xml'}));
     const [w,h]=xrDims(xrPx(r.px));if(w*h>XR_AREA)return rej(new Error('That size is too large for this browser. Try a smaller long side.'));
     const img=new Image();
-    img.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d',{willReadFrequently:r.fmt=='tiff'});ctx.drawImage(img,0,0,w,h);if(wmGet())wmDraw(ctx,w,h);if(r.fmt=='tiff'){const im=ctx.getImageData(0,0,w,h);res(xrTiff(im.data,w,h,r.dpi||300));return}c.toBlob(b=>b?res(b):rej(new Error('The picture could not be made at that size.')),r.fmt=='jpg'?'image/jpeg':'image/png',.92)}catch(e){rej(e)}};
+    img.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d',{willReadFrequently:r.fmt=='tiff'});if(r.fmt=='jpg'||r.fmt=='tiff'){ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h)}ctx.drawImage(img,0,0,w,h);if(wmGet())wmDraw(ctx,w,h);if(r.fmt=='tiff'){const im=ctx.getImageData(0,0,w,h);res(xrTiff(im.data,w,h,r.dpi||300));return}c.toBlob(b=>b?res(b):rej(new Error('The picture could not be made at that size.')),r.fmt=='jpg'?'image/jpeg':'image/png',.92)}catch(e){rej(e)}};
     img.onerror=()=>rej(new Error('The picture could not be made.'));
     img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser());
   });

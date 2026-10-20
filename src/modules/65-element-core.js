@@ -42,12 +42,13 @@ function elSync(){const b=$('elb');if(b)b.querySelectorAll('.elbb').forEach(x=>{
 // the Image panel's Crop group shows only when there is a picture to crop
 {const c=$('lcrop'),g=$('elcrg');if(c&&g&&g.hidden!==c.hidden)g.hidden=c.hidden}
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden
+if(WBX.wbShSync)WBX.wbShSync();
 const q=elSel(),k=elKind(q);document.querySelectorAll('.elmode[data-k]').forEach(m=>{const on=!!q&&m.dataset.k===k,d=EL_K[m.dataset.k];m.hidden=!on;const nb=m.querySelector('b');if(on&&nb&&d&&d.name){const t=d.name(q);if(nb.textContent!==t)nb.textContent=t}})}
 
 function init65(){
 // the kinds, in the order of the element bar. Image, Text and Stamp exist as placed elements today (their test and drawing; dz keeps the order their
 // shared definitions were always written in); the others get them in later steps.
-elRegister('sheet',{label:'Sheet',icon:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 13L13 4M9 20L20 9"/>'});
+elRegister('sheet',{label:'Sheet',pn:'elsheet',icon:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 13L13 4M9 20L20 9"/>'});
 elRegister('paint',{label:'Paint',icon:'<path d="M19.5 4.5c-2.6 1-6.4 4.8-8.4 7.9l1.6 1.6c3.1-2 6.9-5.8 7.9-8.4z"/><path d="M10.2 13.6c-2 0-3.5 1.3-3.5 3.2 0 1.4-.8 2.4-2.4 2.7 2.6 1.3 7.4.6 7.4-4.4z"/>'});
 elRegister('shape',{label:'Shape',pn:'motifs',icon:'<path d="M12 2.8l5.2 8.7H6.8z"/><circle cx="7" cy="17" r="4"/><rect x="12.8" y="13" width="8.4" height="8.4" rx="1.4"/>'});
 elRegister('image',{label:'Image',pn:'elimg',icon:'<rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5L15 10l-9 9"/>',dz:2,is:q=>!!q.a,name:q=>(WBS.ARTS[q.a]&&WBS.ARTS[q.a].n)||'Image',draw:(L,li)=>artLayer(L,li)});
