@@ -200,4 +200,9 @@ async function noPattern(page) {
   while (await page.locator('#pelist [data-pd]').count()) { await page.click('#pelist [data-pd] >> nth=0'); await settle(page); }
 }
 
-module.exports = { noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// 2.2.3: using the interface puts an armed stamp away, so a test that placed stamps after changing a setting arms the stamp again just before it clicks the canvas
+async function armStamp(page) {
+  if (await page.locator('#lfpst [data-t].on').count()) return;
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page);
+}
+module.exports = { armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
