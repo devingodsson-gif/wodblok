@@ -25,7 +25,7 @@ Selecting a row opens that element's menu: move, size, rotate, align, effects. *
 ## Decisions made here (change them if wrong)
 1. New element goes **to the top of the list** (not above the selection).
 2. **Opacity and blend on every element kind**, including Sheet and Paint.
-3. **No groups** for now. A Group element can come later if wanted.
+3. **Groups (owner, Oct 20 2026):** select several rows (or elements on the canvas) and press Group (button or Shift+G); a Group is an element holding other elements, with its own opacity, blend and eye, expandable in the list, and Ungroup undoes it. The data model (`k:'group'`, children `ch`) is built in step 1; the Group button, shortcut and list indent come with the list UI in step 1 too, since a list without groups would have to be reworked.
 4. Layer features without a clear owner are **dropped**, not carried (list below).
 5. File format **23**: `proj.els` replaces `proj.layers`. Old files are refused with the usual message; no migration (owner, Oct 18 and 19 2026).
 
@@ -51,6 +51,7 @@ Selecting a row opens that element's menu: move, size, rotate, align, effects. *
 ## Step 1 (2.2.2): the flat list, engine and format (risk: high)
 - **Document:** `proj.els: [element]` replaces `proj.layers`; `validate.js`, `container.js` (format 23), `make-fixtures.js`; the three fixtures and the templates are regenerated; one selected element `WBS.sel` replaces `selL` + `fpSel`.
 - **Drawing:** `10-layer-grids.js` draws the list in order (`elDraw`), each element wrapped for opacity and blend and, in a Repeat tile, copied round the tile as now. Ids that used the layer index (`tw0`, `fm0_`, bitmap cache keys) use the element id. The old arrangement engine (lattice, frame layers, layer masks, layer grade) is deleted.
+- **Groups:** `k:'group'` with children `ch`; draws its children in order inside one wrapper carrying its opacity and blend; select several rows, Group / Ungroup (button, Shift+G); expand and collapse in the list; effects on a group apply to the whole group; nesting allowed.
 - **Creation:** the element bar creates instances at the top; the Layers panel becomes the element list (rows, eye, name, opacity, blend, reorder, delete), the old layers UI trimmed down, not redone.
 - **Everything that builds documents:** Randomize (rolls build a flat list: Sheet, Patterns, Paint, stamps), templates, Clear, New project, export, print proof, book cover, Repeat tile, Colourways, undo.
 - **Tests:** state and SVG snapshots change a lot (owner's approval first); about 20 specs read `layers[0]` directly and about 100 go through layers panels; perf must stay within 10% of `main`.
@@ -73,4 +74,3 @@ One step is possible, but it would change the file format, drawing, Randomize, e
 
 ## Open questions
 - Should a Sheet always stay at the bottom, or move like any other element? (Default here: moves like any other.)
-- Does the owner want a Group element in step 2 after all?
