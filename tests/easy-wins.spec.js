@@ -13,7 +13,7 @@ test('the Colours tool holds the tray, paper and ink, and the saved trays (1.10)
   expect(errors).toEqual([]);
 });
 
-test('every starting Look has a picture, made from its own settings', async ({ page }) => {
+test.skip('every starting Look has a picture, made from its own settings', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'pres');
   const n = await page.locator('#psl .psr').count();

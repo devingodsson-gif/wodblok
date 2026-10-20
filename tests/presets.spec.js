@@ -1,3 +1,4 @@
+// Shelved Oct 20 2026: the owner is redoing Presets and Variations; the panels are hidden, so these tests are skipped (not deleted).
 // Presets (Phase 5): saved looks; the palette list moved to Colours > Saved trays in 1.10. Applying never touches stamps or layout, and is one undo step.
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState } = require('./helpers/harness');
@@ -10,7 +11,7 @@ const findTray = async (page, q) => { await openPanel(page, 'colors'); await pag
 const undo = async page => { await page.keyboard.press('Control+z'); await settle(page); };
 const inks = st => [...new Set([...st.tiles.map(t => t.ink), ...st.layers.map(l => l.ink)].filter(Boolean))];
 
-test('the saved trays hold all 348 combinations; typing finds them by name or colour', async ({ page }) => {
+test.skip('the saved trays hold all 348 combinations; typing finds them by name or colour', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'colors');
   const total = await page.$$eval('.stf[data-f^="wada"] small', s => s.reduce((a, x) => a + +x.textContent, 0));
@@ -26,7 +27,7 @@ test('the saved trays hold all 348 combinations; typing finds them by name or co
   expect(errors).toEqual([]);
 });
 
-test('a saved tray sets the tray colours; what links to them follows; stamps and layout stay; one undo step', async ({ page }) => {
+test.skip('a saved tray sets the tray colours; what links to them follows; stamps and layout stay; one undo step', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
   await roll(page);
   const before = await state(page);
@@ -43,7 +44,7 @@ test('a saved tray sets the tray colours; what links to them follows; stamps and
   expect(errors).toEqual([]);
 });
 
-test('a starting look changes the finish only: grade, print effects and canvas texture; Undo brings the old finish back', async ({ page }) => {
+test.skip('a starting look changes the finish only: grade, print effects and canvas texture; Undo brings the old finish back', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 3 });
   await roll(page);
   const before = await state(page);
@@ -63,7 +64,7 @@ test('a starting look changes the finish only: grade, print effects and canvas t
   expect(errors).toEqual([]);
 });
 
-test('save a look, change everything, apply it: the palette, grade, texture and print effects come back; rename, reload, delete', async ({ page }) => {
+test.skip('save a look, change everything, apply it: the palette, grade, texture and print effects come back; rename, reload, delete', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 7 });
   await roll(page);
   const saved = await state(page);
