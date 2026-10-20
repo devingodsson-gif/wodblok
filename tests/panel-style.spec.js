@@ -20,7 +20,7 @@ test('every tool panel uses the same heading, button, dropdown, field and segmen
         sec.querySelectorAll('.ddb').forEach(e => vis(e) && o.ddRadius.push(cs(e, 'borderTopLeftRadius')));
         sec.querySelectorAll('input[type=text],textarea,select').forEach(e => vis(e) && o.fieldRadius.push(cs(e, 'borderTopLeftRadius')));
         sec.querySelectorAll('.seg button.on').forEach(e => vis(e) && (o.segOn.push(cs(e, 'color', 'backgroundColor', 'fontWeight')), o.segH.push(Math.round(e.getBoundingClientRect().height))));
-        sec.querySelectorAll('.shg button').forEach(e => vis(e) && o.tileRadius.push(cs(e, 'borderTopLeftRadius') + '|' + Math.round(e.getBoundingClientRect().height)));
+        sec.querySelectorAll('.shg:not(#lalg) button').forEach(e => vis(e) && o.tileRadius.push(cs(e, 'borderTopLeftRadius') + '|' + Math.round(e.getBoundingClientRect().height)));
         sec.querySelectorAll('.ctl>label,.lyop .ctl label').forEach(e => vis(e) && o.labelInline.push(cs(e, 'fontSize', 'color')));
         return o;
       }, pn);

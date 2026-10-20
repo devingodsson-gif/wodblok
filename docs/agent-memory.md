@@ -89,7 +89,8 @@ Plan and owner's answers: `docs/element-update-plan.md`. In short:
 - Canvas transparent by default; a Sheet is the background. Exports that cannot be transparent fill white.
 - Stamp is a snapshot of elements; Pattern (the arrangement and Frame) does the repeating, with sources by reference; several Patterns per layer are fine.
 - "No brush masks" is removed (Paint has an eraser).
-- No mock-up; build directly. Steps are 2.1.1, 2.1.2...; the end is 3.0.0.
+- No mock-up; build directly. Steps are 2.1.1, 2.1.2...; the version keeps advancing in 2.x, there is no 3.0.0 (owner, Oct 20 2026).
 - **Never run the full suite or CI unless the owner says so** (Oct 19 2026). CI now runs the editor suite only by hand or with the `run-suite` pull request label.
+- Step 12 (2.1.12): new layers are element layers (a free layer holding a Pattern). Specs that need a layer with only placed items call `noPattern(page)` from the harness (and pick a stamp in the Stamp panel to arm placing); specs that clicked the old `#lmode` buttons were rewritten or removed. In a Repeat tile, content is drawn once and copied by `tileWrap` (two tiles out in the 3 x 3 view); a Sheet with effects is a tile-sized rectangle copied the same way. Page console output does not reach the test log: put values on `window` and print them from the test.
 - Publish the preview artifact at the end of every step.
 - Session setup when the npm registry is blocked: `src/vendor/fflate.js` copied to `node_modules/fflate/index.mjs` (package.json with `"type":"module"`), and `node_modules/playwright`, `playwright-core`, `espree`, `eslint-scope` symlinked from `/opt/node-tools/node_modules`, with `node_modules/@playwright/test/index.js` re-exporting `playwright/test`. Run tests with `node node_modules/playwright/cli.js test ...`.

@@ -71,6 +71,8 @@ test('Duplicate makes a copy that edits separately from the original', async ({ 
   expect(s.tiles[1].id).not.toBe(s.tiles[0].id);
   expect(s.layers[0].st).toContain(s.tiles[1].id);
   await expect(rows(page).nth(1)).toHaveClass(/cur/);
+  // the copy is not printed anywhere until it is a source of the Pattern
+  await page.evaluate(() => document.querySelector('#pelist .mr').click()); await page.evaluate(() => document.getElementById('peadd').click()); await settle(page);
   await shapeIn(page, 2);
   s = await state(page);
   expect(s.tiles[0].items.length).toBe(n0);

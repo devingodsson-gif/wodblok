@@ -1281,7 +1281,7 @@ body.eyedrop{cursor:crosshair}
     <div class="row"><button class="alt" id="peadd">Add current stamp</button><button class="alt" id="pesel">Add selected element</button></div>
    </div>
   </div></details>
-  <details class="g" open><summary>Arrangement</summary><div class="gb">
+  <details class="g" open hidden><summary>Arrangement</summary><div class="gb">
    <div class="seg" id="lmode" role="group" aria-label="Arrangement" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-m="x">None</button><button type="button" data-m="p">Repeat</button><button type="button" data-m="f">Frame</button></div>
    <div id="lfrm" hidden>
     <div class="hint" id="lfh" style="margin-top:6px"></div>
@@ -1312,14 +1312,14 @@ body.eyedrop{cursor:crosshair}
    <label id="lrl">Rotation</label><input type="range" id="lrt" min="-180" max="180" value="0" data-u="°">
    </div>
   </div></details>
-  <details class="g" open id="lstbox"><summary>Stamps in the pattern</summary><div class="gb">
+  <details class="g" open hidden id="lstbox"><summary>Stamps in the pattern</summary><div class="gb">
    <div class="strip ls" id="lst"></div>
   </div></details>
-  <details class="g" open id="lmanbox"><summary>Manual arrangement <span class="aux" id="mancnt"></span></summary><div class="gb">
+  <details class="g" open hidden id="lmanbox"><summary>Manual arrangement <span class="aux" id="mancnt"></span></summary><div class="gb">
    <label class="chk" style="margin-top:2px"><input type="checkbox" id="man"><span>Pick stamps by hand</span></label>
    <div class="row"><button class="alt" id="manr">Reset hand-picked stamps</button></div>
   </div></details>
-  <details class="g" id="lrsec" open><summary>Variation <span class="aux">this layer</span></summary><div class="gb">
+  <details class="g" id="lrsec" open hidden><summary>Variation <span class="aux">this layer</span></summary><div class="gb">
    <label>Rotation</label><input type="range" id="lrr" min="0" max="180" value="0" data-u="&#176;" data-def="0">
    <label>Position</label><input type="range" id="lrp" min="0" max="100" value="0" data-u="%" data-def="0">
    <div id="lrzrow"><label>Size</label><input type="range" id="lrz" min="0" max="100" value="0" data-u="%" data-def="0"></div>
@@ -1329,7 +1329,7 @@ body.eyedrop{cursor:crosshair}
    <label class="chk"><input type="checkbox" id="lrfv"><span>Flip some up &#8597; down</span></label>
    <div class="row"><button class="alt" id="lrsh" title="Roll a new random arrangement">Shuffle</button></div>
   </div></details>
-      <details class="g" open id="lipsec"><summary>Impression <span class="aux">this layer</span></summary><div class="gb">
+      <details class="g" open hidden id="lipsec"><summary>Impression <span class="aux">this layer</span></summary><div class="gb">
    <label id="lpl">Uneven pressure</label><input type="range" id="lps" min="0" max="10" value="0">
    <label id="lfl">Ink flooding</label><input type="range" id="lfs" min="0" max="10" value="0">
   </div></details>

@@ -60,7 +60,8 @@ test('with the stamp locked, nothing is put into it', async ({ page }) => {
 test('on a turned layer the shape still lands under the pointer and stands upright', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
-  await page.evaluate(() => { const r = document.getElementById('lrt'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true })); });
+  await page.click('#pelist .mr >> nth=0');
+  await page.evaluate(() => { const r = document.getElementById('pert'); r.value = 30; r.dispatchEvent(new Event('input', { bubbles: true })); });
   await settle(page);
   await unlock(page);
   await pick(page);
@@ -151,7 +152,7 @@ test('text typed in the Text panel goes into the unlocked stamp as letters, on e
   await expect.poll(async () => (await items(page)).length, { timeout: 15000 }).toBe(before + 2);
   const it = await items(page);
   expect(it.slice(-2).every(q => q.tg)).toBe(true);
-  expect((await state(page)).layers[0].pl || []).toHaveLength(0);
+  expect(((await state(page)).layers[0].pl || []).filter(p => p.k !== 'pattern')).toHaveLength(0);   // only the Pattern is on the layer
   expect(errors).toEqual([]);
 });
 

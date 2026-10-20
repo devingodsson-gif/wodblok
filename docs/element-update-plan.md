@@ -1,6 +1,6 @@
 # WODBLOK element update: elements and effects
 
-Written Oct 19 2026. Status: **started Oct 19 2026** (the owner said to start: step 1 after the CI change). Work is done one complete step at a time; after each step this document gets the outcome (see "Progress log" at the end), and anything learned goes into docs/agent-memory.md. The finished update is **version 3.0.0**; its steps are patches 2.1.1, 2.1.2 and so on (owner, Oct 19 2026).
+Written Oct 19 2026. Status: **started Oct 19 2026** (the owner said to start: step 1 after the CI change). Work is done one complete step at a time; after each step this document gets the outcome (see "Progress log" at the end), and anything learned goes into docs/agent-memory.md. Its steps are patches 2.1.1, 2.1.2 and so on (owner, Oct 19 2026); the version keeps advancing in 2.x, there is no 3.0.0 (owner, Oct 20 2026).
 
 ## What the owner asked for (repeated back)
 
@@ -77,7 +77,7 @@ Written Oct 19 2026. Status: **started Oct 19 2026** (the owner said to start: s
 | 9 | - | ~~**Morph**~~ removed (owner, Oct 20 2026) | - |
 | 10 | 2.1.10 | **Paint element**: strokes, shape brushes, eraser; speed test with many strokes | high (speed) |
 | 11 | 2.1.11 | **Everything that builds documents**: Randomize tool, Presets, Variations, Colourways, export, print proof, book cover. Seeded Randomize snapshots change once (owner's OK first) | high |
-| 12 | 3.0.0 | Tests, perf, docs, old code removed, release | |
+| 12 | 2.1.12 | Tests, perf, docs, old code removed, release | |
 
 ## Tests and safety
 
@@ -177,3 +177,14 @@ Written Oct 19 2026. Status: **started Oct 19 2026** (the owner said to start: s
 - **Element panels leave the tool bar** (owner): the Pattern, Stamp, Shape, Text, Image, Sheet and Paint rail buttons are hidden and left out of the tool repository (`EL_ONLY` in `34-desktop-shell.js`); the element bar opens them. Their `Open …` commands still work. The harness `openPanel` opens these panels from the element bar.
 - **Fixes found while updating specs** (all were broken before this change, since 2.1.4 or 2.1.7): the Shape panel that opens by itself when a shape is added now opens as its own group along the bottom (as the old Element editor did) instead of taking over the Text tab, which broke about 20 Text specs; the bitmap cache dropped the block-edge and pressure definitions of stamps that sit inside an effect wrapper (Texture or Colour grade), leaving `use` elements pointing at nothing (`bkNeed` in `03-stamp-prints-and-drawing.js`); the `element-bar` and `panel-text` specs were stale (Paint is enabled; the Stamp settings panel is gone).
 - **State and SVG snapshots regenerated with the owner's approval:** `randomize-seed-1`, `-2`, `-3`, `before-view`, `split-view` (a roll now makes elements).
+
+### Step 12 outcome: new layers are element layers (2.1.12, Oct 20 2026)
+- **A new project, a new layer and Clear make an element layer:** a free layer holding one Pattern (`mkEL` in `71-randomize-elements.js`: grid of the current stamp, about 180 units a cell). Nothing makes an old arrangement layer any more.
+- **Retired from the Pattern panel (hidden, code kept for now):** Arrangement (`#lmode`), Stamps in the pattern, Manual arrangement, Variation, Impression. The old arrangement engine (lattice, Repeat, Frame layers) is still in the code and still draws any layer that has one; it can be deleted in a later clean-up once nothing needs it.
+- **Stamp editing on the canvas works on Pattern placements:** the printed stamps of the selected layer's Pattern go to the stamp-edit overlay (`stOlAdd` from `24-free-place-layers.js`), so Shapes can be put into a stamp by pointing at any printed copy, as before. The overlay is hidden in the Repeat 3 x 3 view (it showed in the middle tile only).
+- **Repeat tile and element layers (found by the seamless specs):** the 3 x 3 view draws each layer's copies two tiles out (was one), so the outer tiles get the spill from the tile beyond them; a Sheet with effects is drawn as one tile-sized textured rectangle copied round the tile, and its Texture bitmap is made seamless (`fxTex` `tl` flag), because the stitched filter left a faint seam across the tile; Pattern grids no longer pick up a column or row that sits exactly on the edge by floating point luck.
+- **Tests:** about 70 specs of the retired Arrangement UI were rewritten for element layers or removed (`any-layer-items`, `free-place`, `grid-tool`, `layout-settings` Variation and Brick tests, `layout-cleanup` Impression test); new harness helper `noPattern(page)` takes a new layer's Pattern away so a test places only what it means to; `layer-items` builds elements with `k` (format 22).
+- **State and SVG snapshots regenerated with the owner's approval (Oct 20 2026):** `launch` (state and svg: the default layer is now an element layer with Pattern 1), `scenarios` (`randomize-seed-1..3`, `before-view`, `split-view`, the eight `canvas-shape-*` svg summaries) and `roundtrip` `open-project-1-diamond` (svg: the class order on the picture, `fpm shp`). Pixel goldens were not run here (the editor suite and the picture comparison are only run on the owner's word).
+- **Not run:** the full suite and CI (owner's rule). Targeted runs covered about 66 specs.
+- **No 3.0.0:** the owner said the version keeps advancing in 2.x.
+

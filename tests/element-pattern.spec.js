@@ -1,13 +1,14 @@
 // Element update, step 5 (2.1.5): the Pattern element. A list of points plus sources (stamps, images, text) placed at them by cycle, random or weighted random.
 // It is stored on the layer's element list as {k:'pattern'} and draws as ordinary elements; sources are references.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, addStamp } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, addStamp, noPattern } = require('./helpers/harness');
 
 const pats = async page => JSON.parse(await getState(page)).layers[0].pl.filter(q => q.k === 'pattern');
 const drawn = async (page, u) => page.$$eval(`#art [data-fp^="${u}."]`, es => es.length);
 
 test('New pattern puts a pattern on the layer with the current stamp as its source and draws a 4 x 4 grid of it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await openPanel(page, 'layers');
   await expect(page.locator('#peed')).toBeHidden();
   await page.click('#penew');
@@ -24,6 +25,7 @@ test('New pattern puts a pattern on the layer with the current stamp as its sour
 
 test('columns, rows and layout change the points; a pattern with no source draws nothing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await openPanel(page, 'layers');
   await page.click('#penew');
   await settle(page);
@@ -43,6 +45,7 @@ test('columns, rows and layout change the points; a pattern with no source draws
 
 test('two sources alternate by cycle; Reroll changes the seed; delete takes the pattern away and undo brings it back', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await addStamp(page);
   await openPanel(page, 'layers');
   await page.click('#penew');
@@ -65,6 +68,7 @@ test('two sources alternate by cycle; Reroll changes the seed; delete takes the 
 
 test('Frame lays points along the four edges, the sides turned to lie along them; Inset moves them in', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await openPanel(page, 'layers');
   await page.click('#penew');
   await settle(page);
@@ -85,6 +89,7 @@ test('Frame lays points along the four edges, the sides turned to lie along them
 
 test('Shift across and Shift down move a grid by a share of a cell without losing the cells that come in at the edge', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await openPanel(page, 'layers');
   await page.click('#penew');
   await settle(page);

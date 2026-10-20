@@ -194,4 +194,10 @@ async function addStamp(page) {
   await settle(page);
 }
 
-module.exports = { addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// a new layer starts with a Pattern element; this takes it away so the layer holds only what the test places
+async function noPattern(page) {
+  await showPanel(page, 'layers');
+  while (await page.locator('#pelist [data-pd]').count()) { await page.click('#pelist [data-pd] >> nth=0'); await settle(page); }
+}
+
+module.exports = { noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

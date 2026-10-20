@@ -2,10 +2,11 @@
 const { test, expect } = require('@playwright/test');
 const fs = require('fs'), os = require('os'), path = require('path');
 const { zipSync, unzipSync, strToU8, strFromU8 } = require('fflate');
-const { openApp, openPanel, settle, getState, openProjectFile } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, openProjectFile, noPattern } = require('./helpers/harness');
 
 const setv = (page, id, v, ev = 'input') => page.locator('#' + id).evaluate((e, [v, ev]) => { e.value = v; e.dispatchEvent(new Event(ev, { bubbles: true })); }, [v, ev]);
-const pick = (page, v) => page.click(`#lmode [data-m="${v}"]`);
+// a layer starts with a Pattern; 'x' takes it away and picks the first stamp so clicks on the canvas place stamps freely
+const pick = async (page, v) => { await noPattern(page); if (v === 'x') { await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page); } };
 
 // one plain Repeat layer: no jitter, no offset, so the points are exactly where the arrangement puts them
 async function oneLayer(page, name) {
@@ -44,43 +45,6 @@ test('radial arrangements: rings sit on whole-step rings, a spiral grows steadil
   expect(ang.length).toBe(12);                                                              // twelve spokes
   const state = JSON.parse(await getState(page));
   expect(state.layers[0].ak.rect).toBe('x-spk');
-  expect(errors).toEqual([]);
-});
-
-test('Variation Size and Gaps: gaps leave prints out, size changes how big they print; Frame and Free place show fewer rows', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await oneLayer(page, 'wb-var');
-  const n0 = (await pts(page)).length;
-  await setv(page, 'lrg', 60); await settle(page);
-  const n1 = (await pts(page)).length;
-  expect(n1).toBeLessThan(n0 * 0.7);
-  await setv(page, 'lrg', 0); await setv(page, 'lrz', 80); await settle(page);
-  const sc = (await pts(page)).map(p => p[3]);
-  expect(Math.max(...sc) / Math.min(...sc)).toBeGreaterThan(1.3);
-  expect((await pts(page)).length).toBe(n0);
-  await pick(page, 'x'); await settle(page);
-  await expect(page.locator('#lrzrow')).toBeVisible(); await expect(page.locator('#lrgrow')).toBeHidden();
-  await pick(page, 'f'); await settle(page);
-  await expect(page.locator('#lrzrow')).toBeHidden(); await expect(page.locator('#lrgrow')).toBeHidden();
-  expect(errors).toEqual([]);
-});
-
-test('Brick offset moves the odd rows by the chosen fraction', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await oneLayer(page, 'wb-brick');
-  await setv(page, 'larr', 'r-brick'); await settle(page);
-  await expect(page.locator('#lborow')).toBeVisible();
-  const rows = async () => { const p = await pts(page); const ys = [...new Set(p.map(q => Math.round(q[1])))].sort((a, b) => a - b); return ys.slice(0, 2).map(y => p.filter(q => Math.round(q[1]) == y).map(q => q[0]).sort((a, b) => a - b)[2]); };
-  const step = 108;
-  let [a, b] = await rows();
-  expect(Math.abs(((b - a) % step + step) % step - step / 2)).toBeLessThan(1);
-  await setv(page, 'lbo', '25'); await settle(page);
-  [a, b] = await rows();
-  const sh = ((b - a) % step + step) % step;                       // the rows differ by a quarter step, whichever way round they are listed
-  expect(Math.min(Math.abs(sh - step / 4), Math.abs(sh - step * 3 / 4))).toBeLessThan(1);
-  expect(JSON.parse(await getState(page)).layers[0].bo).toBe(25);
-  await setv(page, 'larr', 'r-check'); await settle(page);
-  await expect(page.locator('#lborow')).toBeHidden();
   expect(errors).toEqual([]);
 });
 

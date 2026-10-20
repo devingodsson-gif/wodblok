@@ -16,11 +16,11 @@ function patRnd(sd){let a=(+sd||1)>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t
 function patPts(p){const cn=patClamp(p.cn,1,40)|0||1,rn=patClamp(p.rn,1,40)|0||1,cw=CW/cn,ch=CH/rn,cell=Math.min(cw,ch),o=[];
 // frame: a row of points along each edge, turned to lie along it
 if(p.lay=='frame'){const m=Math.min(CW,CH)*patClamp(p.in==null?4:p.in,0,40)/100,W=CW-2*m,H=CH-2*m,rot=[];for(let i=0;i<cn;i++){const x=m+(i+.5)*W/cn;o.push([x,m]);rot.push(0);o.push([x,CH-m]);rot.push(0)}for(let j=0;j<rn;j++){const y=m+(j+.5)*H/rn;o.push([m,y]);rot.push(90);o.push([CW-m,y]);rot.push(90)}return{pts:o,cell:W/cn,rot}}
-const ox=patClamp(p.ox,-100,100)/100*cw,oy=patClamp(p.oy,-100,100)/100*ch,sh=a=>a.map(q=>[q[0]+ox,q[1]+oy]).filter(q=>q[0]>-cw/2&&q[0]<CW+cw/2&&q[1]>-ch/2&&q[1]<CH+ch/2);
+const ox=patClamp(p.ox,-100,100)/100*cw,oy=patClamp(p.oy,-100,100)/100*ch,sh=a=>a.map(q=>[q[0]+ox,q[1]+oy]).filter(q=>q[0]>-cw/2+1e-6&&q[0]<CW+cw/2-1e-6&&q[1]>-ch/2+1e-6&&q[1]<CH+ch/2-1e-6);
 if(p.lay=='radial'){const R=Math.min(CW,CH)/2*.92,st=R/rn;o.push([CW/2,CH/2]);for(let k=1;k<=rn;k++){const n=cn*k;for(let i=0;i<n;i++){const a=i/n*Math.PI*2;o.push([CW/2+Math.cos(a)*st*k,CH/2+Math.sin(a)*st*k])}}return{pts:o,cell:Math.min(st*1.1,2*Math.PI*st/Math.max(3,cn))}}
 if(p.lay=='scatter'){const r=patRnd((+p.sd||1)+77);for(let i=0;i<cn*rn;i++)o.push([r()*CW,r()*CH]);return{pts:o,cell}}
-if(p.lay=='brick'){for(let j=-1;j<=rn;j++)for(let i=-1;i<=cn;i++){const x=(i+.5)*cw+(Math.abs(j)%2?cw/2:0);if(x>-cw/2&&x<CW+cw/2)o.push([x,(j+.5)*ch])}return{pts:sh(o),cell}}
-if(p.lay=='half'){for(let i=-1;i<=cn;i++)for(let j=-1;j<=rn;j++){const y=(j+.5)*ch+(Math.abs(i)%2?ch/2:0);if(y>-ch/2&&y<CH+ch/2)o.push([(i+.5)*cw,y])}return{pts:sh(o),cell}}
+if(p.lay=='brick'){for(let j=-1;j<=rn;j++)for(let i=-1;i<=cn;i++){const x=(i+.5)*cw+(Math.abs(j)%2?cw/2:0);if(x>-cw/2+1e-6&&x<CW+cw/2-1e-6)o.push([x,(j+.5)*ch])}return{pts:sh(o),cell}}
+if(p.lay=='half'){for(let i=-1;i<=cn;i++)for(let j=-1;j<=rn;j++){const y=(j+.5)*ch+(Math.abs(i)%2?ch/2:0);if(y>-ch/2+1e-6&&y<CH+ch/2-1e-6)o.push([(i+.5)*cw,y])}return{pts:sh(o),cell}}
 for(let j=-1;j<=rn;j++)for(let i=-1;i<=cn;i++)o.push([(i+.5)*cw,(j+.5)*ch]);return{pts:sh(o),cell}}
 const patSrcOk=s=>s&&(s.k=='stamp'?WBS.tiles.some(t=>t.id==s.t):s.k=='image'?!!WBS.ARTS[s.a]:s.k=='text'&&s.it);
 // the elements a pattern stands for

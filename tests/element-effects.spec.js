@@ -1,7 +1,7 @@
 // Element update, step 7 (2.1.7): the effect stack. An ordered list `fx` on an element, shown at the bottom of its panel: add, switch off, move, delete.
 // Texture (stamp, picture, text, pattern, Sheet) and Pressure offset (stamp, pattern).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const canvasClick = async (page, fx, fy) => {
@@ -45,6 +45,7 @@ test('the Sheet panel has an Effects group once there is a Sheet; Texture is add
 
 test('a placed stamp gets Pressure offset from its own Effects group; the layer\'s own pressure is not needed', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await page.click('#elb [data-k="stamp"]');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
@@ -73,7 +74,7 @@ test('a pattern\'s effects apply to every placement', async ({ page }) => {
   await settle(page);
   await expect(page.locator('.fxg[data-fxk="pattern"]')).toBeVisible();
   await addEffect(page, 'pattern', 'Pressure offset');
-  const p = (await st(page)).layers[0].pl.find(q => q.k === 'pattern');
+  const p = (await st(page)).layers[0].pl.filter(q => q.k === 'pattern').pop();
   expect(p.fx).toHaveLength(1);
   // the add menu offers only what works on a pattern
   await page.locator('.fxg[data-fxk="pattern"] .fxadd').scrollIntoViewIfNeeded();
@@ -99,6 +100,7 @@ test('a Texture effect on the Sheet masks the paper while it is on, and not when
 
 test('Pressure offset on a stamp makes its own pressure variants; without it the layer\'s zero pressure draws the plain stamp', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await page.click('#elb [data-k="stamp"]');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);

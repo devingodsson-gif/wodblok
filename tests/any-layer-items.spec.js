@@ -1,50 +1,47 @@
-// Layer update, step 2 (1.46.2): any layer takes stamps, pictures and text placed by hand. The layer type dropdown and buttons are gone;
-// a layer's Arrangement is None, Repeat or Frame, and changing it keeps what was placed.
+// Layer update, step 2 (1.46.2), rewritten for element layers in 2.1.12: any layer takes stamps, pictures and text placed by hand, next to its Pattern.
+// A new layer starts with a Pattern; the old Arrangement control (None, Repeat, Frame) is retired, and so are its tests.
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, noPattern } = require('./helpers/harness');
 
 const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const layers = async page => JSON.parse(await getState(page)).layers;
-const setArr = async (page, v) => { await showPanel(page, 'layers'); await page.click(`#lmode [data-m="${v}"]`); };
 const canvasClick = async (page, fx, fy) => {
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
   await settle(page);
 };
 
-test('there is no layer type: Arrangement is a control with None, Repeat and Frame and "+" adds a plain layer', async ({ page }) => {
+test('"+" adds an element layer that starts with a Pattern; there is no layer type', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
   await openPanel(page, 'lyrs');
-  await expect(page.locator('#lmode button')).toHaveText(['None', 'Repeat', 'Frame']);
   await expect(page.locator('#lmsel')).toHaveCount(0);
   await expect(page.locator('#ly_menu')).toHaveCount(0);
   await page.click('#ly_add');
   await settle(page);
   const ls = await layers(page);
   expect(ls.length).toBe(2);
-  expect(ls[1].free).toBeFalsy();
-  expect(ls[1].fr && ls[1].fr.on).toBeFalsy();
+  expect(ls[1].free).toBe(true);
+  expect(ls[1].pl.map(q => q.k)).toEqual(['pattern']);
   expect(errors).toEqual([]);
 });
 
-test('a stamp is placed on a layer that has an arrangement, and the arrangement stays', async ({ page }) => {
+test('a stamp is placed on a layer that has a Pattern, and the Pattern stays', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   const l = (await layers(page))[0];
-  expect(l.free).toBeFalsy();
-  expect(l.pl.length).toBe(1);
-  expect(l.pl[0].t).toBeTruthy();
+  expect(l.pl.map(q => q.k)).toEqual(['pattern', 'stamp']);
+  expect(l.pl[1].t).toBeTruthy();
   expect(await page.locator('#art use[href^="#bk"]').count()).toBeGreaterThan(1);
   expect(errors).toEqual([]);
 });
 
 test('a picture and then a stamp go onto the same layer; each is its own placed item', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await openPanel(page, 'elimg');
   const f = path.join(testInfo.outputDir, 'dot.png');
   fs.mkdirSync(testInfo.outputDir, { recursive: true });
@@ -65,7 +62,7 @@ test('a picture and then a stamp go onto the same layer; each is its own placed 
   expect(errors).toEqual([]);
 });
 
-test('typing in the Text tool places text on the selected layer, whatever its arrangement', async ({ page }) => {
+test('typing in the Text tool places text on the selected layer, next to its Pattern', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Hi');
@@ -73,31 +70,14 @@ test('typing in the Text tool places text on the selected layer, whatever its ar
   await canvasClick(page, 0.5, 0.5);
   const ls = await layers(page);
   expect(ls.length).toBe(1);
-  expect(ls[0].free).toBeFalsy();
   expect(ls[0].pl.some(q => q.tx)).toBe(true);
-  expect(errors).toEqual([]);
-});
-
-test('changing the Arrangement keeps what was placed on the layer', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
-  await canvasClick(page, 0.5, 0.5);
-  for (const v of ['x', 'f', 'p']) {
-    await setArr(page, v);
-    await settle(page);
-    const l = (await layers(page))[0];
-    expect(l.pl.length, `after ${v}`).toBe(1);
-    expect(!!l.free, `free after ${v}`).toBe(v === 'x');
-    expect(!!(l.fr && l.fr.on), `frame after ${v}`).toBe(v === 'f');
-    expect(l.art).toBeUndefined();
-    expect(l.txt).toBeUndefined();
-  }
+  expect(ls[0].pl.some(q => q.k === 'pattern')).toBe(true);
   expect(errors).toEqual([]);
 });
 
 test('the Layers list says how many items a layer holds', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
@@ -105,73 +85,11 @@ test('the Layers list says how many items a layer holds', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('the Arrangement control shows which arrangement the layer has', async ({ page }) => {
+test('the old Arrangement, Stamps in the pattern, Manual arrangement, Variation and Impression groups are retired; placed items live in the element panels', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
-  const on = () => page.locator('#lmode .on').getAttribute('data-m');
-  expect(await on()).toBe('p');
-  await setArr(page, 'f');
-  await settle(page);
-  expect(await on()).toBe('f');
-  await setArr(page, 'x');
-  await settle(page);
-  expect(await on()).toBe('x');
-  expect(errors).toEqual([]);
-});
-
-test('changing the Arrangement can be undone and redone', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
-  const before = await getState(page);
-  await setArr(page, 'f');
-  await settle(page);
-  const framed = await getState(page);
-  expect(framed).not.toBe(before);
-  await page.locator('body').click({ position: { x: 5, y: 5 } });
-  await page.keyboard.press('Control+z');
-  await settle(page);
-  expect(await getState(page)).toBe(before);
-  await page.keyboard.press('Control+Shift+z');
-  await settle(page);
-  expect(await getState(page)).toBe(framed);
-  expect(errors).toEqual([]);
-});
-
-test('turning an arrangement on for a layer with no stamps picks the current stamp', async ({ page }, testInfo) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  const FIX = path.join(__dirname, 'fixtures', 'project-3-rect-16x9.wodblok');
-  const { zipSync, unzipSync, strToU8, strFromU8 } = require('fflate');
-  const read = f => unzipSync(new Uint8Array(fs.readFileSync(f)));
-  const p = JSON.parse(strFromU8(read(FIX)['project.json']));
-  const bare = JSON.parse(JSON.stringify(p.layers[0]));
-  bare.u = 'bareLayer'; bare.name = 'Bare'; bare.free = true; bare.st = []; bare.pl = [];
-  p.layers.push(bare);
-  fs.mkdirSync(testInfo.outputDir, { recursive: true });
-  const file = path.join(testInfo.outputDir, 'bare.wodblok');
-  const out = {}; for (const [k, v] of Object.entries({ ...read(FIX), 'project.json': strToU8(JSON.stringify(p)) })) out[k] = [v, { level: k === 'mimetype' || k.startsWith('assets/') ? 0 : 6 }];
-  fs.writeFileSync(file, Buffer.from(zipSync(out)));
-  await page.setInputFiles('#pfile', file);
-  await page.waitForFunction(() => /Opened/.test((document.getElementById('pmsg') || {}).textContent || ''), null, { timeout: 30000 });
-  await settle(page);
-  await openPanel(page, 'layers');
-  expect((await layers(page)).at(-1).st).toEqual([]);
-  await setArr(page, 'p');
-  await settle(page);
-  const l = (await layers(page)).at(-1);
-  expect(l.free).toBeFalsy();
-  expect(l.st.length).toBe(1);
-  expect(errors).toEqual([]);
-});
-
-test('the Pattern panel holds the arrangement only: Arrangement first, then its stamps; placed items live in the element panels', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
-  const titles = await page.locator('section.pn[data-p="layers"] > details.g > summary').evaluateAll(els => els.map(e => e.firstChild.textContent.trim()));
-  const i = n => titles.indexOf(n);
-  expect(i('Arrangement')).toBeGreaterThanOrEqual(0);
-  expect(i('Arrangement')).toBeLessThan(i('Stamps in the pattern'));
-  expect(i('Placed items')).toBe(-1);
-  expect(i('Align')).toBe(-1);
+  const shown = await page.locator('section.pn[data-p="layers"] > details.g').evaluateAll(els => els.filter(e => !e.hidden && e.offsetParent !== null).map(e => e.querySelector('summary').firstChild.textContent.trim()));
+  for (const old of ['Arrangement', 'Stamps in the pattern', 'Manual arrangement', 'Variation', 'Impression']) expect(shown, old).not.toContain(old);
   for (const [sel, pn] of [['#lfpst', 'stmp'], ['#lfars', 'elimg'], ['#lfpl', 'mlist'], ['#lalg', 'mlist']]) {
     expect(await page.locator(sel).evaluate(e => e.closest('section.pn').dataset.p), sel).toBe(pn);
   }

@@ -1,7 +1,7 @@
 // Element update, step 1 (2.1.1): a layer's elements (placed stamps, pictures, text) draw in the order of the layer's element list,
 // not grouped by kind. Before this, every placed stamp drew under every text whatever the order they were added in.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
 
 const layers = async page => JSON.parse(await getState(page)).layers;
 const canvasClick = async (page, fx, fy) => {
@@ -13,6 +13,7 @@ const drawnOrder = page => page.$$eval('#art [data-fp]', els => els.map(e => e.g
 
 test('text placed before a stamp draws under it: the canvas follows the element list', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Hi');
   await settle(page);
@@ -28,6 +29,7 @@ test('text placed before a stamp draws under it: the canvas follows the element 
 
 test('a stamp placed before text still draws under it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.4, 0.4);

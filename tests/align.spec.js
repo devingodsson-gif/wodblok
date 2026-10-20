@@ -3,7 +3,8 @@ const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, showPanel, settle, getState } = require('./helpers/harness');
 
 // 2.1.2: Align lives in the Elements panel; the arrangement control in Pattern
-const pick = async (page, v) => { await showPanel(page, 'layers'); await page.click(`#lmode [data-m="${v}"]`); await settle(page); await showPanel(page, 'mlist'); };
+// the layer starts with a Pattern; 'x' takes it away so clicks on the canvas place stamps freely
+const pick = async (page, v) => { await showPanel(page, 'layers'); if (v === 'x') while (await page.locator('#pelist [data-pd]').count()) { await page.click('#pelist [data-pd] >> nth=0'); await settle(page); } if (v === 'x') { await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page); } await showPanel(page, 'mlist'); };
 const pl = async page => JSON.parse(await getState(page)).layers[0].pl;
 const dims = async page => (await page.locator('#art').evaluate(e => (e.getAttribute('viewBox') || '0 0 1000 1000'))).split(/[ ,]+/).map(Number);
 async function place(page, fx, fy) {

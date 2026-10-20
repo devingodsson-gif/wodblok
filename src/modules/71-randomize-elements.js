@@ -57,4 +57,6 @@ pats.forEach((p,i)=>{const set=(k,v)=>{if(v==null)delete p[k];else p[k]=v};
 function rzPressEls(layers,o){layers.forEach(l=>{if(!l.free||l.rz=='free')return;(l.pl||[]).forEach(p=>{if(p.k!='pattern')return;const fx=(p.fx||[]).filter(e=>e.k!='pressure');if(!o.ch(.5))fx.push(fxP(o.ri(1,6),p.lay=='frame'?0:o.ch(.65)?0:o.ri(1,3)));if(fx.length)p.fx=fx;else delete p.fx})})}
 // Print effects, Textures: some patterns get a Texture effect
 function rzTexEls(layers,o){layers.forEach(l=>{if(!l.free)return;(l.pl||[]).forEach(p=>{if(p.k!='pattern'||!o.ch(.35))return;const u=o.tex();if(!u.length)return;p.fx=(p.fx||[]).filter(e=>e.k!='texture').concat([fxT(u[0])])})})}
-export {fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPaint,rzPressEls,rzSheet,rzTexEls};
+// a new layer: an element layer holding one Pattern of the given stamps (the old arrangement layer is no longer made)
+const mkEL=(name,st)=>{const n=mkL(name,st,'check',180);n.free=true;n.ak={};n.man=false;n.ov={};n.fit='';n.gap=0;n.pl=[patOf('Pattern 1',st,'grid',cl(Math.round(CW/180),2,14),cl(Math.round(CH/180),2,20),100,[],null)];return n};
+export {mkEL,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPaint,rzPressEls,rzSheet,rzTexEls};

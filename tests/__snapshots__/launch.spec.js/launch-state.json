@@ -32,11 +32,38 @@
    "rot": 0,
    "pst": 0,
    "pfl": 0,
+   "free": true,
    "ak": {},
+   "man": false,
+   "ov": {},
    "fit": "",
    "gap": 0,
-   "man": false,
-   "ov": {}
+   "pl": [
+    {
+     "u": "pmuzhi800a4b",
+     "k": "pattern",
+     "n": "Pattern 1",
+     "lay": "grid",
+     "cn": 3,
+     "rn": 4,
+     "sz": 100,
+     "rt": 0,
+     "ds": "cycle",
+     "sd": 6128,
+     "src": [
+      {
+       "k": "stamp",
+       "t": 1,
+       "w": 1
+      }
+     ],
+     "x": 266.5,
+     "y": 400,
+     "s": 533,
+     "r": 0,
+     "f": 1
+    }
+   ]
   }
  ],
  "proj": {

@@ -1,6 +1,6 @@
 // Element update, step 8 (2.1.8): the Jitter effect. A repeatable random nudge (position, rotation, size, flips) for one element; a pattern's placements each get their own.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const canvasClick = async (page, fx, fy) => {
@@ -28,6 +28,7 @@ const useTransform = page => page.evaluate(() => { const u = document.querySelec
 
 test('Jitter on a placed stamp moves it, Reroll gives another nudge, and off puts it back; the stored place does not change', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await placed(page);
   await expect.poll(() => useTransform(page)).toMatch(/rotate/);
   const plain = await useTransform(page), x0 = (await st(page)).layers[0].pl[0].x;
@@ -49,6 +50,7 @@ test('Jitter on a placed stamp moves it, Reroll gives another nudge, and off put
 
 test('a pattern\'s Jitter nudges each placement differently, and the same seed gives the same picture', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await openPanel(page, 'layers');
   await page.click('#penew');
   await settle(page);

@@ -1,6 +1,6 @@
 // Element update, step 8b (2.1.8): the Colour grade effect, on every kind of element (here the Sheet and a placed stamp).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const canvasClick = async (page, fx, fy) => {
@@ -47,6 +47,7 @@ test('Colour grade on the Sheet draws a filter only once something is adjusted, 
 
 test('Colour grade on a placed stamp grades that stamp only', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await page.click('#elb [data-k="stamp"]');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);

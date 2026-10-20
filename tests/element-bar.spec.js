@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
 
 const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const canvasClick = async (page, fx, fy) => {
@@ -44,6 +44,7 @@ test('each working button opens its panel and shows pressed while that panel is 
 
 test('a stamp is placed from the Stamp panel, listed in Elements, and the Stamp panel says which one is being edited', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   await page.click('#elb [data-k="stamp"]');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);

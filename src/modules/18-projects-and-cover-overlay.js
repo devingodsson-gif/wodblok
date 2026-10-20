@@ -12,6 +12,7 @@ import {buildTex,saveTex,texNorm} from './17-texture-panel-and-previews.js';
 import {artLoad,artSnap,artUsed} from './25-art-layers.js';
 import {clearAll} from './33-clear.js';
 import {trayIn} from './50-tray-core.js';
+import {mkEL} from './71-randomize-elements.js';
 // ---- Projects: the document, the status line, New project. A project is a .wodblok file (see 33-clear.js); the working copy autosaves in this browser for crash recovery.
 const PDEF={pr:{e:3,q:0,t:'speckle',a:35,sc:100,sd:811},tex:{}};
 // The pattern grid (its own tool in Pattern mode): show/hide, columns across, which points stamps snap to, line strength.
@@ -75,7 +76,7 @@ $('cov').addEventListener('input',()=>{saveCov();renderCover()});
 WBS.cp={id:null,name:'',saved:''};
 $('pnm').value=WBS.cp.name||'';setInterval(paintPst,800);paintPst();
 $('pnw').onclick=()=>{confirm2($('pnw'),'Click again: can’t be undone',()=>{const t=JSON.parse(DEF_TILES);
-openData({tiles:t,layers:[mkL('Layer 1',t.map(x=>x.id),'check',180)],proj:{...PCOL},dim:{s:[1,1],c:[2,3]},pr:PDEF.pr,tex:PDEF.tex},null,'');clearAll(true);cov={img:'',iw:0,ih:0,sc:100};covB=blank();covS=blank();WBS.cslot='f';saveCov();WBS.covKey='';renderCover();WBS.cp.saved=coreStr();paintPst()});
+openData({tiles:t,layers:[mkEL('Layer 1',t.map(x=>x.id))],proj:{...PCOL},dim:{s:[1,1],c:[2,3]},pr:PDEF.pr,tex:PDEF.tex},null,'');clearAll(true);cov={img:'',iw:0,ih:0,sc:100};covB=blank();covS=blank();WBS.cslot='f';saveCov();WBS.covKey='';renderCover();WBS.cp.saved=coreStr();paintPst()});
 // first click with unsaved work: the button says so (the File menu stays open, see 34-desktop-shell) and the status bar explains
 if($('pnw').dataset.sure)pmsg('Starting a new project can’t be undone. Click New project again to discard this one.')};
 }
