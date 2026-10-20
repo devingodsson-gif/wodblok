@@ -25,7 +25,7 @@ for (const runtime of ['artifact', 'none']) {
 
     const s = JSON.parse(await getState(page));
     expect(s.tiles).toHaveLength(1);
-    expect(s.layers).toHaveLength(1);
+    expect(s.els).toHaveLength(1);
 
     // Google Fonts is the only network the app touches; that dependency is recorded, not hidden.
     for (const u of requests.filter(u => !u.startsWith('http://127.0.0.1:5199/'))) expect(u).toMatch(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//);

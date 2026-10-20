@@ -57,13 +57,13 @@ test('a placed stamp gets Pressure offset from its own Effects group; the layer\
   await page.click('#elb [data-k="stamp"]');
   await expect(page.locator('.fxg[data-fxk="stamp"]')).toBeVisible();
   await addEffect(page, 'stamp', 'Pressure offset');
-  const q = (await st(page)).layers[0].pl[0];
+  const q = (await st(page)).els[0];
   expect(q.fx).toHaveLength(1);
   expect(q.fx[0]).toMatchObject({ k: 'pressure', on: true, pst: 4, pfl: 0 });
   await expect(page.locator('.fxg[data-fxk="stamp"] .fxpp')).toBeVisible();
   await page.locator('.fxg[data-fxk="stamp"] .fxpf').fill('6');
   await settle(page);
-  expect((await st(page)).layers[0].pl[0].fx[0].pfl).toBe(6);
+  expect((await st(page)).els[0].fx[0].pfl).toBe(6);
   expect(errors).toEqual([]);
 });
 
@@ -74,7 +74,7 @@ test('a pattern\'s effects apply to every placement', async ({ page }) => {
   await settle(page);
   await expect(page.locator('.fxg[data-fxk="pattern"]')).toBeVisible();
   await addEffect(page, 'pattern', 'Pressure offset');
-  const p = (await st(page)).layers[0].pl.filter(q => q.k === 'pattern').pop();
+  const p = (await st(page)).els.filter(q => q.k === 'pattern').pop();
   expect(p.fx).toHaveLength(1);
   // the add menu offers only what works on a pattern
   await page.locator('.fxg[data-fxk="pattern"] .fxadd').scrollIntoViewIfNeeded();

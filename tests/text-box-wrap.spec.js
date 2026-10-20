@@ -41,14 +41,14 @@ test('Stamp text: a Box width breaks the lines; Box height with Top or Bottom mo
 test('Text layer: the side squares set the box width (lines wrap, top stays) and the box height', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add'); await openPanel(page, 'text'); await settle(page);
+  await openPanel(page, 'text'); await settle(page);
   await page.fill('#tx_t', 'ONE TWO THREE FOUR');
   await set(page, 'tx_sz', 6);
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
   await page.click('#tx_go'); await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);   // put the text down, then select it
-  const piece = async () => JSON.parse(await getState(page)).layers.flatMap(l => l.pl || []).find(p => p.tx);
+  const piece = async () => JSON.parse(await getState(page)).els.find(p => p.tx);
   const a = await piece();
   expect(rows(a.Lt.map(l => l[2]))).toBe(1);
   const left0 = a.x - a.bw * a.s / a.n / 2, top0 = a.y - a.bh * a.s / a.n / 2;

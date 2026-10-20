@@ -29,7 +29,7 @@ pts.forEach((q,i)=>{let s;if(p.ds=='random')s=ss[Math.floor(r()*ss.length)];else
 const b={u:p.u+'.'+i,pu:p.u,...(p.fx&&p.fx.length?{fx:p.fx}:{}),x:+q[0].toFixed(1),y:+q[1].toFixed(1),s:+sz.toFixed(2),r:(+p.rt||0)+(rot?rot[i]||0:0),f:1};
 if(s.k=='stamp')out.push({...b,k:'stamp',t:s.t});else if(s.k=='image')out.push({...b,k:'image',a:s.a});else{const{u,x,y,s:_s,r:_r,f:_f,...it}=s.it;out.push({...it,...b,k:'text'})}});return out}
 // the layer as the kinds should draw it: each pattern replaced, in place, by the elements it stands for
-function patExpand(L){const pl=L.pl||[];if(!pl.some(q=>q.k=='pattern'))return L;const o=[];pl.forEach(q=>{if(q.k=='pattern')o.push(...patItems(q));else o.push(q)});return{...L,pl:o}}
+function patExpand(L){const pl=L.pl||[];if(!pl.some(q=>q.k=='pattern'))return L;const o=[];pl.forEach(q=>{if(q.k=='pattern'){const w=q.op!=null||q.bl||q.v===false||q.g?{wk:q.u,...(q.g?{g:q.g}:{}),...(q.op!=null?{op:q.op}:{}),...(q.bl?{bl:q.bl}:{}),...(q.v===false?{v:false}:{})}:null;o.push(...(w?patItems(q).map(i=>({...i,...w})):patItems(q)))}else o.push(q)});return{...L,pl:o}}
 
 // ---- the panel (the Pattern panel's first group)
 const patList=()=>{const L=fpL();return L?(L.pl||[]).filter(q=>q.k=='pattern'):[]};

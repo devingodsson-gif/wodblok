@@ -9,31 +9,18 @@ async function only(page, ft) {
   }, ft);
 }
 const doc = async page => JSON.parse(await getState(page));
-const els = d => d.layers.flatMap(l => l.pl || []);
+const els = d => d.els;
 
 test('a full roll makes element layers: patterns with effects, a frame pattern and a Sheet', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 21 });
   await openPanel(page, 'rand');
   let d;
   for (let i = 0; i < 6; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); d = await doc(page); if (els(d).some(p => p.lay === 'frame')) break; }
-  expect(d.layers.every(l => l.free)).toBe(true);
   expect(els(d).filter(p => p.k === 'pattern' && p.lay !== 'frame').length).toBeGreaterThan(0);
   expect(els(d).some(p => p.lay === 'frame')).toBe(true);
   expect(d.proj.sh).toBeTruthy();
   expect(d.tex.u).toEqual([]);
   expect(els(d).some(p => (p.fx || []).length)).toBe(true);
-  expect(errors).toEqual([]);
-});
-
-test('Paint strokes on their own roll make a Paint element with strokes', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 22 });
-  await openPanel(page, 'rand');
-  await only(page, 'paint');
-  let p;
-  for (let i = 0; i < 10 && !p; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); p = els(await doc(page)).find(q => q.k === 'paint'); }
-  expect(p).toBeTruthy();
-  expect(p.st.length).toBeGreaterThan(1);
-  expect(p.st.every(s => s.pts.length > 3)).toBe(true);
   expect(errors).toEqual([]);
 });
 

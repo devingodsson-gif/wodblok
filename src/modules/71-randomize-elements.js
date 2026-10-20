@@ -36,14 +36,6 @@ function rzFrameEls(FL,T,o){return FL.map(l=>{const t=T.find(x=>x.id==(l.st||[])
 // Sheet: paper, with a Texture (and sometimes a Colour grade) effect
 function rzSheet(proj,texUses,o){const sh={...(proj.sh||{o:100})};let fx=(sh.fx||[]).slice();if(texUses)fx=fx.filter(e=>e.k!='texture').concat(texUses.map(fxT));
 if(o.gradeOn&&o.ch(.25)&&!fx.some(e=>e.k=='grade'))fx.push(fxG({fd:o.ri(5,22),tp:o.ri(-20,24)}));if(fx.length)sh.fx=fx;else delete sh.fx;return sh}
-// Paint: one or two Paint elements with a few strokes (some with a stamp tip, sometimes an eraser stroke), on their own layer
-function rzPaint(o,tileIds,ink){const els=[],n=o.ri(1,2);
-for(let e=0;e<n;e++){const st=[],ns=o.ri(2,5);for(let i=0;i<ns;i++){let x=o.rr(.1,.9)*CW,y=o.rr(.1,.9)*CH,a=o.rr(0,6.28);const pts=[[+x.toFixed(1),+y.toFixed(1)]],len=o.ri(7,16),step=o.rr(.03,.07)*Math.min(CW,CH),bend=o.rr(-.5,.5);
- for(let k=0;k<len;k++){a+=bend*o.rr(.2,1)+o.rr(-.15,.15);x=cl(x+Math.cos(a)*step,0,CW);y=cl(y+Math.sin(a)*step,0,CH);pts.push([+x.toFixed(1),+y.toFixed(1)])}
- const s={u:fpU(),w:+o.rr(6,26).toFixed(1),pts};if(i>1&&o.ch(.18))s.er=true;else{if(tileIds.length&&o.ch(.35))s.t=o.pick(tileIds);else if(ink&&o.ch(.4))s.c=ink}st.push(s)}
- const fx=[];if(o.texOn&&o.ch(.4)){const u=o.tex();if(u.length)fx.push(fxT(u[0]))}if(o.gradeOn&&o.ch(.25))fx.push(fxG({sat:-o.ri(10,30),fd:o.ri(5,20)}));
- els.push({u:fpU(),k:'paint',n:'Paint '+(e+1),x:0,y:0,st,...(fx.length?{fx}:{})})}
-const L=mkL('Paint',[],'check',180);L.free=true;L.pl=els;L.ak={};L.man=false;L.ov={};L.fit='';L.gap=0;return L}
 // Layout on element layers: type, size, spacing, offset and rotation change the Pattern; scatter, turning and size variation become a Jitter effect
 function rzLayoutEls(layers,f,o){const pats=[];layers.forEach(l=>{if(l.free&&l.rz!='free')(l.pl||[]).forEach(p=>{if(p.k=='pattern'&&p.lay!='frame')pats.push(p)})});
 pats.forEach((p,i)=>{const set=(k,v)=>{if(v==null)delete p[k];else p[k]=v};
@@ -59,4 +51,4 @@ function rzPressEls(layers,o){layers.forEach(l=>{if(!l.free||l.rz=='free')return
 function rzTexEls(layers,o){layers.forEach(l=>{if(!l.free)return;(l.pl||[]).forEach(p=>{if(p.k!='pattern'||!o.ch(.35))return;const u=o.tex();if(!u.length)return;p.fx=(p.fx||[]).filter(e=>e.k!='texture').concat([fxT(u[0])])})})}
 // a new layer: an element layer holding one Pattern of the given stamps (the old arrangement layer is no longer made)
 const mkEL=(name,st)=>{const n=mkL(name,st,'check',180);n.free=true;n.ak={};n.man=false;n.ov={};n.fit='';n.gap=0;n.pl=[patOf('Pattern 1',st,'grid',cl(Math.round(CW/180),2,14),cl(Math.round(CH/180),2,20),100,[],null)];return n};
-export {mkEL,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPaint,rzPressEls,rzSheet,rzTexEls};
+export {mkEL,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPressEls,rzSheet,rzTexEls};

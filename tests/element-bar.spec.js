@@ -49,7 +49,7 @@ test('a stamp is placed from the Stamp panel, listed in Elements, and the Stamp 
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   await page.click('#lfpst [data-t]');          // stop placing
-  const pl = JSON.parse(await getState(page)).layers[0].pl;
+  const pl = JSON.parse(await getState(page)).els;
   expect(pl.length).toBe(1);
   await openPanel(page, 'mlist');
   await expect(page.locator('#lfpl .mr')).toHaveCount(1);

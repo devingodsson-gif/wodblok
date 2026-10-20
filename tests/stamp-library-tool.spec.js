@@ -25,7 +25,7 @@ async function shapeIn(page, n) {
   await show(page, 'stmp');
 }
 
-test('New stamp asks for an outline, joins the selected layer, becomes the open stamp, starts locked and keeps the Pattern view', async ({ page }) => {
+test('New stamp asks for an outline, becomes the open stamp, starts locked and keeps the Pattern view', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'stmp');
   await newStamp(page, 'Circle');
@@ -33,10 +33,8 @@ test('New stamp asks for an outline, joins the selected layer, becomes the open 
   expect(s.tiles.length).toBe(2);
   expect(s.tiles[1].sh.k).toBe('circle');
   expect(s.tiles[1].items).toEqual([]);
-  expect(s.layers[0].st).toContain(s.tiles[1].id);
   await expect(rows(page)).toHaveCount(2);
   await expect(rows(page).nth(1)).toHaveClass(/cur/);
-  await expect(rows(page).nth(1).locator('.smkth')).toHaveAttribute('aria-pressed', 'true');
   await expect(rows(page).nth(1).locator('.smklk')).toHaveAttribute('aria-pressed', 'false');
   expect(await page.evaluate(() => __wbTest.unlockedStamp())).toBe(null);
   await expect(page.locator('#boardS')).toHaveCount(0);
@@ -69,7 +67,6 @@ test('Duplicate makes a copy that edits separately from the original', async ({ 
   expect(s.tiles.length).toBe(2);
   expect(s.tiles[1].items.length).toBe(n0);
   expect(s.tiles[1].id).not.toBe(s.tiles[0].id);
-  expect(s.layers[0].st).toContain(s.tiles[1].id);
   await expect(rows(page).nth(1)).toHaveClass(/cur/);
   // the copy is not printed anywhere until it is a source of the Pattern
   await page.evaluate(() => document.querySelector('#pelist .mr').click()); await page.evaluate(() => document.getElementById('peadd').click()); await settle(page);
@@ -93,7 +90,7 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
   await settle(page);
-  expect(((await state(page)).layers[0].pl || []).filter(p => p.t === id2).length).toBe(1);
+  expect(((await state(page)).els || []).filter(p => p.t === id2).length).toBe(1);
   await page.keyboard.press('Escape');
   await show(page, 'stmp');
   await page.click('#smkdel');
@@ -103,8 +100,7 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   await settle(page);
   const s = await state(page);
   expect(s.tiles.length).toBe(1);
-  expect(s.layers[0].st).not.toContain(id2);
-  expect((s.layers[0].pl || []).filter(p => p.t === id2).length).toBe(0);
+  expect((s.els || []).filter(p => p.t === id2).length).toBe(0);
   await expect(rows(page)).toHaveCount(1);
   expect(errors).toEqual([]);
   // one undo step brings it back
@@ -125,7 +121,6 @@ test('a stamp is saved to the library from the Stamps panel and a loaded one joi
   await settle(page);
   const s = await state(page);
   expect(s.tiles.length).toBe(2);
-  expect(s.layers[0].st).toContain(s.tiles[1].id);
   expect(s.tiles[1].items.length).toBe(s.tiles[0].items.length);
   expect(errors).toEqual([]);
 });

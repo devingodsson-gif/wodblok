@@ -16,14 +16,14 @@
   "masks": [
    {
     "sc": "",
-    "id": "m1v3em1",
+    "id": "mqpibu6",
     "t": "rad",
-    "name": "Uneven inking",
+    "name": "Vignette",
     "on": true,
     "inv": true,
     "amt": 100,
     "a": {
-     "ex": 23,
+     "ex": -26,
      "ct": 0,
      "hi": 0,
      "sh": 0,
@@ -36,39 +36,13 @@
      "hue": 0,
      "fd": 0
     },
-    "sp": "s",
+    "sp": "c",
     "st": "",
-    "cx": 0.306,
-    "cy": 0.544,
-    "rx": 0.679,
-    "ry": 0.555,
-    "fe": 61
-   },
-   {
-    "sc": "",
-    "id": "mw1382r",
-    "t": "lum",
-    "name": "Highlight tone",
-    "on": true,
-    "inv": false,
-    "amt": 100,
-    "a": {
-     "ex": 0,
-     "ct": 0,
-     "hi": 0,
-     "sh": 0,
-     "wh": 0,
-     "bl": 0,
-     "tp": 20,
-     "tn": 19,
-     "sat": 0,
-     "vib": 0,
-     "hue": 0,
-     "fd": 0
-    },
-    "lo": 75,
-    "hi": 100,
-    "sm": 39
+    "cx": 0.501,
+    "cy": 0.579,
+    "rx": 0.567,
+    "ry": 0.595,
+    "fe": 78
    }
   ]
  }

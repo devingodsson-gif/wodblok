@@ -109,7 +109,7 @@ test('a saved project opens with its colours in the tray, linked where they were
   for (const id of p.ts) expect(w.m[id], 'tray place ' + id + ' has a colour name').toBeTruthy();
   expect(p.ts).toContain(p.bg.slice(1)); expect(p.ts).toContain(p.ink.slice(1));
   // a stamp or layer ink is a tray place that exists (or a fixed colour), never a name from an older file
-  const inks = c.tiles.map(t => t.ink).concat(c.layers.map(l => l.ink)).filter(Boolean);
+  const inks = c.tiles.map(t => t.ink).concat(c.els.map(q => q.ink)).filter(Boolean);
   for (const k of inks) expect(k[0] === '#' || p.ts.includes(k.slice(1)), 'ink ' + k).toBe(true);
   await expect(page.locator('#pst')).not.toHaveClass(/dirty/);
   expect(errors).toEqual([]);

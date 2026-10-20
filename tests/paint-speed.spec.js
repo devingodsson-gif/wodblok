@@ -25,7 +25,7 @@ test('a Paint element with hundreds of strokes still takes a new stroke quickly'
   });
   const full = await real();
   console.log('paint-speed', JSON.stringify({ ...r, emptyMs: empty, fullMs: full }));
-  const p = JSON.parse(await getState(page)).layers[0].pl.find(q => q.k === 'paint');
+  const p = JSON.parse(await getState(page)).els.find(q => q.k === 'paint');
   expect(p.st).toHaveLength(402);
   expect(full, 'a stroke on 400 others, from pointer up to a settled picture (ms)').toBeLessThan(empty + 1500);
   expect(r.last, 'median commit time with 400 strokes in the element (ms)').toBeLessThan(250);

@@ -13,8 +13,8 @@ test('Placing: the first click on the canvas places the stamp picked in the Stam
   await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
   await settle(page);
   const s = JSON.parse(await getState(page));
-  expect(s.layers[0].pl.length).toBe(1);
-  expect(s.layers[0].pl[0].t).toBe(s.tiles[0].id);
+  expect(s.els.length).toBe(1);
+  expect(s.els[0].t).toBe(s.tiles[0].id);
   expect(errors).toEqual([]);
 });
 
@@ -28,7 +28,7 @@ test('Placing: Esc stops placing', async ({ page }) => {
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
   await settle(page);
-  expect(JSON.parse(await getState(page)).layers[0].pl.length).toBe(0);
+  expect(JSON.parse(await getState(page)).els.length).toBe(0);
   expect(errors).toEqual([]);
 });
 

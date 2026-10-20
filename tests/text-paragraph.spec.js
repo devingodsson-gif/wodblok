@@ -110,7 +110,6 @@ test('Balance lines evens out the lines of a paragraph', async ({ page }) => {
 test('Text layer: styled letters and paragraph options are saved on the text, and a double-click starts typing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add');
   await openPanel(page, 'text');
   await settle(page);
   await page.fill('#tx_t', 'ONE TWO');
@@ -118,7 +117,7 @@ test('Text layer: styled letters and paragraph options are saved on the text, an
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   await settle(page);
-  const piece = async () => JSON.parse(await getState(page)).layers.flatMap(l => (l.pl || []).filter(p => p.tx))[0];
+  const piece = async () => JSON.parse(await getState(page)).els.filter(p => p.tx)[0];
   await expect.poll(async () => (await piece() || {}).tx).toBeTruthy();
   await page.click('#tx_go');
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);

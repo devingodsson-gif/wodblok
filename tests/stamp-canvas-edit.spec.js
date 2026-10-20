@@ -47,13 +47,12 @@ test('a picked shape goes into the unlocked stamp where it is pointed at, and ev
   expect(errors).toEqual([]);
 });
 
-test('with the stamp locked, nothing is put into it', async ({ page }) => {
+test('with the stamp locked, a picked shape unlocks it and lands (2.2.1)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await pick(page);
   const before = (await items(page)).length;
   await click(page, await inst(page));
-  expect((await items(page)).length).toBe(before);
-  await expect(page.locator('#stoh .steh')).toHaveCount(0);
+  expect((await items(page)).length).toBe(before + 1);
   expect(errors).toEqual([]);
 });
 
@@ -152,7 +151,7 @@ test('text typed in the Text panel goes into the unlocked stamp as letters, on e
   await expect.poll(async () => (await items(page)).length, { timeout: 15000 }).toBe(before + 2);
   const it = await items(page);
   expect(it.slice(-2).every(q => q.tg)).toBe(true);
-  expect(((await state(page)).layers[0].pl || []).filter(p => p.k !== 'pattern')).toHaveLength(0);   // only the Pattern is on the layer
+  expect(((await state(page)).els || []).filter(p => p.k !== 'pattern')).toHaveLength(0);   // only the Pattern is on the layer
   expect(errors).toEqual([]);
 });
 

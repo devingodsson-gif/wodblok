@@ -1,45 +1,31 @@
-// Layer update, step 2 (1.46.2), rewritten for element layers in 2.1.12: any layer takes stamps, pictures and text placed by hand, next to its Pattern.
-// A new layer starts with a Pattern; the old Arrangement control (None, Repeat, Frame) is retired, and so are its tests.
+// Stamps, pictures and text placed by hand join the element list next to the Pattern (2.2.2: one list, no layers).
+// A new project starts with a Pattern; the old Arrangement control (None, Repeat, Frame) is retired, and so are its tests.
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, showPanel, settle, getState, noPattern } = require('./helpers/harness');
 
 const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
-const layers = async page => JSON.parse(await getState(page)).layers;
+const els = async page => JSON.parse(await getState(page)).els;
 const canvasClick = async (page, fx, fy) => {
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
   await settle(page);
 };
 
-test('"+" adds an element layer that starts with a Pattern; there is no layer type', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'lyrs');
-  await expect(page.locator('#lmsel')).toHaveCount(0);
-  await expect(page.locator('#ly_menu')).toHaveCount(0);
-  await page.click('#ly_add');
-  await settle(page);
-  const ls = await layers(page);
-  expect(ls.length).toBe(2);
-  expect(ls[1].free).toBe(true);
-  expect(ls[1].pl.map(q => q.k)).toEqual(['pattern']);
-  expect(errors).toEqual([]);
-});
-
-test('a stamp is placed on a layer that has a Pattern, and the Pattern stays', async ({ page }) => {
+test('a stamp is placed next to the Pattern, and the Pattern stays', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
-  const l = (await layers(page))[0];
-  expect(l.pl.map(q => q.k)).toEqual(['pattern', 'stamp']);
-  expect(l.pl[1].t).toBeTruthy();
+  const l = await els(page);
+  expect(l.map(q => q.k)).toEqual(['pattern', 'stamp']);
+  expect(l[1].t).toBeTruthy();
   expect(await page.locator('#art use[href^="#bk"]').count()).toBeGreaterThan(1);
   expect(errors).toEqual([]);
 });
 
-test('a picture and then a stamp go onto the same layer; each is its own placed item', async ({ page }, testInfo) => {
+test('a picture and then a stamp go into the same list; each is its own placed item', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'elimg');
@@ -55,33 +41,22 @@ test('a picture and then a stamp go onto the same layer; each is its own placed 
   await showPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.7, 0.7);
-  const l = (await layers(page))[0];
-  expect(l.pl.map(q => (q.a ? 'a' : q.t ? 't' : '?'))).toEqual(['a', 't']);
+  const l = await els(page);
+  expect(l.map(q => (q.a ? 'a' : q.t ? 't' : '?'))).toEqual(['a', 't']);
   await showPanel(page, 'mlist');
   await expect(page.locator('#lfpl .mr')).toHaveCount(2);
   expect(errors).toEqual([]);
 });
 
-test('typing in the Text tool places text on the selected layer, next to its Pattern', async ({ page }) => {
+test('typing in the Text tool places text next to the Pattern', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Hi');
   await settle(page);
   await canvasClick(page, 0.5, 0.5);
-  const ls = await layers(page);
-  expect(ls.length).toBe(1);
-  expect(ls[0].pl.some(q => q.tx)).toBe(true);
-  expect(ls[0].pl.some(q => q.k === 'pattern')).toBe(true);
-  expect(errors).toEqual([]);
-});
-
-test('the Layers list says how many items a layer holds', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await noPattern(page);
-  await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
-  await canvasClick(page, 0.5, 0.5);
-  await expect(page.locator('#lyl2 .lyr .lym')).toContainText('1 placed');
+  const ls = await els(page);
+  expect(ls.some(q => q.tx)).toBe(true);
+  expect(ls.some(q => q.k === 'pattern')).toBe(true);
   expect(errors).toEqual([]);
 });
 

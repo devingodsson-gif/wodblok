@@ -20,7 +20,7 @@ const stName=id=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==id)+1);
 // the one unlocked stamp, or null; a different layer, or a stamp that is gone, locks it again
 function stUnlocked(){if(STP.un==null)return null;const L=stSel();if(!L||L.u!==STP.unL||!WBS.tiles.some(t=>t.id==STP.un)){STP.un=null;STP.unL=null;return null}return STP.un}
 // stamps in this layer's arrangement plus stamps placed freely on the layer, counted once per layer
-const stUses=id=>WBS.layers.filter(L=>(L.st||[]).includes(id)||(L.pl||[]).some(p=>p.t==id)).length;
+const stUses=id=>WBS.layers.reduce((n,L)=>n+(L.pl||[]).filter(p=>p.t==id||(p.k=='pattern'&&(p.src||[]).some(s=>s.t==id))).length,0);
 // build() calls these three: begin before the layers are drawn, add for every printed stamp of the selected layer, end after
 function stOlBegin(){const L=stSel();STP.on=!!L&&!!L.vis&&(!L.free||(L.pl||[]).some(p=>p.k=='pattern'))&&!(L.fr&&L.fr.on);STP.items=[];STP.rot=0}
 function stOlPath(id,d){STP.p[id]={d,p2:null}}
@@ -46,14 +46,13 @@ function stampAt(x,y,only){for(let i=STP.items.length-1;i>=0;i--){const it=STP.i
 function stampToCanvas(i,u,v){const it=STP.items[i];if(!it)return null;const q=stMatrix(it).transformPoint({x:u,y:v});return{x:q.x,y:q.y}}
 // ----- the panel -----
 function stLock(id){if(stUnlocked()===id){STP.un=null;STP.unL=null;selOne(-1)}else{STP.un=id;STP.unL=(stSel()||{}).u||null;const k=WBS.tiles.findIndex(t=>t.id==id);if(k>=0&&WBS.cur!=k){WBS.cur=k;selOne(-1)}}STP.ai=null;stOlPaint();stPanel(true);stTextSync();if(WBX.wbGrade)WBX.wbGrade.refresh();WBH.draw()}
-function stPick(id){const L=stSel();if(!L)return;const a=L.st=L.st||[],k=a.indexOf(id);if(k<0)a.push(id);else a.splice(k,1);upd()}
 function stSig(){const L=stSel()||{},un=stUnlocked();return[WBS.cur,WBS.selL,(L.st||[]).join(),un,WBS.tiles.map(t=>t.id+':'+(t.items||[]).length).join(),WBS.layers.map(l=>(l.st||[]).length+'/'+(l.pl||[]).length).join(),WBS.proj&&WBS.proj.bg].join('|')}
 function stPanel(force){const list=$('stmpl');if(!list||!list.offsetParent)return;const sig=stSig();if(!force&&sig===STP.sig&&list.childElementCount)return;STP.sig=sig;
  const L=stSel(),un=stUnlocked(),[pa]=pal(),cur=WBS.tiles[WBS.cur];let h='';
- WBS.tiles.forEach((t,k)=>{useT(t);const on=!!L&&(L.st||[]).includes(t.id),lk=un===t.id,n=stUses(t.id);
-  h+=`<div class="smkr${WBS.cur===k?' cur':''}" data-t="${t.id}"><button type="button" class="smkth" aria-pressed="${on}" aria-label="Use Stamp ${k+1} on this layer"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button><span class="smkn">Stamp ${k+1}</span><span class="smkc" aria-label="Used on ${n} ${n==1?'layer':'layers'}">${n}</span><button type="button" class="ib smklk" data-lk aria-pressed="${lk}" aria-label="${lk?'Lock':'Unlock'} Stamp ${k+1}">${lk?STLK_OFF:STLK_ON}</button></div>`});
+ WBS.tiles.forEach((t,k)=>{useT(t);const lk=un===t.id,n=stUses(t.id);
+  h+=`<div class="smkr${WBS.cur===k?' cur':''}" data-t="${t.id}"><button type="button" class="smkth" aria-label="Stamp ${k+1}"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button><span class="smkn">Stamp ${k+1}</span><span class="smkc" aria-label="Used by ${n} ${n==1?'element':'elements'}">${n}</span><button type="button" class="ib smklk" data-lk aria-pressed="${lk}" aria-label="${lk?'Lock':'Unlock'} Stamp ${k+1}">${lk?STLK_OFF:STLK_ON}</button></div>`});
  if(cur)useT(cur);list.innerHTML=h;
- const ed=$('smked');if(ed){ed.hidden=un==null;ed.textContent=un==null?'':`Editing: ${stName(un)} (used on ${stUses(un)} ${stUses(un)==1?'layer':'layers'})`}}
+ const ed=$('smked');if(ed){ed.hidden=un==null;ed.textContent=un==null?'':`Editing: ${stName(un)} (used by ${stUses(un)} ${stUses(un)==1?'element':'elements'})`}}
 // ----- the project's stamps: choose one, make a new one, copy one, delete one, keep one in the library, bring the camera to one -----
 const stLabel=t=>{WBX.wbLabelPlain={t,at:performance.now()}};
 const stAddTo=id=>{const L=stSel();if(L&&!(L.st||[]).includes(id)){L.st=L.st||[];L.st.push(id)}};
@@ -89,7 +88,7 @@ function init63(){
  try{new ResizeObserver(stOlFit).observe($('art'))}catch(e){}
  const op=$('stmpop');if(op){op.value=STP.op;op.addEventListener('input',()=>stSetOp(op.value,true))}
  const list=$('stmpl');if(list){
-  list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r)return;const id=+r.dataset.t;if(e.target.closest('[data-lk]'))stLock(id);else if(e.target.closest('.smkth'))stPick(id);else stCurrent(id)});
+  list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r)return;const id=+r.dataset.t;if(e.target.closest('[data-lk]'))stLock(id);else stCurrent(id)});
  stBar();
   if(typeof IntersectionObserver=='function')new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting))stPanel(true)}).observe(list)}
 }

@@ -33,12 +33,12 @@ pl.forEach(p=>{const A=WBS.ARTS[p.a],id='ar'+li+'_'+String(p.a).replace(/[^\w-]/
 if(!used.has(id)){used.add(id);defs+=`<image id="${id}" href="${A.src}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none"/>`}
 if(WBS.CR&&WBS.CR.u==p.u&&li==WBS.selL)return;const R0=crRef(p),k=p.s/Math.max(A.w,A.h),cpt=crPts(p);let clp='';if(cpt){const cid='ac'+li+'_'+String(p.u).replace(/[^\w-]/g,'');defs+=`<clipPath id="${cid}"><polygon points="${cpt.map(q=>f(q[0]*A.w)+','+f(q[1]*A.h)).join(' ')}"/></clipPath>`;clp=` clip-path="url(#${cid})"`}const hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-w/2)}" y="${f(-h/2)}" width="${f(w)}" height="${f(h)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
 const J=fxJit(p)||{dx:0,dy:0,dr:0,sz:1,sx:1,sy:1},utr=`rotate(${(+p.r||0)+J.dr}) scale(${f(k*(p.f||1)*(p.wx||1)*J.sz*J.sx)} ${f(k*(p.wy||1)*J.sz*J.sy)}) translate(${f(-R0.cu*A.w)} ${f(-R0.cv*A.h)})`,fxT=p.fx&&p.fx.length?fxTex(p,'fm'+li+'_'+String(p.u).replace(/[^\w-]/g,''),{x:0,y:0,W:A.w,H:A.h}):null,fxG=p.fx&&p.fx.length?fxGr(p,'fg'+li+'_'+String(p.u).replace(/[^\w-]/g,''),fxPad(0,0,A.w,A.h)):null;if(fxT)defs+=fxT.defs;if(fxG)defs+=fxG.defs;
-const one=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x+J.dx)} ${f(+p.y+J.dy)})">${hit}${fxT||fxG?`<g transform="${utr}"${fxT?fxT.attrs:''}>${fxG?fxG.wrap(`<use href="#${id}"${clp}/>`):`<use href="#${id}"${clp}/>`}</g>`:`<use href="#${id}"${clp} transform="${utr}"/>`}</g>`;out+=one;fr.set(String(p.u),one)});
+const one=`<g${ed?` data-fp="${p.u}"`:''}${p.akk?` filter="url(#ak${li})"`:''} transform="translate(${f(+p.x+J.dx)} ${f(+p.y+J.dy)})">${hit}${fxT||fxG?`<g transform="${utr}"${fxT?fxT.attrs:''}>${fxG?fxG.wrap(`<use href="#${id}"${clp}/>`):`<use href="#${id}"${clp}/>`}</g>`:`<use href="#${id}"${clp} transform="${utr}"/>`}</g>`;out+=one;fr.set(String(p.u),one)});
 const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'';
-const kid='ak'+li;if(L.akk)defs+=`<filter id="${kid}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -.9 -1.77 -.33 0 3"/><feComposite in2="SourceGraphic" operator="in"/></filter>`;
-const o0=`<g${L.akk?` filter="url(#${kid})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>`;return[defs,o0+out+'</g>',o0,'</g>',fr]}
+const kid='ak'+li;if(pl.some(p=>p.akk))defs+=`<filter id="${kid}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -.9 -1.77 -.33 0 3"/><feComposite in2="SourceGraphic" operator="in"/></filter>`;
+const o0=`<g${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>`;return[defs,o0+out+'</g>',o0,'</g>',fr]}
 // the Art part of the Free place panel
-function artPanel(L){{const k=$('lfaak');if(k){k.checked=!!L.akk;const lb=k.closest('label');if(lb)lb.hidden=!(L.pl||[]).some(p=>p.a)}}
+function artPanel(L){{const k=$('lfaak');if(k){const ps=(L.pl||[]).filter(p=>p.a),sp=ps.find(p=>p.u==WBS.fpSel),tg=sp?[sp]:ps;k.checked=!!tg.length&&tg.every(p=>p.akk);const lb=k.closest('label');if(lb)lb.hidden=!ps.length}}
 const ids=Object.keys(WBS.ARTS),inUse=new Set();ids.forEach(i=>{if(artRefd(i))inUse.add(i)});
 const ky=ids.map(i=>i+':'+WBS.ARTS[i].src.length+(WBS.ARTS[i].ver||'')+(inUse.has(i)?'u':'')).join('|')+'#'+WBS.fpB+(fpPoolOk()?'#'+[...WBS.fpPool].join('.'):''),st=$('lfars');
 if(st.dataset.k!=ky){st.dataset.k=ky;st.innerHTML=ids.length?ids.map(i=>{const A=WBS.ARTS[i];return`<button type="button" data-a="${hx(i)}" class="${WBS.fpB==i||(fpPoolOk()&&WBS.fpPool.has(String(i)))?'on':''}" title="${hx(A.n)}${A.pid?' (linked project)':''}"><img src="${artBU(A)}" alt="">${A.pid?'<u class="alk"></u>':''}${inUse.has(i)?'':`<i data-ax="${hx(i)}" title="Remove from this project">&#215;</i>`}</button>`}).join(''):'<div class="hint" style="margin:0">Nothing imported yet.</div>'}
@@ -71,7 +71,7 @@ if(p||WBS.fpB){const S0=Math.min(CW,CH),sv=(id,v)=>{const el=$(id);if(+el.value!
 function init25(){WBH.fpOverlay=fpOverlay;WBH.fpSync=fpSync;
 WBS.fpLast=null;
 {const ch=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()},cur2=()=>{const L=fpL();return L&&(L.pl||[]).find(q=>q.u==WBS.fpSel)};
-$('lfaak').onchange=()=>{const L=fpL();if(!L)return;if($('lfaak').checked)L.akk=true;else delete L.akk;ch()};
+$('lfaak').onchange=()=>{const L=fpL();if(!L)return;const ps=(L.pl||[]).filter(p=>p.a),sp=ps.find(p=>p.u==WBS.fpSel);(sp?[sp]:ps).forEach(p=>{if($('lfaak').checked)p.akk=true;else delete p.akk});ch()};
 $('lfpl').onclick=e=>{const L=fpL();if(!L)return;const x=e.target.closest('[data-px]');if(x){const i=(L.pl||[]).findIndex(q=>q.u==x.dataset.px);if(i>=0){L.pl.splice(i,1);if(WBS.fpSel==x.dataset.px)WBS.fpSel=-1;ch()}return}const r=e.target.closest('[data-pu]');if(!r)return;if(e.shiftKey){fpRange(r.dataset.pu);return}if(e.ctrlKey||e.metaKey){fpTog(r.dataset.pu);return}WBS.fpB=null;WBS.fpGhost=null;WBS.fpMS=new Set();WBS.fpAnc=r.dataset.pu;WBS.fpSel=r.dataset.pu;upd()};
 $('lfpl').onmousedown=e=>{if(e.shiftKey&&e.target.closest('.mr'))e.preventDefault()};
 

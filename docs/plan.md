@@ -1,5 +1,8 @@
 # Development plan
 
+## Next plan: the element list (written Oct 20 2026, not started)
+Layers become one ordered list of elements; the element buttons create instances at the top. Fix release 2.2.1, then 2.2.2 (list, engine, format 23) and 2.2.3 (menus). See [`element-list-plan.md`](element-list-plan.md).
+
 ## Open plan: the element update (started Oct 19 2026)
 Elements (Sheet, Paint, Shape, Image, Text, Stamp, Pattern) and effects (Texture, Pressure offset, Jitter, Colour grade; Carved edges, Symmetry, Wrap and Invert stay in the Stamp panel; Morph was removed). The plan, the owner's answers and each step's outcome are in [`element-update-plan.md`](element-update-plan.md). Steps are 2.1.1, 2.1.2... up to 2.1.12, released as 2.2.0 (step 12: new layers are element layers, old arrangement groups retired); the version keeps advancing in 2.x, there is no 3.0.0 (owner, Oct 20 2026).
 
@@ -354,3 +357,22 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - A layer with no stamps that gets a Repeat or Frame arrangement takes the current stamp.
 - The speed test (`perf.spec.js`) now scrolls its slider into view; before, it had been measuring an idle page.
 - Tests: `any-layer-items` extended; specs that drove the old dropdown updated.
+
+## 2.2.1 (Oct 20 2026): fixes from the first test of 2.2.0
+- Shapes: a shape picked from the Shapes panel now unlocks the stamp under the first click and lands there (before, nothing happened unless a stamp was unlocked by hand). tests/shape-place.spec.js.
+- Text: Jitter moves each letter on its own, seeded per letter; the text as a whole no longer moves. tests/text-jitter.spec.js.
+- Paint: no "Paint strokes" row in Randomize, no "New paint" button, no delete-paint button; the first stroke makes the Paint element.
+- Perf: slider drag ratio 1.002 against main.
+- Next: docs/element-list-plan.md (2.2.2 flat element list and groups, 2.2.3 menus and flows).
+
+## 2.2.2 (Oct 20 2026): the flat element list (format 23)
+- No layers. The document is one ordered list of elements (`els`, format 23); an older file is refused, nothing is converted. At run time one free layer holds the list so the drawing code is unchanged.
+- Every element has its own opacity, blend and eye; a Pattern's placements share their pattern's wrapper. Groups: select several elements and press Group (button or Shift+G); a group has its own opacity, blend, eye and ink, can be folded, ungrouped and nested. tests/element-list.spec.js, tests/element-core.spec.js.
+- The Layers panel is now Elements: reorder by drag, rename, duplicate, delete, eye, opacity and blend for the selection.
+- Repeat tile: each top-level piece (group, wrapped element, run of one kind) is copied to the neighbouring tiles inside its own opacity, blend and ink; before, a translucent group spilling over a tile edge was laid over its neighbour's copy twice (roll 7).
+- A group's ink filter is defined (its defs were read before the group rendered).
+- Snapshots regenerated with the owner's approval: roundtrip, scenarios, launch. The launch state snapshot was regenerated the same way (approved).
+- Perf: drag p95 16 ms on both builds. The ratio against main (0.27) is not like for like: main refuses the new sample file, so each build opened its own copy of the same sample (WB_BASELINE_FIXTURE in tests/perf.spec.js) and the new sample is lighter.
+- Not done, moved to 2.2.3 with the menus: removing the old arrangement engine (GRAD, gArrAll, arrOpts, fitTs and the layer-level controls are still used by Randomize and the Pattern element's arrangements), Randomize and templates built directly on the flat list, Sheet as an element.
+- Known flake: repeat-tile roll 7 passes alone and fails once under a full parallel load (tolerance 0.12 x half + 0.15).
+

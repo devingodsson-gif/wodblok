@@ -3,7 +3,7 @@
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
 
-const layers = async page => JSON.parse(await getState(page)).layers;
+const layers = async page => JSON.parse(await getState(page)).els;
 const canvasClick = async (page, fx, fy) => {
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
@@ -24,7 +24,7 @@ test('text placed before a stamp draws under it: the canvas follows the element 
   await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.2, 0.2);          // away from the text, which is wider on the CI renderer
-  const pl = (await layers(page))[0].pl;
+  const pl = (await layers(page));
   expect(pl.map(q => (q.tx != null ? 'text' : q.t != null ? 'stamp' : '?'))).toEqual(['text', 'stamp']);
   await expect.poll(() => drawnOrder(page)).toEqual(pl.map(q => String(q.u)));
   expect(errors).toEqual([]);
@@ -41,7 +41,7 @@ test('a stamp placed before text still draws under it', async ({ page }) => {
   await page.fill('#tx_t', 'Hi');
   await settle(page);
   await canvasClick(page, 0.6, 0.6);
-  const pl = (await layers(page))[0].pl;
+  const pl = (await layers(page));
   expect(pl.map(q => (q.tx != null ? 'text' : q.t != null ? 'stamp' : '?'))).toEqual(['stamp', 'text']);
   await expect.poll(() => drawnOrder(page)).toEqual(pl.map(q => String(q.u)));
   expect(errors).toEqual([]);

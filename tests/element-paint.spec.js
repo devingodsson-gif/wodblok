@@ -5,7 +5,7 @@ const { test, expect } = require('@playwright/test');
 const { ROOT, openApp, openProjectFile, settle, getState, stateText } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
-const paints = async page => ((await st(page)).layers[0].pl || []).filter(q => q.k === 'paint');
+const paints = async page => ((await st(page)).els || []).filter(q => q.k === 'paint');
 const drag = async (page, from, to) => {
   const box = await page.locator('#art').boundingBox();
   const at = (f, i) => [box.x + box.width * f[0] + i * 3, box.y + box.height * f[1]];
@@ -25,7 +25,7 @@ test('the Paint button opens the Paint panel; with the brush off a drag draws no
   expect(errors).toEqual([]);
 });
 
-test('brush strokes go into the selected Paint element until a new one is started', async ({ page }) => {
+test('the first brush stroke makes the Paint element and later strokes go into it (no New paint button)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await open(page);
   await page.click('#pamode [data-m="brush"]');
@@ -39,13 +39,8 @@ test('brush strokes go into the selected Paint element until a new one is starte
   p = await paints(page);
   expect(p).toHaveLength(1);
   expect(p[0].st).toHaveLength(2);
-  await page.click('#panew');
-  await settle(page);
-  await drag(page, [0.3, 0.7], [0.6, 0.8]);
-  p = await paints(page);
-  expect(p).toHaveLength(2);
-  expect(p[1].st).toHaveLength(1);
-  expect(await page.locator('#art #dyn path[stroke-linecap="round"]').count()).toBeGreaterThanOrEqual(3);
+  expect(await page.locator('#panew').count()).toBe(0);   // 2.2.1: no "New paint" button; the first stroke made the element
+  expect(await page.locator('#art #dyn path[stroke-linecap="round"]').count()).toBeGreaterThanOrEqual(2);
   expect(errors).toEqual([]);
 });
 
@@ -59,10 +54,6 @@ test('the eraser is a stroke of its own that masks the strokes before it, in its
   const p = (await paints(page))[0];
   expect(p.st.map(s => !!s.er)).toEqual([false, true]);
   expect(await page.locator('#art mask[id^="pe0_"]').count()).toBe(1);
-  await page.click('#panew');
-  await page.click('#pamode [data-m="brush"]');
-  await drag(page, [0.3, 0.3], [0.7, 0.3]);
-  expect(await page.locator('#art mask[id^="pe0_"]').count()).toBe(1);   // the second element has no eraser, so no mask of its own
   expect(errors).toEqual([]);
 });
 
@@ -127,6 +118,6 @@ test('a project with Paint strokes (and an eraser and an effect) saves and opens
   const r2 = await openApp(page2);
   await openProjectFile(page2, tmp);
   expect(await stateText(page2)).toBe(before);
-  expect(((JSON.parse(before).layers[0].pl) || []).find(q => q.k === 'paint').st).toHaveLength(2);
+  expect(((JSON.parse(before).els) || []).find(q => q.k === 'paint').st).toHaveLength(2);
   expect(errors.concat(r2.errors)).toEqual([]);
 });

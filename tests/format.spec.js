@@ -1,4 +1,4 @@
-// The project format (zip container, version check, validation, SVG cleaning). Pure code: no browser needed. Only the current format (22) opens: an older
+// The project format (zip container, version check, validation, SVG cleaning). Pure code: no browser needed. Only the current format (23) opens: an older
 // project is refused, a newer one opens read-only.
 const { test, expect } = require('@playwright/test');
 const fs = require('fs'), path = require('path'), { pathToFileURL } = require('url');
@@ -12,13 +12,13 @@ const MIME = 'application/vnd.wodblok+zip';
 const baseOf = f => JSON.parse(strFromU8(unzipSync(new Uint8Array(fs.readFileSync(path.join(FX, f))))['project.json']));
 const zipOf = p => zipSync({ mimetype: [strToU8(MIME), { level: 0 }], 'project.json': strToU8(JSON.stringify(p)) });
 
-test('every sample project opens as the current format (22) and the original bytes are not touched', async () => {
+test('every sample project opens as the current format (23) and the original bytes are not touched', async () => {
   const { fmtOpen } = await load('container.js');
   expect(fixtures.length).toBeGreaterThan(0);
   for (const f of fixtures) {
     const bytes = new Uint8Array(fs.readFileSync(path.join(FX, f))), before = Buffer.from(bytes).toString('base64');
     const r = await fmtOpen(bytes);
-    expect(r.newer).toBe(false); expect(r.project.v).toBe(22); expect(r.project.app).toBe('WODBLOK');
+    expect(r.newer).toBe(false); expect(r.project.v).toBe(23); expect(r.project.app).toBe('WODBLOK');
     expect(Buffer.from(bytes).toString('base64')).toBe(before);
   }
 });
@@ -68,7 +68,7 @@ test('damaged and hostile files give a friendly error, never a crash', async () 
   const cases = [
     ['empty', new Uint8Array(0)], ['text', new TextEncoder().encode('hello')], ['json array', new TextEncoder().encode('[1,2]')],
     ['json project (the old file kind)', new TextEncoder().encode(JSON.stringify(base))],
-    ['other app', zipOf({ app: 'X', v: 22 })], ['no stamps', zipOf({ app: 'WODBLOK', v: 22, tiles: [], layers: [] })],
+    ['other app', zipOf({ app: 'X', v: 23 })], ['no stamps', zipOf({ app: 'WODBLOK', v: 23, tiles: [], els: [] })],
     ['bad item', zipOf({ ...base, tiles: [{ items: [{ m: 5 }] }] })], ['older format (20)', zipOf({ ...base, v: 20 })], ['no format number', zipOf((({ v, ...r }) => r)(base))],
     ['truncated zip', good.subarray(0, Math.floor(good.length / 2))], ['zip header only', good.subarray(0, 30)],
   ];
@@ -91,7 +91,7 @@ test('a project that points at a missing picture still opens, and says so', asyn
   const { fmtOpen } = await load('container.js');
   const base = baseOf(fixtures[0]);
   delete base.cover; delete base.art;                                                         // the sample's own pictures are not in this file
-  const p = { ...base, v: 22, arts: { a: { n: 'A', src: 'wbasset:assets/' + 'a'.repeat(64) + '.png' } } };
+  const p = { ...base, v: 23, arts: { a: { n: 'A', src: 'wbasset:assets/' + 'a'.repeat(64) + '.png' } } };
   const zip = zipSync({ mimetype: [strToU8('application/vnd.wodblok+zip'), { level: 0 }], 'project.json': strToU8(JSON.stringify(p)) });
   const r = await fmtOpen(zip);
   expect(r.missingAssets).toBe(1); expect(r.project.arts.a.src).toBe('');

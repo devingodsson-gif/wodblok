@@ -79,7 +79,6 @@ test('Warp: Flag makes a wave that grows to the right', async ({ page }) => {
 test('Text layer: a path and a warp are saved on the text', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
-  await page.click('#ly_add');
   await openPanel(page, 'text');
   await settle(page);
   await page.fill('#tx_t', 'WAVE TEXT');
@@ -90,7 +89,7 @@ test('Text layer: a path and a warp are saved on the text', async ({ page }) => 
   await page.click('#tx_go');
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
   await set(page, 'tx_pt', 'w'); await set(page, 'tx_pa', 70);
-  const piece = async () => JSON.parse(await getState(page)).layers.flatMap(l => (l.pl || []).filter(p => p.tx))[0];
+  const piece = async () => JSON.parse(await getState(page)).els.filter(p => p.tx)[0];
   await expect.poll(async () => (await piece()).tx.pt, { timeout: 8000 }).toBe('w');
   expect((await piece()).tx.pa).toBe(70);
   await set(page, 'tx_wp', 'b'); await set(page, 'tx_wa', 50);

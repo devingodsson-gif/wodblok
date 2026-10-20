@@ -5,7 +5,7 @@ const { test, expect } = require('@playwright/test');
 const { ROOT, openApp, openProjectFile, openPanel, settle, getState, stateText, checkpoint, unlockStamp, stampInstance, clickStamp } = require('./helpers/harness');
 
 const FIX = n => path.join(ROOT, 'tests', 'fixtures', n);
-const PANEL_FIXTURE = 'project-4-rect-4x3.wodblok';   // frames, free place, textures, grade, blends, five layers
+const PANEL_FIXTURE = 'project-4-rect-4x3.wodblok';   // frames, free place, textures, grade, blends, elements
 
 async function randomize(page) {
   await openPanel(page, 'rand');
@@ -18,7 +18,7 @@ for (const seed of [1, 2, 3]) {
   test(`randomize with seed ${seed}`, async ({ page }, testInfo) => {
     const { errors } = await openApp(page, { seed });
     await randomize(page);
-    expect(JSON.parse(await getState(page)).layers.length).toBeGreaterThan(0);
+    expect(JSON.parse(await getState(page)).els.length).toBeGreaterThan(0);
     await checkpoint(page, testInfo, errors, `randomize-seed-${seed}`);
   });
 }
