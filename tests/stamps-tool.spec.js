@@ -64,7 +64,7 @@ test('the lock is in the stamp list only; one stamp is unlocked at a time and th
   const first = await page.evaluate(() => __wbTest.unlockedStamp());
   expect(first).toBeTruthy();
   await expect(locks.nth(0)).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('#smked')).toHaveText(/^Editing: Stamp 1 \(used on \d+ layers?\)$/);
+  await expect(page.locator('#smked')).toHaveText(/^Editing: Stamp 1 \(used by \d+ elements?\)$/);
   expect(await outlines(page, '.olu')).toBeGreaterThan(0);
   await locks.nth(1).click();
   await settle(page);

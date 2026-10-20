@@ -9,7 +9,7 @@ async function only(page, ft, subs) {
     const m = document.querySelector(`[data-ft="${ft}"]`); m.value = 100; m.dispatchEvent(new Event('input', { bubbles: true }));
   }, [ft, subs]);
 }
-const layers = async page => JSON.parse(await getState(page)).layers;
+const layers = async page => [{ pl: JSON.parse(await getState(page)).els }];
 // the Pattern elements of every layer
 const pats = async page => (await layers(page)).flatMap(l => (l.pl || []).filter(p => p.k === 'pattern'));
 const jits = async page => (await pats(page)).filter(p => (p.fx || []).some(e => e.k === 'jitter' && (e.pos || e.sz)));

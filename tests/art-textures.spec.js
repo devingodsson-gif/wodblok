@@ -4,7 +4,7 @@ const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAG0lEQVR4nGP4TyJgGOQaGHCAUQ301UAMGIQaAMSCPd+1UKgQAAAAAElFTkSuQmCC', 'base64');
 
-test('the Textures tool has an Apply block (Canvas, Stamps, Layers) and textures can still be added where you work', async ({ page }) => {
+test('the Textures tool has an Apply block (Canvas, Stamps) and textures can still be added where you work', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'tex');
   await page.click('#tx_add');
@@ -12,7 +12,7 @@ test('the Textures tool has an Apply block (Canvas, Stamps, Layers) and textures
   await expect(page.locator('#tx_edg')).toBeVisible();
   await expect(page.locator('#tx_del')).toBeVisible();
   await expect(page.locator('#tx_apg')).toBeVisible();
-  await expect(page.locator('#tx_to [data-t]')).toHaveText(['Canvas', 'Stamps', 'Layers']);
+  await expect(page.locator('#tx_to [data-t]')).toHaveText(['Canvas', 'Stamps']);
   // Canvas still takes a texture from the library
   await openPanel(page, 'canvas');
   const n0 = JSON.parse(await getState(page)).tex.u.length;

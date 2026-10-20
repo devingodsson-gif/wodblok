@@ -16,7 +16,6 @@ test('a full roll makes element layers: patterns with effects, a frame pattern a
   await openPanel(page, 'rand');
   let d;
   for (let i = 0; i < 6; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); d = await doc(page); if (els(d).some(p => p.lay === 'frame')) break; }
-  expect(d.layers.every(l => l.free)).toBe(true);
   expect(els(d).filter(p => p.k === 'pattern' && p.lay !== 'frame').length).toBeGreaterThan(0);
   expect(els(d).some(p => p.lay === 'frame')).toBe(true);
   expect(d.proj.sh).toBeTruthy();

@@ -6,6 +6,7 @@ const { openApp, openPanel, settle, getState, openProjectFile, noPattern } = req
 
 const setv = (page, id, v, ev = 'input') => page.locator('#' + id).evaluate((e, [v, ev]) => { e.value = v; e.dispatchEvent(new Event(ev, { bubbles: true })); }, [v, ev]);
 // a layer starts with a Pattern; 'x' takes it away and picks the first stamp so clicks on the canvas place stamps freely
+const vb = page => page.locator('#art').evaluate(e => e.getAttribute('viewBox').split(' ').map(Number));
 const pick = async (page, v) => { await noPattern(page); if (v === 'x') { await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page); } };
 
 test('Position across / down sets where the selected stamp sits, and a group moves together', async ({ page }) => {
