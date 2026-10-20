@@ -18,7 +18,7 @@ test('every sample project opens as the current format (24) and the original byt
   for (const f of fixtures) {
     const bytes = new Uint8Array(fs.readFileSync(path.join(FX, f))), before = Buffer.from(bytes).toString('base64');
     const r = await fmtOpen(bytes);
-    expect(r.newer).toBe(false); expect(r.project.v).toBe(23); expect(r.project.app).toBe('WODBLOK');
+    expect(r.newer).toBe(false); expect(r.project.v).toBe(24); expect(r.project.app).toBe('WODBLOK');
     expect(Buffer.from(bytes).toString('base64')).toBe(before);
   }
 });
