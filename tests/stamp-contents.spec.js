@@ -40,7 +40,7 @@ test('Make stamp from selection is off with nothing selected; a selected picture
   const t = s.tiles[s.tiles.length - 1];
   expect(t.el).toHaveLength(1);
   expect(t.el[0]).toMatchObject({ k: 'image' });
-  const pl = s.layers[0].pl;
+  const pl = s.els;
   expect(pl.filter(q => q.k === 'image')).toHaveLength(0);
   expect(pl.filter(q => q.k === 'stamp' && q.t === t.id)).toHaveLength(1);
   // the stamp's symbol carries the picture, and it draws on the canvas
@@ -94,6 +94,6 @@ test('selected text becomes a stamp that holds the text', async ({ page }) => {
   const t = s.tiles[s.tiles.length - 1];
   expect(t.el).toHaveLength(1);
   expect(t.el[0]).toMatchObject({ k: 'text' });
-  expect(s.layers[0].pl.filter(q => q.k === 'text')).toHaveLength(0);
+  expect(s.els.filter(q => q.k === 'text')).toHaveLength(0);
   expect(errors).toEqual([]);
 });

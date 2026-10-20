@@ -60,7 +60,7 @@ test('Position across / down sets where the selected stamp sits, and a group mov
   await expect(page.locator('#lfpx')).toBeVisible();
   const [, , W, H] = await vb(page);
   await setv(page, 'lfpx', 25); await setv(page, 'lfpy', 80); await settle(page);
-  const pl = JSON.parse(await getState(page)).layers[0].pl;
+  const pl = JSON.parse(await getState(page)).els;
   expect(pl[1].x).toBeCloseTo(W * 0.25, 0); expect(pl[1].y).toBeCloseTo(H * 0.8, 0);
   expect(errors).toEqual([]);
 });

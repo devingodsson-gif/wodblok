@@ -93,7 +93,7 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
   await settle(page);
-  expect(((await state(page)).layers[0].pl || []).filter(p => p.t === id2).length).toBe(1);
+  expect(((await state(page)).els || []).filter(p => p.t === id2).length).toBe(1);
   await page.keyboard.press('Escape');
   await show(page, 'stmp');
   await page.click('#smkdel');
@@ -104,7 +104,7 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   const s = await state(page);
   expect(s.tiles.length).toBe(1);
   expect(s.layers[0].st).not.toContain(id2);
-  expect((s.layers[0].pl || []).filter(p => p.t === id2).length).toBe(0);
+  expect((s.els || []).filter(p => p.t === id2).length).toBe(0);
   await expect(rows(page)).toHaveCount(1);
   expect(errors).toEqual([]);
   // one undo step brings it back

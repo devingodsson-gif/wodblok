@@ -31,9 +31,9 @@ test('Jitter on a placed stamp moves it, Reroll gives another nudge, and off put
   await noPattern(page);
   await placed(page);
   await expect.poll(() => useTransform(page)).toMatch(/rotate/);
-  const plain = await useTransform(page), x0 = (await st(page)).layers[0].pl[0].x;
+  const plain = await useTransform(page), x0 = (await st(page)).els[0].x;
   await addEffect(page, 'stamp', 'Jitter');
-  const fx = (await st(page)).layers[0].pl[0].fx;
+  const fx = (await st(page)).els[0].fx;
   expect(fx).toHaveLength(1);
   expect(fx[0]).toMatchObject({ k: 'jitter', on: true, pos: 20, rot: 15, sz: 0 });
   await expect.poll(() => useTransform(page)).not.toBe(plain);
@@ -41,7 +41,7 @@ test('Jitter on a placed stamp moves it, Reroll gives another nudge, and off put
   await page.locator('.fxg[data-fxk="stamp"] .fxjrr').click();
   await settle(page);
   await expect.poll(() => useTransform(page)).not.toBe(j1);
-  expect((await st(page)).layers[0].pl[0].x).toBe(x0);
+  expect((await st(page)).els[0].x).toBe(x0);
   await page.locator('.fxg[data-fxk="stamp"] .fxl [data-fon]').first().click();
   await settle(page);
   await expect.poll(() => useTransform(page)).toBe(plain);
@@ -55,7 +55,7 @@ test('a pattern\'s Jitter nudges each placement differently, and the same seed g
   await page.click('#penew');
   await settle(page);
   await addEffect(page, 'pattern', 'Jitter');
-  const fx = (await st(page)).layers[0].pl.find(p => p.k == 'pattern').fx;
+  const fx = (await st(page)).els.find(p => p.k == 'pattern').fx;
   expect(fx[0].k).toBe('jitter');
   const ts = () => page.evaluate(() => [...document.querySelectorAll('#art use[transform*="rotate"]')].slice(0, 6).map(u => u.getAttribute('transform')));
   await expect.poll(async () => new Set(await ts()).size).toBeGreaterThan(2);

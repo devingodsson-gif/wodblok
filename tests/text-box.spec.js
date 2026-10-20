@@ -15,7 +15,7 @@ test('typing changes the selected text box; Add text then arms a second one', as
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   await settle(page);
-  const texts = async () => JSON.parse(await getState(page)).layers.flatMap(l => (l.pl || []).filter(p => p.tx).map(p => p.tx.text));
+  const texts = async () => JSON.parse(await getState(page)).els.filter(p => p.tx).map(p => p.tx.text);
   await expect.poll(texts).toEqual(['ONE']);
   await page.click('#tx_go');
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);

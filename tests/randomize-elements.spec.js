@@ -9,7 +9,7 @@ async function only(page, ft) {
   }, ft);
 }
 const doc = async page => JSON.parse(await getState(page));
-const els = d => d.layers.flatMap(l => l.pl || []);
+const els = d => d.els;
 
 test('a full roll makes element layers: patterns with effects, a frame pattern and a Sheet', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 21 });

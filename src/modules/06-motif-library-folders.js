@@ -24,6 +24,14 @@ function selOne(i){WBS.sel=i;WBS.msel=new Set(i>=0?[i]:[])}
 let DEF_TILES;
 const luid=()=>'l'+Math.random().toString(36).slice(2,9);
 const mkL=(name,st,lay,size)=>({u:luid(),name,vis:true,st,lay,size,ox:0,oy:0,rot:0,pst:0,pfl:0});
+// The document is one ordered list of elements (format 23, owner Oct 20 2026); at run time WBS.layers is always exactly one free layer whose pl is that list.
+// A layer that is hidden, faded, blended or inked becomes a group row holding its elements, so what it did to them is kept.
+function flatEls(layers){const ls=Array.isArray(layers)?layers:[];const out=[];
+ ls.forEach(L=>{const pl=(L.pl||[]).filter(q=>q&&typeof q=='object');if(!pl.length)return;const op=L.op!=null?+L.op:100,bl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'',ink=L.ink||'';
+  if(L.vis!==false&&op>=100&&!bl&&!ink){out.push(...pl);return}
+  const g={u:'g'+String(L.u||luid()),k:'group',n:String(L.name||'Group').slice(0,30),...(L.vis===false?{v:false}:{}),...(op<100?{op}:{}),...(bl?{bl}:{}),...(ink?{ink}:{})};out.push(g);pl.forEach(q=>out.push(q.g?q:{...q,g:g.u}))});
+ return out}
+const oneLayer=(els,st,u)=>{const n=mkL('Layer 1',st,'check',180);if(u)n.u=u;n.free=true;n.ak={};n.man=false;n.ov={};n.fit='';n.gap=0;n.pl=els;return n};
 let _stT=0;const store=()=>{clearTimeout(_stT);_stT=setTimeout(store0,400)};
 const store0=()=>{_stT=0;try{kv.set('wb4_layers',JSON.stringify({layers:WBS.layers}));kv.set('wb2_proj',JSON.stringify(WBS.proj));kv.set('wb2_cust',JSON.stringify(cust));kv.set('wb2_tiles',JSON.stringify(WBS.tiles))}catch(e){}};
 const say=t=>{$('pmsg').textContent=t};
@@ -45,8 +53,8 @@ try{cust=JSON.parse(kv.get('wb2_cust')||'{}');Object.keys(cust).forEach(k=>{if(k
 try{const p=JSON.parse(kv.get('wb2_proj')||'null');if(p&&typeof p=='object')WBS.proj=p}catch(e){}
 WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));{const used=new Set();WBS.tiles.forEach(t=>{if(!t.id||used.has(t.id))t.id=WBS.nid++;used.add(t.id)})}
 WBS.layers=null;WBS.selL=0;
-try{const q=JSON.parse(kv.get('wb4_layers')||'null');if(q&&q.layers&&q.layers.length)WBS.layers=q.layers}catch(e){}
-if(!WBS.layers)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];trayLive();
+try{const q=JSON.parse(kv.get('wb4_layers')||'null');if(q&&q.layers&&q.layers.length)WBS.layers=[oneLayer(flatEls(q.layers),q.layers[0].st||[],q.layers[0].u)]}catch(e){}
+if(!WBS.layers)WBS.layers=[oneLayer([],WBS.tiles.map(t=>t.id))];trayLive();
 WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(id=>WBS.tiles.some(t=>t.id==id));if(L.lay=='brick'){L.lay='cols';if(!L.grid)L.grid='brick'}if(L.fit===true)L.fit='h';else if(!L.fit)L.fit=''});WBS.selL=WBS.layers.length-1;addEventListener('pagehide',()=>{if(_stT){clearTimeout(_stT);store0()}});document.addEventListener('visibilitychange',()=>{if(document.hidden&&_stT){clearTimeout(_stT);store0()}});
 }
-export {BF,DEF_TILES,REN,clean,cols,cust,fClean,fSave,inkOf,it,lsel,luid,mcSave,mk,mkL,pal,say,selOne,store,init06};
+export {BF,DEF_TILES,REN,clean,cols,cust,fClean,flatEls,fSave,inkOf,it,lsel,luid,mcSave,mk,mkL,oneLayer,pal,say,selOne,store,init06};

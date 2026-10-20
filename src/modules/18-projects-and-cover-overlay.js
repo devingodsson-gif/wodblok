@@ -1,7 +1,7 @@
 import {kv} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {C,CC,CH,CM,CW,bk,paintColors,saveCC,setDim,shOf} from './04-canvas-and-stamp-outlines.js';
-import {DEF_TILES,clean,cust,mkL,selOne,store} from './06-motif-library-folders.js';
+import {DEF_TILES,clean,cust,flatEls,mkL,oneLayer,selOne,store} from './06-motif-library-folders.js';
 import {gShOk} from './08-grid-shapes.js';
 import {migLayers} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -20,7 +20,7 @@ const PGD={show:false,n:8,m:'l',op:70,sh:'rect'};
 const pgFix=o=>{let g={...PGD};const nn=v=>Math.max(2,Math.min(60,Math.round(+v)||8));
  if(o&&typeof o=='object'){g={show:!!o.show,n:nn(o.n),m:o.m=='c'||o.m=='b'?o.m:'l',op:Math.max(10,Math.min(100,Math.round(+o.op)||70)),sh:gShOk(o.sh)};if(o.snap!==undefined)g.snap=!!o.snap;if(o.ss!==undefined)g.ss=!!o.ss}
  return g};
-const core=()=>({tiles:WBS.tiles,layers:WBS.layers,proj:WBS.proj,dim:WBS.dim,pr:WBS.pr,tex:WBS.tex,texLib:WBS.texLib,pg:{...WBS.pgrid},grade:WBX.wbGrade?WBX.wbGrade.get():null});
+const core=()=>({tiles:WBS.tiles,els:flatEls(WBS.layers),proj:WBS.proj,dim:WBS.dim,pr:WBS.pr,tex:WBS.tex,texLib:WBS.texLib,pg:{...WBS.pgrid},grade:WBX.wbGrade?WBX.wbGrade.get():null});
 const coreStr=()=>JSON.stringify(core());
 // ---- Book cover overlay: built-in label template, or the user's own image, centered with one scale.
 const blank=()=>({img:'',iw:0,ih:0,sc:100});let covB;let covS;
@@ -43,12 +43,11 @@ o+=R(x1-.25-2,b+g.th-.25-1.2,2,1.2,'#e0006e','6 3')+T(x1-1.25,b+g.th-.25-.55,'BA
 o+=T(b+g.tw/2,b+.4,'BACK')+T(x2+g.tw/2,b+.4,'FRONT');if(g.sw>.15)o+=T(x1+g.sw/2,b+g.th/2,'SPINE',1);G.innerHTML=o}
 function snapshot(){const c=JSON.parse(coreStr()),used=new Set();c.tiles.forEach(t=>t.items.forEach(q=>used.add(q.m)));
 const cm={};Object.keys(cust).forEach(k=>{if(used.has(k))cm[k]=cust[k]});
-return{app:'WODBLOK',v:22,...c,arts:artUsed(),cover:{img:cov.img,iw:cov.iw,ih:cov.ih,sc:cov.sc,tx:cov.tx!==false,on:$('cov').checked,back:covB,spine:covS,book:WBS.book},grade:WBX.wbGrade?WBX.wbGrade.get():null,lib:{motifs:cm,colors:C.filter(x=>CC.includes(x[0]))}}}
-function applySnap(d){if(!d||!Array.isArray(d.tiles)||!d.tiles.length||!Array.isArray(d.layers))throw new Error('Not a WODBLOK project');
+return{app:'WODBLOK',v:23,...c,arts:artUsed(),cover:{img:cov.img,iw:cov.iw,ih:cov.ih,sc:cov.sc,tx:cov.tx!==false,on:$('cov').checked,back:covB,spine:covS,book:WBS.book},grade:WBX.wbGrade?WBX.wbGrade.get():null,lib:{motifs:cm,colors:C.filter(x=>CC.includes(x[0]))}}}
+function applySnap(d){if(!d||!Array.isArray(d.tiles)||!d.tiles.length||!(Array.isArray(d.els)||Array.isArray(d.layers)))throw new Error('Not a WODBLOK project');
 WBS.ARTS=artLoad(d.arts);const L=d.lib||{};Object.entries(L.motifs||{}).forEach(([k,v])=>{if(!v||typeof v.svg!='string')return;if(k.startsWith('t|')){if(/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test(v.svg))cust[k]={n:String(v.n||'?').replace(/["<>&|]/g,'').slice(0,4),svg:v.svg,txt:1};return}if(k.startsWith('i|')){if(WBX.wbImpOk&&WBX.wbImpOk(k,v))cust[k]={n:String(v.n||'Imported shape').replace(/["<>&|]/g,'').slice(0,40),svg:v.svg,imp:1,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,200)}:{})}}else{const c=clean(v.svg);if(c)cust[k]={n:String(v.n||'shape').replace(/["<>&|]/g,'').slice(0,40),svg:c,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,200)}:{})}}});
 (L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();
-WBS.tiles=JSON.parse(JSON.stringify(d.tiles));WBS.layers=JSON.parse(JSON.stringify(d.layers));
-WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(id=>WBS.tiles.some(t=>t.id==id));});if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];
+WBS.tiles=JSON.parse(JSON.stringify(d.tiles));WBS.layers=[oneLayer(JSON.parse(JSON.stringify(Array.isArray(d.els)?d.els:flatEls(d.layers))),WBS.tiles.map(t=>t.id))];
 WBS.proj=trayIn({proj:d.proj&&typeof d.proj=='object'?JSON.parse(JSON.stringify(d.proj)):{},tiles:WBS.tiles,layers:WBS.layers}).proj;
 if(d.cover&&d.cover.book&&typeof d.cover.book=='object')WBS.book={...WBS.book,...d.cover.book};else WBS.book={...WBS.book,on:false};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}
 WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,3]};WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pgrid=pgFix(d.pg);

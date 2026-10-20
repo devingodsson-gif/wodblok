@@ -93,7 +93,7 @@ test('Text layer: a style applies to the selected text', async ({ page }) => {
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
   await page.click('#tsl .scf[data-k="Starter styles"]');
   await page.click('#tsl .scr:has-text("Swell")');
-  const piece = async () => JSON.parse(await getState(page)).layers.flatMap(l => (l.pl || []).filter(p => p.tx))[0];
+  const piece = async () => JSON.parse(await getState(page)).els.filter(p => p.tx)[0];
   await expect.poll(async () => (await piece()).tx.wp, { timeout: 8000 }).toBe('b');
   expect((await piece()).tx.text).toBe('STYLE ME');
   expect(errors).toEqual([]);

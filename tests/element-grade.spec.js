@@ -58,7 +58,7 @@ test('Colour grade on a placed stamp grades that stamp only', async ({ page }) =
   await page.click('#elb [data-k="stamp"]');
   await addEffect(page, 'stamp', 'Colour grade');
   await page.locator('.fxg[data-fxk="stamp"] .fxg_sat').fill('-100'); await settle(page);
-  const q = (await st(page)).layers[0].pl[0];
+  const q = (await st(page)).els[0];
   expect(q.fx[0]).toMatchObject({ k: 'grade', sat: -100 });
   expect(await gradeFilters(page, 'fg0_')).toBe(1);
   expect(errors).toEqual([]);

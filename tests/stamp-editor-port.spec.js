@@ -79,7 +79,7 @@ test('with every stamp locked the Text panel still fills a Text layer', async ({
   await settle(page);
   const s = await state(page);
   expect(s.tiles[0].items.filter(q => q.tg).length).toBe(0);
-  expect((s.layers[0].pl || []).filter(q => q.tx).length).toBe(1);
+  expect((s.els || []).filter(q => q.tx).length).toBe(1);
   expect(errors).toEqual([]);
 });
 

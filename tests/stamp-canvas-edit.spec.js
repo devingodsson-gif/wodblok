@@ -151,7 +151,7 @@ test('text typed in the Text panel goes into the unlocked stamp as letters, on e
   await expect.poll(async () => (await items(page)).length, { timeout: 15000 }).toBe(before + 2);
   const it = await items(page);
   expect(it.slice(-2).every(q => q.tg)).toBe(true);
-  expect(((await state(page)).layers[0].pl || []).filter(p => p.k !== 'pattern')).toHaveLength(0);   // only the Pattern is on the layer
+  expect(((await state(page)).els || []).filter(p => p.k !== 'pattern')).toHaveLength(0);   // only the Pattern is on the layer
   expect(errors).toEqual([]);
 });
 

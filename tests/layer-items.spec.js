@@ -28,7 +28,7 @@ function mixed(outDir) {
     { u: k + 'c', k: 'text', tx: { text: 'A', f: 'x', sz: 40 }, G: { k1: 'M0 0L10 0L10 10Z' }, Lt: [['k1', 0, 0, 0, 1]], bw: 10, bh: 10, n: 10, x: 800, y: 400, s: 120, r: 0, f: 1 },
   ];
   p.arts = { zart: { n: 'Dot', k: 'img', src: PNG, w: 1, h: 1 } };
-  p.layers[0].pl = items('p');
+  p.els = items('p');
   const free = JSON.parse(JSON.stringify(p.layers[0]));
   free.u = 'freeMixed'; free.name = 'Mixed free'; free.free = true; free.st = []; free.pl = items('f');
   p.layers.push(free);
@@ -49,7 +49,7 @@ test('a layer with an arrangement draws its stamps, picture and text on top of t
   await openProjectFile(page, file);
   const s = JSON.parse(await getState(page));
   expect(s.layers[0].free).toBeFalsy();
-  expect(s.layers[0].pl.map(q => Object.keys(q).find(k => ['t', 'a', 'tx'].includes(k)))).toEqual(['t', 'a', 'tx']);
+  expect(s.els.map(q => Object.keys(q).find(k => ['t', 'a', 'tx'].includes(k)))).toEqual(['t', 'a', 'tx']);
   await expect.poll(async () => (await drawn(page, 0)).art, { message: 'picture on the arrangement layer' }).toBe(true);
   await expect.poll(async () => (await drawn(page, 0)).text, { message: 'text on the arrangement layer' }).toBe(true);
   expect(await page.locator('#art image[id^="ar0_"]').count()).toBe(1);
@@ -79,7 +79,7 @@ test('the pictures used by items on any layer are saved with the project, and a 
   const saved = JSON.parse(Buffer.from(require('fflate').unzipSync(new Uint8Array(Buffer.from(dl.base64, 'base64')))['project.json']).toString('utf8'));
   expect(saved.v).toBe(22);
   expect(Object.keys(saved.arts)).toEqual(['zart']);
-  expect(saved.layers[0].pl.length).toBe(3);
+  expect(saved.els.length).toBe(3);
   const out = path.join(testInfo.outputDir, 'again.wodblok');
   fs.writeFileSync(out, Buffer.from(dl.base64, 'base64'));
   await page.reload();
@@ -91,8 +91,8 @@ test('the pictures used by items on any layer are saved with the project, and a 
 test('a layer whose pieces are damaged is refused with a friendly message', async () => {
   const { fmtOpen } = await nativeImport(pathToFileURL(path.join(ROOT, 'src', 'format', 'container.js')).href);
   const p = readProject(FIX);
-  p.layers[0].pl = [{ t: 1, x: 'nope', y: 3 }];
+  p.els = [{ t: 1, x: 'nope', y: 3 }];
   await expect(fmtOpen(projectZip(p))).rejects.toThrow(/damaged pieces/);
-  p.layers[0].pl = 'x';
+  p.els = 'x';
   await expect(fmtOpen(projectZip(p))).rejects.toThrow(/damaged pieces/);
 });

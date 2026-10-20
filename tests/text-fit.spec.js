@@ -84,7 +84,7 @@ test('Text layer: the new options are saved only when set', async ({ page }) => 
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
   await page.click('#tx_go'); await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);   // stop placing, then select the text
-  const tx = async () => JSON.parse(await getState(page)).layers.flatMap(l => l.pl || []).find(p => p.tx).tx;
+  const tx = async () => JSON.parse(await getState(page)).els.find(p => p.tx).tx;
   await expect.poll(async () => (await tx()).text, { timeout: 10000 }).toBe('HELLO WORLD');
   expect(Object.keys(await tx()).filter(k => ['pd', 'ft', 'ov'].includes(k))).toEqual([]);
   await set(page, 'tx_wd', 60); await set(page, 'tx_ht', 30); await set(page, 'tx_ft', 'f');

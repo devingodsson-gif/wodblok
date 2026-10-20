@@ -4,7 +4,7 @@ const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/h
 
 // a layer starts with a Pattern; 'x' takes it away and picks the first stamp so clicks on the canvas place stamps freely
 const pick = async (page, v) => { await noPattern(page); if (v === 'x') { await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page); } };
-const piece = async page => JSON.parse(await getState(page)).layers[0].pl[0];
+const piece = async page => JSON.parse(await getState(page)).els[0];
 const box = p => { const w = p.s * (p.wx || 1), h = p.s * (p.wy || 1); return { l: p.x - w / 2, r: p.x + w / 2, t: p.y - h / 2, b: p.y + h / 2, w, h }; };   // a stamp's tile is square here
 async function setup(page) {
   const r = await openApp(page, { seed: 4 });

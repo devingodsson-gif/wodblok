@@ -1190,13 +1190,13 @@ body.eyedrop{cursor:crosshair}
   </div></details>
  </section>
 <section class="pn" data-p="lyrs" hidden><div class="lys" id="lys">
- <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><div class="dd gmadd"><button type="button" class="ib" id="ly_add" title="New layer" aria-label="New layer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+ <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><div class="dd gmadd"><button type="button" class="ib" id="lygrp" title="Group the selected elements" aria-label="Group the selected elements" disabled><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5V6a2 2 0 012-2H7M17 4h1.5a2 2 0 012 2v1.5M20.5 16.5V18a2 2 0 01-2 2H17M7 20H5.5a2 2 0 01-2-2v-1.5"/><rect x="8" y="8" width="8" height="8" rx="1.5"/></svg></button><button type="button" class="ib" id="lyung" title="Ungroup" aria-label="Ungroup" disabled><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></button>
   </div></div>
  <div id="lybody">
   <div class="lyo"><span class="lyk">Blend</span><select id="ly_bl" title="Blend mode"><option value="">Normal</option><option value="multiply">Multiply (overprint)</option><option value="darken">Darken</option><option value="screen">Screen</option><option value="lighten">Lighten</option><option value="overlay">Overlay</option><option value="soft-light">Soft light</option><option value="behind">Behind (fills gaps only)</option><option value="cancel">Cancel out (overlap prints nothing)</option><option value="replace">Replace (overlap prints a colour)</option></select></div>
   <div class="lyop"><label>Opacity</label><input type="range" id="ly_op" min="0" max="100" value="100" data-u="%" data-def="100"></div>
-  <div class="lyo"><span class="lyk">Ink</span><div class="cwell" id="wl_ly"></div></div>
-  <div class="lyo" style="display:block"><span class="lyk" style="display:block;margin-bottom:6px">Texture</span><div class="txs" id="ly_tex"></div></div>
+  <div class="lyo" hidden><span class="lyk">Ink</span><div class="cwell" id="wl_ly"></div></div>
+  <div class="lyo" style="display:block" hidden><span class="lyk" style="display:block;margin-bottom:6px">Texture</span><div class="txs" id="ly_tex"></div></div>
   <div class="lyo" id="ly_rprow" hidden><span class="lyk">Replace</span><div class="cwell" id="wl_rp"></div></div>
   <div class="lyl2" id="lyl2"></div>
   

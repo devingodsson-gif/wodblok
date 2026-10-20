@@ -4,7 +4,7 @@ import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {DRT,NODRAFT,drOff} from './02-draft-mode-speedups.js';
 import {CASP,CH,CSN,CW,SH,SHN,SW,bk,closeDD,csk,placeFloat,rowMenu,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {trayIn} from './50-tray-core.js';
-import {selOne,store} from './06-motif-library-folders.js';
+import {flatEls,oneLayer,selOne,store} from './06-motif-library-folders.js';
 import {nr,symOf,tbSync} from './07-symmetry.js';
 import {fitTs,migLayers} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -22,13 +22,13 @@ import {stUnlocked} from './63-stamp-tool.js';
 
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
-const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',layers:'Pattern',cover:'Book cover',elimg:'Image',elsheet:'Sheet'};
+const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',layers:'Pattern',cover:'Book cover',elimg:'Image',elsheet:'Sheet'};
 let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Layers',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',mlist:'Elements',elimg:'Image',elsheet:'Sheet',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
+const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',mlist:'Elements',elimg:'Image',elsheet:'Sheet',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
 const EL_ONLY=['layers','stmp','motifs','text','elimg','elsheet','elpaint'];
 const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elimg','elsheet','elpaint','text','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec']};
@@ -358,8 +358,8 @@ function thRun(){if(WBS.WBDRG||WBX.wbHoldOn||WBX.wbRollHold||(WBX.wbTxBusy||0)>0
  const s=thWant;if(!s||s!==coreStr())return;thWant=null;thumb(120).then(u=>{const i=hist.lastIndexOf(s);if(u&&i>=0){histTh[i]=u;if(WBX.wbHistPaint)WBX.wbHistPaint()}})}
 function cap(){if(WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));if(stUnlocked()!=null&&!named&&/^Added shape/.test(histL[histL.length-1])&&seAuto()&&!wsFind('motifs'))setPanel('motifs',1);if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
-function applyCore(c){trayIn(c);WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
-WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=Math.min(WBS.selL,WBS.layers.length-1);selOne(-1);WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
+function applyCore(c){const els=Array.isArray(c.els)?c.els:flatEls(c.layers);c.layers=[oneLayer(els,c.tiles.map(t=>t.id))];trayIn(c);WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
+WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.selL=0;selOne(-1);WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
 store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd();if(WBX.wbGrade&&WBX.wbGrade.sync)WBX.wbGrade.sync()}   // a stamp's own grade is part of the stamp, so the Grading sliders are read again after every step
 // Loading a step normalises the document a little (for example every stamp gets an empty texture list), so the entry is re-read
 // after loading; otherwise the next capture sees a difference, adds a step and cuts off the steps still to redo.
@@ -426,7 +426,7 @@ const tipRows=()=>document.querySelectorAll('.ctl').forEach(row=>{const r=row.qu
 $('gti').onclick=()=>{WBS.edInk=!WBS.edInk;tbSync();upd()};
 $('gtx').onclick=()=>{WBS.edTx=!WBS.edTx;tbSync();upd()};
 $('gtm').onclick=()=>{WBS.edMk=!WBS.edMk;$('gtm').classList.toggle('on',WBS.edMk);$('gtm').setAttribute('aria-pressed',String(WBS.edMk));upd()};
-document.addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input,select,textarea'))return;if(!e.metaKey&&!e.ctrlKey&&e.key.toLowerCase()=='g'){WBS.pgrid.show=!WBS.pgrid.show;upd();if(WBX.wbCap)WBX.wbCap()}});
+document.addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input,select,textarea'))return;if(!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&e.key.toLowerCase()=='g'){WBS.pgrid.show=!WBS.pgrid.show;upd();if(WBX.wbCap)WBX.wbCap()}});
 // ---- randomize motifs on the current stamp
 try{const z=JSON.parse(kv.get('wb36_rz')||'null');if(z){$('rzp').value=z.p;$('rzr').value=z.r;$('rzs').value=z.s}}catch(e){}
 ['rzp','rzr','rzs'].forEach(id=>$(id).addEventListener('input',()=>{try{kv.set('wb36_rz',JSON.stringify({p:+$('rzp').value,r:+$('rzr').value,s:+$('rzs').value}))}catch(e){}}));

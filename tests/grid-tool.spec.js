@@ -34,31 +34,31 @@ test('Snap to grid in the Grid tool snaps every placed stamp, and off leaves the
   await openPanel(page, 'pgrid');
   await expect(page.locator('#pgn')).not.toBeChecked();
   await placeAt(page, 0.337, 0.411);
-  const free = JSON.parse(await getState(page)).layers[0].pl[0];
+  const free = JSON.parse(await getState(page)).els[0];
   await page.click('#pgn'); await settle(page);
   await expect(page.locator('#pgs')).toBeChecked();                       // snapping shows the grid
   await page.click('#pgm [data-g="l"]'); await settle(page);
   const d = await page.locator('#art').evaluate(e => (e.getAttribute('viewBox') || '0 0 1000 1000').split(/[ ,]+/).map(Number));
   const cell = d[2] / 8;
   await placeAt(page, 0.6221, 0.3333);
-  const pl = JSON.parse(await getState(page)).layers[0].pl;
+  const pl = JSON.parse(await getState(page)).els;
   expect(pl.length).toBe(2);
   expect(pl[1].x / cell).toBeCloseTo(Math.round(pl[1].x / cell), 1);       // on a crossing
   expect(pl[1].y / cell).toBeCloseTo(Math.round(pl[1].y / cell), 1);
   expect(Math.abs(free.x / cell - Math.round(free.x / cell))).toBeGreaterThan(0.01);   // the one placed before stayed where it was
   // Snap all to grid brings the first one in
   await page.click('#pgq'); await settle(page);
-  const all = JSON.parse(await getState(page)).layers[0].pl;
+  const all = JSON.parse(await getState(page)).els;
   all.forEach(p => { expect(p.x / cell).toBeCloseTo(Math.round(p.x / cell), 1); expect(p.y / cell).toBeCloseTo(Math.round(p.y / cell), 1); });
   // Cell centres
   await page.click('#pgm [data-g="c"]'); await settle(page);
   await placeAt(page, 0.8, 0.7);
-  const q = JSON.parse(await getState(page)).layers[0].pl[2];
+  const q = JSON.parse(await getState(page)).els[2];
   expect(q.x / cell - 0.5).toBeCloseTo(Math.round(q.x / cell - 0.5), 1);
   // off: free again
   await page.click('#pgn'); await settle(page);
   await placeAt(page, 0.15, 0.85);
-  const r = JSON.parse(await getState(page)).layers[0].pl[3];
+  const r = JSON.parse(await getState(page)).els[3];
   expect(Math.abs((r.x / cell - 0.5) - Math.round(r.x / cell - 0.5)) > 0.01 || Math.abs((r.y / cell - 0.5) - Math.round(r.y / cell - 0.5)) > 0.01).toBe(true);
   expect(errors).toEqual([]);
 });

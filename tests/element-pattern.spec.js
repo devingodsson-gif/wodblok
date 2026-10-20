@@ -3,7 +3,7 @@
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState, addStamp, noPattern } = require('./helpers/harness');
 
-const pats = async page => JSON.parse(await getState(page)).layers[0].pl.filter(q => q.k === 'pattern');
+const pats = async page => JSON.parse(await getState(page)).els.filter(q => q.k === 'pattern');
 const drawn = async (page, u) => page.$$eval(`#art [data-fp^="${u}."]`, es => es.length);
 
 test('New pattern puts a pattern on the layer with the current stamp as its source and draws a 4 x 4 grid of it', async ({ page }) => {

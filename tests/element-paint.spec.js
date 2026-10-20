@@ -5,7 +5,7 @@ const { test, expect } = require('@playwright/test');
 const { ROOT, openApp, openProjectFile, settle, getState, stateText } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
-const paints = async page => ((await st(page)).layers[0].pl || []).filter(q => q.k === 'paint');
+const paints = async page => ((await st(page)).els || []).filter(q => q.k === 'paint');
 const drag = async (page, from, to) => {
   const box = await page.locator('#art').boundingBox();
   const at = (f, i) => [box.x + box.width * f[0] + i * 3, box.y + box.height * f[1]];
@@ -118,6 +118,6 @@ test('a project with Paint strokes (and an eraser and an effect) saves and opens
   const r2 = await openApp(page2);
   await openProjectFile(page2, tmp);
   expect(await stateText(page2)).toBe(before);
-  expect(((JSON.parse(before).layers[0].pl) || []).find(q => q.k === 'paint').st).toHaveLength(2);
+  expect(((JSON.parse(before).els) || []).find(q => q.k === 'paint').st).toHaveLength(2);
   expect(errors.concat(r2.errors)).toEqual([]);
 });
