@@ -4,7 +4,7 @@ const { openApp, openPanel, showPanel, settle, getState } = require('./helpers/h
 
 const state = async page => JSON.parse(await getState(page));
 const tile = async page => (await state(page)).tiles[0];
-const unlock = async page => { await openPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); };
+const unlock = async page => { await showPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); };
 const pick = async page => { await openPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
 const toClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height, k: r.width / vb.width }; }, [x, y]);
 const inst = async page => {
@@ -41,7 +41,7 @@ async function twoShapes(page) {
 test('Stamp settings work from the Pattern view on the unlocked stamp: shape, size, invert, ink, edge', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await unlock(page);
-  await openPanel(page, 'stamp');
+  await showPanel(page, 'stmp');
   const d0 = await page.locator('#stol path.olu').first().getAttribute('d');
   await page.click('#skind [data-k="circle"]');
   await settle(page);
@@ -53,6 +53,10 @@ test('Stamp settings work from the Pattern view on the unlocked stamp: shape, si
   await page.check('#neg'); await settle(page);
   expect((await tile(page)).neg).toBe(true);
   await page.uncheck('#neg'); await settle(page);
+  await page.uncheck('#swrap'); await settle(page);
+  expect((await tile(page)).wr).toBe(false);
+  await page.check('#swrap'); await settle(page);
+  expect((await tile(page)).wr).toBeUndefined();
   await set(page, 'let', 6); await settle(page);
   expect((await tile(page)).et).toBe(6);
   await page.locator('#wl_st .cwsb').click();

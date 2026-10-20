@@ -33,7 +33,7 @@ test('every tool panel uses the same heading, button, dropdown, field and segmen
 
 test('the Stamp panel shape picker is the same tile picker as Canvas and the grid tools', async ({ page }) => {
   const { errors } = await openApp(page);
-  await page.click('#rail-stamp');
+  await page.click('#rail-stmp');
   await expect(page.locator('#skind')).toHaveClass(/shg/);
   expect(await page.locator('#skind button').count()).toBeGreaterThanOrEqual(5);
   expect(errors).toEqual([]);

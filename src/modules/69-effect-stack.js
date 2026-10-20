@@ -19,6 +19,11 @@ const fxTexUses=q=>fxOn(q).filter(e=>e.k=='texture'&&e.x).map(e=>({x:e.x,sd:e.sd
 function fxTex(q,id,b){const u=fxTexUses(q);if(!u.length||!WBS.edInk)return null;const s=txSpecs(u,'wear');if(!s.length)return null;const R=b.R||384;let defs='',attrs='';
 const v=txImgs(s,b.W,b.H,R,'host',txIsW,b.x,b.y);if(v){defs=`<mask id="${id}" maskUnits="userSpaceOnUse" x="${b.x}" y="${b.y}" width="${b.W}" height="${b.H}"><rect x="${b.x}" y="${b.y}" width="${b.W}" height="${b.H}" fill="#fff"/>${v}</mask>`;attrs+=` mask="url(#${id})"`}
 const f=txFilt(s,b.x,b.y,b.W,b.H,R);if(f)attrs+=` filter="url(#${f})"`;return attrs?{defs,attrs}:null}
+// Colour grade {ex ct hi sh wh bl tp tn sat vib hue fd}: the Grade panel's adjustments for one element. Returns {defs, wrap(markup)}: the markup inside one filter per grade effect, in the element's own units for a box b. null = no grade
+const GRL=[['ex','Exposure',-100,100],['ct','Contrast',-100,100],['hi','Highlights',-100,100],['sh','Shadows',-100,100],['wh','Whites',-100,100],['bl','Blacks',-100,100],['tp','Temperature',-100,100],['tn','Tint',-100,100],['sat','Saturation',-100,100],['vib','Vibrance',-100,100],['hue','Hue',-180,180],['fd','Fade',0,100]];
+function fxGr(q,id,b){if(!WBX.wbGrade||!WBX.wbGrade.elF)return null;const es=fxOn(q).filter(e=>e.k=='grade'),ds=[];es.forEach((e,i)=>{const d=WBX.wbGrade.elF(e,id+'_'+i,b.x,b.y,b.W,b.H);if(d)ds.push([id+'_'+i,d])});if(!ds.length)return null;return{defs:ds.map(d=>d[1]).join(''),wrap:c=>ds.reduce((o,d)=>`<g filter="url(#${d[0]})">${o}</g>`,c)}}
+// the box a grade filter covers: the element's box with room round it, as for a stamp
+const fxPad=(x,y,W,H)=>{const p=Math.max(W,H)*.15;return{x:x-p,y:y-p,W:W+2*p,H:H+2*p}};
 // pressure for one element: null when it has none of its own (the layer's setting then applies)
 function fxPress(q){const e=fxOn(q).filter(z=>z.k=='pressure');if(!e.length)return null;return{pst:Math.max(0,Math.min(10,+e[e.length-1].pst||0)),pfl:Math.max(0,Math.min(10,+e[e.length-1].pfl||0))}}
 
@@ -51,6 +56,9 @@ function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hid
 <label class="chk"><input type="checkbox" class="fxjv"><span>Flip down</span></label>
 <div class="row"><button type="button" class="alt fxjrr">Reroll</button></div>
 </div>
+<div class="fxs" data-e="grade" hidden>
+${GRL.map(([k,n,a,b])=>`<div class="ctl"><label>${n}</label><input type="range" class="fxg_${k}" min="${a}" max="${b}" value="0" data-def="0"></div>`).join('')}
+</div>
 <div class="fxs" data-e="pressure" hidden>
 <div class="ctl"><label>Pressure</label><input type="range" class="fxpp" min="0" max="10" value="4" data-def="4"></div>
 <div class="ctl"><label>Flooding</label><input type="range" class="fxpf" min="0" max="10" value="0" data-def="0"></div>
@@ -64,11 +72,13 @@ const sx=g.querySelector('.fxsx');sx.innerHTML=(lib.length?'':'<option value="">
 g.querySelectorAll('.fxs').forEach(s=>{const on=!!sel&&s.dataset.e==sel.k;if(s.hidden===on)s.hidden=!on});
 if(sel&&sel.k=='texture'){const sx=g.querySelector('.fxsx'),sm=g.querySelector('.fxsm');if(sx.value!==sel.x)sx.value=sel.x||'';if(sm.value!==(sel.md||'wear'))sm.value=sel.md||'wear'}
 if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxjp',+sel.pos||0);set('.fxjr2',+sel.rot||0);set('.fxjz',+sel.sz||0);g.querySelector('.fxjh').checked=!!sel.fh;g.querySelector('.fxjv').checked=!!sel.fv}
+if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=g.querySelector('.fxg_'+k),v=+sel[k]||0;if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}});
 if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxpp',+sel.pst||0);set('.fxpf',+sel.pfl||0)}})}
 function init69(){
 fxRegister('texture',{label:'Texture',kinds:['stamp','image','text','pattern','sheet'],make:()=>{const ids=(WBS.texLib||[]).map(x=>x.id),first=Object.keys(TXN)[0];const x=ids[0]||(first?txEnsure({t:first,a:40,sc:100,az:225}):'');return{k:'texture',on:true,x,sd:txRid(),md:'wear'}}});
 fxRegister('pressure',{label:'Pressure offset',kinds:['stamp','pattern'],make:()=>({k:'pressure',on:true,pst:4,pfl:0})});
 fxRegister('jitter',{label:'Jitter',kinds:['stamp','image','text','pattern'],make:()=>({k:'jitter',on:true,pos:20,rot:15,sz:0,sd:txRid()})});
+fxRegister('grade',{label:'Colour grade',kinds:['stamp','image','text','pattern','sheet'],make:()=>({k:'grade',on:true,...Object.fromEntries(GRL.map(r=>[r[0],0]))})});
 Object.entries(KIND_PANEL).forEach(([kind,pn])=>{const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec)return;sec.insertAdjacentHTML('beforeend',fxGroup(kind))});
 document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,tg=()=>fxTarget(kind),cur=()=>{const t=tg();return t?fxOf(t).find(e=>e.u==SEL[kind])||null:null};
 g.querySelector('.fxadd').onclick=e=>{e.stopPropagation();const t=tg();if(!t)return;rowMenu(e.currentTarget,fxFor(kind).map(d=>[d.label,()=>{const t2=tg();if(!t2)return;const f=d.make();f.u=fpU();(t2.fx=t2.fx||[]).push(f);SEL[kind]=f.u;fxCh()}]))};
@@ -81,9 +91,10 @@ SEL[kind]=L[i].u;fxSync()};
 g.querySelector('.fxsx').onchange=()=>{const e=cur();if(e){e.x=g.querySelector('.fxsx').value;fxCh()}};
 g.querySelector('.fxsm').onchange=()=>{const e=cur();if(e){e.md=g.querySelector('.fxsm').value;fxCh()}};
 g.querySelector('.fxrr').onclick=()=>{const e=cur();if(e){e.sd=txRid();fxCh()}};
+GRL.forEach(([k])=>g.querySelector('.fxg_'+k).addEventListener('input',()=>{const e=cur();if(!e||e.k!='grade')return;const v=+g.querySelector('.fxg_'+k).value;if(e[k]!==v){e[k]=v;fxCh()}}));
 [['.fxjp','pos'],['.fxjr2','rot'],['.fxjz','sz']].forEach(([c,f])=>g.querySelector(c).addEventListener('input',()=>{const e=cur();if(!e||e.k!='jitter')return;const v=+g.querySelector(c).value;if(e[f]!==v){e[f]=v;fxCh()}}));
 [['.fxjh','fh'],['.fxjv','fv']].forEach(([c,f])=>g.querySelector(c).onchange=()=>{const e=cur();if(e&&e.k=='jitter'){e[f]=g.querySelector(c).checked;fxCh()}});
 g.querySelector('.fxjrr').onclick=()=>{const e=cur();if(e&&e.k=='jitter'){e.sd=txRid();fxCh()}};
 [['.fxpp','pst'],['.fxpf','pfl']].forEach(([c,f])=>g.querySelector(c).addEventListener('input',()=>{const e=cur();if(!e||e.k!='pressure')return;const v=+g.querySelector(c).value;if(e[f]!==v){e[f]=v;fxCh()}}))});
 WBX.wbFxSync=fxSync}
-export {fxJit,fxPress,fxSync,fxTex,fxTexUses,init69};
+export {fxGr,fxJit,fxPad,fxPress,fxSync,fxTex,fxTexUses,init69};

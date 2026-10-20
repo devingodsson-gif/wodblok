@@ -31,7 +31,7 @@ return`<mask id="${id}" maskUnits="userSpaceOnUse" x="-110" y="-110" width="220"
 function inkRuns(t){if(t.neg||!t.items.some(q=>q.ic))return null;const a=t.items,runs=[];a.forEach((q,i)=>{if(q.k)return;const c=q.ic||'',l=runs[runs.length-1];if(l&&l.c===c)l.ix.push(i);else runs.push({c,ix:[i]})});
  runs.forEach(r=>{const set=new Set(r.ix),end=r.ix[r.ix.length-1];r.sel=i=>set.has(i)||(!!a[i].k&&i>end)});return runs}
 function items(t,cl,ed,e,sel){let o='';expand(t).forEach(([q,i,c])=>{if(sel&&!sel(i))return;const SX=q.sx||1,SY=q.sy||1,r=70*q.s*Math.max(SX,SY),own=ed&&q.ic&&!t.neg&&!q.k?col(q.ic):cl.c,m0=q.k?mk(q.m,cl.d,cl.c):mk(q.m,own,cl.d);
-for(const[dx,dy]of OFFS){const m=clipWrap(q,q.k?(thick(q,cl.c,cl.d)||m0):solid(q,own,ed));const x=q.x+dx,y=q.y+dy;if(x+r<-e||x-r>SW+e||y+r<-e||y-r>SH+e)continue;
+for(const[dx,dy]of(t.wr===false?[[0,0]]:OFFS)){const m=clipWrap(q,q.k?(thick(q,cl.c,cl.d)||m0):solid(q,own,ed));const x=q.x+dx,y=q.y+dy;if(x+r<-e||x-r>SW+e||y+r<-e||y-r>SH+e)continue;
 o+=`<g${ed?` data-i="${i}" data-c="${c}"`:''} transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${q.r}) scale(${+(q.s*q.f*SX).toFixed(4)} ${+(q.s*SY).toFixed(4)})">${m}</g>`}});return o}
 function draw(){if(texNorm())buildTex();useT(WBS.tiles[WBS.cur]);if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];if(WBS.selL<0||WBS.selL>=WBS.layers.length)WBS.selL=WBS.layers.length-1;trayGuard();WBS.tiles.forEach(t=>{if(t.ink&&!okC(t.ink))delete t.ink});sync();const t=WBS.tiles[WBS.cur],cl=cols(t);selFix();const q=t.items[WBS.sel];
 if(WBS.split&&(WBS.split.i!=WBS.sel||!stTxMode()||!q))WBS.split=null;$('spbar').hidden=!WBS.split;

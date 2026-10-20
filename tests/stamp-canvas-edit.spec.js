@@ -2,11 +2,11 @@
 // that stamp where the pointer is (through the instance under it), a click selects a shape inside an instance, dragging moves it, the square handles
 // resize it, the round one turns it, Delete removes it. Locked stamps are not touched.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const items = async page => (await state(page)).tiles[0].items;
-const unlock = async page => { await openPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); };
+const unlock = async page => { await showPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); };
 const pick = async page => { await openPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
 const toClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height, k: r.width / vb.width }; }, [x, y]);
 // an instance whose middle is well inside the canvas: its number and where its middle is, in canvas units and on screen
@@ -129,7 +129,7 @@ test('placing is one undo step, and locking the stamp hides the selection', asyn
   await click(page, await inst(page));
   expect((await items(page)).length).toBe(before + 1);
   await page.keyboard.press('Escape');
-  await openPanel(page, 'stmp');
+  await showPanel(page, 'stmp');
   await page.locator('#stmpl .smklk').first().click();
   await settle(page);
   await expect(page.locator('#stoh .steh')).toHaveCount(0);
@@ -175,7 +175,7 @@ test('the Edit group of the Shape panel acts on the shape placed in the unlocked
 test('Stamp settings is a Pattern tool: symmetry makes copies that can be selected and dragged on the canvas', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await unlock(page);
-  await openPanel(page, 'stamp');
+  await showPanel(page, 'stmp');
   await page.click('#sym [data-y="lr"]');
   await settle(page);
   expect((await state(page)).tiles[0].sym.m).toBe('lr');
