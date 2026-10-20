@@ -74,7 +74,7 @@ test('with nothing typed, the list starts with what you ran last, then commands 
   const first = await rowsOf(page);
   // Pattern view: the stamp editor's motif commands are listed after the ones that apply here
   expect(first.indexOf('Duplicate shape')).toBeGreaterThan(first.indexOf('Open Canvas'));
-  expect(first.indexOf('Knock out')).toBeGreaterThan(first.indexOf('Open Layers'));
+  expect(first.indexOf('Knock out')).toBeGreaterThan(first.indexOf('Open Elements'));
   // run a command from the list: it comes first next time
   await page.keyboard.type('zoom in');
   await page.keyboard.press('Enter');

@@ -83,8 +83,8 @@ test('selected text becomes a stamp that holds the text', async ({ page }) => {
   await settle(page);
   await canvasClick(page, 0.5, 0.5);
   await page.keyboard.press('Escape');         // put the text tool down
-  await openPanel(page, 'mlist');
-  await page.click('#lfpl .mr');                // select the text from the Elements list
+  await openPanel(page, 'lyrs');
+  await page.click('#lyl2 .lyr');                // select the text from the Elements list
   await settle(page);
   await page.click('#elb [data-k="stamp"]');
   await expect(page.locator('#stmksel')).toBeEnabled();

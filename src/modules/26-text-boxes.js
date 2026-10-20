@@ -79,4 +79,4 @@ $('tx_new').addEventListener('click',()=>{if(stTxMode())return;WBS.fpSel=-1;WBS.
 $('tx_file').addEventListener('change',async()=>{if(stTxMode())return;const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl||!WBX.wbTxAddFont)return;try{const id=await WBX.wbTxAddFont(fl);$('tx_f').value=id;tbLive();pmsg(`Loaded “${fl.name.replace(/\.[a-z0-9]+$/i,'')}”.`)}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}});
 WBX.wbTbHas=()=>!!tbSel();WBX.wbTbMode=()=>{tbKey='';const L=fpL();if(L)txbSync(L);else{$('tx_ed').hidden=true;$('tx_sprow').hidden=true}tbArmUI()};if(WBX.wbTxMode)WBX.wbTxMode('pattern')}
 }
-export {fx1,tbG,tbRead,tbSty,txbSync,txtGl,txtLayer,init26};
+export {fx1,tbArm,tbG,tbRead,tbSty,txbSync,txtGl,txtLayer,init26};

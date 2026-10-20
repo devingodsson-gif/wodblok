@@ -51,9 +51,9 @@ test('a stamp is placed from the Stamp panel, listed in Elements, and the Stamp 
   await page.click('#lfpst [data-t]');          // stop placing
   const pl = JSON.parse(await getState(page)).els;
   expect(pl.length).toBe(1);
-  await openPanel(page, 'mlist');
-  await expect(page.locator('#lfpl .mr')).toHaveCount(1);
-  await page.click('#lfpl .mr');
+  await openPanel(page, 'lyrs');
+  await expect(page.locator('#lyl2 .lyr')).toHaveCount(1);
+  await page.click('#lyl2 .lyr');
   await settle(page);
   await page.click('#elb [data-k="stamp"]');
   await expect(page.locator('.elmode[data-k="stamp"]')).toBeVisible();

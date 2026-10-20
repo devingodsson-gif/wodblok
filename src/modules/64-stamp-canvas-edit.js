@@ -1,6 +1,6 @@
 import {$,WBH,WBS,WBX,mod} from './01-launch-and-version.js';
 import {OFFS,SH,SW,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
-import {it,selOne,store} from './06-motif-library-folders.js';
+import {inkOf,it,mk,pal,selOne,store} from './06-motif-library-folders.js';
 import {DOTK} from './05-motif-data.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {symOps} from './07-symmetry.js';
@@ -14,7 +14,7 @@ import {STP,stMatrix,stUnlocked,stampAt,stLock} from './63-stamp-tool.js';
 // so the shape lands where it was pointed at whatever the layer's rotation, turn, flip or size variation. The stamp's items are one list, so every instance and every layer that uses the stamp shows the edit. Clicks that do not land on an instance of the unlocked stamp
 // are left to the layer, as before. Text typed in the Text panel is put into the stamp the same way (as letters tagged tg); a click on a
 // letter of such a text selects the whole text (Alt-click one letter), which puts the text into the Text panel to be edited live.
-const SCE={d:null,h:null,m:null,sp:null,ai:null};
+const SCE={d:null,h:null,m:null,sp:null,ai:null,g:null};
 // the unlocked stamp, if it is also the open stamp (the selection indexes belong to the open stamp)
 const sceRO=()=>{const id=stUnlocked();if(id==null)return null;const t=WBS.tiles[WBS.cur];return t&&t.id===id?t:null};
 function sceOpen(){const id=stUnlocked();if(id==null)return null;const k=WBS.tiles.findIndex(t=>t.id===id);if(k<0)return null;if(WBS.cur!==k){WBS.cur=k;selOne(-1)}return WBS.tiles[k]}
@@ -72,8 +72,14 @@ function sceUp(e){if(SCE.sp){SCE.sp=null;return}
  const d=SCE.d;if(!d)return;SCE.d=null;WBS.WBDRG=0;$('texg').style.display='';if(!d.moved)return;
  sceWith(d.t,()=>{[d.q.x,d.q.y]=wrapP(d.q.x,d.q.y);d.st.forEach(([w])=>{[w.x,w.y]=wrapP(w.x,w.y)})});store();upd()}
 // the selection box (and, for one shape, the handles) drawn on the instance that was last used, in canvas units; handle sizes are fixed on screen
-function sceDraw(){const g=$('stoh');if(!g)return;const t=sceRO();if(!t||!WBS.msel.size){g.innerHTML='';return}
- let ai=SCE.ai;if(ai==null||!STP.items[ai]||STP.items[ai][0]!==t.id)ai=SCE.ai=STP.items.findIndex(x=>x[0]===t.id);if(ai<0){g.innerHTML='';return}
+// The ghost of the shape picked in the Shapes panel, on the pointer: over a stamp it sits where a click would put it (same snap, same size and turn, drawn through the
+// instance's matrix); anywhere else on the canvas it follows the pointer, fainter, at the size of the first stamp.
+function sceGhost(){const b=WBS.brush,g=SCE.g;if(!b||b.txt||!g||!b.m)return'';const t=WBS.tiles[WBS.cur];if(!t)return'';const t0=stUnlocked(),h=stampAt(g.x,g.y,t0),ink=inkOf(t),bg=pal()[0],f=v=>v.toFixed(3);let tr,op;
+ if(h){const M=stMatrix(STP.items[h.i]),sn=sceSnap(M,h.u,h.v,{altKey:g.alt}),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0,r=b.r+(flip?th:-th);tr=`matrix(${f(M.a)} ${f(M.b)} ${f(M.c)} ${f(M.d)} ${f(M.e)} ${f(M.f)}) translate(${f(sn.x)} ${f(sn.y)}) rotate(${f(r)}) scale(${f(b.s)})`;op=.6}
+ else{const it0=STP.items[0];if(!it0)return'';const M=stMatrix(it0),k=Math.hypot(M.a,M.b);tr=`translate(${f(g.x)} ${f(g.y)}) rotate(${f(b.r)}) scale(${f(k*b.s)})`;op=.3}
+ return`<g class="stgh" pointer-events="none" opacity="${op}" transform="${tr}">${mk(b.m,ink,bg)}</g>`}
+function sceDraw(){const g=$('stoh');if(!g)return;const gh=sceGhost(),t=sceRO();if(!t||!WBS.msel.size){g.innerHTML=gh;return}
+ let ai=SCE.ai;if(ai==null||!STP.items[ai]||STP.items[ai][0]!==t.id)ai=SCE.ai=STP.items.findIndex(x=>x[0]===t.id);if(ai<0){g.innerHTML=gh;return}
  const a=$('art'),m0=a&&a.getScreenCTM(),sc=(m0&&m0.a)||1,hs=3.5/sc,off=18/sc,M=stMatrix(STP.items[ai]),f=v=>v.toFixed(2);let h='';
  const P=(x,y)=>{const q=M.transformPoint({x,y});return[q.x,q.y]};
  const box=q=>{const rx=48*q.s*(q.sx||1),ry=48*q.s*(q.sy||1),r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return{rx,ry,L:(u,v)=>P(+q.x+u*c-v*s,+q.y+u*s+v*c)}};
@@ -85,7 +91,7 @@ function sceDraw(){const g=$('stoh');if(!g)return;const t=sceRO();if(!t||!WBS.ms
   h+=`<line class="stes" x1="${f(T[0])}" y1="${f(T[1])}" x2="${f(R[0])}" y2="${f(R[1])}"/><circle class="steh" data-hd="rot" cx="${f(R[0])}" cy="${f(R[1])}" r="${f(hs*1.15)}" cursor="grab"/>`}
  if(WBS.split&&WBS.split.i===WBS.sel){const q2=t.items[WBS.split.i];if(q2){const L=52*q2.s*Math.max(q2.sx||1,q2.sy||1)+14,a=WBS.split.a*Math.PI/180,ux=Math.cos(a)*L,uy=Math.sin(a)*L,p1=P(WBS.split.x-ux,WBS.split.y-uy),p2=P(WBS.split.x+ux,WBS.split.y+uy),pc=P(WBS.split.x,WBS.split.y),ln=(c,x)=>`<line class="${c}" ${x} x1="${f(p1[0])}" y1="${f(p1[1])}" x2="${f(p2[0])}" y2="${f(p2[1])}"/>`;
   h+=ln('stsp','')+ln('stsph','data-sp="m"')+`<circle class="steh" data-sp="m" cx="${f(pc[0])}" cy="${f(pc[1])}" r="${f(hs*1.15)}" cursor="move"/><circle class="steh" data-sp="r" cx="${f(p2[0])}" cy="${f(p2[1])}" r="${f(hs*1.4)}" cursor="grab"/>`}}
- g.innerHTML=h}
+ g.innerHTML=h+gh}
 function sceKey(e){if(WBS.brush&&e.key!=='Delete')return;const tg=e.target;if(tg&&tg.matches&&tg.matches('input,select,textarea,[contenteditable]'))return;const t=sceRO();if(!t||!WBS.msel.size)return;
  if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();delItems([...WBS.msel]);selOne(-1);store();upd()}else if(e.key=='Escape'){selOne(-1);sceSel()}
  else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='s'||e.key=='S')){e.preventDefault();$('ssp').click()}
@@ -95,6 +101,7 @@ function init64(){
  const w=$('artwrap');if(w)w.addEventListener('pointerdown',sceDown,true);
  document.addEventListener('pointermove',sceMove);document.addEventListener('pointerup',sceUp);document.addEventListener('pointercancel',sceUp);
  document.addEventListener('keydown',sceKey);
+ if(w){w.addEventListener('pointermove',e=>{if(!WBS.brush||WBS.brush.txt){if(SCE.g){SCE.g=null;sceDraw()}return}const c=scePt(e);SCE.g=c?{x:c.x,y:c.y,alt:e.altKey}:null;sceDraw()});w.addEventListener('pointerleave',()=>{if(SCE.g){SCE.g=null;sceDraw()}})}
  try{new ResizeObserver(sceDraw).observe($('art'))}catch(e){}}
 // a shape dragged from the Shapes panel and let go over an instance of the unlocked stamp is put in the stamp at that point
 function sceDropShape(k,e){const t0=stUnlocked();if(t0==null)return false;const c=scePt(e);if(!c)return false;const h=stampAt(c.x,c.y,t0);if(!h)return false;const t=sceOpen();if(!t)return false;

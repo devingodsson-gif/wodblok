@@ -32,11 +32,11 @@ test('Placing: Esc stops placing', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('Placed list: no explanatory empty-state text (UX review D3)', async ({ page }) => {
+test('Elements list: no explanatory empty-state text (UX review D3)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  await openPanel(page, 'mlist');
-  await expect(page.locator('#lfpl')).not.toContainText('show up here');
-  await expect(page.locator('#lfpl')).not.toContainText('Stamps you place');
+  await openPanel(page, 'lyrs');
+  await expect(page.locator('#lyl2')).not.toContainText('show up here');
+  await expect(page.locator('#lyl2')).not.toContainText('Stamps you place');
   expect(errors).toEqual([]);
 });

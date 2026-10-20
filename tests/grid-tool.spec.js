@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { openApp, openPanel, settle, getState, openProjectFile, noPattern } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, openProjectFile, noPattern, armStamp } = require('./helpers/harness');
 
 // a layer starts with a Pattern; 'x' takes it away and picks the first stamp so clicks on the canvas place stamps freely
 const pick = async (page, v) => { await noPattern(page); if (v === 'x') { await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page); } };
@@ -23,6 +23,7 @@ test('the Grid tool in the Pattern view has the name Grid and an icon', async ({
 });
 
 async function placeAt(page, fx, fy) {
+  await armStamp(page);
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
   await settle(page);

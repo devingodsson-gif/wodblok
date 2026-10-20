@@ -47,8 +47,8 @@ Object.values(DD).forEach(f=>f())}
 function init13(){
 // ---- Stamp tool: pick a motif in the library, then click on the stamp to stamp it. Scroll resizes, [ ] rotates, Esc or right-click stops.
 WBS.brush=null;
-document.addEventListener('contextmenu',e=>{if(WBS.brush){e.preventDefault();WBS.brush=null;upd();return}
-if(typeof WBS.fpB!='undefined'&&(WBS.fpB||WBS.txArm||WBS.fpSel!==-1)&&fpL()){e.preventDefault();WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}e.preventDefault()},true);
+document.addEventListener('contextmenu',e=>{const was=WBX.plDisarm?WBX.plDisarm():false;
+if(typeof WBS.fpB!='undefined'&&(was||WBS.fpSel!==-1)&&fpL()){e.preventDefault();WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}e.preventDefault()},true);
 mlFold=new Set();try{mlFold=new Set(JSON.parse(kv.get('wb18_mlfold')||'[]'))}catch(e){}
 $('mlist').onmousedown=e=>{if(e.shiftKey&&e.target.closest('.mr'))e.preventDefault()};
 $('mlist').onclick=e=>{const ML=$('mlist'),C=q=>{const x=e.target.closest(q);return x&&ML.contains(x)?x:null},t=WBS.tiles[WBS.cur],add=e.shiftKey||e.ctrlKey||e.metaKey,rng=e.shiftKey,ofName=nm=>t.items.map((q,i)=>(q.tg?'txt:'+q.tg:mName(q.m))==nm?i:-1).filter(i=>i>=0);

@@ -52,8 +52,8 @@ test('Colour grade on a placed stamp grades that stamp only', async ({ page }) =
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   await page.click('#lfpst [data-t]');
-  await openPanel(page, 'mlist');
-  await page.click('#lfpl .mr');
+  await openPanel(page, 'lyrs');
+  await page.click('#lyl2 .lyr');
   await settle(page);
   await page.click('#elb [data-k="stamp"]');
   await addEffect(page, 'stamp', 'Colour grade');

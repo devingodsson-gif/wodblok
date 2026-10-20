@@ -51,8 +51,8 @@ test('a placed stamp gets Pressure offset from its own Effects group; the layer\
   await canvasClick(page, 0.5, 0.5);
   await page.click('#lfpst [data-t]');          // stop placing
   await expect(page.locator('.fxg[data-fxk="stamp"]')).toBeHidden();
-  await openPanel(page, 'mlist');
-  await page.click('#lfpl .mr');
+  await openPanel(page, 'lyrs');
+  await page.click('#lyl2 .lyr');
   await settle(page);
   await page.click('#elb [data-k="stamp"]');
   await expect(page.locator('.fxg[data-fxk="stamp"]')).toBeVisible();
@@ -105,8 +105,8 @@ test('Pressure offset on a stamp makes its own pressure variants; without it the
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   await page.click('#lfpst [data-t]');
-  await openPanel(page, 'mlist');
-  await page.click('#lfpl .mr');
+  await openPanel(page, 'lyrs');
+  await page.click('#lyl2 .lyr');
   await settle(page);
   await page.click('#elb [data-k="stamp"]');
   // the bitmap cache prints every variant into a bk picture, so the placed stamp's picture changes when its own pressure variant replaces the plain stamp

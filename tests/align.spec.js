@@ -1,6 +1,6 @@
 // 1.28.0 Align: the 3x3 grid, centre across / down and distribute, for Free place; on a book cover the region the item is in.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, armStamp } = require('./helpers/harness');
 
 // 2.1.2: Align lives in the Elements panel; the arrangement control in Pattern
 // the layer starts with a Pattern; 'x' takes it away so clicks on the canvas place stamps freely
@@ -8,6 +8,7 @@ const pick = async (page, v) => { await showPanel(page, 'layers'); if (v === 'x'
 const pl = async page => JSON.parse(await getState(page)).els;
 const dims = async page => (await page.locator('#art').evaluate(e => (e.getAttribute('viewBox') || '0 0 1000 1000'))).split(/[ ,]+/).map(Number);
 async function place(page, fx, fy) {
+  await armStamp(page);
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
   await settle(page);
