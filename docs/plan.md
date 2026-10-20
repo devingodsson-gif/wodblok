@@ -388,3 +388,9 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - Randomize makes its Sheet as an element (`rzSheet` returns one).
 - Snapshots regenerated with the owner's approval (Oct 20 2026): roundtrip (3 projects) and scenarios (28 state/SVG files), because the Sheet moved from `proj.sh` into the element list.
 - Plan: 2.2.5 the rest of the engine clean-up and Randomize/templates on the flat list (docs/element-list-plan.md).
+
+## 2.2.5 (Oct 20 2026): the old arrangement engine is gone
+- Removed: the grid and arrangement engine (`lattice`, `arrOf`, `fitTs`, radial points, `latG` and friends in 10-layer-grids.js), the frame-layer module (23-frame-layers.js), the hidden layer-level groups of the Pattern panel (Arrangement, Stamps in the pattern, Manual arrangement, Variation, Impression) with their handlers and styles, the "Fit to frame" control, the layer-level scatter/turn/flip block in the free-place drawing, and the dead old-layer branches of Randomize's Layout and Impression rolls.
+- Kept on purpose: the arrangement table Randomize still picks from (`arrOpts`, `GRAD`, `gArrAll`, now in 71-randomize-elements.js as plain data) so every seeded roll and every snapshot stays the same. A roll still describes its layers the old way for a moment and `rzMainEls` / `rzFrameEls` turn them into Pattern elements; rebuilding Randomize to emit elements directly would change every roll (all snapshots), so it waits for the owner's word.
+- Tests: `frame-inverted` now checks an inverted stamp repeated edge to edge in a Pattern (the old Frame layer is gone); the speed and print specs move their slider from the removed `ts` to the Pattern size slider `pesz`; the perf baseline sliders likewise.
+- No file format change; snapshots and goldens unchanged.
