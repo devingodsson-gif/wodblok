@@ -43,8 +43,8 @@ test('a picture and then a stamp go into the same list; each is its own placed i
   await canvasClick(page, 0.7, 0.7);
   const l = await els(page);
   expect(l.map(q => (q.a ? 'a' : q.t ? 't' : '?'))).toEqual(['a', 't']);
-  await showPanel(page, 'mlist');
-  await expect(page.locator('#lfpl .mr')).toHaveCount(2);
+  await showPanel(page, 'lyrs');
+  await expect(page.locator('#lyl2 .lyr')).toHaveCount(2);
   expect(errors).toEqual([]);
 });
 
@@ -65,7 +65,7 @@ test('the old Arrangement, Stamps in the pattern, Manual arrangement, Variation 
   await openPanel(page, 'layers');
   const shown = await page.locator('section.pn[data-p="layers"] > details.g').evaluateAll(els => els.filter(e => !e.hidden && e.offsetParent !== null).map(e => e.querySelector('summary').firstChild.textContent.trim()));
   for (const old of ['Arrangement', 'Stamps in the pattern', 'Manual arrangement', 'Variation', 'Impression']) expect(shown, old).not.toContain(old);
-  for (const [sel, pn] of [['#lfpst', 'stmp'], ['#lfars', 'elimg'], ['#lfpl', 'mlist'], ['#lalg', 'mlist']]) {
+  for (const [sel, pn] of [['#lfpst', 'stmp'], ['#lfars', 'elimg'], ['#lalg', 'mlist']]) {
     expect(await page.locator(sel).evaluate(e => e.closest('section.pn').dataset.p), sel).toBe(pn);
   }
   expect(errors).toEqual([]);

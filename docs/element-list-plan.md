@@ -57,6 +57,11 @@ Selecting a row opens that element's menu: move, size, rotate, align, effects. *
 - **Tests:** state and SVG snapshots change a lot (owner's approval first); about 20 specs read `layers[0]` directly and about 100 go through layers panels; perf must stay within 10% of `main`.
 - Runs: targeted specs only, then CI when the owner says.
 
+## Step 2 is cut into small releases (Oct 20 2026)
+- **2.2.3:** placing (owner, Oct 20 2026): a shape, a stamp, a picture and text work the same way. The armed item is a ghost on the pointer (a picked shape had none); using anything in the interface puts it away so a click on the canvas cannot place it by accident; a button that arms an item arms it again; a right click puts it away. One module, `72-placing.js`. And the element menu loses its list: the old placed-items list and Clear all are gone from the Element panel, the Elements list is the only list.
+- **2.2.4:** Sheet as an element (a row in the list, `k:'sheet'`, replaces `proj.sh`; format 24).
+- **2.2.5:** the rest of the clean-up: the old arrangement engine (`GRAD`, `gArrAll`, `arrOpts`, `fitTs`, layer-level controls), Randomize and templates built directly on the flat list, docs.
+
 ## Step 2 (2.2.3): menus and flows (risk: medium)
 - **Element menu without the list:** move, size, rotate, align (the Align grid and Position fields), then the effect stack; opens from a row or a click on the canvas.
 - **Per-kind creation flows** as in the table above (Sheet instance, brush, Shapes, Image import, Text, Stamp, Pattern), including the Stamp menu with select, modify and make.
