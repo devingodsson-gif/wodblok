@@ -58,6 +58,7 @@ import {init63,stampAt,stampToCanvas,stUnlocked} from './modules/63-stamp-tool.j
 import {init64} from './modules/64-stamp-canvas-edit.js';
 import {init65} from './modules/65-element-core.js';
 import {init66} from './modules/66-sheet-element.js';
+import {init67} from './modules/67-pattern-element.js';
 import {init58} from './modules/58-account.js';
 import {init59} from './modules/59-align.js';
 import {acAccount} from './platform/account.js';
@@ -117,6 +118,7 @@ init49();
 init51();
 init52();
 init66();
+init67();
 init53();
 init54();
 init55();

@@ -12,13 +12,16 @@ import {txtLayer} from './26-text-boxes.js';
 // Adding a kind or an effect later is one module that calls elRegister / fxRegister from its init; nothing else lists them.
 const EL_K={},EL_O=[];
 function elRegister(k,o){if(!EL_K[k])EL_O.push(k);EL_K[k]={k,...o}}
+function elExtend(k,o){if(EL_K[k])EL_K[k]={...EL_K[k],...o}}
 function elKinds(){return EL_O.map(k=>EL_K[k])}
 function elDef(k){return EL_K[k]||null}
 function elKind(q){if(!q||typeof q!='object')return'';if(q.k&&EL_K[q.k])return q.k;for(const k of EL_O){const d=EL_K[k];if(d.is&&d.is(q))return k}return''}
 // Draws a layer's elements in list order. Each kind draws all of its own elements once (so shared definitions are made once per kind, as before),
 // then the list is walked in order: neighbouring elements of the same kind share that kind's wrapper (ink, opacity, blend), and a change of kind starts a new one.
 // A layer whose elements are already grouped by kind draws exactly the markup it did before elements existed.
-function elDraw(L,li,pa,lgB){const pl=L.pl||[];if(!pl.length)return['',''];const R={};let defs='';
+function elDraw(L,li,pa,lgB){let pl=L.pl||[];if(!pl.length)return['',''];// an element that stands for others (a pattern) is replaced, in place, by what it stands for before anything draws
+for(const k of EL_O){const d=EL_K[k];if(d.expand&&pl.some(q=>q.k==k)){L=d.expand(L);pl=L.pl;break}}
+const R={};let defs='';
 EL_O.filter(k=>EL_K[k].draw).sort((a,b)=>(EL_K[a].dz||0)-(EL_K[b].dz||0)).forEach(k=>{const d=EL_K[k];const r=d.draw(L,li,pa,lgB);if(!r||!r[4])return;defs+=r[0];R[k]=r});
 let out='',run='',buf='';const flush=()=>{if(run&&buf){const r=R[run];out+=r[2]+buf+r[3]}buf=''};
 pl.forEach(q=>{const k=elKind(q),r=R[k];if(!r)return;const s=r[4].get(String(q.u));if(s==null)return;if(k!==run){flush();run=k}buf+=s});flush();
@@ -42,7 +45,7 @@ function elSync(){const b=$('elb');if(b)b.querySelectorAll('.elbb').forEach(x=>{
 // the Image panel's Crop group shows only when there is a picture to crop
 {const c=$('lcrop'),g=$('elcrg');if(c&&g&&g.hidden!==c.hidden)g.hidden=c.hidden}
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden
-if(WBX.wbShSync)WBX.wbShSync();
+if(WBX.wbShSync)WBX.wbShSync();if(WBX.wbPatSync)WBX.wbPatSync();
 const q=elSel(),k=elKind(q);document.querySelectorAll('.elmode[data-k]').forEach(m=>{const on=!!q&&m.dataset.k===k,d=EL_K[m.dataset.k];m.hidden=!on;const nb=m.querySelector('b');if(on&&nb&&d&&d.name){const t=d.name(q);if(nb.textContent!==t)nb.textContent=t}})}
 
 function init65(){
@@ -59,4 +62,4 @@ elBar();
 const b=$('elb');if(b)b.onclick=e=>{const x=e.target.closest('.elbb');if(!x||x.disabled)return;const d=EL_K[x.dataset.k];if(d&&d.pn&&WBX.wbOpenPanel)WBX.wbOpenPanel(d.pn)};
 WBX.wbElSync=elSync;
 }
-export {elDef,elDraw,elKind,elKinds,elRegister,elSel,elSync,fxDef,fxFor,fxOf,fxRegister,init65};
+export {elExtend,elDef,elDraw,elKind,elKinds,elRegister,elSel,elSync,fxDef,fxFor,fxOf,fxRegister,init65};

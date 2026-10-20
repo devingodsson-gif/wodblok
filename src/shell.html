@@ -300,7 +300,7 @@ button.alt{background:var(--raise)}
 #zl{min-width:48px;text-align:center;font-variant-numeric:tabular-nums;font-size:var(--fs-s);color:var(--mut);border:0;background:transparent;padding:4px 4px}
 .board{flex:1;min-height:0;overflow:auto;display:flex}
 .board>div{margin:auto;padding:28px}
-#art{display:block;box-shadow:var(--paper-shadow);border-radius:1px;max-width:none}#artwrap{position:relative}#art.chk{background-color:#fff;background-image:conic-gradient(#dcdcdc 25%,transparent 0 50%,#dcdcdc 0 75%,transparent 0);background-size:16px 16px}#art{position:relative}#art.shp{box-shadow:none;border-radius:0}
+#art{display:block;box-shadow:var(--paper-shadow);border-radius:1px;max-width:none}#artwrap{position:relative}#art.cvck{background-color:#fff;background-image:conic-gradient(#dcdcdc 25%,transparent 0 50%,#dcdcdc 0 75%,transparent 0);background-size:16px 16px}#art{position:relative}#art.shp{box-shadow:none;border-radius:0}
 #artsh{position:absolute;left:28px;top:28px;display:none;pointer-events:none;overflow:visible;filter:drop-shadow(0 2px 5px rgba(0,0,0,.14)) drop-shadow(0 14px 22px rgba(0,0,0,.13))}
 .shg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:4px}
 .shg button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0 6px;letter-spacing:-.02em;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);color:var(--mut);font-size:var(--fs-s);line-height:1.1;cursor:pointer;min-width:0;overflow:hidden}
@@ -1245,6 +1245,21 @@ body.eyedrop{cursor:crosshair}
   </div></details>
  </div></section>
  <section class="pn" data-p="layers" hidden>
+  <details class="g" open><summary>Patterns</summary><div class="gb">
+   <div class="ml" id="pelist"></div>
+   <div class="row"><button class="alt" id="penew">New pattern</button></div>
+   <div id="peed" hidden>
+    <div class="seg" id="pelay" role="group" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-l="grid">Grid</button><button type="button" data-l="brick">Brick</button><button type="button" data-l="half">Half-drop</button><button type="button" data-l="radial">Radial</button><button type="button" data-l="scatter">Scatter</button></div>
+    <div class="ctl"><label>Columns</label><input type="range" id="pecn" min="1" max="24" value="4" data-def="4"></div>
+    <div class="ctl"><label>Rows</label><input type="range" id="pern" min="1" max="24" value="4" data-def="4"></div>
+    <div class="ctl"><label>Size</label><input type="range" id="pesz" min="10" max="200" value="80" data-u="%" data-def="80"></div>
+    <div class="ctl"><label>Rotate</label><input type="range" id="pert" min="-180" max="180" value="0" data-u="&#176;" data-def="0"></div>
+    <div class="seg" id="peds" role="group" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-d="cycle">Cycle</button><button type="button" data-d="random">Random</button><button type="button" data-d="weight">Weighted</button></div>
+    <div class="row"><button class="alt" id="pesd">Reroll</button></div>
+    <div class="ml" id="pesrc"></div>
+    <div class="row"><button class="alt" id="peadd">Add current stamp</button><button class="alt" id="pesel">Add selected element</button></div>
+   </div>
+  </div></details>
   <details class="g" open><summary>Arrangement</summary><div class="gb">
    <div class="seg" id="lmode" role="group" aria-label="Arrangement" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-m="x">None</button><button type="button" data-m="p">Repeat</button><button type="button" data-m="f">Frame</button></div>
    <div id="lfrm" hidden>

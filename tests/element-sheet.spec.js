@@ -9,7 +9,7 @@ test('a new project has no Sheet: nothing paints the paper and the canvas shows 
   const { errors } = await openApp(page, { seed: 4 });
   expect((await proj(page)).sh).toBeUndefined();
   expect(await paperRects(page)).toBe(0);
-  await expect(page.locator('#art')).toHaveClass(/chk/);
+  await expect(page.locator('#art')).toHaveClass(/cvck/);
   expect(errors).toEqual([]);
 });
 
