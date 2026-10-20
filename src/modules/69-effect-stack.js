@@ -1,3 +1,4 @@
+import {shGet} from './66-sheet-element.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {rng,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
@@ -40,7 +41,7 @@ const KIND_PANEL={stamp:'stmp',image:'elimg',text:'text',pattern:'layers',sheet:
 const SEL={};   // the effect whose settings show, per kind
 const fxHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fxCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
-function fxTarget(kind){if(kind=='sheet')return WBS.proj&&WBS.proj.sh||null;if(kind=='pattern')return patCur();if(kind=='paint')return paCur();const q=elSel();return q&&elKind(q)==kind?q:null}
+function fxTarget(kind){if(kind=='sheet')return shGet();if(kind=='pattern')return patCur();if(kind=='paint')return paCur();const q=elSel();return q&&elKind(q)==kind?q:null}
 function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hidden><summary>Effects</summary><div class="gb">
 <div class="ml fxl"></div>
 <div class="row"><button type="button" class="alt fxadd" aria-haspopup="menu">Add effect</button></div>

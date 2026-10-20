@@ -33,16 +33,17 @@ const gWrap=(G,inner)=>{if(!inner)return'';const ink=okC(G.ink)?col(G.ink):'';le
 const its=pl.filter(q=>q.k!='group').map(q=>({q,path:gpath(q)})).filter(it=>!it.path.some(G=>G.v===false));
 // Repeat tile: every top-level piece (a group, a wrapped element, a run of one kind) is copied to the neighbouring tiles on its own, inside its own opacity, blend and ink, so a translucent piece spilling over a tile edge is not laid over its neighbour's copy twice
 const tU=h=>tileOn()?elTile(`${li}_${tn++}`,h):h;let tn=0;
-function render(its,d){let out='',run='',buf='',wb='',wk=null,wa='';const T=h=>d?h:tU(h);const flush=()=>{if(run&&buf){const r=R[run];out+=T(r[2]+buf+r[3])}buf='';run=''};
+function render(its,d){let out='',run='',buf='',wb='',wk=null,wa='',wn=false;const T=(h,own)=>d||own?h:tU(h);const flush=()=>{if(run&&buf){const r=R[run];out+=T(r[2]+buf+r[3],EL_K[run].notile)}buf='';run=''};
 // an element with its own opacity (op), blend (bl) or eye (v:false) is wrapped on its own; the placements a pattern prints share their pattern's wrapper (key wk)
-const emit=()=>{if(wb)out+=`<g${wa}>${T(wb)}</g>`;wb='';wk=null};
+const emit=()=>{if(wb)out+=`<g${wa}>${T(wb,wn)}</g>`;wb='';wk=null;wn=false};
 for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
  if(G){let j=i;while(j<its.length&&its[j].path[d]&&its[j].path[d].u==G.u)j++;const inner=render(its.slice(i,j),d+1);i=j-1;emit();flush();out+=gWrap(G,T(inner));continue}
  const q=it.q;if(q.v===false)continue;const k=elKind(q),r=R[k];if(!r)continue;const s=r[4].get(String(q.u));if(s==null)continue;const a=elOB(q);
- if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a}wb+=r[2]+s+r[3];continue}
+ if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a;wn=!!EL_K[k].notile}wb+=r[2]+s+r[3];continue}
  emit();if(k!==run){flush();run=k}buf+=s}
 flush();emit();return out}
-const body=render(its,0);return[defs,body]}// body first: a group's ink filter is added to defs while it renders
+// the Sheets at the bottom of the list sit under everything else, outside the rough-edge filter and the ink mask (build() puts them there); one higher up draws in its place
+let nu=0;while(nu<its.length&&!its[nu].path.length&&elKind(its[nu].q)=='sheet')nu++;const under=render(its.slice(0,nu),0),body=render(its.slice(nu),0);return[defs,body,'','',null,under]}// body first: a group's ink filter is added to defs while it renders
 function elTile(id,h){let o=`<g id="tw${id}">${h}</g>`;const R=WBS.tilePv?[-2,-1,0,1,2]:[-1,0,1];for(const dx of R)for(const dy of R)if(dx||dy)o+=`<use href="#tw${id}" x="${dx*CW}" y="${dy*CH}"/>`;return o}
 // the opacity and blend attributes of one element ('' when it has neither); behind, cancel and replace stay layer-only
 function elOB(q){const op=q.op!=null?Math.max(0,Math.min(100,+q.op)):100,bl=q.bl&&q.bl!='behind'&&q.bl!='cancel'&&q.bl!='replace'?q.bl:'';return(op<100?` opacity="${(op/100).toFixed(2)}"`:'')+(bl?` style="mix-blend-mode:${bl}"`:'')}

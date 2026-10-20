@@ -4,7 +4,7 @@ import {BK} from './03-stamp-prints-and-drawing.js';
 import {CASP,CH,CM,CW,PL,SH,SK,SW,col,geom,inShape,okC,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {isFixed,isLink,trayLoad} from './50-tray-core.js';
 import {CATS} from './05-motif-data.js';
-import {cust,it,mkL,selOne,store} from './06-motif-library-folders.js';
+import {cust,it,mkL,oneLayer,selOne,store} from './06-motif-library-folders.js';
 import {gModel} from './08-grid-shapes.js';
 import {hx3} from './09-stamp-items-and-print-runs.js';
 import {GRAD,arrOpts,fitTs,gArrAll} from './10-layer-grids.js';
@@ -167,9 +167,10 @@ WCV={relief:3,stain:1,wear:1.4},WST={wear:4,relief:1.5,stain:1},
 rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u:(sOn('tx','none')&&ch(.2)?[]:rzList('tx',WCV,ch(.3)?2:1));
 const EO={pick,ri,rr,ch,jit:!!FT.jit,texOn:!!(FT.pr&&sOn('pr','lay')),gradeOn:!!FT.gr,tex:()=>rzList('pr',WST,1)};
 if(usedGen)mL=rzMainEls(mL,mT,EO);if(FT.frame)fL=rzFrameEls(fL,fT,EO);
-const cvU=rzCv(),mkSheet=!WBS.proj.sh&&(FT.stamps||FT.tx||FT.col)||!!WBS.proj.sh;
+const prevSh=WBS.layers.flatMap(L=>L.pl||[]).find(p=>p.k=='sheet')||null,cvU=rzCv(),mkSheet=!prevSh&&(FT.stamps||FT.tx||FT.col)||!!prevSh;
 const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(rzPic)?[]:WBS.layers.filter(rzPic)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:mkSheet?[]:cvU,v:87}};
-if(mkSheet)c.proj.sh=rzSheet(c.proj,FT.tx&&!RZ.keep.tx?cvU:null,EO);
+c.layers.forEach(l=>{if(l.pl)l.pl=l.pl.filter(p=>p.k!='sheet')});
+if(mkSheet)c.layers.unshift(oneLayer([rzSheet(prevSh,FT.tx&&!RZ.keep.tx?cvU:null,EO)],c.tiles.map(t=>t.id)));// the Sheet is the bottom of the list, in a plain layer of its own so no layer opacity or blend turns it into a group
 if(RZ.keep.pr)c.pr={...WBS.pr};
 if(FT.pr&&!sOn('pr','edges')){c.pr.e=WBS.pr.e;c.pr.q=WBS.pr.q}
 if(FT.pr&&sOn('pr','edges')&&AM('pr')<1){c.pr.e=Math.round(c.pr.e*AM('pr'));c.pr.q=Math.round(c.pr.q*AM('pr'))}
