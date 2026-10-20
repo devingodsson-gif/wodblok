@@ -1,4 +1,5 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
+import {CH,CW,col,okC} from './04-canvas-and-stamp-outlines.js';
 import {freeLayer} from './24-free-place-layers.js';
 import {artLayer} from './25-art-layers.js';
 import {txtLayer} from './26-text-boxes.js';
@@ -23,13 +24,23 @@ function elDraw(L,li,pa,lgB){let pl=L.pl||[];if(!pl.length)return['',''];// an e
 for(const k of EL_O){const d=EL_K[k];if(d.expand&&pl.some(q=>q.k==k)){L=d.expand(L);pl=L.pl;break}}
 const R={};let defs='';
 EL_O.filter(k=>EL_K[k].draw).sort((a,b)=>(EL_K[a].dz||0)-(EL_K[b].dz||0)).forEach(k=>{const d=EL_K[k];const r=d.draw(L,li,pa,lgB);if(!r||!r[4])return;defs+=r[0];R[k]=r});
-let out='',run='',buf='',wb='',wk=null,wa='';const flush=()=>{if(run&&buf){const r=R[run];out+=r[2]+buf+r[3]}buf='';run=''};
+// Groups (2.2.2): a group is a row {k:'group', u, op, bl, v, ink} in the same list; its members carry g:<group u> and sit next to it in the list.
+// A group wraps its members in one opacity, blend and eye (and ink); a group may itself be a member of another group.
+const GP=new Map(pl.filter(q=>q.k=='group').map(q=>[q.u,q]));
+const gpath=q=>{const o=[];let g=q.g,n=0;while(g&&GP.has(g)&&n++<16){o.unshift(GP.get(g));g=GP.get(g).g}return o};
+const gid=G=>String(G.u).replace(/[^\w-]/g,'');
+const gWrap=(G,inner)=>{if(!inner)return'';const ink=okC(G.ink)?col(G.ink):'';let o=inner;if(ink){defs+=`<filter id="gk${gid(G)}" filterUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" color-interpolation-filters="sRGB"><feFlood flood-color="${ink}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;o=`<g filter="url(#gk${gid(G)})">${o}</g>`}return`<g${elOB(G)}>${o}</g>`};
+const its=pl.filter(q=>q.k!='group').map(q=>({q,path:gpath(q)})).filter(it=>!it.path.some(G=>G.v===false));
+function render(its,d){let out='',run='',buf='',wb='',wk=null,wa='';const flush=()=>{if(run&&buf){const r=R[run];out+=r[2]+buf+r[3]}buf='';run=''};
 // an element with its own opacity (op), blend (bl) or eye (v:false) is wrapped on its own; the placements a pattern prints share their pattern's wrapper (key wk)
 const emit=()=>{if(wb)out+=`<g${wa}>${wb}</g>`;wb='';wk=null};
-pl.forEach(q=>{if(q.v===false)return;const k=elKind(q),r=R[k];if(!r)return;const s=r[4].get(String(q.u));if(s==null)return;const a=elOB(q);
- if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a}wb+=r[2]+s+r[3];return}
- emit();if(k!==run){flush();run=k}buf+=s});flush();emit();
-return[defs,out]}
+for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
+ if(G){let j=i;while(j<its.length&&its[j].path[d]&&its[j].path[d].u==G.u)j++;const inner=render(its.slice(i,j),d+1);i=j-1;emit();flush();out+=gWrap(G,inner);continue}
+ const q=it.q;if(q.v===false)continue;const k=elKind(q),r=R[k];if(!r)continue;const s=r[4].get(String(q.u));if(s==null)continue;const a=elOB(q);
+ if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a}wb+=r[2]+s+r[3];continue}
+ emit();if(k!==run){flush();run=k}buf+=s}
+flush();emit();return out}
+return[defs,render(its,0)]}
 // the opacity and blend attributes of one element ('' when it has neither); behind, cancel and replace stay layer-only
 function elOB(q){const op=q.op!=null?Math.max(0,Math.min(100,+q.op)):100,bl=q.bl&&q.bl!='behind'&&q.bl!='cancel'&&q.bl!='replace'?q.bl:'';return(op<100?` opacity="${(op/100).toFixed(2)}"`:'')+(bl?` style="mix-blend-mode:${bl}"`:'')}
 
