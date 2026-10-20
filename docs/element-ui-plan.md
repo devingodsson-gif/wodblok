@@ -1,6 +1,6 @@
 # Element UI plan (one way to make, select and edit every element)
 
-Written Oct 20 2026 at the owner's request, after 2.2.4 (Sheet as an element). Status: **proposal, nothing built.** Open questions at the end need the owner's answer before step 1. Every new size, colour, radius or component below must be added to docs/developing-wodblok.md Part 9 first (Never break list); the look follows the Photoshop direction in docs/agent-memory.md (dark, dense, flat).
+Written Oct 20 2026 at the owner's request, after 2.2.4 (Sheet as an element). Status: **agreed Oct 20 2026 (owner's answers in "Decisions" at the end), nothing built.** Comes after 2.2.5; the steps are 2.2.6 onward and the plan ends at **2.3.0**. Every new size, colour, radius or component below must be added to docs/developing-wodblok.md Part 9 first (Never break list); the look follows the Photoshop direction in docs/agent-memory.md (dark, dense, flat).
 
 ## What the owner asked for (Oct 20 2026)
 - Click a button on the element bar and it **creates a new element** in the Elements list, like a new layer.
@@ -53,15 +53,15 @@ Two panels on the right, like Photoshop's Layers and Properties: **Elements** (t
 | Button | Click | Then |
 |---|---|---|
 | **Select** (new, V) | puts any armed tool away | click selects, drag moves; double-click a stamp edits it |
-| **Sheet** | adds a Sheet **now**, just above the selected element (first one goes to the bottom), selected | Properties: colour, effects. The eye replaces the on/off switch |
-| **Pattern** | adds a Pattern **now**, using the current stamp as its source, selected | Properties: arrange, sources |
-| **Paint** | arms the brush (cursor shows the brush size) | the first stroke makes a Paint element, or adds to the selected Paint element; hold Alt (or the eraser in the options strip) to erase |
-| **Shape** | opens the shape pop-over; picking a shape arms it (ghost on the cursor, as 2.2.3) | click on the canvas: a free **Shape element** is made. Inside stamp editing, the click puts the shape in the stamp instead |
-| **Image** | opens the picture pop-over (recent, import, use a project) | click places an Image element |
-| **Text** | arms text | click (or drag a box) makes a Text element and starts typing |
-| **Stamp** | opens the stamp pop-over (this project's stamps, library, New stamp) | click places a Stamp element; the stamp stays armed |
+| **Sheet** | adds a Sheet **now**, just above the selected element, selected | Properties: colour, effects. The eye replaces the on/off switch |
+| **Pattern** | adds a Pattern **now**, just above the selected element, using the current stamp as its source | Properties: arrange, sources |
+| **Paint** | adds an empty Paint element **now** and arms the brush on it (cursor shows the brush size) | strokes go into that element; hold Alt (or the eraser in the options strip) to erase. Each press of Paint is a new Paint element, like a new layer in Photoshop |
+| **Shape** | adds a Shape element **now** in the middle of the view (the last shape used), selected, and opens the shape pop-over to change it; the shape stays armed | each click on the canvas adds another Shape element (ghost on the cursor, as 2.2.3). Inside stamp editing, shapes go into the stamp instead |
+| **Image** | opens the picture pop-over (recent, import, use a project); the element is made as soon as a picture is chosen, in the middle of the view | a picture cannot be empty, so this is the one button that asks first; further clicks on the canvas place more of the same picture |
+| **Text** | adds a Text element **now** in the middle of the view and starts typing in it (Photoshop's new text layer) | a click elsewhere on the canvas starts another |
+| **Stamp** | adds a Stamp element **now** (the current stamp) in the middle of the view, selected, and opens the stamp pop-over to change it; the stamp stays armed | each click on the canvas places another |
 
-Shared with 2.2.3: Esc, a right click or the Select button puts an armed tool away; using a panel does too; pressing the button again re-arms. A new element is selected straight away, so Properties is always showing what you just made.
+Shared with 2.2.3: Esc, a right click or the Select button puts an armed tool away; using a panel does too; pressing the button again re-arms. Every new element goes **just above the selected element** (at the top of the list when nothing is selected) and is selected straight away, so Properties always shows what you just made.
 
 ## Properties: the same five sections for every kind
 1. **Header**: kind icon, name (click to rename), eye. No separate "Editing …" line.
@@ -96,7 +96,7 @@ Per-kind tabs; the Sheet on/off switch; Paint's Off/Brush/Eraser switch and its 
 - Stamp texture as an effect: the stamp's texture field becomes a `fx` Texture entry on the stamp (same format bump).
 - Everything else is UI over the data that 2.2.2 to 2.2.4 already built.
 
-## Steps (each a small release; numbering is the owner's call, see below)
+## Steps (2.2.6 onward, one small release each; 2.3.0 when the plan is done)
 1. **Properties panel and the Add bar**: Elements + Properties column; tabs go; Select button; Sheet and Pattern create at once; group row order fixed. (Risk: medium. Panels and tests that open panels by name change.)
 2. **Tools that arm**: Paint arms on click (eraser by Alt or the options strip), options strip, Image and Text through the same arm rule, pop-overs for shapes, stamps and pictures. (Medium.)
 3. **Free shapes**: `shape` element kind, format 25, drawing, Randomize aware. (High: drawing and file format; full suite suggested.)
@@ -106,9 +106,11 @@ Per-kind tabs; the Sheet on/off switch; Paint's Off/Brush/Eraser switch and its 
 
 2.2.5 (engine clean-up) still comes first: it removes the old arrangement engine and layer-level controls, and step 1 is simpler without them.
 
-## Open questions for the owner
-1. **Make on click, or on first use?** This plan makes Sheet and Pattern at once and the rest on the first click on the canvas, so a stray button press never leaves an empty element. Or should every button add a row at once?
-2. **Where does a new element go:** just above the selected element (Photoshop) or always at the top (the element-list plan's decision 1)?
-3. **Element bar**: keep it floating over the canvas, or move it into the slim left strip like Photoshop's toolbar (the rail would then hold only tool windows)?
-4. **Version numbers**: this is a new plan; 2.3.0 when it is done, with steps 2.2.6, 2.2.7…, or something else?
-5. **Restyle**: do the Photoshop-style look at the same time (each step restyles what it touches), or as its own pass afterwards?
+## Decisions (owner, Oct 20 2026)
+1. **As much like Photoshop as possible**, in how it works and how it looks.
+2. **Every button press makes an element at once** (Paint makes an empty Paint element, Shape, Text and Stamp make one in the middle of the view). The only exception is Image, which needs a picture chosen first.
+3. **A new element goes just above the selected one** (replaces decision 1 of docs/element-list-plan.md, "always at the top").
+4. **The element bar stays where it is** (floating over the canvas, top centre).
+5. **Version 2.3.0** when the plan is done; the steps are 2.2.6, 2.2.7…
+6. **Restyle towards Photoshop as each step goes**: each step restyles what it touches. Before the first restyle, the new tokens (colours, sizes, the row and slider designs) are proposed to the owner and written into docs/developing-wodblok.md Part 9, as the Never-break list requires.
+7. No mock-up: build it.
