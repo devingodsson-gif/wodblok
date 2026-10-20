@@ -98,4 +98,6 @@ GRL.forEach(([k])=>g.querySelector('.fxg_'+k).addEventListener('input',()=>{cons
 g.querySelector('.fxjrr').onclick=()=>{const e=cur();if(e&&e.k=='jitter'){e.sd=txRid();fxCh()}};
 [['.fxpp','pst'],['.fxpf','pfl']].forEach(([c,f])=>g.querySelector(c).addEventListener('input',()=>{const e=cur();if(!e||e.k!='pressure')return;const v=+g.querySelector(c).value;if(e[f]!==v){e[f]=v;fxCh()}}))});
 WBX.wbFxSync=fxSync}
-export {fxGr,fxJit,fxPad,fxPress,fxSync,fxTex,fxTexUses,init69};
+// a text's Jitter is rolled per letter: letter i of text p gets its own seed, and the size it moves by is the font size
+const fxJitL=(p,i,fs)=>fxJit({u:p.u+'#'+i,s:fs,fx:p.fx});
+export {fxGr,fxJit,fxJitL,fxPad,fxPress,fxSync,fxTex,fxTexUses,init69};
