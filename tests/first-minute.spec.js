@@ -1,6 +1,6 @@
 // The first minute (UX review B4): Randomize is in the top bar, an empty project has no button on the canvas, and an empty stamp in the tray shows a plus.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, unlockStamp } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, canvasToClient } = require('./helpers/harness');
 
 test('launch is still fully cleared: Pattern view, no panel open, no stamps printed', async ({ page }) => {
   const { errors } = await openApp(page);
@@ -32,8 +32,9 @@ test('an empty canvas has no "+" button on it; shapes are added with the Shapes 
   await expect(page.locator('section.pn[data-p="motifs"]')).toBeVisible();
   await page.locator('#lib .lfr[data-f^="b:"]').first().click();      // folders open in place (1.5.0)
   await page.locator('#lib button[data-m]').first().click();
-  const b = await page.locator('#art').boundingBox();
-  await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2);
+  const inst = await stampInstance(page);          // the middle of a printed stamp (the canvas centre can sit between two of the Pattern's cells)
+  const c = await canvasToClient(page, inst.cx, inst.cy);
+  await page.mouse.click(c.x, c.y);
   await page.keyboard.press('Escape');
   await settle(page);
   expect(JSON.parse(await getState(page)).tiles[0].items.length).toBeGreaterThan(0);
