@@ -18,6 +18,7 @@ test('text placed before a stamp draws under it: the canvas follows the element 
   await page.fill('#tx_t', 'Hi');
   await settle(page);
   await canvasClick(page, 0.5, 0.5);
+  await page.evaluate(() => document.activeElement && document.activeElement.blur());   // Escape is ignored while the text field has focus
   await page.keyboard.press('Escape');          // stop placing text before the stamp is picked
   await settle(page);
   await openPanel(page, 'stmp');
