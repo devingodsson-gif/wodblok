@@ -354,3 +354,10 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - A layer with no stamps that gets a Repeat or Frame arrangement takes the current stamp.
 - The speed test (`perf.spec.js`) now scrolls its slider into view; before, it had been measuring an idle page.
 - Tests: `any-layer-items` extended; specs that drove the old dropdown updated.
+
+## 2.2.1 (Oct 20 2026): fixes from the first test of 2.2.0
+- Shapes: a shape picked from the Shapes panel now unlocks the stamp under the first click and lands there (before, nothing happened unless a stamp was unlocked by hand). tests/shape-place.spec.js.
+- Text: Jitter moves each letter on its own, seeded per letter; the text as a whole no longer moves. tests/text-jitter.spec.js.
+- Paint: no "Paint strokes" row in Randomize, no "New paint" button, no delete-paint button; the first stroke makes the Paint element.
+- Perf: slider drag ratio 1.002 against main.
+- Next: docs/element-list-plan.md (2.2.2 flat element list and groups, 2.2.3 menus and flows).
