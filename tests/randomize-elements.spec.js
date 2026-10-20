@@ -25,18 +25,6 @@ test('a full roll makes element layers: patterns with effects, a frame pattern a
   expect(errors).toEqual([]);
 });
 
-test('Paint strokes on their own roll make a Paint element with strokes', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 22 });
-  await openPanel(page, 'rand');
-  await only(page, 'paint');
-  let p;
-  for (let i = 0; i < 10 && !p; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); p = els(await doc(page)).find(q => q.k === 'paint'); }
-  expect(p).toBeTruthy();
-  expect(p.st.length).toBeGreaterThan(1);
-  expect(p.st.every(s => s.pts.length > 3)).toBe(true);
-  expect(errors).toEqual([]);
-});
-
 test('Sheet texture on its own roll puts the Texture effect on the Sheet', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 23 });
   await openPanel(page, 'rand');

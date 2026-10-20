@@ -34,7 +34,7 @@ const o0=`<g${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix
 // ---- the panel
 function paSync(){const host=$('palist');if(!host)return;const a=paList(),p=paCur();if(WBS.paSel!=null&&!p)WBS.paSel=null;
 const key=JSON.stringify([a.map(q=>[q.u,q.n,(q.st||[]).length]),WBS.paSel,BR.mode,BR.tip,BR.w,BR.c,WBS.cur,WBS.tiles.length]);
-if(host.dataset.k!==key){host.dataset.k=key;host.innerHTML=a.slice().reverse().map(q=>`<div class="mr${q.u==WBS.paSel?' on':''}" data-pa="${q.u}"><b>${paHx(q.n)}<i>${(q.st||[]).length} stroke${(q.st||[]).length==1?'':'s'}</i></b><button type="button" data-pd aria-label="Delete this paint">&#215;</button></div>`).join('');
+if(host.dataset.k!==key){host.dataset.k=key;host.innerHTML=a.slice().reverse().map(q=>`<div class="mr${q.u==WBS.paSel?' on':''}" data-pa="${q.u}"><b>${paHx(q.n)}<i>${(q.st||[]).length} stroke${(q.st||[]).length==1?'':'s'}</i></b></div>`).join('');
 $('pamode').querySelectorAll('[data-m]').forEach(b=>{const on=b.dataset.m==BR.mode;if(b.classList.contains('on')!==on)b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});
 $('patip').querySelectorAll('[data-t]').forEach(b=>{const on=b.dataset.t==BR.tip;if(b.classList.contains('on')!==on)b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});
 const sz=$('pasz');if(+sz.value!==BR.w){sz.value=BR.w;sz.dispatchEvent(new Event('input',{bubbles:true}))}
@@ -46,8 +46,7 @@ function init70(){
 elExtend('paint',{pn:'elpaint',dz:4,name:q=>q.n,draw:(L,li)=>paintLayer(L,li)});
 if(!$('palist'))return;
 WBX.wbPaSync=paSync;
-$('panew').onclick=()=>{const L=fpL();if(!L)return;paNew(L);paCh()};
-$('palist').onclick=e=>{const L=fpL();if(!L)return;const d=e.target.closest('[data-pd]'),r=e.target.closest('[data-pa]');if(d&&r){const i=L.pl.findIndex(q=>q.u==r.dataset.pa);if(i>=0){L.pl.splice(i,1);if(WBS.paSel==r.dataset.pa)WBS.paSel=null;paCh()}return}if(r){WBS.paSel=r.dataset.pa;paSync()}};
+$('palist').onclick=e=>{const L=fpL();if(!L)return;const r=e.target.closest('[data-pa]');if(r){WBS.paSel=r.dataset.pa;paSync()}};
 $('pamode').onclick=e=>{const b=e.target.closest('[data-m]');if(b){BR.mode=b.dataset.m;paSync()}};
 $('patip').onclick=e=>{const b=e.target.closest('[data-t]');if(b){BR.tip=b.dataset.t;paSync()}};
 $('pasz').addEventListener('input',()=>{BR.w=+$('pasz').value});
