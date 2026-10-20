@@ -56,6 +56,7 @@ import {init57} from './modules/57-saved-colours.js';
 import {init62} from './modules/62-text-styles.js';
 import {init63,stampAt,stampToCanvas,stUnlocked} from './modules/63-stamp-tool.js';
 import {init64} from './modules/64-stamp-canvas-edit.js';
+import {init65} from './modules/65-element-core.js';
 import {init58} from './modules/58-account.js';
 import {init59} from './modules/59-align.js';
 import {acAccount} from './platform/account.js';
@@ -64,6 +65,8 @@ import {kv} from './platform/index.js';
 import {cmdConflicts,cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdList,cmdRun} from './commands/registry.js';
 
 init01();
+// the element and effect registries are filled first, before anything draws
+init65();
 init02();
 init03();
 init04();

@@ -25,14 +25,14 @@ function crBox(P){let a=1,b=1,c=0,d=0;P.forEach(q=>{a=Math.min(a,q[0]);b=Math.mi
 function crRef(p){const P=crPts(p);if(!P)return{cu:.5,cv:.5,w:1,h:1};const[a,b,c,d]=crBox(P);return{cu:(a+c)/2,cv:(b+d)/2,w:Math.max(.005,c-a),h:Math.max(.005,d-b)}}
 function crIn(P,x,y){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>y)!=(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
 function fpWH(p){if(p.tx){const k=p.s/Math.max(p.n||1,.01);return[(+p.bw||1)*k,(+p.bh||1)*k]}if(p.a){const A=WBS.ARTS[p.a];if(!A)return null;const k=p.s/Math.max(A.w,A.h),b=crRef(p);return[A.w*k*b.w*(p.wx||1),A.h*k*b.h*(p.wy||1)]}const tt=WBS.tiles.find(t=>t.id==p.t);if(!tt)return null;const G=geom(shOf(tt)),k=p.s/Math.max(G.SW,G.SH);return[G.SW*k*(p.wx||1),G.SH*k*(p.wy||1)]}
-function artLayer(L,li){const pl=(L.pl||[]).filter(p=>p.a&&WBS.ARTS[p.a]);if(!pl.length)return['',''];const f=v=>v.toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),used=new Set();let defs='',out='';
+function artLayer(L,li){const pl=(L.pl||[]).filter(p=>p.a&&WBS.ARTS[p.a]);if(!pl.length)return['',''];const f=v=>v.toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),used=new Set(),fr=new Map();let defs='',out='';
 pl.forEach(p=>{const A=WBS.ARTS[p.a],id='ar'+li+'_'+String(p.a).replace(/[^\w-]/g,''),[w,h]=fpWH(p);
 if(!used.has(id)){used.add(id);defs+=`<image id="${id}" href="${A.src}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none"/>`}
 if(WBS.CR&&WBS.CR.u==p.u&&li==WBS.selL)return;const R0=crRef(p),k=p.s/Math.max(A.w,A.h),cpt=crPts(p);let clp='';if(cpt){const cid='ac'+li+'_'+String(p.u).replace(/[^\w-]/g,'');defs+=`<clipPath id="${cid}"><polygon points="${cpt.map(q=>f(q[0]*A.w)+','+f(q[1]*A.h)).join(' ')}"/></clipPath>`;clp=` clip-path="url(#${cid})"`}const hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-w/2)}" y="${f(-h/2)}" width="${f(w)}" height="${f(h)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
-out+=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x)} ${f(+p.y)})">${hit}<use href="#${id}"${clp} transform="rotate(${+p.r||0}) scale(${f(k*(p.f||1)*(p.wx||1))} ${f(k*(p.wy||1))}) translate(${f(-R0.cu*A.w)} ${f(-R0.cv*A.h)})"/></g>`});
+const one=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x)} ${f(+p.y)})">${hit}<use href="#${id}"${clp} transform="rotate(${+p.r||0}) scale(${f(k*(p.f||1)*(p.wx||1))} ${f(k*(p.wy||1))}) translate(${f(-R0.cu*A.w)} ${f(-R0.cv*A.h)})"/></g>`;out+=one;fr.set(String(p.u),one)});
 const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'';
 const kid='ak'+li;if(L.akk)defs+=`<filter id="${kid}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -.9 -1.77 -.33 0 3"/><feComposite in2="SourceGraphic" operator="in"/></filter>`;
-return[defs,`<g${L.akk?` filter="url(#${kid})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>${out}</g>`]}
+const o0=`<g${L.akk?` filter="url(#${kid})"`:''}${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>`;return[defs,o0+out+'</g>',o0,'</g>',fr]}
 // the Art part of the Free place panel
 function artPanel(L){{const k=$('lfaak');if(k){k.checked=!!L.akk;const lb=k.closest('label');if(lb)lb.hidden=!(L.pl||[]).some(p=>p.a)}}
 const ids=Object.keys(WBS.ARTS),inUse=new Set();WBS.layers.forEach(l=>{(l.pl||[]).forEach(p=>{if(p.a)inUse.add(p.a)})});

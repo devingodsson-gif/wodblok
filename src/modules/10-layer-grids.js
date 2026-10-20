@@ -10,9 +10,8 @@ import {SURFC,inkCatch,layTexMask,layTexOv,roughFilter,surfFor,txRefresh,txoG} f
 import {renderCover} from './18-projects-and-cover-overlay.js';
 import {renderLib} from './21-motif-library-ui.js';
 import {frSync,frameLayer} from './23-frame-layers.js';
-import {freeLayer,tGrp} from './24-free-place-layers.js';
-import {artLayer} from './25-art-layers.js';
-import {txtLayer} from './26-text-boxes.js';
+import {tGrp} from './24-free-place-layers.js';
+import {elDraw} from './65-element-core.js';
 import {renderLayers} from './32-layers-panel.js';
 import {stOlAdd,stOlBegin,stOlEnd,stOlPath} from './63-stamp-tool.js';
 // ---- Each layer lays its stamps on a grid. The grid takes its shape from one "lead" stamp (L.lead, else the first),
@@ -79,8 +78,8 @@ if(B!==L){ox+=(L.ox||0)*ts/100;oy+=(L.oy||0)*th/100;offs=placeOffs(gm,g,px,py,L.
 const pts=radial?gRadPts(gm,Math.max(8,Math.min(px,py)),Math.hypot(CW,CH)/2+Math.max(px,py)*2,A.r=='out'):null;
 return{B,g,z:shOf(lt).z||100,ts,th,rot:(fit||tile)?0:B.rot||0,gm,px,py,P,ox,oy,offs,l:O.l,r:O.r,linked:B!==L,tile,NI,NJ,pts}}
 // Repeat tile: a layer made of loose pieces (placed stamps, pictures, text) is drawn again one tile over in every direction, so what runs off one edge shows on the other
-// Items on a layer (layer.pl): free stamps (t), pictures (a) and text boxes (tx) in any mix. Drawn after the layer's arrangement, if it has one.
-function itemsLayer(L,li,pa,lgB){const a=freeLayer(L,li,pa,lgB),b=artLayer(L,li),c=txtLayer(L,li);return[a[0]+b[0]+c[0],a[1]+b[1]+c[1]]}
+// Elements on a layer (layer.pl): free stamps, pictures and text boxes in any mix, drawn in list order (65-element-core.js). Drawn after the layer's arrangement, if it has one.
+function itemsLayer(L,li,pa,lgB){return elDraw(L,li,pa,lgB)}
 function tileWrap(li,h){if(!tileOn())return h;let o=`<g id="tw${li}">${h}</g>`;for(const dx of[-1,0,1])for(const dy of[-1,0,1])if(dx||dy)o+=`<use href="#tw${li}" x="${dx*CW}" y="${dy*CH}"/>`;return o}
 // the area masks and filters of this layer cover: the canvas, or on a repeat tile the tile and one tile on every side
 const RB=()=>tileOn()?`x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"`:`x="0" y="0" width="${CW}" height="${CH}"`,RC=()=>tileOn()?`x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"`:`width="${CW}" height="${CH}"`;
