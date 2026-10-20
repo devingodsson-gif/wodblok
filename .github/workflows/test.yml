@@ -1,9 +1,13 @@
 name: tests
-# Keep marketing-site changes on focused site checks; run the editor suite only when app code changes.
+# The editor suite (Chromium shards, picture comparison, WebKit) runs ONLY when the owner asks for it (owner, Oct 19 2026):
+# by hand (Actions > tests > Run workflow) or on a pull request that carries the label `run-suite`.
+# Opening, updating or marking a pull request ready does not start it. When it does not run, its jobs are skipped,
+# which still satisfies the required `chromium` and `webkit` checks, so merging is never blocked by a run nobody asked for.
+# The small site checks still run on pull requests that change the marketing site.
 on:
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
   workflow_dispatch:
 permissions:
   contents: read
@@ -44,7 +48,7 @@ jobs:
   site:
     name: site
     needs: changes
-    if: ${{ always() && github.event_name == 'pull_request' && needs.changes.outputs.site == 'true' }}
+    if: ${{ always() && github.event_name == 'pull_request' && github.event.action != 'labeled' && needs.changes.outputs.site == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -60,7 +64,7 @@ jobs:
   chromium-shard:
     name: chromium-shard ${{ matrix.shard }}/4
     needs: changes
-    if: ${{ always() && (github.event_name != 'pull_request' || needs.changes.outputs.app == 'true') }}
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || (needs.changes.outputs.app == 'true' && contains(github.event.pull_request.labels.*.name, 'run-suite'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     container: mcr.microsoft.com/playwright:v1.56.0-noble
@@ -89,7 +93,7 @@ jobs:
   picture-compare:
     name: picture-compare
     needs: changes
-    if: ${{ always() && github.event_name == 'pull_request' && needs.changes.outputs.app == 'true' }}
+    if: ${{ always() && github.event_name == 'pull_request' && needs.changes.outputs.app == 'true' && contains(github.event.pull_request.labels.*.name, 'run-suite') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container: mcr.microsoft.com/playwright:v1.56.0-noble
@@ -131,7 +135,7 @@ jobs:
   webkit:
     name: webkit
     needs: changes
-    if: ${{ always() && (github.event_name != 'pull_request' || needs.changes.outputs.app == 'true') }}
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || (needs.changes.outputs.app == 'true' && contains(github.event.pull_request.labels.*.name, 'run-suite'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container: mcr.microsoft.com/playwright:v1.56.0-noble
