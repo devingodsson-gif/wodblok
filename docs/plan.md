@@ -1,5 +1,8 @@
 # Development plan
 
+## Next plan: the element list (written Oct 20 2026, not started)
+Layers become one ordered list of elements; the element buttons create instances at the top. Fix release 2.2.1, then 2.2.2 (list, engine, format 23) and 2.2.3 (menus). See [`element-list-plan.md`](element-list-plan.md).
+
 ## Open plan: the element update (started Oct 19 2026)
 Elements (Sheet, Paint, Shape, Image, Text, Stamp, Pattern) and effects (Texture, Pressure offset, Jitter, Colour grade; Carved edges, Symmetry, Wrap and Invert stay in the Stamp panel; Morph was removed). The plan, the owner's answers and each step's outcome are in [`element-update-plan.md`](element-update-plan.md). Steps are 2.1.1, 2.1.2... up to 2.1.12, released as 2.2.0 (step 12: new layers are element layers, old arrangement groups retired); the version keeps advancing in 2.x, there is no 3.0.0 (owner, Oct 20 2026).
 
