@@ -22,7 +22,7 @@ test('text placed before a stamp draws under it: the canvas follows the element 
   await settle(page);
   await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
-  await canvasClick(page, 0.5, 0.5);
+  await canvasClick(page, 0.2, 0.2);          // away from the text, which is wider on the CI renderer
   const pl = (await layers(page))[0].pl;
   expect(pl.map(q => (q.tx != null ? 'text' : q.t != null ? 'stamp' : '?'))).toEqual(['text', 'stamp']);
   await expect.poll(() => drawnOrder(page)).toEqual(pl.map(q => String(q.u)));
