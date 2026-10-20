@@ -42,7 +42,7 @@ for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
  if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a}wb+=r[2]+s+r[3];continue}
  emit();if(k!==run){flush();run=k}buf+=s}
 flush();emit();return out}
-return[defs,render(its,0)]}
+const body=render(its,0);return[defs,body]}// body first: a group's ink filter is added to defs while it renders
 function elTile(id,h){let o=`<g id="tw${id}">${h}</g>`;const R=WBS.tilePv?[-2,-1,0,1,2]:[-1,0,1];for(const dx of R)for(const dy of R)if(dx||dy)o+=`<use href="#tw${id}" x="${dx*CW}" y="${dy*CH}"/>`;return o}
 // the opacity and blend attributes of one element ('' when it has neither); behind, cancel and replace stay layer-only
 function elOB(q){const op=q.op!=null?Math.max(0,Math.min(100,+q.op)):100,bl=q.bl&&q.bl!='behind'&&q.bl!='cancel'&&q.bl!='replace'?q.bl:'';return(op<100?` opacity="${(op/100).toFixed(2)}"`:'')+(bl?` style="mix-blend-mode:${bl}"`:'')}
