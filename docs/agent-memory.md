@@ -95,3 +95,12 @@ Plan and owner's answers: `docs/element-update-plan.md`. In short:
 - Element list (owner, Oct 20 2026): no layers; one ordered list of elements with opacity and blend on every kind; element buttons create an instance at the top of the list; the element menu has no list (the list is the layers panel's replacement); Sheet is created like any element; Paint's first stroke creates it. Done as a fix release 2.2.1 plus two steps 2.2.2 and 2.2.3; plan in docs/element-list-plan.md. 2.2.0 went live Oct 20 2026.
 - Publish the preview artifact at the end of every step.
 - Session setup when the npm registry is blocked: `src/vendor/fflate.js` copied to `node_modules/fflate/index.mjs` (package.json with `"type":"module"`), and `node_modules/playwright`, `playwright-core`, `espree`, `eslint-scope` symlinked from `/opt/node-tools/node_modules`, with `node_modules/@playwright/test/index.js` re-exporting `playwright/test`. Run tests with `node node_modules/playwright/cli.js test ...`.
+
+## Styling direction (owner, Oct 20 2026)
+The owner shared a screenshot of Adobe Photoshop's interface and said: remember this, he wants to go in this direction with the program's styling and CSS. The screenshot is not in the repo (it is a third party's work and the repo is public); what it shows, as seen by the agent (an observation, not a spec):
+- A dark, neutral grey interface, flat, with no gradients or heavy borders; panels slightly lighter than the canvas surround.
+- Dense, compact panels: small type, tight rows, thin line icons in a slim tool strip down the left edge, a menu bar and document tabs along the top.
+- Panels as tabbed, dockable or floating windows (Layers, Properties) with a small title bar and a menu button.
+- Property sliders as label on the left, value box on the right, a thin track with a small triangle thumb.
+- A layer list with the eye at the left of each row, a small thumbnail, the name, and the selected row picked out in a muted blue.
+How to act on it: nothing is restyled yet. The UI standard (docs/developing-wodblok.md Part 9) rules, so a restyle starts by changing that guide (tokens, scales, one component per role) and asking the owner before inventing any size, colour or radius. Do not claim this look is built until it is.
