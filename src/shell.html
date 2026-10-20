@@ -1267,11 +1267,14 @@ body.eyedrop{cursor:crosshair}
    <div class="ml" id="pelist"></div>
    <div class="row"><button class="alt" id="penew">New pattern</button></div>
    <div id="peed" hidden>
-    <div class="seg" id="pelay" role="group" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-l="grid">Grid</button><button type="button" data-l="brick">Brick</button><button type="button" data-l="half">Half-drop</button><button type="button" data-l="radial">Radial</button><button type="button" data-l="scatter">Scatter</button></div>
+    <div class="seg" id="pelay" role="group" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-l="grid">Grid</button><button type="button" data-l="brick">Brick</button><button type="button" data-l="half">Half-drop</button><button type="button" data-l="radial">Radial</button><button type="button" data-l="scatter">Scatter</button><button type="button" data-l="frame">Frame</button></div>
     <div class="ctl"><label>Columns</label><input type="range" id="pecn" min="1" max="24" value="4" data-def="4"></div>
     <div class="ctl"><label>Rows</label><input type="range" id="pern" min="1" max="24" value="4" data-def="4"></div>
     <div class="ctl"><label>Size</label><input type="range" id="pesz" min="10" max="200" value="80" data-u="%" data-def="80"></div>
     <div class="ctl"><label>Rotate</label><input type="range" id="pert" min="-180" max="180" value="0" data-u="&#176;" data-def="0"></div>
+    <div class="ctl"><label>Shift across</label><input type="range" id="peox" min="-100" max="100" value="0" data-u="%" data-def="0"></div>
+    <div class="ctl"><label>Shift down</label><input type="range" id="peoy" min="-100" max="100" value="0" data-u="%" data-def="0"></div>
+    <div class="ctl" id="peinr"><label>Inset</label><input type="range" id="pein" min="0" max="40" value="4" data-u="%" data-def="4"></div>
     <div class="seg" id="peds" role="group" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-d="cycle">Cycle</button><button type="button" data-d="random">Random</button><button type="button" data-d="weight">Weighted</button></div>
     <div class="row"><button class="alt" id="pesd">Reroll</button></div>
     <div class="ml" id="pesrc"></div>

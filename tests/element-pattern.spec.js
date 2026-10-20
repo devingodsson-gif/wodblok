@@ -62,3 +62,38 @@ test('two sources alternate by cycle; Reroll changes the seed; delete takes the 
   expect(await pats(page)).toHaveLength(1);
   expect(errors).toEqual([]);
 });
+
+test('Frame lays points along the four edges, the sides turned to lie along them; Inset moves them in', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'layers');
+  await page.click('#penew');
+  await settle(page);
+  const u = (await pats(page))[0].u;
+  await expect(page.locator('#peinr')).toBeHidden();
+  await page.click('#pelay [data-l="frame"]');
+  await page.locator('#pecn').fill('5'); await page.locator('#pern').fill('3');
+  await settle(page);
+  await expect(page.locator('#peinr')).toBeVisible();
+  expect(await drawn(page, u)).toBe(2 * 5 + 2 * 3);
+  const before = (await pats(page))[0];
+  expect(before.lay).toBe('frame');
+  await page.locator('#pein').fill('20'); await settle(page);
+  expect((await pats(page))[0].in).toBe(20);
+  expect(await drawn(page, u)).toBe(16);
+  expect(errors).toEqual([]);
+});
+
+test('Shift across and Shift down move a grid by a share of a cell without losing the cells that come in at the edge', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'layers');
+  await page.click('#penew');
+  await settle(page);
+  const u = (await pats(page))[0].u;
+  expect(await drawn(page, u)).toBe(16);
+  await page.locator('#peox').fill('50'); await settle(page);
+  expect((await pats(page))[0].ox).toBe(50);
+  expect(await drawn(page, u)).toBe(20);         // shifted half a cell: the columns now sit on the cell edges, so a fifth one has its centre on the canvas edge
+  await page.locator('#peoy').fill('50'); await settle(page);
+  expect(await drawn(page, u)).toBe(25);
+  expect(errors).toEqual([]);
+});
