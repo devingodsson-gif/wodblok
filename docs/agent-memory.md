@@ -104,3 +104,4 @@ The owner shared a screenshot of Adobe Photoshop's interface and said: remember 
 - Property sliders as label on the left, value box on the right, a thin track with a small triangle thumb.
 - A layer list with the eye at the left of each row, a small thumbnail, the name, and the selected row picked out in a muted blue.
 How to act on it: nothing is restyled yet. The UI standard (docs/developing-wodblok.md Part 9) rules, so a restyle starts by changing that guide (tokens, scales, one component per role) and asking the owner before inventing any size, colour or radius. Do not claim this look is built until it is.
+- (Oct 20 2026) The owner wants WODBLOK to be **as much like Photoshop as possible**, in behaviour and in look. The element UI plan (docs/element-ui-plan.md) follows from this: Elements + Properties panels, every element-bar press makes an element just above the selection, restyle step by step. He does not want mock-ups; build it.
