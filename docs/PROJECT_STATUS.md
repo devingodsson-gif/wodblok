@@ -48,16 +48,19 @@ Only items the owner has stated are listed as next. Nothing is started unless he
 - Decide cleanup of the inert 2.9.0 code (above).
 - Open pull requests: #55 (social post tool, draft) and #45 (UI standard rewrite, draft). 171 branches exist on the remote, most of them from merged or closed work.
 
+## Owner's answers (Oct 21 2026)
+- **Testing:** quick targeted runs of the specs touching a change are fine without asking; anything larger than that (the whole program's suite, CI) needs his word first.
+- **Versions:** no 3.0.0 until he says so; every update keeps raising the minor by one (next is 2.10.0, my reading of "progressing by 0.1"; he can correct it).
+- **Suite before the next release goes live:** not without asking him first.
+- **Business model:** stays out of the repo.
+- **Old remote branches:** he is fine with agents tidying them. My suggestion, not his rule: list the candidates (merged into `main`) and say which before deleting anything.
+
 ## Open questions for the owner
-1. **Testing.** Your brief says to ask before running tests and also that light testing is the default. Is a short targeted run of the specs touching a change fine without asking each time, with asking only for heavier runs (full suite, CI, perf, pixel updates)? Until answered, agents ask once at the start of a task.
-2. **Version after this update.** `docs/agent-memory.md` records "there is no 3.0.0" (Oct 20); other notes say the element update ends at 3.0.0. Which is right?
-3. **Releases 2.4.0 to 2.9.0** are on `main` untested as a whole. Do you want one suite run (CI shard suite) before the next release goes live?
-4. **Business model in the repo.** The repo is public, so this page and `CLAUDE.md` say "commercial product" but not how it will be sold. Keep it that way?
-5. **Stale branches.** Should agents ever clean up the old remote branches? (Default: never delete anything unasked.)
+None at the moment. Add new ones here.
 
 ## Suggestions (my recommendations, not decisions)
 - Keep `CLAUDE.md` short and move detail to the docs it already points at (its opening paragraph had grown into a release-by-release list; it now points here and to `docs/plan.md` instead).
-- Run the CI shard suite once before the next release goes live (my estimate: high importance, because 2.4.0 to 2.9.0 changed the Add bar, panels, stamp view and removed tools with no recorded full run). Only on the owner's word.
+- Run the CI shard suite once before the next release goes live (my estimate: high importance, because 2.4.0 to 2.9.0 changed the Add bar, panels, stamp view and removed tools with no recorded full run). The owner said to ask him first, so suggest it with the importance percentage and wait.
 
 ## Changelog of this page
-- Oct 21 2026: first version, written from a fresh clone of `main` at 2.9.0 and the existing docs.
+- Oct 21 2026: first version, written from a fresh clone of `main` at 2.9.0 and the existing docs. Same day: owner's answers recorded.
