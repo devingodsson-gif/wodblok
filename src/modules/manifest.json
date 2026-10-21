@@ -71,5 +71,6 @@
  "72-placing.js",
  "73-add-bar.js",
  "74-motif-element.js",
- "75-stamp-edit-mode.js"
+ "75-stamp-edit-mode.js",
+ "76-shape-element.js"
 ]

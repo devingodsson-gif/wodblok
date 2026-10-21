@@ -296,7 +296,7 @@ button.alt{background:var(--raise)}
 .vbl,.vbr{display:flex;align-items:center;gap:8px;min-width:0}.vbl{justify-content:flex-end}.vbl .elb{margin-left:auto}.vbr{justify-content:flex-start}
 .elb{display:flex;align-items:center;gap:4px;flex:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-l);padding:2px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
 .elbb{flex:none;width:var(--h-sm);height:var(--h-sm);padding:0;border:0;border-radius:var(--r-m);background:transparent;color:var(--mut);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
-.elbb[hidden]{display:none}.elbb .ic{width:16px;height:16px}.elbb:hover,.elbb:focus-visible{background:var(--raise);color:var(--fg)}.elbb[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink)}.elbb:disabled{opacity:.4;cursor:default;background:transparent;color:var(--mut)}
+.elbb[hidden]{display:none}body.penon #art{cursor:crosshair}.elbb .ic{width:16px;height:16px}.elbb:hover,.elbb:focus-visible{background:var(--raise);color:var(--fg)}.elbb[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink)}.elbb:disabled{opacity:.4;cursor:default;background:transparent;color:var(--mut)}
 .seg2{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-m);padding:2px;gap:2px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
 .seg2 button{border:0;background:transparent;padding:4px 12px;border-radius:var(--r-m);color:var(--mut);font-weight:500}
 .seg2 button.on{background:var(--raise);color:var(--fg);box-shadow:0 0 0 1px var(--line2)}
@@ -915,7 +915,7 @@ body.eyedrop{cursor:crosshair}
   <div class="tyd" id="tyd" role="toolbar" aria-label="Colour tray"><div class="tyc" id="tyc" role="list"></div><button type="button" class="tycw" id="tycw" aria-haspopup="menu" aria-expanded="false" hidden><i></i><span></span><svg class="chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l5 5 5-5"/></svg></button></div>
   </div>
  </div>
- <div class="board" id="boardP"><div id="artwrap"><svg id="artsh" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"></svg><svg id="art" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><defs id="grdf"></defs><defs id="cvdefs"></defs><defs id="surfd"></defs><defs id="txd"></defs><defs id="stdefs"></defs><g id="dyn"></g><g id="covg"></g><g id="texg"></g><g id="guig" pointer-events="none"></g><g id="fpgrid" pointer-events="none"></g><g id="fpov" pointer-events="none"></g><g id="gmov"></g></svg><svg id="stolsvg" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><g id="stol" class="stol" pointer-events="none"></g><g id="stoh" class="stoh"></g></svg></div></div>
+ <div class="board" id="boardP"><div id="artwrap"><svg id="artsh" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"></svg><svg id="art" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><defs id="grdf"></defs><defs id="cvdefs"></defs><defs id="surfd"></defs><defs id="txd"></defs><defs id="stdefs"></defs><g id="dyn"></g><g id="covg"></g><g id="texg"></g><g id="guig" pointer-events="none"></g><g id="fpgrid" pointer-events="none"></g><g id="fpov" pointer-events="none"></g><g id="penov" pointer-events="none"></g><g id="gmov"></g></svg><svg id="stolsvg" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><g id="stol" class="stol" pointer-events="none"></g><g id="stoh" class="stoh"></g></svg></div></div>
  <div class="spbar" id="spbar" hidden><span>Drag the line to place it. Drag the round end to turn it (Shift snaps to 15&#176;).</span><button class="alt" id="spno">Cancel</button><button class="pri" id="spok">Split</button></div>
 
 </main>
@@ -1138,6 +1138,21 @@ body.eyedrop{cursor:crosshair}
      <div class="row fprow"><button class="ib" id="lfpfl" title="Flip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v17" stroke-dasharray="2.4 2.6"/><path d="M9.5 7L4 18h5.5z"/><path d="M14.5 7L20 18h-5.5z"/></svg></button><button class="ib" id="lfpdu" title="Duplicate"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button><button class="ib" id="lfpup" title="Bring to front"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button><button class="ib" id="lfpdn" title="Send to back"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M15.5 8.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5h-7A2.5 2.5 0 018.5 18v-2.5"/></svg></button><button class="ib" id="lfpdl" title="Delete (Del)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button></div>
     </div>
    </div>
+  </div></details>
+  <details class="g" open id="shp_k" hidden><summary>Shape</summary><div class="gb">
+   <div class="shg" id="shp_pre" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+   <div id="shp_crw" hidden><label>Corner</label><input type="range" id="shp_cr" min="0" max="50" value="18" data-u="%" data-def="18"></div>
+   <div id="shp_npw" hidden><label>Points</label><input type="range" id="shp_np" min="3" max="12" value="5" data-def="5"></div>
+   <div class="row"><button type="button" class="alt" id="shp_pen" aria-pressed="false">Draw a path</button><button type="button" class="alt" id="shp_ed" aria-pressed="false" hidden>Edit points</button></div>
+  </div></details>
+  <details class="g" open id="shp_f" hidden><summary>Fill</summary><div class="gb">
+   <div class="seg" id="shp_fk" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-f="none" aria-pressed="false">None</button><button type="button" data-f="solid" aria-pressed="true">Colour</button></div>
+   <div class="cwrow" id="shp_fcr"><span class="cwk">Colour</span><div class="cwell" id="shp_fw"></div></div>
+  </div></details>
+  <details class="g" open id="shp_o" hidden><summary>Outline</summary><div class="gb">
+   <label class="chk"><input type="checkbox" id="shp_oon"><span>Outline</span></label>
+   <div id="shp_owr" hidden><label>Thickness</label><input type="range" id="shp_ow" min="1" max="80" value="6" data-def="6"></div>
+   <div class="cwrow" id="shp_ocr" hidden><span class="cwk">Colour</span><div class="cwell" id="shp_ow2"></div></div>
   </div></details>
   <details class="g" open id="lalsec" hidden><summary>Align</summary><div class="gb">
    <div class="shg" id="lalg" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>

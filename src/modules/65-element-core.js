@@ -66,7 +66,7 @@ function elSync(){if(WBX.wbAbSync)WBX.wbAbSync();if(WBX.wbSteSync)WBX.wbSteSync(
 // the Image panel's Crop group shows only when there is a picture to crop
 {const c=$('lcrop'),g=$('elcrg');if(c&&g&&g.hidden!==c.hidden)g.hidden=c.hidden}
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden
-if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
+if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbShpSync)WBX.wbShpSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
 const q=elSel(),k=elKind(q);
 // Properties follows the selection (2.3.0): picking an element shows its panel there, when the Properties group is open
 {const su=q?String(q.u):'';if(su!==elLast){elLast=su;const d=k&&EL_K[k];if(su&&d&&d.pn&&WBX.wbPropsOpen&&WBX.wbPropsOpen()&&WBX.wbOpenPanel&&(!WBX.wbApart||WBX.wbApart(d.pn))){const pn=d.pn;setTimeout(()=>{const s2=document.querySelector(`section.pn[data-p="${pn}"]`);if(!s2||s2.hidden)WBX.wbOpenPanel(pn)},0)}}}
@@ -77,6 +77,7 @@ function init65(){
 // shared definitions were always written in); the others get them in later steps.
 elRegister('paint',{hide:true,label:'Paint',pn:'elpaint',icon:'<path d="M19.5 4.5c-2.6 1-6.4 4.8-8.4 7.9l1.6 1.6c3.1-2 6.9-5.8 7.9-8.4z"/><path d="M10.2 13.6c-2 0-3.5 1.3-3.5 3.2 0 1.4-.8 2.4-2.4 2.7 2.6 1.3 7.4.6 7.4-4.4z"/>'});
 elRegister('motif',{label:'Motif',pn:'motifs',icon:'<path d="M12 2.8l5.2 8.7H6.8z"/><circle cx="7" cy="17" r="4"/><rect x="12.8" y="13" width="8.4" height="8.4" rx="1.4"/>'});
+elRegister('shape',{label:'Shape',pn:'mlist',icon:'<rect x="3.5" y="4.5" width="10" height="10" rx="1.5"/><circle cx="15.5" cy="15.5" r="5"/>'});
 elRegister('image',{label:'Image',pn:'elimg',icon:'<rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5L15 10l-9 9"/>',dz:2,is:q=>!!q.a,name:q=>(WBS.ARTS[q.a]&&WBS.ARTS[q.a].n)||'Image',draw:(L,li)=>artLayer(L,li)});
 elRegister('text',{label:'Text',pn:'text',icon:'<path d="M5.5 7.5V5h13v2.5M12 5v14M9 19h6"/>',dz:3,is:q=>q.tx!=null,name:q=>String((q.tx&&q.tx.text)||'').replace(/\n/g,' ').slice(0,28),draw:(L,li)=>txtLayer(L,li)});
 elRegister('stamp',{label:'Stamp',pn:'stmp',icon:'<rect x="3.5" y="10.5" width="9" height="9" rx="2"/><path d="M17 4.5l4 7h-8z"/>',dz:1,is:q=>q.t!=null,name:q=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==q.t)+1),draw:(L,li,pa,lgB)=>freeLayer(L,li,pa,lgB)});
