@@ -6,10 +6,10 @@ import {elDef,elKind,elSel} from './65-element-core.js';
 import {plDisarm} from './72-placing.js';
 
 // ===== One list at the top of every element panel (2.6.0, owner Oct 21 2026). Each kind's panel (Text, Shape, Pattern, Motif, Stamp) starts with the list of the elements of
-// that kind on the selected layer, and Text, Shape and Pattern an Add button that makes a new one, selects it and shows its properties just below. Picking a row selects that element,
+// that kind on the selected layer, and every kind an Add button that makes a new one, selects it and shows its properties just below. Picking a row selects that element,
 // and the panel below shows its properties. The Elements list does the same the other way: picking an element there (or on the canvas) opens its kind's panel (elSync in 65).
-// Motifs and Stamps are placed from their libraries, so their panels have the list only. While a stamp is being edited in its tab the lists are hidden.
-const ELK={text:{pn:'text',add:'Add text'},shape:{pn:'mlist',add:'Add shape'},pattern:{pn:'layers',add:'Add pattern'},motif:{pn:'motifs'},stamp:{pn:'stmp'}};
+// Motifs and Stamps are also placed from their libraries (pick, then click the canvas); Add puts one in the middle. While a stamp is being edited in its tab the lists are hidden.
+const ELK={text:{pn:'text',add:'Add text'},shape:{pn:'mlist',add:'Add shape'},pattern:{pn:'layers',add:'Add pattern'},motif:{pn:'motifs',add:'Add motif'},stamp:{pn:'stmp',add:'Add stamp'}};
 const elkHx=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const elkName=(k,q)=>{if(q.nm)return String(q.nm);const d=elDef(k);return(d&&d.name&&String(d.name(q)||''))||(d&&d.label)||'Element'};
 const elkIc=k=>{const d=elDef(k);return`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${(d&&d.icon)||''}</svg>`};

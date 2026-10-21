@@ -16,8 +16,8 @@ const canvasClick = async (page, fx, fy) => {
 test('the element bar has one button per kind, left of centre; the tray starts right of centre', async ({ page }) => {
   const { errors } = await openApp(page);
   const btn = page.locator('#elb .elbb');
-  await expect(btn).toHaveCount(8);
-  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Select', 'Paint', 'Motif', 'Shape', 'Image', 'Text', 'Stamp', 'Pattern']);
+  await expect(btn).toHaveCount(6);   // 2.7.0: no pointer and no Image button
+  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Paint', 'Motif', 'Shape', 'Text', 'Stamp', 'Pattern']);
   await expect(page.locator('#elb [data-k="paint"]')).toBeHidden();   // the brush is put away for now
   for (const pn of ['stmp', 'layers']) await expect(page.locator(`.rail [data-pn="${pn}"]`)).toBeHidden();   // element panels have no rail button
   const vb = await page.locator('.viewbar').boundingBox(), el = await page.locator('#elb').boundingBox(), ty = await page.locator('#tyc').boundingBox();
@@ -33,7 +33,9 @@ test('a bar button opens its panel and Add there makes the element, just above t
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   const kinds = async () => JSON.parse(await getState(page)).els.map(q => q.k);
-  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#elb [data-k="select"]')).toHaveCount(0);   // 2.7.0: no pointer button
+  await expect(page.locator('#elb [data-k="image"]')).toHaveCount(0);    // and no Image button
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(0);
   await page.click('#elb [data-k="pattern"]'); await settle(page);
   expect(await kinds()).toEqual([]);                      // the button makes nothing
   await expect(page.locator('#elb [data-k="pattern"]')).toHaveAttribute('aria-pressed', 'true');
@@ -49,9 +51,8 @@ test('a bar button opens its panel and Add there makes the element, just above t
   expect((await kinds()).includes('motif')).toBe(false);   // 2.4.0: the Motif button makes nothing, a pick arms it
   await expect(page.locator('#elb [data-k="motif"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
-  await page.click('#elb [data-k="select"]'); await settle(page);
-  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
+  await page.keyboard.press('Escape'); await settle(page);            // Escape (or V) puts the tool away
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 
@@ -87,13 +88,14 @@ test('the Shape button makes nothing; it shows the presets (and the pen), and a 
   expect(errors).toEqual([]);
 });
 
-test('Image asks for a picture, then makes a Rectangle Shape filled with it; the Fill group shows it', async ({ page }, testInfo) => {
+test('Import image in the Shape panel asks for a picture, then makes a Rectangle Shape filled with it; the Fill group shows it', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   const f = path.join(testInfo.outputDir, 'dot.png');
   fs.mkdirSync(testInfo.outputDir, { recursive: true });
   fs.writeFileSync(f, Buffer.from(PNG, 'base64'));
-  const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#elb [data-k="image"]')]);
+  await page.click('#elb [data-k="shape"]'); await settle(page);
+  const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#shp_imp')]);
   await fc.setFiles(f);
   await settle(page);
   const els = JSON.parse(await getState(page)).els;

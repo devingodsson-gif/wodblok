@@ -444,3 +444,9 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - **Selection opens the panel.** Picking an element in the Elements list or on the canvas always shows its kind's panel (before, only while the Properties group was open); it still does not open one that would hide the Elements list (same tab group).
 - Tests: `tests/element-panels.spec.js`; specs that made a Text or Pattern by clicking the bar now click Add; rail expects the Shape tab name; element-bar updated.
 - Not run: CI, the full suite and `npm run perf`.
+
+### 2.7.0 (Oct 21 2026): one behaviour for every element button (owner: remove the pointer and Image buttons; every element has an "Add (element name)" button, motifs did not). Format 25 unchanged
+- **Bar.** The Select (pointer) and Image buttons are gone. V and Escape still put the armed tool away. The bar is Motif, Shape, Text, Stamp, Pattern (Paint stays hidden). Importing a picture is Import image in the Shape panel.
+- **One rule.** Every bar button only opens its panel; every panel starts with its element list and an Add button: Add text, Add shape, Add pattern, and now Add motif (the last motif used, else the first of the library, in the middle of the canvas) and Add stamp (the current stamp, in the middle). Picking from the Motif or Stamp library and clicking the canvas still places copies, and picking a library motif with a Motif selected still changes it.
+- Tests: element-panels (Add on all five kinds), element-bar (six buttons), motif-place and placing use V instead of the Select button.
+- Not run: CI, the full suite and `npm run perf`.
