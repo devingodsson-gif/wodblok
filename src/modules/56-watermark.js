@@ -12,7 +12,7 @@ let ready=null;
 const wmReady=()=>ready||(ready=Promise.all([document.fonts.load('400 40px "IM Fell English"','Wodblok'),document.fonts.load('600 40px "Hanken Grotesk"','Made with')]).then(()=>{},()=>{}));
 // Draw the watermark onto a finished picture (a 2D canvas context of w x h pixels). Sizes follow the shorter side (logo 11%, text 4.2%).
 function wmDraw(ctx,w,h){
-  const u=Math.min(w,h)/100,m=4*u,acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()||'#b8914f';
+  const u=Math.min(w,h)/100,m=4*u,acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()||'#4a8fe0';
   ctx.save();
   try{
     // top-left: the logo, drawn from the same outline as the top bar

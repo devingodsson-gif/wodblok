@@ -249,16 +249,16 @@ test('no account code runs on the drawing path: no pointer-move listener is adde
   expect(kinds.filter(k => /move|drag/.test(k))).toEqual([]);
 });
 
-test('the accent colour picked in Settings is handed to the website as a cookie; Oak clears it', async ({ page }) => {
+test('the accent colour picked in Settings is handed to the website as a cookie; Steel clears it', async ({ page }) => {
   await open(page, { '/api/me': ME() });
   const cookie = async () => (await page.context().cookies()).find(c => c.name === 'wb_accent');
-  expect(await cookie()).toBeUndefined();   // the built-in Oak: nothing is set
+  expect(await cookie()).toBeUndefined();   // the built-in Steel: nothing is set
   await page.click('#fileb'); await page.click('#stgo');
   await page.click('.stgab[aria-label="Purpleheart"]');
   const c = await cookie();
   expect(c).toMatchObject({ value: '86629a', domain: '.wodblok.test', path: '/' });
   expect(c.expires).toBeGreaterThan(0);
-  await page.click('.stgab[aria-label="Oak"]');
+  await page.click('.stgab[aria-label="Steel"]');
   expect(await cookie()).toBeUndefined();
 });
 
@@ -276,17 +276,17 @@ const OK = { status: 200, body: { ok: true } };
 
 test('accent: a colour saved with the account is shown on this device, kept here and handed to the website', async ({ page }) => {
   await open(page, { '/api/me': ME({ accent: '#86629a' }), '/api/accent': OK });
-  await expect.poll(() => tok(page, '--acc')).not.toBe('#c9a66b');
+  await expect.poll(() => tok(page, '--acc')).not.toBe('#4a8fe0');
   expect(await page.evaluate(() => window.__wbTest.kv.get('wb114_accent'))).toBe('#86629a');
   expect((await page.context().cookies()).find(c => c.name === 'wb_accent').value).toBe('86629a');
   expect(await calls(page, '/api/accent')).toEqual([]);   // nothing is sent back
 });
 
-test('accent: a saved Oak (chosen on purpose) replaces a colour this device had', async ({ page }) => {
+test('accent: a saved Steel (chosen on purpose) replaces a colour this device had', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('wb_settings', JSON.stringify({ v: 1, values: { wb114_accent: '#86629a' } })));
   await open(page, { '/api/me': ME({ accent: '' }), '/api/accent': OK });
   await expect.poll(() => page.evaluate(() => window.__wbTest.kv.get('wb114_accent'))).toBeNull();
-  expect(await tok(page, '--acc')).toBe('#c9a66b');
+  expect(await tok(page, '--acc')).toBe('#4a8fe0');
   expect(await calls(page, '/api/accent')).toEqual([]);
 });
 
@@ -297,19 +297,19 @@ test('accent: nothing saved yet, so this device\'s colour is saved to the accoun
   expect(await page.evaluate(() => window.__wbTest.kv.get('wb114_accent'))).toBe('#a85a52');   // this device keeps its colour
 });
 
-test('accent: picking a colour in Settings saves it to the account after a short pause; picking Oak saves that too', async ({ page }) => {
+test('accent: picking a colour in Settings saves it to the account after a short pause; picking Steel saves that too', async ({ page }) => {
   await open(page, { '/api/me': ME({ accent: null }), '/api/accent': OK });
   await page.click('#fileb'); await page.click('#stgo');
   await page.click('.stgab[aria-label="Purpleheart"]');
   await page.click('.stgab[aria-label="Walnut"]');   // two quick picks: only the last one is sent
   await expect.poll(async () => (await calls(page, '/api/accent')).map(c => JSON.parse(c.body))).toEqual([{ accent: '#744f3b' }]);
-  await page.click('.stgab[aria-label="Oak"]');
+  await page.click('.stgab[aria-label="Steel"]');
   await expect.poll(async () => (await calls(page, '/api/accent')).map(c => JSON.parse(c.body).accent)).toEqual(['#744f3b', '']);
 });
 
 test('accent: a change made offline is kept and sent at the next check, and wins over the saved colour', async ({ page }) => {
   await open(page, { '/api/me': ME({ accent: '#86629a' }), '/api/accent': 'offline' });
-  await expect.poll(() => tok(page, '--acc')).not.toBe('#c9a66b');
+  await expect.poll(() => tok(page, '--acc')).not.toBe('#4a8fe0');
   await page.click('#fileb'); await page.click('#stgo');
   await page.click('.stgab[aria-label="Rosewood"]');
   await expect.poll(async () => (await calls(page, '/api/accent')).length).toBeGreaterThan(0);   // tried, and failed

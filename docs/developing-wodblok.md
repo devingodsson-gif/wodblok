@@ -177,7 +177,7 @@ The rulebook for how every part of the editor looks and behaves. Read it before 
 
 1. **One way to do each thing.** If a control, list, dialog or heading already exists, reuse it. A second version of the same thing is a bug, even if it looks nicer.
 2. **Few values, used everywhere.** Every size, radius, colour and duration comes from a short scale (sections 3–8). New numbers are not allowed in a feature; if the scale is missing something, change the scale first, in this document.
-3. **Quiet chrome, loud artwork.** Warm paper surfaces, one brass accent, thin lines. The pattern is the only thing allowed to be bold.
+3. **Quiet chrome, loud artwork.** Neutral grey surfaces in the manner of Photoshop (owner, Oct 20 2026: "as much like Photoshop as possible"), dense rows, one accent, thin lines. The pattern is the only thing allowed to be bold.
 4. **Labels, not words.** No explanatory text, helper paragraphs or tooltips in panels. Clear grouping and short labels do the work.
 5. **Nothing is hover-only.** Hover may add feedback, never the only way to find or use something.
 6. **Speed is part of the look.** A style that slows drawing, dragging or sliders is rejected (`npm run perf`).
@@ -196,31 +196,33 @@ The editor supports light and dark. Both must be correct for every screen. Theme
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--stage` | `#eae4d8` | `#1b1a18` | Work stage behind the artwork |
-| `--stage-dot` | `rgba(60,40,10,.07)` | `rgba(255,255,255,.04)` | Stage dots (off with `body.plain`) |
-| `--panel` | `#f6f2e9` | `#242220` | Panels, docks, dialogs |
-| `--raise` | `#ffffff` | `#2e2b28` | Raised surfaces, menus, hovered rows, buttons |
-| `--field` | `#ffffff` | `#1e1c1a` | Input and dropdown backgrounds |
-| `--line` | `#ddd5c6` | `#37332f` | Quiet dividers and card borders |
-| `--line2` | `#cbc2b0` | `#4a453f` | Control edges, menu and dialog borders |
-| `--fg` | `#26221d` | `#ede6da` | Primary text |
-| `--mut` | `#706858` | `#a39b8e` | Secondary text, idle icons |
-| `--faint` | `#766d60` | `#8f887c` | Group labels, counts, hints |
-| `--acc` | `#b8914f` | `#c9a66b` | Accent: focus, selection edge, fills of key actions |
-| `--acc-ink` | `#8a6528` | `#c9a66b` | Text and icons on a soft accent background |
-| `--acc-fg` | `#1b1a18` | `#1b1a18` | Text on a solid accent fill |
-| `--acc-soft` | `rgba(184,145,79,.16)` | `rgba(201,166,107,.16)` | Selected and active background, slider halo |
+| `--stage` | `#d6d6d6` | `#1e1e1e` | Work stage behind the artwork |
+| `--stage-dot` | `rgba(0,0,0,.06)` | `rgba(255,255,255,.04)` | Stage dots (off with `body.plain`) |
+| `--panel` | `#ececec` | `#282828` | Panels, docks, dialogs, the active tab |
+| `--raise` | `#f7f7f7` | `#323232` | Raised surfaces, menus, hovered rows, buttons |
+| `--field` | `#ffffff` | `#1c1c1c` | Input and dropdown backgrounds, value boxes |
+| `--line` | `#d0d0d0` | `#383838` | Quiet dividers and card borders |
+| `--line2` | `#b8b8b8` | `#4a4a4a` | Control edges, menu and dialog borders, slider tracks |
+| `--fg` | `#1f1f1f` | `#e3e3e3` | Primary text |
+| `--mut` | `#5c5c5c` | `#a6a6a6` | Secondary text, idle icons |
+| `--faint` | `#6b6b6b` | `#858585` | Group labels, counts, hints |
+| `--sel` | `#c7d6ec` | `#3a5578` | **Selected row** in every list (Elements, libraries, menus' current item): Photoshop's muted blue |
+| `--sel-fg` | `#1f1f1f` | `#ffffff` | Text and icons on `--sel` |
+| `--acc` | `#2f74c8` | `#4a8fe0` | Accent: focus, key actions, slider fill and thumb, pressed toggles |
+| `--acc-ink` | `#245fa6` | `#6aa6ec` | Text and icons on a soft accent background |
+| `--acc-fg` | `#ffffff` | `#ffffff` | Text on a solid accent fill |
+| `--acc-soft` | `rgba(47,116,200,.16)` | `rgba(74,143,224,.18)` | Pressed toggles and modes, slider halo |
 | `--warn` | `#c0532e` | `#e8895c` | Unsaved dot, warnings, destructive confirm |
 | `--ok` | `#3f8f66` | `#7fb08a` | Success |
-| `--shadow` | layered, warm | layered, dark | Floating surfaces only |
-| `--paper-shadow` | broad, warm | broad, dark | The artwork sheet only |
+| `--shadow` | layered, neutral | layered, dark | Floating surfaces only |
+| `--paper-shadow` | broad, neutral | broad, dark | The artwork sheet only |
 
 Rules:
 - Chrome MUST use these tokens. No literal hex or `rgb()` in chrome CSS or inline styles.
 - Literal colours are allowed only for: the artwork and colours the user chose; the colour picker's own hue bar and handles; the swatch fallback `var(--c,#888)`; scrims (`rgba(10,11,14,.45)`).
 - A swatch of the user's colour MUST have the swatch edge (`inset 0 0 0 1px rgba(0,0,0,.2)`) so pale colours stay visible. One value, everywhere.
-- The accent colour is the person's choice (Settings > General). The values in the table are the default, Oak. The eight named accents are woods: Oak, Birch, Rosewood, Ironwood, Eucalyptus, Purpleheart, Walnut, Maple. Chrome uses the tokens, never the literal, so a changed accent reaches every control. The settings code derives the four accent tokens of both themes from the one colour picked and keeps the ink at 4.5:1 or better on the panel.
-- The accent is for selection, focus and the one key action in a view. Never use it as decoration, and never for more than one primary action per view.
+- The accent colour is the person's choice (Settings > General). The values in the table are the default, **Steel** (a Photoshop blue, 2.3.0). The other named accents are woods: Oak (the default until 2.3.0), Birch, Rosewood, Ironwood, Eucalyptus, Purpleheart, Walnut, Maple. Chrome uses the tokens, never the literal, so a changed accent reaches every control. The settings code derives the four accent tokens of both themes from the one colour picked and keeps the ink at 4.5:1 or better on the panel.
+- Selected rows use `--sel`, not the accent (Photoshop's Layers panel). The accent is for focus, pressed toggles and the one key action in a view. Never use it as decoration, and never for more than one primary action per view.
 - `--warn` and `--ok` carry meaning only.
 - Contrast: check muted and disabled text in both themes. State is never carried by colour alone (add the edge, weight or icon).
 - Compare colours: `--ca` (blue) is A and `--cb` (amber) is B in Before/After; they mean nothing else.
@@ -230,8 +232,8 @@ Rules:
 | Token | Size | Use |
 |---|---|---|
 | `--fs-s` | 11px | Labels, hints, counts, group labels, tab text, meta |
-| `--fs-m` | 12.5px | Body, buttons, fields, list rows, menus. The base size |
-| `--fs-l` | 14px | Panel, group and dialog titles (600) |
+| `--fs-m` | 12px | Body, buttons, fields, list rows, menus. The base size |
+| `--fs-l` | 13px | Panel and dialog titles (600); group titles use `--fs-m` 600 |
 
 Brand sizes are separate and fixed: wordmark 15px, splash 20px. The "+" glyph of an empty slot is 18px (list) or 28px (large). Nothing else uses another size.
 
@@ -255,16 +257,16 @@ Three radii and a circle. Nothing else.
 
 | Token | Value | Use |
 |---|---|---|
-| `--r-s` | 4px | Elements 20px tall or less: chips, checkboxes, tags, small swatches, slider-like handles that are not round |
-| `--r-m` | 8px | **Everything else you can click, type in or select:** buttons, icon buttons, fields, dropdown buttons, list rows, menu items, tab highlights, segmented buttons, swatch wells, thumbnails, tiles, cards, the segmented container |
-| `--r-l` | 12px | Surfaces that float or contain: menus, popovers, dialogs, floating panels, the colour picker |
+| `--r-s` | 2px | Elements 20px tall or less: chips, checkboxes, tags, small swatches, slider-like handles that are not round |
+| `--r-m` | 3px | **Everything else you can click, type in or select:** buttons, icon buttons, fields, dropdown buttons, list rows, menu items, tab highlights, segmented buttons, swatch wells, thumbnails, tiles, cards, the segmented container |
+| `--r-l` | 6px | Surfaces that float or contain: menus, popovers, dialogs, floating panels, the colour picker |
 | `50%` | circle | Dots, radio marks, round handles |
 
 - A shape nested inside a padded parent takes the next radius down: inside `--r-l` use `--r-m`; inside `--r-m` use `--r-s`. A swatch well (`--r-m`) holds a swatch at `--r-s`; the segmented container (`--r-m`) holds buttons at `--r-s`.
 - Slider and progress tracks use half their height.
 - Docked panels, panel headers, tab strips and dock edges are square (radius 0). Only floating panels use `--r-l`.
 - Border: 1px, `--line` for dividers and card borders, `--line2` for the edge of anything you click or type in. No 2px outlines except focus and selection (section 10).
-- There is no 5, 6, 7, 9, 10 or 14. If a shape seems to need one, it is one of the three above.
+- Corners are nearly square (Photoshop, 2.3.0). There is no 4, 5, 7, 8, 9, 10, 12 or 14. If a shape seems to need one, it is one of the three above.
 - Exemptions: tracks of 1–3px (sliders, scrollbars) and the picture buttons listed in section 9.1. `check:style` allows these and nothing else.
 
 ### 6. Size, spacing and layers
@@ -273,17 +275,17 @@ Three radii and a circle. Nothing else.
 
 | Token | Height | Use |
 |---|---|---|
-| `--h-xs` | 22px | Compact buttons inside rows and chips that act |
-| `--h-sm` | 26px | Toolbar and panel-header icon buttons, small inline buttons, segmented control buttons |
-| `--h-md` | 30px | **Default.** Buttons, fields, dropdowns, icon buttons, swatch wells |
-| `--h-row` | 32px | List rows and folder headers |
-| `--h-touch` | 40px | Rail buttons and any new control that needs a touch target |
+| `--h-xs` | 18px | Compact buttons inside rows and chips that act |
+| `--h-sm` | 22px | Toolbar and panel-header icon buttons, small inline buttons, segmented control buttons |
+| `--h-md` | 24px | **Default.** Buttons, fields, dropdowns, icon buttons, swatch wells |
+| `--h-row` | 28px | List rows and folder headers (Elements rows hold a 20px thumbnail) |
+| `--h-touch` | 36px | Rail buttons and any new control that needs a touch target |
 
-Elements under 22px are indicators (dots, chips that do not act, handles), not controls. Mixed heights in one row are not allowed: a row of controls shares one height.
+Elements under 18px are indicators (dots, chips that do not act, handles), not controls. Mixed heights in one row are not allowed: a row of controls shares one height.
 
 **Spacing** (gap, margin and padding steps): 2, 4, 6, 8, 12, 16 px (`--sp-1` … `--sp-6`). 6 and 8 are the workhorses (control rows use gap 6; field groups gap 8).
-- Between control rows in a group: 6.
-- Between groups: 12.
+- Between control rows in a group: 4.
+- Between groups: 8.
 - Panel and group inset: 12 on the left and right, matching the header; rows inside lists use 8. Spacing above 16 is a multiple of 4.
 - A control's internal horizontal padding: 8 for fields, 12 for buttons with text.
 
@@ -346,11 +348,11 @@ Each component has one definition. If a screen needs a variant, it uses the clos
 
 #### 9.2 Sliders (the value row)
 
-One row layout for every slider: **label | track | value**, in a grid of `104px  1fr  52px`, gap 8, rows 6px apart.
+One row layout for every slider: **label | track | value**, in a grid of `96px  1fr  44px`, gap 8, rows 4px apart (Photoshop style, 2.3.0).
 - Label: `--fs-s`, `--mut`. Dragging the label scrubs the value (`ew-resize`).
-- Track: 3px tall, `--line2`, filled part `--acc`. Thumb: 13px circle, `--raise` fill with an accent edge.
-- Thumb grows to 1.15× on hover; while pressed it gets a 5px `--acc-soft` halo. These two effects are the only slider motion.
-- Value: right-aligned, tabular, `--fs-s`; it is editable by clicking. Units appear in the value (`12 px`, `45%`), never in the label.
+- Track: 1px tall, `--line2`, filled part `--acc`. Thumb: a small triangle (9px wide, 6px tall) pointing up, sitting just under the track, `--fg` fill (`--acc` while pressed).
+- While pressed the thumb takes the accent. That is the only slider motion.
+- Value: a small box (`--field`, `--line` edge, `--r-s`), right-aligned, tabular, `--fs-s`; it is editable by clicking. Units appear in the value (`12 px`, `45%`), never in the label.
 - Slider steps and ranges are chosen so a drag feels continuous; never fewer than about 100 positions across the track unless the setting is discrete.
 - A slider MUST NOT rebuild the whole picture when only an overlay opacity changed (see the speed audit).
 
@@ -384,8 +386,8 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 
 #### 9.7 Tabs and rail
 
-- Rail buttons: `--h-touch`, icon only, `--r-m` selected highlight with `--acc-soft`.
-- Panel tabs (`.wtab`): `--fs-s`, 500, `--mut`, 11px side padding, square; the active tab `--fg` with a 2px `--acc` bar on top.
+- Rail buttons: `--h-touch`, icon only, in a 36px strip; `--r-m` selected highlight with `--acc-soft`.
+- Panel tabs (`.wtab`), Photoshop style: the tab strip is `--stage`; tabs `--fs-s`, 500, `--mut`, 10px side padding, square; the active tab takes the `--panel` colour and `--fg` text, so it joins the panel below. No accent bar.
 - A tool opens a panel; a panel never opens by itself at launch, except through the launch workspace (the one called Default, else the first workspace).
 
 #### 9.8 Swatches, thumbnails and cards
@@ -408,7 +410,8 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 | Rest | Token colours, no shadow |
 | Hover | Fill `--raise` (on `--panel`) or edge `--line2`; icons to `--fg`. `--t-fast` |
 | Pressed | One step darker/lighter fill; never a size change |
-| Selected / on | `--acc-soft` fill, `--acc` edge or 2px accent bar, `--acc-ink` text. Plus a non-colour cue (edge or weight 600) |
+| Selected row | `--sel` fill, `--sel-fg` text and icons (Photoshop's Layers). No edge needed: the fill is the cue |
+| On (toggle, mode) | `--acc-soft` fill, `--acc` edge, `--acc-ink` text. Plus a non-colour cue (edge or weight 600) |
 | Focus | `:focus-visible { outline: 2px solid var(--acc); outline-offset: 1px }`. Never removed. On a coloured fill use `0 0 0 2px var(--panel), 0 0 0 4px var(--acc)` |
 | Disabled | Opacity .4, not clickable, still readable. No tooltip explaining why |
 | Dirty / unsaved | 8px `--warn` dot |
@@ -419,9 +422,9 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 
 #### 11.1 Panel structure
 
-- **Panel header:** min-height 40, padding 6 / 12 / 6 / 12, bottom border `--line`; title `--fs-l` 600; header actions on the right are `--h-sm` icon buttons or one `--h-sm` quiet text button, gap 8.
-- **Body:** scrolls; inset 12 left and right.
-- **Group (`details.g`):** summary padding 8 / 12, `--fs-l` 600, chevron left, bottom border `--line`; hover tints with `--raise`. Group content aligns to the same 12px inset.
+- **Panel header:** min-height 32, padding 4 / 8 / 4 / 8, bottom border `--line`; title `--fs-l` 600; header actions on the right are `--h-sm` icon buttons or one `--h-sm` quiet text button, gap 8.
+- **Body:** scrolls; inset 8 left and right.
+- **Group (`details.g`):** summary padding 6 / 8, `--fs-m` 600, chevron left, bottom border `--line`; hover tints with `--raise`. Group content aligns to the same 12px inset.
 - **Group label** (a sub-heading inside a group): section 11.2.
 - **Panel bar** (the compact bar under a header with a setting, e.g. Auto-open): padding 7 / 10, `--fs-s`, `--mut`, bottom border `--line`.
 - Panels MUST work at narrow widths: no fixed widths that overflow; labels truncate; the slider grid keeps its columns.
@@ -432,7 +435,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 | Level | Style | Use |
 |---|---|---|
 | Panel / dialog title | `--fs-l`, 600 | Once per panel or dialog |
-| Group title | `--fs-l`, 600, in a `details.g` summary | Collapsible groups |
+| Group title | `--fs-m`, 600, in a `details.g` summary | Collapsible groups |
 | Group label | `--fs-s`, uppercase, `.06em`, `--faint`, padding 8 / 10 / 2 | Dividing a group inside a panel ("Showing", "All"). Libraries do not use it; their folders are rows (section 12) |
 
 There is no fourth heading. `h1`–`h6` tags are used for structure, then styled as one of these three.
