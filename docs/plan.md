@@ -468,3 +468,7 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - **No panels at start.** Launch opens no panel (Default panels on the rail button still opens the built-in layout). Tests ask for it with `workspaces: true` (`wb96_launch='on'`).
 - **No Stamp library tool.** Its rail button and "Open Stamp library" command are removed; the panel and its code stay for later (stamp saving), and the Stamp panel's library button still opens it.
 - Not run: CI and the full suite (owner's instruction).
+
+### 2.11.0 (Oct 21 2026): Colourways merged into the bottom of Colours (owner). Format 25 unchanged
+- The Colourways tool, its rail button and "Open Colourways" command are gone; its cards and New colourway / Export… buttons are a "Colourways" group at the bottom of the Colours panel (same ids, same code in 53-colourways.js).
+- Not run: CI and the full suite.

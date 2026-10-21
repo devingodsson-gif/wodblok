@@ -49,7 +49,6 @@ const COMMANDS = [
   ['panels.closeAll', 'Close all panels', 'rcls'],
   ['panel.canvas', 'Open Canvas', 'rail-canvas'],
   ['panel.colors', 'Open Colours', 'rail-colors'],
-  ['panel.cways', 'Open Colourways', 'rail-cways'],
   ['colourway.new', 'New colourway', 'cwnew'],
   ['colourway.exportAll', 'Export all colourways', 'cwgo'],
   ['tray.add', 'Add a colour to the tray', 'tyaddl'],

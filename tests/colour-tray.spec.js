@@ -131,7 +131,7 @@ test('saved trays: a Wada set fills the first places; your own tray is kept and 
 
 test('colourways: a new one copies the colours; editing it leaves the first alone; switching swaps; export (in Export recipes) makes one file each', async ({ page }) => {
   const { errors } = await openApp(page);
-  await openPanel(page, 'cways');
+  await openPanel(page, 'colors');
   await expect(page.locator('#cwg .cwc')).toHaveCount(1);
   const c0 = await colours(page);
   await page.click('#cwnew'); await page.keyboard.type('Night'); await page.keyboard.press('Enter'); await settle(page);

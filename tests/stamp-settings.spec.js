@@ -39,7 +39,7 @@ async function twoShapes(page) {
 }
 
 test('Stamp settings work from the Pattern view on the unlocked stamp: shape, size, invert, ink, edge', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
+  const { errors } = await openApp(page, { pattern: true, seed: 4 });
   await unlock(page);
   await showPanel(page, 'stmp');
   const d0 = await page.locator('#stol path.olu').first().getAttribute('d');
@@ -67,7 +67,7 @@ test('Stamp settings work from the Pattern view on the unlocked stamp: shape, si
 });
 
 test('each shape can have a colour of its own: the stamp prints in runs and the tray knows the use', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
+  const { errors } = await openApp(page, { pattern: true, seed: 4 });
   await twoShapes(page);
   expect(await page.locator('#s1 rect[mask^="url(#m1r"]').count()).toBe(0);
   await expect(page.locator('#wl_sh')).toBeVisible();
@@ -101,17 +101,16 @@ test('each shape can have a colour of its own: the stamp prints in runs and the 
 });
 
 test('a colour that is a tray colour follows the tray: another colourway recolours the shape', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
+  const { errors } = await openApp(page, { pattern: true, seed: 4 });
   await twoShapes(page);
   await page.locator('#wl_sh .cwsb').click();
   await page.locator('.cwp .cwpc[data-s="k1"]').click();
   await settle(page);
   const before = await page.evaluate(() => [...document.querySelectorAll('#s1 rect[mask^="url(#m1r"]')].map(r => r.getAttribute('fill')));
   await page.evaluate(() => { const s = JSON.parse(__wbTest.state()); return s; });
-  await openPanel(page, 'cways');
+  await openPanel(page, 'colors');
   await page.click('#cwnew');
   await settle(page);
-  await openPanel(page, 'colors');
   // change colour 1 in the new colourway through its picker field
   await page.locator('#tyc .tys').first().click();
   await page.fill('.cpk [data-f="hex"]', '#cc2200');
@@ -124,7 +123,7 @@ test('a colour that is a tray colour follows the tray: another colourway recolou
 });
 
 test('shape colours show in the printed pattern', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
+  const { errors } = await openApp(page, { pattern: true, seed: 4 });
   await twoShapes(page);
   expect(await redPixels(page)).toBe(0);
   await fixedRed(page);
