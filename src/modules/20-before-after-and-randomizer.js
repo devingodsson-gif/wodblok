@@ -7,7 +7,7 @@ import {CATS} from './05-motif-data.js';
 import {cust,it,mkL,oneLayer,selOne,store} from './06-motif-library-folders.js';
 import {gModel} from './08-grid-shapes.js';
 import {hx3} from './09-stamp-items-and-print-runs.js';
-import {GRAD,arrOpts,fitTs,gArrAll} from './10-layer-grids.js';
+import {GRAD,arrOpts,gArrAll} from './71-randomize-elements.js';
 import {raf,upd} from './11-pressure-flooding-block-edges.js';
 import {TXF,TXMD,txMake,txRid} from './16-texture-generators.js';
 import {txMerge} from './17-texture-panel-and-previews.js';
@@ -15,7 +15,7 @@ import {coreStr,pmsg} from './18-projects-and-cover-overlay.js';
 import {wbHold} from './19-randomize-and-hold.js';
 import {fpU} from './24-free-place-layers.js';
 import {SL,libColors,libMotifs} from './27-stamp-library.js';
-import {rzFrameEls,rzFx,rzLayoutEls,rzMainEls,rzPressEls,rzSheet,rzTexEls} from './71-randomize-elements.js';
+import {rzFrameEls,rzFx,rzLayoutEls,rzMainEls,rzPressEls,rzSheet} from './71-randomize-elements.js';
 // a layer that holds pictures or text boxes: Randomize keeps these
 const rzPic=l=>(l.pl||[]).some(p=>p.a||p.tx);
 // ===== v96 Before / after. `\` flips between the picture and the "before" (tap to stay, hold to peek); Shift+`\` splits the view with a draggable line.
@@ -220,31 +220,13 @@ if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:
   masks=((g0&&g0.masks)||[]).map(m=>{const q=JSON.parse(JSON.stringify(m));if(q.t=='lay'&&q.lay&&mU[q.lay])q.lay=mU[q.lay];if(q.st&&mT[q.st])q.st=mT[q.st];if(q.t=='col'&&q.c){for(const k in inkMap){if(col(k).toLowerCase()==String(q.c).toLowerCase()){q.c=colP(inkMap[k]).slice(0,7).toLowerCase();break}}}return q})}
  if(FT.gr&&AM('gr')<1)Object.keys(gl).forEach(k=>{if(typeof gl[k]=='number')gl[k]=Math.round(gl[k]*AM('gr'))});
  WBX.wbGrade.set({...gl,cov:g0.cov,masks})}
-if(c.layers.some(l=>LS.includes(l)))LS.forEach(l=>{if(c.layers.includes(l)&&l.fit&&!l.gl)l.size=+fitTs(l).toFixed(3)});store();upd();
+store();upd();
 // Layout: pattern type, stamp size, spacing and scatter, offset, rotation and flips of the layers that repeat. Works on whatever layers the project has now.
 if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('layout','rot'),lty=sOn('layout','type'),lof=sOn('layout','offset'),
- lays=WBS.layers.filter(l=>!l.free&&!(l.fr&&l.fr.on)),lnk=new Set(WBS.layers.filter(l=>l.gl).map(l=>l.gl)),
  lrd=sOn('layout','radial')&&!(WBS.dim.rt&&!WBS.book.on),lvr=sOn('layout','vary'),
  EN=[...(lsp?[['scatter',1.2]]:[]),...(lrt?[['tilt',1.1],['spread',1],['flips',1]]:[]),...(lvr?[['sizevar',1],['gaps',.8]]:[])],E=new Set();
  // at most two energetic effects per roll (position scatter, turned grid, rotation spread, flips), so a piece stays coherent
  for(let q=wpick([[1,.55],[2,.45]]);q>0&&E.size<EN.length;q--)E.add(wpick(EN.filter(x=>!E.has(x[0]))));
- lays.forEach((l,i)=>{const lk=!!l.gl;
-  if(!lk){const lead=WBS.tiles.find(t=>t.id==(l.lead!=null?l.lead:(l.st||[])[0]));
-   if(lty&&lead){const g=geom(shOf(lead));let key=pick(arrOpts(g))[0];if(lrd&&!lnk.has(l.u)&&ch(.3))key=pick(GRAD)[0];l.ak={...(l.ak||{}),[g.SK]:key};const am=gArrAll(g).find(o=>o[0]==key);if(lvr&&am&&(am[2]=='brick'||am[2]=='drop'))l.bo=pick([25,33.333,50,66.667,75]);else delete l.bo}
-   if(lsz){l.fit='';l.size=Math.round(i?rr(70,200):rr(110,250))}
-   if(lsp)l.gap=ch(.6)?0:ri(-6,28);
-   if(lof){l.ox=ri(0,99);l.oy=ri(0,99)}
-   if(lrt)l.rot=E.has('tilt')?pick([45,45,30,-30,15,-15,60,90]):0}
-  else if(lty)l.pa=pick(['k','e','k','e','c']);
-  // position scatter: not on a layer whose grid other layers are linked to, so those stay lined up
-  if(lsp&&!lk&&!lnk.has(l.u)){if(E.has('scatter'))l.rpos=wpick([[ri(6,16),.45],[ri(16,30),.4],[ri(30,45),.15]]);else delete l.rpos}
-  if(lrt){
-   if(E.has('spread')){l.rrot=wpick([[ri(8,25),.45],[ri(25,60),.4],[ri(60,150),.15]]);if(ch(.55))l.rtn=true;else delete l.rtn}else{delete l.rrot;delete l.rtn}
-   if(E.has('flips')){const h=ch(.75),v=ch(.5)||!h;if(h)l.rfh=true;else delete l.rfh;if(v)l.rfv=true;else delete l.rfv}else{delete l.rfh;delete l.rfv}}
-  if(lvr){if(E.has('sizevar'))l.rsz=ri(15,45);else delete l.rsz;if(E.has('gaps')&&!lnk.has(l.u))l.rgp=ri(8,28);else delete l.rgp}
-  if(lsp||lrt||lvr)l.rsd=1+Math.floor(R()*99999);
-  if(lsz&&!lk&&i==0&&!l.rot&&ch(.3)){l.fit=pick(['h','v']);try{l.size=+fitTs(l).toFixed(3)}catch(e){}}
- });
  rzLayoutEls(WBS.layers,{type:lty,size:lsz,space:lsp,rot:lrt,offset:lof,vary:lvr,rad:lrd,scatter:E.has('scatter'),tilt:E.has('tilt'),spread:E.has('spread'),sizevar:E.has('sizevar'),gaps:E.has('gaps')},EO);
  useT(WBS.tiles[WBS.cur]);store();upd()}
 // Layer opacity and blend: the first layer stays mostly solid; the ones above can turn see-through or blend

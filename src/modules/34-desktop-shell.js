@@ -6,7 +6,7 @@ import {CASP,CH,CSN,CW,SH,SHN,SW,bk,closeDD,csk,placeFloat,rowMenu,setDim,shOf,w
 import {trayIn} from './50-tray-core.js';
 import {flatEls,oneLayer,selOne,store} from './06-motif-library-folders.js';
 import {nr,symOf,tbSync} from './07-symmetry.js';
-import {fitTs,migLayers} from './10-layer-grids.js';
+import {migLayers} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS,doSplit} from './12-selection-and-split.js';
 import {sync} from './13-preview-and-stamp-tool.js';
@@ -494,15 +494,7 @@ document.addEventListener('pointerdown',e=>{if(e.button||e.pointerType=='touch')
 if(typeof nums=='function'){const _n=nums;nums=function(){_n();WBX.wbDDsync()}}
 })();
 
-enhance();{const r=$('ts'),row=r.closest('.ctl'),f=document.createElement('div');f.className='ctl fitrow';
-const ic=(d)=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-f.innerHTML=`<label>Fit to frame</label><div class="seg" id="tsfit">`+
-`<button type="button" data-f="" title="Off: stamps run off the frame edges">${ic('<circle cx="12" cy="12" r="7.5"/><path d="M6.7 17.3l10.6-10.6"/>')}Off</button>`+
-`<button type="button" data-f="h" title="Fit width">${ic('<path d="M3.5 12h17M7 8.5L3.5 12 7 15.5M17 8.5l3.5 3.5-3.5 3.5"/><path d="M3.5 5v2.5M20.5 5v2.5M3.5 16.5V19M20.5 16.5V19"/>')}Width</button>`+
-`<button type="button" data-f="v" title="Fit height">${ic('<path d="M12 3.5v17M8.5 7L12 3.5 15.5 7M8.5 17l3.5 3.5 3.5-3.5"/><path d="M5 3.5h2.5M16.5 3.5H19M5 20.5h2.5M16.5 20.5H19"/>')}Height</button></div>`;
-row.after(f);
-f.onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const L=LY();L.fit=b.dataset.f;if(L.fit)L.size=+fitTs(L).toFixed(3);store();upd();sync();nums()};
-r.oninput=()=>{const L=LY();L.size=L.fit?+fitTs(L,+r.value).toFixed(3):+r.value;if(L.fit){r.value=L.size;paint(r)}store();upd()}}
+enhance();
 tipRows();WS.pattern={dock:[],float:[]};setView();info();nums();requestAnimationFrame(()=>{applyZ();nums()});
 
 {const sp=document.getElementById('splash'),t0=performance.now();if(sp){const go=()=>{const w=Math.max(0,520-(performance.now()-t0));setTimeout(()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),320)},w)};const f=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1400))]):Promise.resolve();requestAnimationFrame(()=>requestAnimationFrame(()=>f.then(go)))}}

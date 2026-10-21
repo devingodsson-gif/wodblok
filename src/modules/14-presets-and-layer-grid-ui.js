@@ -1,8 +1,7 @@
 import {clipboard,kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,SHN,SK,csk,geom,setDim,shOf,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,SK,csk,geom,setDim,shOf,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {say,store} from './06-motif-library-folders.js';
-import {hx,leadT} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC} from './17-texture-panel-and-previews.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
@@ -22,15 +21,6 @@ if(k=='c'){if(v)WBS.dim.c=v;setDim()}
 else{const t=WBS.tiles[WBS.cur],c={...(ch||{})};if(v)c.s=v;reshape(t,c);const sh=shOf(t);WBS.dim={...WBS.dim,k:sh.k,o:sh.o,s:[...sh.s]}}
 WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd()}
 function csSet(ch){Object.assign(WBS.dim,ch);if(WBS.dim.cs=='rect')delete WBS.dim.cs;setDim();WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd()}
-// ---- layer grid: own grid or another layer's, where to print on it, which stamp sets its shape
-function syncGrid(L,T){const others=WBS.layers.filter(x=>x!==L&&!(x.fr&&x.fr.on)&&!x.free),ky=others.map(x=>x.u+x.name).join('|');
-if($('lgl').dataset.k!=ky){$('lgl').innerHTML='<option value="">Its own grid</option>'+others.map(x=>`<option value="${hx(x.u)}">Same grid as ${hx(x.name)}</option>`).join('');$('lgl').dataset.k=ky}
-$('lgl').value=T.linked?L.gl:'';$('lglrow').hidden=!T.linked;
-document.querySelectorAll('#lpa [data-p]').forEach(b=>b.classList.toggle('on',b.dataset.p==(L.pa||'c')));
-if(T.linked)$('lglh').textContent=`Uses the grid of ${T.B.name}: same pattern, spacing and stamp size. Each stamp prints at its own Size from Stamp settings, so small stamps sit neatly in the gaps.`;
-const ls=WBS.tiles.filter(t=>L.st.includes(t.id)),lt=leadT(L);$('lldrow').hidden=T.linked||ls.length<2;
-const k2=ls.map(t=>t.id+shOf(t).k).join('|');if($('lld').dataset.k!=k2){$('lld').innerHTML=ls.map(t=>`<option value="${t.id}">Stamp ${WBS.tiles.indexOf(t)+1} (${SHN[shOf(t).k]})</option>`).join('');$('lld').dataset.k=k2}
-if(ls.length)$('lld').value=lt.id}
 const LY=()=>WBS.layers[WBS.selL];
 const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'wodblok-pattern';return n+'.'+ext};
 const ser=()=>{const k=WBS.edMk;if(!k){WBS.edMk=true;upd()}try{return ser0()}finally{if(!k){WBS.edMk=false;upd()}}};
@@ -56,15 +46,8 @@ $('shor').oninput=()=>applyAsp('s',null,{o:$('shor').value});
 $('shz').oninput=()=>{shOf(WBS.tiles[WBS.cur]).z=+$('shz').value;store();upd()};
 $('shrad').oninput=()=>{const sh=shOf(WBS.tiles[WBS.cur]),v=Math.max(0,Math.min(100,Math.round(+$('shrad').value)||0));if((sh.rad||0)==v)return;if(v>0)sh.rad=v;else delete sh.rad;WBS.symKey='';store();upd()};
 $('sall').onclick=()=>{const sh=shOf(WBS.tiles[WBS.cur]);let n=0;WBS.tiles.forEach(t=>{if(t===WBS.tiles[WBS.cur])return;const o=shOf(t);if(o.k!=sh.k||o.o!=sh.o||o.s[0]!=sh.s[0]||o.s[1]!=sh.s[1]){reshape(t,{k:sh.k,o:sh.o,s:sh.s});n++}});WBS.symKey='';store();upd();pmsg(n?`${n} other stamp${n>1?'s':''} now use this shape.`:'Every stamp already has this shape.')};
-$('lgl').oninput=()=>{const L=LY(),v=$('lgl').value;if(v){L.gl=v;L.ox=0;L.oy=0;if(!L.pa)L.pa='c'}else delete L.gl;store();upd()};
-$('lpa').onclick=e=>{const b=e.target.closest('[data-p]');if(!b)return;LY().pa=b.dataset.p;store();upd()};
-$('lld').oninput=()=>{LY().lead=+$('lld').value;store();upd()};
 $('neg').oninput=()=>{WBS.tiles[WBS.cur].neg=$('neg').checked;store();upd()};$('swrap').oninput=()=>{const t=WBS.tiles[WBS.cur];if($('swrap').checked)delete t.wr;else t.wr=false;store();upd()};
-[['lgp','gap',Number],['ts','size',Number],['lox','ox',Number],['loy','oy',Number],['lrr','rrot',Number],['lrp','rpos',Number],['lrz','rsz',Number],['lrg','rgp',Number],['lrt','rot',Number],['lps','pst',Number],['lfs','pfl',Number]].forEach(([id,k,f])=>$(id).oninput=()=>{LY()[k]=f($(id).value);store();upd()});
-[['lrtn','rtn'],['lrfh','rfh'],['lrfv','rfv']].forEach(([id,k])=>$(id).oninput=()=>{const L=LY();if($(id).checked)L[k]=true;else delete L[k];store();upd()});
-$('lrsh').onclick=()=>{LY().rsd=1+Math.floor(Math.random()*99999);store();upd();if(WBX.wbCap)WBX.wbCap()};
 $('let').oninput=()=>{WBS.tiles[WBS.cur].et=+$('let').value;store();upd()};$('ler').oninput=()=>{WBS.tiles[WBS.cur].er=+$('ler').value;store();upd()};$('lers').onclick=()=>{WBS.tiles[WBS.cur].es=(WBS.tiles[WBS.cur].es||0)+1;store();upd()};
-$('lst').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;const id=+b.dataset.s,a=LY().st,k=a.indexOf(id);if(k<0)a.push(id);else a.splice(k,1);store();upd()};
 $('cov').addEventListener('input',upd);
 $('cpy').onclick=async()=>{try{await clipboard.writeText(ser());say('SVG copied.')}catch(e){say('Copy was blocked here.')}};
 $('sv').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
@@ -78,4 +61,4 @@ c.toBlob(async b=>{try{await d.save({filename:expName('png'),data:b,handle:h0});
 img.onerror=()=>{pmsg('');say('PNG export failed.')};
 img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())};
 }
-export {LY,expName,ser,syncAsp,syncGrid,init14};
+export {LY,expName,ser,syncAsp,init14};

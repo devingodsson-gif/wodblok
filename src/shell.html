@@ -434,7 +434,7 @@ body.calm *{transition:none!important;animation:none!important}
 
 /* slider rows: label | slider | value */
 .ctl{display:grid;grid-template-columns:104px minmax(0,1fr) 52px;align-items:center;gap:8px;margin-top:6px}
-.ctl.fitrow{grid-template-columns:104px minmax(0,1fr)}.fitrow .seg button{padding:0 2px}.ctl:has(input[type=range]:disabled){opacity:.4}.lk[aria-pressed=true] .on{display:block}.lk[aria-pressed=true] .off{display:none}
+.ctl:has(input[type=range]:disabled){opacity:.4}.lk[aria-pressed=true] .on{display:block}.lk[aria-pressed=true] .off{display:none}
 .ctl label{margin:0;color:var(--fg);font-size:var(--fs-m);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ctl .num{position:relative}
 .ctl .num input{height:26px;font-size:var(--fs-s);padding:2px 6px}
@@ -526,7 +526,7 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 .strip button img,.ath{display:block;width:100%;height:100%;object-fit:contain}.strip button{position:relative}#lfars button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}#lfars .alk{position:absolute;left:3px;bottom:3px;width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 1.5px var(--field)}#lfars i{position:absolute;top:-5px;right:-5px;width:15px;height:15px;line-height:13px;border-radius:50%;background:var(--panel);border:1px solid var(--line2);font-style:normal;font-size:var(--fs-s);color:var(--mut)}
 #lfpst button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}.fpn{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:var(--fs-m);color:var(--mut)}.fpn span{flex:1}.fpn button{margin:0}.fprow{gap:2px}
 .fpl{min-height:0;max-height:210px;overflow:auto;margin-top:6px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);padding:4px}.fpl .mr.on button{visibility:visible}.fpl .mr svg{background:var(--panel)}
-.strip.ls button{opacity:.4}.strip.ls button.on{opacity:1;border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}
+
 #sel .ctl.cwr{grid-template-columns:auto minmax(0,1fr)}.smked{padding:7px 10px;font-size:var(--fs-s);color:var(--mut);border-bottom:1px solid var(--line)}.smked[hidden]{display:none}
 .smkl{display:flex;flex-direction:column;gap:2px}.smkr{display:flex;align-items:center;gap:6px;min-height:var(--h-row);padding:0 4px;border-radius:var(--r-m);font-size:var(--fs-m);cursor:pointer}.smkr:hover{background:var(--raise)}
 .smkr.cur{background:var(--acc-soft);box-shadow:inset 2px 0 0 var(--acc)}.smkr.cur .smkn{font-weight:600;color:var(--acc-ink)}.smkth[aria-pressed=true]{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}.smkt{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-3)}.smkt .ib{width:var(--h-sm);height:var(--h-sm)}.smkt .ib .ic{width:15px;height:15px}.smks{flex:1}.smkt .ib.sure{color:var(--warn);background:var(--acc-soft)}
@@ -1276,58 +1276,6 @@ body.eyedrop{cursor:crosshair}
     <div class="ml" id="pesrc"></div>
     <div class="row"><button class="alt" id="peadd">Add current stamp</button><button class="alt" id="pesel">Add selected element</button></div>
    </div>
-  </div></details>
-  <details class="g" open hidden><summary>Arrangement</summary><div class="gb">
-   <div class="seg" id="lmode" role="group" aria-label="Arrangement" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-m="x">None</button><button type="button" data-m="p">Repeat</button><button type="button" data-m="f">Frame</button></div>
-   <div id="lfrm" hidden>
-    <div class="hint" id="lfh" style="margin-top:6px"></div>
-    <div id="lfscrow"><label>Frame around</label><select id="lfsc"><option value="front">Front cover</option><option value="both">Back and front covers</option><option value="each">Back, spine and front</option><option value="all">The whole cover</option></select>
-     <label class="chk"><input type="checkbox" id="lfsafe"><span>Keep inside the safe area</span></label>
-     <label class="chk" id="lfbarrow"><input type="checkbox" id="lfbar"><span>Leave the barcode area clear</span></label>
-     <div class="hint" id="lfinfo"></div></div>
-    <label>Width</label><input type="range" id="lfw" min="0.3" max="10" step="0.1" value="2.5" data-u="%" data-def="2.5">
-    <label>Inset</label><input type="range" id="lfi" min="0" max="20" step="0.5" value="0" data-u="%" data-def="0">
-    <label>Spacing</label><input type="range" id="lfg" min="0" max="100" value="0" data-u="%" data-def="0">
-    <label>Corners</label><div class="seg" id="lfc"><button type="button" data-c="m" title="Sides cut at 45°, meeting in a diagonal seam">Mitred</button><button type="button" data-c="b" title="A corner stamp in each corner, strips in between">Corner stamp</button><button type="button" data-c="o" title="Strips run past each other">Overlap</button></div>
-    <div id="lfcsrow"><label>Corner stamp</label><select id="lfcs"></select></div>
-    <label>Top of the strip faces</label><div class="seg" id="lffc" style="grid-template-columns:1fr 1fr"><button type="button" data-f="o">Outward</button><button type="button" data-f="i">Inward</button></div>
-    <label class="chk"><input type="checkbox" id="lfclr"><span>Clear the pattern under the frame</span></label>
-   </div>
-   <div id="lpat">
-   <label>Grid</label><select id="lgl"></select>
-   <div id="lglrow" hidden><label>Print on</label><div class="seg" id="lpa"><button type="button" data-p="c" title="One stamp in the middle of every cell">Centres</button><button type="button" data-p="k" title="Where the shapes of the grid meet">Corners</button><button type="button" data-p="e" title="Halfway along every edge of the grid">Edges</button></div><div class="hint" id="lglh"></div></div>
-   <div id="lldrow" hidden><label>Grid shape follows</label><select id="lld"></select></div>
-   <label>Pattern</label><select id="larr"></select>
-   <div id="lborow" hidden><label>Offset</label><select id="lbo"><option value="25">1/4</option><option value="33.333">1/3</option><option value="50">1/2</option><option value="66.667">2/3</option><option value="75">3/4</option></select></div>
-   <div hidden><select id="lgr"><option value="">Auto (fits the stamp shape)</option><option value="square">Grid</option><option value="brick">Brick (offset rows)</option><option value="drop">Half-drop (offset columns)</option><option value="honey">Honeycomb</option></select>
-   <select id="lay"><option value="check">Checker</option><option value="rows">Rows</option><option value="cols">Columns</option><option value="diag">Diagonal stripes</option><option value="rand">Random</option></select></div>
-   <label>Stamp size</label><input type="range" id="ts" min="80" max="320" value="180">
-   <label id="lgpl">Spacing</label><input type="range" id="lgp" min="-20" max="100" value="0" data-u="%">
-   <label>Offset X</label><input type="range" id="lox" min="-50" max="50" value="0">
-   <label>Offset Y</label><input type="range" id="loy" min="-50" max="50" value="0">
-   <label id="lrl">Rotation</label><input type="range" id="lrt" min="-180" max="180" value="0" data-u="°">
-   </div>
-  </div></details>
-  <details class="g" open hidden id="lstbox"><summary>Stamps in the pattern</summary><div class="gb">
-   <div class="strip ls" id="lst"></div>
-  </div></details>
-  <details class="g" open hidden id="lmanbox"><summary>Manual arrangement <span class="aux" id="mancnt"></span></summary><div class="gb">
-   <label class="chk" style="margin-top:2px"><input type="checkbox" id="man"><span>Pick stamps by hand</span></label>
-   <div class="row"><button class="alt" id="manr">Reset hand-picked stamps</button></div>
-  </div></details>
-  <details class="g" id="lrsec" open hidden><summary>Variation <span class="aux">this layer</span></summary><div class="gb">
-   <label>Rotation</label><input type="range" id="lrr" min="0" max="180" value="0" data-u="&#176;" data-def="0">
-   <label>Position</label><input type="range" id="lrp" min="0" max="100" value="0" data-u="%" data-def="0">
-   <div id="lrzrow"><label>Size</label><input type="range" id="lrz" min="0" max="100" value="0" data-u="%" data-def="0"></div>
-   <div id="lrgrow"><label>Gaps</label><input type="range" id="lrg" min="0" max="100" value="0" data-u="%" data-def="0"></div>
-   <label class="chk"><input type="checkbox" id="lrtn"><span>Turn to fit each shape</span></label>
-   <label class="chk"><input type="checkbox" id="lrfh"><span>Flip some left &#8596; right</span></label>
-   <label class="chk"><input type="checkbox" id="lrfv"><span>Flip some up &#8597; down</span></label>
-   <div class="row"><button class="alt" id="lrsh" title="Roll a new random arrangement">Shuffle</button></div>
-  </div></details>
-      <details class="g" open hidden id="lipsec"><summary>Impression <span class="aux">this layer</span></summary><div class="gb">
-   <label id="lpl">Uneven pressure</label><input type="range" id="lps" min="0" max="10" value="0">
-   <label id="lfl">Ink flooding</label><input type="range" id="lfs" min="0" max="10" value="0">
   </div></details>
  </section>
 

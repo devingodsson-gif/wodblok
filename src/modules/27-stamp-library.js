@@ -5,7 +5,7 @@ import {$,WBS,WBX} from './01-launch-and-version.js';
 import {BK} from './03-stamp-prints-and-drawing.js';
 import {C,CC,CH,CM,CW,col,geom,paintColors,saveCC,shOf,shp,useT,okC} from './04-canvas-and-stamp-outlines.js';
 import {clean,cust,inkOf,selOne,store} from './06-motif-library-folders.js';
-import {hx,lattice} from './10-layer-grids.js';
+import {hx} from './10-layer-grids.js';
 import {eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC,inkCatch,txMerge,txPack} from './17-texture-panel-and-previews.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
@@ -30,7 +30,7 @@ async function stampCanvas(t,px,onPaper,o){o=o||{};const G=geom(shOf(t)),dd=$('d
 useT(t);const outline=shp(0);useT(WBS.tiles[WBS.cur]);const ink=inkOf(t),pa=col(WBS.proj.bg),fx=!!o.fx,tx=!!o.tx,hasD=sel=>!!dd.querySelector(sel);
 // print it at the size it prints in your pattern, so grain and roughness match what you see there
 let k=180/Math.max(G.SW,G.SH),L=null,li=-1;
-if(fx||tx)try{li=WBS.layers.findIndex(l=>l.vis!==false&&(l.st||[]).includes(t.id)&&!(l.fr&&l.fr.on));if(li>=0){L=WBS.layers[li];if(!L.free){const T=lattice(L);k=T.ts*(shOf(t).z||100)/(T.g.SW*T.z)*1.004}else{const q=(L.pl||[]).find(z=>z.t==t.id);if(q)k=q.s/Math.max(G.SW,G.SH)}}}catch(e){L=null;li=-1}
+if(fx||tx)try{li=WBS.layers.findIndex(l=>l.vis!==false&&(l.st||[]).includes(t.id)&&!(l.fr&&l.fr.on));if(li>=0){L=WBS.layers[li];{const q=(L.pl||[]).find(z=>z.t==t.id);if(q)k=q.s/Math.max(G.SW,G.SH)}}}catch(e){L=null;li=-1}
 k=Math.min(k,.95*Math.min(CW,CH)/Math.max(G.SW,G.SH));if(!(k>0))k=1;
 const W=G.SW*k,H=G.SH*k,mx=Math.max(W,H),pad=(fx||tx)?mx*.05:0,cx=CW/2,cy=CH/2,xf=`translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(${k.toFixed(5)}) translate(${-G.SW/2} ${-G.SH/2})`;
 let defs=(BK.vdefs!=null?BK.vdefs:dd.innerHTML)+(fx&&SURFC[t.id]?SURFC[t.id].s:'');if(!fx){defs=defs.split(` mask="url(#is${t.id})"`).join('');defs=defs.replace(/<g class="txo"[^>]*>.*?<\/g>/g,'')}let use=`<use href="#s${t.id}"/>`+(eT(t)?`<use href="#e${t.id}_0" fill="${ink}"/>`:'');

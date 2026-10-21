@@ -43,7 +43,7 @@ function patternCounters(page) {
       dynChars: dyn ? dyn.innerHTML.length : 0,
       dynNodes: dyn ? dyn.getElementsByTagName('*').length : 0,
       artChars: document.getElementById('art').innerHTML.length,
-      layerButtons: thumbs('#lst'),
+      layerButtons: [],
     };
   });
 }
