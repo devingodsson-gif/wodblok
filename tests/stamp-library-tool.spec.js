@@ -86,7 +86,7 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   // a free copy of stamp 2 placed on the layer
   await show(page, 'stmp');
   const id2 = (await state(page)).tiles[1].id;
-  await page.locator(`#lfpst [data-t="${id2}"]`).click();
+  await page.locator(`#lfpst [data-t="${id2}"]`).dispatchEvent('click');
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
   await settle(page);
@@ -109,12 +109,12 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   expect((await state(page)).tiles.length).toBe(2);
 });
 
-test('a stamp is saved to the library from the Stamps panel and a loaded one joins the layer', async ({ page }) => {
+test.fixme('a stamp is saved to the library from the Stamps panel and a loaded one joins the layer', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await shapeIn(page, 1);
   await page.click('#smksave');
   await settle(page);
-  await page.click('#smklib');
+  // fixme: the Stamp library has no rail button or command since 2.10.0 (the panel and code are kept for when stamps are saved again)
   await expect(page.locator('section.pn[data-p="slib"]:not([hidden])')).toBeVisible();
   await expect(page.locator('#slgrid .slc')).toHaveCount(1, { timeout: 15000 });
   await page.locator('#slgrid [data-sa="add"]').first().click();

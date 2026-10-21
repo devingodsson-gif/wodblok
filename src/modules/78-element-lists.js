@@ -15,6 +15,7 @@ const elkName=(k,q)=>{if(q.nm)return String(q.nm);const d=elDef(k);return(d&&d.n
 const elkIc=k=>{const d=elDef(k);return`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${(d&&d.icon)||''}</svg>`};
 function elkItems(k){const L=fpL();return L?(L.pl||[]).filter(q=>elKind(q)==k).reverse():[]}   // the top of the list first, as in the Elements list
 function elkSync(){const un=stUnlocked()!=null,s=elSel(),su=s?String(s.u):'';
+ document.querySelectorAll('section.pn[data-p=stmp] .stonly').forEach(d=>{if(d.hidden===un)d.hidden=!un});   // Block, Block edge and Symmetry belong to a stamp tab (2.13.0)
  Object.keys(ELK).forEach(k=>{const box=document.querySelector(`.elk[data-k="${k}"]`);if(!box)return;const keep=un&&(k=='motif'||k=='text');box.hidden=un&&!keep;if(un){if(keep){const h=box.querySelector('.lyl2');if(!h.hidden)h.hidden=true;h.dataset.k=''}return}const a=elkItems(k),host=box.querySelector('.lyl2'),
   key=JSON.stringify([a.map(q=>[q.u,elkName(k,q)]),su]);if(host.dataset.k===key)return;host.dataset.k=key;
   host.innerHTML=a.map(q=>`<div class="lyr${String(q.u)===su?' on':''}" data-u="${elkHx(q.u)}"><span class="gmi">${elkIc(k)}</span><span class="lyn">${elkHx(elkName(k,q))}</span></div>`).join('');
@@ -26,7 +27,8 @@ function elkAdd(k){plDisarm();if(WBX.wbPenStop)WBX.wbPenStop();
  if(WBX.wbAbAdd)WBX.wbAbAdd(k)}
 function init78(){
  Object.keys(ELK).forEach(k=>{const o=ELK[k],sec=document.querySelector(`section.pn[data-p="${o.pn}"]`);if(!sec||sec.querySelector('.elk'))return;
-  sec.insertAdjacentHTML('afterbegin',`<div class="elk" data-k="${k}"><div class="lyl2" hidden></div>${o.add?`<div class="row"><button type="button" class="alt" data-add>${o.add}</button></div>`:''}</div>`);
+  const html=`<div class="elk" data-k="${k}"><div class="lyl2" hidden></div>${o.add?`<div class="row"><button type="button" class="alt" data-add>${o.add}</button></div>`:''}</div>`,at=k=='stamp'?sec.querySelector('details.g'):null;   // the Stamp panel: Create New Stamp, the stamps, then Add stamp under them (2.13.0)
+  if(at)at.insertAdjacentHTML('afterend',html);else sec.insertAdjacentHTML('afterbegin',html);
   const box=sec.querySelector('.elk');box.onclick=e=>{const r=e.target.closest('[data-u]');if(r){elkPick(k,r.dataset.u);return}if(e.target.closest('[data-add]'))elkAdd(k)}});
  WBX.wbElkSync=elkSync}
 export {init78};

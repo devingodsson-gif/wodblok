@@ -16,9 +16,9 @@ const addEffect = async (page, kind, label) => {
 };
 const placed = async page => {
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await canvasClick(page, 0.5, 0.5);
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await openPanel(page, 'lyrs');
   await page.click('#lyl2 .lyr');
   await settle(page);

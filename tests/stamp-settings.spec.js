@@ -42,11 +42,9 @@ test('Stamp settings work from the Pattern view on the unlocked stamp: shape, si
   const { errors } = await openApp(page, { pattern: true, seed: 4 });
   await unlock(page);
   await showPanel(page, 'stmp');
-  const d0 = await page.locator('#stol path.olu').first().getAttribute('d');
   await page.click('#skind [data-k="circle"]');
   await settle(page);
   expect((await tile(page)).sh.k).toBe('circle');
-  expect(await page.locator('#stol path.olu').first().getAttribute('d')).not.toBe(d0);
   expect(await page.evaluate(() => { const vb = document.getElementById('art').viewBox.baseVal; for (let y = 40; y < vb.height; y += 31) for (let x = 40; x < vb.width; x += 29) if (__wbTest.stampAt(x, y)) return true; return false; })).toBe(true);
   await set(page, 'shz', 60); await settle(page);
   expect((await tile(page)).sh.z).toBe(60);

@@ -1,4 +1,3 @@
-import {kv} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,SH,SHN,SW,rowMenu,useT,shp} from './04-canvas-and-stamp-outlines.js';
 import {pal,selOne,store} from './06-motif-library-folders.js';
@@ -10,8 +9,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 // The outlines of the selected layer's arrangement are drawn on the canvas (opacity from the panel). The arrangement code in
 // 10-layer-grids.js hands every printed stamp to stOlAdd, so the outlines, the hit test and the canvas-to-stamp transform all use the
 // same positions that were printed.
-const STOLK='wb146_olop',STOLD=60;
-const STP={p:{},items:[],on:false,rot:0,un:null,unL:null,op:STOLD,sig:'',ai:null,after:null};
+const STP={p:{},items:[],on:false,rot:0,un:null,unL:null,sig:'',ai:null,after:null};
 const stIc=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const STEDIT=stIc('<path d="M4.5 19.5l.9-3.9L16 5a2.1 2.1 0 013 3L8.4 18.6z"/>');   // the Edit pencil on a stamp row (2.5.0, was the lock)
 const STTRRE=/translate\(([-\d.]+) ([-\d.]+)\) rotate\(([-\d.]+)\) scale\(([-\d.]+) ([-\d.]+)\)/;
@@ -30,11 +28,7 @@ const stTxMode=()=>stUnlocked()!=null;
 function stTextSync(){if(!WBX.wbTxMode)return;const m=stTxMode();if(STP.txm===m)return;STP.txm=m;WBX.wbTxMode(m?'stamp':'pattern')}
 function stOlEnd(){stOlPaint();stPanel();stTextSync()}
 function stOlFit(){const a=$('art'),v=$('stolsvg');if(!a||!v)return;v.style.width=a.style.width;v.style.height=a.style.height;const vb=a.getAttribute('viewBox');if(vb)v.setAttribute('viewBox',vb)}
-function stOlPaint(){const g=$('stol');if(!g)return;stOlFit();if(STP.after)STP.after();const op=STP.op;if(!STP.on||!op||!STP.items.length||WBS.tilePv){g.innerHTML='';return}
- if($('cvclip'))g.setAttribute('clip-path','url(#cvclip)');else g.removeAttribute('clip-path');
- const un=stUnlocked();let h='';
- for(const[id,x,y,a,sx,sy,w,hh]of STP.items){const o=STP.p[id];if(!o)continue;h+=`<path d="${o.d}" class="${id===un?'olu':'olk'}" transform="translate(${x} ${y}) rotate(${a}) scale(${sx} ${sy}) translate(${-w/2} ${-hh/2})"/>`}
- g.setAttribute('opacity',(op/100).toFixed(2));g.innerHTML=STP.rot?`<g transform="rotate(${STP.rot} ${CW/2} ${CH/2})">${h}</g>`:h}
+function stOlPaint(){const g=$('stol');if(g&&g.firstChild)g.innerHTML='';stOlFit();if(STP.after)STP.after()}   // 2.13.0: the stamp outlines are no longer drawn; the stamp tab's own editing frame (sceDraw) still is
 // ----- finding the stamp under a point, and moving the point into the stamp's own space -----
 let _cx=null;
 const stCtx=()=>_cx||(_cx=document.createElement('canvas').getContext('2d'));
@@ -80,16 +74,12 @@ function stBar(){const on=(id,f)=>{const b=$(id);if(b)b.addEventListener('click'
   if(!d.classList.contains('sure')){d.classList.add('sure');d.setAttribute('aria-label','Click to confirm');pmsg('Click again to delete Stamp '+(WBS.cur+1)+'.');tm=setTimeout(()=>{d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp')},3000);return}
   clearTimeout(tm);d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp');const n=WBS.cur+1;if(stDelete(t.id))pmsg('Deleted Stamp '+n+'.')})}}
  on('smkzoom',()=>stZoom());
- on('smksave',()=>{const b=$('slsave');if(b)b.click()});
- on('smklib',()=>{const r=$('rail-slib');if(r)r.click()})}
-function stSetOp(v,save){STP.op=Math.max(0,Math.min(100,Math.round(+v)));if(save){try{kv.set(STOLK,String(STP.op))}catch(e){}}stOlPaint()}
+ on('smksave',()=>{const b=$('slsave');if(b)b.click()})}
 function init63(){
- try{const s=kv.get(STOLK);if(s!=null&&s!==''&&isFinite(+s))STP.op=Math.max(0,Math.min(100,+s))}catch(e){}
  try{new ResizeObserver(stOlFit).observe($('art'))}catch(e){}
- const op=$('stmpop');if(op){op.value=STP.op;op.addEventListener('input',()=>stSetOp(op.value,true))}
  const list=$('stmpl');if(list){
   list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r)return;const id=+r.dataset.t;if(e.target.closest('[data-lk]')){if(WBX.wbSteEdit)WBX.wbSteEdit(id);else stLock(id)}else stCurrent(id)});
  stBar();
   if(typeof IntersectionObserver=='function')new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting))stPanel(true)}).observe(list)}
 }
-export {STP,stTxMode,stMatrix,stDelete,stDup,stNew,stZoom,init63,stLock,stOlAdd,stOlBegin,stOlEnd,stOlPaint,stOlPath,stPanel,stSetOp,stUnlocked,stampAt,stampToCanvas};
+export {STP,stTxMode,stMatrix,stDelete,stDup,stNew,stZoom,init63,stLock,stOlAdd,stOlBegin,stOlEnd,stOlPaint,stOlPath,stPanel,stUnlocked,stampAt,stampToCanvas};

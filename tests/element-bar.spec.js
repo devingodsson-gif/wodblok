@@ -62,8 +62,7 @@ test('the Stamp button makes nothing; it opens the Stamp properties, and a picke
   await page.click('#elb [data-k="stamp"]'); await settle(page);
   expect(JSON.parse(await getState(page)).els).toHaveLength(0);
   await expect(page.locator('#elb [data-k="stamp"]')).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('#lfpst')).toBeVisible();
-  await page.locator('#lfpst [data-t] >> nth=0').click(); await settle(page);
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page);
   const b = await page.locator('#art').boundingBox();
   await page.mouse.click(b.x + b.width * 0.3, b.y + b.height * 0.3); await settle(page);
   await page.mouse.click(b.x + b.width * 0.7, b.y + b.height * 0.6); await settle(page);

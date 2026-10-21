@@ -1,11 +1,9 @@
-// Layer update, step 4 (1.46.4): the Stamps tool. Outlines of the selected layer's arrangement are drawn on the canvas (opacity slider in the
-// panel), several stamps can be picked for the arrangement, each stamp has a lock in the stamp list (one unlocked at a time, never saved,
+// Layer update, step 4 (1.46.4): the Stamps tool. The outlines were removed in 2.13.0. Several stamps can be picked for the arrangement, each stamp has a lock in the stamp list (one unlocked at a time, never saved,
 // ends when another layer is selected), and a point on the canvas can be mapped into the stamp printed under it.
 const { test, expect } = require('@playwright/test');
 const { openApp, addStamp, openPanel, settle, getState, patSource } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
-const outlines = (page, cls = '') => page.locator('#stol path' + cls).count();
 
 test('the Stamps panel is on the rail and lists every stamp, with how many elements use it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
@@ -20,33 +18,6 @@ test('the Stamps panel is on the rail and lists every stamp, with how many eleme
   expect(errors).toEqual([]);
 });
 
-test('outlines show for a layer with an arrangement, fade with the slider and are remembered', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'stmp');
-  expect(await outlines(page, '.olk')).toBeGreaterThan(4);
-  expect(await outlines(page, '.olu')).toBe(0);
-  await expect(page.locator('#stol')).toHaveAttribute('opacity', '0.60');
-  await page.evaluate(() => { const r = document.getElementById('stmpop'); r.value = 25; r.dispatchEvent(new Event('input', { bubbles: true })); });
-  await expect(page.locator('#stol')).toHaveAttribute('opacity', '0.25');
-  expect(await page.evaluate(() => __wbTest.kv.get('wb146_olop'))).toBe('25');
-  await page.evaluate(() => { const r = document.getElementById('stmpop'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); });
-  expect(await outlines(page)).toBe(0);
-  expect(errors).toEqual([]);
-});
-
-test('a layer with no pattern draws no outlines; a pattern brings them back', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'layers');
-  expect(await outlines(page)).toBeGreaterThan(0);
-  await page.evaluate(() => document.querySelector('#pelist [data-pd]').click());
-  await settle(page);
-  expect(await outlines(page)).toBe(0);
-  await page.click('#elb [data-k="pattern"]'); await page.click('.elk[data-k="pattern"] [data-add]');
-  await patSource(page);
-  expect(await outlines(page)).toBeGreaterThan(0);
-  expect(errors).toEqual([]);
-});
-
 test('Edit is in the stamp list only; one stamp is open for editing at a time and the outline turns to the accent', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addStamp(page);
@@ -57,7 +28,7 @@ test('Edit is in the stamp list only; one stamp is open for editing at a time an
   await expect(locks).toHaveCount(2);
   await expect(locks.nth(0)).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('#smked')).toBeHidden();
-  await expect(page.locator('#stol .olu')).toHaveCount(0);
+  await expect(page.locator('#stol path')).toHaveCount(0);   // no outlines (2.13.0)
   // nothing on the canvas carries a lock
   expect(await page.locator('#art [class*="lock"], #stol [class*="lock"]').count()).toBe(0);
   await locks.nth(0).click();
@@ -66,7 +37,6 @@ test('Edit is in the stamp list only; one stamp is open for editing at a time an
   expect(first).toBeTruthy();
   await expect(locks.nth(0)).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#smked')).toHaveText(/^Editing: Stamp 1 \(used by \d+ elements?\)$/);
-  expect(await outlines(page, '.olu')).toBeGreaterThan(0);
   await locks.nth(1).click();
   await settle(page);
   expect(await page.evaluate(() => __wbTest.unlockedStamp())).not.toBe(first);
@@ -117,21 +87,6 @@ test('a canvas point maps into the stamp printed under it and back', async ({ pa
   expect(mid.near.i).toBe(mid.r.i);
   expect(Math.abs(mid.near.u - 120)).toBeLessThan(0.01);
   expect(Math.abs(mid.near.v - 120)).toBeLessThan(0.01);
-  expect(errors).toEqual([]);
-});
-
-test('outlines are not part of the artwork: not in #art, the exported SVG or the saved project', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  expect(await outlines(page)).toBeGreaterThan(0);
-  expect(await page.evaluate(() => document.getElementById('art').outerHTML.includes('stol'))).toBe(false);
-  const state = await getState(page);
-  expect(state).not.toContain('stol');
-  expect(state).not.toContain('wb146');
-  await page.evaluate(() => document.getElementById('sv').click());
-  await page.waitForFunction(() => window.__wbDownloads.some(d => /\.svg$/.test(d.filename)), null, { timeout: 30000 });
-  const svg = await page.evaluate(() => { const d = window.__wbDownloads.find(x => /\.svg$/.test(x.filename)); return d.base64 ? atob(d.base64) : String(d.data); });
-  expect(svg.length).toBeGreaterThan(1000);
-  expect(svg).not.toContain('stol');
   expect(errors).toEqual([]);
 });
 

@@ -164,6 +164,8 @@ async function openProjectFile(page, filePath) {
 // the element panels have no rail button: they open from the element bar
 const EL_BAR = { mlist: 'shape', layers: 'pattern', stmp: 'stamp', motifs: 'motif', text: 'text', elpaint: 'paint' };
 // Since 2.3.0 the element bar makes a new element on every press, so an element panel is opened through its (hidden) tool-bar button instead, which only opens it.
+// Close all panels (the button reads "Default panels" when none is open, and then opens them instead)
+const closeAllPanels = async page => { if ((await page.getAttribute('#rcls', 'aria-label')) == 'Close all panels') await page.click('#rcls'); };
 async function openPanel(page, id) { if (EL_BAR[id]) await page.evaluate(id => document.querySelector(`.rail [data-pn="${id}"]`).click(), id); else await page.click(`.rail [data-pn="${id}"]`);
   await page.waitForSelector(`section.pn[data-p="${id}"]:not([hidden])`); }
 
@@ -237,4 +239,4 @@ async function addStampText(page) {
   await page.click('section.pn[data-p="text"] .elk[data-k="text"] [data-add]'); await settle(page);
 }
 
-module.exports = { addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+module.exports = { closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

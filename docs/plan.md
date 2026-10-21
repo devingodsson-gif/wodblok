@@ -481,3 +481,12 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - Tests: `tests/element-flow.spec.js`; the harness now adds a Pattern with the stamp as its source after launch by default (`pattern: false` for an empty start); the text specs use Add text.
 - Snapshot note: tests that now add the Pattern through the bar draw different random ids and seeds, so state and SVG snapshots of those specs will differ; not regenerated (owner's approval first).
 - Not run: CI and the full suite.
+
+### 2.13.0 (Oct 21 2026): the Stamp panel redone (owner). Format 25 unchanged
+Between us only (never in the UI): a stamp parent is a stamp (a template, a tile); a stamp child is a copy printed or placed on the canvas.
+- **Create New Stamp** is the first thing in the Stamp panel (it makes a stamp parent and still asks for its outline kind). The stamp list keeps its Edit pencil and the Edit button; **Add stamp** (a new child of the selected stamp, in the middle of the canvas) sits under the list.
+- **Gone:** Contents (Make stamp from selection and its list), the Place strip, and the Outlines group and the outline drawing on the canvas (the opacity setting `wb146_olop` is no longer read). The hit test and the stamp tab's own frame are unchanged.
+- **Block, Block edge and Symmetry** show only in a stamp's tab.
+- Kept hidden for now: the `#lfpst` strip node (code in 25-art-layers.js and the Add bar arm still read it; the specs arm a stamp through it), the Stamp library code.
+- Tests: `tests/stamp-panel.spec.js`; removed `stamp-contents.spec.js` and the outline checks; the specs now arm a stamp with a dispatched click, `closeAllPanels` replaces `#rcls`, align and row-menu re-show the Elements panel after a selection jump, stamp-editor-port uses Add text; the stamp-library save test is `fixme` (no way to open the library since 2.10.0).
+- Not run: CI, the full suite, `npm run perf` (less drawing work, none added).

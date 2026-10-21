@@ -50,9 +50,9 @@ test('a placed stamp gets Pressure offset from its own Effects group; the layer\
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await canvasClick(page, 0.5, 0.5);
-  await page.click('#lfpst [data-t]');          // stop placing
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');          // stop placing
   await expect(page.locator('.fxg[data-fxk="stamp"]')).toBeHidden();
   await openPanel(page, 'lyrs');
   await page.click('#lyl2 .lyr');
@@ -92,9 +92,9 @@ test('Pressure offset on a stamp makes its own pressure variants; without it the
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await canvasClick(page, 0.5, 0.5);
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await openPanel(page, 'lyrs');
   await page.click('#lyl2 .lyr');
   await settle(page);

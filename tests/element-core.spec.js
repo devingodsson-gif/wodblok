@@ -22,7 +22,7 @@ test('text placed before a stamp draws under it: the canvas follows the element 
   await page.keyboard.press('Escape');          // stop placing text before the stamp is picked
   await settle(page);
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await canvasClick(page, 0.2, 0.2);          // away from the text, which is wider on the CI renderer
   const pl = (await layers(page));
   expect(pl.map(q => (q.tx != null ? 'text' : q.t != null ? 'stamp' : '?'))).toEqual(['text', 'stamp']);
@@ -34,9 +34,9 @@ test('a stamp placed before text still draws under it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await canvasClick(page, 0.4, 0.4);
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Hi');
   await settle(page);

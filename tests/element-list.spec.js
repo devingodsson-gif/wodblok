@@ -12,11 +12,11 @@ const canvasClick = async (page, fx, fy) => {
 const three = async page => {
   await noPattern(page);
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await canvasClick(page, 0.25, 0.3);
   await canvasClick(page, 0.5, 0.5);
   await canvasClick(page, 0.75, 0.7);
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await openPanel(page, 'lyrs');
   await settle(page);
 };

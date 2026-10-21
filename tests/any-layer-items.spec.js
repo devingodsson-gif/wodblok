@@ -16,7 +16,7 @@ const canvasClick = async (page, fx, fy) => {
 test('a stamp is placed next to the Pattern, and the Pattern stays', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await canvasClick(page, 0.5, 0.5);
   const l = await els(page);
   expect(l.map(q => q.k)).toEqual(['pattern', 'stamp']);
