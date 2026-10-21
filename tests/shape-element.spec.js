@@ -1,6 +1,6 @@
 // 2.3.2: the Shape element: geometric presets, a Pen with curves, fill (none, colour, image) and an outline with a thickness.
 const { test, expect } = require('@playwright/test');
-const { openApp, settle, getState, noPattern } = require('./helpers/harness');
+const { openApp, settle, getState, noPattern, addShape } = require('./helpers/harness');
 
 const els = async page => JSON.parse(await getState(page)).els;
 const shapes = async page => (await els(page)).filter(q => q.k === 'shape');
@@ -10,7 +10,7 @@ const canvasAt = async (page, fx, fy) => { const b = await page.locator('#art').
 test('the Shape button makes a Rectangle at once; the presets change it; Fill and Outline work', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  await page.click('#elb [data-k="shape"]'); await settle(page);
+  await addShape(page);
   let s = await shapes(page);
   expect(s).toHaveLength(1);
   expect(s[0].sh).toBe('rect');
@@ -34,7 +34,7 @@ test('the Shape button makes a Rectangle at once; the presets change it; Fill an
 test('a Shape has the transform controls: size, turn, flip', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  await page.click('#elb [data-k="shape"]'); await settle(page);
+  await addShape(page);
   const s0 = (await shapes(page))[0];
   await setRange(page, 'lfpr', 30); await settle(page);
   expect((await shapes(page))[0].r).toBe(30);
@@ -48,8 +48,9 @@ test('a Shape has the transform controls: size, turn, flip', async ({ page }) =>
 test('the Pen: click corner points, drag for a curve, Enter finishes an open path; clicking the first point closes one', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  await page.click('#elb [data-k="pen"]'); await settle(page);
-  await expect(page.locator('#elb [data-k="pen"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#elb [data-k="pen"]')).toHaveCount(0);   // the pen is not a button of the bar: Draw a path is in the Shape properties
+  await page.click('#elb [data-k="shape"]'); await page.click('#shp_pen'); await settle(page);
+  await expect(page.locator('#elb [data-k="shape"]')).toHaveAttribute('aria-pressed', 'true');
   const a = await canvasAt(page, 0.3, 0.6), b = await canvasAt(page, 0.5, 0.3), c = await canvasAt(page, 0.7, 0.6);
   await page.mouse.click(a.x, a.y);
   await page.mouse.move(b.x, b.y); await page.mouse.down(); await page.mouse.move(b.x + 40, b.y, { steps: 4 }); await page.mouse.up();
@@ -64,13 +65,30 @@ test('the Pen: click corner points, drag for a curve, Enter finishes an open pat
   expect(s[0].sw).toBeGreaterThan(0);
   expect(s[0].pts.some(q => q[4] || q[5])).toBe(true);   // the dragged point has curve handles
   // a closed one
-  await page.click('#elb [data-k="pen"]'); await settle(page);
+  await page.click('#shp_pen'); await settle(page);
   const p = [await canvasAt(page, 0.2, 0.2), await canvasAt(page, 0.4, 0.2), await canvasAt(page, 0.3, 0.4)];
   for (const q of p) await page.mouse.click(q.x, q.y);
   await page.mouse.click(p[0].x, p[0].y); await settle(page);
   s = await shapes(page);
   expect(s).toHaveLength(2);
   expect(s[1]).toMatchObject({ sh: 'path', cl: 1 });
-  await expect(page.locator('#elb [data-k="pen"]')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('#elb [data-k="shape"]')).toHaveAttribute('aria-pressed', 'false');
+  expect(errors).toEqual([]);
+});
+
+test('a dragged Shape is drawn moving while the pointer is down', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
+  await addShape(page, 'ellipse');
+  const left = () => page.evaluate(() => { const g = document.querySelector('#art [data-mv]'); return g ? g.getBoundingClientRect().left : null; });
+  const b = await page.locator('#art').boundingBox(), cx = b.x + b.width / 2, cy = b.y + b.height / 2;
+  const x0 = await left();
+  expect(x0).not.toBeNull();
+  await page.mouse.move(cx, cy); await page.mouse.down();
+  await page.mouse.move(cx + 50, cy + 10); await page.waitForTimeout(100);
+  await page.mouse.move(cx + 100, cy + 20); await page.waitForTimeout(100);
+  expect(Math.abs((await left()) - x0 - 100)).toBeLessThan(3);
+  await page.mouse.up(); await settle(page);
+  expect(Math.abs((await left()) - x0 - 100)).toBeLessThan(3);
   expect(errors).toEqual([]);
 });

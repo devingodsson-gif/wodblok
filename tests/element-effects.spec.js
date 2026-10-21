@@ -1,7 +1,7 @@
 // Element update, step 7 (2.1.7): the effect stack. An ordered list `fx` on an element, shown at the bottom of its panel: add, switch off, move, delete.
 // Texture (stamp, text, pattern, Shape) and Pressure offset (stamp, pattern).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern, addShape } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const sheetOf = d => (d.els || []).find(q => q.k === 'shape');   // the effects tests use a Shape element (the Sheet is gone)
@@ -23,7 +23,7 @@ const fxMenu = async (page, kind, n, label) => { await fxRows(page, kind).nth(n)
 
 test('a Shape has an Effects group; Texture is added, switched off, moved and deleted', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="shape"]');
+  await addShape(page);
   await settle(page);
   await expect(page.locator('.fxg[data-fxk="shape"]')).toBeVisible();
   await addEffect(page, 'shape', 'Texture');

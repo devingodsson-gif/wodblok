@@ -388,6 +388,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 
 - Rail buttons: `--h-touch`, icon only, in a 36px strip; `--r-m` selected highlight with `--acc-soft`.
 - Panel tabs (`.wtab`), Photoshop style: the tab strip is `--stage`; tabs `--fs-s`, 500, `--mut`, 10px side padding, square; the active tab takes the `--panel` colour and `--fg` text, so it joins the panel below. No accent bar.
+- Stamp tabs (2.5.0): the strip over the stage reuses `.wtab` (the Canvas first, then one per open stamp with a close `.ib` of `--h-xs`); it is `--stage` with a `--line` bottom edge, `--h-md` high, and is not on screen while no stamp is open.
 - A tool opens a panel; a panel never opens by itself at launch, except through the launch workspace (the one called Default, else the first workspace).
 
 #### 9.8 Swatches, thumbnails and cards
@@ -406,7 +407,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 #### 9.10 The element UI (2.3.0, Photoshop)
 
 - **Elements and Properties:** one docked column on the right. Elements (the list) on top; Properties under it holds the panel of the selected element's kind and shows one tab, "Properties". Selecting an element switches Properties to its kind. There is no tab per kind.
-- **Add bar** (the element bar over the stage): Select first, then Paint (hidden for now), Shape, Pen, Motif, Image, Text, Stamp, Pattern. Shape makes a geometric Shape; Pen draws your own; Motif makes a free motif; Image asks for a picture and makes a Shape filled with it. Every press makes an element at once, just above the selected one, and selects it. The pressed button is the armed tool; Select is pressed when nothing is armed. `--h-md` icon buttons in a `--r-l` floating strip.
+- **Add bar** (the element bar over the stage): Select first, then Paint (hidden for now), Shape, Motif, Image, Text, Stamp, Pattern. Shape, Motif and Stamp make nothing by themselves: each clears the selection and opens its own properties. A Shape preset there makes the shape (just above the selected element); a Motif or a Stamp picked there follows the pointer as a ghost and every click on the canvas places one, as often as wanted (Select, V or a right click puts it away). Text, Pattern and Image make an element at once, just above the selected one, and select it (Image asks for a picture and makes a Shape filled with it). The Background is not an element and has no button (Canvas panel). The pressed button is the armed or waiting tool; Select is pressed when nothing is. `--h-md` icon buttons in a `--r-l` floating strip.
 - **Options strip:** one line under the Add bar while a tool with settings is armed (Paint: Brush / Eraser and size). `--h-row`, `--panel`, `--line` edge, `--r-m`. It holds copies of the tool's own controls, nothing else.
 - **List rows** (Elements, effects, sources): `--h-row`, eye first, a 20px thumbnail or icon, the name (truncates), actions last (⋯). Selected row `--sel`. A row with effects shows an `fx` chip; its arrow unfolds one `--h-sm` sub-row per effect (eye, name), indented.
 - **Effects group:** the title carries a `+` (`--h-sm` icon button) that opens the menu of effects. Rows: eye, chevron, name, ⋯ (Duplicate, Move up, Move down, Delete); drag to reorder. Clicking a row opens its settings right under it and closes the one that was open.

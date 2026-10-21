@@ -1,6 +1,6 @@
 // Element update, step 8 (2.1.8): the Jitter effect. A repeatable random nudge (position, rotation, size, flips) for one element; a pattern's placements each get their own.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern, patSource } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const canvasClick = async (page, fx, fy) => {
@@ -53,7 +53,7 @@ test('a pattern\'s Jitter nudges each placement differently, and the same seed g
   await noPattern(page);
   await openPanel(page, 'layers');
   await page.click('#elb [data-k="pattern"]');
-  await settle(page);
+  await patSource(page);
   await addEffect(page, 'pattern', 'Jitter');
   const fx = (await st(page)).els.find(p => p.k == 'pattern').fx;
   expect(fx[0].k).toBe('jitter');

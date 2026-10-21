@@ -174,7 +174,9 @@ async function checkpoint(page, testInfo, errors, name, { shot = true, selector 
 // Canvas flow (layer update step 11): the Stamp editor is gone, so a test that edits a stamp unlocks it in the Stamps panel and works on the Pattern canvas.
 const showPanel = async (page, id) => { const sec = page.locator(`section.pn[data-p="${id}"]:not([hidden])`).first(); if (!(await sec.isVisible())) await openPanel(page, id); };
 // unlock a stamp (the first in the list by default) so shapes, text and pictures placed on the canvas go into it
-const unlockStamp = async (page, n = 0) => { await showPanel(page, 'stmp'); const b = page.locator('#stmpl .smklk').nth(n); if ((await b.getAttribute('aria-pressed')) !== 'true') await b.click(); await settle(page); };
+// 2.5.0: Edit opens the stamp's tab, which zooms to the stamp; the specs work on the whole canvas, so the view goes back to fit
+const fitView = async page => { await page.evaluate(() => { const z = document.getElementById('zl'); if (/Fit to screen/.test(z.title)) z.click(); }); await settle(page); };
+const unlockStamp = async (page, n = 0) => { await showPanel(page, 'stmp'); const b = page.locator('#stmpl .smklk').nth(n); if ((await b.getAttribute('aria-pressed')) !== 'true') await b.click(); await settle(page); await fitView(page); };
 // pick the first library shape as the brush (opens the first folder if none is open)
 const pickShape = async page => { await showPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
 // canvas units (the artwork's viewBox) to client pixels
@@ -206,4 +208,18 @@ async function armStamp(page) {
   if (await page.locator('#lfpst [data-t].on').count()) return;
   await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page);
 }
-module.exports = { armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// 2.4.0: the Shape button opens the Shape properties and makes nothing; a preset there makes the shape (selected, in the middle)
+async function addShape(page, g = 'rect') {
+  await page.click('#elb [data-k="shape"]');
+  await page.click(`#shp_pre [data-g="${g}"]`); await settle(page);
+}
+// 2.4.0: a new Pattern is empty; this puts a source in it through the Add element list (a stamp by default, or 'motif' / 'text')
+async function patSource(page, kind = 'stamp', n = 0) {
+  await page.evaluate(([kind, n]) => {
+    const s = document.getElementById('peadd'), pre = { stamp: 's:', motif: 'm:', text: 't:' }[kind];
+    const o = [...s.options].filter(x => x.value.startsWith(pre))[n];
+    s.value = o.value; s.dispatchEvent(new Event('change', { bubbles: true }));
+  }, [kind, n]);
+  await settle(page);
+}
+module.exports = { fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

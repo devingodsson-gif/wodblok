@@ -66,7 +66,7 @@ function elSync(){if(WBX.wbAbSync)WBX.wbAbSync();if(WBX.wbSteSync)WBX.wbSteSync(
 if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbShpSync)WBX.wbShpSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
 const q=elSel(),k=elKind(q);
 // Properties follows the selection (2.3.0): picking an element shows its panel there, when the Properties group is open
-{const su=q?String(q.u):'';if(su!==elLast){elLast=su;const d=k&&EL_K[k];if(su&&d&&d.pn&&WBX.wbPropsOpen&&WBX.wbPropsOpen()&&WBX.wbOpenPanel&&(!WBX.wbApart||WBX.wbApart(d.pn))){const pn=d.pn;setTimeout(()=>{const s2=document.querySelector(`section.pn[data-p="${pn}"]`);if(!s2||s2.hidden)WBX.wbOpenPanel(pn)},0)}}}
+{const su=q?String(q.u):'';if(su!==elLast){elLast=su;const d=k&&EL_K[k];if(su&&d&&d.pn&&!(WBX.plKind&&(WBX.plKind()=='motif'||WBX.plKind()=='stamp'))&&WBX.wbPropsOpen&&WBX.wbPropsOpen()&&WBX.wbOpenPanel&&(!WBX.wbApart||WBX.wbApart(d.pn))){const pn=d.pn;setTimeout(()=>{const s2=document.querySelector(`section.pn[data-p="${pn}"]`);if(!s2||s2.hidden)WBX.wbOpenPanel(pn)},0)}}}
 document.querySelectorAll('.elmode[data-k]').forEach(m=>{const on=!!q&&m.dataset.k===k,d=EL_K[m.dataset.k];m.hidden=!on;const nb=m.querySelector('b');if(on&&nb&&d&&d.name){const t=d.name(q);if(nb.textContent!==t)nb.textContent=t}})}
 
 function init65(){

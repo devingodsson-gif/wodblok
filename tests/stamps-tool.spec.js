@@ -2,7 +2,7 @@
 // panel), several stamps can be picked for the arrangement, each stamp has a lock in the stamp list (one unlocked at a time, never saved,
 // ends when another layer is selected), and a point on the canvas can be mapped into the stamp printed under it.
 const { test, expect } = require('@playwright/test');
-const { openApp, addStamp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, addStamp, openPanel, settle, getState, patSource } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const outlines = (page, cls = '') => page.locator('#stol path' + cls).count();
@@ -42,14 +42,15 @@ test('a layer with no pattern draws no outlines; a pattern brings them back', as
   await settle(page);
   expect(await outlines(page)).toBe(0);
   await page.click('#elb [data-k="pattern"]');
-  await settle(page);
+  await patSource(page);
   expect(await outlines(page)).toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });
 
-test('the lock is in the stamp list only; one stamp is unlocked at a time and the outline turns to the accent', async ({ page }) => {
+test('Edit is in the stamp list only; one stamp is open for editing at a time and the outline turns to the accent', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addStamp(page);
+  await page.click('#elb [data-k="pattern"]'); await patSource(page, 'stamp', 1); await openPanel(page, 'stmp');   // a stamp is edited where it is printed
   await page.locator('#stmpl .smkr .smkth').nth(1).click();
   await settle(page);
   const locks = page.locator('#stmpl .smklk');

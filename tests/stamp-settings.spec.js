@@ -1,10 +1,10 @@
 // Layer update, step 7 (1.46.7): Stamp settings from the Pattern view, and stamps with several colours (each shape can have a colour of its own).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, fitView } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const tile = async page => (await state(page)).tiles[0];
-const unlock = async page => { await showPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); };
+const unlock = async page => { await showPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); await fitView(page); };
 const pick = async page => { await openPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
 const toClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height, k: r.width / vb.width }; }, [x, y]);
 const inst = async page => {

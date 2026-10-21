@@ -1,12 +1,12 @@
 // Element update, step 5 (2.1.5): the Pattern element. A list of points plus sources (stamps, images, text) placed at them by cycle, random or weighted random.
 // It is stored on the layer's element list as {k:'pattern'} and draws as ordinary elements; sources are references.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, addStamp, noPattern } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, addStamp, noPattern, patSource } = require('./helpers/harness');
 
 const pats = async page => JSON.parse(await getState(page)).els.filter(q => q.k === 'pattern');
 const drawn = async (page, u) => page.$$eval(`#art [data-fp^="${u}."]`, es => es.length);
 
-test('New pattern puts a pattern on the layer with the current stamp as its source and draws a 4 x 4 grid of it', async ({ page }) => {
+test('New pattern is empty: each of the 16 points shows as an arrow until a source is added from the Add element list', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'layers');
@@ -15,11 +15,38 @@ test('New pattern puts a pattern on the layer with the current stamp as its sour
   await settle(page);
   const p = (await pats(page))[0];
   expect(p).toMatchObject({ k: 'pattern', lay: 'grid', cn: 4, rn: 4, ds: 'cycle' });
-  expect(p.src).toHaveLength(1);
-  expect(p.src[0].k).toBe('stamp');
+  expect(p.src).toHaveLength(0);
   await expect(page.locator('#peed')).toBeVisible();
   await expect(page.locator('#pelist .mr')).toHaveCount(1);
+  expect(await drawn(page, p.u)).toBe(0);
+  await expect(page.locator('#fpov [data-pa]')).toHaveCount(16);
+  // the list holds the stamps, the motifs of the library and the text on the canvas
+  const groups = await page.$$eval('#peadd optgroup', g => g.map(x => x.label));
+  expect(groups[0]).toBe('Stamps');
+  expect(groups.length).toBeGreaterThan(5);
+  await patSource(page);
+  expect((await pats(page))[0].src).toHaveLength(1);
+  expect((await pats(page))[0].src[0].k).toBe('stamp');
   expect(await drawn(page, p.u)).toBe(16);
+  await expect(page.locator('#fpov [data-pa]')).toHaveCount(0);   // placed pieces replace the arrows
+  await patSource(page, 'motif', 3);
+  expect((await pats(page))[0].src.map(s => s.k)).toEqual(['stamp', 'motif']);
+  expect(await drawn(page, p.u)).toBe(8);                                       // cycle: every other point is the motif
+  expect(await page.$$eval('#dyn g[data-mv]', e => e.length)).toBe(8);
+  expect(errors).toEqual([]);
+});
+
+test('arrows turn with Rotate and lie along the edges of a Frame', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
+  await page.click('#elb [data-k="pattern"]'); await settle(page);
+  const rots = () => page.$$eval('#fpov [data-pa]', a => a.map(x => Math.round(+/rotate\((-?[\d.]+)\)/.exec(x.getAttribute('transform'))[1])));
+  expect(new Set(await rots())).toEqual(new Set([0]));
+  await page.locator('#pert').fill('30'); await settle(page);
+  expect(new Set(await rots())).toEqual(new Set([30]));
+  await page.locator('#pert').fill('0');
+  await page.click('#pelay [data-l="frame"]'); await settle(page);
+  expect(new Set(await rots())).toEqual(new Set([0, 90]));
   expect(errors).toEqual([]);
 });
 
@@ -28,7 +55,7 @@ test('columns, rows and layout change the points; a pattern with no source draws
   await noPattern(page);
   await openPanel(page, 'layers');
   await page.click('#elb [data-k="pattern"]');
-  await settle(page);
+  await patSource(page);
   const u = (await pats(page))[0].u;
   await page.locator('#pecn').fill('6'); await page.locator('#pern').fill('3');
   await settle(page);
@@ -40,6 +67,7 @@ test('columns, rows and layout change the points; a pattern with no source draws
   await page.click('#pesrc [data-sx="0"]');
   await settle(page);
   expect(await drawn(page, u)).toBe(0);
+  await expect(page.locator('#fpov [data-pa]')).not.toHaveCount(0);   // with no source the points show as arrows again
   expect(errors).toEqual([]);
 });
 
@@ -49,7 +77,7 @@ test('two sources alternate by cycle; Reroll changes the seed; delete takes the 
   await addStamp(page);
   await openPanel(page, 'layers');
   await page.click('#elb [data-k="pattern"]');
-  await page.click('#peadd');                                   // the current stamp again, as a second source
+  await patSource(page); await patSource(page);                  // the stamp twice: two sources
   await settle(page);
   expect((await pats(page))[0].src).toHaveLength(2);
   const s0 = (await pats(page))[0].sd;
@@ -71,7 +99,7 @@ test('Frame lays points along the four edges, the sides turned to lie along them
   await noPattern(page);
   await openPanel(page, 'layers');
   await page.click('#elb [data-k="pattern"]');
-  await settle(page);
+  await patSource(page);
   const u = (await pats(page))[0].u;
   await expect(page.locator('#peinr')).toBeHidden();
   await page.click('#pelay [data-l="frame"]');
@@ -92,7 +120,7 @@ test('Shift across and Shift down move a grid by a share of a cell without losin
   await noPattern(page);
   await openPanel(page, 'layers');
   await page.click('#elb [data-k="pattern"]');
-  await settle(page);
+  await patSource(page);
   const u = (await pats(page))[0].u;
   expect(await drawn(page, u)).toBe(16);
   await page.locator('#peox').fill('50'); await settle(page);
