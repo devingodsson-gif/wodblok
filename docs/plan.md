@@ -429,3 +429,9 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - **Limit.** Under the hood a tab is the stamp's unlocked state, so a stamp must be printed on the selected layer (in a Pattern) to be edited; otherwise the message says it is not on this layer and no tab opens.
 - Tests: `tests/stamp-tabs.spec.js`; specs that opened a stamp through the lock use `fitView` (harness) so they keep working on the whole canvas.
 
+
+### 2.5.1 (Oct 21 2026): the stamp tab shows the stamp alone (owner: "I don't want to see the rest of the canvas I just want to see the stamp rendered on its own"). Format 25 unchanged
+- **Stamp alone.** A stamp tab no longer zooms the whole canvas: the stage becomes a canvas of the stamp's own size (`stvSet` in 04) holding one printed copy of the stamp, at scale 1, in the middle. No Background, canvas outline, tile, cover or guide is drawn and no other element shows. The build draws a synthetic one-layer scene (`WBX.wbSteScene` in 75, asked by `build()` in 10); nothing of it is stored in the document, and the Canvas tab brings the canvas back with its own zoom.
+- **Limit gone.** Any stamp can be opened, printed on the canvas or not (the 2.5.0 "not on this layer" message is gone).
+- Stamp-view geometry: one canvas unit is one stamp unit and the layer's turn is not applied. Specs that measured instances on the whole canvas (stamp-canvas-edit, selection-handles) were updated for that; stamp-tabs gained a test for the view.
+- Not run: CI and the full suite (owner's instruction). `npm run perf` not run in this release (the drawing path changed only by a null check in `build()`).

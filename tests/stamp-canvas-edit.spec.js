@@ -39,9 +39,9 @@ test('a picked shape goes into the unlocked stamp where it is pointed at, and ev
   await click(page, { x: p.x + p.k * 30, y: p.y + p.k * 20 });
   const it = await items(page);
   expect(it.length).toBe(before + 1);
-  // the stamp is 240 wide and the layer prints it at 180, so 0.75 canvas units per stamp unit: 30 and 20 canvas units are 40 and 26.7 stamp units
-  expect(Math.abs(it[it.length - 1].x - 160)).toBeLessThan(3);
-  expect(Math.abs(it[it.length - 1].y - 146.7)).toBeLessThan(3);
+  // a stamp tab shows the stamp alone at its own size (2.5.1): one canvas unit is one stamp unit, so 30 and 20 units right and down of the middle (120, 120)
+  expect(Math.abs(it[it.length - 1].x - 150)).toBeLessThan(3);
+  expect(Math.abs(it[it.length - 1].y - 140)).toBeLessThan(3);
   expect(await page.locator('#art use[href^="#s1"]').count()).toBe(nUse);
   await expect(page.locator('#stoh .steh')).toHaveCount(9);
   expect(errors).toEqual([]);
@@ -57,7 +57,7 @@ test('with the stamp locked, a picked shape makes a free Motif element and leave
   expect(errors).toEqual([]);
 });
 
-test('on a turned layer the shape still lands under the pointer and stands upright', async ({ page }) => {
+test('with the layer turned, the stamp tab still shows the stamp upright and the shape lands under the pointer', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
   await page.evaluate(() => document.querySelector('#pelist .mr').click());
@@ -75,8 +75,8 @@ test('on a turned layer the shape still lands under the pointer and stands uprig
   const back = await page.evaluate(([i, u, v]) => __wbTest.stampToCanvas(i, u, v), [hit.i, q.x, q.y]);
   expect(Math.abs(back.x - (p.cx + 6))).toBeLessThan(1);
   expect(Math.abs(back.y - (p.cy + 4))).toBeLessThan(1);
-  // the shape is turned back by the layer's 30 degrees so it stands upright on the canvas
-  expect(Math.abs(((q.r + 30 + 540) % 360) - 180)).toBeLessThan(1.5);
+  // the stamp tab does not turn the stamp with the layer, so the shape is not turned either
+  expect(Math.abs(((q.r + 540) % 360) - 180)).toBeLessThan(1.5);
   expect(errors).toEqual([]);
 });
 
@@ -102,7 +102,7 @@ test('a click selects a shape, dragging moves it, a handle resizes it, the round
   await drag(page, p, { x: p.x + 30, y: p.y });
   it = await items(page);
   expect(it.length).toBe(n);
-  expect(Math.abs(it[n - 1].x - x0 - 30 / (p.k * 0.75))).toBeLessThan(3);
+  expect(Math.abs(it[n - 1].x - x0 - 30 / p.k)).toBeLessThan(3);
   // resize from the south east corner, outwards
   const s0 = it[n - 1].s, se = await centre(handle(page, 'se'));
   await drag(page, se, { x: se.x + 25, y: se.y + 25 });
@@ -182,7 +182,7 @@ test('Stamp settings is a Pattern tool: symmetry makes copies that can be select
   expect((await state(page)).tiles[0].sym.m).toBe('lr');
   await pick(page);
   let p = await inst(page);
-  await click(page, await at(page, p, -30, 0));
+  await click(page, await at(page, p, -45, 0));
   p = await inst(page);
   const n = (await items(page)).length;
   const x0 = (await items(page))[n - 1].x;
@@ -204,18 +204,18 @@ test('a box dragged round shapes selects those that lie wholly inside it', async
   await unlock(page);
   await pick(page);
   let p = await inst(page);
-  await click(page, await at(page, p, -30, 0));
+  await click(page, await at(page, p, -45, 0));
   p = await inst(page);
-  await click(page, await at(page, p, 30, 0));
+  await click(page, await at(page, p, 45, 0));
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape');
   await expect(page.locator('#stoh .stes')).toHaveCount(0);
-  await drag(page, await at(page, p, -85, -60), await at(page, p, 85, 60));
+  await drag(page, await at(page, p, -110, -90), await at(page, p, 110, 90));
   await expect(page.locator('#stoh polygon.stes')).toHaveCount(2);
   await expect(page.locator('#stoh .steh')).toHaveCount(0);
   // a box that holds only one of them picks only that one
   await page.keyboard.press('Escape');
-  await drag(page, await at(page, p, -85, -60), await at(page, p, -2, 60));
+  await drag(page, await at(page, p, -110, -90), await at(page, p, -2, 90));
   await expect(page.locator('#stoh polygon.stes')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
@@ -227,7 +227,7 @@ test('the Grid tool snaps shapes put into the unlocked stamp, and Alt skips it',
   await page.click('#pgm [data-g="l"]');
   await unlock(page);
   await pick(page);
-  const cell = 533 / 8;
+  const cell = (await page.evaluate(() => document.getElementById('art').viewBox.baseVal.width)) / 8;   // the stamp tab's canvas is the stamp
   let p = await inst(page);
   const off = async n => { const it = await items(page); const q = it[it.length - 1]; return page.evaluate(([i, u, v]) => __wbTest.stampToCanvas(i, u, v), [p.i, q.x, q.y]).then(c => ({ rx: ((c.x % cell) + cell) % cell, ry: ((c.y % cell) + cell) % cell })); };
   const near = v => Math.min(v, cell - v);
@@ -249,13 +249,13 @@ test('a shape that runs over the stamp edge shows on the other side, and a click
   await unlock(page);
   await pick(page);
   let p = await inst(page);
-  await click(page, await at(page, p, 80, 0));
+  await click(page, await at(page, p, 107, 0));   // runs over the right edge of the 240 wide stamp
   p = await inst(page);
   const n = (await items(page)).length;
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape');
   await expect(page.locator('#stoh .steh')).toHaveCount(0);
-  await click(page, await at(page, p, -86, 0));
+  await click(page, await at(page, p, -115, 0));
   await expect(page.locator('#stoh .steh')).toHaveCount(9);
   expect((await items(page)).length).toBe(n);
   expect(errors).toEqual([]);

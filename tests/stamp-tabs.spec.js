@@ -45,16 +45,13 @@ test('the Edit button of the Stamp properties opens the current stamp; Edit on t
   expect(errors).toEqual([]);
 });
 
-test('several stamps can be open as tabs; closing the shown one goes to the Canvas; a stamp that is not on the layer opens no tab', async ({ page }) => {
+test('several stamps can be open as tabs; closing the shown one goes to the Canvas; a stamp printed nowhere opens too', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addStamp(page);
   expect(await page.locator('#stmpl .smkr').count()).toBe(2);
-  await edit(page, 1);                                           // the new stamp is on no layer yet
-  expect(await tabs(page)).toEqual([]);
-  await expect(page.locator('#pmsg')).toContainText('not on this layer');
-  // put it in the pattern (a stamp is edited where it is printed), then both can be open
-  await page.click('#elb [data-k="pattern"]'); await settle(page);
-  await patSource(page, 'stamp', 1);
+  await edit(page, 1);                                           // the new stamp is printed nowhere: it opens all the same (2.5.1)
+  expect(await tabs(page)).toEqual(['Canvas', 'Stamp 2*']);
+  await page.click('#stetabs [data-sx]'); await settle(page);
   await edit(page, 0);
   await edit(page, 1);
   expect(await tabs(page)).toEqual(['Canvas', 'Stamp 1', 'Stamp 2*']);
@@ -63,5 +60,20 @@ test('several stamps can be open as tabs; closing the shown one goes to the Canv
   expect(await tabs(page)).toEqual(['Canvas', 'Stamp 1*', 'Stamp 2']);
   await page.click('#stetabs .wtg.on [data-sx]'); await settle(page);   // closing the shown tab goes to the Canvas
   expect(await tabs(page)).toEqual(['Canvas*', 'Stamp 2']);
+  expect(errors).toEqual([]);
+});
+
+test('a stamp tab shows the stamp alone: its own canvas size, no background, outline or other element; the Canvas comes back whole', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  const dim = () => page.evaluate(() => { const r = document.getElementById('art').getBoundingClientRect(); return { w: r.width, h: r.height, n: document.querySelectorAll('#art [data-el]').length }; });
+  const before = await page.evaluate(() => JSON.stringify(window.__wbTest.state().layers));
+  const d0 = await dim();
+  await edit(page);
+  const d1 = await dim();
+  expect(Math.abs(d1.w / d1.h - d0.w / d0.h)).toBeGreaterThan(0.001);   // not the sheet's proportions: the stamp's own
+  await page.click('#stetabs [data-sv="c"]'); await settle(page);
+  const d2 = await dim();
+  expect(Math.abs(d2.w / d2.h - d0.w / d0.h)).toBeLessThan(0.01);
+  expect(await page.evaluate(() => JSON.stringify(window.__wbTest.state().layers))).toBe(before);   // the scene is never stored
   expect(errors).toEqual([]);
 });

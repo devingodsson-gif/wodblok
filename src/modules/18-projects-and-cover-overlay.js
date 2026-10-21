@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {C,CC,CH,CM,CW,bk,paintColors,saveCC,setDim,shOf} from './04-canvas-and-stamp-outlines.js';
+import {C,CC,CH,CM,CW,bk,paintColors,saveCC,setDim,shOf,stvOn} from './04-canvas-and-stamp-outlines.js';
 import {DEF_TILES,clean,cust,flatEls,mkL,oneLayer,selOne,store} from './06-motif-library-folders.js';
 import {gShOk} from './08-grid-shapes.js';
 import {migLayers} from './10-layer-grids.js';
@@ -29,12 +29,12 @@ const okImg=u=>typeof u=='string'&&/^data:image\/(png|jpeg|webp|gif);base64,[A-Z
 const slotC=()=>WBS.cslot=='b'?covB:WBS.cslot=='s'?covS:cov,setSlotC=o=>{if(WBS.cslot=='b')covB=o;else if(WBS.cslot=='s')covS=o;else cov=o};
 function covOrder(){const on=cov.tx!==false,a=$('art');if(on)a.insertBefore($('covg'),$('texg'));else a.appendChild($('covg'));$('covtx').checked=on;a.appendChild($('guig'))}
 const saveCov=()=>{try{kv.set('wb40_coverB',JSON.stringify(covB));kv.set('wb40_coverS',JSON.stringify(covS))}catch(e){}try{kv.set('wb31_cover',JSON.stringify({...cov,on:$('cov').checked}))}catch(e){$('cvmsg').textContent='This image is too large to keep in the browser; it will stay until you reload. Saving the project keeps it.'}};
-function renderCover(){const on=$('cov').checked,k=[on,CW,CH,WBS.book.on?JSON.stringify(WBS.book):'',...[cov,covB,covS].map(c=>[c.sc,c.img.length,c.img.slice(-24)].join(','))].join('|');if(k==WBS.covKey)return;WBS.covKey=k;let h='';
+function renderCover(){const on=$('cov').checked&&!stvOn(),k=[on,CW,CH,WBS.book.on?JSON.stringify(WBS.book):'',...[cov,covB,covS].map(c=>[c.sc,c.img.length,c.img.slice(-24)].join(','))].join('|');if(k==WBS.covKey)return;WBS.covKey=k;let h='';
 const put=(c,x,y,w,hh)=>{if(!c.img||!c.iw)return'';const f=Math.min(w/c.iw,hh/c.ih)*c.sc/100,iw=c.iw*f,ih=c.ih*f;return`<image href="${c.img}" x="${(x+(w-iw)/2).toFixed(1)}" y="${(y+(hh-ih)/2).toFixed(1)}" width="${iw.toFixed(1)}" height="${ih.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`};
 if(on){if(WBS.book.on){const g=bk(),u=CW/g.W,y=g.b*u,hh=g.th*u;h=put(covB,g.b*u,y,g.tw*u,hh)+put(covS,(g.b+g.tw)*u,y,g.sw*u,hh)+put(cov,(g.b+g.tw+g.sw)*u,y,g.tw*u,hh)}else h=put(cov,0,0,CW,CH)}
 drawGuides();
 $('covg').innerHTML=h;covOrder()}
-function drawGuides(){const G=$('guig');if(!WBS.book.on||!WBS.book.gd){G.innerHTML='';return}const g=bk(),u=CW/g.W,f=v=>(v*u).toFixed(2),lw=(CW/1000).toFixed(2),b=g.b,x1=b+g.tw,x2=x1+g.sw,sf=.125,ss=.0625;
+function drawGuides(){const G=$('guig');if(stvOn()||!WBS.book.on||!WBS.book.gd){G.innerHTML='';return}const g=bk(),u=CW/g.W,f=v=>(v*u).toFixed(2),lw=(CW/1000).toFixed(2),b=g.b,x1=b+g.tw,x2=x1+g.sw,sf=.125,ss=.0625;
 const R=(x,y,w,h,st,da)=>`<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="none" stroke="${st}" stroke-width="${lw}"${da?` stroke-dasharray="${da}"`:''}/>`,T=(x,y,t,r)=>{const fs=CW/70,w=t.length*fs*.66+fs*1.1,h=fs*1.5,tr=r?` transform="rotate(90 ${f(x)} ${f(y)})"`:'';return`<g${tr}><rect x="${(x*u-w/2).toFixed(2)}" y="${(y*u-fs*1.05).toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}" rx="${(h/4).toFixed(2)}" fill="#fff" fill-opacity=".94" stroke="#e0006e" stroke-width="${lw}"/><text x="${f(x)}" y="${f(y)}" font-family="system-ui,sans-serif" font-size="${fs.toFixed(1)}" font-weight="600" fill="#e0006e" text-anchor="middle" letter-spacing="1">${t}</text></g>`};
 let o=`<path d="M0 0H${CW}V${CH}H0Z M${f(b)} ${f(b)}V${f(b+g.th)}H${f(g.W-b)}V${f(b)}Z" fill="rgba(224,0,110,.16)" fill-rule="evenodd"/>`;
 o+=R(b,b,g.W-2*b,g.th,'#00a3c4');o+=`<line x1="${f(x1)}" y1="0" x2="${f(x1)}" y2="${CH}" stroke="#e0006e" stroke-width="${lw}"/><line x1="${f(x2)}" y1="0" x2="${f(x2)}" y2="${CH}" stroke="#e0006e" stroke-width="${lw}"/>`;

@@ -19,7 +19,7 @@ test('four corners, four sides and a round handle show on one selected motif, an
   await clickStamp(page, await stampInstance(page), 55, 0);
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape');
-  const p = await stampInstance(page), from = await canvasToClient(page, p.cx - 85, p.cy - 60), to = await canvasToClient(page, p.cx + 85, p.cy + 60);
+  const p = await stampInstance(page), from = await canvasToClient(page, p.cx - 115, p.cy - 90), to = await canvasToClient(page, p.cx + 115, p.cy + 90);
   await page.mouse.move(from.x, from.y); await page.mouse.down();
   await page.mouse.move((from.x + to.x) / 2, (from.y + to.y) / 2, { steps: 3 }); await page.mouse.move(to.x, to.y, { steps: 3 }); await page.mouse.up();
   await settle(page);
