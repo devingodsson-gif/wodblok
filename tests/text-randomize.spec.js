@@ -13,7 +13,7 @@ const NEW = m => !!(m.pt || m.wp || m.rp || m.bb);
 test('Randomize gives some lettering a path, warp, scatter or bounce, and the same seed gives the same result', async ({ page }) => {
   let withNew = 0, total = 0, first = null;
   for (const seed of [1, 2, 3, 4, 5, 6, 7, 8]) {
-    const { errors } = await openApp(page, { seed });
+    const { errors } = await openApp(page, { seed, pattern: false });
     await roll(page);
     const ts = texts(await getState(page));
     total += ts.length; withNew += ts.filter(NEW).length;
@@ -22,6 +22,6 @@ test('Randomize gives some lettering a path, warp, scatter or bounce, and the sa
   }
   expect(total).toBeGreaterThan(0);
   expect(withNew).toBeGreaterThan(0);
-  await openApp(page, { seed: 3 }); await roll(page);
+  await openApp(page, { seed: 3, pattern: false }); await roll(page);
   expect(JSON.stringify(texts(await getState(page)).map(m => [m.text, m.pt, m.wp, m.rp, m.bb]))).toBe(first);
 });

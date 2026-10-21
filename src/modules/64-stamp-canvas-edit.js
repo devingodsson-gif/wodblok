@@ -76,7 +76,8 @@ function sceUp(e){if(SCE.sp){SCE.sp=null;return}
 // The ghost of the shape picked in the Shapes panel, on the pointer: over a stamp it sits where a click would put it (same snap, same size and turn, drawn through the
 // instance's matrix); anywhere else on the canvas it follows the pointer, fainter, at the size of the first stamp.
 function sceGhost(){const b=WBS.brush,g=SCE.g;if(!b||b.txt||!g||!b.m)return'';const t=WBS.tiles[WBS.cur];if(!t)return'';const t0=stUnlocked(),h=stampAt(g.x,g.y,t0),ink=inkOf(t),bg=pal()[0],f=v=>v.toFixed(3);let tr,op;
- if(h){const M=stMatrix(STP.items[h.i]),sn=sceSnap(M,h.u,h.v,{altKey:g.alt}),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0,r=b.r+(flip?th:-th);tr=`matrix(${f(M.a)} ${f(M.b)} ${f(M.c)} ${f(M.d)} ${f(M.e)} ${f(M.f)}) translate(${f(sn.x)} ${f(sn.y)}) rotate(${f(r)}) scale(${f(b.s)})`;op=.6}
+ if(t0!=null&&h){const M=stMatrix(STP.items[h.i]),sn=sceSnap(M,h.u,h.v,{altKey:g.alt}),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0,r=b.r+(flip?th:-th);tr=`matrix(${f(M.a)} ${f(M.b)} ${f(M.c)} ${f(M.d)} ${f(M.e)} ${f(M.f)}) translate(${f(sn.x)} ${f(sn.y)}) rotate(${f(r)}) scale(${f(b.s)})`;op=.6}
+ else if(t0==null){const k=(WBX.wbMotifSize?WBX.wbMotifSize():b.s*100)/100;tr=`translate(${f(g.x)} ${f(g.y)}) rotate(${f(b.r)}) scale(${f(k)})`;op=.45}   // 2.12.0: a click here makes a free Motif of this size, with or without a stamp on the canvas
  else{const it0=STP.items[0];if(!it0)return'';const M=stMatrix(it0),k=Math.hypot(M.a,M.b);tr=`translate(${f(g.x)} ${f(g.y)}) rotate(${f(b.r)}) scale(${f(k*b.s)})`;op=.3}
  return`<g class="stgh" pointer-events="none" opacity="${op}" transform="${tr}">${mk(b.m,ink,bg)}</g>`}
 function sceDraw(){const g=$('stoh');if(!g)return;const gh=sceGhost(),t=sceRO();if(!t||!WBS.msel.size){g.innerHTML=gh;return}
@@ -104,6 +105,9 @@ function init64(){
  document.addEventListener('keydown',sceKey);
  if(w){w.addEventListener('pointermove',e=>{if(!WBS.brush||WBS.brush.txt){if(SCE.g){SCE.g=null;sceDraw()}return}const c=scePt(e);SCE.g=c?{x:c.x,y:c.y,alt:e.altKey}:null;sceDraw()});w.addEventListener('pointerleave',()=>{if(SCE.g){SCE.g=null;sceDraw()}})}
  try{new ResizeObserver(sceDraw).observe($('art'))}catch(e){}}
+// Add motif / Add text in a stamp's tab (2.12.0): a shape in the middle of the open stamp, selected
+WBX.wbStampMid=()=>{const t=sceOpen();return t?sceWith(t,()=>[+(SW/2).toFixed(2),+(SH/2).toFixed(2)]):null};
+WBX.wbStampAddMotif=(m,s)=>{const t=sceOpen();if(!t||!m)return false;const[x,y]=WBX.wbStampMid();t.items.push(it(m,x,y,s||.8,0));selOne(t.items.length-1);sceFree();store();upd();if(WBX.wbCap)WBX.wbCap();return true};
 // a shape dragged from the Shapes panel and let go over an instance of the unlocked stamp is put in the stamp at that point
 function sceDropShape(k,e){const t0=stUnlocked();if(t0==null)return false;const c=scePt(e);if(!c)return false;const h=stampAt(c.x,c.y,t0);if(!h)return false;const t=sceOpen();if(!t)return false;
  const M=stMatrix(STP.items[h.i]),sn=sceSnap(M,h.u,h.v,e),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0,r=+(((( flip?th:-th)+540)%360)-180).toFixed(1),[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));

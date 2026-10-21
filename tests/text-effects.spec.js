@@ -1,13 +1,13 @@
 // 1.43.0: letter effects. Random position, rotation and size, Bounce, Scatter, and Vary. Same text and seed always give the same letters.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
 
 const set = (page, id, v) => page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); }, [id, v]);
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;
 const spread = a => Math.max(...a) - Math.min(...a);
 // text goes into the unlocked stamp: set it up in the Text panel, then click an instance of the stamp on the canvas (the placed text is then selected)
 const putStampText = async page => {
-  const p = await stampInstance(page); await clickStamp(page, p);
+  const p = await stampInstance(page); await addStampText(page);
   await expect.poll(async () => JSON.parse(await getState(page)).tiles[0].items.filter(q => q.tg).length, { timeout: 15000 }).toBeGreaterThan(0);
   await settle(page, { max: 30000 });
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
@@ -74,8 +74,8 @@ test('Text layer: effects are saved only when set', async ({ page }) => {
   await page.fill('#tx_t', 'HELLO');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
+  await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
-  await page.click('#tx_go'); await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
   const tx = async () => JSON.parse(await getState(page)).els.find(p => p.tx).tx;
   await expect.poll(async () => (await tx()).text, { timeout: 10000 }).toBe('HELLO');
   expect(Object.keys(await tx()).filter(k => ['rp', 'rr', 'rs', 'bb', 'sc', 'sd'].includes(k))).toEqual([]);

@@ -1,11 +1,11 @@
 // 1.36.0: the Text tool (a stamp unlocked on the canvas) and the Text layer use the same controls; 20 more fonts, each shown in its own face;
 // word spacing, justify and case; Enter is a new line in both.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
 
 // text goes into the unlocked stamp: set it up in the Text panel, then click an instance of the stamp on the canvas (the placed text is then selected)
 const putStampText = async page => {
-  const p = await stampInstance(page); await clickStamp(page, p);
+  const p = await stampInstance(page); await addStampText(page);
   await expect.poll(async () => JSON.parse(await getState(page)).tiles[0].items.filter(q => q.tg).length, { timeout: 15000 }).toBeGreaterThan(0);
   await settle(page, { max: 30000 });
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
@@ -33,12 +33,12 @@ test('one Text panel for a layer and for an unlocked stamp: the controls are the
   expect(errors).toEqual([]);
 });
 
-test('with every stamp locked, typing in the Text panel arms the text and adds nothing until it is placed', async ({ page }) => {
+test('with every stamp locked, typing in the Text panel adds nothing until Add text is pressed', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'text');
   const n0 = JSON.parse(await getState(page)).els.length;
   await page.fill('#tx_t', 'HELLO');
-  await expect(page.locator('#tx_go')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#tx_go')).toHaveAttribute('aria-pressed', 'false');
   const L = async () => JSON.parse(await getState(page)).els;
   expect((await L()).length).toBe(n0);
   expect((await L()).filter(q => q.txt).length).toBe(0);

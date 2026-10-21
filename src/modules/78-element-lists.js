@@ -15,7 +15,7 @@ const elkName=(k,q)=>{if(q.nm)return String(q.nm);const d=elDef(k);return(d&&d.n
 const elkIc=k=>{const d=elDef(k);return`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${(d&&d.icon)||''}</svg>`};
 function elkItems(k){const L=fpL();return L?(L.pl||[]).filter(q=>elKind(q)==k).reverse():[]}   // the top of the list first, as in the Elements list
 function elkSync(){const un=stUnlocked()!=null,s=elSel(),su=s?String(s.u):'';
- Object.keys(ELK).forEach(k=>{const box=document.querySelector(`.elk[data-k="${k}"]`);if(!box)return;box.hidden=un;if(un)return;const a=elkItems(k),host=box.querySelector('.lyl2'),
+ Object.keys(ELK).forEach(k=>{const box=document.querySelector(`.elk[data-k="${k}"]`);if(!box)return;const keep=un&&(k=='motif'||k=='text');box.hidden=un&&!keep;if(un){if(keep){const h=box.querySelector('.lyl2');if(!h.hidden)h.hidden=true;h.dataset.k=''}return}const a=elkItems(k),host=box.querySelector('.lyl2'),
   key=JSON.stringify([a.map(q=>[q.u,elkName(k,q)]),su]);if(host.dataset.k===key)return;host.dataset.k=key;
   host.innerHTML=a.map(q=>`<div class="lyr${String(q.u)===su?' on':''}" data-u="${elkHx(q.u)}"><span class="gmi">${elkIc(k)}</span><span class="lyn">${elkHx(elkName(k,q))}</span></div>`).join('');
   host.hidden=!a.length})}

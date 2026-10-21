@@ -6,6 +6,7 @@ import {fpL,fpU} from './24-free-place-layers.js';
 import {fpSz} from './25-art-layers.js';
 import {elSel} from './65-element-core.js';
 import {plDisarm} from './72-placing.js';
+import {stUnlocked} from './63-stamp-tool.js';
 
 // ===== The Add bar (2.3.0, Photoshop): the element bar makes things. Pattern, Text and Image make a new element at once, just above the selected one (at the top
 // of the list when nothing is selected), selects it, and shows its panel in Properties. Shape, Stamp and Text
@@ -35,7 +36,8 @@ const AD={
  stamp(){const t=WBS.tiles[WBS.cur];if(!t)return;const q=abInsert({u:fpU(),k:'stamp',t:t.id,x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:+fpSz().toFixed(2),r:0,f:1});if(!q)return;WBS.fpB=null;abDone();abOpen('stmp')},
  motif(){if(WBX.wbMotifAdd)WBX.wbMotifAdd()},
  pattern(){const q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),lay:'grid',cn:4,rn:4,sz:80,rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone();abOpen('layers')},
- text(){const L=fpL(),before=new Set(L?(L.pl||[]).map(q=>String(q.u)):[]),anchor=elSel();abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTbAdd)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}
+ text(){if(stUnlocked()!=null){abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTxStampAt||!WBX.wbStampMid)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}const[x,y]=WBX.wbStampMid()||[0,0];Promise.resolve(WBX.wbTxStampAt(x,y)).then(()=>setTimeout(()=>{ta.focus();ta.select()},0));return}
+  const L=fpL(),before=new Set(L?(L.pl||[]).map(q=>String(q.u)):[]),anchor=elSel();abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTbAdd)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}
   Promise.resolve(WBX.wbTbAdd()).then(()=>{const L2=fpL();if(!L2)return;const a=L2.pl||[],q=a.find(x=>!before.has(String(x.u)));if(!q)return;a.splice(a.indexOf(q),1);
    if(anchor&&a.includes(anchor)){if(anchor.g)q.g=anchor.g;a.splice(a.indexOf(anchor)+1,0,q)}else a.push(q);WBS.fpSel=q.u;abDone();setTimeout(()=>{ta.focus();ta.select()},0)})},
 };

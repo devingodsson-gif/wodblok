@@ -71,7 +71,7 @@ function initScript({ seed, runtime, workspaces, templates }) {
 }
 
 // Open the app with controlled randomness, time and network. Returns { errors } (page errors and console errors).
-async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, workspaces = false, templates = false, before = null, pattern = false } = {}) {
+async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, workspaces = false, templates = false, before = null, pattern = true } = {}) {
   const errors = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
@@ -87,10 +87,11 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, wo
   return { errors };
 }
 
-// 2.10.0: a new project is empty. A test that needs the Pattern the old start had adds one through the bar and puts the panels away again.
+// 2.10.0: a new project is empty. Tests add the Pattern the old start had through the bar (and put the panels away) unless they pass `pattern: false`.
 async function addPattern(page) {
   await page.click('#elb [data-k="pattern"]');
   await page.click('.elk[data-k="pattern"] [data-add]'); await settle(page);
+  await patSource(page);                                  // the old start's Pattern printed the stamp
   if ((await page.getAttribute('#rcls', 'aria-label')) === 'Close all panels') await page.click('#rcls');
   await page.keyboard.press('Escape'); await settle(page);
 }
@@ -231,4 +232,9 @@ async function patSource(page, kind = 'stamp', n = 0) {
   }, [kind, n]);
   await settle(page);
 }
-module.exports = { addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// 2.12.0: text is made with the Add text button (no more arming and clicking the canvas); in a stamp's tab it lands in the middle of the stamp
+async function addStampText(page) {
+  await page.click('section.pn[data-p="text"] .elk[data-k="text"] [data-add]'); await settle(page);
+}
+
+module.exports = { addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

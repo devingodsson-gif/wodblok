@@ -8,7 +8,7 @@ for (const runtime of ['artifact', 'none']) {
   test(`launch state (${runtime} runtime) @smoke`, async ({ page }, testInfo) => {
     const requests = [];
     page.on('request', r => { if (/^https?:/.test(r.url())) requests.push(r.url()); });
-    const { errors } = await openApp(page, { runtime });
+    const { errors } = await openApp(page, { runtime, pattern: false });
 
     const facts = await page.evaluate(() => ({
       title: document.title,

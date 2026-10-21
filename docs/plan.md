@@ -472,3 +472,12 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 ### 2.11.0 (Oct 21 2026): Colourways merged into the bottom of Colours (owner). Format 25 unchanged
 - The Colourways tool, its rail button and "Open Colourways" command are gone; its cards and New colourway / Export… buttons are a "Colourways" group at the bottom of the Colours panel (same ids, same code in 53-colourways.js).
 - Not run: CI and the full suite.
+
+### 2.12.0 (Oct 21 2026): element flow (owner: selecting jumps to the panel, tool order, motifs and text without clicking the canvas). Format 25 unchanged
+- **Jump.** Selecting an element (canvas or list) shows its kind's panel whenever that panel is not on screen, also when all panels are closed or it is a tab beside the Elements list (the old `wbApart` rule is gone).
+- **Rail order.** Canvas, Colours, Elements, Grid, History, Randomize, Export recipes.
+- **Motifs.** A picked library motif is a ghost on the pointer and a click makes it, also when there is no stamp on the canvas (the ghost used to need a printed stamp; it is now drawn at the Motif's own size). A stamp's tab shows Add motif (a motif in the middle of the stamp) and Add text on their panels.
+- **Text.** Text is made with Add text only, in the Pattern view and in a stamp's tab (the middle of the stamp). Typing no longer arms a text for clicking onto the canvas; the old Add text arm button (#tx_go) is hidden (code kept for now).
+- Tests: `tests/element-flow.spec.js`; the harness now adds a Pattern with the stamp as its source after launch by default (`pattern: false` for an empty start); the text specs use Add text.
+- Snapshot note: tests that now add the Pattern through the bar draw different random ids and seeds, so state and SVG snapshots of those specs will differ; not regenerated (owner's approval first).
+- Not run: CI and the full suite.

@@ -140,15 +140,14 @@ test('placing is one undo step, and locking the stamp hides the selection', asyn
   expect(errors).toEqual([]);
 });
 
-test('text typed in the Text panel goes into the unlocked stamp as letters, on every instance', async ({ page }) => {
+test('text added with Add text goes into the unlocked stamp as letters, on every instance', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await unlock(page);
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'AB');
   await settle(page);
   const before = (await items(page)).length;
-  const p = await inst(page);
-  await click(page, p);
+  await page.click('section.pn[data-p="text"] .elk[data-k="text"] [data-add]');   // 2.12.0: Add text puts it in the middle of the stamp
   await expect.poll(async () => (await items(page)).length, { timeout: 15000 }).toBe(before + 2);
   const it = await items(page);
   expect(it.slice(-2).every(q => q.tg)).toBe(true);

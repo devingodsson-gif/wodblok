@@ -4,14 +4,12 @@ const { test, expect } = require('@playwright/test');
 const { openApp } = require('./helpers/harness');
 
 const labels = page => page.locator('.rail button:visible').evaluateAll(b => b.map(x => x.getAttribute('aria-label')));
-const SHARED = ['Default panels', 'Randomize', 'Colours', 'History'];   // with no panel open the first button opens the default layout (2.9.0)
+const ORDER = ['Default panels', 'Canvas', 'Colours', 'Elements', 'Grid', 'History', 'Randomize', 'Export recipes', 'More tools'];   // 2.12.0: the rail's order (the first button opens the default layout while no panel is open)
 const closeAll = async page => { if ((await page.getAttribute('#rcls', 'aria-label')) == 'Close all panels') await page.click('#rcls'); };
 
-test('the shared tools are the first four rail buttons, in the same order', async ({ page }) => {
+test('the tools are on the rail in this order: Canvas, Colours, Elements, Grid, History, Randomize, Export recipes', async ({ page }) => {
   const { errors } = await openApp(page);
-  const pattern = await labels(page);
-  expect(pattern.slice(0, 4)).toEqual(SHARED);
-  expect(pattern.slice(4)).toEqual(['Canvas', 'Elements', 'Grid', 'Export recipes', 'More tools']);   // the element panels open from the element bar only
+  expect(await labels(page)).toEqual(ORDER);
   expect(errors).toEqual([]);
 });
 

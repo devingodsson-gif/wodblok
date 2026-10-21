@@ -47,7 +47,8 @@ const[cx0,cy0]=mean(ids),AJ=adjOf(t,M,ids),ax=M.ax+(AJ?AJ.sx:cx0-M.mx),ay=M.ay+(
 if(AJ&&AJ.ad)L.forEach((q,i)=>{const a=AJ.ad[i];if(!a)return;[q.x,q.y]=wrapP(q.x+a[0],q.y+a[1]);q.r=+(q.r+a[2]).toFixed(1);q.s=+(q.s*a[3]).toFixed(4)});t.items.splice(Math.min(pos,t.items.length),0,...L);const nids=L.map((_,i)=>Math.min(pos,t.items.length-L.length)+i);
 const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();upd();if(!live){if(WBX.wbCap)WBX.wbCap();pmsg(`Updated the text.`)}}
 // the text on the stamp follows every change in the panel while a text is being edited
-const live=()=>{if(syncing||!stTxMode())return;if(!edit){if(txArmed())txGhost();else if(st.text.trim())txArm(true);return}clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
+const live=()=>{if(syncing||!stTxMode())return;if(!edit)return;   // 2.12.0: typing no longer arms a click-to-place text
+clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
 // used by Randomize: set text on a stamp (fonts load first; a newer roll cancels an older one)
 WBX.wbTxFonts=teFonts.map(x=>x[0]);
 // Randomize uses the newer text options now and then. They come from the words themselves (not from Math.random), so a Randomize roll draws the same random numbers as before.

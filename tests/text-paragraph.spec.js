@@ -1,10 +1,10 @@
 // 1.44.0: styling selected letters (size, raise, spacing) and paragraph options (first-line indent, paragraph spacing, balance lines). The styles stay with their letters when the words change.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
 // Canvas flow: the text typed in the Text panel is put on the first printed instance of the unlocked stamp, then one of its letters is clicked so the whole text is selected (the panel edits it)
 async function putTextCanvas(page) {
   const p = await stampInstance(page);
-  await clickStamp(page, p);
+  await addStampText(page);
   const tg = async () => JSON.parse(await getState(page)).tiles[0].items.filter(q => q.tg);
   await expect.poll(async () => (await tg()).length, { timeout: 15000 }).toBeGreaterThan(0);
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await settle(page, { max: 30000 });
@@ -115,11 +115,10 @@ test('Text layer: styled letters and paragraph options are saved on the text, an
   await page.fill('#tx_t', 'ONE TWO');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await page.click('.elk[data-k="text"] [data-add]');
   await settle(page);
   const piece = async () => JSON.parse(await getState(page)).els.filter(p => p.tx)[0];
   await expect.poll(async () => (await piece() || {}).tx).toBeTruthy();
-  await page.click('#tx_go');
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
   await select(page, 1, 2); await set(page, 'tx_zs', 200);
   await expect.poll(async () => JSON.stringify((await piece()).tx.sty), { timeout: 8000 }).toBe('[[1,2,200,0,0]]');
