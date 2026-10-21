@@ -30,10 +30,10 @@ let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[pa
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
 const PNAME={cways:'Colourways',xrec:'Export recipes',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',mlist:'Shape',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
-const EL_ONLY=['layers','stmp','motifs','text','elpaint'];
+const EL_ONLY=['layers','stmp','motifs','text','elpaint','mlist'];
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
-const ELP=[...EL_ONLY,'mlist'],wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
-const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elpaint','text','pgrid','canvas','colors','cways','rand','hist','slib','xrec']};
+const ELP=EL_ONLY,wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
+const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elpaint','text','pgrid','canvas','colors','cways','rand','hist','xrec']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85}),wsG(['layers']),wsG(['canvas','colors'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)
@@ -501,7 +501,7 @@ if(typeof nums=='function'){const _n=nums;nums=function(){_n();WBX.wbDDsync()}}
 })();
 
 enhance();
-tipRows();WS.pattern={dock:[],float:[]};setView();{let st='';try{st=kv.get('wb96_launch')||''}catch(e){}if(st!=='none')WBX.wbWsSet(wsLaunch())}info();nums();requestAnimationFrame(()=>{applyZ();nums()});
+tipRows();WS.pattern={dock:[],float:[]};setView();{let st='';try{st=kv.get('wb96_launch')||''}catch(e){}if(st==='on')WBX.wbWsSet(wsLaunch())}info();nums();requestAnimationFrame(()=>{applyZ();nums()});
 
 {const sp=document.getElementById('splash'),t0=performance.now();if(sp){const go=()=>{const w=Math.max(0,520-(performance.now()-t0));setTimeout(()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),320)},w)};const f=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1400))]):Promise.resolve();requestAnimationFrame(()=>requestAnimationFrame(()=>f.then(go)))}}
 {const b=$('gdt');let on=true;try{on=kv.get('wb93_dots')!=='0'}catch(e){}const ap=()=>{document.body.classList.toggle('plain',!on);b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))};ap();b.onclick=()=>{on=!on;try{kv.set('wb93_dots',on?'1':'0')}catch(e){}ap()}}

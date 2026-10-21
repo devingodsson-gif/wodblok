@@ -461,3 +461,10 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - **Texture and Grade tools removed.** The Textures and Grade panels and rail buttons, the Canvas Surface group and the Stamp and Text Texture groups are gone. Texture and Colour grade exist only as per-element effects. The Texture effect now carries Type, Strength, Scale and Light from (each effect owns a private library texture).
 - **Inert, not deleted.** The texture and grade engines and the saved `tu`/`WBS.tex` fields stay, so files still open and render; nothing creates whole-design texture or grade any more (a new project-wide element is planned by the owner). Possible cleanup: the unreachable grade panel DOM and `init31` UI code.
 - Not run: CI, the full suite and `npm run perf`.
+
+### 2.10.0 (Oct 21 2026): tidy start (owner: one Elements tool, nothing created or open at start, no Stamp library tool). Format 25 unchanged
+- **Elements.** The rail's stack tool (tip "Layers") is now "Elements" (it already opened the Elements list). The other rail button called "Element" (Shape panel) is gone from the rail: Shape opens from the element bar like the other element panels.
+- **Nothing at start.** A new project (launch, New, Clear) holds no element at all: the Pattern it used to start with is gone. Add one from the bar.
+- **No panels at start.** Launch opens no panel (Default panels on the rail button still opens the built-in layout). Tests ask for it with `workspaces: true` (`wb96_launch='on'`).
+- **No Stamp library tool.** Its rail button and "Open Stamp library" command are removed; the panel and its code stay for later (stamp saving), and the Stamp panel's library button still opens it.
+- Not run: CI and the full suite (owner's instruction).

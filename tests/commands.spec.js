@@ -36,7 +36,7 @@ test('a disabled button means a disabled command', async ({ page }) => {
   const r = await page.evaluate(() => { const c = window.__wbTest.commands; return c.list().map(x => [x.id, c.isEnabled(x.id), c.run.length >= 0]); });
   for (const [id, enabled] of r) {
     const el = await page.evaluate(id => { const c = window.__wbTest.commands.get(id); const b = document.getElementById(c.elId); return { hidden: b.hidden, disabled: !!b.disabled, input: b.tagName === 'INPUT' }; }, id);
-    const elementPanel = /^panel\.(layers|stmp|motifs|text|elpaint)$/.test(id);   // opened from the element bar: the rail button is hidden but the command works
+    const elementPanel = /^panel\.(layers|stmp|motifs|text|elpaint|mlist)$/.test(id);   // opened from the element bar: the rail button is hidden but the command works
     expect(enabled, id).toBe(el.input ? true : elementPanel ? !el.disabled : !el.hidden && !el.disabled);
   }
   expect(errors).toEqual([]);

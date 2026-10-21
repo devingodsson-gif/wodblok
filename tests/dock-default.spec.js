@@ -16,7 +16,7 @@ test('no tool starts as a floating window (the Shape editor docks along the bott
   for (const mode of ['pattern']) {
     expect(await page.locator('.wg.fl').count(), mode).toBe(0);
     const tools = await page.locator('.rail [data-pn]:not([hidden])').evaluateAll(b => b.map(x => x.dataset.pn));
-    expect(tools.length).toBeGreaterThan(8);
+    expect(tools.length).toBeGreaterThan(6);
     for (const p of tools) {
       if (p === 'mlist' && mode === 'pattern') continue;   // empty until a stamp is unlocked
       await openPanel(page, p);

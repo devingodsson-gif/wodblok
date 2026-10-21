@@ -7,7 +7,7 @@ const items = async page => JSON.parse(await getState(page)).tiles[0].items;
 const shapeOnStamp = async page => { await unlockStamp(page); await pickShape(page); await clickStamp(page, await stampInstance(page)); await page.keyboard.press('Escape'); await clickStamp(page, await stampInstance(page)); };
 
 test('S splits and K knocks out the selected shape of an unlocked stamp; neither does anything when the stamp is locked', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
+  const { errors } = await openApp(page, { seed: 4, pattern: true });
   await shapeOnStamp(page);
   const n = (await items(page)).length;
   await page.keyboard.press('s');
@@ -27,7 +27,7 @@ test('S splits and K knocks out the selected shape of an unlocked stamp; neither
 });
 
 test('Ctrl+D duplicates the selected shape of an unlocked stamp and does nothing on a locked one', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
+  const { errors } = await openApp(page, { seed: 4, pattern: true });
   await shapeOnStamp(page);
   const n = (await items(page)).length;
   await page.keyboard.press('Control+d'); await settle(page);
@@ -50,7 +50,7 @@ test('Settings > Shortcuts lists the keys that work but are not commands, and no
 });
 
 test('the Shape list and the Element editor follow the unlocked stamp: locking it empties both', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
+  const { errors } = await openApp(page, { seed: 4, pattern: true });
   await shapeOnStamp(page);
   await expect.poll(() => page.locator('#mlist .mr').count()).toBeGreaterThan(0);   // 2.3.0: the list sits in the Element panel, which is not always in front, so it is counted, not looked at
   await showPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); await fitView(page);

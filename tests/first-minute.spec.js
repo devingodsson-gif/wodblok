@@ -25,7 +25,7 @@ test('Randomize is a labelled button in the top bar and rolls a piece', async ({
 });
 
 test('an empty canvas has no "+" button on it; shapes are added with the Shapes tool into an unlocked stamp', async ({ page }) => {
-  const { errors } = await openApp(page);
+  const { errors } = await openApp(page, { pattern: true });
   await expect(page.locator('#empc')).toHaveCount(0);
   await unlockStamp(page);
   await openPanel(page, 'motifs');

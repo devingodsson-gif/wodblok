@@ -102,7 +102,7 @@ test('history records a randomize and goes back to Start', async ({ page }) => {
 });
 
 test('text tool turns typed text into a motif (smoke; glyph shapes depend on installed fonts)', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
+  const { errors } = await openApp(page, { seed: 4, pattern: true });
   await unlockStamp(page);                                 // the text goes into the unlocked stamp, from the canvas
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Wod');

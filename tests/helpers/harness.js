@@ -23,7 +23,7 @@ function initScript({ seed, runtime, workspaces, templates }) {
   return `(() => {
     // Tests start with no panel open at launch unless a test asks for the Default panels (workspaces: true).
     try { if (!sessionStorage.getItem('wb_t_ws')) {
-      if (!${!!workspaces}) localStorage.setItem('wb96_launch', 'none');
+      localStorage.setItem('wb96_launch', ${workspaces ? "'on'" : "'none'"});
       if (!${!!templates}) localStorage.setItem('wb111_tplstart', '0');      // the template picker does not open at launch
       sessionStorage.setItem('wb_t_ws', '1');
     } } catch (e) {}
@@ -71,7 +71,7 @@ function initScript({ seed, runtime, workspaces, templates }) {
 }
 
 // Open the app with controlled randomness, time and network. Returns { errors } (page errors and console errors).
-async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, workspaces = false, templates = false, before = null } = {}) {
+async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, workspaces = false, templates = false, before = null, pattern = false } = {}) {
   const errors = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
@@ -83,7 +83,16 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, wo
   await page.goto(url);
   await page.waitForFunction(() => !!window.__wbTest && document.fonts.status === 'loaded');
   await settle(page);
+  if (pattern) await addPattern(page);
   return { errors };
+}
+
+// 2.10.0: a new project is empty. A test that needs the Pattern the old start had adds one through the bar and puts the panels away again.
+async function addPattern(page) {
+  await page.click('#elb [data-k="pattern"]');
+  await page.click('.elk[data-k="pattern"] [data-add]'); await settle(page);
+  if ((await page.getAttribute('#rcls', 'aria-label')) === 'Close all panels') await page.click('#rcls');
+  await page.keyboard.press('Escape'); await settle(page);
 }
 
 async function getState(page) {
@@ -152,7 +161,7 @@ async function openProjectFile(page, filePath) {
 }
 
 // the element panels have no rail button: they open from the element bar
-const EL_BAR = { layers: 'pattern', stmp: 'stamp', motifs: 'motif', text: 'text', elpaint: 'paint' };
+const EL_BAR = { mlist: 'shape', layers: 'pattern', stmp: 'stamp', motifs: 'motif', text: 'text', elpaint: 'paint' };
 // Since 2.3.0 the element bar makes a new element on every press, so an element panel is opened through its (hidden) tool-bar button instead, which only opens it.
 async function openPanel(page, id) { if (EL_BAR[id]) await page.evaluate(id => document.querySelector(`.rail [data-pn="${id}"]`).click(), id); else await page.click(`.rail [data-pn="${id}"]`);
   await page.waitForSelector(`section.pn[data-p="${id}"]:not([hidden])`); }
@@ -222,4 +231,4 @@ async function patSource(page, kind = 'stamp', n = 0) {
   }, [kind, n]);
   await settle(page);
 }
-module.exports = { fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+module.exports = { addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
