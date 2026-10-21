@@ -36,7 +36,7 @@ es.forEach(e=>{const Q=rng(fxSeed(q.u)*15485863+(e.sd|0)*104729+101),a=Q(),b=Q()
 J.dx+=(a*2-1)*P/100*s*.5;J.dy+=(b*2-1)*P/100*s*.5;J.dr+=(c*2-1)*R;J.sz*=1+(d*2-1)*Z/100*.6;if(e.fh&&h<.5)J.sx=-J.sx;if(e.fv&&v<.5)J.sy=-J.sy});return J}
 
 // ---- the panels
-const KIND_PANEL={stamp:'stmp',image:'elimg',text:'text',pattern:'layers',paint:'elpaint',motif:'mlist',shape:'mlist'};
+const KIND_PANEL={stamp:'stmp',text:'text',pattern:'layers',paint:'elpaint',motif:'mlist',shape:'mlist'};
 const SEL={};   // the effect whose settings show, per kind
 const fxHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fxCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
@@ -86,10 +86,10 @@ if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.
 function init69(){
 // the Elements list opens an effect: select its element, show its panel, open that effect's settings
 WBX.wbFxOpen=(kind,u)=>{SEL[kind]=u;const pn=KIND_PANEL[kind];if(pn&&WBX.wbOpenPanel)WBX.wbOpenPanel(pn);document.querySelectorAll('.fxl').forEach(x=>x.dataset.k='');fxSync()};
-fxRegister('texture',{label:'Texture',kinds:['stamp','image','text','pattern','paint','motif','shape'],make:()=>{const ids=(WBS.texLib||[]).map(x=>x.id),first=Object.keys(TXN)[0];const x=ids[0]||(first?txEnsure({t:first,a:40,sc:100,az:225}):'');return{k:'texture',on:true,x,sd:txRid(),md:'wear'}}});
+fxRegister('texture',{label:'Texture',kinds:['stamp','text','pattern','paint','motif','shape'],make:()=>{const ids=(WBS.texLib||[]).map(x=>x.id),first=Object.keys(TXN)[0];const x=ids[0]||(first?txEnsure({t:first,a:40,sc:100,az:225}):'');return{k:'texture',on:true,x,sd:txRid(),md:'wear'}}});
 fxRegister('pressure',{label:'Pressure offset',kinds:['stamp','pattern'],make:()=>({k:'pressure',on:true,pst:4,pfl:0})});
-fxRegister('jitter',{label:'Jitter',kinds:['stamp','image','text','pattern','motif','shape'],make:()=>({k:'jitter',on:true,pos:20,rot:15,sz:0,sd:txRid()})});
-fxRegister('grade',{label:'Colour grade',kinds:['stamp','image','text','pattern','paint','motif','shape'],make:()=>({k:'grade',on:true,...Object.fromEntries(GRL.map(r=>[r[0],0]))})});
+fxRegister('jitter',{label:'Jitter',kinds:['stamp','text','pattern','motif','shape'],make:()=>({k:'jitter',on:true,pos:20,rot:15,sz:0,sd:txRid()})});
+fxRegister('grade',{label:'Colour grade',kinds:['stamp','text','pattern','paint','motif','shape'],make:()=>({k:'grade',on:true,...Object.fromEntries(GRL.map(r=>[r[0],0]))})});
 Object.entries(KIND_PANEL).forEach(([kind,pn])=>{const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec)return;sec.insertAdjacentHTML('beforeend',fxGroup(kind))});
 document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,tg=()=>fxTarget(kind),cur=()=>{const t=tg();return t?fxOf(t).find(e=>e.u==SEL[kind])||null:null};
 g.querySelector('.fxadd').onclick=e=>{e.stopPropagation();e.preventDefault();const t=tg();if(!t)return;rowMenu(e.currentTarget,fxFor(kind).map(d=>[d.label,()=>{const t2=tg();if(!t2)return;const f=d.make();f.u=fpU();(t2.fx=t2.fx||[]).push(f);SEL[kind]=f.u;fxCh()}]))};

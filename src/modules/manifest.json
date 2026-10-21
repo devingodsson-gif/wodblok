@@ -25,7 +25,7 @@
  "25-art-layers.js",
  "26-text-boxes.js",
  "27-stamp-library.js",
- "28-crop-editor.js",
+ "28-canvas-select.js",
  "29-grid-tool.js",
  "30-print-cover.js",
  "31-colour-grading.js",
@@ -72,5 +72,6 @@
  "73-add-bar.js",
  "74-motif-element.js",
  "75-stamp-edit-mode.js",
- "76-shape-element.js"
+ "76-shape-element.js",
+ "77-map-to-shape.js"
 ]

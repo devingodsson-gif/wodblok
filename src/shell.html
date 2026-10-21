@@ -664,7 +664,6 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
 .dock{border-left:0;border-top:1px solid var(--line);min-height:60vh}
 #pnm{width:110px;min-width:0}.wordmark,.ver,#pst,.top .sep,#pwhere{display:none}.top{gap:4px;overflow-x:auto;padding-right:6px}.brand{width:44px}.top button{padding:6px 8px}.status{gap:8px}
 }
-#crbar{position:fixed;z-index:9999;display:flex;gap:6px;padding:6px;border-radius:var(--r-m);background:var(--panel);border:1px solid var(--line2);box-shadow:var(--shadow)}#crbar button{margin:0;white-space:nowrap}
 #cfmth,#ccirh,#pdesc,#symh,#lhint,#lfph,#lfh,#lfgi,#lcrih,#rzhint,#lglh{display:none!important}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .rzbig{width:100%;height:38px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--fs-m)}.rzbig svg{width:19px;height:19px}.rzmain{padding-top:12px}
@@ -1067,6 +1066,11 @@ body.eyedrop{cursor:crosshair}
     <input type="text" id="tsq" maxlength="40" placeholder="Find a style" aria-label="Find a style">
     <div class="stl scl" id="tsl" role="tree" aria-label="Text styles"></div>
    </div></details>
+  <details class="g" open id="mt_g" hidden><summary>Map to shape</summary><div class="gb">
+   <label>Shape</label><select id="mt_s" aria-label="Shape"></select>
+   <div class="seg" id="mt_m" style="grid-template-columns:repeat(2,1fr)" hidden><button type="button" data-m="on" aria-pressed="false">Follow outline</button><button type="button" data-m="in" aria-pressed="false">Inside</button></div>
+   <div class="ctl" id="mt_or" hidden><label>Start</label><input type="range" id="mt_o" min="-50" max="50" value="0" data-u="%" data-def="0"></div>
+  </div></details>
  </section>
  <section class="pn" data-p="motifs" hidden>
   <details class="g" open><summary>Edit</summary><div class="gb">
@@ -1146,8 +1150,15 @@ body.eyedrop{cursor:crosshair}
    <div class="row"><button type="button" class="alt" id="shp_pen" aria-pressed="false">Draw a path</button><button type="button" class="alt" id="shp_ed" aria-pressed="false" hidden>Edit points</button></div>
   </div></details>
   <details class="g" open id="shp_f" hidden><summary>Fill</summary><div class="gb">
-   <div class="seg" id="shp_fk" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-f="none" aria-pressed="false">None</button><button type="button" data-f="solid" aria-pressed="true">Colour</button></div>
+   <div class="seg" id="shp_fk" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-f="none" aria-pressed="false">None</button><button type="button" data-f="solid" aria-pressed="true">Colour</button><button type="button" data-f="img" aria-pressed="false">Image</button></div>
    <div class="cwrow" id="shp_fcr"><span class="cwk">Colour</span><div class="cwell" id="shp_fw"></div></div>
+   <div id="shp_img" hidden>
+    <div class="strip" id="lfars"></div>
+    <div class="row"><button class="alt" id="lfaimp">Import image&#8230;</button><button class="alt" id="lfaprj">Use a project&#8230;</button></div>
+    <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".wodblok,application/zip" tabindex="-1">
+    <div class="seg" id="shp_im" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-i="cover" aria-pressed="true">Cover</button><button type="button" data-i="contain" aria-pressed="false">Fit</button></div>
+    <div><label>Zoom</label><input type="range" id="shp_iz" min="10" max="400" value="100" data-u="%" data-def="100"></div>
+   </div>
   </div></details>
   <details class="g" open id="shp_o" hidden><summary>Outline</summary><div class="gb">
    <label class="chk"><input type="checkbox" id="shp_oon"><span>Outline</span></label>
@@ -1172,36 +1183,7 @@ body.eyedrop{cursor:crosshair}
    <div class="row"><button class="alt" id="paund">Undo stroke</button><button class="alt" id="paclr">Clear</button></div>
   </div></details>
  </section>
- <section class="pn" data-p="elimg" hidden>
-  <details class="g" open><summary>Place</summary><div class="gb">
-   <div class="txed elmode" data-k="image" hidden><span>Editing <b></b></span></div>
-   <div id="lfart">
-     <div class="strip" id="lfars"></div>
-     <label class="chk"><input type="checkbox" id="lfaak"><span>Paper shows through</span></label>
-     <div class="row"><button class="alt" id="lfaimp" title="Import a PNG, JPG, WebP or SVG image">Import image&#8230;</button><button class="alt" id="lfaprj" title="Use a .wodblok project file as a picture">Use a project&#8230;</button></div>
-     <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".wodblok,application/zip" tabindex="-1">
-    </div>
-  </div></details>
-  <details class="g" open id="elcrg" hidden><summary>Crop</summary><div class="gb">
-   <div id="lcrop" hidden>
-      <label>Crop</label>
-      <div class="row tight"><button class="alt" id="lcrb">Crop&#8230;</button><button class="alt" id="lcrx" hidden title="Show the whole picture again">Remove crop</button></div>
-      <div id="lcred" hidden>
-       <div class="seg" id="lcrm" style="grid-template-columns:1fr 1fr;margin-top:6px"><button type="button" data-m="r">Rectangle</button><button type="button" data-m="p">Free points</button></div>
-       <div id="lcrr">
-        <label>Ratio</label><div class="asp"><select id="lcra"><option value="free">Free</option><option value="orig">Original</option><option value="1:1">1 : 1</option><option value="4:5">4 : 5</option><option value="5:4">5 : 4</option><option value="3:4">3 : 4</option><option value="4:3">4 : 3</option><option value="2:3">2 : 3</option><option value="3:2">3 : 2</option><option value="9:16">9 : 16</option><option value="16:9">16 : 9</option></select><button class="alt" id="lcrsw" title="Swap width and height" aria-label="Swap width and height">&#8646;</button></div>
-        <div class="aspc">X <input type="number" id="lcrnx" min="0" max="100" step="0.1"> Y <input type="number" id="lcrny" min="0" max="100" step="0.1"> %</div>
-        <div class="aspc">W <input type="number" id="lcrnw" min="1" max="100" step="0.1"> H <input type="number" id="lcrnh" min="1" max="100" step="0.1"> %</div>
-       </div>
-       <label>Shape preset</label><select id="lcrpr"><option value="">Start from a shape&#8230;</option><option value="ell">Ellipse</option><option value="tri">Triangle</option><option value="dia">Diamond</option><option value="hex">Hexagon</option></select>
-       <label class="chk"><input type="checkbox" id="lcrall"><span>Apply to every copy of this picture on this layer</span></label>
-       <div class="row"><button class="primary" id="lcrok">Apply crop</button><button class="alt" id="lcrno">Cancel</button><button class="alt" id="lcrrs" title="Back to the whole picture">Reset</button></div>
-       <div class="hint" id="lcrih"></div>
-      </div>
-     </div>
-  </div></details>
- </section>
-<section class="pn" data-p="lyrs" hidden><div class="lys" id="lys">
+ <section class="pn" data-p="lyrs" hidden><div class="lys" id="lys">
  <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><div class="dd gmadd"><button type="button" class="ib" id="lygrp" title="Group the selected elements" aria-label="Group the selected elements" disabled><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5V6a2 2 0 012-2H7M17 4h1.5a2 2 0 012 2v1.5M20.5 16.5V18a2 2 0 01-2 2H17M7 20H5.5a2 2 0 01-2-2v-1.5"/><rect x="8" y="8" width="8" height="8" rx="1.5"/></svg></button><button type="button" class="ib" id="lyung" title="Ungroup" aria-label="Ungroup" disabled><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></button>
   </div></div>
  <div id="lybody">
@@ -1291,6 +1273,12 @@ body.eyedrop{cursor:crosshair}
     <div class="psl" id="pesrc"></div>
     <div class="row"><button class="alt" id="peadd">Add current stamp</button><button class="alt" id="pesel">Add selected element</button></div>
    </div>
+  </div></details>
+  <details class="g" open id="mp_g" hidden><summary>Map to shape</summary><div class="gb">
+   <label>Shape</label><select id="mp_s" aria-label="Shape"></select>
+   <div class="seg" id="mp_m" style="grid-template-columns:repeat(2,1fr)" hidden><button type="button" data-m="on" aria-pressed="false">Follow outline</button><button type="button" data-m="in" aria-pressed="false">Inside</button></div>
+   <div class="ctl" id="mp_or" hidden><label>Start</label><input type="range" id="mp_o" min="-50" max="50" value="0" data-u="%" data-def="0"></div>
+   <div class="ctl" id="mp_cr" hidden><label>Count</label><input type="range" id="mp_c" min="2" max="120" value="24" data-def="24"></div>
   </div></details>
  </section>
 

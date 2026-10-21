@@ -22,18 +22,18 @@ import {stUnlocked} from './63-stamp-tool.js';
 
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
-const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',layers:'Pattern',cover:'Book cover',elimg:'Image'};
+const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',layers:'Pattern',cover:'Book cover'};
 let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',mlist:'Element',elimg:'Image',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
+const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',mlist:'Element',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
-const EL_ONLY=['layers','stmp','motifs','text','elimg','elpaint'];
+const EL_ONLY=['layers','stmp','motifs','text','elpaint'];
 // Properties (2.3.0, Photoshop): every element panel opens in one group shown as a single "Properties" tab, right under the Elements list
 const ELP=[...EL_ONLY,'mlist'],wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
-const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elimg','elpaint','text','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec']};
+const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elpaint','text','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85}),wsG(['layers']),wsG(['canvas','colors','grade','tex'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)

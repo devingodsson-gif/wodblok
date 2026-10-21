@@ -152,7 +152,7 @@ async function openProjectFile(page, filePath) {
 }
 
 // the element panels have no rail button: they open from the element bar
-const EL_BAR = { layers: 'pattern', stmp: 'stamp', motifs: 'shape', text: 'text', elimg: 'image', elsheet: 'sheet', elpaint: 'paint' };
+const EL_BAR = { layers: 'pattern', stmp: 'stamp', motifs: 'motif', text: 'text', elpaint: 'paint' };
 // Since 2.3.0 the element bar makes a new element on every press, so an element panel is opened through its (hidden) tool-bar button instead, which only opens it.
 async function openPanel(page, id) { if (EL_BAR[id]) await page.evaluate(id => document.querySelector(`.rail [data-pn="${id}"]`).click(), id); else await page.click(`.rail [data-pn="${id}"]`);
   await page.waitForSelector(`section.pn[data-p="${id}"]:not([hidden])`); }
@@ -206,6 +206,4 @@ async function armStamp(page) {
   if (await page.locator('#lfpst [data-t].on').count()) return;
   await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page);
 }
-// 2.2.4: the Sheet is a row of the element list ({k:'sheet'}), not proj.sh
-const sheetOf = st => (st.els || []).find(q => q.k === 'sheet');
-module.exports = { sheetOf, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+module.exports = { armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

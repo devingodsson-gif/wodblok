@@ -3,7 +3,7 @@ const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, unlockStamp, settle } = require('./helpers/harness');
 
 const val = (page, id) => page.evaluate(id => { const r = document.getElementById(id); return { v: +r.value, n: r._n ? +r._n.value : null }; }, id);
-const move = async (page, id, v) => { await page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); }, [id, v]); await page.waitForTimeout(700); };
+const move = async (page, id, v) => { await page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); }, [id, v]); await page.waitForTimeout(700); await settle(page); };
 
 for (const view of ['pattern', 'unlocked stamp']) {
   test(`${view}: a grading slider goes back on Undo and forward on Redo, with its number`, async ({ page }) => {

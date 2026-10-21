@@ -29,9 +29,8 @@ async function menu(page, v, item) {
 }
 async function open(page) { const r = await openApp(page); await openPanel(page, 'motifs'); return r; }
 // pick from one of the app's styled dropdowns (they stand in for the native <select>)
-async function pick(page, sel, v) {
-  await page.locator(sel).locator('xpath=following-sibling::div[contains(@class,"dd2")][1]/button').click();
-  await page.locator(`.ddl:not([hidden]) .ddi[data-v="${v}"]`).click();
+async function pick(page, sel, v) {   // 2.3.3: the styled list closed itself while the Library redrew; the select is set through the page instead
+  await page.evaluate(([sel, v]) => { const e = document.querySelector(sel); e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, [sel, v]);
 }
 async function mkFolder(page, name) { await page.click('#fnew'); await page.fill('#fname', name); await page.click('#fok'); await settle(page); }
 

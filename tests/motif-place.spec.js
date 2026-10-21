@@ -1,10 +1,10 @@
 const { test, expect } = require('@playwright/test');
 const { openApp, settle, getState } = require('./helpers/harness');
-// 2.3.0: the Shape button makes a free Shape element at once (not inside a stamp); picking another library shape changes it; a click on the canvas makes another
-const shapes = async page => JSON.parse(await getState(page)).els.filter(q => q.k === 'shape');
-test('shape: the Shape button makes one at once, a library pick changes it, a click on the canvas adds another', async ({ page }) => {
+// 2.3.0: the Motif button makes a free Motif element at once (not inside a stamp); picking another library shape changes it; a click on the canvas makes another
+const shapes = async page => JSON.parse(await getState(page)).els.filter(q => q.k === 'motif');
+test('shape: the Motif button makes one at once, a library pick changes it, a click on the canvas adds another', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="shape"]'); await settle(page);
+  await page.click('#elb [data-k="motif"]'); await settle(page);
   expect(await shapes(page)).toHaveLength(1);
   const m0 = (await shapes(page))[0].m;
   if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click();

@@ -16,6 +16,6 @@ function steSync(){const un=stUnlocked(),bar=$('stebar'),ml=$('mlist'),body=$('l
 function init75(){const a=$('art');if(!a)return;
  const st=document.querySelector('.stage');if(st&&!$('stebar'))st.insertAdjacentHTML('beforeend','<div class="stebar" id="stebar" hidden><span>Editing <b></b></span><button type="button" class="primary" id="stedone">Done</button></div>');
  $('stedone').onclick=()=>steDone();
- ($('boardP')||a).addEventListener('dblclick',e=>{if(WBS.brush||WBS.txArm||WBS.fpB!=null)return;const c=stePt(e);if(!c)return;const h=stampAt(c.x,c.y,null);if(!h)return;e.preventDefault();const it=STP.items[h.i],id=it?it[0]:null;if(id==null)return;if(stUnlocked()===id)steDone();else steOpen(id)});
+ ($('boardP')||a).addEventListener('dblclick',e=>{if(WBS.brush||WBS.txArm||WBS.fpB!=null)return;const c=stePt(e);if(!c)return;const h=stampAt(c.x,c.y,null);if(!h)return;e.preventDefault();const it=STP.items[h.i],id=it?it[0]:null;if(id==null)return;if(stUnlocked()===id){if(WBX.wbTxGrp&&WBX.wbTxGrp())return;steDone()}else steOpen(id)});
  WBX.wbSteSync=steSync}
 export {init75,steDone,steOpen};

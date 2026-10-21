@@ -2,12 +2,12 @@ const { test, expect } = require('@playwright/test');
 const { openApp, settle, getState } = require('./helpers/harness');
 // 2.2.3: one way of placing for a shape, a stamp, a picture and text: the armed item is a ghost on the pointer; using the interface or a right click puts it away
 const armShape = async (page, n = 0) => {
-  await page.click('#elb [data-k="shape"]'); await settle(page);
+  await page.click('#elb [data-k="motif"]'); await settle(page);
   if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click();
   await page.locator('#lib button[data-m]').nth(n).click(); await settle(page);
 };
 const over = async (page, fx, fy) => { const b = await page.locator('#art').boundingBox(); await page.mouse.move(b.x + b.width * fx, b.y + b.height * fy); await settle(page); return b; };
-const items = async page => JSON.parse(await getState(page)).els.filter(q => q.k === 'shape').length;   // 2.3.0: a placed shape is a Shape element
+const items = async page => JSON.parse(await getState(page)).els.filter(q => q.k === 'motif').length;   // 2.3.3: a placed motif is a Motif element
 
 test('a picked shape is a ghost on the pointer, and it goes when the pointer leaves the canvas', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
@@ -28,7 +28,7 @@ test('using the interface puts the shape away: a click on the canvas afterwards 
   await armShape(page, 0);
   await over(page, 0.3, 0.3);
   await expect(page.locator('#stoh .stgh')).toHaveCount(1);
-  await page.click('#elb [data-k="paint"]'); await settle(page);           // any other button in the interface
+  await page.click('#elb [data-k="select"]'); await settle(page);           // any other button in the interface
   await over(page, 0.3, 0.3);
   await expect(page.locator('#stoh .stgh')).toHaveCount(0);
   const n0 = await items(page);
@@ -70,7 +70,7 @@ test('using the interface puts away a stamp and text too, and a picking button a
   await page.click('#elb [data-k="stamp"]'); await settle(page);
   await over(page, 0.4, 0.4);
   await expect(page.locator('#fpov .gh')).toHaveCount(1);
-  await page.click('#elb [data-k="paint"]'); await settle(page);
+  await page.click('#elb [data-k="select"]'); await settle(page);
   await over(page, 0.45, 0.45);
   await expect(page.locator('#fpov .gh')).toHaveCount(0);
   await page.click('#elb [data-k="text"]'); await settle(page);

@@ -11,7 +11,7 @@ const texts = s => s.tiles.reduce((n, t) => n + t.items.filter(i => i.tg).length
 const SAMPLES = [
   { file: 'project-1-diamond.wodblok', name: 'Sample diamond', shape: 'diamond', chars: 90000, ok: s => s.dim.k === 'diamond' || s.dim.cs === 'diamond' ? (s.els.length >= 4 && pats(s) >= 2 && s.tiles.some(t => t.neg) && ((s.grade || {}).masks || []).length >= 1) : false },
   { file: 'project-3-rect-16x9.wodblok', name: 'Sample wide', asp: [16, 9], chars: 90000, ok: s => s.els.length >= 3 && s.els.some(q => (q.fx || []).length) },
-  { file: 'project-4-rect-4x3.wodblok', name: 'Sample busy', asp: [4, 3], chars: 110000, ok: s => s.tiles.length >= 6 && s.els.length >= 8 && texts(s) >= 1 },
+  { file: 'project-4-rect-4x3.wodblok', name: 'Sample busy', asp: [4, 3], chars: 110000, ok: s => s.tiles.length >= 6 && s.els.length >= 5 && texts(s) >= 1 },
 ];
 
 (async () => {

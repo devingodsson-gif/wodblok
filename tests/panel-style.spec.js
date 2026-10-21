@@ -7,7 +7,7 @@ test('every tool panel uses the same heading, button, dropdown, field and segmen
   const { errors } = await openApp(page);
   const seen = { summary: new Set(), altFont: new Set(), ddRadius: new Set(), fieldRadius: new Set(), segOn: new Set(), segH: new Set(), tileRadius: new Set(), labelInline: new Set() };
   for (const mode of ['pattern']) {
-    const tools = (await page.locator('.rail [data-pn]:not([hidden])').evaluateAll(b => b.map(x => x.dataset.pn))).concat(['layers', 'stmp', 'motifs', 'text', 'elimg', 'elsheet', 'elpaint']);
+    const tools = (await page.locator('.rail [data-pn]:not([hidden])').evaluateAll(b => b.map(x => x.dataset.pn))).concat(['layers', 'stmp', 'motifs', 'text', 'elpaint']);
     for (const pn of tools) {
       await page.click('#rcls'); await openPanel(page, pn);
       const r = await page.evaluate(pn => {

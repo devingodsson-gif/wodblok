@@ -3,21 +3,21 @@ import {geom,shOf} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
-import {artLayer,fpWH} from './25-art-layers.js';
+import {fpWH} from './25-art-layers.js';
 import {txtLayer} from './26-text-boxes.js';
 
 // ===== Stamp as composite (element update, step 6, 2.1.6): a stamp holds pictures and text as well as shapes.
-// tile.el = [ {u, k:'image', a, x, y, s, r, f, ...} | {u, k:'text', tx, G, Lt, bw, bh, n, x, y, s, r, f, ...} ], in the stamp's own units (0..SW, 0..SH), drawn over the shapes inside the stamp's outline.
+// tile.el = [ {u, k:'text', tx, G, Lt, bw, bh, n, x, y, s, r, f, ...} ], in the stamp's own units (0..SW, 0..SH), drawn over the shapes inside the stamp's outline.
 // They are the same records the layer's picture and text elements use, so they draw with the same code (artLayer and txtLayer, on a stand-in layer made of the stamp's list).
 // A stamp that has none draws exactly as before. "Make stamp from selection" turns the selected pictures and text into a new stamp and puts one copy of it where they were.
-const stcOk=q=>q&&((q.k=='image'&&q.a&&WBS.ARTS[q.a])||(q.k=='text'&&q.tx&&q.Lt&&q.G));
+const stcOk=q=>q&&((q.k=='text'&&q.tx&&q.Lt&&q.G));
 // what to add to a stamp's symbol: the definitions (pictures are defined once) and the drawing, in list order
-function stContents(t){const el=(t.el||[]).filter(stcOk);if(!el.length)return{defs:'',body:''};const li='s'+t.id,F={ink:t.ink,pl:el},A=artLayer(F,li),X=txtLayer(F,li);let body='';
-el.forEach(q=>{const m=q.k=='image'?A[4]:X[4];const s=m&&m.get(String(q.u));if(s)body+=s});return{defs:(A[0]||'')+(X[0]||''),body}}
+function stContents(t){const el=(t.el||[]).filter(stcOk);if(!el.length)return{defs:'',body:''};const li='s'+t.id,F={ink:t.ink,pl:el},X=txtLayer(F,li);let body='';
+el.forEach(q=>{const m=X[4];const s=m&&m.get(String(q.u));if(s)body+=s});return{defs:X[0]||'',body}}
 // the pictures a stamp needs saved with the project
 function stArts(t,o){(t.el||[]).forEach(q=>{if(q.a)o.add(q.a)})}
 
-function stcSel(){const L=fpL();return L?fpGrp().filter(q=>q.k=='image'||q.k=='text'):[]}
+function stcSel(){const L=fpL();return L?fpGrp().filter(q=>q.k=='text'):[]}
 function stcMake(){const L=fpL(),sel=stcSel();if(!L||!sel.length)return;
 const bs=sel.map(q=>{const wh=fpWH(q);if(!wh)return null;const h=Math.max(wh[0],wh[1])/2;return[q.x-h,q.y-h,q.x+h,q.y+h]}).filter(Boolean);if(!bs.length)return;
 const x0=Math.min(...bs.map(b=>b[0])),y0=Math.min(...bs.map(b=>b[1])),x1=Math.max(...bs.map(b=>b[2])),y1=Math.max(...bs.map(b=>b[3])),cx=(x0+x1)/2,cy=(y0+y1)/2,big=Math.max(x1-x0,y1-y0,1);
@@ -30,9 +30,9 @@ WBX.wbLabelNext='Made stamp from selection';store();upd();if(WBX.wbCap)WBX.wbCap
 
 const stcHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function stcSync(){const b=$('stmksel'),host=$('stcl');if(!b||!host)return;const n=stcSel().length;if(b.disabled!==!n)b.disabled=!n;
-const t=WBS.tiles[WBS.cur],el=t?(t.el||[]).filter(stcOk):[],key=JSON.stringify([t&&t.id,el.map(q=>[q.u,q.a||(q.tx&&q.tx.text)])]);if(host.dataset.k===key)return;host.dataset.k=key;
+const t=WBS.tiles[WBS.cur],el=t?(t.el||[]).filter(stcOk):[],key=JSON.stringify([t&&t.id,el.map(q=>[q.u,q.tx&&q.tx.text])]);if(host.dataset.k===key)return;host.dataset.k=key;
 host.hidden=!el.length;
-host.innerHTML=el.map((q,i)=>`<div class="mr"><b>${q.k=='image'?stcHx((WBS.ARTS[q.a]&&WBS.ARTS[q.a].n)||'Image'):stcHx(String((q.tx&&q.tx.text)||'Text').replace(/\n/g,' ').slice(0,28))}<i>${q.k=='image'?'Picture':'Text'}</i></b><button type="button" data-xi="${i}" aria-label="Take this out of the stamp">&#215;</button></div>`).join('')}
+host.innerHTML=el.map((q,i)=>`<div class="mr"><b>${stcHx(String((q.tx&&q.tx.text)||'Text').replace(/\n/g,' ').slice(0,28))}<i>Text</i></b><button type="button" data-xi="${i}" aria-label="Take this out of the stamp">&#215;</button></div>`).join('')}
 function init68(){
 if(!$('stmksel'))return;
 $('stmksel').onclick=stcMake;

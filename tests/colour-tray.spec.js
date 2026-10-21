@@ -15,9 +15,6 @@ const zipNames = page => page.evaluate(() => {
   return out;
 });
 
-// the canvas is transparent until it has a Sheet; these tests look at the paper, so the Sheet goes on first (no panel opened: that would change the canvas size)
-const sheetOn = page => page.evaluate(() => { const c = document.getElementById('sh_on'); if (!c.checked) c.click(); });
-
 test('a new project has a two-colour tray: paper and ink link to it, the dock shows seven places and a +', async ({ page }) => {
   const { errors } = await openApp(page);
   const p = await proj(page);
@@ -32,7 +29,6 @@ test('a new project has a two-colour tray: paper and ink link to it, the dock sh
 
 test('editing a tray colour recolours what links to it; one history step; undo brings it back', async ({ page }) => {
   const { errors } = await openApp(page);
-  await sheetOn(page);
   await page.click('#tyc .tys >> nth=0');
   await expect(page.locator('.cpk')).toBeVisible();
   await setHex(page, '#1E4FA3'); await closePicker(page);
@@ -165,7 +161,6 @@ test('colourways: a new one copies the colours; editing it leaves the first alon
 
 test('the dropper picks the colour under the pointer from the finished picture', async ({ page }) => {
   const { errors } = await openApp(page);
-  await sheetOn(page);
   const r = await page.locator('#art').first().boundingBox();
   await page.click('#tyc .tys >> nth=1');
   await page.click('.cpkd');

@@ -1,6 +1,6 @@
 // Randomize: each main switch is a slider from 0 (off) to 100 (fully on); Colours keeps a plain switch (1.0.8, Q6).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, sheetOf } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const set = (page, k, v) => page.evaluate(([k, v]) => { const c = document.querySelector(`[data-ft="${k}"]`); c.value = v; c.dispatchEvent(new Event('input', { bubbles: true })); }, [k, v]);
 const roll = async page => { await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
@@ -37,7 +37,6 @@ test('a feature at 0 is left alone; the same roll at 100 changes it', async ({ p
   await roll(page);
   const s = JSON.parse(await getState(page));
   expect(Object.values(s.grade || {}).every(v => v === 0 || v === false || (Array.isArray(v) && !v.length))).toBe(true);   // the grade is still neutral
-  expect(((sheetOf(s) || {}).fx || []).filter(e => e.k === 'texture').length).toBeGreaterThan(0);   // the Sheet texture was
   expect(errors).toEqual([]);
 });
 

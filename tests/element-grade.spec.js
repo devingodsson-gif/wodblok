@@ -1,8 +1,9 @@
 // Element update, step 8b (2.1.8): the Colour grade effect, on every kind of element (here the Sheet and a placed stamp).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern, sheetOf } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
+const sheetOf = d => (d.els || []).find(q => q.k === 'shape');   // a Shape element carries the effects here (the Sheet is gone)
 const canvasClick = async (page, fx, fy) => {
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
@@ -18,10 +19,10 @@ const gradeFilters = (page, prefix) => page.evaluate(p => document.querySelector
 
 test('every kind offers Colour grade in its Add effect menu', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="sheet"]');
-  await page.check('#sh_on'); await settle(page);
-  await page.locator('.fxg[data-fxk="sheet"] .fxadd').scrollIntoViewIfNeeded();
-  await page.click('.fxg[data-fxk="sheet"] .fxadd');
+  await page.click('#elb [data-k="shape"]');
+  await settle(page);
+  await page.locator('.fxg[data-fxk="shape"] .fxadd').scrollIntoViewIfNeeded();
+  await page.click('.fxg[data-fxk="shape"] .fxadd');
   const items = (await page.locator('.rowm .ddi').allTextContents()).map(s => s.trim());
   expect(items).toContain('Colour grade');
   expect(items).not.toContain('Pressure offset');
@@ -29,19 +30,19 @@ test('every kind offers Colour grade in its Add effect menu', async ({ page }) =
   expect(errors).toEqual([]);
 });
 
-test('Colour grade on the Sheet draws a filter only once something is adjusted, and not when switched off', async ({ page }) => {
+test('Colour grade on a Shape draws a filter only once something is adjusted, and not when switched off', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="sheet"]');
-  await page.check('#sh_on'); await settle(page);
-  await addEffect(page, 'sheet', 'Colour grade');
+  await page.click('#elb [data-k="shape"]');
+  await settle(page);
+  await addEffect(page, 'shape', 'Colour grade');
   const fx = sheetOf(await st(page)).fx;
   expect(fx[0]).toMatchObject({ k: 'grade', on: true, ex: 0, sat: 0, hue: 0 });
-  expect(await gradeFilters(page, 'fgsheet')).toBe(0);
-  await page.locator('.fxg[data-fxk="sheet"] .fxg_ex').fill('40'); await settle(page);
+  expect(await gradeFilters(page, 'spg')).toBe(0);
+  await page.locator('.fxg[data-fxk="shape"] .fxg_ex').fill('40'); await settle(page);
   expect(sheetOf(await st(page)).fx[0].ex).toBe(40);
-  expect(await gradeFilters(page, 'fgsheet')).toBe(1);
-  await page.locator('.fxg[data-fxk="sheet"] .fxl [data-fon]').first().click(); await settle(page);
-  expect(await gradeFilters(page, 'fgsheet')).toBe(0);
+  expect(await gradeFilters(page, 'spg')).toBe(1);
+  await page.locator('.fxg[data-fxk="shape"] .fxl [data-fon]').first().click(); await settle(page);
+  expect(await gradeFilters(page, 'spg')).toBe(0);
   expect(errors).toEqual([]);
 });
 

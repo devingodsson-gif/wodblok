@@ -47,13 +47,13 @@ test('a picked shape goes into the unlocked stamp where it is pointed at, and ev
   expect(errors).toEqual([]);
 });
 
-test('with the stamp locked, a picked shape makes a free Shape element and leaves the stamp alone (2.3.0)', async ({ page }) => {
+test('with the stamp locked, a picked shape makes a free Motif element and leaves the stamp alone (2.3.0)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await pick(page);
   const before = (await items(page)).length;
   await click(page, await inst(page));
   expect((await items(page)).length).toBe(before);
-  expect((await state(page)).els.filter(q => q.k === 'shape')).toHaveLength(1);
+  expect((await state(page)).els.filter(q => q.k === 'motif')).toHaveLength(1);
   expect(errors).toEqual([]);
 });
 

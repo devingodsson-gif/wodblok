@@ -6,11 +6,13 @@ import {fpL,fpU} from './24-free-place-layers.js';
 import {elExtend,elSel} from './65-element-core.js';
 import {fxGr,fxJit,fxTex} from './69-effect-stack.js';
 import {abInsert} from './73-add-bar.js';
+import {hx} from './10-layer-grids.js';
+import {artBU,artRefd} from './25-art-layers.js';
 
 // ===== The Shape element (2.3.2): a geometric shape on the canvas, drawn as a vector path, solid or an outline (or both), with a pen for your own shapes.
 // {u, k:'shape', sh: preset | 'path', x, y (its middle, canvas units), s (width), wx, wy (stretch: the box is s*wx by s*wy), r (degrees), f (1 or -1, flipped),
 //  ink (fill colour reference, the project ink when not set), fl ('none' = no fill), sw (outline width in canvas units, 0 or none = no outline), sk (outline colour),
-//  cr (corner, % of the short side, Rounded), np (points, Star), pts + cl (a pen path, see below), fx (effects)}.
+//  fl ('img' = filled with a picture: a = the picture's id in the project, iz = zoom in %, default 100, im = 'contain' to fit it whole, else it covers the shape), cr (corner, % of the short side, Rounded), np (points, Star), pts + cl (a pen path, see below), fx (effects)}.
 // Pen path: pts = [[x, y, ix, iy, ox, oy], ...] in shares of the box (-.5 to .5 across it), (ix, iy) is the handle that comes in and (ox, oy) the one that goes out, as
 // offsets from the point; cl is 1 when the path is closed. Stretching the box stretches the path; the outline stays the same width.
 // Texture, Jitter and Colour grade work on a Shape like on any element. Owner, Oct 20 2026.
@@ -45,20 +47,39 @@ const shOpen=p=>p.sh=='line'||(p.sh=='path'&&!p.cl);
 const shBox=p=>{const s=Math.max(1,+p.s||100);return[s*(p.wx||1),s*(p.wy||1)]};
 function shpLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='shape');if(!pl.length)return['',''];const fr=new Map();let defs='',out='';
  pl.forEach(p=>{const id=String(p.u).replace(/[^\w-]/g,''),J=fxJit(p),[w0,h0]=shBox(p),sz=J?J.sz:1,w=w0*sz,h=h0*sz,d=shGeom(p,w,h);if(!d)return;
-  const fill=p.fl=='none'||shOpen(p)&&p.fl!='solid'?'none':col(okC(p.ink)?p.ink:WBS.proj.ink),sw=+p.sw>0?Math.min(400,+p.sw):0,stroke=sw?` stroke="${col(okC(p.sk)?p.sk:WBS.proj.ink)}" stroke-width="${sf(sw)}" stroke-linejoin="round" stroke-linecap="round"`:'';
-  if(fill=='none'&&!sw){fr.set(String(p.u),'');return}
+  const A=p.fl=='img'&&!shOpen(p)?WBS.ARTS[p.a]:null,fill=A||p.fl=='none'||p.fl=='img'||shOpen(p)&&p.fl!='solid'?'none':col(okC(p.ink)?p.ink:WBS.proj.ink),sw=+p.sw>0?Math.min(400,+p.sw):0,stroke=sw?` stroke="${col(okC(p.sk)?p.sk:WBS.proj.ink)}" stroke-width="${sf(sw)}" stroke-linejoin="round" stroke-linecap="round"`:'';
+  if(fill=='none'&&!sw&&!A){fr.set(String(p.u),'');return}
   const rr=(+p.r||0)+(J?J.dr:0),fl=(+p.f||1)*(J&&J.sx<0?-1:1),fv=J&&J.sy<0?-1:1,bx={x:(+p.x||0)-w/2-sw,y:(+p.y||0)-h/2-sw,W:w+2*sw,H:h+2*sw,R:400},
    T=p.fx&&p.fx.length?fxTex(p,'spx'+li+'_'+id,bx):null,G=p.fx&&p.fx.length?fxGr(p,'spg'+li+'_'+id,bx):null;if(T)defs+=T.defs;if(G)defs+=G.defs;
-  const body=`<g transform="translate(${sf((+p.x||0)+(J?J.dx:0))} ${sf((+p.y||0)+(J?J.dy:0))}) rotate(${sf(rr)}) scale(${fl} ${fv})"><path d="${d}" fill="${fill}" fill-rule="evenodd"${stroke}/></g>`,
+  let pic='';if(A){const aid='sai'+li+'_'+String(p.a).replace(/[^\w-]/g,''),cid='sac'+li+'_'+id;if(!defs.includes('id="'+aid+'"'))defs+=`<image id="${aid}" href="${A.src}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none"/>`;defs+=`<clipPath id="${cid}"><path d="${d}"/></clipPath>`;
+   const k=(p.im=='contain'?Math.min(w/A.w,h/A.h):Math.max(w/A.w,h/A.h))*Math.max(.05,Math.min(8,(+p.iz||100)/100));pic=`<g clip-path="url(#${cid})"><use href="#${aid}" transform="scale(${sf(k)}) translate(${sf(-A.w/2)} ${sf(-A.h/2)})"/></g>`}
+  const body=`<g transform="translate(${sf((+p.x||0)+(J?J.dx:0))} ${sf((+p.y||0)+(J?J.dy:0))}) rotate(${sf(rr)}) scale(${fl} ${fv})">${pic}<path d="${d}" fill="${fill}" fill-rule="evenodd"${stroke}/></g>`,
    one=T||G?`<g${T?T.attrs:''}>${G?G.wrap(body):body}</g>`:body;out+=one;fr.set(String(p.u),one)});
  return[defs,out,'','',fr]}
 
+// the outline of a Shape as a polyline, walked clockwise as seen on the canvas: {pts, closed, L (its length), cum (length up to each point)}. local = true leaves it unmoved
+// (middle at 0,0, not turned or flipped), for measuring. Text and Patterns mapped to a Shape use it.
+const SHF=new Map();
+function shFlat(p,local){const[w,h]=shBox(p),d=shGeom(p,w,h);if(!d)return null;const f=+p.f||1,r=(+p.r||0)*Math.PI/180,x=+p.x||0,y=+p.y||0,key=d+'|'+(local?'l':[f,r,x,y].join());if(SHF.has(key))return SHF.get(key);
+ const e=document.createElementNS('http://www.w3.org/2000/svg','path');e.setAttribute('d',d);let L=0;try{L=e.getTotalLength()}catch(x){}if(!(L>0))return null;
+ const closed=!shOpen(p),N=Math.max(48,Math.min(720,Math.round(L/(Math.max(CW,CH)/260)))),n=closed?N:N+1,c=Math.cos(r),sn=Math.sin(r);let pts=[];
+ for(let i=0;i<n;i++){const q=e.getPointAtLength(L*i/N);let lx=q.x,ly=q.y;if(local)pts.push([lx,ly]);else{lx*=f;pts.push([x+lx*c-ly*sn,y+lx*sn+ly*c])}}
+ if(closed){let a=0;for(let i=0;i<n;i++){const u=pts[i],v=pts[(i+1)%n];a+=u[0]*v[1]-v[0]*u[1]}if(a<0)pts.reverse()}
+ else if(!local&&f<0)pts.reverse();
+ const cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));let tot=cum[cum.length-1];if(closed)tot+=Math.hypot(pts[0][0]-pts[pts.length-1][0],pts[0][1]-pts[pts.length-1][1]);
+ const o={pts,closed,L:tot,cum};if(SHF.size>60)SHF.clear();SHF.set(key,o);return o}
 // ---- making one
 let shLast='rect';
 function shNew(g){const S=Math.min(CW,CH),p={u:fpU(),k:'shape',sh:g,x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:+(S*.4).toFixed(1),r:0,f:1};
  if(g=='line'){p.wy=.06;p.sw=Math.max(2,Math.round(S/60));p.s=+(S*.5).toFixed(1)}
  if(g=='rrect')p.cr=18;if(g=='star')p.np=5;if(g=='arrow'||g=='rect'||g=='rrect')p.wy=.7;
  const q=abInsert(p);if(!q)return null;shLast=g;store();upd();if(WBX.wbCap)WBX.wbCap();if(WBX.wbElSeen)WBX.wbElSeen(q.u);return q}
+// a Shape filled with a picture: the selected Shape takes it (from the Fill group), otherwise a new Rectangle the shape of the picture is made (Image on the Add bar, a picture imported)
+function shImage(id,here){const A=WBS.ARTS[id];if(!A)return;const c=here||!SHI.fresh?shCur():null;SHI.fresh=false;
+ if(c){c.fl='img';c.a=id;shCh();shpSync();return}
+ const S=Math.min(CW,CH)*.5,r=A.h/A.w,p={u:fpU(),k:'shape',sh:'rect',x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:+(r>1?S/r:S).toFixed(1),wy:+r.toFixed(4),r:0,f:1,fl:'img',a:id};
+ const q=abInsert(p);if(q){shCh();if(WBX.wbElSeen)WBX.wbElSeen(q.u)}}
+const SHI={fresh:false};
 const shCur=()=>{const q=elSel();return q&&q.k=='shape'?q:null};
 const shCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 
@@ -119,6 +140,9 @@ function penSplit(p,T,c){const q=p.pts,n=q.length,segs=p.cl&&n>2?n:n-1;let best=
  a[4]=r4(A1[0]-a[0]);a[5]=r4(A1[1]-a[1]);b[2]=r4(C1[0]-b[0]);b[3]=r4(C1[1]-b[1]);
  q.splice(best.i+1,0,[r4(M[0]),r4(M[1]),r4(A2[0]-M[0]),r4(A2[1]-M[1]),r4(B2[0]-M[0]),r4(B2[1]-M[1])]);shCh();penDraw()}
 
+// the pictures of this project, as a strip to choose from
+function shStrip(p){const ids=Object.keys(WBS.ARTS),st=$('lfars');if(!st)return;const ky=ids.map(i=>i+':'+WBS.ARTS[i].src.length+(artRefd(i)?'u':'')).join('|')+'#'+p.a;
+ if(st.dataset.k==ky)return;st.dataset.k=ky;st.innerHTML=ids.length?ids.map(i=>{const A=WBS.ARTS[i];return`<button type="button" data-a="${hx(i)}" class="${p.a==i?'on':''}" title="${hx(A.n)}"><img src="${artBU(A)}" alt="">${artRefd(i)?'':`<i data-ax="${hx(i)}" title="Remove from this project">&#215;</i>`}</button>`}).join(''):''}
 // ---- the panel: three groups (Shape, Fill, Outline) in the Element panel, shown while a Shape is selected
 function shpSync(){const p=shCur(),k=$('shp_k');if(!k)return;const show=!!p;['shp_k','shp_f','shp_o'].forEach(id=>{const e=$(id);if(e&&e.hidden===show)e.hidden=!show});
  if(!show){if(PEN.edit){PEN.edit=null;penDraw()}return}
@@ -126,8 +150,8 @@ function shpSync(){const p=shCur(),k=$('shp_k');if(!k)return;const show=!!p;['sh
  const vis=(id,v)=>{const e=$(id);if(e&&e.hidden===v)e.hidden=!v},set=(id,v)=>{const e=$(id);if(e&&+e.value!==v){e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}))}};
  vis('shp_crw',p.sh=='rrect');vis('shp_npw',p.sh=='star');vis('shp_ed',p.sh=='path');if(p.sh=='rrect')set('shp_cr',p.cr==null?18:+p.cr);if(p.sh=='star')set('shp_np',+p.np||5);
  const ed=PEN.edit==p.u,eb=$('shp_ed');if(eb&&eb.getAttribute('aria-pressed')!=String(ed)){eb.setAttribute('aria-pressed',String(ed));eb.classList.toggle('on',ed)}
- const open=shOpen(p),fk=p.fl=='none'?'none':'solid';$('shp_fk').querySelectorAll('[data-f]').forEach(b=>{const on=b.dataset.f==fk;if(b.getAttribute('aria-pressed')!=String(on)){b.setAttribute('aria-pressed',String(on));b.classList.toggle('on',on)}});
- vis('shp_fcr',fk=='solid');const so=+p.sw>0,oc=$('shp_oon');if(oc.checked!==so)oc.checked=so;vis('shp_owr',so);vis('shp_ocr',so);if(so)set('shp_ow',Math.round(+p.sw));
+ const open=shOpen(p),fk=p.fl=='none'?'none':p.fl=='img'?'img':'solid';$('shp_fk').querySelectorAll('[data-f]').forEach(b=>{const on=b.dataset.f==fk;if(b.getAttribute('aria-pressed')!=String(on)){b.setAttribute('aria-pressed',String(on));b.classList.toggle('on',on)}});
+ vis('shp_fcr',fk=='solid');vis('shp_img',fk=='img');if(fk=='img'){shStrip(p);set('shp_iz',Math.round(+p.iz||100));$('shp_im').querySelectorAll('[data-i]').forEach(b=>{const on=(b.dataset.i=='contain')==(p.im=='contain');if(b.getAttribute('aria-pressed')!=String(on)){b.setAttribute('aria-pressed',String(on));b.classList.toggle('on',on)}})}const so=+p.sw>0,oc=$('shp_oon');if(oc.checked!==so)oc.checked=so;vis('shp_owr',so);vis('shp_ocr',so);if(so)set('shp_ow',Math.round(+p.sw));
  if(WBX.wbPaintWells)WBX.wbPaintWells()}
 function init76(){
  elExtend('shape',{dz:6,is:q=>q.k=='shape',name:q=>q.nm||SHPN[q.sh]||'Shape',draw:(L,li,pa)=>shpLayer(L,li,pa)});
@@ -135,10 +159,12 @@ function init76(){
  pre.innerHTML=SHPL.map(a=>`<button type="button" data-g="${a[0]}" aria-label="${a[1]}" title="${a[1]}" aria-pressed="false"><svg viewBox="0 0 24 24">${a[2]}</svg></button>`).join('');
  pre.onclick=e=>{const b=e.target.closest('[data-g]');const p=shCur();if(!b||!p)return;const g=b.dataset.g;if(p.sh==g)return;p.sh=g;shLast=g;if(g=='rrect'&&p.cr==null)p.cr=18;if(g=='star'&&p.np==null)p.np=5;if(g=='line'&&!(+p.sw>0))p.sw=Math.max(2,Math.round(Math.min(CW,CH)/60));PEN.edit=null;shCh();shpSync()};
  const sl=(id,key)=>$(id).addEventListener('input',()=>{const p=shCur();if(!p)return;const v=+$(id).value;if(p[key]===v)return;p[key]=v;store();upd()});
- sl('shp_cr','cr');sl('shp_np','np');['shp_cr','shp_np','shp_ow'].forEach(id=>$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()}));
+ sl('shp_cr','cr');sl('shp_np','np');['shp_cr','shp_np','shp_ow','shp_iz'].forEach(id=>$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()}));
  $('shp_pen').onclick=()=>{if(penOn())penStop();else penStart()};
  $('shp_ed').onclick=()=>penEditOn(PEN.edit==null);
- $('shp_fk').onclick=e=>{const b=e.target.closest('[data-f]');const p=shCur();if(!b||!p)return;if(b.dataset.f=='none')p.fl='none';else if(shOpen(p))p.fl='solid';else delete p.fl;shCh();shpSync()};
+ $('shp_fk').onclick=e=>{const b=e.target.closest('[data-f]');const p=shCur();if(!b||!p)return;if(b.dataset.f=='none')p.fl='none';else if(b.dataset.f=='img'){p.fl='img';if(!WBS.ARTS[p.a]){const k=Object.keys(WBS.ARTS);if(k.length)p.a=k[0]}}else if(shOpen(p))p.fl='solid';else delete p.fl;shCh();shpSync()};
+ $('shp_im').onclick=e=>{const b=e.target.closest('[data-i]');const p=shCur();if(!b||!p)return;if(b.dataset.i=='contain')p.im='contain';else delete p.im;shCh();shpSync()};
+ sl('shp_iz','iz');
  $('shp_oon').onchange=()=>{const p=shCur();if(!p)return;if($('shp_oon').checked)p.sw=+p.sw>0?p.sw:Math.max(2,Math.round(Math.min(CW,CH)/80));else delete p.sw;shCh();shpSync()};
  $('shp_ow').addEventListener('input',()=>{const p=shCur();if(!p)return;const v=+$('shp_ow').value;if(p.sw===v)return;p.sw=v;store();upd()});
  if(WBX.wbMkWell){const pj=()=>WBS.proj;
@@ -157,5 +183,5 @@ function init76(){
  document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.matches&&t.matches('input,select,textarea,[contenteditable]'))return;
   if(PEN.pts){if(e.key=='Enter'){e.preventDefault();penFinish(false)}else if(e.key=='Escape'){e.preventDefault();e.stopPropagation();penStop()}else if(e.key=='Backspace'){e.preventDefault();PEN.pts.pop();if(!PEN.pts.length)PEN.cur=null;penDraw()}}
   else if(PEN.edit&&e.key=='Escape'){penEditOn(false)}},true);
- WBX.wbShpSync=()=>{shpSync();if(PEN.edit)penDraw()};WBX.wbShapeNew=shNew;WBX.wbShapeLast=()=>shLast;WBX.wbPenOn=penOn;WBX.wbPenStop=penStop;WBX.wbPenStart=penStart}
-export {init76,shpLayer,shNew,shBox,shGeom,shOpen};
+ WBX.wbShpSync=()=>{shpSync();if(PEN.edit)penDraw()};WBX.wbShapeNew=shNew;WBX.wbShapeImage=shImage;WBX.wbShapeImageNew=()=>{SHI.fresh=true;$('lfafile').click()};WBX.wbShapeLast=()=>shLast;WBX.wbPenOn=penOn;WBX.wbPenStop=penStop;WBX.wbPenStart=penStart}
+export {init76,shpLayer,shNew,shBox,shGeom,shOpen,shFlat};

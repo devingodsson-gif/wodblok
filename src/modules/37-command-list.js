@@ -7,7 +7,7 @@ import {$} from './01-launch-and-version.js';
 const el = id => () => $(id);
 const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled; };
 // the element panels have no rail button on screen (the element bar opens them), but their commands still click it
-const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-elimg', 'rail-elpaint']);
+const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-elpaint']);
 const exists = id => () => { const b = $(id); return !!b && !b.disabled; };
 const click = id => () => $(id).click();
 const COMMANDS = [
@@ -65,7 +65,6 @@ const COMMANDS = [
   ['panel.motifs', 'Open Shape', 'rail-motifs'],
   ['panel.text', 'Open Text', 'rail-text'],
   ['panel.mlist', 'Open Element', 'rail-mlist'],
-  ['panel.elimg', 'Open Image', 'rail-elimg'],
   ['panel.elpaint', 'Open Paint', 'rail-elpaint'],
   ['panel.lyrs', 'Open Elements', 'rail-lyrs'],
   ['panel.layers', 'Open Pattern', 'rail-layers'],

@@ -1,9 +1,10 @@
 // Element update, step 7 (2.1.7): the effect stack. An ordered list `fx` on an element, shown at the bottom of its panel: add, switch off, move, delete.
-// Texture (stamp, picture, text, pattern, Sheet) and Pressure offset (stamp, pattern).
+// Texture (stamp, text, pattern, Shape) and Pressure offset (stamp, pattern).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern, sheetOf } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
+const sheetOf = d => (d.els || []).find(q => q.k === 'shape');   // the effects tests use a Shape element (the Sheet is gone)
 const canvasClick = async (page, fx, fy) => {
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
@@ -20,27 +21,27 @@ const addEffect = async (page, kind, label) => {
 const fxRows = (page, kind) => page.locator(`.fxg[data-fxk="${kind}"] [data-fu]`);
 const fxMenu = async (page, kind, n, label) => { await fxRows(page, kind).nth(n).locator('[data-fmore]').click(); await page.locator('.rowm .ddi', { hasText: label }).first().click(); await settle(page); };
 
-test('the Sheet panel has an Effects group once there is a Sheet; Texture is added, switched off, moved and deleted', async ({ page }) => {
+test('a Shape has an Effects group; Texture is added, switched off, moved and deleted', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="sheet"]');
+  await page.click('#elb [data-k="shape"]');
   await settle(page);
-  await expect(page.locator('.fxg[data-fxk="sheet"]')).toBeVisible();
-  await addEffect(page, 'sheet', 'Texture');
-  await addEffect(page, 'sheet', 'Texture');
+  await expect(page.locator('.fxg[data-fxk="shape"]')).toBeVisible();
+  await addEffect(page, 'shape', 'Texture');
+  await addEffect(page, 'shape', 'Texture');
   let fx = sheetOf(await st(page)).fx;
   expect(fx.map(e => e.k)).toEqual(['texture', 'texture']);
   expect(fx[0].on).toBe(true);
   expect(fx[0].x).toBeTruthy();
   const second = fx[1].u;
   // switch the first off
-  await fxRows(page, 'sheet').nth(0).locator('[data-fon]').click(); await settle(page);
+  await fxRows(page, 'shape').nth(0).locator('[data-fon]').click(); await settle(page);
   expect(sheetOf(await st(page)).fx[0].on).toBe(false);
   // move the second one up
-  await fxMenu(page, 'sheet', 1, 'Move up');
+  await fxMenu(page, 'shape', 1, 'Move up');
   expect(sheetOf(await st(page)).fx[0].u).toBe(second);
   // delete both
-  await fxMenu(page, 'sheet', 0, 'Delete');
-  await fxMenu(page, 'sheet', 0, 'Delete');
+  await fxMenu(page, 'shape', 0, 'Delete');
+  await fxMenu(page, 'shape', 0, 'Delete');
   expect(sheetOf(await st(page)).fx).toBeUndefined();
   expect(errors).toEqual([]);
 });
@@ -84,19 +85,6 @@ test('a pattern\'s effects apply to every placement', async ({ page }) => {
   const items = await page.locator(".rowm .ddi").allTextContents();
   expect(items.map(s => s.trim())).toEqual(['Texture', 'Pressure offset', 'Jitter', 'Colour grade']);
   await page.keyboard.press('Escape');
-  expect(errors).toEqual([]);
-});
-
-test('a Texture effect on the Sheet masks the paper while it is on, and not when it is off', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="sheet"]');
-  await page.check('#sh_on');
-  await settle(page);
-  expect(await page.$$eval('#dyn mask#fmsheet', e => e.length)).toBe(0);
-  await addEffect(page, 'sheet', 'Texture');
-  await expect.poll(() => page.$$eval('#dyn mask#fmsheet', e => e.length), { timeout: 15000 }).toBe(1);
-  await fxRows(page, 'sheet').nth(0).locator('[data-fon]').click(); await settle(page);
-  await expect.poll(() => page.$$eval('#dyn mask#fmsheet', e => e.length), { timeout: 15000 }).toBe(0);
   expect(errors).toEqual([]);
 });
 

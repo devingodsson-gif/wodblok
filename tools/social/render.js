@@ -20,12 +20,15 @@ const seedBaseOf = (cfg, now = new Date()) => cfg.seedBase === 'date' ? +utcDate
 const seedFor = (base, index, attempt) => (base * 100 + index + attempt * 100003) >>> 0;
 const paletteFor = (cfg, seed) => cfg.roll.palettes[(Math.imul(seed, 2654435761) >>> 0) % cfg.roll.palettes.length];
 
+// The document is one list of elements since 2.2: the patterns stand for the layers (a layer's layout is a pattern's `lay`)
+const layersOf = st => Array.isArray(st.layers) ? st.layers : (st.els || []).filter(q => q.k === 'pattern');
 // Why a roll is not kept (empty string = kept)
 function checkRoll(cfg, st) {
   const { layers: [lo, hi], layouts } = cfg.roll;
-  if (st.layers.length < lo || st.layers.length > hi) return `${st.layers.length} layers (wanted ${lo} to ${hi})`;
+  const ls = layersOf(st);
+  if (ls.length < lo || ls.length > hi) return `${ls.length} layers (wanted ${lo} to ${hi})`;
   const ok = new Set(layouts.map(l => LAYOUTS[l]));
-  const bad = st.layers.find(l => !ok.has(l.grid || ''));
+  const bad = ls.find(l => l.grid != null && !ok.has(l.grid || ''));
   if (bad) return `layout "${bad.grid || 'auto'}" is not allowed`;
   return '';
 }
@@ -116,7 +119,7 @@ async function renderOne(browser, cfg, seed, size) {
     if (!thumb) return { ok: false, seed, why: 'the picture could not be read back' };
     const title = await page.title();
     if (errors.length) return { ok: false, seed, why: 'page error: ' + errors[0].slice(0, 120) };
-    return { ok: true, seed, png, thumb, palette, stateHash: crypto.createHash('sha256').update(JSON.stringify(st)).digest('hex').slice(0, 12), layers: st.layers.length, fits: [...new Set(st.layers.map(l => l.grid || 'auto'))], app: title, ms: Date.now() - t0 };
+    return { ok: true, seed, png, thumb, palette, stateHash: crypto.createHash('sha256').update(JSON.stringify(st)).digest('hex').slice(0, 12), layers: layersOf(st).length, fits: [...new Set(layersOf(st).map(l => l.grid || l.lay || 'auto'))], app: title, ms: Date.now() - t0 };
   } finally {
     await ctx.close();
   }

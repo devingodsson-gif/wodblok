@@ -89,7 +89,7 @@ test('each shape can have a colour of its own: the stamp prints in runs and the 
   expect(svg).toContain('id="m1r1"');
   // the Colours tool says where colour 1 is used
   await openPanel(page, 'colors');
-  await expect(page.locator('#tyl')).toContainText('1 shape');
+  await expect(page.locator('#tyl')).toContainText('1 motif');
   // putting the shape back on the stamp's ink prints one colour again
   await showPanel(page, 'motifs');
   await page.locator('#wl_sh .cwsb').click();
