@@ -32,7 +32,7 @@ test('the Elements panel lists every element top first, with an eye, opacity and
   const els0 = (await st(page)).els.map(q => q.u);
   // the top row is the last element
   await expect(rows(page).nth(0)).toHaveAttribute('data-u', els0[2]);
-  await rows(page).nth(1).locator('.lyn').click();
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(1).locator('.lyn').click();
   await settle(page);
   await expect(rows(page).nth(1)).toHaveClass(/on/);
   await setOp(page, 40);
@@ -45,7 +45,7 @@ test('the Elements panel lists every element top first, with an eye, opacity and
   expect(await page.locator('#art g[opacity="0.40"]').count()).toBeGreaterThan(0);
   // the eye hides one element without removing it
   const before = await page.locator('#art use[href^="#bk"]').count();
-  await rows(page).nth(0).locator('[data-eye]').click();
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(0).locator('[data-eye]').click();
   await settle(page);
   els = (await st(page)).els;
   expect(els[2].v).toBe(false);
@@ -58,10 +58,10 @@ test('Group wraps the selected rows in one row with its own opacity; Ungroup giv
   const { errors } = await openApp(page, { seed: 4 });
   await three(page);
   await expect(page.locator('#lygrp')).toBeDisabled();
-  await rows(page).nth(0).locator('.lyn').click();
-  await rows(page).nth(1).locator('.lyn').click({ modifiers: ['Control'] });
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(0).locator('.lyn').click();
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(1).locator('.lyn').click({ modifiers: ['Control'] });
   await expect(page.locator('#lygrp')).toBeEnabled();
-  await page.click('#lygrp');
+  await settle(page); await showPanel(page, 'lyrs'); await page.click('#lygrp');
   await settle(page);
   let els = (await st(page)).els;
   const g = els.find(q => q.k === 'group');
@@ -80,20 +80,20 @@ test('Group wraps the selected rows in one row with its own opacity; Ungroup giv
   expect(els.filter(q => q.g === g.u).every(q => q.op === undefined)).toBe(true);
   expect(await page.locator('#art g[opacity="0.50"]').count()).toBeGreaterThan(0);
   // fold hides the members from the list but not from the canvas
-  await rows(page).nth(0).locator('[data-fold]').click();
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(0).locator('[data-fold]').click();
   await expect(rows(page)).toHaveCount(2);
-  await rows(page).nth(0).locator('[data-fold]').click();
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(0).locator('[data-fold]').click();
   await expect(rows(page)).toHaveCount(4);
   // Ungroup
-  await page.click('#lyung');
+  await settle(page); await showPanel(page, 'lyrs'); await page.click('#lyung');
   await settle(page);
   els = (await st(page)).els;
   expect(els.some(q => q.k === 'group')).toBe(false);
   expect(els.every(q => !q.g)).toBe(true);
   expect(els).toHaveLength(3);
   // Shift+G groups again
-  await rows(page).nth(0).locator('.lyn').click();
-  await rows(page).nth(1).locator('.lyn').click({ modifiers: ['Control'] });
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(0).locator('.lyn').click();
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(1).locator('.lyn').click({ modifiers: ['Control'] });
   await expect(page.locator('#lygrp')).toBeEnabled();
   await page.keyboard.press('Shift+G');
   await settle(page);
@@ -105,15 +105,15 @@ test('rows move up and down, and a row dragged onto a group row goes into it', a
   const { errors } = await openApp(page, { seed: 4 });
   await three(page);
   const ids = (await st(page)).els.map(q => q.u);
-  await rows(page).nth(0).locator('[data-more]').click();
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(0).locator('[data-more]').click();
   await page.locator('.rowm .ddi', { hasText: 'Move down' }).first().click();
   await settle(page);
   expect((await st(page)).els.map(q => q.u)).toEqual([ids[0], ids[2], ids[1]]);
-  await rows(page).nth(2).locator('[data-more]').click();
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(2).locator('[data-more]').click();
   await page.locator('.rowm .ddi', { hasText: 'Move up' }).first().click();
   await settle(page);
   expect((await st(page)).els.map(q => q.u)).toEqual([ids[2], ids[0], ids[1]]);
-  await rows(page).nth(0).locator('[data-more]').click();
+  await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(0).locator('[data-more]').click();
   await page.locator('.rowm .ddi', { hasText: 'Delete' }).first().click();
   await settle(page);
   expect((await st(page)).els.map(q => q.u)).toEqual([ids[2], ids[0]]);

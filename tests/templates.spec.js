@@ -127,7 +127,7 @@ test('no id appears twice on the page, and the picker\'s own X closes it and is 
 });
 
 test('the template picker opens when the app starts; Settings > General can turn that off', async ({ page }) => {
-  const { errors } = await openApp(page, { templates: true });
+  const { errors } = await openApp(page, { templates: true, pattern: false });
   await expect(page.locator('#tpdlg')).toBeVisible();
   await expect(page.locator('#tpty .on')).toHaveText('Normal canvas');
   await expect(cards(page).first()).toHaveAttribute('aria-label', 'Blank');

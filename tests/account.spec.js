@@ -27,7 +27,7 @@ const HOST = 'https://app.wodblok.test/';
 const serve = p => p.route(HOST + '**', r => (/\/sw\.js$/.test(r.request().url())
   ? r.fulfill({ contentType: 'text/javascript', body: '/* no service worker in this test */' })   // the app registers one on a hosted address
   : r.fulfill({ contentType: 'text/html', body: fs.readFileSync(path.join(ROOT, 'dist', 'wodblok.html')) })));
-const open = async (page, cfg) => { await page.addInitScript(stub(cfg)); return openApp(page, { url: HOST, before: serve }); };
+const open = async (page, cfg) => { await page.addInitScript(stub(cfg)); return openApp(page, { url: HOST, before: serve, pattern: false }); };
 const calls = (page, path) => page.evaluate(p => window.__api.calls.filter(c => c.path === p), path);
 const set = (page, path, r) => page.evaluate(([p, v]) => { window.__api.cfg[p] = v; }, [path, r]);
 const fileMenu = async page => { await page.click('#fileb'); return page.locator('#filem > button, #filem > label'); };
