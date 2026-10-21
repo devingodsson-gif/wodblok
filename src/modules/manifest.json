@@ -70,5 +70,6 @@
  "71-randomize-elements.js",
  "72-placing.js",
  "73-add-bar.js",
- "74-shape-element.js"
+ "74-shape-element.js",
+ "75-stamp-edit-mode.js"
 ]

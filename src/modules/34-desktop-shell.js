@@ -179,7 +179,7 @@ if(!g){const own=(p=='rand'||!L.dock.length)?wsG([p]):null;   // made in the sam
 g=(p=='rand'&&L.dock.find(x=>x.tabs.includes('grade')))||L.dock[0];if(g)g.tabs.push(p);else{g=own;L.dock.push(g)}}g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
-WBX.wbPropsOpen=()=>!!wsAll().find(wsIsP);
+WBX.wbPropsOpen=()=>!!wsAll().find(wsIsP)||!!wsFind('lyrs');   // Properties shows (and opens under the list) once the Elements list is open
 // Workspaces: read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
 WBX.wbWsGet=()=>JSON.parse(JSON.stringify({pattern:WS.pattern}));
 WBX.wbWsSet=o=>{const had=!!wsFind('wspc');['pattern'].forEach(m=>{const L=o&&o[m];if(!L)return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=wsG([]).id;g.f=+g.f||1;g.e=g.e||'r';g.col=false;return g.tabs.length>0};

@@ -1,5 +1,5 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,geom,shOf} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL,fpU} from './24-free-place-layers.js';
@@ -44,7 +44,9 @@ host.innerHTML=a.slice().reverse().map(q=>`<div class="mr${q.u==WBS.patSel?' on'
 $('peed').hidden=!p;if(!p)return;
 $('pelay').querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l==p.lay));$('peds').querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d==p.ds));
 const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};sv('pecn',p.cn);sv('pern',p.rn);sv('pesz',p.sz);sv('pert',p.rt);sv('peox',+p.ox||0);sv('peoy',+p.oy||0);sv('pein',p.in==null?4:+p.in);$('peinr').hidden=p.lay!='frame';
-$('pesrc').innerHTML=(p.src||[]).map((s,i)=>`<div class="mr" data-si="${i}"><b>${patHx(patSrcName(s))}${patSrcOk(s)?'':'<i>missing</i>'}</b><input type="number" min="1" max="99" value="${+s.w>0?+s.w:1}" data-sw="${i}" aria-label="Weight"><button type="button" data-sx="${i}" aria-label="Remove this source">&#215;</button></div>`).join('')}
+// the sources (2.3.0): one row each, a thumbnail of the stamp (or the kind's icon), its name, its weight when the pattern picks by weight, and remove
+$('pesrc').innerHTML=(p.src||[]).map((s,i)=>{const t=s.k=='stamp'?WBS.tiles.find(x=>x.id==s.t):null,G=t?geom(shOf(t)):null,th=G?`<svg viewBox="0 0 ${G.SW} ${G.SH}"><use href="#s${t.id}"/></svg>`:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${s.k=='image'?'<rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5L15 10l-9 9"/>':'<path d="M5.5 7.5V5h13v2.5M12 5v14M9 19h6"/>'}</svg>`;
+ return`<div class="psr2" data-si="${i}"><span class="pth">${th}</span><b>${patHx(patSrcName(s))}${patSrcOk(s)?'':' <i>missing</i>'}</b>${p.ds=='weighted'?`<input type="number" min="1" max="99" value="${+s.w>0?+s.w:1}" data-sw="${i}" aria-label="Weight">`:'<span></span>'}<button type="button" class="ib" data-sx="${i}" aria-label="Remove this source"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`}).join('')}
 function init67(){
 elExtend('pattern',{expand:patExpand,name:q=>q.n});
 if(!$('pelist'))return;

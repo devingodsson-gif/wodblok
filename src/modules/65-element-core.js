@@ -63,7 +63,7 @@ function elBar(){const b=$('elb');if(!b)return;b.innerHTML=EL_O.map(k=>{const d=
 // the selected element on the current layer, if any
 function elSel(){const L=WBS.layers[WBS.selL];if(!L||WBS.fpSel==null||WBS.fpSel===-1)return null;return(L.pl||[]).find(q=>q.u==WBS.fpSel)||null}
 let elLast='';
-function elSync(){if(WBX.wbAbSync)WBX.wbAbSync();
+function elSync(){if(WBX.wbAbSync)WBX.wbAbSync();if(WBX.wbSteSync)WBX.wbSteSync();
 // the Image panel's Crop group shows only when there is a picture to crop
 {const c=$('lcrop'),g=$('elcrg');if(c&&g&&g.hidden!==c.hidden)g.hidden=c.hidden}
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden

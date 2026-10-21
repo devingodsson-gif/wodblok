@@ -42,9 +42,15 @@ const SEL={};   // the effect whose settings show, per kind
 const fxHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fxCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 function fxTarget(kind){if(kind=='sheet')return shGet();if(kind=='pattern')return patCur();if(kind=='paint')return paCur();const q=elSel();return q&&elKind(q)==kind?q:null}
-function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hidden><summary>Effects</summary><div class="gb">
-<div class="ml fxl"></div>
-<div class="row"><button type="button" class="alt fxadd" aria-haspopup="menu">Add effect</button></div>
+// The list (2.3.0, Photoshop's layer effects): one row per effect (eye, name, ⋯), drag to reorder; the open effect's settings show right under its row.
+// The + in the group's title adds one. Rows before the open one and the open row are in .fxl, the settings follow, the rest are in .fxl2.
+const FXI={eye:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+ off:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 6.1A9.6 9.6 0 0112 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 01-3 3.7M6.3 7.9A16.4 16.4 0 002.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.2-1"/></svg>',
+ more:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></svg>',
+ plus:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+ car:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'};
+function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hidden><summary>Effects<button type="button" class="ib fxadd" aria-haspopup="menu" aria-label="Add effect">${FXI.plus}</button></summary><div class="gb">
+<div class="fxl"></div><div class="fxpane">
 <div class="fxs" data-e="texture" hidden>
 <div class="ctl"><label>Texture</label><select class="fxsx" aria-label="Texture"></select></div>
 <div class="ctl"><label>Mode</label><select class="fxsm" aria-label="Mode">${TXMD.map(m=>`<option value="${m}">${TXMN[m]}</option>`).join('')}</select></div>
@@ -65,11 +71,13 @@ ${GRL.map(([k,n,a,b])=>`<div class="ctl"><label>${n}</label><input type="range" 
 <div class="ctl"><label>Pressure</label><input type="range" class="fxpp" min="0" max="10" value="4" data-def="4"></div>
 <div class="ctl"><label>Flooding</label><input type="range" class="fxpf" min="0" max="10" value="0" data-def="0"></div>
 </div>
+</div><div class="fxl fxl2"></div>
 </div></details>`}
 function fxSync(){if(!WBS.layers||!WBS.proj)return;document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,t=fxTarget(kind);if(g.hidden!==!t)g.hidden=!t;if(!t)return;const list=fxOf(t),sel=list.find(e=>e.u==SEL[kind])||null,lib=WBS.texLib||[];
 const key=JSON.stringify([t.u||'sheet',list.map(e=>[e.u,e.k,e.on,e.x,e.md]),sel&&sel.u,lib.map(x=>[x.id,x.name])]);
-const host=g.querySelector('.fxl');if(host.dataset.k!==key){host.dataset.k=key;
-host.innerHTML=list.map((e,i)=>{const d=fxDef(e.k);return`<div class="mr${sel&&e.u==sel.u?' on':''}" data-fu="${e.u}"><button type="button" class="pvc" data-fon aria-pressed="${e.on!==false}" aria-label="Switch on or off">${e.on!==false?'On':'Off'}</button><b>${fxHx(d?d.label:e.k)}</b><button type="button" data-fup aria-label="Move up"${i?'':' disabled'}>&#8593;</button><button type="button" data-fdn aria-label="Move down"${i<list.length-1?'':' disabled'}>&#8595;</button><button type="button" data-fx aria-label="Delete this effect">&#215;</button></div>`}).join('');
+const host=g.querySelector('.fxl'),host2=g.querySelector('.fxl2');if(host.dataset.k!==key){host.dataset.k=key;
+const row=e=>{const d=fxDef(e.k),on=e.on!==false,op=sel&&e.u==sel.u;return`<div class="fxr${op?' on':''}${on?'':' off'}" data-fu="${e.u}" draggable="true"><button type="button" class="ib" data-fon aria-pressed="${on}" aria-label="${on?'Hide':'Show'} this effect">${on?FXI.eye:FXI.off}</button><span class="fxc${op?' open':''}">${FXI.car}</span><b>${fxHx(d?d.label:e.k)}</b><button type="button" class="ib" data-fmore aria-haspopup="menu" aria-label="More">${FXI.more}</button></div>`};
+const si=sel?list.indexOf(sel):list.length-1;host.innerHTML=list.slice(0,si+1).map(row).join('');host2.innerHTML=list.slice(si+1).map(row).join('');
 const sx=g.querySelector('.fxsx');sx.innerHTML=(lib.length?'':'<option value="">None</option>')+lib.map(x=>`<option value="${fxHx(x.id)}">${fxHx(x.name)}</option>`).join('')}
 g.querySelectorAll('.fxs').forEach(s=>{const on=!!sel&&s.dataset.e==sel.k;if(s.hidden===on)s.hidden=!on});
 if(sel&&sel.k=='texture'){const sx=g.querySelector('.fxsx'),sm=g.querySelector('.fxsm');if(sx.value!==sel.x)sx.value=sel.x||'';if(sm.value!==(sel.md||'wear'))sm.value=sel.md||'wear'}
@@ -77,19 +85,27 @@ if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.va
 if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=g.querySelector('.fxg_'+k),v=+sel[k]||0;if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}});
 if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxpp',+sel.pst||0);set('.fxpf',+sel.pfl||0)}})}
 function init69(){
+// the Elements list opens an effect: select its element, show its panel, open that effect's settings
+WBX.wbFxOpen=(kind,u)=>{SEL[kind]=u;const pn=KIND_PANEL[kind];if(pn&&WBX.wbOpenPanel)WBX.wbOpenPanel(pn);document.querySelectorAll('.fxl').forEach(x=>x.dataset.k='');fxSync()};
 fxRegister('texture',{label:'Texture',kinds:['stamp','image','text','pattern','sheet','paint','shape'],make:()=>{const ids=(WBS.texLib||[]).map(x=>x.id),first=Object.keys(TXN)[0];const x=ids[0]||(first?txEnsure({t:first,a:40,sc:100,az:225}):'');return{k:'texture',on:true,x,sd:txRid(),md:'wear'}}});
 fxRegister('pressure',{label:'Pressure offset',kinds:['stamp','pattern'],make:()=>({k:'pressure',on:true,pst:4,pfl:0})});
 fxRegister('jitter',{label:'Jitter',kinds:['stamp','image','text','pattern','shape'],make:()=>({k:'jitter',on:true,pos:20,rot:15,sz:0,sd:txRid()})});
 fxRegister('grade',{label:'Colour grade',kinds:['stamp','image','text','pattern','sheet','paint','shape'],make:()=>({k:'grade',on:true,...Object.fromEntries(GRL.map(r=>[r[0],0]))})});
 Object.entries(KIND_PANEL).forEach(([kind,pn])=>{const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec)return;sec.insertAdjacentHTML('beforeend',fxGroup(kind))});
 document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,tg=()=>fxTarget(kind),cur=()=>{const t=tg();return t?fxOf(t).find(e=>e.u==SEL[kind])||null:null};
-g.querySelector('.fxadd').onclick=e=>{e.stopPropagation();const t=tg();if(!t)return;rowMenu(e.currentTarget,fxFor(kind).map(d=>[d.label,()=>{const t2=tg();if(!t2)return;const f=d.make();f.u=fpU();(t2.fx=t2.fx||[]).push(f);SEL[kind]=f.u;fxCh()}]))};
-g.querySelector('.fxl').onclick=e=>{const t=tg();if(!t)return;const r=e.target.closest('[data-fu]');if(!r)return;const L=t.fx||[],i=L.findIndex(z=>z.u==r.dataset.fu);if(i<0)return;
-if(e.target.closest('[data-fon]')){L[i].on=L[i].on===false;fxCh();return}
-if(e.target.closest('[data-fx]')){L.splice(i,1);if(!L.length)delete t.fx;if(SEL[kind]==r.dataset.fu)SEL[kind]=null;fxCh();return}
-if(e.target.closest('[data-fup]')){if(i>0){[L[i-1],L[i]]=[L[i],L[i-1]];fxCh()}return}
-if(e.target.closest('[data-fdn]')){if(i<L.length-1){[L[i+1],L[i]]=[L[i],L[i+1]];fxCh()}return}
-SEL[kind]=L[i].u;fxSync()};
+g.querySelector('.fxadd').onclick=e=>{e.stopPropagation();e.preventDefault();const t=tg();if(!t)return;rowMenu(e.currentTarget,fxFor(kind).map(d=>[d.label,()=>{const t2=tg();if(!t2)return;const f=d.make();f.u=fpU();(t2.fx=t2.fx||[]).push(f);SEL[kind]=f.u;fxCh()}]))};
+const fxDel=(t,i)=>{const L=t.fx||[],u=L[i]&&L[i].u;L.splice(i,1);if(!L.length)delete t.fx;if(SEL[kind]==u)SEL[kind]=null;fxCh()};
+const fxMv=(t,i,d)=>{const L=t.fx||[],j=i+d;if(j<0||j>=L.length)return;[L[i],L[j]]=[L[j],L[i]];fxCh()};
+const lists=[...g.querySelectorAll('.fxl')];let dragU=null;
+lists.forEach(h=>{h.onclick=e=>{const t=tg();if(!t)return;const r=e.target.closest('[data-fu]');if(!r)return;const L=t.fx||[],i=L.findIndex(z=>z.u==r.dataset.fu);if(i<0)return;
+ if(e.target.closest('[data-fon]')){L[i].on=L[i].on===false;fxCh();return}
+ const mb=e.target.closest('[data-fmore]');if(mb){e.stopPropagation();rowMenu(mb,[['Duplicate',()=>{const c=JSON.parse(JSON.stringify(L[i]));c.u=fpU();L.splice(i+1,0,c);SEL[kind]=c.u;fxCh()}],['Move up',()=>fxMv(t,i,-1)],['Move down',()=>fxMv(t,i,1)],['Delete',()=>fxDel(t,i)]]);return}
+ // a click on the open effect's row closes it (accordion)
+ SEL[kind]=SEL[kind]==L[i].u?null:L[i].u;g.querySelectorAll('.fxl').forEach(x=>x.dataset.k='');fxSync()};
+ h.addEventListener('dragstart',e=>{const r=e.target.closest('[data-fu]');if(!r)return;dragU=r.dataset.fu;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain','effect')}catch(x){}});
+ h.addEventListener('dragover',e=>{if(dragU==null)return;if(e.target.closest('[data-fu]'))e.preventDefault()});
+ h.addEventListener('drop',e=>{if(dragU==null)return;e.preventDefault();const r=e.target.closest('[data-fu]'),t=tg();const u=dragU;dragU=null;if(!r||!t)return;const L=t.fx||[],i=L.findIndex(z=>z.u==u),j=L.findIndex(z=>z.u==r.dataset.fu);if(i<0||j<0||i==j)return;const[m]=L.splice(i,1);L.splice(j,0,m);fxCh()});
+ h.addEventListener('dragend',()=>{dragU=null})});
 g.querySelector('.fxsx').onchange=()=>{const e=cur();if(e){e.x=g.querySelector('.fxsx').value;fxCh()}};
 g.querySelector('.fxsm').onchange=()=>{const e=cur();if(e){e.md=g.querySelector('.fxsm').value;fxCh()}};
 g.querySelector('.fxrr').onclick=()=>{const e=cur();if(e){e.sd=txRid();fxCh()}};

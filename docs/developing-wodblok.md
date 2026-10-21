@@ -403,6 +403,16 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 - No toasts, no `alert`, `confirm` or `prompt`.
 - The account chip ("Hi <first name>!", the one place an exclamation mark is allowed: the owner asked for it to match the website; `--fs-s`, `--mut`, a quiet button) sits at the right of the status line and exists only while signed in.
 
+#### 9.10 The element UI (2.3.0, Photoshop)
+
+- **Elements and Properties:** one docked column on the right. Elements (the list) on top; Properties under it holds the panel of the selected element's kind and shows one tab, "Properties". Selecting an element switches Properties to its kind. There is no tab per kind.
+- **Add bar** (the element bar over the stage): Select first, then Sheet, Paint, Shape, Image, Text, Stamp, Pattern. Every press makes an element at once, just above the selected one, and selects it (Image asks for the picture first). The pressed button is the armed tool; Select is pressed when nothing is armed. `--h-md` icon buttons in a `--r-l` floating strip.
+- **Options strip:** one line under the Add bar while a tool with settings is armed (Paint: Brush / Eraser and size). `--h-row`, `--panel`, `--line` edge, `--r-m`. It holds copies of the tool's own controls, nothing else.
+- **List rows** (Elements, effects, sources): `--h-row`, eye first, a 20px thumbnail or icon, the name (truncates), actions last (⋯). Selected row `--sel`. A row with effects shows an `fx` chip; its arrow unfolds one `--h-sm` sub-row per effect (eye, name), indented.
+- **Effects group:** the title carries a `+` (`--h-sm` icon button) that opens the menu of effects. Rows: eye, chevron, name, ⋯ (Duplicate, Move up, Move down, Delete); drag to reorder. Clicking a row opens its settings right under it and closes the one that was open.
+- **Pattern sources:** rows with a `--h-md` thumbnail, the name, the weight (only when the pattern picks by weight) and remove.
+- **Stamp editing bar:** while a stamp is being edited, a floating bar at the top of the stage reads "Editing Stamp N" with a primary Done. The Elements list shows the stamp's contents in place of the elements.
+
 ### 10. States
 
 | State | Rule |

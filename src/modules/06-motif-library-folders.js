@@ -29,7 +29,7 @@ const mkL=(name,st,lay,size)=>({u:luid(),name,vis:true,st,lay,size,ox:0,oy:0,rot
 function flatEls(layers){const ls=Array.isArray(layers)?layers:[];const out=[];
  ls.forEach(L=>{const pl=(L.pl||[]).filter(q=>q&&typeof q=='object');if(!pl.length)return;const op=L.op!=null?+L.op:100,bl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'',ink=L.ink||'';
   if(L.vis!==false&&op>=100&&!bl&&!ink){out.push(...pl);return}
-  const g={u:'g'+String(L.u||luid()),k:'group',n:String(L.name||'Group').slice(0,30),...(L.vis===false?{v:false}:{}),...(op<100?{op}:{}),...(bl?{bl}:{}),...(ink?{ink}:{})};out.push(g);pl.forEach(q=>out.push(q.g?q:{...q,g:g.u}))});
+  const g={u:'g'+String(L.u||luid()),k:'group',n:String(L.name||'Group').slice(0,30),...(L.vis===false?{v:false}:{}),...(op<100?{op}:{}),...(bl?{bl}:{}),...(ink?{ink}:{})};pl.forEach(q=>out.push(q.g?q:{...q,g:g.u}));out.push(g)});   // the group row sits just after (above) its members, as the list expects
  return out}
 const oneLayer=(els,st,u)=>{const n=mkL('Layer 1',st,'check',180);if(u)n.u=u;n.free=true;n.ak={};n.man=false;n.ov={};n.fit='';n.gap=0;n.pl=els;return n};
 let _stT=0;const store=()=>{clearTimeout(_stT);_stT=setTimeout(store0,400)};
