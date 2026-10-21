@@ -7,7 +7,7 @@ import {fpSz} from './25-art-layers.js';
 import {elSel} from './65-element-core.js';
 import {plDisarm} from './72-placing.js';
 
-// ===== The Add bar (2.3.0, Photoshop): the element bar makes things. Pattern, Text, Pen and Image make a new element at once, just above the selected one (at the top
+// ===== The Add bar (2.3.0, Photoshop): the element bar makes things. Pattern, Text and Image make a new element at once, just above the selected one (at the top
 // of the list when nothing is selected), selects it, and shows its panel in Properties. Shape, Stamp and Text
 // also arm (Paint is hidden since 2.3.1) their tool, so the next clicks on the canvas carry on; Select (first button, V) puts any tool away. Image asks for a picture first and makes a Shape filled with it
 // (2.3.1: there is no Image element and no Sheet; the Background is set in the Canvas tool). Owner, Oct 20 2026: "every click makes an element", "just above the selected one".
@@ -31,11 +31,10 @@ const AB={
   Promise.resolve(WBX.wbTbAdd()).then(()=>{const L2=fpL();if(!L2)return;const a=L2.pl||[],q=a.find(x=>!before.has(String(x.u)));if(!q)return;a.splice(a.indexOf(q),1);
    if(anchor&&a.includes(anchor)){if(anchor.g)q.g=anchor.g;a.splice(a.indexOf(anchor)+1,0,q)}else a.push(q);WBS.fpSel=q.u;abDone();setTimeout(()=>{ta.focus();ta.select()},0)})},
  shape(){abPick('shape')},
- pen(){if(WBX.wbPenStart)WBX.wbPenStart();abOpen('mlist')},
  motif(){abPick('motif')},
  image(){if(WBX.wbShapeImageNew)WBX.wbShapeImageNew()}};
 // which tool is armed, for the pressed look of the bar: '' is Select
-function abTool(){if(WBX.wbPenOn&&WBX.wbPenOn())return'pen';if(WBX.wbPaMode&&WBX.wbPaMode()!='off')return'paint';const k=WBX.plKind?WBX.plKind():'';return k||ABP}
+function abTool(){if(WBX.wbPenOn&&WBX.wbPenOn())return'shape'; /* the pen is part of Shape (Draw a path), not a button of its own */ if(WBX.wbPaMode&&WBX.wbPaMode()!='off')return'paint';const k=WBX.plKind?WBX.plKind():'';return k||ABP}
 function abSync(){const b=$('elb');if(!b)return;if(ABP&&elSel())ABP='';const t=abTool();b.querySelectorAll('.elbb').forEach(x=>{const on=x.dataset.k=='select'?!t:x.dataset.k==t;if(x.getAttribute('aria-pressed')!=String(on))x.setAttribute('aria-pressed',String(on))});abOpts(t)}
 // The options strip (Photoshop's options bar): one line under the bar while the brush is on, with Brush / Eraser and its size. It drives the Paint panel's own controls.
 function abOpts(t){const o=$('elopt');if(!o)return;const on=t=='paint';if(o.hidden===on)o.hidden=!on;if(!on)return;const m=WBX.wbPaMode?WBX.wbPaMode():'off';
@@ -44,9 +43,8 @@ function abOpts(t){const o=$('elopt');if(!o)return;const on=t=='paint';if(o.hidd
 function abSelect(){ABP='';plDisarm();if(WBX.wbPenStop)WBX.wbPenStop();if(WBX.wbPaArm)WBX.wbPaArm('off');abSync()}
 function init73(){const b=$('elb');if(!b)return;
  if(!b.querySelector('[data-k="select"]'))b.insertAdjacentHTML('afterbegin',`<button type="button" class="elbb" data-k="select" aria-label="Select" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${AB_SEL}</svg></button>`);
- if(!b.querySelector('[data-k="pen"]')){const sh=b.querySelector('[data-k="shape"]'),h='<button type="button" class="elbb" data-k="pen" aria-label="Pen" title="Pen" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l5 7-5 10-5-10z"/><path d="M12 13.5v-3"/><circle cx="12" cy="10.5" r="1"/></svg></button>';if(sh)sh.insertAdjacentHTML('afterend',h);else b.insertAdjacentHTML('beforeend',h)}
- if(!b.querySelector('[data-k="image"]')){const pn=b.querySelector('[data-k="pen"]'),h='<button type="button" class="elbb" data-k="image" aria-label="Image" title="Image" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5L15 10l-9 9"/></svg></button>';if(pn)pn.insertAdjacentHTML('afterend',h);else b.insertAdjacentHTML('beforeend',h)}
- b.onclick=e=>{const x=e.target.closest('.elbb');if(!x||x.disabled)return;const k=x.dataset.k;if(k=='select'){abSelect();return}if(k!='shape'&&k!='motif'&&k!='stamp')ABP='';if(k!='paint'&&WBX.wbPaArm)WBX.wbPaArm('off');if(k!='pen'&&WBX.wbPenStop)WBX.wbPenStop();const f=AB[k];if(f)f();abSync()};
+ if(!b.querySelector('[data-k="image"]')){const pn=b.querySelector('[data-k="shape"]'),h='<button type="button" class="elbb" data-k="image" aria-label="Image" title="Image" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5L15 10l-9 9"/></svg></button>';if(pn)pn.insertAdjacentHTML('afterend',h);else b.insertAdjacentHTML('beforeend',h)}
+ b.onclick=e=>{const x=e.target.closest('.elbb');if(!x||x.disabled)return;const k=x.dataset.k;if(k=='select'){abSelect();return}if(k!='shape'&&k!='motif'&&k!='stamp')ABP='';if(k!='paint'&&WBX.wbPaArm)WBX.wbPaArm('off');if(WBX.wbPenStop)WBX.wbPenStop();const f=AB[k];if(f)f();abSync()};
  document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.matches&&t.matches('input,select,textarea,[contenteditable]'))return;if(e.ctrlKey||e.metaKey||e.altKey||e.shiftKey)return;if(e.key=='v'||e.key=='V'){abSelect()}else if(e.key=='Escape'&&WBX.wbPaMode&&WBX.wbPaMode()!='off'){abSelect()}});
  const stg=document.querySelector('.stage');if(stg&&!$('elopt')){stg.insertAdjacentHTML('beforeend','<div class="elopt" id="elopt" hidden><div class="seg"><button type="button" data-m="brush">Brush</button><button type="button" data-m="erase">Eraser</button></div><label>Size</label><input type="range" min="1" max="200" value="14" aria-label="Brush size"></div>');
   const o=$('elopt');o.onclick=e=>{const x=e.target.closest('[data-m]');if(x&&WBX.wbPaArm)WBX.wbPaArm(x.dataset.m)};o.querySelector('input').addEventListener('input',e=>{const s=$('pasz');if(s){s.value=e.target.value;s.dispatchEvent(new Event('input',{bubbles:true}))}})}

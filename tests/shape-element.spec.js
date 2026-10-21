@@ -48,8 +48,9 @@ test('a Shape has the transform controls: size, turn, flip', async ({ page }) =>
 test('the Pen: click corner points, drag for a curve, Enter finishes an open path; clicking the first point closes one', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  await page.click('#elb [data-k="pen"]'); await settle(page);
-  await expect(page.locator('#elb [data-k="pen"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#elb [data-k="pen"]')).toHaveCount(0);   // the pen is not a button of the bar: Draw a path is in the Shape properties
+  await page.click('#elb [data-k="shape"]'); await page.click('#shp_pen'); await settle(page);
+  await expect(page.locator('#elb [data-k="shape"]')).toHaveAttribute('aria-pressed', 'true');
   const a = await canvasAt(page, 0.3, 0.6), b = await canvasAt(page, 0.5, 0.3), c = await canvasAt(page, 0.7, 0.6);
   await page.mouse.click(a.x, a.y);
   await page.mouse.move(b.x, b.y); await page.mouse.down(); await page.mouse.move(b.x + 40, b.y, { steps: 4 }); await page.mouse.up();
@@ -64,14 +65,14 @@ test('the Pen: click corner points, drag for a curve, Enter finishes an open pat
   expect(s[0].sw).toBeGreaterThan(0);
   expect(s[0].pts.some(q => q[4] || q[5])).toBe(true);   // the dragged point has curve handles
   // a closed one
-  await page.click('#elb [data-k="pen"]'); await settle(page);
+  await page.click('#shp_pen'); await settle(page);
   const p = [await canvasAt(page, 0.2, 0.2), await canvasAt(page, 0.4, 0.2), await canvasAt(page, 0.3, 0.4)];
   for (const q of p) await page.mouse.click(q.x, q.y);
   await page.mouse.click(p[0].x, p[0].y); await settle(page);
   s = await shapes(page);
   expect(s).toHaveLength(2);
   expect(s[1]).toMatchObject({ sh: 'path', cl: 1 });
-  await expect(page.locator('#elb [data-k="pen"]')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('#elb [data-k="shape"]')).toHaveAttribute('aria-pressed', 'false');
   expect(errors).toEqual([]);
 });
 
