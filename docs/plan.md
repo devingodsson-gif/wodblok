@@ -450,3 +450,8 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - **One rule.** Every bar button only opens its panel; every panel starts with its element list and an Add button: Add text, Add shape, Add pattern, and now Add motif (the last motif used, else the first of the library, in the middle of the canvas) and Add stamp (the current stamp, in the middle). Picking from the Motif or Stamp library and clicking the canvas still places copies, and picking a library motif with a Motif selected still changes it.
 - Tests: element-panels (Add on all five kinds), element-bar (six buttons), motif-place and placing use V instead of the Select button.
 - Not run: CI, the full suite and `npm run perf`.
+
+### 2.8.0 (Oct 21 2026): Oak is the default accent, Steel is removed (owner: "Remove steel and make oak the default"). Format 25 unchanged
+- The stylesheet's own accent tokens are Oak's (light `#b8914f`, ink `#836635`; dark `#c4a46e`; text on the accent fill `#1b1a18`, as the settings code derives it), so a fresh install, the loading screen and a cleared accent are Oak with no override written. Settings > General lists Oak first, then the woods in hue order; the Steel swatch is gone (8 presets and Custom). A saved explicit `#b8914f` shows as Oak. The selected-row blue (`--sel`) is a separate token and is unchanged.
+- Tests: settings-menu and account specs now use Oak as the built-in. Pixel goldens that show the accent colour will differ (not run; to be regenerated after a suite run, on the owner's word).
+- Not run: CI, the full suite and `npm run perf`.
