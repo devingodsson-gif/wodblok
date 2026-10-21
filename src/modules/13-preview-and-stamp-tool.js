@@ -14,7 +14,7 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {libPick} from './21-motif-library-ui.js';
 import {fpL} from './24-free-place-layers.js';
 import {stUnlocked} from './63-stamp-tool.js';
-const mName=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
+const mName=k=>k[0]=='b'?N[+k.slice(1)]||'Motif':cust[k]?cust[k].n:'Motif';
 let mlFold;
 const CHEV='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3l3 3-3 3"/></svg>';
 let _mlK='';function renderML(){const el=$('mlist'),eg=$('elstg');if(eg)eg.hidden=stUnlocked()==null;if(stUnlocked()==null){if(_mlK){el.innerHTML='';_mlK=''}return}   // a locked stamp does not change, so its shapes are not listed
@@ -29,7 +29,7 @@ for(let i=t.items.length-1;i>=0;i--){const nm=gk(t.items[i]);if(done[nm])continu
 if(g.length==1&&!isT){h+=row(i);continue}
 const fr=isT?[...g]:[...g].reverse(),ns=g.filter(j=>WBS.msel.has(j)).length,open=!mlFold.has(nm),e=hx(nm),lb=hx(gnm(nm));
 h+=`<div class="mg${open?' open':''}"><div class="mr mh${ns==g.length?' on':ns?' part':''}" data-g="${e}" title="Click to select all ${g.length}. Shift+click to add them."><span class="car" data-f="${e}" role="button" aria-label="${open?'Fold':'Unfold'} ${e}" aria-expanded="${open}">${CHEV}</span>${thumb(t.items[fr[0]])}<b>${lb}<i class="cnt">${ns&&ns<g.length?ns+'/':''}${g.length}</i></b><button type="button" data-gx="${e}" title="Delete all ${g.length}" aria-label="Delete all ${lb}">&#215;</button></div>${open?`<div class="mk">${fr.map(j=>row(j,isT?0:g.indexOf(j)+1,1)).join('')}</div>`:''}</div>`}
-el.innerHTML=`<h3>Shapes on stamp ${WBS.cur+1}<span>${WBS.msel.size>1?WBS.msel.size+' of ':''}${t.items.length}</span></h3><div class="ml">`+(h||`<div class="em">No shapes yet</div>`)+`</div>`;
+el.innerHTML=`<h3>Motifs on stamp ${WBS.cur+1}<span>${WBS.msel.size>1?WBS.msel.size+' of ':''}${t.items.length}</span></h3><div class="ml">`+(h||`<div class="em">No shapes yet</div>`)+`</div>`;
 if(sc)el.querySelector('.ml').scrollTop=sc;if(WBX.wbTxSync)WBX.wbTxSync()}
 const txC=()=>{const qs=QS();let x=0,y=0;qs.forEach(o=>{x+=o.x;y+=o.y});return[x/qs.length,y/qs.length]};
 const txAbs=(g,c)=>WBX.wbTxXf(g,M=>{M.ax+=c[0]-M.mx;M.ay+=c[1]-M.my;M.mx=c[0];M.my=c[1]});
@@ -88,6 +88,6 @@ if(ld.g){ld.g.style.left=e.clientX+'px';ld.g.style.top=e.clientY+'px';if(WBX.wbL
 const lend=e=>{if(!ld)return;const x=ld;ld=null;if(x.g)x.g.remove();if(!x.on)return;lsw=true;setTimeout(()=>{lsw=false},0);if(WBX.wbLibOver)WBX.wbLibOver(null);if(e.type!='pointerup')return;if(WBX.wbLibDrop&&WBX.wbLibDrop(x.k,document.elementFromPoint(e.clientX,e.clientY)))return;sceDropShape(x.k,e)};
 document.addEventListener('pointerup',lend);document.addEventListener('pointercancel',lend);
 L.addEventListener('click',e=>{if(lsw){e.stopImmediatePropagation();e.preventDefault()}},true)}
-$('lib').onclick=e=>{const x=e.target.closest('[data-x]');if(x){const k=x.dataset.x;if(WBS.tiles.some(t=>t.items.some(q=>q.m==k))){$('pmsg').textContent='That shape is used on a stamp. Remove it from your stamps first.';return}if(!x.dataset.sure){x.dataset.sure=1;x.textContent='?';setTimeout(()=>{if(x.isConnected){delete x.dataset.sure;x.innerHTML='&#215;'}},2500);return}delete cust[k];store();build();$('pmsg').textContent='Removed from the library.';return}const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;if(WBS.lsm||e.ctrlKey||e.metaKey||e.shiftKey){libPick(k,e);return}if(WBX.wbShapeSwap&&WBX.wbShapeSwap(k)){WBS.brush={m:k,s:1,r:0};upd();return}WBS.brush=WBS.brush&&WBS.brush.m==k?null:{m:k,s:DOTK.has(k)?.22:.8,r:0};selOne(-1);upd()};
+$('lib').onclick=e=>{const x=e.target.closest('[data-x]');if(x){const k=x.dataset.x;if(WBS.tiles.some(t=>t.items.some(q=>q.m==k))){$('pmsg').textContent='That shape is used on a stamp. Remove it from your stamps first.';return}if(!x.dataset.sure){x.dataset.sure=1;x.textContent='?';setTimeout(()=>{if(x.isConnected){delete x.dataset.sure;x.innerHTML='&#215;'}},2500);return}delete cust[k];store();build();$('pmsg').textContent='Removed from the library.';return}const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;if(WBS.lsm||e.ctrlKey||e.metaKey||e.shiftKey){libPick(k,e);return}if(WBX.wbMotifSwap&&WBX.wbMotifSwap(k)){WBS.brush={m:k,s:1,r:0};upd();return}WBS.brush=WBS.brush&&WBS.brush.m==k?null:{m:k,s:DOTK.has(k)?.22:.8,r:0};selOne(-1);upd()};
 }
 export {renderML,sync,init13};

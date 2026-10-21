@@ -7,7 +7,7 @@ import {$} from './01-launch-and-version.js';
 const el = id => () => $(id);
 const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled; };
 // the element panels have no rail button on screen (the element bar opens them), but their commands still click it
-const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-elimg', 'rail-elsheet', 'rail-elpaint']);
+const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-elimg', 'rail-elpaint']);
 const exists = id => () => { const b = $(id); return !!b && !b.disabled; };
 const click = id => () => $(id).click();
 const COMMANDS = [
@@ -66,7 +66,6 @@ const COMMANDS = [
   ['panel.text', 'Open Text', 'rail-text'],
   ['panel.mlist', 'Open Element', 'rail-mlist'],
   ['panel.elimg', 'Open Image', 'rail-elimg'],
-  ['panel.elsheet', 'Open Sheet', 'rail-elsheet'],
   ['panel.elpaint', 'Open Paint', 'rail-elpaint'],
   ['panel.lyrs', 'Open Elements', 'rail-lyrs'],
   ['panel.layers', 'Open Pattern', 'rail-layers'],
@@ -81,11 +80,11 @@ const COMMANDS = [
   ['panel.tex', 'Open Textures', 'rail-tex'],
   ['panel.rand', 'Open Randomize', 'rail-rand'],
   ['panel.hist', 'Open History', 'rail-hist'],
-  ['library.exportShapes', 'Export shapes (SVG zip)', 'fexp'],
+  ['library.exportShapes', 'Export motifs (SVG zip)', 'fexp'],
   ['library.toggleFolders', 'Expand or collapse all shape folders', 'ltog'],
   ['library.newFolder', 'New shape folder', 'fnew'],
   ['library.importImage', 'Import a shape from an image', 'ifile', null, 'input'],
-  ['library.importSheet', 'Import a sheet of shapes', 'sfile', null, 'input'],
+  ['library.importSheet', 'Import a sheet of motifs', 'sfile', null, 'input'],
   ['randomize.roll', 'Randomize now', 'rzdo'],
   ['app.commandSearch', 'Search commands', 'cmdkb', 'Mod+K'],
 ];

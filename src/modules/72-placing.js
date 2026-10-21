@@ -5,8 +5,8 @@ import {tbArm} from './26-text-boxes.js';
 // One rule for all four: using anything in the interface (a button, a slider, a window) puts the armed item away, so a click on the canvas afterwards cannot place
 // it by accident; a button that arms something (a shape, a stamp, a picture, Place text) arms it again and the ghost is back on the pointer; a right click puts it away.
 // Paint (2.3.0) follows the same rule: the brush is 'paint' while it is on.
-// What is armed: 'shape' (WBS.brush), 'text' (WBS.txArm or a text brush), 'stamp' or 'picture' (WBS.fpB: a stamp id or a picture id).
-function plKind(){if(WBX.wbPaMode&&WBX.wbPaMode()!='off')return'paint';if(WBS.txArm||(WBS.brush&&WBS.brush.txt))return'text';if(WBS.brush)return'shape';if(WBS.fpB!=null&&WBS.fpB!==false&&WBS.fpB!=='')return typeof WBS.fpB=='string'?'picture':'stamp';return''}
+// What is armed: 'motif' (WBS.brush), 'text' (WBS.txArm or a text brush), 'stamp' or 'picture' (WBS.fpB: a stamp id or a picture id).
+function plKind(){if(WBX.wbPaMode&&WBX.wbPaMode()!='off')return'paint';if(WBS.txArm||(WBS.brush&&WBS.brush.txt))return'text';if(WBS.brush)return'motif';if(WBS.fpB!=null&&WBS.fpB!==false&&WBS.fpB!=='')return typeof WBS.fpB=='string'?'picture':'stamp';return''}
 // the control that arms each kind: pressing it while another kind is armed puts that one away first; pressing it while its own kind is armed is left to the control (it switches or toggles)
 const PL_ARM={shape:'#lib [data-m]',stamp:'#lfpst [data-t]',picture:'#lfars [data-a]',text:'#tx_go',paint:'section.pn[data-p="elpaint"],#elopt'};   // Paint (2.3.0): its own panel (size, colour, tip, eraser) does not put the brush away
 function plDisarm(){const k=plKind();if(!k)return false;

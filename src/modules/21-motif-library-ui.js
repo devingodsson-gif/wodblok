@@ -25,7 +25,7 @@ const lbName=v=>fClean(v).replace(/\//g,'').replace(/^b:/i,'').trim();
 const lbSort=(a,b)=>a.n.localeCompare(b.n,undefined,{numeric:true,sensitivity:'base'});
 const fOf=k=>k[0]=='b'?BF[k]:(cust[k]||{}).g;
 const fSet=(k,g)=>{if(k[0]=='b'){if(g)BF[k]=g;else delete BF[k]}else if(cust[k]){if(g)cust[k].g=g;else delete cust[k].g}};
-const mNm=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
+const mNm=k=>k[0]=='b'?N[+k.slice(1)]||'Motif':cust[k]?cust[k].n:'Motif';
 // The library is one tree: click a folder to open it in place (its folders, then its shapes, under it) and as many folders as you
 // like can be open at once. lbOpen: the open folders (kept between sessions). WBS.mcat is the active folder (the last one opened,
 // or the one whose menu was used): new folders, imports and the folder form go there; "/" when none is.

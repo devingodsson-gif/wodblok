@@ -20,14 +20,13 @@ const abDone=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 const abOpen=pn=>{if(WBX.wbOpenPanel)WBX.wbOpenPanel(pn)};
 const abCount=k=>{const L=fpL();return L?(L.pl||[]).filter(q=>q.k==k).length:0};
 const AB={
- sheet(){const q=abInsert({u:fpU(),k:'sheet',n:'Sheet'},true);if(!q)return;abDone();abOpen('elsheet')},
  pattern(){const t=WBS.tiles[WBS.cur],q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),lay:'grid',cn:4,rn:4,sz:80,rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:t?[{k:'stamp',t:t.id,w:1}]:[],x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone();abOpen('layers')},
  paint(){const q=abInsert({u:fpU(),k:'paint',n:'Paint '+(abCount('paint')+1),x:0,y:0,st:[]});if(!q)return;WBS.paSel=q.u;if(WBX.wbPaArm)WBX.wbPaArm('brush');abDone();abOpen('elpaint')},
  stamp(){const t=WBS.tiles[WBS.cur];if(!t){abOpen('stmp');return}const q=abInsert({u:fpU(),k:'stamp',t:t.id,x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:+fpSz().toFixed(2),r:0,f:1});if(!q)return;abDone();abOpen('stmp');WBS.fpB=t.id;WBS.fpGhost=null;upd()},
  text(){const L=fpL(),before=new Set(L?(L.pl||[]).map(q=>String(q.u)):[]),anchor=elSel();abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTbAdd)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}
   Promise.resolve(WBX.wbTbAdd()).then(()=>{const L2=fpL();if(!L2)return;const a=L2.pl||[],q=a.find(x=>!before.has(String(x.u)));if(!q)return;a.splice(a.indexOf(q),1);
    if(anchor&&a.includes(anchor)){if(anchor.g)q.g=anchor.g;a.splice(a.indexOf(anchor)+1,0,q)}else a.push(q);WBS.fpSel=q.u;abDone();setTimeout(()=>{ta.focus();ta.select()},0)})},
- shape(){if(WBX.wbShapeNew)WBX.wbShapeNew(CW,CH);abOpen('motifs')},
+ motif(){if(WBX.wbMotifNew)WBX.wbMotifNew(CW,CH);abOpen('motifs')},
  image(){abOpen('elimg')}};
 // which tool is armed, for the pressed look of the bar: '' is Select
 function abTool(){if(WBX.wbPaMode&&WBX.wbPaMode()!='off')return'paint';const k=WBX.plKind?WBX.plKind():'';return k=='picture'?'image':k}

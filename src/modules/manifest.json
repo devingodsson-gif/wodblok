@@ -62,7 +62,7 @@
  "63-stamp-tool.js",
  "64-stamp-canvas-edit.js",
  "65-element-core.js",
- "66-sheet-element.js",
+ "66-background.js",
  "67-pattern-element.js",
  "68-stamp-contents.js",
  "69-effect-stack.js",
@@ -70,6 +70,6 @@
  "71-randomize-elements.js",
  "72-placing.js",
  "73-add-bar.js",
- "74-shape-element.js",
+ "74-motif-element.js",
  "75-stamp-edit-mode.js"
 ]
