@@ -110,24 +110,3 @@ test('Split shape: a line over the selected shape on the canvas is moved and tur
   await expect(page.locator('#spbar')).toBeHidden();
   expect(errors).toEqual([]);
 });
-
-test('Grade masks belong to the unlocked stamp: added while it is unlocked, listed only then', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await unlock(page);
-  await openPanel(page, 'grade');
-  await expect(page.locator('#gm_list .lyn').first()).toContainText('Stamp 1');
-  await page.click('#gm_add');
-  await page.locator('#gm_menu [data-gt="col"]').click();
-  await settle(page);
-  const sc = async () => (JSON.parse(await getState(page)).grade?.masks || []).map(m => m.sc);
-  const id = await page.evaluate(() => String(__wbTest.unlockedStamp()));
-  expect(await sc()).toContain(id);
-  await expect(page.locator('#gm_list .lyr')).toHaveCount(2);
-  await page.evaluate(() => __wbTest.commands.run('stamp.unlock'));
-  await openPanel(page, 'stmp');
-  await page.locator('#stmpl .smklk').first().click();
-  await settle(page);
-  await openPanel(page, 'grade');
-  await expect(page.locator('#gm_list .lyr')).toHaveCount(1);
-  expect(errors).toEqual([]);
-});

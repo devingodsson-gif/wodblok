@@ -78,7 +78,7 @@ test('light theme', async ({ page }, testInfo) => {
 });
 
 // The tool windows with a real project open: the whole window is compared, so chrome changes show up too.
-for (const [panel, label] of [['canvas', 'canvas'], ['colors', 'colors'], ['lyrs', 'layers'], ['layers', 'arrangement'], ['grade', 'grade'], ['tex', 'textures'], ['hist', 'history'], ['rand', 'randomize'], ['pgrid', 'pattern-grid']]) {
+for (const [panel, label] of [['canvas', 'canvas'], ['colors', 'colors'], ['lyrs', 'layers'], ['layers', 'arrangement'], ['hist', 'history'], ['rand', 'randomize'], ['pgrid', 'pattern-grid']]) {
   test(`panel: ${label}`, async ({ page }, testInfo) => {
     const { errors } = await openApp(page);
     await openProjectFile(page, FIX(PANEL_FIXTURE));

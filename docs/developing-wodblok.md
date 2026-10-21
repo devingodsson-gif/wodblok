@@ -33,7 +33,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 
 **What the app must always be**
 - **No explanatory text, helper paragraphs or tooltips in panels.** Short labels and clear grouping only. (The owner asked for these to be removed everywhere; do not bring them back.)
-- At launch the Default workspace opens its tool windows (the first workspace if none is called Default; none if there are no workspaces). The template picker (New from template) also opens at launch unless Settings > General > Templates at launch is off. The app launches in **Pattern mode, fully cleared** (no work from the last session loads). Tests start with no workspaces saved and the picker off (`tests/helpers/harness.js`), so they see an empty launch unless a test asks (`workspaces: true`, `templates: true`).
+- At launch one built-in layout opens its tool windows (saved workspaces were removed in 2.9.0). The template picker (New from template) also opens at launch unless Settings > General > Templates at launch is off. The app launches in **Pattern mode, fully cleared** (no work from the last session loads). Tests start with the launch layout off (`wb96_launch='none'`) and the picker off (`tests/helpers/harness.js`), so they see an empty launch unless a test asks (`workspaces: true`, `templates: true`).
 - **UI follows the standard in Part 9**: tokens and scales, one component per role, one folder tree for every library. Do not invent a size, radius, colour, duration or list design. If the scale lacks something, ask, and change the guide first.
 - **Speed first.** Run `npm run perf` before committing anything that touches drawing, dragging or sliders. No perf regression over 10%.
 - **No backwards compatibility** (owner, Oct 18 and 19 2026): a project file or template made by an older WODBLOK is refused with a message and never converted; the 18 to 21 migration and the v18 fixtures are gone (2.0.2). A file from a newer app still opens read-only and is never rewritten.
@@ -389,7 +389,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 - Rail buttons: `--h-touch`, icon only, in a 36px strip; `--r-m` selected highlight with `--acc-soft`.
 - Panel tabs (`.wtab`), Photoshop style: the tab strip is `--stage`; tabs `--fs-s`, 500, `--mut`, 10px side padding, square; the active tab takes the `--panel` colour and `--fg` text, so it joins the panel below. No accent bar.
 - Stamp tabs (2.5.0): the strip over the stage reuses `.wtab` (the Canvas first, then one per open stamp with a close `.ib` of `--h-xs`); it is `--stage` with a `--line` bottom edge, `--h-md` high, and is not on screen while no stamp is open.
-- A tool opens a panel; a panel never opens by itself at launch, except through the launch workspace (the one called Default, else the first workspace).
+- A tool opens a panel; a panel never opens by itself at launch, except through the built-in launch layout.
 
 #### 9.8 Swatches, thumbnails and cards
 
@@ -456,7 +456,7 @@ There is no fourth heading. `h1`–`h6` tags are used for structure, then styled
 
 - Launch: Pattern mode, fully cleared, no tool window open.
 - There is one list of panels for the whole app (the Stamp editor is gone in 2.0.0); a stamp is edited on the canvas by unlocking it in the Stamps panel.
-- Workspaces save the layout. They are applied on demand, and the launch workspace (the one called Default, else the first) is applied once at launch. Every workspace, including the starting ones, can be changed, replaced or deleted.
+- Workspaces (saved layouts) were removed in 2.9.0; the one built-in launch layout is applied once at launch. Variations, Presets, Navigator and the Textures and Grade tools were removed too.
 
 ### 12. Libraries and the folder system
 

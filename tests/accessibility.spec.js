@@ -17,15 +17,16 @@ for (const theme of ['dark', 'light']) {
 
 test('a slider thumb and a number field show a clear focus ring from the keyboard', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 1 });
-  await openPanel(page, 'grade');
+  await openPanel(page, 'canvas');
+  await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="canvas"] input[type=range]')].find(i => i.getBoundingClientRect().height > 0); e.setAttribute('data-a11y', '1'); });
   const thumb = async () => {
-    const bb = await page.locator('#gd_ex').boundingBox();
+    const bb = await page.locator('[data-a11y]').boundingBox();
     return page.screenshot({ clip: { x: bb.x + bb.width / 2 - 24, y: bb.y - 8, width: 48, height: bb.height + 16 } });
   };
   await page.mouse.move(700, 500);
   const off = await thumb();
   await page.keyboard.press('Tab');
-  await page.focus('#gd_ex');
+  await page.focus('[data-a11y]');
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('ArrowLeft');
   await page.waitForTimeout(300);
@@ -35,19 +36,20 @@ test('a slider thumb and a number field show a clear focus ring from the keyboar
     const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
     const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
     const d = x.getImageData(0, 0, c.width, c.height).data; let n = 0;
-    for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - 74) < 14 && Math.abs(d[i + 1] - 143) < 14 && Math.abs(d[i + 2] - 224) < 14) n++;
+    for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - 196) < 14 && Math.abs(d[i + 1] - 164) < 14 && Math.abs(d[i + 2] - 110) < 14) n++;
     return n;
   }, buf.toString('base64'));
   expect(await accentPixels(on)).toBeGreaterThan((await accentPixels(off)) + 40);
-  const num = await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="grade"] input[type=number]')].find(i => i.getBoundingClientRect().width > 0); e.focus(); return getComputedStyle(e).boxShadow; });
+  const num = await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="canvas"] input[type=number]')].find(i => i.getBoundingClientRect().width > 0); e.focus(); return getComputedStyle(e).boxShadow; });
   expect(num).not.toBe('none');
   expect(errors).toEqual([]);
 });
 
 test('slider rows are at least 24 px tall', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 1 });
-  await openPanel(page, 'grade');
-  const h = await page.evaluate(() => document.getElementById('gd_ex').getBoundingClientRect().height);
+  await openPanel(page, 'canvas');
+  await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="canvas"] input[type=range]')].find(i => i.getBoundingClientRect().height > 0); e.setAttribute('data-a11y', '1'); });
+  const h = await page.evaluate(() => document.querySelector('[data-a11y]').getBoundingClientRect().height);
   expect(h).toBeGreaterThanOrEqual(24);
   expect(errors).toEqual([]);
 });

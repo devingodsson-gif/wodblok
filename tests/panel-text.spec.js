@@ -31,7 +31,7 @@ test('no tool panel opens with an explanatory sentence', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('nor do the layout modes, a grade mask, the repeat tile or the book cover', async ({ page }) => {
+test('nor do the layout modes, the repeat tile or the book cover', async ({ page }) => {
   const { errors } = await openApp(page);
   const found = [];
   const scan = async (pn, tag) => {
@@ -50,9 +50,6 @@ test('nor do the layout modes, a grade mask, the repeat tile or the book cover',
   };
   await openPanel(page, 'layers');
   await scan('layers', 'layout');
-  await page.click('#rcls');
-  await page.click('.rail [data-pn="grade"]');
-  for (const t of ['rad', 'lin', 'lay', 'col', 'lum']) { await page.click('#gm_add'); await page.click(`#gm_menu [data-gt="${t}"]`); await scan('grade', 'mask ' + t); }
   await page.click('#rcls');
   await page.click('.rail [data-pn="canvas"]');
   for (const f of ['Repeat tile', 'Book cover']) { await page.locator('section.pn[data-p="canvas"] button', { hasText: f }).first().click(); await scan('canvas', f); }

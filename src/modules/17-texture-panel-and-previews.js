@@ -40,60 +40,6 @@ function txPack(t){return(Array.isArray(t.tu)?t.tu:[]).map(u=>txLib(u&&u.x)).fil
 function txMerge(t){const pk=txClean(t.txl);delete t.txl;if(!pk.length||!Array.isArray(t.tu))return;const map={};
 pk.forEach(p=>{const same=txLib(p.id);if(same&&txSame(same,p)){map[p.id]=p.id;return}const eq=WBS.texLib.find(x=>txSame(x,p));if(eq){map[p.id]=eq.id;return}const n={...p,id:same?txUid():p.id,name:txUniq(p.name),auto:false};WBS.texLib.push(n);map[p.id]=n.id});
 t.tu=t.tu.map(u=>({...u,x:map[u.x]||u.x}))}
-// ---- previews ----
-const TXIC={dice:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>',edit:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5l.9-3.9L16 5a2.1 2.1 0 013 3L8.4 18.6z"/><path d="M14.4 6.6l3 3"/></svg>',x:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
-let txTc;
-// a small swatch of one texture in one mode, on the project's paper and ink: returns an image address
-function txSwatch(L,md,w,h,sd){const bg=col(WBS.proj.bg),ink=col(WBS.proj.ink),key=[L.id,L.t,L.a,L.sc,L.az,sd||L.sd,md,w,h,bg,ink].join('|');let s=txTc.get(key);
-if(!s){const S={t:L.t,a:Math.max(+L.a,md=='wear'?55:0),sc:+L.sc||100,az:+L.az,sd:sd||+L.sd||1,md},cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');
-try{const pw=w,ph=h,px=txPix(S,pw,ph),t=document.createElement('canvas');t.width=pw;t.height=ph;t.getContext('2d').putImageData(new ImageData(px,pw,ph),0,0);
-if(md=='wear'){x.fillStyle=bg;x.fillRect(0,0,w,h);const k=document.createElement('canvas');k.width=w;k.height=h;const y=k.getContext('2d');y.fillStyle=ink;y.fillRect(0,0,w,h);y.globalCompositeOperation='destination-out';y.drawImage(t,0,0);x.drawImage(k,0,0)}
-else{x.fillStyle=bg;x.fillRect(0,0,w,h);x.drawImage(t,0,0)}}catch(e){x.fillStyle=bg;x.fillRect(0,0,w,h)}
-s=cv.toDataURL('image/png');if(txTc.size>160)txTc.delete(txTc.keys().next().value);txTc.set(key,s)}
-return s}
-const txThumb=(L,u,md)=>`<img class="txt" alt="" src="${txSwatch(L,md||(u&&u.md)||'wear',60,60,u&&u.sd)}">`;
-// ---- the stack of textures shown in the Stamp, Layers, Canvas and Text panels ----
-const TXH=[],txCap=()=>{if(WBX.wbCap)WBX.wbCap()};
-function txReg(id,cfg){const H={id,cfg,sig:''},el=$(id);TXH.push(H);if(!el)return;
-el.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,row=b.closest('.txr'),i=row?+row.dataset.i:-1,uses=(cfg.get()||[]).map(u=>({...u}));
-if(a=='add'){let L=WBS.texLib.find(x=>!uses.some(u=>u.x===x.id))||WBS.texLib[0];if(!L){L=txMake(cfg.def||'pinholes');WBS.texLib.push(L)}uses.push({x:L.id,sd:txRid(),md:cfg.md});cfg.set(uses)}
-else if(a=='x'){uses.splice(i,1);cfg.set(uses)}
-else if(a=='v'){if(cfg.vary)cfg.vary(i);else if(uses[i]){uses[i].sd=txRid();cfg.set(uses)}}
-else if(a=='m'){if(uses[i]&&TXMD.includes(b.dataset.m)){uses[i].md=b.dataset.m;cfg.set(uses)}}
-else if(a=='e'&&uses[i])txOpenLib(uses[i].x)});
-el.addEventListener('change',e=>{const s=e.target.closest('select');if(!s)return;const row=s.closest('.txr');if(!row)return;const uses=(cfg.get()||[]).map(u=>({...u})),i=+row.dataset.i;if(!uses[i])return;uses[i].x=s.value;cfg.set(uses)});
-txRender(H,true)}
-function txRender(H,force){const el=$(H.id);if(!el)return;const c=H.cfg,uses=c.get()||[],o=WBS.texLib;
-const sig=JSON.stringify([uses,c.md,o.map(x=>[x.id,x.name,x.t,x.a,x.sc,x.az,x.sd]),col(WBS.proj.bg),col(WBS.proj.ink)]);if(!force&&sig===H.sig)return;H.sig=sig;
-let h='';uses.forEach((u,i)=>{const L=txLib(u.x),md=TXMD.includes(u.md)?u.md:c.md;h+=`<div class="txr" data-i="${i}">${L?txThumb(L,u,md):'<span class="txt"></span>'}<select aria-label="Texture">${o.map(x=>`<option value="${hx(x.id)}"${x.id===u.x?' selected':''}>${hx(x.name)}</option>`).join('')}${o.some(x=>x.id===u.x)?'':`<option value="${hx(u.x)}" selected>Missing texture</option>`}</select><div class="txa"><button type="button" class="txb" data-a="v" aria-label="New variation" title="New variation">${TXIC.dice}</button><button type="button" class="txb" data-a="e" aria-label="Edit texture" title="Edit texture">${TXIC.edit}</button><button type="button" class="txb" data-a="x" aria-label="Remove texture" title="Remove">${TXIC.x}</button></div><div class="txm" role="group" aria-label="Mode">${TXMD.map(m=>`<button type="button" data-a="m" data-m="${m}" class="${m===md?'on':''}" aria-pressed="${m===md}">${TXMN[m]}</button>`).join('')}</div></div>`});
-if(uses.length<(c.max||6))h+=`<div class="row tight"><button type="button" class="alt" data-a="add">Add texture</button></div>`;
-const fi=document.activeElement&&document.activeElement.tagName=='SELECT'&&el.contains(document.activeElement)?[...el.querySelectorAll('select')].indexOf(document.activeElement):-1;el.innerHTML=h;if(fi>=0){const s=el.querySelectorAll('select')[fi];if(s)s.focus()}}
-function txRefresh(force){TXH.forEach(H=>txRender(H,force));txPaintLib(force);if(WBX.wbTxApplySync)WBX.wbTxApplySync()}
-// ---- the Textures panel ----
-let txLd=false,txSig='';const txCur=()=>txLib(WBS.txSel);
-const txSetR=(id,v)=>{const el=$(id);if(el&&+el.value!=+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};
-function txOpenLib(id){WBS.txSel=id;txRefresh(true);if(WBX.wbOpenPanel)WBX.wbOpenPanel('tex')}
-// a relief or stain texture that only the canvas picture uses: changing it redraws that picture and nothing else (the pattern does not depend on it;
-// only a wear texture decides where ink catches, so wear, stamps and layers still rebuild the pattern)
-function txOnlyCanvas(id){const u=WBS.tex&&Array.isArray(WBS.tex.u)?WBS.tex.u:[],n=u.filter(z=>z&&z.x===id).length;if(!n||u.some(z=>z&&z.x===id&&z.md==='wear'))return false;return(txRefs().get(id)||0)===n}
-function txAfter(id){store();if(WBS.tex&&Array.isArray(WBS.tex.u)&&WBS.tex.u.some(u=>u.x===id)){saveTex();buildTex(txOnlyCanvas(id))}else upd()}
-// while the Amount slider moves: the picture is made once at full strength and Amount is its opacity (the exact picture is drawn when the slider is let go)
-function txPreviewA(L,p){if(Object.keys(p).join()!=='a'||tileOn()||!txOnlyCanvas(L.id)||!(+L.a>0))return false;
- const g=$('texg');if(g.dataset.pv!==L.id||!g.querySelector('image[data-x="'+L.id+'"]')){saveTex();buildTex(true,L.id)}
- g.querySelectorAll('image[data-x="'+L.id+'"]').forEach(i=>i.setAttribute('opacity',(+L.a/100).toFixed(3)));TEXK=txCvKey();txRefresh();return true}   // TEXK: so the history capture does not redraw the exact picture mid-drag
-function txEdit(p,pv){const L=txCur();if(!L||txLd)return;Object.assign(L,p);L.auto=false;if(pv&&txPreviewA(L,p))return;txAfter(L.id)}
-let txThr;
-function txPaintLib(force){if(!$('tx_list'))return;const refs=txRefs();if(!txLib(WBS.txSel))WBS.txSel=(WBS.texLib[0]||{}).id||'';
-const sig=JSON.stringify([WBS.texLib,WBS.txSel,[...refs],col(WBS.proj.bg),col(WBS.proj.ink)]);if(!force&&sig===txSig)return;txSig=sig;
-$('tx_cnt').textContent=WBS.texLib.length?String(WBS.texLib.length):'';
-$('tx_list').innerHTML=!WBS.texLib.length?'<button type="button" class="alt nb" data-n="1">New texture</button>':WBS.texLib.map(L=>`<div class="mr${L.id===WBS.txSel?' on':''}" data-x="${hx(L.id)}">${txThumb(L,null,'relief')}<b>${hx(L.name)}${refs.get(L.id)?`<i>${refs.get(L.id)}</i>`:''}</b><button type="button" data-d="1" aria-label="Delete texture" title="Delete">&times;</button></div>`).join('');
-txPaintEd()}
-function txPaintEd(){const L=txCur(),has=!!L;$('tx_edg').hidden=!has;$('tx_dup').disabled=!has;if(!has)return;txLd=true;
-try{$('tx_prev').innerHTML=TXMD.map(m=>`<figure><img alt="" src="${txSwatch(L,m,120,120)}"><figcaption>${TXMN[m]}</figcaption></figure>`).join('');if(document.activeElement!==$('tx_name'))$('tx_name').value=L.name;$('tx_type').value=L.t;
-txSetR('tx_a',L.a);txSetR('tx_sc',L.sc);txSetR('tx_az',L.az);
-}finally{txLd=false}}
-function txDelete(id){const L=txLib(id);if(!L)return;txCap();let n=0;const cut=o=>{if(Array.isArray(o.tu)){const b=o.tu.length;o.tu=o.tu.filter(z=>z&&z.x!==id);n+=b-o.tu.length}};WBS.tiles.forEach(cut);WBS.layers.forEach(l=>{cut(l);(l.pl||[]).forEach(cut)});if(WBX.wbTxCut)WBX.wbTxCut(id);
-if(WBS.tex&&Array.isArray(WBS.tex.u)){const b=WBS.tex.u.length;WBS.tex.u=WBS.tex.u.filter(z=>z&&z.x!==id);n+=b-WBS.tex.u.length}WBS.texLib=WBS.texLib.filter(x=>x.id!==id);if(WBS.txSel===id)WBS.txSel=(WBS.texLib[0]||{}).id||'';texNorm();store();saveTex();buildTex();upd();txCap();txRefresh(true);pmsg(`Deleted “${L.name}”${n?` and took it off ${n} place${n>1?'s':''}`:''}.`)}
 // projects made before this: the one canvas-wide surface is handed to every stamp (each with its own variation), then retired
 function roughFilter(){
 const E=WBS.pr.e,Q=WBS.pr.q,A=WBS.pr.a/100,k=100/Math.max(25,WBS.pr.sc),f=v=>+(v*k).toFixed(5),S=WBS.pr.sd;
@@ -108,48 +54,21 @@ b+=`<feColorMatrix in="${cur}" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0
 
 if(tl){const[ex,ey]=tileExt();return`<filter id="rf" filterUnits="userSpaceOnUse" x="${-ex}" y="${-ey}" width="${CW+2*ex}" height="${CH+2*ey}" color-interpolation-filters="sRGB">${b}</filter>`}
 return`<filter id="rf" filterUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}" color-interpolation-filters="sRGB">${b}</filter>`}
-function syncPr(){$('rgh').value=WBS.pr.e;$('psq').value=WBS.pr.q;if(WBX.wbTexReady)txRefresh()}
+function syncPr(){$('rgh').value=WBS.pr.e;$('psq').value=WBS.pr.q;}
 const saveTex=()=>{try{kv.set('wb10_tex',JSON.stringify(WBS.tex))}catch(e){}};
 function buildTex(noPat,pv){let o='';try{o=txImgs(txSpecs(WBS.tex&&WBS.tex.u,'relief').map(S=>pv&&S.x===pv&&txIsO(S)?{...S,a:100,op:(S.a/100).toFixed(3)}:S),CW,CH,900,'inline',txIsO,0,0,tileOn());if(o&&tileOn()&&WBS.tilePv)o=tileCopies(o,'txgc')}catch(e){o=''}
-TEXK=txCvKey();$('texg').innerHTML=o?`<g pointer-events="none">${o}</g>`:'';if(pv)$('texg').dataset.pv=pv;else delete $('texg').dataset.pv;if(typeof upd=='function'&&WBX.wbTexReady){if(noPat)txRefresh();else upd()}}
+TEXK=txCvKey();$('texg').innerHTML=o?`<g pointer-events="none">${o}</g>`:'';if(pv)$('texg').dataset.pv=pv;else delete $('texg').dataset.pv;if(typeof upd=='function'&&WBX.wbTexReady&&!noPat)upd()}
 // the mask used on the ink so it skips the worn spots of the canvas texture (inl: pictures inside the markup, for a stand-alone file)
 function inkCatch(inl){const q=txSpecs(WBS.tex&&WBS.tex.u,'relief').filter(txIsW);if(!q.length)return null;const tl=tileOn(),v=txImgs(q,CW,CH,900,inl?'inline':'host',txIsW,0,0,tl);
 if(!v)return null;return tl?{defs:`<mask id="cw" maskUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"><rect x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" fill="#fff"/>${tileCopies(v,'cwc')}</mask>`}:{defs:`<mask id="cw" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`}}
-function syncTex(){texNorm();txRefresh(true)}
-// the same stack control in the Stamp, Layers and Canvas panels
-const txCommit=()=>{store();upd();txCap();txRefresh()};
+function syncTex(){texNorm()}
 function init17(){WBH.syncPr=syncPr;WBH.syncTex=syncTex;WBS.SURFK='';
-txTc=new Map();
-txThr=(()=>{let last=0,tm=0,pend=null;const run=()=>{tm=0;last=performance.now();if(pend){const p=pend;pend=null;txEdit(p,true)}};const f=p=>{pend={...(pend||{}),...p};const w=160-(performance.now()-last);if(w<=0){clearTimeout(tm);tm=0;run()}else if(!tm)tm=setTimeout(run,w)};f.cancel=()=>{clearTimeout(tm);tm=0;pend=null};return f})();
 [['rgh','e'],['psq','q']].forEach(([id,key])=>$(id).oninput=()=>{WBS.pr[key]=+$(id).value;WBH.syncPr();savePr();upd()});
 
 WBH.syncPr();
-// ---- Print / Textures tabs ----
 // ---- Canvas texture. Its uses live in tex.u: relief / stain become pictures laid over the canvas, wear knocks ink out of every layer ----
 WBS.tex={};
 try{const q=JSON.parse(kv.get('wb10_tex')||'null');if(q&&typeof q=='object')WBS.tex=q}catch(e){}
-// library panel wiring
-$('tx_type').innerHTML=TXF.map(([g,o])=>`<optgroup label="${g}">${Object.entries(o).map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</optgroup>`).join('');
-$('tx_list').onclick=e=>{if(e.target.closest('[data-n]')){$('tx_add').click();return}const r=e.target.closest('.mr');if(!r)return;const id=r.dataset.x;if(e.target.closest('[data-d]')){txDelete(id);return}WBS.txSel=id;txRefresh(true)};
-$('tx_add').onclick=()=>{txCap();const L=txMake('cotton');WBS.texLib.push(L);WBS.txSel=L.id;store();txRefresh(true);txCap()};
-$('tx_dup').onclick=()=>{const L=txCur();if(!L)return;txCap();const n={...L,id:txUid(),name:txUniq(L.name),auto:false,sd:txRid()};WBS.texLib.push(n);WBS.txSel=n.id;store();txRefresh(true);txCap()};
-$('tx_del').onclick=()=>{if(txCur())txDelete(WBS.txSel)};
-$('tx_name').addEventListener('input',()=>{const L=txCur();if(!L||txLd)return;L.name=$('tx_name').value.replace(/[<>&"]/g,'').slice(0,40);L.auto=false;store();txRefresh()});
-$('tx_name').addEventListener('blur',()=>{const L=txCur();if(L&&!L.name.trim()){L.name=txUniq(TXN[L.t]||'Texture');store();txRefresh(true)}});
-$('tx_name').addEventListener('change',txCap);
-$('tx_type').addEventListener('input',()=>{const L=txCur();if(!L||txLd)return;const t=$('tx_type').value;if(!TXN[t])return;const old=TXN[L.t];txCap();L.t=t;if(old&&L.name.startsWith(old))L.name=txUniq(TXN[t]);L.auto=false;txAfter(L.id);txRefresh(true);txCap()});
-[['tx_a','a'],['tx_sc','sc'],['tx_az','az']].forEach(([id,k])=>{$(id).addEventListener('input',()=>{if(!txLd)txThr({[k]:+$(id).value})});$(id).addEventListener('change',()=>{if(txLd)return;txThr.cancel();txEdit({[k]:+$(id).value});txCap()})});
-txReg('st_tex',{md:'wear',def:'pinholes',get:()=>{const t=WBS.tiles[WBS.cur];return t&&t.tu||[]},set:a=>{const t=WBS.tiles[WBS.cur];if(!t)return;t.tu=a;txCommit()}});
-txReg('ly_tex',{md:'wear',def:'pinholes',get:()=>{const l=LY();return l&&l.tu||[]},set:a=>{const l=LY();if(!l)return;l.tu=a;txCommit()}});
-txReg('cv_tex',{md:'relief',def:'cotton',max:4,get:()=>Array.isArray(WBS.tex.u)?WBS.tex.u:[],set:a=>{WBS.tex.u=a;texNorm();saveTex();buildTex();store();txCap();txRefresh()}});
-// ---- Apply: put the texture chosen in the library on the Canvas, on the open stamp (Stamps) or on the selected layer (Layers) ----
-{let to='cv_tex';const hostOk=()=>to=='ly_tex'?!!LY():to=='st_tex'?!!WBS.tiles[WBS.cur]:true;
-const paint=()=>{document.querySelectorAll('#tx_to [data-t]').forEach(b=>{const on=b.dataset.t==to;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});const a=$('tx_apply');if(a)a.disabled=!txCur()||!hostOk()};
-$('tx_to').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;to=b.dataset.t;paint()};
-$('tx_apply').onclick=()=>{const L=txCur(),H=TXH.find(h=>h.id==to);if(!L||!H||!hostOk())return;const c=H.cfg,uses=(c.get()||[]).map(u=>({...u}));
-if(uses.length>=(c.max||6)){pmsg('That one already has the most textures it can hold. Remove one first.');return}uses.push({x:L.id,sd:txRid(),md:c.md});c.set(uses);pmsg(`Applied “${L.name}” to the ${to=='cv_tex'?'canvas':to=='st_tex'?'stamp':'layer'}.`)};
-WBX.wbTxApplySync=paint;paint()}
-
 WBH.syncTex();buildTex();WBX.wbTexReady=1;
 }
-export {SURFC,buildTex,inkCatch,layTexMask,layTexOv,roughFilter,saveTex,surfFor,texNorm,txMerge,txPack,txRefresh,txReg,txoG,init17};
+export {SURFC,buildTex,inkCatch,layTexMask,layTexOv,roughFilter,saveTex,surfFor,texNorm,txMerge,txPack,txoG,init17};

@@ -17,12 +17,3 @@ test('Close all panels turns into Default panels when none are open, and back', 
   expect(await page.getAttribute('#rcls', 'aria-label')).toBe('Close all panels');
   expect(errors).toEqual([]);
 });
-
-test('without a Default workspace the button stays Close all panels', async ({ page }) => {
-  const { errors } = await openApp(page);
-  await page.click('#rcls');
-  await page.click('#rcls');
-  expect(await page.getAttribute('#rcls', 'aria-label')).toBe('Close all panels');
-  expect(await open(page)).toBe(0);
-  expect(errors).toEqual([]);
-});
