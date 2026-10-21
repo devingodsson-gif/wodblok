@@ -1,12 +1,12 @@
 // Layer update, step 9a (1.46.9): the four things only the Stamp editor did, now on the Pattern canvas with a stamp unlocked:
 // copy and paste of shapes, editing text that is already in a stamp, Split shape, and grade masks that belong to one stamp.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, fitView } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const items = async page => (await state(page)).tiles[0].items;
 const show = async (page, id) => { if (await page.locator(`section.pn[data-p="${id}"]:not([hidden])`).count() === 0) await openPanel(page, id); };
-const unlock = async page => { await show(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); };
+const unlock = async page => { await show(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page); await fitView(page); };
 const pick = async page => { await show(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
 const toClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height, k: r.width / vb.width }; }, [x, y]);
 const inst = async page => {

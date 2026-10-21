@@ -47,9 +47,10 @@ test('a layer with no pattern draws no outlines; a pattern brings them back', as
   expect(errors).toEqual([]);
 });
 
-test('the lock is in the stamp list only; one stamp is unlocked at a time and the outline turns to the accent', async ({ page }) => {
+test('Edit is in the stamp list only; one stamp is open for editing at a time and the outline turns to the accent', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addStamp(page);
+  await page.click('#elb [data-k="pattern"]'); await patSource(page, 'stamp', 1); await openPanel(page, 'stmp');   // a stamp is edited where it is printed
   await page.locator('#stmpl .smkr .smkth').nth(1).click();
   await settle(page);
   const locks = page.locator('#stmpl .smklk');

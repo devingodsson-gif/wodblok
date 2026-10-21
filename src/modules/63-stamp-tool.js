@@ -13,7 +13,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 const STOLK='wb146_olop',STOLD=60;
 const STP={p:{},items:[],on:false,rot:0,un:null,unL:null,op:STOLD,sig:'',ai:null,after:null};
 const stIc=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-const STLK_ON=stIc('<rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),STLK_OFF=stIc('<rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.6-1.7"/>');
+const STEDIT=stIc('<path d="M4.5 19.5l.9-3.9L16 5a2.1 2.1 0 013 3L8.4 18.6z"/>');   // the Edit pencil on a stamp row (2.5.0, was the lock)
 const STTRRE=/translate\(([-\d.]+) ([-\d.]+)\) rotate\(([-\d.]+)\) scale\(([-\d.]+) ([-\d.]+)\)/;
 const stSel=()=>WBS.layers[WBS.selL];
 const stName=id=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==id)+1);
@@ -50,7 +50,7 @@ function stSig(){const L=stSel()||{},un=stUnlocked();return[WBS.cur,WBS.selL,(L.
 function stPanel(force){const list=$('stmpl');if(!list||!list.offsetParent)return;const sig=stSig();if(!force&&sig===STP.sig&&list.childElementCount)return;STP.sig=sig;
  const L=stSel(),un=stUnlocked(),[pa]=pal(),cur=WBS.tiles[WBS.cur];let h='';
  WBS.tiles.forEach((t,k)=>{useT(t);const lk=un===t.id,n=stUses(t.id);
-  h+=`<div class="smkr${WBS.cur===k?' cur':''}" data-t="${t.id}"><button type="button" class="smkth" aria-label="Stamp ${k+1}"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button><span class="smkn">Stamp ${k+1}</span><span class="smkc" aria-label="Used by ${n} ${n==1?'element':'elements'}">${n}</span><button type="button" class="ib smklk" data-lk aria-pressed="${lk}" aria-label="${lk?'Lock':'Unlock'} Stamp ${k+1}">${lk?STLK_OFF:STLK_ON}</button></div>`});
+  h+=`<div class="smkr${WBS.cur===k?' cur':''}" data-t="${t.id}"><button type="button" class="smkth" aria-label="Stamp ${k+1}"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button><span class="smkn">Stamp ${k+1}</span><span class="smkc" aria-label="Used by ${n} ${n==1?'element':'elements'}">${n}</span><button type="button" class="ib smklk" data-lk aria-pressed="${lk}" aria-label="Edit Stamp ${k+1}">${STEDIT}</button></div>`});
  if(cur)useT(cur);list.innerHTML=h;
  const ed=$('smked');if(ed){ed.hidden=un==null;ed.textContent=un==null?'':`Editing: ${stName(un)} (used by ${stUses(un)} ${stUses(un)==1?'element':'elements'})`}}
 // ----- the project's stamps: choose one, make a new one, copy one, delete one, keep one in the library, bring the camera to one -----
@@ -88,7 +88,7 @@ function init63(){
  try{new ResizeObserver(stOlFit).observe($('art'))}catch(e){}
  const op=$('stmpop');if(op){op.value=STP.op;op.addEventListener('input',()=>stSetOp(op.value,true))}
  const list=$('stmpl');if(list){
-  list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r)return;const id=+r.dataset.t;if(e.target.closest('[data-lk]'))stLock(id);else stCurrent(id)});
+  list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r)return;const id=+r.dataset.t;if(e.target.closest('[data-lk]')){if(WBX.wbSteEdit)WBX.wbSteEdit(id);else stLock(id)}else stCurrent(id)});
  stBar();
   if(typeof IntersectionObserver=='function')new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting))stPanel(true)}).observe(list)}
 }

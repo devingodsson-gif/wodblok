@@ -388,6 +388,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 
 - Rail buttons: `--h-touch`, icon only, in a 36px strip; `--r-m` selected highlight with `--acc-soft`.
 - Panel tabs (`.wtab`), Photoshop style: the tab strip is `--stage`; tabs `--fs-s`, 500, `--mut`, 10px side padding, square; the active tab takes the `--panel` colour and `--fg` text, so it joins the panel below. No accent bar.
+- Stamp tabs (2.5.0): the strip over the stage reuses `.wtab` (the Canvas first, then one per open stamp with a close `.ib` of `--h-xs`); it is `--stage` with a `--line` bottom edge, `--h-md` high, and is not on screen while no stamp is open.
 - A tool opens a panel; a panel never opens by itself at launch, except through the launch workspace (the one called Default, else the first workspace).
 
 #### 9.8 Swatches, thumbnails and cards
