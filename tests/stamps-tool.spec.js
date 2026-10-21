@@ -41,7 +41,7 @@ test('a layer with no pattern draws no outlines; a pattern brings them back', as
   await page.evaluate(() => document.querySelector('#pelist [data-pd]').click());
   await settle(page);
   expect(await outlines(page)).toBe(0);
-  await page.click('#elb [data-k="pattern"]');
+  await page.click('#elb [data-k="pattern"]'); await page.click('.elk[data-k="pattern"] [data-add]');
   await patSource(page);
   expect(await outlines(page)).toBeGreaterThan(0);
   expect(errors).toEqual([]);
@@ -50,7 +50,7 @@ test('a layer with no pattern draws no outlines; a pattern brings them back', as
 test('Edit is in the stamp list only; one stamp is open for editing at a time and the outline turns to the accent', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addStamp(page);
-  await page.click('#elb [data-k="pattern"]'); await patSource(page, 'stamp', 1); await openPanel(page, 'stmp');   // a stamp is edited where it is printed
+  await page.click('#elb [data-k="pattern"]'); await page.click('.elk[data-k="pattern"] [data-add]'); await patSource(page, 'stamp', 1); await openPanel(page, 'stmp');   // a stamp is edited where it is printed
   await page.locator('#stmpl .smkr .smkth').nth(1).click();
   await settle(page);
   const locks = page.locator('#stmpl .smklk');

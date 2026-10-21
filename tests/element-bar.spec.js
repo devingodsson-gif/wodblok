@@ -29,16 +29,21 @@ test('the element bar has one button per kind, left of centre; the tray starts r
   expect(errors).toEqual([]);
 });
 
-test('every button but Select makes an element at once, just above the selected one, and shows pressed while its tool is armed (2.3.0)', async ({ page }) => {
+test('a bar button opens its panel and Add there makes the element, just above the selected one; the button shows pressed while its tool is armed (2.6.0)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   const kinds = async () => JSON.parse(await getState(page)).els.map(q => q.k);
   await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
   await page.click('#elb [data-k="pattern"]'); await settle(page);
+  expect(await kinds()).toEqual([]);                      // the button makes nothing
+  await expect(page.locator('#elb [data-k="pattern"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.click('.elk[data-k="pattern"] [data-add]'); await settle(page);
   expect(await kinds()).toEqual(['pattern']);
   await addShape(page);
   expect(await kinds()).toEqual(['pattern', 'shape']);
   await page.click('#elb [data-k="text"]'); await settle(page);
+  expect(await kinds()).toEqual(['pattern', 'shape']);
+  await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
   expect(await kinds()).toEqual(['pattern', 'shape', 'text']);
   await page.click('#elb [data-k="motif"]'); await settle(page);
   expect((await kinds()).includes('motif')).toBe(false);   // 2.4.0: the Motif button makes nothing, a pick arms it

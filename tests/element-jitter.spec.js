@@ -52,7 +52,7 @@ test('a pattern\'s Jitter nudges each placement differently, and the same seed g
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'layers');
-  await page.click('#elb [data-k="pattern"]');
+  await page.click('#elb [data-k="pattern"]'); await page.click('.elk[data-k="pattern"] [data-add]');
   await patSource(page);
   await addEffect(page, 'pattern', 'Jitter');
   const fx = (await st(page)).els.find(p => p.k == 'pattern').fx;

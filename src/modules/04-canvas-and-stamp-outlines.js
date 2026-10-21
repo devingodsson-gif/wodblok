@@ -33,15 +33,18 @@ const useT=t=>{if(t)useG(geom(shOf(t)))};
 const SHN={rect:'Rectangle',hex:'Hexagon',circle:'Circle',diamond:'Diamond',tri:'Triangle',arch:'Arch',oct:'Octagon',star:'Star',quat:'Quatrefoil',lancet:'Lancet'};
 // Repeat tile canvas (dim.rt): a rectangle whose edges wrap, so copies placed side by side show no seam. The content is drawn a little past
 // each edge (tileExt) so filters see the neighbouring tile, and a whole 3 x 3 when the repeat preview is on (WBS.tilePv).
-const tileOn=()=>!!WBS.dim.rt&&!WBS.book.on;
+// The stamp view (2.5.1): while a stamp is open in its tab the stage is a canvas of the stamp's own size, alone (no outline, tile, book or background)
+let STV=null;const stvOn=()=>!!STV;
+function stvSet(w,h){STV=w?[w,h]:null;setDim()}
+const tileOn=()=>!STV&&!!WBS.dim.rt&&!WBS.book.on;
 const tileExt=()=>tileOn()?(WBS.tilePv?[CW,CH]:[Math.min(CW,48),Math.min(CH,48)]):[0,0];
 const setDim=()=>{if(WBS.dim.rt&&WBS.dim.cs)delete WBS.dim.cs;if(WBS.dim.cs&&!CSN[WBS.dim.cs]){delete WBS.dim.cs;delete WBS.dim.g}if(WBS.dim.cp)delete WBS.dim.cp;useG(geom(WBS.dim));try{useT(WBS.tiles[WBS.cur])}catch(e){}
-if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims(csk())};
+if(STV){CW=STV[0];CH=STV[1]}else if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims(csk())};
 // Canvas outline: dim.cs = rect (default) | rrect | circle | oval | arch | hex | tri | diamond | ngon.
 // Everything is clipped to the outline. dim.cr = rounded corner %, dim.n = polygon sides, dim.co = 'f' for the flat orientation.
 // Print covers always stay rectangular.
 const CSH=[['rect','Rectangle'],['rrect','Rounded'],['circle','Circle'],['oval','Oval'],['arch','Arch'],['hex','Hexagon'],['tri','Triangle'],['diamond','Diamond'],['ngon','Polygon']];let CSN;const CASP=['rect','rrect','oval','arch','diamond'];
-function csk(){if(WBS.book.on)return'rect';const k=WBS.dim.cs;return CSN[k]?k:'rect'}
+function csk(){if(STV||WBS.book.on)return'rect';const k=WBS.dim.cs;return CSN[k]?k:'rect'}
 const hasOut=()=>csk()!='rect';
 const csN=()=>Math.max(3,Math.min(16,Math.round(+WBS.dim.n||5)));
 function polyUnit(n,o){const off=o=='f'?Math.PI/n:0,P=[];for(let i=0;i<n;i++){const a=-Math.PI/2+off+2*Math.PI*i/n;P.push([Math.cos(a),Math.sin(a)])}return P}
@@ -152,4 +155,4 @@ CM=Object.fromEntries(C);
 PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return[WADA_NAMES[i]||'No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj=trayDefault();try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 }
-export {shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csN,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
+export {stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csN,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
