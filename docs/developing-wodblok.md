@@ -208,10 +208,10 @@ The editor supports light and dark. Both must be correct for every screen. Theme
 | `--faint` | `#6b6b6b` | `#8f8f8f` | Group labels, counts, hints |
 | `--sel` | `#c7d6ec` | `#3a5578` | **Selected row** in every list (Elements, libraries, menus' current item): Photoshop's muted blue |
 | `--sel-fg` | `#1f1f1f` | `#ffffff` | Text and icons on `--sel` |
-| `--acc` | `#2f74c8` | `#4a8fe0` | Accent: focus, key actions, slider fill and thumb, pressed toggles |
-| `--acc-ink` | `#245fa6` | `#6aa6ec` | Text and icons on a soft accent background |
-| `--acc-fg` | `#ffffff` | `#ffffff` | Text on a solid accent fill |
-| `--acc-soft` | `rgba(47,116,200,.16)` | `rgba(74,143,224,.18)` | Pressed toggles and modes, slider halo |
+| `--acc` | `#b8914f` | `#c4a46e` | Accent: focus, key actions, slider fill and thumb, pressed toggles |
+| `--acc-ink` | `#836635` | `#c4a46e` | Text and icons on a soft accent background |
+| `--acc-fg` | `#1b1a18` | `#1b1a18` | Text on a solid accent fill |
+| `--acc-soft` | `rgba(184,145,79,.16)` | `rgba(196,164,110,.16)` | Pressed toggles and modes, slider halo |
 | `--warn` | `#c0532e` | `#e8895c` | Unsaved dot, warnings, destructive confirm |
 | `--ok` | `#3f8f66` | `#7fb08a` | Success |
 | `--shadow` | layered, neutral | layered, dark | Floating surfaces only |
@@ -221,7 +221,7 @@ Rules:
 - Chrome MUST use these tokens. No literal hex or `rgb()` in chrome CSS or inline styles.
 - Literal colours are allowed only for: the artwork and colours the user chose; the colour picker's own hue bar and handles; the swatch fallback `var(--c,#888)`; scrims (`rgba(10,11,14,.45)`).
 - A swatch of the user's colour MUST have the swatch edge (`inset 0 0 0 1px rgba(0,0,0,.2)`) so pale colours stay visible. One value, everywhere.
-- The accent colour is the person's choice (Settings > General). The values in the table are the default, **Steel** (a Photoshop blue, 2.3.0). The other named accents are woods: Oak (the default until 2.3.0), Birch, Rosewood, Ironwood, Eucalyptus, Purpleheart, Walnut, Maple. Chrome uses the tokens, never the literal, so a changed accent reaches every control. The settings code derives the four accent tokens of both themes from the one colour picked and keeps the ink at 4.5:1 or better on the panel.
+- The accent colour is the person's choice (Settings > General). The values in the table are the default, **Oak** (again since 2.8.0; Steel, the blue of 2.3.0 to 2.7.0, is gone). The other named accents are woods: Rosewood, Walnut, Eucalyptus, Ironwood, Purpleheart, Maple, Birch. Chrome uses the tokens, never the literal, so a changed accent reaches every control. The settings code derives the four accent tokens of both themes from the one colour picked and keeps the ink at 4.5:1 or better on the panel.
 - Selected rows use `--sel`, not the accent (Photoshop's Layers panel). The accent is for focus, pressed toggles and the one key action in a view. Never use it as decoration, and never for more than one primary action per view.
 - `--warn` and `--ok` carry meaning only.
 - Contrast: check muted and disabled text in both themes. State is never carried by colour alone (add the edge, weight or icon).
