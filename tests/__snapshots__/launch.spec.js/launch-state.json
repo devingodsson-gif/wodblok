@@ -19,7 +19,7 @@
  ],
  "els": [
   {
-   "u": "pmuzhi800a4b",
+   "u": "pmuzhi800py2",
    "k": "pattern",
    "n": "Pattern 1",
    "lay": "grid",
@@ -28,7 +28,7 @@
    "sz": 100,
    "rt": 0,
    "ds": "cycle",
-   "sd": 6128,
+   "sd": 4258,
    "src": [
     {
      "k": "stamp",
