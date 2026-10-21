@@ -1,29 +1,29 @@
 {
  "grade_after_undo": {
   "ex": 0,
-  "ct": 0,
+  "ct": 38,
   "hi": 0,
   "sh": 0,
-  "wh": 0,
+  "wh": -12,
   "bl": 0,
-  "tp": 0,
+  "tp": 36,
   "tn": 0,
-  "sat": 0,
-  "vib": 0,
+  "sat": -46,
+  "vib": -11,
   "hue": 0,
-  "fd": 0,
+  "fd": 33,
   "cov": false,
   "masks": [
    {
     "sc": "",
-    "id": "mq9t998",
-    "t": "rad",
-    "name": "Vignette",
+    "id": "m3on202",
+    "t": "lin",
+    "name": "Ink fade",
     "on": true,
-    "inv": true,
+    "inv": false,
     "amt": 100,
     "a": {
-     "ex": -13,
+     "ex": -14,
      "ct": 0,
      "hi": 0,
      "sh": 0,
@@ -36,13 +36,12 @@
      "hue": 0,
      "fd": 0
     },
-    "sp": "c",
+    "sp": "s",
     "st": "",
-    "cx": 0.542,
-    "cy": 0.446,
-    "rx": 0.545,
-    "ry": 0.5,
-    "fe": 67
+    "x1": 0,
+    "y1": 0,
+    "x2": 0.66,
+    "y2": 0.66
    }
   ]
  }
