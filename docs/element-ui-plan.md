@@ -1,6 +1,6 @@
 # Element UI plan (one way to make, select and edit every element)
 
-Written Oct 20 2026 at the owner's request, after 2.2.4 (Sheet as an element). Status: **agreed Oct 20 2026 (owner's answers in "Decisions" at the end), nothing built.** Comes after 2.2.5; the steps are 2.2.6 onward and the plan ends at **2.3.0**. Every new size, colour, radius or component below must be added to docs/developing-wodblok.md Part 9 first (Never break list); the look follows the Photoshop direction in docs/agent-memory.md (dark, dense, flat).
+Written Oct 20 2026 at the owner's request, after 2.2.4 (Sheet as an element). Status: **agreed Oct 20 2026 (owner's answers in "Decisions" at the end), built in one pass as 2.3.0 (outcome in docs/plan.md; shape and stamp pop-overs and stamp texture as an effect are left for later).** Comes after 2.2.5; the steps are 2.2.6 onward and the plan ends at **2.3.0**. Every new size, colour, radius or component below must be added to docs/developing-wodblok.md Part 9 first (Never break list); the look follows the Photoshop direction in docs/agent-memory.md (dark, dense, flat).
 
 ## What the owner asked for (Oct 20 2026)
 - Click a button on the element bar and it **creates a new element** in the Elements list, like a new layer.
