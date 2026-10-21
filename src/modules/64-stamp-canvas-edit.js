@@ -36,7 +36,8 @@ const sceSel=()=>{if(WBH.draw)WBH.draw();sceDraw()};
 // the Grid tool snaps in canvas units (Alt skips it); a point is snapped there and then moved back into the stamp
 function sceSnap(M,x,y,e){const L=fpL();if(!L)return{x,y};const q=sceTo(M,x,y),n=fpSnap(L,q.x,q.y,e);return sceTo(M.inverse(),n[0],n[1])}
 function sceDown(e){if(e.button!==0)return;let t0=stUnlocked();
- if(t0==null&&WBS.brush&&!WBS.brush.txt&&!WBS.txArm&&WBS.fpB==null){const c0=scePt(e),h0=c0&&stampAt(c0.x,c0.y,null);if(h0){stLock(STP.items[h0.i][0]);t0=stUnlocked()}}
+ // a shape armed while no stamp is unlocked goes on the canvas as a Shape element of its own (2.3.0); an unlocked stamp still takes it
+ if(t0==null&&WBS.brush&&!WBS.brush.txt&&!WBS.txArm&&WBS.fpB==null){const c0=scePt(e);if(c0&&WBX.wbShapeAt&&WBX.wbShapeAt(c0.x,c0.y)){e.preventDefault();e.stopPropagation();return}}
  if(t0==null)return;
  const hand=$('nvhand');if(hand&&hand.getAttribute('aria-pressed')=='true')return;
  const spk=e.target.closest&&e.target.closest('[data-sp]');

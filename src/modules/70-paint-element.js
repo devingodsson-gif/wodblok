@@ -12,7 +12,6 @@ import {fxGr,fxPad,fxTex} from './69-effect-stack.js';
 // Effects that work on it: Texture and Colour grade.
 const paList=()=>{const L=fpL();return L?(L.pl||[]).filter(q=>q.k=='paint'):[]};
 const paCur=()=>{const a=paList();return a.find(q=>q.u==WBS.paSel)||null};
-const paHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const paCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 const BR={mode:'off',w:14,tip:'round',c:''};   // the brush: mode off | brush | erase; size in canvas units; tip round | stamp; colour ('' = the project ink)
 const f1=v=>(+v).toFixed(1);
@@ -32,9 +31,9 @@ const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind
 const o0=`<g${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>`;return[defs,o0+out+'</g>',o0,'</g>',fr]}
 
 // ---- the panel
-function paSync(){const host=$('palist');if(!host)return;const a=paList(),p=paCur();if(WBS.paSel!=null&&!p)WBS.paSel=null;
+function paSync(){const host=$('pamode');if(!host)return;const a=paList(),p=paCur();if(WBS.paSel!=null&&!p)WBS.paSel=null;
 const key=JSON.stringify([a.map(q=>[q.u,q.n,(q.st||[]).length]),WBS.paSel,BR.mode,BR.tip,BR.w,BR.c,WBS.cur,WBS.tiles.length]);
-if(host.dataset.k!==key){host.dataset.k=key;host.innerHTML=a.slice().reverse().map(q=>`<div class="mr${q.u==WBS.paSel?' on':''}" data-pa="${q.u}"><b>${paHx(q.n)}<i>${(q.st||[]).length} stroke${(q.st||[]).length==1?'':'s'}</i></b></div>`).join('');
+if(host.dataset.k!==key){host.dataset.k=key;
 $('pamode').querySelectorAll('[data-m]').forEach(b=>{const on=b.dataset.m==BR.mode;if(b.classList.contains('on')!==on)b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});
 $('patip').querySelectorAll('[data-t]').forEach(b=>{const on=b.dataset.t==BR.tip;if(b.classList.contains('on')!==on)b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});
 const sz=$('pasz');if(+sz.value!==BR.w){sz.value=BR.w;sz.dispatchEvent(new Event('input',{bubbles:true}))}
@@ -44,10 +43,9 @@ const paPt=e=>{const a=$('art'),pt=a.createSVGPoint();pt.x=e.clientX;pt.y=e.clie
 function paNew(L){L.pl=L.pl||[];const q={u:fpU(),k:'paint',n:'Paint '+(paList().length+1),x:0,y:0,st:[]};L.pl.push(q);WBS.paSel=q.u;return q}
 function init70(){
 elExtend('paint',{pn:'elpaint',dz:4,name:q=>q.n,draw:(L,li)=>paintLayer(L,li)});
-if(!$('palist'))return;
-WBX.wbPaSync=paSync;
-$('palist').onclick=e=>{const L=fpL();if(!L)return;const r=e.target.closest('[data-pa]');if(r){WBS.paSel=r.dataset.pa;paSync()}};
-$('pamode').onclick=e=>{const b=e.target.closest('[data-m]');if(b){BR.mode=b.dataset.m;paSync()}};
+if(!$('pamode'))return;
+WBX.wbPaSync=paSync;WBX.wbPaArm=m=>{BR.mode=m;paSync();if(WBX.wbAbSync)WBX.wbAbSync()};WBX.wbPaMode=()=>BR.mode;
+$('pamode').onclick=e=>{const b=e.target.closest('[data-m]');if(b){BR.mode=b.dataset.m;paSync();if(WBX.wbAbSync)WBX.wbAbSync()}};
 $('patip').onclick=e=>{const b=e.target.closest('[data-t]');if(b){BR.tip=b.dataset.t;paSync()}};
 $('pasz').addEventListener('input',()=>{BR.w=+$('pasz').value});
 $('paund').onclick=()=>{const p=paCur();if(p&&(p.st||[]).length){p.st.pop();paCh()}};
@@ -60,7 +58,7 @@ const liveOn=()=>{if(live)return live;live=document.createElementNS('http://www.
 const liveOff=()=>{if(live){live.remove();live=null}};
 let cur=null;
 art.addEventListener('pointerdown',e=>{if(BR.mode=='off'||e.button!==0||$('boardP').classList.contains('off'))return;const L=fpL();if(!L)return;e.preventDefault();e.stopImmediatePropagation();
-const[x,y]=paPt(e),p=paCur()||paNew(L),er=BR.mode=='erase',s={u:fpU(),w:BR.w,pts:[[+f1(x-(+p.x||0)),+f1(y-(+p.y||0))]]};if(er)s.er=true;else{if(BR.c)s.c=BR.c;if(BR.tip=='stamp'){const t=WBS.tiles[WBS.cur];if(t)s.t=t.id}}
+const[x,y]=paPt(e),p=paCur()||paNew(L),er=BR.mode=='erase'||e.altKey,s={u:fpU(),w:BR.w,pts:[[+f1(x-(+p.x||0)),+f1(y-(+p.y||0))]]};if(er)s.er=true;else{if(BR.c)s.c=BR.c;if(BR.tip=='stamp'){const t=WBS.tiles[WBS.cur];if(t)s.t=t.id}}
 cur={p,s,ox:+p.x||0,oy:+p.y||0};try{art.setPointerCapture(e.pointerId)}catch(er2){}
 liveOn();live.setAttribute('stroke',er?'#888':(okC(s.c)?col(s.c):col(WBS.proj.ink)));live.setAttribute('stroke-opacity',er||s.t!=null?'.45':'1');live.setAttribute('stroke-width',String(s.w));live.setAttribute('d',paPath(s.pts))},true);
 art.addEventListener('pointermove',e=>{if(!cur||!live)return;const[x,y]=paPt(e),P=cur.s.pts,l=P[P.length-1],px=x-cur.ox,py=y-cur.oy;if(Math.hypot(px-l[0],py-l[1])<1.5)return;P.push([+f1(px),+f1(py)]);live.setAttribute('d',paPath(P));live.setAttribute('transform',`translate(${cur.ox} ${cur.oy})`)},true);

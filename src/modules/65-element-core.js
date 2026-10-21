@@ -62,12 +62,16 @@ const elIc=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentCo
 function elBar(){const b=$('elb');if(!b)return;b.innerHTML=EL_O.map(k=>{const d=EL_K[k];return`<button type="button" class="elbb" data-k="${k}" aria-label="${d.label}" title="${d.label}" aria-pressed="false"${d.pn?'':' disabled'}>${elIc(d.icon||'')}</button>`}).join('')}
 // the selected element on the current layer, if any
 function elSel(){const L=WBS.layers[WBS.selL];if(!L||WBS.fpSel==null||WBS.fpSel===-1)return null;return(L.pl||[]).find(q=>q.u==WBS.fpSel)||null}
-function elSync(){const b=$('elb');if(b)b.querySelectorAll('.elbb').forEach(x=>{const d=EL_K[x.dataset.k],r=d&&d.pn&&document.querySelector(`.rail [data-pn="${d.pn}"]`),on=!!(r&&r.classList.contains('on'));if(x.getAttribute('aria-pressed')!=String(on))x.setAttribute('aria-pressed',String(on))});
+let elLast='';
+function elSync(){if(WBX.wbAbSync)WBX.wbAbSync();
 // the Image panel's Crop group shows only when there is a picture to crop
 {const c=$('lcrop'),g=$('elcrg');if(c&&g&&g.hidden!==c.hidden)g.hidden=c.hidden}
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden
 if(WBX.wbShSync)WBX.wbShSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
-const q=elSel(),k=elKind(q);document.querySelectorAll('.elmode[data-k]').forEach(m=>{const on=!!q&&m.dataset.k===k,d=EL_K[m.dataset.k];m.hidden=!on;const nb=m.querySelector('b');if(on&&nb&&d&&d.name){const t=d.name(q);if(nb.textContent!==t)nb.textContent=t}})}
+const q=elSel(),k=elKind(q);
+// Properties follows the selection (2.3.0): picking an element shows its panel there, when the Properties group is open
+{const su=q?String(q.u):'';if(su!==elLast){elLast=su;const d=k&&EL_K[k];if(su&&d&&d.pn&&WBX.wbPropsOpen&&WBX.wbPropsOpen()&&WBX.wbOpenPanel){const pn=d.pn;setTimeout(()=>{const s2=document.querySelector(`section.pn[data-p="${pn}"]`);if(!s2||s2.hidden)WBX.wbOpenPanel(pn)},0)}}}
+document.querySelectorAll('.elmode[data-k]').forEach(m=>{const on=!!q&&m.dataset.k===k,d=EL_K[m.dataset.k];m.hidden=!on;const nb=m.querySelector('b');if(on&&nb&&d&&d.name){const t=d.name(q);if(nb.textContent!==t)nb.textContent=t}})}
 
 function init65(){
 // the kinds, in the order of the element bar. Image, Text and Stamp exist as placed elements today (their test and drawing; dz keeps the order their
@@ -81,6 +85,6 @@ elRegister('stamp',{label:'Stamp',pn:'stmp',icon:'<rect x="3.5" y="10.5" width="
 elRegister('pattern',{label:'Pattern',pn:'layers',icon:'<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>'});
 elBar();
 const b=$('elb');if(b)b.onclick=e=>{const x=e.target.closest('.elbb');if(!x||x.disabled)return;const d=EL_K[x.dataset.k];if(d&&d.pn&&WBX.wbOpenPanel)WBX.wbOpenPanel(d.pn)};
-WBX.wbElSync=elSync;
+WBX.wbElSync=elSync;WBX.wbElSeen=u=>{elLast=String(u)};
 }
 export {elExtend,elDef,elDraw,elKind,elKinds,elRegister,elSel,elSync,fxDef,fxFor,fxOf,fxRegister,init65};
