@@ -206,4 +206,18 @@ async function armStamp(page) {
   if (await page.locator('#lfpst [data-t].on').count()) return;
   await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page);
 }
-module.exports = { armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// 2.4.0: the Shape button opens the Shape properties and makes nothing; a preset there makes the shape (selected, in the middle)
+async function addShape(page, g = 'rect') {
+  await page.click('#elb [data-k="shape"]');
+  await page.click(`#shp_pre [data-g="${g}"]`); await settle(page);
+}
+// 2.4.0: a new Pattern is empty; this puts a source in it through the Add element list (a stamp by default, or 'motif' / 'text')
+async function patSource(page, kind = 'stamp', n = 0) {
+  await page.evaluate(([kind, n]) => {
+    const s = document.getElementById('peadd'), pre = { stamp: 's:', motif: 'm:', text: 't:' }[kind];
+    const o = [...s.options].filter(x => x.value.startsWith(pre))[n];
+    s.value = o.value; s.dispatchEvent(new Event('change', { bubbles: true }));
+  }, [kind, n]);
+  await settle(page);
+}
+module.exports = { patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

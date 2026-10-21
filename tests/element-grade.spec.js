@@ -1,6 +1,6 @@
 // Element update, step 8b (2.1.8): the Colour grade effect, on every kind of element (here the Sheet and a placed stamp).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern, addShape } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const sheetOf = d => (d.els || []).find(q => q.k === 'shape');   // a Shape element carries the effects here (the Sheet is gone)
@@ -19,7 +19,7 @@ const gradeFilters = (page, prefix) => page.evaluate(p => document.querySelector
 
 test('every kind offers Colour grade in its Add effect menu', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="shape"]');
+  await addShape(page);
   await settle(page);
   await page.locator('.fxg[data-fxk="shape"] .fxadd').scrollIntoViewIfNeeded();
   await page.click('.fxg[data-fxk="shape"] .fxadd');
@@ -32,7 +32,7 @@ test('every kind offers Colour grade in its Add effect menu', async ({ page }) =
 
 test('Colour grade on a Shape draws a filter only once something is adjusted, and not when switched off', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="shape"]');
+  await addShape(page);
   await settle(page);
   await addEffect(page, 'shape', 'Colour grade');
   const fx = sheetOf(await st(page)).fx;

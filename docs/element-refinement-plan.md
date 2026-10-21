@@ -1,4 +1,4 @@
-# Element refinement update (saved Oct 21 2026, not started)
+# Element refinement update (saved Oct 21 2026, built as 2.4.0 the same day, see docs/plan.md)
 
 The owner's notes, to be built when he says so (he calls it "the element refinement update"). Verbatim sense, grouped:
 

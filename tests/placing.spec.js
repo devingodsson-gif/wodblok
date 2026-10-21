@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { openApp, settle, getState } = require('./helpers/harness');
+const { openApp, settle, getState, armStamp } = require('./helpers/harness');
 // 2.2.3: one way of placing for a shape, a stamp, a picture and text: the armed item is a ghost on the pointer; using the interface or a right click puts it away
 const armShape = async (page, n = 0) => {
   await page.click('#elb [data-k="motif"]'); await settle(page);
@@ -38,7 +38,7 @@ test('using the interface puts the shape away: a click on the canvas afterwards 
   await over(page, 0.3, 0.3);
   await expect(page.locator('#stoh .stgh')).toHaveCount(1);
   await page.mouse.click(...(await (async () => { const b = await page.locator('#art').boundingBox(); return [b.x + b.width * 0.3, b.y + b.height * 0.3]; })())); await settle(page);
-  expect(await items(page)).toBe(n0 + 2);   // the Shape button made one, the click another
+  expect(await items(page)).toBe(n0 + 1);   // the Motif button makes none; the click places one
   expect(errors).toEqual([]);
 });
 
@@ -52,6 +52,7 @@ test('a right click puts away a shape, a stamp and text that were armed', async 
   await expect(page.locator('#stoh .stgh')).toHaveCount(0);
   // stamp
   await page.click('#elb [data-k="stamp"]'); await settle(page);
+  await armStamp(page);
   await over(page, 0.4, 0.4);
   await expect(page.locator('#fpov .gh')).toHaveCount(1);
   await page.mouse.click(...(await (async () => { const b = await page.locator('#art').boundingBox(); return [b.x + b.width * 0.4, b.y + b.height * 0.4]; })()), { button: 'right' }); await settle(page);
@@ -68,6 +69,7 @@ test('a right click puts away a shape, a stamp and text that were armed', async 
 test('using the interface puts away a stamp and text too, and a picking button arms its own kind again', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await page.click('#elb [data-k="stamp"]'); await settle(page);
+  await armStamp(page);
   await over(page, 0.4, 0.4);
   await expect(page.locator('#fpov .gh')).toHaveCount(1);
   await page.click('#elb [data-k="select"]'); await settle(page);

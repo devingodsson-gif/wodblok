@@ -1147,6 +1147,7 @@ body.eyedrop{cursor:crosshair}
    <div class="shg" id="shp_pre" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
    <div id="shp_crw" hidden><label>Corner</label><input type="range" id="shp_cr" min="0" max="50" value="18" data-u="%" data-def="18"></div>
    <div id="shp_npw" hidden><label>Points</label><input type="range" id="shp_np" min="3" max="12" value="5" data-def="5"></div>
+   <div class="row"><button type="button" class="primary" id="shp_imp">Import image&#8230;</button></div>
    <div class="row"><button type="button" class="alt" id="shp_pen" aria-pressed="false">Draw a path</button><button type="button" class="alt" id="shp_ed" aria-pressed="false" hidden>Edit points</button></div>
   </div></details>
   <details class="g" open id="shp_f" hidden><summary>Fill</summary><div class="gb">
@@ -1154,7 +1155,8 @@ body.eyedrop{cursor:crosshair}
    <div class="cwrow" id="shp_fcr"><span class="cwk">Colour</span><div class="cwell" id="shp_fw"></div></div>
    <div id="shp_img" hidden>
     <div class="strip" id="lfars"></div>
-    <div class="row"><button class="alt" id="lfaimp">Import image&#8230;</button><button class="alt" id="lfaprj">Use a project&#8230;</button></div>
+    <div class="row"><button type="button" class="primary" id="lfaimp">Import image&#8230;</button></div>
+    <div class="row"><button class="alt" id="lfaprj">Use a project&#8230;</button></div>
     <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".wodblok,application/zip" tabindex="-1">
     <div class="seg" id="shp_im" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-i="cover" aria-pressed="true">Cover</button><button type="button" data-i="contain" aria-pressed="false">Fit</button></div>
     <div><label>Zoom</label><input type="range" id="shp_iz" min="10" max="400" value="100" data-u="%" data-def="100"></div>
@@ -1271,7 +1273,7 @@ body.eyedrop{cursor:crosshair}
     <div class="row"><button class="alt" id="pesd">Reroll</button></div>
     <div class="glb">Sources</div>
     <div class="psl" id="pesrc"></div>
-    <div class="row"><button class="alt" id="peadd">Add current stamp</button><button class="alt" id="pesel">Add selected element</button></div>
+    <div class="row"><select id="peadd" aria-label="Add element"></select></div>
    </div>
   </div></details>
   <details class="g" open id="mp_g" hidden><summary>Map to shape</summary><div class="gb">

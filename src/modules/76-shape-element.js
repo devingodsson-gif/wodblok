@@ -45,7 +45,7 @@ function shPath(p,w,h){const q=Array.isArray(p.pts)?p.pts:[];if(q.length<2)retur
  for(let i=1;i<q.length;i++)d+=seg(q[i-1],q[i]);if(p.cl&&q.length>2)d+=seg(q[q.length-1],q[0])+'Z';return d}
 const shOpen=p=>p.sh=='line'||(p.sh=='path'&&!p.cl);
 const shBox=p=>{const s=Math.max(1,+p.s||100);return[s*(p.wx||1),s*(p.wy||1)]};
-function shpLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='shape');if(!pl.length)return['',''];const fr=new Map();let defs='',out='';
+function shpLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='shape');if(!pl.length)return['',''];const fr=new Map(),ed=li==WBS.selL&&!$('boardP').classList.contains('off');let defs='',out='';
  pl.forEach(p=>{const id=String(p.u).replace(/[^\w-]/g,''),J=fxJit(p),[w0,h0]=shBox(p),sz=J?J.sz:1,w=w0*sz,h=h0*sz,d=shGeom(p,w,h);if(!d)return;
   const A=p.fl=='img'&&!shOpen(p)?WBS.ARTS[p.a]:null,fill=A||p.fl=='none'||p.fl=='img'||shOpen(p)&&p.fl!='solid'?'none':col(okC(p.ink)?p.ink:WBS.proj.ink),sw=+p.sw>0?Math.min(400,+p.sw):0,stroke=sw?` stroke="${col(okC(p.sk)?p.sk:WBS.proj.ink)}" stroke-width="${sf(sw)}" stroke-linejoin="round" stroke-linecap="round"`:'';
   if(fill=='none'&&!sw&&!A){fr.set(String(p.u),'');return}
@@ -53,7 +53,7 @@ function shpLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='shape');if(!pl.le
    T=p.fx&&p.fx.length?fxTex(p,'spx'+li+'_'+id,bx):null,G=p.fx&&p.fx.length?fxGr(p,'spg'+li+'_'+id,bx):null;if(T)defs+=T.defs;if(G)defs+=G.defs;
   let pic='';if(A){const aid='sai'+li+'_'+String(p.a).replace(/[^\w-]/g,''),cid='sac'+li+'_'+id;if(!defs.includes('id="'+aid+'"'))defs+=`<image id="${aid}" href="${A.src}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none"/>`;defs+=`<clipPath id="${cid}"><path d="${d}"/></clipPath>`;
    const k=(p.im=='contain'?Math.min(w/A.w,h/A.h):Math.max(w/A.w,h/A.h))*Math.max(.05,Math.min(8,(+p.iz||100)/100));pic=`<g clip-path="url(#${cid})"><use href="#${aid}" transform="scale(${sf(k)}) translate(${sf(-A.w/2)} ${sf(-A.h/2)})"/></g>`}
-  const body=`<g transform="translate(${sf((+p.x||0)+(J?J.dx:0))} ${sf((+p.y||0)+(J?J.dy:0))}) rotate(${sf(rr)}) scale(${fl} ${fv})">${pic}<path d="${d}" fill="${fill}" fill-rule="evenodd"${stroke}/></g>`,
+  const body=`<g${ed?` data-mv="${p.u}" data-mx="${+p.x||0}" data-my="${+p.y||0}"`:''} transform="translate(${sf((+p.x||0)+(J?J.dx:0))} ${sf((+p.y||0)+(J?J.dy:0))}) rotate(${sf(rr)}) scale(${fl} ${fv})">${pic}<path d="${d}" fill="${fill}" fill-rule="evenodd"${stroke}/></g>`,
    one=T||G?`<g${T?T.attrs:''}>${G?G.wrap(body):body}</g>`:body;out+=one;fr.set(String(p.u),one)});
  return[defs,out,'','',fr]}
 
@@ -144,8 +144,9 @@ function penSplit(p,T,c){const q=p.pts,n=q.length,segs=p.cl&&n>2?n:n-1;let best=
 function shStrip(p){const ids=Object.keys(WBS.ARTS),st=$('lfars');if(!st)return;const ky=ids.map(i=>i+':'+WBS.ARTS[i].src.length+(artRefd(i)?'u':'')).join('|')+'#'+p.a;
  if(st.dataset.k==ky)return;st.dataset.k=ky;st.innerHTML=ids.length?ids.map(i=>{const A=WBS.ARTS[i];return`<button type="button" data-a="${hx(i)}" class="${p.a==i?'on':''}" title="${hx(A.n)}"><img src="${artBU(A)}" alt="">${artRefd(i)?'':`<i data-ax="${hx(i)}" title="Remove from this project">&#215;</i>`}</button>`}).join(''):''}
 // ---- the panel: three groups (Shape, Fill, Outline) in the Element panel, shown while a Shape is selected
-function shpSync(){const p=shCur(),k=$('shp_k');if(!k)return;const show=!!p;['shp_k','shp_f','shp_o'].forEach(id=>{const e=$(id);if(e&&e.hidden===show)e.hidden=!show});
- if(!show){if(PEN.edit){PEN.edit=null;penDraw()}return}
+function shpSync(){const p=shCur(),k=$('shp_k');if(!k)return;const show=!!p,make=!p&&WBX.wbAbPick&&WBX.wbAbPick()=='shape';   // make: the Shape button was pressed and nothing is selected, so only the presets (and the pen) show
+ [['shp_k',show||make],['shp_f',show],['shp_o',show]].forEach(a=>{const e=$(a[0]);if(e&&e.hidden===a[1])e.hidden=!a[1]});
+ if(!show){if(PEN.edit){PEN.edit=null;penDraw()}if(make){$('shp_pre').querySelectorAll('[data-g]').forEach(b=>{if(b.getAttribute('aria-pressed')!='false'){b.setAttribute('aria-pressed','false');b.classList.remove('on')}});['shp_crw','shp_npw','shp_ed'].forEach(id=>{const e=$(id);if(e&&!e.hidden)e.hidden=true})}return}
  $('shp_pre').querySelectorAll('[data-g]').forEach(b=>{const on=b.dataset.g==p.sh;if(b.getAttribute('aria-pressed')!=String(on)){b.setAttribute('aria-pressed',String(on));b.classList.toggle('on',on)}});
  const vis=(id,v)=>{const e=$(id);if(e&&e.hidden===v)e.hidden=!v},set=(id,v)=>{const e=$(id);if(e&&+e.value!==v){e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}))}};
  vis('shp_crw',p.sh=='rrect');vis('shp_npw',p.sh=='star');vis('shp_ed',p.sh=='path');if(p.sh=='rrect')set('shp_cr',p.cr==null?18:+p.cr);if(p.sh=='star')set('shp_np',+p.np||5);
@@ -157,9 +158,10 @@ function init76(){
  elExtend('shape',{dz:6,is:q=>q.k=='shape',name:q=>q.nm||SHPN[q.sh]||'Shape',draw:(L,li,pa)=>shpLayer(L,li,pa)});
  const pre=$('shp_pre');if(!pre)return;
  pre.innerHTML=SHPL.map(a=>`<button type="button" data-g="${a[0]}" aria-label="${a[1]}" title="${a[1]}" aria-pressed="false"><svg viewBox="0 0 24 24">${a[2]}</svg></button>`).join('');
- pre.onclick=e=>{const b=e.target.closest('[data-g]');const p=shCur();if(!b||!p)return;const g=b.dataset.g;if(p.sh==g)return;p.sh=g;shLast=g;if(g=='rrect'&&p.cr==null)p.cr=18;if(g=='star'&&p.np==null)p.np=5;if(g=='line'&&!(+p.sw>0))p.sw=Math.max(2,Math.round(Math.min(CW,CH)/60));PEN.edit=null;shCh();shpSync()};
+ pre.onclick=e=>{const b=e.target.closest('[data-g]');const p=shCur();if(!b)return;const g=b.dataset.g;if(!p){shNew(g);return}if(p.sh==g)return;p.sh=g;shLast=g;if(g=='rrect'&&p.cr==null)p.cr=18;if(g=='star'&&p.np==null)p.np=5;if(g=='line'&&!(+p.sw>0))p.sw=Math.max(2,Math.round(Math.min(CW,CH)/60));PEN.edit=null;shCh();shpSync()};
  const sl=(id,key)=>$(id).addEventListener('input',()=>{const p=shCur();if(!p)return;const v=+$(id).value;if(p[key]===v)return;p[key]=v;store();upd()});
  sl('shp_cr','cr');sl('shp_np','np');['shp_cr','shp_np','shp_ow','shp_iz'].forEach(id=>$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()}));
+ $('shp_imp').onclick=()=>{if(shCur()){SHI.fresh=false;$('lfafile').click()}else WBX.wbShapeImageNew()};   // a picture for the selected Shape, or a new Shape that shows it
  $('shp_pen').onclick=()=>{if(penOn())penStop();else penStart()};
  $('shp_ed').onclick=()=>penEditOn(PEN.edit==null);
  $('shp_fk').onclick=e=>{const b=e.target.closest('[data-f]');const p=shCur();if(!b||!p)return;if(b.dataset.f=='none')p.fl='none';else if(b.dataset.f=='img'){p.fl='img';if(!WBS.ARTS[p.a]){const k=Object.keys(WBS.ARTS);if(k.length)p.a=k[0]}}else if(shOpen(p))p.fl='solid';else delete p.fl;shCh();shpSync()};
