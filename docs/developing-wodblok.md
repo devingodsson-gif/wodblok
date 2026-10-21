@@ -320,9 +320,10 @@ Elements under 18px are indicators (dots, chips that do not act, handles), not c
 
 ### 8. Icons
 
-- One icon family: line icons, `stroke="currentColor"`, round caps and joins, no fill, no emoji, no text glyphs as icons.
+- One icon family, drawn once in `src/modules/00-icons.js` (2.14.0, owner: minimalist and clear, like Photoshop): line icons on a 24-unit grid inside 3.5..20.5, `stroke="currentColor"`, round caps and joins, no fill, no emoji, no text glyphs as icons. Frames have a 1.5 corner radius; a dot is a small circle.
+- The page's icons are `<svg class="ic" data-ic="name"></svg>` (filled at start-up by `icFill`); code uses `ICN.name` or `ic(name)`. A new icon is added to the set, never drawn inline.
 - Sizes: 13px in dense rows, 15px in panel headers and toolbars, 18px in the rail. Nothing else.
-- Stroke weight is set once, by icon size, in the `.ic` rules; a new icon takes the class and the size and sets no stroke width of its own.
+- Stroke weight is one hairline at every size: `--ic-w` (1.25px) with `vector-effect: non-scaling-stroke` in the `.ic` rules; an icon sets no stroke width of its own.
 - Idle icons `--mut`; hover `--fg`; selected `--acc-ink`.
 - Every icon-only control has an `aria-label` and a keyboard route. The label is not shown as a tooltip.
 - Texture, brand and drawn shapes are artwork, not icons, and are exempt.

@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {C,CH,CW,closeDD,col,geom,okC,placeFloat,shOf} from './04-canvas-and-stamp-outlines.js';
@@ -13,12 +14,12 @@ import {stUnlocked} from './63-stamp-tool.js';
 const GK=['ex','ct','hi','sh','wh','bl','tp','tn','sat','vib','hue','fd'],zA=()=>Object.fromEntries(GK.map(k=>[k,0]));
 const MT={lin:'Linear gradient',rad:'Radial gradient',lay:'Layer',col:'Colour range',lum:'Luminance range'},MS={lin:'Linear',rad:'Radial',lay:'Layer',col:'Colour',lum:'Luminance'};
 const MD={lin:{sp:'c',st:'',x1:.5,y1:.1,x2:.5,y2:.5},rad:{sp:'c',st:'',cx:.5,cy:.5,rx:.32,ry:.22,fe:50},lay:{lay:''},col:{c:'#000000',rg:20,sm:50},lum:{lo:0,hi:35,sm:25}};
-const MIC={lin:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 12h17" stroke-dasharray="2.4 2.4"/></svg>',
-rad:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" stroke-dasharray="2.2 2"/></svg>',
-lay:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l8.5 4.5-8.5 4.5L3.5 8z"/><path d="M3.5 12l8.5 4.5 8.5-4.5"/><path d="M3.5 16l8.5 4.5 8.5-4.5"/></svg>',
-col:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5s6 6.2 6 10.2a6 6 0 01-12 0c0-4 6-10.2 6-10.2z"/></svg>',
-lum:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 010 17z" fill="currentColor"/></svg>',
-glob:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 15l5-5 4 4 2.5-2.5 5.5 5.5"/></svg>'};
+const MIC={lin:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.gradLinear+'</svg>',
+rad:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.gradRadial+'</svg>',
+lay:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.layers+'</svg>',
+col:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.drop+'</svg>',
+lum:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.contrast+'</svg>',
+glob:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.image+'</svg>'};
 const cl01=v=>Math.max(0,Math.min(1,v)),f4=v=>(+v).toFixed(4),sst=t=>{t=cl01(t);return t*t*(3-2*t)},hasA=a=>!!a&&GK.some(k=>+a[k]);
 function mFix(m){if(!m||!MT[m.t])return null;const d=MD[m.t],o={sc:m.sc?String(m.sc):'',id:String(m.id||('m'+Math.random().toString(36).slice(2,8))),t:m.t,name:String(m.name||MS[m.t]).slice(0,30),on:m.on!==false,inv:!!m.inv,amt:m.amt==null||!isFinite(+m.amt)?100:Math.max(0,Math.min(100,+m.amt)),a:zA()};
 GK.forEach(k=>{if(m.a&&isFinite(+m.a[k]))o.a[k]=+m.a[k]});Object.keys(d).forEach(k=>{const v=m[k]??d[k];o[k]=typeof d[k]=='number'?(isFinite(+v)?+v:d[k]):String(v)});
@@ -68,7 +69,7 @@ function colP(m,res){const h=m.c,t=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/25
 const k=.04+m.sm/100*.96,sv=[];for(let i=0;i<=32;i++)sv.push(f4(sst((i/32-(1-k))/k)));
 return[`<feComponentTransfer in="SourceGraphic" result="${res}d"><feFuncR type="table" tableValues="${tab(t[0])}"/><feFuncG type="table" tableValues="${tab(t[1])}"/><feFuncB type="table" tableValues="${tab(t[2])}"/></feComponentTransfer><feColorMatrix in="${res}d" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 -2" result="${res}s"/><feComponentTransfer in="${res}s" result="${res}"><feFuncA type="table" tableValues="${sv.join(' ')}"/></feComponentTransfer>`,res]}
 const inSt=()=>stUnlocked()!=null;
-const OVC='#ff2d55',GEYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>',GNOEYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 5.7A8.6 8.6 0 0112 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 01-2.9 3.7M6.3 7.6C3.6 9.3 2.5 12 2.5 12S6 18.5 12 18.5c1.5 0 2.8-.3 4-.9"/><path d="M4 4l16 16"/></svg>';
+const OVC='#ff2d55',GEYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.eye+'</svg>',GNOEYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.eyeOff+'</svg>';
 function maskStep(m,i,cur,ctx){const p='k'+i+ctx.k,ov=ovOf(m);if(!hasA(m.a)&&!ov)return['',cur];
 let o='',aR=cur;if(hasA(m.a)){const r=adjP(m.a,cur,p+'a');o+=r[0];aR=r[1]}
 const mm=isPos(m)?gImg(m,ctx,p+'i'):m.t=='lum'?lumP(m,p+'i'):colP(m,p+'i'),k=m.amt/100;

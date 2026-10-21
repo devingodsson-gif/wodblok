@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
@@ -12,7 +13,7 @@ import {stUnlocked} from './63-stamp-tool.js';
 // of the list when nothing is selected), selects it, and shows its panel in Properties. Shape, Stamp and Text
 // also arm (Paint is hidden since 2.3.1) their tool, so the next clicks on the canvas carry on; Select (first button, V) puts any tool away. Image asks for a picture first and makes a Shape filled with it
 // (2.3.1: there is no Image element and no Sheet; the Background is set in the Canvas tool). Owner, Oct 20 2026: "every click makes an element", "just above the selected one".
-const AB_SEL='<path d="M6 3.5l12 8.2-5.4 1.2 3.2 6.1-2.4 1.3-3.2-6.1-4.2 3.7z"/>';
+const AB_SEL=ICN.cursor;
 // where a new element goes: just above the selected element (in the same group), else at the top; `bottom` puts it at the bottom when nothing is selected
 function abInsert(q,bottom){const L=fpL();if(!L)return null;const a=(L.pl=L.pl||[]),s=elSel()||(WBS.fpSel!=null&&WBS.fpSel!==-1?a.find(x=>String(x.u)===String(WBS.fpSel)):null);
  if(s&&a.includes(s)){if(s.g)q.g=s.g;a.splice(a.indexOf(s)+1,0,q)}else if(bottom)a.unshift(q);else a.push(q);

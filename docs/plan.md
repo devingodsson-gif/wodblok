@@ -490,3 +490,12 @@ Between us only (never in the UI): a stamp parent is a stamp (a template, a tile
 - Kept hidden for now: the `#lfpst` strip node (code in 25-art-layers.js and the Add bar arm still read it; the specs arm a stamp through it), the Stamp library code.
 - Tests: `tests/stamp-panel.spec.js`; removed `stamp-contents.spec.js` and the outline checks; the specs now arm a stamp with a dispatched click, `closeAllPanels` replaces `#rcls`, align and row-menu re-show the Elements panel after a selection jump, stamp-editor-port uses Add text; the stamp-library save test is `fixme` (no way to open the library since 2.10.0).
 - Not run: CI, the full suite, `npm run perf` (less drawing work, none added).
+
+### 2.14.0 (Oct 21 2026): new icons (owner: "very minimalist and simple, clean yet clear and communicative, like Photoshop"). Format 25 unchanged
+- Every UI icon is redrawn and lives in one place, `src/modules/00-icons.js` (`ICN`, `ic()`, `icFill()`, `icAlign()`): the page's icons are `data-ic` names filled at start-up, the code's icons use `ICN.name`. About 90 icons replace roughly 150 inline drawings across the shell and 21 modules.
+- One hairline weight at every size (`--ic-w` 1.25px, non-scaling stroke) instead of six per-context stroke widths.
+- New pictures where the old ones were unclear: the Stamp is a rubber stamp, Canvas is a crop mark, Motif is a small flower, Bring to front / Send to back are arrows to a bar, Export is a download into a tray, Save to library is the same.
+- Kept as artwork (not icons): stamp outline kinds, grid cell shapes, Shape presets.
+- Tests: element-list re-shows the Elements panel after a selection jump; account and template-picker specs start empty (the harness Pattern needs the app open).
+- Goldens: every pixel golden that shows an icon will differ (the rail, the bars, panel headers): an explained change, to regenerate when the suite runs.
+- Not run: CI, the full suite, `npm run perf` (no drawing path touched).

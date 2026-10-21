@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
 import {$,WBX} from './01-launch-and-version.js';
 import {C,rowMenu} from './04-canvas-and-stamp-outlines.js';
@@ -13,9 +14,9 @@ const SC_SET='Wada colours';
 const scEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const SC={q:'',active:'',open:new Set(['']),scForm:null,ren:null,sel:null,k:''};
 const scIC=(d,w)=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||1.8}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-const scFOLDER=scIC('<path d="M3.5 7.5V18a1.5 1.5 0 0 0 1.5 1.5h14a1.5 1.5 0 0 0 1.5-1.5V9.5A1.5 1.5 0 0 0 19 8h-7l-2-2.5H5A1.5 1.5 0 0 0 3.5 7z"/>'),scFOLDER_O=scIC('<path d="M3.5 18.5V7A1.5 1.5 0 0 1 5 5.5h4l2 2.5h6.5A1.5 1.5 0 0 1 19 9.5V11M3.5 18.5l2.4-7a1.5 1.5 0 0 1 1.4-1h13.2a1 1 0 0 1 .95 1.3l-2 6.2a1.5 1.5 0 0 1-1.4 1H3.5z"/>');
-const scHOME=scIC('<path d="M4 11l8-6.5 8 6.5M6 9.5V19h12V9.5"/>'),scCHEV='<svg class="lfa" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l6 6-6 6"/></svg>';
-const scMORE='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>',scX=scIC('<path d="M6 6l12 12M18 6L6 18"/>',2);
+const scFOLDER=scIC(ICN.folder),scFOLDER_O=scIC(ICN.folderOpen);
+const scHOME=scIC(ICN.home),scCHEV='<svg class="lfa" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l6 6-6 6"/></svg>';
+const scMORE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.more+'</svg>',scX=scIC(ICN.close,2);
 function scLoad(){let d=null;try{d=JSON.parse(kv.get(SC_KEY)||'null')}catch(e){}
  if(!d||typeof d!='object')d={f:[],c:[]};
  d.f=(Array.isArray(d.f)?d.f:[]).filter(x=>typeof x=='string'&&x);
@@ -68,7 +69,7 @@ function scAddColour(hex,name,folder){const d=scLoad(),c={id:newId(),n:name||'',
 function scEdit(id,anchor){const d=scLoad(),c=d.c.find(x=>x.id===id);if(!c)return;
  const set=fn=>{const e=scLoad(),y=e.c.find(x=>x.id===id);if(y){fn(y);scStore(e);scPaint(true)}};
  openPicker(anchor,{value:c.h,alpha:true,name:c.n,namePh:c.h.slice(0,7).toUpperCase(),onName:v=>set(y=>{y.n=String(v||'').trim().slice(0,40)}),onInput:h=>set(y=>{y.h=normHexA(h)||y.h}),
-  actions:[['Add to the tray',scIC('<path d="M12 5v14M5 12h14"/>',2),()=>{const y=scLoad().c.find(x=>x.id===id);if(!y)return;if(trayAdd(y.h,y.n)==null)pmsg('The tray is full.');else{trayDone('Added “'+scNameOf(y)+'” to the tray');pmsg('Added “'+scNameOf(y)+'” to the tray.')}}]]})}
+  actions:[['Add to the tray',scIC(ICN.plus,2),()=>{const y=scLoad().c.find(x=>x.id===id);if(!y)return;if(trayAdd(y.h,y.n)==null)pmsg('The tray is full.');else{trayDone('Added “'+scNameOf(y)+'” to the tray');pmsg('Added “'+scNameOf(y)+'” to the tray.')}}]]})}
 function scFolderPaths(d){const fs=scFolders(d).sort((a,b)=>scCmp(a.replace(/\//g,' / '),b.replace(/\//g,' / ')));return fs}
 function init57(){
  scUi();

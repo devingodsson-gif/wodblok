@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {acAccount} from '../platform/account.js';
 import {cmdGet,cmdRegister} from '../commands/registry.js';
 import {$,WBX,WB_VER} from './01-launch-and-version.js';
@@ -22,8 +23,8 @@ function axClose(id){if($(id).hidden)return;$(id).hidden=true;const b=axOpener&&
 // ---------------------------------------------------------------- state
 // The two File menu items and their commands exist only while an account is signed in, so everywhere else the menu and command search are as before.
 const axIC=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-const axITEMS=[['acgo','Account…','account.open','Account',axIC('<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/>'),()=>axAccountShow()],
- ['fbgo','Send feedback…','feedback.open','Send feedback',axIC('<path d="M4 5.5h16v11H11l-4.5 3.5v-3.5H4z"/>'),()=>axFbShow()]];
+const axITEMS=[['acgo','Account…','account.open','Account',axIC(ICN.user),()=>axAccountShow()],
+ ['fbgo','Send feedback…','feedback.open','Send feedback',axIC(ICN.feedback),()=>axFbShow()]];
 function axMenu(on){let after=$('stgo');
  for(const [id,text,cmd,label,icon,run] of axITEMS){let b=$(id);
   if(on&&!b){b=document.createElement('button');b.id=id;b.type='button';b.innerHTML=icon+text;b.onclick=run;after.parentNode.insertBefore(b,after.nextSibling);after=b}

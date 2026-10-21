@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {ser} from './14-presets-and-layer-grid-ui.js';
@@ -18,7 +19,7 @@ function vrRecolor(svg,from){
   return s;
 }
 const cwEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const CW_MORE='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
+const CW_MORE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.more+'</svg>';
 const TH=new Map();   // pictures: key (piece + colours) -> data URL
 let ren=-1,busy=false,stale=true,timer=0;
 const sec=()=>document.querySelector('section.pn[data-p="colors"]');   // 2.11.0: Colourways sit at the bottom of the Colours panel

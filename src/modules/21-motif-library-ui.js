@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {M,N,rowMenu} from './04-canvas-and-stamp-outlines.js';
@@ -80,16 +81,16 @@ function libOpen(v){lbDirty();const n=lbNode(v)||lbNode('/');WBS.mcat=n.v;mcSave
 function lbRemap(p,np){const m=x=>lbIn(x,p)?np+x.slice(p.length):x;
 WBS.FOLD=[...new Set(WBS.FOLD.map(m))];Object.values(cust).forEach(v=>{if(v&&v.g)v.g=m(v.g)});Object.keys(BF).forEach(k=>{BF[k]=m(BF[k])});
 if(WBS.mcat.startsWith('g:'))WBS.mcat=lbId(m(WBS.mcat.slice(2)));const lo=[...lbOpen];lbOpen.clear();lo.forEach(v=>lbOpen.add(v.startsWith('g:')?lbId(m(v.slice(2))):v));loSave();mcSave();fSave();store();lbDirty()}
-const IC={del:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg>',
-hide:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 5.7A8.6 8.6 0 0112 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 01-2.9 3.7M6.3 7.6C3.6 9.3 2.5 12 2.5 12S6 18.5 12 18.5c1.5 0 2.8-.3 4-.9"/><path d="M4 4l16 16"/></svg>',
-fold:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/></svg>',
-set:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l4.4 7.4H7.6z"/><circle cx="7.6" cy="16.6" r="3.4"/><rect x="13" y="13.2" width="7" height="7" rx="1.2"/></svg>',
-tray:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 13.5l2.3-6.8A1.8 1.8 0 017.8 5.5h8.4a1.8 1.8 0 011.7 1.2l2.3 6.8V18a1.5 1.5 0 01-1.5 1.5H5.3A1.5 1.5 0 013.8 18z"/><path d="M3.8 13.5h4.6l1.1 2.2h5l1.1-2.2h4.6"/></svg>',
-pen:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5l.9-3.9L16 5a2.1 2.1 0 013 3L8.4 18.6z"/></svg>',
-chev:'<svg class="lfa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 7l5 5-5 5"/></svg>',
+const IC={del:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.trash+'</svg>',
+hide:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.eyeOff+'</svg>',
+fold:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.folder+'</svg>',
+set:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.motif+'</svg>',
+tray:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.tray+'</svg>',
+pen:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.pencil+'</svg>',
+chev:'<svg class="lfa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevR+'</svg>',
 ck:'<svg viewBox="0 0 16 16"><path d="M4.3 8.4l2.4 2.4 5-5.3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
-const IC2={foldo:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17.5V7A2.5 2.5 0 016 4.5h3.2l2 2.5H17.5A2.5 2.5 0 0120 9.5v1"/><path d="M3.5 17.5l2.2-5.4a1.8 1.8 0 011.7-1.1h13.1a.9.9 0 01.8 1.2l-2.1 5.6a1.8 1.8 0 01-1.7 1.2H4.5a1 1 0 01-1-1.5z"/></svg>',
-more:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 12h.01M12 12h.01M18 12h.01"/></svg>'};
+const IC2={foldo:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.folderOpen+'</svg>',
+more:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">'+ICN.more+'</svg>'};
 // the folders at the top of the tree: My imports, Drawn by Claude (old projects only), then your folders and the sets, A to Z
 const lbTop=()=>[lbNode('i'),...(lbX().drw.length?[lbNode('d')]:[]),...lbKids(lbNode('/'))];
 const lbVis=()=>[...new Set([...$('lib').querySelectorAll('button[data-m]')].map(b=>b.dataset.m))];

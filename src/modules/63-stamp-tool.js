@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,SH,SHN,SW,rowMenu,useT,shp} from './04-canvas-and-stamp-outlines.js';
 import {pal,selOne,store} from './06-motif-library-folders.js';
@@ -11,7 +12,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 // same positions that were printed.
 const STP={p:{},items:[],on:false,rot:0,un:null,unL:null,sig:'',ai:null,after:null};
 const stIc=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-const STEDIT=stIc('<path d="M4.5 19.5l.9-3.9L16 5a2.1 2.1 0 013 3L8.4 18.6z"/>');   // the Edit pencil on a stamp row (2.5.0, was the lock)
+const STEDIT=stIc(ICN.pencil);   // the Edit pencil on a stamp row (2.5.0, was the lock)
 const STTRRE=/translate\(([-\d.]+) ([-\d.]+)\) rotate\(([-\d.]+)\) scale\(([-\d.]+) ([-\d.]+)\)/;
 const stSel=()=>WBS.layers[WBS.selL];
 const stName=id=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==id)+1);

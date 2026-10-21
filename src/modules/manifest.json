@@ -1,4 +1,5 @@
 [
+ "00-icons.js",
  "01-launch-and-version.js",
  "02-draft-mode-speedups.js",
  "03-stamp-prints-and-drawing.js",

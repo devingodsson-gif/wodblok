@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {cmdFormatShortcut,cmdIsEnabled,cmdList,cmdRun} from '../commands/registry.js';
 import {kv} from '../platform/index.js';
 import {$} from './01-launch-and-version.js';
@@ -52,7 +53,7 @@ function init40(){
       b.textContent=r.c.label;e.appendChild(b);
       if(r.c.shortcut){const k=document.createElement('kbd');k.textContent=cmdFormatShortcut(r.c.shortcut,isMac());e.appendChild(k)}
       const pn=document.createElement('button'),on=pinIs(r.c.id);pn.type='button';pn.className='ckp'+(on?' on':'');pn.dataset.id=r.c.id;pn.tabIndex=-1;pn.setAttribute('aria-pressed',on?'true':'false');pn.setAttribute('aria-label',(on?'Unpin ':'Pin ')+r.c.label+(on?' from the task bar':' to the task bar'));
-      pn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7"/></svg>';e.appendChild(pn);
+      pn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.pin+'</svg>';e.appendChild(pn);
       list.appendChild(e);
     });
     mark();
