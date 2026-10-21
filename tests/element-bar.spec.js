@@ -16,8 +16,8 @@ const canvasClick = async (page, fx, fy) => {
 test('the element bar has one button per kind, left of centre; the tray starts right of centre', async ({ page }) => {
   const { errors } = await openApp(page);
   const btn = page.locator('#elb .elbb');
-  await expect(btn).toHaveCount(7);
-  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Sheet', 'Paint', 'Shape', 'Image', 'Text', 'Stamp', 'Pattern']);
+  await expect(btn).toHaveCount(8);
+  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Select', 'Sheet', 'Paint', 'Shape', 'Image', 'Text', 'Stamp', 'Pattern']);
   await expect(page.locator('#elb [data-k="sheet"]')).toBeEnabled();
   await expect(page.locator('#elb [data-k="paint"]')).toBeEnabled();
   for (const pn of ['elsheet', 'stmp', 'layers']) await expect(page.locator(`.rail [data-pn="${pn}"]`)).toBeHidden();   // element panels have no rail button
@@ -30,34 +30,35 @@ test('the element bar has one button per kind, left of centre; the tray starts r
   expect(errors).toEqual([]);
 });
 
-test('each working button opens its panel and shows pressed while that panel is in front', async ({ page }) => {
-  const { errors } = await openApp(page);
-  for (const [k, pn] of [['sheet', 'elsheet'], ['shape', 'motifs'], ['image', 'elimg'], ['text', 'text'], ['stamp', 'stmp'], ['pattern', 'layers'], ['paint', 'elpaint']]) {
-    await page.click(`#elb [data-k="${k}"]`);
-    await settle(page);
-    await expect(page.locator(`section.pn[data-p="${pn}"]`)).toBeVisible();
-    await expect(page.locator(`#elb [data-k="${k}"]`)).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
-  }
+test('every button but Select makes an element at once, just above the selected one, and shows pressed while its tool is armed (2.3.0)', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
+  const kinds = async () => JSON.parse(await getState(page)).els.map(q => q.k);
+  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.click('#elb [data-k="sheet"]'); await settle(page);
+  expect(await kinds()).toEqual(['sheet']);
+  await page.click('#elb [data-k="pattern"]'); await settle(page);
+  expect(await kinds()).toEqual(['sheet', 'pattern']);
+  await page.click('#elb [data-k="paint"]'); await settle(page);
+  expect(await kinds()).toEqual(['sheet', 'pattern', 'paint']);
+  await expect(page.locator('#elb [data-k="paint"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
+  await page.click('#elb [data-k="select"]'); await settle(page);
+  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
+  await page.click('#elb [data-k="shape"]'); await settle(page);
+  expect((await kinds()).includes('shape')).toBe(true);
   expect(errors).toEqual([]);
 });
 
-test('a stamp is placed from the Stamp panel, listed in Elements, and the Stamp panel says which one is being edited', async ({ page }) => {
+test('the Stamp button puts the current stamp on the canvas as an element at once, listed in Elements', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  await page.click('#elb [data-k="stamp"]');
-  await page.click('#lfpst [data-t]');
-  await canvasClick(page, 0.5, 0.5);
-  await page.click('#lfpst [data-t]');          // stop placing
+  await page.click('#elb [data-k="stamp"]'); await settle(page);
   const pl = JSON.parse(await getState(page)).els;
-  expect(pl.length).toBe(1);
+  expect(pl.map(q => q.k)).toEqual(['stamp']);
   await openPanel(page, 'lyrs');
   await expect(page.locator('#lyl2 .lyr')).toHaveCount(1);
-  await page.click('#lyl2 .lyr');
-  await settle(page);
-  await page.click('#elb [data-k="stamp"]');
-  await expect(page.locator('.elmode[data-k="stamp"]')).toBeVisible();
-  await expect(page.locator('.elmode[data-k="stamp"] b')).toHaveText('Stamp 1');
   expect(errors).toEqual([]);
 });
 

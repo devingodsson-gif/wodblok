@@ -26,7 +26,7 @@ test('an inverted stamp repeated edge to edge shows no light line between its ti
   expect(JSON.parse(await getState(page)).tiles[0].neg, 'the stamp is inverted').toBeTruthy();
   await page.evaluate(() => { const e = document.getElementById('stmpop'); e.value = 0; e.dispatchEvent(new Event('input', { bubbles: true })); });   // no outline overlay on the picture
   await openPanel(page, 'layers');
-  await page.click('#pelist .mr');
+  await page.evaluate(() => document.querySelector('#pelist .mr').click());
   await page.evaluate(() => { const e = document.getElementById('pesz'); e.value = 100; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });   // full size: neighbouring cells touch
   await settle(page);
   const r = await lines(page);

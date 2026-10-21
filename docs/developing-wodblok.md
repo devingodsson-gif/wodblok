@@ -205,7 +205,7 @@ The editor supports light and dark. Both must be correct for every screen. Theme
 | `--line2` | `#b8b8b8` | `#4a4a4a` | Control edges, menu and dialog borders, slider tracks |
 | `--fg` | `#1f1f1f` | `#e3e3e3` | Primary text |
 | `--mut` | `#5c5c5c` | `#a6a6a6` | Secondary text, idle icons |
-| `--faint` | `#6b6b6b` | `#858585` | Group labels, counts, hints |
+| `--faint` | `#6b6b6b` | `#8f8f8f` | Group labels, counts, hints |
 | `--sel` | `#c7d6ec` | `#3a5578` | **Selected row** in every list (Elements, libraries, menus' current item): Photoshop's muted blue |
 | `--sel-fg` | `#1f1f1f` | `#ffffff` | Text and icons on `--sel` |
 | `--acc` | `#2f74c8` | `#4a8fe0` | Accent: focus, key actions, slider fill and thumb, pressed toggles |

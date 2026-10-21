@@ -14,7 +14,7 @@ const canvasClick = async (page, fx, fy) => {
 const st = async page => JSON.parse(await getState(page));
 
 async function placePicture(page, testInfo) {
-  await page.click('#elb [data-k="image"]');
+  await openPanel(page, 'elimg');
   const f = path.join(testInfo.outputDir, 'dot.png');
   fs.mkdirSync(testInfo.outputDir, { recursive: true });
   fs.writeFileSync(f, Buffer.from(PNG, 'base64'));
@@ -28,10 +28,10 @@ async function placePicture(page, testInfo) {
 test('Make stamp from selection is off with nothing selected; a selected picture becomes a stamp that holds it', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
   const n0 = (await st(page)).tiles.length;
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   await expect(page.locator('#stmksel')).toBeDisabled();
   await placePicture(page, testInfo);
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   await expect(page.locator('#stmksel')).toBeEnabled();
   await page.click('#stmksel');
   await settle(page);
@@ -65,7 +65,7 @@ test('Make stamp from selection is off with nothing selected; a selected picture
 test('taking the picture out of the stamp empties its Contents; the project keeps the picture while a stamp holds it', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
   await placePicture(page, testInfo);
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   await page.click('#stmksel');
   await settle(page);
   await page.click('#stcl [data-xi="0"]');
@@ -86,7 +86,7 @@ test('selected text becomes a stamp that holds the text', async ({ page }) => {
   await openPanel(page, 'lyrs');
   await page.click('#lyl2 .lyr');                // select the text from the Elements list
   await settle(page);
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   await expect(page.locator('#stmksel')).toBeEnabled();
   await page.click('#stmksel');
   await settle(page);

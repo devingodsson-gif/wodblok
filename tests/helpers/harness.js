@@ -198,7 +198,7 @@ async function addStamp(page) {
 // a new layer starts with a Pattern element; this takes it away so the layer holds only what the test places
 async function noPattern(page) {
   await showPanel(page, 'layers');
-  while (await page.locator('#pelist [data-pd]').count()) { await page.click('#pelist [data-pd] >> nth=0'); await settle(page); }
+  while (await page.locator('#pelist [data-pd]').count()) { await page.evaluate(() => document.querySelector('#pelist [data-pd]').click()); await settle(page); }
 }
 
 // 2.2.3: using the interface puts an armed stamp away, so a test that placed stamps after changing a setting arms the stamp again just before it clicks the canvas

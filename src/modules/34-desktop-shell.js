@@ -179,6 +179,7 @@ if(!g){const own=(p=='rand'||!L.dock.length)?wsG([p]):null;   // made in the sam
 g=(p=='rand'&&L.dock.find(x=>x.tabs.includes('grade')))||L.dock[0];if(g)g.tabs.push(p);else{g=own;L.dock.push(g)}}g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
+WBX.wbApart=pn=>{const a=wsFind('lyrs'),b=wsFind(pn);return!(a&&b&&a===b)};   // false when the panel is a tab beside the Elements list: showing it would hide the list
 WBX.wbPropsOpen=()=>!!wsAll().find(wsIsP)||!!wsFind('lyrs');   // Properties shows (and opens under the list) once the Elements list is open
 // Workspaces: read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
 WBX.wbWsGet=()=>JSON.parse(JSON.stringify({pattern:WS.pattern}));

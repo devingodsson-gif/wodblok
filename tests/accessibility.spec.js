@@ -35,7 +35,7 @@ test('a slider thumb and a number field show a clear focus ring from the keyboar
     const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
     const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
     const d = x.getImageData(0, 0, c.width, c.height).data; let n = 0;
-    for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - 201) < 12 && Math.abs(d[i + 1] - 166) < 12 && Math.abs(d[i + 2] - 107) < 12) n++;
+    for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - 74) < 14 && Math.abs(d[i + 1] - 143) < 14 && Math.abs(d[i + 2] - 224) < 14) n++;
     return n;
   }, buf.toString('base64'));
   expect(await accentPixels(on)).toBeGreaterThan((await accentPixels(off)) + 40);

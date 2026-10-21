@@ -48,14 +48,14 @@ test('Colour grade on the Sheet draws a filter only once something is adjusted, 
 test('Colour grade on a placed stamp grades that stamp only', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   await page.click('#lfpst [data-t]');
   await openPanel(page, 'lyrs');
   await page.click('#lyl2 .lyr');
   await settle(page);
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   await addEffect(page, 'stamp', 'Colour grade');
   await page.locator('.fxg[data-fxk="stamp"] .fxg_sat').fill('-100'); await settle(page);
   const q = (await st(page)).els[0];

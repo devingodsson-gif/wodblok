@@ -1,12 +1,12 @@
 // Element update, step 10 (2.1.10): speed with many strokes. Strokes are drawn with synthetic pointer events straight onto the canvas; the time a stroke takes to join the
 // element and the picture to be redrawn (pointer up) must stay small when the element already holds hundreds of strokes.
 const { test, expect } = require('@playwright/test');
-const { openApp, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 test('a Paint element with hundreds of strokes still takes a new stroke quickly', async ({ page }) => {
   test.setTimeout(240000);
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="paint"]');
+  await openPanel(page, 'elpaint');
   await page.click('#pamode [data-m="brush"]');
   const real = async () => { const box = await page.locator('#art').boundingBox(); await page.mouse.move(box.x + box.width * .2, box.y + box.height * .5); await page.mouse.down(); for (let i = 1; i <= 6; i++) await page.mouse.move(box.x + box.width * (.2 + .08 * i), box.y + box.height * .5); const t0 = Date.now(); await page.mouse.up(); await settle(page); return Date.now() - t0; };
   const empty = await real();

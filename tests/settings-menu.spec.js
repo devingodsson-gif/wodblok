@@ -116,15 +116,15 @@ test('accent: the presets are named after woods, in hue order, and the row shows
   await openApp(page);
   await open(page);
   const names = await page.$$eval('#stgacc .stgab:not(.stgac)', bs => bs.map(b => b.getAttribute('aria-label')));
-  expect(names).toEqual(['Rosewood', 'Walnut', 'Steel', 'Eucalyptus', 'Ironwood', 'Purpleheart', 'Maple', 'Birch']);
-  // the order is by hue, measured from the swatch colours; the grey (Birch) is last
+  expect(names).toEqual(['Steel', 'Rosewood', 'Walnut', 'Oak', 'Eucalyptus', 'Ironwood', 'Purpleheart', 'Maple', 'Birch']);   // 2.3.0: Steel is the default and comes first, the woods follow
+  // after Steel the order is by hue, measured from the swatch colours; the grey (Birch) is last
   const hues = await page.$$eval('#stgacc .stgab:not(.stgac)', bs => bs.map(b => {
     const m = b.style.getPropertyValue('--c').trim(), n = [1, 3, 5].map(i => parseInt(m.slice(i, i + 2), 16) / 255), mx = Math.max(...n), mn = Math.min(...n), d = mx - mn;
     if (d < .08) return 999;
     const h = mx === n[0] ? ((n[1] - n[2]) / d + (n[1] < n[2] ? 6 : 0)) : mx === n[1] ? (n[2] - n[0]) / d + 2 : (n[0] - n[1]) / d + 4;
     return h * 60;
   }));
-  expect(hues).toEqual([...hues].sort((a, b) => a - b));
+  expect(hues.slice(1)).toEqual([...hues.slice(1)].sort((a, b) => a - b));
   await expect(page.locator('#stgan')).toHaveText('Steel');
   await expect(page.locator('#stgacc [aria-label="Steel"]')).toHaveAttribute('aria-pressed', 'true');
   await page.click('#stgacc [aria-label="Walnut"]');
@@ -139,7 +139,7 @@ test('accent: every preset keeps its ink readable on both panels', async ({ page
   await openApp(page);
   await open(page);
   const names = await page.$$eval('#stgacc .stgab:not(.stgac)', bs => bs.map(b => b.getAttribute('aria-label')));
-  expect(names.length).toBe(8);
+  expect(names.length).toBe(9);
   for (const n of names) {
     await page.click(`#stgacc [aria-label="${n}"]`);
     for (const t of ['dark', 'light']) {
