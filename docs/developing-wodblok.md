@@ -25,7 +25,7 @@ It is a **commercial product**. The owner plans to sell it and wants it to feel 
 
 The owner is the only person who decides product questions: what a feature does, what the standard is, when something goes live. If a rule, a scale or a plan does not cover something, **ask and change the document first**; do not invent. Keep questions short and ask them only when the answer changes what you build.
 
-Current state (Oct 19 2026): `main` is at **2.0.0** and live (the layer update and the text update are finished). The clean-up plan in `docs/plan.md` (2.0.1 to 2.0.3, then 2.1.0) is done on its branches.
+Current state: see `docs/PROJECT_STATUS.md` (kept up to date by every session; this guide no longer carries a version).
 
 ## 2. Rules that are never broken
 
@@ -146,6 +146,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 
 | File | What it is |
 |---|---|
+| `PROJECT_STATUS.md` | Where development stands: current state, what was and was not tested, known issues, next steps, open questions (read at the start of a session, update at the end) |
 | `agent-memory.md` | What the owner's Claude memory knows: standing preferences, decisions by date (read at the start of a session) |
 | `layer-update-plan.md` | The layer update: the plan, the decisions and the progress log, updated after every step |
 | `plan.md` | The current plan and the outcome of each release since 1.1.0 (add yours here) |

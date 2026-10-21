@@ -1,5 +1,10 @@
 # WODBLOK
-The full developer guide is docs/developing-wodblok.md (rules, workflow, code, tests, CI, UI standard). This file is the short list every session loads. Also read docs/agent-memory.md (standing preferences and decisions), docs/plan.md, docs/element-list-plan.md (the next plan: layers become one list of elements, Oct 20 2026) and docs/element-ui-plan.md (the element UI, built as 2.3.0, Oct 20 2026: Add bar, Properties panel, effects list, free shapes, stamp editing mode; 2.3.1-2.3.3: Background replaces Sheets, Motifs, Shapes with image fill, Map to shape, see docs/plan.md; 2.4.0, docs/element-refinement-plan.md: Add bar picks then places, live motif dragging, empty Patterns with arrows; 2.5.0-2.5.1: stamp tabs, a stamp tab shows the stamp alone; 2.6.0-2.7.0: one panel per element kind with its own element list and an Add button on every kind, no pointer or Image button; 2.9.0: Variations, Presets, Workspaces, Navigator, Textures and Grade tools removed, texture and grade are effects only) and docs/element-update-plan.md (the element update, 2.1.1 to 2.2.0, started Oct 19 2026; the finished layer update is in docs/layer-update-plan.md). Anything saved to Claude memory about WODBLOK is also written to docs/agent-memory.md.
+Every session, in this order, before touching anything:
+1. This file (the short list of rules).
+2. docs/PROJECT_STATUS.md (where development stands, what was and was not tested, open questions) and docs/agent-memory.md (the owner's standing preferences and decisions, by date).
+3. docs/developing-wodblok.md: the full guide (rules, workflow, code, tests, CI). Part 9 is the UI and CSS standard; read it before any UI work.
+4. docs/plan.md (outcome of every release) and the plan for the work in hand (docs/element-refinement-plan.md, docs/element-ui-plan.md, docs/element-list-plan.md, docs/element-update-plan.md; the finished layer update is docs/layer-update-plan.md).
+The GitHub repo is the shared source of truth, not any conversation or agent memory. Anything saved to Claude memory about WODBLOK is also written to docs/agent-memory.md.
 Stamped-pattern editor, web app first. Commercial product. The repo is PUBLIC while it is developed (since Oct 11 2026) and goes private again before it is sold: see "Public repo rules" below and docs/public-repo.md.
 
 ## Commands
@@ -27,6 +32,23 @@ Treat everything pushed as published: it can be cloned and forked at once, and m
 - wodblok.com is hosted on Cloudflare from `main` and is currently open to anyone who visits (no login), so the whole built app is already downloadable by visitors. Never put anything in the build that must stay secret (no keys, no personal data, no real project files in the app). Do not link wodblok.com anywhere public. Putting the site behind Cloudflare Access, or blocking search engines, is the user's decision: never do it unasked. The user has accepted (Oct 11 2026) that anyone who finds the site may use it for now, so do not raise it again unless they ask or the situation changes (selling starts, a paywall is built). **Update Oct 17 2026:** the user asked for accounts. 1.20.0 adds sign-in (Clerk) and an approval gate for the hosted app (docs/accounts.md); it is OFF until `GATE_HOSTS` is set in Cloudflare, so merging it changes nothing by itself. The gate protects the hosted copy only: while the repo is public the source is still readable. Keys, tokens and the Clerk secret key never go in the repo (only the Clerk *publishable* key, which is public by design).
 - Before the user makes the repo private again, follow the checklist in docs/public-repo.md. Never delete the repo, change its visibility, or rewrite git history without the user asking for that specifically.
 - GitHub Actions on a public repo are free, but keep the lean workflows (docs/ci-budget-rules.md) in case the repo goes private again.
+
+## How the owner wants work done (his own words, collected Oct 21 2026; they win over what an agent would prefer)
+- **Vision and bar:** a professional, minimalist, clean editor; Photoshop and Lightroom are the reference applications.
+- **Ask first** before running tests, merging, running CI, opening a pull request, or anything like those. Testing is light by default (the quick specs for the change); if heavy testing is advisable, say why and ask. Open question, in docs/PROJECT_STATUS.md: whether light runs also need asking. Until he answers, ask once at the start of a task ("light checks on X, ok?"); a yes covers light testing for that task.
+- **Build quality:** one consistent style across the code base; modularity, expandability and clarity first; durable, robust systems over fast-to-build rigid ones.
+- **Never diverge from the styling system** (docs/developing-wodblok.md Part 9).
+- **Technical freedom:** ask if the decision is big. Otherwise suggest changes, improvements or upgrades before proceeding; do not just do them.
+- **A finished, high-quality feature** is fast and styled to the standard. If it is not unique (a list, a folder system, a button), it is designed like the existing lists, folders and buttons. If it has never been done before, ask the owner to define it before building.
+- **Before calling work complete,** verify style continuity (new UI looks and behaves like the existing UI; `npm run check:style` where it applies). Never say something works or a test passed unless it was actually verified; say what was and was not run.
+- **Test depth follows risk:** a small change gets small checks; drawing, rendering, Randomize, saving and opening files, the file format and src/platform need broader regression (heavy runs only with his OK; importance guide in step 3 below).
+
+## Several agents work on this repo
+The owner uses several Claude agents and accounts; any may work at any time.
+- Before starting: read the files listed at the top; inspect `git status`, recent history, the code in question, and other active work (`git ls-remote --heads origin`, open pull requests). Check for overlap and coordinate through git.
+- Never overwrite, revert, duplicate or interfere with another agent's work, and never assume it is finished or safe to replace.
+- Before finishing: update docs/PROJECT_STATUS.md (progress, decisions, known issues, unfinished work, next steps, open questions) and the release's entry in docs/plan.md; update the docs when a standard changes. Report what changed, what was tested, what failed and what remains.
+- Do not invent features, architecture, history or test results. Keep the owner's stated preferences apart from your own recommendations (recommendations go under "Suggestions" in docs/PROJECT_STATUS.md until he approves them). If something important is unclear, record the question there or ask.
 
 ## Release workflow
 1. **Check the version first.** At the start of every session, fetch, state the newest version on `main` (package.json) and the latest tag, and work from that, never from an older checkout or branch. Older versions and `legacy/` are never touched, rebuilt, archived or modified unless the user explicitly says so.
