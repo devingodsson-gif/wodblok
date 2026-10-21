@@ -33,7 +33,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 
 **What the app must always be**
 - **No explanatory text, helper paragraphs or tooltips in panels.** Short labels and clear grouping only. (The owner asked for these to be removed everywhere; do not bring them back.)
-- At launch the Default workspace opens its tool windows (the first workspace if none is called Default; none if there are no workspaces). The template picker (New from template) also opens at launch unless Settings > General > Templates at launch is off. The app launches in **Pattern mode, fully cleared** (no work from the last session loads). Tests start with no workspaces saved and the picker off (`tests/helpers/harness.js`), so they see an empty launch unless a test asks (`workspaces: true`, `templates: true`).
+- At launch one built-in layout opens its tool windows (saved workspaces were removed in 2.9.0). The template picker (New from template) also opens at launch unless Settings > General > Templates at launch is off. The app launches in **Pattern mode, fully cleared** (no work from the last session loads). Tests start with the launch layout off (`wb96_launch='none'`) and the picker off (`tests/helpers/harness.js`), so they see an empty launch unless a test asks (`workspaces: true`, `templates: true`).
 - **UI follows the standard in Part 9**: tokens and scales, one component per role, one folder tree for every library. Do not invent a size, radius, colour, duration or list design. If the scale lacks something, ask, and change the guide first.
 - **Speed first.** Run `npm run perf` before committing anything that touches drawing, dragging or sliders. No perf regression over 10%.
 - **No backwards compatibility** (owner, Oct 18 and 19 2026): a project file or template made by an older WODBLOK is refused with a message and never converted; the 18 to 21 migration and the v18 fixtures are gone (2.0.2). A file from a newer app still opens read-only and is never rewritten.
@@ -208,10 +208,10 @@ The editor supports light and dark. Both must be correct for every screen. Theme
 | `--faint` | `#6b6b6b` | `#8f8f8f` | Group labels, counts, hints |
 | `--sel` | `#c7d6ec` | `#3a5578` | **Selected row** in every list (Elements, libraries, menus' current item): Photoshop's muted blue |
 | `--sel-fg` | `#1f1f1f` | `#ffffff` | Text and icons on `--sel` |
-| `--acc` | `#2f74c8` | `#4a8fe0` | Accent: focus, key actions, slider fill and thumb, pressed toggles |
-| `--acc-ink` | `#245fa6` | `#6aa6ec` | Text and icons on a soft accent background |
-| `--acc-fg` | `#ffffff` | `#ffffff` | Text on a solid accent fill |
-| `--acc-soft` | `rgba(47,116,200,.16)` | `rgba(74,143,224,.18)` | Pressed toggles and modes, slider halo |
+| `--acc` | `#b8914f` | `#c4a46e` | Accent: focus, key actions, slider fill and thumb, pressed toggles |
+| `--acc-ink` | `#836635` | `#c4a46e` | Text and icons on a soft accent background |
+| `--acc-fg` | `#1b1a18` | `#1b1a18` | Text on a solid accent fill |
+| `--acc-soft` | `rgba(184,145,79,.16)` | `rgba(196,164,110,.16)` | Pressed toggles and modes, slider halo |
 | `--warn` | `#c0532e` | `#e8895c` | Unsaved dot, warnings, destructive confirm |
 | `--ok` | `#3f8f66` | `#7fb08a` | Success |
 | `--shadow` | layered, neutral | layered, dark | Floating surfaces only |
@@ -221,7 +221,7 @@ Rules:
 - Chrome MUST use these tokens. No literal hex or `rgb()` in chrome CSS or inline styles.
 - Literal colours are allowed only for: the artwork and colours the user chose; the colour picker's own hue bar and handles; the swatch fallback `var(--c,#888)`; scrims (`rgba(10,11,14,.45)`).
 - A swatch of the user's colour MUST have the swatch edge (`inset 0 0 0 1px rgba(0,0,0,.2)`) so pale colours stay visible. One value, everywhere.
-- The accent colour is the person's choice (Settings > General). The values in the table are the default, **Steel** (a Photoshop blue, 2.3.0). The other named accents are woods: Oak (the default until 2.3.0), Birch, Rosewood, Ironwood, Eucalyptus, Purpleheart, Walnut, Maple. Chrome uses the tokens, never the literal, so a changed accent reaches every control. The settings code derives the four accent tokens of both themes from the one colour picked and keeps the ink at 4.5:1 or better on the panel.
+- The accent colour is the person's choice (Settings > General). The values in the table are the default, **Oak** (again since 2.8.0; Steel, the blue of 2.3.0 to 2.7.0, is gone). The other named accents are woods: Rosewood, Walnut, Eucalyptus, Ironwood, Purpleheart, Maple, Birch. Chrome uses the tokens, never the literal, so a changed accent reaches every control. The settings code derives the four accent tokens of both themes from the one colour picked and keeps the ink at 4.5:1 or better on the panel.
 - Selected rows use `--sel`, not the accent (Photoshop's Layers panel). The accent is for focus, pressed toggles and the one key action in a view. Never use it as decoration, and never for more than one primary action per view.
 - `--warn` and `--ok` carry meaning only.
 - Contrast: check muted and disabled text in both themes. State is never carried by colour alone (add the edge, weight or icon).
@@ -389,7 +389,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 - Rail buttons: `--h-touch`, icon only, in a 36px strip; `--r-m` selected highlight with `--acc-soft`.
 - Panel tabs (`.wtab`), Photoshop style: the tab strip is `--stage`; tabs `--fs-s`, 500, `--mut`, 10px side padding, square; the active tab takes the `--panel` colour and `--fg` text, so it joins the panel below. No accent bar.
 - Stamp tabs (2.5.0): the strip over the stage reuses `.wtab` (the Canvas first, then one per open stamp with a close `.ib` of `--h-xs`); it is `--stage` with a `--line` bottom edge, `--h-md` high, and is not on screen while no stamp is open.
-- A tool opens a panel; a panel never opens by itself at launch, except through the launch workspace (the one called Default, else the first workspace).
+- A tool opens a panel; a panel never opens by itself at launch, except through the built-in launch layout.
 
 #### 9.8 Swatches, thumbnails and cards
 
@@ -456,7 +456,7 @@ There is no fourth heading. `h1`–`h6` tags are used for structure, then styled
 
 - Launch: Pattern mode, fully cleared, no tool window open.
 - There is one list of panels for the whole app (the Stamp editor is gone in 2.0.0); a stamp is edited on the canvas by unlocking it in the Stamps panel.
-- Workspaces save the layout. They are applied on demand, and the launch workspace (the one called Default, else the first) is applied once at launch. Every workspace, including the starting ones, can be changed, replaced or deleted.
+- Workspaces (saved layouts) were removed in 2.9.0; the one built-in launch layout is applied once at launch. Variations, Presets, Navigator and the Textures and Grade tools were removed too.
 
 ### 12. Libraries and the folder system
 

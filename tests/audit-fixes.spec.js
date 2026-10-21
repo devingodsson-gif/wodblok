@@ -6,16 +6,6 @@ const { openApp, openPanel, showPanel, settle, getState, unlockStamp, pickShape,
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;
 const shapeOnStamp = async page => { await unlockStamp(page); await pickShape(page); await clickStamp(page, await stampInstance(page)); await page.keyboard.press('Escape'); await clickStamp(page, await stampInstance(page)); };
 
-test('Edit on a texture row opens the Textures panel on that texture without an error', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'tex');
-  await page.click('#tx_add'); await settle(page);
-  await page.click('#tx_apply'); await settle(page);          // a texture on the Canvas: its row has Edit
-  await page.evaluate(() => document.querySelector('.txr [data-a="e"]').click());
-  await expect(page.locator('section.pn[data-p="tex"]:not([hidden])')).toHaveCount(1);
-  expect(errors).toEqual([]);
-});
-
 test('S splits and K knocks out the selected shape of an unlocked stamp; neither does anything when the stamp is locked', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await shapeOnStamp(page);

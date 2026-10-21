@@ -444,3 +444,20 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - **Selection opens the panel.** Picking an element in the Elements list or on the canvas always shows its kind's panel (before, only while the Properties group was open); it still does not open one that would hide the Elements list (same tab group).
 - Tests: `tests/element-panels.spec.js`; specs that made a Text or Pattern by clicking the bar now click Add; rail expects the Shape tab name; element-bar updated.
 - Not run: CI, the full suite and `npm run perf`.
+
+### 2.7.0 (Oct 21 2026): one behaviour for every element button (owner: remove the pointer and Image buttons; every element has an "Add (element name)" button, motifs did not). Format 25 unchanged
+- **Bar.** The Select (pointer) and Image buttons are gone. V and Escape still put the armed tool away. The bar is Motif, Shape, Text, Stamp, Pattern (Paint stays hidden). Importing a picture is Import image in the Shape panel.
+- **One rule.** Every bar button only opens its panel; every panel starts with its element list and an Add button: Add text, Add shape, Add pattern, and now Add motif (the last motif used, else the first of the library, in the middle of the canvas) and Add stamp (the current stamp, in the middle). Picking from the Motif or Stamp library and clicking the canvas still places copies, and picking a library motif with a Motif selected still changes it.
+- Tests: element-panels (Add on all five kinds), element-bar (six buttons), motif-place and placing use V instead of the Select button.
+- Not run: CI, the full suite and `npm run perf`.
+
+### 2.8.0 (Oct 21 2026): Oak is the default accent, Steel is removed (owner: "Remove steel and make oak the default"). Format 25 unchanged
+- The stylesheet's own accent tokens are Oak's (light `#b8914f`, ink `#836635`; dark `#c4a46e`; text on the accent fill `#1b1a18`, as the settings code derives it), so a fresh install, the loading screen and a cleared accent are Oak with no override written. Settings > General lists Oak first, then the woods in hue order; the Steel swatch is gone (8 presets and Custom). A saved explicit `#b8914f` shows as Oak. The selected-row blue (`--sel`) is a separate token and is unchanged.
+- Tests: settings-menu and account specs now use Oak as the built-in. Pixel goldens that show the accent colour will differ (not run; to be regenerated after a suite run, on the owner's word).
+- Not run: CI, the full suite and `npm run perf`.
+
+### 2.9.0 (Oct 21 2026): fewer tools (owner: remove variations, presets, workspaces, navigator; texture and grading become effects). Format 25 unchanged
+- **Removed tools.** Variations, Presets, Workspaces (saved layouts) and Navigator panels, modules 41, 42, 46, 47, their rail buttons, commands and specs. Launch opens one built-in layout (Canvas and Colours on the left, Elements and Layers on the right); tests set `wb96_launch='none'` (harness) unless `workspaces: true`.
+- **Texture and Grade tools removed.** The Textures and Grade panels and rail buttons, the Canvas Surface group and the Stamp and Text Texture groups are gone. Texture and Colour grade exist only as per-element effects. The Texture effect now carries Type, Strength, Scale and Light from (each effect owns a private library texture).
+- **Inert, not deleted.** The texture and grade engines and the saved `tu`/`WBS.tex` fields stay, so files still open and render; nothing creates whole-design texture or grade any more (a new project-wide element is planned by the owner). Possible cleanup: the unreachable grade panel DOM and `init31` UI code.
+- Not run: CI, the full suite and `npm run perf`.

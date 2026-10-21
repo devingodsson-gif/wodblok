@@ -2,13 +2,21 @@ import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {ser} from './14-presets-and-layer-grid-ui.js';
 import {coreStr,pmsg} from './18-projects-and-cover-overlay.js';
-import {vrRecolor} from './47-variations.js';
 import {cwAdd,cwDel,cwMove,cwNow,cwUse,trayDone} from './50-tray-core.js';
 import {swBg} from './51-colour-picker.js';
 // ===== Colourways =====
 // A colourway is one set of colours for the tray's places (see 50-tray-core.js). This tool shows each one as a small picture of the piece in
 // those colours; click one to use it (one step in the history). New makes a copy of the one showing; rename, duplicate, move and delete
 // from the "..." menu. Exporting them all is in Export recipes (Colourways: All); the Export… button here opens it.
+// the piece's own picture with every colour moved to its new place (exact colour words only)
+function vrRecolor(svg,from){
+  // from: Map of colour (as drawn) -> new colour. Both cases of the hex are swapped.
+  let s=svg;const pairs=[...from.entries()].filter(([a,b])=>a&&b&&a!==b);
+  // a 6-digit colour must not match the start of an 8-digit one (a see-through colour is a different colour)
+  pairs.forEach(([a],k)=>{s=s.replace(new RegExp(a.replace(/[^#0-9a-fA-F]/g,'')+'(?![0-9a-fA-F])','gi'),'\u0001'+k+'\u0001')});
+  pairs.forEach(([a,b],k)=>{s=s.split('\u0001'+k+'\u0001').join(a.length==9&&b.length==7?b+a.slice(7):b)});
+  return s;
+}
 const cwEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CW_MORE='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
 const TH=new Map();   // pictures: key (piece + colours) -> data URL

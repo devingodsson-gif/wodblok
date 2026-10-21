@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { openApp, settle, showPanel, getState } = require('./helpers/harness');
+const { openApp, settle, showPanel, getState, noPattern } = require('./helpers/harness');
 // 2.6.0: every element panel starts with the list of its elements and (Text, Shape, Pattern) an Add button; picking a row selects it; the Elements list opens the kind's panel.
 const tabs = page => page.$$eval('.wg .wtab', b => b.map(x => x.textContent));
 const rows = (page, k) => page.$$eval(`.elk[data-k="${k}"] .lyr`, r => r.map(x => x.textContent + (x.classList.contains('on') ? '*' : '')));
@@ -39,5 +39,21 @@ test('picking an element in the Elements list opens its kind\'s panel; the tabs 
   await shapeRow.click(); await settle(page);
   expect(await shown(page)).toContain('mlist');
   expect((await rows(page, 'shape'))[0]).toMatch(/\*$/);
+  expect(errors).toEqual([]);
+});
+
+test('every element panel has an Add button and it makes one element of that kind, selected (2.7.0: Motif and Stamp too)', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
+  const kinds = async () => JSON.parse(await getState(page)).els.map(q => q.k);
+  for (const k of ['text', 'shape', 'pattern', 'motif', 'stamp']) {
+    await page.click(`#elb [data-k="${k}"]`); await settle(page);
+    expect(await kinds()).not.toContain(k);                              // the bar button makes nothing
+    await expect(page.locator(`.elk[data-k="${k}"] [data-add]`)).toBeVisible();
+    const n0 = (await kinds()).filter(x => x === k).length;
+    await page.click(`.elk[data-k="${k}"] [data-add]`); await settle(page);
+    expect((await kinds()).filter(x => x === k).length, `Add ${k}`).toBe(n0 + 1);
+    expect((await rows(page, k))[0], `${k} is selected`).toMatch(/\*$/);
+  }
   expect(errors).toEqual([]);
 });

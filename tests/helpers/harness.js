@@ -21,9 +21,9 @@ const FIXED_TIME = Date.UTC(2026, 9, 8, 12, 0, 0);   // 2026-10-08 12:00:00 UTC,
 // artifact runtime (`window.claude.use('db'|'user'|'downloads')`).
 function initScript({ seed, runtime, workspaces, templates }) {
   return `(() => {
-    // Tests start with no workspaces saved (so no tool window opens at launch) unless a test asks for the starting ones.
+    // Tests start with no panel open at launch unless a test asks for the Default panels (workspaces: true).
     try { if (!sessionStorage.getItem('wb_t_ws')) {
-      if (!${!!workspaces}) { localStorage.setItem('wb96_workspaces', '[]'); localStorage.setItem('wb96_ws_seeded', '2'); }
+      if (!${!!workspaces}) localStorage.setItem('wb96_launch', 'none');
       if (!${!!templates}) localStorage.setItem('wb111_tplstart', '0');      // the template picker does not open at launch
       sessionStorage.setItem('wb_t_ws', '1');
     } } catch (e) {}

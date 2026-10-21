@@ -4,13 +4,14 @@ const { test, expect } = require('@playwright/test');
 const { openApp } = require('./helpers/harness');
 
 const labels = page => page.locator('.rail button:visible').evaluateAll(b => b.map(x => x.getAttribute('aria-label')));
-const SHARED = ['Close all panels', 'Randomize', 'Colours', 'Colourways', 'Stamp library', 'Colour grading', 'Textures', 'History', 'Workspaces'];
+const SHARED = ['Default panels', 'Randomize', 'Colours', 'Colourways', 'Stamp library', 'History'];   // with no panel open the first button opens the default layout (2.9.0)
+const closeAll = async page => { if ((await page.getAttribute('#rcls', 'aria-label')) == 'Close all panels') await page.click('#rcls'); };
 
-test('the shared tools are the first nine rail buttons, in the same order', async ({ page }) => {
+test('the shared tools are the first six rail buttons, in the same order', async ({ page }) => {
   const { errors } = await openApp(page);
   const pattern = await labels(page);
-  expect(pattern.slice(0, 9)).toEqual(SHARED);
-  expect(pattern.slice(9)).toEqual(['Canvas', 'Elements', 'Grid', 'Navigator', 'Export recipes', 'Element', 'More tools']);   // the element panels open from the element bar only
+  expect(pattern.slice(0, 6)).toEqual(SHARED);
+  expect(pattern.slice(6)).toEqual(['Canvas', 'Elements', 'Grid', 'Export recipes', 'Element', 'More tools']);   // the element panels open from the element bar only
   expect(errors).toEqual([]);
 });
 
@@ -20,7 +21,7 @@ test('each tool has one name: the rail, the tab it opens, and "Open …" in comm
   for (const mode of ['pattern']) {
     for (const b of await page.locator('.rail [data-pn]:visible').all()) {
       const name = await b.getAttribute('aria-label');
-      await page.click('#rcls');
+      await closeAll(page);
       await b.click();
       await expect(page.locator('.wtab.on').first(), `the tab for ${name}`).toHaveText(name === 'Element' ? 'Shape' : name);   // 2.6.0: each element panel has its own tab name
       expect(cmds, `command "Open ${name}"`).toContain('Open ' + name);

@@ -104,7 +104,7 @@ function refreshG(){gBuilt=gKey();const d=gDefs(true),has=id=>d.includes(`id="${
 has('wbgrade')?$('dyn').setAttribute('filter','url(#wbgrade)'):$('dyn').removeAttribute('filter');
 has('wbgradeT')?$('texg').setAttribute('filter','url(#wbgradeT)'):$('texg').removeAttribute('filter');
 if(has('wbgrade')&&grd.cov)$('covg').setAttribute('filter','url(#wbgrade)');else $('covg').removeAttribute('filter');
-document.querySelector('.rail [data-pn="grade"]').classList.toggle('gdon',hasA(grd)||grd.masks.some(m=>m.on&&hasA(m.a)));gmHandles()}
+gmHandles()}
 const gdSave=()=>{try{kv.set('wb41_grade',JSON.stringify(grd))}catch(e){}};
 const gCap=()=>{if(WBX.wbCap)WBX.wbCap()};
 // ---- mask list + settings

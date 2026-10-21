@@ -4,7 +4,6 @@ import {CH,CW,col,okC} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {txFilt,txImgs,txIsW,txRid,txSpecs} from './16-texture-generators.js';
-import {txRefresh,txReg} from './17-texture-panel-and-previews.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {mkWell,paintWell} from './52-tray-ui.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
@@ -46,8 +45,8 @@ function tbArm(on){WBS.txArm=on;if(on){WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpB=n
 var tbInkK='',TBW=null;
 function tbStyUI(){tbLoad=true;try{if(TBW)paintWell(TBW,true)}finally{tbLoad=false}}
 function tbStyle(k,v){const grp=fpGrp().filter(q=>q.tx);if(k=='ink'){tbSty.ink=v;grp.forEach(q=>{if(v)q.ink=v;else delete q.ink})}tbStyUI();if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();if(WBS.txArm)WBH.fpOverlay()}
-function tbStySet(a){const grp=fpGrp().filter(q=>q.tx);tbSty.tu=a.map(u=>({...u}));grp.forEach(q=>{q.tu=a.map((u,i)=>{const o=(q.tu||[])[i];return o&&o.x===u.x?o:{x:u.x,sd:grp.length>1?txRid():u.sd}})});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();if(WBS.txArm)WBH.fpOverlay();txRefresh()}
-function tbStyVary(i){const grp=fpGrp().filter(q=>q.tx);if(tbSty.tu[i])tbSty.tu[i]={...tbSty.tu[i],sd:txRid()};grp.forEach(q=>{if(q.tu&&q.tu[i])q.tu[i]={...q.tu[i],sd:txRid()}});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();txRefresh()}
+function tbStySet(a){const grp=fpGrp().filter(q=>q.tx);tbSty.tu=a.map(u=>({...u}));grp.forEach(q=>{q.tu=a.map((u,i)=>{const o=(q.tu||[])[i];return o&&o.x===u.x?o:{x:u.x,sd:grp.length>1?txRid():u.sd}})});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();if(WBS.txArm)WBH.fpOverlay()}
+function tbStyVary(i){const grp=fpGrp().filter(q=>q.tx);if(tbSty.tu[i])tbSty.tu[i]={...tbSty.tu[i],sd:txRid()};grp.forEach(q=>{if(q.tu&&q.tu[i])q.tu[i]={...q.tu[i],sd:txRid()}});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd()}
 function txbSync(L){if(WBS.txArm&&(tbSel()||WBS.fpB)){WBS.txArm=false;tbG=null;tbArmUI()}
 if(!stTxMode()&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;const tx=tbSel()||WBS.txArm;sw.style.display=tx?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=tx?'none':''}if(!$('tx_t')||stTxMode())return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
 const key=p?p.u+'|'+Math.round(p.s*10)+'|'+(p.tx.wd||0)+'|'+(p.tx.ht||0)+'|'+(p.tx.va||'t')+'|'+(p.tx.pd||0)+(p.tx.ft||'')+(p.tx.ov||'')+(p.tx.rp||0)+(p.tx.rr||0)+(p.tx.rs||0)+(p.tx.bb||0)+(p.tx.sc||'')+(p.tx.sd||0)+'|'+(p.tx.ind||0)+'|'+(p.tx.psp||0)+(p.tx.bal||'')+JSON.stringify(p.tx.sty||0)+(p.tx.wp||'')+(p.tx.wa||0)+(p.tx.pt||'')+(p.tx.pa||0)+(p.tx.pw||0):'-';if(key===tbKey)return;tbKey=key;if(!p)return;
@@ -66,7 +65,6 @@ TXM=new Map();WBS.txArm=false;
 txoBind(()=>!stTxMode(),()=>tbLive());txoSelBind(()=>!stTxMode(),()=>tbLive());
 $('tx_vary').addEventListener('click',()=>{if(stTxMode())return;txoSeed(1+Math.floor(Math.random()*1e6));tbLive()});
 TBW=mkWell($('wl_tx'),{label:'Text colour',what:'Text',def:'Layer colour',defRef:()=>{const L=fpL();return L&&okC(L.ink)?L.ink:WBS.proj.ink},get:()=>okC(tbSty.ink)?tbSty.ink:'',set:v=>{if(!tbLoad)tbStyle('ink',v||'')}});
-txReg('tx_tex',{md:'wear',def:'pinholes',get:()=>{const p=tbSel();return p?(Array.isArray(p.tu)?p.tu:[]):tbSty.tu},set:tbStySet,vary:tbStyVary});
 WBX.wbTbRelay=tbRelay;WBX.wbTxUses=()=>tbSty.tu;WBX.wbTxCut=id=>{tbSty.tu=tbSty.tu.filter(u=>u.x!==id)};
 $('tx_split').addEventListener('click',async()=>{if(stTxMode())return;const L=fpL();if(!L)return;const grp=fpGrp().filter(q=>q.tx);if(!grp.length)return;if(WBX.wbCap)WBX.wbCap();const cache=new Map(),made=[];let total=0;
 for(const p of grp){const ra=p.s/Math.max(p.n||1,.01),k=ra,rr=(+p.r||0)*Math.PI/180,cs=Math.cos(rr),sn=Math.sin(rr),fl=p.f||1,out=[];

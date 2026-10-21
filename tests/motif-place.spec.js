@@ -38,7 +38,7 @@ test('motif: with nothing armed, picking a shape changes the selected Motif; the
   await btns.nth(0).click(); await settle(page);
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * 0.4, box.y + box.height * 0.4); await settle(page);
-  await page.click('#elb [data-k="select"]'); await settle(page);
+  await page.keyboard.press('v'); await settle(page);
   await page.mouse.click(box.x + box.width * 0.4, box.y + box.height * 0.4); await settle(page);
   const m0 = (await motifs(page))[0].m;
   await btns.nth(1).click(); await settle(page);
@@ -55,7 +55,7 @@ test('motif: a dragged Motif is drawn moving while the pointer is down, not only
   await page.locator('#lib button[data-m]:visible').first().click();
   const box = await page.locator('#art').boundingBox(), cx = box.x + box.width * 0.4, cy = box.y + box.height * 0.4;
   await page.mouse.click(cx, cy); await settle(page);
-  await page.click('#elb [data-k="select"]'); await settle(page);
+  await page.keyboard.press('v'); await settle(page);
   const left = () => page.evaluate(() => { const g = document.querySelector('#art [data-mv]'); return g ? g.getBoundingClientRect().left : null; });
   const x0 = await left();
   expect(x0).not.toBeNull();
