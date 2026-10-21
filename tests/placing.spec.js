@@ -28,7 +28,7 @@ test('using the interface puts the shape away: a click on the canvas afterwards 
   await armShape(page, 0);
   await over(page, 0.3, 0.3);
   await expect(page.locator('#stoh .stgh')).toHaveCount(1);
-  await page.click('#elb [data-k="select"]'); await settle(page);           // any other button in the interface
+  await page.keyboard.press('v'); await settle(page);           // any other button in the interface
   await over(page, 0.3, 0.3);
   await expect(page.locator('#stoh .stgh')).toHaveCount(0);
   const n0 = await items(page);
@@ -72,7 +72,7 @@ test('using the interface puts away a stamp and text too, and a picking button a
   await armStamp(page);
   await over(page, 0.4, 0.4);
   await expect(page.locator('#fpov .gh')).toHaveCount(1);
-  await page.click('#elb [data-k="select"]'); await settle(page);
+  await page.keyboard.press('v'); await settle(page);
   await over(page, 0.45, 0.45);
   await expect(page.locator('#fpov .gh')).toHaveCount(0);
   await page.click('#elb [data-k="text"]'); await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
