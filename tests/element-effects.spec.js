@@ -73,7 +73,7 @@ test('a placed stamp gets Pressure offset from its own Effects group; the layer\
 test('a pattern\'s effects apply to every placement', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
-  await page.click('#elb [data-k="pattern"]');
+  await page.click('#elb [data-k="pattern"]'); await page.click('.elk[data-k="pattern"] [data-add]');
   await settle(page);
   await expect(page.locator('.fxg[data-fxk="pattern"]')).toBeVisible();
   await addEffect(page, 'pattern', 'Pressure offset');

@@ -436,3 +436,11 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - Stamp-view geometry: one canvas unit is one stamp unit and the layer's turn is not applied. Specs that measured instances on the whole canvas (stamp-canvas-edit, selection-handles) were updated for that; stamp-tabs gained a test for the view.
 - Switching tabs no longer opens or closes any panel: the tools stay as they are (owner, Oct 21 2026).
 - Not run: CI and the full suite (owner's instruction). `npm run perf` not run in this release (the drawing path changed only by a null check in `build()`).
+
+### 2.6.0 (Oct 21 2026): one panel per element kind, no Properties (owner: "each of the element buttons already opens the elements panel… at the top of each element panel a list of existing elements of that type with an add"; "yes get rid of it"). Format 25 unchanged
+- **Lists.** The Text, Shape, Pattern, Motif and Stamp panels each start with a list of the elements of that kind on the selected layer (`.elk` in `78-element-lists.js`, the same row design as the Elements list). Text, Shape and Pattern have an Add button (Add text / Add shape / Add pattern) that makes the element just above the selected one (Shape makes a Rectangle), selects it and shows its properties below. Motifs and Stamps are placed from their libraries, so their lists have no Add. Picking a row selects that element. The lists are hidden while a stamp tab is shown.
+- **Bar.** The Text and Pattern buttons no longer make anything: like Shape, Motif and Stamp they clear the selection and open the panel (`abPick`); Add in the panel makes the element (`AD` in 73).
+- **No Properties.** The group of element panels (still docked under the Elements list) shows each panel under its own name (Text, Shape, Pattern, Motif, Stamp); the old single "Properties" tab and the panel name "Element" for Shape are gone.
+- **Selection opens the panel.** Picking an element in the Elements list or on the canvas always shows its kind's panel (before, only while the Properties group was open); it still does not open one that would hide the Elements list (same tab group).
+- Tests: `tests/element-panels.spec.js`; specs that made a Text or Pattern by clicking the bar now click Add; rail expects the Shape tab name; element-bar updated.
+- Not run: CI, the full suite and `npm run perf`.
