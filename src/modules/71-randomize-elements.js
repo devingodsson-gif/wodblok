@@ -40,9 +40,6 @@ return out}
 // frame layers -> a Pattern on the Frame layout (the strip stamp is the source; a corner stamp is not used)
 function rzFrameEls(FL,T,o){return FL.map(l=>{const t=T.find(x=>x.id==(l.st||[])[0]);if(!t)return l;const rule=(l.name||'').startsWith('Frame rule'),R2=(t.sh&&t.sh.s&&+t.sh.s[0])||8,cn=cl(o.ri(3,6),3,6),rn=cl(Math.round(cn*CH/CW),1,10),
  p=patOf(l.name,[t.id],'frame',cn,rn,rule?40:100,rzFx(o,l.pst,0,null),null);p.in=cl(Math.round(2+(+(l.fr||{}).i||0)*.5+(rule?2:0)),2,12);return eLayer(l,[p],[t.id])})}
-// Sheet: paper, with a Texture (and sometimes a Colour grade) effect
-function rzSheet(prev,texUses,o){const sh={...(prev||{u:fpU(),k:'sheet',n:'Sheet',o:100})};let fx=(sh.fx||[]).slice();if(texUses)fx=fx.filter(e=>e.k!='texture').concat(texUses.map(fxT));
-if(o.gradeOn&&o.ch(.25)&&!fx.some(e=>e.k=='grade'))fx.push(fxG({fd:o.ri(5,22),tp:o.ri(-20,24)}));if(fx.length)sh.fx=fx;else delete sh.fx;return sh}
 // Layout on element layers: type, size, spacing, offset and rotation change the Pattern; scatter, turning and size variation become a Jitter effect
 function rzLayoutEls(layers,f,o){const pats=[];layers.forEach(l=>{if(l.free&&l.rz!='free')(l.pl||[]).forEach(p=>{if(p.k=='pattern'&&p.lay!='frame')pats.push(p)})});
 pats.forEach((p,i)=>{const set=(k,v)=>{if(v==null)delete p[k];else p[k]=v};
@@ -58,4 +55,4 @@ function rzPressEls(layers,o){layers.forEach(l=>{if(!l.free||l.rz=='free')return
 function rzTexEls(layers,o){layers.forEach(l=>{if(!l.free)return;(l.pl||[]).forEach(p=>{if(p.k!='pattern'||!o.ch(.35))return;const u=o.tex();if(!u.length)return;p.fx=(p.fx||[]).filter(e=>e.k!='texture').concat([fxT(u[0])])})})}
 // a new layer: an element layer holding one Pattern of the given stamps (the old arrangement layer is no longer made)
 const mkEL=(name,st)=>{const n=mkL(name,st,'check',180);n.free=true;n.ak={};n.man=false;n.ov={};n.fit='';n.gap=0;n.pl=[patOf('Pattern 1',st,'grid',cl(Math.round(CW/180),2,14),cl(Math.round(CH/180),2,20),100,[],null)];return n};
-export {GRAD,arrOpts,gArrAll,mkEL,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPressEls,rzSheet,rzTexEls};
+export {GRAD,arrOpts,gArrAll,mkEL,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPressEls,rzTexEls};

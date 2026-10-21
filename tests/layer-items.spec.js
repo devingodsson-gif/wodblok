@@ -17,13 +17,13 @@ function writeProject(file, p, base) {
 }
 const projectZip = p => zipSync({ mimetype: [strToU8('application/vnd.wodblok+zip'), { level: 0 }], 'project.json': strToU8(JSON.stringify(p)) });
 
-// A project whose element list holds a stamp, a picture and a text box.
+// A project whose element list holds a stamp, a Shape filled with a picture and a text box.
 function mixed(outDir) {
   const p = readProject(FIX);
   const tid = p.tiles[0].id;
   const items = k => [
     { u: k + 'a', k: 'stamp', t: tid, x: 200, y: 200, s: 160, r: 0, f: 1 },
-    { u: k + 'b', k: 'image', a: 'zart', x: 500, y: 300, s: 200, r: 10, f: 1 },
+    { u: k + 'b', k: 'shape', sh: 'rect', fl: 'img', a: 'zart', x: 500, y: 300, s: 200, r: 10, f: 1 },
     { u: k + 'c', k: 'text', tx: { text: 'A', f: 'x', sz: 40 }, G: { k1: 'M0 0L10 0L10 10Z' }, Lt: [['k1', 0, 0, 0, 1]], bw: 10, bh: 10, n: 10, x: 800, y: 400, s: 120, r: 0, f: 1 },
   ];
   p.arts = { zart: { n: 'Dot', k: 'img', src: PNG, w: 1, h: 1 } };
@@ -35,19 +35,19 @@ function mixed(outDir) {
 }
 
 const drawn = (page, li) => page.evaluate(li => ({
-  art: !!document.querySelector(`#art image[id^="ar${li}_"]`),
+  art: !!document.querySelector(`#art image[id^="sai${li}_"]`),
   text: !!document.querySelector(`#art [id^="tg${li}_"]`),
 }), li);
 
-test('a list with a stamp, a picture and a text draws all three', async ({ page }, testInfo) => {
+test('a list with a stamp, a picture-filled shape and a text draws all three', async ({ page }, testInfo) => {
   const { errors } = await openApp(page);
   const { file } = mixed(testInfo.outputDir);
   await openProjectFile(page, file);
   const s = JSON.parse(await getState(page));
-  expect(s.els.map(q => Object.keys(q).find(k => ['t', 'a', 'tx'].includes(k)))).toEqual(['t', 'a', 'tx']);
+  expect(s.els.map(q => Object.keys(q).find(k => ['t', 'sh', 'tx'].includes(k)))).toEqual(['t', 'sh', 'tx']);
   await expect.poll(async () => (await drawn(page, 0)).art, { message: 'picture' }).toBe(true);
   await expect.poll(async () => (await drawn(page, 0)).text, { message: 'text' }).toBe(true);
-  expect(await page.locator('#art image[id^="ar0_"]').count()).toBe(1);
+  expect(await page.locator('#art image[id^="sai0_"]').count()).toBe(1);
   expect(errors).toEqual([]);
 });
 
@@ -61,7 +61,7 @@ test('the pictures used by elements are saved with the project, and a saved mixe
   await page.keyboard.press('Escape');
   const dl = await page.evaluate(() => window.__wbDownloads[0]);
   const saved = JSON.parse(Buffer.from(require('fflate').unzipSync(new Uint8Array(Buffer.from(dl.base64, 'base64')))['project.json']).toString('utf8'));
-  expect(saved.v).toBe(23);
+  expect(saved.v).toBe(25);
   expect(Object.keys(saved.arts)).toEqual(['zart']);
   expect(saved.els.length).toBe(3);
   const out = path.join(testInfo.outputDir, 'again.wodblok');

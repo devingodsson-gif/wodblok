@@ -62,7 +62,7 @@ test('General: theme and stage dots follow the existing controls', async ({ page
   await expect(page.locator('#stgdt')).toHaveAttribute('aria-pressed', 'false');
 });
 
-test('accent: a preset recolours both themes, stays readable, is remembered, and Oak restores the stylesheet values', async ({ page }) => {
+test('accent: a preset recolours both themes, stays readable, is remembered, and Steel restores the stylesheet values', async ({ page }) => {
   const { errors } = await openApp(page);
   const bronzeDark = await tok(page, '--acc');
   await open(page);
@@ -80,14 +80,14 @@ test('accent: a preset recolours both themes, stays readable, is remembered, and
   await page.waitForFunction(() => window.__wbTest && document.fonts.status === 'loaded');
   expect(await tok(page, '--acc')).toBe(plumLight);
   await open(page);
-  await page.click('#stgacc [aria-label="Oak"]');
+  await page.click('#stgacc [aria-label="Steel"]');
   expect(await kvGet(page, 'wb114_accent')).toBeNull();
   expect(await page.evaluate(() => (document.getElementById('accstyle') || { textContent: '' }).textContent)).toBe('');
-  expect(await tok(page, '--acc')).toBe('#b8914f');
+  expect(await tok(page, '--acc')).toBe('#2f74c8');
   expect(errors).toEqual([]);
 });
 
-test('accent: the colour is in place before the loading screen shows, and Oak removes the saved rules', async ({ page }) => {
+test('accent: the colour is in place before the loading screen shows, and Steel removes the saved rules', async ({ page }) => {
   // sample --acc at the moment the page's loading screen is added to the document (before the app script has run)
   await page.addInitScript(() => {
     window.__accAtSplash = null;
@@ -95,38 +95,38 @@ test('accent: the colour is in place before the loading screen shows, and Oak re
       .observe(document, { childList: true, subtree: true });
   });
   await openApp(page);
-  expect(await page.evaluate(() => window.__accAtSplash)).toBe('#c9a66b');   // Oak: the page's own colour
+  expect(await page.evaluate(() => window.__accAtSplash)).toBe('#4a8fe0');   // Steel: the page's own colour
   await open(page);
   await page.click('#stgacc [aria-label="Purpleheart"]');
   const plum = await tok(page, '--acc');
   expect(await page.evaluate(() => localStorage.getItem('wb_accentcss'))).toContain('--acc:');
   await page.reload();
   await page.waitForFunction(() => window.__wbTest && document.fonts.status === 'loaded');
-  expect(await page.evaluate(() => window.__accAtSplash)).toBe(plum);   // already the chosen colour, not Oak, when the loading screen appears
+  expect(await page.evaluate(() => window.__accAtSplash)).toBe(plum);   // already the chosen colour, not Steel, when the loading screen appears
   expect(await page.evaluate(() => document.querySelectorAll('#accstyle').length)).toBe(1);
   await open(page);
-  await page.click('#stgacc [aria-label="Oak"]');
+  await page.click('#stgacc [aria-label="Steel"]');
   expect(await page.evaluate(() => localStorage.getItem('wb_accentcss'))).toBeNull();
   await page.reload();
   await page.waitForFunction(() => window.__wbTest && document.fonts.status === 'loaded');
-  expect(await page.evaluate(() => window.__accAtSplash)).toBe('#c9a66b');
+  expect(await page.evaluate(() => window.__accAtSplash)).toBe('#4a8fe0');
 });
 
 test('accent: the presets are named after woods, in hue order, and the row shows the chosen name', async ({ page }) => {
   await openApp(page);
   await open(page);
   const names = await page.$$eval('#stgacc .stgab:not(.stgac)', bs => bs.map(b => b.getAttribute('aria-label')));
-  expect(names).toEqual(['Rosewood', 'Walnut', 'Oak', 'Eucalyptus', 'Ironwood', 'Purpleheart', 'Maple', 'Birch']);
-  // the order is by hue, measured from the swatch colours; the grey (Birch) is last
+  expect(names).toEqual(['Steel', 'Rosewood', 'Walnut', 'Oak', 'Eucalyptus', 'Ironwood', 'Purpleheart', 'Maple', 'Birch']);   // 2.3.0: Steel is the default and comes first, the woods follow
+  // after Steel the order is by hue, measured from the swatch colours; the grey (Birch) is last
   const hues = await page.$$eval('#stgacc .stgab:not(.stgac)', bs => bs.map(b => {
     const m = b.style.getPropertyValue('--c').trim(), n = [1, 3, 5].map(i => parseInt(m.slice(i, i + 2), 16) / 255), mx = Math.max(...n), mn = Math.min(...n), d = mx - mn;
     if (d < .08) return 999;
     const h = mx === n[0] ? ((n[1] - n[2]) / d + (n[1] < n[2] ? 6 : 0)) : mx === n[1] ? (n[2] - n[0]) / d + 2 : (n[0] - n[1]) / d + 4;
     return h * 60;
   }));
-  expect(hues).toEqual([...hues].sort((a, b) => a - b));
-  await expect(page.locator('#stgan')).toHaveText('Oak');
-  await expect(page.locator('#stgacc [aria-label="Oak"]')).toHaveAttribute('aria-pressed', 'true');
+  expect(hues.slice(1)).toEqual([...hues.slice(1)].sort((a, b) => a - b));
+  await expect(page.locator('#stgan')).toHaveText('Steel');
+  await expect(page.locator('#stgacc [aria-label="Steel"]')).toHaveAttribute('aria-pressed', 'true');
   await page.click('#stgacc [aria-label="Walnut"]');
   await expect(page.locator('#stgan')).toHaveText('Walnut');
   await page.click('#stgacc .stgac');
@@ -139,7 +139,7 @@ test('accent: every preset keeps its ink readable on both panels', async ({ page
   await openApp(page);
   await open(page);
   const names = await page.$$eval('#stgacc .stgab:not(.stgac)', bs => bs.map(b => b.getAttribute('aria-label')));
-  expect(names.length).toBe(8);
+  expect(names.length).toBe(9);
   for (const n of names) {
     await page.click(`#stgacc [aria-label="${n}"]`);
     for (const t of ['dark', 'light']) {

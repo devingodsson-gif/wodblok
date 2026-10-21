@@ -14,9 +14,9 @@ const stK_ACC='wb114_accent',stK_DRAFT='wb114_draft',stK_CALM='wb114_calm',stK_T
 const stPAGES=[['general','General'],['colour','Colour'],['speed','Speed'],['files','Files'],['keys','Shortcuts'],['about','About']];
 // Accent presets. They are the person's colours, not chrome, so literal values are allowed (style guide 3). The first is the built-in bronze
 // and stays the stylesheet's own values (no override is written for it).
-// Named after woods, desaturated and warm so they sit with Oak. Each is the base colour; the accent tokens of each theme are derived from it.
+// Steel (the built-in blue, 2.3.0: the Photoshop look) and colours named after woods. Each is the base colour; the accent tokens of each theme are derived from it.
 // Shown in hue order (red, brown, bronze, green, blue, purple, pink); Birch, the grey, has no hue and comes last.
-const stACCENTS=[['Rosewood','#a85a52'],['Walnut','#744f3b'],['Oak',''],['Eucalyptus','#72977f'],['Ironwood','#5f7f9a'],['Purpleheart','#86629a'],['Maple','#c48a96'],['Birch','#a3a09a']];
+const stACCENTS=[['Steel',''],['Rosewood','#a85a52'],['Walnut','#744f3b'],['Oak','#b8914f'],['Eucalyptus','#72977f'],['Ironwood','#5f7f9a'],['Purpleheart','#86629a'],['Maple','#c48a96'],['Birch','#a3a09a']];
 const stAccentName=cur=>{const a=stACCENTS.find(x=>x[1]===(cur||''));return a?a[0]:'Custom'};
 const stSAVE_EVERY=[[8,'8 s'],[30,'30 s'],[120,'2 min']];
 const stHEX6=/^#[0-9a-f]{6}$/i;
@@ -30,7 +30,7 @@ function stHsl2rgb([h,s,l]){const f=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;return t<1
 const stLum=c=>{const a=stToRgb(c).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*a[0]+.7152*a[1]+.0722*a[2]};
 const stContrast=(a,b)=>{const x=stLum(a),y=stLum(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
 // the two surfaces the accent text sits on (the --panel of each theme)
-const stPANEL={light:'#f6f2e9',dark:'#242220'};
+const stPANEL={light:'#ececec',dark:'#282828'};
 // Move the lightness until the colour reads at 4.5:1 on the panel (the soft accent fill is only 16% of it, so the panel is the worst case).
 function stInkOn(h,s,l,panel,dir){let c=stToHex(stHsl2rgb([h,s,l]));for(let i=0;i<40&&stContrast(c,panel)<4.5;i++){l=Math.max(.05,Math.min(.95,l+dir*.02));c=stToHex(stHsl2rgb([h,s,l]))}return c}
 // One colour in, the four accent tokens of both themes out. Light: the fill sits mid-dark, the ink darker. Dark: the fill is lifted and the ink is the fill.
@@ -72,7 +72,7 @@ const stViewOn=id=>$(id)?.getAttribute('aria-pressed')==='true';
 const stViewToggles=()=>stVIEW.map(([sid,bid,t])=>stTgl(sid,stViewOn(bid),t)).join('');
 const stThemeNow=()=>document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
 function stAccentRow(){const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur);
- return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div></div>`}
+ return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#4a8fe0'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button></div></div>`}
 function stPageHtml(p){
  if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stTgl('stgtl',stFlag(stK_TPL,true),'Templates at launch')+stViewToggles()+stAccentRow();
  if(p=='colour')return`<div class="ctl stgr"><label for="stgtv">Places shown</label><input type="range" id="stgtv" min="7" max="${TRAY_MAX}" step="1" value="${stNumGet(stK_TRAY,7,7,TRAY_MAX)}"><output id="stgtvo">${stNumGet(stK_TRAY,7,7,TRAY_MAX)}</output></div><div class="stgr"><span>Recent colours</span><button type="button" class="alt" id="stgrc">Clear</button></div>`;
@@ -98,7 +98,7 @@ function stWire(){const b=$('stgbody');
  seg('stgth',v=>{if(stThemeNow()!==v)$('thm').click()});
  stVIEW.forEach(([sid,bid])=>on(sid,()=>{$(bid).click();const v=stViewOn(bid),e=$(sid);e.setAttribute('aria-pressed',String(v));e.textContent=v?'On':'Off'}));
  const g=$('stgacc');if(g)g.addEventListener('click',e=>{const x=e.target.closest('.stgab');if(!x)return;
-  if(x.dataset.custom){const cur=stAccentGet()||'#b8914f';openPicker(x,{value:cur,alpha:false,onInput:h=>{const v=String(h).slice(0,7).toLowerCase();if(stHEX6.test(v)){stAccentSet(v);stAccentMarks()}},onClose:()=>stAccentMarks()});return}
+  if(x.dataset.custom){const cur=stAccentGet()||'#4a8fe0';openPicker(x,{value:cur,alpha:false,onInput:h=>{const v=String(h).slice(0,7).toLowerCase();if(stHEX6.test(v)){stAccentSet(v);stAccentMarks()}},onClose:()=>stAccentMarks()});return}
   closePicker();stAccentSet(x.dataset.h);stAccentMarks()});
  const tv=$('stgtv');if(tv)tv.addEventListener('input',()=>{const n=+tv.value;$('stgtvo').textContent=n;try{kv.set(stK_TRAY,String(n))}catch(e){}setTrayView(n);try{paintDock(true)}catch(e){}});
  on('stgrc',()=>{try{kv.remove('wb200_recent')}catch(e){}const c=$('stgrc');c.textContent='Cleared';c.disabled=true});

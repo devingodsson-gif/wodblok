@@ -1,3 +1,4 @@
+import {mapBox,mapShape,mapText} from './77-map-to-shape.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,col,okC} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
@@ -14,10 +15,11 @@ import {fxGr,fxJit,fxJitL,fxPad,fxTexUses} from './69-effect-stack.js';
 // ===== Text boxes. Any layer may hold them, in L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
 // The letters are stored as outlines (centred on the box), so the project needs no fonts to show them. s = the box's long side on the canvas.
 const fx1=v=>(+v).toFixed(1);
-function txtGl(p,fill,pre,jit){const G=p.G,Lt=p.Lt;let li=0;const fs=+(p.tx&&p.tx.sz)||40;if(!G||typeof G!='object'||!Array.isArray(Lt)||Lt.length>800)return'';let d0='',o='';const seen={};
+function txtGl(p,fill,pre,jit,map){const G=p.G,Lt=p.Lt;let li=0;const fs=+(p.tx&&p.tx.sz)||40;if(!G||typeof G!='object'||!Array.isArray(Lt)||Lt.length>800)return'';let d0='',o='';const seen={};
 for(const l of Lt){if(!Array.isArray(l))continue;const d=G[l[0]];if(typeof d!='string'||!/^[MLQZ0-9.,\- ]+$/.test(d))continue;let x=+l[1],y=+l[2],r=+l[3],s=+l[4],sx=1,sy=1;if(![x,y,r,s].every(isFinite))continue;
 if(jit){const J=fxJitL(p,li,fs);if(J){x+=J.dx;y+=J.dy;r+=J.dr;s*=J.sz;sx=J.sx;sy=J.sy}}li++;
-const id=pre+'_'+String(l[0]).replace(/[^\w-]/g,'_');if(!seen[id]){seen[id]=1;d0+=`<path id="${id}" d="${d}"/>`}o+=`<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s*sx} ${s*sy})"/>`}
+const id=pre+'_'+String(l[0]).replace(/[^\w-]/g,'_');if(!seen[id]){seen[id]=1;d0+=`<path id="${id}" d="${d}"/>`}
+if(map){const m=map(x,y,r),K=map.k;o+=`<use href="#${id}" transform="translate(${m[0].toFixed(2)} ${m[1].toFixed(2)}) rotate(${m[2].toFixed(2)}) scale(${(s*sx*K).toFixed(4)} ${(s*sy*K).toFixed(4)})"/>`}else o+=`<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s*sx} ${s*sy})"/>`}
 return`<defs>${d0}</defs><g fill="${fill}" fill-rule="evenodd">${o}</g>`}
 let TXM;
 // a text's textures: the ones from the Text panel, then the Texture effects on it
@@ -28,7 +30,8 @@ const m=`<mask id="${id}" maskUnits="userSpaceOnUse" x="${x}" y="${y}" width="${
 if(TXM.size>300)TXM.delete(TXM.keys().next().value);TXM.set(key,m);return m}
 function txOvF(p){const q=txSpecs(txAll(p),'wear');if(!q.length||!WBS.edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1);return txFilt(q,-W/2,-H/2,W,H,384)}
 function txtLayer(L,li){const pl=(L.pl||[]).filter(p=>p.tx&&p.Lt&&p.G);if(!pl.length)return['',''];const fr=new Map();const f=v=>(+v).toFixed(2),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),fill=okC(L.ink)?col(L.ink):col(WBS.proj.ink);let out='',defs='';
-pl.forEach(p=>{const[w,h]=fpWH(p),k=p.s/Math.max(p.n||1,.01),mid='tm'+li+'_'+String(p.u).replace(/[^\w-]/g,''),mk=txMask(mid,p),fo=txOvF(p);if(mk)defs+=mk;const pf=okC(p.ink)?col(p.ink):fill,hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-w/2)}" y="${f(-h/2)}" width="${f(w)}" height="${f(h)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
+pl.forEach(p=>{const MS=p.mm=='on'?mapShape(p):null,MF=MS?mapText(p,MS):null;if(MF){const mb=mapBox(MS),pf0=okC(p.ink)?col(p.ink):fill,gid=String(p.u).replace(/[^\w-]/g,''),fxM=p.fx&&p.fx.length?fxGr(p,'fg'+li+'_'+gid,mb):null,gl=txtGl(p,pf0,'tg'+li+'_'+gid,1,MF),one=`<g${ed?` data-fp="${p.u}"`:''}>${fxM?fxM.wrap(gl):gl}</g>`;if(fxM)defs+=fxM.defs;out+=one;fr.set(String(p.u),one);return}
+const[w,h]=fpWH(p),k=p.s/Math.max(p.n||1,.01),mid='tm'+li+'_'+String(p.u).replace(/[^\w-]/g,''),mk=txMask(mid,p),fo=txOvF(p);if(mk)defs+=mk;const pf=okC(p.ink)?col(p.ink):fill,hit=ed?`<rect transform="rotate(${+p.r||0})" x="${f(-w/2)}" y="${f(-h/2)}" width="${f(w)}" height="${f(h)}" fill="none" pointer-events="all" style="cursor:move"/>`:'';
 const J={dx:0,dy:0,dr:0,sz:1,sx:1,sy:1},fxG=p.fx&&p.fx.length?fxGr(p,'fg'+li+'_'+String(p.u).replace(/[^\w-]/g,''),fxPad(-(+p.bw||1)/2,-(+p.bh||1)/2,+p.bw||1,+p.bh||1)):null,one=`<g${ed?` data-fp="${p.u}"`:''} transform="translate(${f(+p.x+J.dx)} ${f(+p.y+J.dy)})">${hit}<g transform="rotate(${(+p.r||0)+J.dr}) scale(${(k*(p.f||1)*J.sz*J.sx).toFixed(4)} ${(k*J.sz*J.sy).toFixed(4)})"${fo?` filter="url(#${fo})"`:''}${mk?` mask="url(#${mid})"`:''}>${fxG?fxG.wrap(txtGl(p,pf,'tg'+li+'_'+String(p.u).replace(/[^\w-]/g,''),1)):txtGl(p,pf,'tg'+li+'_'+String(p.u).replace(/[^\w-]/g,''),1)}</g></g>`;if(fxG)defs+=fxG.defs;out+=one;fr.set(String(p.u),one)});
 const lop=L.op!=null?Math.max(0,Math.min(100,+L.op)):100,lbl=L.bl&&L.bl!='behind'&&L.bl!='cancel'&&L.bl!='replace'?L.bl:'';
 const o0=`<g${lop<100?` opacity="${(lop/100).toFixed(2)}"`:''}${lbl?` style="mix-blend-mode:${lbl}"`:''}>`;return[defs,o0+out+'</g>',o0,'</g>',fr]}
@@ -57,6 +60,7 @@ async function tbAdd(){const L=fpL();if(!L)return;const o=tbRead();if(!o.text.tr
 L.pl=L.pl||[];const c=L.pl.filter(z=>z.tx).length,n=Math.max(R.bw,R.bh),q={u:fpU(),k:'text',tx:o,G:R.G,Lt:R.Lt,bw:R.bw,bh:R.bh,n,x:+(CW/2+((c%4)-1.5)*CW*.03).toFixed(1),y:+(CH/2+((c%4)-1.5)*CW*.03).toFixed(1),s:+n.toFixed(2),r:0,f:1};
 L.pl.push(q);WBS.fpSel=q.u;WBS.fpMS=new Set();WBS.fpB=null;WBS.fpGhost=null;tbKey='';store();upd();if(WBX.wbCap)WBX.wbCap()}
 function init26(){
+WBX.wbTbAdd=tbAdd;
 TXM=new Map();WBS.txArm=false;
 {['tx_t',...TXO_IDS].forEach(id=>$(id).addEventListener('input',tbLive));
 txoBind(()=>!stTxMode(),()=>tbLive());txoSelBind(()=>!stTxMode(),()=>tbLive());

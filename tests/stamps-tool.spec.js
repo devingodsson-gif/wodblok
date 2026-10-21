@@ -38,10 +38,10 @@ test('a layer with no pattern draws no outlines; a pattern brings them back', as
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
   expect(await outlines(page)).toBeGreaterThan(0);
-  await page.click('#pelist [data-pd]');
+  await page.evaluate(() => document.querySelector('#pelist [data-pd]').click());
   await settle(page);
   expect(await outlines(page)).toBe(0);
-  await page.click('#penew');
+  await page.click('#elb [data-k="pattern"]');
   await settle(page);
   expect(await outlines(page)).toBeGreaterThan(0);
   expect(errors).toEqual([]);

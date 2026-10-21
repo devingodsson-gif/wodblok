@@ -3,9 +3,8 @@ const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const roll = async page => { if (!(await page.locator('section.pn[data-p="rand"]:not([hidden])').count())) await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
-// the canvas is transparent (a checkerboard on screen) until it has a Sheet; these tests measure the artwork on paper, so the Sheet goes on first (no panel opened: that would change the canvas size)
-const sheetOn = page => page.evaluate(() => { const c = document.getElementById('sh_on'); if (!c.checked) c.click(); });
-const tile = async (page, on = true) => { await sheetOn(page); await openPanel(page, 'canvas'); await page.click(`#cfmt [data-f="${on ? 'tile' : 'free'}"]`); await settle(page); };
+// the Background is on by default (a solid paper colour), so the artwork is measured on paper
+const tile = async (page, on = true) => { await openPanel(page, 'canvas'); await page.click(`#cfmt [data-f="${on ? 'tile' : 'free'}"]`); await settle(page); };
 
 // The "Repeat 3 x 3" view draws the tile and its neighbours for real. If the piece repeats, the middle tile and the one to its right (or
 // below) are the same picture; a tile moved half a tile across is not, which is what makes the comparison meaningful.

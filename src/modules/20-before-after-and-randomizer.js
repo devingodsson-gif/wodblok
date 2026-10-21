@@ -15,7 +15,7 @@ import {coreStr,pmsg} from './18-projects-and-cover-overlay.js';
 import {wbHold} from './19-randomize-and-hold.js';
 import {fpU} from './24-free-place-layers.js';
 import {SL,libColors,libMotifs} from './27-stamp-library.js';
-import {rzFrameEls,rzFx,rzLayoutEls,rzMainEls,rzPressEls,rzSheet} from './71-randomize-elements.js';
+import {rzFrameEls,rzFx,rzLayoutEls,rzMainEls,rzPressEls} from './71-randomize-elements.js';
 // a layer that holds pictures or text boxes: Randomize keeps these
 const rzPic=l=>(l.pl||[]).some(p=>p.a||p.tx);
 // ===== v96 Before / after. `\` flips between the picture and the "before" (tap to stay, hold to peek); Shift+`\` splits the view with a draggable line.
@@ -167,10 +167,8 @@ WCV={relief:3,stain:1,wear:1.4},WST={wear:4,relief:1.5,stain:1},
 rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u:(sOn('tx','none')&&ch(.2)?[]:rzList('tx',WCV,ch(.3)?2:1));
 const EO={pick,ri,rr,ch,jit:!!FT.jit,texOn:!!(FT.pr&&sOn('pr','lay')),gradeOn:!!FT.gr,tex:()=>rzList('pr',WST,1)};
 if(usedGen)mL=rzMainEls(mL,mT,EO);if(FT.frame)fL=rzFrameEls(fL,fT,EO);
-const prevSh=WBS.layers.flatMap(L=>L.pl||[]).find(p=>p.k=='sheet')||null,cvU=rzCv(),mkSheet=!prevSh&&(FT.stamps||FT.tx||FT.col)||!!prevSh;
-const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(rzPic)?[]:WBS.layers.filter(rzPic)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:mkSheet?[]:cvU,v:87}};
-c.layers.forEach(l=>{if(l.pl)l.pl=l.pl.filter(p=>p.k!='sheet')});
-if(mkSheet)c.layers.unshift(oneLayer([rzSheet(prevSh,FT.tx&&!RZ.keep.tx?cvU:null,EO)],c.tiles.map(t=>t.id)));// the Sheet is the bottom of the list, in a plain layer of its own so no layer opacity or blend turns it into a group
+const cvU=rzCv();
+const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(rzPic)?[]:WBS.layers.filter(rzPic)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:cvU,v:87}};
 if(RZ.keep.pr)c.pr={...WBS.pr};
 if(FT.pr&&!sOn('pr','edges')){c.pr.e=WBS.pr.e;c.pr.q=WBS.pr.q}
 if(FT.pr&&sOn('pr','edges')&&AM('pr')<1){c.pr.e=Math.round(c.pr.e*AM('pr'));c.pr.q=Math.round(c.pr.q*AM('pr'))}

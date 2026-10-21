@@ -16,11 +16,10 @@ const canvasClick = async (page, fx, fy) => {
 test('the element bar has one button per kind, left of centre; the tray starts right of centre', async ({ page }) => {
   const { errors } = await openApp(page);
   const btn = page.locator('#elb .elbb');
-  await expect(btn).toHaveCount(7);
-  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Sheet', 'Paint', 'Shape', 'Image', 'Text', 'Stamp', 'Pattern']);
-  await expect(page.locator('#elb [data-k="sheet"]')).toBeEnabled();
-  await expect(page.locator('#elb [data-k="paint"]')).toBeEnabled();
-  for (const pn of ['elsheet', 'stmp', 'layers']) await expect(page.locator(`.rail [data-pn="${pn}"]`)).toBeHidden();   // element panels have no rail button
+  await expect(btn).toHaveCount(9);
+  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Select', 'Paint', 'Motif', 'Shape', 'Pen', 'Image', 'Text', 'Stamp', 'Pattern']);
+  await expect(page.locator('#elb [data-k="paint"]')).toBeHidden();   // the brush is put away for now
+  for (const pn of ['stmp', 'layers']) await expect(page.locator(`.rail [data-pn="${pn}"]`)).toBeHidden();   // element panels have no rail button
   const vb = await page.locator('.viewbar').boundingBox(), el = await page.locator('#elb').boundingBox(), ty = await page.locator('#tyc').boundingBox();
   const mid = vb.x + vb.width / 2;
   expect(el.x + el.width).toBeLessThanOrEqual(mid);
@@ -30,50 +29,53 @@ test('the element bar has one button per kind, left of centre; the tray starts r
   expect(errors).toEqual([]);
 });
 
-test('each working button opens its panel and shows pressed while that panel is in front', async ({ page }) => {
-  const { errors } = await openApp(page);
-  for (const [k, pn] of [['sheet', 'elsheet'], ['shape', 'motifs'], ['image', 'elimg'], ['text', 'text'], ['stamp', 'stmp'], ['pattern', 'layers'], ['paint', 'elpaint']]) {
-    await page.click(`#elb [data-k="${k}"]`);
-    await settle(page);
-    await expect(page.locator(`section.pn[data-p="${pn}"]`)).toBeVisible();
-    await expect(page.locator(`#elb [data-k="${k}"]`)).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
-  }
-  expect(errors).toEqual([]);
-});
-
-test('a stamp is placed from the Stamp panel, listed in Elements, and the Stamp panel says which one is being edited', async ({ page }) => {
+test('every button but Select makes an element at once, just above the selected one, and shows pressed while its tool is armed (2.3.0)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  await page.click('#elb [data-k="stamp"]');
-  await page.click('#lfpst [data-t]');
-  await canvasClick(page, 0.5, 0.5);
-  await page.click('#lfpst [data-t]');          // stop placing
-  const pl = JSON.parse(await getState(page)).els;
-  expect(pl.length).toBe(1);
-  await openPanel(page, 'lyrs');
-  await expect(page.locator('#lyl2 .lyr')).toHaveCount(1);
-  await page.click('#lyl2 .lyr');
-  await settle(page);
-  await page.click('#elb [data-k="stamp"]');
-  await expect(page.locator('.elmode[data-k="stamp"]')).toBeVisible();
-  await expect(page.locator('.elmode[data-k="stamp"] b')).toHaveText('Stamp 1');
+  const kinds = async () => JSON.parse(await getState(page)).els.map(q => q.k);
+  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.click('#elb [data-k="pattern"]'); await settle(page);
+  expect(await kinds()).toEqual(['pattern']);
+  await page.click('#elb [data-k="shape"]'); await settle(page);
+  expect(await kinds()).toEqual(['pattern', 'shape']);
+  await page.click('#elb [data-k="text"]'); await settle(page);
+  expect(await kinds()).toEqual(['pattern', 'shape', 'text']);
+  await page.click('#elb [data-k="motif"]'); await settle(page);
+  expect((await kinds()).includes('motif')).toBe(true);
+  await expect(page.locator('#elb [data-k="motif"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
+  await page.click('#elb [data-k="select"]'); await settle(page);
+  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
 
-test('a picture is imported and placed from the Image panel; its Crop group shows when it is selected', async ({ page }, testInfo) => {
+test('the Stamp button puts the current stamp on the canvas as an element at once, listed in Elements', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="image"]');
-  await expect(page.locator('#elcrg')).toBeHidden();
+  await noPattern(page);
+  await page.click('#elb [data-k="stamp"]'); await settle(page);
+  const pl = JSON.parse(await getState(page)).els;
+  expect(pl.map(q => q.k)).toEqual(['stamp']);
+  await openPanel(page, 'lyrs');
+  await expect(page.locator('#lyl2 .lyr')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
+test('Image asks for a picture, then makes a Rectangle Shape filled with it; the Fill group shows it', async ({ page }, testInfo) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await noPattern(page);
   const f = path.join(testInfo.outputDir, 'dot.png');
   fs.mkdirSync(testInfo.outputDir, { recursive: true });
   fs.writeFileSync(f, Buffer.from(PNG, 'base64'));
-  await page.setInputFiles('#lfafile', f);
+  const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#elb [data-k="image"]')]);
+  await fc.setFiles(f);
   await settle(page);
-  await canvasClick(page, 0.5, 0.5);
-  await page.click('#lfars [data-a]');          // stop placing
-  await canvasClick(page, 0.5, 0.5);            // select it
-  await expect(page.locator('#elcrg')).toBeVisible();
-  await expect(page.locator('.elmode[data-k="image"]')).toBeVisible();
+  const els = JSON.parse(await getState(page)).els;
+  expect(els).toHaveLength(1);
+  expect(els[0]).toMatchObject({ k: 'shape', sh: 'rect', fl: 'img' });
+  expect(els[0].a).toBeTruthy();
+  await expect(page.locator('#shp_fk [data-f="img"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#lfars [data-a]')).toHaveCount(1);
+  expect(await page.$$eval('#dyn use[href^="#sai"]', u => u.length)).toBe(1);
   expect(errors).toEqual([]);
 });

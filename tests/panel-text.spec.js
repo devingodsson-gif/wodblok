@@ -8,7 +8,7 @@ test('no tool panel opens with an explanatory sentence', async ({ page }) => {
   const { errors } = await openApp(page);
   const found = [];
   for (const mode of ['pattern']) {
-    const tools = (await page.locator('.rail [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn).filter(p => !(p === 'mlist' && __wbTest.unlockedStamp() == null)))).concat(['layers', 'stmp', 'motifs', 'text', 'elimg', 'elsheet', 'elpaint']);   // the Shape list is empty in Pattern until a stamp is unlocked
+    const tools = (await page.locator('.rail [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn).filter(p => !(p === 'mlist' && __wbTest.unlockedStamp() == null)))).concat(['layers', 'stmp', 'motifs', 'text', 'elpaint']);   // the Shape list is empty in Pattern until a stamp is unlocked
     for (const pn of tools) {
       await page.click('#rcls');
       await openPanel(page, pn);

@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { ROOT, openApp, openProjectFile, settle, getState, stateText } = require('./helpers/harness');
+const { ROOT, openApp, openPanel, openProjectFile, settle, getState, stateText } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const paints = async page => ((await st(page)).els || []).filter(q => q.k === 'paint');
@@ -15,7 +15,7 @@ const drag = async (page, from, to) => {
   await page.mouse.up();
   await settle(page);
 };
-const open = async page => { await page.click('#elb [data-k="paint"]'); await expect(page.locator('section.pn[data-p="elpaint"]:not([hidden])')).toBeVisible(); };
+const open = async page => { await openPanel(page, 'elpaint'); await expect(page.locator('section.pn[data-p="elpaint"]:not([hidden])')).toBeVisible(); };
 
 test('the Paint button opens the Paint panel; with the brush off a drag draws nothing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });

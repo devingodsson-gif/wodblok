@@ -15,14 +15,14 @@ const addEffect = async (page, kind, label) => {
   await settle(page);
 };
 const placed = async page => {
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   await page.click('#lfpst [data-t]');
   await openPanel(page, 'lyrs');
   await page.click('#lyl2 .lyr');
   await settle(page);
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
 };
 const useTransform = page => page.evaluate(() => { const u = document.querySelector('#art [data-fp] use'); return u ? u.getAttribute('transform') : ''; });
 
@@ -52,7 +52,7 @@ test('a pattern\'s Jitter nudges each placement differently, and the same seed g
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'layers');
-  await page.click('#penew');
+  await page.click('#elb [data-k="pattern"]');
   await settle(page);
   await addEffect(page, 'pattern', 'Jitter');
   const fx = (await st(page)).els.find(p => p.k == 'pattern').fx;

@@ -62,8 +62,7 @@ test('Settings > Shortcuts lists the keys that work but are not commands, and no
 test('the Shape list and the Element editor follow the unlocked stamp: locking it empties both', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await shapeOnStamp(page);
-  await showPanel(page, 'mlist');
-  await expect(page.locator('#mlist .mr').first()).toBeVisible();
+  await expect.poll(() => page.locator('#mlist .mr').count()).toBeGreaterThan(0);   // 2.3.0: the list sits in the Element panel, which is not always in front, so it is counted, not looked at
   await showPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await settle(page);
   await expect(page.locator('#mlist .mr')).toHaveCount(0);   // the panel has no size when it is empty, so it is checked in the page, not by sight
   await expect(page.locator('#sel')).toHaveClass(/none/);

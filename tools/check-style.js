@@ -4,9 +4,9 @@
 const fs = require('fs'), path = require('path');
 const SRC = path.join(__dirname, '..', 'src');
 // Exemptions (style guide 3.2 and 4.3): wordmark 15 and splash 20 display text; "+" glyphs 18 and 28.
-const FS_OK = new Set(['11px', '12.5px', '14px', 'inherit', '15px', '18px', '20px', '28px']);
-// 1-3px radii are slider and scrollbar tracks (style guide 4.2).
-const R_OK = new Set(['0', '1px', '2px', '3px', '4px', '8px', '12px', '50%', '999px', 'inherit']);
+const FS_OK = new Set(['11px', '12px', '13px', 'inherit', '15px', '18px', '20px', '28px']);
+// radii: the three of the scale (2, 3, 6), round (50%, 999px) and 1px tracks.
+const R_OK = new Set(['0', '1px', '2px', '3px', '6px', '50%', '999px', 'inherit']);   // 2.3.0: radii 2 / 3 / 6 (Photoshop look)
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 const files = [path.join(SRC, 'shell.html'), ...walk(path.join(SRC, 'modules')).filter(f => f.endsWith('.js'))];
 let bad = 0;

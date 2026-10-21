@@ -22,7 +22,7 @@ test('each tool has one name: the rail, the tab it opens, and "Open …" in comm
       const name = await b.getAttribute('aria-label');
       await page.click('#rcls');
       await b.click();
-      await expect(page.locator('.wtab.on').first(), `the tab for ${name}`).toHaveText(name);
+      await expect(page.locator('.wtab.on').first(), `the tab for ${name}`).toHaveText(name === 'Element' ? 'Properties' : name);   // 2.3.0: element panels show as one Properties tab
       expect(cmds, `command "Open ${name}"`).toContain('Open ' + name);
     }
   }

@@ -11,7 +11,7 @@ test('New pattern puts a pattern on the layer with the current stamp as its sour
   await noPattern(page);
   await openPanel(page, 'layers');
   await expect(page.locator('#peed')).toBeHidden();
-  await page.click('#penew');
+  await page.click('#elb [data-k="pattern"]');
   await settle(page);
   const p = (await pats(page))[0];
   expect(p).toMatchObject({ k: 'pattern', lay: 'grid', cn: 4, rn: 4, ds: 'cycle' });
@@ -27,7 +27,7 @@ test('columns, rows and layout change the points; a pattern with no source draws
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'layers');
-  await page.click('#penew');
+  await page.click('#elb [data-k="pattern"]');
   await settle(page);
   const u = (await pats(page))[0].u;
   await page.locator('#pecn').fill('6'); await page.locator('#pern').fill('3');
@@ -48,7 +48,7 @@ test('two sources alternate by cycle; Reroll changes the seed; delete takes the 
   await noPattern(page);
   await addStamp(page);
   await openPanel(page, 'layers');
-  await page.click('#penew');
+  await page.click('#elb [data-k="pattern"]');
   await page.click('#peadd');                                   // the current stamp again, as a second source
   await settle(page);
   expect((await pats(page))[0].src).toHaveLength(2);
@@ -57,7 +57,7 @@ test('two sources alternate by cycle; Reroll changes the seed; delete takes the 
   expect((await pats(page))[0].sd).not.toBe(s0);
   await page.click('#peds [data-d="random"]');
   expect((await pats(page))[0].ds).toBe('random');
-  await page.click('#pelist [data-pd]');
+  await page.evaluate(() => document.querySelector('#pelist [data-pd]').click());
   await settle(page);
   expect(await pats(page)).toHaveLength(0);
   await page.keyboard.press('Control+z');
@@ -70,7 +70,7 @@ test('Frame lays points along the four edges, the sides turned to lie along them
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'layers');
-  await page.click('#penew');
+  await page.click('#elb [data-k="pattern"]');
   await settle(page);
   const u = (await pats(page))[0].u;
   await expect(page.locator('#peinr')).toBeHidden();
@@ -91,7 +91,7 @@ test('Shift across and Shift down move a grid by a share of a cell without losin
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'layers');
-  await page.click('#penew');
+  await page.click('#elb [data-k="pattern"]');
   await settle(page);
   const u = (await pats(page))[0].u;
   expect(await drawn(page, u)).toBe(16);

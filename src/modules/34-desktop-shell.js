@@ -22,19 +22,21 @@ import {stUnlocked} from './63-stamp-tool.js';
 
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
-const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',layers:'Pattern',cover:'Book cover',elimg:'Image',elsheet:'Sheet'};
+const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',layers:'Pattern',cover:'Book cover'};
 let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',mlist:'Element',elimg:'Image',elsheet:'Sheet',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
+const PNAME={cways:'Colourways',vars:'Variations',pres:'Presets',xrec:'Export recipes',wspc:'Workspaces',nav:'Navigator',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',mlist:'Element',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',grade:'Colour grading',tex:'Textures',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
-const EL_ONLY=['layers','stmp','motifs','text','elimg','elsheet','elpaint'];
-const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elimg','elsheet','elpaint','text','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec']};
+const EL_ONLY=['layers','stmp','motifs','text','elpaint'];
+// Properties (2.3.0, Photoshop): every element panel opens in one group shown as a single "Properties" tab, right under the Elements list
+const ELP=[...EL_ONLY,'mlist'],wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
+const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elpaint','text','pgrid','canvas','colors','cways','grade','tex','rand','hist','slib','nav','wspc','xrec']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
-const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85}),wsG(['layers','canvas']),wsG(['colors','grade','tex'],{f:.8})],float:[]});
+const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85}),wsG(['layers']),wsG(['canvas','colors','grade','tex'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)
 let WS={pattern:wsDef()};
 try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}})}catch(e){}
 
@@ -54,7 +56,7 @@ const z=document.createElement('div');z.className='wzn';z.dataset.e=k;z.hidden=t
 wsBox.r.id='wsdock';
 // size of each dock (width for left/right, height for top/bottom), kept per mode for this session only
 const wsSz=k=>{const L=wsL();return(L.sz&&L.sz[k])||{l:316,r:316,t:260,b:260}[k]};
-const wsClampSz=(k,v)=>{const hz=k=='t'||k=='b',o=hz?(k=='t'?'b':'t'):(k=='l'?'r':'l'),oth=wsDk[o]&&!wsDk[o].hidden?wsSz(o):0,mn=hz?110:200,mx=hz?innerHeight-46-26-330-oth:innerWidth-52-420-oth;return Math.round(Math.max(mn,Math.min(v,Math.max(mn,mx))))};
+const wsClampSz=(k,v)=>{const hz=k=='t'||k=='b',o=hz?(k=='t'?'b':'t'):(k=='l'?'r':'l'),oth=wsDk[o]&&!wsDk[o].hidden?wsSz(o):0,mn=hz?110:200,mx=hz?innerHeight-46-26-330-oth:innerWidth-44-420-oth;return Math.round(Math.max(mn,Math.min(v,Math.max(mn,mx))))};
 const wsSetSz=(k,v)=>{const L=wsL();v=wsClampSz(k,v);(L.sz=L.sz||{})[k]=v;if(k=='t'||k=='b')wsDk[k].style.height=v+'px';else wsDk[k].style.width=v+'px'};
 // put a group into one edge's stack at position i (i past the end means last)
 const wsDockIns=(L,g,k,i)=>{g.e=k;g.f=1;L.dock.forEach(x=>{if((x.e||'r')==k)x.f=1});const el=L.dock.filter(x=>x!==g&&(x.e||'r')==k);if(i>=el.length){const last=el[el.length-1];if(last)L.dock.splice(L.dock.indexOf(last)+1,0,g);else L.dock.push(g)}else L.dock.splice(L.dock.indexOf(el[i]),0,g)};
@@ -81,7 +83,7 @@ function wsClamp(g){const st=document.querySelector('.stage').getBoundingClientR
 g.w=Math.max(200,Math.min(+g.w||300,innerWidth-20));g.h=Math.max(120,Math.min(+g.h||420,innerHeight-60));g.x=Math.max(-g.w+80,Math.min(g.x,innerWidth-80));g.y=Math.max(0,Math.min(g.y,innerHeight-36));if(g.y+g.h>innerHeight-8)g.y=Math.max(0,innerHeight-8-g.h);g.h=Math.min(g.h,innerHeight-8-g.y)}
 function wsEl(g,fl){const el=document.createElement('div');el.className='wg'+(fl?' fl':'')+(g.col?' col':'');el.dataset.g=g.id;
 if(fl){wsClamp(g);el.style.cssText=`left:${g.x}px;top:${g.y}px;width:${g.w}px;${g.col?'':`height:${g.h}px;`}z-index:${++wsZ}`}else el.style.flexGrow=g.f;
-el.innerHTML=`<div class="wh" title="Drag to move"><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
+el.innerHTML=`<div class="wh" title="Drag to move"><div class="wt">${wsIsP(g)?`<button type="button" class="wtab on" data-t="${g.a}">Properties</button>`:g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
 `<button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button><button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close (reopen from the left bar)">${IC.x}</button></div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
 const bd=el.querySelector('.wbd');g.tabs.forEach(p=>{const sc=wsSec(p);if(sc){sc.classList.toggle('mc',!!sc.querySelector(':scope>details.g'));sc.hidden=p!=g.a;bd.appendChild(sc)}});return el}
 // the tool bar: the user's own order and the tools they took off it (kept in settings)
@@ -144,7 +146,7 @@ if(wd.k=='split'){const dy=(wd.hz?e.clientX:e.clientY)-wd.sy,mn=wd.hz?160:80,ha=
 if(wd.k=='size'){wd.g.w=Math.max(200,Math.round(wd.r.width+e.clientX-wd.sx));wd.g.h=Math.max(120,Math.round(wd.r.height+e.clientY-wd.sy));wd.w.style.width=wd.g.w+'px';wd.w.style.height=wd.g.h+'px';return}
 if(!wd.on){if(Math.hypot(e.clientX-wd.sx,e.clientY-wd.sy)<6)return;wd.on=true;wd.whole=!wd.p||wd.g.tabs.length==1;document.body.classList.add('wsdrag');
 if(wd.whole&&wd.fl){wd.live=true;wd.el.classList.add('lift');wd.ox=wd.sx-wd.r.left;wd.oy=wd.sy-wd.r.top}
-else{wd.gh=document.createElement('div');wd.gh.className='wghost';wd.gh.textContent=wd.whole?wd.g.tabs.map(p=>PNAME[p]).join(' · '):PNAME[wd.p];document.body.appendChild(wd.gh);wd.ox=40;wd.oy=14;if(wd.whole)wd.el.classList.add('lift')}}
+else{wd.gh=document.createElement('div');wd.gh.className='wghost';wd.gh.textContent=wsIsP(wd.g)?'Properties':wd.whole?wd.g.tabs.map(p=>PNAME[p]).join(' · '):PNAME[wd.p];document.body.appendChild(wd.gh);wd.ox=40;wd.oy=14;if(wd.whole)wd.el.classList.add('lift')}}
 if(wd.live){wd.el.style.left=(e.clientX-wd.ox)+'px';wd.el.style.top=Math.max(0,e.clientY-wd.oy)+'px'}else{wd.gh.style.left=(e.clientX+12)+'px';wd.gh.style.top=(e.clientY+10)+'px'}
 wd.t=wsTarget(e)});
 document.addEventListener('pointerup',e=>{if(!wd)return;const d=wd;wd=null;
@@ -170,11 +172,15 @@ function setPanel(p,bot){if(!PNAME[p])p='canvas';if(!wsReady)setView();
 const L=wsL();let g=wsFind(p);
 // the Shape panel that opens by itself when a shape is added opens as its own group along the bottom, so the panel you are working in stays in front
 if(!g&&bot){g=wsG([p],{e:'b'});L.dock.push(g)}
+// an element panel joins the Properties group; with none, a Properties group opens under the Elements list (its id is fixed, so no random number is used)
+if(!g&&ELP.includes(p)){g=wsAll().find(wsIsP)||null;if(g)g.tabs.push(p);else{const E=L.dock.find(x=>x.tabs.includes('lyrs'));if(E){g={id:'gprops',tabs:[p],a:p,f:1,e:E.e||'r'};L.dock.splice(L.dock.indexOf(E)+1,0,g)}}}
 // a tool that is not open yet opens docked on the right: Randomize beside the colour tools, anything else as a tab in the first group
 if(!g){const own=(p=='rand'||!L.dock.length)?wsG([p]):null;   // made in the same cases as before, so the series of random ids (and the seeded test runs) stays as it was
 g=(p=='rand'&&L.dock.find(x=>x.tabs.includes('grade')))||L.dock[0];if(g)g.tabs.push(p);else{g=own;L.dock.push(g)}}g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
+WBX.wbApart=pn=>{const a=wsFind('lyrs'),b=wsFind(pn);return!(a&&b&&a===b)};   // false when the panel is a tab beside the Elements list: showing it would hide the list
+WBX.wbPropsOpen=()=>!!wsAll().find(wsIsP)||!!wsFind('lyrs');   // Properties shows (and opens under the list) once the Elements list is open
 // Workspaces: read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
 WBX.wbWsGet=()=>JSON.parse(JSON.stringify({pattern:WS.pattern}));
 WBX.wbWsSet=o=>{const had=!!wsFind('wspc');['pattern'].forEach(m=>{const L=o&&o[m];if(!L)return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=wsG([]).id;g.f=+g.f||1;g.e=g.e||'r';g.col=false;return g.tabs.length>0};

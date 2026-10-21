@@ -1,9 +1,10 @@
 // Element update, step 7 (2.1.7): the effect stack. An ordered list `fx` on an element, shown at the bottom of its panel: add, switch off, move, delete.
-// Texture (stamp, picture, text, pattern, Sheet) and Pressure offset (stamp, pattern).
+// Texture (stamp, text, pattern, Shape) and Pressure offset (stamp, pattern).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern, sheetOf } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
+const sheetOf = d => (d.els || []).find(q => q.k === 'shape');   // the effects tests use a Shape element (the Sheet is gone)
 const canvasClick = async (page, fx, fy) => {
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * fx, box.y + box.height * fy);
@@ -16,29 +17,31 @@ const addEffect = async (page, kind, label) => {
   await settle(page);
 };
 
-test('the Sheet panel has an Effects group once there is a Sheet; Texture is added, switched off, moved and deleted', async ({ page }) => {
+// 2.3.0: an effect is a row (.fxr, data-fu) with an eye (data-fon) and a ⋯ menu (data-fmore: Duplicate, Move up, Move down, Delete); no up/down/delete buttons
+const fxRows = (page, kind) => page.locator(`.fxg[data-fxk="${kind}"] [data-fu]`);
+const fxMenu = async (page, kind, n, label) => { await fxRows(page, kind).nth(n).locator('[data-fmore]').click(); await page.locator('.rowm .ddi', { hasText: label }).first().click(); await settle(page); };
+
+test('a Shape has an Effects group; Texture is added, switched off, moved and deleted', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="sheet"]');
-  await expect(page.locator('.fxg[data-fxk="sheet"]')).toBeHidden();
-  await page.check('#sh_on');
+  await page.click('#elb [data-k="shape"]');
   await settle(page);
-  await expect(page.locator('.fxg[data-fxk="sheet"]')).toBeVisible();
-  await addEffect(page, 'sheet', 'Texture');
-  await addEffect(page, 'sheet', 'Texture');
+  await expect(page.locator('.fxg[data-fxk="shape"]')).toBeVisible();
+  await addEffect(page, 'shape', 'Texture');
+  await addEffect(page, 'shape', 'Texture');
   let fx = sheetOf(await st(page)).fx;
   expect(fx.map(e => e.k)).toEqual(['texture', 'texture']);
   expect(fx[0].on).toBe(true);
   expect(fx[0].x).toBeTruthy();
   const second = fx[1].u;
   // switch the first off
-  await page.locator('.fxg[data-fxk="sheet"] .fxl [data-fon]').first().click();
+  await fxRows(page, 'shape').nth(0).locator('[data-fon]').click(); await settle(page);
   expect(sheetOf(await st(page)).fx[0].on).toBe(false);
   // move the second one up
-  await page.locator('.fxg[data-fxk="sheet"] .fxl [data-fu]').nth(1).locator('[data-fup]').click();
+  await fxMenu(page, 'shape', 1, 'Move up');
   expect(sheetOf(await st(page)).fx[0].u).toBe(second);
   // delete both
-  await page.locator('.fxg[data-fxk="sheet"] .fxl [data-fx]').first().click();
-  await page.locator('.fxg[data-fxk="sheet"] .fxl [data-fx]').first().click();
+  await fxMenu(page, 'shape', 0, 'Delete');
+  await fxMenu(page, 'shape', 0, 'Delete');
   expect(sheetOf(await st(page)).fx).toBeUndefined();
   expect(errors).toEqual([]);
 });
@@ -46,7 +49,7 @@ test('the Sheet panel has an Effects group once there is a Sheet; Texture is add
 test('a placed stamp gets Pressure offset from its own Effects group; the layer\'s own pressure is not needed', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   await page.click('#lfpst [data-t]');          // stop placing
@@ -54,7 +57,7 @@ test('a placed stamp gets Pressure offset from its own Effects group; the layer\
   await openPanel(page, 'lyrs');
   await page.click('#lyl2 .lyr');
   await settle(page);
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   await expect(page.locator('.fxg[data-fxk="stamp"]')).toBeVisible();
   await addEffect(page, 'stamp', 'Pressure offset');
   const q = (await st(page)).els[0];
@@ -70,7 +73,7 @@ test('a placed stamp gets Pressure offset from its own Effects group; the layer\
 test('a pattern\'s effects apply to every placement', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'layers');
-  await page.click('#penew');
+  await page.click('#elb [data-k="pattern"]');
   await settle(page);
   await expect(page.locator('.fxg[data-fxk="pattern"]')).toBeVisible();
   await addEffect(page, 'pattern', 'Pressure offset');
@@ -85,30 +88,17 @@ test('a pattern\'s effects apply to every placement', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('a Texture effect on the Sheet masks the paper while it is on, and not when it is off', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#elb [data-k="sheet"]');
-  await page.check('#sh_on');
-  await settle(page);
-  expect(await page.$$eval('#dyn mask#fmsheet', e => e.length)).toBe(0);
-  await addEffect(page, 'sheet', 'Texture');
-  await expect.poll(() => page.$$eval('#dyn mask#fmsheet', e => e.length), { timeout: 15000 }).toBe(1);
-  await page.locator('.fxg[data-fxk="sheet"] .fxl [data-fon]').first().click();
-  await expect.poll(() => page.$$eval('#dyn mask#fmsheet', e => e.length), { timeout: 15000 }).toBe(0);
-  expect(errors).toEqual([]);
-});
-
 test('Pressure offset on a stamp makes its own pressure variants; without it the layer\'s zero pressure draws the plain stamp', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   await page.click('#lfpst [data-t]');
   await canvasClick(page, 0.5, 0.5);
   await page.click('#lfpst [data-t]');
   await openPanel(page, 'lyrs');
   await page.click('#lyl2 .lyr');
   await settle(page);
-  await page.click('#elb [data-k="stamp"]');
+  await openPanel(page, 'stmp');
   // the bitmap cache prints every variant into a bk picture, so the placed stamp's picture changes when its own pressure variant replaces the plain stamp
   const pic = () => page.evaluate(() => { const u = document.querySelector('#art [data-fp] use'); return u ? u.getAttribute('href') : ''; });
   await expect.poll(pic, { timeout: 15000 }).toMatch(/^#/);

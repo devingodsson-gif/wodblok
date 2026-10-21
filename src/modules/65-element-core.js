@@ -1,7 +1,6 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,col,okC,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {freeLayer} from './24-free-place-layers.js';
-import {artLayer} from './25-art-layers.js';
 import {txtLayer} from './26-text-boxes.js';
 
 // ===== Element core (element update, step 1, 2.1.1): the two registries every element kind and every effect joins.
@@ -42,8 +41,7 @@ for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
  if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a;wn=!!EL_K[k].notile}wb+=r[2]+s+r[3];continue}
  emit();if(k!==run){flush();run=k}buf+=s}
 flush();emit();return out}
-// the Sheets at the bottom of the list sit under everything else, outside the rough-edge filter and the ink mask (build() puts them there); one higher up draws in its place
-let nu=0;while(nu<its.length&&!its[nu].path.length&&elKind(its[nu].q)=='sheet')nu++;const under=render(its.slice(0,nu),0),body=render(its.slice(nu),0);return[defs,body,'','',null,under]}// body first: a group's ink filter is added to defs while it renders
+const body=render(its,0);return[defs,body,'','',null,'']}   // render first: a group's ink adds its filter to defs while it draws
 function elTile(id,h){let o=`<g id="tw${id}">${h}</g>`;const R=WBS.tilePv?[-2,-1,0,1,2]:[-1,0,1];for(const dx of R)for(const dy of R)if(dx||dy)o+=`<use href="#tw${id}" x="${dx*CW}" y="${dy*CH}"/>`;return o}
 // the opacity and blend attributes of one element ('' when it has neither); behind, cancel and replace stay layer-only
 function elOB(q){const op=q.op!=null?Math.max(0,Math.min(100,+q.op)):100,bl=q.bl&&q.bl!='behind'&&q.bl!='cancel'&&q.bl!='replace'?q.bl:'';return(op<100?` opacity="${(op/100).toFixed(2)}"`:'')+(bl?` style="mix-blend-mode:${bl}"`:'')}
@@ -59,28 +57,29 @@ function fxOf(q){return q&&Array.isArray(q.fx)?q.fx:[]}
 // ===== The element bar: one button per kind, left of the centre of the window (the colour tray sits right of it). A button opens its kind's panel;
 // it shows pressed while that panel is the one in front. Kinds whose panel is not built yet show their button switched off.
 const elIc=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-function elBar(){const b=$('elb');if(!b)return;b.innerHTML=EL_O.map(k=>{const d=EL_K[k];return`<button type="button" class="elbb" data-k="${k}" aria-label="${d.label}" title="${d.label}" aria-pressed="false"${d.pn?'':' disabled'}>${elIc(d.icon||'')}</button>`}).join('')}
+function elBar(){const b=$('elb');if(!b)return;b.innerHTML=EL_O.map(k=>{const d=EL_K[k];return`<button type="button" class="elbb" data-k="${k}" aria-label="${d.label}" title="${d.label}" aria-pressed="false"${d.pn?'':' disabled'}${d.hide?' hidden':''}>${elIc(d.icon||'')}</button>`}).join('')}
 // the selected element on the current layer, if any
 function elSel(){const L=WBS.layers[WBS.selL];if(!L||WBS.fpSel==null||WBS.fpSel===-1)return null;return(L.pl||[]).find(q=>q.u==WBS.fpSel)||null}
-function elSync(){const b=$('elb');if(b)b.querySelectorAll('.elbb').forEach(x=>{const d=EL_K[x.dataset.k],r=d&&d.pn&&document.querySelector(`.rail [data-pn="${d.pn}"]`),on=!!(r&&r.classList.contains('on'));if(x.getAttribute('aria-pressed')!=String(on))x.setAttribute('aria-pressed',String(on))});
-// the Image panel's Crop group shows only when there is a picture to crop
-{const c=$('lcrop'),g=$('elcrg');if(c&&g&&g.hidden!==c.hidden)g.hidden=c.hidden}
+let elLast='';
+function elSync(){if(WBX.wbAbSync)WBX.wbAbSync();if(WBX.wbSteSync)WBX.wbSteSync();if(WBX.wbMapSync)WBX.wbMapSync();
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden
-if(WBX.wbShSync)WBX.wbShSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
-const q=elSel(),k=elKind(q);document.querySelectorAll('.elmode[data-k]').forEach(m=>{const on=!!q&&m.dataset.k===k,d=EL_K[m.dataset.k];m.hidden=!on;const nb=m.querySelector('b');if(on&&nb&&d&&d.name){const t=d.name(q);if(nb.textContent!==t)nb.textContent=t}})}
+if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbShpSync)WBX.wbShpSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
+const q=elSel(),k=elKind(q);
+// Properties follows the selection (2.3.0): picking an element shows its panel there, when the Properties group is open
+{const su=q?String(q.u):'';if(su!==elLast){elLast=su;const d=k&&EL_K[k];if(su&&d&&d.pn&&WBX.wbPropsOpen&&WBX.wbPropsOpen()&&WBX.wbOpenPanel&&(!WBX.wbApart||WBX.wbApart(d.pn))){const pn=d.pn;setTimeout(()=>{const s2=document.querySelector(`section.pn[data-p="${pn}"]`);if(!s2||s2.hidden)WBX.wbOpenPanel(pn)},0)}}}
+document.querySelectorAll('.elmode[data-k]').forEach(m=>{const on=!!q&&m.dataset.k===k,d=EL_K[m.dataset.k];m.hidden=!on;const nb=m.querySelector('b');if(on&&nb&&d&&d.name){const t=d.name(q);if(nb.textContent!==t)nb.textContent=t}})}
 
 function init65(){
 // the kinds, in the order of the element bar. Image, Text and Stamp exist as placed elements today (their test and drawing; dz keeps the order their
 // shared definitions were always written in); the others get them in later steps.
-elRegister('sheet',{label:'Sheet',pn:'elsheet',icon:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 13L13 4M9 20L20 9"/>'});
-elRegister('paint',{label:'Paint',pn:'elpaint',icon:'<path d="M19.5 4.5c-2.6 1-6.4 4.8-8.4 7.9l1.6 1.6c3.1-2 6.9-5.8 7.9-8.4z"/><path d="M10.2 13.6c-2 0-3.5 1.3-3.5 3.2 0 1.4-.8 2.4-2.4 2.7 2.6 1.3 7.4.6 7.4-4.4z"/>'});
-elRegister('shape',{label:'Shape',pn:'motifs',icon:'<path d="M12 2.8l5.2 8.7H6.8z"/><circle cx="7" cy="17" r="4"/><rect x="12.8" y="13" width="8.4" height="8.4" rx="1.4"/>'});
-elRegister('image',{label:'Image',pn:'elimg',icon:'<rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5L15 10l-9 9"/>',dz:2,is:q=>!!q.a,name:q=>(WBS.ARTS[q.a]&&WBS.ARTS[q.a].n)||'Image',draw:(L,li)=>artLayer(L,li)});
+elRegister('paint',{hide:true,label:'Paint',pn:'elpaint',icon:'<path d="M19.5 4.5c-2.6 1-6.4 4.8-8.4 7.9l1.6 1.6c3.1-2 6.9-5.8 7.9-8.4z"/><path d="M10.2 13.6c-2 0-3.5 1.3-3.5 3.2 0 1.4-.8 2.4-2.4 2.7 2.6 1.3 7.4.6 7.4-4.4z"/>'});
+elRegister('motif',{label:'Motif',pn:'motifs',icon:'<path d="M12 2.8l5.2 8.7H6.8z"/><circle cx="7" cy="17" r="4"/><rect x="12.8" y="13" width="8.4" height="8.4" rx="1.4"/>'});
+elRegister('shape',{label:'Shape',pn:'mlist',icon:'<rect x="3.5" y="4.5" width="10" height="10" rx="1.5"/><circle cx="15.5" cy="15.5" r="5"/>'});
 elRegister('text',{label:'Text',pn:'text',icon:'<path d="M5.5 7.5V5h13v2.5M12 5v14M9 19h6"/>',dz:3,is:q=>q.tx!=null,name:q=>String((q.tx&&q.tx.text)||'').replace(/\n/g,' ').slice(0,28),draw:(L,li)=>txtLayer(L,li)});
 elRegister('stamp',{label:'Stamp',pn:'stmp',icon:'<rect x="3.5" y="10.5" width="9" height="9" rx="2"/><path d="M17 4.5l4 7h-8z"/>',dz:1,is:q=>q.t!=null,name:q=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==q.t)+1),draw:(L,li,pa,lgB)=>freeLayer(L,li,pa,lgB)});
 elRegister('pattern',{label:'Pattern',pn:'layers',icon:'<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>'});
 elBar();
 const b=$('elb');if(b)b.onclick=e=>{const x=e.target.closest('.elbb');if(!x||x.disabled)return;const d=EL_K[x.dataset.k];if(d&&d.pn&&WBX.wbOpenPanel)WBX.wbOpenPanel(d.pn)};
-WBX.wbElSync=elSync;
+WBX.wbElSync=elSync;WBX.wbElSeen=u=>{elLast=String(u)};
 }
 export {elExtend,elDef,elDraw,elKind,elKinds,elRegister,elSel,elSync,fxDef,fxFor,fxOf,fxRegister,init65};

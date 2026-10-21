@@ -40,9 +40,9 @@
    "ink": null,
    "tu": [
     {
-     "x": "xmuzhi8001cx6",
-     "sd": 93102,
-     "md": "wear"
+     "x": "xmuzhi8004276",
+     "sd": 93980,
+     "md": "relief"
     }
    ]
   },
@@ -85,9 +85,14 @@
    "ink": null,
    "tu": [
     {
-     "x": "xmuzhi800s364",
-     "sd": 5178,
-     "md": "stain"
+     "x": "xmuzhi800vyq5",
+     "sd": 99070,
+     "md": "wear"
+    },
+    {
+     "x": "xmuzhi800zk0c",
+     "sd": 77228,
+     "md": "relief"
     }
    ]
   },
@@ -144,8 +149,8 @@
    "es": 382,
    "tu": [
     {
-     "x": "xmuzhi800ptub",
-     "sd": 67842,
+     "x": "xmuzhi8006xm1",
+     "sd": 56761,
      "md": "wear"
     }
    ]
@@ -178,18 +183,7 @@
    "et": 2.2,
    "er": 2.3,
    "es": 509,
-   "tu": [
-    {
-     "x": "xmuzhi800uc35",
-     "sd": 41420,
-     "md": "wear"
-    },
-    {
-     "x": "xmuzhi800vdga",
-     "sd": 69388,
-     "md": "wear"
-    }
-   ]
+   "tu": []
   },
   {
    "id": 5,
@@ -229,30 +223,14 @@
    "es": 563,
    "tu": [
     {
-     "x": "xmuzhi800g6ty",
-     "sd": 29608,
+     "x": "xmuzhi800xpli",
+     "sd": 50969,
      "md": "relief"
     }
    ]
   }
  ],
  "els": [
-  {
-   "u": "pmuzhi800n6h",
-   "k": "sheet",
-   "n": "Sheet",
-   "o": 100,
-   "fx": [
-    {
-     "u": "pmuzhi800e9x",
-     "k": "texture",
-     "on": true,
-     "x": "xmuzhi80027nv",
-     "sd": 13671,
-     "md": "relief"
-    }
-   ]
-  },
   {
    "u": "pmuzhi800sp8",
    "k": "pattern",
@@ -283,20 +261,13 @@
    "f": 1,
    "fx": [
     {
-     "u": "pmuzhi800j67",
+     "u": "pmuzhi800cok",
      "k": "pressure",
      "on": true,
-     "pst": 3,
+     "pst": 2,
      "pfl": 1
     }
    ]
-  },
-  {
-   "u": "glo4gfrfq",
-   "k": "group",
-   "n": "Layer 2",
-   "op": 65,
-   "ink": "@k4"
   },
   {
    "u": "pmuzhi800cr9",
@@ -326,9 +297,10 @@
    "g": "glo4gfrfq"
   },
   {
-   "u": "gl2zf3phl",
+   "u": "glo4gfrfq",
    "k": "group",
-   "n": "Frame",
+   "n": "Layer 2",
+   "op": 65,
    "ink": "@k4"
   },
   {
@@ -363,17 +335,16 @@
      "rot": 0,
      "sz": 0,
      "sd": 36413
-    },
-    {
-     "u": "pmuzhi800zzc",
-     "k": "pressure",
-     "on": true,
-     "pst": 5,
-     "pfl": 0
     }
    ],
    "in": 4,
    "g": "gl2zf3phl"
+  },
+  {
+   "u": "gl2zf3phl",
+   "k": "group",
+   "n": "Frame",
+   "ink": "@k4"
   }
  ],
  "proj": {
@@ -426,9 +397,15 @@
   "sd": 1
  },
  "tex": {
-  "u": [],
+  "u": [
+   {
+    "x": "xmuzhi80027nv",
+    "sd": 13671,
+    "md": "relief"
+   }
+  ],
   "v": 87,
-  "t": ""
+  "t": "1"
  },
  "texLib": [
   {
@@ -442,63 +419,53 @@
    "auto": true
   },
   {
-   "id": "xmuzhi8001cx6",
-   "name": "Washi",
-   "t": "washi",
-   "a": 43,
-   "sc": 164,
-   "az": 250,
-   "sd": 15837,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800s364",
-   "name": "Blotchy Wash",
-   "t": "blotchy",
-   "a": 53,
-   "sc": 169,
-   "az": 135,
-   "sd": 97431,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800ptub",
-   "name": "Riso Grain",
-   "t": "riso",
-   "a": 44,
-   "sc": 157,
-   "az": 225,
-   "sd": 77905,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800uc35",
-   "name": "Granite",
-   "t": "granite",
-   "a": 27,
-   "sc": 98,
-   "az": 315,
-   "sd": 94820,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800vdga",
+   "id": "xmuzhi8004276",
    "name": "Kraft",
    "t": "kraft",
-   "a": 58,
-   "sc": 132,
-   "az": 250,
-   "sd": 81193,
+   "a": 73,
+   "sc": 130,
+   "az": 225,
+   "sd": 58844,
    "auto": true
   },
   {
-   "id": "xmuzhi800g6ty",
-   "name": "Cotton Rag",
-   "t": "cotton",
-   "a": 76,
-   "sc": 139,
+   "id": "xmuzhi800vyq5",
+   "name": "Worn Block",
+   "t": "worn",
+   "a": 46,
+   "sc": 158,
+   "az": 315,
+   "sd": 62314,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800zk0c",
+   "name": "Riso Grain",
+   "t": "riso",
+   "a": 84,
+   "sc": 65,
+   "az": 315,
+   "sd": 51596,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi8006xm1",
+   "name": "Hammered",
+   "t": "hammered",
+   "a": 51,
+   "sc": 135,
+   "az": 135,
+   "sd": 18349,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800xpli",
+   "name": "Scuffed",
+   "t": "scuff",
+   "a": 56,
+   "sc": 104,
    "az": 225,
-   "sd": 33300,
+   "sd": 64983,
    "auto": true
   }
  ],
@@ -510,78 +477,19 @@
   "sh": "rect"
  },
  "grade": {
-  "ex": 11,
-  "ct": -9,
-  "hi": -10,
-  "sh": 0,
-  "wh": 21,
-  "bl": -25,
-  "tp": -26,
+  "ex": 1,
+  "ct": 0,
+  "hi": 12,
+  "sh": -4,
+  "wh": 0,
+  "bl": -15,
+  "tp": -8,
   "tn": 0,
-  "sat": 0,
-  "vib": 19,
-  "hue": -1,
+  "sat": 3,
+  "vib": 0,
+  "hue": 16,
   "fd": 0,
   "cov": false,
-  "masks": [
-   {
-    "sc": "",
-    "id": "m27ptun",
-    "t": "lin",
-    "name": "Ink fade",
-    "on": true,
-    "inv": false,
-    "amt": 100,
-    "a": {
-     "ex": 26,
-     "ct": 0,
-     "hi": 0,
-     "sh": 0,
-     "wh": 0,
-     "bl": 0,
-     "tp": 0,
-     "tn": 0,
-     "sat": 0,
-     "vib": 0,
-     "hue": 0,
-     "fd": 0
-    },
-    "sp": "s",
-    "st": "",
-    "x1": 1,
-    "y1": 0.5,
-    "x2": 0.161,
-    "y2": 0.5
-   },
-   {
-    "sc": "",
-    "id": "m1vxmr6",
-    "t": "lin",
-    "name": "Edge fade",
-    "on": true,
-    "inv": false,
-    "amt": 100,
-    "a": {
-     "ex": 0,
-     "ct": 0,
-     "hi": 0,
-     "sh": 0,
-     "wh": 0,
-     "bl": 0,
-     "tp": 25,
-     "tn": 0,
-     "sat": 0,
-     "vib": 0,
-     "hue": 0,
-     "fd": 0
-    },
-    "sp": "c",
-    "st": "",
-    "x1": 0.5,
-    "y1": 0,
-    "x2": 0.5,
-    "y2": 0.395
-   }
-  ]
+  "masks": []
  }
 }
