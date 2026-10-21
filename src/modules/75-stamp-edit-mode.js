@@ -29,7 +29,6 @@ function steGo(id){const cur=stUnlocked();if((cur==null?null:cur)===(id==null?nu
  STE.views[cur==null?'c':cur]=steView();
  if(id==null){steStage(null);stLock(cur)}else{if(!STE.tabs.includes(id))STE.tabs.push(id);steStage(id);stLock(id)}
  const v=STE.views[id==null?'c':id];if(v)steBack(v);else if(id!=null&&WBX.wbZoomIn&&WBX.wbZoomIn())$('zl').click();
- if(id!=null&&WBX.wbOpenPanel)WBX.wbOpenPanel('stmp');
  steSync()}
 function steClose(id){const i=STE.tabs.indexOf(id);if(i<0)return;const act=stUnlocked()===id;if(act)steGo(null);STE.tabs.splice(i,1);delete STE.views[id];steSync()}
 // Edit on a stamp: opens its tab, or closes it when it is the one shown

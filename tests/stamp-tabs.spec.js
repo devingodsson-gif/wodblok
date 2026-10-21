@@ -77,3 +77,21 @@ test('a stamp tab shows the stamp alone: its own canvas size, no background, out
   expect(await page.evaluate(() => JSON.stringify(window.__wbTest.state().layers))).toBe(before);   // the scene is never stored
   expect(errors).toEqual([]);
 });
+
+test('the panels stay as they are when a tab is picked: no tool opens or closes', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await showPanel(page, 'motifs');
+  const open = () => page.$$eval('section.pn:not([hidden])', s => s.filter(x => x.offsetParent).map(x => x.dataset.p).sort().join());
+  const a = await open();
+  await page.locator('#elb [data-k="pattern"]').click(); await settle(page);   // some element, so the stamp list is not the only way in
+  const b = await open();
+  await page.evaluate(() => window.__wbTest.commands && 0);
+  await showPanel(page, 'stmp');
+  const c = await open();
+  await page.locator('#stmpl .smklk').first().click(); await settle(page);
+  expect(await open()).toBe(c);
+  await page.click('#stetabs [data-sv="c"]'); await settle(page);
+  expect(await open()).toBe(c);
+  expect(a.length + b.length).toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});
