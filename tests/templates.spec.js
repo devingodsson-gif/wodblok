@@ -38,7 +38,7 @@ test('both commands exist', async ({ page }) => {
 });
 
 test('every built-in opens clean, matches its kind and opens the same twice', async ({ page }) => {
-  const { errors } = await openApp(page);
+  const { errors } = await openApp(page, { pattern: false });   // an empty project: nothing to discard
   for (const [k, n] of Object.keys(HAND).map(k => [k, HAND[k]])) {
     for (let i = 1; i <= n; i++) {
       await openPicker(page); await kind(page, k);

@@ -249,7 +249,7 @@ async function addKind(page, k) {
   await page.click(`.elk[data-k="${k}"] [data-add]`);
   await settle(page);
   // 2.26.0: Add motif with nothing chosen yet opens the library instead of placing the first shape; this picks one there
-  if (k === 'motif' && !(await page.evaluate(() => !!document.querySelector('#elb [data-k="motif"][aria-pressed="true"]')))) await pickShape(page);
+  if (k === 'motif' && !page.__wbMotifPicked) { await pickShape(page); page.__wbMotifPicked = true; }   // later Adds use the shape picked here
   await placeArmed(page, k);
 }
 async function placeArmed(page, k) {
