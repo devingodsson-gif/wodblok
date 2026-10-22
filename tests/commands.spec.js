@@ -53,8 +53,10 @@ test('documented shortcuts really work', async ({ page }) => {
   // a tap keeps Before on; holding it is a peek that ends when the key is let go (the picture being compared is the current one after a roll)
   await page.keyboard.press('Backslash');
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'true');
+  await page.waitForSelector('.baov');   // the other picture is ready: a press while it is still being made is ignored
   await page.keyboard.press('Backslash');
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('.baov')).toHaveCount(0);
   await page.keyboard.down('Backslash');
   await expect(page.locator('#bab')).toHaveAttribute('aria-pressed', 'true');   // it takes a moment to get the other picture ready
   await page.waitForSelector('.baov');   // the other picture is on screen (the button reads pressed while it is still being made; letting go before it is ready leaves Before on, as a tap does)

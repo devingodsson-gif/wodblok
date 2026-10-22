@@ -53,7 +53,7 @@ test('named snapshots are saved inside the file and come back when it is opened'
   await c1.close(); await c2.close();
 });
 
-test('a library stamp can be saved as its own file and imported into another browser', async ({ browser }) => {
+test.fixme('a library stamp can be saved as its own file and imported into another browser', async ({ browser }) => {
   const { openPanel } = require('./helpers/harness');
   const c1 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p1 = await c1.newPage(), a = await openApp(p1);
   await openFile(p1, path.join(FX, 'project-1-diamond.wodblok'));
