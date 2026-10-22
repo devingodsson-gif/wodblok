@@ -56,5 +56,5 @@ function init75(){const a=$('art');if(!a)return;
  $('stetabs').onclick=e=>{const x=e.target.closest('[data-sx]');if(x){steClose(+x.dataset.sx);return}const t=e.target.closest('[data-sv]');if(!t)return;steGo(t.dataset.sv=='c'?null:+t.dataset.sv)};
  const ed=$('smkedit');if(ed)ed.onclick=()=>{const t=WBS.tiles[WBS.cur];if(t)steGo(t.id)};
  ($('boardP')||a).addEventListener('dblclick',e=>{if(WBS.brush||WBS.txArm||WBS.fpB!=null)return;const c=stePt(e);if(!c)return;const h=stampAt(c.x,c.y,null);if(!h)return;e.preventDefault();const it=STP.items[h.i],id=it?it[0]:null;if(id==null)return;if(stUnlocked()===id){if(WBX.wbTxGrp&&WBX.wbTxGrp())return;steClose(id)}else steGo(id)});
- WBX.wbSteSync=steSync;WBX.wbSteReset=steReset;WBX.wbSteEdit=steEdit;WBX.wbSteScene=steScene}
+ WBX.wbSteSync=steSync;WBX.wbSteReset=steReset;WBX.wbSteGo=steGo;WBX.wbSteEdit=steEdit;WBX.wbSteScene=steScene}
 export {init75,steDone,steOpen};

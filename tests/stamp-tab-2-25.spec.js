@@ -61,3 +61,16 @@ test('the right-click menu works in the tab: Delete removes the shape under the 
   expect((await items(page)).length).toBe(n0 - 1);
   expect(errors).toEqual([]);
 });
+
+test('New stamp opens its tab; a roll closes every stamp tab', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.openPanel(page, 'stmp');
+  await page.click('#smknew'); await H.settle(page);
+  const id = (await st(page)).tiles.at(-1).id;
+  expect(await inTab(page), 'the new stamp is open').toBe(id);
+  await expect(page.locator('#stetabs [data-sv]')).toHaveCount(2);      // Canvas and the new stamp
+  await page.click('#rzdo'); await H.settle(page, { max: 60000 });
+  expect(await inTab(page), 'back on the Canvas').toBe(null);
+  await expect(page.locator('#stetabs [data-sv]')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
