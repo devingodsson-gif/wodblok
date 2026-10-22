@@ -162,3 +162,36 @@ test('Copy a prompt is in the Import menu of the motif library (an image prompt,
   expect(await page.evaluate(() => window.__clip[1])).toContain('different [subject]');
   expect(errors).toEqual([]);
 });
+
+test('a recipe exports from its own Export button; a click on its name exports nothing', async ({ page }) => {
+  const { errors } = await H.openApp(page);
+  await H.openPanel(page, 'xrec');
+  const row = page.locator('#xrl .xrr', { hasText: 'Preview' });
+  await expect(row.locator('[data-act="exp"]')).toHaveAttribute('aria-label', 'Export Preview');
+  await row.locator('b').click(); await H.settle(page);
+  expect(await page.evaluate(() => window.__wbDownloads.length), 'the name is not a button').toBe(0);
+  await row.locator('[data-act="exp"]').click();
+  await page.waitForFunction(() => window.__wbDownloads.length > 0);
+  expect((await page.evaluate(() => window.__wbDownloads[0].filename))).toMatch(/-preview\.jpg$/);
+  expect(errors).toEqual([]);
+});
+
+test('the Canvas panel has a Texture group with a switch when the project has a canvas texture (a roll makes one); off hides it, Undo brings it back', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await page.click('#rzdo'); await H.settle(page, { max: 60000 });
+  await H.openPanel(page, 'canvas');
+  expect((await st(page)).tex.u.length, 'the roll made a canvas texture').toBeGreaterThan(0);
+  await expect(page.locator('#ctxg')).toBeVisible();
+  await expect(page.locator('#ctxg summary')).toHaveText('Texture');
+  await expect(page.locator('#ctxon')).toBeChecked();
+  expect(await page.evaluate(() => document.getElementById('texg').innerHTML.length), 'drawn').toBeGreaterThan(0);
+  await page.locator('#ctxg .chk').click(); await H.settle(page);
+  await expect(page.locator('#ctxon')).not.toBeChecked();
+  expect((await st(page)).tex.off, 'a project setting').toBe(1);
+  expect(await page.evaluate(() => document.getElementById('texg').innerHTML.length), 'not drawn').toBe(0);
+  await page.click('#undo'); await H.settle(page);
+  await expect(page.locator('#ctxon')).toBeChecked();
+  expect((await st(page)).tex.off).toBeUndefined();
+  expect(await page.evaluate(() => document.getElementById('texg').innerHTML.length)).toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});
