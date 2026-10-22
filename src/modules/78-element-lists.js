@@ -11,7 +11,8 @@ const ELK={text:{pn:'text',add:'Add text'},shape:{pn:'mlist',add:'Add shape'},pa
 // A Pattern keeps its own grid controls. One set of controls, so one set of ids: the group moves, it is not copied.
 const ELG_PN={shape:'mlist',motif:'mlist',text:'text',stamp:'stmp'};
 function elgPlace(){const g=document.querySelector('details.g:has(>.gb>#lfree)');if(!g)return;const q=elSel(),pn=q&&ELG_PN[elKind(q)];if(!pn)return;
- const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec||g.parentElement===sec)return;const at=sec.querySelector('.elk[data-k]');if(at)at.insertAdjacentElement('afterend',g);else sec.insertAdjacentElement('afterbegin',g)}
+ const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec||g.parentElement===sec)return;const at=sec.querySelector('.elk[data-k]');if(at)at.insertAdjacentElement('afterend',g);else sec.insertAdjacentElement('afterbegin',g);
+ const al=document.getElementById('lalsec');if(al)g.insertAdjacentElement('afterend',al)}   // Align sits right under the element's own group (2.22.0)
 function elkSync(){const un=stUnlocked()!=null;elgPlace();
  {const ab=document.querySelector('.elk[data-k="stamp"] [data-add]');if(ab){const none=!WBS.tiles.length;if(ab.disabled!==none)ab.disabled=none}}   // no stamp yet: nothing to add
  {const ed=$('smkedit');if(ed){const none=!WBS.tiles.length;if(ed.disabled!==none)ed.disabled=none}}
