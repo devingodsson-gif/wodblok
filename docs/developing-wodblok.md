@@ -32,7 +32,7 @@ Current state: see `docs/PROJECT_STATUS.md` (kept up to date by every session; t
 These are from CLAUDE.md and the owner's instructions. They win over anything else.
 
 **What the app must always be**
-- **No explanatory text, helper paragraphs or tooltips in panels.** Short labels and clear grouping only. (The owner asked for these to be removed everywhere; do not bring them back.)
+- **No explanatory text or helper paragraphs in panels.** Short labels and clear grouping only. (The owner asked for these to be removed everywhere; do not bring them back.) **Tooltips: only a short name on hover (the `title` attribute, the same words as the `aria-label`) on an icon-only control, never on a control that already shows its name, never a sentence (owner, Oct 22 2026).**
 - At launch no panel is open and the project is empty (2.10.0). The template picker (New from template) also opens at launch unless Settings > General > Templates at launch is off. The app launches in **Pattern mode, fully cleared** (no work from the last session loads). Tests start with no panel open and the picker off (`tests/helpers/harness.js`), so they see an empty launch unless a test asks (`workspaces: true`, `templates: true`).
 - **UI follows the standard in Part 9**: tokens and scales, one component per role, one folder tree for every library. Do not invent a size, radius, colour, duration or list design. If the scale lacks something, ask, and change the guide first.
 - **Speed first.** Run `npm run perf` before committing anything that touches drawing, dragging or sliders. No perf regression over 10%.
@@ -179,7 +179,7 @@ The rulebook for how every part of the editor looks and behaves. Read it before 
 1. **One way to do each thing.** If a control, list, dialog or heading already exists, reuse it. A second version of the same thing is a bug, even if it looks nicer.
 2. **Few values, used everywhere.** Every size, radius, colour and duration comes from a short scale (sections 3–8). New numbers are not allowed in a feature; if the scale is missing something, change the scale first, in this document.
 3. **Quiet chrome, loud artwork.** Neutral grey surfaces in the manner of Photoshop (owner, Oct 20 2026: "as much like Photoshop as possible"), dense rows, one accent, thin lines. The pattern is the only thing allowed to be bold.
-4. **Labels, not words.** No explanatory text, helper paragraphs or tooltips in panels. Clear grouping and short labels do the work.
+4. **Labels, not words.** No explanatory text or helper paragraphs in panels. Clear grouping and short labels do the work. An icon-only control shows its name on hover (a `title`); a labelled control shows nothing extra.
 5. **Nothing is hover-only.** Hover may add feedback, never the only way to find or use something.
 6. **Speed is part of the look.** A style that slows drawing, dragging or sliders is rejected (`npm run perf`).
 
@@ -239,7 +239,7 @@ Rules:
 Brand sizes are separate and fixed: wordmark 15px, splash 20px. The "+" glyph of an empty slot is 18px (list) or 28px (large). Nothing else uses another size.
 
 Font (one family, sans-serif only):
-- **Hanken Grotesk** for every piece of text in the app: the wordmark and splash, titles, labels, buttons, fields, lists, menus, status messages and the print proof sheet. Fallback `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
+- **Hanken Grotesk** for every piece of text in the app, except the "WODBLOK" wordmark in the top bar, which is set in IM Fell English (owner, Oct 22 2026; this is the only serif in the app): the splash, titles, labels, buttons, fields, lists, menus, status messages and the print proof sheet. Fallback `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
 - No serif, display or second UI face. Hierarchy comes from size, weight and case, never from a different font.
 - Exempt: the fonts the user picks for their own artwork in the Text tool (and imported fonts). They are content, not interface.
 - The font is bundled; no remote fonts, no runtime network.
@@ -326,7 +326,7 @@ Elements under 18px are indicators (dots, chips that do not act, handles), not c
 - Sizes: 13px in dense rows, 15px in panel headers and toolbars, 18px in the rail. Nothing else.
 - Stroke weight is one hairline at every size: `--ic-w` (1.25px) with `vector-effect: non-scaling-stroke` in the `.ic` rules; an icon sets no stroke width of its own.
 - Idle icons `--mut`; hover `--fg`; selected `--acc-ink`.
-- Every icon-only control has an `aria-label` and a keyboard route. The label is not shown as a tooltip.
+- Every icon-only control has an `aria-label`, the same words as its `title` (shown as a short name on hover; owner, Oct 22 2026), and a keyboard route.
 - Texture, brand and drawn shapes are artwork, not icons, and are exempt.
 
 ### 9. Components
@@ -659,7 +659,7 @@ Side effects of 1.12.0: controls moved by one or two pixels (for example the typ
 - [ ] Heights in a row match; radii follow section 5.
 - [ ] Headings are one of the three levels.
 - [ ] Hover, focus-visible, selected, disabled and error states exist; nothing depends on hover.
-- [ ] No explanatory text, no tooltips, no `alert`/`confirm`/`prompt`; destructive actions use two-tap.
+- [ ] No explanatory text; a hover name only on icon-only controls; no `alert`/`confirm`/`prompt`; destructive actions use two-tap.
 - [ ] Every action is a registry command; icon-only controls have `aria-label`.
 - [ ] Works docked, tabbed and floating, at narrow width, and on touch (pointer events).
 - [ ] Wording follows section 14 (British, sentence case, standard words).

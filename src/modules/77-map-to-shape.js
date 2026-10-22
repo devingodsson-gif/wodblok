@@ -14,7 +14,7 @@ import {shBox,shFlat} from './76-shape-element.js';
 // in the widest width that fits the Shape (so it wraps), and a Pattern keeps the placements whose middle is inside. Owner, Oct 20 2026.
 const mapShape=p=>{if(!p||!p.mp||!p.mm)return null;const L=fpL();if(!L)return null;const s=(L.pl||[]).find(q=>q.u==p.mp&&q.k=='shape');return s||null};
 const mapList=()=>{const L=fpL();return L?(L.pl||[]).filter(q=>q.k=='shape'):[]};
-const MPN={rect:'Rectangle',rrect:'Rounded',ellipse:'Ellipse',tri:'Triangle',dia:'Diamond',pent:'Pentagon',hex:'Hexagon',star:'Star',arrow:'Arrow',heart:'Heart',line:'Line',path:'Path'};
+const MPN={rect:'Rectangle',rrect:'Rounded',ellipse:'Oval',tri:'Triangle',dia:'Diamond',pent:'Pentagon',hex:'Hexagon',star:'Star',arrow:'Arrow',heart:'Heart',line:'Line',path:'Path'};
 const mapName=(q,i)=>(q.nm||MPN[q.sh]||'Shape')+' '+(i+1);
 // where the way round starts: the highest point of a closed shape, the middle of an open one; mo moves it
 function mapRef(F,mo){let s0=F.L/2;if(F.closed){let b=0;F.pts.forEach((q,i)=>{if(q[1]<F.pts[b][1]-1e-6)b=i});s0=F.cum[b]}return s0+(+mo||0)/100*F.L}

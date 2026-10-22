@@ -117,3 +117,13 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 - Preferences: do not tell him about stop-hook "unpushed commits" false alarms if the remote already matches HEAD (check `git ls-remote`); keep reports short, one block (task list with %, what was and was not run, snapshot or golden changes); publish the preview artifact after pushes that are not docs- or tests-only.
 - Lessons: with no stamps, code must fall back to `WBS.noTile` (`WBS.tiles[WBS.cur]||WBS.noTile`); a ghost, a motif click or a box that silently disappears with zero stamps is this bug. The harness `addPattern` now makes a stamp first; `closeAllPanels` exists because `#rcls` reads "Default panels" when no panel is open; selecting an element jumps to its panel, so specs re-show the panel before clicking; click-to-add-text was removed, specs use Add text. Always `npm run build` before running specs (they test `dist/`). Do not use `git stash`. Merging brought a `CLAUDE.md` conflict; main's version won.
 - Open question for him: Create New Stamp makes a rectangle at once and does not open its tab; Add stamp and Edit are disabled with no stamps; the last stamp can be deleted. He has not commented on these three behaviours.
+
+## Owner decisions, Oct 22 2026 (answers to the 2.15 new-user review)
+- **Tooltips:** short names on hover are allowed for icon-only controls only (`title` = the `aria-label`); no sentences, nothing on labelled controls. Part 9 is updated.
+- **Wordmark:** IM Fell English only for the "WODBLOK" title in the top bar; everything else Hanken Grotesk. Part 9 is updated.
+- **Randomize:** add a toggle (in the Randomize panel): a roll replaces the previous roll and leaves the user's own elements alone, or starts from an empty canvas. (Planned for 2.21.0.)
+- **Stamps:** the double-click question needs a clearer question; the owner asked for it to be explained again (see the reply in the session).
+- **Lists:** drop the per-kind lists in each panel. The Elements panel (old Layers) is the only list. Panels get a small lock icon on the panel's top rail: a locked panel cannot be moved or closed. The Elements panel starts locked. (Planned for 2.19.0.)
+- **Template picker:** off at launch until the starter templates exist.
+- **No "make a pattern from the selection"** addition (dropped from the plan).
+- Releases from the review: 2.16.0 bug fixes, 2.17.0 words, 2.18.0 components, 2.19.0 one panel per element, 2.20.0 adding things and text on the canvas, 2.21.0 File, Export, Randomize, 2.22.0 additions.

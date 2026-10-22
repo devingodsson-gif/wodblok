@@ -30,7 +30,7 @@ svg{display:block}
 svg[stroke="currentColor"]:not([width]):not(.ic){stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .ic{stroke-width:var(--ic-w)}.ic *{vector-effect:non-scaling-stroke}
 .ddsel,.ccsel{display:none!important}
-.dd2{width:100%}.dd2>.ddb{width:100%;height:auto;margin:0;min-height:var(--h-md);display:flex;border-radius:var(--r-m);padding:4px 8px 4px 8px;justify-content:space-between}.dd2 .ddb:hover:not(:disabled){border-color:var(--line2)}.dd2 .ddb[aria-expanded=true]{border-color:var(--acc)}.dd2 .ddb:disabled{opacity:.45}
+.dd2{width:100%}.dd2>.ddb{width:100%;height:auto;margin:0;min-height:var(--h-md);display:flex;border-radius:var(--r-m);padding:3px 8px 3px 8px;justify-content:space-between}.dd2 .ddb:hover:not(:disabled){border-color:var(--line2)}.dd2 .ddb[aria-expanded=true]{border-color:var(--acc)}.dd2 .ddb:disabled{opacity:.45}
 .dd2 .ddt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.dd2 .ddb em{transition:transform var(--t-fast)}.dd2 .ddb[aria-expanded=true] em{transform:rotate(180deg)}
 .ddl{border-radius:var(--r-l);padding:6px}.ddi{border-radius:var(--r-m);padding:6px 8px}.ddi.cur{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}.ddi.dis{opacity:.4;cursor:default}.rowm .ddi{display:flex;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);font:inherit;cursor:pointer}.rowm .ddi:hover:not(:disabled),.rowm .ddi:focus-visible{background:var(--acc-soft)}.rowm .ddi:disabled{opacity:.4;cursor:default}.ddg{padding:8px 8px 4px;font-size:var(--fs-s);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .sw .dd2,.asp .dd2,.lyo .dd2,.gmc .dd2{flex:1;min-width:0}
@@ -249,7 +249,7 @@ body.wsedge,body.wsedge *{user-select:none!important}
 .tb{display:flex;align-items:center;gap:2px}
 
 /* ---------- buttons ---------- */
-button{cursor:pointer;border:1px solid var(--line2);background:var(--raise);border-radius:var(--r-m);padding:6px 8px;line-height:1.3;margin:0}
+button{cursor:pointer;border:1px solid var(--line2);background:var(--raise);border-radius:var(--r-m);padding:0 8px;height:var(--h-md);line-height:1.3;margin:0}
 button:hover:not(:disabled){border-color:var(--faint)}
 button:disabled{opacity:.4;cursor:default}
 button.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-fg);font-weight:600}
@@ -260,7 +260,7 @@ button.ghost:hover:not(:disabled),.ib:hover:not(:disabled){background:var(--rais
 .ib{width:var(--h-md);height:var(--h-md);padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r-m);color:var(--mut)}
 .ib:hover:not(:disabled){color:var(--fg)}
 .ib svg{width:17px;height:17px}
-button.alt{background:var(--raise)}
+button.alt{background:var(--raise)}#scadd,#tsadd{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-3);white-space:nowrap}
 .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
 .row.tight{margin-top:0}
 
@@ -307,8 +307,8 @@ button.alt{background:var(--raise)}
 .board>div{margin:auto;padding:28px}
 #art{display:block;box-shadow:var(--paper-shadow);border-radius:1px;max-width:none}#artwrap{position:relative}#art.cvck{background-color:#fff;background-image:conic-gradient(#dcdcdc 25%,transparent 0 50%,#dcdcdc 0 75%,transparent 0);background-size:16px 16px}#art{position:relative}#art.shp{box-shadow:none;border-radius:0}
 #artsh{position:absolute;left:28px;top:28px;display:none;pointer-events:none;overflow:visible;filter:drop-shadow(0 2px 5px rgba(0,0,0,.14)) drop-shadow(0 14px 22px rgba(0,0,0,.13))}
-.shg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:4px}
-.shg button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0 6px;letter-spacing:-.02em;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);color:var(--mut);font-size:var(--fs-s);line-height:1.1;cursor:pointer;min-width:0;overflow:hidden}
+.shg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-2);margin-top:4px}
+.shg button{display:flex;align-items:center;justify-content:center;padding:0;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);color:var(--mut);cursor:pointer;min-width:0;overflow:hidden}
 .shg button svg{width:var(--h-xs);height:var(--h-xs);fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round;flex:none}
 .shg button:hover{color:var(--fg);border-color:var(--line2)}
 .shg button.on{color:var(--acc-ink);border-color:var(--acc);background:var(--acc-soft)}
@@ -480,7 +480,7 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 /* swatch + custom dropdowns */
 .sw{display:flex;gap:6px;align-items:center}.sw i{flex:none;width:var(--h-md);height:var(--h-md);border-radius:var(--r-m);border:1px solid var(--line)}.sw select,.sw .dd{flex:1}
 .dd{position:relative;min-width:0}
-.ddb{display:flex;align-items:center;gap:8px;width:100%;margin:0;padding:4px 8px;height:var(--h-md);text-align:left;background:var(--field);border:1px solid var(--line);border-radius:var(--r-m);font-size:var(--fs-m)}
+.ddb{display:flex;align-items:center;gap:8px;width:100%;margin:0;padding:3px 8px;height:var(--h-md);text-align:left;background:var(--field);border:1px solid var(--line);border-radius:var(--r-m);font-size:var(--fs-m)}
 .ddb{height:auto;min-height:var(--h-md)}.ddb small{display:block;color:var(--mut);font-size:var(--fs-s);line-height:1.2}.ddb>span{min-width:0;line-height:1.25}
 .ddb em{margin-left:auto;font-style:normal;color:var(--faint);font-size:var(--fs-s)}
 .ddl{position:absolute;z-index:40;left:0;right:0;top:100%;margin-top:4px;max-height:300px;overflow-y:auto;background:var(--raise);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow);padding:4px}
@@ -665,7 +665,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
 }
 #cfmth,#ccirh,#pdesc,#symh,#lhint,#lfph,#lfh,#lfgi,#lcrih,#rzhint,#lglh{display:none!important}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-.rzbig{width:100%;height:38px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--fs-m)}.rzbig svg{width:19px;height:19px}.rzmain{padding-top:12px}
+.rzbig{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--fs-m)}.rzbig svg{width:15px;height:15px}.rzmain{padding-top:12px}
 [data-p="rand"] .chk{margin-top:8px}.rzrow{display:flex;align-items:center;gap:6px}.rzrow .ctl,.rzlet .ctl{flex:1;min-width:0;grid-template-columns:112px minmax(0,1fr) 52px}.rzlet .ctl{grid-template-columns:98px minmax(0,1fr) 52px}.rzlet{padding-left:12px}.rzrow .chk{flex:1;min-width:0}.rzx{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;margin-top:8px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);color:var(--mut);font-size:var(--fs-s);cursor:pointer}.rzx svg{transition:transform var(--t-fast)}.rzx[aria-expanded="true"] svg{transform:rotate(180deg)}.rzx.part{color:var(--acc-ink);border-color:var(--acc)}.rzsub{margin:2px 0 6px 6px;padding:2px 0 4px 12px;border-left:2px solid var(--line)}.rzsub[hidden]{display:none}.rzsub.off{opacity:.55}.rzgh{font-size:var(--fs-s);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin-top:8px}.rzsub .row{margin-top:8px}[data-p="rand"] #rzlast{margin-top:8px;text-align:center}[data-p="rand"] select{width:100%}
 /* variations */
 .vrb{display:flex;flex-direction:column;gap:4px;padding:6px;border-radius:var(--r-m);border:1px solid var(--line);background:var(--field);cursor:pointer;text-align:left;min-width:0}
@@ -924,7 +924,7 @@ body.eyedrop{cursor:crosshair}
    <div id="tlobox" hidden><label for="tlo">Grid opacity</label><input type="range" id="tlo" min="0" max="100" step="1" value="92" data-u="%" data-def="92"></div>
   </div></details>
   <details class="g" id="cfree" open><summary>Canvas size</summary><div class="gb">
-   <label>Shape</label><div class="shg" id="cshp"><button type="button" data-s="rect" title="Rectangle"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/></svg><span>Rectangle</span></button><button type="button" data-s="rrect" title="Rounded"><svg viewBox="0 0 24 24"><rect x="5.5" y="4" width="13" height="16" rx="4.5"/></svg><span>Rounded</span></button><button type="button" data-s="circle" title="Circle"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg><span>Circle</span></button><button type="button" data-s="oval" title="Oval"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="6.5" ry="8.5"/></svg><span>Oval</span></button><button type="button" data-s="arch" title="Arch"><svg viewBox="0 0 24 24"><path d="M6 20V10a6 6 0 0112 0v10z"/></svg><span>Arch</span></button><button type="button" data-s="hex" title="Hexagon"><svg viewBox="0 0 24 24"><path d="M12 3.5l7.4 4.25v8.5L12 20.5l-7.4-4.25v-8.5z"/></svg><span>Hexagon</span></button><button type="button" data-s="tri" title="Triangle"><svg viewBox="0 0 24 24"><path d="M12 4l8 14H4z"/></svg><span>Triangle</span></button><button type="button" data-s="diamond" title="Diamond"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 8.5-6.5 8.5L5.5 12z"/></svg><span>Diamond</span></button><button type="button" data-s="ngon" title="Polygon"><svg viewBox="0 0 24 24"><path d="M12 3.8l7.8 5.7-3 9.2H7.2l-3-9.2z"/></svg><span>Polygon</span></button></div>
+   <label>Shape</label><div class="shg" id="cshp"><button type="button" aria-label="Rectangle" title="Rectangle" data-s="rect"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16"/></svg></button><button type="button" aria-label="Rounded" title="Rounded" data-s="rrect"><svg viewBox="0 0 24 24"><rect x="5.5" y="4" width="13" height="16" rx="4.5"/></svg></button><button type="button" aria-label="Circle" title="Circle" data-s="circle"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg></button><button type="button" aria-label="Oval" title="Oval" data-s="oval"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="6.5" ry="8.5"/></svg></button><button type="button" aria-label="Arch" title="Arch" data-s="arch"><svg viewBox="0 0 24 24"><path d="M6 20V10a6 6 0 0112 0v10z"/></svg></button><button type="button" aria-label="Hexagon" title="Hexagon" data-s="hex"><svg viewBox="0 0 24 24"><path d="M12 3.5l7.4 4.25v8.5L12 20.5l-7.4-4.25v-8.5z"/></svg></button><button type="button" aria-label="Triangle" title="Triangle" data-s="tri"><svg viewBox="0 0 24 24"><path d="M12 4l8 14H4z"/></svg></button><button type="button" aria-label="Diamond" title="Diamond" data-s="diamond"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 8.5-6.5 8.5L5.5 12z"/></svg></button><button type="button" aria-label="Polygon" title="Polygon" data-s="ngon"><svg viewBox="0 0 24 24"><path d="M12 3.8l7.8 5.7-3 9.2H7.2l-3-9.2z"/></svg></button></div>
    <div id="crrbox" hidden><label>Corner radius</label><input type="range" id="ccr" min="0" max="100" step="1" value="25" data-u="%" data-def="25"></div>
    <div id="cngbox" hidden><label>Sides</label><input type="range" id="cns" min="3" max="16" step="1" value="5" data-def="5"></div>
    <div id="ccobox" hidden><label>Orientation</label><div class="seg" id="cor" style="grid-template-columns:1fr 1fr"><button type="button" data-o="p">Point up</button><button type="button" data-o="f">Flat top</button></div></div>
@@ -1132,10 +1132,10 @@ body.eyedrop{cursor:crosshair}
    </div>
   </div></details>
   <details class="g" open id="shp_k" hidden><summary>Shape</summary><div class="gb">
-   <div class="shg" id="shp_pre" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+   <div class="shg" id="shp_pre"></div>
    <div id="shp_crw" hidden><label>Corner</label><input type="range" id="shp_cr" min="0" max="50" value="18" data-u="%" data-def="18"></div>
    <div id="shp_npw" hidden><label>Points</label><input type="range" id="shp_np" min="3" max="12" value="5" data-def="5"></div>
-   <div class="row"><button type="button" class="primary" id="shp_imp">Import image&#8230;</button></div>
+   <div class="row"><button type="button" class="alt" id="shp_imp">Import image&#8230;</button></div>
    <div class="row"><button type="button" class="alt" id="shp_pen" aria-pressed="false">Draw a path</button><button type="button" class="alt" id="shp_ed" aria-pressed="false" hidden>Edit points</button></div>
   </div></details>
   <details class="g" open id="shp_f" hidden><summary>Fill</summary><div class="gb">
@@ -1189,7 +1189,7 @@ body.eyedrop{cursor:crosshair}
   <details class="g" open><summary>Grid <span class="aux" id="pgd"></span></summary><div class="gb">
    <label class="chk" style="margin-top:2px"><input type="checkbox" id="pgs"><span>Show grid</span></label>
    <label class="chk"><input type="checkbox" id="pgn"><span>Snap to grid</span></label>
-   <label>Shape</label><div class="shg" id="pgsh"><button type="button" data-sh="rect" title="Square"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/></svg><span>Square</span></button><button type="button" data-sh="hex" title="Hexagon"><svg viewBox="0 0 24 24"><path d="M12 3.5l7.4 4.25v8.5L12 20.5l-7.4-4.25v-8.5z"/></svg><span>Hexagon</span></button><button type="button" data-sh="tri" title="Triangle"><svg viewBox="0 0 24 24"><path d="M12 4l8 14H4z"/></svg><span>Triangle</span></button><button type="button" data-sh="diamond" title="Diamond"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 8.5-6.5 8.5L5.5 12z"/></svg><span>Diamond</span></button></div>
+   <label>Shape</label><div class="shg" id="pgsh"><button type="button" aria-label="Square" title="Square" data-sh="rect"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/></svg></button><button type="button" aria-label="Hexagon" title="Hexagon" data-sh="hex"><svg viewBox="0 0 24 24"><path d="M12 3.5l7.4 4.25v8.5L12 20.5l-7.4-4.25v-8.5z"/></svg></button><button type="button" aria-label="Triangle" title="Triangle" data-sh="tri"><svg viewBox="0 0 24 24"><path d="M12 4l8 14H4z"/></svg></button><button type="button" aria-label="Diamond" title="Diamond" data-sh="diamond"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 8.5-6.5 8.5L5.5 12z"/></svg></button></div>
    <label>Cells across</label><input type="range" id="pgz" min="2" max="60" value="8" data-def="8">
    <label>Snap points</label><div class="seg" id="pgm" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-g="l">Crossings</button><button type="button" data-g="c">Centres</button><button type="button" data-g="b">Both</button></div>
    <label class="chk"><input type="checkbox" id="pgss"><span>Snap size to whole cells</span></label>
@@ -1209,11 +1209,11 @@ body.eyedrop{cursor:crosshair}
     <button type="button" class="ib" id="smksave" aria-label="Save to library"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="download"></svg></button>
    </div>
    <div class="smkl" id="stmpl"></div>
-   <div class="row"><button type="button" class="primary" id="smkedit">Edit</button></div>
+   <div class="row"><button type="button" class="alt" id="smkedit">Edit</button></div>
   </div></details>
   <div hidden><div class="txed elmode" data-k="stamp" hidden><span>Editing <b></b></span></div><div class="strip" id="lfpst"></div></div>
     <details class="g stonly" open hidden><summary>Stamp shape</summary><div class="gb">
-   <label>Shape</label><div class="shg" id="skind"><button type="button" data-k="rect"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Rectangle</button><button type="button" data-k="hex"><svg viewBox="0 0 20 20"><path d="M10 2L17 6V14L10 18L3 14V6Z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Hexagon</button><button type="button" data-k="circle"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Circle</button><button type="button" data-k="diamond"><svg viewBox="0 0 20 20"><path d="M10 2L18 10L10 18L2 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Diamond</button><button type="button" data-k="tri"><svg viewBox="0 0 20 20"><path d="M10 3L18 17H2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Triangle</button><button type="button" data-k="arch"><svg viewBox="0 0 20 20"><path d="M4.5 17V9.5a5.5 5.5 0 0111 0V17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Arch</button><button type="button" data-k="oct"><svg viewBox="0 0 20 20"><path d="M7 3h6l4 4v6l-4 4H7l-4-4V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Octagon</button><button type="button" data-k="star"><svg viewBox="0 0 20 20"><path d="M10.0 2.5L11.8 5.7L15.3 4.7L14.3 8.2L17.5 10.0L14.3 11.8L15.3 15.3L11.8 14.3L10.0 17.5L8.2 14.3L4.7 15.3L5.7 11.8L2.5 10.0L5.7 8.2L4.7 4.7L8.2 5.7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Star</button><button type="button" data-k="quat"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7.4" cy="10" r="4.2"/><circle cx="12.6" cy="10" r="4.2"/><circle cx="10" cy="7.4" r="4.2"/><circle cx="10" cy="12.6" r="4.2"/></svg>Quatrefoil</button><button type="button" data-k="lancet"><svg viewBox="0 0 20 20"><path d="M4.5 17v-6.5Q4.5 6.5 10 3q5.5 3.5 5.5 7.5V17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Lancet</button></div>
+   <label>Shape</label><div class="shg" id="skind"><button type="button" aria-label="Rectangle" title="Rectangle" data-k="rect"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><button type="button" aria-label="Hexagon" title="Hexagon" data-k="hex"><svg viewBox="0 0 20 20"><path d="M10 2L17 6V14L10 18L3 14V6Z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><button type="button" aria-label="Circle" title="Circle" data-k="circle"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><button type="button" aria-label="Diamond" title="Diamond" data-k="diamond"><svg viewBox="0 0 20 20"><path d="M10 2L18 10L10 18L2 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button><button type="button" aria-label="Triangle" title="Triangle" data-k="tri"><svg viewBox="0 0 20 20"><path d="M10 3L18 17H2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button><button type="button" aria-label="Arch" title="Arch" data-k="arch"><svg viewBox="0 0 20 20"><path d="M4.5 17V9.5a5.5 5.5 0 0111 0V17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button><button type="button" aria-label="Octagon" title="Octagon" data-k="oct"><svg viewBox="0 0 20 20"><path d="M7 3h6l4 4v6l-4 4H7l-4-4V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button><button type="button" aria-label="Star" title="Star" data-k="star"><svg viewBox="0 0 20 20"><path d="M10.0 2.5L11.8 5.7L15.3 4.7L14.3 8.2L17.5 10.0L14.3 11.8L15.3 15.3L11.8 14.3L10.0 17.5L8.2 14.3L4.7 15.3L5.7 11.8L2.5 10.0L5.7 8.2L4.7 4.7L8.2 5.7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button><button type="button" aria-label="Quatrefoil" title="Quatrefoil" data-k="quat"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7.4" cy="10" r="4.2"/><circle cx="12.6" cy="10" r="4.2"/><circle cx="10" cy="7.4" r="4.2"/><circle cx="10" cy="12.6" r="4.2"/></svg></button><button type="button" aria-label="Lancet" title="Lancet" data-k="lancet"><svg viewBox="0 0 20 20"><path d="M4.5 17v-6.5Q4.5 6.5 10 3q5.5 3.5 5.5 7.5V17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button></div>
    <div id="sasprow" style="margin-top:6px"><div class="asp"><select id="sasp"></select><button class="alt" id="sswp" title="Swap width and height" aria-label="Swap width and height">&#8646;</button></div><div class="aspc" id="sascw">Width <input type="number" id="saw" min="0.1" max="50" step="0.1"> Height <input type="number" id="sah" min="0.1" max="50" step="0.1"></div></div>
    <div id="shexrow" style="margin-top:6px"><select id="shor"><option value="p">Pointy top</option><option value="f">Flat top</option></select></div>
    <label>Size</label><input type="range" id="shz" min="20" max="300" value="100" data-u="%" data-def="100">
@@ -1350,7 +1350,7 @@ body.eyedrop{cursor:crosshair}
  </div></details>
 </section>
 <section class="pn" data-p="rand" hidden>
-  <div class="gb rzmain"><button class="primary rzbig" id="rzdo" title="Roll a whole new piece (Ctrl+Z to go back)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dice"></svg>Randomize</button>
+  <div class="gb rzmain"><button class="alt rzbig" id="rzdo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dice"></svg>Randomize</button>
    <div class="hint" id="rzlast"></div></div>
   <details class="g" open><summary>What to randomize</summary><div class="gb">
    <div class="row tight"><button class="alt" id="rzall">All on</button><button class="alt" id="rznone">All off</button></div>

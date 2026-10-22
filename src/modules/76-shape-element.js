@@ -16,7 +16,7 @@ import {artBU,artRefd} from './25-art-layers.js';
 // Pen path: pts = [[x, y, ix, iy, ox, oy], ...] in shares of the box (-.5 to .5 across it), (ix, iy) is the handle that comes in and (ox, oy) the one that goes out, as
 // offsets from the point; cl is 1 when the path is closed. Stretching the box stretches the path; the outline stays the same width.
 // Texture, Jitter and Colour grade work on a Shape like on any element. Owner, Oct 20 2026.
-const SHPL=[['rect','Rectangle','<rect x="4.5" y="6.5" width="15" height="11"/>'],['rrect','Rounded','<rect x="4.5" y="6.5" width="15" height="11" rx="4"/>'],['ellipse','Ellipse','<ellipse cx="12" cy="12" rx="8" ry="6.2"/>'],
+const SHPL=[['rect','Rectangle','<rect x="4.5" y="6.5" width="15" height="11"/>'],['rrect','Rounded','<rect x="4.5" y="6.5" width="15" height="11" rx="4"/>'],['ellipse','Oval','<ellipse cx="12" cy="12" rx="8" ry="6.2"/>'],
  ['tri','Triangle','<path d="M12 5L20 18H4z"/>'],['dia','Diamond','<path d="M12 4l8 8-8 8-8-8z"/>'],['pent','Pentagon','<path d="M12 4.5l7.5 5.5-2.9 8.5H7.4L4.5 10z"/>'],
  ['hex','Hexagon','<path d="M8 5h8l4.5 7-4.5 7H8l-4.5-7z"/>'],['star','Star','<path d="M12 4l2.4 5 5.6.7-4.1 3.8 1.1 5.5L12 16.2 7 19l1.1-5.5L4 9.7 9.6 9z"/>'],
  ['arrow','Arrow','<path d="M4 9.5h9V5l7 7-7 7v-4.5H4z"/>'],['heart','Heart','<path d="M12 19.5C5 14.5 3.5 10.5 5.5 8c1.7-2 4.7-1.6 6.5 1 1.8-2.6 4.8-3 6.5-1 2 2.5.5 6.5-6.5 11.5z"/>'],
