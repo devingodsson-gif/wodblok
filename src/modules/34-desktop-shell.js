@@ -86,7 +86,7 @@ g.w=Math.max(200,Math.min(+g.w||300,innerWidth-20));g.h=Math.max(120,Math.min(+g
 function wsEl(g,fl){const el=document.createElement('div');el.className='wg'+(fl?' fl':'')+(g.col?' col':'');el.dataset.g=g.id;
 if(fl){wsClamp(g);el.style.cssText=`left:${g.x}px;top:${g.y}px;width:${g.w}px;${g.col?'':`height:${g.h}px;`}z-index:${++wsZ}`}else el.style.flexGrow=g.f;
 el.innerHTML=`<div class="wh" title="Drag to move"><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
-`<button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button><button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close (reopen from the left bar)">${IC.x}</button></div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
+`<button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button><button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close" aria-label="Close">${IC.x}</button></div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
 const bd=el.querySelector('.wbd');g.tabs.forEach(p=>{const sc=wsSec(p);if(sc){sc.classList.toggle('mc',!!sc.querySelector(':scope>details.g'));sc.hidden=p!=g.a;bd.appendChild(sc)}});return el}
 // the tool bar: the user's own order and the tools they took off it (kept in settings)
 const RO={order:[],off:[]};try{const r=JSON.parse(kv.get('wb120_rail')||'null');if(r){if(Array.isArray(r.order))RO.order=r.order.filter(x=>typeof x=='string');if(Array.isArray(r.off))RO.off=r.off.filter(x=>typeof x=='string')}}catch(e){}
@@ -314,10 +314,11 @@ n.addEventListener('keydown',e=>{if(e.key=='Enter')n.blur();else if(e.key=='Esca
 let paintBack=0;document.addEventListener('dblclick',e=>{const t=e.target;if(t&&t.matches&&t.matches('input[type=number]')){t.focus();t.select()}});
 function enhance(){document.querySelectorAll('.dock input[type=range]').forEach(r=>{if(r.closest('.ctl')||r.hasAttribute('data-plain'))return;const lb=r.previousElementSibling,row=document.createElement('div');row.className='ctl';
 const hasL=lb&&lb.tagName=='LABEL';r.parentNode.insertBefore(row,hasL?lb:r);if(hasL){row.appendChild(lb);if(!r.id)0;lb.htmlFor=r.id}row.appendChild(r);addNum(row,r)});
-document.querySelectorAll('#sel input[type=range]').forEach(r=>{const row=r.closest('.ctl');if(row&&!row.querySelector('.num')){row.querySelector('label').htmlFor=r.id;addNum(row,r)}})}
+// every slider row in a panel has a value box (Part 9): rows written in the page or by a panel's own markup get theirs here
+document.querySelectorAll('#sel input[type=range],.dock .ctl input[type=range]').forEach(r=>{const row=r.closest('.ctl');if(row&&!row.querySelector('.num')&&!row.querySelector('input[type=number]')&&!r.hasAttribute('data-plain')){const lb=row.querySelector('label');if(lb&&r.id)lb.htmlFor=r.id;addNum(row,r)}})}
 function paint(r){const lo=+r.min,hi=+r.max,p=hi>lo?(r.value-lo)/(hi-lo)*100:0;r.style.setProperty('--p',p.toFixed(1)+'%');if(r._n&&document.activeElement!==r._n)r._n.value=+(+r.value).toFixed(2)}
 function nums(){document.querySelectorAll('input[type=range]').forEach(paint)}
-WBX.wbNums=nums;
+WBX.wbNums=nums;WBX.wbEnhance=enhance;
 document.addEventListener('input',e=>{if(e.target.type=='range')paint(e.target)});
 
 // ---- status line + dock subtitle
@@ -408,6 +409,10 @@ $('bab').onclick=()=>{$('bab').blur();wbBA.toggle()};$('bas').onclick=()=>{$('ba
 sk=key();try{snaps=JSON.parse(kv.get(sk)||'[]')}catch(e){snaps=[]}
 setInterval(()=>{if(!sec.hidden)paint()},30000)})();
 
+
+// ---- names on hover (Part 9, owner Oct 22 2026): an icon-only button shows its aria-label; a button that shows its own words shows nothing extra
+document.addEventListener('pointerover',e=>{const b=e.target.closest&&e.target.closest('button[aria-label],[role=button][aria-label]');if(!b||b.title||b.closest('.rail'))return;
+const tip=b.querySelector('.tip');const words=b.textContent.replace(tip?tip.textContent:'','').trim();if(!words)b.title=b.getAttribute('aria-label')},true);
 
 // ---- keyboard shortcuts
 document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=WBS.tiles[WBS.cur]&&(WBS.tiles[WBS.cur]||WBS.noTile).items[WBS.sel];

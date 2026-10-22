@@ -20,10 +20,10 @@ const CHEV='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-wi
 let _mlK='';function renderML(){const el=$('mlist'),eg=$('elstg');if(eg)eg.hidden=stUnlocked()==null;if(stUnlocked()==null){if(_mlK){el.innerHTML='';_mlK=''}return}   // a locked stamp does not change, so its shapes are not listed
 const t=WBS.tiles[WBS.cur],pa=col(WBS.proj.bg),pb=inkOf(t),sc=el.querySelector('.ml')?el.querySelector('.ml').scrollTop:0;{const k=JSON.stringify([WBS.cur,pa,pb,[...WBS.msel],[...mlFold],t.items.map(q=>[q.m,q.k,q.cl,q.tg,cust[q.m]?[cust[q.m].n,cust[q.m].svg.length]:0]),t.tgm||0]);if(k===_mlK&&el.firstChild){if(WBX.wbTxSync)WBX.wbTxSync();return}_mlK=k}
 const thumb=q=>`<svg viewBox="-50 -50 100 100" style="background:${q.k?pb:pa}">${clipWrap(q,q.k?mk(q.m,pa,pb):mk(q.m,pb,pa))}</svg>`;
-const tags=q=>`${q.cl&&q.cl.length?' <i>piece</i>':''}${q.k?'<i title="Knocks out the shapes under it">knockout</i>':''}`;
+const tags=q=>`${q.cl&&q.cl.length?' <i>piece</i>':''}${q.k?'<i>knockout</i>':''}`;
 const gk=q=>q.tg?'txt:'+q.tg:mName(q.m),gnm=k=>{if(k.startsWith('txt:')){const M=(t.tgm||{})[k.slice(4)];const s=M?M.text.replace(/\n/g,' '):'Text';return '“'+(s.length>24?s.slice(0,23)+'…':s)+'”'}return k};
 const by={};t.items.forEach((q,i)=>{const nm=gk(q);(by[nm]=by[nm]||[]).push(i)});
-const row=(i,n,kid)=>{const q=t.items[i],nm=mName(q.m);return`<div class="mr${kid?' kid':''}${WBS.msel.has(i)?' on':''}" data-r="${i}" title="Click to select. Shift+click to add or remove.">${thumb(q)}<b>${hx(nm)}${n?` <i>${n}</i>`:''}${tags(q)}</b><button type="button" data-rx="${i}" title="Delete" aria-label="Delete ${hx(nm)}">&#215;</button></div>`};
+const row=(i,n,kid)=>{const q=t.items[i],nm=mName(q.m);return`<div class="mr${kid?' kid':''}${WBS.msel.has(i)?' on':''}" data-r="${i}">${thumb(q)}<b>${hx(nm)}${n?` <i>${n}</i>`:''}${tags(q)}</b><button type="button" data-rx="${i}" title="Delete" aria-label="Delete ${hx(nm)}">&#215;</button></div>`};
 let h='';const done={};
 for(let i=t.items.length-1;i>=0;i--){const nm=gk(t.items[i]);if(done[nm])continue;done[nm]=1;const g=by[nm],isT=nm.startsWith('txt:');
 if(g.length==1&&!isT){h+=row(i);continue}
@@ -53,7 +53,7 @@ mlFold=new Set();try{mlFold=new Set(JSON.parse(kv.get('wb18_mlfold')||'[]'))}cat
 $('mlist').onmousedown=e=>{if(e.shiftKey&&e.target.closest('.mr'))e.preventDefault()};
 $('mlist').onclick=e=>{const ML=$('mlist'),C=q=>{const x=e.target.closest(q);return x&&ML.contains(x)?x:null},t=WBS.tiles[WBS.cur],add=e.shiftKey||e.ctrlKey||e.metaKey,rng=e.shiftKey,ofName=nm=>t.items.map((q,i)=>(q.tg?'txt:'+q.tg:mName(q.m))==nm?i:-1).filter(i=>i>=0);
 const f=C('[data-f]');if(f){const nm=f.dataset.f;mlFold.has(nm)?mlFold.delete(nm):mlFold.add(nm);try{kv.set('wb18_mlfold',JSON.stringify([...mlFold]))}catch(er){}renderML();return}
-const gx=C('[data-gx]');if(gx){if(!gx.dataset.sure){gx.dataset.sure=1;gx.textContent='?';gx.title='Click again to delete them all';setTimeout(()=>{if(gx.isConnected){delete gx.dataset.sure;gx.innerHTML='&#215;'}},2500);return}delItems(ofName(gx.dataset.gx));store();upd();return}
+const gx=C('[data-gx]');if(gx){if(!gx.dataset.sure){gx.dataset.sure=1;gx.textContent='?';setTimeout(()=>{if(gx.isConnected){delete gx.dataset.sure;gx.innerHTML='&#215;'}},2500);return}delItems(ofName(gx.dataset.gx));store();upd();return}
 const x=C('[data-rx]');if(x){delItems([+x.dataset.rx]);store();upd();return}
 const g=C('[data-g]');if(g){selSet(ofName(g.dataset.g),add);upd();return}
 const r=C('[data-r]');if(!r)return;const i=+r.dataset.r;WBS.brush=null;if(rng){const ord=[...ML.querySelectorAll('[data-r]')].map(x=>+x.dataset.r),a=WBS.mAnc!=null&&ord.includes(WBS.mAnc)?ord.indexOf(WBS.mAnc):(WBS.sel>=0&&ord.includes(WBS.sel)?ord.indexOf(WBS.sel):-1),b=ord.indexOf(i);if(a>=0&&b>=0){selSet(ord.slice(Math.min(a,b),Math.max(a,b)+1),false);WBS.sel=i}else{selToggle(i);WBS.mAnc=i}}else if(e.ctrlKey||e.metaKey){selToggle(i);WBS.mAnc=i}else{selOne(i);WBS.mAnc=i}upd()};

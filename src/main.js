@@ -2,7 +2,7 @@
 // runs here, in the same order as before.
 import {coreStr} from './modules/18-projects-and-cover-overlay.js';
 import {icFill} from './modules/00-icons.js';
-import {init01} from './modules/01-launch-and-version.js';
+import {init01,WBX} from './modules/01-launch-and-version.js';
 import {init02} from './modules/02-draft-mode-speedups.js';
 import {init03,BK} from './modules/03-stamp-prints-and-drawing.js';
 import {init04} from './modules/04-canvas-and-stamp-outlines.js';
@@ -142,4 +142,5 @@ init59();
 init62();
 init63();
 init64();
+if(WBX.wbEnhance)WBX.wbEnhance();   // value boxes on the slider rows that panels wrote themselves
 window.__wbTest = { stampAt, stampToCanvas, unlockedStamp: stUnlocked, state: () => coreStr(), kv, account: acAccount, recoveryTick: rcTick, printsBusy: () => !BK.off && !!(BK.busy || BK.q.size), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
