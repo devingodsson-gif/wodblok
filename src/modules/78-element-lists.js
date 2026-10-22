@@ -13,7 +13,7 @@ const ELG_PN={shape:'mlist',motif:'mlist',text:'text',stamp:'stmp'};
 function elgPlace(){const g=document.querySelector('details.g:has(>.gb>#lfree)');if(!g)return;const q=elSel(),pn=q&&ELG_PN[elKind(q)];if(!pn)return;
  const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec||g.parentElement===sec)return;const at=sec.querySelector('.elk[data-k]');if(at)at.insertAdjacentElement('afterend',g);else sec.insertAdjacentElement('afterbegin',g);
  const al=document.getElementById('lalsec');if(al)g.insertAdjacentElement('afterend',al)}   // Align sits right under the element's own group (2.22.0)
-function elkSync(){const un=stUnlocked()!=null;elgPlace();
+function elkSync(){const un=stUnlocked()!=null;elgPlace();if(WBX.wbSlSync)WBX.wbSlSync();
  {const ab=document.querySelector('.elk[data-k="stamp"] [data-add]');if(ab){const none=!WBS.tiles.length;if(ab.disabled!==none)ab.disabled=none}}   // no stamp yet: nothing to add
  {const ed=$('smkedit');if(ed){const none=!WBS.tiles.length;if(ed.disabled!==none)ed.disabled=none}}
  document.querySelectorAll('section.pn[data-p=stmp] .stonly').forEach(d=>{if(d.hidden===un)d.hidden=!un});   // Block, Block edge and Symmetry belong to a stamp tab (2.13.0)

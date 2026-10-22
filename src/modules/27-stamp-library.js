@@ -51,7 +51,14 @@ const slOptSave=()=>{try{kv.set('wb50_slopt',JSON.stringify({fx:$('slfx').checke
 function libMotifs(L){Object.entries(L.motifs||{}).forEach(([k,v])=>{if(!v||typeof v.svg!='string')return;if(k.startsWith('t|')){if(/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/.test(v.svg))cust[k]={n:String(v.n||'?').replace(/["<>&|]/g,'').slice(0,4),svg:v.svg,txt:1};return}if(k.startsWith('i|')){if(WBX.wbImpOk&&WBX.wbImpOk(k,v))cust[k]={n:String(v.n||'Imported shape').replace(/["<>&|]/g,'').slice(0,40),svg:v.svg,imp:1,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,200)}:{})}}else{const c=clean(v.svg);if(c)cust[k]={n:String(v.n||'shape').replace(/["<>&|]/g,'').slice(0,40),svg:c,...(v.g?{g:String(v.g).replace(/["<>&|]/g,'').slice(0,200)}:{})}}});
 }
 function libColors(L){(L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();}
-async function slPaint(){if(!$('slgrid'))return;$('slname').placeholder='Stamp '+(WBS.cur+1);await SL.init();$('slwhere').textContent=SL.kind=='account'?'Saved to your Claude account':'Saved in this browser';
+// (2.24.0) the stamp Save to library and Export PNG work on: a placed stamp that is selected, otherwise the current stamp
+function slTile(){const L=WBS.layers[WBS.selL],q=L&&WBS.fpSel!=null&&WBS.fpSel!==-1?(L.pl||[]).find(p=>p.u==WBS.fpSel):null;const t=q&&q.k!='pattern'&&q.t!=null?WBS.tiles.find(x=>x.id==q.t):null;return t||WBS.tiles[WBS.cur]||WBS.tiles[0]||null}
+const slNo=()=>{const t=slTile();return t?WBS.tiles.indexOf(t)+1:0};
+// Save and export and Library sit at the end of the Stamp panel; Save and export shows only when there is a stamp to save; its name field suggests that stamp's name. Kept up to date with the selection (WBX.wbSlSync from the element sync)
+function slSync(){const g=$('slname')&&$('slname').closest('details.g');if(!g)return;
+ {const sec=g.closest('section.pn'),lib=$('slgrid').closest('details.g');if(sec&&lib&&sec.lastElementChild!==lib){sec.appendChild(g);sec.appendChild(lib)}}   // last in the panel, below a placed stamp's Effects (2.24.0)
+const none=!WBS.tiles.length;if(g.hidden!==none)g.hidden=none;const ph='Stamp '+(slNo()||1);if($('slname').placeholder!==ph)$('slname').placeholder=ph}
+async function slPaint(){if(!$('slgrid'))return;slSync();await SL.init();$('slwhere').textContent=SL.kind=='account'?'Saved to your Claude account':'Saved in this browser';
 try{const ps=await SL.list();$('slcount').textContent=ps.length?String(ps.length):'';$('slgrid').innerHTML=ps.length?ps.map(p=>`<div class="slc" data-sl="${hx(p.id)}">${slOkImg(p.img)?`<div class="im"><img src="${hx(p.img)}" alt=""></div>`:'<div class="im"></div>'}<b title="${hx(p.name||'Stamp')}">${hx(p.name||'Stamp')}</b><div class="row"><button class="alt" data-sa="add">Add</button><button class="alt" data-sa="png">PNG</button><button class="alt" data-sa="file">File</button><button class="alt" data-sa="del">Delete</button></div></div>`).join(''):'<div class="hint" style="grid-column:1/-1">No saved stamps</div>'}
 catch(e){$('slgrid').innerHTML='<div class="hint" style="grid-column:1/-1">Could not load the library.</div>'}}
 // --- Art: import an image, or use a saved project
@@ -61,12 +68,12 @@ if(!img)return pmsg('Could not read that image.');let nw=img.naturalWidth||img.w
 const id=artId();WBS.ARTS[id]={n:(f.name||'Art').replace(/\.[^.]+$/,'').replace(/["<>&|]/g,'').slice(0,40)||'Art',k:'img',src:artEnc(c),w,h};if(WBX.wbShapeImage)WBX.wbShapeImage(id);pmsg('Image added.');upd()}
 function init27(){
 try{const so=JSON.parse(kv.get('wb50_slopt')||'{}');$('slfx').checked=!!so.fx;$('sltx').checked=!!so.tx;if(so.px)$('slpx').value=so.px;if(so.bg!=null)$('slbg').value=so.bg}catch(e){}['slfx','sltx','slpx','slbg'].forEach(id=>$(id).addEventListener('change',slOptSave));
-$('slpng').onclick=async()=>{const t=WBS.tiles[WBS.cur];if(!t)return;$('slpng').disabled=true;try{const c=await stampCanvas(t,+$('slpx').value||1024,$('slbg').value=='paper',{fx:$('slfx').checked,tx:$('sltx').checked});await slSavePng(await slBlob(c),$('slname').value.trim()||('Stamp '+(WBS.cur+1)))}catch(e){slMsg((e&&e.message)||'Could not export that stamp.')}$('slpng').disabled=false};
+$('slpng').onclick=async()=>{const t=slTile();if(!t)return slMsg('There is no stamp to export.');$('slpng').disabled=true;try{const c=await stampCanvas(t,+$('slpx').value||1024,$('slbg').value=='paper',{fx:$('slfx').checked,tx:$('sltx').checked});await slSavePng(await slBlob(c),$('slname').value.trim()||('Stamp '+slNo()))}catch(e){slMsg((e&&e.message)||'Could not export that stamp.')}$('slpng').disabled=false};
 // A stamp in the library keeps its own colour as a fixed colour (tray places belong to a project); when it is added to a project,
 // a colour that is in that project's tray links to it.
-$('slsave').onclick=async()=>{const t=WBS.tiles[WBS.cur];if(!t)return;const b=$('slsave');b.disabled=true;slMsg('Saving…');
+$('slsave').onclick=async()=>{const t=slTile();if(!t)return slMsg('There is no stamp to save.');const b=$('slsave');b.disabled=true;slMsg('Saving…');
 try{const G=geom(shOf(t)),c=await stampCanvas(t,1400,false),w=c.toDataURL('image/webp',.9),img=w.startsWith('data:image/webp')?w:c.toDataURL('image/png'),used=new Set(),cm={};t.items.forEach(q=>used.add(q.m));used.forEach(k=>{if(cust[k])cm[k]=cust[k]});
-const nm=($('slname').value.trim()||('Stamp '+(WBS.cur+1))).replace(/["<>&|]/g,'').slice(0,40),clone=JSON.parse(JSON.stringify(t));delete clone.id;clone.txl=txPack(t);if(clone.ink)clone.ink=col(clone.ink);
+const nm=($('slname').value.trim()||('Stamp '+slNo())).replace(/["<>&|]/g,'').slice(0,40),clone=JSON.parse(JSON.stringify(t));delete clone.id;clone.txl=txPack(t);if(clone.ink)clone.ink=col(clone.ink);
 const rec={name:nm,updated:Date.now(),w:+G.SW.toFixed(2),h:+G.SH.toFixed(2),img,tile:JSON.stringify(clone),motifs:cm,colors:t.ink&&CC.includes(t.ink)?[[t.ink,CM[t.ink]]]:[]};
 await SL.put(newId(),rec);$('slname').value='';slMsg('Saved “'+nm+'” to the library.');slPaint()}
 catch(e){slMsg(e&&/quota|storage/i.test(e.message||'')?'The library is full in this browser. Delete a stamp or two, then try again.':'Could not save: '+((e&&e.message)||'unknown error'))}b.disabled=false};
@@ -80,6 +87,7 @@ else if(a=='del'){if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Sure?';s
 catch(er){slMsg('Something went wrong: '+((er&&er.message)||'unknown error'))}};
 $('slimp').onclick=()=>$('slimpf').click();
 $('slimpf').onchange=async()=>{const f=$('slimpf').files[0];$('slimpf').value='';if(!f)return;try{const rec=fmtStampOpen(await f.text());await SL.put(newId(),rec);slMsg('Added “'+rec.name+'” to the library.');slPaint()}catch(er){slMsg((er&&er.name=='FormatError'&&er.message)||'Could not read that file.')}};
+WBX.wbSlSync=slSync;
 {const sp=document.querySelector('section.pn[data-p="stmp"]');if(sp){new MutationObserver(()=>{if(!sp.hidden)setTimeout(slPaint,60)}).observe(sp,{attributes:true,attributeFilter:['hidden']});if(!sp.hidden)setTimeout(slPaint,60)}}   // the library lives in the Stamp panel (2.23.0); paint it when the panel is shown
 $('lfaimp').onclick=()=>$('lfafile').click();
 $('lfafile').onchange=async()=>{const f=$('lfafile').files[0];$('lfafile').value='';if(f)await artImport(f)};

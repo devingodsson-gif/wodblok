@@ -117,3 +117,23 @@ test('deleting a stamp a pattern uses says so, and the pattern lets go of it', a
   expect(a.els.filter(q => (q.src || []).some(r => r.k === 'stamp' && r.t === id)), 'no source left pointing at it').toEqual([]);
   expect(errors).toEqual([]);
 });
+
+test('Stamp panel: Save and export and Library come last, Save and export only with a stamp; the name follows the selected stamp; Save works after Undo and Redo', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.openPanel(page, 'stmp'); await H.settle(page);
+  const save = page.locator('section.pn[data-p="stmp"] details.g:has(#slname)');
+  await expect(save).toBeHidden();                                       // no stamp yet
+  await H.addStamp(page); await H.addStamp(page);
+  await expect(save).toBeVisible();
+  const s = await st(page);
+  s.els.push({ u: 'z2', k: 'stamp', t: s.tiles[1].id, x: 300, y: 300, s: 200, r: 0, f: 1 });
+  await page.evaluate(j => window.__wbTest.apply(j), JSON.stringify(s)); await H.settle(page);
+  const c = await H.canvasToClient(page, 300, 300); await page.mouse.click(c.x, c.y); await H.settle(page);
+  await expect(page.locator('#slname')).toHaveAttribute('placeholder', 'Stamp 2');
+  const last = await page.evaluate(() => [...document.querySelectorAll('section.pn[data-p="stmp"] details.g')].filter(d => !d.hidden).map(d => d.querySelector('summary').textContent.trim()).slice(-3));
+  expect(last.slice(-2)).toEqual(['Save and export', 'Library']);
+  await page.keyboard.press('Control+z'); await H.settle(page); await page.keyboard.press('Control+Shift+z'); await H.settle(page);
+  await H.openPanel(page, 'stmp'); await H.settle(page);
+  await page.click('#slsave'); await expect(page.locator('#pmsg')).toContainText('Saved');
+  expect(errors).toEqual([]);
+});
