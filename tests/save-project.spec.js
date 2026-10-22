@@ -10,7 +10,7 @@ async function roll(page) {
 }
 
 test('a fresh launch shows no unsaved dot, and making a change shows it', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 3 });
+  const { errors } = await openApp(page, { seed: 3, pattern: false });
   await page.waitForTimeout(1800);                                   // the dot repaints every 0.8 s
   await expect(page.locator('#pst')).not.toHaveClass(/dirty/);
   await roll(page);

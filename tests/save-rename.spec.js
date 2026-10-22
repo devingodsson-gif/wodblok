@@ -16,7 +16,7 @@ async function openFromFolder(page) {
 const sizes = page => page.evaluate(() => ({ ...window.__folder.files }));
 
 test('rename an opened project and Save: a new file in the folder, the original untouched; Save again writes the new file', async ({ page }) => {
-  const { errors } = await openApp(page, { runtime: 'none' });
+  const { errors } = await openApp(page, { runtime: 'none', pattern: false });
   test.skip(!(await page.evaluate(() => typeof window.showDirectoryPicker === 'function')), 'this browser has no folder picker');
   await installFolder(page, FILES);
   await openFromFolder(page);
@@ -34,7 +34,7 @@ test('rename an opened project and Save: a new file in the folder, the original 
 });
 
 test('without a folder: the same name saves into the opened file, a new name asks where to save', async ({ page }) => {
-  const { errors } = await openApp(page, { runtime: 'none' });
+  const { errors } = await openApp(page, { runtime: 'none', pattern: false });
   test.skip(!(await page.evaluate(() => typeof window.showDirectoryPicker === 'function')), 'this browser has no folder picker');
   let dialogs = 0;
   await page.exposeFunction('__saveDialog', () => { dialogs++; });

@@ -95,6 +95,7 @@ async function addPattern(page) {
   await patSource(page);                                  // the old start's Pattern printed the stamp
   if ((await page.getAttribute('#rcls', 'aria-label')) === 'Close all panels') await page.click('#rcls');
   await page.keyboard.press('Escape'); await settle(page);
+  await page.evaluate(() => window.__wbTest.resetHistory());   // the set-up steps are not the test's history: the first step is the Start again
 }
 
 async function getState(page) {

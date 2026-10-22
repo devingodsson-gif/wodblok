@@ -18,7 +18,7 @@ test('a full roll makes element layers: patterns with effects, and a frame patte
   for (let i = 0; i < 6; i++) { await page.click('#rzdo'); await settle(page, { max: 90000 }); d = await doc(page); if (els(d).some(p => p.lay === 'frame')) break; }
   expect(els(d).filter(p => p.k === 'pattern' && p.lay !== 'frame').length).toBeGreaterThan(0);
   expect(els(d).some(p => p.lay === 'frame')).toBe(true);
-  expect(d.tex.u).toEqual([]);
+  expect(Array.isArray(d.tex.u)).toBe(true);   // a roll may now lay a canvas texture (wear, relief, stain); it used to leave none
   expect(els(d).some(p => (p.fx || []).length)).toBe(true);
   expect(errors).toEqual([]);
 });

@@ -43,11 +43,11 @@ test('the search button opens it, arrows move, a click on a row runs that comman
   expect(await page.locator('#cmdkl .ckr.on b').textContent()).not.toBe(on0);
   await page.keyboard.press('ArrowUp');
   expect(await page.locator('#cmdkl .ckr.on b').textContent()).toBe(on0);
-  // pointer: click the Colour grading row
-  await page.fill('#cmdki', 'grading');
-  await page.locator('#cmdkl .ckr', { hasText: 'Open Colour grading' }).click();
+  // pointer: click the Grid row
+  await page.fill('#cmdki', 'grid');
+  await page.locator('#cmdkl .ckr', { hasText: 'Open Grid' }).click();
   await expect(page.locator('#cmdk')).toBeHidden();
-  await expect(page.locator('section.pn[data-p="grade"]')).toBeVisible();
+  await expect(page.locator('section.pn[data-p="pgrid"]')).toBeVisible();
   // clicking the dim backdrop closes it
   await page.click('#cmdkb');
   await page.mouse.click(5, 5);

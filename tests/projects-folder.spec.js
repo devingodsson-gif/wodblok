@@ -12,7 +12,7 @@ const FILES = [
 ];
 
 test('the button names the next step, the folder lists its projects, a project opens, and Close folder forgets it', async ({ page }) => {
-  const { errors } = await openApp(page);
+  const { errors } = await openApp(page, { pattern: false });
   test.skip(!(await page.evaluate(() => typeof window.showDirectoryPicker === 'function')), 'this browser has no folder picker');
   await installFolder(page, FILES);
   await expect(page.locator('#pls')).toHaveText('Open projects folder');
