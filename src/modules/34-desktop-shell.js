@@ -38,9 +38,9 @@ const ELP=EL_ONLY,wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p)
 const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elpaint','text','pgrid','canvas','colors','rand','hist','xrec']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
-const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85}),wsG(['layers']),wsG(['canvas','colors'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)
+const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85,lk:1}),wsG(['layers']),wsG(['canvas','colors'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)
 let WS={pattern:wsDef()};
-try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}})}catch(e){}
+try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;if(g.lk===undefined&&g.tabs.includes('lyrs'))g.lk=1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}})}catch(e){}
 
 const wsSave=()=>{try{kv.set('wb30_ws',JSON.stringify(WS))}catch(e){}};
 const wsL=()=>WS.pattern;
@@ -79,14 +79,16 @@ const IC={col:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentCo
 exp:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevR+'</svg>',
 pop:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.popout+'</svg>',
 dock:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.panels+'</svg>',
-x:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.close+'</svg>'};
+x:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.close+'</svg>',
+lk:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.lock+'</svg>',
+ul:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.unlock+'</svg>'};
 const wsNarrow=()=>innerWidth<=860;
 function wsClamp(g){const st=document.querySelector('.stage').getBoundingClientRect();if(g.x==null){if(g.pos=='bc'){g.x=Math.round(st.left+(st.width-(+g.w||300))/2);g.y=Math.round(st.bottom-(parseFloat(getComputedStyle(document.querySelector('.stage')).getPropertyValue('--film-h'))||79)-12-(+g.h||420))}else{const r=g.pos=='r'||g.pos=='rb';g.x=Math.round(r?st.right-(+g.w||300)-12:st.left+12);g.y=Math.round(st.top+52+(g.pos=='rb'?392:0))}}
 g.w=Math.max(200,Math.min(+g.w||300,innerWidth-20));g.h=Math.max(120,Math.min(+g.h||420,innerHeight-60));g.x=Math.max(-g.w+80,Math.min(g.x,innerWidth-80));g.y=Math.max(0,Math.min(g.y,innerHeight-36));if(g.y+g.h>innerHeight-8)g.y=Math.max(0,innerHeight-8-g.h);g.h=Math.min(g.h,innerHeight-8-g.y)}
 function wsEl(g,fl){const el=document.createElement('div');el.className='wg'+(fl?' fl':'')+(g.col?' col':'');el.dataset.g=g.id;
 if(fl){wsClamp(g);el.style.cssText=`left:${g.x}px;top:${g.y}px;width:${g.w}px;${g.col?'':`height:${g.h}px;`}z-index:${++wsZ}`}else el.style.flexGrow=g.f;
-el.innerHTML=`<div class="wh" title="Drag to move"><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
-`<button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button><button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close" aria-label="Close">${IC.x}</button></div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
+el.innerHTML=`<div class="wh"${g.lk?'':' title="Drag to move"'}><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
+`<button type="button" class="wb" data-act="lock" aria-pressed="${g.lk?'true':'false'}" aria-label="${g.lk?'Unlock panel':'Lock panel'}">${g.lk?IC.lk:IC.ul}</button><button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button>${g.lk?'':`<button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close" aria-label="Close">${IC.x}</button>`}</div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
 const bd=el.querySelector('.wbd');g.tabs.forEach(p=>{const sc=wsSec(p);if(sc){sc.classList.toggle('mc',!!sc.querySelector(':scope>details.g'));sc.hidden=p!=g.a;bd.appendChild(sc)}});return el}
 // the tool bar: the user's own order and the tools they took off it (kept in settings)
 const RO={order:[],off:[]};try{const r=JSON.parse(kv.get('wb120_rail')||'null');if(r){if(Array.isArray(r.order))RO.order=r.order.filter(x=>typeof x=='string');if(Array.isArray(r.off))RO.off=r.off.filter(x=>typeof x=='string')}}catch(e){}
@@ -110,7 +112,7 @@ addEventListener('resize',()=>{if(wsReady)wsTabFit()});
 // tabs and buttons
 document.addEventListener('click',e=>{const w=e.target.closest('.wg');if(!w||Date.now()-wsJust<250)return;const g=wsGroup(w.dataset.g);if(!g)return;
 const b=e.target.closest('.wb');if(b){const a=b.dataset.act,r=w.getBoundingClientRect();
-if(a=='col')g.col=!g.col;else if(a=='close'){wsDetach(g)}else if(a=='float'){wsDetach(g);const ek=g.e||'r',hz=ek=='t'||ek=='b',fw=Math.round(hz?Math.min(340,r.width):Math.min(320,r.width)),fh=Math.round(hz?Math.max(300,Math.min(420,innerHeight-120)):Math.min(Math.max(r.height,260),560));Object.assign(g,{x:Math.round(ek=='l'?r.right+14:ek=='r'?r.left-fw-14:r.left),y:Math.max(Math.round(document.querySelector('.stage').getBoundingClientRect().top+56),Math.round(ek=='t'?r.bottom+14:ek=='b'?r.top-fh-14:r.top)),w:fw,h:fh,col:false});wsL().float.push(g)}
+if(a=='lock')g.lk=g.lk?0:1;else if(g.lk&&a!='col'){return}else if(a=='col')g.col=!g.col;else if(a=='close'){wsDetach(g)}else if(a=='float'){wsDetach(g);const ek=g.e||'r',hz=ek=='t'||ek=='b',fw=Math.round(hz?Math.min(340,r.width):Math.min(320,r.width)),fh=Math.round(hz?Math.max(300,Math.min(420,innerHeight-120)):Math.min(Math.max(r.height,260),560));Object.assign(g,{x:Math.round(ek=='l'?r.right+14:ek=='r'?r.left-fw-14:r.left),y:Math.max(Math.round(document.querySelector('.stage').getBoundingClientRect().top+56),Math.round(ek=='t'?r.bottom+14:ek=='b'?r.top-fh-14:r.top)),w:fw,h:fh,col:false});wsL().float.push(g)}
 else if(a=='dock'){wsDetach(g);g.col=false;g.f=1;wsDockIns(wsL(),g,g.e||'r',1e9)}wsSave();wsRender();return}
 const t=e.target.closest('.wtab');if(t){g.a=t.dataset.t;g.col=false;panel=g.a;wsSave();wsRender()}});
 // floating windows come to the front when touched
@@ -120,7 +122,7 @@ document.addEventListener('pointerdown',e=>{if(e.button!==0)return;const tg=e.ta
 const eh=tg.closest('.wed');if(eh){const dk=eh.parentElement,k=dk.dataset.e;e.preventDefault();eh.classList.add('on');document.body.classList.add('wsedge');wd={k:'edge',h:eh,e:k,sx:e.clientX,sy:e.clientY,s0:dk.getBoundingClientRect()[k=='t'||k=='b'?'height':'width'],on:true};return}
 const sp=tg.closest('.wsp');if(sp){const a=sp.previousElementSibling,b=sp.nextElementSibling,ga=wsGroup(a.dataset.g),gb=wsGroup(b.dataset.g);if(!ga||!gb||ga.col||gb.col)return;e.preventDefault();const hz=sp.parentElement.classList.contains('hz');wd={k:'split',sp,a,b,ga,gb,hz,ha:hz?a.getBoundingClientRect().width:a.getBoundingClientRect().height,hb:hz?b.getBoundingClientRect().width:b.getBoundingClientRect().height,sy:hz?e.clientX:e.clientY,on:true};sp.classList.add('on');return}
 const rs=tg.closest('.wrs');if(rs){const w=rs.closest('.wg');e.preventDefault();wd={k:'size',w,g:wsGroup(w.dataset.g),sx:e.clientX,sy:e.clientY,r:w.getBoundingClientRect(),on:true};return}
-const h=tg.closest('.wg .wh');if(!h||tg.closest('.wb'))return;const el=h.closest('.wg'),g=wsGroup(el.dataset.g);if(!g)return;const tab=tg.closest('.wtab');
+const h=tg.closest('.wg .wh');if(!h||tg.closest('.wb'))return;const el=h.closest('.wg'),g=wsGroup(el.dataset.g);if(!g||g.lk)return;const tab=tg.closest('.wtab');
 wd={k:'move',g,el,p:tab?tab.dataset.t:null,sx:e.clientX,sy:e.clientY,on:false,fl:el.classList.contains('fl'),r:el.getBoundingClientRect(),t:null}});
 function wsTarget(e){wsInd.hidden=true;wsTint.hidden=true;document.querySelectorAll('.wg.wdrop').forEach(x=>x.classList.remove('wdrop'));document.querySelectorAll('.dk.dropz').forEach(x=>x.classList.remove('dropz'));wsZones(null);
 const x=document.elementFromPoint(e.clientX,e.clientY);if(!x)return{k:'float'};const tb=x.closest('.wg .wh'),own=wd.whole?wd.el:null;
@@ -184,7 +186,7 @@ WBX.wbOpenPanel=setPanel;
 WBX.wbApart=pn=>{const a=wsFind('lyrs'),b=wsFind(pn);return!(a&&b&&a===b)};   // false when the panel is a tab beside the Elements list: showing it would hide the list
 // The panels the app opens with (2.9.0: the Workspaces tool is gone; this is the one built-in layout, opened at launch and by the Default panels button). Read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
 WBX.wbWsGet=()=>JSON.parse(JSON.stringify({pattern:WS.pattern}));
-const wsLaunch=()=>({pattern:{dock:[wsG(['canvas','colors'],{e:'l'}),wsG(['lyrs','layers'],{e:'r'})],float:[]}});
+const wsLaunch=()=>({pattern:{dock:[wsG(['canvas','colors'],{e:'l'}),wsG(['lyrs','layers'],{e:'r',lk:1})],float:[]}});
 WBX.wbWsDefault=()=>({layout:wsLaunch()});
 WBX.wbWsSet=o=>{['pattern'].forEach(m=>{const L=o&&o[m];if(!L)return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=wsG([]).id;g.f=+g.f||1;g.e=g.e||'r';g.col=false;return g.tabs.length>0};
  const c=JSON.parse(JSON.stringify(L));WS[m]={dock:(c.dock||[]).filter(ok),float:(c.float||[]).filter(ok)}});
@@ -193,12 +195,12 @@ WBX.wbWsSet=o=>{['pattern'].forEach(m=>{const L=o&&o[m];if(!L)return;const seen=
 {const b=$('rcls'),CL=b.querySelector('svg').outerHTML,tp=b.querySelector('.tip'),DF='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.panelsDefault+'</svg>';let dm=false;
 const paint=()=>{const L=wsL(),e=!L.dock.length&&!L.float.length,d=e&&!!(WBX.wbWsDefault&&WBX.wbWsDefault());if(d===dm&&b.dataset.m)return;dm=d;b.dataset.m=d?'d':'c';b.setAttribute('aria-label',d?'Default panels':'Close all panels');b.querySelector('svg').outerHTML=d?DF:CL;tp.textContent=d?'Default panels':'Close all panels'};
 WBX.wbRcls=paint;
-b.onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length){const w=WBX.wbWsDefault&&WBX.wbWsDefault();if(w){WBX.wbWsSet(w.layout);pmsg('Default panels.')}return}L.dock=[];L.float=[];wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')}}
+b.onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length){const w=WBX.wbWsDefault&&WBX.wbWsDefault();if(w){WBX.wbWsSet(w.layout);pmsg('Default panels.')}return}L.dock=L.dock.filter(g=>g.lk);L.float=L.float.filter(g=>g.lk);wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')}}
 document.querySelector('.rail').onclick=e=>{const b=e.target.closest('[data-pn]');if(!b)return;const p=b.dataset.pn,g=wsFind(p);
 // double-clicking the Randomize tool rolls a new piece, the same as pressing the Randomize button in its window (the window is left open)
 if(p=='rand'&&e.isTrusted&&e.detail>1){const g2=wsFind('rand');if(!(g2&&g2.a=='rand'&&!g2.col))setPanel('rand');$('rzdo').click();return}
 // clicking the button of a panel that is already showing closes it (only for real clicks, not when the app opens a panel itself)
-if(e.isTrusted&&g&&g.a==p&&!g.col){const i=g.tabs.indexOf(p);g.tabs.splice(i,1);if(g.a==p)g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g);wsSave();wsRender();return}
+if(e.isTrusted&&g&&g.a==p&&!g.col&&!g.lk){const i=g.tabs.indexOf(p);g.tabs.splice(i,1);if(g.a==p)g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g);wsSave();wsRender();return}
 setPanel(p)};
 
 // tool bar editing: the three-line button lists the tools that are off the bar; while it is open each tool on the bar shows an X to take it off; tools drag to a new place
