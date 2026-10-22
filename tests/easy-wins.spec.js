@@ -41,10 +41,10 @@ test('the four view toggles live in Settings (General) and the Display tab is go
   expect(errors).toEqual([]);
 });
 
-// 2.10.0 removed the Stamp library tool (its panel code is still in the page); these two cover it until it is deleted or brought back
-test.fixme('the stamp library says what an empty name will become, and confirms in the status line', async ({ page }) => {
+// 2.23.0: the stamp library is a group in the Stamp panel again
+test('the stamp library says what an empty name will become, and confirms in the status line', async ({ page }) => {
   const { errors } = await openApp(page);
-  await openPanel(page, 'slib');
+  await openPanel(page, 'stmp');
   await expect(page.locator('#slname')).toHaveAttribute('placeholder', 'Stamp 1');
   await page.click('#slsave');
   await expect(page.locator('#pmsg')).toContainText('Saved “Stamp 1”');

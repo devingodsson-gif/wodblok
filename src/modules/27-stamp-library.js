@@ -80,7 +80,7 @@ else if(a=='del'){if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Sure?';s
 catch(er){slMsg('Something went wrong: '+((er&&er.message)||'unknown error'))}};
 $('slimp').onclick=()=>$('slimpf').click();
 $('slimpf').onchange=async()=>{const f=$('slimpf').files[0];$('slimpf').value='';if(!f)return;try{const rec=fmtStampOpen(await f.text());await SL.put(newId(),rec);slMsg('Added “'+rec.name+'” to the library.');slPaint()}catch(er){slMsg((er&&er.name=='FormatError'&&er.message)||'Could not read that file.')}};
-document.querySelector('.rail [data-pn="slib"]').addEventListener('click',()=>setTimeout(slPaint,60));
+{const sp=document.querySelector('section.pn[data-p="stmp"]');if(sp){new MutationObserver(()=>{if(!sp.hidden)setTimeout(slPaint,60)}).observe(sp,{attributes:true,attributeFilter:['hidden']});if(!sp.hidden)setTimeout(slPaint,60)}}   // the library lives in the Stamp panel (2.23.0); paint it when the panel is shown
 $('lfaimp').onclick=()=>$('lfafile').click();
 $('lfafile').onchange=async()=>{const f=$('lfafile').files[0];$('lfafile').value='';if(f)await artImport(f)};
 $('lfars').onclick=e=>{const x=e.target.closest('[data-ax]');if(x){const id=x.dataset.ax;if(!artRefd(id)){delete WBS.ARTS[id];upd()}return}const b=e.target.closest('[data-a]');if(b&&WBX.wbShapeImage)WBX.wbShapeImage(b.dataset.a,true)};

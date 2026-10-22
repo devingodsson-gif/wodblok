@@ -885,7 +885,6 @@ body.eyedrop{cursor:crosshair}
  <button id="rail-hist" data-pn="hist" aria-label="History"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="history"></svg><span class="tip">History</span></button>
  <button id="rail-rand" data-pn="rand" aria-label="Randomize"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dice"></svg><span class="tip">Randomize</span></button>
  <button id="rail-xrec" data-pn="xrec" aria-label="Export recipes"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="download"></svg><span class="tip">Export recipes</span></button>
- <button id="rail-slib" data-pn="slib" aria-label="Stamp library"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="books"></svg><span class="tip">Stamp library</span></button>
  <button id="rail-layers" data-pn="layers" aria-label="Pattern"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="pattern"></svg><span class="tip">Pattern</span></button>
  <button id="rail-stmp" data-pn="stmp" aria-label="Stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="stamp"></svg><span class="tip">Stamp</span></button>
  <button id="rail-motifs" data-pn="motifs" aria-label="Motif"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="motif"></svg><span class="tip">Shape</span></button>
@@ -963,22 +962,6 @@ body.eyedrop{cursor:crosshair}
   </div></details>
  </section>
 
- <section class="pn" data-p="slib" hidden>
-  <details class="g" open><summary>This stamp</summary><div class="gb">
-   <label>Name</label><input type="text" id="slname" maxlength="40" placeholder="e.g. Lion in a ring">
-   <div class="row"><button class="primary" id="slsave">Save to library</button><button class="alt" id="slimp">Import stamp file</button></div><input type="file" id="slimpf" class="vh" accept=".wodblok-stamp,.json,application/json" tabindex="-1">
-   <label>Export as PNG</label>
-   <div class="row"><select id="slpx" aria-label="Size"><option value="512">512 px</option><option value="1024" selected>1024 px</option><option value="2048">2048 px</option><option value="4096">4096 px</option></select><select id="slbg" aria-label="Background"><option value="">Transparent</option><option value="paper">Paper colour</option></select></div>
-   <label class="chk"><input type="checkbox" id="slfx"><span>With my print settings</span></label>
-   <label class="chk"><input type="checkbox" id="sltx"><span>With my surface texture</span></label>
-   <div class="row"><button class="alt" id="slpng">Export PNG</button></div>
-  </div></details>
-  <details class="g" open><summary>Library <span class="aux" id="slcount"></span></summary><div class="gb">
-   <div class="hint" id="slwhere"></div>
-   <div class="slg" id="slgrid"></div>
-   <div class="hint" id="slmsg"></div>
-  </div></details>
- </section>
 
  <section class="pn" data-p="colors" hidden>
   <details class="g" open><summary>Tray <span class="aux" id="tycnt"></span></summary><div class="gb">
@@ -1242,6 +1225,20 @@ body.eyedrop{cursor:crosshair}
    <div class="hint" id="symh"></div>
    <label class="chk" id="symtxr" hidden><input type="checkbox" id="symtx"><span>Mirror text with symmetry</span></label>
    <div class="row" id="sbkr" hidden><button class="alt" id="sbk">Make copies separate</button></div>
+  </div></details>
+  <details class="g" open><summary>Save and export</summary><div class="gb">
+   <label>Name</label><input type="text" id="slname" maxlength="40" placeholder="e.g. Lion in a ring">
+   <div class="row"><button class="primary" id="slsave">Save to library</button><button class="alt" id="slimp">Import stamp file</button></div><input type="file" id="slimpf" class="vh" accept=".wodblok-stamp,.json,application/json" tabindex="-1">
+   <label>Export as PNG</label>
+   <div class="row"><select id="slpx" aria-label="Size"><option value="512">512 px</option><option value="1024" selected>1024 px</option><option value="2048">2048 px</option><option value="4096">4096 px</option></select><select id="slbg" aria-label="Background"><option value="">Transparent</option><option value="paper">Paper colour</option></select></div>
+   <label class="chk"><input type="checkbox" id="slfx"><span>With my print settings</span></label>
+   <label class="chk"><input type="checkbox" id="sltx"><span>With my surface texture</span></label>
+   <div class="row"><button class="alt" id="slpng">Export PNG</button></div>
+  </div></details>
+  <details class="g" open><summary>Library <span class="aux" id="slcount"></span></summary><div class="gb">
+   <div class="hint" id="slwhere"></div>
+   <div class="slg" id="slgrid"></div>
+   <div class="hint" id="slmsg"></div>
   </div></details>
  </div></section>
  <section class="pn" data-p="layers" hidden>

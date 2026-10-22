@@ -53,11 +53,11 @@ test('named snapshots are saved inside the file and come back when it is opened'
   await c1.close(); await c2.close();
 });
 
-test.fixme('a library stamp can be saved as its own file and imported into another browser', async ({ browser }) => {
+test('a library stamp can be saved as its own file and imported into another browser', async ({ browser }) => {
   const { openPanel } = require('./helpers/harness');
   const c1 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p1 = await c1.newPage(), a = await openApp(p1);
   await openFile(p1, path.join(FX, 'project-1-diamond.wodblok'));
-  await openPanel(p1, 'slib');
+  await openPanel(p1, 'stmp');
   await p1.fill('#slname', 'Test stamp'); await p1.click('#slsave');
   await expect(p1.locator('#slgrid .slc')).toHaveCount(1);
   await p1.evaluate(() => { window.__wbDownloads.length = 0; });
@@ -66,7 +66,7 @@ test.fixme('a library stamp can be saved as its own file and imported into anoth
   const dl = await p1.evaluate(() => window.__wbDownloads[0]);
   expect(dl.filename).toBe('test-stamp.wodblok-stamp');
   const c2 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p2 = await c2.newPage(), b = await openApp(p2);
-  await openPanel(p2, 'slib');
+  await openPanel(p2, 'stmp');
   await p2.setInputFiles('#slimpf', tmp('s.wodblok-stamp', dl.data)); await settle(p2);
   await expect(p2.locator('#slgrid .slc')).toHaveCount(1);
   await expect(p2.locator('#slgrid .slc b')).toHaveText('Test stamp');
