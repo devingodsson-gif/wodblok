@@ -1,7 +1,7 @@
 // 2.12.0: selecting an element jumps to its panel; a picked motif is a ghost on the pointer and a click makes it, with or without a stamp on the canvas;
 // a stamp's tab has Add motif and Add text; the rail order.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, addShape, unlockStamp } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, addShape, unlockStamp, addKind } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 
@@ -36,12 +36,12 @@ test('a stamp tab has Add motif and Add text, each puts one in the stamp', async
   const n0 = await n();
   await openPanel(page, 'motifs');
   await expect(page.locator('.elk[data-k="motif"] [data-add]')).toBeVisible();
-  await page.click('.elk[data-k="motif"] [data-add]'); await settle(page);
+  await addKind(page, 'motif'); await settle(page);
   expect(await n()).toBe(n0 + 1);
   await openPanel(page, 'text');
   await expect(page.locator('.elk[data-k="text"] [data-add]')).toBeVisible();
   await page.fill('#tx_t', 'Hi');
-  await page.click('.elk[data-k="text"] [data-add]'); await settle(page, { max: 30000 });
+  await addKind(page, 'text'); await settle(page, { max: 30000 });
   expect(await n()).toBeGreaterThan(n0 + 1);
   expect(errors).toEqual([]);
 });

@@ -52,6 +52,6 @@ function init24(){// ===== Free-place layers: no arrangement, just stamps put do
 // L.pl = [{u, t: stamp id, x, y (canvas units), s: long side (canvas units), r: degrees, f: 1 | -1}]
 WBS.selLM=new Set();WBS.lAnc=null;WBS.tM=new Set();WBS.tAnc=null;WBS.mAnc=null;
 WBS.fpMS=new Set();WBS.fpAnc=null;WBS.fpPool=new Set();WBS.fpPA=null;
-WBS.CR=null;WBS.fpB=null;WBS.fpSel=-1;WBS.fpDrag=null;WBS.fpGhost=null;WBS.fpXf=null;WBS.fpSyncing=0;WBS.fpTh={};WBS.fpAlt=false;
+WBS.CR=null;WBS.plArm=null;WBS.fpB=null;WBS.fpSel=-1;WBS.fpDrag=null;WBS.fpGhost=null;WBS.fpXf=null;WBS.fpSyncing=0;WBS.fpTh={};WBS.fpAlt=false;
 }
 export {pgSnap,pgSs,fpCell,fpFG,fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnap,fpSnapS,fpTog,fpU,freeLayer,tGrp,init24};

@@ -1,7 +1,7 @@
 // Element update, step 1 (2.1.1): a layer's elements (placed stamps, pictures, text) draw in the order of the layer's element list,
 // not grouped by kind. Before this, every placed stamp drew under every text whatever the order they were added in.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern, addKind } = require('./helpers/harness');
 
 const layers = async page => JSON.parse(await getState(page)).els;
 const canvasClick = async (page, fx, fy) => {
@@ -17,7 +17,7 @@ test('text placed before a stamp draws under it: the canvas follows the element 
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Hi');
   await settle(page);
-  await page.click('.elk[data-k=\"text\"] [data-add]'); await settle(page);   // 2.12.0: Add text makes it
+  await addKind(page, 'text'); await settle(page);   // 2.12.0: Add text makes it
   await page.evaluate(() => document.activeElement && document.activeElement.blur());   // Escape is ignored while the text field has focus
   await page.keyboard.press('Escape');          // stop placing text before the stamp is picked
   await settle(page);
@@ -40,7 +40,7 @@ test('a stamp placed before text still draws under it', async ({ page }) => {
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Hi');
   await settle(page);
-  await page.click('.elk[data-k=\"text\"] [data-add]'); await settle(page);   // 2.12.0: Add text makes it
+  await addKind(page, 'text'); await settle(page);   // 2.12.0: Add text makes it
   const pl = (await layers(page));
   expect(pl.map(q => (q.tx != null ? 'text' : q.t != null ? 'stamp' : '?'))).toEqual(['stamp', 'text']);
   await expect.poll(() => drawnOrder(page)).toEqual(pl.map(q => String(q.u)));

@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern, addShape } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern, addShape, addKind } = require('./helpers/harness');
 
 const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const canvasClick = async (page, fx, fy) => {
@@ -39,13 +39,13 @@ test('a bar button opens its panel and Add there makes the element, just above t
   await page.click('#elb [data-k="pattern"]'); await settle(page);
   expect(await kinds()).toEqual([]);                      // the button makes nothing
   await expect(page.locator('#elb [data-k="pattern"]')).toHaveAttribute('aria-pressed', 'true');
-  await page.click('.elk[data-k="pattern"] [data-add]'); await settle(page);
+  await addKind(page, 'pattern'); await settle(page);
   expect(await kinds()).toEqual(['pattern']);
   await addShape(page);
   expect(await kinds()).toEqual(['pattern', 'shape']);
   await page.click('#elb [data-k="text"]'); await settle(page);
   expect(await kinds()).toEqual(['pattern', 'shape']);
-  await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
+  await addKind(page, 'text'); await settle(page);
   expect(await kinds()).toEqual(['pattern', 'shape', 'text']);
   await page.click('#elb [data-k="motif"]'); await settle(page);
   expect((await kinds()).includes('motif')).toBe(false);   // 2.4.0: the Motif button makes nothing, a pick arms it

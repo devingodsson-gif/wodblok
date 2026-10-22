@@ -1,6 +1,6 @@
 // 1.44.0: styling selected letters (size, raise, spacing) and paragraph options (first-line indent, paragraph spacing, balance lines). The styles stay with their letters when the words change.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText, addKind } = require('./helpers/harness');
 // Canvas flow: the text typed in the Text panel is put on the first printed instance of the unlocked stamp, then one of its letters is clicked so the whole text is selected (the panel edits it)
 async function putTextCanvas(page) {
   const p = await stampInstance(page);
@@ -115,7 +115,7 @@ test('Text layer: styled letters and paragraph options are saved on the text, an
   await page.fill('#tx_t', 'ONE TWO');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
-  await page.click('.elk[data-k="text"] [data-add]');
+  await addKind(page, 'text');
   await settle(page);
   const piece = async () => JSON.parse(await getState(page)).els.filter(p => p.tx)[0];
   await expect.poll(async () => (await piece() || {}).tx).toBeTruthy();

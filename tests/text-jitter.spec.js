@@ -1,6 +1,6 @@
 // 2.2.1: Jitter on a text nudges each letter on its own (seeded per letter); the text as a whole stays where it is.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, addKind } = require('./helpers/harness');
 
 const uses = page => page.evaluate(() => [...document.querySelectorAll('#art use[href^="#tg"]')].map(u => u.getAttribute('transform')).slice(0, 4));
 const num = t => (t.match(/-?\d+\.?\d*/g) || []).map(Number);
@@ -13,7 +13,7 @@ test('text Jitter moves every letter differently, not the text as one object', a
   await page.fill('#tx_t', 'ABCD');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
-  await page.click('.elk[data-k="text"] [data-add]');
+  await addKind(page, 'text');
   await settle(page);
   await expect.poll(async () => (await uses(page)).length).toBe(4);
   const plain = await uses(page);

@@ -1,6 +1,6 @@
 // 1.43.0: letter effects. Random position, rotation and size, Bounce, Scatter, and Vary. Same text and seed always give the same letters.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText, addKind } = require('./helpers/harness');
 
 const set = (page, id, v) => page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); }, [id, v]);
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;
@@ -74,7 +74,7 @@ test('Text layer: effects are saved only when set', async ({ page }) => {
   await page.fill('#tx_t', 'HELLO');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
-  await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
+  await addKind(page, 'text'); await settle(page);
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
   const tx = async () => JSON.parse(await getState(page)).els.find(p => p.tx).tx;
   await expect.poll(async () => (await tx()).text, { timeout: 10000 }).toBe('HELLO');

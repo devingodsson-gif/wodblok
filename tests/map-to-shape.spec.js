@@ -1,6 +1,6 @@
 // 2.3.3: Text and Pattern stay free until "Map to shape" picks a Shape element: Follow outline or Inside.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern, addShape, patSource } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern, addShape, patSource, addKind } = require('./helpers/harness');
 
 const els = async page => JSON.parse(await getState(page)).els;
 const kind = async (page, k) => (await els(page)).filter(q => q.k === k);
@@ -12,7 +12,7 @@ const choose = (page, id, v) => page.evaluate(([id, v]) => { const e = document.
 async function shapeAndText(page) {
   await addShape(page);
   await page.click('#shp_pre [data-g="ellipse"]'); await settle(page);
-  await page.click('#elb [data-k="text"]'); await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
+  await page.click('#elb [data-k="text"]'); await addKind(page, 'text'); await settle(page);
 }
 
 test('a Text is free until mapped: Follow outline moves the letters onto the Shape, Free puts it back', async ({ page }) => {
@@ -56,7 +56,7 @@ test('a Pattern can follow a Shape (Count placements) or fill it (the placements
   await noPattern(page);
   await addShape(page);
   await page.click('#shp_pre [data-g="ellipse"]'); await settle(page);
-  await page.click('#elb [data-k="pattern"]'); await page.click('.elk[data-k="pattern"] [data-add]'); await patSource(page);
+  await page.click('#elb [data-k="pattern"]'); await addKind(page, 'pattern'); await patSource(page);
   const sh = (await kind(page, 'shape'))[0];
   const n0 = await page.$$eval('#dyn use', u => u.length);
   await expect(page.locator('#mp_g')).toBeVisible();

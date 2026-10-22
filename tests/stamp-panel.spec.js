@@ -1,7 +1,7 @@
 // 2.13.0: the Stamp panel. New stamp is at the very top and makes a stamp (a template), Add stamp sits under the stamp list and
 // prints a copy of the selected stamp on the canvas. Contents, Place and Outlines are gone; Block, Block edge and Symmetry show only in a stamp tab.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState, unlockStamp } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, addKind } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 
@@ -27,7 +27,7 @@ test('Add stamp prints a copy of the selected stamp on the canvas', async ({ pag
   await showPanel(page, 'stmp');
   await expect(page.locator('.elk[data-k="stamp"] [data-add]')).toBeDisabled();      // nothing to add before a stamp exists
   await page.click('#smknew'); await settle(page);
-  await page.click('.elk[data-k="stamp"] [data-add]'); await settle(page);
+  await addKind(page, 'stamp'); await settle(page);
   const els = (await st(page)).els || [];
   expect(els.filter(e => e.k === 'stamp')).toHaveLength(1);
   expect(errors).toEqual([]);

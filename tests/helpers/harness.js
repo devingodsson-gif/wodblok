@@ -91,7 +91,7 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, wo
 async function addPattern(page) {
   if (!(await page.evaluate(() => JSON.parse(window.__wbTest.state()).tiles.length))) await addStamp(page);   // 2.15.0: a new project has no stamp; the old start's one is made here
   await page.click('#elb [data-k="pattern"]');
-  await page.click('.elk[data-k="pattern"] [data-add]'); await settle(page);
+  await addKind(page, 'pattern');
   await patSource(page);                                  // the old start's Pattern printed the stamp
   if ((await page.getAttribute('#rcls', 'aria-label')) === 'Close all panels') await page.click('#rcls');
   await page.keyboard.press('Escape'); await settle(page);
@@ -236,7 +236,21 @@ async function patSource(page, kind = 'stamp', n = 0) {
 }
 // 2.12.0: text is made with the Add text button (no more arming and clicking the canvas); in a stamp's tab it lands in the middle of the stamp
 async function addStampText(page) {
-  await page.click('section.pn[data-p="text"] .elk[data-k="text"] [data-add]'); await settle(page);
+  await addKind(page, 'text');
 }
 
-module.exports = { closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// 2.20.0: every Add button arms its kind (a ghost follows the pointer); a click on the canvas places one. This clicks Add, then places one in the middle and puts the tool away (V).
+async function addKind(page, k) {
+  await page.click(`.elk[data-k="${k}"] [data-add]`);
+  await settle(page);
+  if (!(await page.evaluate(k => !!document.querySelector(`#elb [data-k="${k}"][aria-pressed="true"]`), k))) return;   // not armed: made at once (a stamp's tab)
+  const b = await page.locator('#art').boundingBox();
+  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+  await page.waitForFunction(k => k === 'motif' || document.querySelector('#fpov .gh'), k, { timeout: 4000 }).catch(() => {});
+  await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2);
+  await settle(page);
+  await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur());
+  await page.keyboard.press('v'); await settle(page);
+}
+
+module.exports = { addKind, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

@@ -1,6 +1,6 @@
 // 1.41.0: Box and fit. Padding, Spread, Fit to box (Shrink to fit, Fill the box, Fit each line to width, Fit width) and Overflow Hide.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText, addKind } = require('./helpers/harness');
 
 const set = (page, id, v) => page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); }, [id, v]);
 const items = async page => JSON.parse(await getState(page)).tiles[0].items;
@@ -82,7 +82,7 @@ test('Text layer: the new options are saved only when set', async ({ page }) => 
   await page.fill('#tx_t', 'HELLO WORLD');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
-  await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
+  await addKind(page, 'text'); await settle(page);
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);   // stop placing, then select the text
   const tx = async () => JSON.parse(await getState(page)).els.find(p => p.tx).tx;
   await expect.poll(async () => (await tx()).text, { timeout: 10000 }).toBe('HELLO WORLD');

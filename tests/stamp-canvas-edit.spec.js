@@ -2,7 +2,7 @@
 // that stamp where the pointer is (through the instance under it), a click selects a shape inside an instance, dragging moves it, the square handles
 // resize it, the round one turns it, Delete removes it. Locked stamps are not touched.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState, fitView } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, fitView, addKind } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const items = async page => (await state(page)).tiles[0].items;
@@ -149,7 +149,7 @@ test('text added with Add text goes into the unlocked stamp as letters, on every
   await page.fill('#tx_t', 'AB');
   await settle(page);
   const before = (await items(page)).length;
-  await page.click('section.pn[data-p="text"] .elk[data-k="text"] [data-add]');   // 2.12.0: Add text puts it in the middle of the stamp
+  await addKind(page, 'text');   // 2.12.0: Add text puts it in the middle of the stamp
   await expect.poll(async () => (await items(page)).length, { timeout: 15000 }).toBe(before + 2);
   const it = await items(page);
   expect(it.slice(-2).every(q => q.tg)).toBe(true);

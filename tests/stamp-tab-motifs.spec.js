@@ -1,7 +1,7 @@
 // 2.15.0: a stamp's tab works on its own, with no Pattern anywhere in the project: Add motif makes a motif you can move, a library motif is a ghost on the pointer
 // and a click puts it in the stamp.
 const { test, expect } = require('@playwright/test');
-const { openApp, showPanel, settle, getState } = require('./helpers/harness');
+const { openApp, showPanel, settle, getState, addKind } = require('./helpers/harness');
 
 const items = async page => JSON.parse(await getState(page)).tiles[0].items.map(q => ({ m: q.m, x: q.x, y: q.y }));
 async function newStampTab(page) {
@@ -14,7 +14,7 @@ async function newStampTab(page) {
 test('in a stamp tab of an empty project, Add motif makes a motif that can be dragged', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
   await newStampTab(page);
-  await page.locator('.elk[data-k="motif"] [data-add]').click(); await settle(page);
+  await addKind(page, 'motif'); await settle(page);
   expect(await items(page)).toHaveLength(1);
   await expect(page.locator('#stoh .steh')).toHaveCount(9);          // the box and its eight handles
   const [x0, y0] = [(await items(page))[0].x, (await items(page))[0].y];
@@ -44,7 +44,7 @@ test('the other things a stamp tab offers work in an empty project: Add text, th
   const { errors } = await openApp(page, { seed: 4, pattern: false });
   await newStampTab(page);
   await showPanel(page, 'text');
-  await page.click('section.pn[data-p="text"] .elk[data-k="text"] [data-add]'); await settle(page);
+  await addKind(page, 'text'); await settle(page);
   expect((await items(page)).length).toBeGreaterThan(0);
   await showPanel(page, 'stmp');
   await expect(page.locator('section.pn[data-p="stmp"] summary', { hasText: /^Stamp shape$/ })).toBeVisible();
@@ -59,7 +59,7 @@ test('the other things a stamp tab offers work in an empty project: Add text, th
 test('in a stamp tab a corner pulled sideways widens, pulled down makes taller; Ctrl scales both', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
   await newStampTab(page);
-  await page.locator('.elk[data-k="motif"] [data-add]').click(); await settle(page);
+  await addKind(page, 'motif'); await settle(page);
   const q = async () => JSON.parse(await getState(page)).tiles[0].items[0];
   const corner = async () => { const r = await page.locator('#stoh [data-hd="se"]').boundingBox(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; };
   const pull = async (dx, dy, ctrl) => { const c = await corner(); if (ctrl) await page.keyboard.down('Control'); await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.move(c.x + dx, c.y + dy, { steps: 6 }); await page.mouse.up(); if (ctrl) await page.keyboard.up('Control'); await settle(page); };

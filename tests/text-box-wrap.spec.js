@@ -1,6 +1,6 @@
 // Text: Box width wraps the lines, Box height + Vertical place them in a fixed box, and the side squares of a placed text pull those two (1.37.0).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText, addKind } = require('./helpers/harness');
 
 const set = (page, id, v) => page.evaluate(([id, v]) => { const r = document.getElementById(id); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); }, [id, v]);
 const rows = ys => new Set(ys.map(y => Math.round(y / 4))).size;
@@ -46,7 +46,7 @@ test('Text layer: the side squares set the box width (lines wrap, top stays) and
   await set(page, 'tx_sz', 6);
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
-  await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
+  await addKind(page, 'text'); await settle(page);
   const piece = async () => JSON.parse(await getState(page)).els.find(p => p.tx);
   const a = await piece();
   expect(rows(a.Lt.map(l => l[2]))).toBe(1);

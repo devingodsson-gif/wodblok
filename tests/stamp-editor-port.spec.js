@@ -1,7 +1,7 @@
 // Layer update, step 9a (1.46.9): the four things only the Stamp editor did, now on the Pattern canvas with a stamp unlocked:
 // copy and paste of shapes, editing text that is already in a stamp, Split motif, and grade masks that belong to one stamp.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, fitView, addStampText } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, fitView, addStampText, addKind } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const items = async page => (await state(page)).tiles[0].items;
@@ -72,7 +72,7 @@ test('text that is in a stamp is selected as one text, edited live from the Text
 test('with every stamp locked the Text panel still fills a Text layer', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await show(page, 'text');
-  await page.click('section.pn[data-p="text"] .elk[data-k="text"] [data-add]');     // Add text (2.12.0)
+  await addKind(page, 'text');     // Add text (2.12.0)
   await settle(page);
   const s = await state(page);
   expect(s.tiles[0].items.filter(q => q.tg).length).toBe(0);

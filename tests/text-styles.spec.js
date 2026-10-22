@@ -1,6 +1,6 @@
 // 1.46.0: the Text styles library: built-in Starter styles, Save style, folders, apply, rename, delete (same tree as Saved colours).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText, addKind } = require('./helpers/harness');
 // Canvas flow: the text typed in the Text panel is put on the first printed instance of the unlocked stamp, then one of its letters is clicked so the whole text is selected (the panel edits it)
 async function putTextCanvas(page) {
   const p = await stampInstance(page);
@@ -87,7 +87,7 @@ test('Text layer: a style applies to the selected text', async ({ page }) => {
   await page.fill('#tx_t', 'STYLE ME');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
-  await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
+  await addKind(page, 'text'); await settle(page);
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
   await page.click('#tsl .scf[data-k="Starter styles"]');
   await page.click('#tsl .scr:has-text("Swell")');

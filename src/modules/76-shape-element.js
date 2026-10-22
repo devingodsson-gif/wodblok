@@ -70,7 +70,7 @@ function shFlat(p,local){const[w,h]=shBox(p),d=shGeom(p,w,h);if(!d)return null;c
  const o={pts,closed,L:tot,cum};if(SHF.size>60)SHF.clear();SHF.set(key,o);return o}
 // ---- making one
 let shLast='rect';
-function shNew(g){const S=Math.min(CW,CH),p={u:fpU(),k:'shape',sh:g,x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:+(S*.4).toFixed(1),r:0,f:1};
+function shNew(g,x,y){const S=Math.min(CW,CH),p={u:fpU(),k:'shape',sh:g,x:+(x==null?CW/2:x).toFixed(1),y:+(y==null?CH/2:y).toFixed(1),s:+(S*.4).toFixed(1),r:0,f:1};
  if(g=='line'){p.wy=.06;p.sw=Math.max(2,Math.round(S/60));p.s=+(S*.5).toFixed(1)}
  if(g=='rrect')p.cr=18;if(g=='star')p.np=5;if(g=='arrow'||g=='rect'||g=='rrect')p.wy=.7;
  const q=abInsert(p);if(!q)return null;shLast=g;store();upd();if(WBX.wbCap)WBX.wbCap();if(WBX.wbElSeen)WBX.wbElSeen(q.u);return q}
@@ -158,7 +158,7 @@ function init76(){
  elExtend('shape',{dz:6,is:q=>q.k=='shape',name:q=>q.nm||SHPN[q.sh]||'Shape',draw:(L,li,pa)=>shpLayer(L,li,pa)});
  const pre=$('shp_pre');if(!pre)return;
  pre.innerHTML=SHPL.map(a=>`<button type="button" data-g="${a[0]}" aria-label="${a[1]}" title="${a[1]}" aria-pressed="false"><svg viewBox="0 0 24 24">${a[2]}</svg></button>`).join('');
- pre.onclick=e=>{const b=e.target.closest('[data-g]');const p=shCur();if(!b)return;const g=b.dataset.g;if(!p){shNew(g);return}if(p.sh==g)return;p.sh=g;shLast=g;if(g=='rrect'&&p.cr==null)p.cr=18;if(g=='star'&&p.np==null)p.np=5;if(g=='line'&&!(+p.sw>0))p.sw=Math.max(2,Math.round(Math.min(CW,CH)/60));PEN.edit=null;shCh();shpSync()};
+ pre.onclick=e=>{const b=e.target.closest('[data-g]');const p=shCur();if(!b)return;const g=b.dataset.g;if(!p){WBX.wbPlArm({k:'shape',g,s:Math.min(CW,CH)*(g=='line'?.5:.4),wy:g=='line'?.06:(g=='arrow'||g=='rect'||g=='rrect')?.7:1});return}if(p.sh==g)return;p.sh=g;shLast=g;if(g=='rrect'&&p.cr==null)p.cr=18;if(g=='star'&&p.np==null)p.np=5;if(g=='line'&&!(+p.sw>0))p.sw=Math.max(2,Math.round(Math.min(CW,CH)/60));PEN.edit=null;shCh();shpSync()};
  const sl=(id,key)=>$(id).addEventListener('input',()=>{const p=shCur();if(!p)return;const v=+$(id).value;if(p[key]===v)return;p[key]=v;store();upd()});
  sl('shp_cr','cr');sl('shp_np','np');['shp_cr','shp_np','shp_ow','shp_iz'].forEach(id=>$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()}));
  $('shp_imp').onclick=()=>{if(shCur()){SHI.fresh=false;$('lfafile').click()}else WBX.wbShapeImageNew()};   // a picture for the selected Shape, or a new Shape that shows it

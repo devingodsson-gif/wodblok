@@ -25,6 +25,10 @@ const abCount=k=>{const L=fpL();return L?(L.pl||[]).filter(q=>q.k==k).length:0};
 // what is picked there is made (a Shape preset) or follows the pointer as a ghost and is placed as often as wanted (a Motif, a Stamp).
 let ABP='';   // which of 'shape', 'motif', 'stamp' was last chosen on the bar and is waiting for a pick, '' for none
 const abPick=k=>{if(WBX.wbPenStop)WBX.wbPenStop();plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;ABP=k;upd();if(WBX.wbShpSync)WBX.wbShpSync();abOpen(k=='shape'?'mlist':k=='motif'?'motifs':k=='text'?'text':k=='pattern'?'layers':'stmp')};
+// 2.20.0 (owner Oct 22 2026): every Add arms its kind, a ghost follows the pointer and each click on the canvas places one; Esc or V puts it away. Text, Motif and Stamp use their own ghosts; Shape and Pattern use a box.
+function plArm(o){plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;WBS.plArm=o;upd();abOpen(o.k=='shape'?'mlist':'layers');abSync()}
+function plMake(o,x,y){if(o.k=='shape'){if(WBX.wbShapeNew)WBX.wbShapeNew(o.g,x,y);return}
+ if(o.k=='pattern'){const q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),lay:'grid',cn:4,rn:4,sz:80,rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x,y,s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone()}}
 const AB={
  pattern(){abPick('pattern')},
  text(){abPick('text')},   /* the bar only shows the panel (2.6.0); Add in the panel makes the element, as AD below */
@@ -34,11 +38,12 @@ const AB={
  motif(){abPick('motif')}};
 // what Add in an element panel makes (2.6.0; Motif and Stamp too from 2.7.0): just above the selected element; Shape is made by the Shape panel itself (shNew)
 const AD={
- stamp(){const t=WBS.tiles[WBS.cur];if(!t)return;const q=abInsert({u:fpU(),k:'stamp',t:t.id,x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:+fpSz().toFixed(2),r:0,f:1});if(!q)return;WBS.fpB=null;abDone();abOpen('stmp')},
- motif(){if(WBX.wbMotifAdd)WBX.wbMotifAdd()},
- pattern(){const q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),lay:'grid',cn:4,rn:4,sz:80,rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone();abOpen('layers')},
+ stamp(){const t=WBS.tiles[WBS.cur];if(!t)return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpB=t.id;upd();abOpen('stmp')},
+ motif(){if(WBX.wbMotifAdd)WBX.wbMotifAdd()},   // arms the last motif (74); in a stamp's tab it puts one in at once
+ pattern(){plArm({k:'pattern',s:Math.min(CW,CH)})},
  text(){if(stUnlocked()!=null){abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTxStampAt||!WBX.wbStampMid)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}const[x,y]=WBX.wbStampMid()||[0,0];Promise.resolve(WBX.wbTxStampAt(x,y)).then(()=>setTimeout(()=>{ta.focus();ta.select()},0));return}
-  const L=fpL(),before=new Set(L?(L.pl||[]).map(q=>String(q.u)):[]),anchor=elSel();abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTbAdd)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}
+  abOpen('text');const ta=$('tx_t'),go=$('tx_go');if(!ta||!go)return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}if(!WBS.txArm)go.click();return;
+  const L=fpL(),before=new Set(L?(L.pl||[]).map(q=>String(q.u)):[]),anchor=elSel();if(!WBX.wbTbAdd)return;
   Promise.resolve(WBX.wbTbAdd()).then(()=>{const L2=fpL();if(!L2)return;const a=L2.pl||[],q=a.find(x=>!before.has(String(x.u)));if(!q)return;a.splice(a.indexOf(q),1);
    if(anchor&&a.includes(anchor)){if(anchor.g)q.g=anchor.g;a.splice(a.indexOf(anchor)+1,0,q)}else a.push(q);WBS.fpSel=q.u;abDone();setTimeout(()=>{ta.focus();ta.select()},0)})},
 };
@@ -55,5 +60,5 @@ function init73(){const b=$('elb');if(!b)return;
  document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.matches&&t.matches('input,select,textarea,[contenteditable]'))return;if(e.ctrlKey||e.metaKey||e.altKey||e.shiftKey)return;if(e.key=='v'||e.key=='V'){abSelect()}else if(e.key=='Escape'&&((WBX.wbPaMode&&WBX.wbPaMode()!='off')||ABP||(WBX.plKind&&WBX.plKind()))){abSelect()}});
  const stg=document.querySelector('.stage');if(stg&&!$('elopt')){stg.insertAdjacentHTML('beforeend','<div class="elopt" id="elopt" hidden><div class="seg"><button type="button" data-m="brush">Brush</button><button type="button" data-m="erase">Eraser</button></div><label>Size</label><input type="range" min="1" max="200" value="14" aria-label="Brush size"></div>');
   const o=$('elopt');o.onclick=e=>{const x=e.target.closest('[data-m]');if(x&&WBX.wbPaArm)WBX.wbPaArm(x.dataset.m)};o.querySelector('input').addEventListener('input',e=>{const s=$('pasz');if(s){s.value=e.target.value;s.dispatchEvent(new Event('input',{bubbles:true}))}})}
- WBX.wbAbSync=abSync;WBX.wbAbPick=()=>ABP;WBX.wbAbAdd=k=>{const f=AD[k]||AB[k];if(f)f();abSync()}}
+ WBX.wbPlArm=plArm;WBX.wbPlMake=plMake;WBX.wbAbSync=abSync;WBX.wbAbPick=()=>ABP;WBX.wbAbAdd=k=>{const f=AD[k]||AB[k];if(f)f();abSync()}}
 export {abInsert,init73};
