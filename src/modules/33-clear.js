@@ -5,7 +5,7 @@ import {shOf} from './04-canvas-and-stamp-outlines.js';
 import {mkL,selOne,store} from './06-motif-library-folders.js';
 import {build,hx,migLayers} from './10-layer-grids.js';
 import {trayDefault} from './50-tray-core.js';
-import {fileSnap,thumb,confirm2,coreStr,newId,openData,paintPst,pmsg} from './18-projects-and-cover-overlay.js';
+import {fileSnap,thumb,confirm2,coreStr,dirty,newId,openData,paintPst,pmsg} from './18-projects-and-cover-overlay.js';
 import {mkEL} from './71-randomize-elements.js';
 // ===== Clear: one blank square stamp, default palette, plain arrangement, no print effects. Canvas size and cover are kept. Undoable.
 function clearAll(fresh){if(fresh)link=null;if(!fresh&&WBX.wbCap)WBX.wbCap();if(WBX.wbGrade)WBX.wbGrade.set(null);const L=mkEL('Layer 1',[]);L.pl=[];   // 2.10.0: a new project starts with nothing in it (no Pattern)
@@ -62,6 +62,10 @@ const name=(d.name||fl.name.replace(/\.wodblok$/i,'')).slice(0,60);
 if(r.newer){openData(d,null,name);WBS.cp.saved='';paintPst();link=null;putSnaps(null,r.snapshots);pmsg('“'+name+'” was made by a newer WODBLOK, so it is open as a copy that is not saved. Update the app to work on the original.');return}
 const id=newId();openData(d,id,name);link=handle?{id,name,handle}:null;if(handle&&WBX.wbRecentAdd)WBX.wbRecentAdd(name,handle);putSnaps(id,r.snapshots);await new Promise(r2=>setTimeout(r2,50));WBS.cp.saved=coreStr();paintPst();pmsg('Opened “'+name+'”.'+(r.missingAssets?' '+r.missingAssets+' picture'+(r.missingAssets>1?'s were':' was')+' missing from the file.':''))}
 catch(e){pmsg((e&&e.message)||'Could not open that file.')}};
+// (2.24.0) Open project with unsaved changes asks first, like New project: the first click turns the menu item into "Discard changes?", a second click opens
+const pfAsk=e=>{const b=$('pop');if(!dirty()||b.dataset.sure)return false;e.preventDefault();e.stopImmediatePropagation();confirm2(b,'Discard changes?',()=>{});return true};
+$('pop').addEventListener('click',pfAsk,true);   // on the menu item itself, so the menu stays open showing the question
+$('pfile').addEventListener('click',e=>{if(pfAsk(e))return;const b=$('pop');if(b.dataset.sure)confirm2(b,'',()=>{});if(WBX.wbCloseMenus)WBX.wbCloseMenus()},true);   // also the Open project command
 $('pfile').onchange=()=>{const fl=$('pfile').files[0];$('pfile').value='';if(fl)openFile(fl,null)};
 // Where the browser has its own Open dialog (Chrome, Edge) use it, so Save can write back to the same file; elsewhere the plain file input opens as before
 let pfNative=false;

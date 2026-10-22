@@ -63,7 +63,9 @@ function thumb(w0){return new Promise(res=>{try{const img=new Image(),to=setTime
 // The project as it is written to a file: the document plus the pictures Art layers use (so another project can take this one as a picture).
 async function fileSnap(){const sn=snapshot(),a=await artSnap();if(a)sn.art=a;return sn}
 // two-tap confirm for actions that would drop unsaved work
-const confirm2=(btn,label,fn)=>{if(!dirty()||btn.dataset.sure){delete btn.dataset.sure;return fn()}btn.dataset.sure='1';const o=btn.textContent;btn.textContent=label;setTimeout(()=>{delete btn.dataset.sure;btn.textContent=o},3500)};
+// (2.24.0) only the button's words change, so a menu item keeps its icon
+const c2Txt=btn=>[...btn.childNodes].reverse().find(n=>n.nodeType==3&&n.nodeValue.trim())||null;
+const confirm2=(btn,label,fn)=>{if(!dirty()||btn.dataset.sure){delete btn.dataset.sure;return fn()}btn.dataset.sure='1';const t=c2Txt(btn),o=t?t.nodeValue:btn.textContent;if(t)t.nodeValue=label;else btn.textContent=label;setTimeout(()=>{delete btn.dataset.sure;const t2=c2Txt(btn);if(t2)t2.nodeValue=o;else btn.textContent=o},3500)};
 function openData(d,id,name){applySnap(d);WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;paintPst();if(WBX.wbResetHist)WBX.wbResetHist();if(WBX.wbWatch)WBX.wbWatch()}
 function init18(){WBS.pgrid={...PGD};
 covB=blank();covS=blank();WBS.cslot='f';

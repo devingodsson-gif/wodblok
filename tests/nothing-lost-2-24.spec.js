@@ -16,3 +16,25 @@ test('after Randomize, stamps placed on their own are in the Elements list and c
   expect(await page.locator('#fpov [data-fh]').count(), 'the clicked stamp shows its handles').toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });
+
+test('File > Open project with unsaved changes asks "Discard changes?" first; a second click opens', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await page.evaluate(() => { window.__opens = 0; window.showOpenFilePicker = () => { window.__opens++; return new Promise(() => {}); }; });   // count the Open dialogs
+  const opens = () => page.evaluate(() => window.__opens);
+  await H.addShape(page); await H.settle(page);                        // unsaved work
+  await page.click('#fileb'); await page.click('#pop');
+  await expect(page.locator('#pop')).toHaveText('Discard changes?');
+  await expect(page.locator('#pop svg')).toHaveCount(1);                // the icon stays
+  await expect(page.locator('#filem')).toBeVisible();
+  await page.waitForTimeout(300); expect(await opens(), 'no Open dialog on the first click').toBe(0);
+  await page.click('#pop'); await expect.poll(opens).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+test('File > Open project on a clean project opens at once', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await page.evaluate(() => { window.__opens = 0; window.showOpenFilePicker = () => { window.__opens++; return new Promise(() => {}); }; });
+  await page.click('#fileb'); await page.click('#pop');
+  await expect.poll(() => page.evaluate(() => window.__opens)).toBe(1);
+  expect(errors).toEqual([]);
+});
