@@ -52,6 +52,8 @@ let plList=[];
 function init33(){
 $('clr').onclick=()=>clearAll(false);
 $('psv').onclick=saveProject;
+// 2.21.0, the File menu: Save project (the same as the button) and Save project as (a new file: the link to the file it came from is dropped first), Export opens the Export panel
+$('psvm').onclick=()=>$('psv').click();$('psa').onclick=()=>{link=null;saveProject()};$('xrm').onclick=()=>{if(WBX.wbOpenPanel)WBX.wbOpenPanel('xrec')};
 
 const openFile=async(fl,handle)=>{
 try{const r=await fmtOpen(new Uint8Array(await fl.arrayBuffer())),d=r.project;

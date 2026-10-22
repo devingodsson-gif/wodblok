@@ -25,6 +25,8 @@ const COMMANDS = [
   ['settings.open', 'Settings', 'stgo'],
   ['file.open', 'Open project', 'pfile', null, 'input'],
   ['file.save', 'Save project', 'psv', 'Mod+S'],
+  ['file.saveAs', 'Save project as', 'psa'],
+  ['file.export', 'Export', 'xrm'],
   ['export.png', 'Export PNG', 'png'],
   ['export.svg', 'Export SVG', 'sv'],
   ['export.copySvg', 'Copy SVG', 'cpy'],
