@@ -508,3 +508,14 @@ Between us only (never in the UI): a stamp parent is a stamp (a template, a tile
 - **Stamp tabs.** Fixed the cause of "a motif I can't touch or place": a stamp's tab edited the stamp through the printed copy, which only existed when the layer had a Pattern. In an empty project the tab did nothing. It now works with nothing else in the project (Add motif, drag, a library motif as a ghost and click to place, Add text, Block, Symmetry).
 - Tests: `selection-box.spec.js`, `stamp-tab-motifs.spec.js`; the harness makes the one stamp the old start had when it adds a Pattern.
 - Not run: CI, the full suite, `npm run perf` (a wide batch of the stamp, pattern and project specs ran).
+
+### 2.16.0 (Oct 22 2026): bug fixes from the 2.15.0 new-user walk-through. Format 25 unchanged
+- **Add shape** in the Import window no longer throws in a project with no stamp: the shape goes to the library only.
+- **Elements row menu button** and **Pattern source remove button** showed nothing (icon strings written as `'+ICN.x+'` inside template literals since 2.14.0); they show their icons.
+- **Ctrl or Cmd + D** duplicates the selected element on the canvas (it only worked inside an unlocked stamp).
+- **Segmented controls marked with `aria-pressed`** (Shape fill: None, Colour, Image) show the selected button like every `.on` one.
+- **Open Paint** is gone from command search (Paint has no button).
+- Tests: `bug-fixes-2-16.spec.js` (5). Also run, Chromium only: `commands`, `command-search` (the "Undo dimmed" test fails as it did on 2.14.0), `element-list`; `check:style` and `check:platform` pass.
+- Not fixed, needs the owner: File > Open replaces unsaved work with no cue (no confirm dialogs allowed; the New project two-click cue is the pattern to reuse); the Motif panel Edit group on canvas motifs; Randomize adding to earlier rolls; the empty More tools (rail tool tray); default text size on a 2:3 canvas; "Open Element" in command search doing nothing was not re-checked.
+- Not a bug: "Open projects folder" is already hidden when the browser lacks `showDirectoryPicker`; headless Chromium has it but refuses the picker.
+- Not run: CI, the full suite, WebKit (not installed in this container), `npm run perf` (no drawing path touched).

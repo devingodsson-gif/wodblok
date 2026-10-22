@@ -4,7 +4,7 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**As of Oct 21 2026 (night).** `main` is at **2.15.0** (merge commit `bc2bfbd`, live on wodblok.com), project file format **25** (`FMT_LATEST` in `src/format/container.js`, unchanged since 2.9.0). 75 files in `src/modules`, 126 spec files in `tests/`. The tag workflow makes the tags (latest tag seen: `v108`, not matched to a version here).
+**As of Oct 22 2026.** `main` is at **2.15.0** (branch `fix/2.16.0-bug-fixes` holds 2.16.0, not merged) (merge commit `bc2bfbd`, live on wodblok.com), project file format **25** (`FMT_LATEST` in `src/format/container.js`, unchanged since 2.9.0). 75 files in `src/modules`, 126 spec files in `tests/`. The tag workflow makes the tags (latest tag seen: `v108`, not matched to a version here).
 
 ## Direction
 - A professional, minimal, clean editor in the class of Photoshop and Lightroom (the owner's reference applications). Web app first; Mac, Windows and mobile later and not blocked. A commercial product, sold later; the repo is public until then.
@@ -58,6 +58,7 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 
 ## Unfinished and next
 Only items the owner has stated are listed as next. Nothing is started unless he says so.
+- 2.16.0 (bug fixes, branch `fix/2.16.0-bug-fixes`) is done and waiting for his word to merge; the bugs it leaves open are listed in `docs/plan.md` under 2.16.0.
 - Decide with the owner: snapshot regeneration (above), and a first full CI suite run (suggest it with the importance percentage: high, about 80%, because 2.4.0 to 2.15.0 changed launch, panels, selection, stamps and icons with no recorded full run).
 - The preview artifact (https://claude.ai/artifact/Y7qKSU4gbU9sCdQYNmBH93) was last published from 2.14.0; publish from `main` after the next build.
 - Stale branches: `feat/2.10.0-tidy-start` to `feat/2.15.0-selection-box` are merged into `main`; the temporary worktree `/tmp/claude-0/wt214` may remain in the old session's container only.

@@ -112,7 +112,8 @@ if(view=='t'){o=`<rect width="${W}" height="${H}" fill="${bg}"/>`;if(last)o+=`<p
 $('sov').innerHTML=o;viewSeg();$('shint').textContent=''}
 function addOne(){if(!last)return;const d=dest();if(!d)return;const g=libG(d),nm=($('inm').value.trim()||'Imported shape').replace(/["<>&|]/g,'').slice(0,40),key='i|'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 cust[key]={n:nm,svg:`<path d="${last.d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,...(g?{g}:{})};
-const t=WBS.tiles[WBS.cur],full=$('ifull').checked,s=full?+(Math.min(SW,SH)/100*1.04).toFixed(3):.9;t.items.push(it(key,SW/2,SH/2,s));selOne(t.items.length-1);
+const t=WBS.tiles[WBS.cur];if(!t)return done(d,`Added “${nm}” to ${libPath(d)}.`);// no stamp in the project: the shape goes to the library only
+const full=$('ifull').checked,s=full?+(Math.min(SW,SH)/100*1.04).toFixed(3):.9;t.items.push(it(key,SW/2,SH/2,s));selOne(t.items.length-1);
 done(d,`Added “${nm}” to ${libPath(d)} and placed it on the stamp.`)}
 // ===== Sheets: one image -> many shapes (grid you can adjust, or auto-detected shapes) =====
 let S=null,stmr=0;
