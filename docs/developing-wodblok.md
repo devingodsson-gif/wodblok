@@ -592,7 +592,7 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 #### 13.4 Settings
 
 - One dialog (`File > Settings…`, command `settings.open`), width 640, a page list on the left (`--h-row` items, the current page `--acc-soft`, `--acc-ink`, 600) and one page at a time on the right. On a phone the list becomes a row across the top.
-- A setting is one row: label left, control right, `--h-row` tall, a `--line` rule between rows. Controls are the standard ones: toggle (`.pvc`, On / Off), segmented control, slider row, button, swatch row. No explanatory text; the label says what it does.
+- A setting is one row: label left, control right, `--h-row` tall, a `--line` rule between rows. Controls are the standard ones: toggle (`.pvc`, the sliding switch, 28 x 18), segmented control, slider row, button, swatch row. No explanatory text; the label says what it does.
 - A setting changes the app at once, is kept in the settings record (kv, keys `wb114_…`), and has no Apply or Save button.
 - A page lists only what the app can really do today. Do not add a control whose effect is not built.
 

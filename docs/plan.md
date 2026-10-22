@@ -530,3 +530,12 @@ Between us only (never in the UI): a stamp parent is a stamp (a template, a tile
 - Not done (not text only, or needs the owner): history step names ("Change" for most steps), real names for element rows, removing the Randomize rows Sheet texture and Free-placed stamps, Randomize naming patterns "Layer 1" (changes state snapshots), the tray's "Paper" role name and the proof sheet's "Paper"/"Ink" legend, "Moved or edited shape" history text, the one-line "Selected letters" heading.
 - Tests: `words-2-17.spec.js` (3); wording updated in `audit-fixes`, `command-search`, `motif-export`, `shape-folders`, `motif-library`, `stamp-panel`, `stamp-library-tool`, `stamps-tool`, `stamp-editor-port`, `background`. Chromium only: those plus `commands`, `first-minute`, `undo`, `panels-1019` pass except `command-search` ("Undo dimmed") and `undo` (2), which also fail without this release. `check:style` and `check:platform` pass.
 - Not run: CI, the full suite, WebKit, `npm run perf` (no drawing path touched). No snapshot or golden changed; pixel goldens that show a renamed label would differ (status bar, Canvas, Stamp panel): regenerate when the suite runs, with the owner's word.
+
+### 2.18.0 (Oct 22 2026): one component per role. Look and behaviour of controls only. Format 25 unchanged
+- **Heights.** Every button is `--h-md` (24) by default; the shape pickers are icon-only grids (`.shg`); primaries that were not the one key action are demoted.
+- **One toggle:** the sliding switch (28 x 18) in Settings, panels and Export. Needs the owner's nod; Part 9 describes it.
+- **Slider value boxes** on every slider row, with units.
+- **Tooltips:** sentence tooltips removed; an icon-only button shows its name on hover (delegated handler); the rail and colour lock use short names.
+- **Smaller fixes:** empty groups hidden, folder menu visible at rest, Save as template footer is Cancel then Save, `kbd` uses the app font, selected marker row uses `--sel`.
+- Tests: `components-2-18.spec.js` (7); `stamp-tabs`, `element-bar`, `stamp-tab-motifs` updated. `check:style` and `check:platform` pass.
+- Run: components-2-18, settings, templates, color-tray, plus the related batch (43 of 44 passed; `settings.spec.js:46` failed once under load and passes alone). Not run: CI, the full suite, WebKit, `npm run perf` (no drawing path touched). No snapshot or golden changed; pixel goldens showing buttons, pickers or switches would differ.

@@ -100,7 +100,7 @@ document.querySelectorAll('section.pn').forEach(sc=>wsStash.appendChild(sc));wsF
 gs.forEach((g,i)=>{if(i){const sp=document.createElement('div');sp.className='wsp';sp.dataset.i=i;box.appendChild(sp)}box.appendChild(wsEl(g,false))});
 dk.hidden=!gs.length;if(nar){dk.style.width='';dk.style.height=''}else if(gs.length){const ac=gs.every(g=>g.col);if(k=='l'||k=='r')dk.style.width=(ac?Math.min(200,wsClampSz(k,wsSz(k))):wsClampSz(k,wsSz(k)))+'px';else dk.style.height=(ac?34:wsClampSz(k,wsSz(k)))+'px'}});
 if(!nar)L.float.forEach(g=>wsFl.appendChild(wsEl(g,true)));
-document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=wsFind(p);b.hidden=!MODEP.pattern.includes(p)||RO.off.includes(p)||EL_ONLY.includes(p);const fr=!!g&&g.a==p&&!g.col;b.classList.toggle('on',fr);b.classList.toggle('op',!!g&&!fr);b.title=fr?'':(g?'Open in a tab. Click to bring it to the front':'')});
+document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=wsFind(p);b.hidden=!MODEP.pattern.includes(p)||RO.off.includes(p)||EL_ONLY.includes(p);const fr=!!g&&g.a==p&&!g.col;b.classList.toggle('on',fr);b.classList.toggle('op',!!g&&!fr);b.title=''});
 wsTabFit();nums();if(railHook)railHook();if(WBX.wbRcls)WBX.wbRcls();if(WBX.wbElSync)WBX.wbElSync()}
 // a panel with more tabs than fit: the chosen tab is scrolled into view and the edge that hides more tabs fades
 function wsTabEdge(t){const h=t.parentElement;h.classList.toggle('ovr',t.scrollLeft+t.clientWidth<t.scrollWidth-1);h.classList.toggle('ovl',t.scrollLeft>1)}

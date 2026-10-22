@@ -90,7 +90,7 @@ function paintWell(W,force){if(!W.host.isConnected||(!force&&!shown(W.host)))ret
  sp.textContent=def?W.spec.def:wellText(show);
  const n=isLink(r)?tyP().ts.indexOf(r.slice(1))+1:0;em.textContent=n?String(n):'';em.hidden=!n;
  const fixed=isFixed(r);W.lk.innerHTML=fixed?LOCK_ON:LOCK_OFF;W.lk.setAttribute('aria-pressed',String(fixed));W.lk.disabled=!r;
- W.lk.setAttribute('aria-label',fixed?'Fixed colour: unlock to follow the tray':'Follows the tray: lock to keep this colour');W.lk.title=W.lk.getAttribute('aria-label');
+ W.lk.setAttribute('aria-label',fixed?'Fixed colour':'Follows tray');W.lk.title=fixed?'Fixed colour':'Follows tray';
  W.host.classList.toggle('fixed',fixed);W.sb.setAttribute('aria-label',(W.spec.label||'Colour')+': '+(def?W.spec.def:wellText(show)))}
 let WP=null;   // the open well popover
 function closeWell(){if(!WP)return;WP.el.remove();WP.W.sb.setAttribute('aria-expanded','false');WP=null}
