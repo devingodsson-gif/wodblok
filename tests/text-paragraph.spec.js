@@ -129,7 +129,7 @@ test('Text layer: styled letters and paragraph options are saved on the text, an
   await expect.poll(async () => JSON.stringify((await piece()).tx.sty), { timeout: 8000 }).toBe('[[2,3,200,0,0]]');
   await page.locator('#tx_t').blur();
   await page.mouse.dblclick(box.x + box.width / 2, box.y + box.height / 2);
-  await expect(page.locator('#tx_t')).toBeFocused();
+  await expect(page.locator('#txin')).toBeFocused();
   expect(errors).toEqual([]);
 });
 

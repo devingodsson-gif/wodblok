@@ -10,6 +10,7 @@ test('the Element group is in the selected element\'s panel: Shape, Text, Stamp;
   for (const [k, pn] of [['shape', 'mlist'], ['text', 'text'], ['stamp', 'stmp']]) {
     await page.click(`#elb [data-k="${k}"]`); await settle(page);
     await addKind(page, k); await settle(page);
+    if (k === 'stamp') { const b = await page.locator('#art').boundingBox(); await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await settle(page); }   // a placed stamp is picked by a click
     expect(await inPanel(page, pn), k).toBe(true);
     const sec = page.locator(`section.pn[data-p="${pn}"]`);
     await expect(sec.locator('#lfpr')).toBeVisible();
