@@ -36,7 +36,7 @@ function rzPut(S){if(!S||!S.own.length)return;const L=WBS.layers[0];if(!L)return
  Object.keys(S.tiles).forEach(id=>{const cur=WBS.tiles.find(t=>String(t.id)==id);if(cur&&JSON.stringify(cur)===S.tiles[id])return;const c=JSON.parse(S.tiles[id]);c.id=next++;WBS.tiles.push(c);map[id]=c.id});
  S.own.forEach(q=>{if(q.t!=null&&map[q.t]!=null)q.t=map[q.t];(q.src||[]).forEach(x=>{if(x&&x.t!=null&&map[x.t]!=null)x.t=map[x.t]})});
  L.pl=(L.pl||[]).concat(S.own);WBS.nid=Math.max(WBS.nid||0,next)}
-let wbBA;function randomize(fresh){if(WBX.wbBA)wbBA.off();if(!fresh&&rzFresh()){if(WBX.wbClearAll)WBX.wbClearAll();RZMADE=null}const b4=fresh?{els:new Set(),tiles:new Set()}:rzIds(),mark=()=>{const a=rzIds();RZMADE={els:[...a.els].filter(u=>!b4.els.has(u)),tiles:[...a.tiles].filter(t=>!b4.tiles.has(t))}};
+let wbBA;function randomize(fresh){if(WBX.wbBA)wbBA.off();if(!fresh&&rzFresh()){if(WBX.wbClearAll)WBX.wbClearAll();RZMADE=null}const b4=fresh?{els:new Set(),tiles:new Set()}:rzIds(),mark=()=>{const a=rzIds(),k=RZMADE;RZMADE={els:[...(k?k.els:[]),...[...a.els].filter(u=>!b4.els.has(u))],tiles:[...(k?k.tiles:[]),...[...a.tiles].filter(t=>!b4.tiles.has(t))]}};   // a roll that only reworks what is there adds to what the last stamps roll made
 wbHold.start();let r;try{r=randomize0(fresh)}catch(e){wbHold.arm();throw e}if(r&&typeof r.then=="function")r.then(()=>{mark();wbHold.arm()},()=>wbHold.arm());else{mark();wbHold.arm()}return r}
 function randomize0(fresh){const ft=WBX.wbRZ?WBX.wbRZ.get():null;window.SLC=[];
  if(ft&&ft.lib&&typeof SL!='undefined')return SL.list().then(l=>{window.SLC=(l||[]).filter(r=>r&&typeof r.tile=='string');return randomizeCore(fresh)},()=>randomizeCore(fresh));
@@ -58,7 +58,7 @@ const libTile=id=>{const r=pick(window.SLC);let t=null;try{t=JSON.parse(r.tile)}
 if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.shape||FT.free||FT.layout||FT.size||FT.look||FT.lib)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
 const dim0=JSON.parse(JSON.stringify(WBS.dim));
 if(!fresh&&WBX.wbCap)WBX.wbCap();
-const OWN=fresh?null:rzTake();   // 2.21.0: the previous roll is dropped and your own elements are held aside until the new ones are built
+const OWN=fresh||!FT.stamps?null:rzTake();   // 2.21.0: a roll that builds new stamps drops the previous roll and holds your own elements aside until the new ones are built (a roll that only reworks what is there, such as Layout or Colours alone, changes it in place)
 // --- the bold moves for this roll (only used when Stamps is on)
 const MOVES=[['sym','new symmetry',1.3],['link','accents in the gaps',1.2],['shape','accent shapes',1],['mix','mixed shapes',.7],['rot','turned grid',.8],['inks','extra inks',.7],['motif','shape tweaks',.8],['swap','light on dark',.6],['blend','soft blending',.5],['radial','round arrangements',.7],['vary','size, gaps and offset',.6],['text','lettering',1],['frame','frame',1.1]];
 const RZ={mv:null,n:0,keep:{col:!FT.col,gr:!FT.gr,tx:!FT.tx,pr:!FT.pr}};
