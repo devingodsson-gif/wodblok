@@ -51,11 +51,12 @@ test('the tool bar is one list; the three-line button opens a tool repository: t
   expect(await page.locator('#rmenu:visible').count()).toBe(0);
   const n = (await ids()).length;
   await page.click('#rmore');
-  expect(await page.locator('#rmenu:visible').count()).toBe(1);
+  expect(await page.locator('#rmenu:visible').count(), '2.26.0: nothing is off the bar, so no empty strip').toBe(0);
   const drag = async (from, to) => {
-    const a = await from.boundingBox(), b = await to.boundingBox();
+    const a = await from.boundingBox();
     await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2); await page.mouse.down();
     await page.mouse.move(a.x + a.width / 2 + 10, a.y + a.height / 2 + 10, { steps: 3 });
+    const b = await to.boundingBox();                                   // the strip shows once a tool is being dragged
     await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 8 }); await page.mouse.up();
   };
   await drag(page.locator('.rail [data-pn="hist"]'), page.locator('#rmenu'));

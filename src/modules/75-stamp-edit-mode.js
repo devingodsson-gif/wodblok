@@ -39,10 +39,14 @@ const steDone=()=>{const id=stUnlocked();if(id!=null)steClose(id)};
 // every tab closes (2.25.0) when the stamps are replaced: a roll, New project, Open; a tab would otherwise show another stamp under the old one's id
 function steReset(){if(stUnlocked()!=null)steGo(null);STE.tabs=[];STE.views={};STE.key='';steSync()}
 const stIcX='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.close+'</svg>';
+// more tabs than fit (2.26.0): an arrow at each end that has more behind it, and the open tab is scrolled into view
+const stIcL='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevL+'</svg>',stIcR='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevR+'</svg>';
+function steEdge(bar){const o=bar.scrollWidth>bar.clientWidth+1,l=o&&bar.scrollLeft>1,r=o&&bar.scrollLeft+bar.clientWidth<bar.scrollWidth-1;if(bar.classList.contains('ovl')!==l)bar.classList.toggle('ovl',l);if(bar.classList.contains('ovr')!==r)bar.classList.toggle('ovr',r)}
 function steTabs(un){const bar=$('stetabs');if(!bar)return;STE.tabs=STE.tabs.filter(id=>WBS.tiles.some(t=>t.id==id));
- const key=[un,STE.tabs.map(id=>id+':'+(WBS.tiles.findIndex(t=>t.id==id)+1)).join()].join('|');if(key===STE.key)return;STE.key=key;
+ const key=[un,STE.tabs.map(id=>id+':'+(WBS.tiles.findIndex(t=>t.id==id)+1)).join()].join('|');if(key===STE.key){steEdge(bar);return}STE.key=key;
  const on=STE.tabs.length>0;if(bar.classList.contains('on')!==on)bar.classList.toggle('on',on);
- bar.innerHTML=on?`<button type="button" class="wtab${un==null?' on':''}" role="tab" aria-selected="${un==null}" data-sv="c">Canvas</button>`+STE.tabs.map(id=>{const k=WBS.tiles.findIndex(t=>t.id==id)+1,a=un===id;return`<span class="wtg${a?' on':''}"><button type="button" class="wtab${a?' on':''}" role="tab" aria-selected="${a}" data-sv="${id}">Stamp ${k}</button><button type="button" class="ib" data-sx="${id}" aria-label="Close Stamp ${k}">${stIcX}</button></span>`}).join(''):''}
+ bar.innerHTML=on?`<button type="button" class="wb wta l" data-sc="-1" aria-label="Earlier tabs">${stIcL}</button><button type="button" class="wtab${un==null?' on':''}" role="tab" aria-selected="${un==null}" data-sv="c">Canvas</button>`+STE.tabs.map(id=>{const k=WBS.tiles.findIndex(t=>t.id==id)+1,a=un===id;return`<span class="wtg${a?' on':''}"><button type="button" class="wtab${a?' on':''}" role="tab" aria-selected="${a}" data-sv="${id}">Stamp ${k}</button><button type="button" class="ib" data-sx="${id}" aria-label="Close Stamp ${k}">${stIcX}</button></span>`}).join('')+`<button type="button" class="wb wta r" data-sc="1" aria-label="Later tabs">${stIcR}</button>`:'';
+ if(on){const a=bar.querySelector('.wtab.on');if(a&&a.scrollIntoView)a.scrollIntoView({inline:'nearest',block:'nearest'});steEdge(bar)}}
 function steSync(){const un=stUnlocked(),ml=$('mlist'),body=$('lybody'),list=$('lyl2');if(!ml||!body||!list)return;
  if(STID!=null&&un!==STID){steStage(null);STE.views.c&&steBack(STE.views.c);upd();return}   // the stamp went away (deleted, another layer): back on the Canvas
  // a stamp that opened some other way (a double click, or the stamp list) gets its tab too
@@ -53,7 +57,8 @@ function steSync(){const un=stUnlocked(),ml=$('mlist'),body=$('lybody'),list=$('
  else if(!on&&steHome&&ml.parentNode!==steHome){steHome.appendChild(ml);list.hidden=false}}
 function init75(){const a=$('art');if(!a)return;
  const st=document.querySelector('.stage');if(st&&!$('stetabs'))st.insertAdjacentHTML('afterbegin','<div class="stt" id="stetabs" role="tablist" aria-label="Views"></div>');
- $('stetabs').onclick=e=>{const x=e.target.closest('[data-sx]');if(x){steClose(+x.dataset.sx);return}const t=e.target.closest('[data-sv]');if(!t)return;steGo(t.dataset.sv=='c'?null:+t.dataset.sv)};
+ $('stetabs').onclick=e=>{const sc=e.target.closest('[data-sc]');if(sc){const b=$('stetabs');b.scrollBy({left:+sc.dataset.sc*Math.max(80,Math.round(b.clientWidth*.7)),behavior:'smooth'});return}const x=e.target.closest('[data-sx]');if(x){steClose(+x.dataset.sx);return}const t=e.target.closest('[data-sv]');if(!t)return;steGo(t.dataset.sv=='c'?null:+t.dataset.sv)};
+ $('stetabs').addEventListener('scroll',()=>steEdge($('stetabs')));addEventListener('resize',()=>steEdge($('stetabs')));
  const ed=$('smkedit');if(ed)ed.onclick=()=>{const t=WBS.tiles[WBS.cur];if(t)steGo(t.id)};
  ($('boardP')||a).addEventListener('dblclick',e=>{if(WBS.brush||WBS.txArm||WBS.fpB!=null)return;const c=stePt(e);if(!c)return;const h=stampAt(c.x,c.y,null);if(!h)return;e.preventDefault();const it=STP.items[h.i],id=it?it[0]:null;if(id==null)return;if(stUnlocked()===id){if(WBX.wbTxGrp&&WBX.wbTxGrp())return;steClose(id)}else steGo(id)});
  WBX.wbSteSync=steSync;WBX.wbSteReset=steReset;WBX.wbSteGo=steGo;WBX.wbSteEdit=steEdit;WBX.wbSteScene=steScene}
