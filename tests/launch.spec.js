@@ -24,7 +24,7 @@ for (const runtime of ['artifact', 'none']) {
     expect(facts.name).toBe('');
 
     const s = JSON.parse(await getState(page));
-    expect(s.tiles).toHaveLength(1);
+    expect(s.tiles).toHaveLength(0);   // 2.15.0: a new project has no stamp
     expect(s.els || []).toHaveLength(0);   // 2.10.0: nothing is created at start
 
     // Google Fonts is the only network the app touches; that dependency is recorded, not hidden.

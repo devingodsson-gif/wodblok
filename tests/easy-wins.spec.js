@@ -7,7 +7,7 @@ test('the Colours tool holds the tray, paper and ink, and the saved trays (1.10)
   const { errors } = await openApp(page);
   await openPanel(page, 'colors');
   const heads = await page.evaluate(() => [...document.querySelectorAll('section[data-p="colors"] details.g > summary')].map(s => s.firstChild.textContent.trim()));
-  expect(heads).toEqual(['Tray', 'Ink', 'Saved colours', 'Saved trays']);   // Saved colours came with 1.19
+  expect(heads).toEqual(['Tray', 'Ink', 'Saved colours', 'Saved trays', 'Colourways']);   // Saved colours came with 1.19
   expect(await page.evaluate(() => [...document.querySelectorAll('section[data-p="colors"] .cwk')].map(l => l.textContent))).toEqual(['Ink']);   // Paper is the Background, in the Canvas panel (2.3.1)
   await expect(page.locator('#tyl .tyr')).toHaveCount(2);
   expect(errors).toEqual([]);

@@ -108,6 +108,7 @@ test('text tool turns typed text into a motif (smoke; glyph shapes depend on ins
   await page.fill('#tx_t', 'Wod');
   await settle(page);
   const before = JSON.parse(await getState(page)).tiles.reduce((n, t) => n + t.items.length, 0);
+  await page.click('.elk[data-k="text"] [data-add]'); await settle(page);   // 2.20.0: Add arms the text tool
   await clickStamp(page, await stampInstance(page));
   await expect.poll(async () => JSON.parse(await getState(page)).tiles.reduce((n, t) => n + t.items.length, 0), { timeout: 15000 }).toBeGreaterThan(before);
   expect(errors).toEqual([]);

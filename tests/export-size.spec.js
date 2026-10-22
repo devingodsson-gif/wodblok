@@ -10,7 +10,7 @@ test('exported SVG shares identical knockout masks, every reference still resolv
   const stage = await page.evaluate(() => document.querySelectorAll('#art mask[id^="ks"]').length);
   await page.evaluate(() => document.getElementById('sv').click());
   await page.waitForFunction(() => (window.__wbDownloads || []).length > 0);
-  const svg = await page.evaluate(() => window.__wbDownloads[0].data);
+  const svg = await page.evaluate(() => { const d = window.__wbDownloads[0]; return d.data !== undefined ? d.data : atob(d.base64); });   // 2.21.0: Quick SVG goes through the recipe exporter, which saves a Blob
   const ids = new Set([...svg.matchAll(/<mask id="(ks\d+)"/g)].map(m => m[1]));
   const refs = [...svg.matchAll(/url\(#(ks\d+)\)/g)].map(m => m[1]);
   expect(refs.length).toBeGreaterThan(200);              // many placements carry a knockout...
