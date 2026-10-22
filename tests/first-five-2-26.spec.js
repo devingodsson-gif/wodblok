@@ -65,3 +65,29 @@ test('Add motif with nothing chosen opens the library and places nothing; a pick
   expect(all[1].m, 'the same shape').toBe(m.m);
   expect(errors).toEqual([]);
 });
+
+test('selecting a motif on the canvas opens the Motif panel (not Shape); its Element group and its Edit Width, Height and Colour work on it', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4 });
+  await H.noPattern(page);
+  await page.click('#elb [data-k="motif"]'); await H.pickShape(page);
+  const b = await page.locator('#art').boundingBox(), px = b.x + b.width * 0.4, py = b.y + b.height * 0.4;
+  await page.mouse.click(px, py); await H.settle(page);
+  await page.keyboard.press('v'); await H.settle(page);
+  await page.mouse.click(b.x + b.width * 0.9, b.y + b.height * 0.9); await H.settle(page);   // nothing selected
+  await H.openPanel(page, 'lyrs');                                     // some other panel is in front
+  await page.mouse.click(px, py); await H.settle(page);
+  await expect(page.locator('section.pn[data-p="motifs"]')).toBeVisible();
+  await expect(page.locator('section.pn[data-p="mlist"]')).toBeHidden();
+  await expect(page.locator('section.pn[data-p="motifs"] #lfree')).toBeVisible();   // the Element group
+  await expect(page.locator('#sel')).toHaveClass(/mtel/);
+  await expect(page.locator('#ssx')).toBeVisible(); await expect(page.locator('#ssz')).toBeHidden();
+  const q0 = (await els(page, 'motif'))[0];
+  await page.locator('#ssx').fill('150'); await H.settle(page);
+  await page.locator('#ssy').fill('60'); await H.settle(page);
+  const q1 = (await els(page, 'motif'))[0];
+  expect(q1.wx, 'Width').toBeCloseTo(1.5, 2); expect(q1.wy, 'Height').toBeCloseTo(0.6, 2);
+  expect(q1.x).toBe(q0.x);
+  await page.click('#undo'); await H.settle(page);
+  expect((await els(page, 'motif'))[0].wy ?? 1).not.toBeCloseTo(0.6, 2);
+  expect(errors).toEqual([]);
+});

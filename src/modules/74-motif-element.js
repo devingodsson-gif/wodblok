@@ -4,7 +4,7 @@ import {CW,col,okC} from './04-canvas-and-stamp-outlines.js';
 import {mk,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL,fpU} from './24-free-place-layers.js';
-import {elExtend} from './65-element-core.js';
+import {elExtend,elSel} from './65-element-core.js';
 import {fxGr,fxJit,fxTex} from './69-effect-stack.js';
 import {abInsert} from './73-add-bar.js';
 import {stUnlocked} from './63-stamp-tool.js';
@@ -26,9 +26,15 @@ function mtfLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='motif'&&p.m);if(!
 // make a Motif element at x, y (canvas units) of motif m, above the selected element; it is selected
 function mtfMake(m,x,y,s,r){const q=abInsert({u:fpU(),k:'motif',m,x:+mtF(x),y:+mtF(y),s:+(s||100).toFixed(1),r:+(r||0),f:1});if(!q)return null;mtLast=m;store();upd();if(WBX.wbCap)WBX.wbCap();return q}
 const mtfSize=()=>{const b=WBS.brush;return b&&b.s?Math.max(20,Math.min(400,b.s*100)):100};
+// 2.26.0 (review 12): a Motif on the canvas is edited in the Motif panel. Its Element group (size, turn, position, flip, order) sits at the top; the panel's Edit group, which works on the shapes of a stamp, switches to
+// the canvas motif's Width, Height and Colour while one is selected (the rest of Edit is for stamp shapes and hides).
+const mtSel=()=>{const q=elSel();return q&&q.k=='motif'&&stUnlocked()==null?q:null};
+function mtSync(){const e=$('sel');if(!e)return;const q=mtSel();if(e.classList.contains('mtel')!==!!q)e.classList.toggle('mtel',!!q);if(!q)return;
+ const x=Math.round((+q.wx||1)*100),y=Math.round((+q.wy||1)*100);if($('ssx').value!=x)$('ssx').value=x;if($('ssy').value!=y)$('ssy').value=y}
 function init74(){
- WBX.wbMotifSize=mtfSize;
- elExtend('motif',{dz:5,pn:'mlist',is:q=>q.k=='motif',name:q=>q.nm||'Motif',draw:(L,li,pa)=>mtfLayer(L,li,pa)});
+ WBX.wbMotifSize=mtfSize;WBX.wbMtSel=mtSel;WBX.wbMtSync=mtSync;
+ [['ssx','wx'],['ssy','wy']].forEach(([id,f])=>$(id).addEventListener('input',e=>{const q=mtSel();if(!q)return;e.stopImmediatePropagation();const v=+e.target.value/100;if(v==1)delete q[f];else q[f]=+v.toFixed(3);store();upd()},true));
+ elExtend('motif',{dz:5,pn:'motifs',is:q=>q.k=='motif',name:q=>q.nm||'Motif',draw:(L,li,pa)=>mtfLayer(L,li,pa)});
  // a click on the canvas with a shape armed and no stamp unlocked: a free Motif element there (64-stamp-canvas-edit.js asks first)
 // Add motif (2.7.0): a Motif in the middle of the canvas, the last one used or else the first of the library, selected; the library then changes its shape
  WBX.wbMotifAdd=()=>{const m=mtLast;if(!m){if(WBX.wbOpenPanel)WBX.wbOpenPanel('motifs');return}   /* 2.26.0: nothing chosen yet, so the library opens (it used to place the first shape, a battle axe) */WBS.brush=null;if(stUnlocked()!=null){if(WBX.wbStampAddMotif)WBX.wbStampAddMotif(m,.8);return}if(!fpL())return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.brush={m,s:.8,r:0};upd()};

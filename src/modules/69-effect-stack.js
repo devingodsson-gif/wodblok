@@ -37,7 +37,7 @@ es.forEach(e=>{const Q=rng(fxSeed(q.u)*15485863+(e.sd|0)*104729+101),a=Q(),b=Q()
 J.dx+=(a*2-1)*P/100*s*.5;J.dy+=(b*2-1)*P/100*s*.5;J.dr+=(c*2-1)*R;J.sz*=1+(d*2-1)*Z/100*.6;if(e.fh&&h<.5)J.sx=-J.sx;if(e.fv&&v<.5)J.sy=-J.sy});return J}
 
 // ---- the panels
-const KIND_PANEL={stamp:'stmp',text:'text',pattern:'layers',paint:'elpaint',motif:'mlist',shape:'mlist'};
+const KIND_PANEL={stamp:'stmp',text:'text',pattern:'layers',paint:'elpaint',motif:'motifs',shape:'mlist'};
 const SEL={};   // the effect whose settings show, per kind
 const fxHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fxCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};

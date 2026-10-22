@@ -400,7 +400,7 @@ button.alt{background:var(--raise)}#scadd,#tsadd{display:inline-flex;align-items
 
 /* contextual motif bar */
 /* The motif controls bar floats over the bottom of the editor while a motif is selected, so no empty band is kept under the stamp. */
-#sel{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:0}#sel.none{opacity:.45;pointer-events:none}
+#sel{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:0}#sel.none{opacity:.45;pointer-events:none}#sel.mtel,#sel.mtel.none{opacity:1;pointer-events:auto}#sel.mtel>.ctl:not(.mtk),#sel.mtel>.sdiv,#sel.mtel>.rzg,#sel.mtel>.row,#sel.mtel>.msc{display:none}
 #sel .ctl{margin:0}
 #sel .row{margin:0;flex-wrap:wrap;gap:2px}
 #sel .sdiv{height:1px;background:var(--line)}
@@ -1067,10 +1067,10 @@ body.eyedrop{cursor:crosshair}
   <div class="ctl"><label>Size</label><input type="range" id="ssz" min="8" max="260" data-def="80"></div>
   <div class="ctl"><label>Rotate</label><input type="range" id="srt" min="-180" max="180" data-def="0"></div>
   <span class="sdiv"></span>
-  <div class="ctl"><label>Width</label><input type="range" id="ssx" min="20" max="300" data-u="%" data-def="100"></div>
-  <div class="ctl"><label>Height</label><input type="range" id="ssy" min="20" max="300" data-u="%" data-def="100"></div>
+  <div class="ctl mtk"><label>Width</label><input type="range" id="ssx" min="20" max="300" data-u="%" data-def="100"></div>
+  <div class="ctl mtk"><label>Height</label><input type="range" id="ssy" min="20" max="300" data-u="%" data-def="100"></div>
   <div class="ctl"><label>Thickness</label><input type="range" id="sth" min="-3" max="3" step="0.1" data-def="0"></div>
-  <div class="ctl cwr"><label>Colour</label><div class="cwell" id="wl_sh"></div></div>
+  <div class="ctl cwr mtk"><label>Colour</label><div class="cwell" id="wl_sh"></div></div>
   <span class="sdiv"></span>
   <div class="rzg" title="Jitter">
    <span class="rzl">Jitter</span><div class="ctl"><label>Move</label><input type="range" id="rzp" min="0" max="100" value="20" data-u="%" data-def="20"></div>
