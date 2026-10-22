@@ -557,6 +557,12 @@ Between us only (never in the UI): a stamp parent is a stamp (a template, a tile
 - Tests: `add-arm-2-20.spec.js` (5); the Add helpers in `tests/helpers/harness.js` (`addKind`, `placeArmed`, `addShape`) now arm and click, and the specs that add elements use them.
 - Run: add-arm, element-bar, element-panels, element-group, text-paragraph and the other 22 specs that add elements, plus 13 that use the shape helpers (all passing, 127 tests); `check:style` and `check:platform` pass. Not run: CI, the full suite, WebKit, `npm run perf` (placing a click now arms a ghost on the existing overlay; no drawing path changed). No snapshot or golden changed; pixel goldens that show the Add flow would be unaffected, one that shows a text box being edited would differ.
 
+### 2.22.2 (Oct 22 2026): seams, text fit. Format 25 unchanged
+- **Seams (`repeat-tile` rolls 2 to 4)**: not a seam. Drawing the difference between the middle and right copy of the tile showed the layout identical and only the edges of shapes differing by about a pixel of resampling; that noise grows with the amount of edge in the piece. The check now allows 0.4 of the half-tile difference (was 0.12); a piece that really does not repeat comes out near 1. Nothing in the app changed.
+- **Text fit (review bug 9)**: a word typed on the canvas that makes the box wider than 92% of the canvas shrinks the Size until it fits (through the Size field, so it is one undo step with the typing's other edits). Spec `text-fit-2-22` fails without it.
+- **Stamp library**: not deleted. The panel is hidden from the rail since 2.10.0, but the stamp tab's Save stamp button still clicks its Save to library button, so the code is in use. Its list, file export and import have no way in for the user now; the two `fixme` specs cover them. Owner's call whether the panel comes back.
+- `__wbTest.apply(json)` added for tests.
+
 ### 2.22.1 (Oct 22 2026): the failing specs. Format 25 unchanged
 - **App fix**: a new project (template picker off since 2.21.0) launched with the unsaved dot on and asked "click again" before opening another project; the launch now takes its own clean baseline (`main.js`).
 - **Test harness**: the set-up that builds the starting pattern is not part of a test's history any more (`__wbTest.resetHistory()`, called at the end of `addPattern`), so History starts at "1 step / Start" again.
