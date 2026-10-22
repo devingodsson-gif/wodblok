@@ -539,3 +539,13 @@ Between us only (never in the UI): a stamp parent is a stamp (a template, a tile
 - **Smaller fixes:** empty groups hidden, folder menu visible at rest, Save as template footer is Cancel then Save, `kbd` uses the app font, selected marker row uses `--sel`.
 - Tests: `components-2-18.spec.js` (7); `stamp-tabs`, `element-bar`, `stamp-tab-motifs` updated. `check:style` and `check:platform` pass.
 - Run: components-2-18, settings, templates, color-tray, plus the related batch (43 of 44 passed; `settings.spec.js:46` failed once under load and passes alone). Not run: CI, the full suite, WebKit, `npm run perf` (no drawing path touched). No snapshot or golden changed; pixel goldens showing buttons, pickers or switches would differ.
+
+### 2.19.0 (Oct 22 2026): one panel per element. Format 25 unchanged
+- **Elements is the only list.** The lists at the top of the Text, Shape, Pattern, Motif and Stamp panels are gone; each keeps its Add button. The Stamp panel's own "Stamps" list is the stamp designs, not placed copies.
+- **Panel lock.** A small lock on a panel's top rail. A locked panel cannot be dragged, popped out or closed (the close and pop-out buttons are not shown, the rail button no longer closes it, Close all panels keeps it). The Elements panel starts locked (a saved layout with no lock record locks the Elements panel once). Stored with the layout (`lk`).
+- **One Element group** (Size, Rotate, Position, Flip, Duplicate, Order, Delete): one set of controls that sits at the top of the selected kind's panel (Shape, Motif, Text, placed Stamp). Pattern keeps its own grid controls (Columns, Rows, Size, Rotate, Shift).
+- **Stamp double-click** (owner yes, Oct 22): double-clicking a placed stamp already opens its tab (`stamp-tabs`); nothing to change.
+- Tests: `panel-lock-2-19.spec.js` (2), `element-group-2-19.spec.js` (2); `element-panels` rewritten for no lists; `panels-default` updated (Close all keeps a locked panel).
+- Run: those plus element-list, bug-fixes-2-16, stamps-tool, stamp-editor-port, dock-default, panels-1019, panel-style, free-place, text-box-wrap, element-bar, stamp-tabs, element-flow, element-pattern, row-menu, align, components-2-18 (all passing); `check:style` and `check:platform` pass. Not run: CI, the full suite, WebKit, `npm run perf` (no drawing path touched). No snapshot or golden changed; pixel goldens showing panel headers (lock icon) or the Text panel would differ.
+- Left for 2.20.0: the Text size row still sits in the Text group beside the shared Element group (Size is hidden for Text there); a saved layout is not reset.
+
