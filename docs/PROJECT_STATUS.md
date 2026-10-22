@@ -54,6 +54,7 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 ## Known issues
 - Full list and history: `docs/known-issues.md` (mostly rare "drawn after the settle check" flakes; re-run the spec alone before calling it a bug).
 - From `docs/plan.md`: Texture, mask and filter effects on Text mapped to an outline use the Shape's area; selection handles of mapped text show the text box at the Shape's middle; separate pop-overs for shapes, stamps and pictures and Stamp texture as an effect were left for later (2.3.0).
+- Repeat tile: a rolled Pattern with a Texture effect can show a faint seam at the tile edge (`repeat-tile` roll 21 fails since 2.24.0, which shows the roll as it is saved; 2.23.0 had the same seam after Undo and Redo). Not fixed.
 - `speed-guard` markup budget: "after Randomize" sits at about 148,000 against a limit of 150,000, so adding markup to a rolled picture will fail it.
 - 2.9.0 left the texture and grade engines, the `tu` / `WBS.tex` fields and the unreachable grade panel DOM and `init31` UI code in place. The owner has said a project-wide texture/grade element is planned; cleanup is not decided.
 
