@@ -73,5 +73,6 @@
  "76-shape-element.js",
  "77-map-to-shape.js",
  "78-element-lists.js",
- "79-text-in-place.js"
+ "79-text-in-place.js",
+ "80-element-menu.js"
 ]

@@ -47,7 +47,7 @@ Object.values(DD).forEach(f=>f())}
 function init13(){
 // ---- Stamp tool: pick a motif in the library, then click on the stamp to stamp it. Scroll resizes, [ ] rotates, Esc or right-click stops.
 WBS.brush=null;
-document.addEventListener('contextmenu',e=>{const was=WBX.plDisarm?WBX.plDisarm():false;
+document.addEventListener('contextmenu',e=>{const was=WBX.plDisarm?WBX.plDisarm():false;if(!was&&WBX.wbCtxMenu&&WBX.wbCtxMenu(e))return;
 if(typeof WBS.fpB!='undefined'&&(was||WBS.fpSel!==-1)&&fpL()){e.preventDefault();WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}e.preventDefault()},true);
 mlFold=new Set();try{mlFold=new Set(JSON.parse(kv.get('wb18_mlfold')||'[]'))}catch(e){}
 $('mlist').onmousedown=e=>{if(e.shiftKey&&e.target.closest('.mr'))e.preventDefault()};
