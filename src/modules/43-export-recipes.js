@@ -118,6 +118,8 @@ function init43(){
   });
   list.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.classList&&e.target.classList.contains('xrr')){e.preventDefault();e.target.click()}});
   $('xrnow').onclick=()=>exportOne(cur());
+  $('png').onclick=()=>exportOne({fmt:'png',px:Math.max(CW,CH)*3,sfx:''});   // Quick: PNG at 3x the canvas, SVG as it is; the same render, watermark and save as a recipe
+  $('sv').onclick=()=>exportOne({fmt:'svg',px:2048,sfx:''});
   $('xrall').onclick=exportAll;
   $('xrsave').onclick=()=>{
     const a=xrLoad();let name=nm.value.trim().slice(0,40);if(!name)name='Recipe '+(a.length+1);

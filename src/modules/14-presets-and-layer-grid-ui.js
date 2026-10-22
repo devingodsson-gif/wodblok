@@ -50,15 +50,6 @@ $('neg').oninput=()=>{WBS.tiles[WBS.cur].neg=$('neg').checked;store();upd()};$('
 $('let').oninput=()=>{WBS.tiles[WBS.cur].et=+$('let').value;store();upd()};$('ler').oninput=()=>{WBS.tiles[WBS.cur].er=+$('ler').value;store();upd()};$('lers').onclick=()=>{WBS.tiles[WBS.cur].es=(WBS.tiles[WBS.cur].es||0)+1;store();upd()};
 $('cov').addEventListener('input',upd);
 $('cpy').onclick=async()=>{try{await clipboard.writeText(ser());say('SVG copied.')}catch(e){say('Copy was blocked here.')}};
-$('sv').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
-try{await d.save({filename:expName('svg'),data:ser()})}catch(e){if(e&&e.code!='declined')say('Could not save: '+e.message)}};
-$('png').onclick=async()=>{const d=await use('downloads');if(!d)return say('Saving is not available here.');
-let h0=null;try{h0=d.pick?await d.pick({filename:expName('png')}):null}catch(e){return}   // ask where to save first: making the picture takes a while
-pmsg('Making the PNG…');await new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));   // let the message show before the page is busy
-if(wmGet())await wmReady();
-const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=CW*3;c.height=CH*3;const x=c.getContext('2d');x.drawImage(img,0,0,c.width,c.height);if(wmGet())wmDraw(x,c.width,c.height);
-c.toBlob(async b=>{try{await d.save({filename:expName('png'),data:b,handle:h0});pmsg('')}catch(e){pmsg('');if(e&&e.code!='declined')say('Could not save: '+e.message)}},'image/png')};
-img.onerror=()=>{pmsg('');say('PNG export failed.')};
-img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())};
+// 2.21.0: the quick PNG and SVG buttons are made by the Export recipes code (43), so a quick file and a recipe's file are made the same way
 }
 export {LY,expName,ser,syncAsp,init14};

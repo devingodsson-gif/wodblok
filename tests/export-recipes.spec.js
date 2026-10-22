@@ -128,3 +128,24 @@ test('Export all makes every recipe in one zip', async ({ page }) => {
   expect(names.some(n => /-preview\.jpg$/.test(n))).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test('2.21.0: Quick PNG and SVG go through the recipe exporter: PNG is 3x the canvas, the name has no ending, and a recipe at the same size makes the same picture', async ({ page }) => {
+  const { errors } = await openApp(page);
+  await openPanel(page, 'xrec');
+  const cw = await page.evaluate(() => { const v = document.getElementById('art').viewBox.baseVal; return Math.max(v.width, v.height); });
+  await page.click('#png');
+  await page.waitForFunction(() => window.__wbDownloads.length > 0);
+  await page.click('#xrf [data-f="png"]'); await page.fill('#xrpx', String(Math.round(cw * 3))); await page.fill('#xrsfx', '');
+  await page.click('#xrnow');
+  await page.waitForFunction(() => window.__wbDownloads.length > 1);
+  const d = await downloads(page);
+  expect(d[0].filename).not.toMatch(/-(web|print|preview)\.png$/);
+  expect(d[0].filename).toBe(d[1].filename);
+  expect(d[0].size).toBe(d[1].size);                                           // the same bytes: one way of making the file
+  const [w, h] = await pixels(page, 0);
+  expect(Math.max(w, h)).toBe(Math.round(cw * 3));
+  await page.click('#sv');
+  await page.waitForFunction(() => window.__wbDownloads.length > 2);
+  expect((await downloads(page))[2].filename).toMatch(/\.svg$/);
+  expect(errors).toEqual([]);
+});
