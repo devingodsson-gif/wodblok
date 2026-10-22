@@ -27,6 +27,7 @@ test('Add stamp prints a copy of the selected stamp on the canvas', async ({ pag
   await showPanel(page, 'stmp');
   await expect(page.locator('.elk[data-k="stamp"] [data-add]')).toBeDisabled();      // nothing to add before a stamp exists
   await page.click('#smknew'); await settle(page);
+  await page.click('#stetabs .wtg.on [data-sx]'); await settle(page);   // 2.25.0: the new stamp opened in its tab; back to the canvas
   await addKind(page, 'stamp'); await settle(page);
   const els = (await st(page)).els || [];
   expect(els.filter(e => e.k === 'stamp')).toHaveLength(1);
