@@ -8,7 +8,7 @@ import {eNV,eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
 import {fxGr,fxJit,fxPad,fxPress,fxTex} from './69-effect-stack.js';
 import {stOlAdd} from './63-stamp-tool.js';
 
-function tGrp(){const g=WBS.tiles.map((t,i)=>i).filter(i=>WBS.tM.has(WBS.tiles[i].id));return g.length>1&&WBS.tiles[WBS.cur]&&WBS.tM.has(WBS.tiles[WBS.cur].id)?g:[WBS.cur]}
+function tGrp(){const g=WBS.tiles.map((t,i)=>i).filter(i=>WBS.tM.has(WBS.tiles[i].id));return g.length>1&&WBS.tiles[WBS.cur]&&WBS.tM.has((WBS.tiles[WBS.cur]||WBS.noTile).id)?g:[WBS.cur]}
 function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(WBS.fpMS.size>1&&WBS.fpMS.has(String(WBS.fpSel))){const g=pl.filter(q=>WBS.fpMS.has(String(q.u)));if(g.length>1)return g}const p=pl.find(q=>q.u==WBS.fpSel);return p?[p]:[]}
 function fpPoolOk(){return!!(WBS.fpB&&WBS.fpPool.size>1&&WBS.fpPool.has(String(WBS.fpB)))}
 function fpTog(u){u=String(u);let cur=fpGrp().map(q=>String(q.u));if(!cur.length&&WBS.fpSel!==-1)cur=[String(WBS.fpSel)];const st=new Set(cur);if(st.has(u)){st.delete(u);WBS.fpSel=st.size?[...st][st.size-1]:-1}else{st.add(u);WBS.fpSel=u}WBS.fpMS=st;WBS.fpAnc=u;WBS.fpB=null;WBS.fpGhost=null;upd()}

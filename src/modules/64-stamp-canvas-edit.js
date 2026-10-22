@@ -75,14 +75,14 @@ function sceUp(e){if(SCE.sp){SCE.sp=null;return}
 // the selection box (and, for one shape, the handles) drawn on the instance that was last used, in canvas units; handle sizes are fixed on screen
 // The ghost of the shape picked in the Shapes panel, on the pointer: over a stamp it sits where a click would put it (same snap, same size and turn, drawn through the
 // instance's matrix); anywhere else on the canvas it follows the pointer, fainter, at the size of the first stamp.
-function sceGhost(){const b=WBS.brush,g=SCE.g;if(!b||b.txt||!g||!b.m)return'';const t=WBS.tiles[WBS.cur];if(!t)return'';const t0=stUnlocked(),h=stampAt(g.x,g.y,t0),ink=inkOf(t),bg=pal()[0],f=v=>v.toFixed(3);let tr,op;
+function sceGhost(){const b=WBS.brush,g=SCE.g;if(!b||b.txt||!g||!b.m)return'';const t=WBS.tiles[WBS.cur]||WBS.noTile;const t0=stUnlocked(),h=stampAt(g.x,g.y,t0),ink=inkOf(t),bg=pal()[0],f=v=>v.toFixed(3);let tr,op;
  if(t0!=null&&h){const M=stMatrix(STP.items[h.i]),sn=sceSnap(M,h.u,h.v,{altKey:g.alt}),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0,r=b.r+(flip?th:-th);tr=`matrix(${f(M.a)} ${f(M.b)} ${f(M.c)} ${f(M.d)} ${f(M.e)} ${f(M.f)}) translate(${f(sn.x)} ${f(sn.y)}) rotate(${f(r)}) scale(${f(b.s)})`;op=.6}
  else if(t0==null){const k=(WBX.wbMotifSize?WBX.wbMotifSize():b.s*100)/100;tr=`translate(${f(g.x)} ${f(g.y)}) rotate(${f(b.r)}) scale(${f(k)})`;op=.45}   // 2.12.0: a click here makes a free Motif of this size, with or without a stamp on the canvas
  else{const it0=STP.items[0];if(!it0)return'';const M=stMatrix(it0),k=Math.hypot(M.a,M.b);tr=`translate(${f(g.x)} ${f(g.y)}) rotate(${f(b.r)}) scale(${f(k*b.s)})`;op=.3}
  return`<g class="stgh" pointer-events="none" opacity="${op}" transform="${tr}">${mk(b.m,ink,bg)}</g>`}
 function sceDraw(){const g=$('stoh');if(!g)return;const gh=sceGhost(),t=sceRO();if(!t||!WBS.msel.size){g.innerHTML=gh;return}
  let ai=SCE.ai;if(ai==null||!STP.items[ai]||STP.items[ai][0]!==t.id)ai=SCE.ai=STP.items.findIndex(x=>x[0]===t.id);if(ai<0){g.innerHTML=gh;return}
- const a=$('art'),m0=a&&a.getScreenCTM(),sc=(m0&&m0.a)||1,hs=3.5/sc,off=18/sc,M=stMatrix(STP.items[ai]),f=v=>v.toFixed(2);let h='';
+ const a=$('art'),m0=a&&a.getScreenCTM(),sc=(m0&&m0.a)||1,hs=4.5/sc,off=20/sc,M=stMatrix(STP.items[ai]),f=v=>v.toFixed(2);let h='';
  const P=(x,y)=>{const q=M.transformPoint({x,y});return[q.x,q.y]};
  const box=q=>{const rx=48*q.s*(q.sx||1),ry=48*q.s*(q.sy||1),r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return{rx,ry,L:(u,v)=>P(+q.x+u*c-v*s,+q.y+u*s+v*c)}};
  for(const i of WBS.msel){const q=t.items[i];if(!q)continue;const b=box(q);h+=`<polygon class="stes" points="${[b.L(-b.rx,-b.ry),b.L(b.rx,-b.ry),b.L(b.rx,b.ry),b.L(-b.rx,b.ry)].map(p=>f(p[0])+','+f(p[1])).join(' ')}"/>`}

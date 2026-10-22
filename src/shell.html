@@ -35,7 +35,8 @@ svg[stroke="currentColor"]:not([width]):not(.ic){stroke-width:1.7;stroke-linecap
 .ddl{border-radius:var(--r-l);padding:6px}.ddi{border-radius:var(--r-m);padding:6px 8px}.ddi.cur{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}.ddi.dis{opacity:.4;cursor:default}.rowm .ddi{display:flex;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);font:inherit;cursor:pointer}.rowm .ddi:hover:not(:disabled),.rowm .ddi:focus-visible{background:var(--acc-soft)}.rowm .ddi:disabled{opacity:.4;cursor:default}.ddg{padding:8px 8px 4px;font-size:var(--fs-s);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .sw .dd2,.asp .dd2,.lyo .dd2,.gmc .dd2{flex:1;min-width:0}
 .ccb{flex:none;width:38px;height:var(--h-md);padding:4px;margin:0;border:1px solid var(--line2);border-radius:var(--r-m);background:var(--field)}.ccb::before{content:"";display:block;width:100%;height:100%;border-radius:var(--r-s);background:var(--c,#888);box-shadow:var(--edge)}.ccb:hover{border-color:var(--faint)}.gmc .ccb{width:var(--h-md);height:var(--h-md)}
-#fpov rect.gh.ov{stroke:var(--warn)}
+#fpov rect.sel,#fpov rect.gh{fill:none;stroke:var(--acc);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}#fpov rect.gh{stroke-dasharray:4 3}#fpov rect.gh.ov{stroke:var(--warn)}
+#fpov .fhd,#fpov .frt{fill:var(--fg);stroke:var(--panel);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:all}#fpov .fhd:hover,#fpov .frt:hover{fill:var(--acc)}#fpov .frl{stroke:var(--acc);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}
 .cpop{position:fixed;z-index:9100;width:224px;padding:8px;background:var(--raise);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;touch-action:none}.cpop[hidden]{display:none}
 .cpsv{position:relative;height:132px;border-radius:var(--r-m);cursor:crosshair;box-shadow:var(--edge)}.cpsv i,.cph i{position:absolute;width:14px;height:14px;margin:-8px 0 0 -8px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);pointer-events:none}
 .cph{position:relative;height:12px;border-radius:var(--r-m);cursor:pointer;background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}.cph i{top:50%}
@@ -538,7 +539,7 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 .smkth{flex:none;width:var(--h-xs);height:var(--h-xs);padding:2px;margin:0;background:var(--field);border:1px solid var(--line);border-radius:var(--r-s)}.smkth svg{display:block;width:100%;height:100%}
 .smkn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.smkc{flex:none;min-width:12px;text-align:right;font-size:var(--fs-s);color:var(--faint);font-variant-numeric:tabular-nums}
 .smkp .smklk{width:var(--h-xs);height:var(--h-xs);flex:none}.smkp .smklk .ic{width:13px;height:13px}.smkp .smklk[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink)}
-#stolsvg{position:absolute;left:28px;top:28px;pointer-events:none}.stes{fill:none;stroke:var(--acc);stroke-width:1.5px;vector-effect:non-scaling-stroke;pointer-events:none}.stsp{fill:none;stroke:var(--acc);stroke-width:2px;stroke-dasharray:6 4;vector-effect:non-scaling-stroke;pointer-events:none}.stsph{fill:none;stroke:transparent;stroke-width:16px;vector-effect:non-scaling-stroke;pointer-events:stroke}.steh{fill:var(--raise);stroke:var(--acc);stroke-width:1.5px;vector-effect:non-scaling-stroke;pointer-events:all}.stol path{fill:none;vector-effect:non-scaling-stroke;stroke-linejoin:round}.lhead{display:flex;align-items:center;gap:2px;margin-bottom:8px}.lhead span{font-size:var(--fs-s);color:var(--mut);margin-right:auto}
+#stolsvg{position:absolute;left:28px;top:28px;pointer-events:none}.stes{fill:none;stroke:var(--acc);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}.stsp{fill:none;stroke:var(--acc);stroke-width:2px;stroke-dasharray:6 4;vector-effect:non-scaling-stroke;pointer-events:none}.stsph{fill:none;stroke:transparent;stroke-width:16px;vector-effect:non-scaling-stroke;pointer-events:stroke}.steh:hover{fill:var(--acc)}.steh{fill:var(--fg);stroke:var(--panel);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:all}.stol path{fill:none;vector-effect:non-scaling-stroke;stroke-linejoin:round}.lhead{display:flex;align-items:center;gap:2px;margin-bottom:8px}.lhead span{font-size:var(--fs-s);color:var(--mut);margin-right:auto}
 
 /* menus */
 .menu{position:relative}
@@ -1197,7 +1198,7 @@ body.eyedrop{cursor:crosshair}
   </div></details>
  </section>
  <section class="pn" data-p="stmp" hidden><div class="smkp">
-  <div class="row"><button type="button" class="alt" id="smknew" aria-haspopup="menu">Create New Stamp</button></div>
+  <div class="elk"><div class="row"><button type="button" class="alt" id="smknew">Create New Stamp</button></div></div>
   <div class="smked" id="smked" hidden></div>
   <details class="g" open><summary>Stamps</summary><div class="gb">
    <div class="smkt">

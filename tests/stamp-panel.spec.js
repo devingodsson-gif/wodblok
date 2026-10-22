@@ -13,8 +13,7 @@ test('Create New Stamp is first, the stamp list has Edit, Add stamp is under the
   const order = await page.evaluate(() => { const s = document.querySelector('section.pn[data-p="stmp"]'), q = x => { const e = s.querySelector(x); return e ? [...s.querySelectorAll('*')].indexOf(e) : -1; }; return [q('#smknew'), q('#stmpl'), q('.elk[data-k="stamp"] [data-add]')]; });
   expect(order[0]).toBeGreaterThan(-1); expect(order[1]).toBeGreaterThan(order[0]); expect(order[2]).toBeGreaterThan(order[1]);
   const n0 = (await st(page)).tiles.length;
-  await page.click('#smknew');
-  await page.locator('.rowm button, .rowm [role="menuitem"]', { hasText: 'Circle' }).first().click(); await settle(page);
+  await page.click('#smknew'); await settle(page);       // at once, like Add stamp
   expect((await st(page)).tiles.length).toBe(n0 + 1);
   await expect(page.locator('#stmpl .smkr [data-lk]').last()).toBeVisible();
   await expect(page.locator('#smkedit')).toBeVisible();
@@ -26,6 +25,8 @@ test('Create New Stamp is first, the stamp list has Edit, Add stamp is under the
 test('Add stamp prints a copy of the selected stamp on the canvas', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
   await showPanel(page, 'stmp');
+  await expect(page.locator('.elk[data-k="stamp"] [data-add]')).toBeDisabled();      // nothing to add before a stamp exists
+  await page.click('#smknew'); await settle(page);
   await page.click('.elk[data-k="stamp"] [data-add]'); await settle(page);
   const els = (await st(page)).els || [];
   expect(els.filter(e => e.k === 'stamp')).toHaveLength(1);

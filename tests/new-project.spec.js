@@ -25,7 +25,7 @@ test('first click with unsaved work keeps the menu open and says what the next c
   expect(await getState(page)).toBe(before);
   await page.click('#pnw');
   await settle(page, { max: 30000 });
-  expect(JSON.parse(await getState(page)).tiles.length).toBe(1);
+  expect(JSON.parse(await getState(page)).tiles.length).toBe(0);   // 2.10.0: a new project has no stamp
   await expect(page.locator('#filem')).toBeHidden();
   await expect(page.locator('#pnw')).toHaveText('New project');
   expect(errors).toEqual([]);
@@ -40,7 +40,7 @@ test('the New project button in the Projects dialog shows the same cue', async (
   await expect(page.locator('#pnw2')).toHaveText('Click again: can’t be undone');
   await page.click('#pnw2');
   await settle(page, { max: 30000 });
-  expect(JSON.parse(await getState(page)).tiles.length).toBe(1);
+  expect(JSON.parse(await getState(page)).tiles.length).toBe(0);   // 2.10.0: a new project has no stamp
   expect(errors).toEqual([]);
 });
 

@@ -409,7 +409,7 @@ setInterval(()=>{if(!sec.hidden)paint()},30000)})();
 
 
 // ---- keyboard shortcuts
-document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=WBS.tiles[WBS.cur]&&WBS.tiles[WBS.cur].items[WBS.sel];
+document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=WBS.tiles[WBS.cur]&&(WBS.tiles[WBS.cur]||WBS.noTile).items[WBS.sel];
 if(m&&k=='z'){if(typing&&(t.type=='text'||t.type=='number'))return;e.preventDefault();e.shiftKey?redo():undo()}
 else if(m&&k=='y'){e.preventDefault();redo()}
 else if(m&&k=='s'){e.preventDefault();cmdGet('file.save').run()}

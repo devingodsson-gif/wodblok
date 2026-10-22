@@ -105,7 +105,9 @@ test('a click selects a shape, dragging moves it, a handle resizes it, the round
   expect(Math.abs(it[n - 1].x - x0 - 30 / p.k)).toBeLessThan(3);
   // resize from the south east corner, outwards
   const s0 = it[n - 1].s, se = await centre(handle(page, 'se'));
+  await page.keyboard.down('Control');                      // Ctrl or Cmd scales both sides together (2.15.0); a plain corner stretches one
   await drag(page, se, { x: se.x + 25, y: se.y + 25 });
+  await page.keyboard.up('Control');
   expect((await items(page))[n - 1].s).toBeGreaterThan(s0);
   // turn with the round handle: drag it to the right of the shape's middle
   it = await items(page);

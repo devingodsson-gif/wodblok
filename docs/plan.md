@@ -499,3 +499,12 @@ Between us only (never in the UI): a stamp parent is a stamp (a template, a tile
 - Tests: element-list re-shows the Elements panel after a selection jump; account and template-picker specs start empty (the harness Pattern needs the app open).
 - Goldens: every pixel golden that shows an icon will differ (the rail, the bars, panel headers): an explained change, to regenerate when the suite runs.
 - Not run: CI, the full suite, `npm run perf` (no drawing path touched).
+
+### 2.15.0 (Oct 21 2026): selection box, no stamp by default, Create New Stamp, stamp tabs without a Pattern (owner). Format 25 unchanged
+- **Selection box.** One-pixel accent line, square handles and a round rotate handle filled with the text colour and edged with the panel colour (tokens only, no red or white), 9px handles at any zoom (the box redraws when the view changes). The stamp tab's box uses the same look.
+- **Corners.** A corner now stretches one side: pulled sideways it sets the width, up or down the height (the first clear pull decides). Ctrl or Cmd scales both together as before; Shift still works from the middle. Same in a stamp tab.
+- **No stamp by default.** A new project has no stamp at all (`tiles: []`); Add stamp and Edit are off until one exists; the last stamp can be deleted. The editor reads `WBS.noTile` where it needs a stamp and there is none (never saved).
+- **Create New Stamp** is the same box and button as Add stamp and the other Add buttons, and works the same: one press makes a plain rectangle stamp (the outline is chosen in its tab, Block). It does not open the tab.
+- **Stamp tabs.** Fixed the cause of "a motif I can't touch or place": a stamp's tab edited the stamp through the printed copy, which only existed when the layer had a Pattern. In an empty project the tab did nothing. It now works with nothing else in the project (Add motif, drag, a library motif as a ghost and click to place, Add text, Block, Symmetry).
+- Tests: `selection-box.spec.js`, `stamp-tab-motifs.spec.js`; the harness makes the one stamp the old start had when it adds a Pattern.
+- Not run: CI, the full suite, `npm run perf` (a wide batch of the stamp, pattern and project specs ran).

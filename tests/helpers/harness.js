@@ -89,6 +89,7 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, wo
 
 // 2.10.0: a new project is empty. Tests add the Pattern the old start had through the bar (and put the panels away) unless they pass `pattern: false`.
 async function addPattern(page) {
+  if (!(await page.evaluate(() => JSON.parse(window.__wbTest.state()).tiles.length))) await addStamp(page);   // 2.15.0: a new project has no stamp; the old start's one is made here
   await page.click('#elb [data-k="pattern"]');
   await page.click('.elk[data-k="pattern"] [data-add]'); await settle(page);
   await patSource(page);                                  // the old start's Pattern printed the stamp
@@ -205,7 +206,6 @@ const clickStamp = async (page, p, dx = 0, dy = 0) => { const c = await canvasTo
 async function addStamp(page) {
   if (await page.locator('section.pn[data-p="stmp"]').isHidden()) await openPanel(page, 'stmp');
   await page.click('#smknew');
-  await page.click('.rowm .ddi >> nth=0');
   await settle(page);
 }
 

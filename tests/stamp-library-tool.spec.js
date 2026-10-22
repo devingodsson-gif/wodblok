@@ -7,7 +7,8 @@ const state = async page => JSON.parse(await getState(page));
 // the rail button of a tool that is already showing closes it, so only click when it is not showing
 const show = async (page, id) => { if (await page.locator(`section.pn[data-p="${id}"]:not([hidden])`).count() === 0) await openPanel(page, id); };
 const rows = page => page.locator('#stmpl .smkr');
-const newStamp = async (page, name = 'Circle') => { await page.click('#smknew'); await page.locator('.rowm button, .rowm [role="menuitem"]', { hasText: name }).first().click(); await settle(page); };
+// Create New Stamp makes a rectangle at once (2.15.0); another outline is picked in the stamp's Block group
+const newStamp = async (page, name = 'Circle') => { await page.click('#smknew'); await settle(page); const k = { Circle: 'circle', Rectangle: 'rect' }[name]; if (k && k !== 'rect') { await page.evaluate(k => document.querySelector(`#skind [data-k="${k}"]`).click(), k); await settle(page); } };
 const pick = async page => { await openPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
 const toClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height }; }, [x, y]);
 // put one shape into stamp number n (1-based, as listed), through its first well-placed instance
@@ -77,11 +78,9 @@ test('Duplicate makes a copy that edits separately from the original', async ({ 
   expect(errors).toEqual([]);
 });
 
-test('Delete takes two taps, removes the stamp from every layer and free item that uses it, and never the last stamp', async ({ page }) => {
+test('Delete takes two taps, removes the stamp from every layer and free item that uses it, and the last stamp can go too', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'stmp');
-  await page.click('#smkdel');
-  expect((await state(page)).tiles.length).toBe(1);
   await newStamp(page, 'Rectangle');
   // a free copy of stamp 2 placed on the layer
   await show(page, 'stmp');
@@ -107,6 +106,10 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   await page.keyboard.press('Control+z');
   await settle(page);
   expect((await state(page)).tiles.length).toBe(2);
+  await show(page, 'stmp');
+  for (let i = 0; i < 2; i++) { await page.click('#smkdel'); await page.click('#smkdel'); await settle(page); }
+  expect((await state(page)).tiles.length).toBe(0);     // down to none: a project may have no stamp
+  expect(errors).toEqual([]);
 });
 
 test.fixme('a stamp is saved to the library from the Stamps panel and a loaded one joins the layer', async ({ page }) => {

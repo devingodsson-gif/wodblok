@@ -28,7 +28,8 @@ else if(k=='diamond'){[SW,SH]=fitD(s,240);HL=[[SW/2,SH/2],[-SW/2,SH/2]];const[a,
 else{[SW,SH]=fitD(s,240);if(k=='rect')OFFS=[-1,0,1].flatMap(a=>[-1,0,1].map(b=>[a*SW,b*SH]))}
 g={SK:k,HO:o,SW,SH,HL,HN,OFFS,RAD:rad};GC.set(key,g);return g}
 const useG=g=>{SK=g.SK;HO=g.HO;SW=g.SW;SH=g.SH;HL=g.HL;HN=g.HN;OFFS=g.OFFS;CRAD=g.RAD||0};
-const shOf=t=>{if(!t.sh||typeof t.sh!='object')t.sh={k:SHK.includes(WBS.dim.k)?WBS.dim.k:'rect',o:WBS.dim.o=='f'?'f':'p',s:[...(WBS.dim.s||[1,1])],z:100};return t.sh};
+const shOf=t=>{if(!t)t={};   // no stamp at all (2.15.0): a plain default shape that nothing keeps
+if(!t.sh||typeof t.sh!='object')t.sh={k:SHK.includes(WBS.dim.k)?WBS.dim.k:'rect',o:WBS.dim.o=='f'?'f':'p',s:[...(WBS.dim.s||[1,1])],z:100};return t.sh};
 const useT=t=>{if(t)useG(geom(shOf(t)))};
 const SHN={rect:'Rectangle',hex:'Hexagon',circle:'Circle',diamond:'Diamond',tri:'Triangle',arch:'Arch',oct:'Octagon',star:'Star',quat:'Quatrefoil',lancet:'Lancet'};
 // Repeat tile canvas (dim.rt): a rectangle whose edges wrap, so copies placed side by side show no seam. The content is drawn a little past

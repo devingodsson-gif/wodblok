@@ -21,7 +21,7 @@ function stUnlocked(){if(STP.un==null)return null;const L=stSel();if(!L||L.u!==S
 // stamps in this layer's arrangement plus stamps placed freely on the layer, counted once per layer
 const stUses=id=>WBS.layers.reduce((n,L)=>n+(L.pl||[]).filter(p=>p.t==id||(p.k=='pattern'&&(p.src||[]).some(s=>s.t==id))).length,0);
 // build() calls these three: begin before the layers are drawn, add for every printed stamp of the selected layer, end after
-function stOlBegin(){const L=stSel();STP.on=!!L&&!!L.vis&&(!L.free||(L.pl||[]).some(p=>p.k=='pattern'))&&!(L.fr&&L.fr.on);STP.items=[];STP.rot=0}
+function stOlBegin(){const L=stSel();STP.on=!!L&&!!L.vis&&(!L.free||(L.pl||[]).some(p=>p.k=='pattern')||(!!WBX.wbSteScene&&WBX.wbSteScene()!=null))&&!(L.fr&&L.fr.on);STP.items=[];STP.rot=0}
 function stOlPath(id,d){STP.p[id]={d,p2:null}}
 function stOlAdd(id,tr,rot,w,h){if(!STP.on)return;const m=STTRRE.exec(tr);if(!m)return;STP.rot=rot||0;STP.items.push([id,+m[1],+m[2],+m[3],+m[4],+m[5],w,h])}
 // The Text panel builds letters in the stamp (letters tagged tg) while a stamp is unlocked, and fills a Text layer otherwise
@@ -59,9 +59,9 @@ function stNew(kind){const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z
 // a copy edits separately from the original
 function stDup(){const k=WBS.cur,src=WBS.tiles[k];if(!src)return;const t=JSON.parse(JSON.stringify(src));t.id=WBS.nid++;WBS.tiles.splice(k+1,0,t);stAddTo(t.id);WBS.cur=k+1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;stLabel('Duplicated stamp');store();upd();pmsg('Duplicated Stamp '+(k+1)+' as Stamp '+(k+2)+'.')}
 // deleting a stamp that is in use takes it out of every arrangement and every free item that points at it, in one step
-function stDelete(id){if(WBS.tiles.length<2)return false;const k=WBS.tiles.findIndex(t=>t.id==id);if(k<0)return false;WBS.tiles.splice(k,1);
+function stDelete(id){const k=WBS.tiles.findIndex(t=>t.id==id);if(k<0)return false;WBS.tiles.splice(k,1);
  WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(x=>x!=id);if(L.lead==id)delete L.lead;if(L.pl)L.pl=L.pl.filter(p=>p.t!=id);if(L.ov)Object.keys(L.ov).forEach(c=>{if(L.ov[c]==id)delete L.ov[c]})});
- WBS.tM=new Set();WBS.cur=Math.min(k,WBS.tiles.length-1);selOne(-1);if(STP.un===id){STP.un=null;STP.unL=null}STP.ai=null;stLabel('Deleted stamp');store();upd();return true}
+ WBS.tM=new Set();WBS.cur=Math.max(0,Math.min(k,WBS.tiles.length-1));selOne(-1);if(STP.un===id){STP.un=null;STP.unL=null}STP.ai=null;stLabel('Deleted stamp');store();upd();return true}
 // the camera goes to one printed copy of the open stamp (the one nearest the middle of the canvas); the layers stay as they are
 function stZoom(){const t=WBS.tiles[WBS.cur];if(!t||!WBX.wbZoomTo)return;let best=-1,bd=1e18;STP.items.forEach((it,i)=>{if(it[0]!==t.id)return;const p=stMatrix(it).transformPoint({x:it[6]/2,y:it[7]/2}),d=Math.hypot(p.x-CW/2,p.y-CH/2);if(d<bd){bd=d;best=i}});
  if(best<0)return pmsg('Stamp '+(WBS.cur+1)+' is not on this layer.');
@@ -69,9 +69,9 @@ function stZoom(){const t=WBS.tiles[WBS.cur];if(!t||!WBX.wbZoomTo)return;let bes
  const w=Math.max(...xs)-Math.min(...xs),h=Math.max(...ys)-Math.min(...ys),b=$('boardP'),s=Math.min(8,Math.max(.1,Math.min(b.clientWidth,b.clientHeight)*.8/Math.max(w,h,1)));
  WBX.wbZoomTo(s);const a=$('art'),m=a.getScreenCTM(),P=a.createSVGPoint();P.x=(Math.min(...xs)+Math.max(...xs))/2;P.y=(Math.min(...ys)+Math.max(...ys))/2;const c=P.matrixTransform(m),r=b.getBoundingClientRect();b.scrollLeft+=c.x-(r.left+r.width/2);b.scrollTop+=c.y-(r.top+r.height/2)}
 function stBar(){const on=(id,f)=>{const b=$(id);if(b)b.addEventListener('click',f)};
- on('smknew',e=>{e.stopPropagation();const kinds=[...document.querySelectorAll('#skind [data-k]')].map(b=>b.dataset.k);rowMenu($('smknew'),kinds.map(k=>[SHN[k]||k,()=>stNew(k)]))});
+ on('smknew',()=>stNew('rect'));   // like every Add button: it makes one at once (2.15.0); the outline is changed in the stamp's tab
  on('smkdup',()=>stDup());
- {const d=$('smkdel');if(d){let tm=0;d.addEventListener('click',()=>{const t=WBS.tiles[WBS.cur];if(!t)return;if(WBS.tiles.length<2){pmsg('A project keeps at least one stamp.');return}
+ {const d=$('smkdel');if(d){let tm=0;d.addEventListener('click',()=>{const t=WBS.tiles[WBS.cur];if(!t)return;
   if(!d.classList.contains('sure')){d.classList.add('sure');d.setAttribute('aria-label','Click to confirm');pmsg('Click again to delete Stamp '+(WBS.cur+1)+'.');tm=setTimeout(()=>{d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp')},3000);return}
   clearTimeout(tm);d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp');const n=WBS.cur+1;if(stDelete(t.id))pmsg('Deleted Stamp '+n+'.')})}}
  on('smkzoom',()=>stZoom());
