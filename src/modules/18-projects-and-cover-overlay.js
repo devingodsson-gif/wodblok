@@ -66,7 +66,7 @@ async function fileSnap(){const sn=snapshot(),a=await artSnap();if(a)sn.art=a;re
 // (2.24.0) only the button's words change, so a menu item keeps its icon
 const c2Txt=btn=>[...btn.childNodes].reverse().find(n=>n.nodeType==3&&n.nodeValue.trim())||null;
 const confirm2=(btn,label,fn)=>{if(!dirty()||btn.dataset.sure){delete btn.dataset.sure;return fn()}btn.dataset.sure='1';const t=c2Txt(btn),o=t?t.nodeValue:btn.textContent;if(t)t.nodeValue=label;else btn.textContent=label;setTimeout(()=>{delete btn.dataset.sure;const t2=c2Txt(btn);if(t2)t2.nodeValue=o;else btn.textContent=o},3500)};
-function openData(d,id,name){applySnap(d);if(WBX.wbClipClear)WBX.wbClipClear();WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;paintPst();if(WBX.wbResetHist)WBX.wbResetHist();if(WBX.wbWatch)WBX.wbWatch()}
+function openData(d,id,name){if(WBX.wbSteReset)WBX.wbSteReset();applySnap(d);if(WBX.wbClipClear)WBX.wbClipClear();WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;paintPst();if(WBX.wbResetHist)WBX.wbResetHist();if(WBX.wbWatch)WBX.wbWatch()}
 function init18(){WBS.pgrid={...PGD};
 covB=blank();covS=blank();WBS.cslot='f';
 try{const q=JSON.parse(kv.get('wb40_coverB')||'null');if(q&&typeof q.sc=='number')covB={...covB,...q}}catch(e){}

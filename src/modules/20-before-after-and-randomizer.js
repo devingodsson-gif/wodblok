@@ -41,7 +41,8 @@ function rzPut(S,top){if(!S||!S.own.length)return;const L=WBS.layers[0];if(!L)re
  S.own.forEach(q=>{if(q.t!=null&&map[q.t]!=null)q.t=map[q.t];(q.src||[]).forEach(x=>{if(x&&x.t!=null&&map[x.t]!=null)x.t=map[x.t]})});
  {const pl=L.pl||[],i=top?pl.findIndex(q=>top.has(String(q.u))):-1;L.pl=i<0?pl.concat(S.own):pl.slice(0,i).concat(S.own,pl.slice(i))}   // under the stamps this roll placed on their own, which stay on top (2.24.0)
  WBS.nid=Math.max(WBS.nid||0,next)}
-let wbBA;function randomize(fresh){if(WBX.wbBA)wbBA.off();if(!fresh&&rzFresh()){if(WBX.wbClearAll)WBX.wbClearAll();RZMADE=null}const b4=fresh?{els:new Set(),tiles:new Set()}:rzIds(),mark=()=>{const a=rzIds(),k=RZMADE;RZMADE={els:[...(k?k.els:[]),...[...a.els].filter(u=>!b4.els.has(u))],tiles:[...(k?k.tiles:[]),...[...a.tiles].filter(t=>!b4.tiles.has(t))]}};   // a roll that only reworks what is there adds to what the last stamps roll made
+let wbBA;function randomize(fresh){if(WBX.wbBA)wbBA.off();if(WBX.wbSteReset)WBX.wbSteReset();   // a roll replaces the stamps: back on the Canvas, no stamp tabs (2.25.0)
+if(!fresh&&rzFresh()){if(WBX.wbClearAll)WBX.wbClearAll();RZMADE=null}const b4=fresh?{els:new Set(),tiles:new Set()}:rzIds(),mark=()=>{const a=rzIds(),k=RZMADE;RZMADE={els:[...(k?k.els:[]),...[...a.els].filter(u=>!b4.els.has(u))],tiles:[...(k?k.tiles:[]),...[...a.tiles].filter(t=>!b4.tiles.has(t))]}};   // a roll that only reworks what is there adds to what the last stamps roll made
 wbHold.start();let r;try{r=randomize0(fresh)}catch(e){wbHold.arm();throw e}if(r&&typeof r.then=="function")r.then(()=>{mark();wbHold.arm()},()=>wbHold.arm());else{mark();wbHold.arm()}return r}
 function randomize0(fresh){const ft=WBX.wbRZ?WBX.wbRZ.get():null;window.SLC=[];
  if(ft&&ft.lib&&typeof SL!='undefined')return SL.list().then(l=>{window.SLC=(l||[]).filter(r=>r&&typeof r.tile=='string');return randomizeCore(fresh)},()=>randomizeCore(fresh));

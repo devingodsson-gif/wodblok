@@ -208,6 +208,9 @@ async function addStamp(page) {
   if (await page.locator('section.pn[data-p="stmp"]').isHidden()) await openPanel(page, 'stmp');
   await page.click('#smknew');
   await settle(page);
+  // 2.25.0: a new stamp opens in its tab; the helper closes that tab, so the tests go on on the Canvas as before
+  const x = page.locator('#stetabs .wtg.on [data-sx]');
+  if (await x.count()) { await x.click(); await settle(page); }
 }
 
 // a new layer starts with a Pattern element; this takes it away so the layer holds only what the test places

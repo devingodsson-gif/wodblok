@@ -26,7 +26,7 @@ async function shapeIn(page, n) {
   await show(page, 'stmp');
 }
 
-test('New stamp asks for an outline, becomes the open stamp, starts locked and keeps the Pattern view', async ({ page }) => {
+test('New stamp asks for an outline, becomes the open stamp and opens in its tab (2.25.0)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'stmp');
   await newStamp(page, 'Circle');
@@ -36,8 +36,8 @@ test('New stamp asks for an outline, becomes the open stamp, starts locked and k
   expect(s.tiles[1].items).toEqual([]);
   await expect(rows(page)).toHaveCount(2);
   await expect(rows(page).nth(1)).toHaveClass(/cur/);
-  await expect(rows(page).nth(1).locator('.smklk')).toHaveAttribute('aria-pressed', 'false');
-  expect(await page.evaluate(() => __wbTest.unlockedStamp())).toBe(null);
+  await expect(rows(page).nth(1).locator('.smklk')).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.evaluate(() => __wbTest.unlockedStamp())).toBe(s.tiles[1].id);
   await expect(page.locator('#boardS')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
@@ -82,6 +82,7 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'stmp');
   await newStamp(page, 'Rectangle');
+  await page.click('#stetabs .wtg.on [data-sx]'); await settle(page);   // 2.25.0: the new stamp opened in its tab; back to the canvas
   // a free copy of stamp 2 placed on the layer
   await show(page, 'stmp');
   const id2 = (await state(page)).tiles[1].id;
