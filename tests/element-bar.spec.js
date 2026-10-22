@@ -115,7 +115,7 @@ test('Shape properties have a clear Import image button: from the Shape button i
   fs.writeFileSync(f, Buffer.from(PNG, 'base64'));
   await page.click('#elb [data-k="shape"]'); await settle(page);
   await expect(page.locator('#shp_imp')).toBeVisible();
-  await expect(page.locator('#shp_imp')).toHaveClass(/primary/);
+  await expect(page.locator('#shp_imp')).not.toHaveClass(/primary/);
   let [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#shp_imp')]);
   await fc.setFiles(f); await settle(page);
   let els = JSON.parse(await getState(page)).els;

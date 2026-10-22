@@ -40,14 +40,14 @@ test('in a stamp tab of an empty project, a library motif is a ghost on the poin
   expect(errors).toEqual([]);
 });
 
-test('the other things a stamp tab offers work in an empty project: Add text, the Block shape, Symmetry', async ({ page }) => {
+test('the other things a stamp tab offers work in an empty project: Add text, the Stamp shape, Symmetry', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
   await newStampTab(page);
   await showPanel(page, 'text');
   await page.click('section.pn[data-p="text"] .elk[data-k="text"] [data-add]'); await settle(page);
   expect((await items(page)).length).toBeGreaterThan(0);
   await showPanel(page, 'stmp');
-  await expect(page.locator('section.pn[data-p="stmp"] summary', { hasText: /^Block$/ })).toBeVisible();
+  await expect(page.locator('section.pn[data-p="stmp"] summary', { hasText: /^Stamp shape$/ })).toBeVisible();
   await page.click('#skind [data-k="circle"]'); await settle(page);
   expect(JSON.parse(await getState(page)).tiles[0].sh.k).toBe('circle');
   await page.locator('#sym button').nth(1).click(); await settle(page);

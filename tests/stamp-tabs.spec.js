@@ -34,7 +34,7 @@ test('the Edit button of the Stamp properties opens the current stamp; Edit on t
   const { errors } = await openApp(page, { seed: 4 });
   await showPanel(page, 'stmp');
   await expect(page.locator('#smkedit')).toBeVisible();
-  await expect(page.locator('#smkedit')).toHaveClass(/primary/);
+  await expect(page.locator('#smkedit')).not.toHaveClass(/primary/);
   await page.click('#smkedit'); await settle(page);
   expect(await tabs(page)).toEqual(['Canvas', 'Stamp 1*']);
   await edit(page);                                               // the pencil on the open stamp closes it
