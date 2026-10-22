@@ -12,6 +12,7 @@ test('every command has a label and a real button behind it, and shortcuts do no
   expect(new Set(list.map(c => c.id)).size).toBe(list.length);
   for (const c of list) {
     expect(c.label, c.id).toBeTruthy();
+    if (!c.elId) continue;   // 2.22.0: copy, cut and paste act on the selection and have no button
     expect(await page.locator('#' + c.elId).count(), `${c.id} -> #${c.elId}`).toBe(1);
   }
   expect(await page.evaluate(() => window.__wbTest.commands.conflicts())).toEqual([]);
@@ -35,6 +36,7 @@ test('a disabled button means a disabled command', async ({ page }) => {
   const { errors } = await openApp(page);
   const r = await page.evaluate(() => { const c = window.__wbTest.commands; return c.list().map(x => [x.id, c.isEnabled(x.id), c.run.length >= 0]); });
   for (const [id, enabled] of r) {
+    if (/^edit\.(copy|cut|paste)$/.test(id)) continue;
     const el = await page.evaluate(id => { const c = window.__wbTest.commands.get(id); const b = document.getElementById(c.elId); return { hidden: b.hidden, disabled: !!b.disabled, input: b.tagName === 'INPUT' }; }, id);
     const elementPanel = /^panel\.(layers|stmp|motifs|text|elpaint|mlist)$/.test(id);   // opened from the element bar: the rail button is hidden but the command works
     expect(enabled, id).toBe(el.input ? true : elementPanel ? !el.disabled : !el.hidden && !el.disabled);

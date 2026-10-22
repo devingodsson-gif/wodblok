@@ -557,6 +557,14 @@ Between us only (never in the UI): a stamp parent is a stamp (a template, a tile
 - Tests: `add-arm-2-20.spec.js` (5); the Add helpers in `tests/helpers/harness.js` (`addKind`, `placeArmed`, `addShape`) now arm and click, and the specs that add elements use them.
 - Run: add-arm, element-bar, element-panels, element-group, text-paragraph and the other 22 specs that add elements, plus 13 that use the shape helpers (all passing, 127 tests); `check:style` and `check:platform` pass. Not run: CI, the full suite, WebKit, `npm run perf` (placing a click now arms a ghost on the existing overlay; no drawing path changed). No snapshot or golden changed; pixel goldens that show the Add flow would be unaffected, one that shows a text box being edited would differ.
 
+### 2.22.0 (Oct 22 2026): Additions. Format 25 unchanged
+- **Copy, cut, paste**: Ctrl or Cmd with C, X and V work on the selected elements (one or many). The clipboard is inside the app (`80-element-menu.js`), so pasting a picture copied elsewhere still makes an image; V only takes the key when something has been copied here. Each paste lands a little further on. Commands `edit.copy`, `edit.cut`, `edit.paste` are in command search.
+- **Right-click menu on the canvas**: right click selects the element under the pointer and offers Cut, Copy, Paste, Duplicate, Bring to front, Send to back, Delete (the `.pop` menu, `#ctxm`); on empty canvas it offers Paste only when something is copied, otherwise the browser menu is left alone. Esc, a click outside, a resize or leaving the window closes it. Armed tools still put themselves away on right click first.
+- **Align** moved: it sits directly under the Element group, so it follows the selected kind's panel.
+- **Library search**: the motif library has a "Find a motif" field; a word lists matching motifs from every folder in one grid ("No motifs found" when none); clearing it brings the folders back.
+- Tests: `copy-paste-2-22` (2), `align-place-2-22`, `library-search-2-22`; `any-layer-items`, `element-group-2-19` rerun.
+- Not done: search in the stamp library (it has no names to search).
+
 ### 2.21.0 (Oct 22 2026): File, Export, Randomize. Format 25 unchanged
 - **Template picker off at launch** by default (owner yes, until starter templates exist). Settings > General > Templates at launch turns it on. CLAUDE.md updated; tests start with it off (`templates: 'default'` leaves the setting alone).
 - **File menu**: Save project (Ctrl+S), Save project as (drops the link to the file so it asks where), Import image as motif, Export (opens the Export panel), as well as New, New from template, Clear, Open, Save as template and Settings. Commands: Save project as, Export.

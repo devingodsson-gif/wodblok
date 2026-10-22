@@ -98,7 +98,8 @@ function renderLib(force){lbDirty();const c=libCur(),[pa,pb]=pal(),L=$('lib'),F=
 [...lbOpen].forEach(v=>{if(!lbNode(v))lbOpen.delete(v)});
 // build() calls this on every change, so skip the work when nothing the library shows has changed; a new brush only moves a highlight
 const br=WBS.brush&&!WBS.lsm?WBS.brush.m:'';
-const sig=[c.v,WBS.lsm,[...lsel].join(','),pa,pb,lbHidOpen,[...lbOpen].join('|'),WBS.fmode,JSON.stringify(REN),WBS.HID.join(','),WBS.FOLD.join('|'),JSON.stringify(BF),Object.keys(cust).map(k=>{const v=cust[k]||{};return k+'>'+(v.g||'')+(v.svg||'').length+(v.n||'')}).join(',')].join('#');
+const LQ=($('lq')?$('lq').value:'').trim().toLowerCase();
+const sig=[LQ,c.v,WBS.lsm,[...lsel].join(','),pa,pb,lbHidOpen,[...lbOpen].join('|'),WBS.fmode,JSON.stringify(REN),WBS.HID.join(','),WBS.FOLD.join('|'),JSON.stringify(BF),Object.keys(cust).map(k=>{const v=cust[k]||{};return k+'>'+(v.g||'')+(v.svg||'').length+(v.n||'')}).join(',')].join('#');
 if(!force&&sig===lbSig){if(br!==lbBr){lbBr=br;L.querySelectorAll('button[data-m].on').forEach(b=>b.classList.remove('on'));if(br)L.querySelectorAll(`button[data-m="${br}"]`).forEach(b=>b.classList.add('on'))}return}
 lbSig=sig;lbBr=br;
 const tile=k=>{const on=lsel.has(k),b=`<button data-m="${k}" class="${br==k?'on':''}${on?' pk':''}" aria-label="${hx(mNm(k))}"><svg viewBox="-50 -50 100 100" style="background:${pa};border-radius:var(--r-s)">${mk(k,pb,pa)}</svg></button>`;
@@ -109,8 +110,11 @@ out.push(`<div class="lrw${n.v===c.v?' act':''}${n.hid?' hid':''}" style="--d:${
 if(!open)return;kids.forEach(x=>walk(x,d+1));
 if(n.ks.length){n.ks.forEach(k=>vis.add(k));out.push(`<div class="lib${WBS.lsm?' sel':''}" style="--d:${d+1}">${n.ks.map(tile).join('')}</div>`)}
 else if(!kids.length)out.push(`<div class="lmt" style="--d:${d+1}">${n.v=='i'?'No imports yet':'Empty folder'}</div>`)};
-lbTop().forEach(n=>walk(n,0));
-const hidL=lbKids(lbNode('/'),true);
+if(LQ){const seen=new Set(),all=[],col=n=>{n.ks.forEach(k=>{if(!seen.has(k)){seen.add(k);all.push(k)}});lbKids(n).forEach(col)};   // a search lists the matches from every folder in one grid (2.22.0)
+ lbTop().forEach(col);const hit=all.filter(k=>mNm(k).toLowerCase().includes(LQ));hit.forEach(k=>vis.add(k));
+ out.push(hit.length?`<div class="lib${WBS.lsm?' sel':''}" style="--d:0">${hit.map(tile).join('')}</div>`:'<div class="lmt" style="--d:0">No motifs found</div>')}
+else lbTop().forEach(n=>walk(n,0));
+const hidL=LQ?[]:lbKids(lbNode('/'),true);
 if(hidL.length){out.push(`<div class="lrw" style="--d:0"><button type="button" class="lfr lfh" id="lhid" aria-expanded="${lbHidOpen}">${IC.chev}<span class="lfi">${IC.hide}</span><span class="lfn">Hidden sets</span><span class="lfc">${hidL.length}</span></button></div>`);if(lbHidOpen)hidL.forEach(n=>walk(n,1))}
 // the folder form (new folder, rename, move, delete) sits under the active folder
 if(L.contains(F))L.before(F);
@@ -164,6 +168,7 @@ WBX.wbLibOpen=libOpen;
 const SZ=$('lsz'),szSet=v=>{SZ.value=v;$('lib').style.setProperty('--lcols',10-v);SZ.style.setProperty('--p',(v/8*100)+'%')};
 let sz0=6;try{const v=kv.get('wb150_lsz');if(v!=null&&+v>=0&&+v<=8)sz0=Math.round(+v)}catch(e){}
 szSet(sz0);
+$('lq').addEventListener('keydown',e=>e.stopPropagation());$('lq').addEventListener('input',()=>renderLib());
 SZ.oninput=()=>{szSet(+SZ.value);try{kv.set('wb150_lsz',String(SZ.value))}catch(e){}};
 try{const o=JSON.parse(kv.get('wb150_lopen')||'[]');if(Array.isArray(o))o.forEach(v=>{if(typeof v=='string')lbOpen.add(v)})}catch(e){}
 $('ltog').onclick=lbAll;

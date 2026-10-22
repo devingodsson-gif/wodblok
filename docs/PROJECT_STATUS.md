@@ -58,7 +58,7 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 
 ## Unfinished and next
 Only items the owner has stated are listed as next. Nothing is started unless he says so.
-- 2.21.0 (File, Export, Randomize, branch `feat/2.21.0-file-export-randomize`, on top of 2.20.0 which is live) is done and waiting for his word; it lists the specs that were already failing. Details in `docs/plan.md`.
+- 2.22.0 (additions: copy and paste, right-click menu, Align under the Element group, motif search; branch `feat/2.22.0-additions`, on top of 2.21.0 which is live) is done and waiting for his word. Details in `docs/plan.md`.
 - 2.20.0 (adding things and typing on the canvas, branch `feat/2.20.0-adding`, stacked on 2.19.0) is done and waiting for his word. Details in `docs/plan.md`.
 - 2.19.0 (one panel per element, branch `feat/2.19.0-one-panel-per-element`, on top of 2.18.0 which is live) is done and waiting for his word. Details in `docs/plan.md`.
 - 2.18.0 (components, branch `feat/2.18.0-components`, stacked on 2.17.0) is done and waiting for his word; he still has to approve the sliding switch as the one toggle. Details in `docs/plan.md`.
