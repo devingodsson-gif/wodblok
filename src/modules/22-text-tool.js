@@ -25,7 +25,7 @@ function toUI0(){txoWrite(st,null,true)}
 function fromUI(){const o=txoRead();TXO_KEYS.forEach(k=>delete st[k]);Object.assign(st,o)}
 async function preview(){await teReady(st);const t=WBS.tiles[WBS.cur];useT(t);autoFit();const[pa]=pal(),ink=inkOf(t),ps=st.text.trim()?teLayout(st):[],C=cen();
 $('tx_pv').innerHTML=`<svg viewBox="-12 -12 ${SW+24} ${SH+24}"><path d="${shp(0)}" fill="${pa}" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/>`+ps.map(p=>`<g transform="translate(${(C[0]+p.x).toFixed(1)} ${(C[1]+p.y).toFixed(1)}) rotate(${p.r.toFixed(1)}) scale(${p.s})"><path d="${p.g.d}" fill="${ink}" fill-rule="evenodd"/></g>`).join('')+`</svg>`;
-$('tx_go').disabled=!st.text.trim()}
+$('tx_go').disabled=stTxMode()&&!st.text.trim()}   // (2.25.0) only a stamp's text can be empty; on the canvas Add text puts in the word "Text" itself
 const cen=()=>SK=='tri'?[SW/2,SH*2/3]:[SW/2,SH/2];
 const later=()=>{if(!stTxMode())return;clearTimeout(tmr);tmr=setTimeout(preview,120)};
 // Letters moved, turned or scaled by hand: how far each differs from where the layout puts it (the median offset is the group having been moved as a whole)
@@ -84,7 +84,8 @@ WBX.wbTxLay=teLayBox;
 WBX.wbTxUnit=()=>Math.min(CW,CH)/100;
 WBX.wbTxAddFont=async fl=>{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';const id=await teAddUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();return id};
 // one Text panel: with a stamp unlocked it builds letters in the stamp, otherwise it fills a Text layer
-WBX.wbTxArm=txArm;WBX.wbTxMode=v=>{const pat=v=='pattern';$('tx_lay').hidden=!pat;$('tx_pv').hidden=pat;if(pat)$('tx_convrow').hidden=true;$('tx_sz').dataset.def=pat?'10':'30';if(pat){if(txArmed())txArm(false);if(WBX.wbTbMode)WBX.wbTbMode()}else{WBS.txArm=false;toUI();$('tx_ed').hidden=!edit;$('tx_convrow').hidden=!edit;$('tx_sprow').hidden=true;txArmUI()}};
+WBX.wbTxArm=txArm;WBX.wbTxMode=v=>{const pat=v=='pattern';if(pat)$('tx_go').disabled=false;   // (2.25.0) leaving a stamp tab with an empty text left Add text switched off on the canvas
+ $('tx_lay').hidden=!pat;$('tx_pv').hidden=pat;if(pat)$('tx_convrow').hidden=true;$('tx_sz').dataset.def=pat?'10':'30';if(pat){if(txArmed())txArm(false);if(WBX.wbTbMode)WBX.wbTbMode()}else{WBS.txArm=false;toUI();$('tx_ed').hidden=!edit;$('tx_convrow').hidden=!edit;$('tx_sprow').hidden=true;txArmUI()}};
 // double-click a text on the canvas: the Text panel opens with the words selected, so typing replaces them and the canvas follows as you type
 WBX.wbTxGrp=()=>grpOf();   // a text of the unlocked stamp is selected (a double click then goes to the text field, not to Done)
 document.addEventListener('dblclick',e=>{const t=e.target;if(!t||!t.closest)return;const stamp=stTxMode()&&t.closest('#artwrap')&&grpOf(),lay=!stTxMode()&&t.closest('#boardP')&&WBX.wbTbHas&&WBX.wbTbHas();if(!stamp&&!lay)return;if(WBX.wbOpenPanel)WBX.wbOpenPanel('text');if(lay&&WBX.wbTxIn&&WBX.wbTxIn())return;const f=$('tx_t');f.focus();f.select()});

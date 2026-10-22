@@ -89,3 +89,13 @@ test('in a tab the Elements header counts the stamp\'s contents, and a row\'s â€
   await expect(page.locator('#lycnt')).toHaveText(`${els} element${els === 1 ? '' : 's'}`);
   expect(errors).toEqual([]);
 });
+
+test('after a stamp tab, Add text on the canvas still places a text (it was left switched off)', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.openPanel(page, 'stmp'); await page.click('#smknew'); await H.settle(page);
+  await page.click('#stetabs [data-sv="c"]'); await H.settle(page);
+  await page.click('#elb [data-k="text"]'); await H.settle(page);
+  await H.addKind(page, 'text');
+  expect((await st(page)).els.filter(q => q.tx).length).toBe(1);
+  expect(errors).toEqual([]);
+});
