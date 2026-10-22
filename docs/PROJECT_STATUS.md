@@ -4,7 +4,7 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**As of Oct 22 2026.** `main` is at **2.15.0** (branch `fix/2.16.0-bug-fixes` holds 2.16.0, not merged) (merge commit `bc2bfbd`, live on wodblok.com), project file format **25** (`FMT_LATEST` in `src/format/container.js`, unchanged since 2.9.0). 75 files in `src/modules`, 126 spec files in `tests/`. The tag workflow makes the tags (latest tag seen: `v108`, not matched to a version here).
+**As of Oct 22 2026.** `main` is at **2.23.0** (live on wodblok.com); branch `fix/2.24.0-nothing-lost` holds 2.24.0, not merged. Project file format **25** (`FMT_LATEST` in `src/format/container.js`, unchanged since 2.9.0). 77 files in `src/modules`, 140 spec files in `tests/`.
 
 ## Direction
 - A professional, minimal, clean editor in the class of Photoshop and Lightroom (the owner's reference applications). Web app first; Mac, Windows and mobile later and not blocked. A commercial product, sold later; the repo is public until then.
@@ -28,6 +28,7 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 ## Release history on `main` (newest first)
 | Version | What |
 |---|---|
+| 2.16.0 to 2.23.0 | Bug fixes, words, components, one panel per element, adding and typing on the canvas, File/Export/Randomize, copy and paste, the Stamp library in the Stamp panel, Open recent (each in `docs/plan.md`) |
 | 2.15.0 | Selection box, one-axis corners, no stamp by default, Create New Stamp, stamp-tab motifs |
 | 2.14.0 | Every icon redrawn in one set |
 | 2.13.0 | Stamp panel redone |
@@ -53,18 +54,17 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 ## Known issues
 - Full list and history: `docs/known-issues.md` (mostly rare "drawn after the settle check" flakes; re-run the spec alone before calling it a bug).
 - From `docs/plan.md`: Texture, mask and filter effects on Text mapped to an outline use the Shape's area; selection handles of mapped text show the text box at the Shape's middle; separate pop-overs for shapes, stamps and pictures and Stamp texture as an effect were left for later (2.3.0).
+- Repeat tile: a rolled Pattern with a Texture effect can show a faint seam at the tile edge (`repeat-tile` roll 21 fails since 2.24.0, which shows the roll as it is saved; 2.23.0 had the same seam after Undo and Redo). Not fixed.
 - `speed-guard` markup budget: "after Randomize" sits at about 148,000 against a limit of 150,000, so adding markup to a rolled picture will fail it.
 - 2.9.0 left the texture and grade engines, the `tu` / `WBS.tex` fields and the unreachable grade panel DOM and `init31` UI code in place. The owner has said a project-wide texture/grade element is planned; cleanup is not decided.
 
 ## Unfinished and next
 Only items the owner has stated are listed as next. Nothing is started unless he says so.
-- 2.23.0 (Stamp library back in the Stamp panel, Open recent; branch `feat/2.23.0-stamp-files-recent`, on top of 2.22.2 which is live) is done and waiting for his word. Details in `docs/plan.md`. Waiting by his word: Stamp library search.
-- 2.22.0 (additions: copy and paste, right-click menu, Align under the Element group, motif search; branch `feat/2.22.0-additions`, on top of 2.21.0 which is live) is done and waiting for his word. Details in `docs/plan.md`.
-- 2.20.0 (adding things and typing on the canvas, branch `feat/2.20.0-adding`, stacked on 2.19.0) is done and waiting for his word. Details in `docs/plan.md`.
-- 2.19.0 (one panel per element, branch `feat/2.19.0-one-panel-per-element`, on top of 2.18.0 which is live) is done and waiting for his word. Details in `docs/plan.md`.
-- 2.18.0 (components, branch `feat/2.18.0-components`, stacked on 2.17.0) is done and waiting for his word; he still has to approve the sliding switch as the one toggle. Details in `docs/plan.md`.
-- 2.17.0 (words, branch `feat/2.17.0-words`, stacked on 2.16.0) is done and waiting for his word; what it leaves is in `docs/plan.md`.
-- 2.16.0 (bug fixes, branch `fix/2.16.0-bug-fixes`) is done and waiting for his word to merge; the bugs it leaves open are listed in `docs/plan.md` under 2.16.0.
+- `main` is at 2.23.0 (live). 2.16.0 to 2.23.0 are all merged.
+- **2.24.0 "Nothing lost, nothing out of reach"** (branch `fix/2.24.0-nothing-lost`) is done and waiting for his word. Details in `docs/plan.md`. It is step 1 of the fix plan from the 2.23 review (five releases, 2.24.0 to 2.28.0; review items in brackets there).
+- Next by the plan: 2.25.0 the stamp tab works like the canvas (no decisions needed); 2.26.0 first five minutes; 2.27.0 editing habits; 2.28.0 style and words.
+- Owner decisions for the plan (Oct 22 2026): the element bar buttons arm their tool at once (the panel's Add button stays); starter templates: one per format plus a framed border; the canvas texture switch goes in the Canvas panel, Texture group; corner handles stay as 2.15.0 made them (no Photoshop-style corner change); stamps and patterns get stable names even if the file format has to change (a format change refuses older files, by the no-backwards-compatibility rule; say before going live); the wordmark stays 21 px and the guide is changed to say so.
+- Waiting by his word: Stamp library search.
 - Decide with the owner: snapshot regeneration (above), and a first full CI suite run (suggest it with the importance percentage: high, about 80%, because 2.4.0 to 2.15.0 changed launch, panels, selection, stamps and icons with no recorded full run).
 - The preview artifact (https://claude.ai/artifact/Y7qKSU4gbU9sCdQYNmBH93) was last published from 2.14.0; publish from `main` after the next build.
 - Stale branches: `feat/2.10.0-tidy-start` to `feat/2.15.0-selection-box` are merged into `main`; the temporary worktree `/tmp/claude-0/wt214` may remain in the old session's container only.

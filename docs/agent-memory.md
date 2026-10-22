@@ -127,3 +127,12 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 - **Template picker:** off at launch until the starter templates exist.
 - **No "make a pattern from the selection"** addition (dropped from the plan).
 - Releases from the review: 2.16.0 bug fixes, 2.17.0 words, 2.18.0 components, 2.19.0 one panel per element, 2.20.0 adding things and text on the canvas, 2.21.0 File, Export, Randomize, 2.22.0 additions.
+
+## Oct 22 2026: the fix plan from the 2.23 review (2.24.0 to 2.28.0)
+- Five releases, in order: 2.24.0 nothing lost, nothing out of reach; 2.25.0 the stamp tab works like the canvas; 2.26.0 a clear first five minutes; 2.27.0 editing habits; 2.28.0 style and words. Each on its own branch; nothing goes live without his word.
+- **Element bar buttons** arm their tool at once (click the button, then the canvas); the panel's Add button stays as a second way.
+- **Starter templates:** one per format plus a framed border.
+- **Canvas texture switch** (the texture a roll gives the canvas): in the Canvas panel, a Texture group.
+- **Corner handles stay as 2.15.0 made them** (one side unless Ctrl); the Photoshop-style corner change is dropped from 2.27.0.
+- **Stamps and patterns get stable names**, even if the file format has to change (older files are then refused, by the no-backwards-compatibility rule). Say before going live, since it touches the file format.
+- **Wordmark:** stays 21 px; the guide (Part 9) is changed to say 21 px.
