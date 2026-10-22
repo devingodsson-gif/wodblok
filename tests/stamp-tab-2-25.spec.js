@@ -1,0 +1,63 @@
+const { test, expect } = require('@playwright/test');
+const H = require('./helpers/harness');
+// 2.25.0 "The stamp tab works like the canvas": Undo and Redo stay in the tab, the canvas keys and the right-click menu work on the stamp's shapes.
+const st = async page => JSON.parse(await H.getState(page));
+const items = async page => (await st(page)).tiles.find(t => t.id === 1).items;
+const inTab = page => page.evaluate(() => window.__wbTest.unlockedStamp());
+
+// a rolled piece, its first stamp open in its tab, one of its shapes selected
+async function enter(page) {
+  const o = await H.openApp(page, { seed: 4, pattern: false });
+  await page.click('#rzdo'); await H.settle(page, { max: 60000 });
+  const p = await H.stampInstance(page); const c = await H.canvasToClient(page, p.cx, p.cy);
+  await page.mouse.dblclick(c.x, c.y); await H.settle(page);
+  expect(await inTab(page), 'Stamp 1 open in its tab').toBe(1);
+  const b = await page.locator('#art').boundingBox(), pt = { x: b.x + b.width * 0.5, y: b.y + b.height * 0.62 };
+  await page.mouse.click(pt.x, pt.y); await H.settle(page);
+  return { ...o, pt };
+}
+
+test('Undo and Redo stay in the stamp tab', async ({ page }) => {
+  const { errors, pt } = await enter(page);
+  const x0 = JSON.stringify(await items(page));
+  await page.mouse.move(pt.x, pt.y); await page.mouse.down(); await page.mouse.move(pt.x + 60, pt.y, { steps: 6 }); await page.mouse.up(); await H.settle(page);
+  expect(JSON.stringify(await items(page)), 'moved').not.toBe(x0);
+  await page.click('#undo'); await H.settle(page);
+  expect(JSON.stringify(await items(page)), 'undone').toBe(x0);
+  expect(await inTab(page), 'still in the tab after Undo').toBe(1);
+  await page.click('#redo'); await H.settle(page);
+  expect(await inTab(page), 'still in the tab after Redo').toBe(1);
+  expect(errors).toEqual([]);
+});
+
+test('arrow keys nudge the selected shape in the tab', async ({ page }) => {
+  const { errors } = await enter(page);
+  const a = JSON.stringify(await items(page));
+  for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowLeft');
+  await H.settle(page);
+  expect(JSON.stringify(await items(page))).not.toBe(a);
+  expect((await items(page)).length).toBe(JSON.parse(a).length);
+  expect(errors).toEqual([]);
+});
+
+test('Ctrl+X cuts the selected shape in the tab and Ctrl+V brings it back', async ({ page }) => {
+  const { errors } = await enter(page);
+  const n0 = (await items(page)).length;
+  await page.keyboard.press('Control+x'); await H.settle(page);
+  expect((await items(page)).length, 'cut').toBeLessThan(n0);
+  await page.keyboard.press('Control+v'); await H.settle(page);
+  expect((await items(page)).length, 'pasted').toBe(n0);
+  expect(await inTab(page)).toBe(1);
+  expect(errors).toEqual([]);
+});
+
+test('the right-click menu works in the tab: Delete removes the shape under the pointer', async ({ page }) => {
+  const { errors, pt } = await enter(page);
+  const n0 = (await items(page)).length;
+  await page.mouse.click(pt.x, pt.y, { button: 'right' });
+  await expect(page.locator('#ctxm')).toBeVisible();
+  await expect(page.locator('#ctxm [data-a="del"]')).toBeEnabled();
+  await page.click('#ctxm [data-a="del"]'); await H.settle(page);
+  expect((await items(page)).length).toBe(n0 - 1);
+  expect(errors).toEqual([]);
+});

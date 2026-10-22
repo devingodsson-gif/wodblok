@@ -1,5 +1,5 @@
 import {ICN} from './00-icons.js';
-import {cmdRegister} from '../commands/registry.js';
+import {cmdGet,cmdRegister} from '../commands/registry.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
@@ -30,13 +30,18 @@ const emRows=[['cut','Cut','Ctrl+X','split'],['copy','Copy','Ctrl+C','duplicate'
 const emRun={cut:emCut,copy:emCopy,paste:emPaste,dup:()=>lyDupSel(),front:()=>emOrder(true),back:()=>emOrder(false),del:emDel};
 const emIc=n=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN[n]||''}</svg>`;
 function emClose(){const m=$('ctxm');if(m)m.hidden=true}
+// in a stamp tab (2.25.0) the same menu works on the stamp's shapes
+const emTab=()=>stUnlocked()!=null&&!!WBX.wbStClip;
+const emCanT={cut:()=>WBX.wbStClip.sel(),copy:()=>WBX.wbStClip.sel(),paste:()=>WBX.wbStClip.has(),dup:()=>WBX.wbStClip.sel(),front:()=>WBX.wbStClip.sel(),back:()=>WBX.wbStClip.sel(),del:()=>WBX.wbStClip.sel()};
+const emRunT={cut:()=>WBX.wbStClip.cut(),copy:()=>WBX.wbStClip.copy(),paste:()=>WBX.wbStClip.paste(),dup:()=>{const c=cmdGet('stamp.duplicateMotif');if(c)c.run()},front:()=>WBX.wbSceOrder(true),back:()=>WBX.wbSceOrder(false),del:()=>WBX.wbSceDelSel()};
 function emOpen(e,over){let m=$('ctxm');if(!m){m=document.createElement('div');m.id='ctxm';m.className='pop';m.setAttribute('role','menu');document.body.appendChild(m);
-  m.addEventListener('click',ev=>{const b=ev.target.closest('button[data-a]');if(!b||b.disabled)return;emClose();emRun[b.dataset.a]()})}
- m.innerHTML=emRows.map(r=>r?`<button type="button" role="menuitem" data-a="${r[0]}"${emCan[r[0]]()?'':' disabled'}>${emIc(r[3])}${r[1]}${r[2]?`<kbd>${r[2]}</kbd>`:''}</button>`:'<hr>').join('');
+  m.addEventListener('click',ev=>{const b=ev.target.closest('button[data-a]');if(!b||b.disabled)return;emClose();(emTab()?emRunT:emRun)[b.dataset.a]()})}
+ m.innerHTML=emRows.map(r=>r?`<button type="button" role="menuitem" data-a="${r[0]}"${(emTab()?emCanT:emCan)[r[0]]()?'':' disabled'}>${emIc(r[3])}${r[1]}${r[2]?`<kbd>${r[2]}</kbd>`:''}</button>`:'<hr>').join('');
  m.hidden=false;m.style.cssText=`position:fixed;left:0;top:0;z-index:60`;const r=m.getBoundingClientRect();
  m.style.left=Math.max(4,Math.min(e.clientX,innerWidth-r.width-4))+'px';m.style.top=Math.max(4,Math.min(e.clientY,innerHeight-r.height-4))+'px'}
 // returns true when it opened the menu (13 calls this first on a right click)
-function emCtx(e){if(stUnlocked()!=null)return false;const L=fpL(),t=e.target;if(!L||!t||!t.closest||!t.closest('#boardP')||t.closest('button,input,select,textarea,label'))return false;
+function emCtx(e){if(emTab()){const t=e.target;if(!t||!t.closest||!t.closest('#boardP')||t.closest('button,input,select,textarea,label'))return false;e.preventDefault();WBX.wbSceHitSel(e);emOpen(e);return true}
+ if(stUnlocked()!=null)return false;const L=fpL(),t=e.target;if(!L||!t||!t.closest||!t.closest('#boardP')||t.closest('button,input,select,textarea,label'))return false;
  const[x,y]=fpPt(e),p=fpHit(L,x,y);if(p){if(!fpGrp().includes(p)){WBS.fpMS=new Set();WBS.fpSel=p.u;WBS.fpAnc=String(p.u);upd()}}else{WBS.fpMS=new Set();WBS.fpSel=-1;upd()}
  if(!p&&!emCan.paste())return false;e.preventDefault();emOpen(e,p);return true}
 function init80(){

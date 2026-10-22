@@ -94,12 +94,23 @@ function sceDraw(){const g=$('stoh');if(!g)return;const gh=sceGhost(),t=sceRO();
  if(WBS.split&&WBS.split.i===WBS.sel){const q2=t.items[WBS.split.i];if(q2){const L=52*q2.s*Math.max(q2.sx||1,q2.sy||1)+14,a=WBS.split.a*Math.PI/180,ux=Math.cos(a)*L,uy=Math.sin(a)*L,p1=P(WBS.split.x-ux,WBS.split.y-uy),p2=P(WBS.split.x+ux,WBS.split.y+uy),pc=P(WBS.split.x,WBS.split.y),ln=(c,x)=>`<line class="${c}" ${x} x1="${f(p1[0])}" y1="${f(p1[1])}" x2="${f(p2[0])}" y2="${f(p2[1])}"/>`;
   h+=ln('stsp','')+ln('stsph','data-sp="m"')+`<circle class="steh" data-sp="m" cx="${f(pc[0])}" cy="${f(pc[1])}" r="${f(hs*1.15)}" cursor="move"/><circle class="steh" data-sp="r" cx="${f(p2[0])}" cy="${f(p2[1])}" r="${f(hs*1.4)}" cursor="grab"/>`}}
  g.innerHTML=h+gh}
+// (2.25.0) the stamp tab answers the canvas keys: arrows nudge the selected shapes (Shift: ten times as far)
+const SCE_AR={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
+function sceNudge(t,d,big){const k=Math.min(SW,SH)/200*(big?10:1);sceWith(t,()=>{[...WBS.msel].forEach(i=>{const q=t.items[i];if(!q)return;const w=wrapP(+q.x+d[0]*k,+q.y+d[1]*k);q.x=+w[0].toFixed(2);q.y=+w[1].toFixed(2)})});store();upd()}
+// the selected shapes of the open stamp go (Cut and Delete use it)
+function sceDelSel(){const t=sceRO();if(!t||!WBS.msel.size)return false;delItems([...WBS.msel]);selOne(-1);store();upd();if(WBX.wbCap)WBX.wbCap();return true}
+// to the front or the back of the stamp's list (the list order is the drawing order)
+function sceOrder(front){const t=sceRO();if(!t||!WBS.msel.size)return false;const ids=[...WBS.msel].sort((a,b)=>a-b),mv=ids.map(i=>t.items[i]),rest=t.items.filter((q,i)=>!WBS.msel.has(i));t.items=front?rest.concat(mv):mv.concat(rest);const at=front?rest.length:0;selSet(mv.map((q,j)=>at+j),false);WBS.sel=at;store();upd();if(WBX.wbCap)WBX.wbCap();return true}
+// the shape of the open stamp under a pointer event: selects it (keeping a selection it is part of); true when one was hit
+function sceHitSel(e){const id=stUnlocked();if(id==null)return false;const c=scePt(e);if(!c)return false;const h=stampAt(c.x,c.y,id);if(!h)return false;const t=sceOpen();if(!t)return false;SCE.ai=h.i;const hit=sceItemAt(t,h.u,h.v);
+ if(!hit){selOne(-1);sceSel();return false}if(!WBS.msel.has(hit.i)){const g=t.items[hit.i].tg;if(g)selSet(t.items.map((x,j)=>x.tg===g?j:-1).filter(j=>j>=0),false);else selOne(hit.i)}WBS.sel=hit.i;sceFree();sceSel();return true}
 function sceKey(e){if(WBS.brush&&e.key!=='Delete')return;const tg=e.target;if(tg&&tg.matches&&tg.matches('input,select,textarea,[contenteditable]'))return;const t=sceRO();if(!t||!WBS.msel.size)return;
  if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();delItems([...WBS.msel]);selOne(-1);store();upd()}else if(e.key=='Escape'){selOne(-1);sceSel()}
+ else if(SCE_AR[e.key]&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();sceNudge(t,SCE_AR[e.key],e.shiftKey)}
  else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='s'||e.key=='S')){e.preventDefault();$('ssp').click()}
  else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='k'||e.key=='K')){e.preventDefault();$('sko').click()}}
 function init64(){
- STP.after=sceDraw;WBX.wbSceDraw=sceDraw;
+ STP.after=sceDraw;WBX.wbSceDraw=sceDraw;WBX.wbSceDelSel=sceDelSel;WBX.wbSceOrder=sceOrder;WBX.wbSceHitSel=sceHitSel;
  const w=$('artwrap');if(w)w.addEventListener('pointerdown',sceDown,true);
  document.addEventListener('pointermove',sceMove);document.addEventListener('pointerup',sceUp);document.addEventListener('pointercancel',sceUp);
  document.addEventListener('keydown',sceKey);

@@ -68,11 +68,14 @@ $('scp').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).it
 // the open stamp takes copy and paste, with a stamp unlocked, on the Pattern canvas
 const stEdit=()=>stUnlocked()!=null;
 {let mclip=null,mpaste=0;const typingIn=t=>!!(t&&t.matches&&t.matches('input,select,textarea,[contenteditable]'));
-document.addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey)||e.altKey||e.shiftKey||e.key.toLowerCase()!='c'||typingIn(e.target)||!stEdit())return;if(String(getSelection&&getSelection()||'').length)return;const src=QS();if(!src.length)return;
-mclip=src.map(o=>{const q=JSON.parse(JSON.stringify(o));delete q.tg;return q});mpaste=0});
-document.addEventListener('paste',e=>{if(!stEdit()||!mclip||typingIn(e.target))return;if([...(e.clipboardData&&e.clipboardData.items||[])].some(i=>/^image\//.test(i.type)))return;e.preventDefault();
-const t=WBS.tiles[WBS.cur],a=t.items,ids=[];mpaste++;const d=20*mpaste;mclip.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+d,q.y+d);a.push(q);ids.push(a.length-1)});
-WBS.msel=new Set(ids);WBS.sel=ids[0];store();upd()});}
+// the stamp tab's own clipboard (shapes inside a stamp): Copy, Cut (2.25.0) and Paste, by keys and by the right-click menu (WBX.wbStClip)
+const mCopy=()=>{const src=QS();if(!src.length)return false;mclip=src.map(o=>{const q=JSON.parse(JSON.stringify(o));delete q.tg;return q});mpaste=0;return true};
+const mPaste=()=>{if(!stEdit()||!mclip)return false;const t=WBS.tiles[WBS.cur],a=t.items,ids=[];mpaste++;const d=20*mpaste;mclip.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+d,q.y+d);a.push(q);ids.push(a.length-1)});
+WBS.msel=new Set(ids);WBS.sel=ids[0];store();upd();if(WBX.wbCap)WBX.wbCap();return true};
+WBX.wbStClip={copy:mCopy,cut:()=>mCopy()&&!!WBX.wbSceDelSel&&WBX.wbSceDelSel(),paste:mPaste,has:()=>!!mclip,sel:()=>QS().length>0};
+document.addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey)||e.altKey||e.shiftKey||typingIn(e.target)||!stEdit())return;const k=e.key.toLowerCase();if(k!='c'&&k!='x')return;if(String(getSelection&&getSelection()||'').length)return;
+if(k=='c')mCopy();else if(WBX.wbStClip.cut())e.preventDefault()});
+document.addEventListener('paste',e=>{if(!stEdit()||!mclip||typingIn(e.target))return;if([...(e.clipboardData&&e.clipboardData.items||[])].some(i=>/^image\//.test(i.type)))return;e.preventDefault();mPaste()});}
 $('sfr').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...rest,...mv);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
 $('ssb').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...mv,...rest);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
 $('sym').onclick=e=>{const b=e.target.closest('[data-y]');if(!b)return;const t=WBS.tiles[WBS.cur],d=SYM.find(x=>x[0]==b.dataset.y);t.sym={m:d[0],n:d[2]?(t.sym&&t.sym.m==d[0]?t.sym.n:d[4]):0,...(t.sym&&t.sym.tx?{tx:1}:{})};store();upd()};
