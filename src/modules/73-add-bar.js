@@ -41,7 +41,7 @@ const AD={
  stamp(){const t=WBS.tiles[WBS.cur];if(!t)return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpB=t.id;upd();abOpen('stmp')},
  motif(){if(WBX.wbMotifAdd)WBX.wbMotifAdd()},   // arms the last motif (74); in a stamp's tab it puts one in at once
  pattern(){plArm({k:'pattern',s:Math.min(CW,CH)})},
- text(){if(stUnlocked()!=null){abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTxStampAt||!WBX.wbStampMid)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}const[x,y]=WBX.wbStampMid()||[0,0];Promise.resolve(WBX.wbTxStampAt(x,y)).then(()=>setTimeout(()=>{ta.focus();ta.select()},0));return}
+ text(){if(stUnlocked()!=null){abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTxStampAt||!WBX.wbStampMid)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}const[x,y]=WBX.wbStampMid()||[0,0];Promise.resolve(WBX.wbTxStampAt(x,y,true)).then(g=>setTimeout(()=>{if(!(g&&WBX.wbTxInStamp&&WBX.wbTxInStamp(g))){ta.focus();ta.select()}},0));return}   // (2.25.0) the typing starts on the stamp, in place
   abOpen('text');const ta=$('tx_t'),go=$('tx_go');if(!ta||!go)return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}if(!WBS.txArm)go.click();return;
   const L=fpL(),before=new Set(L?(L.pl||[]).map(q=>String(q.u)):[]),anchor=elSel();if(!WBX.wbTbAdd)return;
   Promise.resolve(WBX.wbTbAdd()).then(()=>{const L2=fpL();if(!L2)return;const a=L2.pl||[],q=a.find(x=>!before.has(String(x.u)));if(!q)return;a.splice(a.indexOf(q),1);
