@@ -1,4 +1,5 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
+import {CW} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL} from './24-free-place-layers.js';
@@ -29,5 +30,7 @@ function init79(){
  document.addEventListener('pointerdown',e=>{if(TIN&&e.target!==$('txin'))tinStop()},true);
  addEventListener('resize',tinPlace);
  const t=$('tx_t');if(t)t.addEventListener('input',()=>{const e=$('txin');if(TIN&&e&&e.value!==t.value){e.value=t.value;tinPlace()}});
+ // a word typed on the canvas must not run off it (review bug 9): once the box is wider than the canvas, the size comes down until it fits, through the same Size field you would use
+ let fitT=0;if(t)t.addEventListener('input',()=>{if(!TIN)return;clearTimeout(fitT);fitT=setTimeout(()=>{const L=fpL(),p=L&&(L.pl||[]).find(q=>q.u==TIN),z=$('tx_sz');if(!p||!z||!(+p.bw>CW*.92))return;const n=Math.max(+z.min||5,Math.floor(+z.value*CW*.92/p.bw));if(n<+z.value){z.value=n;z.dispatchEvent(new Event('input',{bubbles:true}))}},250)});
  WBX.wbTxIn=tinStart;WBX.wbTxInNew=tinNew;WBX.wbTxInPlace=tinPlace;WBX.wbTxInOn=()=>!!TIN}
 export {init79};
