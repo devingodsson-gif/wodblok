@@ -20,7 +20,24 @@ import {rzFrameEls,rzFx,rzLayoutEls,rzMainEls,rzPressEls} from './71-randomize-e
 const rzPic=l=>(l.pl||[]).some(p=>p.a||p.tx);
 // ===== v96 Before / after. `\` flips between the picture and the "before" (tap to stay, hold to peek); Shift+`\` splits the view with a draggable line.
 // The "before" is the first state of this project in the History panel unless another history step or snapshot is chosen there.
-let wbBA;function randomize(fresh){if(WBX.wbBA)wbBA.off();wbHold.start();let r;try{r=randomize0(fresh)}catch(e){wbHold.arm();throw e}if(r&&typeof r.then=="function")r.then(()=>wbHold.arm(),()=>wbHold.arm());else wbHold.arm();return r}
+// 2.21.0 (owner Oct 22 2026): a roll either replaces the previous roll and leaves your own elements alone (the default), or starts from an empty canvas (Randomize panel switch, kept in settings).
+// What a roll made is remembered here (not in the file): the elements and stamps that were not there before it. The next roll takes those away first.
+const RZ_KEY='wb121_rzfresh';let RZMADE=null;
+const rzFresh=()=>{try{return kv.get(RZ_KEY)==='1'}catch(e){return false}};
+const rzIds=()=>({els:new Set(WBS.layers.flatMap(l=>(l.pl||[]).map(q=>String(q.u)))),tiles:new Set(WBS.tiles.map(t=>t.id))});
+function rzDrop(){const m=RZMADE;RZMADE=null;if(!m)return;const E=new Set(m.els);WBS.layers.forEach(l=>{if(l.pl)l.pl=l.pl.filter(q=>!E.has(String(q.u)))});
+ const left=JSON.stringify(WBS.layers),used=id=>new RegExp('"(t|lead|cs)":'+id+'[,}]|"st":\\[[^\\]]*(^|[\\[,])'+id+'([,\\]])').test(left);
+ const gone=new Set(m.tiles.filter(id=>!used(id)));if(gone.size&&WBS.tiles.length>gone.size){WBS.tiles=WBS.tiles.filter(t=>!gone.has(t.id));WBS.layers.forEach(l=>{if(l.st)l.st=l.st.filter(x=>!gone.has(x))});WBS.cur=0}}
+// Taken out of the layers before a roll builds the new ones, put back on top of the first layer after it: your own elements (what is left once the previous roll is dropped), with the stamps they use.
+function rzTake(){rzDrop();const own=[],ids=new Set();WBS.layers.forEach(l=>{if(l.pl&&l.pl.length){own.push(...l.pl);l.pl=[]}});
+ own.forEach(q=>{if(q.t!=null)ids.add(String(q.t));(q.src||[]).forEach(x=>{if(x&&x.t!=null)ids.add(String(x.t))})});
+ const tiles={};WBS.tiles.forEach(t=>{if(ids.has(String(t.id)))tiles[t.id]=JSON.stringify(t)});return{own,tiles}}
+function rzPut(S){if(!S||!S.own.length)return;const L=WBS.layers[0];if(!L)return;let next=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));const map={};
+ Object.keys(S.tiles).forEach(id=>{const cur=WBS.tiles.find(t=>String(t.id)==id);if(cur&&JSON.stringify(cur)===S.tiles[id])return;const c=JSON.parse(S.tiles[id]);c.id=next++;WBS.tiles.push(c);map[id]=c.id});
+ S.own.forEach(q=>{if(q.t!=null&&map[q.t]!=null)q.t=map[q.t];(q.src||[]).forEach(x=>{if(x&&x.t!=null&&map[x.t]!=null)x.t=map[x.t]})});
+ L.pl=(L.pl||[]).concat(S.own);WBS.nid=Math.max(WBS.nid||0,next)}
+let wbBA;function randomize(fresh){if(WBX.wbBA)wbBA.off();if(!fresh&&rzFresh()){if(WBX.wbClearAll)WBX.wbClearAll();RZMADE=null}const b4=fresh?{els:new Set(),tiles:new Set()}:rzIds(),mark=()=>{const a=rzIds();RZMADE={els:[...a.els].filter(u=>!b4.els.has(u)),tiles:[...a.tiles].filter(t=>!b4.tiles.has(t))}};
+wbHold.start();let r;try{r=randomize0(fresh)}catch(e){wbHold.arm();throw e}if(r&&typeof r.then=="function")r.then(()=>{mark();wbHold.arm()},()=>wbHold.arm());else{mark();wbHold.arm()}return r}
 function randomize0(fresh){const ft=WBX.wbRZ?WBX.wbRZ.get():null;window.SLC=[];
  if(ft&&ft.lib&&typeof SL!='undefined')return SL.list().then(l=>{window.SLC=(l||[]).filter(r=>r&&typeof r.tile=='string');return randomizeCore(fresh)},()=>randomizeCore(fresh));
  return randomizeCore(fresh)}
@@ -41,6 +58,7 @@ const libTile=id=>{const r=pick(window.SLC);let t=null;try{t=JSON.parse(r.tile)}
 if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.shape||FT.free||FT.layout||FT.size||FT.look||FT.lib)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
 const dim0=JSON.parse(JSON.stringify(WBS.dim));
 if(!fresh&&WBX.wbCap)WBX.wbCap();
+const OWN=fresh?null:rzTake();   // 2.21.0: the previous roll is dropped and your own elements are held aside until the new ones are built
 // --- the bold moves for this roll (only used when Stamps is on)
 const MOVES=[['sym','new symmetry',1.3],['link','accents in the gaps',1.2],['shape','accent shapes',1],['mix','mixed shapes',.7],['rot','turned grid',.8],['inks','extra inks',.7],['motif','shape tweaks',.8],['swap','light on dark',.6],['blend','soft blending',.5],['radial','round arrangements',.7],['vary','size, gaps and offset',.6],['text','lettering',1],['frame','frame',1.1]];
 const RZ={mv:null,n:0,keep:{col:!FT.col,gr:!FT.gr,tx:!FT.tx,pr:!FT.pr}};
@@ -268,6 +286,7 @@ if((FT.free||libFree)&&ch(.65)){
  const usedIds=new Set(FL.pl.map(q=>q.t)),keep=made.filter(t=>usedIds.has(t.id));
  if(keep.length){const fp=ch(.4)?0:ri(1,4);FL.pl.forEach(q=>{const fx=rzFx(EO,fp,0,null);if(fx.length)q.fx=fx});FL.st=keep.map(t=>t.id);keep.forEach(t=>WBS.tiles.push(t));WBS.layers.push(FL);reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0))}
  setDim();useT(WBS.tiles[WBS.cur]);store();upd()}
+rzPut(OWN);
 const txAll=(txReq?[[WBS.tiles[0],txReq]]:[]).concat(fzReqs);
 if(txAll.length){pmsg('Randomized… setting the lettering.');WBX.wbTxBusy=(WBX.wbTxBusy||0)+1;WBX.wbRollHold=tok;(async()=>{try{for(const[t,o] of txAll){try{await WBX.wbTxPlace(t,o,tok)}catch(e){}}if(tok!==WBX.wbRndTok)return;store();upd();if(WBX.wbRollHold===tok)WBX.wbRollHold=0;if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()}}finally{if(WBX.wbRollHold===tok)WBX.wbRollHold=0;WBX.wbTxBusy=Math.max(0,(WBX.wbTxBusy||1)-1)}})()}
 else if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()};

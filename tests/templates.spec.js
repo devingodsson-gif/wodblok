@@ -11,7 +11,7 @@ for (const t of FOLDER) HAND[t.type]++;
 const openPicker = async page => { await page.click('#fileb'); await page.click('#tpnew'); await expect(page.locator('#tpdlg')).toBeVisible(); };
 const kind = async (page, k) => { await page.click(`#tpty [data-k="${k}"]`); await settle(page, { quiet: 4 }); };
 const cards = page => page.locator('#tpg .tpc');
-const roll = async page => { await page.click('#rzbar'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
+const roll = async page => { await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
 const meta = page => page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()), b = document.querySelector('#cfmt [data-f="book"]'); return { book: !!b && (b.classList.contains('on') || b.getAttribute('aria-pressed') === 'true' || b.getAttribute('aria-selected') === 'true'), rt: !!(s.dim && s.dim.rt), ts: !!(s.proj && s.proj.ts && s.proj.ts.length) }; });
 
 test('the File menu has both template items and the picker lists three kinds with Blank first', async ({ page }) => {

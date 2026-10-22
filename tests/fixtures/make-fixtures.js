@@ -26,7 +26,7 @@ const SAMPLES = [
       if (sm.shape) await page.click(`#cshp [data-s="${sm.shape}"]`);
       if (sm.asp) { await page.fill('#caw', String(sm.asp[0])); await page.dispatchEvent('#caw', 'change'); await page.fill('#cah', String(sm.asp[1])); await page.dispatchEvent('#cah', 'change'); }
       await settle(page);
-      await page.click('#rzbar'); await settle(page, { max: 60000 });
+      await page.click('#rzdo'); await settle(page, { max: 60000 });
       await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)'));
       const s = JSON.parse(await getState(page));
       // the speed guard budgets the markup of the pattern on screen (tests/speed-guard.spec.js); a sample must sit well under it

@@ -12,7 +12,7 @@ test('launch is still fully cleared: Pattern view, no panel open, no stamps prin
 
 test('Randomize is a labelled button in the top bar and rolls a piece', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
-  const btn = page.locator('#rzbar');
+  const btn = page.locator('#rzdo');
   await expect(btn).toBeVisible();
   await expect(btn).toContainText('Randomize');
   const before = await getState(page);
@@ -43,7 +43,7 @@ test('an empty canvas has no "+" button on it; shapes are added with the Shapes 
 
 test('Randomize fills the canvas', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
-  await page.click('#rzbar');
+  await page.click('#rzdo');
   await settle(page, { max: 60000 });
   await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)'));
   expect(errors).toEqual([]);

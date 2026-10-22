@@ -666,7 +666,7 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
 }
 #cfmth,#ccirh,#pdesc,#symh,#lhint,#lfph,#lfh,#lfgi,#lcrih,#rzhint,#lglh{display:none!important}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-.rzbig{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:var(--fs-m)}.rzbig svg{width:15px;height:15px}.rzmain{padding-top:12px}
+.rzmain{padding-top:12px}
 [data-p="rand"] .chk{margin-top:8px}.rzrow{display:flex;align-items:center;gap:6px}.rzrow .ctl,.rzlet .ctl{flex:1;min-width:0;grid-template-columns:112px minmax(0,1fr) 52px}.rzlet .ctl{grid-template-columns:98px minmax(0,1fr) 52px}.rzlet{padding-left:12px}.rzrow .chk{flex:1;min-width:0}.rzx{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;margin-top:8px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);color:var(--mut);font-size:var(--fs-s);cursor:pointer}.rzx svg{transition:transform var(--t-fast)}.rzx[aria-expanded="true"] svg{transform:rotate(180deg)}.rzx.part{color:var(--acc-ink);border-color:var(--acc)}.rzsub{margin:2px 0 6px 6px;padding:2px 0 4px 12px;border-left:2px solid var(--line)}.rzsub[hidden]{display:none}.rzsub.off{opacity:.55}.rzgh{font-size:var(--fs-s);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin-top:8px}.rzsub .row{margin-top:8px}[data-p="rand"] #rzlast{margin-top:8px;text-align:center}[data-p="rand"] select{width:100%}
 /* variations */
 .vrb{display:flex;flex-direction:column;gap:4px;padding:6px;border-radius:var(--r-m);border:1px solid var(--line);background:var(--field);cursor:pointer;text-align:left;min-width:0}
@@ -851,7 +851,7 @@ body.eyedrop{cursor:crosshair}
  </div>
  
  <div class="sep"></div>
- <button class="rnd" id="rzbar" type="button"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dice"></svg>Randomize</button>
+ <button class="rnd" id="rzdo" type="button"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dice"></svg>Randomize</button>
  <div class="spacer"></div>
  <button class="ib" id="thm" type="button" title="Switch to light mode" aria-label="Switch to light mode"></button>
  <button class="ghost" id="pls">Open projects folder</button>
@@ -1357,7 +1357,7 @@ body.eyedrop{cursor:crosshair}
  </div></details>
 </section>
 <section class="pn" data-p="rand" hidden>
-  <div class="gb rzmain"><button class="alt rzbig" id="rzdo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dice"></svg>Randomize</button>
+  <div class="gb rzmain"><label class="chk"><input type="checkbox" id="rzfresh"><span>Start from an empty canvas</span></label>
    <div class="hint" id="rzlast"></div></div>
   <details class="g" open><summary>What to randomize</summary><div class="gb">
    <div class="row tight"><button class="alt" id="rzall">All on</button><button class="alt" id="rznone">All off</button></div>

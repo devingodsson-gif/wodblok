@@ -328,7 +328,7 @@ function info(){const ks=new Set(WBS.tiles.map(t=>shOf(t).k)),k=ks.size>1?'Mixed
 $('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(()=>{const k=csk(),r=(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2));return k=='rect'?r:CSN[k]+(CASP.includes(k)?' '+r:'')})()}</b></span>`}<span class="it">Stamp shape <b>${k}</b></span><span class="it">Stamps <b>${WBS.tiles.length}</b></span>`;
 }
 // wrap redraw hooks so the shell stays in sync
-$('rzbar').onclick=()=>$('rzdo').click();
+{const f=$('rzfresh');if(f){try{f.checked=kv.get('wb121_rzfresh')==='1'}catch(e){}f.addEventListener('change',()=>{try{kv.set('wb121_rzfresh',f.checked?'1':'0')}catch(e){}})}}
 const _draw=WBH.draw;WBH.draw=function(){_draw();nums();info()};
 const _sp=WBH.syncPr;WBH.syncPr=function(){_sp();nums()};const _stx=WBH.syncTex;WBH.syncTex=function(){_stx();nums()};
 

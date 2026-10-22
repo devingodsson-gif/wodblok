@@ -4,10 +4,10 @@ const { openApp, openPanel, settle } = require('./helpers/harness');
 
 test('History: every row shows its Compare button without hovering', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await page.click('#rzbar');
+  await page.click('#rzdo');
   await settle(page);
   await openPanel(page, 'hist');
-  await page.click('#rzbar');
+  await page.click('#rzdo');
   await settle(page);
   const row = page.locator('#hhl .hr:not(.on)').first();
   await expect(row).toBeVisible();

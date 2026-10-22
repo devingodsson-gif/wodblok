@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle } = require('./helpers/harness');
 
 async function roll(page) {
-  await page.click('#rzbar');
+  await page.click('#rzdo');
   await settle(page, { max: 60000 });
   await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)'));
 }

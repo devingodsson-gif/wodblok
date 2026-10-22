@@ -40,7 +40,7 @@ test('the button names the next step, the folder lists its projects, a project o
 test('opening a project from the folder asks first when the current one has unsaved work', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
   test.skip(!(await page.evaluate(() => typeof window.showDirectoryPicker === 'function')), 'this browser has no folder picker');
-  await page.click('#rzbar'); await settle(page, { max: 60000 });
+  await page.click('#rzdo'); await settle(page, { max: 60000 });
   await installFolder(page, FILES);
   await page.click('#pls');
   const b = page.locator('#pgrid .pc [data-a="open"]').first();
@@ -55,7 +55,7 @@ test('opening a project from the folder asks first when the current one has unsa
 });
 
 async function rollAndName(page, name) {
-  await page.click('#rzbar'); await settle(page, { max: 60000 });
+  await page.click('#rzdo'); await settle(page, { max: 60000 });
   await page.fill('#pnm', name);
 }
 

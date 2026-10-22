@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle } = require('./helpers/harness');
 
-const roll = async page => { await page.click('#rzbar'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
+const roll = async page => { await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
 
 test('rolls get a picture a moment after they finish; the Start and later hand edits do not; a snapshot gets one too', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });

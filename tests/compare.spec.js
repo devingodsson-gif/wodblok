@@ -33,7 +33,7 @@ for (const [name, btn, mode] of [['Before', '#bab', 1], ['Split', '#bas', 2]]) {
   });
 }
 
-const rollTop = async page => { await page.click('#rzbar'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
+const rollTop = async page => { await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
 // 1.0.9: Before and Split compare with the step before the current one, not always with the Start.
 test('Before compares with the step before this one, and follows the history as it grows', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 11 });

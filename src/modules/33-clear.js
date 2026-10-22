@@ -51,7 +51,7 @@ catch(e){if(tok==plTok)g.innerHTML='<div class="hint">Could not read the folder:
 let plList=[];
 function init33(){
 $('clr').onclick=()=>clearAll(false);
-$('psv').onclick=saveProject;
+$('psv').onclick=saveProject;WBX.wbClearAll=()=>clearAll(false);
 // 2.21.0, the File menu: Save project (the same as the button) and Save project as (a new file: the link to the file it came from is dropped first), Export opens the Export panel
 $('psvm').onclick=()=>$('psv').click();$('psa').onclick=()=>{link=null;saveProject()};$('xrm').onclick=()=>{if(WBX.wbOpenPanel)WBX.wbOpenPanel('xrec')};
 
