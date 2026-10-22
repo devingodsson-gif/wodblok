@@ -15,10 +15,13 @@ import {stUnlocked} from './63-stamp-tool.js';
 let EMCLIP=null;   // copies of the elements: [{...element}] (the same document only)
 const emDone=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 const emCopy=()=>{const g=fpGrp().filter(q=>q.k!='group');if(!g.length)return false;EMCLIP=JSON.parse(JSON.stringify(g)).map(q=>{delete q.g;return q});return true};
+// (2.24.0) a copy that needs a stamp the project no longer has is left out: a stamp element without its stamp, a pattern source without its stamp or element (a pattern left with no source is left out).
+// New project and Open empty the clipboard (WBX.wbClipClear, from openData)
+const emOk=o=>{const has=t=>WBS.tiles.some(x=>x.id==t);if(o.k!='pattern'&&o.t!=null)return has(o.t);if(o.k=='pattern'&&Array.isArray(o.src)){const L=fpL(),hasU=u=>!!L&&(L.pl||[]).some(x=>x.u==u);o.src=o.src.filter(r=>(r.k!='stamp'||has(r.t))&&(!r.u||hasU(r.u)));return o.src.length>0}return true};
 function emPaste(){const L=fpL();if(!L||!EMCLIP||!EMCLIP.length)return false;L.pl=L.pl||[];const d=Math.min(CW,CH)*.03,ns=[];
- EMCLIP.forEach(o=>{const q=JSON.parse(JSON.stringify(o));q.u=fpU();if(q.x!=null)q.x=+(q.x+d).toFixed(1);if(q.y!=null)q.y=+(q.y+d).toFixed(1);L.pl.push(q);ns.push(q)});
+ EMCLIP.forEach(o=>{const q=JSON.parse(JSON.stringify(o));if(!emOk(q))return;q.u=fpU();if(q.x!=null)q.x=+(q.x+d).toFixed(1);if(q.y!=null)q.y=+(q.y+d).toFixed(1);L.pl.push(q);ns.push(q)});
  EMCLIP=JSON.parse(JSON.stringify(EMCLIP)).map(o=>{if(o.x!=null)o.x=+(o.x+d).toFixed(1);if(o.y!=null)o.y=+(o.y+d).toFixed(1);return o});   // the next paste lands a step further on
- WBS.fpMS=ns.length>1?new Set(ns.map(q=>String(q.u))):new Set();WBS.fpSel=ns[ns.length-1].u;WBS.fpAnc=WBS.fpSel;emDone();return true}
+ if(!ns.length)return false;WBS.fpMS=ns.length>1?new Set(ns.map(q=>String(q.u))):new Set();WBS.fpSel=ns[ns.length-1].u;WBS.fpAnc=WBS.fpSel;emDone();return true}
 function emDel(){const L=fpL(),g=fpGrp();if(!L||!g.length)return false;g.forEach(q=>{const i=L.pl.indexOf(q);if(i>=0)L.pl.splice(i,1)});WBS.fpSel=-1;WBS.fpMS=new Set();emDone();return true}
 const emCut=()=>{if(!emCopy())return false;return emDel()};
 function emOrder(front){const L=fpL(),g=fpGrp();if(!L||!g.length)return false;g.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));if(front)L.pl.push(...g);else L.pl.unshift(...g);emDone();return true}
@@ -37,7 +40,7 @@ function emCtx(e){if(stUnlocked()!=null)return false;const L=fpL(),t=e.target;if
  const[x,y]=fpPt(e),p=fpHit(L,x,y);if(p){if(!fpGrp().includes(p)){WBS.fpMS=new Set();WBS.fpSel=p.u;WBS.fpAnc=String(p.u);upd()}}else{WBS.fpMS=new Set();WBS.fpSel=-1;upd()}
  if(!p&&!emCan.paste())return false;e.preventDefault();emOpen(e,p);return true}
 function init80(){
- WBX.wbCtxMenu=emCtx;
+ WBX.wbCtxMenu=emCtx;WBX.wbClipClear=()=>{EMCLIP=null};
  document.addEventListener('pointerdown',e=>{const m=$('ctxm');if(m&&!m.hidden&&!e.target.closest('#ctxm'))emClose()},true);
  document.addEventListener('keydown',e=>{const m=$('ctxm');if(e.key=='Escape'&&m&&!m.hidden){emClose();e.stopPropagation()}},true);
  addEventListener('blur',close);addEventListener('resize',close);
