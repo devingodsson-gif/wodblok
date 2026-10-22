@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {C,CM,PL,col,placeFloat,rowMenu} from './04-canvas-and-stamp-outlines.js';
@@ -14,10 +15,10 @@ import {closePicker,openPicker,swBg} from './51-colour-picker.js';
 //    open = follows a tray colour, closed = a fixed colour of its own. The well opens the tray to choose from.
 // 3. The Colours tool: the tray as a list (name, hex, what uses it), paper and ink, and saved trays in folders (Wada's sets built in).
 const TY_IC=(d,w)=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-const LOCK_ON=TY_IC('<rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),LOCK_OFF=TY_IC('<rect x="5" y="11" width="14" height="9.5" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.6-1.7"/>');
-const TRASH=TY_IC('<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>'),TY_MORE='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
+const LOCK_ON=TY_IC(ICN.lock),LOCK_OFF=TY_IC(ICN.unlock);
+const TRASH=TY_IC(ICN.trash),TY_MORE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.more+'</svg>';
 const TY_CHEV='<svg class="chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l5 5 5-5"/></svg>';
-const FOLDER=TY_IC('<path d="M3.5 7.5V18a1.5 1.5 0 0 0 1.5 1.5h14a1.5 1.5 0 0 0 1.5-1.5V9.5A1.5 1.5 0 0 0 19 8h-7l-2-2.5H5A1.5 1.5 0 0 0 3.5 7z"/>',1.8),BACK=TY_IC('<path d="M14.5 6l-6 6 6 6"/>');
+const FOLDER=TY_IC(ICN.folder,1.8),BACK=TY_IC(ICN.chevL);
 const tyEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const tyP=()=>WBS.proj;
 // the label a well shows for a reference, and the small number of its tray place
@@ -50,7 +51,7 @@ function paintDock(force){const o=tyP(),w=cwNow(o),box=$('tyc');if(!box)return;
  const k=JSON.stringify([o.ts,o.ts.map(id=>w.c[id]),[...used],WBS.trayEdit,o.cw.length,o.cwa,w.n]);if(!force&&k===dockK)return;dockK=k;
  let h=o.ts.map((id,i)=>{const c=w.c[id],nm=w.m[id];return`<button type="button" class="tys${WBS.trayEdit===id?' on':''}${used.has(id)?' used':''}${hexAlpha(c)<1?' see':''}" data-s="${id}" role="listitem" aria-label="Colour ${i+1}${nm?': '+tyEsc(nm):''}" style="--c:${c}">${hexAlpha(c)<1?'<b></b>':''}</button>`}).join('');
  for(let i=o.ts.length;i<TRAY_VIEW;i++)h+=`<button type="button" class="tye" data-add="1" aria-label="Add a colour"></button>`;
- if(o.ts.length<TRAY_MAX)h+=`<button type="button" class="tyadd" data-add="1" aria-label="Add a colour">${TY_IC('<path d="M12 6v12M6 12h12"/>',2.2)}</button>`;
+ if(o.ts.length<TRAY_MAX)h+=`<button type="button" class="tyadd" data-add="1" aria-label="Add a colour">${TY_IC(ICN.plus,2.2)}</button>`;
  box.innerHTML=h;
  const cw=$('tycw');cw.hidden=o.cw.length<2;if(!cw.hidden){cw.querySelector('span').textContent=w.n;cw.querySelector('i').style.background=`linear-gradient(90deg,${o.ts.slice(0,4).map((id,i,a)=>`${w.c[id]} ${i/a.length*100}% ${(i+1)/a.length*100}%`).join(',')})`;cw.setAttribute('aria-label','Colourway: '+w.n)}}
 // which slots something links to
@@ -96,8 +97,8 @@ function closeWell(){if(!WP)return;WP.el.remove();WP.W.sb.setAttribute('aria-exp
 function openWell(W){closeWell();closePicker();const o=tyP(),w=cwNow(o),r=W.spec.get(),el=document.createElement('div');el.className='cwp';el.setAttribute('role','dialog');el.setAttribute('aria-label',W.spec.label||'Colour');
  const cur=isLink(r)?r.slice(1):null;
  let h='';if(W.spec.def){const ds=W.spec.defSwatch?W.spec.defSwatch():W.spec.defRef?swBg(col(W.spec.defRef())):'';h+=`<button type="button" class="cwpd${!r?' on':''}" data-def="1"><i${ds?` style="background:${ds};border-style:solid"`:''}></i><span>${tyEsc(W.spec.def)}</span></button>`}
- h+=`<div class="cwpg" role="list">${o.ts.map((id,i)=>`<button type="button" role="listitem" class="cwpc${id===cur?' on':''}" data-s="${id}" aria-label="Colour ${i+1}${w.m[id]?': '+tyEsc(w.m[id]):''}" title="${tyEsc(w.m[id]||w.c[id].toUpperCase())}" style="--c:${w.c[id]}"><em>${i+1}</em></button>`).join('')}${o.ts.length<TRAY_MAX?`<button type="button" class="cwpc add" data-add="1" aria-label="Add a colour to the tray">${TY_IC('<path d="M12 6v12M6 12h12"/>',2.2)}</button>`:''}</div>`;
- h+=`<div class="cwpr"><button type="button" class="alt" data-fix="1">${LOCK_ON}Fixed colour</button>${isFixed(r)&&o.ts.length<TRAY_MAX?`<button type="button" class="alt" data-adopt="1">${TY_IC('<path d="M12 6v12M6 12h12"/>')}Add to tray</button>`:''}</div>`;
+ h+=`<div class="cwpg" role="list">${o.ts.map((id,i)=>`<button type="button" role="listitem" class="cwpc${id===cur?' on':''}" data-s="${id}" aria-label="Colour ${i+1}${w.m[id]?': '+tyEsc(w.m[id]):''}" title="${tyEsc(w.m[id]||w.c[id].toUpperCase())}" style="--c:${w.c[id]}"><em>${i+1}</em></button>`).join('')}${o.ts.length<TRAY_MAX?`<button type="button" class="cwpc add" data-add="1" aria-label="Add a colour to the tray">${TY_IC(ICN.plus,2.2)}</button>`:''}</div>`;
+ h+=`<div class="cwpr"><button type="button" class="alt" data-fix="1">${LOCK_ON}Fixed colour</button>${isFixed(r)&&o.ts.length<TRAY_MAX?`<button type="button" class="alt" data-adopt="1">${TY_IC(ICN.plus)}Add to tray</button>`:''}</div>`;
  el.innerHTML=h;document.body.appendChild(el);placeFloat(el,W.sb,false);el.style.width='';WP={el,W};W.sb.setAttribute('aria-expanded','true');
  el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();
   if(b.dataset.def){W.spec.set('');closeWell();trayDone(W.spec.what+' colour');return}

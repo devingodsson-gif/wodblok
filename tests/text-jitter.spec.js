@@ -13,13 +13,12 @@ test('text Jitter moves every letter differently, not the text as one object', a
   await page.fill('#tx_t', 'ABCD');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await page.click('.elk[data-k="text"] [data-add]');
   await settle(page);
   await expect.poll(async () => (await uses(page)).length).toBe(4);
   const plain = await uses(page);
   const grp = () => page.evaluate(() => document.querySelector('#art [data-fp]').getAttribute('transform'));
   const g0 = await grp();
-  await page.click('#tx_go');
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   await settle(page);
   await openPanel(page, 'text');

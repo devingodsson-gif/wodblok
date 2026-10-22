@@ -1,10 +1,10 @@
 // 1.46.0: the Text styles library: built-in Starter styles, Save style, folders, apply, rename, delete (same tree as Saved colours).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
 // Canvas flow: the text typed in the Text panel is put on the first printed instance of the unlocked stamp, then one of its letters is clicked so the whole text is selected (the panel edits it)
 async function putTextCanvas(page) {
   const p = await stampInstance(page);
-  await clickStamp(page, p);
+  await addStampText(page);
   const tg = async () => JSON.parse(await getState(page)).tiles[0].items.filter(q => q.tg);
   await expect.poll(async () => (await tg()).length, { timeout: 15000 }).toBeGreaterThan(0);
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await settle(page, { max: 30000 });
@@ -87,8 +87,7 @@ test('Text layer: a style applies to the selected text', async ({ page }) => {
   await page.fill('#tx_t', 'STYLE ME');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
-  await page.click('#tx_go');
+  await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
   await page.click('#tsl .scf[data-k="Starter styles"]');
   await page.click('#tsl .scr:has-text("Swell")');

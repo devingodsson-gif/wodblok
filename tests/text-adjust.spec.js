@@ -1,13 +1,13 @@
 // 1.40.0: a letter moved by hand keeps its move when the text is edited; Convert to shapes makes the letters plain shapes.
 const { test, expect } = require('@playwright/test');
-const { openApp, settle, getState, showPanel, unlockStamp, canvasToClient, stampInstance, clickStamp } = require('./helpers/harness');
+const { openApp, settle, getState, showPanel, unlockStamp, canvasToClient, stampInstance, clickStamp, addStampText } = require('./helpers/harness');
 
 // text goes into the unlocked stamp: type it in the Text panel, then click an instance of the stamp on the canvas
 async function setup(page) {
   await unlockStamp(page); await showPanel(page, 'text');
   await page.fill('#tx_t', 'ab'); await settle(page);
   const p = await stampInstance(page);
-  await clickStamp(page, p);
+  await addStampText(page);
   const items = async () => JSON.parse(await getState(page)).tiles[0].items;
   await expect.poll(async () => (await items()).filter(q => q.tg).length, { timeout: 15000 }).toBe(2);
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape');

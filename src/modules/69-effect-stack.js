@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {rng,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
@@ -43,11 +44,11 @@ const fxCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 function fxTarget(kind){if(kind=='pattern')return patCur();if(kind=='paint')return paCur();const q=elSel();return q&&elKind(q)==kind?q:null}
 // The list (2.3.0, Photoshop's layer effects): one row per effect (eye, name, ⋯), drag to reorder; the open effect's settings show right under its row.
 // The + in the group's title adds one. Rows before the open one and the open row are in .fxl, the settings follow, the rest are in .fxl2.
-const FXI={eye:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>',
- off:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 6.1A9.6 9.6 0 0112 5.5c6 0 9.5 6.5 9.5 6.5a16 16 0 01-3 3.7M6.3 7.9A16.4 16.4 0 002.5 12S6 18.5 12 18.5c1.6 0 3-.4 4.2-1"/></svg>',
- more:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></svg>',
- plus:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
- car:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'};
+const FXI={eye:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.eye+'</svg>',
+ off:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.eyeOff+'</svg>',
+ more:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.more+'</svg>',
+ plus:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.plus+'</svg>',
+ car:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevR+'</svg>'};
 function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hidden><summary>Effects<button type="button" class="ib fxadd" aria-haspopup="menu" aria-label="Add effect">${FXI.plus}</button></summary><div class="gb">
 <div class="fxl"></div><div class="fxpane">
 <div class="fxs" data-e="texture" hidden>

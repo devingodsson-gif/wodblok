@@ -7,7 +7,7 @@ test('Placing: the first click on the canvas places the stamp picked in the Stam
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await expect(page.locator('#lfpst [data-t].on')).toHaveCount(1);
   const box = await page.locator('#art').boundingBox();
   await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
@@ -22,7 +22,7 @@ test('Placing: Esc stops placing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await page.keyboard.press('Escape');
   await settle(page);
   const box = await page.locator('#art').boundingBox();

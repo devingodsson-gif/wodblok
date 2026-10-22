@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
 import {cmdGet} from '../commands/registry.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
@@ -28,12 +29,12 @@ let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[pa
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={cways:'Colourways',xrec:'Export recipes',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',mlist:'Shape',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
+const PNAME={xrec:'Export recipes',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',mlist:'Shape',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
-const EL_ONLY=['layers','stmp','motifs','text','elpaint'];
+const EL_ONLY=['layers','stmp','motifs','text','elpaint','mlist'];
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
-const ELP=[...EL_ONLY,'mlist'],wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
-const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elpaint','text','pgrid','canvas','colors','cways','rand','hist','slib','xrec']};
+const ELP=EL_ONLY,wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
+const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elpaint','text','pgrid','canvas','colors','rand','hist','xrec']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85}),wsG(['layers']),wsG(['canvas','colors'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)
@@ -73,11 +74,11 @@ if(k=='l'||k=='r'){s.left=(k=='l'?W.ox0:W.ox1-th)+'px';s.top=W.y0+'px';s.width=t
 else{s.left=W.x0+'px';s.top=(k=='t'?W.y0:W.y1-th)+'px';s.width=(W.x1-W.x0)+'px';s.height=th+'px'}
 z.classList.toggle('hot',hot==k)})}
 wsStash.hidden=true;wsFl.id='wsfl';wsInd.id='wsind';wsInd.hidden=true;wsTint.id='wstint';wsTint.hidden=true;document.body.append(wsStash,wsFl,wsTint,wsInd);
-const IC={col:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9.5l5 5 5-5"/></svg>',
-exp:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 7l5 5-5 5"/></svg>',
-pop:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M12 3.5h8.5V12M20.5 3.5L12.5 11.5"/></svg>',
-dock:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M14.5 3.5v17"/></svg>',
-x:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
+const IC={col:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevD+'</svg>',
+exp:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevR+'</svg>',
+pop:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.popout+'</svg>',
+dock:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.panels+'</svg>',
+x:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.close+'</svg>'};
 const wsNarrow=()=>innerWidth<=860;
 function wsClamp(g){const st=document.querySelector('.stage').getBoundingClientRect();if(g.x==null){if(g.pos=='bc'){g.x=Math.round(st.left+(st.width-(+g.w||300))/2);g.y=Math.round(st.bottom-(parseFloat(getComputedStyle(document.querySelector('.stage')).getPropertyValue('--film-h'))||79)-12-(+g.h||420))}else{const r=g.pos=='r'||g.pos=='rb';g.x=Math.round(r?st.right-(+g.w||300)-12:st.left+12);g.y=Math.round(st.top+52+(g.pos=='rb'?392:0))}}
 g.w=Math.max(200,Math.min(+g.w||300,innerWidth-20));g.h=Math.max(120,Math.min(+g.h||420,innerHeight-60));g.x=Math.max(-g.w+80,Math.min(g.x,innerWidth-80));g.y=Math.max(0,Math.min(g.y,innerHeight-36));if(g.y+g.h>innerHeight-8)g.y=Math.max(0,innerHeight-8-g.h);g.h=Math.min(g.h,innerHeight-8-g.y)}
@@ -188,7 +189,7 @@ WBX.wbWsSet=o=>{['pattern'].forEach(m=>{const L=o&&o[m];if(!L)return;const seen=
  const c=JSON.parse(JSON.stringify(L));WS[m]={dock:(c.dock||[]).filter(ok),float:(c.float||[]).filter(ok)}});
   wsSave();wsRender();info();nums()};
 // The Close all panels button turns into Default when no panel is open and a Default workspace exists: pressing it opens that layout, and it turns back into Close.
-{const b=$('rcls'),CL=b.querySelector('svg').outerHTML,tp=b.querySelector('.tip'),DF='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M14.5 4.5v15"/><path d="M7 12h4M9 10v4"/></svg>';let dm=false;
+{const b=$('rcls'),CL=b.querySelector('svg').outerHTML,tp=b.querySelector('.tip'),DF='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.panelsDefault+'</svg>';let dm=false;
 const paint=()=>{const L=wsL(),e=!L.dock.length&&!L.float.length,d=e&&!!(WBX.wbWsDefault&&WBX.wbWsDefault());if(d===dm&&b.dataset.m)return;dm=d;b.dataset.m=d?'d':'c';b.setAttribute('aria-label',d?'Default panels':'Close all panels');b.querySelector('svg').outerHTML=d?DF:CL;tp.textContent=d?'Default panels':'Close all panels'};
 WBX.wbRcls=paint;
 b.onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length){const w=WBX.wbWsDefault&&WBX.wbWsDefault();if(w){WBX.wbWsSet(w.layout);pmsg('Default panels.')}return}L.dock=[];L.float=[];wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')}}
@@ -375,9 +376,9 @@ function redo(){if(hi<hist.length-1){goTo(hi+1);pmsg('Redid: '+histL[hi])}ub()}
 $('undo').onclick=undo;$('redo').onclick=redo;ub();
 WBX.wbHistGet=i=>hist[i];WBX.wbHistIdx=()=>hi;WBX.wbHistLabel=i=>histL[i]||'Change';WBX.wbResetHist=()=>{if(WBX.wbBA)wbBA.reset();hist=[coreStr()];histL=['Start'];histT=[Date.now()];histTh=[''];hi=0;thWant=null;ub();if(WBX.wbSnapLoad)WBX.wbSnapLoad()};WBX.wbCap=cap;WBX.wbApply=applyCore;
 // ---- History panel + named snapshots
-(()=>{const sec=document.querySelector('section.pn[data-p="hist"]'),hl=$('hhl'),sl=$('hsl'),XI=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+(()=>{const sec=document.querySelector('section.pn[data-p="hist"]'),hl=$('hhl'),sl=$('hsl'),XI=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.close}</svg>`;
 let snaps=[],sk='',raf=0,ren=-1;
-const DOTS='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
+const DOTS='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.more+'</svg>';
 const key=()=>'wb95_sn_'+(WBS.cp&&WBS.cp.id?WBS.cp.id:'draft');
 const persist=()=>{try{kv.set(sk,JSON.stringify(snaps))}catch(e){pmsg('This snapshot is kept for now, but is too large to keep after you close the page.')}};
 function load(){const k=key();try{if(WBS.cp&&WBS.cp.id){const d=kv.get('wb95_sn_draft');if(d&&!kv.get(k)&&sk=='wb95_sn_draft'){kv.set(k,d);kv.remove('wb95_sn_draft')}}}catch(e){}
@@ -408,7 +409,7 @@ setInterval(()=>{if(!sec.hidden)paint()},30000)})();
 
 
 // ---- keyboard shortcuts
-document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=WBS.tiles[WBS.cur]&&WBS.tiles[WBS.cur].items[WBS.sel];
+document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=WBS.tiles[WBS.cur]&&(WBS.tiles[WBS.cur]||WBS.noTile).items[WBS.sel];
 if(m&&k=='z'){if(typing&&(t.type=='text'||t.type=='number'))return;e.preventDefault();e.shiftKey?redo():undo()}
 else if(m&&k=='y'){e.preventDefault();redo()}
 else if(m&&k=='s'){e.preventDefault();cmdGet('file.save').run()}
@@ -501,7 +502,7 @@ if(typeof nums=='function'){const _n=nums;nums=function(){_n();WBX.wbDDsync()}}
 })();
 
 enhance();
-tipRows();WS.pattern={dock:[],float:[]};setView();{let st='';try{st=kv.get('wb96_launch')||''}catch(e){}if(st!=='none')WBX.wbWsSet(wsLaunch())}info();nums();requestAnimationFrame(()=>{applyZ();nums()});
+tipRows();WS.pattern={dock:[],float:[]};setView();{let st='';try{st=kv.get('wb96_launch')||''}catch(e){}if(st==='on')WBX.wbWsSet(wsLaunch())}info();nums();requestAnimationFrame(()=>{applyZ();nums()});
 
 {const sp=document.getElementById('splash'),t0=performance.now();if(sp){const go=()=>{const w=Math.max(0,520-(performance.now()-t0));setTimeout(()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),320)},w)};const f=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1400))]):Promise.resolve();requestAnimationFrame(()=>requestAnimationFrame(()=>f.then(go)))}}
 {const b=$('gdt');let on=true;try{on=kv.get('wb93_dots')!=='0'}catch(e){}const ap=()=>{document.body.classList.toggle('plain',!on);b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))};ap();b.onclick=()=>{on=!on;try{kv.set('wb93_dots',on?'1':'0')}catch(e){}ap()}}

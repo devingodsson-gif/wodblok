@@ -36,12 +36,12 @@ const txAbs=(g,c)=>WBX.wbTxXf(g,M=>{M.ax+=c[0]-M.mx;M.ay+=c[1]-M.my;M.mx=c[0];M.
 const sAx=k=>e=>{const q=Q();if(!q)return;const v=e.target.value/100,f=v/(q[k]||1);QS().forEach(o=>o[k]=o===q?v:clampN((o[k]||1)*f,.2,3));store();upd()};
 const addSt=t=>{const L=WBS.layers[WBS.selL];if(L&&!L.st.includes(t.id))L.st.push(t.id)};
 const layName=()=>{const L=WBS.layers[WBS.selL];return L?L.name:'the pattern'};
-function sync(){const t=WBS.tiles[WBS.cur],L=WBS.layers[WBS.selL],sv=(id,v)=>{if($(id).value!=v)$(id).value=v};syncAsp('c','c');syncAsp('s','s');{const k=csk();document.querySelectorAll('#cshp [data-s]').forEach(b=>{b.classList.toggle('on',b.dataset.s==k);b.disabled=WBS.book.on});
+function sync(){const t=WBS.tiles[WBS.cur]||WBS.noTile,L=WBS.layers[WBS.selL],sv=(id,v)=>{if($(id).value!=v)$(id).value=v};syncAsp('c','c');syncAsp('s','s');{const k=csk();document.querySelectorAll('#cshp [data-s]').forEach(b=>{b.classList.toggle('on',b.dataset.s==k);b.disabled=WBS.book.on});
 $('caspbox').hidden=!CASP.includes(k);$('crrbox').hidden=k!='rrect';$('cngbox').hidden=k!='ngon';$('ccobox').hidden=!['hex','tri','ngon'].includes(k);$('ccirh').hidden=k=='rect';
 {const a=$('ccr'),b=$('cns');if(document.activeElement!==a)a.value=WBS.dim.cr==null?25:WBS.dim.cr;if(document.activeElement!==b)b.value=csN();if(WBX.wbNums)WBX.wbNums()}
 const ob=document.querySelectorAll('#cor [data-o]');ob.forEach(x=>x.classList.toggle('on',x.dataset.o==(WBS.dim.co=='f'?'f':'p')));if(ob.length){ob[0].textContent=k=='hex'?'Pointy top':'Point up';ob[1].textContent=k=='tri'?'Point down':'Flat top'}
 }document.querySelectorAll('#skind [data-k]').forEach(b=>b.classList.toggle('on',b.dataset.k==SK));$('sasprow').hidden=SK=='hex'||SK=='tri';$('shexrow').hidden=SK!='hex';$('shor').value=HO;
-if(WBX.wbTraySync)WBX.wbTraySync();$('neg').checked=!!t.neg;$('swrap').checked=t.wr!==false;
+if(WBX.wbTraySync)WBX.wbTraySync();$('neg').checked=!!(t&&t.neg);$('swrap').checked=!t||t.wr!==false;
 sv('shz',shOf(t).z||100);{const rr=$('shrad');if(rr){sv('shrad',shOf(t).rad||0);const row=rr.closest('.ctl');if(row)row.hidden=SK=='circle'}}sv('let',eT(t));sv('ler',eR(t));$('lers').disabled=!eT(t)||!eR(t);
 Object.values(DD).forEach(f=>f())}
 function init13(){
@@ -62,7 +62,7 @@ $('sth').oninput=e=>{if(!Q())return;const v=+e.target.value;QS().forEach(o=>{if(
 $('srt').oninput=e=>{const q=Q();if(!q)return;const v=+e.target.value,d=v-q.r;{const g=WBX.wbTxGrp&&WBX.wbTxGrp();if(g&&WBS.msel.size>1){const c=txC(),a=d*Math.PI/180,cs=Math.cos(a),sn=Math.sin(a),R=(x,y)=>[c[0]+(x-c[0])*cs-(y-c[1])*sn,c[1]+(x-c[0])*sn+(y-c[1])*cs];txAbs(g,c);QS().forEach(o=>{o.r=o===q?v:wrapA(o.r+d);[o.x,o.y]=wrapP(...R(o.x,o.y))});WBX.wbTxXf(g,M=>{M.rot=wrapA((M.rot||0)+d);[M.ax,M.ay]=R(M.ax,M.ay)});store();upd();return}}QS().forEach(o=>o.r=o===q?v:wrapA(o.r+d));store();upd()};$('ssx').oninput=sAx('sx');$('ssy').oninput=sAx('sy');$('ssr').onclick=()=>{if(Q()){QS().forEach(o=>{delete o.sx;delete o.sy});store();upd()}};
 $('sko').onclick=()=>{const q=Q();if(!q)return;const on=!q.k;QS().forEach(o=>{if(on)o.k=1;else delete o.k});store();upd()};
 $('sfl').onclick=()=>{if(Q()){QS().forEach(o=>o.f*=-1);store();upd()}};
-$('scp').onclick=()=>{if(!Q())return;const a=WBS.tiles[WBS.cur].items,src=QS(),p=src.indexOf(Q()),ids=[];src.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+20,q.y+20);a.push(q);ids.push(a.length-1)});WBS.msel=new Set(ids);WBS.sel=ids[p];store();upd()};
+$('scp').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).items,src=QS(),p=src.indexOf(Q()),ids=[];src.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+20,q.y+20);a.push(q);ids.push(a.length-1)});WBS.msel=new Set(ids);WBS.sel=ids[p];store();upd()};
 // Copy and paste of shapes on an unlocked stamp: Cmd/Ctrl+C keeps the selected shapes, Cmd/Ctrl+V puts copies on the open stamp (also another stamp),
 // each paste a little further along; a picture on the clipboard still goes to the importer.
 // the open stamp takes copy and paste, with a stamp unlocked, on the Pattern canvas
@@ -73,8 +73,8 @@ mclip=src.map(o=>{const q=JSON.parse(JSON.stringify(o));delete q.tg;return q});m
 document.addEventListener('paste',e=>{if(!stEdit()||!mclip||typingIn(e.target))return;if([...(e.clipboardData&&e.clipboardData.items||[])].some(i=>/^image\//.test(i.type)))return;e.preventDefault();
 const t=WBS.tiles[WBS.cur],a=t.items,ids=[];mpaste++;const d=20*mpaste;mclip.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+d,q.y+d);a.push(q);ids.push(a.length-1)});
 WBS.msel=new Set(ids);WBS.sel=ids[0];store();upd()});}
-$('sfr').onclick=()=>{if(!Q())return;const a=WBS.tiles[WBS.cur].items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...rest,...mv);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
-$('ssb').onclick=()=>{if(!Q())return;const a=WBS.tiles[WBS.cur].items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...mv,...rest);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
+$('sfr').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...rest,...mv);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
+$('ssb').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...mv,...rest);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
 $('sym').onclick=e=>{const b=e.target.closest('[data-y]');if(!b)return;const t=WBS.tiles[WBS.cur],d=SYM.find(x=>x[0]==b.dataset.y);t.sym={m:d[0],n:d[2]?(t.sym&&t.sym.m==d[0]?t.sym.n:d[4]):0,...(t.sym&&t.sym.tx?{tx:1}:{})};store();upd()};
 $('symtx').onchange=()=>{const t=WBS.tiles[WBS.cur];t.sym={...(t.sym||{m:'off'})};if($('symtx').checked)t.sym.tx=1;else delete t.sym.tx;WBS.symKey='';store();upd();if(WBX.wbCap)WBX.wbCap()};
 $('sn').oninput=e=>{const t=WBS.tiles[WBS.cur];if(t.sym){t.sym.n=+e.target.value;store();upd()}};

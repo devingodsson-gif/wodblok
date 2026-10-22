@@ -17,12 +17,12 @@ test('text placed before a stamp draws under it: the canvas follows the element 
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Hi');
   await settle(page);
-  await canvasClick(page, 0.5, 0.5);
+  await page.click('.elk[data-k=\"text\"] [data-add]'); await settle(page);   // 2.12.0: Add text makes it
   await page.evaluate(() => document.activeElement && document.activeElement.blur());   // Escape is ignored while the text field has focus
   await page.keyboard.press('Escape');          // stop placing text before the stamp is picked
   await settle(page);
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await canvasClick(page, 0.2, 0.2);          // away from the text, which is wider on the CI renderer
   const pl = (await layers(page));
   expect(pl.map(q => (q.tx != null ? 'text' : q.t != null ? 'stamp' : '?'))).toEqual(['text', 'stamp']);
@@ -34,13 +34,13 @@ test('a stamp placed before text still draws under it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'stmp');
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await canvasClick(page, 0.4, 0.4);
-  await page.click('#lfpst [data-t]');
+  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click');
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'Hi');
   await settle(page);
-  await canvasClick(page, 0.6, 0.6);
+  await page.click('.elk[data-k=\"text\"] [data-add]'); await settle(page);   // 2.12.0: Add text makes it
   const pl = (await layers(page));
   expect(pl.map(q => (q.tx != null ? 'text' : q.t != null ? 'stamp' : '?'))).toEqual(['stamp', 'text']);
   await expect.poll(() => drawnOrder(page)).toEqual(pl.map(q => String(q.u)));

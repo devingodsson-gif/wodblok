@@ -1,10 +1,10 @@
 // Text on a stamp stays readable under symmetry; mirroring it is a choice (UX review D6).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
+const { openApp, openPanel, showPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
 // Canvas flow: the text typed in the Text panel is put on the first printed instance of the unlocked stamp, then one of its letters is clicked so the whole text is selected (the panel edits it)
 async function putTextCanvas(page) {
   const p = await stampInstance(page);
-  await clickStamp(page, p);
+  await addStampText(page);
   const tg = async () => JSON.parse(await getState(page)).tiles[0].items.filter(q => q.tg);
   await expect.poll(async () => (await tg()).length, { timeout: 15000 }).toBeGreaterThan(0);
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await settle(page, { max: 30000 });

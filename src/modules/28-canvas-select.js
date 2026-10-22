@@ -15,6 +15,7 @@ function fpLive(q){const a=document.querySelector(`#art [data-fp="${q.u}"]`);if(
 let fpRaf=0;function fpRedraw(){if(fpRaf)return;fpRaf=requestAnimationFrame(()=>{fpRaf=0;if(WBS.fpDrag)upd()})}
 const fpEnd=()=>{if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved;WBS.fpDrag=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};
 function init28(){
+ try{let raf=0;new ResizeObserver(()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(WBH.fpOverlay)WBH.fpOverlay()})}).observe($("art"))}catch(e){}   // the box keeps its pixel size when the view is zoomed (2.15.0)
 // --- canvas: place, select, drag
 $('art').addEventListener('pointerdown',e=>{const L=fpL();if(!L||e.button!==0||$('boardP').classList.contains('off'))return;const[x,y]=fpPt(e);if(!inShape(x,y)&&!(e.target.closest&&e.target.closest('[data-fh]')))return;
 const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,x0:hp.x,y0:hp.y,wx0:hp.wx||1,wy0:hp.wy||1,wh0:fpWH(hp)||[1,1],moved:false};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
@@ -28,12 +29,14 @@ p.x=+nx.toFixed(1);p.y=+ny.toFixed(1);
 if(!fpLive(p))fpRedraw();$('fpov').innerHTML=fpBox(p,'sel')+fpHandles(p);return}
 if(WBS.fpB||WBS.txArm){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpPt(e),e);WBH.fpOverlay()}});
 // Pulling a corner or a side square of a placed piece: the opposite corner or side stays where it is; with Shift it grows from the middle. Corners keep the proportions, sides pull only the width or the height.
-function fpResize(h,x,y,e){const p=h.p,S0=Math.min(CW,CH),a=-(+p.r||0)*Math.PI/180,dx=x-h.x0,dy=y-h.y0,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),[w0,h0]=h.wh0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ox=0,oy=0;
-if(h.k.length==2){const cx=h.k[1]=='e'?1:-1,cy=h.k[0]=='s'?1:-1,Cx=cx*w0/2,Cy=cy*h0/2,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy),s=cl(h.s0*k,S0*.02,S0*3);s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);WBS.fpLast=p.s;k=p.s/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
-else if(p.tx&&h.k.length==1){// a text: the sides pull its box (width wraps the lines, height makes it a fixed box)
-const ra=p.s/Math.max(p.n||1,.01),U=WBX.wbTxUnit(),side=h.k=='e'||h.k=='w',d=h.k=='e'||h.k=='s'?1:-1;if(side){const w=Math.max(U*3*ra,mid?Math.abs(lx)*2:d*lx+w0/2);p.tx={...p.tx,wd:+(w/ra/U).toFixed(2)};if(!mid)ox=d*(w-w0)/2}else{const hh=Math.max(U*3*ra,mid?Math.abs(ly)*2:d*ly+h0/2);p.tx={...p.tx,ht:+(hh/ra/U).toFixed(2)};if(!mid)oy=d*(hh-h0)/2}h.rel=[p,side&&!mid&&!(p.tx.ht>0)]}
-else if(h.k=='e'||h.k=='w'){const d=h.k=='e'?1:-1,w=Math.max(w0*.02,mid?Math.abs(lx)*2:d*lx+w0/2),nx=cl(+(h.wx0*w/w0).toFixed(3),.05,20);if(nx!=1||p.wx)p.wx=nx;if(!mid)ox=d*(w0*nx/h.wx0-w0)/2}
-else{const d=h.k=='s'?1:-1,hh=Math.max(h0*.02,mid?Math.abs(ly)*2:d*ly+h0/2),ny=cl(+(h.wy0*hh/h0).toFixed(3),.05,20);if(ny!=1||p.wy)p.wy=ny;if(!mid)oy=d*(h0*ny/h.wy0-h0)/2}
+function fpResize(h,x,y,e){const p=h.p,S0=Math.min(CW,CH),a=-(+p.r||0)*Math.PI/180,dx=x-h.x0,dy=y-h.y0,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),[w0,h0]=h.wh0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ox=0,oy=0,k0=h.k;
+// A corner stretches one side (2.15.0): the first clear pull sideways sets the width, up or down the height; Ctrl or Cmd keeps scaling both together.
+if(k0.length==2&&!(e.ctrlKey||e.metaKey)){{const mx=lx-(k0[1]=='e'?w0/2:-w0/2),my=ly-(k0[0]=='s'?h0/2:-h0/2);if(!h.ax&&Math.hypot(mx,my)>S0*.006)h.ax=Math.abs(mx)>=Math.abs(my)?'x':'y'}if(!h.ax)return;k0=h.ax=='x'?(k0[1]=='e'?'e':'w'):(k0[0]=='s'?'s':'n')}
+if(k0.length==2){const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Cx=cx*w0/2,Cy=cy*h0/2,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy),s=cl(h.s0*k,S0*.02,S0*3);s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);WBS.fpLast=p.s;k=p.s/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
+else if(p.tx&&k0.length==1){// a text: the sides pull its box (width wraps the lines, height makes it a fixed box)
+const ra=p.s/Math.max(p.n||1,.01),U=WBX.wbTxUnit(),side=k0=='e'||k0=='w',d=k0=='e'||k0=='s'?1:-1;if(side){const w=Math.max(U*3*ra,mid?Math.abs(lx)*2:d*lx+w0/2);p.tx={...p.tx,wd:+(w/ra/U).toFixed(2)};if(!mid)ox=d*(w-w0)/2}else{const hh=Math.max(U*3*ra,mid?Math.abs(ly)*2:d*ly+h0/2);p.tx={...p.tx,ht:+(hh/ra/U).toFixed(2)};if(!mid)oy=d*(hh-h0)/2}h.rel=[p,side&&!mid&&!(p.tx.ht>0)]}
+else if(k0=='e'||k0=='w'){const d=k0=='e'?1:-1,w=Math.max(w0*.02,mid?Math.abs(lx)*2:d*lx+w0/2),nx=cl(+(h.wx0*w/w0).toFixed(3),.05,20);if(nx!=1||p.wx)p.wx=nx;if(!mid)ox=d*(w0*nx/h.wx0-w0)/2}
+else{const d=k0=='s'?1:-1,hh=Math.max(h0*.02,mid?Math.abs(ly)*2:d*ly+h0/2),ny=cl(+(h.wy0*hh/h0).toFixed(3),.05,20);if(ny!=1||p.wy)p.wy=ny;if(!mid)oy=d*(h0*ny/h.wy0-h0)/2}
 const r=-a;p.x=+(h.x0+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(1);p.y=+(h.y0+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(1);if(h.rel&&WBX.wbTbRelay)WBX.wbTbRelay(h.rel[0],h.rel[1],h)}
 $('art').addEventListener('pointermove',e=>{if(!WBS.fpXf)return;const[x,y]=fpPt(e),p=WBS.fpXf.p,S0=Math.min(CW,CH);
 if(WBS.fpXf.k!='rot')fpResize(WBS.fpXf,x,y,e);

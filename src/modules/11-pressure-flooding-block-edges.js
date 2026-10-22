@@ -12,7 +12,7 @@ import {txoG} from './17-texture-panel-and-previews.js';
 // Flooding: mottled ink and pooling (noise) that fades in toward the heavy side, clipped square by the block.
 // ---- Block edges: the raised rim of the block, printed as a ribbon along the stamp outline.
 // Thickness sets the ribbon width; roughness adds width swell, ragged sides, per-side misalignment and worn gaps.
-const eT=t=>t.et!=null?+t.et:3,eR=t=>t.er!=null?+t.er:3,eNV=t=>eR(t)>0?6:1;
+const eT=t=>t&&t.et!=null?+t.et:3,eR=t=>t&&t.er!=null?+t.er:3,eNV=t=>eR(t)>0?6:1;
 // Block edge artifact, modelled on how a real block prints its rim:
 // - the outer edge is the straight cut edge of the block (clipped exactly to the stamp outline);
 // - the inner edge is ragged where the ink stops;
@@ -85,15 +85,17 @@ const mkm=(id,body)=>`<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" wi
 o+=fd+`<mask id="mp${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shape}</mask>${rm}${t.neg?`<g id="q${k}">${shBleed(ci)}<g clip-path="url(#shc${t.id})">`:`<g id="q${k}" clip-path="url(#shc${t.id})">`}${isOf(t)?`<g mask="url(#is${t.id})">`:''}${rn?rn.map((r,j)=>`<rect width="${SW}" height="${SH}" fill="${r.c?col(r.c):ci}" mask="url(#mp${k}r${j})"/>`).join('')+(frame?`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k}rr)"/>`:''):`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k})"/>`}${txoG(t,'mp'+k)}${isOf(t)?'</g>':''}${t.neg?'</g></g>':'</g>'}`;{const _pc=o.slice(_ob);BK.PC[k]=_pc;BK.P[k]=bkH(_pc+'|'+(BK.PF[x]||''));o=o.slice(0,_ob)+'<!--@P:'+k+'-->'+_pc+'<!--@-->'}});BK.PD.set(x,{k:_ck,o:o.slice(_o0),pf:BK.PF[x],pc:_bt.map(b=>{const k=x+'_'+b;return[k,BK.PC[k],BK.P[k]]})})});
 useT(WBS.tiles[WBS.cur]);return o}
 let raf=0;const upd=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;WBH.draw();build();if(typeof WBH.syncPr=='function')WBH.syncPr()})};
-const Q=()=>WBS.tiles[WBS.cur].items[WBS.sel];
+const Q=()=>(WBS.tiles[WBS.cur]||WBS.noTile).items[WBS.sel];
 function init11(){
 EDC=new Map();
 WBX.hdResize=hdResize;
 // Pulling a corner or a side square: the opposite corner or side stays where it is; with Shift the motif grows from its middle. Works in the motif's own (turned) frame.
-function hdResize(h,p,e){const q=h.q,a=-h.r0*Math.PI/180,dx=p.x-h.cx,dy=p.y-h.cy,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),rx0=48*h.s0*h.sx0,ry0=48*h.s0*h.sy0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ns=h.s0,nx=h.sx0,ny=h.sy0,ox=0,oy=0;
-if(h.k.length==2){const cx=h.k[1]=='e'?1:-1,cy=h.k[0]=='s'?1:-1,Cx=cx*rx0,Cy=cy*ry0,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy);ns=cl(+(h.s0*k).toFixed(3),.02,4);k=ns/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
-else if(h.k=='e'||h.k=='w'){const d=h.k=='e'?1:-1,w=mid?Math.abs(lx)*2:d*lx+rx0;nx=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)ox=-d*rx0+d*48*h.s0*nx}
-else{const d=h.k=='s'?1:-1,w=mid?Math.abs(ly)*2:d*ly+ry0;ny=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)oy=-d*ry0+d*48*h.s0*ny}
+function hdResize(h,p,e){const q=h.q,a=-h.r0*Math.PI/180,dx=p.x-h.cx,dy=p.y-h.cy,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),rx0=48*h.s0*h.sx0,ry0=48*h.s0*h.sy0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ns=h.s0,nx=h.sx0,ny=h.sy0,ox=0,oy=0,k0=h.k;
+// A corner stretches one side (2.15.0): the first clear pull sideways sets the width, up or down the height; Ctrl or Cmd keeps scaling both together.
+if(k0.length==2&&!(e.ctrlKey||e.metaKey)){{const mx=lx-(k0[1]=='e'?rx0:-rx0),my=ly-(k0[0]=='s'?ry0:-ry0);if(!h.ax&&Math.hypot(mx,my)>Math.max(2,Math.min(rx0,ry0)*.08))h.ax=Math.abs(mx)>=Math.abs(my)?'x':'y'}if(!h.ax)return;k0=h.ax=='x'?(k0[1]=='e'?'e':'w'):(k0[0]=='s'?'s':'n')}
+if(k0.length==2){const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Cx=cx*rx0,Cy=cy*ry0,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy);ns=cl(+(h.s0*k).toFixed(3),.02,4);k=ns/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
+else if(k0=='e'||k0=='w'){const d=k0=='e'?1:-1,w=mid?Math.abs(lx)*2:d*lx+rx0;nx=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)ox=-d*rx0+d*48*h.s0*nx}
+else{const d=k0=='s'?1:-1,w=mid?Math.abs(ly)*2:d*ly+ry0;ny=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)oy=-d*ry0+d*48*h.s0*ny}
 q.s=ns;if(nx!=1||q.sx)q.sx=nx;if(ny!=1||q.sy)q.sy=ny;const r=-a;q.x=+(h.cx+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(2);q.y=+(h.cy+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(2)}
 }
 export {Q,eNV,eR,eSeed,eT,edgeDef,edgeDefs,pressDefs,raf,upd,init11};

@@ -1,7 +1,7 @@
 import {kv} from '../platform/index.js';
 const WBH={};
 const WBX={};
-const WBS={};
+const WBS={noTile:{id:0,items:[],et:0,er:0}};   // noTile: what the editor reads while the project has no stamp at all (2.15.0); it is never in the document
 // One place to change the version (package.json): the badge, tooltip and page title all follow this text, e.g. 0.108 (shown as v0.108).
 const WB_VER='0.100';
 // When this build was made (ISO time, written by the build from the commit date; empty when running the unbundled modules).

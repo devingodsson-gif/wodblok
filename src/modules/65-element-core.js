@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,col,okC,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {freeLayer} from './24-free-place-layers.js';
@@ -66,18 +67,18 @@ function elSync(){if(WBX.wbAbSync)WBX.wbAbSync();if(WBX.wbElkSync)WBX.wbElkSync(
 if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbShpSync)WBX.wbShpSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
 const q=elSel(),k=elKind(q);
 // the selection opens its kind's panel (2.6.0, always; before, only while the Properties group was open): picking an element in the Elements list or on the canvas shows its properties
-{const su=q?String(q.u):'';if(su!==elLast){elLast=su;const d=k&&EL_K[k];if(su&&d&&d.pn&&!(WBX.plKind&&(WBX.plKind()=='motif'||WBX.plKind()=='stamp'))&&WBX.wbOpenPanel&&(!WBX.wbApart||WBX.wbApart(d.pn))){const pn=d.pn;setTimeout(()=>{const s2=document.querySelector(`section.pn[data-p="${pn}"]`);if(!s2||s2.hidden)WBX.wbOpenPanel(pn)},0)}}}
+{const su=q?String(q.u):'';if(su!==elLast){elLast=su;const d=k&&EL_K[k];if(su&&d&&d.pn&&!(WBX.plKind&&(WBX.plKind()=='motif'||WBX.plKind()=='stamp'))&&WBX.wbOpenPanel){const pn=d.pn;setTimeout(()=>{const s2=document.querySelector(`section.pn[data-p="${pn}"]`);if(!s2||s2.hidden||!s2.getClientRects().length)WBX.wbOpenPanel(pn)},0)}}}
 document.querySelectorAll('.elmode[data-k]').forEach(m=>{const on=!!q&&m.dataset.k===k,d=EL_K[m.dataset.k];m.hidden=!on;const nb=m.querySelector('b');if(on&&nb&&d&&d.name){const t=d.name(q);if(nb.textContent!==t)nb.textContent=t}})}
 
 function init65(){
 // the kinds, in the order of the element bar. Image, Text and Stamp exist as placed elements today (their test and drawing; dz keeps the order their
 // shared definitions were always written in); the others get them in later steps.
-elRegister('paint',{hide:true,label:'Paint',pn:'elpaint',icon:'<path d="M19.5 4.5c-2.6 1-6.4 4.8-8.4 7.9l1.6 1.6c3.1-2 6.9-5.8 7.9-8.4z"/><path d="M10.2 13.6c-2 0-3.5 1.3-3.5 3.2 0 1.4-.8 2.4-2.4 2.7 2.6 1.3 7.4.6 7.4-4.4z"/>'});
-elRegister('motif',{label:'Motif',pn:'motifs',icon:'<path d="M12 2.8l5.2 8.7H6.8z"/><circle cx="7" cy="17" r="4"/><rect x="12.8" y="13" width="8.4" height="8.4" rx="1.4"/>'});
-elRegister('shape',{label:'Shape',pn:'mlist',icon:'<rect x="3.5" y="4.5" width="10" height="10" rx="1.5"/><circle cx="15.5" cy="15.5" r="5"/>'});
-elRegister('text',{label:'Text',pn:'text',icon:'<path d="M5.5 7.5V5h13v2.5M12 5v14M9 19h6"/>',dz:3,is:q=>q.tx!=null,name:q=>String((q.tx&&q.tx.text)||'').replace(/\n/g,' ').slice(0,28),draw:(L,li)=>txtLayer(L,li)});
-elRegister('stamp',{label:'Stamp',pn:'stmp',icon:'<rect x="3.5" y="10.5" width="9" height="9" rx="2"/><path d="M17 4.5l4 7h-8z"/>',dz:1,is:q=>q.t!=null,name:q=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==q.t)+1),draw:(L,li,pa,lgB)=>freeLayer(L,li,pa,lgB)});
-elRegister('pattern',{label:'Pattern',pn:'layers',icon:'<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>'});
+elRegister('paint',{hide:true,label:'Paint',pn:'elpaint',icon:ICN.brush});
+elRegister('motif',{label:'Motif',pn:'motifs',icon:ICN.motif});
+elRegister('shape',{label:'Shape',pn:'mlist',icon:ICN.shape});
+elRegister('text',{label:'Text',pn:'text',icon:ICN.text,dz:3,is:q=>q.tx!=null,name:q=>String((q.tx&&q.tx.text)||'').replace(/\n/g,' ').slice(0,28),draw:(L,li)=>txtLayer(L,li)});
+elRegister('stamp',{label:'Stamp',pn:'stmp',icon:ICN.stamp,dz:1,is:q=>q.t!=null,name:q=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==q.t)+1),draw:(L,li,pa,lgB)=>freeLayer(L,li,pa,lgB)});
+elRegister('pattern',{label:'Pattern',pn:'layers',icon:ICN.pattern});
 elBar();
 const b=$('elb');if(b)b.onclick=e=>{const x=e.target.closest('.elbb');if(!x||x.disabled)return;const d=EL_K[x.dataset.k];if(d&&d.pn&&WBX.wbOpenPanel)WBX.wbOpenPanel(d.pn)};
 WBX.wbElSync=elSync;WBX.wbElSeen=u=>{elLast=String(u)};

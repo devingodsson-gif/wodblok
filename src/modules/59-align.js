@@ -1,3 +1,4 @@
+import {ICN,icAlign} from './00-icons.js';
 import {cmdRegister} from '../commands/registry.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,bk} from './04-canvas-and-stamp-outlines.js';
@@ -24,15 +25,15 @@ function alTo(fx,fy){const bs=alItems();if(!bs.length)return;const bb=alBounds(b
 function alSpread(ax){const bs=alItems();if(bs.length<3)return;const lo=ax=='x'?'x0':'y0',hi=ax=='x'?'x1':'y1',k=ax,s=bs.slice().sort((a,b)=>(a[lo]+a[hi])-(b[lo]+b[hi]));const first=s[0],last=s[s.length-1],total=last[hi]-first[lo],sum=s.reduce((t,b)=>t+(b[hi]-b[lo]),0),gap=(total-sum)/(s.length-1);let pos=first[hi]+gap,ch=false;
  for(let i=1;i<s.length-1;i++){const b=s[i],d=pos-b[lo];if(Math.abs(d)>1e-6){b.p[k]+=d;ch=true}pos+=(b[hi]-b[lo])+gap}if(ch)alDone()}
 function alSync(){const n=alItems().length,g=$('lalsec');if(!g)return;g.querySelectorAll('button').forEach(b=>{b.disabled=b.dataset.k=='d'?n<3:!n})}
-const alIc=b=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${b}</svg>`;
+const alIc=b=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${b}</svg>`;
 function init59(){
  const g=$('lalg');if(!g)return;
- g.innerHTML=ALN.map((t,i)=>{const r=Math.floor(i/3),c=i%3;return`<button type="button" id="al_${r}${c}" data-k="a" data-x="${c/2}" data-y="${r/2}" disabled aria-label="${t}" title="${t}">${alIc(`<rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><rect x="${5+c*4.5}" y="${5+r*4.5}" width="5" height="5" rx="1" fill="currentColor" fill-opacity=".55"/>`)}</button>`}).join('');
+ g.innerHTML=ALN.map((t,i)=>{const r=Math.floor(i/3),c=i%3;return`<button type="button" id="al_${r}${c}" data-k="a" data-x="${c/2}" data-y="${r/2}" disabled aria-label="${t}" title="${t}">${alIc(icAlign(r,c))}</button>`}).join('');
  g.onclick=e=>{const b=e.target.closest('button[data-k="a"]');if(b&&!b.disabled)alTo(+b.dataset.x,+b.dataset.y)};
- const X=[['al_ch','Centre across','c','x',alIc('<path d="M12 3.5v17" stroke-dasharray="2.4 2.6"/><rect x="6" y="9.5" width="12" height="5" rx="1.2"/>'),()=>alTo(.5,null)],
-  ['al_cv','Centre down','c','y',alIc('<path d="M3.5 12h17" stroke-dasharray="2.4 2.6"/><rect x="9.5" y="6" width="5" height="12" rx="1.2"/>'),()=>alTo(null,.5)],
-  ['al_dh','Distribute across','d','x',alIc('<path d="M4 4v16M20 4v16"/><rect x="9.5" y="8" width="5" height="8" rx="1.2"/>'),()=>alSpread('x')],
-  ['al_dv','Distribute down','d','y',alIc('<path d="M4 4h16M4 20h16"/><rect x="8" y="9.5" width="8" height="5" rx="1.2"/>'),()=>alSpread('y')]];
+ const X=[['al_ch','Centre across','c','x',alIc(ICN.alignCx),()=>alTo(.5,null)],
+  ['al_cv','Centre down','c','y',alIc(ICN.alignCy),()=>alTo(null,.5)],
+  ['al_dh','Distribute across','d','x',alIc(ICN.distX),()=>alSpread('x')],
+  ['al_dv','Distribute down','d','y',alIc(ICN.distY),()=>alSpread('y')]];
  const row=$('lalr');row.innerHTML=X.map(([id,t,k,,svg])=>`<button class="ib" type="button" id="${id}" data-k="${k}" disabled aria-label="${t}" title="${t}">${svg}</button>`).join('');
  X.forEach(([id,,,,,fn])=>{$(id).onclick=fn});
  const cmds=[...ALN.map((t,i)=>['align.'+i,'Align: '+t,'al_'+Math.floor(i/3)+(i%3)]),...X.map(([id,t])=>['align.'+id.slice(3),'Align: '+t,id])];

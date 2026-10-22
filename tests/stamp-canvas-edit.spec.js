@@ -105,7 +105,9 @@ test('a click selects a shape, dragging moves it, a handle resizes it, the round
   expect(Math.abs(it[n - 1].x - x0 - 30 / p.k)).toBeLessThan(3);
   // resize from the south east corner, outwards
   const s0 = it[n - 1].s, se = await centre(handle(page, 'se'));
+  await page.keyboard.down('Control');                      // Ctrl or Cmd scales both sides together (2.15.0); a plain corner stretches one
   await drag(page, se, { x: se.x + 25, y: se.y + 25 });
+  await page.keyboard.up('Control');
   expect((await items(page))[n - 1].s).toBeGreaterThan(s0);
   // turn with the round handle: drag it to the right of the shape's middle
   it = await items(page);
@@ -140,15 +142,14 @@ test('placing is one undo step, and locking the stamp hides the selection', asyn
   expect(errors).toEqual([]);
 });
 
-test('text typed in the Text panel goes into the unlocked stamp as letters, on every instance', async ({ page }) => {
+test('text added with Add text goes into the unlocked stamp as letters, on every instance', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await unlock(page);
   await openPanel(page, 'text');
   await page.fill('#tx_t', 'AB');
   await settle(page);
   const before = (await items(page)).length;
-  const p = await inst(page);
-  await click(page, p);
+  await page.click('section.pn[data-p="text"] .elk[data-k="text"] [data-add]');   // 2.12.0: Add text puts it in the middle of the stamp
   await expect.poll(async () => (await items(page)).length, { timeout: 15000 }).toBe(before + 2);
   const it = await items(page);
   expect(it.slice(-2).every(q => q.tg)).toBe(true);

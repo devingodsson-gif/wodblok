@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {kv,use} from '../platform/index.js';
 import {zipSync} from '../vendor/fflate.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
@@ -70,8 +71,8 @@ function init43(){
       }
       const t=document.createElement('div'),b=document.createElement('b'),s=document.createElement('small');b.textContent=r.name;s.textContent=sum(r);t.append(b,s);e.appendChild(t);
       if(own){
-        const a=document.createElement('button');a.type='button';a.className='ib';a.dataset.act='ren';a.setAttribute('aria-label','Rename '+r.name);a.innerHTML=icon('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>');
-        const d=document.createElement('button');d.type='button';d.className='ib';d.dataset.act='del';d.setAttribute('aria-label','Delete '+r.name);d.innerHTML=icon('<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/>');
+        const a=document.createElement('button');a.type='button';a.className='ib';a.dataset.act='ren';a.setAttribute('aria-label','Rename '+r.name);a.innerHTML=icon(ICN.pencil);
+        const d=document.createElement('button');d.type='button';d.className='ib';d.dataset.act='del';d.setAttribute('aria-label','Delete '+r.name);d.innerHTML=icon(ICN.trash);
         e.append(a,d);
       }else e.style.gridTemplateColumns='minmax(0,1fr)';
       list.appendChild(e);

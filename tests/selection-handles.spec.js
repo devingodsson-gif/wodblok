@@ -45,8 +45,10 @@ test('dragging the round handle turns the motif and a corner outward makes it la
   await page.waitForTimeout(700);                                                  // the history picks the finished drag up
   const c = await centre(page, '#stoh [data-hd="se"]'), nw = await centre(page, '#stoh [data-hd="nw"]');
   const dx = c.x - nw.x, dy = c.y - nw.y, k = 40 / Math.hypot(dx, dy);   // outward along the turned shape's own diagonal
+  await page.keyboard.down('Control');                                             // both sides together (a plain corner stretches one)
   await page.mouse.move(c.x, c.y); await page.mouse.down();
   await page.mouse.move(c.x + dx * k, c.y + dy * k, { steps: 6 }); await page.mouse.up();
+  await page.keyboard.up('Control');
   await settle(page);
   const after = await items(page);
   expect(after[i].s).toBeGreaterThan(mid[i].s * 1.05);

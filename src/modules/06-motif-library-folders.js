@@ -36,7 +36,7 @@ let _stT=0;const store=()=>{clearTimeout(_stT);_stT=setTimeout(store0,400)};
 const store0=()=>{_stT=0;try{kv.set('wb4_layers',JSON.stringify({layers:WBS.layers}));kv.set('wb2_proj',JSON.stringify(WBS.proj));kv.set('wb2_cust',JSON.stringify(cust));kv.set('wb2_tiles',JSON.stringify(WBS.tiles))}catch(e){}};
 const say=t=>{$('pmsg').textContent=t};
 const pal=()=>[col(WBS.proj.bg),col(WBS.proj.ink)];
-const inkOf=t=>col(t.ink||WBS.proj.ink);
+const inkOf=t=>col((t&&t.ink)||WBS.proj.ink);
 const cols=t=>{const b0=col(WBS.proj.bg),c0=inkOf(t);return t.neg?{bg:c0,c:b0,d:c0}:{bg:b0,c:c0,d:b0}};
 const mk=(k,c,d)=>(k[0]=='b'?M[(+k.slice(1)||0)%M.length]:cust[k]?tk(cust[k].svg):M[0])(c,d);
 function init06(){// ---- Library folders. Your folders hold imported and Claude-drawn shapes (moved in), and built-in shapes

@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {geom,shOf,stvSet} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -35,7 +36,7 @@ function steClose(id){const i=STE.tabs.indexOf(id);if(i<0)return;const act=stUnl
 const steEdit=id=>{if(stUnlocked()===id)steClose(id);else steGo(id)};
 const steOpen=id=>steGo(id);
 const steDone=()=>{const id=stUnlocked();if(id!=null)steClose(id)};
-const stIcX='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const stIcX='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.close+'</svg>';
 function steTabs(un){const bar=$('stetabs');if(!bar)return;STE.tabs=STE.tabs.filter(id=>WBS.tiles.some(t=>t.id==id));
  const key=[un,STE.tabs.map(id=>id+':'+(WBS.tiles.findIndex(t=>t.id==id)+1)).join()].join('|');if(key===STE.key)return;STE.key=key;
  const on=STE.tabs.length>0;if(bar.classList.contains('on')!==on)bar.classList.toggle('on',on);

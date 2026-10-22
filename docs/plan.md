@@ -461,3 +461,50 @@ Third step of the layer update (docs/layer-update-plan.md). Screen only; no data
 - **Texture and Grade tools removed.** The Textures and Grade panels and rail buttons, the Canvas Surface group and the Stamp and Text Texture groups are gone. Texture and Colour grade exist only as per-element effects. The Texture effect now carries Type, Strength, Scale and Light from (each effect owns a private library texture).
 - **Inert, not deleted.** The texture and grade engines and the saved `tu`/`WBS.tex` fields stay, so files still open and render; nothing creates whole-design texture or grade any more (a new project-wide element is planned by the owner). Possible cleanup: the unreachable grade panel DOM and `init31` UI code.
 - Not run: CI, the full suite and `npm run perf`.
+
+### 2.10.0 (Oct 21 2026): tidy start (owner: one Elements tool, nothing created or open at start, no Stamp library tool). Format 25 unchanged
+- **Elements.** The rail's stack tool (tip "Layers") is now "Elements" (it already opened the Elements list). The other rail button called "Element" (Shape panel) is gone from the rail: Shape opens from the element bar like the other element panels.
+- **Nothing at start.** A new project (launch, New, Clear) holds no element at all: the Pattern it used to start with is gone. Add one from the bar.
+- **No panels at start.** Launch opens no panel (Default panels on the rail button still opens the built-in layout). Tests ask for it with `workspaces: true` (`wb96_launch='on'`).
+- **No Stamp library tool.** Its rail button and "Open Stamp library" command are removed; the panel and its code stay for later (stamp saving), and the Stamp panel's library button still opens it.
+- Not run: CI and the full suite (owner's instruction).
+
+### 2.11.0 (Oct 21 2026): Colourways merged into the bottom of Colours (owner). Format 25 unchanged
+- The Colourways tool, its rail button and "Open Colourways" command are gone; its cards and New colourway / Export… buttons are a "Colourways" group at the bottom of the Colours panel (same ids, same code in 53-colourways.js).
+- Not run: CI and the full suite.
+
+### 2.12.0 (Oct 21 2026): element flow (owner: selecting jumps to the panel, tool order, motifs and text without clicking the canvas). Format 25 unchanged
+- **Jump.** Selecting an element (canvas or list) shows its kind's panel whenever that panel is not on screen, also when all panels are closed or it is a tab beside the Elements list (the old `wbApart` rule is gone).
+- **Rail order.** Canvas, Colours, Elements, Grid, History, Randomize, Export recipes.
+- **Motifs.** A picked library motif is a ghost on the pointer and a click makes it, also when there is no stamp on the canvas (the ghost used to need a printed stamp; it is now drawn at the Motif's own size). A stamp's tab shows Add motif (a motif in the middle of the stamp) and Add text on their panels.
+- **Text.** Text is made with Add text only, in the Pattern view and in a stamp's tab (the middle of the stamp). Typing no longer arms a text for clicking onto the canvas; the old Add text arm button (#tx_go) is hidden (code kept for now).
+- Tests: `tests/element-flow.spec.js`; the harness now adds a Pattern with the stamp as its source after launch by default (`pattern: false` for an empty start); the text specs use Add text.
+- Snapshot note: tests that now add the Pattern through the bar draw different random ids and seeds, so state and SVG snapshots of those specs will differ; not regenerated (owner's approval first).
+- Not run: CI and the full suite.
+
+### 2.13.0 (Oct 21 2026): the Stamp panel redone (owner). Format 25 unchanged
+Between us only (never in the UI): a stamp parent is a stamp (a template, a tile); a stamp child is a copy printed or placed on the canvas.
+- **Create New Stamp** is the first thing in the Stamp panel (it makes a stamp parent and still asks for its outline kind). The stamp list keeps its Edit pencil and the Edit button; **Add stamp** (a new child of the selected stamp, in the middle of the canvas) sits under the list.
+- **Gone:** Contents (Make stamp from selection and its list), the Place strip, and the Outlines group and the outline drawing on the canvas (the opacity setting `wb146_olop` is no longer read). The hit test and the stamp tab's own frame are unchanged.
+- **Block, Block edge and Symmetry** show only in a stamp's tab.
+- Kept hidden for now: the `#lfpst` strip node (code in 25-art-layers.js and the Add bar arm still read it; the specs arm a stamp through it), the Stamp library code.
+- Tests: `tests/stamp-panel.spec.js`; removed `stamp-contents.spec.js` and the outline checks; the specs now arm a stamp with a dispatched click, `closeAllPanels` replaces `#rcls`, align and row-menu re-show the Elements panel after a selection jump, stamp-editor-port uses Add text; the stamp-library save test is `fixme` (no way to open the library since 2.10.0).
+- Not run: CI, the full suite, `npm run perf` (less drawing work, none added).
+
+### 2.14.0 (Oct 21 2026): new icons (owner: "very minimalist and simple, clean yet clear and communicative, like Photoshop"). Format 25 unchanged
+- Every UI icon is redrawn and lives in one place, `src/modules/00-icons.js` (`ICN`, `ic()`, `icFill()`, `icAlign()`): the page's icons are `data-ic` names filled at start-up, the code's icons use `ICN.name`. About 90 icons replace roughly 150 inline drawings across the shell and 21 modules.
+- One hairline weight at every size (`--ic-w` 1.25px, non-scaling stroke) instead of six per-context stroke widths.
+- New pictures where the old ones were unclear: the Stamp is a rubber stamp, Canvas is a crop mark, Motif is a small flower, Bring to front / Send to back are arrows to a bar, Export is a download into a tray, Save to library is the same.
+- Kept as artwork (not icons): stamp outline kinds, grid cell shapes, Shape presets.
+- Tests: element-list re-shows the Elements panel after a selection jump; account and template-picker specs start empty (the harness Pattern needs the app open).
+- Goldens: every pixel golden that shows an icon will differ (the rail, the bars, panel headers): an explained change, to regenerate when the suite runs.
+- Not run: CI, the full suite, `npm run perf` (no drawing path touched).
+
+### 2.15.0 (Oct 21 2026): selection box, no stamp by default, Create New Stamp, stamp tabs without a Pattern (owner). Format 25 unchanged
+- **Selection box.** One-pixel accent line, square handles and a round rotate handle filled with the text colour and edged with the panel colour (tokens only, no red or white), 9px handles at any zoom (the box redraws when the view changes). The stamp tab's box uses the same look.
+- **Corners.** A corner now stretches one side: pulled sideways it sets the width, up or down the height (the first clear pull decides). Ctrl or Cmd scales both together as before; Shift still works from the middle. Same in a stamp tab.
+- **No stamp by default.** A new project has no stamp at all (`tiles: []`); Add stamp and Edit are off until one exists; the last stamp can be deleted. The editor reads `WBS.noTile` where it needs a stamp and there is none (never saved).
+- **Create New Stamp** is the same box and button as Add stamp and the other Add buttons, and works the same: one press makes a plain rectangle stamp (the outline is chosen in its tab, Block). It does not open the tab.
+- **Stamp tabs.** Fixed the cause of "a motif I can't touch or place": a stamp's tab edited the stamp through the printed copy, which only existed when the layer had a Pattern. In an empty project the tab did nothing. It now works with nothing else in the project (Add motif, drag, a library motif as a ghost and click to place, Add text, Block, Symmetry).
+- Tests: `selection-box.spec.js`, `stamp-tab-motifs.spec.js`; the harness makes the one stamp the old start had when it adds a Pattern.
+- Not run: CI, the full suite, `npm run perf` (a wide batch of the stamp, pattern and project specs ran).

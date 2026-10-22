@@ -16,8 +16,8 @@ function init22(){// ===== Text tool: type text, it's traced into carved letter 
 const autoFit=()=>{if(!st.auto||edit||!st.text.trim())return;const v=teFitSz(st);if(v!=st.sz){st.sz=v;$('tx_sz').value=v;$('tx_sz').dispatchEvent(new Event('input',{bubbles:true}))}};let st={...teD},edit=null,tmr=0,syncing=0,ltmr=0,lastLive=0;
 const A=(t)=>t.tgm||(t.tgm={});
 const grpOf=()=>{const qs=QS();if(!qs.length)return null;const g=qs[0].tg;if(!g||!qs.every(o=>o.tg==g))return null;const t=WBS.tiles[WBS.cur];return A(t)[g]?g:null};
-const idsOf=g=>WBS.tiles[WBS.cur].items.map((q,i)=>q.tg==g?i:-1).filter(i=>i>=0);
-const mean=ids=>{const it2=WBS.tiles[WBS.cur].items;let x=0,y=0;ids.forEach(i=>{x+=it2[i].x;y+=it2[i].y});return[x/ids.length,y/ids.length]};
+const idsOf=g=>(WBS.tiles[WBS.cur]||WBS.noTile).items.map((q,i)=>q.tg==g?i:-1).filter(i=>i>=0);
+const mean=ids=>{const it2=(WBS.tiles[WBS.cur]||WBS.noTile).items;let x=0,y=0;ids.forEach(i=>{x+=it2[i].x;y+=it2[i].y});return[x/ids.length,y/ids.length]};
 WBX.wbTxGrp=()=>grpOf();WBX.wbTxMeta=g=>A(WBS.tiles[WBS.cur])[g];
 function fillFonts(){const cur0=$('tx_f').value||st.f;$('tx_f').innerHTML=`<optgroup label="Built-in fonts">${teFonts.map(x=>`<option value="${x[0]}" data-font="${hx(x[1])}" data-w="${x[3]}">${hx(x[1])}</option>`).join('')}</optgroup>`+(teUF.length?`<optgroup label="Your fonts">${teUF.map(id=>`<option value="${id}" data-font="${hx(teF[id].fam)}" data-w="400">${hx(teF[id].lbl)}</option>`).join('')}</optgroup>`:'');$('tx_f').value=teF[cur0]?cur0:'cinzel'}
 function toUI(){syncing++;try{toUI0()}finally{syncing--}}
@@ -47,7 +47,8 @@ const[cx0,cy0]=mean(ids),AJ=adjOf(t,M,ids),ax=M.ax+(AJ?AJ.sx:cx0-M.mx),ay=M.ay+(
 if(AJ&&AJ.ad)L.forEach((q,i)=>{const a=AJ.ad[i];if(!a)return;[q.x,q.y]=wrapP(q.x+a[0],q.y+a[1]);q.r=+(q.r+a[2]).toFixed(1);q.s=+(q.s*a[3]).toFixed(4)});t.items.splice(Math.min(pos,t.items.length),0,...L);const nids=L.map((_,i)=>Math.min(pos,t.items.length-L.length)+i);
 const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();upd();if(!live){if(WBX.wbCap)WBX.wbCap();pmsg(`Updated the text.`)}}
 // the text on the stamp follows every change in the panel while a text is being edited
-const live=()=>{if(syncing||!stTxMode())return;if(!edit){if(txArmed())txGhost();else if(st.text.trim())txArm(true);return}clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
+const live=()=>{if(syncing||!stTxMode())return;if(!edit)return;   // 2.12.0: typing no longer arms a click-to-place text
+clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
 // used by Randomize: set text on a stamp (fonts load first; a newer roll cancels an older one)
 WBX.wbTxFonts=teFonts.map(x=>x[0]);
 // Randomize uses the newer text options now and then. They come from the words themselves (not from Math.random), so a Randomize roll draws the same random numbers as before.

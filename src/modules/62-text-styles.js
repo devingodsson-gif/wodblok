@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
 import {$} from './01-launch-and-version.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
@@ -11,9 +12,9 @@ const TS_KEY='wb200_textstyles',TS_OPEN='wb200_textstylesui',TS_SET='Starter sty
 const tsEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const TS={q:'',active:'',open:new Set(['']),form:null,ren:null,k:''};
 const tsIC=(d,w)=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||1.8}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-const tsFOLDER=tsIC('<path d="M3.5 7.5V18a1.5 1.5 0 0 0 1.5 1.5h14a1.5 1.5 0 0 0 1.5-1.5V9.5A1.5 1.5 0 0 0 19 8h-7l-2-2.5H5A1.5 1.5 0 0 0 3.5 7z"/>'),tsFOLDER_O=tsIC('<path d="M3.5 18.5V7A1.5 1.5 0 0 1 5 5.5h4.5l2 2.5H19A1.5 1.5 0 0 1 20.5 9.5V11M3.5 18.5l2.4-7a1.5 1.5 0 0 1 1.4-1h13.2a1 1 0 0 1 1 1.3l-2 6.2a1.5 1.5 0 0 1-1.4 1H5"/>');
-const tsHOME=tsIC('<path d="M4 11l8-6.5 8 6.5M6 9.5V19h12V9.5"/>'),tsCHEV='<svg class="lfa" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l6 6-6 6"/></svg>';
-const tsMORE='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>',tsX=tsIC('<path d="M6 6l12 12M18 6L6 18"/>');
+const tsFOLDER=tsIC(ICN.folder),tsFOLDER_O=tsIC(ICN.folderOpen);
+const tsHOME=tsIC(ICN.home),tsCHEV='<svg class="lfa" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l6 6-6 6"/></svg>';
+const tsMORE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.more+'</svg>',tsX=tsIC(ICN.close);
 // the built-in set (fonts that are not installed fall back to the current font when applied)
 const TS_BUILT=[['Wood type poster',{f:'rye',tc:'u',lh:90,ls:2,rp:8,rr:4}],['Seal',{f:'cinzel',tc:'u',ls:12,cv:100}],['Wavy',{f:'lobster',pt:'w',pa:45,pw:45}],['Typewriter',{f:'elite',ls:4,rp:10,rr:3,rs:6}],['Bold block',{f:'montserrat',tc:'u',ls:2,lh:100}],['Swell',{f:'cinzel',tc:'u',wp:'b',wa:60}],['Spiral',{f:'cinzel',tc:'u',pt:'s',pa:40,pw:60}],['Bounce',{f:'lobster',bb:40,rr:8}],['Flag',{f:'cinzel',tc:'u',wp:'f',wa:70}],['Stacked lines',{f:'bebas',tc:'u',lh:85,al:'j',ls:2}]];
 const tsBuilt=()=>TS_BUILT.filter(([,o])=>teF[o.f]).map(([n,o])=>({id:'b:'+n,n,o,f:TS_SET,set:1}));

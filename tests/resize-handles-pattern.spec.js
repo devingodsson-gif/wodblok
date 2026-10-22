@@ -47,10 +47,10 @@ test('a placed stamp has eight squares; a side one stretches only that way and t
 test('a corner keeps the opposite corner, and Shift grows from the middle', async ({ page }) => {
   const { errors } = await setup(page);
   const a = box(await piece(page));
-  await pull(page, 'ne', 30, -30);
+  await pull(page, 'ne', 30, 0);   // a corner moved sideways only changes the width (2.15.0)
   const b = box(await piece(page));
   expect(b.w).toBeGreaterThan(a.w + 1); expect(b.l).toBeCloseTo(a.l, 0); expect(b.b).toBeCloseTo(a.b, 0);
-  await pull(page, 'se', 25, 25, true);
+  await pull(page, 'se', 25, 0, true);
   const c = box(await piece(page));
   expect(c.w).toBeGreaterThan(b.w + 1);
   expect((c.l + c.r) / 2).toBeCloseTo((b.l + b.r) / 2, 0); expect((c.t + c.b) / 2).toBeCloseTo((b.t + b.b) / 2, 0);

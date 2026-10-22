@@ -1,10 +1,10 @@
 // 1.45.0: text on a wave or spiral, and warp (Bulge, Rise, Flag). Same controls in the Stamp editor and the Text layer.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, unlockStamp, stampInstance, clickStamp, canvasToClient, addStampText } = require('./helpers/harness');
 // Canvas flow: the text typed in the Text panel is put on the first printed instance of the unlocked stamp, then one of its letters is clicked so the whole text is selected (the panel edits it)
 async function putTextCanvas(page) {
   const p = await stampInstance(page);
-  await clickStamp(page, p);
+  await addStampText(page);
   const tg = async () => JSON.parse(await getState(page)).tiles[0].items.filter(q => q.tg);
   await expect.poll(async () => (await tg()).length, { timeout: 15000 }).toBeGreaterThan(0);
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await settle(page, { max: 30000 });
@@ -84,9 +84,8 @@ test('Text layer: a path and a warp are saved on the text', async ({ page }) => 
   await page.fill('#tx_t', 'WAVE TEXT');
   await page.waitForTimeout(500);
   const box = await page.locator('#art').boundingBox();
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await page.click('.elk[data-k="text"] [data-add]');
   await settle(page);
-  await page.click('#tx_go');
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);
   await set(page, 'tx_pt', 'w'); await set(page, 'tx_pa', 70);
   const piece = async () => JSON.parse(await getState(page)).els.filter(p => p.tx)[0];

@@ -1,7 +1,7 @@
 // Layer update, step 9a (1.46.9): the four things only the Stamp editor did, now on the Pattern canvas with a stamp unlocked:
 // copy and paste of shapes, editing text that is already in a stamp, Split shape, and grade masks that belong to one stamp.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, fitView } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, fitView, addStampText } = require('./helpers/harness');
 
 const state = async page => JSON.parse(await getState(page));
 const items = async page => (await state(page)).tiles[0].items;
@@ -41,7 +41,7 @@ test('text that is in a stamp is selected as one text, edited live from the Text
   await page.fill('#tx_t', 'AB');
   await settle(page);
   let p = await inst(page);
-  await clickAt(page, p);
+  await addStampText(page);            // text is made with Add text, not by a click on the canvas (2.12.0)
   await expect.poll(async () => (await items(page)).filter(q => q.tg).length, { timeout: 15000 }).toBe(2);
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape');
@@ -72,10 +72,7 @@ test('text that is in a stamp is selected as one text, edited live from the Text
 test('with every stamp locked the Text panel still fills a Text layer', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await show(page, 'text');
-  await page.fill('#tx_t', 'Hi');
-  await settle(page);
-  const box = await page.locator('#art').boundingBox();
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await page.click('section.pn[data-p="text"] .elk[data-k="text"] [data-add]');     // Add text (2.12.0)
   await settle(page);
   const s = await state(page);
   expect(s.tiles[0].items.filter(q => q.tg).length).toBe(0);

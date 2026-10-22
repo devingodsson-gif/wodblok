@@ -7,7 +7,7 @@ import {$} from './01-launch-and-version.js';
 const el = id => () => $(id);
 const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled; };
 // the element panels have no rail button on screen (the element bar opens them), but their commands still click it
-const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-elpaint']);
+const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-elpaint', 'rail-mlist']);
 const exists = id => () => { const b = $(id); return !!b && !b.disabled; };
 const click = id => () => $(id).click();
 const COMMANDS = [
@@ -49,12 +49,10 @@ const COMMANDS = [
   ['panels.closeAll', 'Close all panels', 'rcls'],
   ['panel.canvas', 'Open Canvas', 'rail-canvas'],
   ['panel.colors', 'Open Colours', 'rail-colors'],
-  ['panel.cways', 'Open Colourways', 'rail-cways'],
   ['colourway.new', 'New colourway', 'cwnew'],
   ['colourway.exportAll', 'Export all colourways', 'cwgo'],
   ['tray.add', 'Add a colour to the tray', 'tyaddl'],
   ['tray.save', 'Save tray', 'tysave'],
-  ['panel.slib', 'Open Stamp library', 'rail-slib'],
   ['panel.motifs', 'Open Shape', 'rail-motifs'],
   ['panel.text', 'Open Text', 'rail-text'],
   ['panel.mlist', 'Open Element', 'rail-mlist'],

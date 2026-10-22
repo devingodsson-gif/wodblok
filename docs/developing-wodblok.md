@@ -33,7 +33,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 
 **What the app must always be**
 - **No explanatory text, helper paragraphs or tooltips in panels.** Short labels and clear grouping only. (The owner asked for these to be removed everywhere; do not bring them back.)
-- At launch one built-in layout opens its tool windows (saved workspaces were removed in 2.9.0). The template picker (New from template) also opens at launch unless Settings > General > Templates at launch is off. The app launches in **Pattern mode, fully cleared** (no work from the last session loads). Tests start with the launch layout off (`wb96_launch='none'`) and the picker off (`tests/helpers/harness.js`), so they see an empty launch unless a test asks (`workspaces: true`, `templates: true`).
+- At launch no panel is open and the project is empty (2.10.0). The template picker (New from template) also opens at launch unless Settings > General > Templates at launch is off. The app launches in **Pattern mode, fully cleared** (no work from the last session loads). Tests start with no panel open and the picker off (`tests/helpers/harness.js`), so they see an empty launch unless a test asks (`workspaces: true`, `templates: true`).
 - **UI follows the standard in Part 9**: tokens and scales, one component per role, one folder tree for every library. Do not invent a size, radius, colour, duration or list design. If the scale lacks something, ask, and change the guide first.
 - **Speed first.** Run `npm run perf` before committing anything that touches drawing, dragging or sliders. No perf regression over 10%.
 - **No backwards compatibility** (owner, Oct 18 and 19 2026): a project file or template made by an older WODBLOK is refused with a message and never converted; the 18 to 21 migration and the v18 fixtures are gone (2.0.2). A file from a newer app still opens read-only and is never rewritten.
@@ -321,9 +321,10 @@ Elements under 18px are indicators (dots, chips that do not act, handles), not c
 
 ### 8. Icons
 
-- One icon family: line icons, `stroke="currentColor"`, round caps and joins, no fill, no emoji, no text glyphs as icons.
+- One icon family, drawn once in `src/modules/00-icons.js` (2.14.0, owner: minimalist and clear, like Photoshop): line icons on a 24-unit grid inside 3.5..20.5, `stroke="currentColor"`, round caps and joins, no fill, no emoji, no text glyphs as icons. Frames have a 1.5 corner radius; a dot is a small circle.
+- The page's icons are `<svg class="ic" data-ic="name"></svg>` (filled at start-up by `icFill`); code uses `ICN.name` or `ic(name)`. A new icon is added to the set, never drawn inline.
 - Sizes: 13px in dense rows, 15px in panel headers and toolbars, 18px in the rail. Nothing else.
-- Stroke weight is set once, by icon size, in the `.ic` rules; a new icon takes the class and the size and sets no stroke width of its own.
+- Stroke weight is one hairline at every size: `--ic-w` (1.25px) with `vector-effect: non-scaling-stroke` in the `.ic` rules; an icon sets no stroke width of its own.
 - Idle icons `--mut`; hover `--fg`; selected `--acc-ink`.
 - Every icon-only control has an `aria-label` and a keyboard route. The label is not shown as a tooltip.
 - Texture, brand and drawn shapes are artwork, not icons, and are exempt.

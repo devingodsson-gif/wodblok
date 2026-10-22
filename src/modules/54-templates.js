@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {collection,kv,use} from '../platform/index.js';
 import {fmtOpen,fmtPack,fmtPeek} from '../format/container.js';
 import {TPL_BUILTIN} from '../data/templates.js';
@@ -13,7 +14,7 @@ import {fileUnlink,thumbPng} from './33-clear.js';
 // project's bytes are kept in the records store and read only when it is opened.
 const TP_INDEX='wb111_templates',TP_START='wb111_tplstart',TP_TYPE='wb111_tptype',TP_KINDS=[['canvas','Normal canvas'],['tile','Repeating pattern'],['book','Book']];
 const tpEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const TP_MORE='<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>';
+const TP_MORE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.more+'</svg>';
 // the three blank starting points draw their canvas outline instead of a stored picture
 const TP_BLANK={canvas:'<svg viewBox="0 0 60 80" aria-hidden="true"><rect x="14" y="10" width="32" height="60" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
  tile:'<svg viewBox="0 0 60 80" aria-hidden="true"><rect x="16" y="22" width="28" height="36" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 22h6M44 22h6M10 58h6M44 58h6M16 16v6M44 16v6M16 58v6M44 58v6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>',

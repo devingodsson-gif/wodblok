@@ -11,7 +11,7 @@
 <style id="wbfonts">/*@@FONTS@@*/</style>
 <style>
 /* UI standard tokens: see docs/style-guide.md */
-:root{--r-s:2px;--r-m:3px;--r-l:6px;--fs-s:11px;--fs-m:12px;--fs-l:13px;--h-xs:18px;--h-sm:22px;--h-md:24px;--h-row:28px;--h-touch:36px;--sp-1:2px;--sp-2:4px;--sp-3:6px;--sp-4:8px;--sp-5:12px;--sp-6:16px;--t-fast:.12s;--t-slow:.2s;--edge:inset 0 0 0 1px rgba(0,0,0,.2)}
+:root{--r-s:2px;--r-m:3px;--r-l:6px;--fs-s:11px;--fs-m:12px;--fs-l:13px;--h-xs:18px;--h-sm:22px;--h-md:24px;--h-row:28px;--h-touch:36px;--ic-w:1.25px;--sp-1:2px;--sp-2:4px;--sp-3:6px;--sp-4:8px;--sp-5:12px;--sp-6:16px;--t-fast:.12s;--t-slow:.2s;--edge:inset 0 0 0 1px rgba(0,0,0,.2)}
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 --stage:#d6d6d6;--stage-dot:rgba(0,0,0,.06);--panel:#ececec;--raise:#f7f7f7;--field:#ffffff;--line:#d0d0d0;--line2:#b8b8b8;--fg:#1f1f1f;--mut:#5c5c5c;--faint:#6b6b6b;--sel:#c7d6ec;--sel-fg:#1f1f1f;--acc:#b8914f;--acc-ink:#836635;--acc-fg:#1b1a18;--acc-soft:rgba(184,145,79,.16);--warn:#c0532e;--ok:#3f8f66;--shadow:0 1px 2px rgba(0,0,0,.12),0 8px 24px rgba(0,0,0,.18);--paper-shadow:0 1px 3px rgba(0,0,0,.25),0 22px 48px rgba(0,0,0,.25)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--stage:#1e1e1e;--stage-dot:rgba(255,255,255,.04);--panel:#282828;--raise:#323232;--field:#1c1c1c;--line:#383838;--line2:#4a4a4a;--fg:#e3e3e3;--mut:#a6a6a6;--faint:#8f8f8f;--sel:#3a5578;--sel-fg:#ffffff;--acc:#c4a46e;--acc-ink:#c4a46e;--acc-fg:#1b1a18;--acc-soft:rgba(196,164,110,.16);--warn:#e8895c;--ok:#7fb08a;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.5);--paper-shadow:0 2px 6px rgba(0,0,0,.4),0 30px 70px rgba(0,0,0,.55)}}
@@ -28,14 +28,15 @@ svg{display:block}
 
 /* v90 controls */
 svg[stroke="currentColor"]:not([width]):not(.ic){stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.ic{stroke-width:1.7}.ib .ic,.rnd .ic{stroke-width:2.1}.lyb .ic,.eye .ic,.pop .ic,.seg .ic,.shg .ic{stroke-width:2.4}.txb .ic{stroke-width:2.25}.wb .ic{stroke-width:2.6}.cpe .ic{stroke-width:2.1}
+.ic{stroke-width:var(--ic-w)}.ic *{vector-effect:non-scaling-stroke}
 .ddsel,.ccsel{display:none!important}
 .dd2{width:100%}.dd2>.ddb{width:100%;height:auto;margin:0;min-height:var(--h-md);display:flex;border-radius:var(--r-m);padding:4px 8px 4px 8px;justify-content:space-between}.dd2 .ddb:hover:not(:disabled){border-color:var(--line2)}.dd2 .ddb[aria-expanded=true]{border-color:var(--acc)}.dd2 .ddb:disabled{opacity:.45}
 .dd2 .ddt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.dd2 .ddb em{transition:transform var(--t-fast)}.dd2 .ddb[aria-expanded=true] em{transform:rotate(180deg)}
 .ddl{border-radius:var(--r-l);padding:6px}.ddi{border-radius:var(--r-m);padding:6px 8px}.ddi.cur{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}.ddi.dis{opacity:.4;cursor:default}.rowm .ddi{display:flex;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);font:inherit;cursor:pointer}.rowm .ddi:hover:not(:disabled),.rowm .ddi:focus-visible{background:var(--acc-soft)}.rowm .ddi:disabled{opacity:.4;cursor:default}.ddg{padding:8px 8px 4px;font-size:var(--fs-s);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .sw .dd2,.asp .dd2,.lyo .dd2,.gmc .dd2{flex:1;min-width:0}
 .ccb{flex:none;width:38px;height:var(--h-md);padding:4px;margin:0;border:1px solid var(--line2);border-radius:var(--r-m);background:var(--field)}.ccb::before{content:"";display:block;width:100%;height:100%;border-radius:var(--r-s);background:var(--c,#888);box-shadow:var(--edge)}.ccb:hover{border-color:var(--faint)}.gmc .ccb{width:var(--h-md);height:var(--h-md)}
-#fpov rect.gh.ov{stroke:var(--warn)}
+#fpov rect.sel,#fpov rect.gh{fill:none;stroke:var(--acc);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}#fpov rect.gh{stroke-dasharray:4 3}#fpov rect.gh.ov{stroke:var(--warn)}
+#fpov .fhd,#fpov .frt{fill:var(--fg);stroke:var(--panel);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:all}#fpov .fhd:hover,#fpov .frt:hover{fill:var(--acc)}#fpov .frl{stroke:var(--acc);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}
 .cpop{position:fixed;z-index:9100;width:224px;padding:8px;background:var(--raise);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;touch-action:none}.cpop[hidden]{display:none}
 .cpsv{position:relative;height:132px;border-radius:var(--r-m);cursor:crosshair;box-shadow:var(--edge)}.cpsv i,.cph i{position:absolute;width:14px;height:14px;margin:-8px 0 0 -8px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);pointer-events:none}
 .cph{position:relative;height:12px;border-radius:var(--r-m);cursor:pointer;background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}.cph i{top:50%}
@@ -538,8 +539,7 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 .smkth{flex:none;width:var(--h-xs);height:var(--h-xs);padding:2px;margin:0;background:var(--field);border:1px solid var(--line);border-radius:var(--r-s)}.smkth svg{display:block;width:100%;height:100%}
 .smkn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.smkc{flex:none;min-width:12px;text-align:right;font-size:var(--fs-s);color:var(--faint);font-variant-numeric:tabular-nums}
 .smkp .smklk{width:var(--h-xs);height:var(--h-xs);flex:none}.smkp .smklk .ic{width:13px;height:13px}.smkp .smklk[aria-pressed=true]{background:var(--acc-soft);color:var(--acc-ink)}
-#stolsvg{position:absolute;left:28px;top:28px;pointer-events:none}.stes{fill:none;stroke:var(--acc);stroke-width:1.5px;vector-effect:non-scaling-stroke;pointer-events:none}.stsp{fill:none;stroke:var(--acc);stroke-width:2px;stroke-dasharray:6 4;vector-effect:non-scaling-stroke;pointer-events:none}.stsph{fill:none;stroke:transparent;stroke-width:16px;vector-effect:non-scaling-stroke;pointer-events:stroke}.steh{fill:var(--raise);stroke:var(--acc);stroke-width:1.5px;vector-effect:non-scaling-stroke;pointer-events:all}.stol path{fill:none;vector-effect:non-scaling-stroke;stroke-linejoin:round}.stol .olk{stroke:var(--mut);stroke-width:1px}.stol .olu{stroke:var(--acc);stroke-width:2px}
-.lhead{display:flex;align-items:center;gap:2px;margin-bottom:8px}.lhead span{font-size:var(--fs-s);color:var(--mut);margin-right:auto}
+#stolsvg{position:absolute;left:28px;top:28px;pointer-events:none}.stes{fill:none;stroke:var(--acc);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}.stsp{fill:none;stroke:var(--acc);stroke-width:2px;stroke-dasharray:6 4;vector-effect:non-scaling-stroke;pointer-events:none}.stsph{fill:none;stroke:transparent;stroke-width:16px;vector-effect:non-scaling-stroke;pointer-events:stroke}.steh:hover{fill:var(--acc)}.steh{fill:var(--fg);stroke:var(--panel);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:all}.stol path{fill:none;vector-effect:non-scaling-stroke;stroke-linejoin:round}.lhead{display:flex;align-items:center;gap:2px;margin-bottom:8px}.lhead span{font-size:var(--fs-s);color:var(--mut);margin-right:auto}
 
 /* menus */
 .menu{position:relative}
@@ -818,7 +818,7 @@ body.eyedrop{cursor:crosshair}
 .scform{display:flex;align-items:center;gap:6px;margin:2px 0 2px calc(var(--d,0)*12px + 8px);font-size:var(--fs-m)}.scform input{flex:1;min-width:0}.scform span{flex:1}
 #stq{width:100%}
 /* colourways */
-.cwx{padding:12px 12px;border-bottom:1px solid var(--line)}
+.cwx{padding:0}
 .cwg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .cwc{display:flex;flex-direction:column;gap:6px;padding:6px;border-radius:var(--r-l);border:1px solid var(--line);background:var(--field);cursor:pointer;min-width:0}
 .cwc:hover,.cwc:focus-visible{border-color:var(--line2);background:var(--raise);outline:none}
@@ -844,25 +844,25 @@ body.eyedrop{cursor:crosshair}
  <div class="doc"><input type="text" id="pnm" maxlength="60" placeholder="Untitled pattern" aria-label="Project name"><span id="pst"></span></div>
  <div class="sep"></div>
  <div class="tb">
-  <button class="ib" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6.5L4.5 11 9 15.5"/><path d="M5 11h9.5a4.5 4.5 0 010 9H11"/></svg></button>
-  <button class="ib" id="redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6.5l4.5 4.5-4.5 4.5"/><path d="M19 11H9.5a4.5 4.5 0 000 9H13"/></svg></button>
-  <button class="ib" id="cmdkb" aria-label="Search commands" title="Search commands (Ctrl+K)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="5.5"/><path d="M15 15l5 5"/></svg></button>
+  <button class="ib" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="undo"></svg></button>
+  <button class="ib" id="redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="redo"></svg></button>
+  <button class="ib" id="cmdkb" aria-label="Search commands" title="Search commands (Ctrl+K)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="search"></svg></button>
  </div>
  
  <div class="sep"></div>
- <button class="rnd" id="rzbar" type="button" title="Roll a whole new piece"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>Randomize</button>
+ <button class="rnd" id="rzbar" type="button" title="Roll a whole new piece"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dice"></svg>Randomize</button>
  <div class="spacer"></div>
  <button class="ib" id="thm" type="button" title="Switch to light mode" aria-label="Switch to light mode"></button>
  <button class="ghost" id="pls">Open projects folder</button>
  <div class="menu"><button class="ghost" id="fileb" aria-haspopup="true">File</button>
   <div class="pop r" id="filem" hidden>
-   <button id="pnw"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8l4.5 4.5v12.5H6z"/><path d="M14 3.5V8h4.5"/></svg>New project</button>
-   <button id="tpnew"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>New from template…</button>
-   <button id="clr" title="Blank stamp (Ctrl+Z)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19.5h11"/><path d="M4.6 14.4l8.3-8.3a2 2 0 012.8 0l3 3a2 2 0 010 2.8L11 19.5H7.4l-2.8-2.8a2 2 0 010-2.8z"/><path d="M9.2 9.8l5 5"/></svg>Clear canvas</button>
+   <button id="pnw"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="file"></svg>New project</button>
+   <button id="tpnew"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="template"></svg>New from template…</button>
+   <button id="clr" title="Blank stamp (Ctrl+Z)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="eraser"></svg>Clear canvas</button>
    <hr>
-   <label id="pop" for="pfile" class="mi" role="button" tabindex="0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/></svg>Open project…</label>
-   <button id="tpsave"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4z"/></svg>Save as template…</button>
-   <button id="stgo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4L18 18M6 18l1.6-1.6M16.4 7.6L18 6"/></svg>Settings…</button>
+   <label id="pop" for="pfile" class="mi" role="button" tabindex="0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="folderOpen"></svg>Open project…</label>
+   <button id="tpsave"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="bookmark"></svg>Save as template…</button>
+   <button id="stgo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="settings"></svg>Settings…</button>
   </div>
   <input type="file" id="pfile" class="vh" accept=".wodblok,application/zip" tabindex="-1">
  </div>
@@ -870,24 +870,23 @@ body.eyedrop{cursor:crosshair}
 </header>
 
 <nav class="rail" aria-label="Tools">
- <button id="rcls" aria-label="Close all panels"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M14.5 4.5v15"/><path d="M7.2 9.8l3.6 4.4M10.8 9.8l-3.6 4.4"/></svg><span class="tip">Close all panels</span></button>
- <button id="rail-rand" data-pn="rand" aria-label="Randomize"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg><span class="tip">Randomize</span></button>
- <button id="rail-colors" data-pn="colors" aria-label="Colours"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9.5" r="5"/><circle cx="15" cy="9.5" r="5"/><circle cx="12" cy="14.5" r="5"/></svg><span class="tip">Colours</span></button>
- <button id="rail-cways" data-pn="cways" aria-label="Colourways"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.6"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.6"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.6"/><rect x="13" y="13" width="7.5" height="7.5" rx="1.6"/><path d="M5.5 9l3.5-3.5M15 9l3.5-3.5M5.5 18.5L9 15M15 18.5l3.5-3.5" stroke-width="1.3"/></svg><span class="tip">Colourways</span></button>
- <button id="rail-slib" data-pn="slib" aria-label="Stamp library"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="5" height="14" rx="1.5"/><rect x="10" y="5" width="4" height="14" rx="1.5"/><rect x="15.6" y="5.4" width="4.6" height="14" rx="1.5" transform="rotate(-10 18 12.4)"/></svg><span class="tip">Stamp library</span></button>
- <button id="rail-hist" data-pn="hist" aria-label="History"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.7-6.2"/><path d="M3.5 4.5v4h4"/><path d="M12 7.5V12l3 2"/></svg><span class="tip">History</span></button>
- <button id="rail-canvas" data-pn="canvas" aria-label="Canvas"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M7 3v2.5M17 3v2.5M7 18.5V21M17 18.5V21M3 7h2.5M3 17h2.5M18.5 7H21M18.5 17H21"/></svg><span class="tip">Canvas</span></button>
- <button id="rail-lyrs" data-pn="lyrs" aria-label="Elements"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l8.5 4.5-8.5 4.5L3.5 8z"/><path d="M3.5 12l8.5 4.5 8.5-4.5"/><path d="M3.5 16l8.5 4.5 8.5-4.5"/></svg><span class="tip">Layers</span></button>
- <button id="rail-layers" data-pn="layers" aria-label="Pattern"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span class="tip">Pattern</span></button>
- <button id="rail-stmp" data-pn="stmp" aria-label="Stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="10.5" width="9" height="9" rx="2"/><path d="M17 4.5l4 7h-8z"/></svg><span class="tip">Stamp</span></button>
- <button id="rail-pgrid" data-pn="pgrid" aria-label="Grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 9.2h17M3.5 14.8h17M9.2 3.5v17M14.8 3.5v17"/></svg><span class="tip">Grid</span></button>
- <button id="rail-xrec" data-pn="xrec" aria-label="Export recipes"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 11L12 15.5 16.5 11"/><path d="M4.5 15v3.5a1.5 1.5 0 001.5 1.5h12a1.5 1.5 0 001.5-1.5V15"/></svg><span class="tip">Export recipes</span></button>
- <button id="rail-motifs" data-pn="motifs" aria-label="Motif"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8l5.2 8.7H6.8z"/><circle cx="7" cy="17" r="4"/><rect x="12.8" y="13" width="8.4" height="8.4" rx="1.4"/></svg><span class="tip">Shape</span></button>
- <button id="rail-text" data-pn="text" aria-label="Text"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 7.5V5h13v2.5M12 5v14M9 19h6"/></svg><span class="tip">Text</span></button>
- <button id="rail-mlist" data-pn="mlist" aria-label="Element"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="4" height="4" rx="1.2"/><rect x="3.5" y="10" width="4" height="4" rx="1.2"/><rect x="3.5" y="15.5" width="4" height="4" rx="1.2"/><path d="M11 6.5h9.5M11 12h9.5M11 17.5h9.5"/></svg><span class="tip">Elements</span></button>
- <button id="rail-elpaint" data-pn="elpaint" aria-label="Paint"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 4.5c-2.6 1-6.4 4.8-8.4 7.9l1.6 1.6c3.1-2 6.9-5.8 7.9-8.4z"/><path d="M10.2 13.6c-2 0-3.5 1.3-3.5 3.2 0 1.4-.8 2.4-2.4 2.7 2.6 1.3 7.4.6 7.4-4.4z"/></svg><span class="tip">Paint</span></button>
+ <button id="rcls" aria-label="Close all panels"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="panelsClose"></svg><span class="tip">Close all panels</span></button>
+ <button id="rail-canvas" data-pn="canvas" aria-label="Canvas"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="crop"></svg><span class="tip">Canvas</span></button>
+ <button id="rail-colors" data-pn="colors" aria-label="Colours"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="colours"></svg><span class="tip">Colours</span></button>
+ <button id="rail-lyrs" data-pn="lyrs" aria-label="Elements"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="layers"></svg><span class="tip">Elements</span></button>
+ <button id="rail-pgrid" data-pn="pgrid" aria-label="Grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="grid"></svg><span class="tip">Grid</span></button>
+ <button id="rail-hist" data-pn="hist" aria-label="History"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="history"></svg><span class="tip">History</span></button>
+ <button id="rail-rand" data-pn="rand" aria-label="Randomize"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dice"></svg><span class="tip">Randomize</span></button>
+ <button id="rail-xrec" data-pn="xrec" aria-label="Export recipes"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="download"></svg><span class="tip">Export recipes</span></button>
+ <button id="rail-slib" data-pn="slib" aria-label="Stamp library"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="books"></svg><span class="tip">Stamp library</span></button>
+ <button id="rail-layers" data-pn="layers" aria-label="Pattern"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="pattern"></svg><span class="tip">Pattern</span></button>
+ <button id="rail-stmp" data-pn="stmp" aria-label="Stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="stamp"></svg><span class="tip">Stamp</span></button>
+ <button id="rail-motifs" data-pn="motifs" aria-label="Motif"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="motif"></svg><span class="tip">Shape</span></button>
+ <button id="rail-text" data-pn="text" aria-label="Text"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="text"></svg><span class="tip">Text</span></button>
+ <button id="rail-mlist" data-pn="mlist" aria-label="Element"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="shape"></svg><span class="tip">Elements</span></button>
+ <button id="rail-elpaint" data-pn="elpaint" aria-label="Paint"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="brush"></svg><span class="tip">Paint</span></button>
  <div class="rsp"></div>
- <button id="rmore" aria-label="More tools" aria-expanded="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+ <button id="rmore" aria-label="More tools" aria-expanded="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="more"></svg></button>
  <div id="rmenu" class="rmenu" hidden></div>
  
  </nav>
@@ -899,7 +898,7 @@ body.eyedrop{cursor:crosshair}
   <div class="vbl">
   <div class="seg2" id="tpvg" role="group" aria-label="Repeat tile" hidden><button type="button" id="tpv" aria-pressed="false">Repeat 3 × 3</button></div>
   <div class="seg2" id="bacmp" hidden role="group" aria-label="Compare"><button type="button" id="bab" aria-pressed="false" title="Before (\)">Before</button><button type="button" id="bas" aria-pressed="false" title="Split view (Shift+\)">Split</button></div>
-  <div id="viewctl" hidden><button id="gti" title="Show the stamp textures in the pattern (view only)" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M8 16l8-8M8 11l3-3M13 16l3-3"/></svg>Stamp texture</button><button id="gtx" title="Show the canvas texture in the pattern (view only)" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5H7c2 0 3-2 5-2s3 2 5 2h3.5"/><path d="M3.5 12h5.5M15 12h5.5"/><ellipse cx="12" cy="12" rx="3" ry="1.8"/><path d="M3.5 16.5H7c2 0 3 2 5 2s3-2 5-2h3.5"/></svg>Canvas texture</button><button id="gtm" class="on" title="Show the grading masks (view only)" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" stroke-dasharray="2.6 2.4"/><circle cx="12" cy="12" r="3"/></svg>Grading masks</button><button id="gdt" class="on" title="Dotted stage behind the canvas" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 5.5h.01M12 5.5h.01M18.5 5.5h.01M5.5 12h.01M12 12h.01M18.5 12h.01M5.5 18.5h.01M12 18.5h.01M18.5 18.5h.01"/></svg>Stage dots</button><div class="zoom" id="zoomc"><button class="ib" id="zo" title="Zoom out" aria-label="Zoom out"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button><button id="zl" title="Fit to screen">Fit</button><button id="nv100" title="Zoom to 100%">100%</button><button class="ib" id="zi" title="Zoom in" aria-label="Zoom in"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button><button type="button" class="ib" id="nvhand" aria-label="Hand tool" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12V6.5a1.5 1.5 0 013 0V11M11 10.5V5a1.5 1.5 0 013 0v5.5M14 10.5V6.5a1.5 1.5 0 013 0V13c0 4-2.2 6.5-5.5 6.5S7 17.5 6 15.5l-1.3-2.7a1.4 1.4 0 012.3-1.5L8 12.5"/></svg></button></div></div>
+  <div id="viewctl" hidden><button id="gti" title="Show the stamp textures in the pattern (view only)" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="texture"></svg>Stamp texture</button><button id="gtx" title="Show the canvas texture in the pattern (view only)" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="canvasTexture"></svg>Canvas texture</button><button id="gtm" class="on" title="Show the grading masks (view only)" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="mask"></svg>Grading masks</button><button id="gdt" class="on" title="Dotted stage behind the canvas" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dots"></svg>Stage dots</button><div class="zoom" id="zoomc"><button class="ib" id="zo" title="Zoom out" aria-label="Zoom out"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="minus"></svg></button><button id="zl" title="Fit to screen">Fit</button><button id="nv100" title="Zoom to 100%">100%</button><button class="ib" id="zi" title="Zoom in" aria-label="Zoom in"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="plus"></svg></button><button type="button" class="ib" id="nvhand" aria-label="Hand tool" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="hand"></svg></button></div></div>
   <div class="elb" id="elb" role="toolbar" aria-label="Elements"></div>
   </div>
   <div class="vbr">
@@ -977,14 +976,14 @@ body.eyedrop{cursor:crosshair}
  <section class="pn" data-p="colors" hidden>
   <details class="g" open><summary>Tray <span class="aux" id="tycnt"></span></summary><div class="gb">
    <div class="tyl" id="tyl" role="list" aria-label="Tray colours"></div>
-   <div class="row tyft"><button type="button" class="alt" id="tyaddl"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add colour</button><button type="button" class="alt" id="tysave"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l3 3v13H6z"/><path d="M9 4v5h6V4M9 20v-6h7v6"/></svg>Save tray</button></div>
+   <div class="row tyft"><button type="button" class="alt" id="tyaddl"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" data-ic="plus"></svg>Add colour</button><button type="button" class="alt" id="tysave"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="save"></svg>Save tray</button></div>
    <div class="tysvf" id="tysvf" hidden><input type="text" id="tysvn" maxlength="40" placeholder="Tray name" aria-label="Tray name"><button type="button" class="primary" id="tysvok">Save</button><button type="button" class="alt" id="tysvcx">Cancel</button></div>
   </div></details>
   <details class="g" open><summary>Ink</summary><div class="gb">
    <div class="cwrow"><span class="cwk">Ink</span><div class="cwell" id="wl_pi"></div></div>
   </div></details>
   <details class="g" open><summary>Saved colours <span class="aux" id="scn"></span></summary><div class="gb">
-   <div class="sctb"><button type="button" class="ib" id="scall" aria-pressed="false" aria-label="Expand all"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5 5 5-5M7 4l5 5 5-5" transform="translate(0 4)"/></svg></button><button type="button" class="ib" id="scnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5V18a1.5 1.5 0 0 0 1.5 1.5h14a1.5 1.5 0 0 0 1.5-1.5V9.5A1.5 1.5 0 0 0 19 8h-7l-2-2.5H5A1.5 1.5 0 0 0 3.5 7zM12 11.5v5M9.5 14h5"/></svg></button><button type="button" class="alt" id="scadd"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add colour</button></div>
+   <div class="sctb"><button type="button" class="ib" id="scall" aria-pressed="false" aria-label="Expand all"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="chevsD"></svg></button><button type="button" class="ib" id="scnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="folderNew"></svg></button><button type="button" class="alt" id="scadd"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" data-ic="plus"></svg>Add colour</button></div>
    <input type="text" id="scq" maxlength="40" placeholder="Find a colour" aria-label="Find a colour">
    <div class="stl scl" id="scl" role="tree" aria-label="Saved colours"></div>
   </div></details>
@@ -992,16 +991,15 @@ body.eyedrop{cursor:crosshair}
    <input type="text" id="stq" maxlength="40" placeholder="Find a tray" aria-label="Find a tray">
    <div class="stnav" id="stnav"></div>
    <div class="stl" id="stl" role="list"></div>
-   <div class="row" id="stnewr"><button type="button" class="alt" id="stnew"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5V18a1.5 1.5 0 0 0 1.5 1.5h14a1.5 1.5 0 0 0 1.5-1.5V9.5A1.5 1.5 0 0 0 19 8h-7l-2-2.5H5A1.5 1.5 0 0 0 3.5 7z"/><path d="M12 11v5M9.5 13.5h5"/></svg>New folder</button></div>
+   <div class="row" id="stnewr"><button type="button" class="alt" id="stnew"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="folderNew"></svg>New folder</button></div>
   </div></details>
- </section>
-
- <section class="pn" data-p="cways" hidden>
-  <div class="cwx">
+ <details class="g" open><summary>Colourways</summary><div class="gb"><div class="cwx">
    <div class="cwg" id="cwg" role="list" aria-label="Colourways"></div>
-   <div class="row"><button type="button" class="alt" id="cwnew"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New colourway</button><button type="button" id="cwgo">Export…</button></div>
-  </div>
- </section>
+   <div class="row"><button type="button" class="alt" id="cwnew"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" data-ic="plus"></svg>New colourway</button><button type="button" id="cwgo">Export…</button></div>
+  </div></div></details>
+  </section>
+
+ 
 
 
 
@@ -1049,10 +1047,10 @@ body.eyedrop{cursor:crosshair}
    </div>
    <div class="txpv" id="tx_pv"></div>
    <div class="row" id="tx_sprow" hidden><button class="alt" id="tx_split">Split into letters</button></div>
-   <div class="row"><button class="primary" id="tx_go" aria-pressed="false">Add text</button></div>
+   <div class="row" hidden><button class="primary" id="tx_go" aria-pressed="false">Add text</button></div>
   </div></details>
    <details class="g" open><summary>Text styles <span class="aux" id="tsn"></span></summary><div class="gb">
-    <div class="sctb"><button type="button" class="ib" id="tsall" aria-pressed="false" aria-label="Expand all"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5 5 5-5M7 4l5 5 5-5" transform="translate(0 4)"/></svg></button><button type="button" class="ib" id="tsnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5V18a1.5 1.5 0 0 0 1.5 1.5h14a1.5 1.5 0 0 0 1.5-1.5V9.5A1.5 1.5 0 0 0 19 8h-7l-2-2.5H5A1.5 1.5 0 0 0 3.5 7zM12 11.5v5M9.5 14h5"/></svg></button><button type="button" class="alt" id="tsadd"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Save style</button></div>
+    <div class="sctb"><button type="button" class="ib" id="tsall" aria-pressed="false" aria-label="Expand all"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="chevsD"></svg></button><button type="button" class="ib" id="tsnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="folderNew"></svg></button><button type="button" class="alt" id="tsadd"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" data-ic="plus"></svg>Save style</button></div>
     <input type="text" id="tsq" maxlength="40" placeholder="Find a style" aria-label="Find a style">
     <div class="stl scl" id="tsl" role="tree" aria-label="Text styles"></div>
    </div></details>
@@ -1079,29 +1077,29 @@ body.eyedrop{cursor:crosshair}
    <span class="rzl">Jitter</span><div class="ctl"><label>Move</label><input type="range" id="rzp" min="0" max="100" value="20" data-u="%" data-def="20"></div>
    <div class="ctl"><label>Turn</label><input type="range" id="rzr" min="0" max="180" value="30" data-u="&#176;" data-def="30"></div>
    <div class="ctl"><label>Scale</label><input type="range" id="rzs" min="0" max="100" value="20" data-u="%" data-def="20"></div>
-   <button class="alt" id="rzgo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>Randomize</button>
+   <button class="alt" id="rzgo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dice"></svg>Randomize</button>
   </div>
   <span class="sdiv"></span>
   <div class="row">
-   <button class="ib" id="ssr" title="Reset width and height" aria-label="Reset width and height"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 107.5-7.5A7.5 7.5 0 006.6 6.8L4.5 9"/><path d="M4.5 4.5V9H9"/></svg></button>
-   <button class="ib" id="sfl" title="Flip" aria-label="Flip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v17" stroke-dasharray="2.4 2.6"/><path d="M9.5 7L4 18h5.5z"/><path d="M14.5 7L20 18h-5.5z"/></svg></button>
-   <button class="ib" id="sko" title="Knockout (K)" aria-label="Knockout" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="12" cy="12" r="4.5" stroke-dasharray="2.4 2"/></svg></button>
-   <button class="ib" id="ssp" title="Split: cut this shape in two along a line you place (S)" aria-label="Split"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M6 17L18 7" stroke-dasharray="2.6 2.6"/></svg></button>
-   <button class="ib" id="scp" title="Duplicate (Ctrl+D)" aria-label="Duplicate"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button>
-   <button class="ib" id="sfr" title="Bring to front" aria-label="Bring to front"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button>
-   <button class="ib" id="ssb" title="Send to back" aria-label="Send to back"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M15.5 8.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5h-7a2.5 2.5 0 01-2.5-2.5v-2.5"/></svg></button>
-   <button class="ib" id="sdl" title="Delete (Del)" aria-label="Delete"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button>
+   <button class="ib" id="ssr" title="Reset width and height" aria-label="Reset width and height"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="reset"></svg></button>
+   <button class="ib" id="sfl" title="Flip" aria-label="Flip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="flip"></svg></button>
+   <button class="ib" id="sko" title="Knockout (K)" aria-label="Knockout" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="knockout"></svg></button>
+   <button class="ib" id="ssp" title="Split: cut this shape in two along a line you place (S)" aria-label="Split"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="split"></svg></button>
+   <button class="ib" id="scp" title="Duplicate (Ctrl+D)" aria-label="Duplicate"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="duplicate"></svg></button>
+   <button class="ib" id="sfr" title="Bring to front" aria-label="Bring to front"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="front"></svg></button>
+   <button class="ib" id="ssb" title="Send to back" aria-label="Send to back"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="back"></svg></button>
+   <button class="ib" id="sdl" title="Delete (Del)" aria-label="Delete"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="trash"></svg></button>
   </div>
  </div>
   </div></details>
   <details class="g" open><summary>Library</summary><div class="gb">
    <div class="lnav">
-    <button class="ib" id="ltog" aria-label="Expand all folders"><svg class="ic e" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9l5-4 5 4M7 15l5 4 5-4"/></svg><svg class="ic c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5l5 4 5-4M7 19l5-4 5 4"/></svg></button>
+    <button class="ib" id="ltog" aria-label="Expand all folders"><svg class="ic e" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="unfold"></svg><svg class="ic c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="fold"></svg></button>
     <input type="range" id="lsz" min="0" max="8" step="1" value="6" aria-label="Motif size" data-plain>
-    <button class="ib" id="limp" aria-label="Import" aria-haspopup="menu" data-more><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V5M8.5 8.5L12 5l3.5 3.5"/><path d="M5 15v2.5A1.5 1.5 0 006.5 19h11a1.5 1.5 0 001.5-1.5V15"/></svg></button>
-    <button class="ib" id="fnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5A2.5 2.5 0 016 5h3.2l2 2.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5H6A2.5 2.5 0 013.5 17z"/><path d="M12 11v5M9.5 13.5h5"/></svg></button>
-    <button class="ib" id="fsel" aria-label="Select shapes" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5" stroke-dasharray="3 3"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></button>
-    <button class="ib" id="fexp" aria-label="Export all shapes" aria-haspopup="menu" data-more><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v9M8.5 9.8l3.5 3.5 3.5-3.5"/><path d="M5 15v2.5A1.5 1.5 0 006.5 19h11a1.5 1.5 0 001.5-1.5V15"/></svg></button>
+    <button class="ib" id="limp" aria-label="Import" aria-haspopup="menu" data-more><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="importIc"></svg></button>
+    <button class="ib" id="fnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="folderNew"></svg></button>
+    <button class="ib" id="fsel" aria-label="Select shapes" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="marquee"></svg></button>
+    <button class="ib" id="fexp" aria-label="Export all shapes" aria-haspopup="menu" data-more><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="download"></svg></button>
    </div>
    <div class="fform" id="fform" hidden><input type="text" id="fname" maxlength="30" placeholder="Folder name" aria-label="Folder name"><select id="fdest" aria-label="Move into" hidden></select><span id="fq" hidden></span><button class="primary" id="fok">Create</button><button class="alt" id="fcx">Cancel</button></div>
    <div class="ltr" id="lib"></div>
@@ -1129,7 +1127,7 @@ body.eyedrop{cursor:crosshair}
      <label>Size</label><input type="range" id="lfps" min="2" max="300" value="20" data-u="%" data-def="20">
      <label>Rotate</label><input type="range" id="lfpr" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
      <div id="lfpxy"><label>Position across</label><input type="range" id="lfpx" min="0" max="100" step="0.5" value="50" data-u="%" data-def="50"><label>Position down</label><input type="range" id="lfpy" min="0" max="100" step="0.5" value="50" data-u="%" data-def="50"></div>
-     <div class="row fprow"><button class="ib" id="lfpfl" title="Flip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v17" stroke-dasharray="2.4 2.6"/><path d="M9.5 7L4 18h5.5z"/><path d="M14.5 7L20 18h-5.5z"/></svg></button><button class="ib" id="lfpdu" title="Duplicate"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button><button class="ib" id="lfpup" title="Bring to front"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button><button class="ib" id="lfpdn" title="Send to back"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="12" height="12" rx="2.5" fill="currentColor" fill-opacity=".2"/><path d="M15.5 8.5H18a2.5 2.5 0 012.5 2.5v7a2.5 2.5 0 01-2.5 2.5h-7A2.5 2.5 0 018.5 18v-2.5"/></svg></button><button class="ib" id="lfpdl" title="Delete (Del)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button></div>
+     <div class="row fprow"><button class="ib" id="lfpfl" title="Flip"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="flip"></svg></button><button class="ib" id="lfpdu" title="Duplicate"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="duplicate"></svg></button><button class="ib" id="lfpup" title="Bring to front"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="front"></svg></button><button class="ib" id="lfpdn" title="Send to back"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="back"></svg></button><button class="ib" id="lfpdl" title="Delete (Del)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="trash"></svg></button></div>
     </div>
    </div>
   </div></details>
@@ -1176,7 +1174,7 @@ body.eyedrop{cursor:crosshair}
   </div></details>
  </section>
  <section class="pn" data-p="lyrs" hidden><div class="lys" id="lys">
- <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><div class="dd gmadd"><button type="button" class="ib" id="lygrp" title="Group the selected elements" aria-label="Group the selected elements" disabled><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5V6a2 2 0 012-2H7M17 4h1.5a2 2 0 012 2v1.5M20.5 16.5V18a2 2 0 01-2 2H17M7 20H5.5a2 2 0 01-2-2v-1.5"/><rect x="8" y="8" width="8" height="8" rx="1.5"/></svg></button><button type="button" class="ib" id="lyung" title="Ungroup" aria-label="Ungroup" disabled><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></button>
+ <div class="lyh"><span class="lyt" id="lytg"><span id="lycnt"></span></span><div class="dd gmadd"><button type="button" class="ib" id="lygrp" title="Group the selected elements" aria-label="Group the selected elements" disabled><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="group"></svg></button><button type="button" class="ib" id="lyung" title="Ungroup" aria-label="Ungroup" disabled><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="ungroup"></svg></button>
   </div></div>
  <div id="lybody">
   <div class="lyo"><span class="lyk">Blend</span><select id="ly_bl" title="Blend mode"><option value="">Normal</option><option value="multiply">Multiply (overprint)</option><option value="darken">Darken</option><option value="screen">Screen</option><option value="lighten">Lighten</option><option value="overlay">Overlay</option><option value="soft-light">Soft light</option><option value="behind">Behind (fills gaps only)</option><option value="cancel">Cancel out (overlap prints nothing)</option><option value="replace">Replace (overlap prints a colour)</option></select></div>
@@ -1200,26 +1198,21 @@ body.eyedrop{cursor:crosshair}
   </div></details>
  </section>
  <section class="pn" data-p="stmp" hidden><div class="smkp">
+  <div class="elk"><div class="row"><button type="button" class="alt" id="smknew">Create New Stamp</button></div></div>
   <div class="smked" id="smked" hidden></div>
   <details class="g" open><summary>Stamps</summary><div class="gb">
    <div class="smkt">
-    <button type="button" class="ib" id="smknew" aria-haspopup="menu" aria-label="New stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
-    <button type="button" class="ib" id="smkdup" aria-label="Duplicate stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button>
-    <button type="button" class="ib" id="smkdel" aria-label="Delete stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button>
+    <button type="button" class="ib" id="smkdup" aria-label="Duplicate stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="duplicate"></svg></button>
+    <button type="button" class="ib" id="smkdel" aria-label="Delete stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="trash"></svg></button>
     <span class="smks"></span>
-    <button type="button" class="ib" id="smkzoom" aria-label="Zoom to stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></button>
-    <button type="button" class="ib" id="smksave" aria-label="Save to library"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10M8 10l4 4 4-4M5 19h14"/></svg></button>
-    <button type="button" class="ib" id="smklib" aria-label="Stamp library"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="5" height="14" rx="1.5"/><rect x="10" y="5" width="4" height="14" rx="1.5"/><rect x="15.6" y="5.4" width="4.6" height="14" rx="1.5" transform="rotate(-10 18 12.4)"/></svg></button>
+    <button type="button" class="ib" id="smkzoom" aria-label="Zoom to stamp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="search"></svg></button>
+    <button type="button" class="ib" id="smksave" aria-label="Save to library"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="download"></svg></button>
    </div>
    <div class="smkl" id="stmpl"></div>
    <div class="row"><button type="button" class="primary" id="smkedit">Edit</button></div>
   </div></details>
-  <details class="g" open><summary>Contents</summary><div class="gb">
-   <div class="row"><button class="alt" id="stmksel" disabled>Make stamp from selection</button></div>
-   <div class="ml" id="stcl" hidden></div>
-  </div></details>
-  <details class="g" open><summary>Place</summary><div class="gb"><div class="txed elmode" data-k="stamp" hidden><span>Editing <b></b></span></div><div class="strip" id="lfpst"></div></div></details>
-    <details class="g" open><summary>Block</summary><div class="gb">
+  <div hidden><div class="txed elmode" data-k="stamp" hidden><span>Editing <b></b></span></div><div class="strip" id="lfpst"></div></div>
+    <details class="g stonly" open hidden><summary>Block</summary><div class="gb">
    <label>Shape</label><div class="shg" id="skind"><button type="button" data-k="rect"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Rectangle</button><button type="button" data-k="hex"><svg viewBox="0 0 20 20"><path d="M10 2L17 6V14L10 18L3 14V6Z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Hexagon</button><button type="button" data-k="circle"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Circle</button><button type="button" data-k="diamond"><svg viewBox="0 0 20 20"><path d="M10 2L18 10L10 18L2 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Diamond</button><button type="button" data-k="tri"><svg viewBox="0 0 20 20"><path d="M10 3L18 17H2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Triangle</button><button type="button" data-k="arch"><svg viewBox="0 0 20 20"><path d="M4.5 17V9.5a5.5 5.5 0 0111 0V17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Arch</button><button type="button" data-k="oct"><svg viewBox="0 0 20 20"><path d="M7 3h6l4 4v6l-4 4H7l-4-4V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Octagon</button><button type="button" data-k="star"><svg viewBox="0 0 20 20"><path d="M10.0 2.5L11.8 5.7L15.3 4.7L14.3 8.2L17.5 10.0L14.3 11.8L15.3 15.3L11.8 14.3L10.0 17.5L8.2 14.3L4.7 15.3L5.7 11.8L2.5 10.0L5.7 8.2L4.7 4.7L8.2 5.7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Star</button><button type="button" data-k="quat"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7.4" cy="10" r="4.2"/><circle cx="12.6" cy="10" r="4.2"/><circle cx="10" cy="7.4" r="4.2"/><circle cx="10" cy="12.6" r="4.2"/></svg>Quatrefoil</button><button type="button" data-k="lancet"><svg viewBox="0 0 20 20"><path d="M4.5 17v-6.5Q4.5 6.5 10 3q5.5 3.5 5.5 7.5V17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Lancet</button></div>
    <div id="sasprow" style="margin-top:6px"><div class="asp"><select id="sasp"></select><button class="alt" id="sswp" title="Swap width and height" aria-label="Swap width and height">&#8646;</button></div><div class="aspc" id="sascw">Width <input type="number" id="saw" min="0.1" max="50" step="0.1"> Height <input type="number" id="sah" min="0.1" max="50" step="0.1"></div></div>
    <div id="shexrow" style="margin-top:6px"><select id="shor"><option value="p">Pointy top</option><option value="f">Flat top</option></select></div>
@@ -1230,20 +1223,17 @@ body.eyedrop{cursor:crosshair}
    <label class="chk"><input type="checkbox" id="neg"><span>Invert (carve the shapes away)</span></label>
    <label class="chk"><input type="checkbox" id="swrap" checked><span>Wrap at the edges</span></label>
   </div></details>
-  <details class="g" open><summary>Block edge</summary><div class="gb">
+  <details class="g stonly" open hidden><summary>Block edge</summary><div class="gb">
    <label id="letl">Thickness</label><input type="range" id="let" min="0" max="12" step="0.5" value="3">
    <label id="lerl">Roughness</label><input type="range" id="ler" min="0" max="10" step="0.5" value="3">
    <div class="row"><button class="alt" id="lers">Reshuffle edges</button></div>
   </div></details>
-  <details class="g" open><summary>Symmetry</summary><div class="gb">
+  <details class="g stonly" open hidden><summary>Symmetry</summary><div class="gb">
    <div class="sym" id="sym"></div>
    <div id="symn" hidden><label id="snl">Copies</label><input type="range" id="sn" min="2" max="12"></div>
    <div class="hint" id="symh"></div>
    <label class="chk" id="symtxr" hidden><input type="checkbox" id="symtx"><span>Mirror text with symmetry</span></label>
    <div class="row" id="sbkr" hidden><button class="alt" id="sbk">Make copies separate</button></div>
-  </div></details>
-  <details class="g" open><summary>Outlines</summary><div class="gb">
-   <label>Opacity</label><input type="range" id="stmpop" min="0" max="100" value="60" data-u="%" data-def="60">
   </div></details>
  </div></section>
  <section class="pn" data-p="layers" hidden>
@@ -1277,7 +1267,7 @@ body.eyedrop{cursor:crosshair}
  <section class="pn" data-p="grade" hidden>
   <div class="lys gms">
    <div class="lyh"><span class="lyt" style="cursor:default">Masks <span id="gm_cnt"></span></span>
-    <div class="dd gmadd"><button type="button" class="ib" id="gm_add" title="Add a mask" aria-label="Add a mask" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <div class="dd gmadd"><button type="button" class="ib" id="gm_add" title="Add a mask" aria-label="Add a mask" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="plus"></svg></button>
      <div class="ddl" id="gm_menu" data-w="236" hidden>
       <div class="ddi" data-gt="lin"><span class="gmi" data-ic="lin"></span><span>Linear gradient<small>Fades across the canvas or each stamp</small></span></div>
       <div class="ddi" data-gt="rad"><span class="gmi" data-ic="rad"></span><span>Radial gradient<small>An oval you can feather, inside or out</small></span></div>
@@ -1285,15 +1275,15 @@ body.eyedrop{cursor:crosshair}
       <div class="ddi" data-gt="col"><span class="gmi" data-ic="col"></span><span>Colour range<small>Wherever one colour prints</small></span></div>
       <div class="ddi" data-gt="lum"><span class="gmi" data-ic="lum"></span><span>Luminance range<small>The darks, the lights, or a band between</small></span></div>
      </div></div>
-    <button type="button" class="ib" id="gm_dup" title="Duplicate mask" aria-label="Duplicate mask"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg></button>
-    <button type="button" class="ib" id="gm_del" title="Delete mask" aria-label="Delete mask"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7M10.2 11v5M13.8 11v5"/></svg></button>
+    <button type="button" class="ib" id="gm_dup" title="Duplicate mask" aria-label="Duplicate mask"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="duplicate"></svg></button>
+    <button type="button" class="ib" id="gm_del" title="Delete mask" aria-label="Delete mask"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="trash"></svg></button>
    </div>
    <div class="lyl2" id="gm_list"></div>
    <div id="gm_body" hidden>
     <div class="lyo" id="gm_sp_r"><span class="lyk">Apply to</span><div class="seg" id="gm_sp" style="grid-template-columns:1fr 1fr"><button type="button" data-gs="c" title="One gradient over the whole print">Whole canvas</button><button type="button" data-gs="s" title="The gradient repeats inside every print of the stamp">Each stamp</button></div></div>
     <div class="lyo" id="gm_st_r"><span class="lyk">Stamps</span><select id="gm_st"></select></div>
     <div class="lyo" id="gm_lay_r"><span class="lyk">Layer</span><select id="gm_lay"></select></div>
-    <div class="lyo" id="gm_col_r"><span class="lyk">Colour</span><div class="gmc"><select id="gm_col"></select><input type="color" id="gm_cc" title="Pick any colour"><button type="button" class="ib" id="gm_eye" title="Pick a colour from the print" aria-label="Pick a colour from the print" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19l.7-3.3L14 7.4 16.6 10 8.3 18.3z"/><path d="M13 6.4l1.2-1.2a1.8 1.8 0 012.6 0l2 2a1.8 1.8 0 010 2.6L17.6 11"/></svg></button></div></div>
+    <div class="lyo" id="gm_col_r"><span class="lyk">Colour</span><div class="gmc"><select id="gm_col"></select><input type="color" id="gm_cc" title="Pick any colour"><button type="button" class="ib" id="gm_eye" title="Pick a colour from the print" aria-label="Pick a colour from the print" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="eyedropper"></svg></button></div></div>
     <div class="lyop" id="gm_lo_r"><label>From</label><input type="range" id="gm_lo" min="0" max="100" value="0" data-def="0"></div>
     <div class="lyop" id="gm_hi_r"><label>To</label><input type="range" id="gm_hi" min="0" max="100" value="35" data-def="35"></div>
     <div class="lyop" id="gm_rg_r"><label>Range</label><input type="range" id="gm_rg" min="0" max="100" value="20" data-def="20"></div>
@@ -1352,15 +1342,15 @@ body.eyedrop{cursor:crosshair}
   <div class="xrn"><input type="text" id="xrn" maxlength="40" aria-label="Recipe name" placeholder="Recipe name"><button type="button" id="xrsave">Save recipe</button></div>
  </div></details>
  <details class="g" open><summary>Quick</summary><div class="gb">
-  <div class="row xrq"><button id="png"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M3.5 15l5-5 4 4 2.5-2.5 5.5 5.5"/></svg>PNG image<kbd>3× size</kbd></button><button id="sv"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.5L12 5l7.5 14.5z"/><circle cx="12" cy="5" r="1.4"/></svg>SVG vector</button><button id="cpy"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M8.5 15.5H6A2.5 2.5 0 013.5 13V6A2.5 2.5 0 016 3.5h7A2.5 2.5 0 0115.5 6v2.5"/></svg>Copy SVG code</button></div>
-  <div class="row xrq"><button id="bkpdf" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8l4.5 4.5v12.5H6z"/><path d="M14 3.5V8h4.5M9 13h6M9 16.5h6"/></svg>Print cover PDF<kbd>300 DPI</kbd></button><button id="bkpng" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M9.5 5v14M14.5 5v14"/></svg>Print cover PNG<kbd>300 DPI</kbd></button></div>
+  <div class="row xrq"><button id="png"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="image"></svg>PNG image<kbd>3× size</kbd></button><button id="sv"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="pen"></svg>SVG vector</button><button id="cpy"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="duplicate"></svg>Copy SVG code</button></div>
+  <div class="row xrq"><button id="bkpdf" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="fileText"></svg>Print cover PDF<kbd>300 DPI</kbd></button><button id="bkpng" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="spread"></svg>Print cover PNG<kbd>300 DPI</kbd></button></div>
  </div></details>
  <details class="g" open><summary>Print proof</summary><div class="gb">
   <div class="row xrp"><select id="xpp" aria-label="Paper"><option value="letter">Letter</option><option value="a4">A4</option></select><button type="button" id="xppdf">PDF</button><button type="button" id="xppng">PNG</button></div>
  </div></details>
 </section>
 <section class="pn" data-p="rand" hidden>
-  <div class="gb rzmain"><button class="primary rzbig" id="rzdo" title="Roll a whole new piece (Ctrl+Z to go back)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>Randomize</button>
+  <div class="gb rzmain"><button class="primary rzbig" id="rzdo" title="Roll a whole new piece (Ctrl+Z to go back)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="dice"></svg>Randomize</button>
    <div class="hint" id="rzlast"></div></div>
   <details class="g" open><summary>What to randomize</summary><div class="gb">
    <div class="row tight"><button class="alt" id="rzall">All on</button><button class="alt" id="rznone">All off</button></div>
@@ -1403,7 +1393,7 @@ body.eyedrop{cursor:crosshair}
 </div>
 
 <div class="modal" id="idlg" hidden><div class="dlg idl" role="dialog" aria-modal="true" aria-labelledby="idlgt">
- <div class="dlg-h"><h2 id="idlgt">Import</h2><div class="seg imd" id="imode" role="group" aria-label="Import as"><button type="button" data-m="one" class="on">Single shape</button><button type="button" data-m="sheet">Sheet</button></div><button class="ib" id="icx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-h"><h2 id="idlgt">Import</h2><div class="seg imd" id="imode" role="group" aria-label="Import as"><button type="button" data-m="one" class="on">Single shape</button><button type="button" data-m="sheet">Sheet</button></div><button class="ib" id="icx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-b"><div class="iwrap">
   <div class="istg">
    <div class="seg svw" id="sview" role="group" aria-label="Show"><button type="button" data-v="o">Original</button><button type="button" data-v="t" class="on">Traced</button></div>
@@ -1435,7 +1425,7 @@ body.eyedrop{cursor:crosshair}
  <div class="dlg-f ifoot"><span id="iinfo"></span><button class="alt" id="icl">Cancel</button><button class="primary" id="iadd">Add shape</button></div>
 </div></div>
 <div class="modal" id="tpdlg" hidden><div class="dlg tpd" role="dialog" aria-modal="true" aria-labelledby="tpt">
- <div class="dlg-h"><h2 id="tpt">New from template</h2><button type="button" class="alt" id="tpadd">Add from file</button><button class="ib" id="tpclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-h"><h2 id="tpt">New from template</h2><button type="button" class="alt" id="tpadd">Add from file</button><button class="ib" id="tpclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-b">
   <div class="seg" id="tpty" role="group" aria-label="Kind"><button type="button" data-k="canvas">Normal canvas</button><button type="button" data-k="tile">Repeating pattern</button><button type="button" data-k="book">Book</button></div>
   <div class="glb">Starting points</div><div class="pgrid" id="tpg" role="list"></div>
@@ -1444,19 +1434,19 @@ body.eyedrop{cursor:crosshair}
  </div>
 </div></div>
 <div class="modal" id="tpsd" hidden><div class="dlg tpsd" role="dialog" aria-modal="true" aria-labelledby="tpst">
- <div class="dlg-h"><h2 id="tpst">Save as template</h2><button class="ib" id="tpsx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-h"><h2 id="tpst">Save as template</h2><button class="ib" id="tpsx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-b"><input type="text" id="tpsn" maxlength="40" aria-label="Template name" placeholder="Template name"><div class="row"><button type="button" class="primary" id="tpsok">Save</button><button type="button" class="alt" id="tpscx">Cancel</button></div></div>
 </div></div>
 <div class="modal" id="stgdlg" hidden><div class="dlg stgd" role="dialog" aria-modal="true" aria-labelledby="stgt">
- <div class="dlg-h"><h2 id="stgt">Settings</h2><button class="ib" id="stgclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-h"><h2 id="stgt">Settings</h2><button class="ib" id="stgclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-b"><div class="stgw"><div class="stgn" id="stgnav" role="tablist" aria-orientation="vertical" aria-label="Settings pages"></div><div class="stgb" id="stgbody" role="tabpanel"></div></div></div>
 </div></div>
 <div class="modal" id="acdlg" hidden><div class="dlg acd" role="dialog" aria-modal="true" aria-labelledby="actt">
- <div class="dlg-h"><h2 id="actt">Account</h2><button class="ib" id="acclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-h"><h2 id="actt">Account</h2><button class="ib" id="acclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-b" id="acbody"></div>
 </div></div>
 <div class="modal" id="fbdlg" hidden><div class="dlg fbd" role="dialog" aria-modal="true" aria-labelledby="fbt">
- <div class="dlg-h"><h2 id="fbt">Send feedback</h2><button class="ib" id="fbx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-h"><h2 id="fbt">Send feedback</h2><button class="ib" id="fbx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-b"><div class="seg" id="fbcat" role="group" aria-label="Kind of feedback" style="--n:3"><button type="button" data-v="bug">Bug</button><button type="button" data-v="idea" class="on" aria-pressed="true">Idea</button><button type="button" data-v="other">Other</button></div><textarea id="fbmsg" rows="6" maxlength="4000" aria-label="Message" placeholder="Message"></textarea><div class="row"><button type="button" class="primary" id="fbok" disabled>Send</button><button type="button" class="alt" id="fbcx">Cancel</button></div></div>
 </div></div>
 <div class="modal" id="aclk" hidden><div class="dlg aclk" role="dialog" aria-modal="true" aria-labelledby="aclt">
@@ -1464,7 +1454,7 @@ body.eyedrop{cursor:crosshair}
  <div class="dlg-b"><div class="row"><button type="button" class="primary" id="aclin">Sign in</button><button type="button" class="alt" id="aclre">Try again</button><button type="button" class="alt" id="aclsv">Save project</button></div></div>
 </div></div>
 <div class="modal" id="plist" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="pdlgt">
- <div class="dlg-h"><h2 id="pdlgt">Projects</h2><button class="alt" id="pnw2">New project</button><button class="alt" id="pcf">Close folder</button><button class="ib" id="pclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dlg-h"><h2 id="pdlgt">Projects</h2><button class="alt" id="pnw2">New project</button><button class="alt" id="pcf">Close folder</button><button class="ib" id="pclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-b"><div class="pgrid" id="pgrid"></div></div>
  </div></div>
 
@@ -1474,8 +1464,8 @@ body.eyedrop{cursor:crosshair}
 <script>
 // v70 light / dark toggle in the top bar. Dark is the default; the choice is remembered when the browser allows it.
 (function(){const b=document.getElementById('thm'),R=document.documentElement;if(!b)return;
-const SUN='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg>',
-MOON='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>';
+const SUN='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6L18 18M6 18l1.4-1.4M16.6 7.4L18 6"/></svg>',
+MOON='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.5A7.5 7.5 0 019.5 4.5a7.5 7.5 0 1010 10z"/></svg>';
 const paint=()=>{const dark=R.getAttribute('data-theme')!=='light';b.innerHTML=dark?SUN:MOON;b.title=dark?'Switch to light mode':'Switch to dark mode';b.setAttribute('aria-label',b.title)};
 b.onclick=()=>{const n=R.getAttribute('data-theme')==='light'?'dark':'light';R.setAttribute('data-theme',n);try{localStorage.setItem('wb60_theme',n)}catch(e){}paint()};
 paint()})();

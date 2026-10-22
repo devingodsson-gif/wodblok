@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
@@ -6,12 +7,13 @@ import {fpL,fpU} from './24-free-place-layers.js';
 import {fpSz} from './25-art-layers.js';
 import {elSel} from './65-element-core.js';
 import {plDisarm} from './72-placing.js';
+import {stUnlocked} from './63-stamp-tool.js';
 
 // ===== The Add bar (2.3.0, Photoshop): the element bar makes things. Pattern, Text and Image make a new element at once, just above the selected one (at the top
 // of the list when nothing is selected), selects it, and shows its panel in Properties. Shape, Stamp and Text
 // also arm (Paint is hidden since 2.3.1) their tool, so the next clicks on the canvas carry on; Select (first button, V) puts any tool away. Image asks for a picture first and makes a Shape filled with it
 // (2.3.1: there is no Image element and no Sheet; the Background is set in the Canvas tool). Owner, Oct 20 2026: "every click makes an element", "just above the selected one".
-const AB_SEL='<path d="M6 3.5l12 8.2-5.4 1.2 3.2 6.1-2.4 1.3-3.2-6.1-4.2 3.7z"/>';
+const AB_SEL=ICN.cursor;
 // where a new element goes: just above the selected element (in the same group), else at the top; `bottom` puts it at the bottom when nothing is selected
 function abInsert(q,bottom){const L=fpL();if(!L)return null;const a=(L.pl=L.pl||[]),s=elSel()||(WBS.fpSel!=null&&WBS.fpSel!==-1?a.find(x=>String(x.u)===String(WBS.fpSel)):null);
  if(s&&a.includes(s)){if(s.g)q.g=s.g;a.splice(a.indexOf(s)+1,0,q)}else if(bottom)a.unshift(q);else a.push(q);
@@ -35,7 +37,8 @@ const AD={
  stamp(){const t=WBS.tiles[WBS.cur];if(!t)return;const q=abInsert({u:fpU(),k:'stamp',t:t.id,x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:+fpSz().toFixed(2),r:0,f:1});if(!q)return;WBS.fpB=null;abDone();abOpen('stmp')},
  motif(){if(WBX.wbMotifAdd)WBX.wbMotifAdd()},
  pattern(){const q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),lay:'grid',cn:4,rn:4,sz:80,rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone();abOpen('layers')},
- text(){const L=fpL(),before=new Set(L?(L.pl||[]).map(q=>String(q.u)):[]),anchor=elSel();abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTbAdd)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}
+ text(){if(stUnlocked()!=null){abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTxStampAt||!WBX.wbStampMid)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}const[x,y]=WBX.wbStampMid()||[0,0];Promise.resolve(WBX.wbTxStampAt(x,y)).then(()=>setTimeout(()=>{ta.focus();ta.select()},0));return}
+  const L=fpL(),before=new Set(L?(L.pl||[]).map(q=>String(q.u)):[]),anchor=elSel();abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTbAdd)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}
   Promise.resolve(WBX.wbTbAdd()).then(()=>{const L2=fpL();if(!L2)return;const a=L2.pl||[],q=a.find(x=>!before.has(String(x.u)));if(!q)return;a.splice(a.indexOf(q),1);
    if(anchor&&a.includes(anchor)){if(anchor.g)q.g=anchor.g;a.splice(a.indexOf(anchor)+1,0,q)}else a.push(q);WBS.fpSel=q.u;abDone();setTimeout(()=>{ta.focus();ta.select()},0)})},
 };

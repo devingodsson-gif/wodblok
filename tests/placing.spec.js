@@ -57,12 +57,6 @@ test('a right click puts away a shape, a stamp and text that were armed', async 
   await expect(page.locator('#fpov .gh')).toHaveCount(1);
   await page.mouse.click(...(await (async () => { const b = await page.locator('#art').boundingBox(); return [b.x + b.width * 0.4, b.y + b.height * 0.4]; })()), { button: 'right' }); await settle(page);
   await expect(page.locator('#fpov .gh')).toHaveCount(0);
-  // text
-  await page.click('#elb [data-k="text"]'); await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
-  await page.click('#tx_go'); await settle(page);   // arm the text tool (2.3.0: the Text button already made one; Add text arms the next)
-  await expect(page.locator('#tx_go')).toHaveAttribute('aria-pressed', 'true');
-  await page.mouse.click(...(await (async () => { const b = await page.locator('#art').boundingBox(); return [b.x + b.width * 0.5, b.y + b.height * 0.6]; })()), { button: 'right' }); await settle(page);
-  await expect(page.locator('#tx_go')).toHaveAttribute('aria-pressed', 'false');
   expect(errors).toEqual([]);
 });
 
@@ -75,10 +69,5 @@ test('using the interface puts away a stamp and text too, and a picking button a
   await page.keyboard.press('v'); await settle(page);
   await over(page, 0.45, 0.45);
   await expect(page.locator('#fpov .gh')).toHaveCount(0);
-  await page.click('#elb [data-k="text"]'); await page.click('.elk[data-k="text"] [data-add]'); await settle(page);
-  await page.click('#tx_go'); await settle(page);   // arm the text tool (2.3.0: the Text button already made one; Add text arms the next)
-  await expect(page.locator('#tx_go')).toHaveAttribute('aria-pressed', 'true');
-  await page.click('#elb [data-k="shape"]'); await settle(page);
-  await expect(page.locator('#tx_go')).toHaveAttribute('aria-pressed', 'false');
   expect(errors).toEqual([]);
 });

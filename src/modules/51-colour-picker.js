@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,closeDD,placeFloat} from './04-canvas-and-stamp-outlines.js';
@@ -12,7 +13,7 @@ import {hexAlpha,normHexA,withAlpha} from './50-tray-core.js';
 // openPicker(anchor, {value, alpha, name, onName, onInput(hex), onChange(hex), saved(), onPick(hex, name), actions:[[label, svg, fn]], onClose})
 // saved() gives the colours for the "Saved colours" dropdown (with its search); onPick, when given, takes a chosen saved colour and its name as one step.
 const PK_IC=(d,w)=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-const DROP_IC=PK_IC('<path d="M14.5 5.5l4 4"/><path d="M16.8 3.4a2.3 2.3 0 0 1 3.3 3.3l-2.2 2.2-3.3-3.3z"/><path d="M14.6 7.6L6 16.2V18h1.8l8.6-8.6"/><path d="M4 20l2-2"/>');
+const DROP_IC=PK_IC(ICN.eyedropper);
 const RC_KEY='wb200_recent',RC_MAX=20;
 let PK=null;   // the open picker: {el, o (options), H,S,V,A, anchor}
 const hx2=n=>Math.round(Math.max(0,Math.min(255,n))).toString(16).padStart(2,'0');
@@ -47,7 +48,7 @@ function emit(fin){const p=PK;if(!p)return;const h=pkPaint();if(h!==p.last){p.la
 function commit(){const p=PK;if(!p||!p.dirty)return;p.dirty=false;if(rafI){cancelAnimationFrame(rafI);rafI=0;if(p.o.onInput)p.o.onInput(p.last)}addRecent(p.last);if(p.o.onChange)p.o.onChange(p.last);paintRecents()}
 function setHex(h,fin){h=normHexA(h);if(!h||!PK)return;const [r,g,b]=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),[H,S,V]=rgb2hsv(r,g,b);if(S>0&&V>0)PK.H=H;PK.S=S;PK.V=V;PK.A=hexAlpha(h);if(!PK.o.alpha)PK.A=1;emit(fin)}
 // ---- saved colours: a dropdown with a search field, offered when the caller passes saved():[{g:'Group', items:[{n name, h hex, t tray}]}]
-const SV_IC=PK_IC('<circle cx="10.5" cy="10.5" r="5.5"/><path d="M15 15l5 5"/>',1.7),xe=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SV_IC=PK_IC(ICN.search,1.7),xe=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let SVL=null,SVB=null,SVI=null,SVR=[];   // the list, its button, its search field, the rows now showing (flat, in order)
 let SVX=-1;                                // the row the arrow keys are on
 function svPaint(){if(!SVL||!PK||!PK.o.saved)return;const q=SVI.value.trim().toLowerCase().split(/\s+/).filter(Boolean);SVR=[];let h='';

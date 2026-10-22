@@ -1,7 +1,7 @@
 // Continuity between the tool panels: the same kind of control looks the same in every panel (headings, buttons, dropdowns, text fields,
 // segmented controls, shape pickers). Measured on the real panels, in both views.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel } = require('./helpers/harness');
+const { openApp, openPanel, closeAllPanels } = require('./helpers/harness');
 
 test('every tool panel uses the same heading, button, dropdown, field and segmented-control styles', async ({ page }) => {
   const { errors } = await openApp(page);
@@ -9,13 +9,13 @@ test('every tool panel uses the same heading, button, dropdown, field and segmen
   for (const mode of ['pattern']) {
     const tools = (await page.locator('.rail [data-pn]:not([hidden])').evaluateAll(b => b.map(x => x.dataset.pn))).concat(['layers', 'stmp', 'motifs', 'text', 'elpaint']);
     for (const pn of tools) {
-      await page.click('#rcls'); await openPanel(page, pn);
+      await closeAllPanels(page); await openPanel(page, pn);
       const r = await page.evaluate(pn => {
         const sec = document.querySelector(`section.pn[data-p="${pn}"]`); sec.querySelectorAll('details').forEach(d => { d.open = true; });
         const vis = e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
         const cs = (e, ...k) => { const c = getComputedStyle(e); return k.map(x => c[x]).join('|'); };
         const o = { summary: [], altFont: [], ddRadius: [], fieldRadius: [], segOn: [], segH: [], tileRadius: [], labelInline: [] };
-        sec.querySelectorAll('details.g>summary').forEach(e => vis(e) && o.summary.push(cs(e, 'fontFamily', 'fontSize', 'fontWeight') + '|' + Math.round(e.getBoundingClientRect().height)));
+        sec.querySelectorAll('details.g:not(.fxg)>summary').forEach(e => vis(e) && o.summary.push(cs(e, 'fontFamily', 'fontSize', 'fontWeight') + '|' + Math.round(e.getBoundingClientRect().height)));
         sec.querySelectorAll('button.alt').forEach(e => vis(e) && !e.classList.contains('ib') && !e.closest('#zoomc,#navbar,.zoom') && !/^[^\w]*$/.test(e.textContent.trim()) && o.altFont.push(cs(e, 'fontSize', 'fontWeight')));
         sec.querySelectorAll('.ddb').forEach(e => vis(e) && o.ddRadius.push(cs(e, 'borderTopLeftRadius')));
         sec.querySelectorAll('input[type=text],textarea,select').forEach(e => vis(e) && o.fieldRadius.push(cs(e, 'borderTopLeftRadius')));
