@@ -4,7 +4,7 @@ import {BK} from './03-stamp-prints-and-drawing.js';
 import {CASP,CH,CM,CW,PL,SH,SK,SW,col,geom,inShape,okC,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {isFixed,isLink,trayLoad} from './50-tray-core.js';
 import {CATS} from './05-motif-data.js';
-import {cust,it,mkL,oneLayer,selOne,store} from './06-motif-library-folders.js';
+import {cust,flatEls,it,mkL,oneLayer,selOne,store} from './06-motif-library-folders.js';
 import {gModel} from './08-grid-shapes.js';
 import {hx3} from './09-stamp-items-and-print-runs.js';
 import {GRAD,arrOpts,gArrAll} from './71-randomize-elements.js';
@@ -23,6 +23,10 @@ const rzPic=l=>(l.pl||[]).some(p=>p.a||p.tx);
 // 2.21.0 (owner Oct 22 2026): a roll either replaces the previous roll and leaves your own elements alone (the default), or starts from an empty canvas (Randomize panel switch, kept in settings).
 // What a roll made is remembered here (not in the file): the elements and stamps that were not there before it. The next roll takes those away first.
 const RZ_KEY='wb121_rzfresh';let RZMADE=null;
+// the stamps the last roll placed on their own (2.24.0): the project is one element list, so a reroll tells them apart by their element ids.
+// A stamp counts only while an element the roll made still uses it (ids are never reused, so a new or opened project cannot match).
+let RZFZ=new Set();
+const rzFz=()=>{const o=new Set();WBS.layers.forEach(l=>(l.pl||[]).forEach(q=>{if(q.t!=null&&RZFZ.has(String(q.u)))o.add(q.t)}));return o};
 const rzFresh=()=>{try{return kv.get(RZ_KEY)==='1'}catch(e){return false}};
 const rzIds=()=>({els:new Set(WBS.layers.flatMap(l=>(l.pl||[]).map(q=>String(q.u)))),tiles:new Set(WBS.tiles.map(t=>t.id))});
 function rzDrop(){const m=RZMADE;RZMADE=null;if(!m)return;const E=new Set(m.els);WBS.layers.forEach(l=>{if(l.pl)l.pl=l.pl.filter(q=>!E.has(String(q.u)))});
@@ -173,8 +177,8 @@ const isFr=l=>!!(l.fr&&l.fr.on),idMax=a=>Math.max(0,...a.map(t=>+t.id||0));
 const remap=(ts,ls,base)=>{const m={};ts.forEach((t,i)=>m[t.id]=base+1+i);return[ts.map(t=>({...t,id:m[t.id]})),ls.map(l=>{const n={...l,st:(l.st||[]).map(x=>m[x]!=null?m[x]:x)};if(l.fr&&l.fr.cs!=null&&m[l.fr.cs]!=null)n.fr={...l.fr,cs:m[l.fr.cs]};if(l.lead!=null&&m[l.lead]!=null)n.lead=m[l.lead];return n})]};
 const curFrL=WBS.layers.filter(isFr),curFrIds=new Set();curFrL.forEach(l=>{(l.st||[]).forEach(x=>curFrIds.add(x));if(l.fr.cs!=null)curFrIds.add(l.fr.cs)});
 let mT=tl.filter(t=>!skipIds.has(t.id)),mL=LS.filter(l=>!isFr(l)),fT=tl.filter(t=>skipIds.has(t.id)),fL=LS.filter(isFr),usedGen=true;
-const oldFz=new Set();if(FT.free||libFree)WBS.layers.forEach(l=>{if(l.rz=='free')(l.st||[]).forEach(x=>oldFz.add(x))});
-if(!FT.stamps){const kT=WBS.tiles.filter(t=>!curFrIds.has(t.id)&&!oldFz.has(t.id)),kL=WBS.layers.filter(l=>!isFr(l)&&!((FT.free||libFree)&&l.rz=='free'));if(kT.length&&kL.length){mT=kT;mL=kL;usedGen=false}}
+const oldFz=new Set();if(FT.free||libFree){WBS.layers.forEach(l=>{if(l.rz=='free')(l.st||[]).forEach(x=>oldFz.add(x))});rzFz().forEach(x=>oldFz.add(x))}
+if(!FT.stamps){const kT=WBS.tiles.filter(t=>!curFrIds.has(t.id)&&!oldFz.has(t.id)),kL=WBS.layers.filter(l=>!isFr(l)&&!((FT.free||libFree)&&l.rz=='free')).map(l=>oldFz.size?{...l,pl:(l.pl||[]).filter(q=>!(q.k!='pattern'&&q.t!=null&&oldFz.has(q.t)))}:l);if(kT.length&&kL.length){mT=kT;mL=kL;usedGen=false}}
 if(!FT.frame){fT=WBS.tiles.filter(t=>curFrIds.has(t.id));fL=curFrL}
 [fT,fL]=remap(fT,fL,idMax(mT));
 const rzPool=m=>{const a=[];TXFK.forEach((ks,i)=>{if(sOn(m,'f'+i))a.push(...ks)});return a},rzMds=m=>TXMD.filter(x=>sOn(m,'m_'+x)),
@@ -284,9 +288,11 @@ if((FT.free||libFree)&&ch(.65)){
  if(single){if(want=='text')addText(CW/2,CH/2);else addMotif(CW/2,CH/2,Math.max(2,Math.round(gn*rr(.4,.65))))}
  else{const n2=ri(2,4);let first=true;for(let i=0;i<n2;i++){const tx=rr(0,CW),ty=rr(0,CH);if(first&&want=='text'){addText(CW/2,CH*pick([.3,.5,.7]))}else addMotif(tx,ty,pick([1,1,2,2,3]));first=false}}
  const usedIds=new Set(FL.pl.map(q=>q.t)),keep=made.filter(t=>usedIds.has(t.id));
- if(keep.length){const fp=ch(.4)?0:ri(1,4);FL.pl.forEach(q=>{const fx=rzFx(EO,fp,0,null);if(fx.length)q.fx=fx});FL.st=keep.map(t=>t.id);keep.forEach(t=>WBS.tiles.push(t));WBS.layers.push(FL);reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0))}
+ if(keep.length){const fp=ch(.4)?0:ri(1,4);FL.pl.forEach(q=>{const fx=rzFx(EO,fp,0,null);if(fx.length)q.fx=fx});FL.st=keep.map(t=>t.id);keep.forEach(t=>WBS.tiles.push(t));WBS.layers.push(FL);RZFZ=new Set(FL.pl.map(q=>String(q.u)));reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0))}
  setDim();useT(WBS.tiles[WBS.cur]);store();upd()}
 rzPut(OWN);
+// one element list (2.24.0): the stamps placed on their own were built on a layer of their own; fold it into the project's one list so the Elements list and the canvas reach them (as opening the file does)
+if(WBS.layers.length>1){const L0=WBS.layers[0],st=[...new Set(WBS.layers.flatMap(l=>l.st||[]))];WBS.layers=[oneLayer(flatEls(WBS.layers),st,L0.u)];WBS.selL=0;store();upd()}
 const txAll=(txReq?[[WBS.tiles[0],txReq]]:[]).concat(fzReqs);
 if(txAll.length){pmsg('Randomized… setting the lettering.');WBX.wbTxBusy=(WBX.wbTxBusy||0)+1;WBX.wbRollHold=tok;(async()=>{try{for(const[t,o] of txAll){try{await WBX.wbTxPlace(t,o,tok)}catch(e){}}if(tok!==WBX.wbRndTok)return;store();upd();if(WBX.wbRollHold===tok)WBX.wbRollHold=0;if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()}}finally{if(WBX.wbRollHold===tok)WBX.wbRollHold=0;WBX.wbTxBusy=Math.max(0,(WBX.wbTxBusy||1)-1)}})()}
 else if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()};
