@@ -149,4 +149,4 @@ init64();
 // a launch with no template picker is an untouched new project: no unsaved dot, nothing to confirm before opening another (2.22.1; the picker's own finish used to set this)
 if(!WBS.cp.id&&WBS.cp.saved===''){WBS.cp.saved=coreStr()}
 if(WBX.wbEnhance)WBX.wbEnhance();   // value boxes on the slider rows that panels wrote themselves
-window.__wbTest = { resetHistory: () => WBX.wbResetHist && WBX.wbResetHist(), stampAt, stampToCanvas, unlockedStamp: stUnlocked, state: () => coreStr(), kv, account: acAccount, recoveryTick: rcTick, printsBusy: () => !BK.off && !!(BK.busy || BK.q.size), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
+window.__wbTest = { apply: s => WBX.wbApply(JSON.parse(s)), resetHistory: () => WBX.wbResetHist && WBX.wbResetHist(), stampAt, stampToCanvas, unlockedStamp: stUnlocked, state: () => coreStr(), kv, account: acAccount, recoveryTick: rcTick, printsBusy: () => !BK.off && !!(BK.busy || BK.q.size), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
