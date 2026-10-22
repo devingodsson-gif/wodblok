@@ -58,7 +58,7 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 
 ## Unfinished and next
 Only items the owner has stated are listed as next. Nothing is started unless he says so.
-- 2.22.2 (seam check corrected, typed text fits the canvas; branch `fix/2.22.2-seams-text-slib`, on top of 2.22.1 which is live) is done and waiting for his word. Open: whether the Stamp library panel comes back. Details in `docs/plan.md`.
+- 2.23.0 (Stamp library back in the Stamp panel, Open recent; branch `feat/2.23.0-stamp-files-recent`, on top of 2.22.2 which is live) is done and waiting for his word. Details in `docs/plan.md`. Waiting by his word: Stamp library search.
 - 2.22.0 (additions: copy and paste, right-click menu, Align under the Element group, motif search; branch `feat/2.22.0-additions`, on top of 2.21.0 which is live) is done and waiting for his word. Details in `docs/plan.md`.
 - 2.20.0 (adding things and typing on the canvas, branch `feat/2.20.0-adding`, stacked on 2.19.0) is done and waiting for his word. Details in `docs/plan.md`.
 - 2.19.0 (one panel per element, branch `feat/2.19.0-one-panel-per-element`, on top of 2.18.0 which is live) is done and waiting for his word. Details in `docs/plan.md`.

@@ -43,7 +43,7 @@ const write = async (name, data, opts = {}) => {
   }
   const a = document.createElement('a'), u = URL.createObjectURL(data); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 4000); return { how: 'downloaded', handle: null };
 };
-const FOLDER_KEY = 'folder:projects';
+const FOLDER_KEY = 'folder:projects', RECENT_KEY = 'recent:files';
 const files = {
   /** Opens the Save dialog now and returns the file to write later (so a long export can ask first, while the click still counts). null when the browser has no Save dialog; throws AbortError when the person cancels. */
   pick: async (name, type) => { if (!canSave()) return null; try { return await /** @type {any} */ (window).showSaveFilePicker({ suggestedName: name, types: picker(name, type) }); } catch (e) { if (e && e.name === 'AbortError') throw e; return null; } },
@@ -66,6 +66,9 @@ const files = {
   },
   savedFolder: async () => (await records.get(FOLDER_KEY)) || null,
   forgetFolder: async () => { await records.del(FOLDER_KEY); },
+  /** The last few project files opened or saved ([{ name, at, handle }]), kept so the File menu can list them. A handle that cannot be stored just is not remembered for next time. */
+  recentGet: async () => (await records.get(RECENT_KEY)) || [],
+  recentPut: async list => { try { await records.put(RECENT_KEY, list); } catch (e) { /* kept for this visit only */ } },
   /** true when the folder can be read now; asks the person when the browser needs a click first (call from a click). */
   folderAccess: async h => { try { return (await h.queryPermission({ mode: 'read' })) === 'granted' || (await h.requestPermission({ mode: 'read' })) === 'granted'; } catch (e) { return false; } },
   /** true when files can be written into the folder; asks the person when the browser needs a click first (call from a click). */

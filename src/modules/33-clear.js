@@ -29,8 +29,8 @@ async function dl(name,data,thumbUrl,id){const d=await use('downloads');if(!d){p
 try{const h0=!linkOf(id,name)&&!folder&&d.pick?await d.pick({filename:fname(name)+'.wodblok'}):null;   // no file to write into: ask where first, packing a big project takes a while
 const zip=await fmtPack({name,...data},{thumbnail:await thumbPng(thumbUrl),snapshots:snapsOf(id)}),blob=new Blob([zip],{type:FMT_MIME});
 // a project that is not tied to a file yet goes straight into the projects folder when one is chosen (never over a file that is already there)
-if(folder&&!linkOf(id,name)){try{if(await files.folderWritable(folder)){const f=await files.saveToFolder(folder,fname(name)+'.wodblok',blob);link={id:id||null,name,handle:f.handle};pmsg('Saved “'+name+'” to '+folder.name+'.');if(!$('plist').hidden)renderPL();return true}}catch(e){/* the folder cannot be written: use the Save dialog below */}}
-const r=await d.save({filename:fname(name)+'.wodblok',data:blob,handle:linkOf(id,name)||h0});if(r&&r.handle)link={id:id||null,name,handle:r.handle};pmsg((r&&r.how=='saved'?'Saved “':'Downloaded “')+name+'”.');return true}catch(e){if(e&&e.code!='declined')pmsg('Could not save: '+e.message);else pmsg('');return false}}
+if(folder&&!linkOf(id,name)){try{if(await files.folderWritable(folder)){const f=await files.saveToFolder(folder,fname(name)+'.wodblok',blob);link={id:id||null,name,handle:f.handle};if(WBX.wbRecentAdd)WBX.wbRecentAdd(name,f.handle);pmsg('Saved “'+name+'” to '+folder.name+'.');if(!$('plist').hidden)renderPL();return true}}catch(e){/* the folder cannot be written: use the Save dialog below */}}
+const r=await d.save({filename:fname(name)+'.wodblok',data:blob,handle:linkOf(id,name)||h0});if(r&&r.handle){link={id:id||null,name,handle:r.handle};if(WBX.wbRecentAdd)WBX.wbRecentAdd(name,r.handle)}pmsg((r&&r.how=='saved'?'Saved “':'Downloaded “')+name+'”.');return true}catch(e){if(e&&e.code!='declined')pmsg('Could not save: '+e.message);else pmsg('');return false}}
 // Save project: write the .wodblok file (into the file this project came from or was last saved to, where the browser allows; else the Save dialog; else a download).
 async function saveProject(){const name=$('pnm').value.trim()||'Untitled pattern',id=WBS.cp.id||newId(),b=$('psv');b.disabled=true;pmsg('Saving…');
 try{if(await dl(name,await fileSnap(),await thumb(),id)){WBS.cp={id,name,saved:coreStr()};$('pnm').value=name}}finally{b.disabled=false;paintPst()}}
@@ -51,7 +51,7 @@ catch(e){if(tok==plTok)g.innerHTML='<div class="hint">Could not read the folder:
 let plList=[];
 function init33(){
 $('clr').onclick=()=>clearAll(false);
-$('psv').onclick=saveProject;WBX.wbClearAll=()=>clearAll(false);
+$('psv').onclick=saveProject;WBX.wbClearAll=()=>clearAll(false);WBX.wbOpenFile=(f,h)=>openFile(f,h);
 // 2.21.0, the File menu: Save project (the same as the button) and Save project as (a new file: the link to the file it came from is dropped first), Export opens the Export panel
 $('psvm').onclick=()=>$('psv').click();$('psa').onclick=()=>{link=null;saveProject()};$('xrm').onclick=()=>{if(WBX.wbOpenPanel)WBX.wbOpenPanel('xrec')};
 
@@ -60,7 +60,7 @@ try{const r=await fmtOpen(new Uint8Array(await fl.arrayBuffer())),d=r.project;
 const name=(d.name||fl.name.replace(/\.wodblok$/i,'')).slice(0,60);
 // a file from a newer app opens as an unsaved copy: nothing is written back
 if(r.newer){openData(d,null,name);WBS.cp.saved='';paintPst();link=null;putSnaps(null,r.snapshots);pmsg('“'+name+'” was made by a newer WODBLOK, so it is open as a copy that is not saved. Update the app to work on the original.');return}
-const id=newId();openData(d,id,name);link=handle?{id,name,handle}:null;putSnaps(id,r.snapshots);await new Promise(r2=>setTimeout(r2,50));WBS.cp.saved=coreStr();paintPst();pmsg('Opened “'+name+'”.'+(r.missingAssets?' '+r.missingAssets+' picture'+(r.missingAssets>1?'s were':' was')+' missing from the file.':''))}
+const id=newId();openData(d,id,name);link=handle?{id,name,handle}:null;if(handle&&WBX.wbRecentAdd)WBX.wbRecentAdd(name,handle);putSnaps(id,r.snapshots);await new Promise(r2=>setTimeout(r2,50));WBS.cp.saved=coreStr();paintPst();pmsg('Opened “'+name+'”.'+(r.missingAssets?' '+r.missingAssets+' picture'+(r.missingAssets>1?'s were':' was')+' missing from the file.':''))}
 catch(e){pmsg((e&&e.message)||'Could not open that file.')}};
 $('pfile').onchange=()=>{const fl=$('pfile').files[0];$('pfile').value='';if(fl)openFile(fl,null)};
 // Where the browser has its own Open dialog (Chrome, Edge) use it, so Save can write back to the same file; elsewhere the plain file input opens as before

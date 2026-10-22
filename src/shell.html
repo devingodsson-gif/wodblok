@@ -561,7 +561,8 @@ label.btn{display:inline-flex;align-items:center;justify-content:center;cursor:p
 label.btn:hover{border-color:var(--faint)}
 label.btn.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-fg);font-weight:600}
 .pop label.mi{display:flex;align-items:center;gap:8px;width:100%;margin:0;padding:8px 8px;border-radius:var(--r-m);font-size:var(--fs-m);color:var(--fg);cursor:pointer}
-.pop label.mi:hover{background:var(--acc-soft)}.pop label.mi svg{width:15px;height:15px;color:var(--mut)}
+.pop label.mi:hover{background:var(--acc-soft)}
+.mrec .glb{padding:6px 8px 2px;color:var(--faint);font-size:var(--fs-s)}.mrec button{padding-left:31px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pop label.mi svg{width:15px;height:15px;color:var(--mut)}
 @media (pointer:coarse){label.btn{min-height:40px;padding:8px 12px}}
 /* import */
 textarea{width:100%;margin-top:8px;background:var(--field);border:1px solid var(--line);border-radius:var(--r-m);padding:8px 8px;font:12px/1.45 inherit;color:inherit;resize:vertical}
@@ -862,6 +863,7 @@ body.eyedrop{cursor:crosshair}
    <button id="clr"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="eraser"></svg>Clear canvas</button>
    <hr>
    <label id="pop" for="pfile" class="mi" role="button" tabindex="0"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="folderOpen"></svg>Open project…</label>
+   <div id="pmr" class="mrec" hidden></div>
    <button id="psvm"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="save"></svg>Save project<kbd>Ctrl+S</kbd></button>
    <button id="psa"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="save"></svg>Save project as…</button>
    <button id="tpsave"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="bookmark"></svg>Save as template…</button>

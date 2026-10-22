@@ -74,5 +74,6 @@
  "77-map-to-shape.js",
  "78-element-lists.js",
  "79-text-in-place.js",
- "80-element-menu.js"
+ "80-element-menu.js",
+ "81-recent-files.js"
 ]
