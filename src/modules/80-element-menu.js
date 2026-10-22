@@ -45,7 +45,7 @@ function emCtx(e){if(emTab()){const t=e.target;if(!t||!t.closest||!t.closest('#b
  const[x,y]=fpPt(e),p=fpHit(L,x,y);if(p){if(!fpGrp().includes(p)){WBS.fpMS=new Set();WBS.fpSel=p.u;WBS.fpAnc=String(p.u);upd()}}else{WBS.fpMS=new Set();WBS.fpSel=-1;upd()}
  if(!p&&!emCan.paste())return false;e.preventDefault();emOpen(e,p);return true}
 function init80(){
- WBX.wbCtxMenu=emCtx;WBX.wbClipClear=()=>{EMCLIP=null};
+ WBX.wbCtxMenu=emCtx;WBX.wbCtxAt=el=>{const r=el.getBoundingClientRect();emOpen({clientX:r.left,clientY:r.bottom})};WBX.wbClipClear=()=>{EMCLIP=null};
  document.addEventListener('pointerdown',e=>{const m=$('ctxm');if(m&&!m.hidden&&!e.target.closest('#ctxm'))emClose()},true);
  document.addEventListener('keydown',e=>{const m=$('ctxm');if(e.key=='Escape'&&m&&!m.hidden){emClose();e.stopPropagation()}},true);
  addEventListener('blur',close);addEventListener('resize',close);

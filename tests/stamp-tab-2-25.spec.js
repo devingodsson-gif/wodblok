@@ -74,3 +74,18 @@ test('New stamp opens its tab; a roll closes every stamp tab', async ({ page }) 
   await expect(page.locator('#stetabs [data-sv]')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
+
+test('in a tab the Elements header counts the stamp\'s contents, and a row\'s … button opens the element menu', async ({ page }) => {
+  const { errors } = await enter(page);
+  await page.click('.rail [data-pn="lyrs"]'); await H.settle(page);
+  const t = (await st(page)).tiles.find(x => x.id === 1).items;
+  const n = t.filter(q => !q.tg).length + new Set(t.filter(q => q.tg).map(q => q.tg)).size;
+  await expect(page.locator('#lycnt')).toHaveText(`${n} element${n === 1 ? '' : 's'}`);
+  await page.locator('#mlist [data-rm]').first().click();
+  await expect(page.locator('#ctxm')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.locator('#stetabs [data-sv="c"]').click(); await H.settle(page);
+  const els = (await st(page)).els.filter(q => q.k !== 'group').length;
+  await expect(page.locator('#lycnt')).toHaveText(`${els} element${els === 1 ? '' : 's'}`);
+  expect(errors).toEqual([]);
+});
