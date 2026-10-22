@@ -36,6 +36,8 @@ function steClose(id){const i=STE.tabs.indexOf(id);if(i<0)return;const act=stUnl
 const steEdit=id=>{if(stUnlocked()===id)steClose(id);else steGo(id)};
 const steOpen=id=>steGo(id);
 const steDone=()=>{const id=stUnlocked();if(id!=null)steClose(id)};
+// every tab closes (2.25.0) when the stamps are replaced: a roll, New project, Open; a tab would otherwise show another stamp under the old one's id
+function steReset(){if(stUnlocked()!=null)steGo(null);STE.tabs=[];STE.views={};STE.key='';steSync()}
 const stIcX='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.close+'</svg>';
 function steTabs(un){const bar=$('stetabs');if(!bar)return;STE.tabs=STE.tabs.filter(id=>WBS.tiles.some(t=>t.id==id));
  const key=[un,STE.tabs.map(id=>id+':'+(WBS.tiles.findIndex(t=>t.id==id)+1)).join()].join('|');if(key===STE.key)return;STE.key=key;
@@ -54,5 +56,5 @@ function init75(){const a=$('art');if(!a)return;
  $('stetabs').onclick=e=>{const x=e.target.closest('[data-sx]');if(x){steClose(+x.dataset.sx);return}const t=e.target.closest('[data-sv]');if(!t)return;steGo(t.dataset.sv=='c'?null:+t.dataset.sv)};
  const ed=$('smkedit');if(ed)ed.onclick=()=>{const t=WBS.tiles[WBS.cur];if(t)steGo(t.id)};
  ($('boardP')||a).addEventListener('dblclick',e=>{if(WBS.brush||WBS.txArm||WBS.fpB!=null)return;const c=stePt(e);if(!c)return;const h=stampAt(c.x,c.y,null);if(!h)return;e.preventDefault();const it=STP.items[h.i],id=it?it[0]:null;if(id==null)return;if(stUnlocked()===id){if(WBX.wbTxGrp&&WBX.wbTxGrp())return;steClose(id)}else steGo(id)});
- WBX.wbSteSync=steSync;WBX.wbSteEdit=steEdit;WBX.wbSteScene=steScene}
+ WBX.wbSteSync=steSync;WBX.wbSteReset=steReset;WBX.wbSteEdit=steEdit;WBX.wbSteScene=steScene}
 export {init75,steDone,steOpen};
