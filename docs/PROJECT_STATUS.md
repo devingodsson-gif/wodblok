@@ -4,7 +4,7 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**As of Oct 22 2026.** `main` is at **2.24.0** (live on wodblok.com); branch `fix/2.25.0-stamp-tab` holds 2.25.0, not merged. Project file format **25** (`FMT_LATEST` in `src/format/container.js`, unchanged since 2.9.0). 77 files in `src/modules`, 140 spec files in `tests/`.
+**As of Oct 22 2026.** `main` is at **2.25.0** (live on wodblok.com); branch `fix/2.26.0-first-five-minutes` holds 2.26.0, not merged. Project file format **25** (`FMT_LATEST` in `src/format/container.js`, unchanged since 2.9.0). 77 files in `src/modules`, 140 spec files in `tests/`.
 
 ## Direction
 - A professional, minimal, clean editor in the class of Photoshop and Lightroom (the owner's reference applications). Web app first; Mac, Windows and mobile later and not blocked. A commercial product, sold later; the repo is public until then.
@@ -61,13 +61,13 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 
 ## Unfinished and next
 Only items the owner has stated are listed as next. Nothing is started unless he says so.
-- `main` is at 2.24.0 (live, "nothing lost, nothing out of reach", step 1 of the fix plan from the 2.23 review: five releases, 2.24.0 to 2.28.0).
-- **2.25.0 "The stamp tab works like the canvas"** (branch `fix/2.25.0-stamp-tab`) is done and waiting for his word. Details in `docs/plan.md`.
-- Still waiting for his word from 2.24.0: regenerating the `scenarios` randomize snapshots (seed 1 and 2 state: one text id; seed 3 SVG summary) and whether to fix the repeat-tile seam (`repeat-tile` roll 21).
-- Next by the plan: 2.26.0 first five minutes; 2.27.0 editing habits; 2.28.0 style and words.
+- `main` is at 2.25.0 (live; 2.24.0 "nothing lost, nothing out of reach" and 2.25.0 "the stamp tab works like the canvas" are steps 1 and 2 of the fix plan from the 2.23 review: five releases, 2.24.0 to 2.28.0).
+- **2.26.0 "A clear first five minutes"** (branch `fix/2.26.0-first-five-minutes`) is done and waiting for his word. Details in `docs/plan.md`. The three `scenarios` randomize snapshots were regenerated with his word (Oct 22 2026).
+- Still open with the owner: whether to fix the repeat-tile seam (`repeat-tile` roll 21), asked Oct 22 2026; for now it goes into a later release.
+- Next by the plan: 2.27.0 editing habits; 2.28.0 style and words.
 - Owner decisions for the plan (Oct 22 2026): the element bar buttons arm their tool at once (the panel's Add button stays); starter templates: one per format plus a framed border; the canvas texture switch goes in the Canvas panel, Texture group; corner handles stay as 2.15.0 made them (no Photoshop-style corner change); stamps and patterns get stable names even if the file format has to change (a format change refuses older files, by the no-backwards-compatibility rule; say before going live); the wordmark stays 21 px and the guide is changed to say so.
 - Waiting by his word: Stamp library search.
-- Decide with the owner: snapshot regeneration (above), and a first full CI suite run (suggest it with the importance percentage: high, about 80%, because 2.4.0 to 2.15.0 changed launch, panels, selection, stamps and icons with no recorded full run).
+- Decide with the owner: a first full CI suite run (suggest it with the importance percentage: high, about 80%, because 2.4.0 to 2.15.0 changed launch, panels, selection, stamps and icons with no recorded full run).
 - The preview artifact (https://claude.ai/artifact/Y7qKSU4gbU9sCdQYNmBH93) was last published from 2.14.0; publish from `main` after the next build.
 - Stale branches: `feat/2.10.0-tidy-start` to `feat/2.15.0-selection-box` are merged into `main`; the temporary worktree `/tmp/claude-0/wt214` may remain in the old session's container only.
 - A new project-wide element to replace the removed whole-design texture and grade (owner's plan, not specified yet).

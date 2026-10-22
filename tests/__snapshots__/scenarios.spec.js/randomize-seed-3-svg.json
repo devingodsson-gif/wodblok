@@ -1,6 +1,6 @@
 {
- "length": 479835,
- "sha256": "0757b37a6a5233d9138efcaad76e0f0d1402477543735c79554dd1b87285fe99",
+ "length": 479992,
+ "sha256": "ebcdbcb99047f05e08797943d75e71879e6e650e73800baffc126b70046afa19",
  "tags": {
   "circle": 507,
   "clipPath": 8,
@@ -20,12 +20,12 @@
   "feMergeNode": 2,
   "feTurbulence": 7,
   "filter": 15,
-  "g": 336,
+  "g": 335,
   "image": 45,
   "linearGradient": 26,
   "mask": 108,
   "path": 776,
-  "rect": 270,
+  "rect": 271,
   "stop": 1250,
   "svg": 1,
   "symbol": 36,
