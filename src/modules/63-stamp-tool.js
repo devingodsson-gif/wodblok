@@ -59,8 +59,11 @@ function stNew(kind){const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z
 // a copy edits separately from the original
 function stDup(){const k=WBS.cur,src=WBS.tiles[k];if(!src)return;const t=JSON.parse(JSON.stringify(src));t.id=WBS.nid++;WBS.tiles.splice(k+1,0,t);stAddTo(t.id);WBS.cur=k+1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;stLabel('Duplicated stamp');store();upd();pmsg('Duplicated Stamp '+(k+1)+' as Stamp '+(k+2)+'.')}
 // deleting a stamp that is in use takes it out of every arrangement and every free item that points at it, in one step
+// how many patterns and placed stamps use a stamp (2.24.0: deleting asks with this count, and its patterns let go of it too)
+function stUseN(id){let pa=0,el=0;WBS.layers.forEach(L=>(L.pl||[]).forEach(p=>{if(p.k=='pattern'){if((p.src||[]).some(r=>r.k=='stamp'&&r.t==id))pa++}else if(p.t==id)el++}));return{pa,el}}
+const stUseSay=id=>{const u=stUseN(id),w=[];if(u.pa)w.push(u.pa+' pattern'+(u.pa>1?'s':''));if(u.el)w.push(u.el+' placed cop'+(u.el>1?'ies':'y'));return w.length?' It is used by '+w.join(' and ')+'.':''};
 function stDelete(id){const k=WBS.tiles.findIndex(t=>t.id==id);if(k<0)return false;WBS.tiles.splice(k,1);
- WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(x=>x!=id);if(L.lead==id)delete L.lead;if(L.pl)L.pl=L.pl.filter(p=>p.t!=id);if(L.ov)Object.keys(L.ov).forEach(c=>{if(L.ov[c]==id)delete L.ov[c]})});
+ WBS.layers.forEach(L=>{L.st=(L.st||[]).filter(x=>x!=id);if(L.lead==id)delete L.lead;if(L.pl)L.pl=L.pl.filter(p=>p.k=='pattern'||p.t!=id).map(p=>p.k=='pattern'&&Array.isArray(p.src)&&p.src.some(r=>r.k=='stamp'&&r.t==id)?{...p,src:p.src.filter(r=>!(r.k=='stamp'&&r.t==id))}:p);if(L.ov)Object.keys(L.ov).forEach(c=>{if(L.ov[c]==id)delete L.ov[c]})});
  WBS.tM=new Set();WBS.cur=Math.max(0,Math.min(k,WBS.tiles.length-1));selOne(-1);if(STP.un===id){STP.un=null;STP.unL=null}STP.ai=null;stLabel('Deleted stamp');store();upd();return true}
 // the camera goes to one printed copy of the open stamp (the one nearest the middle of the canvas); the layers stay as they are
 function stZoom(){const t=WBS.tiles[WBS.cur];if(!t||!WBX.wbZoomTo)return;let best=-1,bd=1e18;STP.items.forEach((it,i)=>{if(it[0]!==t.id)return;const p=stMatrix(it).transformPoint({x:it[6]/2,y:it[7]/2}),d=Math.hypot(p.x-CW/2,p.y-CH/2);if(d<bd){bd=d;best=i}});
@@ -72,7 +75,7 @@ function stBar(){const on=(id,f)=>{const b=$(id);if(b)b.addEventListener('click'
  on('smknew',()=>stNew('rect'));   // like every Add button: it makes one at once (2.15.0); the outline is changed in the stamp's tab
  on('smkdup',()=>stDup());
  {const d=$('smkdel');if(d){let tm=0;d.addEventListener('click',()=>{const t=WBS.tiles[WBS.cur];if(!t)return;
-  if(!d.classList.contains('sure')){d.classList.add('sure');d.setAttribute('aria-label','Click to confirm');pmsg('Click again to delete Stamp '+(WBS.cur+1)+'.');tm=setTimeout(()=>{d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp')},3000);return}
+  if(!d.classList.contains('sure')){d.classList.add('sure');d.setAttribute('aria-label','Click to confirm');pmsg('Click again to delete Stamp '+(WBS.cur+1)+'.'+stUseSay(t.id));tm=setTimeout(()=>{d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp')},3000);return}
   clearTimeout(tm);d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp');const n=WBS.cur+1;if(stDelete(t.id))pmsg('Deleted Stamp '+n+'.')})}}
  on('smkzoom',()=>stZoom());
  on('smksave',()=>{const b=$('slsave');if(b)b.click()})}
