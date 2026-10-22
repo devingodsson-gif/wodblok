@@ -72,5 +72,6 @@
  "75-stamp-edit-mode.js",
  "76-shape-element.js",
  "77-map-to-shape.js",
- "78-element-lists.js"
+ "78-element-lists.js",
+ "79-text-in-place.js"
 ]

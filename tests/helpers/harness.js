@@ -224,6 +224,7 @@ async function armStamp(page) {
 async function addShape(page, g = 'rect') {
   await page.click('#elb [data-k="shape"]');
   await page.click(`#shp_pre [data-g="${g}"]`); await settle(page);
+  await placeArmed(page, 'shape');                         // 2.20.0: a preset arms the shape; a click on the canvas places it
 }
 // 2.4.0: a new Pattern is empty; this puts a source in it through the Add element list (a stamp by default, or 'motif' / 'text')
 async function patSource(page, kind = 'stamp', n = 0) {
@@ -243,6 +244,9 @@ async function addStampText(page) {
 async function addKind(page, k) {
   await page.click(`.elk[data-k="${k}"] [data-add]`);
   await settle(page);
+  await placeArmed(page, k);
+}
+async function placeArmed(page, k) {
   if (!(await page.evaluate(k => !!document.querySelector(`#elb [data-k="${k}"][aria-pressed="true"]`), k))) return;   // not armed: made at once (a stamp's tab)
   const b = await page.locator('#art').boundingBox();
   await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
@@ -253,4 +257,4 @@ async function addKind(page, k) {
   await page.keyboard.press('v'); await settle(page);
 }
 
-module.exports = { addKind, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+module.exports = { addKind, placeArmed, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

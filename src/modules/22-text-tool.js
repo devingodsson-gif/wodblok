@@ -84,7 +84,7 @@ WBX.wbTxAddFont=async fl=>{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(
 WBX.wbTxArm=txArm;WBX.wbTxMode=v=>{const pat=v=='pattern';$('tx_lay').hidden=!pat;$('tx_pv').hidden=pat;if(pat)$('tx_convrow').hidden=true;$('tx_sz').dataset.def=pat?'10':'30';if(pat){if(txArmed())txArm(false);if(WBX.wbTbMode)WBX.wbTbMode()}else{WBS.txArm=false;toUI();$('tx_ed').hidden=!edit;$('tx_convrow').hidden=!edit;$('tx_sprow').hidden=true;txArmUI()}};
 // double-click a text on the canvas: the Text panel opens with the words selected, so typing replaces them and the canvas follows as you type
 WBX.wbTxGrp=()=>grpOf();   // a text of the unlocked stamp is selected (a double click then goes to the text field, not to Done)
-document.addEventListener('dblclick',e=>{const t=e.target;if(!t||!t.closest)return;const stamp=stTxMode()&&t.closest('#artwrap')&&grpOf(),lay=!stTxMode()&&t.closest('#boardP')&&WBX.wbTbHas&&WBX.wbTbHas();if(!stamp&&!lay)return;if(WBX.wbOpenPanel)WBX.wbOpenPanel('text');const f=$('tx_t');f.focus();f.select()});
+document.addEventListener('dblclick',e=>{const t=e.target;if(!t||!t.closest)return;const stamp=stTxMode()&&t.closest('#artwrap')&&grpOf(),lay=!stTxMode()&&t.closest('#boardP')&&WBX.wbTbHas&&WBX.wbTbHas();if(!stamp&&!lay)return;if(WBX.wbOpenPanel)WBX.wbOpenPanel('text');if(lay&&WBX.wbTxIn&&WBX.wbTxIn())return;const f=$('tx_t');f.focus();f.select()});
 // redraw the preview whenever the panel is shown
 new MutationObserver(()=>{const s=document.querySelector('section.pn[data-p="text"]');if(s&&!s.hidden)later()}).observe(document.querySelector('section.pn[data-p="text"]'),{attributes:true,attributeFilter:['hidden']});
 later();

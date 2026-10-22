@@ -62,7 +62,7 @@ function elBar(){const b=$('elb');if(!b)return;b.innerHTML=EL_O.map(k=>{const d=
 // the selected element on the current layer, if any
 function elSel(){const L=WBS.layers[WBS.selL];if(!L||WBS.fpSel==null||WBS.fpSel===-1)return null;return(L.pl||[]).find(q=>q.u==WBS.fpSel)||null}
 let elLast='';
-function elSync(){if(WBX.wbAbSync)WBX.wbAbSync();if(WBX.wbElkSync)WBX.wbElkSync();if(WBX.wbSteSync)WBX.wbSteSync();if(WBX.wbMapSync)WBX.wbMapSync();
+function elSync(){if(WBX.wbTxInPlace)WBX.wbTxInPlace();if(WBX.wbAbSync)WBX.wbAbSync();if(WBX.wbElkSync)WBX.wbElkSync();if(WBX.wbSteSync)WBX.wbSteSync();if(WBX.wbMapSync)WBX.wbMapSync();
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden
 if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbShpSync)WBX.wbShpSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
 const q=elSel(),k=elKind(q);

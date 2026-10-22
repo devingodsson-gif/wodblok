@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, noPattern, addShape, addKind } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, noPattern, addShape, addKind, placeArmed } = require('./helpers/harness');
 
 const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const canvasClick = async (page, fx, fy) => {
@@ -72,7 +72,7 @@ test('the Stamp button makes nothing; it opens the Stamp properties, and a picke
   expect(errors).toEqual([]);
 });
 
-test('the Shape button makes nothing; it shows the presets (and the pen), and a preset makes the shape', async ({ page }) => {
+test('the Shape button makes nothing; it shows the presets (and the pen), and a preset arms it and a click places it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await page.click('#elb [data-k="shape"]'); await settle(page);
@@ -81,6 +81,8 @@ test('the Shape button makes nothing; it shows the presets (and the pen), and a 
   await expect(page.locator('#shp_pen')).toBeVisible();
   await expect(page.locator('#shp_f')).toBeHidden();
   await page.click('#shp_pre [data-g="hex"]'); await settle(page);
+  expect(JSON.parse(await getState(page)).els).toHaveLength(0);          // 2.20.0: a preset arms the shape; the canvas click places it
+  await placeArmed(page, 'shape');
   const els = JSON.parse(await getState(page)).els;
   expect(els.map(q => q.k + ':' + q.sh)).toEqual(['shape:hex']);
   await expect(page.locator('#shp_f')).toBeVisible();
