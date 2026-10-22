@@ -24,7 +24,7 @@ function initScript({ seed, runtime, workspaces, templates }) {
     // Tests start with no panel open at launch unless a test asks for the Default panels (workspaces: true).
     try { if (!sessionStorage.getItem('wb_t_ws')) {
       localStorage.setItem('wb96_launch', ${workspaces ? "'on'" : "'none'"});
-      if (!${!!templates}) localStorage.setItem('wb111_tplstart', '0');      // the template picker does not open at launch
+      if (${templates !== 'default'} && localStorage.getItem('wb111_tplstart') == null) localStorage.setItem('wb111_tplstart', ${templates ? "'1'" : "'0'"});      // the template picker opens at launch only when a test asks (2.21.0: it is off by default; 'default' leaves the setting alone)
       sessionStorage.setItem('wb_t_ws', '1');
     } } catch (e) {}
     let a = ${seed >>> 0};

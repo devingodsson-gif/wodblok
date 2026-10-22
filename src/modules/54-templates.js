@@ -131,6 +131,6 @@ function init54(){
  $('tpsn').addEventListener('keydown',e=>{e.stopPropagation();if(e.key=='Enter'){e.preventDefault();tpSave()}});
  $('tpsok').onclick=tpSave;
  // the picker opens when the app starts, so the first choice is what to start from (Settings > General can turn this off)
- let on=true;try{on=kv.get(TP_START)!=='0'}catch(e){}
+ let on=false;try{on=kv.get(TP_START)==='1'}catch(e){}
  if(on)requestAnimationFrame(()=>{if(!tpIsOpen())tpShow()})}
 export {init54};

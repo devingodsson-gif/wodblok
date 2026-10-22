@@ -142,3 +142,12 @@ test('the template picker opens when the app starts; Settings > General can turn
   await expect(page.locator('#tpdlg')).toBeHidden();
   expect(errors).toEqual([]);
 });
+
+test('2.21.0: the template picker does not open at launch unless Settings > General > Templates at launch is on', async ({ page }) => {
+  const { errors } = await openApp(page, { templates: 'default', pattern: false });
+  await expect(page.locator('#tpdlg')).toBeHidden();
+  await page.evaluate(() => document.getElementById('stgo').click());
+  await page.click('#stgnav [data-p="general"]');
+  await expect(page.locator('#stgtl')).toHaveAttribute('aria-pressed', 'false');
+  expect(errors).toEqual([]);
+});
