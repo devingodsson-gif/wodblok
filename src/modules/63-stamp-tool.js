@@ -47,7 +47,7 @@ function stPanel(force){const list=$('stmpl');if(!list||!list.offsetParent)retur
  WBS.tiles.forEach((t,k)=>{useT(t);const lk=un===t.id,n=stUses(t.id);
   h+=`<div class="smkr${WBS.cur===k?' cur':''}" data-t="${t.id}"><button type="button" class="smkth" aria-label="Stamp ${k+1}"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button><span class="smkn">Stamp ${k+1}</span><span class="smkc" aria-label="Used by ${n} ${n==1?'element':'elements'}">${n}</span><button type="button" class="ib smklk" data-lk aria-pressed="${lk}" aria-label="Edit Stamp ${k+1}">${STEDIT}</button></div>`});
  if(cur)useT(cur);list.innerHTML=h;
- const ed=$('smked');if(ed){ed.hidden=un==null;ed.textContent=un==null?'':`Editing: ${stName(un)} (used by ${stUses(un)} ${stUses(un)==1?'element':'elements'})`}}
+ const ed=$('smked');if(ed){ed.hidden=un==null;ed.textContent=un==null?'':`${stName(un)} · ${stUses(un)} ${stUses(un)==1?'element':'elements'}`}}
 // ----- the project's stamps: choose one, make a new one, copy one, delete one, keep one in the library, bring the camera to one -----
 const stLabel=t=>{WBX.wbLabelPlain={t,at:performance.now()}};
 const stAddTo=id=>{const L=stSel();if(L&&!(L.st||[]).includes(id)){L.st=L.st||[];L.st.push(id)}};

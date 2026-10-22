@@ -915,7 +915,7 @@ body.eyedrop{cursor:crosshair}
 
  <section class="pn" data-p="canvas">
   <details class="g" open><summary>Background</summary><div class="gb">
-   <label class="chk"><input type="checkbox" id="bg_on" checked><span>Background colour</span></label>
+   <label class="chk"><input type="checkbox" id="bg_on" checked><span>Background</span></label>
    <div class="cwrow"><span class="cwk">Colour</span><div class="cwell" id="bg_wl"></div></div>
   </div></details>
   <details class="g" open><summary>Format</summary><div class="gb">
@@ -936,10 +936,10 @@ body.eyedrop{cursor:crosshair}
   <details class="g" open><summary>Book cover <span class="aux" id="bksum"></span></summary><div class="gb">
    <input type="checkbox" id="bkon" hidden>
    <div id="bkc">
-    <label>Trim size (one cover)</label><select id="bktr"></select>
+    <label>Trim size</label><select id="bktr"></select>
     <div class="aspc" id="bkcu">Width <input type="number" id="bktw" min="1" max="20" step="0.01"> Height <input type="number" id="bkth" min="1" max="20" step="0.01"> in</div>
     <div class="bk2"><div><label>Pages</label><input type="number" id="bkpg" min="1" max="1200" step="1"></div><div><label>Paper</label><select id="bkpp"></select></div></div>
-    <label class="chk"><input type="checkbox" id="bkman"><span>Enter the spine width myself</span></label>
+    <label class="chk"><input type="checkbox" id="bkman"><span>Custom spine width</span></label>
     <div class="bk2"><div><label>Spine width (in)</label><input type="number" id="bksw" min="0" max="4" step="0.001"></div><div><label>Bleed (in)</label><input type="number" id="bkbl" min="0" max="1" step="0.001"></div></div>
     <label class="chk"><input type="checkbox" id="bkgd"><span>Show trim, spine and safe-area guides</span></label>
     <div class="bkinfo" id="bkinfo"></div>
@@ -1025,9 +1025,9 @@ body.eyedrop{cursor:crosshair}
     <label>First-line indent</label><input type="range" id="tx_ind" min="0" max="300" value="0" data-u="%" data-def="0">
     <label>Paragraph spacing</label><input type="range" id="tx_psp" min="0" max="300" value="0" data-u="%" data-def="0">
     <label>Balance lines</label><div class="seg" id="tx_bal" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-b="" class="on">Off</button><button type="button" data-b="1">On</button></div>
-    <label>Selected letters: size</label><input type="range" id="tx_zs" min="30" max="300" value="100" data-u="%" data-def="100">
-    <label>Selected letters: raise</label><input type="range" id="tx_dy" min="-60" max="100" value="0" data-u="%" data-def="0">
-    <label>Selected letters: spacing</label><input type="range" id="tx_sl" min="-30" max="100" value="0" data-u="%" data-def="0">
+    <label>Letter size</label><input type="range" id="tx_zs" min="30" max="300" value="100" data-u="%" data-def="100">
+    <label>Letter raise</label><input type="range" id="tx_dy" min="-60" max="100" value="0" data-u="%" data-def="0">
+    <label>Letter spacing</label><input type="range" id="tx_sl" min="-30" max="100" value="0" data-u="%" data-def="0">
     <div class="row"><button class="alt" id="tx_sup">Super</button><button class="alt" id="tx_sub">Sub</button><button class="alt" id="tx_clr">Clear</button></div>
    <label>Curve</label><input type="range" id="tx_cv" min="-100" max="100" value="0" data-u="%" data-def="0">
    <label>Warp</label><select id="tx_wp"><option value="">None</option><option value="b">Bulge</option><option value="r">Rise</option><option value="f">Flag</option></select>
@@ -1098,8 +1098,8 @@ body.eyedrop{cursor:crosshair}
     <input type="range" id="lsz" min="0" max="8" step="1" value="6" aria-label="Motif size" data-plain>
     <button class="ib" id="limp" aria-label="Import" aria-haspopup="menu" data-more><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="importIc"></svg></button>
     <button class="ib" id="fnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="folderNew"></svg></button>
-    <button class="ib" id="fsel" aria-label="Select shapes" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="marquee"></svg></button>
-    <button class="ib" id="fexp" aria-label="Export all shapes" aria-haspopup="menu" data-more><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="download"></svg></button>
+    <button class="ib" id="fsel" aria-label="Select motifs" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="marquee"></svg></button>
+    <button class="ib" id="fexp" aria-label="Export all motifs" aria-haspopup="menu" data-more><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="download"></svg></button>
    </div>
    <div class="fform" id="fform" hidden><input type="text" id="fname" maxlength="30" placeholder="Folder name" aria-label="Folder name"><select id="fdest" aria-label="Move into" hidden></select><span id="fq" hidden></span><button class="primary" id="fok">Create</button><button class="alt" id="fcx">Cancel</button></div>
    <div class="ltr" id="lib"></div>
@@ -1111,7 +1111,7 @@ body.eyedrop{cursor:crosshair}
     <div class="r"><button class="alt" id="fout">Take out of folder</button><button class="alt" id="fdelm">Delete</button></div>
    </div>
   </div></details>
-  <details class="g" id="iprg"><summary>ChatGPT prompt</summary><div class="gb">
+  <details class="g" id="iprg"><summary>Copy a prompt</summary><div class="gb">
    <input type="text" id="isub" placeholder="Subject, e.g. folk-art tulips" aria-label="Subject">
    <div class="seg ipt" id="iptype"><button type="button" data-t="1" class="on">Single shape</button><button type="button" data-t="s">Sheet</button></div>
    <div class="row shrow" id="ipsz" hidden><input type="number" id="scol" min="1" max="8" value="4" aria-label="Columns"><span>&#215;</span><input type="number" id="srow" min="1" max="8" value="4" aria-label="Rows"></div>
@@ -1198,7 +1198,7 @@ body.eyedrop{cursor:crosshair}
   </div></details>
  </section>
  <section class="pn" data-p="stmp" hidden><div class="smkp">
-  <div class="elk"><div class="row"><button type="button" class="alt" id="smknew">Create New Stamp</button></div></div>
+  <div class="elk"><div class="row"><button type="button" class="alt" id="smknew">New stamp</button></div></div>
   <div class="smked" id="smked" hidden></div>
   <details class="g" open><summary>Stamps</summary><div class="gb">
    <div class="smkt">
@@ -1212,7 +1212,7 @@ body.eyedrop{cursor:crosshair}
    <div class="row"><button type="button" class="primary" id="smkedit">Edit</button></div>
   </div></details>
   <div hidden><div class="txed elmode" data-k="stamp" hidden><span>Editing <b></b></span></div><div class="strip" id="lfpst"></div></div>
-    <details class="g stonly" open hidden><summary>Block</summary><div class="gb">
+    <details class="g stonly" open hidden><summary>Stamp shape</summary><div class="gb">
    <label>Shape</label><div class="shg" id="skind"><button type="button" data-k="rect"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Rectangle</button><button type="button" data-k="hex"><svg viewBox="0 0 20 20"><path d="M10 2L17 6V14L10 18L3 14V6Z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Hexagon</button><button type="button" data-k="circle"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Circle</button><button type="button" data-k="diamond"><svg viewBox="0 0 20 20"><path d="M10 2L18 10L10 18L2 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Diamond</button><button type="button" data-k="tri"><svg viewBox="0 0 20 20"><path d="M10 3L18 17H2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Triangle</button><button type="button" data-k="arch"><svg viewBox="0 0 20 20"><path d="M4.5 17V9.5a5.5 5.5 0 0111 0V17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Arch</button><button type="button" data-k="oct"><svg viewBox="0 0 20 20"><path d="M7 3h6l4 4v6l-4 4H7l-4-4V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Octagon</button><button type="button" data-k="star"><svg viewBox="0 0 20 20"><path d="M10.0 2.5L11.8 5.7L15.3 4.7L14.3 8.2L17.5 10.0L14.3 11.8L15.3 15.3L11.8 14.3L10.0 17.5L8.2 14.3L4.7 15.3L5.7 11.8L2.5 10.0L5.7 8.2L4.7 4.7L8.2 5.7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Star</button><button type="button" data-k="quat"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="7.4" cy="10" r="4.2"/><circle cx="12.6" cy="10" r="4.2"/><circle cx="10" cy="7.4" r="4.2"/><circle cx="10" cy="12.6" r="4.2"/></svg>Quatrefoil</button><button type="button" data-k="lancet"><svg viewBox="0 0 20 20"><path d="M4.5 17v-6.5Q4.5 6.5 10 3q5.5 3.5 5.5 7.5V17z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Lancet</button></div>
    <div id="sasprow" style="margin-top:6px"><div class="asp"><select id="sasp"></select><button class="alt" id="sswp" title="Swap width and height" aria-label="Swap width and height">&#8646;</button></div><div class="aspc" id="sascw">Width <input type="number" id="saw" min="0.1" max="50" step="0.1"> Height <input type="number" id="sah" min="0.1" max="50" step="0.1"></div></div>
    <div id="shexrow" style="margin-top:6px"><select id="shor"><option value="p">Pointy top</option><option value="f">Flat top</option></select></div>
@@ -1220,7 +1220,7 @@ body.eyedrop{cursor:crosshair}
    <label>Corner radius</label><input type="range" id="shrad" min="0" max="100" value="0" data-u="%" data-def="0">
    <div class="row"><button class="alt" id="sall">Use this shape on every stamp</button></div>
    <label>Ink</label><div class="cwell" id="wl_st"></div>
-   <label class="chk"><input type="checkbox" id="neg"><span>Invert (carve the shapes away)</span></label>
+   <label class="chk"><input type="checkbox" id="neg"><span>Invert</span></label>
    <label class="chk"><input type="checkbox" id="swrap" checked><span>Wrap at the edges</span></label>
   </div></details>
   <details class="g stonly" open hidden><summary>Block edge</summary><div class="gb">
@@ -1393,7 +1393,7 @@ body.eyedrop{cursor:crosshair}
 </div>
 
 <div class="modal" id="idlg" hidden><div class="dlg idl" role="dialog" aria-modal="true" aria-labelledby="idlgt">
- <div class="dlg-h"><h2 id="idlgt">Import</h2><div class="seg imd" id="imode" role="group" aria-label="Import as"><button type="button" data-m="one" class="on">Single shape</button><button type="button" data-m="sheet">Sheet</button></div><button class="ib" id="icx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
+ <div class="dlg-h"><h2 id="idlgt">Import</h2><div class="seg imd" id="imode" role="group" aria-label="Import as"><button type="button" data-m="one" class="on">Single motif</button><button type="button" data-m="sheet">Sheet</button></div><button class="ib" id="icx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-b"><div class="iwrap">
   <div class="istg">
    <div class="seg svw" id="sview" role="group" aria-label="Show"><button type="button" data-v="o">Original</button><button type="button" data-v="t" class="on">Traced</button></div>
@@ -1402,7 +1402,7 @@ body.eyedrop{cursor:crosshair}
    <div class="scells" id="scells"></div>
   </div>
   <div class="iside">
-   <section class="isec" id="isecS"><h3>Find shapes</h3>
+   <section class="isec" id="isecS"><h3>Find motifs</h3>
     <div class="seg" id="smode" style="grid-template-columns:1fr 1fr"><button type="button" data-m="grid" class="on">Grid</button><button type="button" data-m="auto">Auto-detect</button></div>
     <div id="sgc"><div class="row shrow"><span>Columns</span><input type="number" id="sc" min="1" max="12" value="4"><span>Rows</span><input type="number" id="sr" min="1" max="12" value="4"><button class="alt" id="seven">Even out</button></div></div>
     <div id="sac" hidden><div class="ctl"><label for="sgap">Join parts</label><input type="range" id="sgap" min="0" max="40" step="1" value="10"><span class="v" id="sgapv"></span></div></div>
@@ -1412,7 +1412,7 @@ body.eyedrop{cursor:crosshair}
     <div class="ctl"><label for="ism">Smooth edges</label><input type="range" id="ism" min="0" max="4" step="1" value="1"><span class="v" id="ismv"></span></div>
     <div class="ctl"><label for="isp">Clean up</label><input type="range" id="isp" min="0" max="100" step="1" value="15"><span class="v" id="ispv"></span></div>
     <div class="ctl"><label for="idt">Simplify</label><input type="range" id="idt" min="0.2" max="3" step="0.1" value="0.8"><span class="v" id="idtv"></span></div>
-    <label class="chk"><input type="checkbox" id="iinv"><span>Invert (light art on dark)</span></label>
+    <label class="chk"><input type="checkbox" id="iinv"><span>Invert</span></label>
    </section>
    <section class="isec"><h3>Save</h3>
     <label for="inm">Name</label><input type="text" id="inm" maxlength="40">
@@ -1422,7 +1422,7 @@ body.eyedrop{cursor:crosshair}
    </section>
   </div>
  </div></div>
- <div class="dlg-f ifoot"><span id="iinfo"></span><button class="alt" id="icl">Cancel</button><button class="primary" id="iadd">Add shape</button></div>
+ <div class="dlg-f ifoot"><span id="iinfo"></span><button class="alt" id="icl">Cancel</button><button class="primary" id="iadd">Add motif</button></div>
 </div></div>
 <div class="modal" id="tpdlg" hidden><div class="dlg tpd" role="dialog" aria-modal="true" aria-labelledby="tpt">
  <div class="dlg-h"><h2 id="tpt">New from template</h2><button type="button" class="alt" id="tpadd">Add from file</button><button class="ib" id="tpclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>

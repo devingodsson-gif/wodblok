@@ -191,7 +191,7 @@ function init52(){
  const o=()=>tyP();
  mkWell($('bg_wl'),{label:'Background',what:'Paper',get:()=>o().bg,set:v=>{o().bg=v||o().bg}});
  mkWell($('wl_pi'),{label:'Ink',what:'Ink',get:()=>o().ink,set:v=>{o().ink=v||o().ink}});
- mkWell($('wl_st'),{label:'Stamp ink',what:'Stamp ink',def:'Default ink',defRef:()=>o().ink,get:()=>{const t=WBS.tiles[WBS.cur];return t&&t.ink||''},set:v=>{const t=WBS.tiles[WBS.cur];if(!t)return;if(v)t.ink=v;else delete t.ink}});
+ mkWell($('wl_st'),{label:'Stamp ink',what:'Stamp ink',def:'Ink',defRef:()=>o().ink,get:()=>{const t=WBS.tiles[WBS.cur];return t&&t.ink||''},set:v=>{const t=WBS.tiles[WBS.cur];if(!t)return;if(v)t.ink=v;else delete t.ink}});
  mkWell($('wl_sh'),{label:'Motif colour',what:'Motif',def:'Stamp ink',defRef:()=>{const t=WBS.tiles[WBS.cur];return t&&t.ink||o().ink},get:()=>{const q=QS()[0];return q&&q.ic||''},set:v=>{QS().forEach(q=>{if(v)q.ic=v;else delete q.ic})}});
  mkWell($('wl_ly'),{label:'Layer ink',what:'Layer ink',def:'Stamp colours',defSwatch:()=>`linear-gradient(135deg,${col(o().ink)} 50%,${col(o().bg)} 50%)`,get:()=>{const L=LY();return L&&L.ink||''},set:v=>{const L=LY();if(!L)return;if(v)L.ink=v;else delete L.ink}});
  mkWell($('wl_rp'),{label:'Replace colour',what:'Replace',defRef:()=>o().ink,get:()=>{const L=LY();return L&&L.rp||o().ink},set:v=>{const L=LY();if(L&&v)L.rp=v}});

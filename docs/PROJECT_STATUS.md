@@ -58,6 +58,7 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 
 ## Unfinished and next
 Only items the owner has stated are listed as next. Nothing is started unless he says so.
+- 2.17.0 (words, branch `feat/2.17.0-words`, stacked on 2.16.0) is done and waiting for his word; what it leaves is in `docs/plan.md`.
 - 2.16.0 (bug fixes, branch `fix/2.16.0-bug-fixes`) is done and waiting for his word to merge; the bugs it leaves open are listed in `docs/plan.md` under 2.16.0.
 - Decide with the owner: snapshot regeneration (above), and a first full CI suite run (suggest it with the importance percentage: high, about 80%, because 2.4.0 to 2.15.0 changed launch, panels, selection, stamps and icons with no recorded full run).
 - The preview artifact (https://claude.ai/artifact/Y7qKSU4gbU9sCdQYNmBH93) was last published from 2.14.0; publish from `main` after the next build.

@@ -8,12 +8,12 @@ import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 // ===== Shape library: one list of folders, folders inside folders, multi-select and moving =====
-// Your own folders and the built-in sets sit side by side in one list (A to Z, My imports first), and any of them can hold
+// Your own folders and the built-in sets sit side by side in one list (A to Z, Yours first), and any of them can hold
 // folders of its own. A folder is known by its path: "Florals/Roses" for your own, "b:Plants" for a built-in set (its
 // original name, so renaming the set changes nothing) and "b:Plants/Mine" for a folder inside a set. A shape's folder is
 // that path, kept in cust[k].g for your imports (projects already save it as a plain string, so nesting needs no new file
 // format) and in BF[k] for a built-in shape added to a folder (it also stays in its own set). WBS.mcat is the active folder:
-// "/" none, "i" My imports, "d" Drawn by Claude (old projects only), "b:<set>" or "g:<path>".
+// "/" none, "i" Yours, "d" Drawn by Claude (old projects only), "b:<set>" or "g:<path>".
 const bOk=k=>/^b\d+$/.test(k)&&+k.slice(1)<M.length;
 // The built-in sets sit in the same list as your own folders, and you can add your own folders to them.
 const lbSet=n=>CATS.findIndex(c=>c.n==n);
@@ -43,7 +43,7 @@ const lbX=()=>LBX||(LBX=lbIndex());
 const lbDirty=()=>{LBX=null};
 function lbNode(v){const X=lbX();if(typeof v!='string')return null;
 if(v=='/')return{v,t:'r',n:'All folders',ks:[]};
-if(v=='i')return{v,t:'u',n:'My imports',ks:X.imp};
+if(v=='i')return{v,t:'u',n:'Yours',ks:X.imp};
 if(v=='d')return{v,t:'u',n:'Drawn by Claude',ks:X.drw};
 if(v.startsWith('b:')){const i=lbSet(v.slice(2));if(i<0)return null;const c=CATS[i],ex=X.by.get(v)||[];return{v,t:'b',n:REN[c.n]||c.n,orig:c.n,hid:WBS.HID.includes(c.n),g:v,p:v,ks:ex.length?[...new Set([...c.k,...ex])]:c.k}}
 if(v.startsWith('g:')){const p=v.slice(2);if(!X.all.has(p))return null;return{v,t:'f',n:lbLeaf(p),g:p,p,ks:X.by.get(p)||[]}}
@@ -58,7 +58,7 @@ function lbCount(nd){if(nd.t!='f'&&nd.t!='b')return nd.ks.length;const s=new Set
 function lbCrumbs(nd){if(nd.t!='f'&&nd.t!='b')return nd.t=='r'?[]:[nd];const a=nd.p.split('/'),o=[];for(let i=1;i<=a.length;i++){const n=lbNode(lbId(a.slice(0,i).join('/')));if(n)o.push(n)}
 return o}
 // every folder in list order, named by its full path, for the "Move to" and "Save to" pickers
-function lbTree(){const o=[{v:'i',n:'My imports',d:0}],walk=(nd,d,pre)=>{const n=pre?pre+' / '+nd.n:nd.n;o.push({v:nd.v,n,d});lbKids(nd).forEach(k=>walk(k,d+1,n))};lbKids(lbNode('/')).forEach(n=>walk(n,0,''));return o}
+function lbTree(){const o=[{v:'i',n:'Yours',d:0}],walk=(nd,d,pre)=>{const n=pre?pre+' / '+nd.n:nd.n;o.push({v:nd.v,n,d});lbKids(nd).forEach(k=>walk(k,d+1,n))};lbKids(lbNode('/')).forEach(n=>walk(n,0,''));return o}
 const lbOpts=(sel,skip)=>lbTree().filter(x=>!skip||!skip(x)).map(x=>`<option value="${hx(x.v)}"${x.v==sel?' selected':''}>${hx(x.n)}</option>`).join('');
 // for Randomize: every folder in list order (v: its id, n: its name, d: how deep, c: shapes inside it and its folders, ks: the shapes it holds itself)
 function libRz(){lbDirty();return lbTree().map(x=>{const nd=lbNode(x.v);return{v:x.v,n:nd?nd.n:x.n,d:x.d,c:nd?lbCount(nd):0,ks:nd?nd.ks.slice():[]}})}
@@ -66,7 +66,7 @@ function libCur(){let v=WBS.mcat;if(/^\d+$/.test(v||'')){const c=CATS[+v];v=c?'b
 // ---- for the import window: where new shapes go, how that folder is named, the folder picker, and making a folder
 function libDest(){lbDirty();const c=libCur();return c.t=='f'||c.t=='b'?c.v:'i'}
 function libG(v){lbDirty();const n=lbNode(v);return n&&(n.t=='f'||n.t=='b')?n.g:''}
-function libPath(v){lbDirty();const n=lbNode(v);return n?(n.t=='r'?n.n:lbCrumbs(n).map(x=>x.n).join(' / ')):'My imports'}
+function libPath(v){lbDirty();const n=lbNode(v);return n?(n.t=='r'?n.n:lbCrumbs(n).map(x=>x.n).join(' / ')):'Yours'}
 function libOptions(sel){lbDirty();return lbOpts(sel)}
 function libMk(parentV,name){lbDirty();const nm=lbName(name);if(!nm)return null;const pn=lbNode(parentV)||lbNode('/'),own=pn.t=='f'||pn.t=='b'?pn:lbNode('/');
 const ex=lbKids(own).concat(own.t=='r'?lbKids(own,true):[]).find(x=>x.n.toLowerCase()==nm.toLowerCase());if(ex)return ex.v;
@@ -91,7 +91,7 @@ chev:'<svg class="lfa" viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 ck:'<svg viewBox="0 0 16 16"><path d="M4.3 8.4l2.4 2.4 5-5.3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
 const IC2={foldo:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.folderOpen+'</svg>',
 more:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">'+ICN.more+'</svg>'};
-// the folders at the top of the tree: My imports, Drawn by Claude (old projects only), then your folders and the sets, A to Z
+// the folders at the top of the tree: Yours, Drawn by Claude (old projects only), then your folders and the sets, A to Z
 const lbTop=()=>[lbNode('i'),...(lbX().drw.length?[lbNode('d')]:[]),...lbKids(lbNode('/'))];
 const lbVis=()=>[...new Set([...$('lib').querySelectorAll('button[data-m]')].map(b=>b.dataset.m))];
 function renderLib(force){lbDirty();const c=libCur(),[pa,pb]=pal(),L=$('lib'),F=$('fform');
@@ -186,7 +186,7 @@ $('fname').onkeydown=e=>{if(e.key=='Enter'){e.preventDefault();$('fok').click()}
 $('fdest').onkeydown=e=>{if(e.key=='Escape'){e.stopPropagation();$('fcx').click()}};
 $('fok').onclick=()=>{const c=libCur(),mode=WBS.fmode,v=lbName($('fname').value);
 if(mode=='del'){if(c.t!='f')return;const p=c.p;let back=0;Object.values(cust).forEach(x=>{if(x&&lbIn(x.g,p)){delete x.g;back++}});Object.keys(BF).forEach(k=>{if(lbIn(BF[k],p))delete BF[k]});WBS.FOLD=WBS.FOLD.filter(x=>!lbIn(x,p));fSave();store();closeF();libOpen(lbId(lbPar(p)));upd();
-pmsg(`Deleted the folder “${c.n}”.`+(back?` Its imported shapes went back to My imports.`:''));return}
+pmsg(`Deleted the folder “${c.n}”.`+(back?` Its imported shapes went back to Yours.`:''));return}
 if(mode=='mvf'){if(c.t!='f')return;const t=$('fdest').value,tn=lbNode(t);if(!tn)return;const np=(tn.t=='r'?'':tn.p+'/')+lbLeaf(c.p);closeF();if(np!==c.p&&!lbIn(tn.p||'',c.p)){lbRemap(c.p,np);upd()}else renderLib(true);pmsg(`Moved “${c.n}” to “${libPath(t)}”.`);return}
 if(mode=='ren'&&c.t=='b'){const r=fClean($('fname').value);if(!r||r==c.orig)delete REN[c.orig];else REN[c.orig]=r;fSave();closeF();renderLib(true);pmsg(r&&r!=c.orig?`Renamed the set to “${r}”.`:'Set name reset.');return}
 if(!v){$('fname').focus();return}

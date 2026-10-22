@@ -36,13 +36,13 @@ test('Edit is in the stamp list only; one stamp is open for editing at a time an
   const first = await page.evaluate(() => __wbTest.unlockedStamp());
   expect(first).toBeTruthy();
   await expect(locks.nth(0)).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('#smked')).toHaveText(/^Editing: Stamp 1 \(used by \d+ elements?\)$/);
+  await expect(page.locator('#smked')).toHaveText(/^Stamp 1 · \d+ elements?$/);
   await locks.nth(1).click();
   await settle(page);
   expect(await page.evaluate(() => __wbTest.unlockedStamp())).not.toBe(first);
   await expect(locks.nth(0)).toHaveAttribute('aria-pressed', 'false');
   await expect(locks.nth(1)).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('#smked')).toHaveText(/^Editing: Stamp 2 /);
+  await expect(page.locator('#smked')).toHaveText(/^Stamp 2 /);
   await locks.nth(1).click();
   await settle(page);
   expect(await page.evaluate(() => __wbTest.unlockedStamp())).toBe(null);

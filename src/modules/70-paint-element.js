@@ -50,7 +50,7 @@ $('patip').onclick=e=>{const b=e.target.closest('[data-t]');if(b){BR.tip=b.datas
 $('pasz').addEventListener('input',()=>{BR.w=+$('pasz').value});
 $('paund').onclick=()=>{const p=paCur();if(p&&(p.st||[]).length){p.st.pop();paCh()}};
 $('paclr').onclick=()=>{const p=paCur();if(p&&(p.st||[]).length){p.st=[];paCh()}};
-if(WBX.wbMkWell)WBX.wbMkWell($('pawl'),{label:'Brush colour',what:'Brush',def:'Project ink',defRef:()=>WBS.proj.ink,get:()=>BR.c,set:v=>{BR.c=v||'';paSync()}});
+if(WBX.wbMkWell)WBX.wbMkWell($('pawl'),{label:'Brush colour',what:'Brush',def:'Ink',defRef:()=>WBS.proj.ink,get:()=>BR.c,set:v=>{BR.c=v||'';paSync()}});
 // the live stroke: a plain path that follows the pointer; the stroke joins the element (and the picture is redrawn once) when the pointer comes up
 const art=$('art');let live=null;
 // the path is added to the picture only while a stroke is being drawn, so nothing of it stays in the picture's markup

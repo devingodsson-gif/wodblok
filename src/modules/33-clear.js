@@ -12,7 +12,7 @@ function clearAll(fresh){if(fresh)link=null;if(!fresh&&WBX.wbCap)WBX.wbCap();if(
 WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;
 const dim0={...WBS.dim};['cs','cr','n','co','g','cp'].forEach(k=>delete dim0[k]); // the canvas outline goes back to a plain rectangle (the ratio stays)
 (WBX.wbApply||applyCore)({texLib:[],tiles:[],layers:[L],proj:trayDefault(),dim:{...dim0,k:'rect',o:'p',s:[1,1]},pr:{e:0,q:0,t:'',a:0,sc:100,sd:811},tex:{u:[],v:87}});
-store();if(fresh){if(WBX.wbResetHist)WBX.wbResetHist();pmsg('Started a new, empty project.')}else{if(WBX.wbCap)WBX.wbCap();pmsg('Cleared. Ctrl+Z brings back what you had.')}}
+store();if(fresh){if(WBX.wbResetHist)WBX.wbResetHist();pmsg('Started a new, empty project.')}else{if(WBX.wbCap)WBX.wbCap();pmsg('Cleared.')}}
 
 const fname=n=>(n||'untitled').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase().slice(0,50)||'untitled';
 // A small PNG preview for the file (file browsers can show it). Any picture that cannot be made is simply left out.

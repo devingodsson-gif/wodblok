@@ -92,7 +92,7 @@ test.describe('library button', () => {
   test('the toolbar button exports every shape, folder by folder, with folders inside folders kept', async ({ page }) => {
     const { errors } = await open(page);
     await build(page);
-    await expect(page.locator('#fexp')).toHaveAttribute('aria-label', 'Export all shapes');
+    await expect(page.locator('#fexp')).toHaveAttribute('aria-label', 'Export all motifs');
     await page.click('#fexp');
     await page.waitForFunction(() => window.__wbDownloads.length > 0);
     const z = await downloaded(page, 0), under = d => z.names.filter(n => n.startsWith(d + '/') && !n.slice(d.length + 1).includes('/'));

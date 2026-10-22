@@ -1,4 +1,4 @@
-// Shape library folders: one tree of every folder (built-in sets and your own, A to Z, My imports first) that open in place (1.5.0),
+// Shape library folders: one tree of every folder (built-in sets and your own, A to Z, Yours first) that open in place (1.5.0),
 // folders inside folders, each folder's menu (rename, move, delete; hide for a set), moving shapes, and imports landing in the active folder.
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle } = require('./helpers/harness');
@@ -37,7 +37,7 @@ async function mkFolder(page, name) { await page.click('#fnew'); await page.fill
 test('the library is one tree: folders open in place, several at once, and folders can be made at the top and inside others', async ({ page }) => {
   const { errors } = await open(page);
   const names = await rows(page);
-  expect(names[0]).toBe('My imports');
+  expect(names[0]).toBe('Yours');
   expect(names).toContain('Flowers');                                   // the built-in sets sit in the same list as your folders
   await expect(tiles(page)).toHaveCount(0);                             // every folder starts closed
   await mkFolder(page, 'Florals');                                      // made at the top; it opens and becomes the active folder
@@ -72,7 +72,7 @@ test('the library is one tree: folders open in place, several at once, and folde
   expect(errors).toEqual([]);
 });
 
-test('a sheet imports into the active folder; with no folder active, imports go to My imports', async ({ page }) => {
+test('a sheet imports into the active folder; with no folder active, imports go to Yours', async ({ page }) => {
   const { errors } = await open(page);
   await mkFolder(page, 'Florals');
   await mkFolder(page, 'Tulips');
@@ -80,25 +80,25 @@ test('a sheet imports into the active folder; with no folder active, imports go 
   await expect(page.locator('#idlg')).toBeVisible();
   await expect(page.locator('#imode [data-m="sheet"]')).toHaveClass(/on/);
   await expect(page.locator('#ifold')).toHaveValue('g:Florals/Tulips');
-  await expect(page.locator('#iadd')).toHaveText('Import 16 shapes');
+  await expect(page.locator('#iadd')).toHaveText('Import 16 motifs');
   await page.click('#iadd');
   await settle(page);
   await expect(page.locator('#idlg')).toBeHidden();
   await expect(active(page)).toHaveText('Tulips');
   await expect(tiles(page)).toHaveCount(16);
   await expect(page.locator('#lib [data-f="g:Florals"] .lfc')).toHaveText('16');   // a folder's count includes the folders inside it
-  // with everything closed: a single image goes to My imports, and can be switched to a sheet in the same window
+  // with everything closed: a single image goes to Yours, and can be switched to a sheet in the same window
   await page.click('#ltog');
   await page.setInputFiles('#ifile', await sheet(page));
   await expect(page.locator('#imode [data-m="one"]')).toHaveClass(/on/);
   await expect(page.locator('#ifold')).toHaveValue('i');
-  await expect(page.locator('#iadd')).toHaveText('Add shape');
+  await expect(page.locator('#iadd')).toHaveText('Add motif');
   await page.click('#imode [data-m="sheet"]');
-  await expect(page.locator('#iadd')).toHaveText('Import 16 shapes');
+  await expect(page.locator('#iadd')).toHaveText('Import 16 motifs');
   await page.click('#imode [data-m="one"]');
   await page.click('#iadd');
   await settle(page);
-  await expect(active(page)).toHaveText('My imports');
+  await expect(active(page)).toHaveText('Yours');
   await expect(tiles(page)).toHaveCount(1);
   expect(errors).toEqual([]);
 });
@@ -116,7 +116,7 @@ test('the import window can save into another folder, or a new one', async ({ pa
   expect(errors).toEqual([]);
 });
 
-test('folder menu: rename and move keep what is inside; delete sends imports back to My imports; a set can be hidden', async ({ page }) => {
+test('folder menu: rename and move keep what is inside; delete sends imports back to Yours; a set can be hidden', async ({ page }) => {
   const { errors } = await open(page);
   await mkFolder(page, 'Florals');
   await mkFolder(page, 'Tulips');
@@ -139,7 +139,7 @@ test('folder menu: rename and move keep what is inside; delete sends imports bac
   await settle(page);
   await expect(page.locator('#lib .lrw:has(> [data-f="g:Tulips"])')).toHaveAttribute('style', '--d:0');
   await expect(tiles(page)).toHaveCount(16);
-  // delete it: asks first, then its imports go back to My imports
+  // delete it: asks first, then its imports go back to Yours
   await menu(page, 'g:Tulips', 'Delete folder');
   await expect(page.locator('#fq')).toHaveText('Delete “Tulips”?');
   await page.click('#fok');

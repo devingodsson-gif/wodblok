@@ -43,7 +43,7 @@ test('Settings > Shortcuts lists the keys that work but are not commands, and no
   await page.evaluate(() => document.getElementById('stgo').click());
   await page.click('#stgnav [data-p="keys"]');
   const rows = await page.locator('#stgkl .stgkr').evaluateAll(r => r.map(x => x.textContent));
-  for (const k of ['Copy shape', 'Paste shape', 'Hand (hold)', 'Split shape: apply', 'Zoom to fit']) expect(rows.join('|'), k).toContain(k);
+  for (const k of ['Copy motif', 'Paste motif', 'Hand (hold)', 'Split motif: apply', 'Zoom to fit']) expect(rows.join('|'), k).toContain(k);
   await page.fill('#stgkq', 'knock');
   await expect(page.locator('#stgkl .stgkr')).toHaveCount(1);
   expect(errors).toEqual([]);

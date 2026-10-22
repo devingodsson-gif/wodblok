@@ -1,4 +1,4 @@
-// 2.3.1: the Sheet is gone; the canvas has a Background colour (the project's Paper colour) set in the Canvas panel, with an option for none.
+// 2.3.1: the Sheet is gone; the canvas has a Background (the project's Paper colour) set in the Canvas panel, with an option for none.
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
@@ -16,7 +16,7 @@ test('a new project has a Background: the first tray colour, linked, drawn under
   expect(errors).toEqual([]);
 });
 
-test('the Canvas panel has a Background colour with an on/off switch; off draws nothing', async ({ page }) => {
+test('the Canvas panel has a Background with an on/off switch; off draws nothing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'canvas');
   await expect(page.locator('#bg_on')).toBeChecked();

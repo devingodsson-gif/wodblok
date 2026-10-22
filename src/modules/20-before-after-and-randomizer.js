@@ -271,9 +271,8 @@ if((FT.free||libFree)&&ch(.65)){
 const txAll=(txReq?[[WBS.tiles[0],txReq]]:[]).concat(fzReqs);
 if(txAll.length){pmsg('Randomized… setting the lettering.');WBX.wbTxBusy=(WBX.wbTxBusy||0)+1;WBX.wbRollHold=tok;(async()=>{try{for(const[t,o] of txAll){try{await WBX.wbTxPlace(t,o,tok)}catch(e){}}if(tok!==WBX.wbRndTok)return;store();upd();if(WBX.wbRollHold===tok)WBX.wbRollHold=0;if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()}}finally{if(WBX.wbRollHold===tok)WBX.wbRollHold=0;WBX.wbTxBusy=Math.max(0,(WBX.wbTxBusy||1)-1)}})()}
 else if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()};
-const fn=[...MOVES.filter(x=>F.has(x[0])).map(x=>x[1]),...(fzDone?['free-placed stamps']:[]),...(libDone?['library stamps']:[]),...[['layout','layout'],['shape','canvas shape'],['size','canvas size'],['look','layer opacity and blend'],['col','colours'],['gr','colour grade'],['masks','grade masks'],['tx','sheet texture'],['jit','jitter'],['pr','textures and print effects']].filter(x=>FT[x[0]]).map(x=>x[1])].join(' + ')||'a calm base';
 
-['rzdo'].forEach(id=>{const b=$(id);if(b){b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin')}});pmsg((fresh?'Started a new project with a fresh random piece':'Randomized')+` (featuring ${fn}).`+(FT.lib&&!SLCn?' Your stamp library is empty, so no saved stamps were used.':'')+(fresh?'':' Ctrl+Z brings back the previous piece.'))}
+['rzdo'].forEach(id=>{const b=$(id);if(b){b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin')}});pmsg(fresh?'Started a new project with a fresh random piece.':'Randomized.')}
 function init20(){
 wbBA=(()=>{const st=()=>document.querySelector('.stage'),bd=()=>[...st().querySelectorAll(':scope>.board')].filter(b=>!b.hidden&&!b.classList.contains('off')),key=()=>bd().map(b=>b.id).join();
 let ref=null,pics=null,pk='',pcore=null,mode=0,busy=0,sp=.5,ovs=[],tags=[],hd=null,loop=0,dt=0,pk0=0;

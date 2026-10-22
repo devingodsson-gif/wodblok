@@ -7,7 +7,7 @@ const state = async page => JSON.parse(await getState(page));
 // the rail button of a tool that is already showing closes it, so only click when it is not showing
 const show = async (page, id) => { if (await page.locator(`section.pn[data-p="${id}"]:not([hidden])`).count() === 0) await openPanel(page, id); };
 const rows = page => page.locator('#stmpl .smkr');
-// Create New Stamp makes a rectangle at once (2.15.0); another outline is picked in the stamp's Block group
+// New stamp makes a rectangle at once (2.15.0); another outline is picked in the stamp's Stamp shape group
 const newStamp = async (page, name = 'Circle') => { await page.click('#smknew'); await settle(page); const k = { Circle: 'circle', Rectangle: 'rect' }[name]; if (k && k !== 'rect') { await page.evaluate(k => document.querySelector(`#skind [data-k="${k}"]`).click(), k); await settle(page); } };
 const pick = async page => { await openPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
 const toClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height }; }, [x, y]);

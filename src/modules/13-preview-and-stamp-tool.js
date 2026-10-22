@@ -29,7 +29,7 @@ for(let i=t.items.length-1;i>=0;i--){const nm=gk(t.items[i]);if(done[nm])continu
 if(g.length==1&&!isT){h+=row(i);continue}
 const fr=isT?[...g]:[...g].reverse(),ns=g.filter(j=>WBS.msel.has(j)).length,open=!mlFold.has(nm),e=hx(nm),lb=hx(gnm(nm));
 h+=`<div class="mg${open?' open':''}"><div class="mr mh${ns==g.length?' on':ns?' part':''}" data-g="${e}" title="Click to select all ${g.length}. Shift+click to add them."><span class="car" data-f="${e}" role="button" aria-label="${open?'Fold':'Unfold'} ${e}" aria-expanded="${open}">${CHEV}</span>${thumb(t.items[fr[0]])}<b>${lb}<i class="cnt">${ns&&ns<g.length?ns+'/':''}${g.length}</i></b><button type="button" data-gx="${e}" title="Delete all ${g.length}" aria-label="Delete all ${lb}">&#215;</button></div>${open?`<div class="mk">${fr.map(j=>row(j,isT?0:g.indexOf(j)+1,1)).join('')}</div>`:''}</div>`}
-el.innerHTML=`<h3>Motifs on stamp ${WBS.cur+1}<span>${WBS.msel.size>1?WBS.msel.size+' of ':''}${t.items.length}</span></h3><div class="ml">`+(h||`<div class="em">No shapes yet</div>`)+`</div>`;
+el.innerHTML=`<h3>Motifs on stamp ${WBS.cur+1}<span>${WBS.msel.size>1?WBS.msel.size+' of ':''}${t.items.length}</span></h3><div class="ml">`+(h||`<div class="em">No motifs yet</div>`)+`</div>`;
 if(sc)el.querySelector('.ml').scrollTop=sc;if(WBX.wbTxSync)WBX.wbTxSync()}
 const txC=()=>{const qs=QS();let x=0,y=0;qs.forEach(o=>{x+=o.x;y+=o.y});return[x/qs.length,y/qs.length]};
 const txAbs=(g,c)=>WBX.wbTxXf(g,M=>{M.ax+=c[0]-M.mx;M.ay+=c[1]-M.my;M.mx=c[0];M.my=c[1]});
