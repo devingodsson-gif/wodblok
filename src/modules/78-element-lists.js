@@ -1,11 +1,17 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {stUnlocked} from './63-stamp-tool.js';
 import {plDisarm} from './72-placing.js';
+import {elKind,elSel} from './65-element-core.js';
 
 // ===== An Add button at the top of every element panel (2.6.0). 2.19.0 (owner Oct 22 2026): the per-kind lists are gone; the Elements panel is the only list. Add makes a new element of the kind,
 // selects it and shows its properties just below. Motifs and Stamps are also placed from their libraries. While a stamp is being edited in its tab only Motif and Text keep their Add.
 const ELK={text:{pn:'text',add:'Add text'},shape:{pn:'mlist',add:'Add shape'},pattern:{pn:'layers',add:'Add pattern'},motif:{pn:'motifs',add:'Add motif'},stamp:{pn:'stmp',add:'Add stamp'}};
-function elkSync(){const un=stUnlocked()!=null;
+// One Element group (Size, Rotate, Position, Flip, Duplicate, Order, Delete) for every kind (2.19.0): it sits at the top of the panel of the kind that is selected (a Shape's, a Motif's, a Text's, a placed Stamp's).
+// A Pattern keeps its own grid controls. One set of controls, so one set of ids: the group moves, it is not copied.
+const ELG_PN={shape:'mlist',motif:'mlist',text:'text',stamp:'stmp'};
+function elgPlace(){const g=document.querySelector('details.g:has(>.gb>#lfree)');if(!g)return;const q=elSel(),pn=q&&ELG_PN[elKind(q)];if(!pn)return;
+ const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec||g.parentElement===sec)return;const at=sec.querySelector('.elk[data-k]');if(at)at.insertAdjacentElement('afterend',g);else sec.insertAdjacentElement('afterbegin',g)}
+function elkSync(){const un=stUnlocked()!=null;elgPlace();
  {const ab=document.querySelector('.elk[data-k="stamp"] [data-add]');if(ab){const none=!WBS.tiles.length;if(ab.disabled!==none)ab.disabled=none}}   // no stamp yet: nothing to add
  {const ed=$('smkedit');if(ed){const none=!WBS.tiles.length;if(ed.disabled!==none)ed.disabled=none}}
  document.querySelectorAll('section.pn[data-p=stmp] .stonly').forEach(d=>{if(d.hidden===un)d.hidden=!un});   // Block, Block edge and Symmetry belong to a stamp tab (2.13.0)
