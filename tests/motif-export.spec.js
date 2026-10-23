@@ -13,7 +13,7 @@ test.describe('pure zip builder', () => {
     const { unzipSync, strFromU8 } = await load('vendor/fflate.js');
     expect(safeName('a/b:c*d?', 'x')).toBe('a b c d');
     expect(safeName('  ..hidden. ', 'x')).toBe('hidden');
-    expect(safeName('', 'Motif')).toBe('Motif');
+    expect(safeName('', 'Shape')).toBe('Shape');
     expect(safeName('CON', 'x')).toBe('CON_');
     const { zip, count } = buildMotifZip([
       { name: 'Leaves', items: [{ name: 'Leaf', svg: '<svg>1</svg>' }, { name: 'leaf', svg: '<svg>2</svg>' }, { name: 'Leaf', svg: '<svg>3</svg>' }] },
