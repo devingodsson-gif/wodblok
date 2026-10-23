@@ -353,9 +353,20 @@ $('pgrid').addEventListener('click',e=>{const b=e.target.closest('[data-a="open"
 // ---- undo / redo (snapshots of the whole project state)
 let hist=[coreStr()],hi=0;
 const ub=()=>{$('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;if(WBX.wbHistPaint)WBX.wbHistPaint()};
-let histL=['Start'],histT=[Date.now()],histTh=[''];
-const HK={tiles:'Stamp change',layers:'Layer change',proj:'Colours',dim:'Canvas size',pg:'Grid',pr:'Roughness',tex:'Texture',texLib:'Texture library',grade:'Grade'};
-function hLabel(a,b){try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added motif'+(y-x>1?'s':'');if(y<x)return 'Removed motif'+(x-y>1?'s':'');return 'Moved or edited shape'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
+let histL=['Start'],histT=[Date.now()],histTh=[''],histU=[''];
+const HK={tiles:'Stamp change',els:'Element change',layers:'Layer change',proj:'Colours',dim:'Canvas size',pg:'Grid',pr:'Roughness',tex:'Texture',texLib:'Texture library',grade:'Grade'};
+// What one step did to the elements, in words (2.27.0): "Moved shape", "Edited text", "Resized 3 elements"... hLU keeps the uid when only one element changed
+let hLU='';
+const hKN={text:'text',shape:'shape',motif:'motif',stamp:'stamp',pattern:'pattern',paint:'paint',group:'group'};
+function hEls(c){const m=new Map();(Array.isArray(c.els)?c.els:[]).forEach(p=>m.set(String(p.u),p));return m}
+function hElWords(A,B){const a=hEls(A),b=hEls(B);if(!a.size&&!b.size)return'';const add=[...b.keys()].filter(u=>!a.has(u)),rem=[...a.keys()].filter(u=>!b.has(u)),kn=p=>hKN[p.k]||'element';
+if(add.length||rem.length){if(add.length&&rem.length)return'';const ks=(add.length?add.map(u=>b.get(u)):rem.map(u=>a.get(u))),n=ks.length,w=add.length?'Added ':'Removed ';return w+(n==1?kn(ks[0]):n+' elements')}
+const chg=[...b.keys()].filter(u=>JSON.stringify(a.get(u))!==JSON.stringify(b.get(u)));if(!chg.length)return'';
+const keys=u=>{const p=a.get(u),q=b.get(u);return[...new Set([...Object.keys(p),...Object.keys(q)])].filter(k=>JSON.stringify(p[k])!==JSON.stringify(q[k]))};
+const only=(ks,ok)=>ks.every(k=>ok.includes(k)),all=chg.map(keys);let w='Changed';
+if(all.every(ks=>only(ks,['x','y'])))w='Moved';else if(all.every(ks=>only(ks,['r'])))w='Rotated';else if(all.every(ks=>only(ks,['s','wx','wy','bw','bh','n','x','y','G','Lt'])&&!ks.includes('tx')))w='Resized';else if(all.every(ks=>only(ks,['tx','G','Lt','bw','bh','n','tu'])))w='Edited';else if(all.every(ks=>only(ks,['ink','col','fill','op','a'])))w='Recoloured';else if(all.every(ks=>only(ks,['v'])))w=b.get(chg[0]).v===false?'Hid':'Showed';else if(all.every(ks=>only(ks,['name'])))w='Renamed';
+if(chg.length==1){const p=b.get(chg[0]);hLU=String(chg[0]);return w+' '+(w=='Edited'&&p.k=='text'?'text':kn(p))}return w+' '+chg.length+' elements'}
+function hLabel(a,b){hLU='';try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length==1&&ch[0]=='els'){const w=hElWords(A,B);if(w)return w}if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added motif'+(y-x>1?'s':'');if(y<x)return 'Removed motif'+(x-y>1?'s':'');return 'Moved or edited shape'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
 // wbRollHold: a Randomize roll is still setting its lettering, so the half-made piece is not a history step
 // Shape editor: opens by itself when a shape is placed, unless Auto-open (top of the panel) is switched off; the choice is remembered
 let seOn=true;try{seOn=kv.get('wb_se_auto')!=='0'}catch(e){}
@@ -368,7 +379,11 @@ const navDirty=()=>{if(WBX.wbNavDirty)WBX.wbNavDirty();if(WBX.wbVarDirty)WBX.wbV
 let thT=0,thWant=null;
 function thRun(){if(WBS.WBDRG||WBX.wbHoldOn||WBX.wbRollHold||(WBX.wbTxBusy||0)>0||document.body.classList.contains('babusy')){thT=setTimeout(thRun,800);return}
  const s=thWant;if(!s||s!==coreStr())return;thWant=null;thumb(120).then(u=>{const i=hist.lastIndexOf(s);if(u&&i>=0){histTh[i]=u;if(WBX.wbHistPaint)WBX.wbHistPaint()}})}
-function cap(){if(WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold)return;if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));if(stUnlocked()!=null&&!named&&/^Added motif/.test(histL[histL.length-1])&&seAuto()&&!wsFind('motifs'))setPanel('motifs',1);if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift()}hi=hist.length-1}ub()}
+function cap(){if(WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold||(WBS.fpXf&&WBS.fpXf.moved)||(WBS.fpDrag&&WBS.fpDrag.moved))return;   // a drag in progress is not a step yet (2.27.0)
+if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];
+// typing in a text is one step, not one per pause (2.27.0): the same text edited again within a few seconds replaces the last step
+if(hi>0&&hi==hist.length-1&&!(WBX.wbLabelNext&&performance.now()-WBX.wbLabelNext.at<3000)&&hLabel(prev,s)=='Edited text'&&hLU&&histL[hi]=='Edited text'&&hLU===histU[hi]&&Date.now()-histT[hi]<6000){hist[hi]=s;histT[hi]=Date.now();histTh[hi]='';navDirty();ub();return}
+hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;histU.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));histU[histL.length-1]=(!named&&!plain)?hLU:'';if(stUnlocked()!=null&&!named&&/^Added motif/.test(histL[histL.length-1])&&seAuto()&&!wsFind('motifs'))setPanel('motifs',1);if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift();histU.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
 // the one list keeps its id (2.25.0): a stamp tab belongs to it, so Undo and Redo stay in the tab that is open (the id is not part of the document)
 function applyCore(c){const els=Array.isArray(c.els)?c.els:flatEls(c.layers),L0=WBS.layers&&WBS.layers[0];c.layers=[oneLayer(els,c.tiles.map(t=>t.id),L0&&L0.u)];trayIn(c);WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
@@ -381,7 +396,7 @@ function goTo(i){hi=i;applyCore(JSON.parse(hist[hi]));hist[hi]=coreStr();navDirt
 function undo(){cap();if(hi>0){const was=histL[hi];goTo(hi-1);pmsg('Undid: '+was)}ub()}
 function redo(){if(hi<hist.length-1){goTo(hi+1);pmsg('Redid: '+histL[hi])}ub()}
 $('undo').onclick=undo;$('redo').onclick=redo;ub();
-WBX.wbHistGet=i=>hist[i];WBX.wbHistIdx=()=>hi;WBX.wbHistLabel=i=>histL[i]||'Change';WBX.wbResetHist=()=>{if(WBX.wbBA)wbBA.reset();hist=[coreStr()];histL=['Start'];histT=[Date.now()];histTh=[''];hi=0;thWant=null;ub();if(WBX.wbSnapLoad)WBX.wbSnapLoad()};WBX.wbCap=cap;WBX.wbApply=applyCore;
+WBX.wbHistLabels=()=>histL.slice();WBX.wbHistGet=i=>hist[i];WBX.wbHistIdx=()=>hi;WBX.wbHistLabel=i=>histL[i]||'Change';WBX.wbResetHist=()=>{if(WBX.wbBA)wbBA.reset();hist=[coreStr()];histL=['Start'];histT=[Date.now()];histTh=[''];histU=[''];hi=0;thWant=null;ub();if(WBX.wbSnapLoad)WBX.wbSnapLoad()};WBX.wbCap=cap;WBX.wbApply=applyCore;
 // ---- History panel + named snapshots
 (()=>{const sec=document.querySelector('section.pn[data-p="hist"]'),hl=$('hhl'),sl=$('hsl'),XI=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.close}</svg>`;
 let snaps=[],sk='',raf=0,ren=-1;

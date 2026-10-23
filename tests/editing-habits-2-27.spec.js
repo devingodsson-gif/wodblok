@@ -44,8 +44,8 @@ test('the Text panel field empties when the selection leaves a text, and a new t
 
 test('Esc during a drag puts the element back: no move, no history step; same for a handle drag', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, pattern: false });
-  await H.addShape(page); await H.settle(page);
-  const e0 = (await els(page, 'shape'))[0], h0 = await page.evaluate(() => window.__wbTest.histL ? window.__wbTest.histL() : null);
+  await H.addShape(page); await H.settle(page); await page.waitForTimeout(700);
+  const e0 = (await els(page, 'shape'))[0], h0 = await page.evaluate(() => window.__wbTest.histLabels().length);
   const c = await H.canvasToClient(page, e0.x, e0.y);
   await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.move(c.x + 60, c.y + 40, { steps: 6 });
   await page.keyboard.press('Escape'); await page.mouse.up(); await H.settle(page);
@@ -57,7 +57,7 @@ test('Esc during a drag puts the element back: no move, no history step; same fo
   await page.keyboard.press('Escape'); await page.mouse.up(); await H.settle(page);
   const e2 = (await els(page, 'shape'))[0];
   expect([e2.s, e2.wx, e2.wy, e2.x, e2.y], 'size unchanged').toEqual([e0.s, e0.wx, e0.wy, e0.x, e0.y]);
-  expect(await page.evaluate(() => window.__wbTest.histL ? window.__wbTest.histL() : null), 'no history step').toEqual(h0);
+  const hl = await page.evaluate(() => window.__wbTest.histLabels()); expect(hl.length, 'no history step: ' + hl.join(', ')).toBe(h0);
   expect(errors).toEqual([]);
 });
 
@@ -90,5 +90,25 @@ test('dragging a box on empty canvas selects what it touches, and a click on emp
   await page.mouse.move(b.x + b.width * 0.01, b.y + b.height * 0.01); await page.mouse.down();
   await page.mouse.move(b.x + b.width * 0.2, b.y + b.height * 0.2, { steps: 4 }); await page.mouse.up(); await H.settle(page);
   expect(await page.locator('#fpov .sel').count(), 'a box over nothing selects nothing').toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test('history steps are named by what was done, and typing in a text is one step', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.addShape(page); await page.keyboard.press('Escape'); await H.settle(page); await page.waitForTimeout(700);
+  const e0 = (await els(page, 'shape'))[0], c = await H.canvasToClient(page, e0.x, e0.y);
+  await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.move(c.x + 50, c.y + 30, { steps: 5 }); await page.mouse.up(); await H.settle(page); await page.waitForTimeout(700);
+  const L = async () => page.evaluate(() => window.__wbTest.histLabels());
+  expect((await L()).slice(-1)[0], 'a move is named').toBe('Moved shape');
+  await page.keyboard.press('Escape');
+  await page.click('#elb [data-k="text"]'); await H.settle(page);
+  const b0 = await page.locator('#art').boundingBox();
+  await page.mouse.move(b0.x + b0.width * 0.2, b0.y + b0.height * 0.2);
+  await page.waitForFunction(() => document.querySelector('#fpov .gh'), null, { timeout: 5000 });
+  await page.mouse.click(b0.x + b0.width * 0.2, b0.y + b0.height * 0.2); await H.settle(page); await page.waitForTimeout(700);
+  const n0 = (await L()).length;
+  for (const w of ['Hel', 'lo ', 'wor', 'ld']) { await page.keyboard.type(w); await H.settle(page); await page.waitForTimeout(700); }
+  const after = (await L()).slice(n0);
+  expect(after.filter(x => x === 'Edited text').length, 'one step for the whole typing: ' + after.join(', ')).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
