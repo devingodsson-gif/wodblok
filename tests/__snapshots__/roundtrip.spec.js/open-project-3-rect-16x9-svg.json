@@ -1,10 +1,10 @@
 {
- "length": 474255,
- "sha256": "58ee335cf0257c73d1e2fe490772fdafca9a6a843a08d802a85a7a0e0da759c2",
+ "length": 474249,
+ "sha256": "232002e3eba4446d16c48f3e6c07759b400fa7f63e2ba22f5e0ea62af44debf5",
  "tags": {
   "circle": 29,
   "clipPath": 5,
-  "defs": 6,
+  "defs": 7,
   "ellipse": 21,
   "feColorMatrix": 8,
   "feComponentTransfer": 6,
@@ -20,7 +20,7 @@
   "feMergeNode": 2,
   "feTurbulence": 1,
   "filter": 7,
-  "g": 205,
+  "g": 204,
   "image": 35,
   "mask": 92,
   "path": 132,
