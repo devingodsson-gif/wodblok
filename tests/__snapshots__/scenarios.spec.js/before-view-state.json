@@ -13,39 +13,39 @@
    },
    "items": [
     {
-     "m": "b121",
-     "x": 81.86144496818048,
-     "y": 81.86144496818048,
-     "s": 0.699,
-     "r": -45,
+     "m": "b283",
+     "x": 120,
+     "y": 80.68873348425807,
+     "s": 0.464,
+     "r": 0,
      "f": 1
     },
     {
-     "m": "b129",
+     "m": "b302",
      "x": 120,
      "y": 120,
-     "s": 0.378,
+     "s": 0.369,
      "r": 0,
      "f": 1
     }
    ],
    "sym": {
-    "m": "quad"
+    "m": "star"
    },
    "et": 1.2,
-   "er": 0.9,
-   "es": 252,
+   "er": 0.3,
+   "es": 421,
    "neg": false,
    "ink": null,
    "tu": [
     {
-     "x": "xmuzhi800e4yi",
-     "sd": 61322,
+     "x": "xmuzhi800k129",
+     "sd": 31855,
      "md": "wear"
     },
     {
-     "x": "xmuzhi800v5yy",
-     "sd": 50796,
+     "x": "xmuzhi800a3s2",
+     "sd": 49618,
      "md": "relief"
     }
    ]
@@ -63,34 +63,18 @@
    },
    "items": [
     {
-     "m": "b131",
-     "x": 60,
-     "y": 60,
-     "s": 0.55,
+     "m": "b301",
+     "x": 120,
+     "y": 120,
+     "s": 1.428,
      "r": 0,
-     "f": 1
+     "f": -1
     },
     {
-     "m": "b131",
-     "x": 180,
-     "y": 60,
-     "s": 0.55,
-     "r": 0,
-     "f": 1
-    },
-    {
-     "m": "b131",
-     "x": 180,
-     "y": 60,
-     "s": 0.55,
-     "r": 0,
-     "f": 1
-    },
-    {
-     "m": "b131",
-     "x": 60,
-     "y": 60,
-     "s": 0.55,
+     "m": "b300",
+     "x": 120,
+     "y": 0,
+     "s": 0.398,
      "r": 0,
      "f": 1
     }
@@ -98,51 +82,21 @@
    "sym": {
     "m": "off"
    },
-   "et": 0,
-   "er": 1.7,
-   "es": 956,
+   "et": 2.2,
+   "er": 4,
+   "es": 254,
    "neg": false,
    "ink": null,
-   "tu": []
-  },
-  {
-   "id": 3,
-   "sh": {
-    "k": "rect",
-    "o": "p",
-    "s": [
-     6,
-     1
-    ],
-    "z": 100
-   },
-   "items": [
-    {
-     "m": "b124",
-     "x": 40,
-     "y": 20,
-     "s": 0.517,
-     "r": 45,
-     "f": 1
-    }
-   ],
-   "sym": {
-    "m": "rx",
-    "n": 3
-   },
-   "et": 1.7,
-   "er": 1.3,
-   "es": 826,
    "tu": [
     {
-     "x": "xmuzhi8006jg8",
-     "sd": 95501,
+     "x": "xmuzhi800ic40",
+     "sd": 63309,
      "md": "wear"
     }
    ]
   },
   {
-   "id": 4,
+   "id": 3,
    "sh": {
     "k": "rect",
     "o": "p",
@@ -154,33 +108,244 @@
    },
    "items": [
     {
-     "m": "b124",
-     "x": 120,
-     "y": 70,
-     "s": 0.917,
+     "m": "b302",
+     "x": 40,
+     "y": 40,
+     "s": 0.367,
      "r": 0,
      "f": 1
     },
     {
-     "m": "b119",
+     "m": "b302",
+     "x": 40,
+     "y": 120,
+     "s": 0.367,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b302",
+     "x": 40,
+     "y": 200,
+     "s": 0.367,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b302",
+     "x": 120,
+     "y": 40,
+     "s": 0.367,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b302",
      "x": 120,
      "y": 120,
-     "s": 0.542,
+     "s": 0.367,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b302",
+     "x": 120,
+     "y": 200,
+     "s": 0.367,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b302",
+     "x": 200,
+     "y": 40,
+     "s": 0.367,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b302",
+     "x": 200,
+     "y": 120,
+     "s": 0.367,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b302",
+     "x": 200,
+     "y": 200,
+     "s": 0.367,
      "r": 0,
      "f": 1
     }
    ],
    "sym": {
-    "m": "rot",
-    "n": 4
+    "m": "off"
    },
-   "et": 1.4,
-   "er": 1.3,
-   "es": 254,
-   "tu": []
+   "et": 0,
+   "er": 4.3,
+   "es": 773,
+   "tu": [
+    {
+     "x": "xmuzhi800vct9",
+     "sd": 87905,
+     "md": "wear"
+    },
+    {
+     "x": "xmuzhi800p0jc",
+     "sd": 59068,
+     "md": "wear"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "sh": {
+    "k": "rect",
+    "o": "p",
+    "s": [
+     8,
+     1
+    ],
+    "z": 100
+   },
+   "items": [
+    {
+     "m": "b299",
+     "x": 40,
+     "y": 15,
+     "s": 0.238,
+     "r": 0,
+     "f": 1
+    }
+   ],
+   "sym": {
+    "m": "rx",
+    "n": 3
+   },
+   "et": 2.7,
+   "er": 0.7,
+   "es": 293,
+   "tu": [
+    {
+     "x": "xmuzhi8007glq",
+     "sd": 37133,
+     "md": "wear"
+    }
+   ]
   },
   {
    "id": 5,
+   "sh": {
+    "k": "rect",
+    "o": "p",
+    "s": [
+     5,
+     1
+    ],
+    "z": 100
+   },
+   "items": [
+    {
+     "m": "b288",
+     "x": 24,
+     "y": 24,
+     "s": 0.14,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b288",
+     "x": 216,
+     "y": 24,
+     "s": 0.14,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "t|medieval|1t",
+     "x": 85.69453125000001,
+     "y": 32.00438530186524,
+     "s": 0.48,
+     "r": 11,
+     "f": 1,
+     "tg": "txmuzhi800rth"
+    },
+    {
+     "m": "t|medieval|24",
+     "x": 102.80859375,
+     "y": 18.94254993617494,
+     "s": 0.48,
+     "r": -41.3,
+     "f": 1,
+     "tg": "txmuzhi800rth"
+    },
+    {
+     "m": "t|medieval|28",
+     "x": 117.30703125000002,
+     "y": 21.05255149104852,
+     "s": 0.48,
+     "r": 46.7,
+     "f": 1,
+     "tg": "txmuzhi800rth"
+    },
+    {
+     "m": "t|medieval|20",
+     "x": 136.11562500000002,
+     "y": 30.110448510516363,
+     "s": 0.48,
+     "r": -37.1,
+     "f": 1,
+     "tg": "txmuzhi800rth"
+    },
+    {
+     "m": "t|medieval|1t",
+     "x": 154.30546875,
+     "y": 16.167177198134752,
+     "s": 0.48,
+     "r": 11,
+     "f": 1,
+     "tg": "txmuzhi800rth"
+    }
+   ],
+   "sym": {
+    "m": "off"
+   },
+   "et": 0,
+   "er": 0.1,
+   "es": 850,
+   "neg": false,
+   "ink": null,
+   "tu": [],
+   "tgm": {
+    "txmuzhi800rth": {
+     "text": "ALPHA",
+     "f": "medieval",
+     "sz": 60,
+     "ls": 0,
+     "ws": 0,
+     "lh": 115,
+     "al": "c",
+     "tc": "",
+     "cv": 0,
+     "rot": 0,
+     "wd": 0,
+     "ht": 0,
+     "va": "t",
+     "auto": false,
+     "pt": "w",
+     "pa": 31,
+     "pw": 51,
+     "ax": 120,
+     "ay": 24,
+     "mx": 119.24625,
+     "my": 23.655422487547963
+    }
+   }
+  },
+  {
+   "id": 6,
    "items": [],
    "sh": {
     "k": "rect",
@@ -196,22 +361,23 @@
    },
    "et": 0,
    "er": 0,
-   "es": 739,
-   "tu": []
+   "es": 13,
+   "tu": [],
+   "nm": "Stamp 1"
   }
  ],
  "els": [
   {
-   "u": "pmuzhi800w71",
+   "u": "pmuzhi800cv2",
    "k": "pattern",
-   "n": "Layer 1",
-   "lay": "scatter",
-   "cn": 2,
-   "rn": 3,
+   "n": "Pattern 1",
+   "lay": "half",
+   "cn": 3,
+   "rn": 4,
    "sz": 100,
    "rt": 0,
    "ds": "cycle",
-   "sd": 7745,
+   "sd": 2524,
    "src": [
     {
      "k": "stamp",
@@ -231,37 +397,80 @@
    "f": 1,
    "fx": [
     {
-     "u": "pmuzhi800l3q",
-     "k": "texture",
+     "u": "pmuzhi800gcj",
+     "k": "jitter",
      "on": true,
-     "x": "xmuzhi800g9ti",
-     "sd": 77722,
-     "md": "wear"
+     "pos": 11,
+     "rot": 5,
+     "sz": 0,
+     "sd": 46523
     },
     {
-     "u": "pmuzhi8000rk",
+     "u": "pmuzhi800las",
      "k": "pressure",
      "on": true,
-     "pst": 6,
+     "pst": 1,
+     "pfl": 1
+    }
+   ]
+  },
+  {
+   "u": "pmuzhi8008tt",
+   "k": "pattern",
+   "n": "Pattern 2",
+   "lay": "grid",
+   "cn": 6,
+   "rn": 9,
+   "sz": 100,
+   "rt": 0,
+   "ds": "cycle",
+   "sd": 7899,
+   "src": [
+    {
+     "k": "stamp",
+     "t": 3,
+     "w": 1
+    }
+   ],
+   "x": 266.5,
+   "y": 400,
+   "s": 533,
+   "r": 0,
+   "f": 1,
+   "ox": 22,
+   "oy": 89,
+   "g": "gla7bvqyj",
+   "fx": [
+    {
+     "u": "pmuzhi800apa",
+     "k": "pressure",
+     "on": true,
+     "pst": 3,
      "pfl": 0
     }
    ]
   },
   {
-   "u": "pmuzhi8008r4",
+   "u": "gla7bvqyj",
+   "k": "group",
+   "n": "Group 1",
+   "ink": "@k2"
+  },
+  {
+   "u": "pmuzhi800yj0",
    "k": "pattern",
    "n": "Frame",
    "lay": "frame",
-   "cn": 3,
-   "rn": 5,
+   "cn": 4,
+   "rn": 6,
    "sz": 100,
    "rt": 0,
    "ds": "cycle",
-   "sd": 6652,
+   "sd": 5079,
    "src": [
     {
      "k": "stamp",
-     "t": 3,
+     "t": 4,
      "w": 1
     }
    ],
@@ -272,60 +481,42 @@
    "f": 1,
    "fx": [
     {
-     "u": "pmuzhi800052",
-     "k": "jitter",
+     "u": "pmuzhi800e4y",
+     "k": "texture",
      "on": true,
-     "pos": 20,
-     "rot": 11,
-     "sz": 0,
-     "sd": 65833
+     "x": "xmuzhi8004sr7",
+     "sd": 98325,
+     "md": "wear"
     },
     {
-     "u": "pmuzhi800vfa",
+     "u": "pmuzhi800v5y",
+     "k": "grade",
+     "on": true,
+     "ex": 0,
+     "ct": 0,
+     "hi": 0,
+     "sh": 0,
+     "wh": 0,
+     "bl": 0,
+     "tp": 0,
+     "tn": 0,
+     "sat": 0,
+     "vib": 0,
+     "hue": 0,
+     "fd": 19
+    },
+    {
+     "u": "pmuzhi800mls",
      "k": "pressure",
      "on": true,
-     "pst": 2,
+     "pst": 3,
      "pfl": 0
     }
    ],
-   "in": 2
+   "in": 3
   },
   {
-   "u": "pmuzhi800768",
-   "k": "pattern",
-   "n": "Frame rule",
-   "lay": "frame",
-   "cn": 5,
-   "rn": 8,
-   "sz": 40,
-   "rt": 0,
-   "ds": "cycle",
-   "sd": 1064,
-   "src": [
-    {
-     "k": "stamp",
-     "t": 3,
-     "w": 1
-    }
-   ],
-   "x": 266.5,
-   "y": 400,
-   "s": 533,
-   "r": 0,
-   "f": 1,
-   "fx": [
-    {
-     "u": "pmuzhi800l9i",
-     "k": "pressure",
-     "on": true,
-     "pst": 1,
-     "pfl": 0
-    }
-   ],
-   "in": 6
-  },
-  {
-   "u": "pmuzhi800ns3",
+   "u": "pmuzhi800gr5",
    "k": "pattern",
    "n": "Pattern 1",
    "lay": "grid",
@@ -334,11 +525,11 @@
    "sz": 80,
    "rt": 0,
    "ds": "cycle",
-   "sd": 139,
+   "sd": 3004,
    "src": [
     {
      "k": "stamp",
-     "t": 5,
+     "t": 6,
      "w": 1
     }
    ],
@@ -347,6 +538,33 @@
    "s": 533,
    "r": 0,
    "f": 1
+  },
+  {
+   "u": "pmuzhi800hyo1",
+   "k": "stamp",
+   "t": 5,
+   "x": 266.5,
+   "y": 373.1,
+   "s": 319.8,
+   "r": 0,
+   "f": 1,
+   "fx": [
+    {
+     "u": "pmuzhi8007q9",
+     "k": "pressure",
+     "on": true,
+     "pst": 1,
+     "pfl": 0
+    },
+    {
+     "u": "pmuzhi800iee",
+     "k": "texture",
+     "on": true,
+     "x": "xmuzhi800sdd3",
+     "sd": 51967,
+     "md": "relief"
+    }
+   ]
   }
  ],
  "proj": {
@@ -354,25 +572,19 @@
   "ink": "@k2",
   "ts": [
    "k1",
-   "k2",
-   "k3",
-   "k4"
+   "k2"
   ],
   "cw": [
    {
     "id": "w1",
     "n": "Colourway 1",
     "c": {
-     "k1": "#f27291",
-     "k2": "#1e0e3f",
-     "k3": "#b73f74",
-     "k4": "#837e31"
+     "k1": "#f8b6ba",
+     "k2": "#a36aa5"
     },
     "m": {
-     "k1": "Spinel Red",
-     "k2": "Dull Violet Black",
-     "k3": "Rosolanc Purple",
-     "k4": "Olive"
+     "k1": "Corinthian Pink",
+     "k2": "Aconite Violet"
     }
    }
   ],
@@ -391,8 +603,8 @@
   "o": "p"
  },
  "pr": {
-  "e": 0,
-  "q": 0,
+  "e": 1,
+  "q": 4,
   "t": "",
   "a": 0,
   "sc": 100,
@@ -401,13 +613,8 @@
  "tex": {
   "u": [
    {
-    "x": "xmuzhi800cv28",
-    "sd": 43496,
-    "md": "relief"
-   },
-   {
-    "x": "xmuzhi8002fff",
-    "sd": 68965,
+    "x": "xmuzhi8006jg8",
+    "sd": 95501,
     "md": "relief"
    }
   ],
@@ -416,116 +623,143 @@
  },
  "texLib": [
   {
-   "id": "xmuzhi800g9ti",
-   "name": "Newsprint",
-   "t": "news",
-   "a": 19,
-   "sc": 85,
-   "az": 315,
-   "sd": 4217,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800cv28",
-   "name": "Bark",
-   "t": "bark",
-   "a": 58,
-   "sc": 102,
-   "az": 250,
-   "sd": 25236,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi8002fff",
-   "name": "Concrete",
-   "t": "concrete",
-   "a": 53,
-   "sc": 87,
-   "az": 135,
-   "sd": 36658,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800e4yi",
-   "name": "Felt",
-   "t": "felt",
-   "a": 23,
-   "sc": 83,
-   "az": 315,
-   "sd": 3079,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800v5yy",
-   "name": "Riso Grain",
-   "t": "riso",
-   "a": 61,
-   "sc": 85,
-   "az": 225,
-   "sd": 95912,
+   "id": "xmuzhi8004sr7",
+   "name": "Foxing",
+   "t": "foxing",
+   "a": 21,
+   "sc": 117,
+   "az": 200,
+   "sd": 20868,
    "auto": true
   },
   {
    "id": "xmuzhi8006jg8",
    "name": "Washi",
    "t": "washi",
-   "a": 38,
+   "a": 59,
    "sc": 169,
    "az": 250,
    "sd": 23168,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800k129",
+   "name": "Worn Block",
+   "t": "worn",
+   "a": 18,
+   "sc": 144,
+   "az": 200,
+   "sd": 44262,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800a3s2",
+   "name": "Pinholes",
+   "t": "pinholes",
+   "a": 48,
+   "sc": 100,
+   "az": 225,
+   "sd": 81470,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800ic40",
+   "name": "Concrete",
+   "t": "concrete",
+   "a": 21,
+   "sc": 72,
+   "az": 250,
+   "sd": 53251,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800vct9",
+   "name": "Foxing 2",
+   "t": "foxing",
+   "a": 22,
+   "sc": 76,
+   "az": 200,
+   "sd": 93389,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800p0jc",
+   "name": "Cotton Rag",
+   "t": "cotton",
+   "a": 50,
+   "sc": 96,
+   "az": 315,
+   "sd": 5902,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi8007glq",
+   "name": "Cold Press",
+   "t": "cold",
+   "a": 47,
+   "sc": 123,
+   "az": 135,
+   "sd": 59707,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800sdd3",
+   "name": "Denim Twill",
+   "t": "denim",
+   "a": 38,
+   "sc": 167,
+   "az": 250,
+   "sd": 78082,
    "auto": true
   }
  ],
  "pg": {
   "show": false,
-  "n": 8,
-  "m": "l",
+  "n": 5,
+  "m": "c",
   "op": 70,
   "sh": "rect"
  },
  "grade": {
-  "ex": -18,
+  "ex": 0,
   "ct": 0,
-  "hi": 9,
-  "sh": 12,
-  "wh": -9,
+  "hi": 0,
+  "sh": 26,
+  "wh": 0,
   "bl": 0,
-  "tp": 0,
-  "tn": -8,
-  "sat": -15,
-  "vib": 35,
+  "tp": 34,
+  "tn": -14,
+  "sat": 0,
+  "vib": 20,
   "hue": 0,
-  "fd": 14,
+  "fd": 0,
   "cov": false,
   "masks": [
    {
     "sc": "",
-    "id": "mvct9ym",
-    "t": "lin",
-    "name": "Edge fade",
+    "id": "mf5sspk",
+    "t": "lum",
+    "name": "Shadow tone",
     "on": true,
     "inv": false,
     "amt": 100,
     "a": {
-     "ex": 10,
+     "ex": 0,
      "ct": 0,
      "hi": 0,
      "sh": 0,
      "wh": 0,
      "bl": 0,
-     "tp": 0,
-     "tn": 0,
+     "tp": -35,
+     "tn": -9,
      "sat": 0,
      "vib": 0,
      "hue": 0,
-     "fd": 15
+     "fd": 0
     },
-    "sp": "c",
-    "st": "",
-    "x1": 1,
-    "y1": 0,
-    "x2": 0.713,
-    "y2": 0.287
+    "lo": 0,
+    "hi": 29,
+    "sm": 22
    }
   ]
  }

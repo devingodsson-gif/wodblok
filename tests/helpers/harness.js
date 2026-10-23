@@ -119,7 +119,7 @@ async function settle(page, { quiet = 4, step = 120, max = 15000 } = {}) {
       const missing = [...document.querySelectorAll('#art use')].some(u => { const h = u.getAttribute('href'); return h && h[0] === '#' && !document.getElementById(h.slice(1)); });
       // a content hash, not just lengths: a redraw that rebuilds the same amount of markup in a different shape still counts as change
       const h = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0).toString(36); };
-      return h(window.__wbTest.state()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + busy + missing + '|' + (document.querySelector('.fzov') ? 'hold' : '');   // 2.30.0: the Randomize cover (it fades out when the roll is drawn) is not quiet, so a click is not met by it
+      return h(window.__wbTest.state()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + busy + missing + '|' + (document.getElementById('fzst') && document.getElementById('fzst').classList.contains('on') ? 'hold' : '');   // 2.30.0: the Randomize cover (it fades out when the roll is drawn) is not quiet, so a click is not met by it
     });
     if (sig === last && !sig.endsWith('|hold')) { if (++same >= quiet) return; } else { same = 0; last = sig; }
     await page.waitForTimeout(step);
