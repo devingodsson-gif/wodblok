@@ -13,12 +13,15 @@ function fpLive(q){const a=document.querySelector(`#art [data-fp="${q.u}"]`);if(
  const m=document.querySelector(`#art [data-mv="${q.u}"]`);if(m){if(m.dataset.t0==null)m.dataset.t0=m.getAttribute('transform')||'';m.setAttribute('transform',`translate(${(q.x-(+m.dataset.mx||0)).toFixed(2)} ${(q.y-(+m.dataset.my||0)).toFixed(2)}) ${m.dataset.t0}`);return true}
  return false}
 let fpRaf=0;function fpRedraw(){if(fpRaf)return;fpRaf=requestAnimationFrame(()=>{fpRaf=0;if(WBS.fpDrag)upd()})}
+// Esc during a drag puts everything back as it was: no store, no history step (2.27.0)
+const fpCancel=()=>{const d=WBS.fpDrag,x=WBS.fpXf;if(d){if(d.g)d.g.forEach(([q,qx,qy])=>{q.x=qx;q.y=qy});else{d.p.x=d.s0[0];d.p.y=d.s0[1]}WBS.fpDrag=null}
+if(x){const o=JSON.parse(x.orig);Object.keys(x.p).forEach(k=>{if(!(k in o))delete x.p[k]});Object.assign(x.p,o);WBS.fpXf=null;if(x.p.tx&&typeof tbRelay=='function')tbRelay(x.p)}upd()};
 const fpEnd=()=>{if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved;WBS.fpDrag=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};
 function init28(){
  try{let raf=0;new ResizeObserver(()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(WBH.fpOverlay)WBH.fpOverlay()})}).observe($("art"))}catch(e){}   // the box keeps its pixel size when the view is zoomed (2.15.0)
 // --- canvas: place, select, drag
 $('art').addEventListener('pointerdown',e=>{const L=fpL();if(!L||e.button!==0||$('boardP').classList.contains('off'))return;const[x,y]=fpPt(e);if(!inShape(x,y)&&!(e.target.closest&&e.target.closest('[data-fh]'))&&(WBS.plArm||WBS.txArm||WBS.fpB||!fpHit(L,x,y)))return;   // outside a round or shaped canvas a click still reaches an element (2.24.0)
-const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,x0:hp.x,y0:hp.y,wx0:hp.wx||1,wy0:hp.wy||1,wh0:fpWH(hp)||[1,1],moved:false};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
+const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,x0:hp.x,y0:hp.y,wx0:hp.wx||1,wy0:hp.wy||1,wh0:fpWH(hp)||[1,1],moved:false,orig:JSON.stringify(hp)};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
 if(WBS.plArm&&WBX.wbPlMake){e.preventDefault();const[sx,sy]=fpSnap(L,x,y,e);WBX.wbPlMake(WBS.plArm,+sx.toFixed(1),+sy.toFixed(1));return}
 if(WBS.txArm&&tbG){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),n=Math.max(tbG.bw,tbG.bh,.01);const nq={u:fpU(),k:'text',tx:{...tbRead()},G:tbG.G,Lt:tbG.Lt,bw:tbG.bw,bh:tbG.bh,n,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+n.toFixed(2),r:0,f:1,...(tbSty.tu.length?{tu:tbSty.tu.map(u=>({x:u.x,sd:txRid()}))}:{}),...(tbSty.ink?{ink:tbSty.ink}:{})};L.pl.push(nq);store();upd();if(WBX.wbCap)WBX.wbCap();if(WBX.wbTxInNew)WBX.wbTxInNew(nq);return}
 if(WBS.fpB&&(WBS.tiles.some(t=>t.id==WBS.fpB))){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),q={u:fpU(),k:'stamp',t:WBS.fpB,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+fpSnapS(L,fpSz(),e).toFixed(2),r:fpRot,f:fpFlip};L.pl.push(q);if(fpPoolOk()){const a=[...WBS.fpPool],nx=a[Math.floor(Math.random()*a.length)];WBS.fpB=+nx}store();upd();if(WBX.wbCap)WBX.wbCap();return}
@@ -47,6 +50,7 @@ else{let r=Math.atan2(y-p.y,x-p.x)*180/Math.PI+90;r=((r+180)%360+360)%360-180;if
 WBS.fpXf.moved=true;upd()});$('art').addEventListener('pointerup',xfEnd);$('art').addEventListener('pointercancel',xfEnd);
 $('art').addEventListener('pointerleave',()=>{if(WBS.fpGhost){WBS.fpGhost=null;WBH.fpOverlay()}});$('art').addEventListener('pointerup',fpEnd);$('art').addEventListener('pointercancel',fpEnd);
 document.addEventListener('keydown',e=>{const L=fpL();if(!L||$('boardP').classList.contains('off')||(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]')))return;
+if(e.key=='Escape'&&(WBS.fpDrag||WBS.fpXf)){e.preventDefault();fpCancel();return}
 if(e.key=='Escape'&&(WBS.fpB||WBS.txArm||WBS.plArm||WBS.fpSel!==-1)){WBS.plArm=null;WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}
 if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&(L.pl||[]).length){e.preventDefault();WBS.fpMS=new Set(L.pl.map(q=>String(q.u)));WBS.fpSel=L.pl[L.pl.length-1].u;WBS.fpB=null;WBS.fpGhost=null;upd();return}
 const gr=fpGrp(),p=gr[0];if(!p)return;

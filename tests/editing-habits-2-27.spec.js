@@ -41,3 +41,34 @@ test('the Text panel field empties when the selection leaves a text, and a new t
   expect(await page.inputValue('#tx_t'), 'a new text starts fresh').toBe('Text');
   expect(errors).toEqual([]);
 });
+
+test('Esc during a drag puts the element back: no move, no history step; same for a handle drag', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.addShape(page); await H.settle(page);
+  const e0 = (await els(page, 'shape'))[0], h0 = await page.evaluate(() => window.__wbTest.histL ? window.__wbTest.histL() : null);
+  const c = await H.canvasToClient(page, e0.x, e0.y);
+  await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.move(c.x + 60, c.y + 40, { steps: 6 });
+  await page.keyboard.press('Escape'); await page.mouse.up(); await H.settle(page);
+  const e1 = (await els(page, 'shape'))[0];
+  expect([e1.x, e1.y], 'back where it was').toEqual([e0.x, e0.y]);
+  const hd = page.locator('#fpov [data-fh="se"]'); await expect(hd).toHaveCount(1);
+  const hb = await hd.boundingBox();
+  await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2); await page.mouse.down(); await page.mouse.move(hb.x + 80, hb.y + 80, { steps: 6 });
+  await page.keyboard.press('Escape'); await page.mouse.up(); await H.settle(page);
+  const e2 = (await els(page, 'shape'))[0];
+  expect([e2.s, e2.wx, e2.wy, e2.x, e2.y], 'size unchanged').toEqual([e0.s, e0.wx, e0.wy, e0.x, e0.y]);
+  expect(await page.evaluate(() => window.__wbTest.histL ? window.__wbTest.histL() : null), 'no history step').toEqual(h0);
+  expect(errors).toEqual([]);
+});
+
+test('a squeezed shape drops its side handles so the handles never pile up', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.addShape(page); await H.settle(page);
+  expect(await page.locator('#fpov [data-fh]').count(), 'normal shape: 8 handles + rotate').toBe(9);
+  const hd = page.locator('#fpov [data-fh="e"]'); const hb = await hd.boundingBox();
+  await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2); await page.mouse.down();
+  await page.mouse.move(hb.x - 5000, hb.y, { steps: 12 }); await page.mouse.up(); await H.settle(page);
+  expect(await page.locator('#fpov [data-fh="n"]').count(), 'squeezed: no top/bottom middle handle').toBe(0);
+  expect(await page.locator('#fpov [data-fh="se"]').count(), 'corners stay').toBe(1);
+  expect(errors).toEqual([]);
+});
