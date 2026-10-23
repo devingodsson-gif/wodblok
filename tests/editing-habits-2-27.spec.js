@@ -72,3 +72,23 @@ test('a squeezed shape drops its side handles so the handles never pile up', asy
   expect(await page.locator('#fpov [data-fh="se"]').count(), 'corners stay').toBe(1);
   expect(errors).toEqual([]);
 });
+
+test('dragging a box on empty canvas selects what it touches, and a click on empty canvas clears it', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.addShape(page); await page.keyboard.press('Escape');
+  await H.addShape(page); await page.keyboard.press('Escape'); await H.settle(page);
+  const b = await page.locator('#art').boundingBox();
+  await page.mouse.move(b.x + b.width * 0.01, b.y + b.height * 0.01); await page.mouse.down();
+  await page.mouse.move(b.x + b.width * 0.99, b.y + b.height * 0.99, { steps: 8 });
+  await expect(page.locator('#fpov .fpmq')).toHaveCount(1);
+  await page.mouse.up(); await H.settle(page);
+  await expect(page.locator('#fpov .fpmq')).toHaveCount(0);
+  const n = await page.evaluate(() => window.__wbTest.fpSelCount ? window.__wbTest.fpSelCount() : document.querySelectorAll('#fpov .sel').length);
+  expect(n, 'both shapes are selected').toBeGreaterThanOrEqual(2);
+  await page.mouse.click(b.x + b.width * 0.01, b.y + b.height * 0.99); await H.settle(page);
+  expect(await page.locator('#fpov .sel').count(), 'a click on empty canvas clears it').toBe(0);
+  await page.mouse.move(b.x + b.width * 0.01, b.y + b.height * 0.01); await page.mouse.down();
+  await page.mouse.move(b.x + b.width * 0.2, b.y + b.height * 0.2, { steps: 4 }); await page.mouse.up(); await H.settle(page);
+  expect(await page.locator('#fpov .sel').count(), 'a box over nothing selects nothing').toBe(0);
+  expect(errors).toEqual([]);
+});

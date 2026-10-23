@@ -16,6 +16,11 @@ let fpRaf=0;function fpRedraw(){if(fpRaf)return;fpRaf=requestAnimationFrame(()=>
 // Esc during a drag puts everything back as it was: no store, no history step (2.27.0)
 const fpCancel=()=>{const d=WBS.fpDrag,x=WBS.fpXf;if(d){if(d.g)d.g.forEach(([q,qx,qy])=>{q.x=qx;q.y=qy});else{d.p.x=d.s0[0];d.p.y=d.s0[1]}WBS.fpDrag=null}
 if(x){const o=JSON.parse(x.orig);Object.keys(x.p).forEach(k=>{if(!(k in o))delete x.p[k]});Object.assign(x.p,o);WBS.fpXf=null;if(x.p.tx&&typeof tbRelay=='function')tbRelay(x.p)}upd()};
+// Rubber band: every element the box touches is selected; Shift/Ctrl/Cmd adds to the selection (2.27.0)
+function fpMqPick(L){const m=WBS.fpMq,a=Math.min(m.x0,m.x1),b=Math.max(m.x0,m.x1),c=Math.min(m.y0,m.y1),d=Math.max(m.y0,m.y1),pl=L.pl||[],hit=new Set(m.base);
+pl.forEach(p=>{const wh=fpWH(p);if(!wh||fpHid(pl,p))return;const r=-(+p.r||0)*Math.PI/180*-1,co=Math.cos(r),si=Math.sin(r),hw=wh[0]/2,hh=wh[1]/2,ex=Math.abs(hw*co)+Math.abs(hh*si),ey=Math.abs(hw*si)+Math.abs(hh*co);if(p.x+ex>=a&&p.x-ex<=b&&p.y+ey>=c&&p.y-ey<=d)hit.add(String(p.u))});
+const arr=[...hit];WBS.fpMS=new Set(arr);WBS.fpSel=arr.length?arr[arr.length-1]:-1;WBS.fpAnc=WBS.fpSel===-1?null:String(WBS.fpSel);upd()}
+const fpMqEnd=()=>{if(!WBS.fpMq)return;const on=WBS.fpMq.on;WBS.fpMq=null;if(on)upd();else WBH.fpOverlay()};
 const fpEnd=()=>{if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved;WBS.fpDrag=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};
 function init28(){
  try{let raf=0;new ResizeObserver(()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(WBH.fpOverlay)WBH.fpOverlay()})}).observe($("art"))}catch(e){}   // the box keeps its pixel size when the view is zoomed (2.15.0)
@@ -25,12 +30,13 @@ const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const 
 if(WBS.plArm&&WBX.wbPlMake){e.preventDefault();const[sx,sy]=fpSnap(L,x,y,e);WBX.wbPlMake(WBS.plArm,+sx.toFixed(1),+sy.toFixed(1));return}
 if(WBS.txArm&&tbG){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),n=Math.max(tbG.bw,tbG.bh,.01);const nq={u:fpU(),k:'text',tx:{...tbRead()},G:tbG.G,Lt:tbG.Lt,bw:tbG.bw,bh:tbG.bh,n,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+n.toFixed(2),r:0,f:1,...(tbSty.tu.length?{tu:tbSty.tu.map(u=>({x:u.x,sd:txRid()}))}:{}),...(tbSty.ink?{ink:tbSty.ink}:{})};L.pl.push(nq);store();upd();if(WBX.wbCap)WBX.wbCap();if(WBX.wbTxInNew)WBX.wbTxInNew(nq);return}
 if(WBS.fpB&&(WBS.tiles.some(t=>t.id==WBS.fpB))){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),q={u:fpU(),k:'stamp',t:WBS.fpB,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+fpSnapS(L,fpSz(),e).toFixed(2),r:fpRot,f:fpFlip};L.pl.push(q);if(fpPoolOk()){const a=[...WBS.fpPool],nx=a[Math.floor(Math.random()*a.length)];WBS.fpB=+nx}store();upd();if(WBX.wbCap)WBX.wbCap();return}
-const p=fpHit(L,x,y);if(!p){if(WBS.fpSel!==-1||WBS.fpMS.size){WBS.fpSel=-1;WBS.fpMS=new Set();upd()}return}
+const p=fpHit(L,x,y);if(!p){const add=e.shiftKey||e.ctrlKey||e.metaKey,base=add?new Set(fpGrp().map(q=>String(q.u))):new Set();if(!add&&(WBS.fpSel!==-1||WBS.fpMS.size)){WBS.fpSel=-1;WBS.fpMS=new Set();upd()}
+if((L.pl||[]).length){WBS.fpMq={x0:x,y0:y,x1:x,y1:y,on:false,add,base,id:e.pointerId};try{$('art').setPointerCapture(e.pointerId)}catch(er){}}return}
 if(e.shiftKey||e.ctrlKey||e.metaKey){e.preventDefault();fpTog(p.u);return}
 e.preventDefault();const g0=fpGrp(),inG=g0.length>1&&g0.includes(p);if(!inG)WBS.fpMS=new Set();WBS.fpSel=p.u;WBS.fpAnc=String(p.u);const g=inG?g0.map(q=>[q,q.x,q.y]):null;WBS.fpDrag={p,g,s0:[p.x,p.y],dx:x-p.x,dy:y-p.y,moved:false,id:e.pointerId};try{$('art').setPointerCapture(e.pointerId)}catch(er){}upd()});
 // a drag keeps the element's centre on the sheet (2.24.0), so it can always be clicked and dragged back
 const fpOn=(v,m)=>Math.min(m,Math.max(0,v));
-$('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBS.fpDrag){const[x0,y0]=fpPt(e),p=WBS.fpDrag.p,[nx,ny]=fpSnap(L,fpOn(x0-WBS.fpDrag.dx,CW),fpOn(y0-WBS.fpDrag.dy,CH),e);WBS.fpDrag.moved=true;if(WBS.fpDrag.g){const ddx=+nx.toFixed(1)-WBS.fpDrag.s0[0],ddy=+ny.toFixed(1)-WBS.fpDrag.s0[1];let oh='',live=true;WBS.fpDrag.g.forEach(([q,qx,qy])=>{q.x=+(qx+ddx).toFixed(1);q.y=+(qy+ddy).toFixed(1);if(!fpLive(q))live=false;oh+=fpBox(q,'sel')});$('fpov').innerHTML=oh;if(!live)fpRedraw();return}
+$('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBS.fpMq){const m=WBS.fpMq,[x,y]=fpPt(e);m.x1=x;m.y1=y;if(!m.on&&Math.hypot(x-m.x0,y-m.y0)<Math.min(CW,CH)*.008)return;m.on=true;fpMqPick(L);return}if(WBS.fpDrag){const[x0,y0]=fpPt(e),p=WBS.fpDrag.p,[nx,ny]=fpSnap(L,fpOn(x0-WBS.fpDrag.dx,CW),fpOn(y0-WBS.fpDrag.dy,CH),e);WBS.fpDrag.moved=true;if(WBS.fpDrag.g){const ddx=+nx.toFixed(1)-WBS.fpDrag.s0[0],ddy=+ny.toFixed(1)-WBS.fpDrag.s0[1];let oh='',live=true;WBS.fpDrag.g.forEach(([q,qx,qy])=>{q.x=+(qx+ddx).toFixed(1);q.y=+(qy+ddy).toFixed(1);if(!fpLive(q))live=false;oh+=fpBox(q,'sel')});$('fpov').innerHTML=oh;if(!live)fpRedraw();return}
 p.x=+nx.toFixed(1);p.y=+ny.toFixed(1);
 if(!fpLive(p))fpRedraw();$('fpov').innerHTML=fpBox(p,'sel')+fpHandles(p);return}
 if(WBS.fpB||WBS.txArm||WBS.plArm){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpPt(e),e);WBH.fpOverlay()}});
@@ -48,8 +54,9 @@ $('art').addEventListener('pointermove',e=>{if(!WBS.fpXf)return;const[x,y]=fpPt(
 if(WBS.fpXf.k!='rot')fpResize(WBS.fpXf,x,y,e);
 else{let r=Math.atan2(y-p.y,x-p.x)*180/Math.PI+90;r=((r+180)%360+360)%360-180;if(e.shiftKey)r=Math.round(r/15)*15;p.r=Math.round(r)}
 WBS.fpXf.moved=true;upd()});$('art').addEventListener('pointerup',xfEnd);$('art').addEventListener('pointercancel',xfEnd);
-$('art').addEventListener('pointerleave',()=>{if(WBS.fpGhost){WBS.fpGhost=null;WBH.fpOverlay()}});$('art').addEventListener('pointerup',fpEnd);$('art').addEventListener('pointercancel',fpEnd);
+$('art').addEventListener('pointerleave',()=>{if(WBS.fpGhost){WBS.fpGhost=null;WBH.fpOverlay()}});$('art').addEventListener('pointerup',fpEnd);$('art').addEventListener('pointercancel',fpEnd);$('art').addEventListener('pointerup',fpMqEnd);$('art').addEventListener('pointercancel',fpMqEnd);
 document.addEventListener('keydown',e=>{const L=fpL();if(!L||$('boardP').classList.contains('off')||(e.target.matches&&e.target.matches('input,textarea,select,[contenteditable]')))return;
+if(e.key=='Escape'&&WBS.fpMq){e.preventDefault();WBS.fpMq=null;WBS.fpSel=-1;WBS.fpMS=new Set();upd();return}
 if(e.key=='Escape'&&(WBS.fpDrag||WBS.fpXf)){e.preventDefault();fpCancel();return}
 if(e.key=='Escape'&&(WBS.fpB||WBS.txArm||WBS.plArm||WBS.fpSel!==-1)){WBS.plArm=null;WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}
 if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&(L.pl||[]).length){e.preventDefault();WBS.fpMS=new Set(L.pl.map(q=>String(q.u)));WBS.fpSel=L.pl[L.pl.length-1].u;WBS.fpB=null;WBS.fpGhost=null;upd();return}
