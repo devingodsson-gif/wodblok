@@ -5,7 +5,7 @@ const { openApp, openPanel, showPanel, settle, getState } = require('./helpers/h
 const state = async page => JSON.parse(await getState(page));
 
 test('a new project starts with a Background shape: canvas-sized, first tray colour (linked), named, first in the list; the canvas has no Background setting', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4, pattern: false });
+  const { errors } = await openApp(page, { seed: 4, pattern: false, background: true });
   const s = await state(page), bg = s.els.filter(q => q.nm === 'Background');
   expect(bg).toHaveLength(1);
   expect(s.els[0].nm, 'at the bottom of the list').toBe('Background');
@@ -21,7 +21,7 @@ test('a new project starts with a Background shape: canvas-sized, first tray col
 });
 
 test('a click on the canvas goes through the Background; the list picks it; deleting it leaves a transparent canvas', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4, pattern: false });
+  const { errors } = await openApp(page, { seed: 4, pattern: false, background: true });
   const b = await page.locator('#art').boundingBox();
   await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await settle(page);
   expect(await page.locator('#fpov .sel').count(), 'nothing is picked by clicking the canvas').toBe(0);

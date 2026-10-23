@@ -71,7 +71,7 @@ function initScript({ seed, runtime, workspaces, templates }) {
 }
 
 // Open the app with controlled randomness, time and network. Returns { errors } (page errors and console errors).
-async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, workspaces = false, templates = false, before = null, pattern = true } = {}) {
+async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, workspaces = false, templates = false, before = null, pattern = true, background = false } = {}) {
   const errors = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
@@ -83,6 +83,11 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, wo
   await page.goto(url);
   await page.waitForFunction(() => !!window.__wbTest && document.fonts.status === 'loaded');
   await settle(page);
+  // 2.27.0: a new project starts with a Background shape. Most specs are about something else and count elements, so they start without it unless they pass `background: true`.
+  if (!background) {
+    await page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()); s.els = s.els.filter(q => !q.bgd); window.__wbTest.apply(JSON.stringify(s)); window.__wbTest.resetHistory(); });
+    await settle(page);
+  }
   if (pattern) await addPattern(page);
   return { errors };
 }
