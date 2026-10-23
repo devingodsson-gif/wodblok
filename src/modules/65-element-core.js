@@ -1,6 +1,6 @@
 import {ICN} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,col,okC,tileOn} from './04-canvas-and-stamp-outlines.js';
+import {CH,col,CW,okC,stNmId,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {freeLayer} from './24-free-place-layers.js';
 import {txtLayer} from './26-text-boxes.js';
 
@@ -79,7 +79,7 @@ elRegister('paint',{hide:true,label:'Paint',pn:'elpaint',icon:ICN.brush});
 elRegister('motif',{label:'Motif',pn:'motifs',icon:ICN.motif});
 elRegister('shape',{label:'Shape',pn:'mlist',icon:ICN.shape});
 elRegister('text',{label:'Text',pn:'text',icon:ICN.text,dz:3,is:q=>q.tx!=null,name:q=>String((q.tx&&q.tx.text)||'').replace(/\n/g,' ').slice(0,28),draw:(L,li)=>txtLayer(L,li)});
-elRegister('stamp',{label:'Stamp',pn:'stmp',icon:ICN.stamp,dz:1,is:q=>q.t!=null,name:q=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==q.t)+1),draw:(L,li,pa,lgB)=>freeLayer(L,li,pa,lgB)});
+elRegister('stamp',{label:'Stamp',pn:'stmp',icon:ICN.stamp,dz:1,is:q=>q.t!=null,name:q=>stNmId(q.t),draw:(L,li,pa,lgB)=>freeLayer(L,li,pa,lgB)});
 elRegister('pattern',{label:'Pattern',pn:'layers',icon:ICN.pattern});
 elBar();
 const b=$('elb');if(b)b.onclick=e=>{const x=e.target.closest('.elbb');if(!x||x.disabled)return;const d=EL_K[x.dataset.k];if(d&&d.pn&&WBX.wbOpenPanel)WBX.wbOpenPanel(d.pn)};

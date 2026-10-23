@@ -1,12 +1,12 @@
 import {ICN} from './00-icons.js';
 import {mapPts,mapShape} from './77-map-to-shape.js';
-import {CATS} from './05-motif-data.js';
 import {cust,mk} from './06-motif-library-folders.js';
 import {mNm} from './21-motif-library-ui.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,geom,shOf} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,geom,rowMenu,shOf,stNmId} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
+import {pmsg} from './18-projects-and-cover-overlay.js';
 import {fpL,fpU} from './24-free-place-layers.js';
 import {elExtend,elSel} from './65-element-core.js';
 
@@ -47,8 +47,8 @@ const patList=()=>{const L=fpL();return L?(L.pl||[]).filter(q=>q.k=='pattern'):[
 const patCur=()=>{const a=patList();return a.find(q=>q.u==WBS.patSel)||null};
 const patHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const patCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
-function patSrcName(s){if(s.k=='stamp')return'Stamp '+(WBS.tiles.findIndex(t=>t.id==s.t)+1);if(s.k=='motif')return mNm(s.m);return String((s.it.tx&&s.it.tx.text)||'Text').replace(/\n/g,' ').slice(0,24)}
-function patSync(){const host=$('pelist');if(!host)return;patAddFill();const a=patList(),p=patCur();if(WBS.patSel!=null&&!p&&a.length===0)WBS.patSel=null;
+function patSrcName(s){if(s.k=='stamp')return stNmId(s.t);if(s.k=='motif')return mNm(s.m);return String((s.it.tx&&s.it.tx.text)||'Text').replace(/\n/g,' ').slice(0,24)}
+function patSync(){const host=$('pelist');if(!host)return;const a=patList(),p=patCur();if(WBS.patSel!=null&&!p&&a.length===0)WBS.patSel=null;
 const key=JSON.stringify([a.map(q=>[q.u,q.n]),WBS.patSel,p&&[p.lay,p.cn,p.rn,p.sz,p.rt,p.ox,p.oy,p.in,p.ds,(p.src||[]).map(s=>[s.k,s.t,s.a,s.w,s.it&&s.it.tx&&s.it.tx.text])],WBS.tiles.map(t=>t.id).join()]);
 if(host.dataset.k===key)return;host.dataset.k=key;
 host.innerHTML=a.slice().reverse().map(q=>`<div class="mr${q.u==WBS.patSel?' on':''}" data-pe="${q.u}"><b>${patHx(q.n)}<i>${(q.src||[]).length} source${(q.src||[]).length==1?'':'s'}</i></b><button type="button" data-pd="${q.u}" aria-label="Delete this pattern">&#215;</button></div>`).join('');
@@ -58,10 +58,13 @@ const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;el.dispatchEvent(n
 // the sources (2.3.0): one row each, a thumbnail of the stamp (or the kind's icon), its name, its weight when the pattern picks by weight, and remove
 $('pesrc').innerHTML=(p.src||[]).map((s,i)=>{const t=s.k=='stamp'?WBS.tiles.find(x=>x.id==s.t):null,G=t?geom(shOf(t)):null,th=s.k=='motif'?`<svg viewBox="-110 -110 220 220">${mk(s.m,'currentColor','transparent')}</svg>`:G?`<svg viewBox="0 0 ${G.SW} ${G.SH}"><use href="#s${t.id}"/></svg>`:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.text}</svg>`;
  return`<div class="psr2" data-si="${i}"><span class="pth">${th}</span><b>${patHx(patSrcName(s))}${patSrcOk(s)?'':' <i>missing</i>'}</b>${p.ds=='weighted'?`<input type="number" min="1" max="99" value="${+s.w>0?+s.w:1}" data-sw="${i}" aria-label="Weight">`:'<span></span>'}<button type="button" class="ib" data-sx="${i}" aria-label="Remove this source"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.close}</svg></button></div>`}).join('')}
-function patAddFill(){const sel=$('peadd');if(!sel)return;const L=fpL(),tx=L?(L.pl||[]).filter(q=>q.k=='text'||(q.tx!=null&&q.k!='pattern')):[],ck=[WBS.tiles.map(t=>t.id).join(),tx.map(q=>q.u).join(),WBS.HID.join(),Object.keys(cust).join()].join('#');
- if(sel.dataset.k===ck)return;sel.dataset.k=ck;const o=k=>`<option value="m:${patHx(k)}">${patHx(mNm(k))}</option>`,g=(n,a)=>a.length?`<optgroup label="${patHx(n)}">${a.join('')}</optgroup>`:'';
- sel.innerHTML='<option value="">Add element</option>'+g('Stamps',WBS.tiles.map((t,i)=>`<option value="s:${t.id}">Stamp ${i+1}</option>`))+g('Text',tx.map(q=>`<option value="t:${patHx(q.u)}">${patHx(String((q.tx&&q.tx.text)||'Text').replace(/\n/g,' ').slice(0,24))}</option>`))
-  +CATS.filter(c=>!WBS.HID.includes(c.n)).map(c=>g(c.n,c.k.map(o))).join('')+g('My shapes',Object.keys(cust).filter(k=>cust[k]&&!k.startsWith('t|')).map(o));sel.value=''}
+// Add source (2.28.0): a menu with the project's stamps and texts, and "Motif from the library…", which opens the Motifs panel's folder tree: the next motif clicked
+// there becomes a source of this pattern and the Pattern panel comes back (Esc lets go). It replaces one dropdown of every motif in the library (464 of them).
+function patAddSrc(p,src){const q=patList().find(x=>x.u===p.u);if(!q)return;q.src=q.src||[];q.src.push(src);WBS.patSel=q.u;patCh()}
+function patAddMenu(){const p=patCur(),b=$('peadd');if(!p||!b)return;const L=fpL(),tx=L?(L.pl||[]).filter(q=>q.k=='text'||(q.tx!=null&&q.k!='pattern')):[];
+ const items=WBS.tiles.map(t=>[patHx(stNmId(t.id)),()=>patAddSrc(p,{k:'stamp',t:t.id,w:1})]).concat(tx.map(q=>[patHx(String((q.tx&&q.tx.text)||'Text').replace(/\n/g,' ').slice(0,24)),()=>{const{u,x,y,s,r,f,k:_k,g,...it}=q;patAddSrc(p,{k:'text',w:1,it:JSON.parse(JSON.stringify(it))})}]));
+ items.push(['Motif from the library…',()=>{WBX.wbLibPick=m=>{WBX.wbLibPick=null;patAddSrc(p,{k:'motif',m,w:1});if(WBX.wbOpenPanel)WBX.wbOpenPanel('layers');pmsg('Added '+mNm(m)+' to '+p.n+'.')};if(WBX.wbOpenPanel)WBX.wbOpenPanel('motifs');pmsg('Choose a motif for '+p.n+'.')}]);
+ rowMenu(b,items)}
 function init67(){
 elExtend('pattern',{expand:patExpand,name:q=>q.n});
 if(!$('pelist'))return;
@@ -73,11 +76,8 @@ $('peds').onclick=e=>{const b=e.target.closest('[data-d]');if(b)set('ds',b.datas
 [['pecn','cn'],['pern','rn'],['pesz','sz'],['pert','rt'],['peox','ox'],['peoy','oy'],['pein','in']].forEach(([id,f])=>$(id).addEventListener('input',()=>{const p=patCur();if(!p)return;const v=+$(id).value;if(p[f]!==v){p[f]=v;patCh()}}));
 $('pesd').onclick=()=>{const p=patCur();if(p){p.sd=1+Math.floor(Math.random()*9998);patCh()}};
 // "Add element" (2.4.0): one list of everything a pattern can place: the stamps, the motifs of the library, and the text on the canvas
-$('peadd').onchange=()=>{const sel=$('peadd'),v=sel.value,p=patCur();if(!v)return;sel.value='';if(!p)return;const k=v[0],id=v.slice(2);
- if(k=='s'){if(WBS.tiles.some(t=>String(t.id)===id))p.src.push({k:'stamp',t:WBS.tiles.find(t=>String(t.id)===id).id,w:1})}
- else if(k=='m')p.src.push({k:'motif',m:id,w:1});
- else if(k=='t'){const L=fpL(),q=L&&(L.pl||[]).find(x=>String(x.u)===id);if(!q)return;const{u,x,y,s,r,f,k:_k,g,...it}=q;p.src.push({k:'text',w:1,it:JSON.parse(JSON.stringify(it))})}
- patCh()};
+$('peadd').onclick=e=>{e.stopPropagation();patAddMenu()};
+document.addEventListener('keydown',e=>{if(e.key=='Escape'&&WBX.wbLibPick){WBX.wbLibPick=null;pmsg('')}},true);
 $('pesrc').onclick=e=>{const p=patCur(),x=e.target.closest('[data-sx]');if(p&&x){p.src.splice(+x.dataset.sx,1);patCh()}};
 $('pesrc').addEventListener('change',e=>{const p=patCur(),w=e.target.closest('[data-sw]');if(p&&w){p.src[+w.dataset.sw].w=Math.max(1,Math.min(99,Math.round(+w.value||1)));patCh()}});
 WBX.wbPatSync=patSync;WBX.wbPatArrows=patArrows;patSync()}

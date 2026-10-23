@@ -1,6 +1,6 @@
 import {ICN} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {geom,shOf,stvSet} from './04-canvas-and-stamp-outlines.js';
+import {geom,hEsc,shOf,stNmId,stvSet} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {STP,stLock,stUnlocked,stampAt} from './63-stamp-tool.js';
 
@@ -43,9 +43,9 @@ const stIcX='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColo
 const stIcL='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevL+'</svg>',stIcR='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevR+'</svg>';
 function steEdge(bar){const o=bar.scrollWidth>bar.clientWidth+1,l=o&&bar.scrollLeft>1,r=o&&bar.scrollLeft+bar.clientWidth<bar.scrollWidth-1;if(bar.classList.contains('ovl')!==l)bar.classList.toggle('ovl',l);if(bar.classList.contains('ovr')!==r)bar.classList.toggle('ovr',r)}
 function steTabs(un){const bar=$('stetabs');if(!bar)return;STE.tabs=STE.tabs.filter(id=>WBS.tiles.some(t=>t.id==id));
- const key=[un,STE.tabs.map(id=>id+':'+(WBS.tiles.findIndex(t=>t.id==id)+1)).join()].join('|');if(key===STE.key){steEdge(bar);return}STE.key=key;
+ const key=[un,STE.tabs.map(id=>id+':'+stNmId(id)).join()].join('|');if(key===STE.key){steEdge(bar);return}STE.key=key;
  const on=STE.tabs.length>0;if(bar.classList.contains('on')!==on)bar.classList.toggle('on',on);
- bar.innerHTML=on?`<button type="button" class="wb wta l" data-sc="-1" aria-label="Earlier tabs">${stIcL}</button><button type="button" class="wtab${un==null?' on':''}" role="tab" aria-selected="${un==null}" data-sv="c">Canvas</button>`+STE.tabs.map(id=>{const k=WBS.tiles.findIndex(t=>t.id==id)+1,a=un===id;return`<span class="wtg${a?' on':''}"><button type="button" class="wtab${a?' on':''}" role="tab" aria-selected="${a}" data-sv="${id}">Stamp ${k}</button><button type="button" class="ib" data-sx="${id}" aria-label="Close Stamp ${k}">${stIcX}</button></span>`}).join('')+`<button type="button" class="wb wta r" data-sc="1" aria-label="Later tabs">${stIcR}</button>`:'';
+ bar.innerHTML=on?`<button type="button" class="wb wta l" data-sc="-1" aria-label="Earlier tabs">${stIcL}</button><button type="button" class="wtab${un==null?' on':''}" role="tab" aria-selected="${un==null}" data-sv="c">Canvas</button>`+STE.tabs.map(id=>{const k=hEsc(stNmId(id)),a=un===id;return`<span class="wtg${a?' on':''}"><button type="button" class="wtab${a?' on':''}" role="tab" aria-selected="${a}" data-sv="${id}">${k}</button><button type="button" class="ib" data-sx="${id}" aria-label="Close ${k}">${stIcX}</button></span>`}).join('')+`<button type="button" class="wb wta r" data-sc="1" aria-label="Later tabs">${stIcR}</button>`:'';
  if(on){const a=bar.querySelector('.wtab.on');if(a&&a.scrollIntoView)a.scrollIntoView({inline:'nearest',block:'nearest'});steEdge(bar)}}
 function steSync(){const un=stUnlocked(),ml=$('mlist'),body=$('lybody'),list=$('lyl2');if(!ml||!body||!list)return;
  if(STID!=null&&un!==STID){steStage(null);STE.views.c&&steBack(STE.views.c);upd();return}   // the stamp went away (deleted, another layer): back on the Canvas
