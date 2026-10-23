@@ -4,7 +4,7 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**As of Oct 22 2026.** `main` is at **2.25.0** (live on wodblok.com); branch `fix/2.26.0-first-five-minutes` holds 2.26.0, not merged. Project file format **25** (`FMT_LATEST` in `src/format/container.js`, unchanged since 2.9.0). 77 files in `src/modules`, 140 spec files in `tests/`.
+**As of Oct 22 2026.** `main` is at **2.27.0** (merged and live on wodblok.com at the owner's word, Oct 22 2026, with the rest of 2.27.0 still to do: see the 2.27.0 entry in docs/plan.md). Project file format **26** (`FMT_LATEST` in `src/format/container.js`); projects saved before 2.27.0 are refused. 77 files in `src/modules`, 140 spec files in `tests/`.
 
 ## Direction
 - A professional, minimal, clean editor in the class of Photoshop and Lightroom (the owner's reference applications). Web app first; Mac, Windows and mobile later and not blocked. A commercial product, sold later; the repo is public until then.
