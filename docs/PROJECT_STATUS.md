@@ -4,17 +4,17 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**As of Oct 23 2026.** `main` is at **2.29.0** (merged at the owner's word without a test run). 2.27.0, 2.28.0 and 2.29.0 were merged without the full suite, pixel goldens or `npm run perf`; about 17 SVG snapshots in tests/scenarios.spec.js still expect the old canvas background and wait for the owner's approval to regenerate, and specs that look for words 2.29.0 changed need updating (docs/plan.md, 2.29.0). Project file format **26** (`FMT_LATEST` in `src/format/container.js`); projects saved before 2.27.0 are refused. 77 files in `src/modules`, 140 spec files in `tests/`.
+**As of Oct 23 2026.** `main` is at **2.30.0** (the test refresh after 2.27 to 2.29). Branch `feat/2.31.0-motifs-take-over-shapes` holds 2.31.0 (the Shape element merged into the Motif; file format 27), checked with targeted specs only: the full suite, pixel goldens and the snapshots it touches have not been run for it; it waits for the owner's word to go live.
 
 ## Direction
 - A professional, minimal, clean editor in the class of Photoshop and Lightroom (the owner's reference applications). Web app first; Mac, Windows and mobile later and not blocked. A commercial product, sold later; the repo is public until then.
 - Styling is heading toward the Photoshop interface (dark neutral greys, dense panels). The UI standard is Part 9 of `docs/developing-wodblok.md`; a restyle changes that guide first.
 
 ## What exists now (from `docs/plan.md`, 2.2.0 to 2.15.0)
-- **Element model.** One ordered list of elements (no layers). Kinds: Motif, Shape, Text, Stamp, Pattern (Paint exists but its button is hidden). Each element can carry an ordered stack of effects (Texture, Colour grade, Jitter, Pressure offset, Morph, stamp settings).
-- **Add bar** (Motif, Shape, Text, Stamp, Pattern): a button only opens that kind's panel; the panel starts with the list of that kind and an Add button. Motifs and Stamps picked from a library follow the pointer and place on each click.
-- **Shape** has 11 presets, a pen with curves, and a colour or image fill (a picture is a Shape fill, never its own element). Text and Pattern can Map to a Shape.
-- **Background** is a canvas colour with a None option, not an element.
+- **Element model.** One ordered list of elements (no layers). Kinds: Motif, Text, Stamp, Pattern (Paint exists but its button is hidden; the Shape element is gone since 2.31.0). Each element can carry an ordered stack of effects (Texture, Colour grade, Jitter, Pressure offset, Morph, stamp settings).
+- **Add bar** (Motif, Text, Stamp, Pattern): a button only opens that kind's panel; the panel starts with the list of that kind and an Add button. Motifs and Stamps picked from a library follow the pointer and place on each click.
+- **Motifs took over the Shape element (2.31.0).** The 11 old presets are the Basic shapes motifs (fixed outlines, the first set of the library; the pen is gone). Every motif (on the canvas, in a stamp, as a pattern's source) can be stretched, have no fill or an image in place of its colour, and an outline (`mtDraw` in 74-motif-element.js; the groups are in 82-motif-look.js). Text and Pattern can Map to a Basic shapes motif. A click picks a motif by its outline.
+- **Background** (2.27.0) is an element: a Rectangle motif the size of the canvas, in the first tray colour, skipped by canvas clicks.
 - **Stamp tabs** edit a stamp alone in its own view. A new Pattern starts empty and shows arrows for each position.
 - **Removed in 2.9.0:** Variations, Presets, Workspaces, Navigator, Textures and Grade tools (texture and grade are effects only).
 - **Empty start (2.10.0, 2.15.0):** a new or launched project has no Pattern, **no stamp**, and no panel open. `WBS.tiles` is `[]`; code that reads the current stamp falls back to `WBS.noTile`. Add stamp and Edit are disabled until a stamp exists; the last stamp can be deleted. Colourways live at the bottom of Colours (2.11.0).

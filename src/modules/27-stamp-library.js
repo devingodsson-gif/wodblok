@@ -65,7 +65,7 @@ catch(e){$('slgrid').innerHTML='<div class="hint" style="grid-column:1/-1">Could
 async function artImport(f){if(!f||!/^image\//.test(f.type))return pmsg('That file is not an image.');if(f.size>30e6)return pmsg('That image is too large. Try one under 30 MB.');
 const url=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=()=>r(null);fr.readAsDataURL(f)}),img=url&&await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=url});
 if(!img)return pmsg('Could not read that image.');let nw=img.naturalWidth||img.width||1000,nh=img.naturalHeight||img.height||1000;const k=Math.min(1,2000/Math.max(nw,nh)),w=Math.max(1,Math.round(nw*k)),h=Math.max(1,Math.round(nh*k)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
-const id=artId();WBS.ARTS[id]={n:(f.name||'Art').replace(/\.[^.]+$/,'').replace(/["<>&|]/g,'').slice(0,40)||'Art',k:'img',src:artEnc(c),w,h};if(WBX.wbShapeImage)WBX.wbShapeImage(id);pmsg('Image added.');upd()}
+const id=artId();WBS.ARTS[id]={n:(f.name||'Art').replace(/\.[^.]+$/,'').replace(/["<>&|]/g,'').slice(0,40)||'Art',k:'img',src:artEnc(c),w,h};if(WBX.wbMotifImage)WBX.wbMotifImage(id);pmsg('Image added.');upd()}
 function init27(){
 try{const so=JSON.parse(kv.get('wb50_slopt')||'{}');$('slfx').checked=!!so.fx;$('sltx').checked=!!so.tx;if(so.px)$('slpx').value=so.px;if(so.bg!=null)$('slbg').value=so.bg}catch(e){}['slfx','sltx','slpx','slbg'].forEach(id=>$(id).addEventListener('change',slOptSave));
 $('slpng').onclick=async()=>{const t=slTile();if(!t)return slMsg('There is no stamp to export.');$('slpng').disabled=true;try{const c=await stampCanvas(t,+$('slpx').value||1024,$('slbg').value=='paper',{fx:$('slfx').checked,tx:$('sltx').checked});await slSavePng(await slBlob(c),$('slname').value.trim()||stNm(t))}catch(e){slMsg((e&&e.message)||'Could not export that stamp.')}$('slpng').disabled=false};
@@ -91,9 +91,9 @@ WBX.wbSlSync=slSync;
 {const sp=document.querySelector('section.pn[data-p="stmp"]');if(sp){new MutationObserver(()=>{if(!sp.hidden)setTimeout(slPaint,60)}).observe(sp,{attributes:true,attributeFilter:['hidden']});if(!sp.hidden)setTimeout(slPaint,60)}}   // the library lives in the Stamp panel (2.23.0); paint it when the panel is shown
 $('lfaimp').onclick=()=>$('lfafile').click();
 $('lfafile').onchange=async()=>{const f=$('lfafile').files[0];$('lfafile').value='';if(f)await artImport(f)};
-$('lfars').onclick=e=>{const x=e.target.closest('[data-ax]');if(x){const id=x.dataset.ax;if(!artRefd(id)){delete WBS.ARTS[id];upd()}return}const b=e.target.closest('[data-a]');if(b&&WBX.wbShapeImage)WBX.wbShapeImage(b.dataset.a,true)};
+$('lfars').onclick=e=>{const x=e.target.closest('[data-ax]');if(x){const id=x.dataset.ax;if(!artRefd(id)){delete WBS.ARTS[id];upd()}return}const b=e.target.closest('[data-a]');if(b&&WBX.wbMotifImage)WBX.wbMotifImage(b.dataset.a)};
 $('lfaprj').onclick=()=>$('lfapfile').click();
 $('lfapfile').onchange=async()=>{const f=$('lfapfile').files[0];$('lfapfile').value='';if(!f)return;try{const d=(await fmtOpen(new Uint8Array(await f.arrayBuffer()))).project,a=d&&d.art;if(!d||d.app!='WODBLOK')return pmsg('That is not a WODBLOK project file.');if(!a||!artOk(a.src))return pmsg('That file was saved before Art existed. Open it and save it again.');
-const id=artId();WBS.ARTS[id]={n:String(d.name||f.name).replace(/\.wodblok$/i,'').replace(/["<>&|]/g,'').slice(0,40)||'Project',k:'img',src:a.src,w:+a.w,h:+a.h};if(WBX.wbShapeImage)WBX.wbShapeImage(id);pmsg('Project picture added.');upd()}catch(er){pmsg((er&&er.name=='FormatError'&&er.message)||'Could not read that file.')}};
+const id=artId();WBS.ARTS[id]={n:String(d.name||f.name).replace(/\.wodblok$/i,'').replace(/["<>&|]/g,'').slice(0,40)||'Project',k:'img',src:a.src,w:+a.w,h:+a.h};if(WBX.wbMotifImage)WBX.wbMotifImage(id);pmsg('Project picture added.');upd()}catch(er){pmsg((er&&er.name=='FormatError'&&er.message)||'Could not read that file.')}};
 }
 export {SL,libColors,libMotifs,init27};

@@ -55,7 +55,7 @@ function paintDock(force){const o=tyP(),w=cwNow(o),box=$('tyc');if(!box)return;
  box.innerHTML=h;
  const cw=$('tycw');cw.hidden=o.cw.length<2;if(!cw.hidden){cw.querySelector('span').textContent=w.n;cw.querySelector('i').style.background=`linear-gradient(90deg,${o.ts.slice(0,4).map((id,i,a)=>`${w.c[id]} ${i/a.length*100}% ${(i+1)/a.length*100}%`).join(',')})`;cw.setAttribute('aria-label','Colourway: '+w.n)}}
 // which slots something links to
-function refsUsed(){const o=tyP(),s=new Set(),a=r=>{if(isLink(r))s.add(r.slice(1))};a(o.bg);a(o.ink);WBS.tiles.forEach(t=>a(t.ink));WBS.layers.forEach(L=>{a(L.ink);a(L.rp);(L.pl||[]).forEach(q=>{if(q){a(q.ink);a(q.sk)}})});
+function refsUsed(){const o=tyP(),s=new Set(),a=r=>{if(isLink(r))s.add(r.slice(1))};a(o.bg);a(o.ink);WBS.tiles.forEach(t=>{a(t.ink);(t.items||[]).forEach(q=>{if(q){a(q.ic);a(q.sk)}})});WBS.layers.forEach(L=>{a(L.ink);a(L.rp);(L.pl||[]).forEach(q=>{if(q){a(q.ink);a(q.sk);(q.src||[]).forEach(z=>{if(z){a(z.ink);a(z.sk)}})}})});
  // stamps without their own ink use the default ink
  return s}
 function dockEvents(){const box=$('tyc');let dr=null;

@@ -64,7 +64,7 @@ function elSel(){const L=WBS.layers[WBS.selL];if(!L||WBS.fpSel==null||WBS.fpSel=
 let elLast='',elLastK='';
 function elSync(){if(WBX.wbTxInPlace)WBX.wbTxInPlace();if(WBX.wbAbSync)WBX.wbAbSync();if(WBX.wbElkSync)WBX.wbElkSync();if(WBX.wbSteSync)WBX.wbSteSync();if(WBX.wbMapSync)WBX.wbMapSync();if(WBX.wbMtSync)WBX.wbMtSync();
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden
-if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbShpSync)WBX.wbShpSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
+if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbMfSync)WBX.wbMfSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
 const q=elSel(),k=elKind(q);
 // 2.27.0 (review 33): when the selection leaves a text, the Text panel's field empties (it kept the old words with nothing selected, and the next Add text took them)
 if(k!==elLastK){if(elLastK=='text'&&k!='text'&&!WBS.txArm&&!document.body.classList.contains('stedit')){const t=$('tx_t');if(t&&t.value)t.value=''}elLastK=k}
@@ -77,7 +77,6 @@ function init65(){
 // shared definitions were always written in); the others get them in later steps.
 elRegister('paint',{hide:true,label:'Paint',pn:'elpaint',icon:ICN.brush});
 elRegister('motif',{label:'Motif',pn:'motifs',icon:ICN.motif});
-elRegister('shape',{label:'Shape',pn:'mlist',icon:ICN.shape});
 elRegister('text',{label:'Text',pn:'text',icon:ICN.text,dz:3,is:q=>q.tx!=null,name:q=>String((q.tx&&q.tx.text)||'').replace(/\n/g,' ').slice(0,28),draw:(L,li)=>txtLayer(L,li)});
 elRegister('stamp',{label:'Stamp',pn:'stmp',icon:ICN.stamp,dz:1,is:q=>q.t!=null,name:q=>stNmId(q.t),draw:(L,li,pa,lgB)=>freeLayer(L,li,pa,lgB)});
 elRegister('pattern',{label:'Pattern',pn:'layers',icon:ICN.pattern});

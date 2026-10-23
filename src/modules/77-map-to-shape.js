@@ -5,17 +5,18 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL} from './24-free-place-layers.js';
 import {patCur} from './67-pattern-element.js';
 import {elSel} from './65-element-core.js';
-import {shBox,shFlat} from './76-shape-element.js';
+import {shBox,shFlat,basicSh} from './76-basic-shapes.js';
+import {mNm} from './21-motif-library-ui.js';
 
-// ===== Map to shape (2.3.3): a Text or a Pattern can follow the outline of a Shape element, or sit inside it. They stay free until one is chosen.
+// ===== Map to shape (2.3.3): a Text or a Pattern can follow the outline of a Shape element, or sit inside it. 2.31.0: of a Basic shapes motif (the Shape element is gone). They stay free until one is chosen.
 // Text and Pattern fields: mp = the Shape's id, mm = 'on' (follow the outline) | 'in' (inside it), mo = where it starts, in % of the way round (-50 to 50), mc = how many along the outline (Pattern).
 // The Shape stays where it is and keeps its own look; deleting the Shape sets the mapping aside (the element is free again, mp is ignored).
 // Following the outline: each letter (or placement) goes to its place on the outline and turns to lie along it; the text stands outside, on the line. Inside: the text is laid out again
 // in the widest width that fits the Shape (so it wraps), and a Pattern keeps the placements whose middle is inside. Owner, Oct 20 2026.
-const mapShape=p=>{if(!p||!p.mp||!p.mm)return null;const L=fpL();if(!L)return null;const s=(L.pl||[]).find(q=>q.u==p.mp&&q.k=='shape');return s||null};
-const mapList=()=>{const L=fpL();return L?(L.pl||[]).filter(q=>q.k=='shape'):[]};
-const MPN={rect:'Rectangle',rrect:'Rounded',ellipse:'Oval',tri:'Triangle',dia:'Diamond',pent:'Pentagon',hex:'Hexagon',star:'Star',arrow:'Arrow',heart:'Heart',line:'Line',path:'Path'};
-const mapName=(q,i)=>(q.nm||MPN[q.sh]||'Shape')+' '+(i+1);
+const mapOk=q=>q&&q.k=='motif'&&!q.bgd&&!!basicSh(q.m);
+const mapShape=p=>{if(!p||!p.mp||!p.mm)return null;const L=fpL();if(!L)return null;const s=(L.pl||[]).find(q=>q.u==p.mp&&mapOk(q));return s||null};
+const mapList=()=>{const L=fpL();return L?(L.pl||[]).filter(mapOk):[]};
+const mapName=(q,i)=>(q.nm||mNm(q.m)||'Motif')+' '+(i+1);
 // where the way round starts: the highest point of a closed shape, the middle of an open one; mo moves it
 function mapRef(F,mo){let s0=F.L/2;if(F.closed){let b=0;F.pts.forEach((q,i)=>{if(q[1]<F.pts[b][1]-1e-6)b=i});s0=F.cum[b]}return s0+(+mo||0)/100*F.L}
 // the point and the turn (degrees) at a length along the outline
@@ -46,7 +47,7 @@ async function mapFit(p,S,key){const F=shFlat(S,true);if(!F||!F.closed||!p.tx||!
   const H=R.bh*kk,Wn=Math.max(8,Math.min(chord(F.pts,H/2),chord(F.pts,-H/2))*.92);if(H<=sh*.72&&!R.over&&Wn>=W*.95)break;kk*=H>sh*.72||R.over?.85:1;W=Wn}
  const L=fpL();if(!L||!(L.pl||[]).includes(p))return;
  p.tx={...p.tx,wd:+wd.toFixed(3)};p.G=R.G;p.Lt=R.Lt;p.bw=R.bw;p.bh=R.bh;p.n=Math.max(R.bw,R.bh);p.s=+(kk*p.n).toFixed(2);p.x=+(+S.x||0).toFixed(1);p.y=+(+S.y||0).toFixed(1);p.r=+(+S.r||0).toFixed(2);DONE.set(String(p.u),fitKey(p,S));store();upd()}
-const fitKey=(p,S)=>JSON.stringify([S.sh,S.x,S.y,S.s,S.wx,S.wy,S.r,S.f,S.cr,S.np,S.pts,{...p.tx,wd:0},+(p.s/Math.max(p.n||1,.01)).toFixed(3)]);
+const fitKey=(p,S)=>JSON.stringify([S.m,S.x,S.y,S.s,S.wx,S.wy,S.r,S.f,{...p.tx,wd:0},+(p.s/Math.max(p.n||1,.01)).toFixed(3)]);
 
 // ---- the panels (a "Map to shape" group in Text and in Pattern)
 const GR={tx:{g:'mt_g',s:'mt_s',m:'mt_m',o:'mt_o',or:'mt_or',c:null,cr:null,cur:()=>{const q=elSel();return q&&q.tx?q:null}},

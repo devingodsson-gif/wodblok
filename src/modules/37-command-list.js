@@ -7,7 +7,7 @@ import {$} from './01-launch-and-version.js';
 const el = id => () => $(id);
 const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled; };
 // the element panels have no rail button on screen (the element bar opens them), but their commands still click it
-const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-mlist']);
+const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text']);
 const exists = id => () => { const b = $(id); return !!b && !b.disabled; };
 const click = id => () => $(id).click();
 const COMMANDS = [
@@ -57,7 +57,6 @@ const COMMANDS = [
   ['tray.save', 'Save tray', 'tysave'],
   ['panel.motifs', 'Open Motif', 'rail-motifs'],
   ['panel.text', 'Open Text', 'rail-text'],
-  ['panel.mlist', 'Open Shape', 'rail-mlist'],
   ['panel.lyrs', 'Open Elements', 'rail-lyrs'],
   ['panel.layers', 'Open Pattern', 'rail-layers'],
   ['panel.stmp', 'Open Stamp', 'rail-stmp'],

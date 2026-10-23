@@ -7,6 +7,7 @@ import {selFix} from './12-selection-and-split.js';
 import {renderML,sync} from './13-preview-and-stamp-tool.js';
 import {buildTex,texNorm} from './17-texture-panel-and-previews.js';
 import {stTxMode} from './63-stamp-tool.js';
+import {mtDraw,mtPic} from './74-motif-element.js';
  // the Stamp texture / Canvas texture view switches: one setting for the pattern
 // Split pieces: q.cl is a list of [angle, offset, side] half-planes in the motif's own -50..50 space.
 let clipN=0;
@@ -27,11 +28,23 @@ function solid(q,c,ed){const id='ks'+(clipN++),inner=+q.w?thickF(q,1):mk(q.m,'#f
 return`<mask id="${id}" maskUnits="userSpaceOnUse" x="-110" y="-110" width="220" height="220">${inner}</mask><rect x="-110" y="-110" width="220" height="220" fill="${c}" mask="url(#${id})" pointer-events="none"/>`+(ed?`<g opacity="0">${mk(q.m,'#000','#000')}</g>`:'')}
 // A stamp whose shapes have colours of their own (shape.ic, a colour reference) is printed in runs: neighbouring shapes of the same colour print together,
 // in the order they were put down, so a shape of one colour can lie over a shape of another. A knock-out erases what lies under it, in every run before it.
-// inkRuns gives [{c: colour ref or '' for the stamp's own ink, ix: the shape numbers, sel(i): which shapes a run's mask holds}], or null for a one-colour stamp.
-function inkRuns(t){if(t.neg||!t.items.some(q=>q.ic))return null;const a=t.items,runs=[];a.forEach((q,i)=>{if(q.k)return;const c=q.ic||'',l=runs[runs.length-1];if(l&&l.c===c)l.ix.push(i);else runs.push({c,ix:[i]})});
- runs.forEach(r=>{const set=new Set(r.ix),end=r.ix[r.ix.length-1];r.sel=i=>set.has(i)||(!!a[i].k&&i>end)});return runs}
-function items(t,cl,ed,e,sel){let o='';expand(t).forEach(([q,i,c])=>{if(sel&&!sel(i))return;const SX=q.sx||1,SY=q.sy||1,r=70*q.s*Math.max(SX,SY),own=ed&&q.ic&&!t.neg&&!q.k?col(q.ic):cl.c,m0=q.k?mk(q.m,cl.d,cl.c):mk(q.m,own,cl.d);
-for(const[dx,dy]of(t.wr===false?[[0,0]]:OFFS)){const m=clipWrap(q,q.k?(thick(q,cl.c,cl.d)||m0):solid(q,own,ed));const x=q.x+dx,y=q.y+dy;if(x+r<-e||x-r>SW+e||y+r<-e||y-r>SH+e)continue;
+// 2.31.0: a stamp's motif can also have an outline of its own colour (sk; it prints just under the motif, as its own part 'o'+i) and a picture in place of its colour
+// (fl 'img': a run of its own that is painted with the picture, img: true). A motif with fill 'none' prints only its outline.
+// inkRuns gives [{c: colour ref or '' for the stamp's own ink, img, sel(k): which parts a run's mask holds (k: a shape number, or 'o'+number for its outline)}], or null for a one-colour stamp.
+const lookOf=q=>!q.k&&(q.fl=='none'||(q.fl=='img'&&!!q.a)||+q.sw>0);
+function inkRuns(t){const a=t.items;if(t.neg||!a.some(q=>q.ic||(!q.k&&(q.fl=='img'&&q.a||+q.sw>0&&q.sk))))return null;const seq=[];
+ a.forEach((q,i)=>{if(q.k)return;if(+q.sw>0)seq.push({k:'o'+i,i,c:q.sk||q.ic||''});if(q.fl!='none')seq.push({k:i,i,c:q.fl=='img'&&q.a?'#img'+i:q.ic||''})});
+ const runs=[];seq.forEach(x=>{const l=runs[runs.length-1];if(l&&l.c===x.c&&!x.c.startsWith('#img'))l.ks.push(x);else runs.push({c:x.c,ks:[x]})});
+ runs.forEach(r=>{const set=new Set(r.ks.map(x=>x.k)),end=Math.max(...r.ks.map(x=>x.i));r.img=r.c.startsWith('#img');if(r.img)r.c='';r.sel=k=>set.has(k)||(typeof k=='number'&&!!a[k].k&&k>end)});return runs}
+// cl: {c: ink, d: cut} colours; pic: paint the pictures of the selected motifs (a picture run); sel(k): only these parts (see inkRuns)
+function items(t,cl,ed,e,sel){let o='';expand(t).forEach(([q,i,c])=>{const lk=lookOf(q),pb=!sel||sel(i),po=lk&&+q.sw>0&&(!sel||sel('o'+i));if(cl.pic?!(lk&&q.fl=='img'&&pb):!(pb||po))return;
+const SX=q.sx||1,SY=q.sy||1,r=70*q.s*Math.max(SX,SY)+(+q.sw||0),own=ed&&q.ic&&!t.neg&&!q.k?col(q.ic):cl.c,m0=lk?null:q.k?mk(q.m,cl.d,cl.c):mk(q.m,own,cl.d);
+for(const[dx,dy]of(t.wr===false?[[0,0]]:OFFS)){const x=q.x+dx,y=q.y+dy;if(x+r<-e||x-r>SW+e||y+r<-e||y-r>SH+e)continue;
+if(lk){const w=100*q.s*SX,h=100*q.s*SY,id='kl'+(clipN++),pic=pb&&q.fl=='img'?(cl.pic||ed?mtPic(q):null):null,
+  D=mtDraw(q.m,{w,h,fill:cl.pic||!pb||q.fl=='none'?'':pic?'':own,pic,sw:po&&!cl.pic?+q.sw:0,sk:ed&&q.sk?col(q.sk):own,inner:+q.w?thickF(q,1):null},id,true,'msi_');
+ let m=D.defs+D.body;if(q.cl&&q.cl.length){const kx=(w/100).toFixed(4),ky=(h/100).toFixed(4);m=`<g transform="scale(${kx} ${ky})">${clipWrap(q,`<g transform="scale(${(100/w).toFixed(5)} ${(100/h).toFixed(5)})">${m}</g>`)}</g>`}
+ o+=`<g${ed?` data-i="${i}" data-c="${c}"`:''} transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${q.r}) scale(${q.f||1} 1)">${m}${ed?`<g opacity="0" transform="scale(${(w/100).toFixed(4)} ${(h/100).toFixed(4)})">${mk(q.m,'#000','#000')}</g>`:''}</g>`;continue}
+const m=clipWrap(q,q.k?(thick(q,cl.c,cl.d)||m0):solid(q,own,ed));
 o+=`<g${ed?` data-i="${i}" data-c="${c}"`:''} transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${q.r}) scale(${+(q.s*q.f*SX).toFixed(4)} ${+(q.s*SY).toFixed(4)})">${m}</g>`}});return o}
 function draw(){if(texNorm())buildTex();useT(WBS.tiles[WBS.cur]);if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];if(WBS.selL<0||WBS.selL>=WBS.layers.length)WBS.selL=WBS.layers.length-1;trayGuard();WBS.tiles.forEach(t=>{if(t.ink&&!okC(t.ink))delete t.ink});sync();const t=WBS.tiles[WBS.cur]||WBS.noTile,cl=cols(t);selFix();const q=t.items[WBS.sel];
 if(WBS.split&&(WBS.split.i!=WBS.sel||!stTxMode()||!q))WBS.split=null;$('spbar').hidden=!WBS.split;
@@ -48,4 +61,4 @@ function init09(){WBH.draw=draw;
 WBS.edMk=true;WBS.edInk=true;WBS.edTx=true;
 ORN.forEach(k=>ARR[k]=ARR.circle);
 }
-export {ARR,clipSeed,clipWrap,hx3,inkRuns,items,init09};
+export {ARR,clipSeed,clipWrap,hx3,inkRuns,items,lookOf,init09};

@@ -197,7 +197,8 @@ const showPanel = async (page, id) => { const sec = page.locator(`section.pn[dat
 const fitView = async page => { await page.evaluate(() => { const z = document.getElementById('zl'); if (/Fit to screen/.test(z.title)) z.click(); }); await settle(page); };
 const unlockStamp = async (page, n = 0) => { await showPanel(page, 'stmp'); const b = page.locator('#stmpl .smklk').nth(n); if ((await b.getAttribute('aria-pressed')) !== 'true') await b.click(); await settle(page); await fitView(page); };
 // pick the first library shape as the brush (opens the first folder if none is open)
-const pickShape = async page => { await showPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
+// (2.31.0: the Basic shapes set is listed first; this keeps picking from the first set of artwork, as before)
+const pickShape = async page => { await showPanel(page, 'motifs'); if (!(await page.locator('#lib button[data-m]').count())) await page.locator('#lib .lfr[data-f^="b:"]:not([data-f="b:Basic shapes"])').first().click(); await page.locator('#lib button[data-m]').first().click(); await settle(page); };
 // canvas units (the artwork's viewBox) to client pixels
 const canvasToClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height, k: r.width / vb.width }; }, [x, y]);
 // the middle of a printed instance of the stamp, clear of the edges of the canvas: { i, cx, cy } in canvas units
@@ -229,11 +230,20 @@ async function armStamp(page) {
   if (await page.locator('#lfpst [data-t].on').count()) return;
   await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page);
 }
-// 2.4.0: the Shape button opens the Shape properties and makes nothing; a preset there makes the shape (selected, in the middle)
+// 2.31.0: the Shape element is gone; its shapes are the Basic shapes motifs. This places one (by its old preset name) in the middle of the canvas, selected.
+const BASIC = { rect: 'Rectangle', rrect: 'Rounded rectangle', ellipse: 'Oval', tri: 'Triangle', dia: 'Diamond', pent: 'Pentagon', hex: 'Hexagon', star: 'Star', arrow: 'Arrow', heart: 'Heart', line: 'Line' };
 async function addShape(page, g = 'rect') {
-  await page.click('#elb [data-k="shape"]');
-  await page.click(`#shp_pre [data-g="${g}"]`); await settle(page);
-  await placeArmed(page, 'shape');                         // 2.20.0: a preset arms the shape; a click on the canvas places it
+  await showPanel(page, 'motifs');
+  const set = page.locator('#lib .lfr[data-f="b:Basic shapes"]');
+  if (!(await page.locator(`#lib button[data-m][aria-label="${BASIC[g]}"]`).count())) { await set.click(); await settle(page); }
+  await page.locator(`#lib button[data-m][aria-label="${BASIC[g]}"]`).click(); await settle(page);
+  const b = await page.locator('#art').boundingBox();
+  await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await settle(page);
+  await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur());
+  await page.keyboard.press('v'); await settle(page);
+  // the new motif stays selected (the click that placed it selected it)
+  const u = await page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()); const q = s.els[s.els.length - 1]; return q && q.u; });
+  return u;
 }
 // 2.4.0: a new Pattern is empty; this puts a source in it (a stamp by default, or 'motif' / 'text').
 // 2.28.0: Add source is a menu: the project's stamps, then its texts, then "Motif from the library…", which opens the library; the motif clicked there is added.
