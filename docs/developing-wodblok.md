@@ -49,9 +49,9 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 - The colour system is the **tray** (up to 16 colours; palettes are called trays; Wada's *A Dictionary of Color Combinations* is the default library); a small lock icon next to a colour selector means fixed colour, an open lock means linked to a tray slot. Colours carry their own opacity. Colourways are saved named trays.
 - Libraries of any kind (shapes, stamps, textures, colours, colourways, templates, workspaces, export recipes, text styles) use the **same folder tree** as the shape library (Part 9, section 12).
 - "Motif" was renamed **shape** in the UI. "Ink surface" was renamed **stamp texture**. Panels use plain everyday words (no jargon like "dry brayer").
-- Canvas shapes are only regular geometric ones (no torn paper, blob or splatter, no custom SVG outline).
+- The canvas is always a rectangle (2.32.0; the rounded, circle, oval, arch, hexagon, triangle, diamond and polygon outlines are gone). A stamp can still have its own outline.
 - Brand: the "WB" letter mark in bronze (bare letters, no tile behind them); the wordmark is set in IM Fell English; the same mark is the favicon. The accent colour is the user's choice, eight woods: Oak (default bronze), Birch, Rosewood, Ironwood, Eucalyptus, Purpleheart, Walnut, Maple.
-- Launch is always cleared and in Pattern mode. Clear resets the canvas shape to a rectangle.
+- Launch is always cleared and in Pattern mode. Clear resets the canvas.
 
 ## 3. Working with the owner
 

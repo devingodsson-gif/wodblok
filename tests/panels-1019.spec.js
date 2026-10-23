@@ -23,10 +23,3 @@ test('History has a labelled Save snapshot button that still saves one', async (
   expect(errors).toEqual([]);
 });
 
-test('Canvas shape names fit their buttons', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await openPanel(page, 'canvas');
-  const clipped = await page.evaluate(() => [...document.querySelectorAll('#cshp button span')].filter(e => e.scrollWidth > e.parentElement.clientWidth - 2).map(e => e.textContent));
-  expect(clipped).toEqual([]);
-  expect(errors).toEqual([]);
-});

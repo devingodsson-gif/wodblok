@@ -44,39 +44,24 @@ let STV=null;const stvOn=()=>!!STV;
 function stvSet(w,h){STV=w?[w,h]:null;setDim()}
 const tileOn=()=>!STV&&!!WBS.dim.rt&&!WBS.book.on;
 const tileExt=()=>tileOn()?(WBS.tilePv?[CW,CH]:[Math.min(CW,48),Math.min(CH,48)]):[0,0];
-const setDim=()=>{if(WBS.dim.rt&&WBS.dim.cs)delete WBS.dim.cs;if(WBS.dim.cs&&!CSN[WBS.dim.cs]){delete WBS.dim.cs;delete WBS.dim.g}if(WBS.dim.cp)delete WBS.dim.cp;useG(geom(WBS.dim));try{useT(WBS.tiles[WBS.cur])}catch(e){}
-if(STV){CW=STV[0];CH=STV[1]}else if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims(csk())};
-// Canvas outline: dim.cs = rect (default) | rrect | circle | oval | arch | hex | tri | diamond | ngon.
-// Everything is clipped to the outline. dim.cr = rounded corner %, dim.n = polygon sides, dim.co = 'f' for the flat orientation.
-// Print covers always stay rectangular.
-const CSH=[['rect','Rectangle'],['rrect','Rounded'],['circle','Circle'],['oval','Oval'],['arch','Arch'],['hex','Hexagon'],['tri','Triangle'],['diamond','Diamond'],['ngon','Polygon']];let CSN;const CASP=['rect','rrect','oval','arch','diamond'];
-function csk(){if(STV||WBS.book.on)return'rect';const k=WBS.dim.cs;return CSN[k]?k:'rect'}
+const setDim=()=>{['cs','cr','n','co','g','cp'].forEach(x=>{if(x in WBS.dim)delete WBS.dim[x]});useG(geom(WBS.dim));try{useT(WBS.tiles[WBS.cur])}catch(e){}
+if(STV){CW=STV[0];CH=STV[1]}else if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims()};
+// Canvas (2.32.0, owner Oct 23 2026): the canvas is always a rectangle. The other outlines (rounded, circle, oval, arch, hex, triangle, diamond, polygon) are gone; setDim drops the old fields.
+const CSH=[['rect','Rectangle']];let CSN;const CASP=['rect'];
+function csk(){return'rect'}
 // In a stamp tab the canvas is the stamp's own outline (2.27.0), not its bounding rectangle: a circle stamp has a circle canvas
 const stvOut=()=>!!STV&&SK!='rect';
 let STPC=['',[]];
 function stPts(d){if(STPC[0]==d)return STPC[1];const h=document.getElementById('cvdefs'),p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);if(h)h.appendChild(p);const o=[];try{const L=p.getTotalLength(),N=240;for(let i=0;i<N;i++){const q=p.getPointAtLength(L*i/N);o.push([q.x,q.y])}}catch(e){}if(p.parentNode)p.parentNode.removeChild(p);STPC=[d,o];return o}
-const hasOut=()=>stvOut()||csk()!='rect';
-const csN=()=>Math.max(3,Math.min(16,Math.round(+WBS.dim.n||5)));
-function polyUnit(n,o){const off=o=='f'?Math.PI/n:0,P=[];for(let i=0;i<n;i++){const a=-Math.PI/2+off+2*Math.PI*i/n;P.push([Math.cos(a),Math.sin(a)])}return P}
-function polyFit(n,o){const P=polyUnit(n,o),xs=P.map(p=>p[0]),ys=P.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys),bw=Math.max(...xs)-x0,bh=Math.max(...ys)-y0,k=800/Math.max(bw,bh);return{W:+(bw*k).toFixed(3),H:+(bh*k).toFixed(3),pts:P.map(p=>[(p[0]-x0)*k,(p[1]-y0)*k])}}
-function csDims(k){if(k=='circle')return[800,800];if(k=='hex'||k=='tri'||k=='ngon'){const q=polyFit(k=='hex'?6:k=='tri'?3:csN(),WBS.dim.co);return[q.W,q.H]}return fitD(WBS.dim.c,800)}
+const hasOut=()=>stvOut();
+function csDims(){return fitD(WBS.dim.c,800)}
 const polyArea=P=>{let a=0;for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length];a+=p[0]*q[1]-q[0]*p[1]}return a/2};
 // Inset a closed outline by d (mitred corners). Needs the points to run clockwise on screen; returns null once it collapses.
 function offPoly(P,d){const m=P.length;if(m<3)return null;const N=[];for(let i=0;i<m;i++){const a=P[i],b=P[(i+1)%m],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1e-9;N.push([-dy/L,dx/L])}
 const R=[];for(let i=0;i<m;i++){const n1=N[(i+m-1)%m],n2=N[i],k=1+n1[0]*n2[0]+n1[1]*n2[1],c=d/Math.max(k,.15);R.push([P[i][0]+(n1[0]+n2[0])*c,P[i][1]+(n1[1]+n2[1])*c])}
 return polyArea(R)>0?R:null}
 // The outline of the canvas: d (SVG path), pts (clockwise polyline), keys (indices of the corner / marker points), vk (true when the keys are the real corners of a polygon)
-function cOut(){if(stvOut()){const d=shp(0);return{d,pts:stPts(d),keys:[],vk:false}}const k=csk(),W=CW,H=CH,fm=v=>+(+v).toFixed(2),poly=P=>'M'+P.map(p=>fm(p[0])+' '+fm(p[1])).join('L')+'Z';let pts=[],keys=[],vk=false,d='';
-if(k=='circle'||k=='oval'){const rx=W/2,ry=H/2,N=160;for(let i=0;i<N;i++){const a=-Math.PI/2+2*Math.PI*i/N;pts.push([rx+rx*Math.cos(a),ry+ry*Math.sin(a)])}keys=[0,N/4,N/2,3*N/4];d=`M${fm(rx)} 0A${fm(rx)} ${fm(ry)} 0 1 1 ${fm(rx)} ${fm(H)}A${fm(rx)} ${fm(ry)} 0 1 1 ${fm(rx)} 0Z`}
-else if(k=='rrect'){const r=Math.min(W,H)/2*Math.max(0,Math.min(100,WBS.dim.cr==null?25:+WBS.dim.cr))/100;
-if(r<.5){pts=[[0,0],[W,0],[W,H],[0,H]];keys=[0,1,2,3];vk=true;d=poly(pts)}
-else{const M=10;[[W-r,r,-90],[W-r,H-r,0],[r,H-r,90],[r,r,180]].forEach(([cx,cy,a0],ci)=>{for(let j=0;j<=M;j++){const a=(a0+90*j/M)*Math.PI/180;pts.push([cx+r*Math.cos(a),cy+r*Math.sin(a)])}keys.push(ci*(M+1)+M/2)});
-const q=fm(r);d=`M${q} 0H${fm(W-r)}A${q} ${q} 0 0 1 ${fm(W)} ${q}V${fm(H-r)}A${q} ${q} 0 0 1 ${fm(W-r)} ${fm(H)}H${q}A${q} ${q} 0 0 1 0 ${fm(H-r)}V${q}A${q} ${q} 0 0 1 ${q} 0Z`}}
-else if(k=='arch'){const rx=W/2,ry=Math.min(rx,H*.8);pts.push([0,H],[0,ry]);for(let j=1;j<=28;j++){const a=Math.PI+Math.PI*j/28;pts.push([rx+rx*Math.cos(a),ry+ry*Math.sin(a)])}pts.push([W,H]);keys=[0,15,pts.length-1];d=`M0 ${fm(H)}V${fm(ry)}A${fm(rx)} ${fm(ry)} 0 0 1 ${fm(W)} ${fm(ry)}V${fm(H)}Z`}
-else if(k=='hex'||k=='tri'||k=='ngon'){pts=polyFit(k=='hex'?6:k=='tri'?3:csN(),WBS.dim.co).pts;keys=pts.map((_,i)=>i);vk=true;d=poly(pts)}
-else if(k=='diamond'){pts=[[W/2,0],[W,H/2],[W/2,H],[0,H/2]];keys=[0,1,2,3];vk=true;d=poly(pts)}
-else{pts=[[0,0],[W,0],[W,H],[0,H]];keys=[0,1,2,3];vk=true;d=poly(pts)}
-return{d,pts,keys,vk}}
+function cOut(){if(stvOut()){const d=shp(0);return{d,pts:stPts(d),keys:[],vk:false}}const W=CW,H=CH,fm=v=>+(+v).toFixed(2),pts=[[0,0],[W,0],[W,H],[0,H]];return{d:'M'+pts.map(p=>fm(p[0])+' '+fm(p[1])).join('L')+'Z',pts,keys:[0,1,2,3],vk:true}}
 
 function inShape(x,y){if(!hasOut())return true;const P=cOut().pts;let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>y)!=(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
 function wrapP(x,y){if(SK=='rect')return[mod(x,SW),mod(y,SH)];if(SK=='circle'||SK=='tri'||ORN.includes(SK))return[x,y];
@@ -165,4 +150,4 @@ CM=Object.fromEntries(C);
 PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return[WADA_NAMES[i]||'No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj=trayDefault();try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 }
-export {hEsc,stNm,stNmId,stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csN,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
+export {hEsc,stNm,stNmId,stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};

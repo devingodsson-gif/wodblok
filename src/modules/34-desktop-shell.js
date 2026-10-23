@@ -3,7 +3,7 @@ import {kv} from '../platform/index.js';
 import {cmdGet} from '../commands/registry.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {DRT,NODRAFT,drOff} from './02-draft-mode-speedups.js';
-import {CASP,CH,CSN,CW,SH,SHN,SW,bk,closeDD,csk,placeFloat,rowMenu,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,SH,SHN,SW,bk,closeDD,placeFloat,rowMenu,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {trayIn} from './50-tray-core.js';
 import {flatEls,oneLayer,selOne,store} from './06-motif-library-folders.js';
 import {nr,symOf,tbSync} from './07-symmetry.js';
@@ -24,13 +24,13 @@ import {lyDupSel} from './32-layers-panel.js';
 
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
-const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',layers:'Pattern',cover:'Book cover'};
+const PN={tex:'Textures',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',layers:'Pattern',cover:'Book cover'};
 let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[panel])panel='canvas'}catch(e){}
 
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={xrec:'Export',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',mlist:'Element',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
+const PNAME={xrec:'Export',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',mlist:'Element',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
 const EL_ONLY=['layers','stmp','motifs','text','elpaint','mlist'];
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
@@ -271,7 +271,7 @@ const sub=m=>{const ss=sk(m);return ss.length?new Set(ss.filter(c=>c.checked).ma
 const sync=()=>{const st=isOn(by('stamps')),t=by('text');t.disabled=!st;(t.closest('.ctl')||t.parentNode).style.opacity=st?'':'.45';
 sec.querySelectorAll('.rzx[data-rzx]').forEach(b=>{const m=b.dataset.rzx,ss=sk(m),n=ss.filter(c=>c.checked).length,all=n==ss.length;b.querySelector('.rzn').textContent=all?'All':n+'/'+ss.length;b.classList.toggle('part',!all);const box=sec.querySelector('[data-rzs="'+m+'"]');if(box)box.classList.toggle('off',!isOn(by(m)))});
 const any=fts.some(c=>eff(c)&&!c.disabled),b=$('rzdo');if(b)b.disabled=!any;
-const h=$('rzhint');if(h)h.textContent=any?'Only what is switched on changes. Everything else stays exactly as it is. Use the arrows to choose which kinds of change are allowed. The canvas stays the same size and shape unless Canvas shape or Canvas size is on, and the book cover is always kept.':'Nothing is switched on, so Randomize has nothing to change.'};
+const h=$('rzhint');if(h)h.textContent=any?'Only what is switched on changes. Everything else stays exactly as it is. Use the arrows to choose which kinds of change are allowed. The canvas stays the same size unless Canvas size is on, and the book cover is always kept.':'Nothing is switched on, so Randomize has nothing to change.'};
 const save=()=>{try{kv.set(KEY,JSON.stringify(Object.fromEntries(fts.map(c=>[c.dataset.ft,c.type=='range'?+c.value:c.checked]))));kv.set(SKEY,JSON.stringify(Object.fromEntries(subs.map(c=>[c.dataset.sub,c.checked]))))}catch(e){}sync()};
 sec.addEventListener('change',save);sec.addEventListener('input',save);
 sec.addEventListener('click',e=>{const x=e.target.closest('[data-rzx]');if(x){const m=x.dataset.rzx,box=sec.querySelector('[data-rzs="'+m+'"]'),open=box.hidden;box.hidden=!open;x.setAttribute('aria-expanded',open?'true':'false');return}
@@ -326,7 +326,7 @@ document.addEventListener('input',e=>{if(e.target.type=='range')paint(e.target)}
 
 // ---- status line + dock subtitle
 function info(){const ks=new Set(WBS.tiles.map(t=>shOf(t).k)),k=ks.size>1?'Mixed':SHN[[...ks][0]]||'Rectangle',c=WBS.dim.c;
-$('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(()=>{const k=csk(),r=(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2));return k=='rect'?r:CSN[k]+(CASP.includes(k)?' '+r:'')})()}</b></span>`}<span class="it">Stamp shape <b>${k}</b></span><span class="it">Stamps <b>${WBS.tiles.length}</b></span>`;
+$('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.toFixed(2)} × ${bk().H.toFixed(2)} in</b></span>`:`<span class="it">Canvas <b>${(+(+c[0]).toFixed(2))+':'+(+(+c[1]).toFixed(2))}</b></span>`}<span class="it">Stamp shape <b>${k}</b></span><span class="it">Stamps <b>${WBS.tiles.length}</b></span>`;
 }
 // wrap redraw hooks so the shell stays in sync
 {const f=$('rzfresh');if(f){try{f.checked=kv.get('wb121_rzfresh')==='1'}catch(e){}f.addEventListener('change',()=>{try{kv.set('wb121_rzfresh',f.checked?'1':'0')}catch(e){}})}}
@@ -357,7 +357,7 @@ let histL=['Start'],histT=[Date.now()],histTh=[''],histU=[''];
 const HK={tiles:'Stamp change',els:'Element change',layers:'Layer change',proj:'Colours',dim:'Canvas size',pg:'Grid',pr:'Roughness',tex:'Texture',texLib:'Texture library',grade:'Grade'};
 // What one step did to the elements, in words (2.27.0): "Moved shape", "Edited text", "Resized 3 elements"... hLU keeps the uid when only one element changed
 let hLU='';
-const hKN={text:'text',motif:'motif',stamp:'stamp',pattern:'pattern',paint:'paint',group:'group'};
+const hKN={text:'text',motif:'shape',stamp:'stamp',pattern:'pattern',paint:'paint',group:'group'};
 function hEls(c){const m=new Map();(Array.isArray(c.els)?c.els:[]).forEach(p=>m.set(String(p.u),p));return m}
 function hElWords(A,B){const a=hEls(A),b=hEls(B);if(!a.size&&!b.size)return'';const add=[...b.keys()].filter(u=>!a.has(u)),rem=[...a.keys()].filter(u=>!b.has(u)),kn=p=>hKN[p.k]||'element';
 if(add.length||rem.length){if(add.length&&rem.length)return'';const ks=(add.length?add.map(u=>b.get(u)):rem.map(u=>a.get(u))),n=ks.length,w=add.length?'Added ':'Removed ';return w+(n==1?kn(ks[0]):n+' elements')}
@@ -366,7 +366,7 @@ const keys=u=>{const p=a.get(u),q=b.get(u);return[...new Set([...Object.keys(p),
 const only=(ks,ok)=>ks.every(k=>ok.includes(k)),all=chg.map(keys);let w='Changed';
 if(all.every(ks=>only(ks,['x','y'])))w='Moved';else if(all.every(ks=>only(ks,['r'])))w='Rotated';else if(all.every(ks=>only(ks,['s','wx','wy','bw','bh','n','x','y','G','Lt'])&&!ks.includes('tx')))w='Resized';else if(all.every(ks=>only(ks,['tx','G','Lt','bw','bh','n','tu'])))w='Edited';else if(all.every(ks=>only(ks,['ink','col','fill','op','a'])))w='Recoloured';else if(all.every(ks=>only(ks,['v'])))w=b.get(chg[0]).v===false?'Hid':'Showed';else if(all.every(ks=>only(ks,['name'])))w='Renamed';
 if(chg.length==1){const p=b.get(chg[0]);hLU=String(chg[0]);return w+' '+(w=='Edited'&&p.k=='text'?'text':kn(p))}return w+' '+chg.length+' elements'}
-function hLabel(a,b){hLU='';try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length==1&&ch[0]=='els'){const w=hElWords(A,B);if(w)return w}if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added motif'+(y-x>1?'s':'');if(y<x)return 'Removed motif'+(x-y>1?'s':'');return 'Moved or edited shape'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
+function hLabel(a,b){hLU='';try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length==1&&ch[0]=='els'){const w=hElWords(A,B);if(w)return w}if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added shape'+(y-x>1?'s':'');if(y<x)return 'Removed shape'+(x-y>1?'s':'');return 'Moved or edited shape'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
 // wbRollHold: a Randomize roll is still setting its lettering, so the half-made piece is not a history step
 // Shape editor: opens by itself when a shape is placed, unless Auto-open (top of the panel) is switched off; the choice is remembered
 let seOn=true;try{seOn=kv.get('wb_se_auto')!=='0'}catch(e){}
@@ -383,7 +383,7 @@ function cap(){if(WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold||(WBS.fpXf&&WBS.fpXf.mo
 if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];
 // typing in a text is one step, not one per pause (2.27.0): the same text edited again within a few seconds replaces the last step
 if(hi>0&&hi==hist.length-1&&!(WBX.wbLabelNext&&performance.now()-WBX.wbLabelNext.at<3000)&&hLabel(prev,s)=='Edited text'&&hLU&&histL[hi]=='Edited text'&&hLU===histU[hi]&&Date.now()-histT[hi]<6000){hist[hi]=s;histT[hi]=Date.now();histTh[hi]='';navDirty();ub();return}
-hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;histU.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));histU[histL.length-1]=(!named&&!plain)?hLU:'';if(stUnlocked()!=null&&!named&&/^Added motif/.test(histL[histL.length-1])&&seAuto()&&!wsFind('motifs'))setPanel('motifs',1);if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift();histU.shift()}hi=hist.length-1}ub()}
+hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;histU.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));histU[histL.length-1]=(!named&&!plain)?hLU:'';if(stUnlocked()!=null&&!named&&/^Added shape/.test(histL[histL.length-1])&&seAuto()&&!wsFind('motifs'))setPanel('motifs',1);if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift();histU.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
 // the one list keeps its id (2.25.0): a stamp tab belongs to it, so Undo and Redo stay in the tab that is open (the id is not part of the document)
 function applyCore(c){const els=Array.isArray(c.els)?c.els:flatEls(c.layers),L0=WBS.layers&&WBS.layers[0];c.layers=[oneLayer(els,c.tiles.map(t=>t.id),L0&&L0.u)];trayIn(c);WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));

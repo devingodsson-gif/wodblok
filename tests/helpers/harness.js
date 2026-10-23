@@ -246,14 +246,14 @@ async function addShape(page, g = 'rect') {
   return u;
 }
 // 2.4.0: a new Pattern is empty; this puts a source in it (a stamp by default, or 'motif' / 'text').
-// 2.28.0: Add source is a menu: the project's stamps, then its texts, then "Motif from the library…", which opens the library; the motif clicked there is added.
+// 2.28.0: Add source is a menu: the project's stamps, then its texts, then "Shape from the library…", which opens the library; the motif clicked there is added.
 async function patSource(page, kind = 'stamp', n = 0) {
   // the menu closes when its panel scrolls, so bring the button into view first and let the scroll event pass before opening it
   await page.locator('#peadd').scrollIntoViewIfNeeded(); await page.waitForTimeout(100);
   await page.click('#peadd');
   const items = page.locator('.rowm .ddi');
   if (kind === 'motif') {
-    await items.filter({ hasText: 'Motif from the library' }).click(); await settle(page);
+    await items.filter({ hasText: 'Shape from the library' }).click(); await settle(page);
     if (!(await page.locator('#lib button[data-m]:visible').count())) await page.locator('#lib .lfr[data-f^="b:"]:visible').first().click();
     await page.locator('#lib button[data-m]:visible').nth(n).click();
   } else {

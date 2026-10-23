@@ -76,7 +76,7 @@ function init65(){
 // the kinds, in the order of the element bar. Image, Text and Stamp exist as placed elements today (their test and drawing; dz keeps the order their
 // shared definitions were always written in); the others get them in later steps.
 elRegister('paint',{hide:true,label:'Paint',pn:'elpaint',icon:ICN.brush});
-elRegister('motif',{label:'Motif',pn:'motifs',icon:ICN.motif});
+elRegister('motif',{label:'Shape',pn:'motifs',icon:ICN.motif});
 elRegister('text',{label:'Text',pn:'text',icon:ICN.text,dz:3,is:q=>q.tx!=null,name:q=>String((q.tx&&q.tx.text)||'').replace(/\n/g,' ').slice(0,28),draw:(L,li)=>txtLayer(L,li)});
 elRegister('stamp',{label:'Stamp',pn:'stmp',icon:ICN.stamp,dz:1,is:q=>q.t!=null,name:q=>stNmId(q.t),draw:(L,li,pa,lgB)=>freeLayer(L,li,pa,lgB)});
 elRegister('pattern',{label:'Pattern',pn:'layers',icon:ICN.pattern});

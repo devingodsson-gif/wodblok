@@ -1,7 +1,7 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {BK} from './03-stamp-prints-and-drawing.js';
-import {CASP,CH,CM,CW,PL,SH,SK,SW,col,geom,inShape,okC,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {CH,CM,CW,PL,SH,SK,SW,col,geom,inShape,okC,setDim,shOf,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {isFixed,isLink,trayLoad} from './50-tray-core.js';
 import {CATS} from './05-motif-data.js';
 import {cust,flatEls,it,mkL,oneLayer,selOne,store} from './06-motif-library-folders.js';
@@ -48,9 +48,9 @@ function randomize0(fresh){const ft=WBX.wbRZ?WBX.wbRZ.get():null;window.SLC=[];
  if(ft&&ft.lib&&typeof SL!='undefined')return SL.list().then(l=>{window.SLC=(l||[]).filter(r=>r&&typeof r.tile=='string');return randomizeCore(fresh)},()=>randomizeCore(fresh));
  return randomizeCore(fresh)}
 function randomizeCore(fresh){const R=Math.random,pick=a=>a[Math.floor(R()*a.length)],rr=(a,b)=>a+R()*(b-a),ri=(a,b)=>Math.floor(rr(a,b+1)),ch=p=>R()<p,wpick=o=>{let t=R()*o.reduce((x,y)=>x+y[1],0);for(const x of o){if((t-=x[1])<=0)return x[0]}return o[0][0]};
-const FT=WBX.wbRZ?WBX.wbRZ.get():{stamps:1,text:1,frame:1,col:1,gr:1,masks:1,tx:1,pr:1,shape:0,free:1,layout:0,size:0,look:0,lib:0,jit:1};
+const FT=WBX.wbRZ?WBX.wbRZ.get():{stamps:1,text:1,frame:1,col:1,gr:1,masks:1,tx:1,pr:1,free:1,layout:0,size:0,look:0,lib:0,jit:1};
 // which kinds of change each switch allows (the arrows in the Randomize panel)
-const SUBS={};['stamps','frame','shape','free','col','gr','masks','tx','pr','layout','size','look','lib','jit'].forEach(m=>SUBS[m]=WBX.wbRZ?WBX.wbRZ.sub(m):null);const sOn=(m,k)=>!SUBS[m]||SUBS[m].has(k);
+const SUBS={};['stamps','frame','free','col','gr','masks','tx','pr','layout','size','look','lib','jit'].forEach(m=>SUBS[m]=WBX.wbRZ?WBX.wbRZ.sub(m):null);const sOn=(m,k)=>!SUBS[m]||SUBS[m].has(k);
 // An amount under 100 (the sliders in the Randomize panel) lets only some of a feature's allowed kinds of change happen on this roll (at least one), or, for a feature
 // without kinds, lets it happen on some rolls. At 100 nothing is drawn here, so a roll comes out exactly as it did before the sliders. Colours keep a plain switch.
 const AM=k=>WBX.wbRZ&&WBX.wbRZ.amt?WBX.wbRZ.amt(k):1;
@@ -61,7 +61,7 @@ const AM=k=>WBX.wbRZ&&WBX.wbRZ.amt?WBX.wbRZ.amt(k):1;
 const RAT={portrait:[[2,3],[3,4],[4,5],[5,7]],square:[[1,1]],landscape:[[3,2],[4,3],[7,5]],banner:[[1,2],[9,16],[2,1],[16,9]]},ratioPick=()=>{let a=[];if(FT.size)Object.keys(RAT).forEach(g=>{if(sOn('size',g))a=a.concat(RAT[g])});if(!a.length)a=[[2,3],[3,4],[4,5],[5,7],[1,1],[3,2],[4,3]];return pick(a)};
 const SLCn=(window.SLC||[]).length,libFree=!!(FT.lib&&sOn('lib','free')&&SLCn),libPat=!!(FT.lib&&sOn('lib','pat')&&SLCn);let libDone=false;
 const libTile=id=>{const r=pick(window.SLC);let t=null;try{t=JSON.parse(r.tile)}catch(e){}if(!t||!Array.isArray(t.items))return null;try{libMotifs({motifs:r.motifs});libColors({colors:r.colors})}catch(e){}txMerge(t);t.id=id;shOf(t);return t};
-if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.shape||FT.free||FT.layout||FT.size||FT.look||FT.lib)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
+if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.free||FT.layout||FT.size||FT.look||FT.lib)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
 const dim0=JSON.parse(JSON.stringify(WBS.dim));
 if(!fresh&&WBX.wbCap)WBX.wbCap();
 const OWN=fresh||!FT.stamps?null:rzTake();   // 2.21.0: a roll that builds new stamps drops the previous roll and holds your own elements aside until the new ones are built (a roll that only reworks what is there, such as Layout or Colours alone, changes it in place)
@@ -206,13 +206,8 @@ c.pr.t='';
 // Colours: when the palette changes (a new palette, or paper and ink swapped), kept stamps and layers that carry their own accent ink move to the new palette too
 if(FT.col&&(sOn('col','pal')||newPal)&&!noAcc){const keepN=new Set(PC),mapInk=n=>{if(!n||!okC(n)||isFixed(n)||keepN.has(n)||acc.includes(n))return n;if(!(n in inkMap))inkMap[n]=inkFor()||n;return inkMap[n]};
  c.tiles=c.tiles.map(t=>{const n=mapInk(t.ink);return n!==t.ink?{...t,ink:n}:t});c.layers=c.layers.map(l=>{const n=mapInk(l.ink);return n!==l.ink?{...l,ink:n}:l})}
-// Canvas shape: roll a new outline (never the print cover, and never Custom, which needs a file)
-if(FT.shape&&!WBS.book.on&&!WBS.dim.rt){const SGM={rect:'box',rrect:'box',circle:'round',oval:'round',arch:'arch',hex:'poly',tri:'poly',diamond:'poly',ngon:'poly'},SHL=[['rect',1.2],['rrect',1],['circle',.8],['oval',1],['arch',1],['hex',.8],['tri',.6],['diamond',.7],['ngon',.8]].filter(x=>sOn('shape',SGM[x[0]])),k=wpick(SHL.length?SHL:[['rect',1]]),nd=JSON.parse(JSON.stringify(c.dim));['cs','cr','n','co','g'].forEach(x=>delete nd[x]);
-if(k!='rect')nd.cs=k;if(CASP.includes(k)||k=='rect')nd.c=ratioPick();
-if(k=='rrect')nd.cr=ri(8,45);if(k=='ngon'){nd.n=ri(5,10);if(ch(.5))nd.co='f'}if(k=='hex'||k=='tri'){if(ch(.35))nd.co='f'}
-c.dim=nd;try{kv.set('wb14_dim',JSON.stringify(nd))}catch(e){}}
-// Canvas size on its own: a new ratio for a canvas that has one (round and regular shapes stay square)
-if(FT.size&&!FT.shape&&!WBS.book.on&&!WBS.dim.rt){const kk=c.dim.cs||'rect';if(kk=='rect'||CASP.includes(kk)){const nd2=JSON.parse(JSON.stringify(c.dim));nd2.c=ratioPick();c.dim=nd2;try{kv.set('wb14_dim',JSON.stringify(nd2))}catch(e){}}}
+// Canvas size on its own: a new ratio for the canvas
+if(FT.size&&!WBS.book.on&&!WBS.dim.rt){const nd2=JSON.parse(JSON.stringify(c.dim));nd2.c=ratioPick();c.dim=nd2;try{kv.set('wb14_dim',JSON.stringify(nd2))}catch(e){}}
 WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;const oldL=WBS.layers.slice(),oldT=WBS.tiles.slice(),oldG=WBX.wbGrade?WBX.wbGrade.get():null;WBS.selL=0;(WBX.wbApply||applyCore)(c);WBS.selL=0;
 // colour grade: a gentle look most of the time (about a quarter stay neutral). Masks: up to two light local touches.
 if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:v,isF=l=>!!(l.fr&&l.fr.on);let gl={};

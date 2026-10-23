@@ -60,7 +60,7 @@ function mtSync(){const e=$('sel');if(!e)return;const q=mtSel();if(e.classList.c
 function init74(){
  WBX.wbMotifSize=mtfSize;WBX.wbMtSel=mtSel;WBX.wbMtSync=mtSync;
  [['ssx','wx'],['ssy','wy']].forEach(([id,f])=>$(id).addEventListener('input',e=>{const q=mtSel();if(!q)return;e.stopImmediatePropagation();const v=+e.target.value/100;if(v==1)delete q[f];else q[f]=+v.toFixed(3);store();upd()},true));
- elExtend('motif',{dz:5,pn:'motifs',is:q=>q.k=='motif',name:q=>q.nm||mNm(q.m)||'Motif',draw:(L,li,pa)=>mtfLayer(L,li,pa)});
+ elExtend('motif',{dz:5,pn:'motifs',is:q=>q.k=='motif',name:q=>q.nm||mNm(q.m)||'Shape',draw:(L,li,pa)=>mtfLayer(L,li,pa)});
  // a click on the canvas with a shape armed and no stamp unlocked: a free Motif element there (64-stamp-canvas-edit.js asks first)
 // Add motif (2.7.0): a Motif in the middle of the canvas, the last one used or else the first of the library, selected; the library then changes its shape
  WBX.wbMotifAdd=()=>{const m=mtLast;if(!m){if(WBX.wbOpenPanel)WBX.wbOpenPanel('motifs');return}   /* 2.26.0: nothing chosen yet, so the library opens (it used to place the first shape, a battle axe) */WBS.brush=null;if(stUnlocked()!=null){if(WBX.wbStampAddMotif)WBX.wbStampAddMotif(m,.8);return}if(!fpL())return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.brush={m,s:.8,r:0};upd()};

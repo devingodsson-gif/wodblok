@@ -1,7 +1,7 @@
 import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CASP,DD,HO,N,SK,col,csN,csk,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {DD,HO,N,SK,col,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {DOTK} from './05-motif-data.js';
 import {cust,inkOf,it,mk,selOne,store} from './06-motif-library-folders.js';
 import {SYM,expand,symOf} from './07-symmetry.js';
@@ -15,7 +15,7 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {libPick} from './21-motif-library-ui.js';
 import {fpL} from './24-free-place-layers.js';
 import {stUnlocked} from './63-stamp-tool.js';
-const mName=k=>k[0]=='b'?N[+k.slice(1)]||'Motif':cust[k]?cust[k].n:'Motif';
+const mName=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
 let mlFold;
 const CHEV='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3l3 3-3 3"/></svg>';
 const MLMORE=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.more}</svg>`;
@@ -31,7 +31,7 @@ for(let i=t.items.length-1;i>=0;i--){const nm=gk(t.items[i]);if(done[nm])continu
 if(g.length==1&&!isT){h+=row(i);continue}
 const fr=isT?[...g]:[...g].reverse(),ns=g.filter(j=>WBS.msel.has(j)).length,open=!mlFold.has(nm),e=hx(nm),lb=hx(gnm(nm));
 h+=`<div class="mg${open?' open':''}"><div class="mr mh${ns==g.length?' on':ns?' part':''}" data-g="${e}"><span class="car" data-f="${e}" role="button" aria-label="${open?'Fold':'Unfold'} ${e}" aria-expanded="${open}">${CHEV}</span>${thumb(t.items[fr[0]])}<b>${lb}<i class="cnt">${ns&&ns<g.length?ns+'/':''}${g.length}</i></b><button type="button" class="lyb" data-gm="${e}" aria-haspopup="menu" aria-label="Actions for ${lb}">${MLMORE}</button></div>${open?`<div class="mk">${fr.map(j=>row(j,isT?0:g.indexOf(j)+1,1)).join('')}</div>`:''}</div>`}
-el.innerHTML=`<div class="ml">`+(h||`<div class="em">No motifs yet</div>`)+`</div>`;
+el.innerHTML=`<div class="ml">`+(h||`<div class="em">No shapes yet</div>`)+`</div>`;
 // the Elements header counts what the tab lists (2.25.0): each motif, and a text once
 {const n=t.items.filter(q=>!q.tg).length+new Set(t.items.filter(q=>q.tg).map(q=>q.tg)).size,c=$('lycnt');if(c)c.textContent=`${n} element${n==1?'':'s'}`}
 if(sc)el.querySelector('.ml').scrollTop=sc;if(WBX.wbTxSync)WBX.wbTxSync()}
@@ -40,10 +40,8 @@ const txAbs=(g,c)=>WBX.wbTxXf(g,M=>{M.ax+=c[0]-M.mx;M.ay+=c[1]-M.my;M.mx=c[0];M.
 const sAx=k=>e=>{const q=Q();if(!q)return;const v=e.target.value/100,f=v/(q[k]||1);QS().forEach(o=>o[k]=o===q?v:clampN((o[k]||1)*f,.2,3));store();upd()};
 const addSt=t=>{const L=WBS.layers[WBS.selL];if(L&&!L.st.includes(t.id))L.st.push(t.id)};
 const layName=()=>{const L=WBS.layers[WBS.selL];return L?L.name:'the pattern'};
-function sync(){const t=WBS.tiles[WBS.cur]||WBS.noTile,L=WBS.layers[WBS.selL],sv=(id,v)=>{if($(id).value!=v)$(id).value=v};syncAsp('c','c');syncAsp('s','s');{const k=csk();document.querySelectorAll('#cshp [data-s]').forEach(b=>{b.classList.toggle('on',b.dataset.s==k);b.disabled=WBS.book.on});
-$('caspbox').hidden=!CASP.includes(k);$('crrbox').hidden=k!='rrect';$('cngbox').hidden=k!='ngon';$('ccobox').hidden=!['hex','tri','ngon'].includes(k);$('ccirh').hidden=k=='rect';
-{const a=$('ccr'),b=$('cns');if(document.activeElement!==a)a.value=WBS.dim.cr==null?25:WBS.dim.cr;if(document.activeElement!==b)b.value=csN();if(WBX.wbNums)WBX.wbNums()}
-const ob=document.querySelectorAll('#cor [data-o]');ob.forEach(x=>x.classList.toggle('on',x.dataset.o==(WBS.dim.co=='f'?'f':'p')));if(ob.length){ob[0].textContent=k=='hex'?'Pointy top':'Point up';ob[1].textContent=k=='tri'?'Point down':'Flat top'}
+function sync(){const t=WBS.tiles[WBS.cur]||WBS.noTile,L=WBS.layers[WBS.selL],sv=(id,v)=>{if($(id).value!=v)$(id).value=v};syncAsp('c','c');syncAsp('s','s');{
+if(WBX.wbNums)WBX.wbNums()
 }document.querySelectorAll('#skind [data-k]').forEach(b=>b.classList.toggle('on',b.dataset.k==SK));$('sasprow').hidden=SK=='hex'||SK=='tri';$('shexrow').hidden=SK!='hex';$('shor').value=HO;
 if(WBX.wbTraySync)WBX.wbTraySync();$('neg').checked=!!(t&&t.neg);$('swrap').checked=!t||t.wr!==false;
 sv('shz',shOf(t).z||100);{const rr=$('shrad');if(rr){sv('shrad',shOf(t).rad||0);const row=rr.closest('.ctl');if(row)row.hidden=SK=='circle'}}sv('let',eT(t));sv('ler',eR(t));$('lers').disabled=!eT(t)||!eR(t);

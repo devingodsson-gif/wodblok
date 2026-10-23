@@ -46,7 +46,7 @@ $('icl').onclick=closeDlg;$('icx').onclick=closeDlg;$('idlg').addEventListener('
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('idlg').hidden&&!(e.target&&e.target.id=='ifnew'&&e.target.value))closeDlg()});
 function setMode(m){mode=m;$('imode').querySelectorAll('[data-m]').forEach(b=>{const on=b.dataset.m==m;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});
 const one=m=='one';$('isecS').hidden=one;$('ifullb').hidden=!one;$('scells').hidden=one;
-$('inm').value=(one?srcName||'Imported motif':(srcName||'Sheet').replace(/^./,c=>c.toUpperCase())).slice(0,40);
+$('inm').value=(one?srcName||'Imported shape':(srcName||'Sheet').replace(/^./,c=>c.toUpperCase())).slice(0,40);
 if(one){prep(src);run()}else{sPrep();setSMode(S.mode);sRun()}}
 $('imode').onclick=e=>{const b=e.target.closest('[data-m]');if(!b||!src||b.dataset.m==mode)return;setMode(b.dataset.m)};
 $('sview').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||!src)return;view=b.dataset.v;mode=='one'?drawOne():drawOv()};
@@ -103,12 +103,12 @@ const cx=(x0+x1+1)/2,cy=(y0+y1+1)/2,k=92/Math.max(x1-x0+1,y1-y0+1),f=v=>(Math.ro
 let d='',pts=0;loops.forEach(l=>{const n=l.length,P=l.map(([x,y])=>[(x-cx)*k,(y-cy)*k]),mid=i=>{const a=P[i%n],c=P[(i+1)%n];return[(a[0]+c[0])/2,(a[1]+c[1])/2]};
 if(n<3)return;const m0=mid(0);d+='M'+f(m0[0])+','+f(m0[1]);for(let i=1;i<=n;i++){const p=P[i%n],m=mid(i);d+='Q'+f(p[0])+','+f(p[1])+' '+f(m[0])+','+f(m[1])}d+='Z';pts+=n});
 last={d,pts,cx,cy,k};drawOne();
-const kb=(d.length/1024).toFixed(0);$('iinfo').textContent=`${loops.length} part${loops.length==1?'':'s'} · ${pts} points · ${kb} KB`+(d.length>180000?'. That is heavy; raise Simplify or Clean up.':'');$('iadd').textContent='Add motif';$('iadd').disabled=d.length>400000}
+const kb=(d.length/1024).toFixed(0);$('iinfo').textContent=`${loops.length} part${loops.length==1?'':'s'} · ${pts} points · ${kb} KB`+(d.length>180000?'. That is heavy; raise Simplify or Clean up.':'');$('iadd').textContent='Add shape';$('iadd').disabled=d.length>400000}
 // single shape: the traced shape drawn over the picture, where it was found
 function drawOne(){const ink=col(WBS.proj.ink),bg=col(WBS.proj.bg);$('sov').setAttribute('viewBox',`0 0 ${W} ${H}`);let o='';
 if(view=='t'){o=`<rect width="${W}" height="${H}" fill="${bg}"/>`;if(last)o+=`<path d="${last.d}" transform="translate(${last.cx} ${last.cy}) scale(${(1/last.k).toFixed(5)})" fill="${ink}" fill-rule="evenodd"/>`}
 $('sov').innerHTML=o;viewSeg();$('shint').textContent=''}
-function addOne(){if(!last)return;const d=dest();if(!d)return;const g=libG(d),nm=($('inm').value.trim()||'Imported motif').replace(/["<>&|]/g,'').slice(0,40),key='i|'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function addOne(){if(!last)return;const d=dest();if(!d)return;const g=libG(d),nm=($('inm').value.trim()||'Imported shape').replace(/["<>&|]/g,'').slice(0,40),key='i|'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 cust[key]={n:nm,svg:`<path d="${last.d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,...(g?{g}:{})};
 const t=WBS.tiles[WBS.cur];if(!t)return done(d,`Added “${nm}” to ${libPath(d)}.`);// no stamp in the project: the shape goes to the library only
 const full=$('ifull').checked,s=full?+(Math.min(SW,SH)/100*1.04).toFixed(3):.9;t.items.push(it(key,SW/2,SH/2,s));selOne(t.items.length-1);
@@ -170,8 +170,8 @@ if(S.mode=='grid'){S.xs.forEach((x,i)=>{o+=`<line x1="${f(x*w)}" y1="0" x2="${f(
 S.ys.forEach((y,j)=>{o+=`<line x1="0" y1="${f(y*h)}" x2="${w}" y2="${f(y*h)}" stroke="#3f5fe0" stroke-width="${f(sw*1.6)}" stroke-dasharray="${f(sw*6)} ${f(sw*4)}"/><line data-ly="${j}" x1="0" y1="${f(y*h)}" x2="${w}" y2="${f(y*h)}" stroke="transparent" stroke-width="${f(sw*14)}"/>`})}
 $('sov').innerHTML=o;$('shint').textContent=S.mode=='grid'?'Drag the dashed lines to fit the grid to the artwork.':'Raise "Join parts" if a shape is split, lower it if two shapes are merged.'}
 function drawCells(){const ink=col(WBS.proj.ink),bg=col(WBS.proj.bg);let n=0;
-$('scells').innerHTML=S.boxes.length?S.boxes.map((b,i)=>{const r=S.res[i],d=r&&r.d,off=S.off.has(i)||!d;if(!off)n++;return`<button type="button" data-c="${i}" class="${off?'off':''}" aria-pressed="${!off}" aria-label="Shape ${i+1}${d?'':', no ink'}"><svg viewBox="-50 -50 100 100" style="background:${bg}">${d?`<path d="${d}" fill="${ink}" fill-rule="evenodd"/>`:''}</svg><i>${i+1}</i></button>`}).join(''):'<div class="em">No motifs found. Adjust the threshold or try the other way of finding them.</div>';
-$('iadd').textContent=`Import ${n} motif${n==1?'':'s'}`;$('iadd').disabled=!n;$('iinfo').textContent=`${n} of ${S.boxes.length} motif${S.boxes.length==1?'':'s'} · click one to leave it out`}
+$('scells').innerHTML=S.boxes.length?S.boxes.map((b,i)=>{const r=S.res[i],d=r&&r.d,off=S.off.has(i)||!d;if(!off)n++;return`<button type="button" data-c="${i}" class="${off?'off':''}" aria-pressed="${!off}" aria-label="Shape ${i+1}${d?'':', no ink'}"><svg viewBox="-50 -50 100 100" style="background:${bg}">${d?`<path d="${d}" fill="${ink}" fill-rule="evenodd"/>`:''}</svg><i>${i+1}</i></button>`}).join(''):'<div class="em">No shapes found. Adjust the threshold or try the other way of finding them.</div>';
+$('iadd').textContent=`Import ${n} shape${n==1?'':'s'}`;$('iadd').disabled=!n;$('iinfo').textContent=`${n} of ${S.boxes.length} shape${S.boxes.length==1?'':'s'} · click one to leave it out`}
 $('scells').onclick=e=>{const b=e.target.closest('[data-c]');if(!b||!S)return;const i=+b.dataset.c;if(!S.res[i])return;S.off.has(i)?S.off.delete(i):S.off.add(i);drawOv();drawCells()};
 // drag grid lines
 let sd=null;$('sov').addEventListener('pointerdown',e=>{const t=e.target.closest('[data-lx],[data-ly]');if(!t||!S||mode!='sheet')return;e.preventDefault();$('sov').setPointerCapture(e.pointerId);sd={x:t.dataset.lx!=null,i:+(t.dataset.lx??t.dataset.ly)}});
