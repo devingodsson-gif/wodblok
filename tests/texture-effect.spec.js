@@ -41,3 +41,31 @@ test('Variations, Presets, Workspaces, Navigator, Textures and Grade are no long
   for (const n of ['Variations', 'Presets', 'Workspaces', 'Navigator', 'Textures', 'Colour grading']) expect(cmds).not.toContain('Open ' + n);
   expect(errors).toEqual([]);
 });
+
+// 2.27.0: a texture keeps its size in canvas units when the element is made bigger or smaller.
+test('a Shape\'s texture does not scale with the Shape: the same feature size at half and at double the width', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4, pattern: false });
+  await addShape(page); await settle(page);
+  await addEffect(page, 'shape', 'Texture');
+  const s0 = await st(page), p0 = s0.els.find(q => q.k === 'shape' && q.nm !== 'Background');
+  const feature = async w => {
+    const s = JSON.parse(JSON.stringify(s0)); const p = s.els.find(q => q.u === p0.u); p.s = w; p.wy = 1; p.fx.forEach(e => { e.md = 'wear'; });
+    await page.evaluate(j => window.__wbTest.apply(j), JSON.stringify(s)); await settle(page);
+    return page.evaluate(async () => {
+      const imgs = [...document.querySelectorAll('#txd image[href^="data:image/png"]')], im = imgs[imgs.length - 1];
+      if (!im) return null;
+      const img = new Image(); img.src = im.getAttribute('href'); await img.decode();
+      const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+      const d = x.getImageData(0, 0, c.width, c.height).data; let runs = 0, n = 0;
+      for (let j = 0; j < c.height; j++) { let prev = false; for (let i = 0; i < c.width; i++) { const a = d[(j * c.width + i) * 4 + 3] > 100; if (a && !prev) runs++; if (a) n++; prev = a; } }
+      const wUnits = +im.getAttribute('width');
+      return { runsPerUnit: runs / c.height / wUnits, wUnits };
+    });
+  };
+  const a = await feature(120), b = await feature(240);
+  expect(a && b, 'the texture picture was found').toBeTruthy();
+  const ratio = b.runsPerUnit / a.runsPerUnit;
+  expect(ratio, 'features per canvas unit stay about the same (they would halve if the texture scaled): ' + JSON.stringify([a, b])).toBeGreaterThan(0.7);
+  expect(ratio).toBeLessThan(1.4);
+  expect(errors).toEqual([]);
+});

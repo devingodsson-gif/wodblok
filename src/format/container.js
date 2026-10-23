@@ -6,7 +6,7 @@ import {fmtValidate} from './validate.js';
 // In memory, a project keeps its images as data URLs, as the app always has; the container only moves them out of the JSON.
 // Format 21 is the only one the app opens. A file made by an older app is refused with a message, never converted (owner, Oct 19 2026); a file made by a newer
 // app opens read-only and is never written back.
-const FMT_LATEST = 25;
+const FMT_LATEST = 26;
 const FMT_MIME = 'application/vnd.wodblok+zip', FMT_REF = 'wbasset:';
 const FMT_EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' };
 const FMT_TYPE = Object.fromEntries(Object.entries(FMT_EXT).map(([k, v]) => [v, k]));

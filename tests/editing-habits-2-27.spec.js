@@ -112,3 +112,33 @@ test('history steps are named by what was done, and typing in a text is one step
   expect(after.filter(x => x === 'Edited text').length, 'one step for the whole typing: ' + after.join(', ')).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
+
+test('a drag ends when the button is let go anywhere: if the release is missed, the next move without a button stops it', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.addShape(page); await H.settle(page);
+  const shp = async () => (await st(page)).els.filter(q => q.k === 'shape' && q.nm !== 'Background')[0];
+  const hb = await page.locator('#fpov [data-fh="e"]').boundingBox(), ab = await page.locator('#art').boundingBox();
+  await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2); await page.mouse.down();
+  await page.mouse.move(ab.x + ab.width + 30, hb.y, { steps: 6 });
+  const w1 = (await shp()).s;
+  // the release never reached the page (outside the window, say); the next move arrives with no button down
+  await page.evaluate(({ x, y }) => window.dispatchEvent(new PointerEvent('pointermove', { clientX: x, clientY: y, buttons: 0, bubbles: true })), { x: ab.x + ab.width * 0.5, y: hb.y });
+  await page.mouse.move(ab.x + ab.width * 0.3, hb.y, { steps: 6 });
+  expect((await shp()).s, 'it no longer follows the mouse').toBe(w1);
+  await page.mouse.up(); await H.settle(page);
+  expect(errors).toEqual([]);
+});
+
+test('a stamp tab shows a canvas in the stamp\'s own shape, and the Symmetry buttons are squares', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.showPanel(page, 'stmp'); await page.click('#smknew'); await H.settle(page); await page.click('#smkedit'); await H.settle(page); await H.showPanel(page, 'stmp'); await H.settle(page);
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('#artsh')).display), 'a rectangle stamp: the plain canvas').toBe('none');
+  await page.click('#skind [data-k="circle"]'); await H.settle(page);
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('#artsh')).display), 'a circle stamp: the canvas is a circle').toBe('block');
+  expect(await page.locator('#cvdefs clipPath#cvclip path').getAttribute('d')).toMatch(/A/);
+  await page.evaluate(() => document.querySelector('#sym').scrollIntoView({ block: 'center' }));
+  const sizes = await page.evaluate(() => [...document.querySelectorAll('#sym button')].map(b => { const r = b.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }));
+  expect(sizes.length).toBeGreaterThan(5);
+  sizes.forEach(([w, h]) => { expect(Math.abs(w - h), 'square: ' + w + 'x' + h).toBeLessThanOrEqual(1); });
+  expect(errors).toEqual([]);
+});

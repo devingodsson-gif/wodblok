@@ -98,7 +98,9 @@ function txDims(W,H,R){const s=R/Math.max(W,H,1e-6);return[Math.max(8,Math.round
 function txSeam(px,pw,ph){const src=new Uint8ClampedArray(px),hx=pw>>1,hy=ph>>1,wx=new Float32Array(pw),wy=new Float32Array(ph);
 for(let x=0;x<pw;x++)wx[x]=Math.pow(Math.sin(Math.PI*x/pw),2);for(let y=0;y<ph;y++)wy[y]=Math.pow(Math.sin(Math.PI*y/ph),2);
 for(let y=0;y<ph;y++){const y2=(y+hy)%ph;for(let x=0;x<pw;x++){const a=wx[x]*wy[y],o=(y*pw+x)*4,o2=(y2*pw+(x+hx)%pw)*4;for(let c=0;c<4;c++)px[o+c]=src[o+c]*a+src[o2+c]*(1-a)}}}
-function txBmp(S,W,H,R,tl){const Z=R>=800?Math.max(1,Math.max(W,H)/200):1;if(Z>1)S={...S,sc:S.sc/Z};const[pw,ph]=txDims(W,H,R),key=txKey(S)+'|'+pw+'x'+ph+(tl?'|tile':'');let e=TXB.get(key);if(e){TXB.delete(key);TXB.set(key,e);return e}
+// The texture keeps its size in canvas units (2.27.0): the picture is made for the whole box, so its scale is set against 200 units, whatever the box measures. A Shape or Motif
+// (R 400) that is made bigger or smaller shows the same texture, not a magnified one.
+function txBmp(S,W,H,R,tl){const M=Math.max(W,H),Z=R>=800?Math.max(1,M/200):R>=400?Math.max(.1,M/200):1;if(Z!==1)S={...S,sc:S.sc/Z};const[pw,ph]=txDims(W,H,R),key=txKey(S)+'|'+pw+'x'+ph+(tl?'|tile':'');let e=TXB.get(key);if(e){TXB.delete(key);TXB.set(key,e);return e}
 const px=txPix(S,pw,ph);if(tl)txSeam(px,pw,ph);const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;cv.getContext('2d').putImageData(new ImageData(px,pw,ph),0,0);
 e={id:++TXBN,url:cv.toDataURL('image/png'),pw,ph,key};TXB.set(key,e);while(TXB.size>90){const k=TXB.keys().next().value;txUnhost(TXB.get(k).id);TXB.delete(k)}return e}
 // big pictures stay out of the per-frame markup: they live once in a persistent block (#txd) and the page refers to them by id

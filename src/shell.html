@@ -513,9 +513,9 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 
 /* symmetry */
 .sym{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.sym button{margin:0;padding:6px 2px 4px;background:var(--field);border:1px solid var(--line);font-size:var(--fs-s);line-height:1.2;color:var(--mut);border-radius:var(--r-m)}
+.sym button{margin:0;height:auto;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;padding:4px 2px;background:var(--field);border:1px solid var(--line);font-size:var(--fs-s);line-height:1.2;color:var(--mut);border-radius:var(--r-m)}
 .sym button.on{border-color:var(--acc);color:var(--acc-ink);background:var(--acc-soft)}
-.sym svg{width:70%;margin:0 auto 4px;aspect-ratio:1}
+.sym svg{width:46%;margin:0;flex:none;aspect-ratio:1}
 
 /* motif library */
 .lib{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
@@ -929,10 +929,6 @@ body.eyedrop{cursor:crosshair}
  <div class="dock-b">
 
  <section class="pn" data-p="canvas">
-  <details class="g" open><summary>Background</summary><div class="gb">
-   <label class="chk"><input type="checkbox" id="bg_on" checked><span>Background</span></label>
-   <div class="cwrow"><span class="cwk">Colour</span><div class="cwell" id="bg_wl"></div></div>
-  </div></details>
   <details class="g" id="ctxg" open hidden><summary>Texture</summary><div class="gb">
    <label class="chk"><input type="checkbox" id="ctxon" checked><span>Canvas texture</span></label>
   </div></details>

@@ -46,7 +46,11 @@ if(STV){CW=STV[0];CH=STV[1]}else if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=10
 // Print covers always stay rectangular.
 const CSH=[['rect','Rectangle'],['rrect','Rounded'],['circle','Circle'],['oval','Oval'],['arch','Arch'],['hex','Hexagon'],['tri','Triangle'],['diamond','Diamond'],['ngon','Polygon']];let CSN;const CASP=['rect','rrect','oval','arch','diamond'];
 function csk(){if(STV||WBS.book.on)return'rect';const k=WBS.dim.cs;return CSN[k]?k:'rect'}
-const hasOut=()=>csk()!='rect';
+// In a stamp tab the canvas is the stamp's own outline (2.27.0), not its bounding rectangle: a circle stamp has a circle canvas
+const stvOut=()=>!!STV&&SK!='rect';
+let STPC=['',[]];
+function stPts(d){if(STPC[0]==d)return STPC[1];const h=document.getElementById('cvdefs'),p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);if(h)h.appendChild(p);const o=[];try{const L=p.getTotalLength(),N=240;for(let i=0;i<N;i++){const q=p.getPointAtLength(L*i/N);o.push([q.x,q.y])}}catch(e){}if(p.parentNode)p.parentNode.removeChild(p);STPC=[d,o];return o}
+const hasOut=()=>stvOut()||csk()!='rect';
 const csN=()=>Math.max(3,Math.min(16,Math.round(+WBS.dim.n||5)));
 function polyUnit(n,o){const off=o=='f'?Math.PI/n:0,P=[];for(let i=0;i<n;i++){const a=-Math.PI/2+off+2*Math.PI*i/n;P.push([Math.cos(a),Math.sin(a)])}return P}
 function polyFit(n,o){const P=polyUnit(n,o),xs=P.map(p=>p[0]),ys=P.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys),bw=Math.max(...xs)-x0,bh=Math.max(...ys)-y0,k=800/Math.max(bw,bh);return{W:+(bw*k).toFixed(3),H:+(bh*k).toFixed(3),pts:P.map(p=>[(p[0]-x0)*k,(p[1]-y0)*k])}}
@@ -57,7 +61,7 @@ function offPoly(P,d){const m=P.length;if(m<3)return null;const N=[];for(let i=0
 const R=[];for(let i=0;i<m;i++){const n1=N[(i+m-1)%m],n2=N[i],k=1+n1[0]*n2[0]+n1[1]*n2[1],c=d/Math.max(k,.15);R.push([P[i][0]+(n1[0]+n2[0])*c,P[i][1]+(n1[1]+n2[1])*c])}
 return polyArea(R)>0?R:null}
 // The outline of the canvas: d (SVG path), pts (clockwise polyline), keys (indices of the corner / marker points), vk (true when the keys are the real corners of a polygon)
-function cOut(){const k=csk(),W=CW,H=CH,fm=v=>+(+v).toFixed(2),poly=P=>'M'+P.map(p=>fm(p[0])+' '+fm(p[1])).join('L')+'Z';let pts=[],keys=[],vk=false,d='';
+function cOut(){if(stvOut()){const d=shp(0);return{d,pts:stPts(d),keys:[],vk:false}}const k=csk(),W=CW,H=CH,fm=v=>+(+v).toFixed(2),poly=P=>'M'+P.map(p=>fm(p[0])+' '+fm(p[1])).join('L')+'Z';let pts=[],keys=[],vk=false,d='';
 if(k=='circle'||k=='oval'){const rx=W/2,ry=H/2,N=160;for(let i=0;i<N;i++){const a=-Math.PI/2+2*Math.PI*i/N;pts.push([rx+rx*Math.cos(a),ry+ry*Math.sin(a)])}keys=[0,N/4,N/2,3*N/4];d=`M${fm(rx)} 0A${fm(rx)} ${fm(ry)} 0 1 1 ${fm(rx)} ${fm(H)}A${fm(rx)} ${fm(ry)} 0 1 1 ${fm(rx)} 0Z`}
 else if(k=='rrect'){const r=Math.min(W,H)/2*Math.max(0,Math.min(100,WBS.dim.cr==null?25:+WBS.dim.cr))/100;
 if(r<.5){pts=[[0,0],[W,0],[W,H],[0,H]];keys=[0,1,2,3];vk=true;d=poly(pts)}

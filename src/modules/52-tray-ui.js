@@ -189,7 +189,6 @@ function paintAll(force){paintDock(force);paintList(force);paintWells(force)}
 function init52(){
  dockEvents();listEvents();stEvents();
  const o=()=>tyP();
- mkWell($('bg_wl'),{label:'Background',what:'Paper',get:()=>o().bg,set:v=>{o().bg=v||o().bg}});
  mkWell($('wl_pi'),{label:'Ink',what:'Ink',get:()=>o().ink,set:v=>{o().ink=v||o().ink}});
  mkWell($('wl_st'),{label:'Stamp ink',what:'Stamp ink',def:'Ink',defRef:()=>o().ink,get:()=>{const t=WBS.tiles[WBS.cur];return t&&t.ink||''},set:v=>{const t=WBS.tiles[WBS.cur];if(!t)return;if(v)t.ink=v;else delete t.ink}});
  mkWell($('wl_sh'),{label:'Motif colour',what:'Motif',def:'Stamp ink',defRef:()=>{const t=WBS.tiles[WBS.cur];return t&&t.ink||o().ink},get:()=>{const m=WBX.wbMtSel&&WBX.wbMtSel();if(m)return m.ink||'';const q=QS()[0];return q&&q.ic||''},set:v=>{const m=WBX.wbMtSel&&WBX.wbMtSel();if(m){if(v)m.ink=v;else delete m.ink;return}QS().forEach(q=>{if(v)q.ic=v;else delete q.ic})}});
