@@ -43,28 +43,28 @@ test('a drag keeps the centre on the sheet, so the element can be clicked and dr
   const { errors } = await H.openApp(page, { seed: 4, pattern: false });
   await H.addShape(page); await page.keyboard.press('Escape'); await H.settle(page);
   const W = await page.evaluate(() => document.getElementById('art').viewBox.baseVal.width);
-  let e = (await st(page)).els.find(q => q.k === 'shape');
+  let e = (await st(page)).els.find(q => q.k === 'motif' && !q.bgd);
   const c = await H.canvasToClient(page, e.x, e.y), b = await page.locator('#art').boundingBox();
   await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.move(b.x + b.width + 200, c.y, { steps: 10 }); await page.mouse.up(); await H.settle(page);
-  e = (await st(page)).els.find(q => q.k === 'shape');
+  e = (await st(page)).els.find(q => q.k === 'motif' && !q.bgd);
   expect(e.x, 'centre stays on the sheet').toBeLessThanOrEqual(W);
   await page.keyboard.press('Escape'); await H.settle(page);
   const c2 = await H.canvasToClient(page, e.x - 2, e.y);
   await page.mouse.move(c2.x, c2.y); await page.mouse.down(); await page.mouse.move(c2.x - 150, c2.y, { steps: 8 }); await page.mouse.up(); await H.settle(page);
-  expect((await st(page)).els.find(q => q.k === 'shape').x, 'dragged back').toBeLessThan(e.x - 20);
+  expect((await st(page)).els.find(q => q.k === 'motif' && !q.bgd).x, 'dragged back').toBeLessThan(e.x - 20);
   expect(errors).toEqual([]);
 });
 
 test('a hidden element takes no clicks: clicking where it is selects nothing, Delete leaves it', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, pattern: false });
   await H.addShape(page); await page.keyboard.press('Escape'); await H.settle(page);
-  const s = await st(page); const e = s.els.find(q => q.k === 'shape'); e.v = false;
+  const s = await st(page); const e = s.els.find(q => q.k === 'motif' && !q.bgd); e.v = false;
   await page.evaluate(j => window.__wbTest.apply(j), JSON.stringify(s)); await H.settle(page);
   const c = await H.canvasToClient(page, e.x, e.y);
   await page.mouse.click(c.x, c.y); await H.settle(page);
   expect(await page.locator('#fpov [data-fh]').count(), 'no handles').toBe(0);
   await page.keyboard.press('Delete'); await H.settle(page);
-  expect((await st(page)).els.filter(q => q.k === 'shape').length, 'still there').toBe(1);
+  expect((await st(page)).els.filter(q => q.k === 'motif' && !q.bgd).length, 'still there').toBe(1);
   expect(errors).toEqual([]);
 });
 

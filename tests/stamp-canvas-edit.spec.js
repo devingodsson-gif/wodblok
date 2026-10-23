@@ -21,9 +21,9 @@ const handle = (page, k) => page.locator(`#stoh [data-hd="${k}"]`);
 const centre = async loc => { const b = await loc.boundingBox(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; };
 const drag = async (page, from, to) => { await page.mouse.move(from.x, from.y); await page.mouse.down(); await page.mouse.move((from.x + to.x) / 2, (from.y + to.y) / 2, { steps: 3 }); await page.mouse.move(to.x, to.y, { steps: 3 }); await page.mouse.up(); await settle(page); };
 
-test('the Shapes panel is on the Pattern rail', async ({ page }) => {
+test('the Motif panel is on the Pattern rail', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
-  await expect(page.locator('#elb [data-k="shape"]')).toBeVisible();   // the element bar opens it
+  await expect(page.locator('#elb [data-k="motif"]')).toBeVisible();   // the element bar opens it
   await openPanel(page, 'motifs');
   expect(await page.locator('#lib .lfr').count()).toBeGreaterThan(0);
   expect(errors).toEqual([]);

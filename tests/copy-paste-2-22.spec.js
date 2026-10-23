@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { openApp, settle, getState, noPattern, addShape } = require('./helpers/harness');
 // 2.22.0: Ctrl+C / X / V on selected elements, and the right-click menu.
-const shapes = async page => JSON.parse(await getState(page)).els.filter(q => q.k === 'shape');
+const shapes = async page => JSON.parse(await getState(page)).els.filter(q => q.k === 'motif' && !q.bgd);
 
 test('copy then paste adds an offset copy and selects it; cut removes; paste after cut brings it back', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });

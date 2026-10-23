@@ -30,7 +30,7 @@ let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[pa
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={xrec:'Export',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',mlist:'Shape',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
+const PNAME={xrec:'Export',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Motif',mlist:'Element',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
 const EL_ONLY=['layers','stmp','motifs','text','elpaint','mlist'];
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
@@ -357,7 +357,7 @@ let histL=['Start'],histT=[Date.now()],histTh=[''],histU=[''];
 const HK={tiles:'Stamp change',els:'Element change',layers:'Layer change',proj:'Colours',dim:'Canvas size',pg:'Grid',pr:'Roughness',tex:'Texture',texLib:'Texture library',grade:'Grade'};
 // What one step did to the elements, in words (2.27.0): "Moved shape", "Edited text", "Resized 3 elements"... hLU keeps the uid when only one element changed
 let hLU='';
-const hKN={text:'text',shape:'shape',motif:'motif',stamp:'stamp',pattern:'pattern',paint:'paint',group:'group'};
+const hKN={text:'text',motif:'motif',stamp:'stamp',pattern:'pattern',paint:'paint',group:'group'};
 function hEls(c){const m=new Map();(Array.isArray(c.els)?c.els:[]).forEach(p=>m.set(String(p.u),p));return m}
 function hElWords(A,B){const a=hEls(A),b=hEls(B);if(!a.size&&!b.size)return'';const add=[...b.keys()].filter(u=>!a.has(u)),rem=[...a.keys()].filter(u=>!b.has(u)),kn=p=>hKN[p.k]||'element';
 if(add.length||rem.length){if(add.length&&rem.length)return'';const ks=(add.length?add.map(u=>b.get(u)):rem.map(u=>a.get(u))),n=ks.length,w=add.length?'Added ':'Removed ';return w+(n==1?kn(ks[0]):n+' elements')}

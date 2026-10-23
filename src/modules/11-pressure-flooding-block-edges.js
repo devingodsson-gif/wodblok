@@ -3,7 +3,7 @@ import {BK,bkH} from './03-stamp-prints-and-drawing.js';
 import {shBleed,HO,ORN,SH,SK,SW,col,ornPts,rng,useT} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,it} from './06-motif-library-folders.js';
 import {inkRuns,items} from './09-stamp-items-and-print-runs.js';
-import {build,hx} from './10-layer-grids.js';
+import {build,hx,runPaint} from './10-layer-grids.js';
 import {isOf} from './16-texture-generators.js';
 import {txoG} from './17-texture-panel-and-previews.js';
 // Uneven pressure + ink flooding. Each impression uses one of 16 random "heavy side" directions.
@@ -82,7 +82,7 @@ nf=(id,fq,oc,sd,m)=>`<filter id="${id}${k}" filterUnits="userSpaceOnUse" x="0" y
 fd=FL>0?nf('na',.07,3,seed,'4 0 0 0 -1.6')+nf('nb',.035,2,seed+13,'8 0 0 0 -4.4'):'',
 tone=FL>0?`<rect width="${SW}" height="${SH}" fill="#fff" filter="url(#na${k})" mask="url(#tn1${x}_${b})"/><rect width="${SW}" height="${SH}" fill="#fff" filter="url(#nb${k})" mask="url(#tn2${x}_${b})"/>`:'';
 const mkm=(id,body)=>`<mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shapeOf(body)}</mask>`,rm=rn?rn.map((r,j)=>mkm('mp'+k+'r'+j,blk+items(t,{c:'#fff',d:'#000'},0,12,r.sel))).join('')+(frame?mkm('mp'+k+'rr',blk+frame):''):'';
-o+=fd+`<mask id="mp${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shape}</mask>${rm}${t.neg?`<g id="q${k}">${shBleed(ci)}<g clip-path="url(#shc${t.id})">`:`<g id="q${k}" clip-path="url(#shc${t.id})">`}${isOf(t)?`<g mask="url(#is${t.id})">`:''}${rn?rn.map((r,j)=>`<rect width="${SW}" height="${SH}" fill="${r.c?col(r.c):ci}" mask="url(#mp${k}r${j})"/>`).join('')+(frame?`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k}rr)"/>`:''):`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k})"/>`}${txoG(t,'mp'+k)}${isOf(t)?'</g>':''}${t.neg?'</g></g>':'</g>'}`;{const _pc=o.slice(_ob);BK.PC[k]=_pc;BK.P[k]=bkH(_pc+'|'+(BK.PF[x]||''));o=o.slice(0,_ob)+'<!--@P:'+k+'-->'+_pc+'<!--@-->'}});BK.PD.set(x,{k:_ck,o:o.slice(_o0),pf:BK.PF[x],pc:_bt.map(b=>{const k=x+'_'+b;return[k,BK.PC[k],BK.P[k]]})})});
+o+=fd+`<mask id="mp${k}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${tone}${shape}</mask>${rm}${t.neg?`<g id="q${k}">${shBleed(ci)}<g clip-path="url(#shc${t.id})">`:`<g id="q${k}" clip-path="url(#shc${t.id})">`}${isOf(t)?`<g mask="url(#is${t.id})">`:''}${rn?rn.map((r,j)=>runPaint(t,r,`mp${k}r${j}`,ci,12)).join('')+(frame?`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k}rr)"/>`:''):`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#mp${k})"/>`}${txoG(t,'mp'+k)}${isOf(t)?'</g>':''}${t.neg?'</g></g>':'</g>'}`;{const _pc=o.slice(_ob);BK.PC[k]=_pc;BK.P[k]=bkH(_pc+'|'+(BK.PF[x]||''));o=o.slice(0,_ob)+'<!--@P:'+k+'-->'+_pc+'<!--@-->'}});BK.PD.set(x,{k:_ck,o:o.slice(_o0),pf:BK.PF[x],pc:_bt.map(b=>{const k=x+'_'+b;return[k,BK.PC[k],BK.P[k]]})})});
 useT(WBS.tiles[WBS.cur]);return o}
 let raf=0;const upd=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;WBH.draw();build();if(typeof WBH.syncPr=='function')WBH.syncPr()})};
 const Q=()=>(WBS.tiles[WBS.cur]||WBS.noTile).items[WBS.sel];

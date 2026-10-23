@@ -16,8 +16,8 @@ const canvasClick = async (page, fx, fy) => {
 test('the element bar has one button per kind, left of centre; the tray starts right of centre', async ({ page }) => {
   const { errors } = await openApp(page);
   const btn = page.locator('#elb .elbb');
-  await expect(btn).toHaveCount(7);   // 2.26.0: Select (V) comes first again; still no Image button
-  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Select', 'Paint', 'Motif', 'Shape', 'Text', 'Stamp', 'Pattern']);
+  await expect(btn).toHaveCount(6);   // 2.26.0: Select (V) comes first again; still no Image button
+  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Select', 'Paint', 'Motif', 'Text', 'Stamp', 'Pattern']);
   await expect(page.locator('#elb [data-k="paint"]')).toBeHidden();   // the brush is put away for now
   for (const pn of ['stmp', 'layers']) await expect(page.locator(`.rail [data-pn="${pn}"]`)).toBeHidden();   // element panels have no rail button
   const vb = await page.locator('.viewbar').boundingBox(), el = await page.locator('#elb').boundingBox(), ty = await page.locator('#tyc').boundingBox();
@@ -42,13 +42,13 @@ test('a bar button opens its panel and Add there makes the element, just above t
   await addKind(page, 'pattern'); await settle(page);
   expect(await kinds()).toEqual(['pattern']);
   await addShape(page);
-  expect(await kinds()).toEqual(['pattern', 'shape']);
+  expect(await kinds()).toEqual(['pattern', 'motif']);
   await page.click('#elb [data-k="text"]'); await settle(page);
-  expect(await kinds()).toEqual(['pattern', 'shape']);
+  expect(await kinds()).toEqual(['pattern', 'motif']);
   await addKind(page, 'text'); await settle(page);
-  expect(await kinds()).toEqual(['pattern', 'shape', 'text']);
+  expect(await kinds()).toEqual(['pattern', 'motif', 'text']);
   await page.click('#elb [data-k="motif"]'); await settle(page);
-  expect((await kinds()).includes('motif')).toBe(false);   // 2.4.0: the Motif button makes nothing, a pick arms it
+  expect((await kinds()).filter(k => k == 'motif').length).toBe(1);   // 2.4.0: the Motif button makes nothing more, a pick arms it
   await expect(page.locator('#elb [data-k="motif"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
   await page.keyboard.press('Escape'); await settle(page);            // Escape (or V) puts the tool away: Select is in hand again
@@ -73,64 +73,19 @@ test('the Stamp button arms the stamp at once (2.26.0) and opens the Stamp prope
   expect(errors).toEqual([]);
 });
 
-test('the Shape button makes nothing; it shows the presets (and the pen), and a preset arms it and a click places it', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await noPattern(page);
-  await page.click('#elb [data-k="shape"]'); await settle(page);
-  expect(JSON.parse(await getState(page)).els).toHaveLength(0);
-  await expect(page.locator('#shp_pre')).toBeVisible();
-  await expect(page.locator('#shp_pen')).toBeVisible();
-  await expect(page.locator('#shp_f')).toBeHidden();
-  await page.click('#shp_pre [data-g="hex"]'); await settle(page);
-  expect(JSON.parse(await getState(page)).els).toHaveLength(0);          // 2.20.0: a preset arms the shape; the canvas click places it
-  await placeArmed(page, 'shape');
-  const els = JSON.parse(await getState(page)).els;
-  expect(els.map(q => q.k + ':' + q.sh)).toEqual(['shape:hex']);
-  await expect(page.locator('#shp_f')).toBeVisible();
-  expect(errors).toEqual([]);
-});
-
-test('Import image in the Shape panel asks for a picture, then makes a Rectangle Shape filled with it; the Fill group shows it', async ({ page }, testInfo) => {
+test('Import image with nothing picked makes a Rectangle motif filled with the picture; the Fill group shows it', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   const f = path.join(testInfo.outputDir, 'dot.png');
   fs.mkdirSync(testInfo.outputDir, { recursive: true });
   fs.writeFileSync(f, Buffer.from(PNG, 'base64'));
-  await page.click('#elb [data-k="shape"]'); await settle(page);
-  const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#shp_imp')]);
-  await fc.setFiles(f);
+  await page.setInputFiles('#lfafile', f);
   await settle(page);
   const els = JSON.parse(await getState(page)).els;
   expect(els).toHaveLength(1);
-  expect(els[0]).toMatchObject({ k: 'shape', sh: 'rect', fl: 'img' });
+  expect(els[0]).toMatchObject({ k: 'motif', fl: 'img' });
   expect(els[0].a).toBeTruthy();
-  await expect(page.locator('#shp_fk [data-f="img"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#mf_fk [data-f="img"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#lfars [data-a]')).toHaveCount(1);
-  expect(await page.$$eval('#dyn use[href^="#sai"]', u => u.length)).toBe(1);
-  expect(errors).toEqual([]);
-});
-
-test('Shape properties have a clear Import image button: from the Shape button it makes a Shape that shows the picture; on a selected Shape it fills that Shape', async ({ page }, testInfo) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await noPattern(page);
-  const f = path.join(testInfo.outputDir, 'dot2.png');
-  fs.mkdirSync(testInfo.outputDir, { recursive: true });
-  fs.writeFileSync(f, Buffer.from(PNG, 'base64'));
-  await page.click('#elb [data-k="shape"]'); await settle(page);
-  await expect(page.locator('#shp_imp')).toBeVisible();
-  await expect(page.locator('#shp_imp')).not.toHaveClass(/primary/);
-  let [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#shp_imp')]);
-  await fc.setFiles(f); await settle(page);
-  let els = JSON.parse(await getState(page)).els;
-  expect(els.map(q => q.k)).toEqual(['shape']);   // still a Shape, no Image element
-  expect(els[0]).toMatchObject({ sh: 'rect', fl: 'img' });
-  // a second Shape, filled with the picture through its own Fill group
-  await addShape(page, 'ellipse');
-  await page.click('#shp_fk [data-f="img"]'); await settle(page);
-  await expect(page.locator('#lfaimp')).toHaveClass(/primary/);
-  [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#lfaimp')]);
-  await fc.setFiles(f); await settle(page);
-  els = JSON.parse(await getState(page)).els;
-  expect(els.map(q => q.k + ':' + q.sh + ':' + q.fl)).toEqual(['shape:rect:img', 'shape:ellipse:img']);
   expect(errors).toEqual([]);
 });

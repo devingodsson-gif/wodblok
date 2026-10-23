@@ -8,7 +8,7 @@ import {tbArm} from './26-text-boxes.js';
 // What is armed: 'motif' (WBS.brush), 'text' (WBS.txArm or a text brush), 'stamp' or 'picture' (WBS.fpB: a stamp id or a picture id).
 function plKind(){if(WBX.wbPaMode&&WBX.wbPaMode()!='off')return'paint';if(WBS.txArm||(WBS.brush&&WBS.brush.txt))return'text';if(WBS.plArm)return WBS.plArm.k;if(WBS.brush)return'motif';if(WBS.fpB!=null&&WBS.fpB!==false&&WBS.fpB!=='')return'stamp';return''}
 // the control that arms each kind: pressing it while another kind is armed puts that one away first; pressing it while its own kind is armed is left to the control (it switches or toggles)
-const PL_ARM={shape:'#shp_pre [data-g]',motif:'#lib [data-m]',stamp:'#lfpst [data-t]',text:'#tx_go',paint:'section.pn[data-p="elpaint"],#elopt'};   // Paint (2.3.0): its own panel (size, colour, tip, eraser) does not put the brush away
+const PL_ARM={motif:'#lib [data-m]',stamp:'#lfpst [data-t]',text:'#tx_go',paint:'section.pn[data-p="elpaint"],#elopt'};   // Paint (2.3.0): its own panel (size, colour, tip, eraser) does not put the brush away
 function plDisarm(){const k=plKind();if(!k)return false;
  if(k=='paint'){WBX.wbPaArm('off');return true}
  if(WBS.txArm)tbArm(false);

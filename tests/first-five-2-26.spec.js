@@ -4,7 +4,7 @@ const H = require('./helpers/harness');
 const st = async page => JSON.parse(await H.getState(page));
 const els = async (page, k) => (await st(page)).els.filter(q => q.k === k);
 
-for (const k of ['shape', 'pattern', 'stamp']) {
+for (const k of ['pattern', 'stamp']) {
   test(`the ${k} bar button arms its tool at once: one click on the bar, one click on the canvas, one ${k}`, async ({ page }) => {
     const { errors } = await H.openApp(page, { seed: 4 });
     await H.noPattern(page);
@@ -35,12 +35,12 @@ test('the Text bar button arms text at once; Select (V) is the first button, sho
   await page.mouse.click(b.x + b.width * 0.4, b.y + b.height * 0.4); await H.settle(page);
   expect((await els(page, 'text')).length).toBe(1);
   await page.keyboard.press('Escape'); await H.settle(page);
-  await page.click('#elb [data-k="shape"]'); await H.settle(page);
+  await page.click('#elb [data-k="pattern"]'); await H.settle(page);
   await page.click('#elb [data-k="select"]'); await H.settle(page);
   await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('#elb [data-k="shape"]')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('#elb [data-k="pattern"]')).toHaveAttribute('aria-pressed', 'false');
   await page.mouse.click(b.x + b.width * 0.8, b.y + b.height * 0.8); await H.settle(page);
-  expect((await els(page, 'shape')).length, 'Select puts the tool away: a click places nothing').toBe(0);
+  expect((await els(page, 'pattern')).length, 'Select puts the tool away: a click places nothing').toBe(0);
   expect(errors).toEqual([]);
 });
 

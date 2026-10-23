@@ -3,7 +3,7 @@
 const { test, expect } = require('@playwright/test');
 const { openApp, settle, getState, addShape } = require('./helpers/harness');
 
-const el = async page => (JSON.parse(await getState(page)).els || []).filter(q => q.k === 'shape')[0];
+const el = async page => (JSON.parse(await getState(page)).els || []).filter(q => q.k === 'motif' && !q.bgd)[0];
 const box = async (page, h) => { const r = await page.locator(`#fpov [data-fh="${h}"]`).boundingBox(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; };
 const pull = async (page, h, dx, dy, key) => { const c = await box(page, h); if (key) await page.keyboard.down(key); await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.move(c.x + dx, c.y + dy, { steps: 6 }); await page.mouse.up(); if (key) await page.keyboard.up(key); await settle(page); };
 

@@ -9,7 +9,7 @@ test('a new project starts with a Background shape: canvas-sized, first tray col
   const s = await state(page), bg = s.els.filter(q => q.nm === 'Background');
   expect(bg).toHaveLength(1);
   expect(s.els[0].nm, 'at the bottom of the list').toBe('Background');
-  expect(bg[0].k).toBe('shape'); expect(bg[0].sh).toBe('rect');
+  expect(bg[0].k).toBe('motif');
   expect(bg[0].ink, 'the first tray colour, linked').toBe('@' + s.proj.ts[0]);
   const b = await page.locator('#art').evaluate(a => { const v = a.viewBox.baseVal; return { width: v.width, height: v.height }; });
   expect(bg[0].s).toBeCloseTo(b.width, 0); expect(bg[0].s * bg[0].wy).toBeCloseTo(b.height, 0);

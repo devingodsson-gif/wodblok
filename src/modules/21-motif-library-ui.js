@@ -23,7 +23,8 @@ const lbLeaf=p=>p.slice(p.lastIndexOf('/')+1);
 const lbIn=(p,a)=>typeof p=='string'&&(p===a||p.startsWith(a+'/'));
 const lbId=p=>!p?'/':lbRoot(p)?p:'g:'+p;
 const lbName=v=>fClean(v).replace(/\//g,'').replace(/^b:/i,'').trim();
-const lbSort=(a,b)=>a.n.localeCompare(b.n,undefined,{numeric:true,sensitivity:'base'});
+const lbBasicTop=n=>n&&n.t=='b'&&n.orig=='Basic shapes'?1:0;   // 2.31.0: the Basic shapes set comes first
+const lbSort=(a,b)=>(lbBasicTop(b)-lbBasicTop(a))||a.n.localeCompare(b.n,undefined,{numeric:true,sensitivity:'base'});
 const fOf=k=>k[0]=='b'?BF[k]:(cust[k]||{}).g;
 const fSet=(k,g)=>{if(k[0]=='b'){if(g)BF[k]=g;else delete BF[k]}else if(cust[k]){if(g)cust[k].g=g;else delete cust[k].g}};
 const mNm=k=>k[0]=='b'?N[+k.slice(1)]||'Motif':cust[k]?cust[k].n:'Motif';
