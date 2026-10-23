@@ -7,7 +7,7 @@ const el = async (page, k) => JSON.parse(await getState(page)).els.find(q => q.k
 test('the Element group is in the selected element\'s panel: Shape, Text, Stamp; Rotate works on each', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
-  for (const [k, pn] of [['shape', 'mlist'], ['text', 'text'], ['stamp', 'stmp']]) {
+  for (const [k, pn] of [['motif', 'motifs'], ['text', 'text'], ['stamp', 'stmp']]) {
     await page.click(`#elb [data-k="${k}"]`); await settle(page);
     await addKind(page, k); await settle(page);
     if (k === 'stamp') { const b = await page.locator('#art').boundingBox(); await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await settle(page); }   // a placed stamp is picked by a click

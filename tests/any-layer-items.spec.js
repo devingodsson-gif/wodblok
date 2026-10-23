@@ -30,7 +30,7 @@ test('the old Arrangement, Stamps in the pattern, Manual arrangement, Variation 
   await openPanel(page, 'layers');
   const shown = await page.locator('section.pn[data-p="layers"] > details.g').evaluateAll(els => els.filter(e => !e.hidden && e.offsetParent !== null).map(e => e.querySelector('summary').firstChild.textContent.trim()));
   for (const old of ['Arrangement', 'Stamps in the pattern', 'Manual arrangement', 'Variation', 'Impression']) expect(shown, old).not.toContain(old);
-  for (const [sel, pn] of [['#lfpst', 'stmp'], ['#lfars', 'mlist'], ['#lalg', 'mlist']]) {
+  for (const [sel, pn] of [['#lfpst', 'stmp'], ['#lfars', 'motifs'], ['#lalg', 'mlist']]) {
     expect(await page.locator(sel).evaluate(e => e.closest('section.pn').dataset.p), sel).toBe(pn);
   }
   expect(errors).toEqual([]);

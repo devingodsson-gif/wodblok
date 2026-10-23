@@ -5,7 +5,7 @@ test('the File menu lists Save, Save as, Import and Export; Export opens the Exp
   const { errors } = await openApp(page);
   await page.click('#fileb');
   const items = await page.$$eval('#filem > button, #filem > label', b => b.map(x => x.textContent.replace(/Ctrl\+S/, '').trim()));
-  expect(items).toEqual(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save project', 'Save project as…', 'Save as template…', 'Import image as motif…', 'Export…', 'Settings…']);
+  expect(items).toEqual(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save project', 'Save project as…', 'Save as template…', 'Import image as shape…', 'Export…', 'Settings…']);
   await page.click('#xrm'); await settle(page);
   await expect(page.locator('section.pn[data-p="xrec"]')).toBeVisible();
   await page.click('#fileb'); await page.click('#psvm'); await settle(page);
