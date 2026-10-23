@@ -17,7 +17,7 @@ test('a roll replaces the previous roll: the count does not grow roll after roll
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await addShape(page);
-  const own = (await st(page)).els.find(q => q.k === 'shape').u;
+  const own = (await st(page)).els.find(q => q.k === 'motif' && !q.bgd).u;
   const counts = [];
   for (let i = 0; i < 4; i++) { await roll(page); const s = await st(page); counts.push(s.els.length); expect(s.els.some(q => q.u === own), 'roll ' + (i + 1)).toBe(true); }
   expect(Math.max(...counts)).toBeLessThan(counts[0] * 3);   // before 2.21.0 each roll kept every earlier one on top
@@ -29,7 +29,7 @@ test('the switch "Start from an empty canvas" removes your own elements before a
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await addShape(page);
-  const own = (await st(page)).els.find(q => q.k === 'shape').u;
+  const own = (await st(page)).els.find(q => q.k === 'motif' && !q.bgd).u;
   await page.evaluate(() => window.__wbTest.commands.run('panel.rand'));
   await settle(page);
   await page.locator('#rzfresh').check(); await settle(page);

@@ -69,5 +69,5 @@ function init82(){if(!$('mf_f'))return;
  if(WBX.wbMkWell){const pj=()=>WBS.proj,first=()=>{const T=mfT();return T?T.list[0]:null};
   WBX.wbMkWell($('mf_ow2'),{label:'Outline colour',what:'Outline',defRef:()=>{const T=mfT();if(T&&T.k=='items'){const t=WBS.tiles[WBS.cur];return T.list[0].ic||(t&&t.ink)||pj().ink}return pj().ink},get:()=>{const q=first();return q&&q.sk||''},set:v=>{each(q=>{if(v)q.sk=v;else delete q.sk})}});
   WBX.wbMkWell($('mf_cw'),{label:'Motif colour',what:'Motif',defRef:()=>pj().ink,get:()=>{const q=first();return q&&q.ink||''},set:v=>{each(q=>{if(v)q.ink=v;else delete q.ink})}})}
- WBX.wbMfSync=mfSync;WBX.wbMotifImage=mfImage;WBX.wbMtHit=mtHit}
+ WBX.wbMfSync=mfSync;WBX.wbMotifImage=mfImage;WBX.wbMtHit=mtHit;WBX.wbMtWarm=mtShape}
 export {init82,mfSync,mtHit};

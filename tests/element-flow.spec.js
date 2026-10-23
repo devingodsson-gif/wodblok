@@ -7,12 +7,12 @@ const st = async page => JSON.parse(await getState(page));
 
 test('selecting an element on the canvas jumps to its panel', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
-  await addShape(page);                                // the Shape panel is shown for the new shape
+  await addShape(page);                                // the Motif panel is shown for the new motif
   await page.click('#rcls'); await page.keyboard.press('Escape'); await settle(page);
-  await expect(page.locator('section.pn[data-p="mlist"]')).toBeHidden();
+  await expect(page.locator('section.pn[data-p="motifs"]')).toBeHidden();
   const b = await page.locator('#art').boundingBox();
   await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await settle(page);   // the shape is in the middle of the canvas
-  await expect(page.locator('section.pn[data-p="mlist"]')).toBeVisible();
+  await expect(page.locator('section.pn[data-p="motifs"]')).toBeVisible();
   expect(errors).toEqual([]);
 });
 

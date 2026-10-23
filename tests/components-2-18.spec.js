@@ -29,7 +29,7 @@ test('buttons, dropdowns and fields in every panel sit on the height scale (18, 
 test('every shape picker is the same component: a four-column grid of icon buttons that carry their name', async ({ page }) => {
   const { errors } = await openApp(page);
   await addShape(page);
-  for (const [panel, sel] of [['canvas', '#cshp'], ['pgrid', '#pgsh'], ['stmp', '#skind'], ['mlist', '#shp_pre']]) {
+  for (const [panel, sel] of [['canvas', '#cshp'], ['pgrid', '#pgsh'], ['stmp', '#skind']]) {
     await openPanel(page, panel); await settle(page);
     if (panel === 'stmp') await page.evaluate(() => document.querySelector('#skind').closest('details,section')?.setAttribute('open', ''));
     // a picker inside a closed group has no layout: it must at least have no column override of its own
@@ -49,7 +49,7 @@ test('every shape picker is the same component: a four-column grid of icon butto
 test('Import image, Edit and the Randomize panel button are secondary; the only primary buttons are a view\'s one key action', async ({ page }) => {
   const { errors } = await openApp(page);
   await addShape(page);
-  for (const id of ['shp_imp', 'smkedit', 'rzdo']) await expect(page.locator('#' + id)).not.toHaveClass(/primary/);
+  for (const id of ['smkedit', 'rzdo']) await expect(page.locator('#' + id)).not.toHaveClass(/primary/);
   expect(errors).toEqual([]);
 });
 
@@ -108,7 +108,7 @@ test('tooltips: a control that shows its own words has none; an icon-only button
 
 test('no empty groups; the Save as template footer is Cancel then Save; kbd uses the app font; the folder menu shows at rest', async ({ page }) => {
   const { errors } = await openApp(page, { pattern: false });
-  await openPanel(page, 'mlist'); await settle(page);
+  await openPanel(page, 'motifs'); await settle(page);
   const empty = await page.evaluate(() => [...document.querySelectorAll('section.pn:not([hidden]) details.g')].filter(d => d.offsetParent !== null && d.querySelector(':scope>.gb') && !d.querySelector(':scope>.gb').offsetHeight).map(d => d.querySelector('summary').textContent.trim()));
   expect(empty).toEqual([]);
   expect(await page.evaluate(() => { const f = document.querySelector('#tpsok').closest('.dlg-f'); const a = [...f.querySelectorAll('button')].map(b => b.id); return !!f && a.join() === 'tpscx,tpsok'; })).toBe(true);

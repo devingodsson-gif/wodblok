@@ -40,10 +40,10 @@ test('Ctrl+D duplicates the selected element on the canvas', async ({ page }) =>
   expect(errors).toEqual([]);
 });
 
-test('a segmented control marked with aria-pressed shows its selected button (Shape fill)', async ({ page }) => {
+test('a segmented control marked with aria-pressed shows its selected button (Motif fill)', async ({ page }) => {
   const { errors } = await openApp(page);
   await addShape(page); await settle(page);
-  const bg = f => page.locator(`#shp_fk [data-f="${f}"]`).evaluate(e => getComputedStyle(e).backgroundColor);
+  const bg = f => page.locator(`#mf_fk [data-f="${f}"]`).evaluate(e => getComputedStyle(e).backgroundColor);
   expect(await bg('solid')).not.toBe(await bg('none'));
   expect(errors).toEqual([]);
 });
