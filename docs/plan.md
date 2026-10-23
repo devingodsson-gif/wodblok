@@ -557,6 +557,14 @@ Between us only (never in the UI): a stamp parent is a stamp (a template, a tile
 - Tests: `add-arm-2-20.spec.js` (5); the Add helpers in `tests/helpers/harness.js` (`addKind`, `placeArmed`, `addShape`) now arm and click, and the specs that add elements use them.
 - Run: add-arm, element-bar, element-panels, element-group, text-paragraph and the other 22 specs that add elements, plus 13 that use the shape helpers (all passing, 127 tests); `check:style` and `check:platform` pass. Not run: CI, the full suite, WebKit, `npm run perf` (placing a click now arms a ghost on the existing overlay; no drawing path changed). No snapshot or golden changed; pixel goldens that show the Add flow would be unaffected, one that shows a text box being edited would differ.
 
+### 2.30.0 (Oct 23 2026): the full test run after 2.27 to 2.29, specs brought up to date. Format 26 unchanged
+The first full run since 2.26 (Chromium, 1.6 h): 520 passed, 53 failed. Two failures were real and are fixed in the app; the rest were specs and helpers that had not caught up.
+- **A small text box had lost its width handle** (2.27.0): the rule that drops side handles on a squeezed shape counted anything under five handle-widths; a one-line text of small size fell under it, and the side squares that set its width went. A side handle is now dropped only when it would sit on top of the corner handles (under four handle-widths).
+- **The Randomize "All / 3 of 5" buttons showed a tooltip repeating their name** (2.29.0): the hover-name watcher saw them while their word was still empty. They start with "All" in the page itself.
+- **Test helper**: Settle also waits for the Randomize cover to leave (a click met the cover and did nothing), Add source scrolls its button into view before opening the menu (a panel scroll closes row menus), a stamp instance can be asked for by stamp.
+- **Specs**: the Background shape and the new words (colour-tray, print-proof, components, motif-export), file format 26 (roundtrip), placed text in the flat list (text-randomize, with more seeds, because the seeded draws moved when 2.27.0 removed the canvas-background draw), Pattern panel showing before Add source (stamp-library-tool), 2.30.0 seam tolerance for two specky rolls (repeat-tile; looked at in the 3 x 3 view, no seam).
+- **Not changed, waiting for the owner**: 28 SVG/state snapshots (scenarios, roundtrip, launch) that show the Background rect gone and the seeded rolls moved.
+
 ### 2.29.1 (Oct 23 2026): hotfix, the page could freeze on opening a shape set
 The hover-name watcher of 2.29.0 set a button's title again and again when its name itself ended in brackets (a few shape names do), so opening such a set in the Motifs library locked the page. A name that ends in brackets is now left alone. Found by the full test run that followed 2.29.0.
 

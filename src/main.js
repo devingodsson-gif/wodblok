@@ -51,7 +51,7 @@ import {init53} from './modules/53-colourways.js';
 import {init54} from './modules/54-templates.js';
 import {init57} from './modules/57-saved-colours.js';
 import {init62} from './modules/62-text-styles.js';
-import {init63,stampAt,stampToCanvas,stUnlocked} from './modules/63-stamp-tool.js';
+import {init63,stampAt,stampToCanvas,stUnlocked,STP} from './modules/63-stamp-tool.js';
 import {init64} from './modules/64-stamp-canvas-edit.js';
 import {init65} from './modules/65-element-core.js';
 import {init67} from './modules/67-pattern-element.js';
@@ -150,4 +150,4 @@ init64();
 // a launch with no template picker is an untouched new project: no unsaved dot, nothing to confirm before opening another (2.22.1; the picker's own finish used to set this)
 if(!WBS.cp.id&&WBS.cp.saved===''){WBS.cp.saved=coreStr()}
 if(WBX.wbEnhance)WBX.wbEnhance();   // value boxes on the slider rows that panels wrote themselves
-window.__wbTest = { histLabels: () => WBX.wbHistLabels(), markClean: () => { WBS.cp.saved = coreStr(); WBX.wbPaintPst && WBX.wbPaintPst(); }, apply: s => WBX.wbApply(JSON.parse(s)), resetHistory: () => WBX.wbResetHist && WBX.wbResetHist(), stampAt, stampToCanvas, unlockedStamp: stUnlocked, state: () => coreStr(), kv, account: acAccount, recoveryTick: rcTick, printsBusy: () => !BK.off && !!(BK.busy || BK.q.size), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
+window.__wbTest = { stampIdOf: i => { const it = STP.items[i]; return it ? it[0] : null; }, histLabels: () => WBX.wbHistLabels(), markClean: () => { WBS.cp.saved = coreStr(); WBX.wbPaintPst && WBX.wbPaintPst(); }, apply: s => WBX.wbApply(JSON.parse(s)), resetHistory: () => WBX.wbResetHist && WBX.wbResetHist(), stampAt, stampToCanvas, unlockedStamp: stUnlocked, state: () => coreStr(), kv, account: acAccount, recoveryTick: rcTick, printsBusy: () => !BK.off && !!(BK.busy || BK.q.size), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };

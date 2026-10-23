@@ -119,9 +119,9 @@ async function settle(page, { quiet = 4, step = 120, max = 15000 } = {}) {
       const missing = [...document.querySelectorAll('#art use')].some(u => { const h = u.getAttribute('href'); return h && h[0] === '#' && !document.getElementById(h.slice(1)); });
       // a content hash, not just lengths: a redraw that rebuilds the same amount of markup in a different shape still counts as change
       const h = str => { let x = 2166136261; for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); } return (x >>> 0).toString(36); };
-      return h(window.__wbTest.state()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + busy + missing;
+      return h(window.__wbTest.state()) + '|' + (art ? h(art.innerHTML) : 0) + '|' + busy + missing + '|' + (document.querySelector('.fzov') ? 'hold' : '');   // 2.30.0: the Randomize cover (it fades out when the roll is drawn) is not quiet, so a click is not met by it
     });
-    if (sig === last) { if (++same >= quiet) return; } else { same = 0; last = sig; }
+    if (sig === last && !sig.endsWith('|hold')) { if (++same >= quiet) return; } else { same = 0; last = sig; }
     await page.waitForTimeout(step);
   }
   throw new Error('settle: the page never went quiet (last signature ' + last + ')');
@@ -201,9 +201,9 @@ const pickShape = async page => { await showPanel(page, 'motifs'); if (!(await p
 // canvas units (the artwork's viewBox) to client pixels
 const canvasToClient = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getElementById('art'), r = a.getBoundingClientRect(), vb = a.viewBox.baseVal; return { x: r.left + x / vb.width * r.width, y: r.top + y / vb.height * r.height, k: r.width / vb.width }; }, [x, y]);
 // the middle of a printed instance of the stamp, clear of the edges of the canvas: { i, cx, cy } in canvas units
-const stampInstance = async page => {
-  const c = await page.evaluate(() => { const vb = document.getElementById('art').viewBox.baseVal;
-    for (let i = 0; i < 400; i++) { const p = __wbTest.stampToCanvas(i, 120, 120); if (!p) break; if (p.x > 90 && p.x < vb.width - 90 && p.y > 90 && p.y < vb.height - 90) return { i, ...p }; } return null; });
+const stampInstance = async (page, id = null) => {   // 2.30.0: `id` picks an instance of that stamp (a roll puts whichever stamp it draws under a given point)
+  const c = await page.evaluate(id => { const vb = document.getElementById('art').viewBox.baseVal;
+    for (let i = 0; i < 400; i++) { const p = __wbTest.stampToCanvas(i, 120, 120); if (!p) break; if (id != null && (__wbTest.stampIdOf(i) !== id || (__wbTest.stampAt(p.x, p.y, null) || {}).i !== i)) continue; if (p.x > 90 && p.x < vb.width - 90 && p.y > 90 && p.y < vb.height - 90) return { i, ...p }; } return null; }, id);
   return { i: c.i, cx: c.x, cy: c.y };
 };
 // press and release on the canvas at a point of an instance (offset in canvas units)
@@ -238,6 +238,8 @@ async function addShape(page, g = 'rect') {
 // 2.4.0: a new Pattern is empty; this puts a source in it (a stamp by default, or 'motif' / 'text').
 // 2.28.0: Add source is a menu: the project's stamps, then its texts, then "Motif from the library…", which opens the library; the motif clicked there is added.
 async function patSource(page, kind = 'stamp', n = 0) {
+  // the menu closes when its panel scrolls, so bring the button into view first and let the scroll event pass before opening it
+  await page.locator('#peadd').scrollIntoViewIfNeeded(); await page.waitForTimeout(100);
   await page.click('#peadd');
   const items = page.locator('.rowm .ddi');
   if (kind === 'motif') {
