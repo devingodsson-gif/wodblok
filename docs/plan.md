@@ -565,7 +565,7 @@ The owner asked for one element: "getting rid of the shapes all together and mak
 - **Background** is a Rectangle motif (`bgd:1`). Import image with nothing picked makes a Rectangle motif the shape of the picture.
 - **Specs**: the Shape-element specs moved to the Motif element (element bar now has 6 buttons, effects and grade on a motif, map-to-shape on a Basic shapes Oval, format 27, picture ids `mai_`); `shape-element.spec.js` removed; new `motif-look-2-31.spec.js` (6). The effects spec scrolls a row's menu button into view before opening it (a panel scroll closes row menus).
 - Run: the 21 spec files that touched shapes plus the new one, all passing in targeted reruns; `check:style` and `check:platform` pass; `npm run perf` passes (drag 1.04x the 2.30 build, baseline opened with the format-26 fixture through `WB_BASELINE_FIXTURE`). Not run: the full suite, CI, WebKit, pixel goldens.
-- **Not changed, waiting for the owner**: 19 SVG snapshots (launch, roundtrip 3, scenarios 15: randomize seeds, before/split view, canvas shapes, light theme) that show the Background drawn as a motif.
+- **Snapshots**: the 19 SVG snapshots (launch, roundtrip 3, scenarios 15: randomize seeds, before/split view, canvas shapes, light theme) were regenerated with the owner's approval (Oct 23 2026). They differ by a few tags and bytes: the Background is drawn as a motif (one more defs, one fewer g). The roundtrip spec expects format 27.
 
 ### 2.30.0 (Oct 23 2026): the full test run after 2.27 to 2.29, specs brought up to date. Format 26 unchanged
 The first full run since 2.26 (Chromium, 1.6 h): 520 passed, 53 failed. Two failures were real and are fixed in the app; the rest were specs and helpers that had not caught up.
