@@ -13,7 +13,7 @@ test.describe('pure zip builder', () => {
     const { unzipSync, strFromU8 } = await load('vendor/fflate.js');
     expect(safeName('a/b:c*d?', 'x')).toBe('a b c d');
     expect(safeName('  ..hidden. ', 'x')).toBe('hidden');
-    expect(safeName('', 'Motif')).toBe('Motif');
+    expect(safeName('', 'Shape')).toBe('Shape');
     expect(safeName('CON', 'x')).toBe('CON_');
     const { zip, count } = buildMotifZip([
       { name: 'Leaves', items: [{ name: 'Leaf', svg: '<svg>1</svg>' }, { name: 'leaf', svg: '<svg>2</svg>' }, { name: 'Leaf', svg: '<svg>3</svg>' }] },
@@ -92,7 +92,7 @@ test.describe('library button', () => {
   test('the toolbar button exports every shape, folder by folder, with folders inside folders kept', async ({ page }) => {
     const { errors } = await open(page);
     await build(page);
-    await expect(page.locator('#fexp')).toHaveAttribute('aria-label', 'Export all motifs');
+    await expect(page.locator('#fexp')).toHaveAttribute('aria-label', 'Export all shapes');
     await page.click('#fexp');
     await page.waitForFunction(() => window.__wbDownloads.length > 0);
     const z = await downloaded(page, 0), under = d => z.names.filter(n => n.startsWith(d + '/') && !n.slice(d.length + 1).includes('/'));
@@ -153,7 +153,7 @@ test.describe('library button', () => {
   test('it is a command; its tooltip is only its name, with no explanatory text', async ({ page }) => {
     const { errors } = await open(page);
     expect(await page.evaluate(() => window.__wbTest.commands.list().map(c => c.id))).toContain('library.exportShapes');
-    await expect(page.locator('#fexp')).toHaveAttribute('title', 'Export all motifs');   // 2.29.0: an icon-only button names itself on hover
+    await expect(page.locator('#fexp')).toHaveAttribute('title', 'Export all shapes');   // 2.29.0: an icon-only button names itself on hover
     expect(errors).toEqual([]);
   });
 });

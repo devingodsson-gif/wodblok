@@ -42,7 +42,7 @@ function buildMotifZip(folders) {
     const raw = Array.isArray(f.path) ? f.path : [f.name], dir = dirOf(raw);
     const used = usedNames.get(dir) || usedNames.set(dir, new Set()).get(dir);   // per folder in the zip, so nothing is ever overwritten
     for (const it of f.items) {
-      const base = safeName(it.name, 'Motif');
+      const base = safeName(it.name, 'Shape');
       let n = base, k = 2;
       while (used.has(n.toLowerCase())) n = base + '-' + k++;
       used.add(n.toLowerCase());

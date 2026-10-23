@@ -46,7 +46,7 @@ test('the library is one tree: folders open in place, several at once, and folde
   await mkFolder(page, 'Tulips');                                       // made inside the active folder
   await expect(active(page)).toHaveText('Tulips');
   await expect(page.locator('#lib .lrw:has(> [data-f="g:Florals/Tulips"])')).toHaveAttribute('style', '--d:1');
-  const top = await rows(page), rest = top.slice(1);
+  const top = await rows(page), rest = top.slice(1).filter(n => n !== 'Basic shapes');   // 2.31.0: Basic shapes is listed first, before the A to Z sets
   expect(rest).toContain('Florals');
   expect(rest).not.toContain('Tulips');
   expect(rest).toEqual([...rest].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })));   // A to Z

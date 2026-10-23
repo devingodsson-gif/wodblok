@@ -27,7 +27,7 @@ test('picking an element in the Elements list opens its kind\'s panel; the tabs 
   await page.click('#elb [data-k="motif"]'); await addKind(page, 'motif'); await settle(page);
   await page.click('#elb [data-k="pattern"]'); await addKind(page, 'pattern'); await settle(page);
   expect(await shown(page)).toContain('layers');
-  expect(await tabs(page)).toEqual(expect.arrayContaining(['Motif', 'Pattern']));
+  expect(await tabs(page)).toEqual(expect.arrayContaining(['Shape', 'Pattern']));
   expect(await tabs(page)).not.toContain('Properties');
   await showPanel(page, 'lyrs');
   const u = JSON.parse(await getState(page)).els.find(q => q.k === 'motif').u;
