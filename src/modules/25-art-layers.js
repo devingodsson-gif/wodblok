@@ -31,7 +31,7 @@ return`<rect class="${cls}" transform="translate(${(+p.x).toFixed(1)} ${(+p.y).t
 // a side handle is left out while its side is too short to keep it clear of the corner handles (2.27.0)
 function fpHandles(p){const wh=fpWH(p);if(!wh)return'';const w=wh[0],h=wh[1],u=fpUnit(),hs=4.5*u,arm=20*u,f=v=>v.toFixed(2),r=+p.r||0;
 let o=`<g transform="translate(${f(+p.x)} ${f(+p.y)}) rotate(${r})"><line class="frl" x1="0" y1="${f(-h/2)}" x2="0" y2="${f(-h/2-arm)}"/><circle class="frt" data-fh="rot" cx="0" cy="${f(-h/2-arm)}" r="${f(hs)}" style="cursor:grab"><title>Rotate</title></circle>`;
-[[-1,-1,'nw'],[1,-1,'ne'],[1,1,'se'],[-1,1,'sw'],[0,-1,'n'],[0,1,'s'],[1,0,'e'],[-1,0,'w']].forEach(([cx,cy,nm])=>{if(nm.length==1&&(cy?w:h)<hs*5)return;const a=(((Math.atan2(cy*h,cx*w)*180/Math.PI+r)%180)+180)%180,cu=a<22.5||a>=157.5?'ew-resize':a<67.5?'nwse-resize':a<112.5?'ns-resize':'nesw-resize';
+[[-1,-1,'nw'],[1,-1,'ne'],[1,1,'se'],[-1,1,'sw'],[0,-1,'n'],[0,1,'s'],[1,0,'e'],[-1,0,'w']].forEach(([cx,cy,nm])=>{if(nm.length==1&&(cy?w:h)<hs*4)return;const a=(((Math.atan2(cy*h,cx*w)*180/Math.PI+r)%180)+180)%180,cu=a<22.5||a>=157.5?'ew-resize':a<67.5?'nwse-resize':a<112.5?'ns-resize':'nesw-resize';
 o+=`<rect class="fhd" data-fh="${nm}" x="${f(cx*w/2-hs)}" y="${f(cy*h/2-hs)}" width="${f(hs*2)}" height="${f(hs*2)}" style="cursor:${cu}"><title>Resize</title></rect>`});
 return o+'</g>'}
 // the rubber-band box of a drag on empty canvas (2.27.0)

@@ -5,7 +5,7 @@ const { openApp, openPanel, settle } = require('./helpers/harness');
 test('commands and the history use "motif" for library art', async ({ page }) => {
   const { errors } = await openApp(page);
   const labels = await page.evaluate(() => window.__wbTest.commands.list().map(c => c.label));
-  for (const l of ['Duplicate motif', 'Delete motif', 'Split motif', 'Import a motif from an image', 'New motif folder', 'Hand tool']) expect(labels, l).toContain(l);
+  for (const l of ['Duplicate', 'Delete', 'Split', 'Import a motif from an image', 'New motif folder', 'Hand tool']) expect(labels, l).toContain(l);
   for (const l of ['Duplicate shape', 'Delete shape', 'Split shape', 'Hand tool (drag to move the picture)']) expect(labels, l).not.toContain(l);
   expect(errors).toEqual([]);
 });

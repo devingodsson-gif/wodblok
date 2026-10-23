@@ -70,8 +70,8 @@ test('one toggle: the sliding switch, the same size in Settings, panels and Expo
   const { errors } = await openApp(page);
   await addShape(page);
   const size = sel => page.locator(sel).locator('visible=true').first().evaluate(e => { const b = e.getBoundingClientRect(); return Math.round(b.width) + 'x' + Math.round(b.height); });
-  await openPanel(page, 'canvas'); await settle(page);
-  expect(await size('.chk input')).toBe('28x18');
+  await openPanel(page, 'rand'); await settle(page);
+  expect(await size('.chk input')).toBe('28x18');   // 2.30.0: the Canvas panel's switches moved into groups (Background is a shape now); the Randomize panel always shows some
   await openPanel(page, 'xrec'); await settle(page);
   expect(await size('#xrwm')).toBe('28x18');
   await page.evaluate(() => window.__wbTest.commands.run('settings.open')); await settle(page);

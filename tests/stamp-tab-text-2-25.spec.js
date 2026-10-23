@@ -1,13 +1,15 @@
 const { test, expect } = require('@playwright/test');
 const H = require('./helpers/harness');
 // 2.25.0: Add text in a stamp tab starts the typing on the stamp, where the text is; the letters follow the keys; Esc ends it; an emptied text is taken out.
-const items = async page => JSON.parse(await H.getState(page)).tiles.find(t => t.id === 1).items;
+let sid = 1;   // 2.30.0: the stamp the roll put under the pointer
+const items = async page => JSON.parse(await H.getState(page)).tiles.find(t => t.id === sid).items;
 
 async function addTextInTab(page) {
   const o = await H.openApp(page, { seed: 4, pattern: false });
   await page.click('#rzdo'); await H.settle(page, { max: 60000 });
-  const p = await H.stampInstance(page); const c = await H.canvasToClient(page, p.cx, p.cy);
+  const p = await H.stampInstance(page, 1); const c = await H.canvasToClient(page, p.cx, p.cy);
   await page.mouse.dblclick(c.x, c.y); await H.settle(page);
+  sid = await page.evaluate(() => window.__wbTest.unlockedStamp());
   const n0 = (await items(page)).length;
   await page.click('#elb [data-k="text"]'); await H.settle(page);   // 2.26.0: the bar button does what Add does
   return { ...o, n0 };
@@ -21,7 +23,7 @@ test('Add text in a stamp tab types in place: the letters follow the keys, Esc e
   expect((await items(page)).length - n0, 'three letters').toBe(3);
   await page.keyboard.press('Escape'); await H.settle(page);
   await expect(page.locator('#txin')).toBeHidden();
-  expect(await page.evaluate(() => window.__wbTest.unlockedStamp()), 'still in the tab').toBe(1);
+  expect(await page.evaluate(() => window.__wbTest.unlockedStamp()), 'still in the tab').toBe(sid);
   await page.keyboard.press('Control+z'); await H.settle(page);
   expect((await items(page)).length - n0, 'back to the word it started with').toBe(4);
   expect(errors).toEqual([]);

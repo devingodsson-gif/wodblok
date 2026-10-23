@@ -1,6 +1,6 @@
 {
- "length": 1188,
- "sha256": "7fdc5a8dd5d15273100488db56e6ab5edea74f64732b2d4d241993046fb4ab2e",
+ "length": 1123,
+ "sha256": "50e44d2934682101c94417d02ddff7a26c669cfaca1e918d6644de6b2bdc0b2c",
  "tags": {
   "defs": 6,
   "feColorMatrix": 2,
@@ -8,7 +8,6 @@
   "feFuncA": 2,
   "filter": 2,
   "g": 10,
-  "rect": 1,
   "svg": 1
  }
 }

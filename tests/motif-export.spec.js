@@ -150,10 +150,10 @@ test.describe('library button', () => {
     expect(errors).toEqual([]);
   });
 
-  test('it is a command, and has no tooltip or explanatory text', async ({ page }) => {
+  test('it is a command; its tooltip is only its name, with no explanatory text', async ({ page }) => {
     const { errors } = await open(page);
     expect(await page.evaluate(() => window.__wbTest.commands.list().map(c => c.id))).toContain('library.exportShapes');
-    await expect(page.locator('#fexp')).not.toHaveAttribute('title', /.+/);
+    await expect(page.locator('#fexp')).toHaveAttribute('title', 'Export all motifs');   // 2.29.0: an icon-only button names itself on hover
     expect(errors).toEqual([]);
   });
 });

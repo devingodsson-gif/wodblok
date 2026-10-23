@@ -19,7 +19,7 @@ test('the File menu has both template items and the picker lists three kinds wit
   await page.click('#fileb');
   await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save projectCtrl+S', 'Save project as…', 'Save as template…', 'Import image as motif…', 'Export…', 'Settings…']);
   await page.click('#tpnew');
-  await expect(page.locator('#tpty button')).toHaveText(['Normal canvas', 'Repeating pattern', 'Book']);
+  await expect(page.locator('#tpty button')).toHaveText(['Free canvas', 'Repeat tile', 'Book cover']);
   for (const k of ['canvas', 'tile', 'book']) {
     await kind(page, k);
     await expect(cards(page)).toHaveCount(1 + HAND[k]);          // Blank, and one for every file in the templates/ folder of that kind
@@ -129,7 +129,7 @@ test('no id appears twice on the page, and the picker\'s own X closes it and is 
 test('the template picker opens when the app starts; Settings > General can turn that off', async ({ page }) => {
   const { errors } = await openApp(page, { templates: true, pattern: false });
   await expect(page.locator('#tpdlg')).toBeVisible();
-  await expect(page.locator('#tpty .on')).toHaveText('Normal canvas');
+  await expect(page.locator('#tpty .on')).toHaveText('Free canvas');
   await expect(cards(page).first()).toHaveAttribute('aria-label', 'Blank');
   await page.click('#tpclose');                                        // closing it leaves the blank project
   await expect(page.locator('#tpdlg')).toBeHidden();

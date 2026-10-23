@@ -7,12 +7,13 @@ async function roll(page) {
   await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)'));
   await settle(page, { max: 30000 });
 }
-const texts = st => { const s = JSON.parse(st), out = []; s.tiles.forEach(t => Object.values(t.tgm || {}).forEach(m => out.push(m))); (s.layers || []).forEach(l => (l.pl || []).forEach(p => { if (p.tx) out.push(p.tx); })); return out; };
+// 2.30.0: placed text is in the one flat list (els)
+const texts = st => { const s = JSON.parse(st), out = []; s.tiles.forEach(t => Object.values(t.tgm || {}).forEach(m => out.push(m))); (s.layers || []).forEach(l => (l.pl || []).forEach(p => { if (p.tx) out.push(p.tx); })); (s.els || []).forEach(p => { if (p.tx) out.push(p.tx); }); return out; };
 const NEW = m => !!(m.pt || m.wp || m.rp || m.bb);
 
 test('Randomize gives some lettering a path, warp, scatter or bounce, and the same seed gives the same result', async ({ page }) => {
   let withNew = 0, total = 0, first = null;
-  for (const seed of [1, 2, 3, 4, 5, 6, 7, 8]) {
+  for (const seed of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]) {   // 2.30.0: more seeds, as the draws moved and fewer of the first eight put lettering down
     const { errors } = await openApp(page, { seed, pattern: false });
     await roll(page);
     const ts = texts(await getState(page));

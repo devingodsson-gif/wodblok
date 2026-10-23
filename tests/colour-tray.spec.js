@@ -28,7 +28,7 @@ test('a new project has a two-colour tray: paper and ink link to it, the dock sh
 });
 
 test('editing a tray colour recolours what links to it; one history step; undo brings it back', async ({ page }) => {
-  const { errors } = await openApp(page);
+  const { errors } = await openApp(page, { background: true });   // 2.30.0: the paper is the Background shape now
   await page.click('#tyc .tys >> nth=0');
   await expect(page.locator('.cpk')).toBeVisible();
   await setHex(page, '#1E4FA3'); await closePicker(page);
@@ -88,7 +88,7 @@ test('removing a tray colour that is in use keeps what used it as a fixed colour
   await page.click('#tyc .tys >> nth=0');
   await page.click('.cpka [data-a="0"]');                       // first press: says how many things use it
   expect((await proj(page)).ts).toHaveLength(2);
-  await expect(page.locator('#pmsg')).toContainText('fixed colour');
+  await expect(page.locator('#pmsg')).toContainText('Used by');
   await page.click('.cpka [data-a="0"]'); await settle(page);   // second press removes it
   const p = await proj(page);
   expect(p.ts).toHaveLength(1);
@@ -160,7 +160,7 @@ test('colourways: a new one copies the colours; editing it leaves the first alon
 });
 
 test('the dropper picks the colour under the pointer from the finished picture', async ({ page }) => {
-  const { errors } = await openApp(page);
+  const { errors } = await openApp(page, { background: true });
   const r = await page.locator('#art').first().boundingBox();
   await page.click('#tyc .tys >> nth=1');
   await page.click('.cpkd');

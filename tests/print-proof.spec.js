@@ -24,7 +24,7 @@ const look = (page, d, hexes) => page.evaluate(async ([b64, type, hexes]) => {
 }, [d.base64, d.type, hexes]);
 
 test('the PNG proof is a Letter page with the palette colours on it; A4 is a different size', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 3 });
+  const { errors } = await openApp(page, { seed: 3, background: true });
   await roll(page);
   const pal = JSON.parse(await page.evaluate(() => window.__wbTest.state())).proj, w = pal.cw[pal.cwa];
   const hexes = [pal.bg, pal.ink].map(r => w.c[r.slice(1)].slice(0, 7));     // paper and ink are tray colours

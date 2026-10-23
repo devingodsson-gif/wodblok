@@ -2,16 +2,17 @@ const { test, expect } = require('@playwright/test');
 const H = require('./helpers/harness');
 // 2.25.0 "The stamp tab works like the canvas": Undo and Redo stay in the tab, the canvas keys and the right-click menu work on the stamp's shapes.
 const st = async page => JSON.parse(await H.getState(page));
-const items = async page => (await st(page)).tiles.find(t => t.id === 1).items;
+let sid = 1;   // 2.30.0: the stamp the roll put under the pointer (it is whichever one the seed drew there)
+const items = async page => (await st(page)).tiles.find(t => t.id === sid).items;
 const inTab = page => page.evaluate(() => window.__wbTest.unlockedStamp());
 
 // a rolled piece, its first stamp open in its tab, one of its shapes selected
 async function enter(page) {
   const o = await H.openApp(page, { seed: 4, pattern: false });
   await page.click('#rzdo'); await H.settle(page, { max: 60000 });
-  const p = await H.stampInstance(page); const c = await H.canvasToClient(page, p.cx, p.cy);
+  const p = await H.stampInstance(page, 1); const c = await H.canvasToClient(page, p.cx, p.cy);
   await page.mouse.dblclick(c.x, c.y); await H.settle(page);
-  expect(await inTab(page), 'Stamp 1 open in its tab').toBe(1);
+  sid = await inTab(page); expect(sid, 'a stamp is open in its tab').toBeGreaterThan(0);
   const b = await page.locator('#art').boundingBox(), pt = { x: b.x + b.width * 0.5, y: b.y + b.height * 0.62 };
   await page.mouse.click(pt.x, pt.y); await H.settle(page);
   return { ...o, pt };
@@ -24,9 +25,9 @@ test('Undo and Redo stay in the stamp tab', async ({ page }) => {
   expect(JSON.stringify(await items(page)), 'moved').not.toBe(x0);
   await page.click('#undo'); await H.settle(page);
   expect(JSON.stringify(await items(page)), 'undone').toBe(x0);
-  expect(await inTab(page), 'still in the tab after Undo').toBe(1);
+  expect(await inTab(page), 'still in the tab after Undo').toBe(sid);
   await page.click('#redo'); await H.settle(page);
-  expect(await inTab(page), 'still in the tab after Redo').toBe(1);
+  expect(await inTab(page), 'still in the tab after Redo').toBe(sid);
   expect(errors).toEqual([]);
 });
 
@@ -47,7 +48,7 @@ test('Ctrl+X cuts the selected shape in the tab and Ctrl+V brings it back', asyn
   expect((await items(page)).length, 'cut').toBeLessThan(n0);
   await page.keyboard.press('Control+v'); await H.settle(page);
   expect((await items(page)).length, 'pasted').toBe(n0);
-  expect(await inTab(page)).toBe(1);
+  expect(await inTab(page)).toBe(sid);
   expect(errors).toEqual([]);
 });
 
@@ -78,7 +79,7 @@ test('New stamp opens its tab; a roll closes every stamp tab', async ({ page }) 
 test('in a tab the Elements header counts the stamp\'s contents, and a row\'s … button opens the element menu', async ({ page }) => {
   const { errors } = await enter(page);
   await page.click('.rail [data-pn="lyrs"]'); await H.settle(page);
-  const t = (await st(page)).tiles.find(x => x.id === 1).items;
+  const t = (await st(page)).tiles.find(x => x.id === sid).items;
   const n = t.filter(q => !q.tg).length + new Set(t.filter(q => q.tg).map(q => q.tg)).size;
   await expect(page.locator('#lycnt')).toHaveText(`${n} element${n === 1 ? '' : 's'}`);
   await page.locator('#mlist [data-rm]').first().click();
