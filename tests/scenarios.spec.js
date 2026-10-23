@@ -57,17 +57,16 @@ test('split compare view', async ({ page }, testInfo) => {
   await checkpoint(page, testInfo, errors, 'split-view');
 });
 
-for (const shape of ['rect', 'rrect', 'circle', 'oval', 'arch', 'hex', 'tri', 'diamond', 'ngon']) {
-  test(`canvas shape: ${shape}`, async ({ page }, testInfo) => {
-    const { errors } = await openApp(page);
-    await openProjectFile(page, FIX('project-1-diamond.wodblok'));
-    await openPanel(page, 'canvas');
-    await page.click(`#cshp [data-s="${shape}"]`);
-    await settle(page);
-    expect(JSON.parse(await getState(page)).dim.cs || 'rect').toBe(shape);
-    await checkpoint(page, testInfo, errors, `canvas-shape-${shape}`);
-  });
-}
+test('the canvas is always a rectangle: no outline picker, and no outline field is kept', async ({ page }) => {   // 2.32.0: the other canvas shapes are gone
+  const { errors } = await openApp(page);
+  await openProjectFile(page, FIX('project-1-diamond.wodblok'));
+  await openPanel(page, 'canvas');
+  for (const id of ['cshp', 'ccr', 'cns', 'cor']) await expect(page.locator('#' + id)).toHaveCount(0);
+  await expect(page.locator('#caspbox')).toBeVisible();
+  const d = JSON.parse(await getState(page)).dim;
+  for (const k of ['cs', 'cr', 'n', 'co']) expect(d[k], k).toBeUndefined();
+  expect(errors).toEqual([]);
+});
 
 test('light theme', async ({ page }, testInfo) => {
   const { errors } = await openApp(page);

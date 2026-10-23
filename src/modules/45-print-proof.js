@@ -1,6 +1,6 @@
 import {use} from '../platform/index.js';
 import {$,WBS,WB_VER} from './01-launch-and-version.js';
-import {CH,CW,PL,bk,col,csk,tileOn} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,PL,bk,col,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {pdfJpeg} from './30-print-cover.js';
@@ -62,7 +62,7 @@ async function proofCanvas(paper){
   const asp=(WBS.dim.c&&WBS.dim.c.length==2)?WBS.dim.c.join(':'):'';
   if(WBS.book.on){const g=bk();rows.push(`Print cover ${g.W.toFixed(3)} × ${g.H.toFixed(3)} in  ·  spine ${g.sw.toFixed(3)} in  ·  at 300 DPI ${Math.round(g.W*300)} × ${Math.round(g.H*300)} px`)}
   else if(tile)rows.push(`Repeat tile${asp?', ratio '+asp:''}  ·  the edges meet, so copies placed side by side show no seam`);
-  else rows.push(`Canvas${asp?' ratio '+asp:''}${csk()!='rect'?'  ·  shape '+csk():''}`);
+  else rows.push(`Canvas${asp?' ratio '+asp:''}`);
   rows.push(`${WBS.tiles.length} stamp${WBS.tiles.length==1?'':'s'}  ·  ${WBS.layers.length} layer${WBS.layers.length==1?'':'s'}`);
   rows.forEach((r,k)=>text(clip(r,19,aw),19,H-m-(rows.length-1-k)*30,{c:mut}));
   return{c,W,H,pw,ph};

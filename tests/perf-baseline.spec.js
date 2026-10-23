@@ -7,7 +7,7 @@ const { ROOT, TARGET, openApp, openProjectFile, openPanel, settle } = require('.
 
 test.skip(!process.env.WB_PERF, 'WB_PERF=1 only');
 const FIXTURE = path.join(ROOT, 'tests', 'fixtures', 'project-4-rect-4x3.wodblok');
-const SLIDERS = [['layers', 'pesz', 'pattern size'], ['layers', 'peox', 'pattern shift'], ['canvas', 'ccr', 'canvas corner']];
+const SLIDERS = [['layers', 'pesz', 'pattern size'], ['layers', 'peox', 'pattern shift']];
 const STEPS = 20;
 
 test('baseline per-input busy time', async ({ page }) => {

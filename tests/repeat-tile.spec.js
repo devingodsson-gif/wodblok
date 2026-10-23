@@ -63,13 +63,12 @@ test('the Format switch has Repeat tile: it is a rectangle, saved with the canva
   expect(JSON.parse(await getState(page)).dim.rt).toBe(1);
   await expect(page.locator('#cfmt [data-f="tile"]')).toHaveClass(/on/);
   await expect(page.locator('#tpvg')).toBeVisible();
-  await expect(page.locator('#cshp')).toBeHidden();                              // only a rectangle
   await page.click('#cfmt [data-f="book"]'); await settle(page);
   expect(JSON.parse(await getState(page)).dim.rt).toBe(1);                       // the book cover is its own format: the tile is kept underneath
   await page.click('#cfmt [data-f="free"]'); await settle(page);
   expect(JSON.parse(await getState(page)).dim.rt).toBeUndefined();
   await expect(page.locator('#tpvg')).toBeHidden();
-  await expect(page.locator('#cshp')).toBeVisible();
+  await expect(page.locator('#caspbox')).toBeVisible();
   expect(errors).toEqual([]);
 });
 

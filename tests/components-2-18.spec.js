@@ -29,7 +29,7 @@ test('buttons, dropdowns and fields in every panel sit on the height scale (18, 
 test('every shape picker is the same component: a four-column grid of icon buttons that carry their name', async ({ page }) => {
   const { errors } = await openApp(page);
   await addShape(page);
-  for (const [panel, sel] of [['canvas', '#cshp'], ['pgrid', '#pgsh'], ['stmp', '#skind']]) {
+  for (const [panel, sel] of [['pgrid', '#pgsh'], ['stmp', '#skind']]) {
     await openPanel(page, panel); await settle(page);
     if (panel === 'stmp') await page.evaluate(() => document.querySelector('#skind').closest('details,section')?.setAttribute('open', ''));
     // a picker inside a closed group has no layout: it must at least have no column override of its own

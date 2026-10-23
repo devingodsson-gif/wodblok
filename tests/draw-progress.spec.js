@@ -16,13 +16,3 @@ test('opening a file shows the progress bar while it draws, then removes it', as
   expect(errors).toEqual([]);
 });
 
-test('changing the canvas shape on a drawn piece shows the bar and it ends', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 2 });
-  await page.setInputFiles('#pfile', FIX);
-  await settle(page);
-  await openPanel(page, 'canvas');
-  await page.click('#cshp [data-s="circle"]');
-  await page.waitForSelector('.stage > .fzbar', { timeout: 5000 });
-  await page.waitForFunction(() => !document.querySelector('.stage > .fzbar'), null, { timeout: 40000 });
-  expect(errors).toEqual([]);
-});

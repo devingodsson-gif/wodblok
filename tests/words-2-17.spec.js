@@ -1,12 +1,12 @@
-// 2.17.0: one vocabulary. "Motif" is library art, "shape" only the Shape element; short labels; no words for removed things.
+// 2.17.0: one vocabulary; short labels; no words for removed things. 2.32.0: library art and the element are both called "shape".
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle } = require('./helpers/harness');
 
-test('commands and the history use "motif" for library art', async ({ page }) => {
+test('commands use "shape" for library art', async ({ page }) => {
   const { errors } = await openApp(page);
   const labels = await page.evaluate(() => window.__wbTest.commands.list().map(c => c.label));
-  for (const l of ['Duplicate', 'Delete', 'Split', 'Import a motif from an image', 'New motif folder', 'Hand tool']) expect(labels, l).toContain(l);
-  for (const l of ['Duplicate shape', 'Delete shape', 'Split shape', 'Hand tool (drag to move the picture)']) expect(labels, l).not.toContain(l);
+  for (const l of ['Duplicate', 'Delete', 'Split', 'Import a shape from an image', 'New shape folder', 'Hand tool']) expect(labels, l).toContain(l);
+  for (const l of ['Hand tool (drag to move the picture)']) expect(labels, l).not.toContain(l);
   expect(errors).toEqual([]);
 });
 

@@ -80,7 +80,7 @@ test('a sheet imports into the active folder; with no folder active, imports go 
   await expect(page.locator('#idlg')).toBeVisible();
   await expect(page.locator('#imode [data-m="sheet"]')).toHaveClass(/on/);
   await expect(page.locator('#ifold')).toHaveValue('g:Florals/Tulips');
-  await expect(page.locator('#iadd')).toHaveText('Import 16 motifs');
+  await expect(page.locator('#iadd')).toHaveText('Import 16 shapes');
   await page.click('#iadd');
   await settle(page);
   await expect(page.locator('#idlg')).toBeHidden();
@@ -92,9 +92,9 @@ test('a sheet imports into the active folder; with no folder active, imports go 
   await page.setInputFiles('#ifile', await sheet(page));
   await expect(page.locator('#imode [data-m="one"]')).toHaveClass(/on/);
   await expect(page.locator('#ifold')).toHaveValue('i');
-  await expect(page.locator('#iadd')).toHaveText('Add motif');
+  await expect(page.locator('#iadd')).toHaveText('Add shape');
   await page.click('#imode [data-m="sheet"]');
-  await expect(page.locator('#iadd')).toHaveText('Import 16 motifs');
+  await expect(page.locator('#iadd')).toHaveText('Import 16 shapes');
   await page.click('#imode [data-m="one"]');
   await page.click('#iadd');
   await settle(page);

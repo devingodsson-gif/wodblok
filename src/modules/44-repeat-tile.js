@@ -17,7 +17,7 @@ function init44(){
   const frames=()=>WBS.layers.filter(L=>L.fr&&L.fr.on&&L.vis!==false).length;
   const grads=()=>{const g=WBX.wbGrade?WBX.wbGrade.get():null;return g?g.masks.filter(m=>m.on&&(m.t=='lin'||m.t=='rad')&&m.sp!='s').length:0};
   WBX.wbTileSet=on=>{
-    if(on){WBS.dim={...WBS.dim,rt:1};delete WBS.dim.cs}else{delete WBS.dim.rt;WBS.tilePv=false}
+    if(on){WBS.dim={...WBS.dim,rt:1}}else{delete WBS.dim.rt;WBS.tilePv=false}
     setDim();WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
     store();buildTex();upd();if(WBX.wbCap)WBX.wbCap();if(WBX.wbApplyZ)requestAnimationFrame(WBX.wbApplyZ);
   };
@@ -26,7 +26,7 @@ function init44(){
     if(!on&&WBS.tilePv)WBS.tilePv=false;
     document.querySelectorAll('#cfmt [data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==(WBS.book.on?'book':on?'tile':'free')));
     $('tlobox').hidden=!on;$('tpvg').hidden=!on;$('tpv').disabled=!on;$('tpv').setAttribute('aria-pressed',String(on&&!!WBS.tilePv));
-    $('cshp').hidden=on;const lb=$('cshp').previousElementSibling;if(lb&&lb.tagName=='LABEL')lb.hidden=on;if(on)['crrbox','cngbox','ccobox'].forEach(id=>{$(id).hidden=true});
+    
     const parts=[];if(on&&n)parts.push(n+(n>1?' frames':' frame'));if(g)parts.push(g+(g>1?' gradients':' gradient'));
     $('tpn').hidden=!parts.length;$('tpn').textContent=parts.length?'Hidden on a repeat tile: '+parts.join(', '):'';
     $('artwrap').classList.toggle('tpv',on&&!!WBS.tilePv);

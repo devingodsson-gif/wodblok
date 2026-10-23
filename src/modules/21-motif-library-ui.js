@@ -27,7 +27,7 @@ const lbBasicTop=n=>n&&n.t=='b'&&n.orig=='Basic shapes'?1:0;   // 2.31.0: the Ba
 const lbSort=(a,b)=>(lbBasicTop(b)-lbBasicTop(a))||a.n.localeCompare(b.n,undefined,{numeric:true,sensitivity:'base'});
 const fOf=k=>k[0]=='b'?BF[k]:(cust[k]||{}).g;
 const fSet=(k,g)=>{if(k[0]=='b'){if(g)BF[k]=g;else delete BF[k]}else if(cust[k]){if(g)cust[k].g=g;else delete cust[k].g}};
-const mNm=k=>k[0]=='b'?N[+k.slice(1)]||'Motif':cust[k]?cust[k].n:'Motif';
+const mNm=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
 // The library is one tree: click a folder to open it in place (its folders, then its shapes, under it) and as many folders as you
 // like can be open at once. lbOpen: the open folders (kept between sessions). WBS.mcat is the active folder (the last one opened,
 // or the one whose menu was used): new folders, imports and the folder form go there; "/" when none is.
@@ -113,7 +113,7 @@ if(n.ks.length){n.ks.forEach(k=>vis.add(k));out.push(`<div class="lib${WBS.lsm?'
 else if(!kids.length)out.push(`<div class="lmt" style="--d:${d+1}">${n.v=='i'?'No imports yet':'Empty folder'}</div>`)};
 if(LQ){const seen=new Set(),all=[],col=n=>{n.ks.forEach(k=>{if(!seen.has(k)){seen.add(k);all.push(k)}});lbKids(n).forEach(col)};   // a search lists the matches from every folder in one grid (2.22.0)
  lbTop().forEach(col);const hit=all.filter(k=>mNm(k).toLowerCase().includes(LQ));hit.forEach(k=>vis.add(k));
- out.push(hit.length?`<div class="lib${WBS.lsm?' sel':''}" style="--d:0">${hit.map(tile).join('')}</div>`:'<div class="lmt" style="--d:0">No motifs found</div>')}
+ out.push(hit.length?`<div class="lib${WBS.lsm?' sel':''}" style="--d:0">${hit.map(tile).join('')}</div>`:'<div class="lmt" style="--d:0">No shapes found</div>')}
 else lbTop().forEach(n=>walk(n,0));
 const hidL=LQ?[]:lbKids(lbNode('/'),true);
 if(hidL.length){out.push(`<div class="lrw" style="--d:0"><button type="button" class="lfr lfh" id="lhid" aria-expanded="${lbHidOpen}">${IC.chev}<span class="lfi">${IC.hide}</span><span class="lfn">Hidden sets</span><span class="lfc">${hidL.length}</span></button></div>`);if(lbHidOpen)hidL.forEach(n=>walk(n,1))}

@@ -24,7 +24,7 @@ test('New pattern is empty: each of the 16 points shows as an arrow until a sour
   await page.click('#peadd');
   const items = await page.$$eval('.rowm .ddi', g => g.map(x => x.textContent));
   expect(items[0]).toMatch(/^Stamp /);
-  expect(items[items.length - 1]).toBe('Motif from the library…');
+  expect(items[items.length - 1]).toBe('Shape from the library…');
   await page.keyboard.press('Escape');
   await patSource(page);
   expect((await pats(page))[0].src).toHaveLength(1);

@@ -16,7 +16,7 @@ import {mNm} from './21-motif-library-ui.js';
 const mapOk=q=>q&&q.k=='motif'&&!q.bgd&&!!basicSh(q.m);
 const mapShape=p=>{if(!p||!p.mp||!p.mm)return null;const L=fpL();if(!L)return null;const s=(L.pl||[]).find(q=>q.u==p.mp&&mapOk(q));return s||null};
 const mapList=()=>{const L=fpL();return L?(L.pl||[]).filter(mapOk):[]};
-const mapName=(q,i)=>(q.nm||mNm(q.m)||'Motif')+' '+(i+1);
+const mapName=(q,i)=>(q.nm||mNm(q.m)||'Shape')+' '+(i+1);
 // where the way round starts: the highest point of a closed shape, the middle of an open one; mo moves it
 function mapRef(F,mo){let s0=F.L/2;if(F.closed){let b=0;F.pts.forEach((q,i)=>{if(q[1]<F.pts[b][1]-1e-6)b=i});s0=F.cum[b]}return s0+(+mo||0)/100*F.L}
 // the point and the turn (degrees) at a length along the outline
