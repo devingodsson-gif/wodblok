@@ -177,7 +177,7 @@ test('a recipe exports from its own Export button; a click on its name exports n
 });
 
 test('the Canvas panel has a Texture group with a switch when the project has a canvas texture (a roll makes one); off hides it, Undo brings it back', async ({ page }) => {
-  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  const { errors } = await H.openApp(page, { seed: 1, pattern: false, background: true });
   await page.click('#rzdo'); await H.settle(page, { max: 60000 });
   await H.openPanel(page, 'canvas');
   expect((await st(page)).tex.u.length, 'the roll made a canvas texture').toBeGreaterThan(0);

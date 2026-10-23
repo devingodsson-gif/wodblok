@@ -10,7 +10,6 @@ import {SURFC,inkCatch,layTexMask,layTexOv,roughFilter,surfFor,txoG} from './17-
 import {renderCover} from './18-projects-and-cover-overlay.js';
 import {renderLib} from './21-motif-library-ui.js';
 import {elDraw} from './65-element-core.js';
-import {bgDraw} from './66-background.js';
 import {stContents} from './68-stamp-contents.js';
 import {renderLayers} from './32-layers-panel.js';
 import {stOlBegin,stOlEnd,stOlPath} from './63-stamp-tool.js';
@@ -22,7 +21,7 @@ const RB=()=>tileOn()?`x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"`:`
 const bhStrip=x=>x.replace(/ opacity="[^"]*"/g,'');
 function build(){bkPre();const _cn=clipSeed(1e7);
 const[pa,pb]=pal();
-let defs='',lg='',sd='',un=bgDraw();
+let defs='',lg='',sd='',un='';
 WBS.tiles.forEach(t=>{useT(t);surfFor(t);stOlPath(t.id,shp(0));const stc=stContents(t),ci=inkOf(t),sA=`<clipPath id="shc${t.id}"><path d="${shp(0)}"/></clipPath>`,eD=`<!--@E:${t.id}-->`+edgeDefs(t)+'<!--@-->',rn=inkRuns(t),xm=rn?rn.map((r,j)=>`<mask id="m${t.id}r${j}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${items(t,{c:'#fff',d:'#000'},0,0,r.sel)}</mask>`).join(''):'';const sB=`<mask id="m${t.id}" maskUnits="userSpaceOnUse" x="0" y="0" width="${SW}" height="${SH}">${t.neg?`<rect width="${SW}" height="${SH}" fill="#fff"/>${items(t,{c:'#000',d:'#fff'},0,0)}`:items(t,{c:'#fff',d:'#000'},0,0)}</mask>${xm}${stc.defs}${t.neg?`<g id="s${t.id}">${shBleed(ci)}<g clip-path="url(#shc${t.id})">`:`<g id="s${t.id}" clip-path="url(#shc${t.id})">`}${isOf(t)?`<g mask="url(#is${t.id})">`:''}${rn?rn.map((r,j)=>`<rect width="${SW}" height="${SH}" fill="${r.c?col(r.c):ci}" mask="url(#m${t.id}r${j})"/>`).join(''):`<rect width="${SW}" height="${SH}" fill="${ci}" mask="url(#m${t.id})"/>`}${txoG(t,'m'+t.id)}${stc.body}${isOf(t)?'</g>':''}${t.neg?'</g></g>':'</g>'}`;defs+=eD;sd+=sA+sB;bkTile(t,sA+eD+sB)});useT(WBS.tiles[WBS.cur]);
 stOlBegin();
 (WBX.wbSteScene&&WBX.wbSteScene()||WBS.layers).forEach((L,li)=>{if(!L.vis)return;const lgB=lg;(()=>{const ls=WBS.tiles.filter(t=>L.st.includes(t.id)),n=ls.length;const lw=h=>{const lf=WBX.wbGrade?WBX.wbGrade.layF(L.u):'';let o=lf?`<g filter="url(#${lf})">${h}</g>`:h;const tm=layTexMask(L,li);if(tm){defs+=tm;o=`<g mask="url(#lt${li})">${o}</g>`}const ov=layTexOv(L);return ov[0]+o+ov[1]};const addItems=all=>{if(!all&&!(L.pl||[]).length)return;const r=elDraw(L,li,pa,lgB);defs+=r[0];lg+=lw(r[1])};addItems(true)})();

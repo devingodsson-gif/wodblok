@@ -11,7 +11,7 @@ import {elDef,elKind,fxDef} from './65-element-core.js';
 // ===== The element list (2.2.2). There are no layers: the document is one ordered list of elements, drawn in list order, first = bottom.
 // This panel shows that list top first. Every row has an eye, a name, an opacity and a blend (the controls above the list act on the selected rows).
 // Groups: a lyGroup is a row {k:'group'} in the same list. Its members carry g:<lyGroup u>; the lyGroup row sits just after (above) its members, so the list reads
-// lyGroup, then its members, newest first. Select rows (Shift or Ctrl click), press Group (or Shift+G); Ungroup gives the members back.
+// lyGroup, then its members, newest first. Select rows (Shift or Ctrl click), press Group (or Ctrl+G; Ungroup is Ctrl+Shift+G); Ungroup gives the members back.
 // lyInkFill is kept because the colour wells still call it.
 function lyInkFill(){if(WBX.wbPaintWells)WBX.wbPaintWells()}
 const EYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.eye+'</svg>';
@@ -87,9 +87,9 @@ function init32(){
  host.addEventListener('dragend',()=>{lyDrag=null;lyClr()});
  $('lygrp').onclick=e=>{e.stopPropagation();lyGroup()};
  $('lyung').onclick=e=>{e.stopPropagation();lyUngroup()};
- cmdRegister({id:'element.group',label:'Group the selected elements',shortcut:'Shift+G',elId:'lygrp',enabled:()=>!$('lygrp').disabled,run:()=>lyGroup()});
- cmdRegister({id:'element.ungroup',label:'Ungroup',elId:'lyung',enabled:()=>!$('lyung').disabled,run:()=>lyUngroup()});
- document.addEventListener('keydown',e=>{const t=e.target;if(t.matches&&t.matches('input,select,textarea'))return;if(e.shiftKey&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.key.toLowerCase()=='g'){e.preventDefault();if(!$('lygrp').disabled)lyGroup()}});
+ cmdRegister({id:'element.group',label:'Group the selected elements',shortcut:'Mod+G',elId:'lygrp',enabled:()=>!$('lygrp').disabled,run:()=>lyGroup()});
+ cmdRegister({id:'element.ungroup',label:'Ungroup',shortcut:'Mod+Shift+G',elId:'lyung',enabled:()=>!$('lyung').disabled,run:()=>lyUngroup()});
+ document.addEventListener('keydown',e=>{const t=e.target;if(t.matches&&t.matches('input,select,textarea'))return;if((e.ctrlKey||e.metaKey)&&!e.altKey&&e.key.toLowerCase()=='g'){e.preventDefault();if(e.shiftKey){if(!$('lyung').disabled)lyUngroup()}else if(!$('lygrp').disabled)lyGroup()}});   // Photoshop's: Ctrl+G groups, Ctrl+Shift+G ungroups (2.27.0; it was Shift+G)
  $('ly_bl').onchange=()=>{const v=$('ly_bl').value;lySel().forEach(q=>{if(v)q.bl=v;else delete q.bl});lyDone()};
  $('ly_op').addEventListener('input',()=>{if(lySync||WBS.fpSyncing)return;const v=+$('ly_op').value,s=lySel();if(!s.length)return;let ch=false;s.forEach(q=>{const o=q.op==null?100:q.op;if(o!==v){ch=true;if(v<100)q.op=v;else delete q.op}});if(ch){store();upd()}});
  covOrder();

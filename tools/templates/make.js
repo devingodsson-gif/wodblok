@@ -30,7 +30,7 @@ const only = process.argv[2];
   for (const R of RECIPES) {
     if (only && R.file !== only) continue;
     const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true })).newPage();
-    const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+    const { errors } = await H.openApp(page, { seed: 4, pattern: false, background: true });
     if (R.kind !== 'canvas') {                                           // a blank project of the kind, as the picker starts it
       await page.click('#fileb'); await page.click('#tpnew'); await page.click(`#tpty [data-k="${R.kind}"]`); await H.settle(page, { quiet: 4 });
       await page.locator('#tpg .tpc').first().click(); await H.settle(page, { quiet: 6 });
@@ -40,7 +40,8 @@ const only = process.argv[2];
     const dims = await page.evaluate(() => { const v = document.getElementById('art').viewBox.baseVal; return { w: v.width, h: v.height }; });
     const s = JSON.parse(await H.getState(page));
     s.tiles.forEach((t, i) => { t.items = R.stamps[i].map(([m, x, y, sc, r]) => ({ m, x, y, s: sc, r, f: 1 })); });
-    s.els = R.els(dims).map((q, i) => ({ u: 'tp' + i, ...q }));
+    const bg = s.els.filter(q => q.bgd).map(q => ({ ...q, x: +(dims.w / 2).toFixed(1), y: +(dims.h / 2).toFixed(1), s: +dims.w.toFixed(1), wy: +(dims.h / dims.w).toFixed(4) }));   // the Background fits this canvas
+    s.els = [...bg, ...R.els(dims).map((q, i) => ({ u: 'tp' + i, ...q }))];
     s.name = R.name;
     await page.evaluate(j => window.__wbTest.apply(j), JSON.stringify(s)); await H.settle(page);
     await page.evaluate(() => { window.__wbTest.resetHistory(); });
