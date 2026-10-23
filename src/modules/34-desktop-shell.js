@@ -106,7 +106,7 @@ document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=
 wsTabFit();nums();if(railHook)railHook();if(WBX.wbRcls)WBX.wbRcls();if(WBX.wbElSync)WBX.wbElSync()}
 // a panel with more tabs than fit: the chosen tab is scrolled into view and the edge that hides more tabs fades
 function wsTabEdge(t){const h=t.parentElement;h.classList.toggle('ovr',t.scrollLeft+t.clientWidth<t.scrollWidth-1);h.classList.toggle('ovl',t.scrollLeft>1)}
-function wsTabFit(){document.querySelectorAll('.wh .wt').forEach(t=>{const a=t.querySelector('.wtab.on');if(a){if(a.offsetLeft+a.offsetWidth>t.scrollLeft+t.clientWidth)t.scrollLeft=a.offsetLeft+a.offsetWidth-t.clientWidth;else if(a.offsetLeft<t.scrollLeft)t.scrollLeft=a.offsetLeft}wsTabEdge(t)})}
+function wsTabFit(){document.querySelectorAll('.wh .wt').forEach(t=>{for(let k=0;k<3;k++){wsTabEdge(t);const a=t.querySelector('.wtab.on');if(!a)break;let m=0;if(a.offsetLeft+a.offsetWidth>t.scrollLeft+t.clientWidth){t.scrollLeft=a.offsetLeft+a.offsetWidth-t.clientWidth;m=1}else if(a.offsetLeft<t.scrollLeft){t.scrollLeft=a.offsetLeft;m=1}wsTabEdge(t);if(!m)break}})}   // the arrows (2.26.0) change the strip's width as they show or hide, so fit again until the open tab is in view
 document.addEventListener('scroll',e=>{if(e.target.classList&&e.target.classList.contains('wt'))wsTabEdge(e.target)},true);
 addEventListener('resize',()=>{if(wsReady)wsTabFit()});
 // tabs and buttons

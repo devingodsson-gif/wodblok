@@ -70,7 +70,7 @@ function init43(){
         list.appendChild(e);setTimeout(()=>{i.focus();i.select()},0);return;
       }
       const t=document.createElement('div'),b=document.createElement('b'),s=document.createElement('small');b.textContent=r.name;s.textContent=sum(r);t.append(b,s);e.appendChild(t);
-      {const x=document.createElement('button');x.type='button';x.className='ib';x.dataset.act='exp';x.setAttribute('aria-label','Export '+r.name);x.title='Export';x.innerHTML=icon(ICN.download);e.appendChild(x)}   // 2.26.0: a recipe exports from its own button, not from a click on its name
+      {const x=document.createElement('button');x.type='button';x.className='ib';x.dataset.act='exp';x.setAttribute('aria-label','Export '+r.name);x.title='Export '+r.name;x.innerHTML=icon(ICN.download);e.appendChild(x)}   // 2.26.0: a recipe exports from its own button, not from a click on its name
       if(own){
         const a=document.createElement('button');a.type='button';a.className='ib';a.dataset.act='ren';a.setAttribute('aria-label','Rename '+r.name);a.innerHTML=icon(ICN.pencil);
         const d=document.createElement('button');d.type='button';d.className='ib';d.dataset.act='del';d.setAttribute('aria-label','Delete '+r.name);d.innerHTML=icon(ICN.trash);

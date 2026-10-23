@@ -17,7 +17,7 @@ test('the element bar has one button per kind, left of centre; the tray starts r
   const { errors } = await openApp(page);
   const btn = page.locator('#elb .elbb');
   await expect(btn).toHaveCount(7);   // 2.26.0: Select (V) comes first again; still no Image button
-  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Select (V)', 'Paint', 'Motif', 'Shape', 'Text', 'Stamp', 'Pattern']);
+  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Select', 'Paint', 'Motif', 'Shape', 'Text', 'Stamp', 'Pattern']);
   await expect(page.locator('#elb [data-k="paint"]')).toBeHidden();   // the brush is put away for now
   for (const pn of ['stmp', 'layers']) await expect(page.locator(`.rail [data-pn="${pn}"]`)).toBeHidden();   // element panels have no rail button
   const vb = await page.locator('.viewbar').boundingBox(), el = await page.locator('#elb').boundingBox(), ty = await page.locator('#tyc').boundingBox();

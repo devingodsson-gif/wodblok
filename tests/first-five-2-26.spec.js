@@ -106,13 +106,13 @@ test('a panel with more tabs than fit gets arrows at the ends that have more beh
   await page.setViewportSize({ width: 900, height: 700 });
   const { errors } = await H.openApp(page, { seed: 4, workspaces: true });
   for (const pn of ['hist', 'xrec', 'rand', 'canvas', 'colors', 'pgrid']) { const b = page.locator(`.rail [data-pn="${pn}"]`); if (await b.count() && await b.isVisible()) { await b.click(); await H.settle(page); } }
-  const wh = page.locator('.wg .wh').first();
-  await expect(wh).toHaveClass(/ovr/);
-  await expect(wh.locator('.wta.r')).toBeVisible();
-  const x0 = await page.locator('.wg .wt').first().evaluate(t => t.scrollLeft);
-  await wh.locator('.wta.r').click();
-  await expect.poll(() => page.locator('.wg .wt').first().evaluate(t => t.scrollLeft)).toBeGreaterThan(x0);
+  const wh = page.locator('.wg .wh').first(), wt = page.locator('.wg .wt').first();
+  await expect(wh).toHaveClass(/ovl/);                                  // the open tab is the last one, in view; the earlier ones are behind the left edge
   await expect(wh.locator('.wta.l')).toBeVisible();
+  const x0 = await wt.evaluate(t => t.scrollLeft);
+  await wh.locator('.wta.l').click();
+  await expect.poll(() => wt.evaluate(t => t.scrollLeft)).toBeLessThan(x0);
+  await expect(wh.locator('.wta.r')).toBeVisible();                     // and now there is more behind the right edge
   expect(errors).toEqual([]);
 });
 
