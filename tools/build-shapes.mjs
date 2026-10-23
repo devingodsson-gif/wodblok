@@ -9,7 +9,12 @@ const root = process.argv[2];
 if (!root) { console.error('Usage: node tools/build-shapes.mjs "<folder>"'); process.exit(1); }
 
 const num = s => { const m = /^(\d+)\s+/.exec(s); return m ? +m[1] : 1e9; };
-const catName = s => s.replace(/^\d+\s+/, '').trim();
+// Set and shape names follow the words rules (developer guide, Part 9 section 14; 2.29.0): sentence case and British spelling. Proper nouns stay as they are.
+const KEEP = /^(Egypt|Greek|Christian|Bible|Fuji|Mount)$/;
+const sentence = s => s.split(' ').map((w, i) => i === 0 || KEEP.test(w) ? w : w.toLowerCase()).join(' ');
+const BRIT = [[/\bArmor\b/gi, m => m[0] === 'A' ? 'Armour' : 'armour'], [/\bTheater\b/gi, m => m[0] === 'T' ? 'Theatre' : 'theatre'], [/\bPlow\b/gi, m => m[0] === 'P' ? 'Plough' : 'plough'], [/\bColor/gi, m => m[0] === 'C' ? 'Colour' : 'colour'], [/\bGray\b/gi, m => m[0] === 'G' ? 'Grey' : 'grey']];
+const words = s => BRIT.reduce((t, [r, f]) => t.replace(r, f), s);
+const catName = s => words(sentence(s.replace(/^\d+\s+/, '').trim()));
 const num2 = v => v;
 
 function flatten(svg, file) {
@@ -30,7 +35,7 @@ const out = [];
 let n = 0;
 for (const d of cats) {
   const files = readdirSync(join(root, d)).filter(f => f.toLowerCase().endsWith('.svg')).sort((a, b) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'base'}));
-  const list = files.map(f => [basename(f, '.svg'), flatten(readFileSync(join(root, d, f), 'utf8'), join(d, f))]);
+  const list = files.map(f => [words(basename(f, '.svg')), flatten(readFileSync(join(root, d, f), 'utf8'), join(d, f))]);
   n += list.length;
   out.push([catName(d), list]);
 }

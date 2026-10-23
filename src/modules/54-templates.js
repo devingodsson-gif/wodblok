@@ -12,7 +12,7 @@ import {fileUnlink,thumbPng} from './33-clear.js';
 // normal canvas. "Starting points" are built in (the .wodblok files in the templates/ folders, added to src/data/templates.js by the build); "Yours" are saved here with
 // "Save as template". The list (name, kind, a small picture) is kept in settings so the picker opens without reading any project; each
 // project's bytes are kept in the records store and read only when it is opened.
-const TP_INDEX='wb111_templates',TP_START='wb111_tplstart',TP_TYPE='wb111_tptype',TP_KINDS=[['canvas','Normal canvas'],['tile','Repeating pattern'],['book','Book']];
+const TP_INDEX='wb111_templates',TP_START='wb111_tplstart',TP_TYPE='wb111_tptype',TP_KINDS=[['canvas','Free canvas'],['tile','Repeat tile'],['book','Book cover']];
 const tpEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const TP_MORE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.more+'</svg>';
 // the three blank starting points draw their canvas outline instead of a stored picture

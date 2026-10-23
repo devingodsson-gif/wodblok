@@ -39,7 +39,7 @@ function editSlot(id,anchor){const o=tyP();if(!o.ts.includes(id))return;
  WBS.trayEdit=id;paintAll(true)}
 // removing a slot that is in use: the first press says how many things will keep their colour as a fixed colour; the second removes it
 let rmAsk=null;
-function removeSlot(id){const n=trayUses(id).length;if(n&&rmAsk!==id){rmAsk=id;setTimeout(()=>{if(rmAsk===id)rmAsk=null},4000);pmsg(`${n} thing${n>1?'s use':' uses'} this colour and will keep it as a fixed colour. Press remove again to remove it from the tray.`);return}
+function removeSlot(id){const n=trayUses(id).length;if(n&&rmAsk!==id){rmAsk=id;setTimeout(()=>{if(rmAsk===id)rmAsk=null},4000);pmsg(`Used by ${n} element${n>1?'s':''}. Remove again to take it out of the tray.`);return}
  rmAsk=null;closePicker();const k=trayRemove(id);trayDone('Removed tray colour');pmsg(k?`Removed from the tray. ${k} thing${k>1?'s':''} kept the colour as a fixed colour.`:'Removed from the tray.')}
 function addSlot(anchorFn){const o=tyP();if(o.ts.length>=TRAY_MAX){pmsg(`The tray holds ${TRAY_MAX} colours.`);return}
  const last=slotHex(o.ts[o.ts.length-1]),id=trayAdd(last.slice(0,7),'');trayDone('Added tray colour');paintAll(true);
@@ -161,7 +161,7 @@ function paintST(force){const box=$('stl');if(!box||!box.isConnected)return;cons
  else{const wf=WF.find(x=>x[0]===ST.f),uf=d.f.find(f=>f.id===ST.f);if(!wf&&!uf){ST.f='';return paintST(true)}
   nav=`<button type="button" class="ib" data-up aria-label="Back to all trays">${BACK}</button><b>${tyEsc(wf?wf[1]:uf.n)}</b>`;
   h=(wf?W.filter(t=>t.f===ST.f):d.t.filter(t=>t.f===ST.f)).map(t=>row(t,!wf)).join('')||'<div class="stno">Empty folder</div>';$('stcnt').textContent=''}
- $('stnav').innerHTML=nav;$('stnav').hidden=!nav;box.innerHTML=h;$('stnewr').hidden=!!(ST.f||q.length);
+ $('stnav').innerHTML=nav;$('stnav').hidden=!nav;box.innerHTML=h;$('stnew').disabled=!!(ST.f||q.length);
  const ri=box.querySelector('.ren input');if(ri){ri.focus();ri.select()}}
 function stFind(id){return stLoad().t.find(t=>t.id===id)||wada().find(t=>t.id===id)}
 function stUse(t){trayLoad(t.c);trayDone('Tray “'+t.n+'”');pmsg('Loaded “'+t.n+'” into the tray.')}

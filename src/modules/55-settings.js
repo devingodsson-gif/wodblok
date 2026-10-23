@@ -67,8 +67,8 @@ const stTgl=(id,on,label)=>`<div class="stgr"><span>${label}</span><button type=
 const stSegH=(id,label,opts,cur)=>`<div class="stgr"><span>${label}</span><div class="seg" id="${id}" role="group" aria-label="${label}" style="--n:${opts.length}">${opts.map(([v,t])=>`<button type="button" data-v="${v}" class="${String(v)===String(cur)?'on':''}" aria-pressed="${String(v)===String(cur)}">${t}</button>`).join('')}</div></div>`;
 // The four view-only toggles (formerly the Display menu). Each one drives the existing hidden button, so the state, keys and commands stay shared.
 // the keys that work but are not commands, listed with the commands that have one
-const stKeys=()=>cmdList().filter(c=>c.shortcut).concat([['Redo (also)','Mod+Y'],['Copy motif','Mod+C'],['Paste motif','Mod+V'],['Hand (hold)','Space'],['Turn the picked shape','[ ]'],['Split motif: apply','Enter'],['Split motif: cancel','Escape'],['Zoom in','Mod+='],['Zoom out','Mod+-'],['Zoom to fit','Mod+0']].map(([label,shortcut])=>({label,shortcut})));
-const stVIEW=[['stgti','gti','Stamp texture'],['stgtx','gtx','Canvas texture'],['stgtm','gtm','Grading masks'],['stgdt','gdt','Stage dots']];
+const stKeys=()=>cmdList().filter(c=>c.shortcut).concat([['Redo (also)','Mod+Y'],['Copy','Mod+C'],['Paste','Mod+V'],['Hand (hold)','Space'],['Turn the picked shape','[ ]'],['Split: apply','Enter'],['Split: cancel','Escape'],['Zoom in','Mod+='],['Zoom out','Mod+-'],['Zoom to fit','Mod+0']].map(([label,shortcut])=>({label,shortcut})));
+const stVIEW=[['stgti','gti','Stamp texture'],['stgtx','gtx','Canvas texture'],['stgtm','gtm','Grade masks'],['stgdt','gdt','Stage dots']];
 const stViewOn=id=>$(id)?.getAttribute('aria-pressed')==='true';
 const stViewToggles=()=>stVIEW.map(([sid,bid,t])=>stTgl(sid,stViewOn(bid),t)).join('');
 const stThemeNow=()=>document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';

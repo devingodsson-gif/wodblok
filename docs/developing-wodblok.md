@@ -236,7 +236,7 @@ Rules:
 | `--fs-m` | 12px | Body, buttons, fields, list rows, menus. The base size |
 | `--fs-l` | 13px | Panel and dialog titles (600); group titles use `--fs-m` 600 |
 
-Brand sizes are separate and fixed: wordmark 15px, splash 20px. The "+" glyph of an empty slot is 18px (list) or 28px (large). Nothing else uses another size.
+Brand sizes are separate and fixed: wordmark 21px (owner, Oct 22 2026; the guide said 15px), splash 20px. The "+" glyph of an empty slot is 18px (list) or 28px (large). Nothing else uses another size.
 
 Font (one family, sans-serif only):
 - **Hanken Grotesk** for every piece of text in the app, except the "WODBLOK" wordmark in the top bar, which is set in IM Fell English (owner, Oct 22 2026; this is the only serif in the app): the splash, titles, labels, buttons, fields, lists, menus, status messages and the print proof sheet. Fallback `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.

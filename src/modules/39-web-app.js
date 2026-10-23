@@ -15,7 +15,7 @@ function init39(){
   if(!offline.available())return;
   const dot=$('pupd');
   dot.onclick=async()=>{
-    if(rcUnsaved()){pmsg('Save your work first, then press the dot again to update.');return}
+    if(rcUnsaved()){pmsg('Save your work first.');return}
     dot.disabled=true;await offline.apply();reload();
   };
   offline.register(()=>{dot.hidden=false}).catch(()=>{});
