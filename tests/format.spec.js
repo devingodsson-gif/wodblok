@@ -12,13 +12,13 @@ const MIME = 'application/vnd.wodblok+zip';
 const baseOf = f => JSON.parse(strFromU8(unzipSync(new Uint8Array(fs.readFileSync(path.join(FX, f))))['project.json']));
 const zipOf = p => zipSync({ mimetype: [strToU8(MIME), { level: 0 }], 'project.json': strToU8(JSON.stringify(p)) });
 
-test('every sample project opens as the current format (25) and the original bytes are not touched', async () => {
+test('every sample project opens as the current format (26) and the original bytes are not touched', async () => {
   const { fmtOpen } = await load('container.js');
   expect(fixtures.length).toBeGreaterThan(0);
   for (const f of fixtures) {
     const bytes = new Uint8Array(fs.readFileSync(path.join(FX, f))), before = Buffer.from(bytes).toString('base64');
     const r = await fmtOpen(bytes);
-    expect(r.newer).toBe(false); expect(r.project.v).toBe(25); expect(r.project.app).toBe('WODBLOK');
+    expect(r.newer).toBe(false); expect(r.project.v).toBe(26); expect(r.project.app).toBe('WODBLOK');
     expect(Buffer.from(bytes).toString('base64')).toBe(before);
   }
 });

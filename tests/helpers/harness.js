@@ -85,7 +85,7 @@ async function openApp(page, { seed = 1, runtime = 'artifact', url = APP_URL, wo
   await settle(page);
   // 2.27.0: a new project starts with a Background shape. Most specs are about something else and count elements, so they start without it unless they pass `background: true`.
   if (!background) {
-    await page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()); s.els = s.els.filter(q => !q.bgd); window.__wbTest.apply(JSON.stringify(s)); window.__wbTest.resetHistory(); });
+    await page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()); s.els = s.els.filter(q => !q.bgd); window.__wbTest.apply(JSON.stringify(s)); window.__wbTest.resetHistory(); window.__wbTest.markClean(); });
     await settle(page);
   }
   if (pattern) await addPattern(page);
