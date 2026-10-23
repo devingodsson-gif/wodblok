@@ -20,10 +20,12 @@ test('New pattern is empty: each of the 16 points shows as an arrow until a sour
   await expect(page.locator('#pelist .mr')).toHaveCount(1);
   expect(await drawn(page, p.u)).toBe(0);
   await expect(page.locator('#fpov [data-pa]')).toHaveCount(16);
-  // the list holds the stamps, the motifs of the library and the text on the canvas
-  const groups = await page.$$eval('#peadd optgroup', g => g.map(x => x.label));
-  expect(groups[0]).toBe('Stamps');
-  expect(groups.length).toBeGreaterThan(5);
+  // 2.28.0: Add source is a menu of the project's stamps (and texts) that ends with the library
+  await page.click('#peadd');
+  const items = await page.$$eval('.rowm .ddi', g => g.map(x => x.textContent));
+  expect(items[0]).toMatch(/^Stamp /);
+  expect(items[items.length - 1]).toBe('Motif from the library…');
+  await page.keyboard.press('Escape');
   await patSource(page);
   expect((await pats(page))[0].src).toHaveLength(1);
   expect((await pats(page))[0].src[0].k).toBe('stamp');

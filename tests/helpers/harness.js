@@ -235,13 +235,19 @@ async function addShape(page, g = 'rect') {
   await page.click(`#shp_pre [data-g="${g}"]`); await settle(page);
   await placeArmed(page, 'shape');                         // 2.20.0: a preset arms the shape; a click on the canvas places it
 }
-// 2.4.0: a new Pattern is empty; this puts a source in it through the Add element list (a stamp by default, or 'motif' / 'text')
+// 2.4.0: a new Pattern is empty; this puts a source in it (a stamp by default, or 'motif' / 'text').
+// 2.28.0: Add source is a menu: the project's stamps, then its texts, then "Motif from the library…", which opens the library; the motif clicked there is added.
 async function patSource(page, kind = 'stamp', n = 0) {
-  await page.evaluate(([kind, n]) => {
-    const s = document.getElementById('peadd'), pre = { stamp: 's:', motif: 'm:', text: 't:' }[kind];
-    const o = [...s.options].filter(x => x.value.startsWith(pre))[n];
-    s.value = o.value; s.dispatchEvent(new Event('change', { bubbles: true }));
-  }, [kind, n]);
+  await page.click('#peadd');
+  const items = page.locator('.rowm .ddi');
+  if (kind === 'motif') {
+    await items.filter({ hasText: 'Motif from the library' }).click(); await settle(page);
+    if (!(await page.locator('#lib button[data-m]:visible').count())) await page.locator('#lib .lfr[data-f^="b:"]:visible').first().click();
+    await page.locator('#lib button[data-m]:visible').nth(n).click();
+  } else {
+    const stamps = JSON.parse(await getState(page)).tiles.length;
+    await items.nth(kind === 'text' ? stamps + n : n).click();
+  }
   await settle(page);
 }
 // 2.12.0: text is made with the Add text button (no more arming and clicking the canvas); in a stamp's tab it lands in the middle of the stamp
