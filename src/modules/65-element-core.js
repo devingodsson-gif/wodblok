@@ -61,11 +61,13 @@ const elIc=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentCo
 function elBar(){const b=$('elb');if(!b)return;b.innerHTML=EL_O.map(k=>{const d=EL_K[k];return`<button type="button" class="elbb" data-k="${k}" aria-label="${d.label}" title="${d.label}" aria-pressed="false"${d.pn?'':' disabled'}${d.hide?' hidden':''}>${elIc(d.icon||'')}</button>`}).join('')}
 // the selected element on the current layer, if any
 function elSel(){const L=WBS.layers[WBS.selL];if(!L||WBS.fpSel==null||WBS.fpSel===-1)return null;return(L.pl||[]).find(q=>q.u==WBS.fpSel)||null}
-let elLast='';
+let elLast='',elLastK='';
 function elSync(){if(WBX.wbTxInPlace)WBX.wbTxInPlace();if(WBX.wbAbSync)WBX.wbAbSync();if(WBX.wbElkSync)WBX.wbElkSync();if(WBX.wbSteSync)WBX.wbSteSync();if(WBX.wbMapSync)WBX.wbMapSync();if(WBX.wbMtSync)WBX.wbMtSync();
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden
 if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbShpSync)WBX.wbShpSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();
 const q=elSel(),k=elKind(q);
+// 2.27.0 (review 33): when the selection leaves a text, the Text panel's field empties (it kept the old words with nothing selected, and the next Add text took them)
+if(k!==elLastK){if(elLastK=='text'&&k!='text'&&!WBS.txArm&&!document.body.classList.contains('stedit')){const t=$('tx_t');if(t&&t.value)t.value=''}elLastK=k}
 // the selection opens its kind's panel (2.6.0, always; before, only while the Properties group was open): picking an element in the Elements list or on the canvas shows its properties
 {const su=q?String(q.u):'';if(su!==elLast){elLast=su;const d=k&&EL_K[k];if(su&&d&&d.pn&&!(WBX.plKind&&(WBX.plKind()=='motif'||WBX.plKind()=='stamp'))&&WBX.wbOpenPanel){const pn=d.pn;setTimeout(()=>{const s2=document.querySelector(`section.pn[data-p="${pn}"]`);if(!s2||s2.hidden||!s2.getClientRects().length)WBX.wbOpenPanel(pn)},0)}}}
 document.querySelectorAll('.elmode[data-k]').forEach(m=>{const on=!!q&&m.dataset.k===k,d=EL_K[m.dataset.k];m.hidden=!on;const nb=m.querySelector('b');if(on&&nb&&d&&d.name){const t=d.name(q);if(nb.textContent!==t)nb.textContent=t}})}

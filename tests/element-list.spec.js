@@ -1,4 +1,4 @@
-// 2.2.2: the element list. No layers: one ordered list of elements with an eye, a name, an opacity and a blend on every row; Group and Ungroup (Shift+G).
+// 2.2.2: the element list. No layers: one ordered list of elements with an eye, a name, an opacity and a blend on every row; Group and Ungroup (Ctrl+G, Ctrl+Shift+G).
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, showPanel, settle, getState, noPattern } = require('./helpers/harness');
 
@@ -54,7 +54,7 @@ test('the Elements panel lists every element top first, with an eye, opacity and
   expect(errors).toEqual([]);
 });
 
-test('Group wraps the selected rows in one row with its own opacity; Ungroup gives them back (Shift+G)', async ({ page }) => {
+test('Group wraps the selected rows in one row with its own opacity; Ungroup gives them back (Ctrl+G)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await three(page);
   await expect(page.locator('#lygrp')).toBeDisabled();
@@ -91,11 +91,11 @@ test('Group wraps the selected rows in one row with its own opacity; Ungroup giv
   expect(els.some(q => q.k === 'group')).toBe(false);
   expect(els.every(q => !q.g)).toBe(true);
   expect(els).toHaveLength(3);
-  // Shift+G groups again
+  // Ctrl+G groups again (2.27.0; it was Shift+G)
   await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(0).locator('.lyn').click();
   await settle(page); await showPanel(page, 'lyrs'); await rows(page).nth(1).locator('.lyn').click({ modifiers: ['Control'] });
   await expect(page.locator('#lygrp')).toBeEnabled();
-  await page.keyboard.press('Shift+G');
+  await page.keyboard.press('Control+G');
   await settle(page);
   expect((await st(page)).els.some(q => q.k === 'group')).toBe(true);
   expect(errors).toEqual([]);
