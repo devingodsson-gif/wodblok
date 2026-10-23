@@ -39,7 +39,7 @@ function rzTake(){rzDrop();const own=[],ids=new Set();WBS.layers.forEach(l=>{if(
 function rzPut(S,top){if(!S||!S.own.length)return;const L=WBS.layers[0];if(!L)return;let next=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));const map={};
  Object.keys(S.tiles).forEach(id=>{const cur=WBS.tiles.find(t=>String(t.id)==id);if(cur&&JSON.stringify(cur)===S.tiles[id])return;const c=JSON.parse(S.tiles[id]);c.id=next++;WBS.tiles.push(c);map[id]=c.id});
  S.own.forEach(q=>{if(q.t!=null&&map[q.t]!=null)q.t=map[q.t];(q.src||[]).forEach(x=>{if(x&&x.t!=null&&map[x.t]!=null)x.t=map[x.t]})});
- {const pl=L.pl||[],i=top?pl.findIndex(q=>top.has(String(q.u))):-1;L.pl=i<0?pl.concat(S.own):pl.slice(0,i).concat(S.own,pl.slice(i))}   // under the stamps this roll placed on their own, which stay on top (2.24.0)
+ {const bg=S.own.filter(q=>q.bgd),mine=S.own.filter(q=>!q.bgd),pl=(L.pl||[]).filter(q=>!q.bgd),i=top?pl.findIndex(q=>top.has(String(q.u))):-1;L.pl=bg.concat(i<0?pl.concat(mine):pl.slice(0,i).concat(mine,pl.slice(i)))}   // the Background goes back under everything (2.28.0)   // under the stamps this roll placed on their own, which stay on top (2.24.0)
  WBS.nid=Math.max(WBS.nid||0,next)}
 let wbBA;function randomize(fresh){if(WBX.wbBA)wbBA.off();if(WBX.wbSteReset)WBX.wbSteReset();   // a roll replaces the stamps: back on the Canvas, no stamp tabs (2.25.0)
 if(!fresh&&rzFresh()){if(WBX.wbClearAll)WBX.wbClearAll();RZMADE=null}const b4=fresh?{els:new Set(),tiles:new Set()}:rzIds(),mark=()=>{const a=rzIds(),k=RZMADE;RZMADE={els:[...(k?k.els:[]),...[...a.els].filter(u=>!b4.els.has(u))],tiles:[...(k?k.tiles:[]),...[...a.tiles].filter(t=>!b4.tiles.has(t))]}};   // a roll that only reworks what is there adds to what the last stamps roll made
@@ -126,7 +126,7 @@ const mixK=on('mix')?pick(KW.map(x=>x[0]).filter(x=>x!=sh0.k)):null;
 for(let q=0;q<n;q++){const sh=q&&mixK?mkSh(mixK,ri(70,95)):{...sh0,s:[...sh0.s],z:100};
  const c=comp(sh,q>0&&!mixK&&ch(.3));tl.push({id:q+1,sh,items:c.items,sym:c.sym,et:+wpick([[0,.25],[rr(1,3),.45],[rr(3,6),.3]]).toFixed(1),er:+rr(0,6).toFixed(1),es:ri(0,999),neg:ch(.12),ink:q&&on('inks')&&ch(.6)?inkFor():null})}
 if(mixK&&!tl.some((t,i)=>i&&t.sh.k==mixK))tl[1].sh=mkSh(mixK,85);
-const g0=geom(sh0),L=mkL('Layer 1',tl.map(t=>t.id),'check',180);
+const g0=geom(sh0),L=mkL('Pattern 1',tl.map(t=>t.id),'check',180);   // a roll's patterns are called Pattern 1, Pattern 2... (2.28.0; they were Layer N)
 L.ak={[g0.SK]:pick(arrOpts(g0))[0]};if(on('radial')&&!on('link'))L.ak={[g0.SK]:pick(GRAD)[0]};if(on('vary')){if(ch(.7))L.rsz=ri(15,45);if(ch(.6)||!L.rsz)L.rgp=ri(8,28);const am=gArrAll(g0).find(o=>o[0]==L.ak[g0.SK]);if(am&&(am[2]=='brick'||am[2]=='drop'))L.bo=pick([25,33.333,50,66.667,75])}L.lead=1;L.fit=!on('rot')&&ch(.35)?pick(['h','v']):'';L.size=Math.round(rr(110,250));L.gap=ch(.65)?0:ri(-6,22);
 L.pst=ch(.5)?0:ri(1,6);L.pfl=ch(.65)?0:ri(1,3);L.rot=on('rot')?pick([45,45,30,-30,15,-15,60,90]):0;L.man=false;L.ov={};
 const TXFK=TXF.map(f=>Object.keys(f[1]));
@@ -135,7 +135,7 @@ const needAcc=on('link')||on('shape'),LS=[L],nl=needAcc?wpick([[2,.75],[3,.25]])
 for(let li=1;li<nl;li++){const first=li==1,link=on('link')&&first,own=on('shape')&&first,pa=link?pick(['k','e','k','e','c']):null;
  const z=link?(pa=='c'?ri(55,80):ri(35,60)):100,sh2=own?mkSh(pick(KW.map(x=>x[0]).filter(x=>x!=sh0.k)),z):{...sh0,s:[...sh0.s],z};
  const c2=comp(sh2,link||own||ch(.55)),id=tl.length+1;tl.push({id,sh:sh2,items:c2.items,sym:c2.sym,et:ch(.6)?0:+rr(1,3).toFixed(1),er:+rr(0,5).toFixed(1),es:ri(0,999)});
- const L2=mkL('Layer '+(li+1),!own&&ch(.25)?[id,pick(tl.slice(0,-1)).id]:[id],'check',180);L2.lead=id;
+ const L2=mkL('Pattern '+(li+1),!own&&ch(.25)?[id,pick(tl.slice(0,-1)).id]:[id],'check',180);L2.lead=id;
  const g2=link?g0:geom(sh2);L2.ak={[g2.SK]:pick(arrOpts(g2))[0]};
  if(link){L2.gl=L.u;L2.pa=pa;L2.ox=0;L2.oy=0}else{L2.size=Math.round(rr(70,200));L2.gap=ch(.5)?0:ri(0,40);L2.ox=ri(0,99);L2.oy=ri(0,99);L2.fit=''}
 L2.pst=ch(.6)?0:ri(1,5);L2.pfl=0;L2.man=false;L2.ov={};
@@ -193,7 +193,7 @@ const EO={pick,ri,rr,ch,jit:!!FT.jit,texOn:!!(FT.pr&&sOn('pr','lay')),gradeOn:!!
 if(usedGen)mL=rzMainEls(mL,mT,EO);if(FT.frame)fL=rzFrameEls(fL,fT,EO);
 const cvU=rzCv();
 const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(rzPic)?[]:WBS.layers.filter(rzPic)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:cvU,v:87,...(RZ.keep.tx&&WBS.tex.off?{off:1}:{})}};
-{const bgK=flatEls(WBS.layers).filter(p=>p.bgd);if(bgK.length){const L1=oneLayer(JSON.parse(JSON.stringify(bgK)),[]);c.layers.unshift(L1)}}   // the Background stays under a new roll (2.27.0)
+{const bgK=flatEls(WBS.layers).filter(p=>p.bgd);if(bgK.length&&!flatEls(c.layers).some(p=>p.bgd)){const L1=oneLayer(JSON.parse(JSON.stringify(bgK)),[]);c.layers.unshift(L1)}}   // the Background stays under a new roll (2.27.0)
 if(RZ.keep.pr)c.pr={...WBS.pr};
 if(FT.pr&&!sOn('pr','edges')){c.pr.e=WBS.pr.e;c.pr.q=WBS.pr.q}
 if(FT.pr&&sOn('pr','edges')&&AM('pr')<1){c.pr.e=Math.round(c.pr.e*AM('pr'));c.pr.q=Math.round(c.pr.q*AM('pr'))}
@@ -293,7 +293,7 @@ if((FT.free||libFree)&&ch(.65)){
  const usedIds=new Set(FL.pl.map(q=>q.t)),keep=made.filter(t=>usedIds.has(t.id));
  if(keep.length){const fp=ch(.4)?0:ri(1,4);FL.pl.forEach(q=>{const fx=rzFx(EO,fp,0,null);if(fx.length)q.fx=fx});FL.st=keep.map(t=>t.id);keep.forEach(t=>WBS.tiles.push(t));WBS.layers.push(FL);RZFZ=new Set(FL.pl.map(q=>String(q.u)));fzU=RZFZ;
   // one element list (2.24.0): the stamps placed on their own were built on a layer of their own; fold it into the project's one list so the Elements list and the canvas reach them (as opening the file does)
-  {const L0=WBS.layers[0],st=[...new Set(WBS.layers.flatMap(l=>l.st||[]))];WBS.layers=[oneLayer(flatEls(WBS.layers),st,L0.u)];WBS.selL=0}
+  {const L0=WBS.layers[0],st=[...new Set(WBS.layers.flatMap(l=>l.st||[]))];const fe=flatEls(WBS.layers);WBS.layers=[oneLayer(fe.filter(p=>p.bgd).concat(fe.filter(p=>!p.bgd)),st,L0.u)];WBS.selL=0}   // the Background stays at the bottom (2.28.0)
   reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0))}
  setDim();useT(WBS.tiles[WBS.cur]);store();upd()}
 rzPut(OWN,fzU);

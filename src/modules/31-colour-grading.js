@@ -1,7 +1,7 @@
 import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {C,CH,CW,closeDD,col,geom,okC,placeFloat,shOf} from './04-canvas-and-stamp-outlines.js';
+import {C,CH,closeDD,col,CW,geom,hEsc,okC,placeFloat,shOf,stNm} from './04-canvas-and-stamp-outlines.js';
 import {refLabel} from './50-tray-core.js';
 import {store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
@@ -109,18 +109,18 @@ gmHandles()}
 const gdSave=()=>{try{kv.set('wb41_grade',JSON.stringify(grd))}catch(e){}};
 const gCap=()=>{if(WBX.wbCap)WBX.wbCap()};
 // ---- mask list + settings
-const tileN=id=>{const i=WBS.tiles.findIndex(t=>String(t.id)==String(id));return i<0?'':'Stamp '+(i+1)};
+const tileN=id=>{const t=WBS.tiles.find(t=>String(t.id)==String(id));return t?stNm(t):''};
 const colName=h=>{const e=C.find(c=>c[1].toLowerCase()==h.toLowerCase());return e?e[0]:h.toUpperCase()};
 function gmMeta(m){let s=m.t=='lay'?((WBS.layers.find(L=>L.u==m.lay)||{}).name||'Pick a layer'):m.t=='col'?colName(m.c):m.t=='lum'?`${m.lo}–${m.hi}%`:m.sp=='s'?(m.st?tileN(m.st)||'Each stamp':'Each stamp'):'Canvas';
 if(m.inv&&m.t!='lay')s+=', inverted';if(!hasA(m.a))s+=' · no changes yet';return s}
 function renderGM(){if(gmSel>=grd.masks.length)gmSel=grd.masks.length-1;if(gmSel>=0&&!gmVisM(grd.masks[gmSel]))gmSel=-1;const m=gmCur();
-$('gm_list').innerHTML=`<div class="lyr${gmSel<0?' on':''}" data-gm="-1"><span class="gmsp"></span><span class="gmi">${MIC.glob}</span><span class="lyn">${inSt()?'Stamp '+(WBS.cur+1)+' <span class="lym">This stamp only</span>':'Global <span class="lym">Whole print</span>'}</span></div>`+grd.masks.map((q,i)=>!gmVisM(q)?'':`<div class="lyr${i==gmSel?' on':''}${q.on?'':' off'}" data-gm="${i}"><button type="button" class="eye" data-eye title="${q.on?'Hide':'Show'}">${q.on?GEYE:GNOEYE}</button><span class="gmi">${MIC[q.t]}</span><span class="lyn">${i==gmRen?`<input value="${hx(q.name)}" maxlength="30">`:hx(q.name)} <span class="lym">${hx(gmMeta(q))}</span></span></div>`).join('');
-{const nv=grd.masks.filter(gmVisM).length;$('gm_cnt').textContent=nv?String(nv):''}$('gm_dup').disabled=$('gm_del').disabled=!m;$('gd_who').textContent=m?m.name:(inSt()?'Stamp '+(WBS.cur+1):'Global');{const co=$('gdcov');if(co&&co.closest('label'))co.closest('label').hidden=inSt()}$('gm_body').hidden=!m;
+$('gm_list').innerHTML=`<div class="lyr${gmSel<0?' on':''}" data-gm="-1"><span class="gmsp"></span><span class="gmi">${MIC.glob}</span><span class="lyn">${inSt()?stNm(WBS.tiles[WBS.cur])+' <span class="lym">This stamp only</span>':'Global <span class="lym">Whole print</span>'}</span></div>`+grd.masks.map((q,i)=>!gmVisM(q)?'':`<div class="lyr${i==gmSel?' on':''}${q.on?'':' off'}" data-gm="${i}"><button type="button" class="eye" data-eye title="${q.on?'Hide':'Show'}">${q.on?GEYE:GNOEYE}</button><span class="gmi">${MIC[q.t]}</span><span class="lyn">${i==gmRen?`<input value="${hx(q.name)}" maxlength="30">`:hx(q.name)} <span class="lym">${hx(gmMeta(q))}</span></span></div>`).join('');
+{const nv=grd.masks.filter(gmVisM).length;$('gm_cnt').textContent=nv?String(nv):''}$('gm_dup').disabled=$('gm_del').disabled=!m;$('gd_who').textContent=m?m.name:(inSt()?stNm(WBS.tiles[WBS.cur]):'Global');{const co=$('gdcov');if(co&&co.closest('label'))co.closest('label').hidden=inSt()}$('gm_body').hidden=!m;
 const inp=$('gm_list').querySelector('input');if(inp){inp.focus();inp.select();const done=ok=>{if(gmRen<0)return;const q=grd.masks[gmRen];if(ok&&q&&inp.value.trim())q.name=inp.value.trim().slice(0,30);gmRen=-1;gdSave();renderGM();gCap()};inp.onkeydown=e=>{if(e.key=='Enter')done(1);else if(e.key=='Escape')done(0);e.stopPropagation()};inp.onblur=()=>done(1)}
 if(!m)return;const T=m.t,show=(id,on)=>$(id).hidden=!on;
 show('gm_sp_r',isPos(m)&&!m.sc&&m.sp=='s');show('gm_st_r',isPos(m)&&m.sp=='s'&&!m.sc&&WBS.tiles.length>1);show('gm_eye',!m.sc);show('gm_lay_r',T=='lay');show('gm_col_r',T=='col');show('gm_lo_r',T=='lum');show('gm_hi_r',T=='lum');show('gm_rg_r',T=='col');show('gm_sm_r',T=='col'||T=='lum');show('gm_fe_r',T=='rad');show('gm_inv_r',T!='lay');
 $('gm_sp').querySelectorAll('[data-gs]').forEach(b=>b.classList.toggle('on',b.dataset.gs==m.sp));
-if(isPos(m)){$('gm_st').innerHTML='<option value="">All stamps</option>'+WBS.tiles.map((t,i)=>`<option value="${t.id}">Stamp ${i+1}</option>`).join('');$('gm_st').value=WBS.tiles.some(t=>String(t.id)==m.st)?m.st:''}
+if(isPos(m)){$('gm_st').innerHTML='<option value="">All stamps</option>'+WBS.tiles.map(t=>`<option value="${t.id}">${hEsc(stNm(t))}</option>`).join('');$('gm_st').value=WBS.tiles.some(t=>String(t.id)==m.st)?m.st:''}
 if(T=='lay'){$('gm_lay').innerHTML=(m.lay&&WBS.layers.some(L=>L.u==m.lay)?'':'<option value="">Pick a layer</option>')+WBS.layers.map((L,i)=>i).reverse().map(i=>`<option value="${WBS.layers[i].u}">${hx(WBS.layers[i].name)}</option>`).join('');$('gm_lay').value=WBS.layers.some(L=>L.u==m.lay)?m.lay:''}
 if(T=='col'){const used=[...new Set([...WBS.proj.ts.map(id=>'@'+id),WBS.proj.bg,WBS.proj.ink,...WBS.tiles.map(t=>t.ink),...WBS.layers.map(L=>L.ink)].filter(n=>okC(n)))],hs=[...new Map(used.map(n=>[col(n).slice(0,7).toLowerCase(),refLabel(n)])).entries()].map(([h,n])=>[n,h]),cur0=m.c.toLowerCase();
  $('gm_col').innerHTML=hs.map(([n,h])=>`<option value="${h}">${hx(n)}</option>`).join('')+(hs.some(x=>x[1]==cur0)?'':`<option value="${cur0}">${hx(colName(cur0))}</option>`);$('gm_col').value=cur0;$('gm_cc').value=cur0}

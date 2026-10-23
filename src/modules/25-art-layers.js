@@ -1,5 +1,5 @@
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CM,CW,SH,SW,col,geom,shOf,shp,useT} from './04-canvas-and-stamp-outlines.js';
+import {CH,CM,col,CW,geom,SH,shOf,shp,stNm,SW,useT} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,pal,store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {eT,upd} from './11-pressure-flooding-block-edges.js';
@@ -46,7 +46,7 @@ const fpHit=(L,x,y)=>{const pl=L.pl||[];for(let i=pl.length-1;i>=0;i--){const p=
 const fpPt=e=>{const a=$('art'),pt=a.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(a.getScreenCTM().inverse());return[q.x,q.y]};
 // --- panel
 function fpSync(){const L=fpL();if(!L||!$('lfree'))return;txbSync(L);const[pa]=pal(),ky=WBS.tiles.map(t=>t.id+JSON.stringify(t.items.length)+JSON.stringify(shOf(t))).join('|')+pa;
-if($('lfpst').dataset.k!=ky){WBS.fpTh={};$('lfpst').innerHTML=WBS.tiles.map((t,i)=>{useT(t);const sv=`<svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg>`;WBS.fpTh[t.id]=sv;return`<button type="button" data-t="${t.id}" title="Stamp ${i+1}">${sv}</button>`}).join('');useT(WBS.tiles[WBS.cur]);$('lfpst').dataset.k=ky}
+if($('lfpst').dataset.k!=ky){WBS.fpTh={};$('lfpst').innerHTML=WBS.tiles.map((t,i)=>{useT(t);const sv=`<svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg>`;WBS.fpTh[t.id]=sv;return`<button type="button" data-t="${t.id}" title="${stNm(t)}" aria-label="${stNm(t)}">${sv}</button>`}).join('');useT(WBS.tiles[WBS.cur]);$('lfpst').dataset.k=ky}
 document.querySelectorAll('#lfpst [data-t]').forEach(b=>b.classList.toggle('on',+b.dataset.t==WBS.fpB||(fpPoolOk()&&WBS.fpPool.has(b.dataset.t))));
 const n=(L.pl||[]).length,p=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(WBX.alSync)WBX.alSync();$('lfpsel').hidden=!(p||WBS.fpB);['lfpdu','lfpup','lfpdn','lfpdl'].forEach(id=>{if($(id))$(id).hidden=!p});
 if(p||WBS.fpB){const S0=Math.min(CW,CH),sv=(id,v)=>{const el=$(id);if(+el.value!=v){el.value=v;WBS.fpSyncing=1;try{el.dispatchEvent(new Event('input',{bubbles:true}))}finally{WBS.fpSyncing=0}}};sv('lfps',Math.round((p?p.s:fpSz())/S0*100));sv('lfpr',Math.round(p?(+p.r||0):fpRot));$('lfpxy').hidden=!p;if(p){sv('lfpx',+(p.x/CW*100).toFixed(1));sv('lfpy',+(p.y/CH*100).toFixed(1))}}if(WBX.wbElSync)WBX.wbElSync()}

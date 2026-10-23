@@ -1,6 +1,6 @@
 import {ICN} from './00-icons.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,SH,SHN,SW,rowMenu,useT,shp} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,hEsc,rowMenu,SH,SHN,shp,stNm,stNmId,SW,useT} from './04-canvas-and-stamp-outlines.js';
 import {pal,selOne,store} from './06-motif-library-folders.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -10,12 +10,12 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 // The outlines of the selected layer's arrangement are drawn on the canvas (opacity from the panel). The arrangement code in
 // 10-layer-grids.js hands every printed stamp to stOlAdd, so the outlines, the hit test and the canvas-to-stamp transform all use the
 // same positions that were printed.
-const STP={p:{},items:[],on:false,rot:0,un:null,unL:null,sig:'',ai:null,after:null};
+const STP={p:{},items:[],on:false,rot:0,un:null,unL:null,sig:'',ai:null,after:null,ren:null};
 const stIc=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const STEDIT=stIc(ICN.pencil);   // the Edit pencil on a stamp row (2.5.0, was the lock)
 const STTRRE=/translate\(([-\d.]+) ([-\d.]+)\) rotate\(([-\d.]+)\) scale\(([-\d.]+) ([-\d.]+)\)/;
 const stSel=()=>WBS.layers[WBS.selL];
-const stName=id=>'Stamp '+(WBS.tiles.findIndex(t=>t.id==id)+1);
+const stName=id=>stNmId(id);
 // the one unlocked stamp, or null; a different layer, or a stamp that is gone, locks it again
 function stUnlocked(){if(STP.un==null)return null;const L=stSel();if(!L||L.u!==STP.unL||!WBS.tiles.some(t=>t.id==STP.un)){STP.un=null;STP.unL=null;return null}return STP.un}
 // stamps in this layer's arrangement plus stamps placed freely on the layer, counted once per layer
@@ -41,23 +41,29 @@ function stampAt(x,y,only){for(let i=STP.items.length-1;i>=0;i--){const it=STP.i
 function stampToCanvas(i,u,v){const it=STP.items[i];if(!it)return null;const q=stMatrix(it).transformPoint({x:u,y:v});return{x:q.x,y:q.y}}
 // ----- the panel -----
 function stLock(id){if(stUnlocked()===id){STP.un=null;STP.unL=null;selOne(-1)}else{STP.un=id;STP.unL=(stSel()||{}).u||null;const k=WBS.tiles.findIndex(t=>t.id==id);if(k>=0&&WBS.cur!=k){WBS.cur=k;selOne(-1)}}STP.ai=null;stOlPaint();stPanel(true);stTextSync();if(WBX.wbGrade)WBX.wbGrade.refresh();WBH.draw()}
-function stSig(){const L=stSel()||{},un=stUnlocked();return[WBS.cur,WBS.selL,(L.st||[]).join(),un,WBS.tiles.map(t=>t.id+':'+(t.items||[]).length).join(),WBS.layers.map(l=>(l.st||[]).length+'/'+(l.pl||[]).length).join(),WBS.proj&&WBS.proj.bg].join('|')}
+function stSig(){const L=stSel()||{},un=stUnlocked();return[STP.ren,WBS.tiles.map(t=>t.nm||'').join('\u0001'),WBS.cur,WBS.selL,(L.st||[]).join(),un,WBS.tiles.map(t=>t.id+':'+(t.items||[]).length).join(),WBS.layers.map(l=>(l.st||[]).length+'/'+(l.pl||[]).length).join(),WBS.proj&&WBS.proj.bg].join('|')}
 function stPanel(force){const list=$('stmpl');if(!list||!list.offsetParent)return;const sig=stSig();if(!force&&sig===STP.sig&&list.childElementCount)return;STP.sig=sig;
  const L=stSel(),un=stUnlocked(),[pa]=pal(),cur=WBS.tiles[WBS.cur];let h='';
  WBS.tiles.forEach((t,k)=>{useT(t);const lk=un===t.id,n=stUses(t.id);
-  h+=`<div class="smkr${WBS.cur===k?' cur':''}" data-t="${t.id}"><button type="button" class="smkth" aria-label="Stamp ${k+1}"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button><span class="smkn">Stamp ${k+1}</span><span class="smkc" aria-label="Used by ${n} ${n==1?'element':'elements'}">${n}</span><button type="button" class="ib smklk" data-lk aria-pressed="${lk}" aria-label="Edit Stamp ${k+1}">${STEDIT}</button></div>`});
- if(cur)useT(cur);list.innerHTML=h;
+  h+=`<div class="smkr${WBS.cur===k?' cur':''}" data-t="${t.id}"><button type="button" class="smkth" aria-label="${hEsc(stNm(t))}"><svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg></button><span class="smkn">${STP.ren===t.id?`<input value="${hEsc(stNm(t))}" maxlength="40" aria-label="Stamp name">`:hEsc(stNm(t))}</span><span class="smkc" aria-label="Used by ${n} ${n==1?'element':'elements'}">${n}</span><button type="button" class="ib smklk" data-lk aria-pressed="${lk}" aria-label="Edit ${hEsc(stNm(t))}">${STEDIT}</button></div>`});
+ if(cur)useT(cur);list.innerHTML=h;stRenWire(list);
  const ed=$('smked');if(ed){ed.hidden=un==null;ed.textContent=un==null?'':`${stName(un)} · ${stUses(un)} ${stUses(un)==1?'element':'elements'}`}}
+// A stamp is renamed in place (2.28.0), like a row of the Elements list: double-click its name, Enter or a click elsewhere keeps it, Esc leaves it as it was
+function stRenWire(list){const inp=list.querySelector('.smkn input');if(!inp)return;inp.focus();inp.select();
+ const done=ok=>{if(STP.ren==null)return;const t=WBS.tiles.find(x=>x.id===STP.ren);STP.ren=null;const v=inp.value.replace(/[\u0000-\u001f]/g,'').trim().slice(0,40);
+  if(ok&&t&&v&&v!==stNm(t)){t.nm=v;stLabel('Renamed stamp');store();upd();if(WBX.wbCap)WBX.wbCap()}else stPanel(true)};
+ inp.onkeydown=e=>{e.stopPropagation();if(e.key=='Enter')done(1);else if(e.key=='Escape')done(0)};inp.onblur=()=>done(1);inp.onclick=e=>e.stopPropagation()}
+const stRename=id=>{if(!WBS.tiles.some(t=>t.id===id))return;STP.ren=id;stPanel(true)};
 // ----- the project's stamps: choose one, make a new one, copy one, delete one, keep one in the library, bring the camera to one -----
 const stLabel=t=>{WBX.wbLabelPlain={t,at:performance.now()}};
 const stAddTo=id=>{const L=stSel();if(L&&!(L.st||[]).includes(id)){L.st=L.st||[];L.st.push(id)}};
 const stNo=id=>WBS.tiles.findIndex(t=>t.id==id)+1;
 function stCurrent(id){const k=WBS.tiles.findIndex(t=>t.id==id);if(k<0||WBS.cur===k)return;if(STP.un!=null&&STP.un!==id){STP.un=null;STP.unL=null}WBS.cur=k;selOne(-1);STP.ai=null;upd()}
 // a new stamp (an outline can be chosen) is added to the selected layer's arrangement, becomes the open stamp and starts locked
-function stNew(kind){const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:0,er:0,es:Math.floor(Math.random()*999),tu:[]};WBS.tiles.push(t);stAddTo(t.id);WBS.cur=WBS.tiles.length-1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;
- if(kind&&kind!='rect'){const b=document.querySelector('#skind [data-k="'+kind+'"]');if(b)b.click()}stLabel('New stamp');store();upd();pmsg('Added Stamp '+stNo(t.id)+'.');if(WBX.wbSteGo)WBX.wbSteGo(t.id)}   // (2.25.0) a new stamp opens in its tab, where it can be seen and filled
+function stNew(kind){const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:0,er:0,es:Math.floor(Math.random()*999),tu:[]};t.nm='Stamp '+t.id;WBS.tiles.push(t);stAddTo(t.id);WBS.cur=WBS.tiles.length-1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;
+ if(kind&&kind!='rect'){const b=document.querySelector('#skind [data-k="'+kind+'"]');if(b)b.click()}stLabel('New stamp');store();upd();pmsg('Added '+stNm(t)+'.');if(WBX.wbSteGo)WBX.wbSteGo(t.id)}   // (2.25.0) a new stamp opens in its tab, where it can be seen and filled
 // a copy edits separately from the original
-function stDup(){const k=WBS.cur,src=WBS.tiles[k];if(!src)return;const t=JSON.parse(JSON.stringify(src));t.id=WBS.nid++;WBS.tiles.splice(k+1,0,t);stAddTo(t.id);WBS.cur=k+1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;stLabel('Duplicated stamp');store();upd();pmsg('Duplicated Stamp '+(k+1)+' as Stamp '+(k+2)+'.')}
+function stDup(){const k=WBS.cur,src=WBS.tiles[k];if(!src)return;const t=JSON.parse(JSON.stringify(src));t.id=WBS.nid++;t.nm=(stNm(src)+' copy').slice(0,40);WBS.tiles.splice(k+1,0,t);stAddTo(t.id);WBS.cur=k+1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;stLabel('Duplicated stamp');store();upd();pmsg('Duplicated '+stNm(src)+'.')}
 // deleting a stamp that is in use takes it out of every arrangement and every free item that points at it, in one step
 // how many patterns and placed stamps use a stamp (2.24.0: deleting asks with this count, and its patterns let go of it too)
 function stUseN(id){let pa=0,el=0;WBS.layers.forEach(L=>(L.pl||[]).forEach(p=>{if(p.k=='pattern'){if((p.src||[]).some(r=>r.k=='stamp'&&r.t==id))pa++}else if(p.t==id)el++}));return{pa,el}}
@@ -67,7 +73,7 @@ function stDelete(id){const k=WBS.tiles.findIndex(t=>t.id==id);if(k<0)return fal
  WBS.tM=new Set();WBS.cur=Math.max(0,Math.min(k,WBS.tiles.length-1));selOne(-1);if(STP.un===id){STP.un=null;STP.unL=null}STP.ai=null;stLabel('Deleted stamp');store();upd();return true}
 // the camera goes to one printed copy of the open stamp (the one nearest the middle of the canvas); the layers stay as they are
 function stZoom(){const t=WBS.tiles[WBS.cur];if(!t||!WBX.wbZoomTo)return;let best=-1,bd=1e18;STP.items.forEach((it,i)=>{if(it[0]!==t.id)return;const p=stMatrix(it).transformPoint({x:it[6]/2,y:it[7]/2}),d=Math.hypot(p.x-CW/2,p.y-CH/2);if(d<bd){bd=d;best=i}});
- if(best<0)return pmsg('Stamp '+(WBS.cur+1)+' is not on this layer.');
+ if(best<0)return pmsg(stNm(t)+' is not on this layer.');
  const it=STP.items[best],M=stMatrix(it),xs=[],ys=[];[[0,0],[it[6],0],[it[6],it[7]],[0,it[7]]].forEach(([u,v])=>{const q=M.transformPoint({x:u,y:v});xs.push(q.x);ys.push(q.y)});
  const w=Math.max(...xs)-Math.min(...xs),h=Math.max(...ys)-Math.min(...ys),b=$('boardP'),s=Math.min(8,Math.max(.1,Math.min(b.clientWidth,b.clientHeight)*.8/Math.max(w,h,1)));
  WBX.wbZoomTo(s);const a=$('art'),m=a.getScreenCTM(),P=a.createSVGPoint();P.x=(Math.min(...xs)+Math.max(...xs))/2;P.y=(Math.min(...ys)+Math.max(...ys))/2;const c=P.matrixTransform(m),r=b.getBoundingClientRect();b.scrollLeft+=c.x-(r.left+r.width/2);b.scrollTop+=c.y-(r.top+r.height/2)}
@@ -75,14 +81,15 @@ function stBar(){const on=(id,f)=>{const b=$(id);if(b)b.addEventListener('click'
  on('smknew',()=>stNew('rect'));   // like every Add button: it makes one at once (2.15.0) and opens its tab (2.25.0); the outline is changed in the stamp's tab
  on('smkdup',()=>stDup());
  {const d=$('smkdel');if(d){let tm=0;d.addEventListener('click',()=>{const t=WBS.tiles[WBS.cur];if(!t)return;
-  if(!d.classList.contains('sure')){d.classList.add('sure');d.setAttribute('aria-label','Click to confirm');pmsg('Click again to delete Stamp '+(WBS.cur+1)+'.'+stUseSay(t.id));tm=setTimeout(()=>{d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp')},3000);return}
-  clearTimeout(tm);d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp');const n=WBS.cur+1;if(stDelete(t.id))pmsg('Deleted Stamp '+n+'.')})}}
+  if(!d.classList.contains('sure')){d.classList.add('sure');d.setAttribute('aria-label','Click to confirm');pmsg('Click again to delete '+stNm(t)+'.'+stUseSay(t.id));tm=setTimeout(()=>{d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp')},3000);return}
+  clearTimeout(tm);d.classList.remove('sure');d.setAttribute('aria-label','Delete stamp');const n=stNm(t);if(stDelete(t.id))pmsg('Deleted '+n+'.')})}}
  on('smkzoom',()=>stZoom());
  on('smksave',()=>{const b=$('slsave');if(b)b.click()})}
 function init63(){
  try{new ResizeObserver(stOlFit).observe($('art'))}catch(e){}
  const list=$('stmpl');if(list){
-  list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r)return;const id=+r.dataset.t;if(e.target.closest('[data-lk]')){if(WBX.wbSteEdit)WBX.wbSteEdit(id);else stLock(id)}else stCurrent(id)});
+  list.addEventListener('dblclick',e=>{const n=e.target.closest('.smkn');const r=n&&n.closest('.smkr');if(!r||n.querySelector('input'))return;stRename(+r.dataset.t)});
+  list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r||e.target.closest('.smkn input'))return;const id=+r.dataset.t;if(e.target.closest('[data-lk]')){if(WBX.wbSteEdit)WBX.wbSteEdit(id);else stLock(id)}else stCurrent(id)});
  stBar();
   if(typeof IntersectionObserver=='function')new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting))stPanel(true)}).observe(list)}
 }
