@@ -114,10 +114,9 @@ for (const seed of [7, 12, 21]) {
     await roll(page);
     const p = await periodic(page);
     expect(p.half, 'the piece has something in it').toBeGreaterThan(1);
-    // 2.33.0: 0.45. Since 2.31.0 the roll takes other shapes (Basic shapes is not a Randomize theme), and roll 7 is 0.42 of the half-tile difference; looked at in the 3 x 3 view: no seam.
     // 2.30.0: 0.4, as in the rolls above. Rolls 7 and 12 now draw a piece of many small specks (looked at in the 3 x 3 view: no seam), which differs between two copies of the tile by about a pixel along their edges.
-    expect(p.right, JSON.stringify(p)).toBeLessThan(0.45 * p.half + 0.4);
-    expect(p.down, JSON.stringify(p)).toBeLessThan(0.45 * p.half + 0.15);
+    expect(p.right, JSON.stringify(p)).toBeLessThan(0.4 * p.half + 0.4);
+    expect(p.down, JSON.stringify(p)).toBeLessThan(0.4 * p.half + 0.15);
     expect(errors).toEqual([]);
   });
 }
