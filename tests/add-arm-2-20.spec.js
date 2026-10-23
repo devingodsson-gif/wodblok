@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { openApp, settle, getState, noPattern } = require('./helpers/harness');
+const { openApp, settle, getState, noPattern, pickShape } = require('./helpers/harness');
 // 2.20.0: every Add arms its kind; a ghost follows the pointer; each click on the canvas places one at the pointer; Esc or V puts the tool away.
 const els = async (page, k) => JSON.parse(await getState(page)).els.filter(q => q.k === k);
 
@@ -10,6 +10,7 @@ for (const k of ['shape', 'pattern', 'motif', 'stamp']) {
     await page.click(`#elb [data-k="${k}"]`); await settle(page);
     await page.click(`.elk[data-k="${k}"] [data-add]`); await settle(page);
     expect((await els(page, k)).length, 'Add alone').toBe(0);
+    if (k === 'motif') await pickShape(page);   // 2.26.0: with nothing chosen yet, Add motif opens the library; a pick arms it
     const b = await page.locator('#art').boundingBox();
     await page.mouse.move(b.x + b.width * 0.3, b.y + b.height * 0.3);
     await expect(page.locator(`#elb [data-k="${k}"]`)).toHaveAttribute('aria-pressed', 'true');   // armed

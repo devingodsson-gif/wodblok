@@ -172,7 +172,7 @@ $('lq').addEventListener('keydown',e=>e.stopPropagation());$('lq').addEventListe
 SZ.oninput=()=>{szSet(+SZ.value);try{kv.set('wb150_lsz',String(SZ.value))}catch(e){}};
 try{const o=JSON.parse(kv.get('wb150_lopen')||'[]');if(Array.isArray(o))o.forEach(v=>{if(typeof v=='string')lbOpen.add(v)})}catch(e){}
 $('ltog').onclick=lbAll;
-$('limp').onclick=e=>{e.stopPropagation();rowMenu($('limp'),[['Image…',()=>$('ifile').click()],['Sheet…',()=>$('sfile').click()]])};
+$('limp').onclick=e=>{e.stopPropagation();rowMenu($('limp'),[['Image…',()=>$('ifile').click()],['Sheet…',()=>$('sfile').click()],['Copy a prompt for an image',()=>WBX.wbPromptCopy&&WBX.wbPromptCopy(false)],['Copy a prompt for a sheet',()=>WBX.wbPromptCopy&&WBX.wbPromptCopy(true)]])};
 const L=$('lib');
 L.addEventListener('click',e=>{const mo=e.target.closest('[data-fm]');if(mo){e.stopPropagation();fMenu(mo.dataset.fm);return}
 if(e.target.closest('#lhid')){lbHidOpen=!lbHidOpen;renderLib(true);return}const r=e.target.closest('.lfr[data-f]');if(r)lbToggle(r.dataset.f)});

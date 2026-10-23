@@ -87,7 +87,7 @@ function wsClamp(g){const st=document.querySelector('.stage').getBoundingClientR
 g.w=Math.max(200,Math.min(+g.w||300,innerWidth-20));g.h=Math.max(120,Math.min(+g.h||420,innerHeight-60));g.x=Math.max(-g.w+80,Math.min(g.x,innerWidth-80));g.y=Math.max(0,Math.min(g.y,innerHeight-36));if(g.y+g.h>innerHeight-8)g.y=Math.max(0,innerHeight-8-g.h);g.h=Math.min(g.h,innerHeight-8-g.y)}
 function wsEl(g,fl){const el=document.createElement('div');el.className='wg'+(fl?' fl':'')+(g.col?' col':'');el.dataset.g=g.id;
 if(fl){wsClamp(g);el.style.cssText=`left:${g.x}px;top:${g.y}px;width:${g.w}px;${g.col?'':`height:${g.h}px;`}z-index:${++wsZ}`}else el.style.flexGrow=g.f;
-el.innerHTML=`<div class="wh"${g.lk?'':' title="Drag to move"'}><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div>`+
+el.innerHTML=`<div class="wh"${g.lk?'':' title="Drag to move"'}><button type="button" class="wb wta l" data-act="tl" aria-label="Earlier tabs"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.chevL}</svg></button><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div><button type="button" class="wb wta r" data-act="tr" aria-label="Later tabs"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.chevR}</svg></button>`+
 `<button type="button" class="wb" data-act="lock" aria-pressed="${g.lk?'true':'false'}" aria-label="${g.lk?'Unlock panel':'Lock panel'}">${g.lk?IC.lk:IC.ul}</button><button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button>${g.lk?'':`<button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close" aria-label="Close">${IC.x}</button>`}</div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
 const bd=el.querySelector('.wbd');g.tabs.forEach(p=>{const sc=wsSec(p);if(sc){sc.classList.toggle('mc',!!sc.querySelector(':scope>details.g'));sc.hidden=p!=g.a;bd.appendChild(sc)}});return el}
 // the tool bar: the user's own order and the tools they took off it (kept in settings)
@@ -106,12 +106,13 @@ document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=
 wsTabFit();nums();if(railHook)railHook();if(WBX.wbRcls)WBX.wbRcls();if(WBX.wbElSync)WBX.wbElSync()}
 // a panel with more tabs than fit: the chosen tab is scrolled into view and the edge that hides more tabs fades
 function wsTabEdge(t){const h=t.parentElement;h.classList.toggle('ovr',t.scrollLeft+t.clientWidth<t.scrollWidth-1);h.classList.toggle('ovl',t.scrollLeft>1)}
-function wsTabFit(){document.querySelectorAll('.wh .wt').forEach(t=>{const a=t.querySelector('.wtab.on');if(a){if(a.offsetLeft+a.offsetWidth>t.scrollLeft+t.clientWidth)t.scrollLeft=a.offsetLeft+a.offsetWidth-t.clientWidth;else if(a.offsetLeft<t.scrollLeft)t.scrollLeft=a.offsetLeft}wsTabEdge(t)})}
+function wsTabFit(){document.querySelectorAll('.wh .wt').forEach(t=>{for(let k=0;k<3;k++){wsTabEdge(t);const a=t.querySelector('.wtab.on');if(!a)break;let m=0;if(a.offsetLeft+a.offsetWidth>t.scrollLeft+t.clientWidth){t.scrollLeft=a.offsetLeft+a.offsetWidth-t.clientWidth;m=1}else if(a.offsetLeft<t.scrollLeft){t.scrollLeft=a.offsetLeft;m=1}wsTabEdge(t);if(!m)break}})}   // the arrows (2.26.0) change the strip's width as they show or hide, so fit again until the open tab is in view
 document.addEventListener('scroll',e=>{if(e.target.classList&&e.target.classList.contains('wt'))wsTabEdge(e.target)},true);
 addEventListener('resize',()=>{if(wsReady)wsTabFit()});
 // tabs and buttons
 document.addEventListener('click',e=>{const w=e.target.closest('.wg');if(!w||Date.now()-wsJust<250)return;const g=wsGroup(w.dataset.g);if(!g)return;
 const b=e.target.closest('.wb');if(b){const a=b.dataset.act,r=w.getBoundingClientRect();
+if(a=='tl'||a=='tr'){const t=w.querySelector('.wt');if(t)t.scrollBy({left:(a=='tl'?-1:1)*Math.max(80,Math.round(t.clientWidth*.7)),behavior:'smooth'});return}   /* 2.26.0: more tabs than fit */
 if(a=='lock')g.lk=g.lk?0:1;else if(g.lk&&a!='col'){return}else if(a=='col')g.col=!g.col;else if(a=='close'){wsDetach(g)}else if(a=='float'){wsDetach(g);const ek=g.e||'r',hz=ek=='t'||ek=='b',fw=Math.round(hz?Math.min(340,r.width):Math.min(320,r.width)),fh=Math.round(hz?Math.max(300,Math.min(420,innerHeight-120)):Math.min(Math.max(r.height,260),560));Object.assign(g,{x:Math.round(ek=='l'?r.right+14:ek=='r'?r.left-fw-14:r.left),y:Math.max(Math.round(document.querySelector('.stage').getBoundingClientRect().top+56),Math.round(ek=='t'?r.bottom+14:ek=='b'?r.top-fh-14:r.top)),w:fw,h:fh,col:false});wsL().float.push(g)}
 else if(a=='dock'){wsDetach(g);g.col=false;g.f=1;wsDockIns(wsL(),g,g.e||'r',1e9)}wsSave();wsRender();return}
 const t=e.target.closest('.wtab');if(t){g.a=t.dataset.t;g.col=false;panel=g.a;wsSave();wsRender()}});
@@ -208,7 +209,7 @@ setPanel(p)};
 const vis=()=>railBtns().filter(b=>!MODEP.pattern.includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)||EL_ONLY.includes(b.dataset.pn)?false:true);
 function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP.pattern.includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn)&&!EL_ONLY.includes(b.dataset.pn));
 {const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML+'<span class="tip">'+b.getAttribute('aria-label')+'</span>';if(wsFind(b.dataset.pn))m.classList.add('on');g.appendChild(m)});menu.append(g)}
-menu.hidden=!ed;if(!menu.hidden){const w=railEl.getBoundingClientRect(),row=w.width>w.height;menu.style.left=(row?w.left:w.left-52)+'px';menu.style.top=(row?w.bottom:w.top)+'px';menu.style.width=w.width+'px';menu.style.height=w.height+'px';menu.style.bottom=''}}
+menu.hidden=!ed||!(off.length||D&&D.on);if(!menu.hidden){const w=railEl.getBoundingClientRect(),row=w.width>w.height;menu.style.left=(row?w.left:w.left-52)+'px';menu.style.top=(row?w.bottom:w.top)+'px';menu.style.width=w.width+'px';menu.style.height=w.height+'px';menu.style.bottom=''}}
 function edit(on){ed=on;document.body.classList.toggle('rtray',on);more.classList.toggle('on',on);more.setAttribute('aria-expanded',String(on));fill()}
 const refresh=()=>wsRender();railHook=()=>{if(ed)fill()};addEventListener('resize',()=>{if(ed)fill()});
 more.onclick=()=>edit(!ed);
@@ -235,12 +236,12 @@ else{cs=row?box.top+4:box.left+6;cz=row?box.height-8:40;st=row?box.left+8:box.to
 ins.style.display='block';
 if(row){ins.style.left=(st-1.5)+'px';ins.style.top=cs+'px';ins.style.width='3px';ins.style.height=cz+'px'}
 else{ins.style.top=(st-1.5)+'px';ins.style.left=cs+'px';ins.style.height='3px';ins.style.width=cz+'px'}}
-function dragEnd(){if(!D)return;const d=D;D=null;if(d.g)d.g.remove();d.el.classList.remove('rsrc');document.body.classList.remove('rdragging');railEl.classList.remove('rtgt','rover');menu.classList.remove('rtgt','rover');if(ins)ins.style.display='none';return d}
+function dragEnd(){if(!D)return;const d=D;D=null;if(d.g)d.g.remove();d.el.classList.remove('rsrc');document.body.classList.remove('rdragging');railEl.classList.remove('rtgt','rover');menu.classList.remove('rtgt','rover');if(ins)ins.style.display='none';if(ed&&d.on)fill();return d}
 railEl.addEventListener('pointerdown',e=>{if(e.button>0)return;const el=e.target.closest('.rail > [data-pn], #rmenu [data-add]');if(!el)return;D={el,id:idOf(el),src:el.dataset.pn?'rail':'tray',x:e.clientX,y:e.clientY,on:false,pid:e.pointerId,g:null}});
 railEl.addEventListener('pointermove',e=>{if(!D||e.pointerId!==D.pid)return;
 if(!D.on){if(Math.hypot(e.clientX-D.x,e.clientY-D.y)<7)return;D.on=true;hvClear();try{D.el.setPointerCapture(e.pointerId)}catch(_){}
  const g=document.createElement('div');g.className='rghost';g.innerHTML=D.el.querySelector('svg').outerHTML;document.body.appendChild(g);D.g=g;D.el.classList.add('rsrc');
- document.body.classList.add('rdragging');railEl.classList.add('rtgt');if(!menu.hidden)menu.classList.add('rtgt')}
+ document.body.classList.add('rdragging');railEl.classList.add('rtgt');if(ed)fill();if(!menu.hidden)menu.classList.add('rtgt')}
 D.g.style.left=(e.clientX-18)+'px';D.g.style.top=(e.clientY-18)+'px';
 const c=colAt(e.clientX,e.clientY);railEl.classList.toggle('rover',c=='rail');menu.classList.toggle('rover',c=='tray');
 if(c)showIns(slot(c,e.clientX,e.clientY));else if(ins)ins.style.display='none'});

@@ -126,8 +126,8 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 .xrw{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:var(--fs-m)}.xrw span,.xrw label{color:var(--mut)}.xrw label{flex:1}.xrw input[type=checkbox]{margin:0;accent-color:var(--acc)}.xrw .seg{flex:1}#xrcw{grid-template-columns:1fr 1fr}#xrf{grid-template-columns:repeat(4,1fr)}.xrs{display:flex;flex-direction:column;gap:8px}.xrs .ctl{grid-template-columns:90px minmax(0,1fr)}
 .xrd{font-size:var(--fs-s);color:var(--mut);min-height:16px}.xrn{display:flex;gap:8px}.xrn input{flex:1;min-width:0}
 .xrl{margin:-2px -4px 0}
-.xrr{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:4px;padding:4px 4px 4px 8px;border-radius:var(--r-m);cursor:pointer;font-size:var(--fs-m);border:1px solid transparent}
-.xrr:hover,.xrr:focus-visible{background:var(--raise)}.xrr b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xrr small{display:block;color:var(--mut);font-size:var(--fs-s)}
+.xrr{display:grid;grid-template-columns:minmax(0,1fr);grid-auto-flow:column;grid-auto-columns:auto;align-items:center;gap:4px;padding:4px 4px 4px 8px;border-radius:var(--r-m);font-size:var(--fs-m);border:1px solid transparent}
+.xrr:hover{background:var(--raise)}.xrr b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xrr small{display:block;color:var(--mut);font-size:var(--fs-s)}
 .xrp select{width:auto;flex:1}.xrr .ib{width:var(--h-sm);height:var(--h-sm)}.xrr .ib svg{width:14px;height:14px}.xrr input{height:var(--h-sm)}.xrall{margin-top:12px}.xrq{margin-top:8px;gap:6px;flex-wrap:wrap}.xrq button{display:inline-flex;align-items:center;gap:6px;height:var(--h-md);padding:0 8px;font-size:var(--fs-m)}.xrq button svg{width:14px;height:14px;flex:none}.xrq kbd{font-size:var(--fs-s);color:var(--mut)}.xrq:not(:has(button:not([hidden]))){display:none}
 #artwrap.tpv>*{pointer-events:none}
 /* 3 x 3 repeat preview: faint lines mark where each tile ends, so seams can be checked; the picture is not editable here */
@@ -162,7 +162,7 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 .lys{background:var(--panel)}.lys .lyt{cursor:default}.lys .lyl2{max-height:none}.lyh{display:flex;align-items:center;gap:2px;height:var(--h-row);padding:0 6px 0 4px;background:color-mix(in srgb,var(--stage) 50%,var(--panel));border-bottom:1px solid var(--line)}.lyt{flex:1;display:flex;align-items:center;gap:6px;border:0;background:transparent;font-weight:600;font-size:var(--fs-m);padding:0 4px;margin:0;cursor:pointer;color:var(--fg)}.lyt svg{width:13px;height:13px;transition:transform var(--t-fast)}.lyt[aria-expanded=false] svg{transform:rotate(-90deg)}.lyt span{color:var(--mut);font-weight:500}.lyh .ib{width:var(--h-sm);height:var(--h-sm)}.lyh .ib svg{width:15px;height:15px}.lyo{display:flex;align-items:center;gap:8px;padding:8px 8px 0}.lyo select{flex:1;min-width:0}.lyo .sw{flex:1;min-width:0}.lyop{padding:6px 8px 0}.lyop .ctl{grid-template-columns:50px minmax(0,1fr) 52px;gap:8px}.lyop .ctl label{font-size:var(--fs-m);color:var(--fg);font-weight:400}.lyk{font-size:var(--fs-m);color:var(--fg);width:50px;flex:none}.lyl2{margin:8px 6px 4px;max-height:210px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field)}.lyr{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--line);cursor:pointer;font-size:var(--fs-m);user-select:none}.lyr:last-child{border-bottom:0}.lyr:hover{background:var(--raise)}.lyr.on{background:var(--sel);color:var(--sel-fg);font-weight:600}.lyr.on .ic{color:var(--sel-fg)}.lyr.off .lyn,.lyr.off .lysw{opacity:.4}.lyr .eye{width:var(--h-xs);height:var(--h-xs);padding:0;margin:0;border:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center;border-radius:var(--r-m)}.lyr .eye:hover{background:var(--line)}
 .psl{display:flex;flex-direction:column;gap:2px;margin:4px 0}.psr2{display:grid;grid-template-columns:var(--h-md) minmax(0,1fr) 44px var(--h-xs);align-items:center;gap:6px;height:var(--h-row);padding:0 4px;border-radius:var(--r-m);font-size:var(--fs-m)}.psr2:hover{background:var(--raise)}.psr2 b{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.psr2 b i{color:var(--warn);font-style:normal}.psr2 .pth{display:flex;align-items:center;justify-content:center;width:var(--h-md);height:var(--h-md);border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);overflow:hidden}.psr2 .pth svg{width:100%;height:100%}.psr2 .pth svg.ic{width:13px;height:13px;color:var(--mut)}.psr2 input{height:var(--h-sm);text-align:right}.psr2 .ib{width:var(--h-xs);height:var(--h-xs);padding:0}.psr2 .ib svg{width:13px;height:13px}
 .elopt{position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:41;display:flex;align-items:center;gap:8px;height:var(--h-row);padding:0 8px;border-radius:var(--r-m);background:var(--panel);border:1px solid var(--line);font-size:var(--fs-s);color:var(--mut)}.elopt .seg{display:grid;grid-template-columns:1fr 1fr;width:140px}.elopt input[type=range]{width:120px}
-body.stedit #lybody>.lyo,body.stedit #lybody>.lyop{display:none}.stt{display:none;flex:none;align-items:stretch;height:var(--h-md);background:var(--stage);border-bottom:1px solid var(--line);overflow-x:auto;position:relative;z-index:44}.stt.on{display:flex}.stt .wtab{height:100%}.wtg{display:flex;align-items:center;border-right:1px solid var(--line)}.wtg.on{background:var(--panel)}.wtg .wtab{border-right:0;background:transparent}.stt .wtg .ib{width:var(--h-xs);height:var(--h-xs);margin-right:6px;flex:none}.stt .wtg .ib .ic{width:12px;height:12px}
+body.stedit #lybody>.lyo,body.stedit #lybody>.lyop{display:none}.stt{display:none;flex:none;align-items:stretch;height:var(--h-md);background:var(--stage);border-bottom:1px solid var(--line);overflow-x:auto;position:relative;z-index:44}.stt.on{display:flex}.stt .wb.wta{position:sticky;z-index:1;height:100%;background:var(--stage)}.stt .wb.wta.l{left:0}.stt .wb.wta.r{right:0}.stt .wtab{height:100%}.wtg{display:flex;align-items:center;border-right:1px solid var(--line)}.wtg.on{background:var(--panel)}.wtg .wtab{border-right:0;background:transparent}.stt .wtg .ib{width:var(--h-xs);height:var(--h-xs);margin-right:6px;flex:none}.stt .wtg .ib .ic{width:12px;height:12px}
 .lyfxb{flex:none;height:var(--h-xs);padding:0 4px;border:1px solid var(--line2);border-radius:var(--r-s);background:transparent;color:var(--mut);font:600 var(--fs-s)/1 "Hanken Grotesk",system-ui,sans-serif;font-style:italic;cursor:pointer}.lyfxb[aria-expanded=true]{color:var(--fg)}.lyr.on .lyfxb{color:var(--sel-fg);border-color:currentColor}.lyfx{display:flex;align-items:center;gap:6px;height:var(--h-sm);padding:0 6px;font-size:var(--fs-s);color:var(--mut);cursor:pointer;border-bottom:1px solid var(--line)}.lyfx .eye{width:var(--h-xs);height:var(--h-xs);padding:0;border:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center}.lyfx .eye svg{width:13px;height:13px}.lyfx.off .lyn{opacity:.5}.lyfx:hover{background:var(--raise)}
 .fxg summary{display:flex;align-items:center}.fxg summary .fxadd{margin-left:auto;width:var(--h-sm);height:var(--h-sm)}.fxg summary .fxadd svg{width:15px;height:15px}.fxr{display:grid;grid-template-columns:var(--h-xs) 13px minmax(0,1fr) var(--h-xs);align-items:center;gap:6px;height:var(--h-row);padding:0 4px;border-radius:var(--r-m);cursor:pointer;font-size:var(--fs-m)}.fxr b{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fxr .ib{width:var(--h-xs);height:var(--h-xs);padding:0}.fxr .ib svg,.fxr .fxc svg{width:13px;height:13px}.fxr .fxc{display:flex;color:var(--mut);transition:transform var(--t-fast)}.fxr .fxc.open{transform:rotate(90deg)}.fxr:hover{background:var(--raise)}.fxr.on{background:var(--sel);color:var(--sel-fg)}.fxr.on .ib,.fxr.on .fxc{color:var(--sel-fg)}.fxr.off b{opacity:.5}.fxpane{padding:0 0 4px 24px}.fxpane:has(.fxs:not([hidden])){border-left:1px solid var(--line);margin:2px 0 4px 10px;padding-left:12px}
 .lyr .lyact{display:flex;gap:2px;flex:none;margin-left:auto}.lyr .lyb{width:var(--h-xs);height:var(--h-xs);padding:0;margin:0;border:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center;border-radius:var(--r-m);opacity:.55}.lyr .lyb svg{width:15px;height:15px}.lyr:hover .lyb,.lyr.on .lyb,.lyr .lyb:focus-visible{opacity:1}.lyr .lyb:hover{background:var(--line);color:var(--fg)}.lyr .lyb[disabled]{opacity:.22!important;cursor:default;pointer-events:none}.lyr .eye svg{width:15px;height:15px}.lysw{width:var(--h-sm);height:var(--h-sm);border-radius:var(--r-m);border:1px solid var(--line2);flex:none;overflow:hidden}.lysw svg{width:100%;height:100%;display:block}.lyn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lyn input{width:100%;font:inherit;padding:2px 4px}.lym{font-size:var(--fs-s);color:var(--faint);font-weight:400}.lyr.dragover-t{box-shadow:inset 0 2px 0 var(--acc)}.lyr.dragover-b{box-shadow:inset 0 -2px 0 var(--acc)}.lyhint{font-size:var(--fs-s);color:var(--faint);padding:0 8px 8px}#lybody[hidden]{display:none}
@@ -172,7 +172,7 @@ body.stedit #lybody>.lyo,body.stedit #lybody>.lyop{display:none}.stt{display:non
 .wsd .wg.col{flex:none!important;min-height:0}
 .wg.col .wbd,.wg.col .wrs{display:none}
 .wh{display:flex;align-items:stretch;height:var(--h-row);flex:none;background:var(--stage);border-bottom:1px solid var(--line);cursor:grab;user-select:none;touch-action:none}
-.wt{display:flex;min-width:0;flex:1;overflow-x:auto;scrollbar-width:none}.wt::-webkit-scrollbar{display:none}
+.wb.wta{display:none;width:20px}.wh.ovl .wb.wta.l,.wh.ovr .wb.wta.r,.stt.ovl .wb.wta.l,.stt.ovr .wb.wta.r{display:flex}.wb.wta .ic{width:14px;height:14px}.wt{display:flex;min-width:0;flex:1;overflow-x:auto;scrollbar-width:none}.wt::-webkit-scrollbar{display:none}
 .wh.ovr .wt{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent)}.wh.ovl .wt{-webkit-mask-image:linear-gradient(270deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(270deg,#000 calc(100% - 24px),transparent)}.wh.ovl.ovr .wt{-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent)}
 .wtab{flex:none;border:0;border-right:1px solid var(--line);background:transparent;padding:0 10px;font-size:var(--fs-s);font-weight:500;color:var(--mut);white-space:nowrap;border-radius:0;cursor:inherit;margin:0}
 .wtab.on{background:var(--panel);color:var(--fg);font-weight:600;box-shadow:none}
@@ -400,7 +400,7 @@ button.alt{background:var(--raise)}#scadd,#tsadd{display:inline-flex;align-items
 
 /* contextual motif bar */
 /* The motif controls bar floats over the bottom of the editor while a motif is selected, so no empty band is kept under the stamp. */
-#sel{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:0}#sel.none{opacity:.45;pointer-events:none}
+#sel{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:0}#sel.none{opacity:.45;pointer-events:none}#sel.mtel,#sel.mtel.none{opacity:1;pointer-events:auto}#sel.mtel>.ctl:not(.mtk),#sel.mtel>.sdiv,#sel.mtel>.rzg,#sel.mtel>.row,#sel.mtel>.msc{display:none}
 #sel .ctl{margin:0}
 #sel .row{margin:0;flex-wrap:wrap;gap:2px}
 #sel .sdiv{height:1px;background:var(--line)}
@@ -636,7 +636,7 @@ button.warn{background:var(--warn);border-color:var(--warn);color:#fff;font-weig
 .idz{display:grid;gap:8px;padding:12px;border:1.5px dashed var(--line2);border-radius:var(--r-l);background:var(--field)}
 .idd{display:flex;align-items:center;gap:8px;min-width:0;font-size:var(--fs-m);color:var(--mut)}.idd .idi{flex:none;width:15px;height:15px}
 .idb{display:grid;grid-template-columns:1fr 1fr;gap:6px}.idb .btn{justify-content:center;margin:0}
-.ipt{margin-top:8px;grid-template-columns:1fr 1fr}#ipsz{margin-top:8px}
+
 .fform{display:flex;gap:6px;margin-top:8px}.fform input{flex:1;min-width:0}.fform button{margin:0}
 .fsbar{position:sticky;bottom:0;z-index:2;margin-top:8px;padding:8px;border:1px solid var(--line2);border-radius:var(--r-m);background:var(--raise);display:grid;gap:6px;box-shadow:0 4px 14px rgba(0,0,0,.12)}
 .fsbar .r{display:flex;gap:6px;align-items:center}.fsbar .r>*{margin:0}.fsbar .r button{flex:none}.fsbar select{width:100%;margin:0}.fsbar #fscnt{flex:1;font-size:var(--fs-m);font-weight:600}
@@ -933,6 +933,9 @@ body.eyedrop{cursor:crosshair}
    <label class="chk"><input type="checkbox" id="bg_on" checked><span>Background</span></label>
    <div class="cwrow"><span class="cwk">Colour</span><div class="cwell" id="bg_wl"></div></div>
   </div></details>
+  <details class="g" id="ctxg" open hidden><summary>Texture</summary><div class="gb">
+   <label class="chk"><input type="checkbox" id="ctxon" checked><span>Canvas texture</span></label>
+  </div></details>
   <details class="g" open><summary>Format</summary><div class="gb">
    <div class="seg" id="cfmt" style="grid-template-columns:1fr 1fr 1fr"><button type="button" data-f="free">Free canvas</button><button type="button" data-f="tile">Repeat tile</button><button type="button" data-f="book">Book cover</button></div>
    <div class="hint" id="cfmth">Free, Repeat tile or Book cover.</div><div class="hint" id="tpn" hidden></div>
@@ -1067,10 +1070,10 @@ body.eyedrop{cursor:crosshair}
   <div class="ctl"><label>Size</label><input type="range" id="ssz" min="8" max="260" data-def="80"></div>
   <div class="ctl"><label>Rotate</label><input type="range" id="srt" min="-180" max="180" data-def="0"></div>
   <span class="sdiv"></span>
-  <div class="ctl"><label>Width</label><input type="range" id="ssx" min="20" max="300" data-u="%" data-def="100"></div>
-  <div class="ctl"><label>Height</label><input type="range" id="ssy" min="20" max="300" data-u="%" data-def="100"></div>
+  <div class="ctl mtk"><label>Width</label><input type="range" id="ssx" min="20" max="300" data-u="%" data-def="100"></div>
+  <div class="ctl mtk"><label>Height</label><input type="range" id="ssy" min="20" max="300" data-u="%" data-def="100"></div>
   <div class="ctl"><label>Thickness</label><input type="range" id="sth" min="-3" max="3" step="0.1" data-def="0"></div>
-  <div class="ctl cwr"><label>Colour</label><div class="cwell" id="wl_sh"></div></div>
+  <div class="ctl cwr mtk"><label>Colour</label><div class="cwell" id="wl_sh"></div></div>
   <span class="sdiv"></span>
   <div class="rzg" title="Jitter">
    <span class="rzl">Jitter</span><div class="ctl"><label>Move</label><input type="range" id="rzp" min="0" max="100" value="20" data-u="%" data-def="20"></div>
@@ -1110,13 +1113,6 @@ body.eyedrop{cursor:crosshair}
     <select id="fmove" aria-label="Move to folder"></select>
     <div class="r"><button class="alt" id="fout">Take out of folder</button><button class="alt" id="fdelm">Delete</button></div>
    </div>
-  </div></details>
-  <details class="g" id="iprg"><summary>Copy a prompt</summary><div class="gb">
-   <input type="text" id="isub" placeholder="Subject, e.g. folk-art tulips" aria-label="Subject">
-   <div class="seg ipt" id="iptype"><button type="button" data-t="1" class="on">Single shape</button><button type="button" data-t="s">Sheet</button></div>
-   <div class="row shrow" id="ipsz" hidden><input type="number" id="scol" min="1" max="8" value="4" aria-label="Columns"><span>&#215;</span><input type="number" id="srow" min="1" max="8" value="4" aria-label="Rows"></div>
-   <div class="row"><button class="alt" id="ipr">Copy prompt</button></div>
-   <textarea id="iprt" hidden readonly rows="6"></textarea>
   </div></details>
  </section>
 

@@ -62,7 +62,7 @@ function init43(){
   function paint(){
     list.textContent='';const mine=xrLoad();
     const row=(r,own)=>{
-      const e=document.createElement('div');e.className='xrr';e.dataset.id=r.id;e.setAttribute('role','listitem');e.tabIndex=0;
+      const e=document.createElement('div');e.className='xrr';e.dataset.id=r.id;e.setAttribute('role','listitem');
       if(own&&ren==r.id){
         const i=document.createElement('input');i.type='text';i.maxLength=40;i.value=r.name;i.setAttribute('aria-label','Recipe name');e.style.gridTemplateColumns='minmax(0,1fr)';e.appendChild(i);
         const done=ok=>{if(ren!=r.id)return;ren=null;if(ok&&i.value.trim()){const a=xrLoad(),x=a.find(y=>y.id==r.id);if(x){x.name=i.value.trim().slice(0,40);xrStore(a)}}paint()};
@@ -70,11 +70,12 @@ function init43(){
         list.appendChild(e);setTimeout(()=>{i.focus();i.select()},0);return;
       }
       const t=document.createElement('div'),b=document.createElement('b'),s=document.createElement('small');b.textContent=r.name;s.textContent=sum(r);t.append(b,s);e.appendChild(t);
+      {const x=document.createElement('button');x.type='button';x.className='ib';x.dataset.act='exp';x.setAttribute('aria-label','Export '+r.name);x.title='Export '+r.name;x.innerHTML=icon(ICN.download);e.appendChild(x)}   // 2.26.0: a recipe exports from its own button, not from a click on its name
       if(own){
         const a=document.createElement('button');a.type='button';a.className='ib';a.dataset.act='ren';a.setAttribute('aria-label','Rename '+r.name);a.innerHTML=icon(ICN.pencil);
         const d=document.createElement('button');d.type='button';d.className='ib';d.dataset.act='del';d.setAttribute('aria-label','Delete '+r.name);d.innerHTML=icon(ICN.trash);
         e.append(a,d);
-      }else e.style.gridTemplateColumns='minmax(0,1fr)';
+      }
       list.appendChild(e);
     };
     const h1=document.createElement('div');h1.className='glb';h1.textContent='Starting points';list.appendChild(h1);XR_BUILTIN.forEach(r=>row(r,false));
@@ -112,11 +113,11 @@ function init43(){
     const r=e.target.closest('.xrr');if(!r)return;const id=r.dataset.id,btn=e.target.closest('button');
     if(btn&&btn.dataset.act=='del'){xrStore(xrLoad().filter(x=>x.id!=id));paint();return}
     if(btn&&btn.dataset.act=='ren'){ren=id;paint();return}
-    if(e.target.closest('input'))return;
+    if(!btn||btn.dataset.act!='exp')return;
     const x=XR_BUILTIN.find(y=>y.id==id)||xrLoad().find(y=>y.id==id);if(!x)return;
     setFmt(x.fmt);px.value=xrPx(x.px);sfx.value=x.sfx||'';if(dpiEl)dpiEl.value=String(x.dpi||300);dims();exportOne(x);
   });
-  list.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.classList&&e.target.classList.contains('xrr')){e.preventDefault();e.target.click()}});
+
   $('xrnow').onclick=()=>exportOne(cur());
   $('png').onclick=()=>exportOne({fmt:'png',px:Math.max(CW,CH)*3,sfx:''});   // Quick: PNG at 3x the canvas, SVG as it is; the same render, watermark and save as a recipe
   $('sv').onclick=()=>exportOne({fmt:'svg',px:2048,sfx:''});

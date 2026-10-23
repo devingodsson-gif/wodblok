@@ -15,7 +15,7 @@ test('a starting recipe exports a picture of the right size, with its ending in 
   const { errors } = await openApp(page);
   await openPanel(page, 'xrec');
   await expect(page.locator('#xrd')).toHaveText(/\d+ × \d+ px/);
-  await row(page, 'Preview').click();                                          // JPG, 800 px long side
+  await row(page, 'Preview').locator('[data-act="exp"]').click();             // JPG, 800 px long side (2.26.0: the recipe's own Export button)
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   const d = await downloads(page);
   expect(d[0].filename).toMatch(/-preview\.jpg$/);
@@ -91,11 +91,11 @@ test('save a recipe, use it, rename it, keep it after a reload, delete it', asyn
   await expect(row(page, 'Mine')).toBeVisible();
   await expect(row(page, 'Mine').locator('small')).toHaveText('JPG · 1200 px');
   await page.click('#xrf [data-f="png"]'); await page.fill('#xrpx', '300');   // change the settings, then use the recipe
-  await row(page, 'Mine').click();
+  await row(page, 'Mine').locator('[data-act="exp"]').click();
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   expect((await downloads(page))[0].filename).toMatch(/-mine\.jpg$/);
   expect(Math.max(...await pixels(page, 0))).toBe(1200);
-  await expect(page.locator('#xrpx')).toHaveValue('1200');                      // clicking a recipe also loads its settings
+  await expect(page.locator('#xrpx')).toHaveValue('1200');                      // exporting a recipe also loads its settings
   await row(page, 'Mine').locator('[data-act="ren"]').click();
   await page.locator('#xrl .xrr input').fill('Mine two'); await page.keyboard.press('Enter');
   await expect(row(page, 'Mine two')).toBeVisible();

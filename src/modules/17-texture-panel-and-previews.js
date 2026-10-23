@@ -34,7 +34,9 @@ if(WBS.tex&&WBS.tex.v===87){WBS.tex.u=WBS.tex.u.filter(u=>u&&typeof u=='object'&
 WBS.texLib.forEach(L=>{if(L._k!==undefined){delete L._k;ch=1}});
 if(ch||WBS.texLib.some(x=>x.auto)){const r=txRefs();WBS.texLib=WBS.texLib.filter(x=>!x.auto||r.get(x.id))}
 return txCvKey()!==TEXK}
-const txCvKey=()=>{const q=txSpecs(WBS.tex&&WBS.tex.u,'relief');return q.map(txKey).join(';')+'|'+CW+'|'+CH};
+// the canvas texture the drawing uses: none while the project's switch (Canvas panel, Texture group; tex.off) is off (2.26.0)
+const txCvU=()=>WBS.tex&&!WBS.tex.off&&Array.isArray(WBS.tex.u)?WBS.tex.u:[];
+const txCvKey=()=>{const q=txSpecs(txCvU(),'relief');return q.map(txKey).join(';')+'|'+CW+'|'+CH};
 // stamps saved to the stamp library carry the textures they use, so they look the same in another project
 function txPack(t){return(Array.isArray(t.tu)?t.tu:[]).map(u=>txLib(u&&u.x)).filter((x,i,a)=>x&&a.indexOf(x)===i).map(x=>({...x}))}
 function txMerge(t){const pk=txClean(t.txl);delete t.txl;if(!pk.length||!Array.isArray(t.tu))return;const map={};
@@ -56,12 +58,14 @@ if(tl){const[ex,ey]=tileExt();return`<filter id="rf" filterUnits="userSpaceOnUse
 return`<filter id="rf" filterUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}" color-interpolation-filters="sRGB">${b}</filter>`}
 function syncPr(){$('rgh').value=WBS.pr.e;$('psq').value=WBS.pr.q;}
 const saveTex=()=>{try{kv.set('wb10_tex',JSON.stringify(WBS.tex))}catch(e){}};
-function buildTex(noPat,pv){let o='';try{o=txImgs(txSpecs(WBS.tex&&WBS.tex.u,'relief').map(S=>pv&&S.x===pv&&txIsO(S)?{...S,a:100,op:(S.a/100).toFixed(3)}:S),CW,CH,900,'inline',txIsO,0,0,tileOn());if(o&&tileOn()&&WBS.tilePv)o=tileCopies(o,'txgc')}catch(e){o=''}
-TEXK=txCvKey();$('texg').innerHTML=o?`<g pointer-events="none">${o}</g>`:'';if(pv)$('texg').dataset.pv=pv;else delete $('texg').dataset.pv;if(typeof upd=='function'&&WBX.wbTexReady&&!noPat)upd()}
+function buildTex(noPat,pv){let o='';try{o=txImgs(txSpecs(txCvU(),'relief').map(S=>pv&&S.x===pv&&txIsO(S)?{...S,a:100,op:(S.a/100).toFixed(3)}:S),CW,CH,900,'inline',txIsO,0,0,tileOn());if(o&&tileOn()&&WBS.tilePv)o=tileCopies(o,'txgc')}catch(e){o=''}
+TEXK=txCvKey();txSw();$('texg').innerHTML=o?`<g pointer-events="none">${o}</g>`:'';if(pv)$('texg').dataset.pv=pv;else delete $('texg').dataset.pv;if(typeof upd=='function'&&WBX.wbTexReady&&!noPat)upd()}
 // the mask used on the ink so it skips the worn spots of the canvas texture (inl: pictures inside the markup, for a stand-alone file)
-function inkCatch(inl){const q=txSpecs(WBS.tex&&WBS.tex.u,'relief').filter(txIsW);if(!q.length)return null;const tl=tileOn(),v=txImgs(q,CW,CH,900,inl?'inline':'host',txIsW,0,0,tl);
+function inkCatch(inl){const q=txSpecs(txCvU(),'relief').filter(txIsW);if(!q.length)return null;const tl=tileOn(),v=txImgs(q,CW,CH,900,inl?'inline':'host',txIsW,0,0,tl);
 if(!v)return null;return tl?{defs:`<mask id="cw" maskUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"><rect x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" fill="#fff"/>${tileCopies(v,'cwc')}</mask>`}:{defs:`<mask id="cw" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`}}
 function syncTex(){texNorm()}
+// the Texture group of the Canvas panel: shown when the project has a canvas texture, with the switch for it
+function txSw(){const g=$('ctxg'),c=$('ctxon');if(!g||!c)return;const has=!!(WBS.tex&&Array.isArray(WBS.tex.u)&&WBS.tex.u.length);if(g.hidden===has)g.hidden=!has;const on=!(WBS.tex&&WBS.tex.off);if(c.checked!==on)c.checked=on}
 function init17(){WBH.syncPr=syncPr;WBH.syncTex=syncTex;WBS.SURFK='';
 [['rgh','e'],['psq','q']].forEach(([id,key])=>$(id).oninput=()=>{WBS.pr[key]=+$(id).value;WBH.syncPr();savePr();upd()});
 
@@ -69,6 +73,7 @@ WBH.syncPr();
 // ---- Canvas texture. Its uses live in tex.u: relief / stain become pictures laid over the canvas, wear knocks ink out of every layer ----
 WBS.tex={};
 try{const q=JSON.parse(kv.get('wb10_tex')||'null');if(q&&typeof q=='object')WBS.tex=q}catch(e){}
+{const c=$('ctxon');if(c)c.onchange=()=>{if(!WBS.tex)return;if(c.checked)delete WBS.tex.off;else WBS.tex.off=1;saveTex();upd();if(WBX.wbCap)WBX.wbCap()}}
 WBH.syncTex();buildTex();WBX.wbTexReady=1;
 }
 export {SURFC,buildTex,inkCatch,layTexMask,layTexOv,roughFilter,saveTex,surfFor,texNorm,txMerge,txPack,txoG,init17};

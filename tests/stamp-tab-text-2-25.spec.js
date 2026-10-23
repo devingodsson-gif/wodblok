@@ -9,8 +9,7 @@ async function addTextInTab(page) {
   const p = await H.stampInstance(page); const c = await H.canvasToClient(page, p.cx, p.cy);
   await page.mouse.dblclick(c.x, c.y); await H.settle(page);
   const n0 = (await items(page)).length;
-  await page.click('#elb [data-k="text"]'); await H.settle(page);
-  await page.locator('.elk[data-k="text"] [data-add]').click(); await H.settle(page);
+  await page.click('#elb [data-k="text"]'); await H.settle(page);   // 2.26.0: the bar button does what Add does
   return { ...o, n0 };
 }
 

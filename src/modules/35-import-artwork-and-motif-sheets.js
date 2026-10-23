@@ -17,13 +17,11 @@ const PROMPT=s=>`Create a single ${s||'[subject]'} designed as a bold woodblock 
 const SPROMPT=(sub,c,r)=>`Create a sheet of ${c*r} different ${sub||'[subject]'} designed as bold woodblock stamp shapes, arranged in a neat grid of ${c} columns and ${r} rows. Every shape: pure solid black shapes on a plain white background, no gray, no shading, no gradients, no texture, with a few thin white carved lines for detail, clean smooth edges and a simple readable silhouette. Each shape is about the same size and centered in its own cell. Leave wide empty white space between all shapes (at least a fifth of a cell); nothing may touch, overlap or cross into a neighbouring cell. No grid lines, no borders, no frames, no labels, no numbers, no text. ${c>r?'Wide landscape image.':c<r?'Tall portrait image.':'Square image.'}`;
 const say2=t=>{$('imsg').textContent=t};
 const pm=t=>{$('pmsg').textContent=t};
-// ---- ChatGPT request text (a single shape or a whole sheet)
-let ptype='1';
-$('iptype').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;ptype=b.dataset.t;$('iptype').querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('on',x===b));$('ipsz').hidden=ptype!='s'};
-$('ipr').onclick=async()=>{const sub=$('isub').value.trim();let t,msg;
-if(ptype=='s'){const c=Math.max(1,Math.min(8,+$('scol').value||4)),r=Math.max(1,Math.min(8,+$('srow').value||4));t=SPROMPT(sub,c,r);$('sc').value=c;$('sr').value=r;msg=`Sheet prompt copied (${c} × ${r} = ${c*r} shapes).`}else{t=PROMPT(sub);msg='Prompt copied.'}
-let ok=false;try{await clipboard.writeText(t);ok=true}catch(e){}
-if(ok){$('iprt').hidden=true;pm(msg)}else{$('iprt').hidden=false;$('iprt').value=t;$('iprt').select()}};
+// ---- ChatGPT request text (a single shape or a whole sheet): two items in the library's Import menu (2.26.0; it was a group of its own with a subject box). The subject is left as [subject] to fill in.
+async function ipCopy(sheet){const c=Math.max(1,Math.min(8,+$('sc').value||4)),r=Math.max(1,Math.min(8,+$('sr').value||4)),t=sheet?SPROMPT('',c,r):PROMPT('');
+ let ok=false;try{await clipboard.writeText(t);ok=true}catch(e){}
+ pm(ok?(sheet?`Sheet prompt copied (${c} × ${r} = ${c*r} shapes). Replace [subject] with what you want.`:'Prompt copied. Replace [subject] with what you want.'):'Could not copy. Allow clipboard access and try again.')}
+WBX.wbPromptCopy=ipCopy;
 // ---- bringing an image in: the two buttons, drag & drop anywhere, paste from the clipboard
 $('ifile').onchange=()=>{const f=$('ifile').files[0];$('ifile').value='';if(f)loadFile(f,null,'one')};
 $('sfile').onchange=()=>{const f=$('sfile').files[0];$('sfile').value='';if(f)loadFile(f,null,'sheet')};
@@ -48,7 +46,7 @@ $('icl').onclick=closeDlg;$('icx').onclick=closeDlg;$('idlg').addEventListener('
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('idlg').hidden&&!(e.target&&e.target.id=='ifnew'&&e.target.value))closeDlg()});
 function setMode(m){mode=m;$('imode').querySelectorAll('[data-m]').forEach(b=>{const on=b.dataset.m==m;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});
 const one=m=='one';$('isecS').hidden=one;$('ifullb').hidden=!one;$('scells').hidden=one;
-const sub=$('isub').value.trim();$('inm').value=(one?srcName||'Imported motif':(sub||srcName||'Sheet').replace(/^./,c=>c.toUpperCase())).slice(0,40);
+$('inm').value=(one?srcName||'Imported motif':(srcName||'Sheet').replace(/^./,c=>c.toUpperCase())).slice(0,40);
 if(one){prep(src);run()}else{sPrep();setSMode(S.mode);sRun()}}
 $('imode').onclick=e=>{const b=e.target.closest('[data-m]');if(!b||!src||b.dataset.m==mode)return;setMode(b.dataset.m)};
 $('sview').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||!src)return;view=b.dataset.v;mode=='one'?drawOne():drawOv()};

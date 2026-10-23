@@ -16,8 +16,8 @@ const canvasClick = async (page, fx, fy) => {
 test('the element bar has one button per kind, left of centre; the tray starts right of centre', async ({ page }) => {
   const { errors } = await openApp(page);
   const btn = page.locator('#elb .elbb');
-  await expect(btn).toHaveCount(6);   // 2.7.0: no pointer and no Image button
-  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Paint', 'Motif', 'Shape', 'Text', 'Stamp', 'Pattern']);
+  await expect(btn).toHaveCount(7);   // 2.26.0: Select (V) comes first again; still no Image button
+  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Select', 'Paint', 'Motif', 'Shape', 'Text', 'Stamp', 'Pattern']);
   await expect(page.locator('#elb [data-k="paint"]')).toBeHidden();   // the brush is put away for now
   for (const pn of ['stmp', 'layers']) await expect(page.locator(`.rail [data-pn="${pn}"]`)).toBeHidden();   // element panels have no rail button
   const vb = await page.locator('.viewbar').boundingBox(), el = await page.locator('#elb').boundingBox(), ty = await page.locator('#tyc').boundingBox();
@@ -33,9 +33,9 @@ test('a bar button opens its panel and Add there makes the element, just above t
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   const kinds = async () => JSON.parse(await getState(page)).els.map(q => q.k);
-  await expect(page.locator('#elb [data-k="select"]')).toHaveCount(0);   // 2.7.0: no pointer button
-  await expect(page.locator('#elb [data-k="image"]')).toHaveCount(0);    // and no Image button
-  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(0);
+  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');   // 2.26.0: Select is the tool in hand until another is armed
+  await expect(page.locator('#elb [data-k="image"]')).toHaveCount(0);    // there is no Image button
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
   await page.click('#elb [data-k="pattern"]'); await settle(page);
   expect(await kinds()).toEqual([]);                      // the button makes nothing
   await expect(page.locator('#elb [data-k="pattern"]')).toHaveAttribute('aria-pressed', 'true');
@@ -51,19 +51,20 @@ test('a bar button opens its panel and Add there makes the element, just above t
   expect((await kinds()).includes('motif')).toBe(false);   // 2.4.0: the Motif button makes nothing, a pick arms it
   await expect(page.locator('#elb [data-k="motif"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
-  await page.keyboard.press('Escape'); await settle(page);            // Escape (or V) puts the tool away
-  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(0);
+  await page.keyboard.press('Escape'); await settle(page);            // Escape (or V) puts the tool away: Select is in hand again
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
+  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
   expect(errors).toEqual([]);
 });
 
-test('the Stamp button makes nothing; it opens the Stamp properties, and a picked stamp is placed by clicks on the canvas', async ({ page }) => {
+test('the Stamp button arms the stamp at once (2.26.0) and opens the Stamp properties; clicks on the canvas place it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await page.click('#elb [data-k="stamp"]'); await settle(page);
   expect(JSON.parse(await getState(page)).els).toHaveLength(0);
   await expect(page.locator('#elb [data-k="stamp"]')).toHaveAttribute('aria-pressed', 'true');
-  await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page);
   const b = await page.locator('#art').boundingBox();
+  await page.mouse.move(b.x + b.width * 0.5, b.y + b.height * 0.5); await settle(page);
   await page.mouse.click(b.x + b.width * 0.3, b.y + b.height * 0.3); await settle(page);
   await page.mouse.click(b.x + b.width * 0.7, b.y + b.height * 0.6); await settle(page);
   expect(JSON.parse(await getState(page)).els.map(q => q.k)).toEqual(['stamp', 'stamp']);
