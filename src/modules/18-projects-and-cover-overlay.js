@@ -79,6 +79,6 @@ $('pnm').value=WBS.cp.name||'';setInterval(paintPst,800);paintPst();
 $('pnw').onclick=()=>{confirm2($('pnw'),'Click again: can’t be undone',()=>{const t=JSON.parse(DEF_TILES);
 openData({tiles:t,layers:[mkEL('Layer 1',t.map(x=>x.id))],proj:{...PCOL},dim:{s:[1,1],c:[2,3]},pr:PDEF.pr,tex:PDEF.tex},null,'');clearAll(true);cov={img:'',iw:0,ih:0,sc:100};covB=blank();covS=blank();WBS.cslot='f';saveCov();WBS.covKey='';renderCover();WBS.cp.saved=coreStr();paintPst()});
 // first click with unsaved work: the button says so (the File menu stays open, see 34-desktop-shell) and the status bar explains
-if($('pnw').dataset.sure)pmsg('Starting a new project can’t be undone. Click New project again to discard this one.')};
+if($('pnw').dataset.sure)pmsg('A new project can’t be undone. New project again to discard this one.')};
 }
 export {PGD,fileSnap,thumb,confirm2,coreStr,covOrder,covS,dirty,newId,openData,paintPst,pgFix,pmsg,renderCover,snapshot,init18};

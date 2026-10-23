@@ -107,4 +107,15 @@ const IC_OPEN='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentCo
 function ic(n){return IC_OPEN+(ICN[n]!=null?ICN[n]:n)+'</svg>'}
 // fill the page's own icons (<svg data-ic="name">); an unknown name leaves the icon empty
 function icFill(root){(root||document).querySelectorAll('svg[data-ic]').forEach(s=>{const d=ICN[s.dataset.ic];if(d!=null&&!s.firstChild)s.innerHTML=d})}
-export {ICN,IC_OPEN,ic,icAlign,icFill};
+// Every icon-only button shows its name on hover and has the same accessible name (Part 9, section 8; 2.29.0). The accessible name leads: a button with only one of
+// the two gets the other, and a title that says something else is set to the name. A title may add a shortcut in brackets ("Undo (Ctrl+Z)"); that is kept.
+// One watcher keeps every button on the page in line as lists and menus are redrawn, so no panel has to remember it.
+const icBare=t=>String(t||'').replace(/ \([^)]*\)$/,'');
+function icNm(b){if(!b||b.tagName!=='BUTTON'||!b.querySelector('svg')||b.textContent.trim())return;const t=b.getAttribute('title'),a=b.getAttribute('aria-label');
+ if(a){if(!t||icBare(t)!==a)b.setAttribute('title',a)}else if(t)b.setAttribute('aria-label',icBare(t))}
+function icNames(root){(root||document).querySelectorAll('button').forEach(icNm)}
+function icNamesWatch(){icNames();if(typeof MutationObserver!='function')return;
+ new MutationObserver(ms=>{for(const m of ms){const n=m.target;if(m.type==='attributes'){icNm(n);continue}if(n.closest&&n.closest('svg'))continue;   // the artwork and its overlays are never buttons
+  m.addedNodes.forEach(x=>{if(x.nodeType!==1)return;if(x.tagName==='BUTTON')icNm(x);else if(x.tagName!=='svg'&&x.querySelectorAll)x.querySelectorAll('button').forEach(icNm)})}})
+  .observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['title','aria-label']})}
+export {ICN,IC_OPEN,ic,icAlign,icFill,icNames,icNamesWatch};

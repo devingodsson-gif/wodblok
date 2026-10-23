@@ -4,7 +4,7 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**As of Oct 23 2026.** `main` is at **2.28.0** (merged at the owner's word without a test run). 2.27.0 and 2.28.0 were merged without the full suite, pixel goldens or `npm run perf`; about 17 SVG snapshots in tests/scenarios.spec.js still expect the old canvas background and wait for the owner's approval to regenerate. Project file format **26** (`FMT_LATEST` in `src/format/container.js`); projects saved before 2.27.0 are refused. 77 files in `src/modules`, 140 spec files in `tests/`.
+**As of Oct 23 2026.** `main` is at **2.29.0** (merged at the owner's word without a test run). 2.27.0, 2.28.0 and 2.29.0 were merged without the full suite, pixel goldens or `npm run perf`; about 17 SVG snapshots in tests/scenarios.spec.js still expect the old canvas background and wait for the owner's approval to regenerate, and specs that look for words 2.29.0 changed need updating (docs/plan.md, 2.29.0). Project file format **26** (`FMT_LATEST` in `src/format/container.js`); projects saved before 2.27.0 are refused. 77 files in `src/modules`, 140 spec files in `tests/`.
 
 ## Direction
 - A professional, minimal, clean editor in the class of Photoshop and Lightroom (the owner's reference applications). Web app first; Mac, Windows and mobile later and not blocked. A commercial product, sold later; the repo is public until then.

@@ -1,7 +1,7 @@
 // Start-up. Modules do no work when imported; everything that used to run at the top of the single script
 // runs here, in the same order as before.
 import {coreStr} from './modules/18-projects-and-cover-overlay.js';
-import {icFill} from './modules/00-icons.js';
+import {icFill,icNamesWatch} from './modules/00-icons.js';
 import {init01,WBX,WBS} from './modules/01-launch-and-version.js';
 import {init02} from './modules/02-draft-mode-speedups.js';
 import {init03,BK} from './modules/03-stamp-prints-and-drawing.js';
@@ -76,6 +76,7 @@ import {kv} from './platform/index.js';
 import {cmdConflicts,cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdList,cmdRun} from './commands/registry.js';
 
 icFill();     // the page's icons first (2.14.0), so nothing below ever sees an empty one
+icNamesWatch();   // every icon-only button: a hover name and the same accessible name (2.29.0)
 init01();
 // the element and effect registries are filled first, before anything draws
 init65();
