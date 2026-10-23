@@ -557,6 +557,9 @@ Between us only (never in the UI): a stamp parent is a stamp (a template, a tile
 - Tests: `add-arm-2-20.spec.js` (5); the Add helpers in `tests/helpers/harness.js` (`addKind`, `placeArmed`, `addShape`) now arm and click, and the specs that add elements use them.
 - Run: add-arm, element-bar, element-panels, element-group, text-paragraph and the other 22 specs that add elements, plus 13 that use the shape helpers (all passing, 127 tests); `check:style` and `check:platform` pass. Not run: CI, the full suite, WebKit, `npm run perf` (placing a click now arms a ghost on the existing overlay; no drawing path changed). No snapshot or golden changed; pixel goldens that show the Add flow would be unaffected, one that shows a text box being edited would differ.
 
+### 2.29.1 (Oct 23 2026): hotfix, the page could freeze on opening a shape set
+The hover-name watcher of 2.29.0 set a button's title again and again when its name itself ended in brackets (a few shape names do), so opening such a set in the Motifs library locked the page. A name that ends in brackets is now left alone. Found by the full test run that followed 2.29.0.
+
 ### 2.29.0 (Oct 23 2026): style and words pass. Format 26 unchanged
 Step 5 of the fix plan from the 2.23 review (planned as 2.28.0; the 2.27.0 leftovers took that number). Merged at the owner's word with no test run; only a short look in the built app (Randomize panel, Motif Edit group, Colours panel, the top bar at 800 px wide, a scan for unnamed icon buttons, no page errors).
 - **Slider rows line up** [24]: in Randomize every slider ends at the same place (rows without an "All" menu keep its room; Lettering's label column fixed); Motif > Edit's Jitter is a group label above Move, Turn and Scale, which use the standard slider row. **Units** [45]: Size shows %, Rotate shows °.

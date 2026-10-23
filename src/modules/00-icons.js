@@ -112,7 +112,7 @@ function icFill(root){(root||document).querySelectorAll('svg[data-ic]').forEach(
 // One watcher keeps every button on the page in line as lists and menus are redrawn, so no panel has to remember it.
 const icBare=t=>String(t||'').replace(/ \([^)]*\)$/,'');
 function icNm(b){if(!b||b.tagName!=='BUTTON'||!b.querySelector('svg')||b.textContent.trim())return;const t=b.getAttribute('title'),a=b.getAttribute('aria-label');
- if(a){if(!t||icBare(t)!==a)b.setAttribute('title',a)}else if(t)b.setAttribute('aria-label',icBare(t))}
+ if(a){if(!t||(t!==a&&icBare(t)!==a))b.setAttribute('title',a)}else if(t)b.setAttribute('aria-label',icBare(t))}   // a name that itself ends in brackets is left alone, so this never sets the same title again
 function icNames(root){(root||document).querySelectorAll('button').forEach(icNm)}
 function icNamesWatch(){icNames();if(typeof MutationObserver!='function')return;
  new MutationObserver(ms=>{for(const m of ms){const n=m.target;if(m.type==='attributes'){icNm(n);continue}if(n.closest&&n.closest('svg'))continue;   // the artwork and its overlays are never buttons
