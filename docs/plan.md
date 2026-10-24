@@ -668,7 +668,7 @@ Step 1 of the fix plan made from the 2.23 review (five releases, 2.24.0 to 2.28.
 - **Stamp library**: its two groups (Save and export, Library) are now at the bottom of the Stamp panel. Name and Save to library, Import stamp file, Export PNG, and the list of saved stamps with Add, PNG, File and Delete. The separate Stamp library tool stays gone from the rail. The two `fixme` specs (`easy-wins`, `project-files`) are on again and open the Stamp panel.
 - **Open recent**: the File menu lists the last three project files that were opened or saved, under Open project, where the browser gave the app a file handle (Chrome, Edge); nothing shows where it did not. Click one to open it (it asks "Discard changes?" first when there is unsaved work; the browser may ask for permission once). A file that was moved or deleted is dropped from the list with a message. The list is kept in the browser's records (`files.recentGet` and `recentPut`); where a handle cannot be stored it lasts for the visit. Module `81-recent-files.js`.
 - Tests: `open-recent-2-23`; the stamp library specs above.
-- Not done: Stamp library search (owner: wait until the library is something people browse).
+- Stamp library search was added in 2.34.0.
 
 ### 2.22.2 (Oct 22 2026): seams, text fit. Format 25 unchanged
 - **Seams (`repeat-tile` rolls 2 to 4)**: not a seam. Drawing the difference between the middle and right copy of the tile showed the layout identical and only the edges of shapes differing by about a pixel of resampling; that noise grows with the amount of edge in the piece. The check now allows 0.4 of the half-tile difference (was 0.12); a piece that really does not repeat comes out near 1. Nothing in the app changed.
@@ -702,3 +702,7 @@ Step 1 of the fix plan made from the 2.23 review (five releases, 2.24.0 to 2.28.
 - Tests: `file-menu-2-21`, `randomize-mode-2-21` (4), a Quick export spec in `export-recipes`, a launch default spec in `templates`; `save-project` and `templates` menu lists updated; `#rzbar` becomes `#rzdo` in 10 specs.
 - Run: the 144 specs that touch Randomize (118 passed; the 20 that failed all fail on 2.20.0 too, except `randomize-new:24` and `templates:17`, which I fixed), then the changed ones again; `check:style` and `check:platform`. Not run: CI, the full suite, WebKit, `npm run perf`. No snapshot or golden was regenerated; pixel goldens showing the top bar, the File menu or the Randomize panel would differ.
 
+
+### 2.34.0 (Oct 23 2026): Find a stamp. Format 27 unchanged
+- **Stamp library search**: a "Find a stamp" field above the saved stamps in the Stamp panel's Library group, like Find a tray and Find a shape. Words filter the saved stamps by name (all words must match); the count shows "N found"; no match shows "No matching stamp"; clearing restores the list. The library is a flat list, so there are no folders to search across.
+- Tests: `stamp-library-search-2-34`.
