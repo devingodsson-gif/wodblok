@@ -39,6 +39,8 @@ const emit=()=>{if(wb)out+=`<g${wa}>${T(wb,wn)}</g>`;wb='';wk=null;wn=false};
 for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
  if(G){let j=i;while(j<its.length&&its[j].path[d]&&its[j].path[d].u==G.u)j++;const inner=render(its.slice(i,j),d+1);i=j-1;emit();flush();out+=gWrap(G,T(inner));continue}
  const q=it.q;if(q.v===false)continue;const k=elKind(q),r=R[k];if(!r)continue;const s=r[4].get(String(q.u));if(s==null)continue;const a=elOB(q);
+ // a filter (2.38.0: a shape in Filter mode) takes what is drawn so far at this level (only its group's members inside a group) and redraws it through its effects
+ if(q.flt&&s.includes('@@UNDER@@')){emit();flush();const fid='flu'+li+'_'+gid(q)+'_'+d;out=s.split('@@UNDER@@').join(out).split('@@UID@@').join(fid);continue}
  if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a;wn=!!EL_K[k].notile}wb+=r[2]+s+r[3];continue}
  emit();if(k!==run){flush();run=k}buf+=s}
 flush();emit();return out}

@@ -18,7 +18,7 @@ const fpCancel=()=>{const d=WBS.fpDrag,x=WBS.fpXf;if(d){if(d.g)d.g.forEach(([q,q
 if(x){const o=JSON.parse(x.orig);Object.keys(x.p).forEach(k=>{if(!(k in o))delete x.p[k]});Object.assign(x.p,o);WBS.fpXf=null;if(x.p.tx&&typeof tbRelay=='function')tbRelay(x.p)}upd()};
 // Rubber band: every element the box touches is selected; Shift/Ctrl/Cmd adds to the selection (2.27.0)
 function fpMqPick(L){const m=WBS.fpMq,a=Math.min(m.x0,m.x1),b=Math.max(m.x0,m.x1),c=Math.min(m.y0,m.y1),d=Math.max(m.y0,m.y1),pl=L.pl||[],hit=new Set(m.base);
-pl.forEach(p=>{const wh=fpWH(p);if(!wh||p.bgd||fpHid(pl,p))return;const r=-(+p.r||0)*Math.PI/180*-1,co=Math.cos(r),si=Math.sin(r),hw=wh[0]/2,hh=wh[1]/2,ex=Math.abs(hw*co)+Math.abs(hh*si),ey=Math.abs(hw*si)+Math.abs(hh*co);if(p.x+ex>=a&&p.x-ex<=b&&p.y+ey>=c&&p.y-ey<=d)hit.add(String(p.u))});
+pl.forEach(p=>{const wh=fpWH(p);if(!wh||p.bgd||p.flt||fpHid(pl,p))return;const r=-(+p.r||0)*Math.PI/180*-1,co=Math.cos(r),si=Math.sin(r),hw=wh[0]/2,hh=wh[1]/2,ex=Math.abs(hw*co)+Math.abs(hh*si),ey=Math.abs(hw*si)+Math.abs(hh*co);if(p.x+ex>=a&&p.x-ex<=b&&p.y+ey>=c&&p.y-ey<=d)hit.add(String(p.u))});
 const arr=[...hit];WBS.fpMS=new Set(arr);WBS.fpSel=arr.length?arr[arr.length-1]:-1;WBS.fpAnc=WBS.fpSel===-1?null:String(WBS.fpSel);upd()}
 const fpMqEnd=()=>{if(!WBS.fpMq)return;const on=WBS.fpMq.on;WBS.fpMq=null;if(on)upd();else WBH.fpOverlay()};
 const fpEnd=()=>{if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved;WBS.fpDrag=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};

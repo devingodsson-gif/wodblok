@@ -32,11 +32,18 @@ const FQ_LINE='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w
 // a ripple cell: one wave in the red channel (128 = no move in green)
 const FQ_WAVE='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><linearGradient id="g" x1="0" y1="0" x2="1" y2="0">${Array.from({length:17},(_,i)=>`<stop offset="${i/16}" stop-color="rgb(${Math.round(127.5+127.5*Math.sin(i/16*2*Math.PI))},128,128)"/>`).join('')}</linearGradient><rect width="64" height="64" fill="url(#g)"/></svg>`);
 const FQ_INK={same:['Same ink',null],cyan:['Cyan','#00aeef'],magenta:['Magenta','#ec008c'],yellow:['Yellow','#ffe600'],red:['Red','#e8312f'],blue:['Blue','#2b4fd8'],black:['Black','#111111']};
+// Filter mode (2.38.0): q.__fm {paper} is set when the effect works on the picture under a filter shape. The effects that read an outline read darkness instead:
+// the picture blurred, 1 - its brightness, as a grey with alpha 1; and what would be a gap shows the paper colour.
+const fqFm=q=>q&&q.__fm||null;
+const fqDark=(inp,res)=>`<feColorMatrix in="${inp}" type="matrix" values="-.2126 -.7152 -.0722 0 1 -.2126 -.7152 -.0722 0 1 -.2126 -.7152 -.0722 0 1 0 0 0 0 1" result="${res}"/>`;
+const fqTone=(sg,fm)=>fm?`<feGaussianBlur in="SourceGraphic" stdDeviation="${q4(sg)}" result="a"/>`+fqDark('a','t'):`<feGaussianBlur in="SourceAlpha" stdDeviation="${q4(sg)}" result="a"/><feColorMatrix in="a" type="matrix" values="0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 1" result="t"/>`;
+// the picture kept where the dots are (alpha in dot); on paper in filter mode
+const fqInk=fm=>fm?`<feComposite in="SourceGraphic" in2="dot" operator="in" result="ink"/><feFlood flood-color="${fm.paper}" result="pp"/><feMerge><feMergeNode in="pp"/><feMergeNode in="ink"/></feMerge>`:`<feComposite in="SourceGraphic" in2="dot" operator="in"/>`;
 // the dot or line screen: the element's own alpha, blurred (Spread), decides how wide each dot or line grows in a tiled cell, in a frame turned by the angle
-function fqScreen(e,id,b,cell,dflt){const S=fqSize(b),c=S*(.008+fqPar(e,'sz',1,100,dflt)/100*.1),T=fqPar(e,'tone',5,100,55)/100*1.02,a=fqPar(e,'ang',0,180,45),sg=c*(.15+fqPar(e,'spr',0,100,40)/100*1.5),cx=b.x+b.W/2,cy=b.y+b.H/2,h=Math.hypot(b.W,b.H)/2,x0=cx-h,y0=cy-h;
- const body=`<feGaussianBlur in="SourceAlpha" stdDeviation="${q4(sg)}" result="a"/><feColorMatrix in="a" type="matrix" values="0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 1" result="t"/>`
+function fqScreen(e,id,b,cell,dflt,q){const fm=fqFm(q);const S=fqSize(b),c=S*(.008+fqPar(e,'sz',1,100,dflt)/100*.1),T=fqPar(e,'tone',5,100,55)/100*1.02,a=fqPar(e,'ang',0,180,45),sg=c*(.15+fqPar(e,'spr',0,100,40)/100*1.5),cx=b.x+b.W/2,cy=b.y+b.H/2,h=Math.hypot(b.W,b.H)/2,x0=cx-h,y0=cy-h;
+ const body=fqTone(sg,fm)
   +`<feImage href="${cell}" x="${q4(x0)}" y="${q4(y0)}" width="${q4(c)}" height="${q4(c)}" preserveAspectRatio="none" result="cell"/><feTile in="cell" result="cone"/>`
-  +`<feComposite in="cone" in2="t" operator="arithmetic" k1="0" k2="1" k3="${q4(T)}" k4="-1" result="d"/><feColorMatrix in="d" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 40 0 0 0 0" result="dot"/><feComposite in="SourceGraphic" in2="dot" operator="in"/>`;
+  +`<feComposite in="cone" in2="t" operator="arithmetic" k1="0" k2="1" k3="${q4(T)}" k4="-1" result="d"/><feColorMatrix in="d" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 40 0 0 0 0" result="dot"/>`+fqInk(fm);
  return{defs:fqFilter(id,x0,y0,2*h,2*h,body),wrap:fqTurn(id,a,cx,cy)}}
 
 const FQ={
@@ -51,12 +58,12 @@ const FQ={
     +(so?`<feGaussianBlur in="n1" stdDeviation="${q4(g*so/100*.6)}" result="n1b"/>`:'')+fqLin(3*(1+so/40),'n2',so?'n1b':'n1')+fqAdd('n2',amt/100*.9);
    return{defs:fqFilter(id,b.x,b.y,b.W,b.H,body),wrap:fqWrap(id)}}},
  dust:{label:'Dust & Scratches',grp:'Noise',seed:true,P:[['amt','Dust',0,100,30,'%'],['sz','Size',1,100,30,''],['scr','Scratches',0,100,30,'%']],S:[['col','Show as',[['holes','Holes'],['specks','Dark specks']],'holes']],
-  filt:(e,id,b)=>{const amt=fqPar(e,'amt',0,100,30),scr=fqPar(e,'scr',0,100,30);if(!amt&&!scr)return null;const S=fqSize(b),g=S*(.004+fqPar(e,'sz',1,100,30)/100*.02),sd=fqSeed(e);let body='',parts=[];
+  filt:(e,id,b,q)=>{const fm=fqFm(q),amt=fqPar(e,'amt',0,100,30),scr=fqPar(e,'scr',0,100,30);if(!amt&&!scr)return null;const S=fqSize(b),g=S*(.004+fqPar(e,'sz',1,100,30)/100*.02),sd=fqSeed(e);let body='',parts=[];
    if(amt){body+=`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/g)}" numOctaves="1" seed="${sd}" result="sp0"/>`+fqToA('sp0','sp1')+fqCut(.76-amt/100*.14,'sp1','sp');parts.push('sp')}
    if(scr){body+=`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/(g*1.2))} ${q4(1/(S*.3))}" numOctaves="1" seed="${sd+7}" result="sc0"/>`+fqToA('sc0','sc1')+fqCut(.78-scr/100*.14,'sc1','sc');parts.push('sc')}
    body+=`<feMerge result="d">${parts.map(p=>`<feMergeNode in="${p}"/>`).join('')}</feMerge>`;
    body+=e.col=='specks'?`<feFlood flood-color="#000" result="k"/><feComposite in="k" in2="d" operator="in" result="kd"/><feComposite in="kd" in2="SourceAlpha" operator="in" result="kd2"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="kd2"/></feMerge>`
-    :`<feComposite in="SourceGraphic" in2="d" operator="out"/>`;
+    :fm?`<feFlood flood-color="${fm.paper}" result="pp"/><feComposite in="pp" in2="d" operator="in" result="pd"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="pd"/></feMerge>`:`<feComposite in="SourceGraphic" in2="d" operator="out"/>`;
    return{defs:fqFilter(id,b.x,b.y,b.W,b.H,body),wrap:fqWrap(id)}}},
  blur:{label:'Gaussian Blur',grp:'Blur',P:[['amt','Radius',0,100,10,'']],
   filt:(e,id,b)=>{const sg=fqSize(b)*fqPar(e,'amt',0,100,10)/100*.06;if(!(sg>0))return null;const m=3*sg;
@@ -65,23 +72,28 @@ const FQ={
   filt:(e,id,b)=>{const sg=fqSize(b)*fqPar(e,'amt',0,100,20)/100*.08;if(!(sg>0))return null;const a=fqPar(e,'ang',0,359,0),cx=b.x+b.W/2,cy=b.y+b.H/2,h=Math.hypot(b.W,b.H)/2+3*sg;
    return{defs:fqFilter(id,cx-h,cy-h,2*h,2*h,`<feGaussianBlur in="SourceGraphic" stdDeviation="${q4(sg)} 0"/>`),wrap:fqTurn(id,a,cx,cy)}}},
  halftone:{label:'Halftone',grp:'Print',P:[['sz','Dot size',1,100,30,''],['tone','Ink',5,100,55,'%'],['ang','Angle',0,90,45,'&#176;'],['spr','Spread',0,100,40,'%']],
-  filt:(e,id,b)=>fqScreen(e,id,b,FQ_CELL,30)},
+  filt:(e,id,b,q)=>fqScreen(e,id,b,FQ_CELL,30,q)},
  lines:{label:'Line Screen',grp:'Print',P:[['sz','Line spacing',1,100,25,''],['tone','Ink',5,100,55,'%'],['ang','Angle',0,180,45,'&#176;'],['spr','Spread',0,100,40,'%']],
-  filt:(e,id,b)=>fqScreen(e,id,b,FQ_LINE,25)},
+  filt:(e,id,b,q)=>fqScreen(e,id,b,FQ_LINE,25,q)},
  stipple:{label:'Stipple',grp:'Print',seed:true,P:[['sz','Dot size',1,100,20,''],['den','Density',0,100,55,'%'],['spr','Spread',0,100,80,'%']],
-  filt:(e,id,b)=>{const S=fqSize(b),g=S*(.003+fqPar(e,'sz',1,100,20)/100*.02),sg=g*(.3+fqPar(e,'spr',0,100,80)/100*6),bias=(fqPar(e,'den',0,100,55)-50)/100*.7;
-   const body=`<feGaussianBlur in="SourceAlpha" stdDeviation="${q4(sg)}" result="a"/><feColorMatrix in="a" type="matrix" values="0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 1" result="t"/>`
+  filt:(e,id,b,q)=>{const fm=fqFm(q),S=fqSize(b),g=S*(.003+fqPar(e,'sz',1,100,20)/100*.02),sg=g*(.3+fqPar(e,'spr',0,100,80)/100*6),bias=(fqPar(e,'den',0,100,55)-50)/100*.7;
+   const body=fqTone(sg,fm)
     +`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/g)}" numOctaves="1" seed="${fqSeed(e)}" result="n0"/><feColorMatrix in="n0" type="matrix" values="${fqMono}" result="n1"/>`+fqLin(-1.6,'n2','n1')
-    +`<feComposite in="t" in2="n2" operator="arithmetic" k1="0" k2=".5" k3=".5" k4="0" result="d"/><feColorMatrix in="d" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 80 0 0 0 ${q4(-40+40*bias)}" result="dot"/><feComposite in="SourceGraphic" in2="dot" operator="in"/>`;
+    +`<feComposite in="t" in2="n2" operator="arithmetic" k1="0" k2=".5" k3=".5" k4="0" result="d"/><feColorMatrix in="d" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 80 0 0 0 ${q4(-40+40*bias)}" result="dot"/>`+fqInk(fm);
    return{defs:fqFilter(id,b.x,b.y,b.W,b.H,body),wrap:fqWrap(id)}}},
  bleed:{label:'Ink Bleed',grp:'Print',seed:true,P:[['amt','Swell',0,100,20,'%'],['rag','Ragged',0,100,30,'%'],['soft','Softness',0,100,30,'%']],
-  filt:(e,id,b)=>{const S=fqSize(b),amt=fqPar(e,'amt',0,100,20),so=fqPar(e,'soft',0,100,30),rg=fqPar(e,'rag',0,100,30);const r=S*amt/100*.03,sg=S*(.002+so/100*.012),sc=S*rg/100*.06,m=r+3*sg+sc;if(!(r>0)&&!rg)return null;
-   const k=1.5+(1-so/100)*10;let body=r>0?`<feMorphology in="SourceGraphic" operator="dilate" radius="${q4(r)}" result="m"/>`:`<feOffset in="SourceGraphic" dx="0" dy="0" result="m"/>`;
+  filt:(e,id,b,q)=>{const fm=fqFm(q),S=fqSize(b),amt=fqPar(e,'amt',0,100,20),so=fqPar(e,'soft',0,100,30),rg=fqPar(e,'rag',0,100,30);const r=S*amt/100*.03,sg=S*(.002+so/100*.012),sc=S*rg/100*.06,m=r+3*sg+sc;if(!(r>0)&&!rg)return null;
+   const k=1.5+(1-so/100)*10; // in filter mode the dark parts of the picture swell (erode takes the darkest neighbour), and stay soft
+   let body=r>0?`<feMorphology in="SourceGraphic" operator="${fm?'erode':'dilate'}" radius="${q4(r)}" result="m"/>`:`<feOffset in="SourceGraphic" dx="0" dy="0" result="m"/>`;
    if(rg)body+=`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/(S*.04))}" numOctaves="2" seed="${fqSeed(e)}" result="n"/><feDisplacementMap in="m" in2="n" scale="${q4(sc)}" xChannelSelector="R" yChannelSelector="G" result="m"/>`;
-   body+=`<feGaussianBlur in="m" stdDeviation="${q4(sg)}" result="bl"/><feComponentTransfer in="bl"><feFuncA type="linear" slope="${q4(k)}" intercept="${q4(.5-.4*k)}"/></feComponentTransfer>`;
+   body+=fm?`<feGaussianBlur in="m" stdDeviation="${q4(sg*.5)}"/>`:`<feGaussianBlur in="m" stdDeviation="${q4(sg)}" result="bl"/><feComponentTransfer in="bl"><feFuncA type="linear" slope="${q4(k)}" intercept="${q4(.5-.4*k)}"/></feComponentTransfer>`;
    return{defs:fqFilter(id,b.x-m,b.y-m,b.W+2*m,b.H+2*m,body),wrap:fqWrap(id)}}},
  misreg:{label:'Misregistration',grp:'Print',P:[['amt','Offset',0,100,25,''],['ang','Angle',0,359,45,'&#176;']],S:[['col','Second copy',Object.entries(FQ_INK).map(([k,v])=>[k,v[0]]),'cyan']],
-  filt:(e,id,b)=>{const d=fqSize(b)*fqPar(e,'amt',0,100,25)/100*.06;if(!(d>0))return null;const a=fqPar(e,'ang',0,359,45)*Math.PI/180,dx=d*Math.cos(a),dy=d*Math.sin(a),ink=(FQ_INK[e.col]||FQ_INK.cyan)[1],m=d+1;
+  filt:(e,id,b,q)=>{const fm=fqFm(q),d=fqSize(b)*fqPar(e,'amt',0,100,25)/100*.06;if(!(d>0))return null;const a=fqPar(e,'ang',0,359,45)*Math.PI/180,dx=d*Math.cos(a),dy=d*Math.sin(a),ink=(FQ_INK[e.col]||FQ_INK.cyan)[1],m=d+1;
+   // in filter mode the second copy is the picture's dark parts (or the picture itself, Same ink), offset and printed over it (multiply)
+   if(fm){const body=(ink?fqDark('SourceGraphic','dk0')+`<feColorMatrix in="dk0" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.6 0 0 0 -.4" result="dk1"/><feComposite in="dk1" in2="SourceAlpha" operator="in" result="dk"/><feOffset in="dk" dx="${q4(dx)}" dy="${q4(dy)}" result="oa"/><feFlood flood-color="${ink}" result="fc"/><feComposite in="fc" in2="oa" operator="in" result="o"/>`
+     :`<feOffset in="SourceGraphic" dx="${q4(dx)}" dy="${q4(dy)}" result="o"/>`)+`<feBlend in="o" in2="SourceGraphic" mode="multiply"/>`;
+    return{defs:fqFilter(id,b.x-m,b.y-m,b.W+2*m,b.H+2*m,body),wrap:fqWrap(id)}}
    const body=(ink?`<feOffset in="SourceAlpha" dx="${q4(dx)}" dy="${q4(dy)}" result="oa"/><feFlood flood-color="${ink}" result="fc"/><feComposite in="fc" in2="oa" operator="in" result="o"/>`:`<feOffset in="SourceGraphic" dx="${q4(dx)}" dy="${q4(dy)}" result="o"/>`)+`<feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>`;
    return{defs:fqFilter(id,b.x-m,b.y-m,b.W+2*m,b.H+2*m,body),wrap:fqWrap(id)}}},
  rough:{label:'Roughen',grp:'Distort',seed:true,P:[['amt','Amount',0,100,25,'%'],['sz','Size',1,100,30,'']],

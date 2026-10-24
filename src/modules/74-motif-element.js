@@ -1,6 +1,6 @@
 import {plDisarm} from './72-placing.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CW,col,okC} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,col,okC} from './04-canvas-and-stamp-outlines.js';
 import {mk,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL,fpU} from './24-free-place-layers.js';
@@ -42,13 +42,31 @@ function mtDraw(m,o,id,seen,ip='mai_'){const w=Math.max(.01,o.w),h=Math.max(.01,
 // the look of a motif (an element, a stamp's motif or a pattern's source) as mtDraw takes it; ink: its fill colour (a colour reference resolved by the caller)
 const mtPic=p=>p.fl=='img'&&p.a&&WBS.ARTS[p.a]?{A:WBS.ARTS[p.a],a:p.a,iz:p.iz,im:p.im}:null;
 function mtfLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='motif'&&p.m);if(!pl.length)return['',''];if(WBX.wbMtWarm)pl.forEach(p=>WBX.wbMtWarm(p.m));const fr=new Map(),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),seen=new Set();let defs='',out='';
- pl.forEach(p=>{const id=String(p.u).replace(/[^\w-]/g,''),s=Math.max(1,+p.s||100),J=fxJit(p),k=s*(J?J.sz:1),fx=(J?J.dx:0),fy=(J?J.dy:0),rr=(+p.r||0)+(J?J.dr:0),fl=(+p.f||1)*(J&&J.sx<0?-1:1),fv=J&&J.sy<0?-1:1,
+ pl.forEach(p=>{if(p.flt&&!p.bgd){const r=mtFilter(p,li,seen);defs+=r.defs;fr.set(String(p.u),r.piece);return}
+  const id=String(p.u).replace(/[^\w-]/g,''),s=Math.max(1,+p.s||100),J=fxJit(p),k=s*(J?J.sz:1),fx=(J?J.dx:0),fy=(J?J.dy:0),rr=(+p.r||0)+(J?J.dr:0),fl=(+p.f||1)*(J&&J.sx<0?-1:1),fv=J&&J.sy<0?-1:1,
   w=k*(+p.wx||1),h=k*(+p.wy||1),sw=+p.sw>0?+p.sw:0,box={x:(+p.x||0)-w*.6-sw,y:(+p.y||0)-h*.6-sw,W:w*1.2+2*sw,H:h*1.2+2*sw,R:400},T=p.fx&&p.fx.length?fxTex(p,'mtx'+li+'_'+id,box):null,G=p.fx&&p.fx.length?fxGr(p,'mtg'+li+'_'+id,box):null,
   D=mtDraw(p.m,{w,h,fill:p.fl=='none'?'':okC(p.ink)?col(p.ink):col(WBS.proj.ink),pic:mtPic(p),sw,sk:col(okC(p.sk)?p.sk:WBS.proj.ink)},'mt'+li+'_'+id,seen);
   defs+=D.defs;if(T)defs+=T.defs;if(G)defs+=G.defs;
   const body=`<g${ed?` data-mv="${p.u}" data-mx="${+p.x||0}" data-my="${+p.y||0}"`:''} transform="translate(${mtF((+p.x||0)+fx)} ${mtF((+p.y||0)+fy)}) rotate(${mtF(rr)}) scale(${fl} ${fv})">${D.body}</g>`;
   const one=T||G?`<g${T?T.attrs:''}>${G?G.wrap(body):body}</g>`:body;out+=one;fr.set(String(p.u),one)});
  return[defs,out,'','',fr]}
+// ===== Filter mode (2.38.0, owner Oct 24 2026): a shape with {flt:1} draws no ink of its own; its effects work on what is drawn under it, inside its outline.
+// The piece holds two tokens the element list fills in (elDraw's render): @@UNDER@@, the markup drawn so far at this level, and @@UID@@, an id for it.
+// The picture is drawn as it is; inside the outline a copy with the shape's effects (Texture, the filter effects, Colour grade) is laid over it, so where an effect
+// leaves a pixel see-through (a blur at the canvas edge) the picture still shows.
+// The shape's opacity is the filter's strength. Jitter and Pressure offset do not apply. Effects that read an outline (Halftone, Line Screen, Stipple, Ink Bleed,
+// Misregistration, Dust's holes) read the picture's darkness instead and fill their gaps with the Background's colour (white without one): they get {__fm:{paper}}.
+const FLT_U='@@UNDER@@',FLT_I='@@UID@@';
+function mtPaper(){for(const L of WBS.layers||[])for(const q of L.pl||[])if(q.bgd&&q.v!==false&&q.k=='motif')return okC(q.ink)?col(q.ink):'#ffffff';return'#ffffff'}
+function mtFilter(p,li,seen){if(WBS.DRAFT&&WBS.DRAFTCV)return{defs:'',piece:FLT_U};   // while something is dragged on the canvas the picture is drawn without the filter, and with it once the drag ends (a slider drag keeps it, so the filter is seen while it is set)
+ const id=String(p.u).replace(/[^\w-]/g,''),s=Math.max(1,+p.s||100),w=s*(+p.wx||1),h=s*(+p.wy||1),op=p.op!=null?Math.max(0,Math.min(100,+p.op))/100:1,
+ box={x:(+p.x||0)-w*.6,y:(+p.y||0)-h*.6,W:w*1.2,H:h*1.2,R:400},q={...p,__fm:{paper:mtPaper()}},T=fxTex(q,'flx'+li+'_'+id,box),G=fxGr(q,'flg'+li+'_'+id,box),
+ tf=`translate(${mtF(+p.x||0)} ${mtF(+p.y||0)}) rotate(${mtF(+p.r||0)}) scale(${+p.f||1} 1)`,
+ Wi=mtDraw(p.m,{w,h,fill:'#fff'},'fli'+li+'_'+id,seen),R=`maskUnits="userSpaceOnUse" x="${mtF(-CW)}" y="${mtF(-CH)}" width="${mtF(3*CW)}" height="${mtF(3*CH)}"`;
+ let defs=Wi.defs+(T?T.defs:'')+(G?G.defs:'');
+ defs+=`<mask id="flmi${li}_${id}" ${R}><g opacity="${op.toFixed(3)}"><g transform="${tf}">${Wi.body}</g></g></mask>`;
+ const use=`<use href="#${FLT_I}"/>`,fx=T||G?`<g${T?T.attrs:''}>${G?G.wrap(use):use}</g>`:use;
+ return{defs,piece:`<g id="${FLT_I}">${FLT_U}</g><g mask="url(#flmi${li}_${id})">${fx}</g>`}}
 // make a Motif element at x, y (canvas units) of motif m, above the selected element; it is selected
 function mtfMake(m,x,y,s,r){const q=abInsert({u:fpU(),k:'motif',m,x:+mtF(x),y:+mtF(y),s:+(s||100).toFixed(1),r:+(r||0),f:1});if(!q)return null;mtLast=m;store();upd();if(WBX.wbCap)WBX.wbCap();return q}
 const mtfSize=()=>{const b=WBS.brush;return b&&b.s?Math.max(20,Math.min(400,b.s*100)):100};
@@ -68,4 +86,4 @@ function init74(){
  // picking a library shape while a Motif element is selected changes that element's shape
  WBX.wbMotifSwap=m=>{if(WBS.brush)return false;const L=fpL(),q=L&&(L.pl||[]).find(x=>String(x.u)===String(WBS.fpSel));if(!q||q.k!='motif')return false;q.m=m;mtLast=m;store();upd();if(WBX.wbCap)WBX.wbCap();return true};
 }
-export {init74,mtfLayer,mtDraw,mtPic};
+export {FLT_I,FLT_U,init74,mtfLayer,mtDraw,mtPic};

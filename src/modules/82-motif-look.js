@@ -37,6 +37,8 @@ function mfStrip(a){const ids=Object.keys(WBS.ARTS),st=$('lfars');if(!st)return;
  if(st.dataset.k==ky)return;st.dataset.k=ky;st.innerHTML=ids.map(i=>{const A=WBS.ARTS[i];return`<button type="button" data-a="${hx(i)}" class="${a==i?'on':''}" title="${hx(A.n)}"><img src="${artBU(A)}" alt="">${artRefd(i)?'':`<i data-ax="${hx(i)}" title="Remove from this project">&#215;</i>`}</button>`}).join('')}
 function mfSync(){if(!$('mf_f'))return;const T=mfT();MF_G.forEach(id=>mfVis(id,!!T&&(id!='mf_s'||T.k=='src')));if(!T)return;mfPlace(T);const p=T.list[0];
  if(T.k=='src'){mfVal('mf_sx',Math.round((+p.wx||1)*100));mfVal('mf_sy',Math.round((+p.wy||1)*100))}
+ // Filter (2.38.0): a shape on the canvas (not the Background) can be a filter; its fill and outline then do nothing, so they hide
+ const fo=T.k=='el'&&!p.bgd,fl=fo&&!!p.flt;mfVis('mf_fltr',fo);{const c=$('mf_flt');if(c.checked!==fl)c.checked=fl}mfVis('mf_fk',!fl);mfVis('mf_o',!fl);if(fl){mfVis('mf_img',false);if(WBX.wbPaintWells)WBX.wbPaintWells();return}
  const fk=p.fl=='none'?'none':p.fl=='img'?'img':'solid';$('mf_fk').querySelectorAll('[data-f]').forEach(b=>mfSet(b,b.dataset.f==fk));mfVis('mf_img',fk=='img');
  if(fk=='img'){mfStrip(p.a);mfVal('mf_iz',Math.round(+p.iz||100));$('mf_im').querySelectorAll('[data-i]').forEach(b=>mfSet(b,(b.dataset.i=='contain')==(p.im=='contain')))}
  const so=+p.sw>0,oc=$('mf_oon');if(oc.checked!==so)oc.checked=so;mfVis('mf_owr',so);mfVis('mf_ocr',so);if(so)mfVal('mf_ow',Math.round(+p.sw));
@@ -65,6 +67,7 @@ function init82(){if(!$('mf_f'))return;
  $('mf_im').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;each(q=>{if(b.dataset.i=='contain')q.im='contain';else delete q.im});mfCh();mfSync()};
  const sl=(id,f,k)=>{$(id).addEventListener('input',()=>{const v=+$(id).value;each(q=>{const n=k?+(v/100).toFixed(3):v;if(k&&n==1)delete q[f];else q[f]=n});store();upd()});$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()})};
  sl('mf_iz','iz');sl('mf_ow','sw');sl('mf_sx','wx',1);sl('mf_sy','wy',1);
+ $('mf_flt').onchange=()=>{const T=mfT();if(!T||T.k!='el')return;const on=$('mf_flt').checked;T.list.forEach(q=>{if(q.bgd)return;if(on)q.flt=1;else delete q.flt});mfCh();mfSync()};
  $('mf_oon').onchange=()=>{const on=$('mf_oon').checked;each((q,T)=>{if(on){if(!(+q.sw>0))q.sw=mfOw(T)}else delete q.sw});mfCh();mfSync()};
  if(WBX.wbMkWell){const pj=()=>WBS.proj,first=()=>{const T=mfT();return T?T.list[0]:null};
   WBX.wbMkWell($('mf_ow2'),{label:'Outline colour',what:'Outline',defRef:()=>{const T=mfT();if(T&&T.k=='items'){const t=WBS.tiles[WBS.cur];return T.list[0].ic||(t&&t.ink)||pj().ink}return pj().ink},get:()=>{const q=first();return q&&q.sk||''},set:v=>{each(q=>{if(v)q.sk=v;else delete q.sk})}});
