@@ -557,6 +557,14 @@ Between us only (never in the UI): a stamp parent is a stamp (a template, a tile
 - Tests: `add-arm-2-20.spec.js` (5); the Add helpers in `tests/helpers/harness.js` (`addKind`, `placeArmed`, `addShape`) now arm and click, and the specs that add elements use them.
 - Run: add-arm, element-bar, element-panels, element-group, text-paragraph and the other 22 specs that add elements, plus 13 that use the shape helpers (all passing, 127 tests); `check:style` and `check:platform` pass. Not run: CI, the full suite, WebKit, `npm run perf` (placing a click now arms a ghost on the existing overlay; no drawing path changed). No snapshot or golden changed; pixel goldens that show the Add flow would be unaffected, one that shows a text box being edited would differ.
 
+### 2.33.0 (Oct 23 2026): the Background follows the canvas, the first full run since 2.30. Format 27 unchanged
+Owner, Oct 23 2026: "Just go ahead and do all that" (the leftovers of 2.31 and 2.32).
+- **The Background follows a new canvas size** when it covered the whole old canvas (`bgFit` in `66-background.js`, called from `setDim`); one the person made smaller or moved is left alone. New spec `background-follows-2-33.spec.js` (2).
+- **Sample projects** (`tests/fixtures`): no canvas shape any more (`project-1-diamond` had a diamond canvas); the generator no longer clicks the canvas shape picker. Its state and SVG snapshots were regenerated with the owner's approval.
+- **Docs**: CLAUDE.md and the developing guide say Shape.
+- **Full run** (Chromium, 1.5 h, pixels on): 531 passed, 33 failed, 11 skipped. 16 failures were specs that had not caught up (the word Shape in the File menu, the Shape button and Element group, the removed Randomize "Canvas shape" row, the library's 474 shapes, texture on a shape); they are fixed and pass. 17 are pixel goldens (launch, roundtrip 3, scenarios 13): they were last taken before 2.27.0 (the launch golden still shows the old yellow canvas background) and the screen has changed in many releases since, so they are stale rather than broken by one release. Not regenerated, waiting for the owner.
+- `repeat-tile` rolls 7, 12 and 21 failed under load in one run and passed on three quiet reruns at the original 0.4 limit; not changed.
+
 ### 2.32.0 (Oct 23 2026): Shape is the word; the canvas is a rectangle. Format 27 unchanged
 Owner, Oct 23 2026: "Rename motifs to shape everywhere in the program. And regenerate the icon to be some shapes. Also make the canvas tool only create rectangle canvases. Get rid of the other shapes."
 - **Words**: what a person reads (buttons, tabs, the Elements list, tooltips, commands, history lines such as "Added shape", messages, the import dialog, the Colours list) says Shape and Shapes instead of Motif and Motifs. The Basic shapes set keeps its name. Names inside the code and the file (`k:'motif'`, the `motifs` panel id, `m`) are unchanged, so format 27 and saved files do not change.

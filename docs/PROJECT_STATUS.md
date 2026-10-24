@@ -4,7 +4,7 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**As of Oct 23 2026.** `main` is at **2.31.0** (motifs take over the Shape element; file format 27). Branch `feat/2.32.0-shapes-rename` holds 2.32.0 (the word Shape for Motif everywhere, a new Shape icon, a rectangle-only canvas), checked with targeted specs only; it waits for the owner's word to go live.
+**As of Oct 23 2026.** `main` is at **2.32.1** (Shape is the word; the canvas is always a rectangle; file format 27). Branch `feat/2.33.0-tidy` holds 2.33.0 (the Background follows the canvas size, sample projects without a canvas shape, spec fixes after the first full run since 2.30); 17 pixel goldens are stale and wait for the owner's word to be regenerated.
 
 ## Direction
 - A professional, minimal, clean editor in the class of Photoshop and Lightroom (the owner's reference applications). Web app first; Mac, Windows and mobile later and not blocked. A commercial product, sold later; the repo is public until then.
