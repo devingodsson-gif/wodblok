@@ -411,6 +411,14 @@
      "on": true,
      "pst": 1,
      "pfl": 1
+    },
+    {
+     "u": "pmuzhi800e15u2",
+     "k": "ripple",
+     "on": true,
+     "amt": 23,
+     "wl": 15,
+     "ang": 70
     }
    ]
   },
