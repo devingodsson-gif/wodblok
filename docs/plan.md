@@ -764,7 +764,7 @@ Step 1 of the fix plan made from the 2.23 review (five releases, 2.24.0 to 2.28.
 - **What it snaps to**: every element with a box (shapes, pictures, stamps, text), not the Background, a Filter shape, a hidden element or a Pattern (no box). Worked out once at the start of a drag; each frame compares numbers only.
 - **Off for the moment**: hold Alt (as for the grid). With the grid's snapping on, the grid wins and there are no smart guides. Escape cancels the drag and clears the guides.
 - **Settings > Guides** (new page after Colour): Smart guides, Snap to canvas, Snap to elements, Equal spacing (toggles, all on), Snap distance (4, 6 or 10 screen pixels, 6). The rows under the switch rest while it is off; Equal spacing needs Snap to elements. The same switch is a Smart guides tick box in the Grid panel, under Snap to grid; command `view.smartGuides` ("Smart guides", Mod+;) clicks it.
-- **Style**: the accent colour, as the selection box (no new colour). `docs/developing-wodblok.md` 9.10 describes it. Suggestion (not done): Photoshop draws guides in magenta so they show on any artwork; a `--guide` token would need the owner's word.
+- **Style**: the accent colour, as the selection box (no new colour). `docs/developing-wodblok.md` 9.10 describes it. Owner, Oct 24 2026: keep the accent for now (a dedicated guide colour, as Photoshop's magenta, was offered). a `--guide` token would need the owner's word.
 - Also: `fpHid` is now exported from 25 (28 used it without importing it).
 - Tests: `smart-guides-2-40` (canvas middle with a line, Alt, guides cleared on release; edge match; the middle between two with two gap marks; several selected as one box, Escape; a side pull; the settings page and the command).
 
