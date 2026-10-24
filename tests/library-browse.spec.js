@@ -11,7 +11,7 @@ test('one button opens every folder, and again closes them all; what is open is 
   const { errors } = await open(page);
   await expect(page.locator('#ltog')).toHaveAttribute('aria-label', 'Expand all folders');
   await page.click('#ltog');
-  await expect(tiles(page)).toHaveCount(463);                           // every built-in shape, under its own set
+  await expect(tiles(page)).toHaveCount(474);                           // every built-in shape, under its own set
   await expect(page.locator('#ltog')).toHaveAttribute('aria-label', 'Collapse all folders');
   await page.click('#ltog');
   await expect(tiles(page)).toHaveCount(0);

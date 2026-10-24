@@ -9,7 +9,7 @@ test('every switch is a slider except Colours; the old on/off choices are 100 an
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'rand');
   const kinds = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('[data-ft]')].map(c => [c.dataset.ft, c.type === 'range' ? c.value : c.checked])));
-  expect(kinds).toEqual({ stamps: '100', text: '100', layout: '0', frame: '100', shape: '0', size: '0', free: '100', col: true, gr: '100', masks: '100', tx: '100', pr: '100', look: '0', jit: '100' });
+  expect(kinds).toEqual({ stamps: '100', text: '100', layout: '0', frame: '100', size: '0', free: '100', col: true, gr: '100', masks: '100', tx: '100', pr: '100', look: '0', jit: '100' });
   await set(page, 'frame', 35);
   await page.reload(); await page.waitForFunction(() => document.fonts.status === 'loaded'); await settle(page);
   await openPanel(page, 'rand');

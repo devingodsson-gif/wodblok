@@ -17,7 +17,7 @@ const meta = page => page.evaluate(() => { const s = JSON.parse(window.__wbTest.
 test('the File menu has both template items and the picker lists three kinds with Blank first', async ({ page }) => {
   const { errors } = await openApp(page);
   await page.click('#fileb');
-  await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save projectCtrl+S', 'Save project as…', 'Save as template…', 'Import image as motif…', 'Export…', 'Settings…']);
+  await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save projectCtrl+S', 'Save project as…', 'Save as template…', 'Import image as shape…', 'Export…', 'Settings…']);
   await page.click('#tpnew');
   await expect(page.locator('#tpty button')).toHaveText(['Free canvas', 'Repeat tile', 'Book cover']);
   for (const k of ['canvas', 'tile', 'book']) {

@@ -1,9 +1,9 @@
 {
- "length": 553991,
- "sha256": "39cd7b62f683c4de8647c3edc916f0d6756a88a4c05b9311e34fa2766dcef110",
+ "length": 553802,
+ "sha256": "1a0bb558ce79499e53fccf72c520c0929013a3edab8bdd3c0fb4b2eb7f412faa",
  "tags": {
   "circle": 179,
-  "clipPath": 8,
+  "clipPath": 7,
   "defs": 7,
   "feColorMatrix": 15,
   "feComponentTransfer": 20,
@@ -24,7 +24,7 @@
   "g": 212,
   "image": 23,
   "mask": 156,
-  "path": 99,
+  "path": 98,
   "rect": 191,
   "svg": 1,
   "symbol": 19,

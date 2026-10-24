@@ -99,7 +99,7 @@ test('history steps are named by what was done, and typing in a text is one step
   const e0 = (await els(page, 'motif'))[0], c = await H.canvasToClient(page, e0.x, e0.y);
   await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.move(c.x + 50, c.y + 30, { steps: 5 }); await page.mouse.up(); await H.settle(page); await page.waitForTimeout(700);
   const L = async () => page.evaluate(() => window.__wbTest.histLabels());
-  expect((await L()).slice(-1)[0], 'a move is named').toBe('Moved motif');
+  expect((await L()).slice(-1)[0], 'a move is named').toBe('Moved shape');
   await page.keyboard.press('Escape');
   await page.click('#elb [data-k="text"]'); await H.settle(page);
   const b0 = await page.locator('#art').boundingBox();

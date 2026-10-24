@@ -9,7 +9,7 @@ const has = (s, f) => f(s);
 const pats = s => s.els.filter(q => q.k === 'pattern').length;
 const texts = s => s.tiles.reduce((n, t) => n + t.items.filter(i => i.tg).length, 0) + s.els.filter(p => p.tx).length;
 const SAMPLES = [
-  { file: 'project-1-diamond.wodblok', name: 'Sample diamond', shape: 'diamond', chars: 90000, ok: s => s.dim.k === 'diamond' || s.dim.cs === 'diamond' ? (s.els.length >= 4 && pats(s) >= 2 && s.tiles.some(t => t.neg) && ((s.grade || {}).masks || []).length >= 1) : false },
+  { file: 'project-1-diamond.wodblok', name: 'Sample diamond', shape: 'diamond', chars: 90000, ok: s => s.dim.k === 'diamond' ? (s.els.length >= 4 && pats(s) >= 2 && s.tiles.some(t => t.neg) && ((s.grade || {}).masks || []).length >= 1) : false },
   { file: 'project-3-rect-16x9.wodblok', name: 'Sample wide', asp: [16, 9], chars: 90000, ok: s => s.els.length >= 3 && s.els.some(q => (q.fx || []).length) },
   { file: 'project-4-rect-4x3.wodblok', name: 'Sample busy', asp: [4, 3], chars: 110000, ok: s => s.tiles.length >= 6 && s.els.length >= 5 && texts(s) >= 1 },
 ];
@@ -23,7 +23,6 @@ const SAMPLES = [
       const page = await ctx.newPage();
       await openApp(page, { seed });
       await openPanel(page, 'canvas');
-      if (sm.shape) await page.click(`#cshp [data-s="${sm.shape}"]`);
       if (sm.asp) { await page.fill('#caw', String(sm.asp[0])); await page.dispatchEvent('#caw', 'change'); await page.fill('#cah', String(sm.asp[1])); await page.dispatchEvent('#cah', 'change'); }
       await settle(page);
       await page.click('#rzdo'); await settle(page, { max: 60000 });

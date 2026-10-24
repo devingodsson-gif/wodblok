@@ -10,7 +10,7 @@ test('library search finds motifs by name across folders and clears back', async
   const name = await page.evaluate(() => { const b = document.querySelector('#lib button[data-m]'); return b ? b.getAttribute('aria-label') : null; });
   await page.fill('#lq', 'zzzzqq'); await settle(page);
   expect(await tiles()).toBe(0);
-  await expect(page.locator('#lib .lmt')).toHaveText('No motifs found');
+  await expect(page.locator('#lib .lmt')).toHaveText('No shapes found');
   await page.fill('#lq', ''); await settle(page);
   expect(await page.locator('#lib .lrw').count()).toBe(folders);
   if (name) {

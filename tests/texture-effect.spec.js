@@ -3,7 +3,7 @@ const { test, expect } = require('@playwright/test');
 const { openApp, settle, getState, addShape } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
-const sheetOf = d => (d.els || []).find(q => q.k === 'shape');
+const sheetOf = d => (d.els || []).find(q => q.k === 'motif' && !q.bgd);
 const addEffect = async (page, kind, label) => {
   await page.locator(`.fxg[data-fxk="${kind}"] .fxadd`).scrollIntoViewIfNeeded();
   await page.click(`.fxg[data-fxk="${kind}"] .fxadd`);
@@ -15,9 +15,9 @@ const setRange = (page, sel, v) => page.evaluate(([s, v]) => { const e = documen
 test('the Texture effect has Type, Strength, Scale and Light from, and each effect keeps its own settings', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addShape(page); await settle(page);
-  await addEffect(page, 'shape', 'Texture');
-  await addEffect(page, 'shape', 'Texture');
-  const g = '.fxg[data-fxk="shape"]';
+  await addEffect(page, 'motif', 'Texture');
+  await addEffect(page, 'motif', 'Texture');
+  const g = '.fxg[data-fxk="motif"]';
   for (const c of ['.fxst', '.fxsa', '.fxsc', '.fxsz']) await expect(page.locator(`${g} ${c}`)).toHaveCount(1);
   for (const c of ['.fxsa', '.fxsc', '.fxsz']) await expect(page.locator(`${g} ${c}`)).toBeVisible();
   const opts = await page.locator(`${g} .fxst option`).evaluateAll(o => o.map(x => x.value));
@@ -46,8 +46,8 @@ test('Variations, Presets, Workspaces, Navigator, Textures and Grade are no long
 test('a Shape\'s texture does not scale with the Shape: the same feature size at half and at double the width', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
   await addShape(page); await settle(page);
-  await addEffect(page, 'shape', 'Texture');
-  const s0 = await st(page), p0 = s0.els.find(q => q.k === 'shape' && q.nm !== 'Background');
+  await addEffect(page, 'motif', 'Texture');
+  const s0 = await st(page), p0 = s0.els.find(q => q.k === 'motif' && !q.bgd);
   const feature = async w => {
     const s = JSON.parse(JSON.stringify(s0)); const p = s.els.find(q => q.u === p0.u); p.s = w; p.wy = 1; p.fx.forEach(e => { e.md = 'wear'; });
     await page.evaluate(j => window.__wbTest.apply(j), JSON.stringify(s)); await settle(page);
