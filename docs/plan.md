@@ -744,7 +744,7 @@ Step 1 of the fix plan made from the 2.23 review (five releases, 2.24.0 to 2.28.
 - **Darkness**: in filter mode Halftone, Line Screen and Stipple read 1 minus brightness (blurred by Spread) instead of the shape's alpha, and their gaps take the Background's colour (white without one); Ink Bleed swells the dark parts (erode) and stays soft; Misregistration offsets the dark parts (light paper ignored) and prints them over the picture (multiply); Dust's holes show the paper colour.
 - **Clicks** go through a filter shape (like the Background); it is picked from the Elements list. The marquee skips it too.
 - **Speed**: the picture under a filter is drawn twice. A 144-stamp pattern under a canvas-sized filter painted in 107 ms with no filter, 144 ms with an empty one, 153 to 288 ms with one effect (Halftone slowest). While something is dragged on the canvas the filter is left out and comes back when the drag ends (draft mode, `WBS.DRAFTCV`); a slider drag keeps it so the filter is seen while it is set. `npm run perf`: drag 1.004 times main.
-- **Not done**: a repeat tile does not copy the filter's outline to the neighbouring tiles (the picture under it is tiled; the outline is not).
+- **Repeat tile** (2.40.1): see that release.
 - Tests: `filter-shape-2-38` (the switch, and none for the Background; a heart greys only under it; strength 0; clicks go through; group scope; Halftone and Misregistration over a picture leave the paper alone).
 
 ### 2.39.0 (Oct 24 2026): Randomize uses the new effects and Filter shapes. Format 27 unchanged
@@ -767,4 +767,10 @@ Step 1 of the fix plan made from the 2.23 review (five releases, 2.24.0 to 2.28.
 - **Style**: the accent colour, as the selection box (no new colour). `docs/developing-wodblok.md` 9.10 describes it. Owner, Oct 24 2026: keep the accent for now (a dedicated guide colour, as Photoshop's magenta, was offered). a `--guide` token would need the owner's word.
 - Also: `fpHid` is now exported from 25 (28 used it without importing it).
 - Tests: `smart-guides-2-40` (canvas middle with a line, Alt, guides cleared on release; edge match; the middle between two with two gap marks; several selected as one box, Escape; a side pull; the settings page and the command).
+
+### 2.40.1 (Oct 24 2026): a Filter shape wraps on a repeat tile. Format 27 unchanged
+- **Owner**: the known gap from 2.38.0 ("a repeat tile does not copy the filter's outline to the neighbouring tiles").
+- **Fix**: a Filter shape's piece is now two parts (the picture drawn so far, and the masked, filtered copy; `@@FSPLIT@@` in `mtFilter`, 74). On a repeat tile `elDraw` copies the filtered copy to the neighbouring tiles the way every other element is copied, so the part of the shape that runs off one edge comes back on the opposite one (and shows in Repeat 3 × 3). The picture part is not copied again (it already is).
+- **Guides on a repeat tile**: no change; they work on the tile itself, as on any canvas.
+- Tests: `filter-tile-2-40-1` (a grey Filter shape centred on the right edge also greys the left edge; it fails on 2.40.0). `filter-shape-2-38` still passes.
 

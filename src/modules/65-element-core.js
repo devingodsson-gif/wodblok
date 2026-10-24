@@ -40,7 +40,7 @@ for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
  if(G){let j=i;while(j<its.length&&its[j].path[d]&&its[j].path[d].u==G.u)j++;const inner=render(its.slice(i,j),d+1);i=j-1;emit();flush();out+=gWrap(G,T(inner));continue}
  const q=it.q;if(q.v===false)continue;const k=elKind(q),r=R[k];if(!r)continue;const s=r[4].get(String(q.u));if(s==null)continue;const a=elOB(q);
  // a filter (2.38.0: a shape in Filter mode) takes what is drawn so far at this level (only its group's members inside a group) and redraws it through its effects
- if(q.flt&&s.includes('@@UNDER@@')){emit();flush();const fid='flu'+li+'_'+gid(q)+'_'+d;out=s.split('@@UNDER@@').join(out).split('@@UID@@').join(fid);continue}
+ if(q.flt&&s.includes('@@UNDER@@')){emit();flush();const fid='flu'+li+'_'+gid(q)+'_'+d;{const[pa,pb]=s.split('@@FSPLIT@@');out=pa.split('@@UNDER@@').join(out).split('@@UID@@').join(fid)+(pb?T(pb.split('@@UID@@').join(fid),false):'')}continue}   // 2.40.1: on a repeat tile the filtered copy (the shape's outline and its effects) is copied to the neighbouring tiles
  if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a;wn=!!EL_K[k].notile}wb+=r[2]+s+r[3];continue}
  emit();if(k!==run){flush();run=k}buf+=s}
 flush();emit();return out}

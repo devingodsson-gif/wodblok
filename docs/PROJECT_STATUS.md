@@ -4,7 +4,7 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**As of Oct 24 2026.** `main` is at **2.40.0** (smart guides; before that Randomize uses the new effects and Filter shapes; before that Fit/Stretch to canvas, Filter mode, Noise, Blur, Print and Distort effects; file format 27). Branch `feat/2.40.0-smart-guides` holds 2.40.0: smart guides (snapping and guide lines while dragging and pulling a side; Settings > Guides; command Smart guides, Mod+;). Merged to `main` at the owner's word. Tested: `smart-guides-2-40` and the drag, selection, resize, align, text box, settings, shortcut and command specs; `npm run perf`; `npm run check:style`. Not run: the full suite (about 45% importance: it changes dragging, not drawing or files), WebKit. Guide colour: the accent for now (owner, Oct 24 2026).
+**As of Oct 24 2026.** `main` is at **2.40.0** (smart guides; file format 27). Branch `fix/2.40.1-repeat-tile-filter` holds 2.40.1: a Filter shape wraps round the edges of a repeat tile (the 2.38.0 gap). Pushed, not merged. Tested: `filter-tile-2-40-1`, the Filter, repeat-tile and drawing specs, `npm run perf`. The full suite (the CI shard suite via a pull request labelled `run-suite`) is next, at the owner's word. Not run so far: the full suite and WebKit since 2.36.0 (2.37.0 to 2.40.0 went live without them).
 
 ## Direction
 - A professional, minimal, clean editor in the class of Photoshop and Lightroom (the owner's reference applications). Web app first; Mac, Windows and mobile later and not blocked. A commercial product, sold later; the repo is public until then.
