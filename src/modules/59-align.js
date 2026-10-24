@@ -52,7 +52,7 @@ function init59(){
   ['al_dv','Distribute down','d','y',alIc(ICN.distY),()=>alSpread('y')]];
  const row=$('lalr');row.innerHTML=X.map(([id,t,k,,svg])=>`<button class="ib" type="button" id="${id}" data-k="${k}" disabled aria-label="${t}" title="${t}">${svg}</button>`).join('');
  X.forEach(([id,,,,,fn])=>{$(id).onclick=fn});
- // in the Element group, under Position (the Align group stays hidden; 2.37.0)
+ // in the Element group, under Position (2.37.0)
  {const at=$('lfpxy')||row;at.insertAdjacentHTML('afterend','<div class="row" id="lalfit" hidden><button type="button" class="alt" id="al_fit" data-k="f" disabled>Fit to canvas</button><button type="button" class="alt" id="al_str" data-k="f" disabled>Stretch to canvas</button></div>');
  }
  $('al_fit').onclick=()=>alCanvas(true);$('al_str').onclick=()=>alCanvas(false);
