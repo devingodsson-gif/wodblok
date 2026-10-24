@@ -26,10 +26,10 @@ test('launch has no settings window open, and File > Settings… is the last Fil
   expect(errors).toEqual([]);
 });
 
-test('the dialog has six pages, opens on General, keeps arrow-key order, closes on Esc and returns focus', async ({ page }) => {
+test('the dialog has seven pages, opens on General, keeps arrow-key order, closes on Esc and returns focus', async ({ page }) => {
   const { errors } = await openApp(page);
   await open(page);
-  await expect(page.locator('#stgnav button')).toHaveText(['General', 'Colour', 'Speed', 'Files', 'Shortcuts', 'About']);
+  await expect(page.locator('#stgnav button')).toHaveText(['General', 'Colour', 'Guides', 'Speed', 'Files', 'Shortcuts', 'About']);
   await expect(page.locator('#stgnav [data-p="general"]')).toHaveAttribute('aria-selected', 'true');
   await page.keyboard.press('ArrowDown');
   await expect(page.locator('#stgnav [data-p="colour"]')).toHaveAttribute('aria-selected', 'true');

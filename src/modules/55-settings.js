@@ -7,7 +7,7 @@ import {setTrayView,TRAY_MAX} from './50-tray-core.js';
 import {setAutosaveEvery} from './38-crash-recovery.js';
 import {paintDock} from './52-tray-ui.js';
 import {acAccount} from '../platform/account.js';
-import {SG_DIST,SG_K,sgDist,sgFlag,sgSet} from './84-smart-guides.js';
+import {SG_DIST,SG_K,sgDist,sgFlag,sgSet,sgSyncBox} from './84-smart-guides.js';
 // ===== Settings =====
 // One dialog, seven pages (General, Colour, Guides, Speed, Files, Shortcuts, About). Every control here changes something that already exists in the
 // app and is remembered in the settings record (kv). Nothing opens at launch; the dialog opens from File > Settings… or the command.
@@ -114,7 +114,7 @@ function stWire(){const b=$('stgbody');
   const rows=stKeys().filter(c=>!stKeyQ||(c.label+' '+c.shortcut).toLowerCase().includes(stKeyQ.toLowerCase()));
   $('stgkl').innerHTML=rows.map(c=>`<div class="stgkr"><span>${stEsc(c.label)}</span><kbd>${stEsc(cmdFormatShortcut(c.shortcut,m))}</kbd></div>`).join('')||'<div class="stgkr"><span>No match</span></div>'})}
 // Guides: with smart guides off the rows under the switch rest; Equal spacing needs Snap to elements
-function stSgSync(){const on=sgFlag(SG_K.on,true),el=sgFlag(SG_K.el,true);['stgsc','stgse'].forEach(id=>{const e=$(id);if(e)e.disabled=!on});
+function stSgSync(){const on=sgFlag(SG_K.on,true),el=sgFlag(SG_K.el,true);sgSyncBox();['stgsc','stgse'].forEach(id=>{const e=$(id);if(e)e.disabled=!on});
  const sp=$('stgss');if(sp)sp.disabled=!on||!el;const d=$('stgsd');if(d)d.querySelectorAll('button').forEach(b=>{b.disabled=!on})}
 // the swatch row follows the stored accent (the picker changes it live)
 function stAccentMarks(){const g=$('stgacc');if(!g)return;const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur),n=$('stgan');if(n)n.textContent=stAccentName(cur);

@@ -100,10 +100,12 @@ test('Settings > Guides: the switches, the distance, and the command', async ({ 
   await expect(page.locator('#stgss')).toBeDisabled();
   await page.locator('#stgse').click();
   await page.locator('#stgsg').click();
+  await expect(page.locator('#pgsg')).not.toBeChecked();
   for (const id of ['stgsc', 'stgse', 'stgss']) await expect(page.locator('#' + id)).toBeDisabled();
   // the command turns it back on and the open page follows
   await page.evaluate(() => __wbTest.commands.run('view.smartGuides')); await settle(page);
   await expect(page.locator('#stgsg')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#pgsg')).toBeChecked();   // the Grid panel's tick box is the same switch
   // Snap to canvas off: the canvas middle no longer pulls
   await page.locator('#stgsc').click();
   await page.keyboard.press('Escape'); await settle(page);

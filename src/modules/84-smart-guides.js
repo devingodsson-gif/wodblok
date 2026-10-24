@@ -76,8 +76,10 @@ function sgPullShow(X){if(!X.sgOn||!X.sg)return;const b=sgBox(X.p);WBS.sgG=b?sgD
 const sgClear=()=>{WBS.sgG=''};
 // Settings > Guides (55-settings.js) reads and writes these
 const sgSet=(k,v)=>{try{kv.set(SG_K[k],typeof v=='boolean'?(v?'1':'0'):String(v))}catch(e){}};
-function sgToggle(){const on=!sgFlag(SG_K.on,true);sgSet('on',on);pmsg(on?'Smart guides on.':'Smart guides off.');if(WBX.wbStgSync)WBX.wbStgSync()}
-function init84(){WBS.sgG='';
- cmdRegister({id:'view.smartGuides',label:'Smart guides',shortcut:'Mod+;',run:sgToggle});
- document.addEventListener('keydown',e=>{const t=e.target;if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&!e.altKey&&e.key==';'&&!(t.matches&&t.matches('input,textarea,select,[contenteditable]'))){e.preventDefault();sgToggle()}})}
-export {SG_DIST,SG_K,init84,sgClear,sgDist,sgFlag,sgMove,sgPull,sgPullShow,sgSet};
+// The switch is also the Smart guides tick box in the Grid panel, next to Snap to grid (#pgsg); the command and Mod+; click it.
+function sgToggle(on){sgSet('on',on);pmsg(on?'Smart guides on.':'Smart guides off.');if(WBX.wbStgSync)WBX.wbStgSync()}
+const sgSyncBox=()=>{const c=$('pgsg');if(c)c.checked=sgFlag(SG_K.on,true)};
+function init84(){WBS.sgG='';const c=$('pgsg');if(c){sgSyncBox();c.addEventListener('change',()=>sgToggle(c.checked))}
+ cmdRegister({id:'view.smartGuides',label:'Smart guides',elId:'pgsg',shortcut:'Mod+;',run:()=>$('pgsg').click()});
+ document.addEventListener('keydown',e=>{const t=e.target;if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&!e.altKey&&e.key==';'&&!(t.matches&&t.matches('input,textarea,select,[contenteditable]'))){e.preventDefault();$('pgsg').click()}})}
+export {SG_DIST,SG_K,init84,sgClear,sgSyncBox,sgDist,sgFlag,sgMove,sgPull,sgPullShow,sgSet};
