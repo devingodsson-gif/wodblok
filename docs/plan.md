@@ -706,3 +706,17 @@ Step 1 of the fix plan made from the 2.23 review (five releases, 2.24.0 to 2.28.
 ### 2.34.0 (Oct 23 2026): Find a stamp. Format 27 unchanged
 - **Stamp library search**: a "Find a stamp" field above the saved stamps in the Stamp panel's Library group, like Find a tray and Find a shape. Words filter the saved stamps by name (all words must match); the count shows "N found"; no match shows "No matching stamp"; clearing restores the list. The library is a flat list, so there are no folders to search across.
 - Tests: `stamp-library-search-2-34`.
+
+### 2.35.0 (Oct 23 2026): Noise, Blur and Halftone effects. Format 27 unchanged
+- **Owner**: "add some different noise/grain effects and some blur effects ... the top noise and blurs from Photoshop ... in a section on the effect drop down menu so it would say Noise >"; then "Let's not do radial" and "also do half tone".
+- **Add effect menu**: Noise › and Blur › open a flyout beside the menu on hover, click, Enter or Right Arrow (Left Arrow or Escape goes back). Halftone is its own item. `rowMenu` items take a fourth field, a list of sub-items (04-canvas-and-stamp-outlines.js); an effect's `grp` puts it in a flyout.
+- **Effects** (module `83-filter-effects.js`; one SVG filter each, sized to the element, chained with Colour grade in list order by `fxGr`):
+  - Add Noise: Amount, Size, Distribution (Gaussian, Uniform), Monochromatic, Reroll.
+  - Film Grain: Amount, Size, Clumping, Reroll (always mono).
+  - Dust & Scratches: Dust, Size, Scratches, Show as (Holes, Dark specks), Reroll. It adds dust; it is not Photoshop's dust remover.
+  - Gaussian Blur: Radius. Motion Blur: Distance, Angle (the blur runs in a turned frame).
+  - Halftone: Dot size, Ink, Angle, Spread. The element becomes a grid of dots in its own colour; Spread makes the dots shrink toward the edges. Different from the Texture type "Halftone Dots".
+- Settings are declared per effect (ranges, menus, checkboxes) and drawn by the effect stack; any later filter effect is one entry in `FQ`.
+- Not in Randomize. Radial blur is not done (owner). Format stays 27: older builds ignore effect kinds they do not know, and a format bump would refuse every saved 27 file.
+- On a pattern the effects apply to each placement, as the others do. Speed: a 144-stamp pattern painted in 94 ms plain and 103 to 185 ms with one of these effects (Halftone slowest), measured by screenshot.
+- Tests: `noise-blur-effects-2-35` (menu and flyouts by mouse and keyboard, every effect's filter, settings, Undo, text and pattern, a Halftone export has less ink but not none); `element-effects` and `element-paint` list the new menu items.

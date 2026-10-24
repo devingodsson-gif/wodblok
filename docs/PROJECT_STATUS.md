@@ -4,14 +4,14 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**As of Oct 23 2026.** `main` is at **2.32.1** (Shape is the word; the canvas is always a rectangle; file format 27). Branch `feat/2.33.0-tidy` holds 2.33.0 (the Background follows the canvas size, sample projects without a canvas shape, spec fixes after the first full run since 2.30); the 17 stale pixel goldens were regenerated with the owner's approval.
+**As of Oct 23 2026.** `main` is at **2.34.0** (Find a stamp; file format 27). Branch `feat/2.35.0-noise-blur` holds 2.35.0: Noise › (Add Noise, Film Grain, Dust & Scratches), Blur › (Gaussian Blur, Motion Blur) and Halftone effects, with flyouts in the Add effect menu; format 27 unchanged. Tested: the new spec and the 16 specs that touch menus and effects. Not run: the full suite, WebKit, `npm run perf`.
 
 ## Direction
 - A professional, minimal, clean editor in the class of Photoshop and Lightroom (the owner's reference applications). Web app first; Mac, Windows and mobile later and not blocked. A commercial product, sold later; the repo is public until then.
 - Styling is heading toward the Photoshop interface (dark neutral greys, dense panels). The UI standard is Part 9 of `docs/developing-wodblok.md`; a restyle changes that guide first.
 
 ## What exists now (from `docs/plan.md`, 2.2.0 to 2.15.0)
-- **Element model.** One ordered list of elements (no layers). Kinds: Motif, Text, Stamp, Pattern (Paint exists but its button is hidden; the Shape element is gone since 2.31.0). Each element can carry an ordered stack of effects (Texture, Colour grade, Jitter, Pressure offset, Morph, stamp settings).
+- **Element model.** One ordered list of elements (no layers). Kinds: Motif, Text, Stamp, Pattern (Paint exists but its button is hidden; the Shape element is gone since 2.31.0). Each element can carry an ordered stack of effects (Texture, Colour grade, Jitter, Pressure offset, Add Noise, Film Grain, Dust & Scratches, Gaussian Blur, Motion Blur, Halftone, Morph, stamp settings).
 - **Add bar** (Motif, Text, Stamp, Pattern): a button only opens that kind's panel; the panel starts with the list of that kind and an Add button. Motifs and Stamps picked from a library follow the pointer and place on each click.
 - **Motifs took over the Shape element (2.31.0).** The 11 old presets are the Basic shapes motifs (fixed outlines, the first set of the library; the pen is gone). Every motif (on the canvas, in a stamp, as a pattern's source) can be stretched, have no fill or an image in place of its colour, and an outline (`mtDraw` in 74-motif-element.js; the groups are in 82-motif-look.js). Text and Pattern can Map to a Basic shapes motif. A click picks a motif by its outline.
 - **Background** (2.27.0) is an element: a Rectangle motif the size of the canvas, in the first tray colour, skipped by canvas clicks.

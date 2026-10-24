@@ -9,6 +9,7 @@ import {fpU} from './24-free-place-layers.js';
 import {elKind,elSel,fxDef,fxFor,fxOf,fxRegister} from './65-element-core.js';
 import {patCur} from './67-pattern-element.js';
 import {paCur} from './70-paint-element.js';
+import {fqRegister,fqVal} from './83-filter-effects.js';
 
 // ===== The effect stack (element update, step 7, 2.1.7): an ordered list `fx` on an element, each {u, k, on, ...settings}, shown at the bottom of the element's panel.
 // An effect can be switched off, moved up or down, and deleted; several of a kind are allowed. Effects that apply to a pattern apply to every placement.
@@ -23,7 +24,9 @@ const tl=!!b.tl&&tileOn(),v=tl?txImgs(s,b.W,b.H,R,'host',txIsW,b.x,b.y,true):txI
 const f=tl?txFilt(s,b.x,b.y,b.W,b.H,R,[0,0]):txFilt(s,b.x,b.y,b.W,b.H,R);if(f)attrs+=` filter="url(#${f})"`;return attrs?{defs,attrs}:null}
 // Colour grade {ex ct hi sh wh bl tp tn sat vib hue fd}: the Grade panel's adjustments for one element. Returns {defs, wrap(markup)}: the markup inside one filter per grade effect, in the element's own units for a box b. null = no grade
 const GRL=[['ex','Exposure',-100,100],['ct','Contrast',-100,100],['hi','Highlights',-100,100],['sh','Shadows',-100,100],['wh','Whites',-100,100],['bl','Blacks',-100,100],['tp','Temperature',-100,100],['tn','Tint',-100,100],['sat','Saturation',-100,100],['vib','Vibrance',-100,100],['hue','Hue',-180,180],['fd','Fade',0,100]];
-function fxGr(q,id,b){if(!WBX.wbGrade||!WBX.wbGrade.elF)return null;const es=fxOn(q).filter(e=>e.k=='grade'),ds=[];es.forEach((e,i)=>{const d=WBX.wbGrade.elF(e,id+'_'+i,b.x,b.y,b.W,b.H);if(d)ds.push([id+'_'+i,d])});if(!ds.length)return null;return{defs:ds.map(d=>d[1]).join(''),wrap:c=>ds.reduce((o,d)=>`<g filter="url(#${d[0]})">${o}</g>`,c)}}
+// 2.35.0: the filter effects (Noise, Blur, Halftone; 83-filter-effects.js) chain with the grades in list order, the first one innermost
+function fxGr(q,id,b){const ds=[];fxOn(q).forEach((e,i)=>{const fid=id+'_'+i;if(e.k=='grade'){if(!WBX.wbGrade||!WBX.wbGrade.elF)return;const d=WBX.wbGrade.elF(e,fid,b.x,b.y,b.W,b.H);if(d)ds.push({defs:d,wrap:c=>`<g filter="url(#${fid})">${c}</g>`});return}
+ const def=fxDef(e.k);if(def&&def.filt){const r=def.filt(e,fid,b,q);if(r)ds.push(r)}});if(!ds.length)return null;return{defs:ds.map(d=>d.defs).join(''),wrap:c=>ds.reduce((o,d)=>d.wrap(o),c)}}
 // the box a grade filter covers: the element's box with room round it, as for a stamp
 const fxPad=(x,y,W,H)=>{const p=Math.max(W,H)*.15;return{x:x-p,y:y-p,W:W+2*p,H:H+2*p}};
 // pressure for one element: null when it has none of its own (the layer's setting then applies)
@@ -74,6 +77,7 @@ ${GRL.map(([k,n,a,b])=>`<div class="ctl"><label>${n}</label><input type="range" 
 <div class="ctl"><label>Pressure</label><input type="range" class="fxpp" min="0" max="10" value="4" data-def="4"></div>
 <div class="ctl"><label>Flooding</label><input type="range" class="fxpf" min="0" max="10" value="0" data-def="0"></div>
 </div>
+${fxFor(kind).filter(d=>d.pane).map(d=>d.pane()).join('')}
 </div><div class="fxl fxl2"></div>
 </div></details>`}
 function fxSync(){if(!WBS.layers||!WBS.proj)return;document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,t=fxTarget(kind);if(g.hidden!==!t)g.hidden=!t;if(!t)return;const list=fxOf(t),sel=list.find(e=>e.u==SEL[kind])||null;
@@ -85,6 +89,7 @@ g.querySelectorAll('.fxs').forEach(s=>{const on=!!sel&&s.dataset.e==sel.k;if(s.h
 if(sel&&sel.k=='texture'){const L=txLib(sel.x)||{t:Object.keys(TXN)[0],a:40,sc:100,az:225},st=g.querySelector('.fxst'),sm=g.querySelector('.fxsm'),set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};if(st.value!==L.t)st.value=L.t;set('.fxsa',+L.a);set('.fxsc',+L.sc);set('.fxsz',+L.az);if(sm.value!==(sel.md||'wear'))sm.value=sel.md||'wear'}
 if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxjp',+sel.pos||0);set('.fxjr2',+sel.rot||0);set('.fxjz',+sel.sz||0);g.querySelector('.fxjh').checked=!!sel.fh;g.querySelector('.fxjv').checked=!!sel.fv}
 if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=g.querySelector('.fxg_'+k),v=+sel[k]||0;if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}});
+if(sel){const d=fxDef(sel.k),pane=d&&d.sync&&g.querySelector(`.fxs[data-e="${sel.k}"]`);if(pane)d.sync(pane,sel)}
 if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxpp',+sel.pst||0);set('.fxpf',+sel.pfl||0)}})}
 function init69(){
 // the Elements list opens an effect: select its element, show its panel, open that effect's settings
@@ -93,9 +98,17 @@ fxRegister('texture',{label:'Texture',kinds:['stamp','text','pattern','paint','m
 fxRegister('pressure',{label:'Pressure offset',kinds:['stamp','pattern'],make:()=>({k:'pressure',on:true,pst:4,pfl:0})});
 fxRegister('jitter',{label:'Jitter',kinds:['stamp','text','pattern','motif'],make:()=>({k:'jitter',on:true,pos:20,rot:15,sz:0,sd:txRid()})});
 fxRegister('grade',{label:'Colour grade',kinds:['stamp','text','pattern','paint','motif'],make:()=>({k:'grade',on:true,...Object.fromEntries(GRL.map(r=>[r[0],0]))})});
+fqRegister();
 Object.entries(KIND_PANEL).forEach(([kind,pn])=>{const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec)return;sec.insertAdjacentHTML('beforeend',fxGroup(kind))});
 document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,tg=()=>fxTarget(kind),cur=()=>{const t=tg();return t?fxOf(t).find(e=>e.u==SEL[kind])||null:null};
-g.querySelector('.fxadd').onclick=e=>{e.stopPropagation();e.preventDefault();const t=tg();if(!t)return;rowMenu(e.currentTarget,fxFor(kind).map(d=>[d.label,()=>{const t2=tg();if(!t2)return;const f=d.make();f.u=fpU();(t2.fx=t2.fx||[]).push(f);SEL[kind]=f.u;fxCh()}]))};
+g.querySelector('.fxadd').onclick=e=>{e.stopPropagation();e.preventDefault();const t=tg();if(!t)return;const add=d=>()=>{const t2=tg();if(!t2)return;const f=d.make();f.u=fpU();(t2.fx=t2.fx||[]).push(f);SEL[kind]=f.u;fxCh()};
+ // effects with a group (Noise, Blur) sit in a flyout under the group's name, at the place of the group's first effect (2.35.0)
+ const items=[],grp={};fxFor(kind).forEach(d=>{const it=[d.label,add(d)];if(d.grp){if(!grp[d.grp]){grp[d.grp]=[d.grp,null,false,[]];items.push(grp[d.grp])}grp[d.grp][3].push(it)}else items.push(it)});
+ rowMenu(e.currentTarget,items)};
+// the declared settings of the filter effects: one listener for every field (data-q) and Reroll (data-qrr)
+const pn=g.querySelector('.fxpane');pn.addEventListener('input',ev=>{const el=ev.target.closest('[data-q]');if(!el)return;const ef=cur(),s=el.closest('.fxs');if(!ef||!s||ef.k!==s.dataset.e)return;const v=fqVal(el);if(ef[el.dataset.q]!==v){ef[el.dataset.q]=v;fxCh()}});
+pn.addEventListener('change',ev=>{const el=ev.target.closest('[data-q]');if(!el||el.type=='range')return;const ef=cur(),s=el.closest('.fxs');if(!ef||!s||ef.k!==s.dataset.e)return;const v=fqVal(el);if(ef[el.dataset.q]!==v){ef[el.dataset.q]=v;fxCh()}});
+pn.addEventListener('click',ev=>{const b=ev.target.closest('[data-qrr]');if(!b)return;const ef=cur(),s=b.closest('.fxs');if(ef&&s&&ef.k===s.dataset.e){ef.sd=txRid();fxCh()}});
 const fxDel=(t,i)=>{const L=t.fx||[],u=L[i]&&L[i].u;L.splice(i,1);if(!L.length)delete t.fx;if(SEL[kind]==u)SEL[kind]=null;fxCh()};
 const fxMv=(t,i,d)=>{const L=t.fx||[],j=i+d;if(j<0||j>=L.length)return;[L[i],L[j]]=[L[j],L[i]];fxCh()};
 const lists=[...g.querySelectorAll('.fxl')];let dragU=null;
