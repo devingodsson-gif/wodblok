@@ -295,8 +295,9 @@ rzPut(OWN,fzU);
 // 2.37.0 (owner Oct 24 2026): a roll that changes the canvas size refits a Background that covered the old canvas, once the roll's elements are all back (the refit inside setDim runs while they are held aside)
 if((CW!=cw0||CH!=ch0)&&WBX.wbBgFit){WBX.wbBgFit(cw0,ch0);store();upd()}
 // 2.39.0 (owner Oct 24 2026): Effects. The roll's new elements may get a Noise, Blur, Print or Distort effect, and a Filter shape may go on top (it replaces the last roll's).
+// Not on a repeat tile: a blur, a displacement or a filter over the whole canvas does not wrap round its edges, so the seams would show (frames and gradients are left out of a tile for the same reason).
 // With Stamps off it reworks the effects of what is there. It draws from its own number stream, so the rest of a seeded roll is unchanged.
-if(FT.efx){const own=new Set(OWN?OWN.own.map(q=>String(q.u)):[]),only=!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.free||FT.layout||FT.size||FT.look||FT.lib);
+if(FT.efx&&!(WBS.dim.rt&&!WBS.book.on)){const own=new Set(OWN?OWN.own.map(q=>String(q.u)):[]),only=!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.free||FT.layout||FT.size||FT.look||FT.lib);
  const n=rzEffectsEls(WBS.layers,{seed:tok+':'+JSON.stringify(WBS.layers),groups:['noise','blur','print','distort'].filter(k=>sOn('efx',k)),filter:sOn('efx','filter'),rework:!FT.stamps,isNew:q=>!own.has(String(q.u)),prev:new Set(!FT.stamps&&RZMADE?RZMADE.els:[]),only});
  if(n){store();upd()}}
 const txAll=(txReq?[[WBS.tiles[0],txReq]]:[]).concat(fzReqs);

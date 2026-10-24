@@ -86,3 +86,16 @@ test('only the ticked kinds are used; Filter shapes alone carry a colour grade',
   }
   expect(errors).toEqual([]);
 });
+
+test('on a repeat tile a roll adds no effects and no Filter shape (they do not wrap round the edges)', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await openPanel(page, 'canvas'); await page.click('#cfmt [data-f="tile"]'); await settle(page);
+  await openPanel(page, 'rand');
+  for (let i = 0; i < 4; i++) {
+    await roll(page);
+    const L = await els(page);
+    expect(fxOf(L).length + filters(L).length).toBe(0);
+  }
+  expect(errors).toEqual([]);
+});
+
