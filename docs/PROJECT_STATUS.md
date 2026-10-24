@@ -4,7 +4,7 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**As of Oct 23 2026.** `main` is at **2.34.0** (Find a stamp; file format 27). Branch `feat/2.35.0-noise-blur` (pushed, not merged) holds 2.35.0: Noise › and Blur › effects with flyouts in the Add effect menu. Branch `feat/2.36.0-print-distort` (on top of it) holds 2.36.0: Print › (Halftone, Line Screen, Stipple, Ink Bleed, Misregistration) and Distort › (Roughen, Ripple). Format 27 unchanged. Tested: `noise-blur-effects-2-35` and the specs that touch menus and effects. Not run: the full suite, WebKit, `npm run perf`.
+**As of Oct 24 2026.** `main` is at **2.36.0** (Noise, Blur, Print and Distort effects; file format 27). Branch `feat/2.37.0-fit-canvas` holds 2.37.0: Fit to canvas and Stretch to canvas for shapes, and a Randomize roll that changes the canvas size refits the Background. Next: 2.38.0, Filter mode for shapes (owner decisions recorded in docs/plan.md under 2.37.0). Open question: the Align group (`#lalsec`) is hidden in the page and nothing shows it; ask the owner whether to bring it back.
 
 ## Direction
 - A professional, minimal, clean editor in the class of Photoshop and Lightroom (the owner's reference applications). Web app first; Mac, Windows and mobile later and not blocked. A commercial product, sold later; the repo is public until then.

@@ -2,7 +2,7 @@ import {ICN,icAlign} from './00-icons.js';
 import {cmdRegister} from '../commands/registry.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,bk} from './04-canvas-and-stamp-outlines.js';
-import {store} from './06-motif-library-folders.js';
+import {mk,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpGrp} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
@@ -24,7 +24,23 @@ function alTo(fx,fy){const bs=alItems();if(!bs.length)return;const bb=alBounds(b
  if(!dx&&!dy)return;bs.forEach(b=>{b.p.x+=dx;b.p.y+=dy});alDone()}
 function alSpread(ax){const bs=alItems();if(bs.length<3)return;const lo=ax=='x'?'x0':'y0',hi=ax=='x'?'x1':'y1',k=ax,s=bs.slice().sort((a,b)=>(a[lo]+a[hi])-(b[lo]+b[hi]));const first=s[0],last=s[s.length-1],total=last[hi]-first[lo],sum=s.reduce((t,b)=>t+(b[hi]-b[lo]),0),gap=(total-sum)/(s.length-1);let pos=first[hi]+gap,ch=false;
  for(let i=1;i<s.length-1;i++){const b=s[i],d=pos-b[lo];if(Math.abs(d)>1e-6){b.p[k]+=d;ch=true}pos+=(b[hi]-b[lo])+gap}if(ch)alDone()}
-function alSync(){const n=alItems().length,g=$('lalsec');if(!g)return;g.querySelectorAll('button').forEach(b=>{b.disabled=b.dataset.k=='d'?n<3:!n})}
+// ===== Stretch to canvas and Fit to canvas (2.37.0, owner Oct 24 2026: "a button that makes them fit to the whole canvas size ... have both options").
+// For each selected shape: turned upright and centred, its drawn outline (not its box) made exactly the canvas size (stretch) or as large as fits with its proportions kept (fit).
+// The outline is measured once per shape from its own markup, in the shape's 100-unit frame (middle at 0,0).
+const OB=new Map();
+function alOutline(m){if(OB.has(m))return OB.get(m);let r={x:-50,y:-50,w:100,h:100};
+ try{let sv=document.getElementById('alob');if(!sv){sv=document.createElementNS('http://www.w3.org/2000/svg','svg');sv.id='alob';sv.setAttribute('aria-hidden','true');sv.style.cssText='position:absolute;width:0;height:0;overflow:hidden;visibility:hidden';document.body.appendChild(sv)}
+  sv.innerHTML=`<g>${mk(m,'#fff','#000')}</g>`;const b=sv.firstChild.getBBox();if(b.width>.01&&b.height>.01)r={x:b.x,y:b.y,w:b.width,h:b.height};sv.innerHTML=''}catch(e){}
+ OB.set(m,r);return r}
+const alShapes=()=>fpGrp().filter(p=>p&&p.k=='motif'&&p.m);
+function alCanvas(keep){const ps=alShapes();if(!ps.length)return;
+ ps.forEach(p=>{const o=alOutline(p.m),s=Math.max(1,+p.s||100);let w=s*(+p.wx||1),h=s*(+p.wy||1);
+  if(keep){const k=Math.min(CW/(w*o.w/100),CH/(h*o.h/100));w*=k;h*=k}else{w=CW*100/o.w;h=CH*100/o.h}
+  const f=+p.f||1;p.r=0;p.s=+w.toFixed(2);p.wy=+(h/w).toFixed(4);delete p.wx;
+  p.x=+(CW/2-f*(o.x+o.w/2)*w/100).toFixed(2);p.y=+(CH/2-(o.y+o.h/2)*h/100).toFixed(2)});
+ alDone()}
+function alSync(){const n=alItems().length,g=$('lalsec');if(!g)return;g.querySelectorAll('#lalg button,#lalr button').forEach(b=>{b.disabled=b.dataset.k=='d'?n<3:!n});
+ const fr=$('lalfit');if(fr){const sh=alShapes().length>0;if(fr.hidden===sh)fr.hidden=!sh;fr.querySelectorAll('button').forEach(b=>{if(b.disabled===sh)b.disabled=!sh})}}
 const alIc=b=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${b}</svg>`;
 function init59(){
  const g=$('lalg');if(!g)return;
@@ -36,7 +52,12 @@ function init59(){
   ['al_dv','Distribute down','d','y',alIc(ICN.distY),()=>alSpread('y')]];
  const row=$('lalr');row.innerHTML=X.map(([id,t,k,,svg])=>`<button class="ib" type="button" id="${id}" data-k="${k}" disabled aria-label="${t}" title="${t}">${svg}</button>`).join('');
  X.forEach(([id,,,,,fn])=>{$(id).onclick=fn});
+ // in the Element group, under Position (the Align group stays hidden; 2.37.0)
+ {const at=$('lfpxy')||row;at.insertAdjacentHTML('afterend','<div class="row" id="lalfit" hidden><button type="button" class="alt" id="al_fit" data-k="f" disabled>Fit to canvas</button><button type="button" class="alt" id="al_str" data-k="f" disabled>Stretch to canvas</button></div>');
+ }
+ $('al_fit').onclick=()=>alCanvas(true);$('al_str').onclick=()=>alCanvas(false);
  const cmds=[...ALN.map((t,i)=>['align.'+i,'Align: '+t,'al_'+Math.floor(i/3)+(i%3)]),...X.map(([id,t])=>['align.'+id.slice(3),'Align: '+t,id])];
+ cmds.push(['shape.fitToCanvas','Fit shape to canvas','al_fit'],['shape.stretchToCanvas','Stretch shape to canvas','al_str']);
  for(const [id,label,elId] of cmds)cmdRegister({id,label,elId,enabled:()=>{const b=$(elId);return!!b&&!b.hidden&&!b.disabled},run:()=>$(elId).click()});
  WBX.alSync=alSync;
 }
