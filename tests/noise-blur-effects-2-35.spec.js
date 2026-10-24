@@ -71,7 +71,7 @@ test('each effect draws its filter on a Shape, and they chain in list order', as
   expect(fx[5]).toMatchObject({ sz: 30, tone: 55, ang: 45, spr: 40 });
   expect(fx[6]).toMatchObject({ k: 'lines', ang: 45 });
   expect(fx[8]).toMatchObject({ k: 'bleed', amt: 20, rag: 30, soft: 30 });
-  expect(fx[9]).toMatchObject({ k: 'misreg', col: 'cyan', amt: 25 });
+  expect(fx[9]).toMatchObject({ k: 'misreg', col: '#00aeef', amt: 25 });
   const art = await page.evaluate(() => { const a = document.getElementById('art'), fs = [...a.querySelectorAll('filter')].map(f => f.innerHTML); return { turb: fs.filter(h => h.includes('feTurbulence')).length, blur: fs.filter(h => /feGaussianBlur in="SourceGraphic" stdDeviation="[\d.]+"\/?>/.test(h)).length, motion: fs.filter(h => /stdDeviation="[\d.]+ 0"/.test(h)).length, tile: fs.filter(h => h.includes('feTile')).length, turned: a.querySelectorAll('g[transform^="rotate"] > g[filter] > g[transform^="rotate"]').length }; });
   expect(art.turb).toBeGreaterThanOrEqual(3);
   expect(art.blur).toBeGreaterThanOrEqual(1);
@@ -174,7 +174,7 @@ test('Print and Distort effects change what is drawn, and Misregistration offset
     });
   };
   const plain = await ink();
-  const fxs = { lines: { k: 'lines', sz: 25, tone: 55, ang: 45, spr: 40 }, stipple: { k: 'stipple', sz: 20, den: 55, spr: 80, sd: 5 }, bleed: { k: 'bleed', amt: 40, rag: 0, soft: 30, sd: 5 }, misreg: { k: 'misreg', amt: 40, ang: 0, col: 'cyan' }, rough: { k: 'rough', amt: 40, sz: 30, sd: 5 }, ripple: { k: 'ripple', amt: 40, wl: 30, ang: 0 } };
+  const fxs = { lines: { k: 'lines', sz: 25, tone: 55, ang: 45, spr: 40 }, stipple: { k: 'stipple', sz: 20, den: 55, spr: 80, sd: 5 }, bleed: { k: 'bleed', amt: 40, rag: 0, soft: 30, sd: 5 }, misreg: { k: 'misreg', amt: 40, ang: 0, col: '#00aeef' }, rough: { k: 'rough', amt: 40, sz: 30, sd: 5 }, ripple: { k: 'ripple', amt: 40, wl: 30, ang: 0 } };
   const got = {};
   for (const [name, f] of Object.entries(fxs)) {
     const d2 = await st(page); shapeOf(d2).fx = [{ u: 'e1', on: true, ...f }];
