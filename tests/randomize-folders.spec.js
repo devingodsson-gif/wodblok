@@ -3,7 +3,8 @@ const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
 const roll = async page => { await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
-const usedKeys = async page => new Set([...(await getState(page)).matchAll(/"m":"(b\d+|i\|[^"]*)"/g)].map(m => m[1]));
+// the shapes a roll drew (a Filter shape, 2.39.0, draws nothing: its outline is a basic shape, not one from a folder)
+const usedKeys = async page => { const d = JSON.parse(await getState(page)); (d.els || []).forEach(q => { if (q.flt) delete q.m; }); return new Set([...JSON.stringify(d).matchAll(/"m":"(b\d+|i\|[^"]*)"/g)].map(m => m[1])); };
 const birdKeys = async page => {
   await openPanel(page, 'motifs');
   await page.locator('#lib .lfr[data-f="b:Birds"]').click();

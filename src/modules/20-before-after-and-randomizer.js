@@ -15,7 +15,7 @@ import {coreStr,pmsg} from './18-projects-and-cover-overlay.js';
 import {wbHold} from './19-randomize-and-hold.js';
 import {fpU} from './24-free-place-layers.js';
 import {SL,libColors,libMotifs} from './27-stamp-library.js';
-import {rzFrameEls,rzFx,rzLayoutEls,rzMainEls,rzPressEls} from './71-randomize-elements.js';
+import {rzEffectsEls,rzFrameEls,rzFx,rzLayoutEls,rzMainEls,rzPressEls} from './71-randomize-elements.js';
 // a layer that holds pictures or text boxes: Randomize keeps these
 const rzPic=l=>(l.pl||[]).some(p=>p.a||p.tx);
 // ===== v96 Before / after. `\` flips between the picture and the "before" (tap to stay, hold to peek); Shift+`\` splits the view with a draggable line.
@@ -48,20 +48,20 @@ function randomize0(fresh){const ft=WBX.wbRZ?WBX.wbRZ.get():null;window.SLC=[];
  if(ft&&ft.lib&&typeof SL!='undefined')return SL.list().then(l=>{window.SLC=(l||[]).filter(r=>r&&typeof r.tile=='string');return randomizeCore(fresh)},()=>randomizeCore(fresh));
  return randomizeCore(fresh)}
 function randomizeCore(fresh){const R=Math.random,pick=a=>a[Math.floor(R()*a.length)],rr=(a,b)=>a+R()*(b-a),ri=(a,b)=>Math.floor(rr(a,b+1)),ch=p=>R()<p,wpick=o=>{let t=R()*o.reduce((x,y)=>x+y[1],0);for(const x of o){if((t-=x[1])<=0)return x[0]}return o[0][0]};
-const FT=WBX.wbRZ?WBX.wbRZ.get():{stamps:1,text:1,frame:1,col:1,gr:1,masks:1,tx:1,pr:1,free:1,layout:0,size:0,look:0,lib:0,jit:1};
+const FT=WBX.wbRZ?WBX.wbRZ.get():{stamps:1,text:1,frame:1,col:1,gr:1,masks:1,tx:1,pr:1,free:1,layout:0,size:0,look:0,lib:0,jit:1,efx:1};
 // which kinds of change each switch allows (the arrows in the Randomize panel)
-const SUBS={};['stamps','frame','free','col','gr','masks','tx','pr','layout','size','look','lib','jit'].forEach(m=>SUBS[m]=WBX.wbRZ?WBX.wbRZ.sub(m):null);const sOn=(m,k)=>!SUBS[m]||SUBS[m].has(k);
+const SUBS={};['stamps','frame','free','col','gr','masks','tx','pr','layout','size','look','lib','jit','efx'].forEach(m=>SUBS[m]=WBX.wbRZ?WBX.wbRZ.sub(m):null);const sOn=(m,k)=>!SUBS[m]||SUBS[m].has(k);
 // An amount under 100 (the sliders in the Randomize panel) lets only some of a feature's allowed kinds of change happen on this roll (at least one), or, for a feature
 // without kinds, lets it happen on some rolls. At 100 nothing is drawn here, so a roll comes out exactly as it did before the sliders. Colours keep a plain switch.
 const AM=k=>WBX.wbRZ&&WBX.wbRZ.amt?WBX.wbRZ.amt(k):1;
-{const gated=[];['stamps','text','layout','frame','shape','size','free','gr','masks','tx','pr','look','jit'].forEach(m=>{const a=AM(m);if(!FT[m]||a>=1)return;const S=SUBS[m];
+{const gated=[];['stamps','text','layout','frame','shape','size','free','gr','masks','tx','pr','look','jit','efx'].forEach(m=>{const a=AM(m);if(!FT[m]||a>=1)return;const S=SUBS[m];
  if(S&&S.size>1&&m!='text'){const keep=[...S].filter(()=>ch(a));if(!keep.length)keep.push(pick([...S]));SUBS[m]=new Set(keep)}
  else if(!ch(a)){FT[m]=0;gated.push(m)}});
- if(gated.length&&!['stamps','frame','col','gr','masks','tx','pr','shape','free','layout','size','look','lib'].some(m=>FT[m]))FT[pick(gated)]=1}
+ if(gated.length&&!['stamps','frame','col','gr','masks','tx','pr','shape','free','layout','size','look','lib','efx'].some(m=>FT[m]))FT[pick(gated)]=1}
 const RAT={portrait:[[2,3],[3,4],[4,5],[5,7]],square:[[1,1]],landscape:[[3,2],[4,3],[7,5]],banner:[[1,2],[9,16],[2,1],[16,9]]},ratioPick=()=>{let a=[];if(FT.size)Object.keys(RAT).forEach(g=>{if(sOn('size',g))a=a.concat(RAT[g])});if(!a.length)a=[[2,3],[3,4],[4,5],[5,7],[1,1],[3,2],[4,3]];return pick(a)};
 const SLCn=(window.SLC||[]).length,libFree=!!(FT.lib&&sOn('lib','free')&&SLCn),libPat=!!(FT.lib&&sOn('lib','pat')&&SLCn);let libDone=false;
 const libTile=id=>{const r=pick(window.SLC);let t=null;try{t=JSON.parse(r.tile)}catch(e){}if(!t||!Array.isArray(t.items))return null;try{libMotifs({motifs:r.motifs});libColors({colors:r.colors})}catch(e){}txMerge(t);t.id=id;shOf(t);return t};
-if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.free||FT.layout||FT.size||FT.look||FT.lib)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
+if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.free||FT.layout||FT.size||FT.look||FT.lib||FT.efx)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
 const dim0=JSON.parse(JSON.stringify(WBS.dim));const cw0=CW,ch0=CH;   // 2.37.0: the canvas size before the roll, for the Background refit at the end
 if(!fresh&&WBX.wbCap)WBX.wbCap();
 const OWN=fresh||!FT.stamps?null:rzTake();   // 2.21.0: a roll that builds new stamps drops the previous roll and holds your own elements aside until the new ones are built (a roll that only reworks what is there, such as Layout or Colours alone, changes it in place)
@@ -294,6 +294,11 @@ if((FT.free||libFree)&&ch(.65)){
 rzPut(OWN,fzU);
 // 2.37.0 (owner Oct 24 2026): a roll that changes the canvas size refits a Background that covered the old canvas, once the roll's elements are all back (the refit inside setDim runs while they are held aside)
 if((CW!=cw0||CH!=ch0)&&WBX.wbBgFit){WBX.wbBgFit(cw0,ch0);store();upd()}
+// 2.39.0 (owner Oct 24 2026): Effects. The roll's new elements may get a Noise, Blur, Print or Distort effect, and a Filter shape may go on top (it replaces the last roll's).
+// With Stamps off it reworks the effects of what is there. It draws from its own number stream, so the rest of a seeded roll is unchanged.
+if(FT.efx){const own=new Set(OWN?OWN.own.map(q=>String(q.u)):[]),only=!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.free||FT.layout||FT.size||FT.look||FT.lib);
+ const n=rzEffectsEls(WBS.layers,{seed:tok+':'+JSON.stringify(WBS.layers),groups:['noise','blur','print','distort'].filter(k=>sOn('efx',k)),filter:sOn('efx','filter'),rework:!FT.stamps,isNew:q=>!own.has(String(q.u)),prev:new Set(!FT.stamps&&RZMADE?RZMADE.els:[]),only});
+ if(n){store();upd()}}
 const txAll=(txReq?[[WBS.tiles[0],txReq]]:[]).concat(fzReqs);
 if(txAll.length){pmsg('Randomized… setting the lettering.');WBX.wbTxBusy=(WBX.wbTxBusy||0)+1;WBX.wbRollHold=tok;(async()=>{try{for(const[t,o] of txAll){try{await WBX.wbTxPlace(t,o,tok)}catch(e){}}if(tok!==WBX.wbRndTok)return;store();upd();if(WBX.wbRollHold===tok)WBX.wbRollHold=0;if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()}}finally{if(WBX.wbRollHold===tok)WBX.wbRollHold=0;WBX.wbTxBusy=Math.max(0,(WBX.wbTxBusy||1)-1)}})()}
 else if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()};
