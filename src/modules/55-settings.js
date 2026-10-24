@@ -7,12 +7,13 @@ import {setTrayView,TRAY_MAX} from './50-tray-core.js';
 import {setAutosaveEvery} from './38-crash-recovery.js';
 import {paintDock} from './52-tray-ui.js';
 import {acAccount} from '../platform/account.js';
+import {SG_DIST,SG_K,sgDist,sgFlag,sgSet} from './84-smart-guides.js';
 // ===== Settings =====
-// One dialog, six pages (General, Colour, Speed, Files, Shortcuts, About). Every control here changes something that already exists in the
+// One dialog, seven pages (General, Colour, Guides, Speed, Files, Shortcuts, About). Every control here changes something that already exists in the
 // app and is remembered in the settings record (kv). Nothing opens at launch; the dialog opens from File > Settings… or the command.
 // The accent colour is made here: one picked colour becomes the four accent tokens of both themes (see accentVars).
 const stK_ACC='wb114_accent',stK_DRAFT='wb114_draft',stK_CALM='wb114_calm',stK_TRAY='wb114_trayview',stK_SAVE='wb114_autosave',stK_PAGE='wb114_page',stK_TPL='wb111_tplstart';
-const stPAGES=[['general','General'],['colour','Colour'],['speed','Speed'],['files','Files'],['keys','Shortcuts'],['about','About']];
+const stPAGES=[['general','General'],['colour','Colour'],['guides','Guides'],['speed','Speed'],['files','Files'],['keys','Shortcuts'],['about','About']];
 // Accent presets. They are the person's colours, not chrome, so literal values are allowed (style guide 3). The first, Oak, is the built-in one
 // and stays the stylesheet's own values (no override is written for it; 2.8.0: it replaced Steel, the blue of 2.3.0, as the default and Steel is gone).
 // Colours named after woods. Each is the base colour; the accent tokens of each theme are derived from it.
@@ -77,6 +78,8 @@ function stAccentRow(){const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[
 function stPageHtml(p){
  if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stTgl('stgtl',stFlag(stK_TPL,false),'Templates at launch')+stViewToggles()+stAccentRow();
  if(p=='colour')return`<div class="ctl stgr"><label for="stgtv">Places shown</label><input type="range" id="stgtv" min="7" max="${TRAY_MAX}" step="1" value="${stNumGet(stK_TRAY,7,7,TRAY_MAX)}"><output id="stgtvo">${stNumGet(stK_TRAY,7,7,TRAY_MAX)}</output></div><div class="stgr"><span>Recent colours</span><button type="button" class="alt" id="stgrc">Clear</button></div>`;
+ // smart guides (2.40.0, 84-smart-guides.js): the switch, what to snap to, how close
+ if(p=='guides')return stTgl('stgsg',sgFlag(SG_K.on,true),'Smart guides')+stTgl('stgsc',sgFlag(SG_K.cv,true),'Snap to canvas')+stTgl('stgse',sgFlag(SG_K.el,true),'Snap to elements')+stTgl('stgss',sgFlag(SG_K.sp,true),'Equal spacing')+stSegH('stgsd','Snap distance',SG_DIST,sgDist());
  if(p=='speed')return stTgl('stgdr',stFlag(stK_DRAFT,true),'Draft while dragging')+stTgl('stgca',stFlag(stK_CALM,false),'Reduce motion');
  if(p=='files')return stSegH('stgas','Autosave every',stSAVE_EVERY,stNumGet(stK_SAVE,8,8,120))+`<div class="stgr"><span>Storage</span><b id="stguse">…</b></div><div class="stgr"><span>Keep data on this device</span><button type="button" class="pvc" id="stgkp" aria-pressed="false" aria-label="Keep data on this device">…</button></div>`;
  if(p=='keys'){const m=/Mac|iPhone|iPad/.test(navigator.platform||'');
@@ -103,12 +106,16 @@ function stWire(){const b=$('stgbody');
   closePicker();stAccentSet(x.dataset.h);stAccentMarks()});
  const tv=$('stgtv');if(tv)tv.addEventListener('input',()=>{const n=+tv.value;$('stgtvo').textContent=n;try{kv.set(stK_TRAY,String(n))}catch(e){}setTrayView(n);try{paintDock(true)}catch(e){}});
  on('stgrc',()=>{try{kv.remove('wb200_recent')}catch(e){}const c=$('stgrc');c.textContent='Cleared';c.disabled=true});
+ flip('stgsg',SG_K.on,stSgSync);flip('stgsc',SG_K.cv,stSgSync);flip('stgse',SG_K.el,stSgSync);flip('stgss',SG_K.sp,()=>{});seg('stgsd',v=>sgSet('d',+v));stSgSync();
  flip('stgtl',stK_TPL,()=>{});flip('stgdr',stK_DRAFT,stDraftApply);flip('stgca',stK_CALM,stCalmApply);
  seg('stgas',v=>{const n=+v;try{kv.set(stK_SAVE,String(n))}catch(e){}setAutosaveEvery(n*1000)});
  on('stgkp',async()=>{try{await storage.persist()}catch(e){}stStoragePaint()});
  const q=$('stgkq');if(q)q.addEventListener('input',()=>{stKeyQ=q.value;const m=/Mac|iPhone|iPad/.test(navigator.platform||'');
   const rows=stKeys().filter(c=>!stKeyQ||(c.label+' '+c.shortcut).toLowerCase().includes(stKeyQ.toLowerCase()));
   $('stgkl').innerHTML=rows.map(c=>`<div class="stgkr"><span>${stEsc(c.label)}</span><kbd>${stEsc(cmdFormatShortcut(c.shortcut,m))}</kbd></div>`).join('')||'<div class="stgkr"><span>No match</span></div>'})}
+// Guides: with smart guides off the rows under the switch rest; Equal spacing needs Snap to elements
+function stSgSync(){const on=sgFlag(SG_K.on,true),el=sgFlag(SG_K.el,true);['stgsc','stgse'].forEach(id=>{const e=$(id);if(e)e.disabled=!on});
+ const sp=$('stgss');if(sp)sp.disabled=!on||!el;const d=$('stgsd');if(d)d.querySelectorAll('button').forEach(b=>{b.disabled=!on})}
 // the swatch row follows the stored accent (the picker changes it live)
 function stAccentMarks(){const g=$('stgacc');if(!g)return;const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur),n=$('stgan');if(n)n.textContent=stAccentName(cur);
  g.querySelectorAll('.stgab').forEach(b=>{const c=b.dataset.custom;b.setAttribute('aria-pressed',String(c?!!custom:(b.dataset.h||'')===cur));if(c)b.style.setProperty('--c',custom?cur:'transparent')})}
@@ -117,7 +124,7 @@ function stShow(){try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}
  try{const p=kv.get(stK_PAGE);if(stPAGES.some(x=>x[0]===p))stPage=p}catch(e){}
  stKeyQ='';stPaint();stD().hidden=false;const t=$('stgnav').querySelector('.on');if(t)t.focus()}
 function stHide(){if(stD().hidden)return;closePicker();stD().hidden=true;const b=stOpener&&stOpener.isConnected?stOpener:$('fileb');if(b&&b.focus)b.focus()}
-function init55(){
+function init55(){WBX.wbStgSync=()=>{if(stIsOpen()&&stPage=='guides')stPaint()};   // the Smart guides command (84) changed the switch
  accentApply(stAccentGet());acAccount.shareAccent(stAccentGet());stDraftApply(stFlag(stK_DRAFT,true));stCalmApply(stFlag(stK_CALM,false));
  {const tv=stNumGet(stK_TRAY,7,7,TRAY_MAX);setTrayView(tv);if(tv>7)try{paintDock(true)}catch(e){}}setAutosaveEvery(stNumGet(stK_SAVE,8,8,120)*1000);
  $('stgo').onclick=stShow;$('stgclose').onclick=stHide;stD().addEventListener('click',e=>{if(e.target===stD())stHide()});

@@ -4,9 +4,10 @@ import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {txRid} from './16-texture-generators.js';
 import {fpCell,fpFG,fpGrp,fpL,fpPoolOk,fpSnap,fpSnapS,fpTog,fpU} from './24-free-place-layers.js';
-import {fpBox,fpFlip,fpHandles,fpHit,fpPt,fpRot,fpSz,fpWH} from './25-art-layers.js';
+import {fpBox,fpFlip,fpHandles,fpHid,fpHit,fpPt,fpRot,fpSz,fpWH} from './25-art-layers.js';
+import {sgClear,sgMove,sgPull,sgPullShow} from './84-smart-guides.js';
 import {tbG,tbSty} from './26-text-boxes.js';
-const xfEnd=()=>{if(!WBS.fpXf)return;const mv=WBS.fpXf.moved;WBS.fpXf=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};
+const xfEnd=()=>{sgClear();if(!WBS.fpXf)return;const mv=WBS.fpXf.moved;WBS.fpXf=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};
 // moving a piece while it is dragged (2.4.0, owner Oct 21 2026: "render them as I'm dragging, not just when I'm done"): a stamp is a [data-fp] group whose transform is its position;
 // a Motif or Shape has a [data-mv] body (it knows where it was drawn: data-mx, data-my) whose own transform is kept and shifted by how far it has moved since; anything else is drawn again, at most once a frame
 function fpLive(q){const a=document.querySelector(`#art [data-fp="${q.u}"]`);if(a){a.setAttribute('transform',`translate(${q.x} ${q.y})`);return true}
@@ -14,14 +15,14 @@ function fpLive(q){const a=document.querySelector(`#art [data-fp="${q.u}"]`);if(
  return false}
 let fpRaf=0;function fpRedraw(){if(fpRaf)return;fpRaf=requestAnimationFrame(()=>{fpRaf=0;if(WBS.fpDrag)upd()})}
 // Esc during a drag puts everything back as it was: no store, no history step (2.27.0)
-const fpCancel=()=>{const d=WBS.fpDrag,x=WBS.fpXf;if(d){if(d.g)d.g.forEach(([q,qx,qy])=>{q.x=qx;q.y=qy});else{d.p.x=d.s0[0];d.p.y=d.s0[1]}WBS.fpDrag=null}
+const fpCancel=()=>{sgClear();const d=WBS.fpDrag,x=WBS.fpXf;if(d){if(d.g)d.g.forEach(([q,qx,qy])=>{q.x=qx;q.y=qy});else{d.p.x=d.s0[0];d.p.y=d.s0[1]}WBS.fpDrag=null}
 if(x){const o=JSON.parse(x.orig);Object.keys(x.p).forEach(k=>{if(!(k in o))delete x.p[k]});Object.assign(x.p,o);WBS.fpXf=null;if(x.p.tx&&typeof tbRelay=='function')tbRelay(x.p)}upd()};
 // Rubber band: every element the box touches is selected; Shift/Ctrl/Cmd adds to the selection (2.27.0)
 function fpMqPick(L){const m=WBS.fpMq,a=Math.min(m.x0,m.x1),b=Math.max(m.x0,m.x1),c=Math.min(m.y0,m.y1),d=Math.max(m.y0,m.y1),pl=L.pl||[],hit=new Set(m.base);
 pl.forEach(p=>{const wh=fpWH(p);if(!wh||p.bgd||p.flt||fpHid(pl,p))return;const r=-(+p.r||0)*Math.PI/180*-1,co=Math.cos(r),si=Math.sin(r),hw=wh[0]/2,hh=wh[1]/2,ex=Math.abs(hw*co)+Math.abs(hh*si),ey=Math.abs(hw*si)+Math.abs(hh*co);if(p.x+ex>=a&&p.x-ex<=b&&p.y+ey>=c&&p.y-ey<=d)hit.add(String(p.u))});
 const arr=[...hit];WBS.fpMS=new Set(arr);WBS.fpSel=arr.length?arr[arr.length-1]:-1;WBS.fpAnc=WBS.fpSel===-1?null:String(WBS.fpSel);upd()}
 const fpMqEnd=()=>{if(!WBS.fpMq)return;const on=WBS.fpMq.on;WBS.fpMq=null;if(on)upd();else WBH.fpOverlay()};
-const fpEnd=()=>{if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved;WBS.fpDrag=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};
+const fpEnd=()=>{sgClear();if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved;WBS.fpDrag=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};
 function init28(){
  try{let raf=0;new ResizeObserver(()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(WBH.fpOverlay)WBH.fpOverlay()})}).observe($("art"))}catch(e){}   // the box keeps its pixel size when the view is zoomed (2.15.0)
 // --- canvas: place, select, drag
@@ -36,9 +37,9 @@ if(e.shiftKey||e.ctrlKey||e.metaKey){e.preventDefault();fpTog(p.u);return}
 e.preventDefault();const g0=fpGrp(),inG=g0.length>1&&g0.includes(p);if(!inG)WBS.fpMS=new Set();WBS.fpSel=p.u;WBS.fpAnc=String(p.u);const g=inG?g0.map(q=>[q,q.x,q.y]):null;WBS.fpDrag={p,g,s0:[p.x,p.y],dx:x-p.x,dy:y-p.y,moved:false,id:e.pointerId};try{$('art').setPointerCapture(e.pointerId)}catch(er){}upd()});
 // a drag keeps the element's centre on the sheet (2.24.0), so it can always be clicked and dragged back
 const fpOn=(v,m)=>Math.min(m,Math.max(0,v));
-$('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBS.fpMq){const m=WBS.fpMq,[x,y]=fpPt(e);m.x1=x;m.y1=y;if(!m.on&&Math.hypot(x-m.x0,y-m.y0)<Math.min(CW,CH)*.008)return;m.on=true;fpMqPick(L);return}if(WBS.fpDrag){const[x0,y0]=fpPt(e),p=WBS.fpDrag.p,[nx,ny]=fpSnap(L,fpOn(x0-WBS.fpDrag.dx,CW),fpOn(y0-WBS.fpDrag.dy,CH),e);WBS.fpDrag.moved=true;if(WBS.fpDrag.g){const ddx=+nx.toFixed(1)-WBS.fpDrag.s0[0],ddy=+ny.toFixed(1)-WBS.fpDrag.s0[1];let oh='',live=true;WBS.fpDrag.g.forEach(([q,qx,qy])=>{q.x=+(qx+ddx).toFixed(1);q.y=+(qy+ddy).toFixed(1);if(!fpLive(q))live=false;oh+=fpBox(q,'sel')});$('fpov').innerHTML=oh;if(!live)fpRedraw();return}
+$('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBS.fpMq){const m=WBS.fpMq,[x,y]=fpPt(e);m.x1=x;m.y1=y;if(!m.on&&Math.hypot(x-m.x0,y-m.y0)<Math.min(CW,CH)*.008)return;m.on=true;fpMqPick(L);return}if(WBS.fpDrag){const[x0,y0]=fpPt(e),p=WBS.fpDrag.p;let[nx,ny]=fpSnap(L,fpOn(x0-WBS.fpDrag.dx,CW),fpOn(y0-WBS.fpDrag.dy,CH),e);[nx,ny]=sgMove(WBS.fpDrag,L,nx,ny,e);nx=fpOn(nx,CW);ny=fpOn(ny,CH);WBS.fpDrag.moved=true;if(WBS.fpDrag.g){const ddx=+nx.toFixed(1)-WBS.fpDrag.s0[0],ddy=+ny.toFixed(1)-WBS.fpDrag.s0[1];let oh='',live=true;WBS.fpDrag.g.forEach(([q,qx,qy])=>{q.x=+(qx+ddx).toFixed(1);q.y=+(qy+ddy).toFixed(1);if(!fpLive(q))live=false;oh+=fpBox(q,'sel')});$('fpov').innerHTML=oh+WBS.sgG;if(!live)fpRedraw();return}
 p.x=+nx.toFixed(1);p.y=+ny.toFixed(1);
-if(!fpLive(p))fpRedraw();$('fpov').innerHTML=fpBox(p,'sel')+fpHandles(p);return}
+if(!fpLive(p))fpRedraw();$('fpov').innerHTML=fpBox(p,'sel')+fpHandles(p)+WBS.sgG;return}
 if(WBS.fpB||WBS.txArm||WBS.plArm){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpPt(e),e);WBH.fpOverlay()}});
 // Pulling a corner or a side square of a placed piece: the opposite corner or side stays where it is; with Shift it grows from the middle. Corners keep the proportions, sides pull only the width or the height.
 function fpResize(h,x,y,e){const p=h.p,S0=Math.min(CW,CH),a=-(+p.r||0)*Math.PI/180,dx=x-h.x0,dy=y-h.y0,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),[w0,h0]=h.wh0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ox=0,oy=0,k0=h.k;
@@ -51,7 +52,7 @@ else if(k0=='e'||k0=='w'){const d=k0=='e'?1:-1,w=Math.max(w0*.02,mid?Math.abs(lx
 else{const d=k0=='s'?1:-1,hh=Math.max(h0*.02,mid?Math.abs(ly)*2:d*ly+h0/2),ny=cl(+(h.wy0*hh/h0).toFixed(3),.05,20);if(ny!=1||p.wy)p.wy=ny;if(!mid)oy=d*(h0*ny/h.wy0-h0)/2}
 const r=-a;p.x=+(h.x0+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(1);p.y=+(h.y0+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(1);if(h.rel&&WBX.wbTbRelay)WBX.wbTbRelay(h.rel[0],h.rel[1],h)}
 $('art').addEventListener('pointermove',e=>{if(!WBS.fpXf)return;const[x,y]=fpPt(e),p=WBS.fpXf.p,S0=Math.min(CW,CH);
-if(WBS.fpXf.k!='rot')fpResize(WBS.fpXf,x,y,e);
+if(WBS.fpXf.k!='rot'){const[sx,sy]=sgPull(WBS.fpXf,fpL(),x,y,e);fpResize(WBS.fpXf,sx,sy,e);sgPullShow(WBS.fpXf)}   // smart guides (2.40.0, 84)
 else{let r=Math.atan2(y-p.y,x-p.x)*180/Math.PI+90;r=((r+180)%360+360)%360-180;if(e.shiftKey)r=Math.round(r/15)*15;p.r=Math.round(r)}
 WBS.fpXf.moved=true;upd()});$('art').addEventListener('pointerup',xfEnd);$('art').addEventListener('pointercancel',xfEnd);
 $('art').addEventListener('pointerleave',()=>{if(WBS.fpGhost){WBS.fpGhost=null;WBH.fpOverlay()}});$('art').addEventListener('pointerup',fpEnd);$('art').addEventListener('pointercancel',fpEnd);$('art').addEventListener('pointerup',fpMqEnd);$('art').addEventListener('pointercancel',fpMqEnd);

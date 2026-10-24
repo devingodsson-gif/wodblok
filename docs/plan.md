@@ -756,3 +756,15 @@ Step 1 of the fix plan made from the 2.23 review (five releases, 2.24.0 to 2.28.
 - **Shape folders**: a Filter shape's outline is a basic shape, not one from a folder; `randomize-folders` now skips Filter shapes.
 - Tests: `randomize-effects-2-39` (the switch; a seeded roll equals the Effects-off roll once the additions are taken out; Effects alone changes something every roll and never stacks Filter shapes; only ticked kinds; Filter shapes alone carry a grade). `randomize-amounts` expects the new switch. Randomize, folder, amounts, mode, Background-refit and scenario specs run: the scenario state snapshots for seeds 1 to 3 and the before and split views differ only by the added effects and Filter shapes (updated with the owner's approval). `npm run perf` passed (drag 1.068).
 
+### 2.40.0 (Oct 24 2026): Smart guides. Format 27 unchanged
+- **Owner**: smart guides for every element kind, with settings for what they snap to, on by default; "make it really good and professional".
+- **Moving** (`sgMove`, new module 84, called from the canvas drag in 28): the dragged element, or the box round several selected ones, snaps its left, middle and right to the canvas edges and middle and to the other elements' edges and middles, and the same up and down. A 1px accent line runs through each match, across the boxes that line up (or the whole canvas). Turned elements count by the upright box round them.
+- **Equal spacing**: among the elements that share some of its height (or width), it snaps to the middle between its nearest neighbours, or repeats the gap between the two on one side; the two equal gaps are marked (a line with end ticks). The nearer of an edge match and a spacing match wins.
+- **Pulling a side** of an upright element snaps that side to the same lines (a corner once its direction is set; not a Ctrl or Cmd corner pull, not a turn).
+- **What it snaps to**: every element with a box (shapes, pictures, stamps, text), not the Background, a Filter shape, a hidden element or a Pattern (no box). Worked out once at the start of a drag; each frame compares numbers only.
+- **Off for the moment**: hold Alt (as for the grid). With the grid's snapping on, the grid wins and there are no smart guides. Escape cancels the drag and clears the guides.
+- **Settings > Guides** (new page after Colour): Smart guides, Snap to canvas, Snap to elements, Equal spacing (toggles, all on), Snap distance (4, 6 or 10 screen pixels, 6). The rows under the switch rest while it is off; Equal spacing needs Snap to elements. Command `view.smartGuides` ("Smart guides", Mod+;) turns it on and off.
+- **Style**: the accent colour, as the selection box (no new colour). `docs/developing-wodblok.md` 9.10 describes it. Suggestion (not done): Photoshop draws guides in magenta so they show on any artwork; a `--guide` token would need the owner's word.
+- Also: `fpHid` is now exported from 25 (28 used it without importing it).
+- Tests: `smart-guides-2-40` (canvas middle with a line, Alt, guides cleared on release; edge match; the middle between two with two gap marks; several selected as one box, Escape; a side pull; the settings page and the command).
+
