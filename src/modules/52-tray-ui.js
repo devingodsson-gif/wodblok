@@ -6,7 +6,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS} from './12-selection-and-split.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
-import {TRAY_MAX,TRAY_VIEW,cwAdd,cwNow,cwUse,hexAlpha,isFixed,isLink,lockRef,normHexA,refSlot,slotHex,slotName,trayAdd,trayDone,trayLoad,trayMove,trayRemove,traySet,trayUses,unlockRef} from './50-tray-core.js';
+import {fxCols,TRAY_MAX,TRAY_VIEW,cwAdd,cwNow,cwUse,hexAlpha,isFixed,isLink,lockRef,normHexA,refSlot,slotHex,slotName,trayAdd,trayDone,trayLoad,trayMove,trayRemove,traySet,trayUses,unlockRef} from './50-tray-core.js';
 import {closePicker,openPicker,swBg} from './51-colour-picker.js';
 // ===== The tray on screen =====
 // 1. The dock: the tray's colours above the canvas in both views (7 places, "+" to add more, up to 16). Click a colour to edit it; drag
@@ -55,7 +55,7 @@ function paintDock(force){const o=tyP(),w=cwNow(o),box=$('tyc');if(!box)return;
  box.innerHTML=h;
  const cw=$('tycw');cw.hidden=o.cw.length<2;if(!cw.hidden){cw.querySelector('span').textContent=w.n;cw.querySelector('i').style.background=`linear-gradient(90deg,${o.ts.slice(0,4).map((id,i,a)=>`${w.c[id]} ${i/a.length*100}% ${(i+1)/a.length*100}%`).join(',')})`;cw.setAttribute('aria-label','Colourway: '+w.n)}}
 // which slots something links to
-function refsUsed(){const o=tyP(),s=new Set(),a=r=>{if(isLink(r))s.add(r.slice(1))};a(o.bg);a(o.ink);WBS.tiles.forEach(t=>{a(t.ink);(t.items||[]).forEach(q=>{if(q){a(q.ic);a(q.sk)}})});WBS.layers.forEach(L=>{a(L.ink);a(L.rp);(L.pl||[]).forEach(q=>{if(q){a(q.ink);a(q.sk);(q.src||[]).forEach(z=>{if(z){a(z.ink);a(z.sk)}})}})});
+function refsUsed(){const o=tyP(),s=new Set(),a=r=>{if(isLink(r))s.add(r.slice(1))};a(o.bg);a(o.ink);WBS.tiles.forEach(t=>{a(t.ink);(t.items||[]).forEach(q=>{if(q){a(q.ic);a(q.sk)}})});WBS.layers.forEach(L=>{a(L.ink);a(L.rp);(L.pl||[]).forEach(q=>{if(q){a(q.ink);a(q.sk);(q.src||[]).forEach(z=>{if(z){a(z.ink);a(z.sk)}});[q,...(q.src||[])].forEach(z=>fxCols(z).forEach(f=>a(f.col)))}})});
  // stamps without their own ink use the default ink
  return s}
 function dockEvents(){const box=$('tyc');let dr=null;
@@ -113,10 +113,10 @@ function openWell(W){closeWell();closePicker();const o=tyP(),w=cwNow(o),r=W.spec
 function paintWells(force){WELLS.forEach(W=>paintWell(W,force))}
 // ---------------------------------------------------------------- 3. the Colours tool: the tray as a list
 function usesText(id){const u=trayUses(id),n={};u.forEach(x=>{n[x.k]=(n[x.k]||0)+1});const out=[];if(n.paper)out.push('Paper');if(n.ink)out.push('Ink');
- const pl=(k,a,b)=>{if(n[k])out.push(n[k]+' '+(n[k]>1?b:a))};pl('stamp','stamp','stamps');pl('shape','shape','shapes');pl('layer','layer','layers');pl('replace','replace','replaces');pl('text','text','texts');pl('element','element','elements');pl('outline','outline','outlines');return out.join(' · ')}
+ const pl=(k,a,b)=>{if(n[k])out.push(n[k]+' '+(n[k]>1?b:a))};pl('stamp','stamp','stamps');pl('shape','shape','shapes');pl('layer','layer','layers');pl('replace','replace','replaces');pl('text','text','texts');pl('element','element','elements');pl('effect','effect','effects');pl('outline','outline','outlines');return out.join(' · ')}
 let listK='';
 function paintList(force){const box=$('tyl');if(!box||!box.isConnected||(!force&&!shown(box)))return;const o=tyP(),w=cwNow(o);
- const k=JSON.stringify([o.ts,o.ts.map(id=>[w.c[id],w.m[id]]),o.bg,o.ink,WBS.tiles.map(t=>t.ink),WBS.layers.map(L=>[L.ink,L.rp,(L.pl||[]).map(q=>q&&[q.ink,q.sk])]),WBS.trayEdit]);if(!force&&k===listK)return;listK=k;
+ const k=JSON.stringify([o.ts,o.ts.map(id=>[w.c[id],w.m[id]]),o.bg,o.ink,WBS.tiles.map(t=>t.ink),WBS.layers.map(L=>[L.ink,L.rp,(L.pl||[]).map(q=>q&&[q.ink,q.sk,fxCols(q).map(f=>f.col)])]),WBS.trayEdit]);if(!force&&k===listK)return;listK=k;
  box.innerHTML=o.ts.map((id,i)=>{const c=w.c[id],nm=w.m[id],u=usesText(id);return`<div class="tyr${WBS.trayEdit===id?' on':''}" data-s="${id}" role="listitem" tabindex="0"><span class="tyn">${i+1}</span><i style="background:${swBg(c)}"></i><span class="tyt"><b>${tyEsc(nm||c.slice(0,7).toUpperCase())}</b><small>${tyEsc([nm?c.slice(0,7).toUpperCase():'',hexAlpha(c)<1?Math.round(hexAlpha(c)*100)+'%':'',u].filter(Boolean).join(' · '))}</small></span><button type="button" class="ib" data-more aria-haspopup="menu" aria-expanded="false" aria-label="Actions for colour ${i+1}">${TY_MORE}</button></div>`}).join('');
  $('tycnt').textContent=o.ts.length+' of '+TRAY_MAX;$('tyaddl').disabled=o.ts.length>=TRAY_MAX}
 function listEvents(){const box=$('tyl');

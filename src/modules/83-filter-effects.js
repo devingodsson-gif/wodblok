@@ -1,4 +1,6 @@
 import {txRid} from './16-texture-generators.js';
+import {WBX} from './01-launch-and-version.js';
+import {col} from './04-canvas-and-stamp-outlines.js';
 import {fxRegister} from './65-element-core.js';
 
 // 2.36.0 adds Print (Halftone moves in, with Line Screen, Stipple, Ink Bleed, Misregistration) and Distort (Roughen, Ripple).
@@ -16,6 +18,8 @@ const fqWrap=id=>c=>`<g filter="url(#${id})">${c}</g>`;
 const fqTurn=(id,a,cx,cy)=>c=>`<g transform="rotate(${q4(a)} ${q4(cx)} ${q4(cy)})"><g filter="url(#${id})"><g transform="rotate(${q4(-a)} ${q4(cx)} ${q4(cy)})">${c}</g></g></g>`;
 const fqSize=b=>Math.max(1e-6,Math.max(b.W,b.H)/1.3);   // the element's own size (fxPad adds 15% each side)
 const fqSeed=e=>Math.abs(e.sd|0)%100000;
+// the i-th number (0 to 1) of a seed's own sequence
+const fqRnd=(sd,i)=>{const x=Math.sin((sd+1)*12.9898+i*78.233)*43758.5453;return x-Math.floor(x)};
 const fqPar=(e,f,a,b,d)=>fqClamp(e[f]==null?d:e[f],a,b,d);
 // noise in R, G, B (or R copied to all three when mono), alpha 1
 const fqMono='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1',fqRGB='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 1';
@@ -31,7 +35,6 @@ const FQ_CELL='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w
 const FQ_LINE='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient><rect width="64" height="64" fill="url(#g)"/></svg>`);
 // a ripple cell: one wave in the red channel (128 = no move in green)
 const FQ_WAVE='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><linearGradient id="g" x1="0" y1="0" x2="1" y2="0">${Array.from({length:17},(_,i)=>`<stop offset="${i/16}" stop-color="rgb(${Math.round(127.5+127.5*Math.sin(i/16*2*Math.PI))},128,128)"/>`).join('')}</linearGradient><rect width="64" height="64" fill="url(#g)"/></svg>`);
-const FQ_INK={same:['Same ink',null],cyan:['Cyan','#00aeef'],magenta:['Magenta','#ec008c'],yellow:['Yellow','#ffe600'],red:['Red','#e8312f'],blue:['Blue','#2b4fd8'],black:['Black','#111111']};
 // Filter mode (2.38.0): q.__fm {paper} is set when the effect works on the picture under a filter shape. The effects that read an outline read darkness instead:
 // the picture blurred, 1 - its brightness, as a grey with alpha 1; and what would be a gap shows the paper colour.
 const fqFm=q=>q&&q.__fm||null;
@@ -88,8 +91,12 @@ const FQ={
    if(rg)body+=`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/(S*.04))}" numOctaves="2" seed="${fqSeed(e)}" result="n"/><feDisplacementMap in="m" in2="n" scale="${q4(sc)}" xChannelSelector="R" yChannelSelector="G" result="m"/>`;
    body+=fm?`<feGaussianBlur in="m" stdDeviation="${q4(sg*.5)}"/>`:`<feGaussianBlur in="m" stdDeviation="${q4(sg)}" result="bl"/><feComponentTransfer in="bl"><feFuncA type="linear" slope="${q4(k)}" intercept="${q4(.5-.4*k)}"/></feComponentTransfer>`;
    return{defs:fqFilter(id,b.x-m,b.y-m,b.W+2*m,b.H+2*m,body),wrap:fqWrap(id)}}},
- misreg:{label:'Misregistration',grp:'Print',P:[['amt','Offset',0,100,25,''],['ang','Angle',0,359,45,'&#176;']],S:[['col','Second copy',Object.entries(FQ_INK).map(([k,v])=>[k,v[0]]),'cyan']],
-  filt:(e,id,b,q)=>{const fm=fqFm(q),d=fqSize(b)*fqPar(e,'amt',0,100,25)/100*.06;if(!(d>0))return null;const a=fqPar(e,'ang',0,359,45)*Math.PI/180,dx=d*Math.cos(a),dy=d*Math.sin(a),ink=(FQ_INK[e.col]||FQ_INK.cyan)[1],m=d+1;
+ misreg:{label:'Misregistration',grp:'Print',seed:true,P:[['amt','Offset',0,100,25,''],['ang','Angle',0,359,45,'&#176;'],['rnd','Random',0,100,0,'']],W:[['col','Colour','Same ink','#00aeef']],
+  filt:(e,id,b,q)=>{const fm=fqFm(q),S=fqSize(b),d=S*fqPar(e,'amt',0,100,25)/100*.06,rm=S*fqPar(e,'rnd',0,100,0)/100*.06;if(!(d>0||rm>0))return null;
+   // the offset (Offset along Angle) plus a random one: a seeded direction and distance up to Random, so Reroll moves the second copy and the same seed always lands the same
+   const a=fqPar(e,'ang',0,359,45)*Math.PI/180,ra=fqRnd(fqSeed(e),0)*2*Math.PI,rr=rm*fqRnd(fqSeed(e),1),dx=d*Math.cos(a)+rr*Math.cos(ra),dy=d*Math.sin(a)+rr*Math.sin(ra),m=d+rm+1;
+   // '' = the same ink; a tray link or fixed colour is resolved here, so a tray edit recolours the copy
+   const ink=e.col===''?null:col(e.col==null?'#00aeef':e.col).slice(0,7);
    // in filter mode the second copy is the picture's dark parts (or the picture itself, Same ink), offset and printed over it (multiply)
    if(fm){const body=(ink?fqDark('SourceGraphic','dk0')+`<feColorMatrix in="dk0" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.6 0 0 0 -.4" result="dk1"/><feComposite in="dk1" in2="SourceAlpha" operator="in" result="dk"/><feOffset in="dk" dx="${q4(dx)}" dy="${q4(dy)}" result="oa"/><feFlood flood-color="${ink}" result="fc"/><feComposite in="fc" in2="oa" operator="in" result="o"/>`
      :`<feOffset in="SourceGraphic" dx="${q4(dx)}" dy="${q4(dy)}" result="o"/>`)+`<feBlend in="o" in2="SourceGraphic" mode="multiply"/>`;
@@ -104,18 +111,20 @@ const FQ={
    return{defs:fqFilter(id,x0,y0,2*h,2*h,`<feImage href="${FQ_WAVE}" x="${q4(x0)}" y="${q4(y0)}" width="${q4(c)}" height="${q4(2*h)}" preserveAspectRatio="none" result="w"/><feTile in="w" result="wt"/><feDisplacementMap in="SourceGraphic" in2="wt" scale="${q4(sc*2)}" xChannelSelector="G" yChannelSelector="R"/>`),wrap:fqTurn(id,a,cx,cy)}}}
 };
 // the defaults of a new effect of kind k
-function fqMake(k){const d=FQ[k],o={k,on:true};(d.P||[]).forEach(p=>o[p[0]]=p[4]);(d.S||[]).forEach(s=>o[s[0]]=s[3]);(d.C||[]).forEach(c=>o[c[0]]=c[2]);if(d.seed)o.sd=txRid();return o}
+function fqMake(k){const d=FQ[k],o={k,on:true};(d.P||[]).forEach(p=>o[p[0]]=p[4]);(d.S||[]).forEach(s=>o[s[0]]=s[3]);(d.C||[]).forEach(c=>o[c[0]]=c[2]);(d.W||[]).forEach(w=>o[w[0]]=w[3]);if(d.seed)o.sd=txRid();return o}
 // the settings pane of one effect, for the effect stack's group (fields carry data-q; Reroll carries data-qrr)
 function fqPane(k){const d=FQ[k];return`<div class="fxs" data-e="${k}" hidden>`
  +(d.P||[]).map(([f,n,a,b,v,u])=>`<div class="ctl"><label>${n}</label><input type="range" data-q="${f}" min="${a}" max="${b}" value="${v}"${u?` data-u="${u}"`:''} data-def="${v}" aria-label="${n}"></div>`).join('')
  +(d.S||[]).map(([f,n,o,v])=>`<div class="ctl"><label>${n}</label><select data-q="${f}" aria-label="${n}">${o.map(([x,t])=>`<option value="${x}"${x==v?' selected':''}>${t}</option>`).join('')}</select></div>`).join('')
+ +(d.W||[]).map(([f,n])=>`<div class="cwrow"><span class="cwk">${n}</span><div class="cwell" data-qw="${f}"></div></div>`).join('')
  +(d.C||[]).map(([f,n,v])=>`<label class="chk"><input type="checkbox" data-q="${f}"${v?' checked':''}><span>${n}</span></label>`).join('')
  +(d.seed?'<div class="row"><button type="button" class="alt" data-qrr>Reroll</button></div>':'')+'</div>'}
 // show effect e's settings in its pane
 function fqSync(pane,e){const d=FQ[e.k];if(!d)return;
  (d.P||[]).forEach(([f,,a,b,v])=>{const el=pane.querySelector(`[data-q="${f}"]`),x=fqPar(e,f,a,b,v);if(el&&+el.value!==x){el.value=x;el.dispatchEvent(new Event('input',{bubbles:true}))}});
  (d.S||[]).forEach(([f,,,v])=>{const el=pane.querySelector(`[data-q="${f}"]`),x=e[f]==null?v:e[f];if(el&&el.value!==x)el.value=x});
- (d.C||[]).forEach(([f,,v])=>{const el=pane.querySelector(`[data-q="${f}"]`),x=e[f]==null?v:!!e[f];if(el&&el.checked!==x)el.checked=x})}
+ (d.C||[]).forEach(([f,,v])=>{const el=pane.querySelector(`[data-q="${f}"]`),x=e[f]==null?v:!!e[f];if(el&&el.checked!==x)el.checked=x});
+ if(d.W&&WBX.wbPaintWells)WBX.wbPaintWells()}
 // a field's value from its control
 const fqVal=el=>el.type=='checkbox'?el.checked:el.tagName=='SELECT'?el.value:+el.value;
 // registered by the effect stack (69) after its own four, so the menu lists Texture, Pressure offset, Jitter and Colour grade first

@@ -59,19 +59,22 @@ function trayIn(c){if(!c||typeof c!='object')return c;const o=c.proj;
  const fix=(r,d)=>{if(typeof r!='string'||!r)return d;if(isLink(r))return seen.has(r.slice(1))?r:d;if(isFixed(r)){const [h,s]=r.split('|'),n=normHexA(h);return n?(s&&/^\w{1,12}$/.test(s)?n+'|'+s:n):d}const h=hexOfName(r);return h||d};
  o.bg=fix(o.bg,'@'+o.ts[0]);o.ink=fix(o.ink,'@'+(o.ts[1]||o.ts[0]));delete o.c3;delete o.c4;
  (c.tiles||[]).forEach(t=>{if(t&&t.ink!=null){const r=fix(t.ink,null);if(r)t.ink=r;else delete t.ink}(t&&t.items||[]).forEach(q=>{if(q&&q.ic!=null){const r=fix(q.ic,null);if(r)q.ic=r;else delete q.ic}if(q&&q.sk!=null){const r=fix(q.sk,null);if(r)q.sk=r;else delete q.sk}})});
- (c.layers||[]).forEach(L=>{if(!L)return;if(L.ink!=null){const r=fix(L.ink,null);if(r)L.ink=r;else delete L.ink}if(L.rp!=null){const r=fix(L.rp,null);if(r)L.rp=r;else delete L.rp}(L.pl||[]).forEach(q=>{[q,...(q&&Array.isArray(q.src)?q.src:[])].forEach(z=>{if(z&&z.ink!=null){const r=fix(z.ink,null);if(r)z.ink=r;else delete z.ink}if(z&&z.sk!=null){const r=fix(z.sk,null);if(r)z.sk=r;else delete z.sk}})})});
+ (c.layers||[]).forEach(L=>{if(!L)return;if(L.ink!=null){const r=fix(L.ink,null);if(r)L.ink=r;else delete L.ink}if(L.rp!=null){const r=fix(L.rp,null);if(r)L.rp=r;else delete L.rp}(L.pl||[]).forEach(q=>{[q,...(q&&Array.isArray(q.src)?q.src:[])].forEach(z=>{if(z&&z.ink!=null){const r=fix(z.ink,null);if(r)z.ink=r;else delete z.ink}if(z&&z.sk!=null){const r=fix(z.sk,null);if(r)z.sk=r;else delete z.sk}fxCols(z).forEach(f=>{f.col=fix(f.col,'')})})})});
  return c}
 // keep the live document whole (cheap when nothing is wrong): the draw loop calls it
 function trayGuard(){const o=WBS.proj;if(!o||!Array.isArray(o.ts)||!Array.isArray(o.cw)||!o.cw.length||!okC(o.bg)||!okC(o.ink))trayLive()}
 function trayLive(){WBS.proj=trayIn({proj:WBS.proj||trayDefault(),tiles:WBS.tiles||[],layers:WBS.layers||[]}).proj}
 // ---- everything that uses a slot (for the tray list, and before a slot is removed)
 // returns [{k:'paper'|'ink'|'stamp'|'shape'|'layer'|'replace'|'text', i, get(), set(v)}]
+// effects that carry a colour of their own (Misregistration's second copy; '' = the element's own ink): the effects of z with a colour field
+function fxCols(z){return z&&Array.isArray(z.fx)?z.fx.filter(f=>f&&f.k=='misreg'&&typeof f.col=='string'):[]}
 function refsAll(){const o=WBS.proj,out=[];
  out.push({k:'paper',get:()=>o.bg,set:v=>{o.bg=v}});out.push({k:'ink',get:()=>o.ink,set:v=>{o.ink=v}});
  WBS.tiles.forEach((t,i)=>{if(t.ink)out.push({k:'stamp',i,get:()=>t.ink,set:v=>{if(v)t.ink=v;else delete t.ink}});(t.items||[]).forEach(q=>{if(q&&q.ic)out.push({k:'shape',i,get:()=>q.ic,set:v=>{if(v)q.ic=v;else delete q.ic}});if(q&&q.sk)out.push({k:'outline',i,get:()=>q.sk,set:v=>{if(v)q.sk=v;else delete q.sk}})})});
  WBS.layers.forEach((L,i)=>{if(L.ink)out.push({k:'layer',i,get:()=>L.ink,set:v=>{if(v)L.ink=v;else delete L.ink}});if(L.rp)out.push({k:'replace',i,get:()=>L.rp,set:v=>{if(v)L.rp=v;else delete L.rp}});
   (L.pl||[]).forEach(q=>{if(q&&q.ink)out.push({k:q.k=='text'?'text':'element',i,get:()=>q.ink,set:v=>{if(v)q.ink=v;else delete q.ink}});if(q&&q.sk)out.push({k:'outline',i,get:()=>q.sk,set:v=>{if(v)q.sk=v;else delete q.sk}});
-   (q&&Array.isArray(q.src)?q.src:[]).forEach(z=>{if(z&&z.ink)out.push({k:'element',i,get:()=>z.ink,set:v=>{if(v)z.ink=v;else delete z.ink}});if(z&&z.sk)out.push({k:'outline',i,get:()=>z.sk,set:v=>{if(v)z.sk=v;else delete z.sk}})})})});
+   (q&&Array.isArray(q.src)?q.src:[]).forEach(z=>{if(z&&z.ink)out.push({k:'element',i,get:()=>z.ink,set:v=>{if(v)z.ink=v;else delete z.ink}});if(z&&z.sk)out.push({k:'outline',i,get:()=>z.sk,set:v=>{if(v)z.sk=v;else delete z.sk}})});
+   [q,...(q&&Array.isArray(q.src)?q.src:[])].forEach(z=>fxCols(z).forEach(f=>{if(f.col)out.push({k:'effect',i,get:()=>f.col,set:v=>{f.col=v||''}})}))})});
  return out}
 function trayUses(id){const r='@'+id;return refsAll().filter(x=>x.get()===r)}
 // ---- changes. Each one edits WBS.proj (and the items), stores, redraws and names the history step in plain words.
@@ -105,4 +108,4 @@ function cwMove(i,to){const o=WBS.proj;if(!o.cw[i])return;const cur=o.cw[o.cwa],
 // ---- colours as a short list for other tools: the tray colours in order (hex), then fixed colours in use
 function fixedInUse(){const s=new Set();refsAll().forEach(x=>{const r=x.get();if(isFixed(r))s.add(col(r))});return[...s]}
 // ---- recently used colours (settings, not the document)
-export {trayLive,TRAY_MAX,TRAY_VIEW,setTrayView,cwAdd,cwDel,cwMove,cwNow,cwUse,fixedInUse,hexAlpha,hexOpaque,isFixed,isLink,lockRef,normHexA,refAdopt,refLabel,refSlot,refsAll,slotHex,slotName,trayAdd,trayDefault,trayDone,trayFromLegacy,trayGuard,trayIn,trayLoad,trayMove,trayNew,trayRemove,traySet,trayUses,unlockRef,withAlpha};
+export {fxCols,trayLive,TRAY_MAX,TRAY_VIEW,setTrayView,cwAdd,cwDel,cwMove,cwNow,cwUse,fixedInUse,hexAlpha,hexOpaque,isFixed,isLink,lockRef,normHexA,refAdopt,refLabel,refSlot,refsAll,slotHex,slotName,trayAdd,trayDefault,trayDone,trayFromLegacy,trayGuard,trayIn,trayLoad,trayMove,trayNew,trayRemove,traySet,trayUses,unlockRef,withAlpha};
