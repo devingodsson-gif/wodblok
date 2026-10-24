@@ -85,7 +85,7 @@ test('Paint offers Texture and Colour grade as effects, and a grade filters the 
   await drag(page, [0.3, 0.5], [0.7, 0.5]);
   await page.locator('.fxg[data-fxk="paint"] .fxadd').scrollIntoViewIfNeeded();
   await page.click('.fxg[data-fxk="paint"] .fxadd');
-  expect((await page.locator('.rowm .ddi').allTextContents()).map(s => s.replace('›', '').trim())).toEqual(['Texture', 'Colour grade', 'Noise', 'Blur', 'Halftone']);   // 2.35.0
+  expect((await page.locator('.rowm .ddi').allTextContents()).map(s => s.replace('›', '').trim())).toEqual(['Texture', 'Colour grade', 'Noise', 'Blur', 'Print', 'Distort']);   // 2.35.0
   await page.locator('.rowm .ddi', { hasText: 'Colour grade' }).click();
   await settle(page);
   await page.locator('.fxg[data-fxk="paint"] .fxg_sat').fill('-100'); await settle(page);

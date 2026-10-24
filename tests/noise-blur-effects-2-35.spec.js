@@ -16,20 +16,24 @@ const addFx = async (page, kind, grp, label) => {
   else await page.locator('.rowm:not(.rowsub) .ddi', { hasText: label }).first().click();
   await settle(page);
 };
-const ALL = [['Noise', 'Add Noise', 'noise'], ['Noise', 'Film Grain', 'grain'], ['Noise', 'Dust & Scratches', 'dust'], ['Blur', 'Gaussian Blur', 'blur'], ['Blur', 'Motion Blur', 'motion'], [null, 'Halftone', 'halftone']];
+const ALL = [['Noise', 'Add Noise', 'noise'], ['Noise', 'Film Grain', 'grain'], ['Noise', 'Dust & Scratches', 'dust'], ['Blur', 'Gaussian Blur', 'blur'], ['Blur', 'Motion Blur', 'motion'], ['Print', 'Halftone', 'halftone'], ['Print', 'Line Screen', 'lines'], ['Print', 'Stipple', 'stipple'], ['Print', 'Ink Bleed', 'bleed'], ['Print', 'Misregistration', 'misreg'], ['Distort', 'Roughen', 'rough'], ['Distort', 'Ripple', 'ripple']];
 
-test('the Add effect menu groups Noise and Blur in flyouts; Halftone sits on its own', async ({ page }) => {
+test('the Add effect menu groups Noise and Blur in flyouts; Print and Distort too', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addShape(page); await settle(page);
   await openAdd(page, 'motif');
   const top = await page.locator('.rowm:not(.rowsub) .ddi').allInnerTexts();
-  expect(top.map(t => t.replace(/\s*›\s*$/, '').trim())).toEqual(['Texture', 'Jitter', 'Colour grade', 'Noise', 'Blur', 'Halftone']);
+  expect(top.map(t => t.replace(/\s*›\s*$/, '').trim())).toEqual(['Texture', 'Jitter', 'Colour grade', 'Noise', 'Blur', 'Print', 'Distort']);
   await expect(page.locator('.rowsub')).toHaveCount(0);
   await page.locator('.rowm .ddi', { hasText: 'Noise' }).first().hover();
   await expect(page.locator('.rowsub .ddi')).toHaveText(['Add Noise', 'Film Grain', 'Dust & Scratches']);
   // moving to a plain item closes the flyout; Blur opens its own
   await page.locator('.rowm .ddi', { hasText: 'Jitter' }).first().hover();
   await expect(page.locator('.rowsub')).toHaveCount(0);
+  await page.locator('.rowm .ddi', { hasText: 'Print' }).first().hover();
+  await expect(page.locator('.rowsub .ddi')).toHaveText(['Halftone', 'Line Screen', 'Stipple', 'Ink Bleed', 'Misregistration']);
+  await page.locator('.rowm .ddi', { hasText: 'Distort' }).first().hover();
+  await expect(page.locator('.rowsub .ddi')).toHaveText(['Roughen', 'Ripple']);
   await page.locator('.rowm .ddi', { hasText: 'Blur' }).first().click();
   await expect(page.locator('.rowsub .ddi')).toHaveText(['Gaussian Blur', 'Motion Blur']);
   await page.locator('.rowsub .ddi', { hasText: 'Motion Blur' }).click(); await settle(page);
@@ -65,16 +69,20 @@ test('each effect draws its filter on a Shape, and they chain in list order', as
   expect(fx[0]).toMatchObject({ amt: 25, sz: 20, dist: 'gauss', mono: true });
   expect(typeof fx[0].sd).toBe('number');
   expect(fx[5]).toMatchObject({ sz: 30, tone: 55, ang: 45, spr: 40 });
+  expect(fx[6]).toMatchObject({ k: 'lines', ang: 45 });
+  expect(fx[8]).toMatchObject({ k: 'bleed', amt: 20, rag: 30, soft: 30 });
+  expect(fx[9]).toMatchObject({ k: 'misreg', col: 'cyan', amt: 25 });
   const art = await page.evaluate(() => { const a = document.getElementById('art'), fs = [...a.querySelectorAll('filter')].map(f => f.innerHTML); return { turb: fs.filter(h => h.includes('feTurbulence')).length, blur: fs.filter(h => /feGaussianBlur in="SourceGraphic" stdDeviation="[\d.]+"\/?>/.test(h)).length, motion: fs.filter(h => /stdDeviation="[\d.]+ 0"/.test(h)).length, tile: fs.filter(h => h.includes('feTile')).length, turned: a.querySelectorAll('g[transform^="rotate"] > g[filter] > g[transform^="rotate"]').length }; });
   expect(art.turb).toBeGreaterThanOrEqual(3);
   expect(art.blur).toBeGreaterThanOrEqual(1);
   expect(art.motion).toBeGreaterThanOrEqual(1);
-  expect(art.tile).toBeGreaterThanOrEqual(1);
-  expect(art.turned).toBeGreaterThanOrEqual(2);   // Motion Blur and Halftone work in a turned frame
+  expect(art.tile).toBeGreaterThanOrEqual(3);   // Halftone, Line Screen and Ripple tile a cell
+  expect(await page.evaluate(() => { const f = [...document.querySelectorAll('#art filter')].map(x => x.innerHTML); return [f.some(h => h.includes('feMorphology')), f.some(h => h.includes('feOffset')), f.filter(h => h.includes('feDisplacementMap')).length]; })).toEqual([true, true, 3]);   // Ink Bleed, Misregistration, and Ink Bleed + Roughen + Ripple displace
+  expect(art.turned).toBeGreaterThanOrEqual(4);   // Motion Blur, Halftone, Line Screen and Ripple work in a turned frame
   // switched off, an effect draws nothing
   const before = await page.evaluate(() => document.querySelectorAll('#art filter feTile').length);
   await page.locator('.fxg[data-fxk="motif"] [data-fu]').nth(5).locator('[data-fon]').click(); await settle(page);
-  expect(await page.evaluate(() => document.querySelectorAll('#art filter feTile').length)).toBe(before - 1);
+  expect(await page.evaluate(() => document.querySelectorAll('#art filter feTile').length)).toBe(before - 1);   // Halftone is off
   expect(errors).toEqual([]);
 });
 
@@ -107,7 +115,7 @@ test('text and a pattern take the new effects too', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'text');
   await addKind(page, 'text');
-  await addFx(page, 'text', null, 'Halftone');
+  await addFx(page, 'text', 'Print', 'Halftone');
   await addFx(page, 'text', 'Noise', 'Film Grain');
   let d = await st(page);
   expect((d.els.find(q => q.k === 'text').fx || []).map(e => e.k)).toEqual(['halftone', 'grain']);
@@ -146,5 +154,41 @@ test('a Halftone shape exports as dots: less ink than the plain shape, but not n
   const dots = await ink();
   expect(dots).toBeGreaterThan(plain * 0.1);
   expect(dots).toBeLessThan(plain * 0.85);
+  expect(errors).toEqual([]);
+});
+
+test('Print and Distort effects change what is drawn, and Misregistration offsets a second copy', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 4 });
+  await addShape(page); await settle(page);
+  const d = await st(page); const q = shapeOf(d); q.s = (+q.s || 100) * 5;
+  await page.evaluate(s => __wbTest.apply(s), JSON.stringify(d)); await settle(page);
+  const ink = async () => {
+    await page.evaluate(() => { window.__wbDownloads.length = 0; });
+    if (await page.locator('section.pn[data-p="xrec"]:not([hidden])').count() === 0) await openPanel(page, 'xrec');
+    await page.locator('#xrl .xrr', { hasText: 'Preview' }).locator('[data-act="exp"]').click();
+    await page.waitForFunction(() => window.__wbDownloads.length > 0);
+    return page.evaluate(async () => {
+      const x = window.__wbDownloads[0], bin = atob(x.base64), u = new Uint8Array(bin.length); for (let k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k);
+      const bm = await createImageBitmap(new Blob([u], { type: x.type })), c = new OffscreenCanvas(bm.width, bm.height), g = c.getContext('2d'); g.drawImage(bm, 0, 0);
+      const p = g.getImageData(0, 0, bm.width, bm.height).data; let dark = 0, cyan = 0, where = 0; for (let i = 0; i < p.length; i += 4) { if (p[i] + p[i + 1] + p[i + 2] < 300) { dark++; where = (where + i * 31) % 1000003; } if (p[i] < 60 && p[i + 1] > 140 && p[i + 2] > 200) cyan++; } return { dark, cyan, where };
+    });
+  };
+  const plain = await ink();
+  const fxs = { lines: { k: 'lines', sz: 25, tone: 55, ang: 45, spr: 40 }, stipple: { k: 'stipple', sz: 20, den: 55, spr: 80, sd: 5 }, bleed: { k: 'bleed', amt: 40, rag: 0, soft: 30, sd: 5 }, misreg: { k: 'misreg', amt: 40, ang: 0, col: 'cyan' }, rough: { k: 'rough', amt: 40, sz: 30, sd: 5 }, ripple: { k: 'ripple', amt: 40, wl: 30, ang: 0 } };
+  const got = {};
+  for (const [name, f] of Object.entries(fxs)) {
+    const d2 = await st(page); shapeOf(d2).fx = [{ u: 'e1', on: true, ...f }];
+    await page.evaluate(s => __wbTest.apply(s), JSON.stringify(d2)); await settle(page);
+    got[name] = await ink();
+  }
+  expect(got.lines.dark).toBeLessThan(plain.dark * 0.9);       // lines leave gaps
+  expect(got.lines.dark).toBeGreaterThan(plain.dark * 0.1);
+  expect(got.stipple.dark).toBeLessThan(plain.dark);           // the edge dissolves
+  expect(got.stipple.dark).toBeGreaterThan(plain.dark * 0.7);
+  expect(got.bleed.dark).toBeGreaterThan(plain.dark * 1.02);   // the ink swells
+  expect(plain.cyan).toBe(0);
+  expect(got.misreg.cyan).toBeGreaterThan(50);                 // a cyan second copy shows beside the ink
+  expect(got.rough.dark).not.toBe(plain.dark);
+  expect(got.ripple.where).not.toBe(plain.where);   // a ripple moves ink sideways to the wave, so the amount stays and the places change
   expect(errors).toEqual([]);
 });
