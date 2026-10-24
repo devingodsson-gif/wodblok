@@ -112,13 +112,26 @@ const saveCC=()=>{try{kv.set('wb7_colors',JSON.stringify(C.filter(c=>CC.includes
 // Open popups are lifted to the top of the page and placed against their button, so no panel, floating window,
 // scrolling area or the phone-width header (which scrolls sideways) can clip them or draw over them.
 // A small "..." menu for one row of a list: items are [label, action, disabled]. It opens next to the button, closes when you choose, click elsewhere or press Esc, and the items are real buttons (Tab and Enter work).
-let ROWM=null;
-function closeRowMenu(){if(ROWM){if(ROWM.btn)ROWM.btn.setAttribute('aria-expanded','false');ROWM.remove();ROWM=null}}
+let ROWM=null,ROWS=null;
+function closeRowSub(){if(ROWS){ROWS.remove();ROWS=null}if(ROWM)ROWM.querySelectorAll('.ddi[aria-expanded="true"]').forEach(b=>b.setAttribute('aria-expanded','false'))}
+function closeRowMenu(){closeRowSub();if(ROWM){if(ROWM.btn)ROWM.btn.setAttribute('aria-expanded','false');ROWM.remove();ROWM=null}}
+// An item is [label, action, disabled, sub]. An item with sub (a list of items, like the menu's own) opens a flyout beside it on hover, click, Enter or Right Arrow (2.35.0).
 function rowMenu(btn,items){const was=ROWM&&ROWM.btn===btn;closeRowMenu();if(was)return;const m=document.createElement('div');m.className='ddl rowm';m.dataset.w='150';m.setAttribute('role','menu');
- m.innerHTML=items.map(([t,,off],i)=>`<button type="button" class="ddi" role="menuitem" data-i="${i}"${off?' disabled':''}><span>${t}</span></button>`).join('');
+ m.innerHTML=items.map(([t,,off,sub],i)=>`<button type="button" class="ddi${sub?' hassub':''}" role="menuitem" data-i="${i}"${off?' disabled':''}${sub?' aria-haspopup="menu" aria-expanded="false"':''}><span>${t}</span>${sub?'<span class="rmcar" aria-hidden="true">&#8250;</span>':''}</button>`).join('');
  document.body.appendChild(m);placeFloat(m,btn,true);m.btn=btn;ROWM=m;btn.setAttribute('aria-expanded','true');
- m.onclick=e=>{const b=e.target.closest('[data-i]');if(!b||b.disabled)return;const f=items[+b.dataset.i][1];closeRowMenu();f()};
- m.onkeydown=e=>{if(e.key=='Escape'){e.stopPropagation();const b=m.btn;closeRowMenu();b.focus()}else if(e.key=='ArrowDown'||e.key=='ArrowUp'){e.preventDefault();const bs=[...m.querySelectorAll('button:not(:disabled)')],i=bs.indexOf(document.activeElement);bs[(i+(e.key=='ArrowDown'?1:-1)+bs.length)%bs.length].focus()}};
+ const openSub=(b,focus)=>{const it=items[+b.dataset.i];if(!it||!it[3])return;if(ROWS&&ROWS.src===b){if(focus){const f=ROWS.querySelector('button');if(f)f.focus()}return}closeRowSub();
+  const f=document.createElement('div');f.className='ddl rowm rowsub fx';f.setAttribute('role','menu');f.src=b;
+  f.innerHTML=it[3].map(([t,,off],i)=>`<button type="button" class="ddi" role="menuitem" data-j="${i}"${off?' disabled':''}><span>${t}</span></button>`).join('');
+  document.body.appendChild(f);b.setAttribute('aria-expanded','true');
+  const r=b.getBoundingClientRect(),mr=m.getBoundingClientRect(),vw=document.documentElement.clientWidth,vh=window.innerHeight,w=f.offsetWidth,h=f.offsetHeight;
+  let left=mr.right+2;if(left+w>vw-8)left=Math.max(8,mr.left-w-2);f.style.left=left+'px';f.style.top=Math.max(8,Math.min(r.top-6,vh-h-8))+'px';f.style.zIndex=9001;ROWS=f;
+  f.onclick=e=>{const c=e.target.closest('[data-j]');if(!c||c.disabled)return;const fn=it[3][+c.dataset.j][1];closeRowMenu();fn()};
+  f.onkeydown=e=>{if(e.key=='Escape'||e.key=='ArrowLeft'){e.stopPropagation();e.preventDefault();closeRowSub();b.focus()}else if(e.key=='ArrowDown'||e.key=='ArrowUp'){e.preventDefault();e.stopPropagation();const bs=[...f.querySelectorAll('button:not(:disabled)')],i=bs.indexOf(document.activeElement);bs[(i+(e.key=='ArrowDown'?1:-1)+bs.length)%bs.length].focus()}};
+  if(focus){const c=f.querySelector('button:not(:disabled)');if(c)c.focus()}};
+ m.onclick=e=>{const b=e.target.closest('[data-i]');if(!b||b.disabled)return;const it=items[+b.dataset.i];if(it[3]){e.stopPropagation();openSub(b,false);return}closeRowMenu();it[1]()};
+ m.addEventListener('mouseover',e=>{const b=e.target.closest('[data-i]');if(!b||b.disabled)return;if(items[+b.dataset.i][3])openSub(b,false);else if(ROWS)closeRowSub()});
+ m.onkeydown=e=>{if(e.key=='Escape'){e.stopPropagation();const b=m.btn;closeRowMenu();b.focus()}else if(e.key=='ArrowDown'||e.key=='ArrowUp'){e.preventDefault();const bs=[...m.querySelectorAll('button:not(:disabled)')],i=bs.indexOf(document.activeElement);bs[(i+(e.key=='ArrowDown'?1:-1)+bs.length)%bs.length].focus()}
+  else if(e.key=='ArrowRight'||e.key=='Enter'){const b=document.activeElement;if(b&&b.dataset&&b.dataset.i!=null&&items[+b.dataset.i][3]){e.preventDefault();openSub(b,true)}}};
  const f=m.querySelector('button:not(:disabled)');if(f)f.focus()}
 document.addEventListener('pointerdown',e=>{if(ROWM&&!e.target.closest('.rowm,[data-more]'))closeRowMenu()},true);
 addEventListener('scroll',e=>{if(ROWM&&!(e.target.closest&&e.target.closest('.rowm')))closeRowMenu()},true);

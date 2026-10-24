@@ -83,7 +83,7 @@ test('a pattern\'s effects apply to every placement', async ({ page }) => {
   await page.locator('.fxg[data-fxk="pattern"] .fxadd').scrollIntoViewIfNeeded();
   await page.click('.fxg[data-fxk="pattern"] .fxadd');
   const items = await page.locator(".rowm .ddi").allTextContents();
-  expect(items.map(s => s.trim())).toEqual(['Texture', 'Pressure offset', 'Jitter', 'Colour grade']);
+  expect(items.map(s => s.replace('›', '').trim())).toEqual(['Texture', 'Pressure offset', 'Jitter', 'Colour grade', 'Noise', 'Blur', 'Print', 'Distort']);   // 2.35.0: Noise and Blur are flyouts
   await page.keyboard.press('Escape');
   expect(errors).toEqual([]);
 });
