@@ -67,4 +67,13 @@ Scene: 40 shapes, 4 effects each (a fixed mix of the 15 shape effects), plus the
 | Undo / redo | 59 ms / 68 ms | 118 ms | -21% |
 Only the work the app's own code did on the main thread went down (sliders no longer repainted all at once, the Stamp panel no longer forces a layout). Effects into pixels did not change; that is 2.44.3. Single runs, about 5% noise. `npm run perf` ratio 0.973 (no regression).
 
+### After 2.44.3 (shapes with effects printed once), same scene and machine
+| Interaction | Time between frames (median / 90th) | Work per step | Change in work vs 2.44.2 | Pixels | Paint | Rebuild | App JS |
+|---|---|---|---|---|---|---|---|
+| Effect slider drag | 62 ms / 77 ms | 55 ms | -48% | 20% | 25% | 20% | 29% |
+| Shape drag | 35 ms / 48 ms | 16 ms | -52% | 27% | 40% | 8% | 20% |
+| Undo / redo | 52 ms / 62 ms | 63 ms | -47% | 18% | 22% | 16% | 37% |
+The selected shape draws live, the other 39 are images. Frame time of the shape drag did not move (35 ms): what is left is the whole-canvas rebuild and paint (step 2.44.4). A single run per row, about 5% noise. `npm run perf` ratio 0.962, randomize roll + settle 2005 ms (was 1888 ms, within noise).
+Picture check (not a stored golden): the same 15-shape scene drawn by 2.44.2 (live) and 2.44.3 (printed), screenshot of the canvas, 480 x 720 px: 112 pixels differ by more than 8 of 255 (0.03%), largest difference 72, all on shape edges. With all 15 effects stacked on a shape: 15 pixels. At a screen density of 2: 918 of 1.38 million (0.07%).
+
 `WB_DRAW_N` and `WB_DRAW_K` change the shapes and effects per shape. `WB_PROFILER=1` adds the JavaScript sampler to the trace.

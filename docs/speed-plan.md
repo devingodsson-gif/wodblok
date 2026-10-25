@@ -1,4 +1,4 @@
-# Speed plan: drawing with many elements and effects (written Oct 25 2026, not started)
+# Speed plan: drawing with many elements and effects (written Oct 25 2026; 2.44.1 to 2.44.3 built, see docs/perf-baseline.md)
 
 Owner, Oct 25 2026: "When there's many elements and effects it's very slow. Do an analysis, figure out what's taking up what percentage of the time, make a pie chart, and come up with a clean plan to speed up the drawing process."
 Nothing here is built. The steps below wait for the owner's word.
