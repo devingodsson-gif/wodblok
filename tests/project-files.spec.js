@@ -41,7 +41,7 @@ test('named snapshots are saved inside the file and come back when it is opened'
   await p1.click('#hsadd'); await p1.locator('#hsl').first().locator('input').press('Enter'); await settle(p1);
   await expect(p1.locator('#hsl').first().locator('[data-sn]')).toHaveCount(1);
   await p1.evaluate(() => { window.__wbDownloads.length = 0; });
-  await p1.click('#psv');
+  await p1.click('#fileb'); await p1.click('#psv');
   await p1.waitForFunction(() => window.__wbDownloads.length > 0);
   const dl = await p1.evaluate(() => window.__wbDownloads[0]), bytes = Buffer.from(dl.base64, 'base64');
   expect(Object.keys(require('fflate').unzipSync(new Uint8Array(bytes)))).toContain('snapshots/00.json');

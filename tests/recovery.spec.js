@@ -35,7 +35,7 @@ test('saved work leaves nothing to restore, and Dismiss removes the offer for go
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } }), page = await ctx.newPage();
   await openApp(page);
   await workAndTick(page);
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await expect(page.locator('#pmsg')).toHaveText(/Saved|Download/, { timeout: 30000 });   // the save has finished (on a slow machine it is not done when the page is quiet)
   await settle(page);
   await page.evaluate(() => window.__wbTest.recoveryTick());               // clean now: the recovery copy is dropped

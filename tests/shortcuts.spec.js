@@ -37,7 +37,7 @@ test('on a Mac the labels say Cmd', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 1 });
   expect(await page.getAttribute('#undo', 'title')).toBe('Undo (Cmd+Z)');
   await page.click('#fileb');
-  await expect(page.locator('#psvm')).toContainText('Cmd+S');   // the File menu shows the shortcut beside the item
+  await expect(page.locator('#psv')).toContainText('Cmd+S');   // the File menu shows the shortcut beside the item
   await page.keyboard.press('Escape');
   expect(await page.getAttribute('#cmdkb', 'title')).toContain('Cmd+K');
   expect(errors).toEqual([]);

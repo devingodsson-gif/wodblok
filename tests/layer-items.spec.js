@@ -56,7 +56,7 @@ test('the pictures used by elements are saved with the project, and a saved mixe
   await openProjectFile(page, mixed(testInfo.outputDir).file);
   const before = await getState(page);
   await page.evaluate(() => { window.__wbDownloads.length = 0; });
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   await page.keyboard.press('Escape');
   const dl = await page.evaluate(() => window.__wbDownloads[0]);

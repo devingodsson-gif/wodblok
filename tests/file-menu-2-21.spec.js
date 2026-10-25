@@ -8,7 +8,7 @@ test('the File menu lists Save, Save as, Import and Export; Export opens the Exp
   expect(items).toEqual(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save project', 'Save project as…', 'Save as template…', 'Import image as shape…', 'Export…', 'Settings…']);
   await page.click('#xrm'); await settle(page);
   await expect(page.locator('section.pn[data-p="xrec"]')).toBeVisible();
-  await page.click('#fileb'); await page.click('#psvm'); await settle(page);
+  await page.click('#fileb'); await page.click('#psv'); await settle(page);
   await page.waitForFunction(() => window.__wbDownloads && window.__wbDownloads.length >= 1);
   await page.click('#fileb'); await page.click('#psa'); await settle(page);
   await page.waitForFunction(() => window.__wbDownloads.length >= 2);

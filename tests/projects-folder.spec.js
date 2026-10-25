@@ -15,10 +15,10 @@ test('the button names the next step, the folder lists its projects, a project o
   const { errors } = await openApp(page, { pattern: false });
   test.skip(!(await page.evaluate(() => typeof window.showDirectoryPicker === 'function')), 'this browser has no folder picker');
   await installFolder(page, FILES);
-  await expect(page.locator('#pls')).toHaveText('Open projects folder');
-  await page.click('#pls');
+  await expect(page.locator('#pls')).toHaveText('Open projects folder…');
+  await page.click('#fileb'); await page.click('#pls');
   await expect(page.locator('#plist')).toBeVisible();
-  await expect(page.locator('#pls')).toHaveText('Projects');
+  await expect(page.locator('#pls')).toHaveText('Projects folder…');
   await expect(page.locator('#pdlgt')).toHaveText('My patterns');
   await expect(page.locator('#pgrid .pc')).toHaveCount(2);
   await expect(page.locator('#pgrid .pc b').first()).toBeVisible();
@@ -29,11 +29,11 @@ test('the button names the next step, the folder lists its projects, a project o
   expect(await getState(page)).not.toBe(emptyBefore);
   await expect(page.locator('#plist')).toBeHidden();
   await expect(page.locator('#pst')).not.toHaveClass(/dirty/);
-  await page.click('#pls');                                            // the list again (the folder is still chosen)
+  await page.click('#fileb'); await page.click('#pls');                                            // the list again (the folder is still chosen)
   await expect(page.locator('#pgrid .pc')).toHaveCount(2);
   await page.click('#pcf');
   await expect(page.locator('#plist')).toBeHidden();
-  await expect(page.locator('#pls')).toHaveText('Open projects folder');
+  await expect(page.locator('#pls')).toHaveText('Open projects folder…');
   expect(errors).toEqual([]);
 });
 
@@ -42,7 +42,7 @@ test('opening a project from the folder asks first when the current one has unsa
   test.skip(!(await page.evaluate(() => typeof window.showDirectoryPicker === 'function')), 'this browser has no folder picker');
   await page.click('#rzdo'); await settle(page, { max: 60000 });
   await installFolder(page, FILES);
-  await page.click('#pls');
+  await page.click('#fileb'); await page.click('#pls');
   const b = page.locator('#pgrid .pc [data-a="open"]').first();
   await expect(b).toBeVisible();
   const before = await getState(page);
@@ -66,22 +66,22 @@ test('with a folder chosen, Save project writes a new file into it, the next Sav
   await page.exposeFunction('__saveDialog', () => { pickerCalls++; });
   await page.evaluate(() => { window.showSaveFilePicker = async () => { window.__saveDialog(); throw Object.assign(new Error('no dialog in this test'), { name: 'AbortError' }); }; });
   await installFolder(page, [FILES[0]]);
-  await page.click('#pls'); await page.click('#pclose');
+  await page.click('#fileb'); await page.click('#pls'); await page.click('#pclose');
   await rollAndName(page, 'My pattern');
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await expect(page.locator('#pmsg')).toContainText('to My patterns');
   await expect.poll(() => page.evaluate(() => Object.keys(window.__folder.files).sort())).toEqual(['diamond.wodblok', 'my-pattern.wodblok']);
   const first = await page.evaluate(() => window.__folder.files['my-pattern.wodblok']);
   expect(first).toBeGreaterThan(1000);
   await rollAndName(page, 'My pattern');
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await expect(page.locator('#pmsg')).toContainText('Saved');
   expect(await page.evaluate(() => Object.keys(window.__folder.files).length)).toBe(2);   // same file written again
   await expect(page.locator('#pst')).not.toHaveClass(/dirty/);
   await page.click('#fileb'); await page.click('#pnw');
   await settle(page);
   await rollAndName(page, 'My pattern');
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await expect.poll(() => page.evaluate(() => Object.keys(window.__folder.files).sort())).toEqual(['diamond.wodblok', 'my-pattern-2.wodblok', 'my-pattern.wodblok']);
   expect(pickerCalls).toBe(0);                                                            // the Save dialog never opened
   expect(errors).toEqual([]);
@@ -91,10 +91,10 @@ test('if the folder cannot be written, Save project falls back to the normal Sav
   const { errors } = await openApp(page, { seed: 5 });
   test.skip(!(await page.evaluate(() => typeof window.showDirectoryPicker === 'function')), 'this browser has no folder picker');
   await installFolder(page, [FILES[0]], { writable: false });
-  await page.click('#pls'); await page.click('#pclose');
+  await page.click('#fileb'); await page.click('#pls'); await page.click('#pclose');
   await rollAndName(page, 'Fallback');
   await page.evaluate(() => { window.__wbDownloads.length = 0; });
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   expect(await page.evaluate(() => window.__wbDownloads[0].filename)).toMatch(/fallback\.wodblok$/);
   expect(await page.evaluate(() => Object.keys(window.__folder.files))).toEqual(['diamond.wodblok']);

@@ -22,7 +22,7 @@ test('a fresh launch shows no unsaved dot, and making a change shows it', async 
 test('the top bar has Save project but no Export; the File menu has the project items (2.21.0: Save, Save as, Import, Export too); the Export tool holds the image exports', async ({ page }) => {
   const { errors } = await openApp(page);
   await expect(page.locator('#expb')).toHaveCount(0);
-  await expect(page.locator('#psv')).toHaveText('Save project');
+  await expect(page.locator('#psv')).toContainText('Save project');
   await page.click('#fileb');
   await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save projectCtrl+S', 'Save project as…', 'Save as template…', 'Import image as shape…', 'Export…', 'Settings…']);
   await page.keyboard.press('Escape');
@@ -35,7 +35,7 @@ test('Save project downloads a .wodblok file and clears the dot; the next change
   const { errors } = await openApp(page, { seed: 5 });
   await roll(page);
   await page.evaluate(() => { window.__wbDownloads.length = 0; });
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   const dl = await page.evaluate(() => window.__wbDownloads[0]);
   expect(dl.filename).toMatch(/\.wodblok$/);
@@ -57,11 +57,11 @@ test('where the browser can write files, the first Save asks where and the next 
     window.showSaveFilePicker = async () => { window.__pickerCalls++; return handle; };
   });
   await roll(page);
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await expect(page.locator('#pmsg')).toContainText('Saved');
   expect(await page.evaluate(() => window.__pickerCalls)).toBe(1);
   await roll(page);
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await expect.poll(() => page.evaluate(() => window.__written.length)).toBe(2);
   expect(await page.evaluate(() => window.__pickerCalls)).toBe(1);
   expect(errors).toEqual([]);

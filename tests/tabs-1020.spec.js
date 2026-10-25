@@ -15,12 +15,3 @@ test('with many tabs open the newest tab is fully visible and the strip shows it
   expect(r.left).toBe(true);
   expect(errors).toEqual([]);
 });
-
-test('Open projects folder and File look like buttons', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  for (const id of ['pls']) {   // File is a name in the menu bar since 2.42.0, plain text like the other menus
-    const w = await page.evaluate(id => parseFloat(getComputedStyle(document.getElementById(id)).borderTopWidth) > 0 && getComputedStyle(document.getElementById(id)).borderTopColor !== 'rgba(0, 0, 0, 0)', id);
-    expect(w, id).toBe(true);
-  }
-  expect(errors).toEqual([]);
-});

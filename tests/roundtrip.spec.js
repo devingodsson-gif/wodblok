@@ -13,7 +13,7 @@ const TMP = path.join(ROOT, 'test-results', 'tmp');
 
 async function download(page) {
   await page.evaluate(() => { window.__wbDownloads.length = 0; });
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   await page.keyboard.press('Escape');
   return page.evaluate(() => window.__wbDownloads[0]);

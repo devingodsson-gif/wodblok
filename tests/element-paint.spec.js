@@ -107,7 +107,7 @@ test('a project with Paint strokes (and an eraser and an effect) saves and opens
   await settle(page);
   const before = await stateText(page);
   await page.evaluate(() => { window.__wbDownloads.length = 0; });
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   await page.keyboard.press('Escape');
   const dl = await page.evaluate(() => window.__wbDownloads[0]);
