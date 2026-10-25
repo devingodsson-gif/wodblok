@@ -90,8 +90,8 @@ Only items the owner has stated are listed as next. Nothing is started unless he
 None at the moment. Add new ones here.
 
 ## Suggestions (my recommendations, not decisions)
-- Drawing speed: plan in docs/speed-plan.md (Oct 25 2026). Recommended order: 2.44.1 measure, 2.44.2 stop refreshing unchanged panels, 2.44.3 print effect elements once (the big one), 2.44.4 update the canvas in place.
-- Known bug found while measuring: `npm run dev` (unbundled modules) fails at start, "teD is not defined" (22-text-tool.js uses teD from 60-text-engine.js without importing it). Fix is in step 2.44.1 of the speed plan.
+- Drawing speed: plan in docs/speed-plan.md (Oct 25 2026). Owner said yes to the order below. 2.44.1 and 2.44.2 are built on feat/2.44.1-perf-draw (not merged; 2.44.2 measured: -8% work per slider/shape step, -21% undo/redo). Order: 2.44.1 measure, 2.44.2 stop refreshing unchanged panels, 2.44.3 print effect elements once (the big one), 2.44.4 update the canvas in place.
+- Known bug found while measuring: `npm run dev` (unbundled modules) fails at start, "teD is not defined" (22-text-tool.js uses teD from 60-text-engine.js without importing it). Fixed in 2.44.1.
 - Window > Close all panels could change its label to Default panels when that is what it does (the command label is fixed today).
 - The panel commands read "Open Canvas", "Open Grid", "Open Export" in the menus; shorter menu labels (Canvas…, Grid…, Export recipes) would read more like Photoshop. Needs the owner's word (command search shows the same labels).
 - Keep `CLAUDE.md` short and move detail to the docs it already points at (its opening paragraph had grown into a release-by-release list; it now points here and to `docs/plan.md` instead).

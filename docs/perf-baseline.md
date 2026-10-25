@@ -58,4 +58,13 @@ Scene: 40 shapes, 4 effects each (a fixed mix of the 15 shape effects), plus the
 | Undo / redo (full redraw) | 66 ms / 77 ms | 150 ms | 42% | 17% | 9% | 26% |
 
 "Pixels" is the browser turning effects into pixels on its drawing threads; it is about half of all work in every case. The first analysis (docs/speed-plan.md) was made with heavier tracing switched on and measured longer times (slider drag 165 ms between frames); the shares agree within a few points, the absolute numbers here are the ones `npm run perf:draw` reproduces.
+
+### After 2.44.2 (stop refreshing what did not change), same scene and machine
+| Interaction | Time between frames (median / 90th) | Work per step | Change in work |
+|---|---|---|---|
+| Effect slider drag | 95 ms / 114 ms | 106 ms | -8% |
+| Shape drag | 37 ms / 47 ms | 33 ms | -8% |
+| Undo / redo | 59 ms / 68 ms | 118 ms | -21% |
+Only the work the app's own code did on the main thread went down (sliders no longer repainted all at once, the Stamp panel no longer forces a layout). Effects into pixels did not change; that is 2.44.3. Single runs, about 5% noise. `npm run perf` ratio 0.973 (no regression).
+
 `WB_DRAW_N` and `WB_DRAW_K` change the shapes and effects per shape. `WB_PROFILER=1` adds the JavaScript sampler to the trace.

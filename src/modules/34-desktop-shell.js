@@ -263,8 +263,11 @@ function enhance(){document.querySelectorAll('.dock input[type=range]').forEach(
 const hasL=lb&&lb.tagName=='LABEL';r.parentNode.insertBefore(row,hasL?lb:r);if(hasL){row.appendChild(lb);if(!r.id)0;lb.htmlFor=r.id}row.appendChild(r);addNum(row,r)});
 // every slider row in a panel has a value box (Part 9): rows written in the page or by a panel's own markup get theirs here
 document.querySelectorAll('#sel input[type=range],.dock .ctl input[type=range]').forEach(r=>{const row=r.closest('.ctl');if(row&&!row.querySelector('.num')&&!row.querySelector('input[type=number]')&&!r.hasAttribute('data-plain')){const lb=row.querySelector('label');if(lb&&r.id)lb.htmlFor=r.id;addNum(row,r)}})}
-function paint(r){const lo=+r.min,hi=+r.max,p=hi>lo?(r.value-lo)/(hi-lo)*100:0;r.style.setProperty('--p',p.toFixed(1)+'%');if(r._n&&document.activeElement!==r._n)r._n.value=+(+r.value).toFixed(2)}
-function nums(){document.querySelectorAll('input[type=range]').forEach(paint)}
+function paint(r){const lo=+r.min,hi=+r.max,p=hi>lo?(r.value-lo)/(hi-lo)*100:0;r.style.setProperty('--p',p.toFixed(1)+'%');const typing=r._n&&document.activeElement===r._n;if(r._n&&!typing)r._n.value=+(+r.value).toFixed(2);r._pk=typing?null:r.value+'|'+r.min+'|'+r.max}
+// 2.44.2 (docs/speed-plan.md): every redraw repainted all 363 sliders of the app. Now only the sliders that can be seen are repainted (those of a panel that is open, and the few
+// outside panels), and only when their value or range changed since the last paint. A panel is repainted when it opens (wsRender calls nums), so a hidden one is never out of date when it shows.
+const NUMS_SEL='section.pn:not([hidden]) input[type=range],input[type=range]:not(section.pn input)';
+function nums(){document.querySelectorAll(NUMS_SEL).forEach(r=>{if(r._pk!==r.value+'|'+r.min+'|'+r.max)paint(r)})}
 WBX.wbNums=nums;WBX.wbEnhance=enhance;
 document.addEventListener('input',e=>{if(e.target.type=='range')paint(e.target)});
 

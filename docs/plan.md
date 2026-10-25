@@ -1,6 +1,7 @@
 # Development plan
 
-## Next plan: drawing speed (written Oct 25 2026, not started)
+## Drawing speed (written Oct 25 2026; 2.44.1 and 2.44.2 built, not merged)
+2.44.1: `npm run perf:draw` and the dev-mode import fix. 2.44.2: `nums()` repaints only the sliders of open panels (and the few outside panels) and only when value/min/max changed; `stPanel` no longer reads `offsetParent` (forced layout). Work per step down 8% (slider, shape drag) and 21% (undo/redo); tests: panels, stamp, top bar, menu, no-rail specs (33 passed), `npm run perf` ratio 0.973, check:style and check:platform OK. Full suite not run. Next: 2.44.3.
 See docs/speed-plan.md: measured breakdown (effects turned into pixels about half of all work on every change; the whole canvas rebuilt each time; panels refreshed for nothing) and five steps, 2.44.1 to 2.44.5, then 2.45.0. Waiting for the owner.
 
 ## Done: the rail moved into the top bar (2.44.0, Oct 25 2026, live with 2.42.0 and 2.43.0 through #125)
