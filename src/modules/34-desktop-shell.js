@@ -337,9 +337,12 @@ const _sp=WBH.syncPr;WBH.syncPr=function(){_sp();nums()};const _stx=WBH.syncTex;
 let mt=0;new MutationObserver(()=>{clearTimeout(mt);$('pmsg').style.opacity=1;if($('pmsg').textContent)mt=setTimeout(()=>{$('pmsg').style.transition='opacity .6s';$('pmsg').style.opacity=0;setTimeout(()=>{$('pmsg').style.transition=''},700)},6000)}).observe($('pmsg'),{childList:true,characterData:true,subtree:true});
 
 // ---- menus
-const menus=[['fileb','filem']];
-const closeMenus=()=>menus.forEach(([b,m])=>{$(m).hidden=true;$(b).setAttribute('aria-expanded','false')});WBX.wbCloseMenus=closeMenus;
-menus.forEach(([b,m])=>{$(b).onclick=e=>{e.stopPropagation();const o=$(m).hidden;closeMenus();closeDD();$(m).hidden=!o;if(o)placeFloat($(m),$(b),$(m).classList.contains('r'));$(b).setAttribute('aria-expanded',String(o))};$(m).addEventListener('click',e=>{if(e.target.closest('button,label')&&!e.target.closest('[data-sure]'))closeMenus()})});
+// The menus of the menu bar (2.42.0): File here, the rest from 85-menu-bar.js through WBX.wbMenuWire. `before` fills a menu just before it opens.
+// A click on an item closes the menus; an item that opens a submenu (aria-haspopup) or asks twice (data-sure) keeps them open.
+const menus=[];
+const closeMenus=()=>{menus.forEach(([b,m])=>{$(m).hidden=true;$(b).setAttribute('aria-expanded','false')});if(WBX.wbMenuSubClose)WBX.wbMenuSubClose()};WBX.wbCloseMenus=closeMenus;
+function menuWire(b,m,before){menus.push([b,m]);$(b).onclick=e=>{e.stopPropagation();const o=$(m).hidden;closeMenus();closeDD();if(o&&before)before();$(m).hidden=!o;if(o)placeFloat($(m),$(b),$(m).classList.contains('r'));$(b).setAttribute('aria-expanded',String(o))};$(m).addEventListener('click',e=>{if(e.target.closest('button,label')&&!e.target.closest('[data-sure],[aria-haspopup]'))closeMenus()})}
+menuWire('fileb','filem');WBX.wbMenuWire=menuWire;WBX.wbMenuOpen=()=>menus.some(([,m])=>!$(m).hidden);
 document.addEventListener('click',e=>{if(!e.target.closest('.menu,.pop'))closeMenus()});
 // A floating popup would drift away from its button if the page or a panel scrolled under it, so close it instead.
 addEventListener('scroll',e=>{const t=e.target;if(t&&t.closest&&t.closest('.pop,.ddl'))return;if(typeof typing=='function'&&typing())return;closeMenus();closeDD()},true);addEventListener('resize',()=>{if(typeof typing=='function'&&typing())return;closeMenus();closeDD()});

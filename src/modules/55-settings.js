@@ -124,7 +124,7 @@ function stShow(){try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}
  try{const p=kv.get(stK_PAGE);if(stPAGES.some(x=>x[0]===p))stPage=p}catch(e){}
  stKeyQ='';stPaint();stD().hidden=false;const t=$('stgnav').querySelector('.on');if(t)t.focus()}
 function stHide(){if(stD().hidden)return;closePicker();stD().hidden=true;const b=stOpener&&stOpener.isConnected?stOpener:$('fileb');if(b&&b.focus)b.focus()}
-function init55(){WBX.wbStgSync=()=>{if(stIsOpen()&&stPage=='guides')stPaint()};   // the Smart guides command (84) changed the switch
+function init55(){WBX.wbStgOpen=p=>{stShow();stSetPage(p)};WBX.wbStgSync=()=>{if(stIsOpen()&&stPage=='guides')stPaint()};   // the Smart guides command (84) changed the switch
  accentApply(stAccentGet());acAccount.shareAccent(stAccentGet());stDraftApply(stFlag(stK_DRAFT,true));stCalmApply(stFlag(stK_CALM,false));
  {const tv=stNumGet(stK_TRAY,7,7,TRAY_MAX);setTrayView(tv);if(tv>7)try{paintDock(true)}catch(e){}}setAutosaveEvery(stNumGet(stK_SAVE,8,8,120)*1000);
  $('stgo').onclick=stShow;$('stgclose').onclick=stHide;stD().addEventListener('click',e=>{if(e.target===stD())stHide()});

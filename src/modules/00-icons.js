@@ -16,6 +16,8 @@ minus:'<path d="M5 12h14"/>',
 more:'<circle cx="6" cy="12" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="18" cy="12" r="1.1"/>',
 menu:'<path d="M4.5 7h15M4.5 12h15M4.5 17h15"/>',
 chevR:'<path d="M10 6.5l5.5 5.5-5.5 5.5"/>',
+// a ticked menu item (2.42.0: the menu bar's on/off commands)
+check:'<path d="M5 12.5l4.5 4.5 9.5-10"/>',
 chevL:'<path d="M14 6.5L8.5 12l5.5 5.5"/>',
 chevD:'<path d="M6.5 10l5.5 5.5 5.5-5.5"/>',
 chevsD:'<path d="M7 6.5l5 5 5-5M7 12.5l5 5 5-5"/>',

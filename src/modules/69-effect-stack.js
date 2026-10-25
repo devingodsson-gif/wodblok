@@ -46,6 +46,12 @@ const SEL={};   // the effect whose settings show, per kind
 const fxHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fxCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 function fxTarget(kind){if(kind=='pattern')return patCur();if(kind=='paint')return paCur();const q=elSel();return q&&elKind(q)==kind?q:null}
+// Adds effect k to the element of that kind that is being edited and opens its settings. The + of the Effects group and the Effects menu (2.42.0) both use it. false = nothing to add it to
+function fxAddTo(kind,k){const d=fxDef(k),t=fxTarget(kind);if(!d||!t||!d.kinds.includes(kind))return false;const f=d.make();f.u=fpU();(t.fx=t.fx||[]).push(f);SEL[kind]=f.u;fxCh();return true}
+// The kind the Effects menu works on: the selected element's kind, when that element takes effects
+function fxMenuKind(){const k=elKind(elSel());return k&&fxTarget(k)?k:''}
+// The Effects menu's run: add effect k to the selected element and show its settings in the element's panel
+function fxMenuAdd(k){const kind=fxMenuKind();if(!kind||!fxAddTo(kind,k))return false;if(WBX.wbFxOpen)WBX.wbFxOpen(kind,SEL[kind]);return true}
 // The list (2.3.0, Photoshop's layer effects): one row per effect (eye, name, ⋯), drag to reorder; the open effect's settings show right under its row.
 // The + in the group's title adds one. Rows before the open one and the open row are in .fxl, the settings follow, the rest are in .fxl2.
 const FXI={eye:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.eye+'</svg>',
@@ -102,7 +108,7 @@ fxRegister('grade',{label:'Colour grade',kinds:['stamp','text','pattern','paint'
 fqRegister();
 Object.entries(KIND_PANEL).forEach(([kind,pn])=>{const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec)return;sec.insertAdjacentHTML('beforeend',fxGroup(kind))});
 document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,tg=()=>fxTarget(kind),cur=()=>{const t=tg();return t?fxOf(t).find(e=>e.u==SEL[kind])||null:null};
-g.querySelector('.fxadd').onclick=e=>{e.stopPropagation();e.preventDefault();const t=tg();if(!t)return;const add=d=>()=>{const t2=tg();if(!t2)return;const f=d.make();f.u=fpU();(t2.fx=t2.fx||[]).push(f);SEL[kind]=f.u;fxCh()};
+g.querySelector('.fxadd').onclick=e=>{e.stopPropagation();e.preventDefault();const t=tg();if(!t)return;const add=d=>()=>fxAddTo(kind,d.k);
  // effects with a group (Noise, Blur) sit in a flyout under the group's name, at the place of the group's first effect (2.35.0)
  const items=[],grp={};fxFor(kind).forEach(d=>{const it=[d.label,add(d)];if(d.grp){if(!grp[d.grp]){grp[d.grp]=[d.grp,null,false,[]];items.push(grp[d.grp])}grp[d.grp][3].push(it)}else items.push(it)});
  rowMenu(e.currentTarget,items)};
@@ -141,4 +147,4 @@ g.querySelector('.fxjrr').onclick=()=>{const e=cur();if(e&&e.k=='jitter'){e.sd=t
 WBX.wbFxSync=fxSync}
 // a text's Jitter is rolled per letter: letter i of text p gets its own seed, and the size it moves by is the font size
 const fxJitL=(p,i,fs)=>fxJit({u:p.u+'#'+i,s:fs,fx:p.fx});
-export {fxGr,fxJit,fxJitL,fxPad,fxPress,fxSync,fxTex,fxTexUses,init69};
+export {fxAddTo,fxMenuAdd,fxMenuKind,fxGr,fxJit,fxJitL,fxPad,fxPress,fxSync,fxTex,fxTexUses,init69};
