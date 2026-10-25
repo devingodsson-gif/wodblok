@@ -47,3 +47,15 @@ Decision: do not build the canvas/WebGL renderer for 1.0. If a Mac with a GPU (o
 
 ## Oct 18 2026 (layer update, step 3): the slider drag test works again
 `tests/perf.spec.js` drags `#lrp`; the Layout panel had grown until that slider was below the 900 px window, so for a while the drag missed it and the test measured an idle page (ratio 0.149). The test now scrolls the slider into view and fails if it is off screen. Same machine, side by side: `main` ratio 0.906, layer update step 3 ratio 0.853; Randomize settle 1.26 s and 1.31 s.
+
+## Oct 25 2026 (2.44.1): drawing with many elements and effects (`npm run perf:draw`)
+Scene: 40 shapes, 4 effects each (a fixed mix of the 15 shape effects), plus the pattern and Background; canvas SVG about 610 KB. Cloud sandbox, headless Chromium, 1440 x 900, 2 CPUs, software drawing (no GPU). Three runs, medians; run to run the numbers moved by about 5%. Compare the same machine before and after a change, never across machines.
+
+| Interaction | Time between frames (median / 90th) | Work per step (all threads) | Pixels | Paint and frames | SVG parse, style, layout | App JavaScript |
+|---|---|---|---|---|---|---|
+| Effect slider drag | 95 ms / 134 ms | 115 ms | 44% | 22% | 10% | 20% |
+| Shape drag | 36 ms / 49 ms | 36 ms | 53% | 29% | 4% | 11% |
+| Undo / redo (full redraw) | 66 ms / 77 ms | 150 ms | 42% | 17% | 9% | 26% |
+
+"Pixels" is the browser turning effects into pixels on its drawing threads; it is about half of all work in every case. The first analysis (docs/speed-plan.md) was made with heavier tracing switched on and measured longer times (slider drag 165 ms between frames); the shares agree within a few points, the absolute numbers here are the ones `npm run perf:draw` reproduces.
+`WB_DRAW_N` and `WB_DRAW_K` change the shapes and effects per shape. `WB_PROFILER=1` adds the JavaScript sampler to the trace.

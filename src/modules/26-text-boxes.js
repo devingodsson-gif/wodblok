@@ -8,7 +8,7 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {mkWell,paintWell} from './52-tray-ui.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
-import {txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
+import {txoRead,txoWrite,txoBind,txoSelBind,txoSeed,TXO_IDS} from './61-text-panel.js';
 import {stTxMode} from './63-stamp-tool.js';
 import {fxGr,fxJit,fxJitL,fxPad,fxTexUses} from './69-effect-stack.js';
 // ===== Text boxes. Any layer may hold them, in L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
