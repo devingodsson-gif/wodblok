@@ -140,3 +140,4 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 ## Oct 24 2026: the menu bar
 - He develops WODBLOK **desktop-only for now** (it does not need to be mobile friendly); mobile comes later as an adaptation.
 - He asked for an Adobe-style top menu bar ("File, Export, Effects, Elements and more") and approved the menus File, Export, Edit, Elements, Effects, Colour, View, Window, Help. Built as 2.42.0: every item is a registry command, so a later desktop build can turn the same list into native menus.
+- Same evening (2.43.0): he wants the top bar "really clean": no wordmark in the bar (the WB mark alone), the project name centred, Save project and the projects folder in the File menu, the version in the status line; right side only undo, redo, search, Randomize, light/dark.

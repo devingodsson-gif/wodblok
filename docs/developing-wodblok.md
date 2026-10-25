@@ -50,7 +50,7 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 - Libraries of any kind (shapes, stamps, textures, colours, colourways, templates, workspaces, export recipes, text styles) use the **same folder tree** as the shape library (Part 9, section 12).
 - The word is **shape** everywhere in the UI (2.32.0: the library art and the element are both "Shape"; the code and the file still say `motif`). "Ink surface" was renamed **stamp texture**. Panels use plain everyday words (no jargon like "dry brayer").
 - The canvas is always a rectangle (2.32.0; the rounded, circle, oval, arch, hexagon, triangle, diamond and polygon outlines are gone). A stamp can still have its own outline.
-- Brand: the "WB" letter mark in bronze (bare letters, no tile behind them); the wordmark is set in IM Fell English; the same mark is the favicon. The accent colour is the user's choice, eight woods: Oak (default bronze), Birch, Rosewood, Ironwood, Eucalyptus, Purpleheart, Walnut, Maple.
+- Brand: the "WB" letter mark in bronze (bare letters, no tile behind them); the wordmark is set in IM Fell English and appears on the splash and the website, not in the top bar (2.43.0: the WB mark alone heads the bar); the same mark is the favicon. The accent colour is the user's choice, eight woods: Oak (default bronze), Birch, Rosewood, Ironwood, Eucalyptus, Purpleheart, Walnut, Maple.
 - Launch is always cleared and in Pattern mode. Clear resets the canvas.
 
 ## 3. Working with the owner
@@ -236,10 +236,10 @@ Rules:
 | `--fs-m` | 12px | Body, buttons, fields, list rows, menus. The base size |
 | `--fs-l` | 13px | Panel and dialog titles (600); group titles use `--fs-m` 600 |
 
-Brand sizes are separate and fixed: wordmark 21px (owner, Oct 22 2026; the guide said 15px), splash 20px. The "+" glyph of an empty slot is 18px (list) or 28px (large). Nothing else uses another size.
+Brand sizes are separate and fixed: splash 20px (the 21px top-bar wordmark was removed in 2.43.0, owner Oct 24 2026). The "+" glyph of an empty slot is 18px (list) or 28px (large). Nothing else uses another size.
 
 Font (one family, sans-serif only):
-- **Hanken Grotesk** for every piece of text in the app, except the "WODBLOK" wordmark in the top bar, which is set in IM Fell English (owner, Oct 22 2026; this is the only serif in the app): the splash, titles, labels, buttons, fields, lists, menus, status messages and the print proof sheet. Fallback `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
+- **Hanken Grotesk** for every piece of text in the app, except the "WODBLOK" wordmark, which is set in IM Fell English (owner, Oct 22 2026; this is the only serif in the app; since 2.43.0 it is not in the top bar): the splash, titles, labels, buttons, fields, lists, menus, status messages and the print proof sheet. Fallback `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
 - No serif, display or second UI face. Hierarchy comes from size, weight and case, never from a different font.
 - Exempt: the fonts the user picks for their own artwork in the Text tool (and imported fonts). They are content, not interface.
 - The font is bundled; no remote fonts, no runtime network.
@@ -584,6 +584,8 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 - Keyboard: arrows move, Enter picks, Esc closes and returns focus.
 - The File menu order is fixed: New project, New from template…, Clear, divider, Open…, Save as template…, then the rest. Add to a menu at the end of its logical group, and ask before reordering.
 - **The menu bar** (2.42.0, `85-menu-bar.js`): File, Export, Edit, Elements, Effects, Colour, View, Window, Help, as plain text names (`.mnbb`: `--h-md`, padding 0 8, `--r-m`, `--fs-m` 400, transparent; `--raise` on hover and while open) at the left of the top bar after the wordmark. The menus are `.pop.mnbm`. Every item is a registry command: its label (plus `…` for a dialog or file picker), its shortcut, greyed out when the command is; an on/off command shows a tick (`check` icon, `--acc-ink`) in the 15px icon column. A submenu (`.mnbs`, chevron right) opens beside its item on hover, click or Right arrow. With a menu open, pointing at another name opens it. Down on a name opens it at its first item; Left and Right move along the bar. A new menu item is a command added to the `MNB` list, never a button written into a menu.
+
+- **The top bar** (2.43.0, owner Oct 24 2026: "really clean"): three zones in a grid. Left (`.tl`): the WB mark and the menu bar. Middle: the project's name (`#pnm`, centred text, a field on click) and its unsaved dot. Right (`.tr`): undo, redo, search, Randomize (the one prominent button) and light/dark; the account goes here later. Nothing else: Save project and the projects folder are File menu items, the version is in the status line (`#ver`). A new tool does not go in the top bar without asking.
 
 #### 13.3 Commands and shortcuts
 
