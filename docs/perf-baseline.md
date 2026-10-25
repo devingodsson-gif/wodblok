@@ -84,4 +84,12 @@ Picture check (not a stored golden): the same 15-shape scene drawn by 2.44.2 (li
 | Undo / redo | 44 ms / 66 ms | 57 ms | -10% |
 Against 2.44.1 (start of the speed work): work per step 115 -> 43 ms (slider), 36 -> 13 ms (shape drag), 150 -> 57 ms (undo/redo); time between frames 95 -> 59, 36 -> 32, 66 -> 44 ms. Single runs, about 5% noise. `npm run perf`: ratio 0.393 (the slider test finished faster), randomize roll + settle 1789 ms.
 
+### 2.45.0: end of the drawing speed plan (three runs, medians), same scene and machine
+| Interaction | Start (2.44.1) frame / work | Now frame / work |
+|---|---|---|
+| Effect slider drag | 95 ms / 115 ms | 59 ms / 44 ms |
+| Shape drag | 36 ms / 36 ms | 33 ms / 15 ms |
+| Undo / redo | 66 ms / 150 ms | 46 ms / 57 ms |
+Work per step is down 60 to 62% on all three. Frame time falls less because the harness measures input to two frames later (a floor of about 30 ms on this machine). Not measured on a Mac with a GPU yet.
+
 `WB_DRAW_N` and `WB_DRAW_K` change the shapes and effects per shape. `WB_PROFILER=1` adds the JavaScript sampler to the trace.
