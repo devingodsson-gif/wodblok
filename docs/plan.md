@@ -1,5 +1,8 @@
 # Development plan
 
+## Next plan: all toolbar items into the top bar (written Oct 24 2026, not started)
+See docs/top-bar-tools-plan.md: a tool strip under the menu row (element tools, panel openers, view controls), steps 2.43.1 to 2.43.4, then 2.44.0. Waiting for the owner on the four open choices at the end of that file.
+
 ## Next plan: the element list (written Oct 20 2026, not started)
 Layers become one ordered list of elements; the element buttons create instances at the top. Fix release 2.2.1, then 2.2.2 (list, engine, format 23) and 2.2.3 (menus). See [`element-list-plan.md`](element-list-plan.md).
 

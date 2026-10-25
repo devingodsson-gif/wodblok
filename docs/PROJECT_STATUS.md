@@ -88,6 +88,7 @@ Only items the owner has stated are listed as next. Nothing is started unless he
 None at the moment. Add new ones here.
 
 ## Suggestions (my recommendations, not decisions)
+- Toolbar items into the top bar: plan in docs/top-bar-tools-plan.md (second header row as a tool strip, rail removed). Open: layout A or B, panel openers in the strip, colour tray, rail customising. Not started.
 - Keep `CLAUDE.md` short and move detail to the docs it already points at (its opening paragraph had grown into a release-by-release list; it now points here and to `docs/plan.md` instead).
 - Run the CI shard suite once before the next release goes live (my estimate: high importance, because 2.4.0 to 2.9.0 changed the Add bar, panels, stamp view and removed tools with no recorded full run). The owner said to ask him first, so suggest it with the importance percentage and wait.
 
