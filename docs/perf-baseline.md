@@ -76,4 +76,12 @@ Only the work the app's own code did on the main thread went down (sliders no lo
 The selected shape draws live, the other 39 are images. Frame time of the shape drag did not move (35 ms): what is left is the whole-canvas rebuild and paint (step 2.44.4). A single run per row, about 5% noise. `npm run perf` ratio 0.962, randomize roll + settle 2005 ms (was 1888 ms, within noise).
 Picture check (not a stored golden): the same 15-shape scene drawn by 2.44.2 (live) and 2.44.3 (printed), screenshot of the canvas, 480 x 720 px: 112 pixels differ by more than 8 of 255 (0.03%), largest difference 72, all on shape edges. With all 15 effects stacked on a shape: 15 pixels. At a screen density of 2: 918 of 1.38 million (0.07%).
 
+### After 2.44.4 (canvas updated in place), same scene and machine
+| Interaction | Time between frames (median / 90th) | Work per step | Change in work vs 2.44.3 |
+|---|---|---|---|
+| Effect slider drag | 59 ms / 78 ms | 43 ms | -22% |
+| Shape drag | 32 ms / 44 ms | 13 ms | -19% |
+| Undo / redo | 44 ms / 66 ms | 57 ms | -10% |
+Against 2.44.1 (start of the speed work): work per step 115 -> 43 ms (slider), 36 -> 13 ms (shape drag), 150 -> 57 ms (undo/redo); time between frames 95 -> 59, 36 -> 32, 66 -> 44 ms. Single runs, about 5% noise. `npm run perf`: ratio 0.393 (the slider test finished faster), randomize roll + settle 1789 ms.
+
 `WB_DRAW_N` and `WB_DRAW_K` change the shapes and effects per shape. `WB_PROFILER=1` adds the JavaScript sampler to the trace.
