@@ -19,12 +19,12 @@ test('a fresh launch shows no unsaved dot, and making a change shows it', async 
   expect(errors).toEqual([]);
 });
 
-test('the top bar has Save project but no Export; the File menu has the project items (2.21.0: Save, Save as, Import, Export too); the Export tool holds the image exports', async ({ page }) => {
+test('the File menu has Save project (2.43.0: no longer in the top bar) and the project items (2.21.0: Save, Save as, Import, Export too); the Export tool holds the image exports', async ({ page }) => {
   const { errors } = await openApp(page);
   await expect(page.locator('#expb')).toHaveCount(0);
   await expect(page.locator('#psv')).toContainText('Save project');
   await page.click('#fileb');
-  await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save projectCtrl+S', 'Save project as…', 'Save as template…', 'Import image as shape…', 'Export…', 'Settings…']);
+  await expect(page.locator('#filem > button, #filem > label')).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Open projects folder…', 'Save projectCtrl+S', 'Save project as…', 'Save as template…', 'Import image as shape…', 'Export…', 'Settings…']);
   await page.keyboard.press('Escape');
   await openPanel(page, 'xrec');
   for (const id of ['png', 'sv', 'cpy', 'xrnow']) await expect(page.locator('#' + id)).toBeVisible();
