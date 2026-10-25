@@ -152,7 +152,7 @@ test('Copy a prompt is in the Import menu of the motif library (an image prompt,
   await H.showPanel(page, 'motifs');
   await expect(page.locator('#iprg')).toHaveCount(0);
   await page.click('#limp');
-  await expect(page.getByRole('menuitem')).toHaveText(['Image…', 'Sheet…', 'Copy a prompt for an image', 'Copy a prompt for a sheet']);
+  await expect(page.locator('.rowm').getByRole('menuitem')).toHaveText(['Image…', 'Sheet…', 'Copy a prompt for an image', 'Copy a prompt for a sheet']);
   await page.getByRole('menuitem', { name: 'Copy a prompt for an image' }).click();
   await expect.poll(() => page.evaluate(() => window.__clip.length)).toBe(1);
   expect(await page.evaluate(() => window.__clip[0])).toContain('single [subject]');
