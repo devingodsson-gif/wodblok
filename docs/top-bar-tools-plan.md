@@ -1,4 +1,6 @@
-# Plan: all toolbar items into the top bar (written Oct 24 2026, not started)
+# Plan: all toolbar items into the top bar (written Oct 24 2026)
+
+**Outcome (Oct 25 2026):** the owner chose a smaller version, built as 2.44.0 (docs/plan.md): no tool strip; the rail's eight buttons went into the menus (a new Image menu holds Canvas and Grid) and two top bar buttons (History beside undo, a gear beside Randomize). The element bar and the view bar stay above the canvas. The rest of this file is the original plan, kept for reference if the strip is ever wanted.
 
 Owner, Oct 24 2026: "Plan on getting all the toolbar items into this bar too. Make the plan, tell me and save it." Desktop only for now. Nothing here is built; the owner has not yet approved the open choices at the end.
 

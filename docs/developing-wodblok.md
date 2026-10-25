@@ -280,7 +280,7 @@ Three radii and a circle. Nothing else.
 | `--h-sm` | 22px | Toolbar and panel-header icon buttons, small inline buttons, segmented control buttons |
 | `--h-md` | 24px | **Default.** Buttons, fields, dropdowns, icon buttons, swatch wells |
 | `--h-row` | 28px | List rows and folder headers (Elements rows hold a 20px thumbnail) |
-| `--h-touch` | 36px | Rail buttons and any new control that needs a touch target |
+| `--h-touch` | 36px | Any control that needs a touch target (the rail that used it is gone since 2.44.0) |
 
 Elements under 18px are indicators (dots, chips that do not act, handles), not controls. Mixed heights in one row are not allowed: a row of controls shares one height.
 
@@ -298,7 +298,7 @@ Elements under 18px are indicators (dots, chips that do not act, handles), not c
 |---|---|---|
 | In a component | 1–9 | Overlap inside one control |
 | Stage overlays | 40–45 | Bars, labels and handles over the stage |
-| Menus and popovers | 50–60 | Anchored menus, dropdown lists, rail flyouts |
+| Menus and popovers | 50–60 | Anchored menus, dropdown lists |
 | Drag ghosts, modals | 70–80 | Dock ghosts, dialogs with scrim |
 | Floating panels | 9000+ | Managed by script, raised on focus |
 | Pickers | 9100 | Colour picker, always above floating panels |
@@ -323,7 +323,7 @@ Elements under 18px are indicators (dots, chips that do not act, handles), not c
 
 - One icon family, drawn once in `src/modules/00-icons.js` (2.14.0, owner: minimalist and clear, like Photoshop): line icons on a 24-unit grid inside 3.5..20.5, `stroke="currentColor"`, round caps and joins, no fill, no emoji, no text glyphs as icons. Frames have a 1.5 corner radius; a dot is a small circle.
 - The page's icons are `<svg class="ic" data-ic="name"></svg>` (filled at start-up by `icFill`); code uses `ICN.name` or `ic(name)`. A new icon is added to the set, never drawn inline.
-- Sizes: 13px in dense rows, 15px in panel headers and toolbars, 18px in the rail. Nothing else.
+- Sizes: 13px in dense rows, 15px in panel headers and toolbars, 18px in the top bar's icon buttons. Nothing else.
 - Stroke weight is one hairline at every size: `--ic-w` (1.25px) with `vector-effect: non-scaling-stroke` in the `.ic` rules; an icon sets no stroke width of its own.
 - Idle icons `--mut`; hover `--fg`; selected `--acc-ink`.
 - Every icon-only control has an `aria-label`, the same words as its `title` (shown as a short name on hover; owner, Oct 22 2026), and a keyboard route.
@@ -386,9 +386,9 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 - Dropper is part of the picker, never a separate window.
 - Never write a one-off colour input; every colour in the app is chosen through the picker.
 
-#### 9.7 Tabs and rail
+#### 9.7 Tabs and panel openers
 
-- Rail buttons: `--h-touch`, icon only, in a 36px strip; `--r-m` selected highlight with `--acc-soft`.
+- No rail (2.44.0, owner Oct 25 2026): panels open from the menu bar (Window lists all; Image: Canvas, Grid; Elements: the element list; Edit: History; Colour: Colours; Export: Export recipes; Effects: Randomize), from the element bar, and from two top bar buttons (History beside undo, a gear beside Randomize). A top bar button that opens a panel is an `.ib` with `aria-pressed`, `--acc-soft` while its panel shows, and a second press closes it. The hidden `#pnop` buttons are the openers every command and menu presses; never show them again as a strip.
 - Panel tabs (`.wtab`), Photoshop style: the tab strip is `--stage`; tabs `--fs-s`, 500, `--mut`, 10px side padding, square; the active tab takes the `--panel` colour and `--fg` text, so it joins the panel below. No accent bar.
 - Stamp tabs (2.5.0): the strip over the stage reuses `.wtab` (the Canvas first, then one per open stamp with a close `.ib` of `--h-xs`); it is `--stage` with a `--line` bottom edge, `--h-md` high, and is not on screen while no stamp is open.
 - A tool opens a panel; a panel never opens by itself at launch, except through the built-in launch layout.
@@ -586,6 +586,7 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 - **The menu bar** (2.42.0, `85-menu-bar.js`): File, Export, Edit, Elements, Effects, Colour, View, Window, Help, as plain text names (`.mnbb`: `--h-md`, padding 0 8, `--r-m`, `--fs-m` 400, transparent; `--raise` on hover and while open) at the left of the top bar after the wordmark. The menus are `.pop.mnbm`. Every item is a registry command: its label (plus `…` for a dialog or file picker), its shortcut, greyed out when the command is; an on/off command shows a tick (`check` icon, `--acc-ink`) in the 15px icon column. A submenu (`.mnbs`, chevron right) opens beside its item on hover, click or Right arrow. With a menu open, pointing at another name opens it. Down on a name opens it at its first item; Left and Right move along the bar. A new menu item is a command added to the `MNB` list, never a button written into a menu.
 
 - **The top bar** (2.43.0, owner Oct 24 2026: "really clean"): three zones in a grid. Left (`.tl`): the WB mark and the menu bar. Middle: the project's name (`#pnm`, centred text, a field on click) and its unsaved dot. Right (`.tr`): undo, redo, search, Randomize (the one prominent button) and light/dark; the account goes here later. Nothing else: Save project and the projects folder are File menu items, the version is in the status line (`#ver`). A new tool does not go in the top bar without asking.
+- **2.44.0**: the right side is undo, redo, History (`#hstb`), search, Randomize, its gear (`#rzopt`, opens the Randomize panel) and light/dark; the menu bar gains Image (after Edit). The rail column is gone from `#app`'s grid.
 
 #### 13.3 Commands and shortcuts
 
