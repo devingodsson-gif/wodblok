@@ -14,7 +14,7 @@ test('three zones: mark and menus, the name in the middle, the few tools right',
   const r = await page.evaluate(() => { const n = document.querySelector('header.top .doc').getBoundingClientRect(), t = document.querySelector('header.top').getBoundingClientRect(); return { mid: n.left + n.width / 2, bar: t.left + t.width / 2 }; });
   expect(Math.abs(r.mid - r.bar)).toBeLessThan(12);
   // the right holds only the tools; Save project and the projects folder moved into File
-  expect(await page.evaluate(() => [...document.querySelectorAll('header.top .tr button')].filter(b => b.offsetParent).map(b => b.id))).toEqual(['undo', 'redo', 'cmdkb', 'rzdo', 'thm']);
+  expect(await page.evaluate(() => [...document.querySelectorAll('header.top .tr button')].filter(b => b.offsetParent).map(b => b.id))).toEqual(['undo', 'redo', 'hstb', 'cmdkb', 'rzdo', 'rzopt', 'thm']);   // 2.44.0: History beside undo, the gear beside Randomize
   await expect(page.locator('#filem #psv')).toHaveCount(1);
   await expect(page.locator('#filem #pls')).toHaveCount(1);
   await expect(page.locator('#psvm')).toHaveCount(0);

@@ -1,10 +1,10 @@
-// 2.42.0: the menu bar (owner, Oct 24 2026). File, Export, Edit, Elements, Effects, Colour, View, Window, Help across the top, each item a command
+// 2.42.0: the menu bar (owner, Oct 24 2026). File, Export, Edit, Image (2.44.0), Elements, Effects, Colour, View, Window, Help across the top, each item a command
 // from the registry: same label, same shortcut, greyed out exactly when the command is. Click or keyboard; with one menu open, the pointer moves along the bar.
 const { test, expect } = require('@playwright/test');
 const { openApp, settle, getState, addShape } = require('./helpers/harness');
 
-const NAMES = ['File', 'Export', 'Edit', 'Elements', 'Effects', 'Colour', 'View', 'Window', 'Help'];
-const BARS = ['fileb', 'mnb-export', 'mnb-edit', 'mnb-elements', 'mnb-effects', 'mnb-colour', 'mnb-view', 'mnb-window', 'mnb-help'];
+const NAMES = ['File', 'Export', 'Edit', 'Image', 'Elements', 'Effects', 'Colour', 'View', 'Window', 'Help'];
+const BARS = ['fileb', 'mnb-export', 'mnb-edit', 'mnb-image', 'mnb-elements', 'mnb-effects', 'mnb-colour', 'mnb-view', 'mnb-window', 'mnb-help'];
 const open = async (page, id) => { await page.click('#' + id); await expect(page.locator('#' + id)).toHaveAttribute('aria-expanded', 'true'); };
 const item = (page, menu, label) => page.locator(`#${menu} [data-cmd]`, { hasText: label }).first();
 

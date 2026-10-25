@@ -98,7 +98,7 @@ async function addPattern(page) {
   await page.click('#elb [data-k="pattern"]');
   await addKind(page, 'pattern');
   await patSource(page);                                  // the old start's Pattern printed the stamp
-  if ((await page.getAttribute('#rcls', 'aria-label')) === 'Close all panels') await page.click('#rcls');
+  if ((await page.getAttribute('#rcls', 'aria-label')) === 'Close all panels') await page.locator('#rcls').dispatchEvent('click');
   await page.keyboard.press('Escape'); await settle(page);
   await page.evaluate(() => window.__wbTest.resetHistory());   // the set-up steps are not the test's history: the first step is the Start again
 }
@@ -172,8 +172,9 @@ async function openProjectFile(page, filePath) {
 const EL_BAR = { mlist: 'shape', layers: 'pattern', stmp: 'stamp', motifs: 'motif', text: 'text', elpaint: 'paint' };
 // Since 2.3.0 the element bar makes a new element on every press, so an element panel is opened through its (hidden) tool-bar button instead, which only opens it.
 // Close all panels (the button reads "Default panels" when none is open, and then opens them instead)
-const closeAllPanels = async page => { if ((await page.getAttribute('#rcls', 'aria-label')) == 'Close all panels') await page.click('#rcls'); };
-async function openPanel(page, id) { if (EL_BAR[id]) await page.evaluate(id => document.querySelector(`.rail [data-pn="${id}"]`).click(), id); else await page.click(`.rail [data-pn="${id}"]`);
+const closeAllPanels = async page => { if ((await page.getAttribute('#rcls', 'aria-label')) == 'Close all panels') await page.locator('#rcls').dispatchEvent('click'); };
+// 2.44.0: there is no rail on screen any more; every panel opens through its hidden opener (the one the menus and commands press)
+async function openPanel(page, id) { await page.evaluate(id => document.querySelector(`.rail [data-pn="${id}"]`).click(), id);
   await page.waitForSelector(`section.pn[data-p="${id}"]:not([hidden])`); }
 
 // The standard checks every scenario ends with: state, markup summary, no errors.

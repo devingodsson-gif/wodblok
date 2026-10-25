@@ -6,7 +6,7 @@ import {$} from './01-launch-and-version.js';
 // bug-for-bug). A command is enabled when its button exists, is visible and is not disabled.
 const el = id => () => $(id);
 const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled; };
-// the element panels have no rail button on screen (the element bar opens them), but their commands still click it
+// the element panels' openers are hidden even among the hidden openers (2.44.0: there is no rail; #pnop holds every opener), so their commands check that the button exists, not that it shows
 const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text']);
 const exists = id => () => { const b = $(id); return !!b && !b.disabled; };
 const click = id => () => $(id).click();

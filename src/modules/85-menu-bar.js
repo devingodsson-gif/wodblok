@@ -8,6 +8,8 @@ import {fxMenuAdd,fxMenuKind} from './69-effect-stack.js';
 // Every item is a command from the registry, so a menu, its shortcut and command search can never disagree: the label is the command's label,
 // the shortcut is the command's shortcut, and an item is greyed out exactly when the command is. Nothing here does work of its own.
 // File is the existing File menu (its fixed order, section 13.2 of the UI standard), moved to the left; the others are drawn here each time they open.
+// 2.44.0 (owner, Oct 25 2026): the rail is gone; its panels are here: Canvas and Grid in Image, the element list first in Elements, History in Edit
+// (and beside undo in the top bar), Colours in Colour, Export recipes in Export, Randomize behind the gear beside the Randomize button.
 // Desktop first (owner, Oct 24 2026); the same list can become the native menu of a desktop build later.
 // An entry is a command id, '-' for a divider, [name, entries] for a submenu, or a function that returns entries when the menu opens.
 const mnbFx=()=>{const out=[],grp={};fxAll().forEach(d=>{const id='effect.'+d.k;if(!d.grp){out.push(id);return}if(!grp[d.grp]){grp[d.grp]=[d.grp,[]];out.push(grp[d.grp])}grp[d.grp][1].push(id)});return out};
@@ -15,8 +17,9 @@ const mnbFx=()=>{const out=[],grp={};fxAll().forEach(d=>{const id='effect.'+d.k;
 const mnbAdds=()=>[...document.querySelectorAll('#elb .elbb[data-k]')].filter(b=>b.dataset.k!='select'&&!b.hidden).map(b=>'element.add.'+b.dataset.k);
 const MNB=[
  ['export','Export',['file.export','-','export.png','export.svg','export.copySvg','-','colourway.exportAll','library.exportShapes','-','export.proofPdf','export.proofPng','-','panel.xrec','export.now','export.allRecipes']],
- ['edit','Edit',['edit.undo','edit.redo','-','edit.cut','edit.copy','edit.paste','stamp.duplicateMotif','stamp.deleteMotif','-','element.group','element.ungroup','-',['Align',['align.0','align.1','align.2','align.3','align.4','align.5','align.6','align.7','align.8','-','align.ch','align.cv','-','align.dh','align.dv']],'shape.fitToCanvas','shape.stretchToCanvas']],
- ['elements','Elements',[mnbAdds,'-','stamp.new','stamp.duplicate','stamp.delete','stamp.saveToLibrary','library.importStamp','-','library.importImage','library.importSheet','library.newFolder','-','stamp.split','stamp.knockout']],
+ ['edit','Edit',['edit.undo','edit.redo','panel.hist','-','edit.cut','edit.copy','edit.paste','stamp.duplicateMotif','stamp.deleteMotif','-','element.group','element.ungroup','-',['Align',['align.0','align.1','align.2','align.3','align.4','align.5','align.6','align.7','align.8','-','align.ch','align.cv','-','align.dh','align.dv']],'shape.fitToCanvas','shape.stretchToCanvas']],
+ ['image','Image',['panel.canvas','panel.pgrid']],
+ ['elements','Elements',['panel.lyrs','-',mnbAdds,'-','stamp.new','stamp.duplicate','stamp.delete','stamp.saveToLibrary','library.importStamp','-','library.importImage','library.importSheet','library.newFolder','-','stamp.split','stamp.knockout']],
  ['effects','Effects',[mnbFx,'-','randomize.roll','panel.rand']],
  ['colour','Colour',['panel.colors','tray.add','tray.save','-','colourway.new','colourway.exportAll']],
  ['view','View',['view.zoomIn','view.zoomOut','view.fit','view.actualSize','view.hand','-','view.grid','view.smartGuides','-','view.before','view.split','view.tileRepeat','-','view.theme']],
