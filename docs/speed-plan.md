@@ -17,7 +17,7 @@ About 195 ms of work per slider step; the picture updates about every 165 ms (6 
 | 48.5% | 2837 | **Effects turned into pixels.** The browser's raster threads redraw every effect filter of every shape on every change (about 10,500 full-area filter paints and 5,900 layers in 10 redraws). |
 | 21.0% | 1229 | **Browser paint and frame assembly.** Pre-paint and paint on the main thread (13.1%) and the compositor thread (7.9%). |
 | 12.7% | 744 | **The whole canvas rebuilt from scratch.** `bkShow` (03) replaces the entire canvas SVG through `innerHTML` (6.2%, about 150 KB of SVG re-parsed per step), then the browser restyles and lays it all out again (6.5%). |
-| 12.0% | 705 | **Interface refreshed for nothing.** On every redraw: every range slider in the app is repainted (`nums` / `paint`, 34-desktop-shell, 5.7%), the Stamp panel is rebuilt (`stPanel`, 63-stamp-tool, 4.3%, even when it is not open), other panels (2.0%). |
+| 12.1% | 705 | **Interface refreshed for nothing.** On every redraw: every range slider in the app is repainted (`nums` / `paint`, 34-desktop-shell, 5.7%), the Stamp panel is rebuilt (`stPanel`, 63-stamp-tool, 4.3%, even when it is not open), other panels (2.0%). |
 | 3.8% | 223 | **Building the SVG text** (element and effect code: 83-filter-effects, 69-effect-stack, 74-motif-element, 25-art-layers...). |
 | 1.9% | 111 | Garbage collection. |
 
