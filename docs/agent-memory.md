@@ -136,3 +136,4 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 - **Corner handles stay as 2.15.0 made them** (one side unless Ctrl); the Photoshop-style corner change is dropped from 2.27.0.
 - **Stamps and patterns get stable names**, even if the file format has to change (older files are then refused, by the no-backwards-compatibility rule). Say before going live, since it touches the file format.
 - **Wordmark:** stays 21 px; the guide (Part 9) is changed to say 21 px.
+- Oct 25 2026: he said "Merge everything": 2.42.0, 2.43.0 and 2.44.0 went live together (pull request #125).
