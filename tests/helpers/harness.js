@@ -9,7 +9,7 @@ const { expect } = require('@playwright/test');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const TARGETS = {
-  build: path.join(ROOT, 'dist', 'wodblok.html'),
+  build: process.env.WB_BUILD_FILE || path.join(ROOT, 'dist', 'wodblok.html'),
 };
 const TARGET = process.env.WB_TARGET || 'build';
 // WB_TARGET=esm loads the unbundled ES modules from `node tools/serve-esm.js` (http://127.0.0.1:5199/)

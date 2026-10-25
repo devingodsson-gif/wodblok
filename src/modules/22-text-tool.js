@@ -6,7 +6,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS,delItems,selSet} from './12-selection-and-split.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {TXO_KEYS,TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
-import {teRnd,teF,teFonts,teUF,teAddUF,teCss,teFitSz,teLayBox,teLayout,teLoadFonts,teReady,teSetNotify} from './60-text-engine.js';
+import {teD,teRnd,teF,teFonts,teUF,teAddUF,teCss,teFitSz,teLayBox,teLayout,teLoadFonts,teReady,teSetNotify} from './60-text-engine.js';
 import {stTxMode} from './63-stamp-tool.js';
 
 function init22(){// ===== Text tool: type text, it's traced into carved letter shapes. Each letter becomes its own shape on the stamp,

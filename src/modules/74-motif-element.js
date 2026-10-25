@@ -1,6 +1,7 @@
 import {plDisarm} from './72-placing.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,col,okC} from './04-canvas-and-stamp-outlines.js';
+import {bkElMark} from './03-stamp-prints-and-drawing.js';
 import {mk,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL,fpU} from './24-free-place-layers.js';
@@ -41,14 +42,19 @@ function mtDraw(m,o,id,seen,ip='mai_'){const w=Math.max(.01,o.w),h=Math.max(.01,
  return{defs,body}}
 // the look of a motif (an element, a stamp's motif or a pattern's source) as mtDraw takes it; ink: its fill colour (a colour reference resolved by the caller)
 const mtPic=p=>p.fl=='img'&&p.a&&WBS.ARTS[p.a]?{A:WBS.ARTS[p.a],a:p.a,iz:p.iz,im:p.im}:null;
+// the shape that is being edited or moved draws live: its print would be out of date at every step
+const mtLive=p=>{const d=WBS.fpDrag,m=WBS.fpMS;return p.u==WBS.fpSel||!!(m&&m.has&&m.has(p.u))||!!(d&&(d.p===p||d.g&&d.g.some(a=>a[0]===p)))};
 function mtfLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='motif'&&p.m);if(!pl.length)return['',''];if(WBX.wbMtWarm)pl.forEach(p=>WBX.wbMtWarm(p.m));const fr=new Map(),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),seen=new Set();let defs='',out='';
  pl.forEach(p=>{if(p.flt&&!p.bgd){const r=mtFilter(p,li,seen);defs+=r.defs;fr.set(String(p.u),r.piece);return}
   const id=String(p.u).replace(/[^\w-]/g,''),s=Math.max(1,+p.s||100),J=fxJit(p),k=s*(J?J.sz:1),fx=(J?J.dx:0),fy=(J?J.dy:0),rr=(+p.r||0)+(J?J.dr:0),fl=(+p.f||1)*(J&&J.sx<0?-1:1),fv=J&&J.sy<0?-1:1,
   w=k*(+p.wx||1),h=k*(+p.wy||1),sw=+p.sw>0?+p.sw:0,box={x:(+p.x||0)-w*.6-sw,y:(+p.y||0)-h*.6-sw,W:w*1.2+2*sw,H:h*1.2+2*sw,R:400},T=p.fx&&p.fx.length?fxTex(p,'mtx'+li+'_'+id,box):null,G=p.fx&&p.fx.length?fxGr(p,'mtg'+li+'_'+id,box):null,
-  D=mtDraw(p.m,{w,h,fill:p.fl=='none'?'':okC(p.ink)?col(p.ink):col(WBS.proj.ink),pic:mtPic(p),sw,sk:col(okC(p.sk)?p.sk:WBS.proj.ink)},'mt'+li+'_'+id,seen);
+  da={w,h,fill:p.fl=='none'?'':okC(p.ink)?col(p.ink):col(WBS.proj.ink),pic:mtPic(p),sw,sk:col(okC(p.sk)?p.sk:WBS.proj.ink)},D=mtDraw(p.m,da,'mt'+li+'_'+id,seen);
   defs+=D.defs;if(T)defs+=T.defs;if(G)defs+=G.defs;
   const body=`<g${ed?` data-mv="${p.u}" data-mx="${+p.x||0}" data-my="${+p.y||0}"`:''} transform="translate(${mtF((+p.x||0)+fx)} ${mtF((+p.y||0)+fy)}) rotate(${mtF(rr)}) scale(${fl} ${fv})">${D.body}</g>`;
-  const one=T||G?`<g${T?T.attrs:''}>${G?G.wrap(body):body}</g>`:body;out+=one;fr.set(String(p.u),one)});
+  let one=T||G?`<g${T?T.attrs:''}>${G?G.wrap(body):body}</g>`:body;
+  // 2.44.3: a shape with effects that is not being edited or moved is printed once into an image (03-stamp-prints-and-drawing.js); the picture it shows is the same, only the browser stops redrawing its effects on every change
+  if((T||G)&&!mtLive(p))one=bkElMark('m'+li+'_'+id,one,(da.pic?mtDraw(p.m,da,'mt'+li+'_'+id,null).defs:D.defs)+(T?T.defs:'')+(G?G.defs:''),{x:(+p.x||0)+fx,y:(+p.y||0)+fy,r:Math.hypot(w,h)*.6+sw});
+  out+=one;fr.set(String(p.u),one)});
  return[defs,out,'','',fr]}
 // ===== Filter mode (2.38.0, owner Oct 24 2026): a shape with {flt:1} draws no ink of its own; its effects work on what is drawn under it, inside its outline.
 // The piece holds two tokens the element list fills in (elDraw's render): @@UNDER@@, the markup drawn so far at this level, and @@UID@@, an id for it.

@@ -47,3 +47,49 @@ Decision: do not build the canvas/WebGL renderer for 1.0. If a Mac with a GPU (o
 
 ## Oct 18 2026 (layer update, step 3): the slider drag test works again
 `tests/perf.spec.js` drags `#lrp`; the Layout panel had grown until that slider was below the 900 px window, so for a while the drag missed it and the test measured an idle page (ratio 0.149). The test now scrolls the slider into view and fails if it is off screen. Same machine, side by side: `main` ratio 0.906, layer update step 3 ratio 0.853; Randomize settle 1.26 s and 1.31 s.
+
+## Oct 25 2026 (2.44.1): drawing with many elements and effects (`npm run perf:draw`)
+Scene: 40 shapes, 4 effects each (a fixed mix of the 15 shape effects), plus the pattern and Background; canvas SVG about 610 KB. Cloud sandbox, headless Chromium, 1440 x 900, 2 CPUs, software drawing (no GPU). Three runs, medians; run to run the numbers moved by about 5%. Compare the same machine before and after a change, never across machines.
+
+| Interaction | Time between frames (median / 90th) | Work per step (all threads) | Pixels | Paint and frames | SVG parse, style, layout | App JavaScript |
+|---|---|---|---|---|---|---|
+| Effect slider drag | 95 ms / 134 ms | 115 ms | 44% | 22% | 10% | 20% |
+| Shape drag | 36 ms / 49 ms | 36 ms | 53% | 29% | 4% | 11% |
+| Undo / redo (full redraw) | 66 ms / 77 ms | 150 ms | 42% | 17% | 9% | 26% |
+
+"Pixels" is the browser turning effects into pixels on its drawing threads; it is about half of all work in every case. The first analysis (docs/speed-plan.md) was made with heavier tracing switched on and measured longer times (slider drag 165 ms between frames); the shares agree within a few points, the absolute numbers here are the ones `npm run perf:draw` reproduces.
+
+### After 2.44.2 (stop refreshing what did not change), same scene and machine
+| Interaction | Time between frames (median / 90th) | Work per step | Change in work |
+|---|---|---|---|
+| Effect slider drag | 95 ms / 114 ms | 106 ms | -8% |
+| Shape drag | 37 ms / 47 ms | 33 ms | -8% |
+| Undo / redo | 59 ms / 68 ms | 118 ms | -21% |
+Only the work the app's own code did on the main thread went down (sliders no longer repainted all at once, the Stamp panel no longer forces a layout). Effects into pixels did not change; that is 2.44.3. Single runs, about 5% noise. `npm run perf` ratio 0.973 (no regression).
+
+### After 2.44.3 (shapes with effects printed once), same scene and machine
+| Interaction | Time between frames (median / 90th) | Work per step | Change in work vs 2.44.2 | Pixels | Paint | Rebuild | App JS |
+|---|---|---|---|---|---|---|---|
+| Effect slider drag | 62 ms / 77 ms | 55 ms | -48% | 20% | 25% | 20% | 29% |
+| Shape drag | 35 ms / 48 ms | 16 ms | -52% | 27% | 40% | 8% | 20% |
+| Undo / redo | 52 ms / 62 ms | 63 ms | -47% | 18% | 22% | 16% | 37% |
+The selected shape draws live, the other 39 are images. Frame time of the shape drag did not move (35 ms): what is left is the whole-canvas rebuild and paint (step 2.44.4). A single run per row, about 5% noise. `npm run perf` ratio 0.962, randomize roll + settle 2005 ms (was 1888 ms, within noise).
+Picture check (not a stored golden): the same 15-shape scene drawn by 2.44.2 (live) and 2.44.3 (printed), screenshot of the canvas, 480 x 720 px: 112 pixels differ by more than 8 of 255 (0.03%), largest difference 72, all on shape edges. With all 15 effects stacked on a shape: 15 pixels. At a screen density of 2: 918 of 1.38 million (0.07%).
+
+### After 2.44.4 (canvas updated in place), same scene and machine
+| Interaction | Time between frames (median / 90th) | Work per step | Change in work vs 2.44.3 |
+|---|---|---|---|
+| Effect slider drag | 59 ms / 78 ms | 43 ms | -22% |
+| Shape drag | 32 ms / 44 ms | 13 ms | -19% |
+| Undo / redo | 44 ms / 66 ms | 57 ms | -10% |
+Against 2.44.1 (start of the speed work): work per step 115 -> 43 ms (slider), 36 -> 13 ms (shape drag), 150 -> 57 ms (undo/redo); time between frames 95 -> 59, 36 -> 32, 66 -> 44 ms. Single runs, about 5% noise. `npm run perf`: ratio 0.393 (the slider test finished faster), randomize roll + settle 1789 ms.
+
+### 2.45.0: end of the drawing speed plan (three runs, medians), same scene and machine
+| Interaction | Start (2.44.1) frame / work | Now frame / work |
+|---|---|---|
+| Effect slider drag | 95 ms / 115 ms | 59 ms / 44 ms |
+| Shape drag | 36 ms / 36 ms | 33 ms / 15 ms |
+| Undo / redo | 66 ms / 150 ms | 46 ms / 57 ms |
+Work per step is down 60 to 62% on all three. Frame time falls less because the harness measures input to two frames later (a floor of about 30 ms on this machine). Not measured on a Mac with a GPU yet.
+
+`WB_DRAW_N` and `WB_DRAW_K` change the shapes and effects per shape. `WB_PROFILER=1` adds the JavaScript sampler to the trace.

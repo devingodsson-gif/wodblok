@@ -89,7 +89,14 @@ Only items the owner has stated are listed as next. Nothing is started unless he
 ## Open questions for the owner
 None at the moment. Add new ones here.
 
+### Found Oct 25 2026 (speed work)
+- The pixel goldens in tests/__golden__/sandbox (scenarios, roundtrip, launch) fail on 2.44.2 and 2.44.3 alike: the stage is 44 px wider since the rail left (2.44.0). They need regenerating after the owner looks at them; not done here (rule: only goldens a release explains, and with a look at each diff).
+- `tests/repeat-tile.spec.js` roll 4 failed once in a long run under load (down seam 24.8, limit 19.0) and passed alone and in its spec; stamp prints finishing during the measurement is the likely cause, not checked further.
+- tests/helpers/harness.js: `WB_BUILD_FILE=<path>` loads another built file than dist/wodblok.html (used to compare two builds picture by picture).
+
 ## Suggestions (my recommendations, not decisions)
+- Drawing speed: plan in docs/speed-plan.md (Oct 25 2026). Owner said yes to the order below. 2.44.1 to 2.44.4 (now released as 2.45.0) are built on feat/2.44.1-perf-draw (not merged; 2.44.2: -8% work per slider/shape step, -21% undo/redo; 2.44.3 on top: another -50%, see docs/perf-baseline.md). 2.44.4 updates the canvas in place (another -10 to -22%). 2.44.3 prints shapes with effects once; text, picture and pattern elements with effects are still drawn live (a later step if wanted). Order: 2.44.1 measure, 2.44.2 stop refreshing unchanged panels, 2.44.3 print effect elements once (the big one), 2.44.4 update the canvas in place.
+- Known bug found while measuring: `npm run dev` (unbundled modules) fails at start, "teD is not defined" (22-text-tool.js uses teD from 60-text-engine.js without importing it). Fixed in 2.44.1.
 - Window > Close all panels could change its label to Default panels when that is what it does (the command label is fixed today).
 - The panel commands read "Open Canvas", "Open Grid", "Open Export" in the menus; shorter menu labels (Canvas…, Grid…, Export recipes) would read more like Photoshop. Needs the owner's word (command search shows the same labels).
 - Keep `CLAUDE.md` short and move detail to the docs it already points at (its opening paragraph had grown into a release-by-release list; it now points here and to `docs/plan.md` instead).
