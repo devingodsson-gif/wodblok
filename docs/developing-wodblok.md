@@ -583,6 +583,7 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 - A menu item that opens a dialog ends with `…`. Disabled items stay visible at opacity .4.
 - Keyboard: arrows move, Enter picks, Esc closes and returns focus.
 - The File menu order is fixed: New project, New from template…, Clear, divider, Open…, Save as template…, then the rest. Add to a menu at the end of its logical group, and ask before reordering.
+- **The menu bar** (2.42.0, `85-menu-bar.js`): File, Export, Edit, Elements, Effects, Colour, View, Window, Help, as plain text names (`.mnbb`: `--h-md`, padding 0 8, `--r-m`, `--fs-m` 400, transparent; `--raise` on hover and while open) at the left of the top bar after the wordmark. The menus are `.pop.mnbm`. Every item is a registry command: its label (plus `…` for a dialog or file picker), its shortcut, greyed out when the command is; an on/off command shows a tick (`check` icon, `--acc-ink`) in the 15px icon column. A submenu (`.mnbs`, chevron right) opens beside its item on hover, click or Right arrow. With a menu open, pointing at another name opens it. Down on a name opens it at its first item; Left and Right move along the bar. A new menu item is a command added to the `MNB` list, never a button written into a menu.
 
 #### 13.3 Commands and shortcuts
 

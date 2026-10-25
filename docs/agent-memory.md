@@ -136,3 +136,7 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 - **Corner handles stay as 2.15.0 made them** (one side unless Ctrl); the Photoshop-style corner change is dropped from 2.27.0.
 - **Stamps and patterns get stable names**, even if the file format has to change (older files are then refused, by the no-backwards-compatibility rule). Say before going live, since it touches the file format.
 - **Wordmark:** stays 21 px; the guide (Part 9) is changed to say 21 px.
+
+## Oct 24 2026: the menu bar
+- He develops WODBLOK **desktop-only for now** (it does not need to be mobile friendly); mobile comes later as an adaptation.
+- He asked for an Adobe-style top menu bar ("File, Export, Effects, Elements and more") and approved the menus File, Export, Edit, Elements, Effects, Colour, View, Window, Help. Built as 2.42.0: every item is a registry command, so a later desktop build can turn the same list into native menus.
