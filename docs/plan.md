@@ -1,5 +1,8 @@
 # Development plan
 
+## Next plan: drawing speed (written Oct 25 2026, not started)
+See docs/speed-plan.md: measured breakdown (effects turned into pixels about half of all work on every change; the whole canvas rebuilt each time; panels refreshed for nothing) and five steps, 2.44.1 to 2.44.5, then 2.45.0. Waiting for the owner.
+
 ## Done: the rail moved into the top bar (2.44.0, Oct 25 2026, live with 2.42.0 and 2.43.0 through #125)
 The owner's version of docs/top-bar-tools-plan.md: no tool strip; the rail's eight buttons went into the menus and two top bar buttons. The element bar and the view bar stay above the canvas (not moved; the plan's second row is not needed for now).
 
