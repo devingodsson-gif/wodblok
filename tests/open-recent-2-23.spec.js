@@ -11,7 +11,7 @@ test('Open recent lists a project once it was opened, and a click opens it again
   await page.click('#fileb');
   await expect(page.locator('#pmr')).toBeHidden();                    // nothing opened yet
   await page.keyboard.press('Escape');
-  await page.click('#pls'); await page.locator('#pgrid .pc [data-a="open"]').first().click();
+  await page.click('#fileb'); await page.click('#pls'); await page.locator('#pgrid .pc [data-a="open"]').first().click();
   await expect(page.locator('#pmsg')).toContainText('Opened'); await settle(page);
   await page.click('#fileb');
   await expect(page.locator('#pmr button')).toHaveCount(1);

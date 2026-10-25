@@ -78,7 +78,7 @@ test('New stamp opens its tab; a roll closes every stamp tab', async ({ page }) 
 
 test('in a tab the Elements header counts the stamp\'s contents, and a row\'s … button opens the element menu', async ({ page }) => {
   const { errors } = await enter(page);
-  await page.click('.rail [data-pn="lyrs"]'); await H.settle(page);
+  await page.locator('.rail [data-pn="lyrs"]').dispatchEvent('click'); await H.settle(page);
   const t = (await st(page)).tiles.find(x => x.id === sid).items;
   const n = t.filter(q => !q.tg).length + new Set(t.filter(q => q.tg).map(q => q.tg)).size;
   await expect(page.locator('#lycnt')).toHaveText(`${n} element${n === 1 ? '' : 's'}`);

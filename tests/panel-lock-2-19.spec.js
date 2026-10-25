@@ -10,7 +10,7 @@ test('the Elements panel starts locked: no close or pop-out buttons, the rail bu
   await expect(g.locator('[data-act="lock"]')).toHaveAttribute('aria-pressed', 'true');
   expect(await g.locator('[data-act="close"]').count()).toBe(0);
   expect(await g.locator('[data-act="float"]').count()).toBe(0);
-  await page.click('#rail-lyrs'); await settle(page);
+  await page.locator('#rail-lyrs').dispatchEvent('click'); await settle(page);
   await expect(grp(page, 'lyrs')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
@@ -22,7 +22,7 @@ test('a locked panel cannot be dragged; unlocking brings back close and pop out;
   const box = await wh.boundingBox();
   await page.mouse.move(box.x + 10, box.y + 8); await page.mouse.down(); await page.mouse.move(box.x - 300, box.y + 200, { steps: 6 }); await page.mouse.up(); await settle(page);
   expect(await g.evaluate(e => e.classList.contains('fl'))).toBe(false);   // still docked
-  await page.click('#rcls'); await settle(page);
+  await page.locator('#rcls').dispatchEvent('click'); await settle(page);
   await expect(grp(page, 'lyrs')).toHaveCount(1);
   await g.locator('[data-act="lock"]').click(); await settle(page);
   await expect(g.locator('[data-act="lock"]')).toHaveAttribute('aria-pressed', 'false');

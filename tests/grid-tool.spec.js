@@ -14,10 +14,10 @@ const outline = (page, panel) => page.evaluate(p => {
   return rows;
 }, panel);
 
-test('the Grid tool in the Pattern view has the name Grid and an icon', async ({ page }) => {
+test('the Grid panel opener has the name Grid (2.44.0: the panel is in the Image menu)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 3 });
-  const rail = await page.evaluate(() => { const b = document.getElementById('rail-pgrid'); return [b.getAttribute('aria-label'), !!b.querySelector('svg')]; });
-  expect(rail).toEqual(['Grid', true]);
+  const rail = await page.evaluate(() => { const b = document.getElementById('rail-pgrid'); return b.getAttribute('aria-label'); });
+  expect(rail).toBe('Grid');
   expect((await outline(page, 'pgrid')).length).toBeGreaterThan(14);
   expect(errors).toEqual([]);
 });

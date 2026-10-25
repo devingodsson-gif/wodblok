@@ -25,10 +25,10 @@ test('no American spelling in the panels, also with a stamp unlocked', async ({ 
   const bad = new Set();
   for (const mode of ['pattern', 'unlocked stamp']) {
     if (mode !== 'pattern') await unlockStamp(page);
-    const tools = await page.locator('.rail [data-pn]:visible').evaluateAll(b => b.map(x => x.dataset.pn).filter(p => !(p === 'mlist' && __wbTest.unlockedStamp() == null)));   // the Shape list is empty in Pattern until a stamp is unlocked
+    const tools = await page.locator('.rail [data-pn]:not([hidden])').evaluateAll(b => b.map(x => x.dataset.pn).filter(p => !(p === 'mlist' && __wbTest.unlockedStamp() == null)));   // the Shape list is empty in Pattern until a stamp is unlocked
     for (const pn of tools) {
       // the rail buttons toggle, and the first button in the rail is Default panels / Close all: open a panel only if it is not already open (2.19.0)
-      if (!(await page.locator(`section.pn[data-p="${pn}"]:visible`).count())) await page.click(`.rail [data-pn="${pn}"]`);
+      if (!(await page.locator(`section.pn[data-p="${pn}"]:visible`).count())) await page.locator(`.rail [data-pn="${pn}"]`).dispatchEvent('click');
       await page.waitForSelector(`section.pn[data-p="${pn}"]:visible`, { timeout: 5000 }).catch(e => { throw new Error('panel did not open: ' + pn + ' (' + mode + ')'); });
       for (const w of await visibleWords(page)) if (US.test(w) && !/Dictionary of Color Combinations/.test(w)) bad.add(`${pn}: ${w}`);
     }

@@ -37,7 +37,8 @@ async function saveProject(){const name=$('pnm').value.trim()||'Untitled pattern
 try{if(await dl(name,await fileSnap(),await thumb(),id)){WBS.cp={id,name,saved:coreStr()};$('pnm').value=name}}finally{b.disabled=false;paintPst()}}
 // The projects folder: a folder on this computer that holds .wodblok files (Chrome and Edge). Its handle is remembered, so the next visit lists it again.
 let folder=null,plTok=0,plUrls=[];
-const folderPaint=()=>{const b=$('pls');b.textContent=folder?'Projects':'Open projects folder';b.classList.toggle('on',!$('plist').hidden)};
+// a File menu item since 2.43.0 (it was a button in the top bar)
+const folderPaint=()=>{const b=$('pls'),t=b.querySelector('span')||b;t.textContent=folder?'Projects folder…':'Open projects folder…';b.classList.toggle('on',!$('plist').hidden)};
 const stem=n=>n.replace(/\.wodblok$/i,'');
 async function renderPL(){const g=$('pgrid'),tok=++plTok;plUrls.forEach(u=>URL.revokeObjectURL(u));plUrls=[];$('pdlgt').textContent=folder?folder.name:'Projects';
 g.innerHTML='<div class="hint">Loading…</div>';
@@ -53,8 +54,8 @@ let plList=[];
 function init33(){
 $('clr').onclick=()=>clearAll(false);
 $('psv').onclick=saveProject;WBX.wbClearAll=()=>clearAll(false);WBX.wbOpenFile=(f,h)=>openFile(f,h);
-// 2.21.0, the File menu: Save project (the same as the button) and Save project as (a new file: the link to the file it came from is dropped first), Export opens the Export panel
-$('psvm').onclick=()=>$('psv').click();$('psa').onclick=()=>{link=null;saveProject()};$('xrm').onclick=()=>{if(WBX.wbOpenPanel)WBX.wbOpenPanel('xrec')};
+// 2.21.0, the File menu: Save project as (a new file: the link to the file it came from is dropped first), Export opens the Export panel. Save project is the File menu's own item since 2.43.0 (the top bar button is gone)
+$('psa').onclick=()=>{link=null;saveProject()};$('xrm').onclick=()=>{if(WBX.wbOpenPanel)WBX.wbOpenPanel('xrec')};
 
 const openFile=async(fl,handle)=>{
 try{const r=await fmtOpen(new Uint8Array(await fl.arrayBuffer())),d=r.project;

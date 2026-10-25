@@ -54,6 +54,7 @@ function elOB(q){const op=q.op!=null?Math.max(0,Math.min(100,+q.op)):100,bl=q.bl
 const FX_K={},FX_O=[];
 function fxRegister(k,o){if(!FX_K[k])FX_O.push(k);FX_K[k]={k,kinds:[],...o}}
 function fxDef(k){return FX_K[k]||null}
+function fxAll(){return FX_O.map(k=>FX_K[k])}
 function fxFor(kind){return FX_O.map(k=>FX_K[k]).filter(d=>d.kinds.includes(kind))}
 function fxOf(q){return q&&Array.isArray(q.fx)?q.fx:[]}
 
@@ -86,4 +87,4 @@ elBar();
 const b=$('elb');if(b)b.onclick=e=>{const x=e.target.closest('.elbb');if(!x||x.disabled)return;const d=EL_K[x.dataset.k];if(d&&d.pn&&WBX.wbOpenPanel)WBX.wbOpenPanel(d.pn)};
 WBX.wbElSync=elSync;WBX.wbElSeen=u=>{elLast=String(u)};
 }
-export {elExtend,elDef,elDraw,elKind,elKinds,elRegister,elSel,elSync,fxDef,fxFor,fxOf,fxRegister,init65};
+export {elExtend,elDef,elDraw,elKind,elKinds,elRegister,elSel,elSync,fxAll,fxDef,fxFor,fxOf,fxRegister,init65};

@@ -1,5 +1,8 @@
 # Development plan
 
+## Done: the rail moved into the top bar (2.44.0, Oct 25 2026, not live)
+The owner's version of docs/top-bar-tools-plan.md: no tool strip; the rail's eight buttons went into the menus and two top bar buttons. The element bar and the view bar stay above the canvas (not moved; the plan's second row is not needed for now).
+
 ## Next plan: the element list (written Oct 20 2026, not started)
 Layers become one ordered list of elements; the element buttons create instances at the top. Fix release 2.2.1, then 2.2.2 (list, engine, format 23) and 2.2.3 (menus). See [`element-list-plan.md`](element-list-plan.md).
 
@@ -781,3 +784,28 @@ Step 1 of the fix plan made from the 2.23 review (five releases, 2.24.0 to 2.28.
 - **Random**: a slider 0 to 100 (0 = off) adds a seeded random offset to the second copy, up to 6% of the piece's size at 100; the direction and distance come from the effect's seed (`fqRnd`), and Reroll draws another. Same seed, same offset. Randomize rolls Random from 0 to 35 and the colour from the tray (`rzQ`, `d.W` fields).
 - **Filter fields**: a declared effect can now list `W` (colour wells) next to `P`, `S` and `C`; `fqPane` writes a `cwrow` host and 69 builds the well.
 - Tests: `misreg-tray-2-41` (tray colour on pick and follows a tray edit; Same ink; Random, Reroll, same seed). `noise-blur-effects-2-35` updated to the new colour value. No snapshot changed.
+
+### 2.42.0 (Oct 24 2026): the menu bar. Format 27 unchanged
+- **Owner**: "I want to add a top bar with file export, effects, elements, and more", desktop only for now, mobile later. He approved the proposed menus (File, Export, Edit, Elements, Effects, Colour, View, Window, Help) with "Sounds good. Send it".
+- **The bar**: plain text menu names at the left of the top bar, after the wordmark and the version (Photoshop). File is the existing File menu, moved from the right and otherwise unchanged (its fixed order, Part 9 section 13.2); the other eight are drawn by `85-menu-bar.js` each time they open.
+- **Every item is a registry command**: the label is the command's label (plus `…` when it opens a dialog or a file picker), the shortcut is the command's, an item is greyed out exactly when the command is, and on/off commands (Show grid, Smart guides, Before, Split view, Repeat tile) carry a tick (`menuitemcheckbox`, new `check` icon). Commands that do not exist (the account's Send feedback while signed out) are left out.
+- **New commands** (so command search finds them too): `element.add.<kind>` (Add shape, Add text, Add stamp, Add pattern: the element bar's buttons; Paint stays hidden), `effect.<k>` (one per effect, run on the selected element: it adds the effect and opens its settings in the element's panel; `fxAddTo`, `fxMenuAdd` in 69, shared with the Effects group's +), `help.shortcuts` and `help.about` (Settings on its Shortcuts or About page, `WBX.wbStgOpen`).
+- **Submenus**: Edit > Align (the align commands) and the effect groups (Noise, Blur, Print, Distort) open beside their item on hover, click or the right arrow.
+- **Behaviour**: click a name to open or close its menu; with one menu open, pointing at another name opens that one (Photoshop), and the click that follows keeps it open. Keyboard (section 13.2): Down on a name opens it at the first item; Up and Down move; Right and Left move along the bar (Right opens a submenu); Enter picks; Esc closes and returns focus to the name.
+- **Shell**: `34-desktop-shell.js` wires every bar menu the way it wired File (`WBX.wbMenuWire`, one `closeMenus`). The Effects menu also holds Randomize now and Open Randomize; Window lists the panels and Close all panels.
+- Tests: `menu-bar-2-42` (order; every item matches its command's label, shortcut and state; an item runs its command and ticks; Effects adds Jitter to a selected shape; Align and Blur submenus; keyboard and pointer along the bar). `commands` skips commands with no button of their own in "a disabled button means a disabled command". No snapshot changed.
+
+### 2.44.0 (Oct 25 2026): the rail moved into the top bar. Format 27 unchanged
+- **Owner**: the rail's eight buttons "I think we can move": Canvas under Image, Colours, Elements and Grid are already up top, History near undo, a gear beside Randomize, Export recipes in Export. He chose an Image menu over Canvas under View.
+- **Menus**: a new Image menu (Open Canvas, Open Grid) after Edit; Open Elements (the element list) is the first item of Elements; Open History follows Undo and Redo in Edit. Colours (Colour), Export recipes (Export), Randomize (Effects) and Close all panels (Window) were already there.
+- **Top bar**: History (`#hstb`, history icon) after Redo; a gear (`#rzopt`, the existing settings icon) after Randomize opens the Randomize panel. Both show pressed while their panel shows and close it on a second press (`wsToggle` in 34-desktop-shell.js, shared with the hidden openers).
+- **The rail is gone**: its column left `#app`'s grid (the canvas area is 44 px wider), the More tools tray, drag-to-reorder and the saved rail order (`wb120_rail`, now ignored) are deleted. Its buttons stay as hidden openers (`#pnop`, same `rail-*` ids and `#rcls`) because every panel command and menu item presses them, as the element panels' commands already did.
+- **Close all panels** says only "Closed all panels." (it pointed at the bar on the left).
+- Tests: new `no-rail-2-44` (no rail, every rail panel in a menu, History and the gear toggle and show pressed); `rail.spec.js` and first-five's More tools test deleted; specs that clicked rail buttons or `#rcls` now press the hidden opener (`dispatchEvent('click')`), and tool lists read `:not([hidden])` instead of `:visible`; `menu-bar-2-42` and `top-bar-2-43` expect Image and the two new buttons; `grid-tool` checks the opener's name only.
+- Known: Window > Close all panels keeps its label when it would open the Default panels instead (the hidden button changes its name, the command's label does not).
+
+### 2.43.0 (Oct 24 2026): a clean top bar. Format 27 unchanged
+- **Owner**: asked whether the big "Wodblok" text and the project name field make sense next to the logo, agreed to the proposed layout and said "please make those changes, I want it to be really clean".
+- **Three zones** (`.top` is a grid of `.tl`, `.doc`, `.tr`): left, the WB mark and the menu bar; middle, the project's name (centred text, a field on click) with its unsaved dot; right, undo, redo, search, Randomize and light/dark.
+- **Gone from the bar**: the IM Fell English wordmark (the WB mark is enough; the splash and the website keep the wordmark); the version badge, which is now quiet text at the right end of the status line (`#ver`, still the release check); the "Save project" button (the File menu's Save project item is now `#psv` itself, Ctrl+S unchanged; `#psvm` is gone); the "Open projects folder" button, now a File menu item after the recent files (`#pls`, "Open projects folder…" or "Projects folder…" once a folder is chosen).
+- Tests: `top-bar-2-43` (zones, name centred, version in the status line, Save and the folder in File, Ctrl+S). The specs that clicked `#psv` or `#pls` open File first; `projects-folder` expects the new labels; `tabs-1020` loses its "look like buttons" test. No snapshot changed; pixel goldens of the whole window will show the new top bar (expected).

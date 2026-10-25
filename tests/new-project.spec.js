@@ -35,7 +35,7 @@ test('the New project button in the Projects dialog shows the same cue', async (
   const { errors } = await openApp(page, { seed: 5 });
   await roll(page);
   await installFolder(page, [{ name: 'x.wodblok', path: path.join(ROOT, 'tests', 'fixtures', 'project-1-diamond.wodblok') }]);
-  await page.click('#pls');
+  await page.click('#fileb'); await page.click('#pls');
   await page.click('#pnw2');
   await expect(page.locator('#pnw2')).toHaveText('Click again: can’t be undone');
   await page.click('#pnw2');
@@ -47,7 +47,7 @@ test('the New project button in the Projects dialog shows the same cue', async (
 test('with nothing to lose (the project was just saved), one click is enough', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
   await roll(page);
-  await page.click('#psv');
+  await page.click('#fileb'); await page.click('#psv');
   await expect(page.locator('#pmsg')).toContainText(/Saved|Downloaded/);
   await page.click('#fileb');
   await page.click('#pnw');

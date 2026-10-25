@@ -105,7 +105,7 @@ test('the template picker has starting points: a stamped pattern and a framed bo
 test('a panel with more tabs than fit gets arrows at the ends that have more behind them', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 700 });
   const { errors } = await H.openApp(page, { seed: 4, workspaces: true });
-  for (const pn of ['hist', 'xrec', 'rand', 'canvas', 'colors', 'pgrid']) { const b = page.locator(`.rail [data-pn="${pn}"]`); if (await b.count() && await b.isVisible()) { await b.click(); await H.settle(page); } }
+  for (const pn of ['hist', 'xrec', 'rand', 'canvas', 'colors', 'pgrid']) { const b = page.locator(`.rail [data-pn="${pn}"]:not([hidden])`); if (await b.count()) { await b.dispatchEvent('click'); await H.settle(page); } }
   const wh = page.locator('.wg .wh').first(), wt = page.locator('.wg .wt').first();
   await expect(wh).toHaveClass(/ovl/);                                  // the open tab is the last one, in view; the earlier ones are behind the left edge
   await expect(wh.locator('.wta.l')).toBeVisible();
@@ -131,28 +131,13 @@ test('stamp tabs that do not fit get arrows too, and the open tab is scrolled in
   expect(errors).toEqual([]);
 });
 
-test('More tools shows no empty strip: the repository appears only when a tool is dragged to it or something is in it', async ({ page }) => {
-  const { errors } = await H.openApp(page);
-  await page.click('#rmore');
-  await expect(page.locator('#rmenu')).toBeHidden();
-  const a = await page.locator('.rail [data-pn="hist"]').boundingBox();
-  await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2); await page.mouse.down();
-  await page.mouse.move(a.x + a.width / 2 + 10, a.y + a.height / 2 + 10, { steps: 3 });
-  await expect(page.locator('#rmenu')).toBeVisible();                  // a place to drop it
-  const b = await page.locator('#rmenu').boundingBox();
-  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 8 }); await page.mouse.up();
-  await expect(page.locator('.rail [data-pn="hist"]')).toBeHidden();
-  await expect(page.locator('#rmenu [data-add="hist"]')).toBeVisible();   // it is in the repository, which now stays open
-  expect(errors).toEqual([]);
-});
-
 test('Copy a prompt is in the Import menu of the motif library (an image prompt, a sheet prompt) and the group of its own is gone', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, pattern: false });
   await page.evaluate(() => { window.__clip = []; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async t => { window.__clip.push(t); } } }); });
   await H.showPanel(page, 'motifs');
   await expect(page.locator('#iprg')).toHaveCount(0);
   await page.click('#limp');
-  await expect(page.getByRole('menuitem')).toHaveText(['Image…', 'Sheet…', 'Copy a prompt for an image', 'Copy a prompt for a sheet']);
+  await expect(page.locator('.rowm').getByRole('menuitem')).toHaveText(['Image…', 'Sheet…', 'Copy a prompt for an image', 'Copy a prompt for a sheet']);
   await page.getByRole('menuitem', { name: 'Copy a prompt for an image' }).click();
   await expect.poll(() => page.evaluate(() => window.__clip.length)).toBe(1);
   expect(await page.evaluate(() => window.__clip[0])).toContain('single [subject]');

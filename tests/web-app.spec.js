@@ -62,7 +62,7 @@ test('installs, opens offline, finds a new version without reloading, and applie
   expect(await page.evaluate(async () => (await caches.keys()).sort())).toEqual([`wodblok-${VER}-2026-10-09T10:00:00Z`, `wodblok-${VER}-2026-10-09T11:00:00Z`]);
 
   // with unsaved work the dot asks to save first and changes nothing
-  await page.click('.rail [data-pn="rand"]');
+  await page.locator('.rail [data-pn="rand"]').dispatchEvent('click');
   await page.click('#rzdo');
   await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)') && window.__wbTest.state().length > 1500);
   await page.click('#pupd');

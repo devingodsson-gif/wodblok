@@ -70,6 +70,7 @@ import {init80} from './modules/80-element-menu.js';
 import {init81} from './modules/81-recent-files.js';
 import {init82} from './modules/82-motif-look.js';
 import {init84} from './modules/84-smart-guides.js';
+import {init85} from './modules/85-menu-bar.js';
 import {init58} from './modules/58-account.js';
 import {init59} from './modules/59-align.js';
 import {acAccount} from './platform/account.js';
@@ -149,6 +150,8 @@ init59();
 init62();
 init63();
 init64();
+// the menu bar last: its menus list commands from every module, the account's included
+init85();
 // a launch with no template picker is an untouched new project: no unsaved dot, nothing to confirm before opening another (2.22.1; the picker's own finish used to set this)
 if(!WBS.cp.id&&WBS.cp.saved===''){WBS.cp.saved=coreStr()}
 if(WBX.wbEnhance)WBX.wbEnhance();   // value boxes on the slider rows that panels wrote themselves

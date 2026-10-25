@@ -9,7 +9,7 @@ test('after Randomize, stamps placed on their own are in the Elements list and c
   const s = await st(page);
   const free = s.els.filter(e => e.k === 'stamp');
   expect(free.length, 'seed 23 places stamps on their own').toBeGreaterThan(0);
-  await page.click('.rail [data-pn="lyrs"]'); await H.settle(page);
+  await page.locator('.rail [data-pn="lyrs"]').dispatchEvent('click'); await H.settle(page);
   expect(await page.locator('#lyl2 [data-u].lyr').count(), 'one list row per element').toBe(s.els.length);
   const c = await H.canvasToClient(page, free[0].x, free[0].y);
   await page.mouse.click(c.x, c.y); await H.settle(page);

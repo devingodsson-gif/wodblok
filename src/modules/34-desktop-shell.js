@@ -62,8 +62,8 @@ const wsClampSz=(k,v)=>{const hz=k=='t'||k=='b',o=hz?(k=='t'?'b':'t'):(k=='l'?'r
 const wsSetSz=(k,v)=>{const L=wsL();v=wsClampSz(k,v);(L.sz=L.sz||{})[k]=v;if(k=='t'||k=='b')wsDk[k].style.height=v+'px';else wsDk[k].style.width=v+'px'};
 // put a group into one edge's stack at position i (i past the end means last)
 const wsDockIns=(L,g,k,i)=>{g.e=k;g.f=1;L.dock.forEach(x=>{if((x.e||'r')==k)x.f=1});const el=L.dock.filter(x=>x!==g&&(x.e||'r')==k);if(i>=el.length){const last=el[el.length-1];if(last)L.dock.splice(L.dock.indexOf(last)+1,0,g);else L.dock.push(g)}else L.dock.splice(L.dock.indexOf(el[i]),0,g)};
-// the strip of window that docks can use: right of the tool bar, below the top bar, above the status bar
-function wsWR(){const rl=document.querySelector('.rail').getBoundingClientRect(),tp=document.querySelector('.top').getBoundingClientRect(),sb=document.querySelector('.status').getBoundingClientRect();
+// the strip of window that docks can use: the full width (2.44.0: no rail), below the top bar, above the status bar
+function wsWR(){const rl={right:0},tp=document.querySelector('.top').getBoundingClientRect(),sb=document.querySelector('.status').getBoundingClientRect();
 return{ox0:rl.right,ox1:innerWidth,y0:tp.bottom,y1:sb.top,x0:wsDk.l.hidden?rl.right:wsDk.l.getBoundingClientRect().right,x1:wsDk.r.hidden?innerWidth:wsDk.r.getBoundingClientRect().left}}
 // which empty window edge the pointer is close to (null if none)
 function wsEdgeAt(e){const W=wsWR(),T=56,x=Math.max(W.ox0,Math.min(W.ox1,e.clientX)),y=Math.max(W.y0,Math.min(W.y1,e.clientY));let best=null,bd=T;
@@ -90,20 +90,16 @@ if(fl){wsClamp(g);el.style.cssText=`left:${g.x}px;top:${g.y}px;width:${g.w}px;${
 el.innerHTML=`<div class="wh"><button type="button" class="wb wta l" data-act="tl" aria-label="Earlier tabs"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.chevL}</svg></button><div class="wt">${g.tabs.map(p=>`<button type="button" class="wtab${p==g.a?' on':''}" data-t="${p}">${PNAME[p]}</button>`).join('')}</div><button type="button" class="wb wta r" data-act="tr" aria-label="Later tabs"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.chevR}</svg></button>`+
 `<button type="button" class="wb" data-act="lock" aria-pressed="${g.lk?'true':'false'}" aria-label="${g.lk?'Unlock panel':'Lock panel'}">${g.lk?IC.lk:IC.ul}</button><button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button>${g.lk?'':`<button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close" aria-label="Close">${IC.x}</button>`}</div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
 const bd=el.querySelector('.wbd');g.tabs.forEach(p=>{const sc=wsSec(p);if(sc){sc.classList.toggle('mc',!!sc.querySelector(':scope>details.g'));sc.hidden=p!=g.a;bd.appendChild(sc)}});return el}
-// the tool bar: the user's own order and the tools they took off it (kept in settings)
-const RO={order:[],off:[]};try{const r=JSON.parse(kv.get('wb120_rail')||'null');if(r){if(Array.isArray(r.order))RO.order=r.order.filter(x=>typeof x=='string');if(Array.isArray(r.off))RO.off=r.off.filter(x=>typeof x=='string')}}catch(e){}
-const railEl=document.querySelector('.rail'),railSave=()=>{try{kv.set('wb120_rail',JSON.stringify(RO))}catch(e){}};
-const railBtns=()=>[...railEl.querySelectorAll(':scope > [data-pn]')];
-function railOrder(){const bs=railBtns(),by={};bs.forEach(b=>by[b.dataset.pn]=b);const ids=RO.order.filter(x=>by[x]);bs.forEach(b=>{if(!ids.includes(b.dataset.pn))ids.push(b.dataset.pn)});const sp=railEl.querySelector('.rsp');ids.forEach(id=>railEl.insertBefore(by[id],sp))}
-let railHook=null;
 function wsRender(){wsReady=true;const L=wsL(),nar=wsNarrow(),dl=nar?[...L.dock,...L.float]:L.dock;
 document.querySelectorAll('section.pn').forEach(sc=>wsStash.appendChild(sc));wsFl.innerHTML='';
 ['l','r','t','b'].forEach(k=>{const box=wsBox[k],dk=wsDk[k],gs=dl.filter(g=>(nar?'r':(g.e||'r'))==k);box.innerHTML='';
 gs.forEach((g,i)=>{if(i){const sp=document.createElement('div');sp.className='wsp';sp.dataset.i=i;box.appendChild(sp)}box.appendChild(wsEl(g,false))});
 dk.hidden=!gs.length;if(nar){dk.style.width='';dk.style.height=''}else if(gs.length){const ac=gs.every(g=>g.col);if(k=='l'||k=='r')dk.style.width=(ac?Math.min(200,wsClampSz(k,wsSz(k))):wsClampSz(k,wsSz(k)))+'px';else dk.style.height=(ac?34:wsClampSz(k,wsSz(k)))+'px'}});
 if(!nar)L.float.forEach(g=>wsFl.appendChild(wsEl(g,true)));
-document.querySelectorAll('.rail [data-pn]').forEach(b=>{const p=b.dataset.pn,g=wsFind(p);b.hidden=!MODEP.pattern.includes(p)||RO.off.includes(p)||EL_ONLY.includes(p);const fr=!!g&&g.a==p&&!g.col;b.classList.toggle('on',fr);b.classList.toggle('op',!!g&&!fr);b.title=''});
-wsTabFit();nums();if(railHook)railHook();if(WBX.wbRcls)WBX.wbRcls();if(WBX.wbElSync)WBX.wbElSync()}
+// the openers of the element panels are hidden (their commands check that the button exists, not that it shows); a top bar button that opens a panel is pressed while that panel shows
+document.querySelectorAll('#pnop [data-pn]').forEach(b=>{const p=b.dataset.pn;b.hidden=!MODEP.pattern.includes(p)||EL_ONLY.includes(p)});
+document.querySelectorAll('[data-opn]').forEach(b=>{const g=wsFind(b.dataset.opn),on=String(!!g&&g.a==b.dataset.opn&&!g.col);if(b.getAttribute('aria-pressed')!=on)b.setAttribute('aria-pressed',on)});
+wsTabFit();nums();if(WBX.wbRcls)WBX.wbRcls();if(WBX.wbElSync)WBX.wbElSync()}
 // a panel with more tabs than fit: the chosen tab is scrolled into view and the edge that hides more tabs fades
 function wsTabEdge(t){const h=t.parentElement;h.classList.toggle('ovr',t.scrollLeft+t.clientWidth<t.scrollWidth-1);h.classList.toggle('ovl',t.scrollLeft>1)}
 function wsTabFit(){document.querySelectorAll('.wh .wt').forEach(t=>{for(let k=0;k<3;k++){wsTabEdge(t);const a=t.querySelector('.wtab.on');if(!a)break;let m=0;if(a.offsetLeft+a.offsetWidth>t.scrollLeft+t.clientWidth){t.scrollLeft=a.offsetLeft+a.offsetWidth-t.clientWidth;m=1}else if(a.offsetLeft<t.scrollLeft){t.scrollLeft=a.offsetLeft;m=1}wsTabEdge(t);if(!m)break}})}   // the arrows (2.26.0) change the strip's width as they show or hide, so fit again until the open tab is in view
@@ -193,70 +189,18 @@ WBX.wbWsSet=o=>{['pattern'].forEach(m=>{const L=o&&o[m];if(!L)return;const seen=
  const c=JSON.parse(JSON.stringify(L));WS[m]={dock:(c.dock||[]).filter(ok),float:(c.float||[]).filter(ok)}});
   wsSave();wsRender();info();nums()};
 // The Close all panels button turns into Default when no panel is open and a Default workspace exists: pressing it opens that layout, and it turns back into Close.
-{const b=$('rcls'),CL=b.querySelector('svg').outerHTML,tp=b.querySelector('.tip'),DF='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.panelsDefault+'</svg>';let dm=false;
-const paint=()=>{const L=wsL(),e=!L.dock.length&&!L.float.length,d=e&&!!(WBX.wbWsDefault&&WBX.wbWsDefault());if(d===dm&&b.dataset.m)return;dm=d;b.dataset.m=d?'d':'c';b.setAttribute('aria-label',d?'Default panels':'Close all panels');b.querySelector('svg').outerHTML=d?DF:CL;tp.textContent=d?'Default panels':'Close all panels'};
+{const b=$('rcls');let dm=null;
+const paint=()=>{const L=wsL(),d=!L.dock.length&&!L.float.length&&!!(WBX.wbWsDefault&&WBX.wbWsDefault());if(d===dm)return;dm=d;b.dataset.m=d?'d':'c';b.setAttribute('aria-label',d?'Default panels':'Close all panels')};
 WBX.wbRcls=paint;
-b.onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length){const w=WBX.wbWsDefault&&WBX.wbWsDefault();if(w){WBX.wbWsSet(w.layout);pmsg('Default panels.')}return}L.dock=L.dock.filter(g=>g.lk);L.float=L.float.filter(g=>g.lk);wsSave();wsRender();pmsg('Closed all panels. Open any tool from the bar on the left.')}}
-document.querySelector('.rail').onclick=e=>{const b=e.target.closest('[data-pn]');if(!b)return;const p=b.dataset.pn,g=wsFind(p);
-// double-clicking the Randomize tool rolls a new piece, the same as pressing the Randomize button in its window (the window is left open)
-if(p=='rand'&&e.isTrusted&&e.detail>1){const g2=wsFind('rand');if(!(g2&&g2.a=='rand'&&!g2.col))setPanel('rand');$('rzdo').click();return}
-// clicking the button of a panel that is already showing closes it (only for real clicks, not when the app opens a panel itself)
-if(e.isTrusted&&g&&g.a==p&&!g.col&&!g.lk){const i=g.tabs.indexOf(p);g.tabs.splice(i,1);if(g.a==p)g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g);wsSave();wsRender();return}
-setPanel(p)};
+b.onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length){const w=WBX.wbWsDefault&&WBX.wbWsDefault();if(w){WBX.wbWsSet(w.layout);pmsg('Default panels.')}return}L.dock=L.dock.filter(g=>g.lk);L.float=L.float.filter(g=>g.lk);wsSave();wsRender();pmsg('Closed all panels.')}}
+// a panel opener (2.44.0: the hidden openers, and the top bar buttons with data-opn): it opens the panel, and pressing it again while the panel shows closes it.
+// A real click only; when the app or a command presses an opener, the panel opens (or stays open).
+function wsToggle(p,user){const g=wsFind(p);
+if(user&&g&&g.a==p&&!g.col&&!g.lk){const i=g.tabs.indexOf(p);g.tabs.splice(i,1);if(g.a==p)g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g);wsSave();wsRender();return}
+setPanel(p)}
+$('pnop').onclick=e=>{const b=e.target.closest('[data-pn]');if(b)wsToggle(b.dataset.pn,e.isTrusted)};
+document.querySelectorAll('[data-opn]').forEach(b=>b.addEventListener('click',e=>wsToggle(b.dataset.opn,e.isTrusted)));
 
-// tool bar editing: the three-line button lists the tools that are off the bar; while it is open each tool on the bar shows an X to take it off; tools drag to a new place
-{const more=$('rmore'),menu=$('rmenu');let ed=false,drag=null,jus=0;
-const vis=()=>railBtns().filter(b=>!MODEP.pattern.includes(b.dataset.pn)||RO.off.includes(b.dataset.pn)||EL_ONLY.includes(b.dataset.pn)?false:true);
-function fill(){menu.innerHTML='';const off=railBtns().filter(b=>MODEP.pattern.includes(b.dataset.pn)&&RO.off.includes(b.dataset.pn)&&!EL_ONLY.includes(b.dataset.pn));
-{const g=document.createElement('div');g.className='rmg';off.forEach(b=>{const m=document.createElement('button');m.type='button';m.dataset.add=b.dataset.pn;m.setAttribute('aria-label','Add '+b.getAttribute('aria-label'));m.innerHTML=b.querySelector('svg').outerHTML+'<span class="tip">'+b.getAttribute('aria-label')+'</span>';if(wsFind(b.dataset.pn))m.classList.add('on');g.appendChild(m)});menu.append(g)}
-menu.hidden=!ed||!(off.length||D&&D.on);if(!menu.hidden){const w=railEl.getBoundingClientRect(),row=w.width>w.height;menu.style.left=(row?w.left:w.left-52)+'px';menu.style.top=(row?w.bottom:w.top)+'px';menu.style.width=w.width+'px';menu.style.height=w.height+'px';menu.style.bottom=''}}
-function edit(on){ed=on;document.body.classList.toggle('rtray',on);more.classList.toggle('on',on);more.setAttribute('aria-expanded',String(on));fill()}
-const refresh=()=>wsRender();railHook=()=>{if(ed)fill()};addEventListener('resize',()=>{if(ed)fill()});
-more.onclick=()=>edit(!ed);
-menu.onclick=e=>{if(Date.now()-jus<300)return;const m=e.target.closest('[data-add]');if(!m)return;const b=railEl.querySelector('[data-pn="'+m.dataset.add+'"]');if(b)b.click()};
-addEventListener('keydown',e=>{if(e.key=='Escape'&&ed)edit(false)});
-// a click that ends a drag is not a tool click
-railEl.addEventListener('click',e=>{if(Date.now()-jus<300){e.stopPropagation();e.preventDefault()}},true);
-// one drag for both columns: the bar and the repository get the same highlight, a line shows exactly where the tool will land, and the move happens on drop
-const rowMode=()=>getComputedStyle(railEl).flexDirection=='row';
-const inRect=(el,x,y)=>{const r=el.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom};
-const hvClear=()=>railEl.querySelectorAll('.hv').forEach(x=>x.classList.remove('hv'));
-const idOf=el=>el.dataset.pn||el.dataset.add;
-const colItems=c=>c=='rail'?vis():[...menu.querySelectorAll('[data-add]')];
-const colAt=(x,y)=>(!menu.hidden&&inRect(menu,x,y))?'tray':inRect(railEl,x,y)?'rail':null;
-let D=null,ins=null;
-function slot(c,x,y){const row=rowMode(),list=colItems(c).filter(el=>idOf(el)!==D.id);let idx=0;list.forEach(el=>{const r=el.getBoundingClientRect(),m=row?r.left+r.width/2:r.top+r.height/2;if((row?x:y)>m)idx++});return{c,idx,list,row}}
-function showIns(sl){if(!ins){ins=document.createElement('div');ins.className='rins';document.body.appendChild(ins)}
-const {list,idx,row,c}=sl,box=(c=='tray'?menu:railEl).getBoundingClientRect();let st,sz,cs,cz;
-const R=el=>el.getBoundingClientRect();
-if(list.length){const f=R(list[0]);cs=row?f.top:f.left;cz=row?f.height:f.width;
- const p=idx>0?(row?R(list[idx-1]).right:R(list[idx-1]).bottom):null,n=idx<list.length?(row?R(list[idx]).left:R(list[idx]).top):null;
- st=p!=null&&n!=null?(p+n)/2:p!=null?p+2:n-2}
-else{cs=row?box.top+4:box.left+6;cz=row?box.height-8:40;st=row?box.left+8:box.top+8}
-ins.style.display='block';
-if(row){ins.style.left=(st-1.5)+'px';ins.style.top=cs+'px';ins.style.width='3px';ins.style.height=cz+'px'}
-else{ins.style.top=(st-1.5)+'px';ins.style.left=cs+'px';ins.style.height='3px';ins.style.width=cz+'px'}}
-function dragEnd(){if(!D)return;const d=D;D=null;if(d.g)d.g.remove();d.el.classList.remove('rsrc');document.body.classList.remove('rdragging');railEl.classList.remove('rtgt','rover');menu.classList.remove('rtgt','rover');if(ins)ins.style.display='none';if(ed&&d.on)fill();return d}
-railEl.addEventListener('pointerdown',e=>{if(e.button>0)return;const el=e.target.closest('.rail > [data-pn], #rmenu [data-add]');if(!el)return;D={el,id:idOf(el),src:el.dataset.pn?'rail':'tray',x:e.clientX,y:e.clientY,on:false,pid:e.pointerId,g:null}});
-railEl.addEventListener('pointermove',e=>{if(!D||e.pointerId!==D.pid)return;
-if(!D.on){if(Math.hypot(e.clientX-D.x,e.clientY-D.y)<7)return;D.on=true;hvClear();try{D.el.setPointerCapture(e.pointerId)}catch(_){}
- const g=document.createElement('div');g.className='rghost';g.innerHTML=D.el.querySelector('svg').outerHTML;document.body.appendChild(g);D.g=g;D.el.classList.add('rsrc');
- document.body.classList.add('rdragging');railEl.classList.add('rtgt');if(ed)fill();if(!menu.hidden)menu.classList.add('rtgt')}
-D.g.style.left=(e.clientX-18)+'px';D.g.style.top=(e.clientY-18)+'px';
-const c=colAt(e.clientX,e.clientY);railEl.classList.toggle('rover',c=='rail');menu.classList.toggle('rover',c=='tray');
-if(c)showIns(slot(c,e.clientX,e.clientY));else if(ins)ins.style.display='none'});
-const dragUp=e=>{if(!D||e.pointerId!==D.pid)return;const wasOn=D.on,x=e.clientX,y=e.clientY,cancel=e.type=='pointercancel';let sl=null;if(wasOn&&!cancel){const c=colAt(x,y);if(c)sl=slot(c,x,y)}
-const d=dragEnd();if(!wasOn)return;jus=Date.now();if(!sl)return;
-const el=railEl.querySelector('[data-pn="'+d.id+'"]'),ref=sl.list[sl.idx],end=railEl.querySelector('.rsp');
-if(sl.c=='rail'){RO.off=RO.off.filter(k=>k!==d.id);railEl.insertBefore(el,ref||end)}
-else{if(!RO.off.includes(d.id))RO.off.push(d.id);const rb=ref&&railEl.querySelector('[data-pn="'+idOf(ref)+'"]');railEl.insertBefore(el,rb||end)}
-RO.order=railBtns().map(b=>b.dataset.pn);railSave();refresh()};
-railEl.addEventListener('pointerup',dragUp);railEl.addEventListener('pointercancel',dragUp);railEl.addEventListener('lostpointercapture',e=>{if(D&&D.on&&e.pointerId===D.pid&&!D.el.isConnected)dragUp(e)});
-// the name label and highlight follow the mouse itself (not the browser's hover state, which can stick after a drag or a touch)
-railEl.addEventListener('pointermove',e=>{if(e.pointerType!='mouse'||D&&D.on)return;const b=document.elementFromPoint(e.clientX,e.clientY),t=b&&b.closest('.rail button');if(t&&t.classList.contains('hv'))return;hvClear();if(t)t.classList.add('hv')});
-railEl.addEventListener('pointerleave',hvClear);
-railOrder();
-}
 
 // ===== Randomize panel: which main features a roll may change. Anything switched off stays exactly as it is. Settings are remembered.
 (()=>{const sec=document.querySelector('section.pn[data-p="rand"]'),fts=[...sec.querySelectorAll('[data-ft]')],subs=[...sec.querySelectorAll('[data-sub]')],KEY='wb38_rzft',SKEY='wb50_rzsub',by=k=>fts.find(c=>c.dataset.ft==k),sk=m=>subs.filter(c=>c.dataset.sub.startsWith(m+'.'));
@@ -337,9 +281,12 @@ const _sp=WBH.syncPr;WBH.syncPr=function(){_sp();nums()};const _stx=WBH.syncTex;
 let mt=0;new MutationObserver(()=>{clearTimeout(mt);$('pmsg').style.opacity=1;if($('pmsg').textContent)mt=setTimeout(()=>{$('pmsg').style.transition='opacity .6s';$('pmsg').style.opacity=0;setTimeout(()=>{$('pmsg').style.transition=''},700)},6000)}).observe($('pmsg'),{childList:true,characterData:true,subtree:true});
 
 // ---- menus
-const menus=[['fileb','filem']];
-const closeMenus=()=>menus.forEach(([b,m])=>{$(m).hidden=true;$(b).setAttribute('aria-expanded','false')});WBX.wbCloseMenus=closeMenus;
-menus.forEach(([b,m])=>{$(b).onclick=e=>{e.stopPropagation();const o=$(m).hidden;closeMenus();closeDD();$(m).hidden=!o;if(o)placeFloat($(m),$(b),$(m).classList.contains('r'));$(b).setAttribute('aria-expanded',String(o))};$(m).addEventListener('click',e=>{if(e.target.closest('button,label')&&!e.target.closest('[data-sure]'))closeMenus()})});
+// The menus of the menu bar (2.42.0): File here, the rest from 85-menu-bar.js through WBX.wbMenuWire. `before` fills a menu just before it opens.
+// A click on an item closes the menus; an item that opens a submenu (aria-haspopup) or asks twice (data-sure) keeps them open.
+const menus=[];
+const closeMenus=()=>{menus.forEach(([b,m])=>{$(m).hidden=true;$(b).setAttribute('aria-expanded','false')});if(WBX.wbMenuSubClose)WBX.wbMenuSubClose()};WBX.wbCloseMenus=closeMenus;
+function menuWire(b,m,before){menus.push([b,m]);$(b).onclick=e=>{e.stopPropagation();const o=$(m).hidden;closeMenus();closeDD();if(o&&before)before();$(m).hidden=!o;if(o)placeFloat($(m),$(b),$(m).classList.contains('r'));$(b).setAttribute('aria-expanded',String(o))};$(m).addEventListener('click',e=>{if(e.target.closest('button,label')&&!e.target.closest('[data-sure],[aria-haspopup]'))closeMenus()})}
+menuWire('fileb','filem');WBX.wbMenuWire=menuWire;WBX.wbMenuOpen=()=>menus.some(([,m])=>!$(m).hidden);
 document.addEventListener('click',e=>{if(!e.target.closest('.menu,.pop'))closeMenus()});
 // A floating popup would drift away from its button if the page or a panel scrolled under it, so close it instead.
 addEventListener('scroll',e=>{const t=e.target;if(t&&t.closest&&t.closest('.pop,.ddl'))return;if(typeof typing=='function'&&typing())return;closeMenus();closeDD()},true);addEventListener('resize',()=>{if(typeof typing=='function'&&typing())return;closeMenus();closeDD()});
@@ -431,7 +378,7 @@ setInterval(()=>{if(!sec.hidden)paint()},30000)})();
 
 
 // ---- names on hover (Part 9, owner Oct 22 2026): an icon-only button shows its aria-label; a button that shows its own words shows nothing extra
-document.addEventListener('pointerover',e=>{const b=e.target.closest&&e.target.closest('button[aria-label],[role=button][aria-label]');if(!b||b.title||b.closest('.rail'))return;
+document.addEventListener('pointerover',e=>{const b=e.target.closest&&e.target.closest('button[aria-label],[role=button][aria-label]');if(!b||b.title)return;
 const tip=b.querySelector('.tip');const words=b.textContent.replace(tip?tip.textContent:'','').trim();if(!words)b.title=b.getAttribute('aria-label')},true);
 
 // ---- keyboard shortcuts
