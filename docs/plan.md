@@ -4,6 +4,8 @@
 - The stamp tab canvas draws the dividing lines (and the shaded base part) of the chosen symmetry in the stamp's own frame, with or without a selection, and redraws when the mode changes (`sceSymG` in 64, `symG` in 07).
 - New types: Diagonal ╲, Diagonal ╱, Both diagonals, Glide, Brick (rows), Half-drop (columns). Brick and Half-drop are repeat modes (rectangle shape only). Randomize does not roll them, so seeded results are unchanged.
 - Tested: tests/symmetry-lines-2-46-0.spec.js (every mode), the stamp-tab, stamp-canvas-edit, panel-text and editing-habits specs, check:platform, check:style. Not run: full suite, perf (no drawing path touched).
+## 2.45.2 (Oct 25 2026): square shape previews
+The previews in the Shape library were 65 x 24 px: the global button height beat the tile's aspect-ratio. `.lib button` now has height:auto (src/shell.html), so they are squares. New tests/shape-previews-2-45-2.spec.js; motif-library, library-browse, shape-folders, stamp-library-tool specs pass; check:style OK.
 
 ## 2.45.1 (Oct 25 2026): pixel goldens regenerated
 16 pictures in tests/__golden__/sandbox, after looking at each diff (top bar, no rail, version badge). Two state/SVG snapshots (randomize seed 2) are out of date and wait for the owner's approval. Full CI suite started by hand on this branch.
