@@ -3,6 +3,12 @@
 ## 2.47.0 (Oct 25 2026): a new Pattern lays its stamps edge to edge
 - A new Pattern element starts at size 100% of its cell (it was 80%), so neighbouring stamps touch with no gap; the Size slider (and Randomize's own values) still make gaps or overlaps. Counts stay 4 x 4. Open question for the owner: derive columns and rows from the stamp size (canvas / stamp) instead of a fixed 4 x 4, and add a separate Spacing slider.
 - Tested: tests/pattern-default-2-47-0.spec.js, element-pattern, add-arm, bug-fixes-2-16, motif-look specs. Not run: full suite.
+## 2.46.0 (Oct 25 2026): symmetry lines on the stamp tab, six new symmetry types
+- The stamp tab canvas draws the dividing lines (and the shaded base part) of the chosen symmetry in the stamp's own frame, with or without a selection, and redraws when the mode changes (`sceSymG` in 64, `symG` in 07).
+- New types: Diagonal ╲, Diagonal ╱, Both diagonals, Glide, Brick (rows), Half-drop (columns). Brick and Half-drop are repeat modes (rectangle shape only). Randomize does not roll them, so seeded results are unchanged.
+- Tested: tests/symmetry-lines-2-46-0.spec.js (every mode), the stamp-tab, stamp-canvas-edit, panel-text and editing-habits specs, check:platform, check:style. Not run: full suite, perf (no drawing path touched).
+## 2.45.2 (Oct 25 2026): square shape previews
+The previews in the Shape library were 65 x 24 px: the global button height beat the tile's aspect-ratio. `.lib button` now has height:auto (src/shell.html), so they are squares. New tests/shape-previews-2-45-2.spec.js; motif-library, library-browse, shape-folders, stamp-library-tool specs pass; check:style OK.
 
 ## 2.45.1 (Oct 25 2026): pixel goldens regenerated
 16 pictures in tests/__golden__/sandbox, after looking at each diff (top bar, no rail, version badge). Two state/SVG snapshots (randomize seed 2) are out of date and wait for the owner's approval. Full CI suite started by hand on this branch.

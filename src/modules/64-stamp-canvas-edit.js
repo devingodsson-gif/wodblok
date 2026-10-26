@@ -3,7 +3,7 @@ import {OFFS,SH,SW,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,it,mk,pal,selOne,store} from './06-motif-library-folders.js';
 import {DOTK} from './05-motif-data.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
-import {symOps} from './07-symmetry.js';
+import {symG,symOf,symOps} from './07-symmetry.js';
 import {delItems,selSet,selToggle} from './12-selection-and-split.js';
 import {fpL,fpSnap} from './24-free-place-layers.js';
 import {STP,stMatrix,stUnlocked,stampAt,stLock} from './63-stamp-tool.js';
@@ -80,8 +80,12 @@ function sceGhost(){const b=WBS.brush,g=SCE.g;if(!b||b.txt||!g||!b.m)return'';co
  else if(t0==null){const k=(WBX.wbMotifSize?WBX.wbMotifSize():b.s*100)/100;tr=`translate(${f(g.x)} ${f(g.y)}) rotate(${f(b.r)}) scale(${f(k)})`;op=.45}   // 2.12.0: a click here makes a free Motif of this size, with or without a stamp on the canvas
  else{const it0=STP.items[0];if(!it0)return'';const M=stMatrix(it0),k=Math.hypot(M.a,M.b);tr=`translate(${f(g.x)} ${f(g.y)}) rotate(${f(b.r)}) scale(${f(k*b.s)})`;op=.3}
  return`<g class="stgh" pointer-events="none" opacity="${op}" transform="${tr}">${mk(b.m,ink,bg)}</g>`}
-function sceDraw(){const g=$('stoh');if(!g)return;const gh=sceGhost(),t=sceRO();if(!t||!WBS.msel.size){g.innerHTML=gh;return}
- let ai=SCE.ai;if(ai==null||!STP.items[ai]||STP.items[ai][0]!==t.id)ai=SCE.ai=STP.items.findIndex(x=>x[0]===t.id);if(ai<0){g.innerHTML=gh;return}
+// 2.46.0: the stamp's symmetry shows on its canvas: the dividing lines of the chosen mode (and a light shade over the part to work in), drawn in the stamp's own frame
+function sceSymG(t,ai){const{m,n}=symOf(t);if(m=='off'||ai<0||!STP.items[ai])return'';const M=stMatrix(STP.items[ai]),a=$('art'),m0=a&&a.getScreenCTM(),sc=(m0&&m0.a)||1,k=Math.hypot(M.a,M.b)||1,g=symG(m,n,1.5/(sc*k),0);
+ return g?`<g transform="matrix(${[M.a,M.b,M.c,M.d,M.e,M.f].map(v=>v.toFixed(5)).join(' ')})">${g}</g>`:''}
+function sceDraw(){const g=$('stoh');if(!g)return;const gh0=sceGhost(),t=sceRO();if(!t){g.innerHTML=gh0;return}
+ let ai=SCE.ai;if(ai==null||!STP.items[ai]||STP.items[ai][0]!==t.id)ai=SCE.ai=STP.items.findIndex(x=>x[0]===t.id);if(ai<0){g.innerHTML=gh0;return}
+ const gh=sceSymG(t,ai)+gh0;if(!WBS.msel.size){g.innerHTML=gh;return}
  const a=$('art'),m0=a&&a.getScreenCTM(),sc=(m0&&m0.a)||1,hs=4.5/sc,off=20/sc,M=stMatrix(STP.items[ai]),f=v=>v.toFixed(2);let h='';
  const P=(x,y)=>{const q=M.transformPoint({x,y});return[q.x,q.y]};
  const box=q=>{const rx=48*q.s*(q.sx||1),ry=48*q.s*(q.sy||1),r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return{rx,ry,L:(u,v)=>P(+q.x+u*c-v*s,+q.y+u*s+v*c)}};
