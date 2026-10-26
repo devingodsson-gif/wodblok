@@ -5,7 +5,9 @@ import {isOf} from './16-texture-generators.js';
 const SYM=[['off','Off'],['lr','Left ↔ right'],['ud','Up ↕ down'],['quad','4-way'],['star','8-way'],['hex','Hex'],['kal','Kaleido',2,12,6,'Mirrors'],['rot','Circular',2,16,6,'Copies'],['rx','Repeat ↔',2,6,2,'Repeats'],['ry','Repeat ↕',2,6,2,'Repeats'],['grid','Repeat grid',2,6,2,'Repeats'],['diag','Diagonal ╲'],['diag2','Diagonal ╱'],['dd','Both diagonals'],['glide','Glide'],['brick','Brick',2,6,2,'Rows'],['drop','Half-drop',2,6,2,'Columns']];
 const REP=['rx','ry','grid','brick','drop'],symOf=t=>{const S=t.sym||{};let d=SYM.find(x=>x[0]==S.m)||SYM[0];if(SK!='rect'&&REP.includes(d[0]))d=SYM[0];return{m:d[0],n:d[2]?Math.max(d[2],Math.min(d[3],S.n||d[4])):0,d}};
 const nr=r=>mod(r+180,360)-180,RAD=Math.PI/180;
-function symOps(t){const{m,n}=symOf(t),C=SW/2,D=SH/2,o=[];
+// the centre every symmetry turns and mirrors about: the middle of the stamp, or a triangle's own centre (a third of the way up from its base; 2.50.1), so turned copies land on it
+const symC=()=>[SW/2,SK=='tri'?SH*2/3:SH/2];
+function symOps(t){const{m,n}=symOf(t),[C,D]=symC(),o=[];
 const rot=a=>{const c=Math.cos(a*RAD),s=Math.sin(a*RAD);return{p:(x,y)=>[C+(x-C)*c-(y-D)*s,D+(x-C)*s+(y-D)*c],i:(x,y)=>[C+(x-C)*c+(y-D)*s,D-(x-C)*s+(y-D)*c],r:r=>r+a,f:f=>f}};
 const ref=th=>{const c=Math.cos(2*th*RAD),s=Math.sin(2*th*RAD),p=(x,y)=>[C+(x-C)*c+(y-D)*s,D+(x-C)*s-(y-D)*c];return{p,i:p,r:r=>2*th+180-r,f:f=>-f}};
 const sh=(dx,dy)=>({p:(x,y)=>[x+dx,y+dy],i:(x,y)=>[x-dx,y-dy],r:r=>r,f:f=>f});
@@ -25,7 +27,7 @@ const wP=(t,x,y)=>t.wr===false?[x,y]:wrapP(x,y);
 function expand(t){const ops=symOps(t),out=[];t.items.forEach((q,i)=>{out.push([q,i,0]);if(q.tg&&!(t.sym&&t.sym.tx))return;const[x0,y0]=wP(t,q.x,q.y);
 ops.forEach((o,c)=>{const[x,y]=o.p(x0,y0);const w=wP(t,x,y);out.push([{...q,x:w[0],y:w[1],r:nr(o.r(q.r)),f:o.f(q.f),...(q.cl?{cl:q.cl.map(a=>a.slice())}:{})},i,c+1])})});return out}
 // Guide lines (and a shaded "work here" area) for a symmetry mode
-function symG(m,n,w,clip){const C=SW/2,D=SH/2,R=Math.max(SW,SH)+40,A=a=>[C+R*Math.cos(a*RAD),D+R*Math.sin(a*RAD)],f=v=>v.toFixed(1);
+function symG(m,n,w,clip){const[C,D]=symC(),R=Math.max(SW,SH)+40,A=a=>[C+R*Math.cos(a*RAD),D+R*Math.sin(a*RAD)],f=v=>v.toFixed(1);
 const L=(x1,y1,x2,y2)=>`<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}"/>`,full=a=>{const[x1,y1]=A(a),[x2,y2]=A(a+180);return L(x1,y1,x2,y2)},ray=a=>{const[x,y]=A(a);return L(C,D,x,y)};
 const wedge=(a0,a1)=>{const[x0,y0]=A(a0),[x1,y1]=A(a1);return`<path d="M${C} ${D}L${f(x0)} ${f(y0)}A${R} ${R} 0 ${a1-a0>180?1:0} 1 ${f(x1)} ${f(y1)}Z"/>`},box=(x,y,wd,h)=>`<rect x="${x}" y="${y}" width="${wd}" height="${h}"/>`;
 let sh='',g='';
@@ -36,7 +38,7 @@ else if(m=='diag'){sh=wedge(45,225);g=full(45)}else if(m=='diag2'){sh=wedge(135,
 else if(m=='glide'){sh=box(C,0,C,SH);g=L(C,-30,C,SH+30)+L(C,D,SW+30,D)}
 else if(m=='star'||m=='hex'||m=='kal'){const k=m=='star'?4:m=='hex'?6:n;sh=wedge(-90,-90+180/k);for(let j=0;j<k;j++)g+=full(90+180*j/k);
 if(m=='hex')[62,112].forEach(r=>{g+=`<polygon points="${[0,1,2,3,4,5].map(j=>f(C+r*Math.cos(((SK=='hex'&&HO=='f'?0:-90)+60*j)*RAD))+','+f(D+r*Math.sin(((SK=='hex'&&HO=='f'?0:-90)+60*j)*RAD))).join(' ')}"/>`})}
-else if(m=='rot'){sh=wedge(-90,-90+360/n);for(let j=0;j<n;j++)g+=ray(-90+360*j/n);g+=`<circle cx="${C}" cy="${D}" r="${Math.min(C,D)*.75}"/>`}
+else if(m=='rot'){sh=wedge(-90,-90+360/n);for(let j=0;j<n;j++)g+=ray(-90+360*j/n);g+=`<circle cx="${C}" cy="${D}" r="${Math.min(C,D,SH-D)*.75}"/>`}
 else if(m=='brick'||m=='drop'){const s=SW/n,u=SH/n;sh=box(0,0,s,u);for(let j=1;j<n;j++){if(m=='brick')g+=L(-30,j*u,SW+30,j*u);else g+=L(j*s,-30,j*s,SH+30)}
  for(let a=0;a<=n;a++)for(let b=0;b<n;b++){if(m=='brick'){const x=a*s+(b%2?s/2:0);if(x>0&&x<SW)g+=L(x,b*u,x,(b+1)*u)}else{const y=b*u+(a%2?u/2:0);if(a<n&&y>=0&&y<SH)g+=L(a*s,y,(a+1)*s,y)}}}
 else if(m=='rx'||m=='ry'||m=='grid'){const s=SW/n,u=SH/n;sh=m=='rx'?box(0,0,s,SH):m=='ry'?box(0,0,SW,u):box(0,0,s,u);for(let j=1;j<n;j++){if(m!='ry')g+=L(j*s,-30,j*s,SH+30);if(m!='rx')g+=L(-30,j*u,SW+30,j*u)}}

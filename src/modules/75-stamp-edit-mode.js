@@ -1,6 +1,6 @@
 import {ICN} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {geom,hEsc,shOf,stNmId,stvSet} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,geom,hEsc,shOf,stNmId,stvSet} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {STP,stLock,stUnlocked,stampAt} from './63-stamp-tool.js';
 
@@ -21,10 +21,15 @@ let STID=null;   // the stamp shown alone, or null while the Canvas is shown
 // the scene the build draws while a stamp is shown: one layer holding a 1 x 1 pattern of the stamp, so the stamp prints once, in the middle, and every tool that works on a
 // printed stamp works on it. It takes the selected layer's id because the unlocked stamp belongs to that layer.
 function steScene(){if(STID==null)return null;const t=WBS.tiles.find(x=>x.id==STID),rl=WBS.layers[WBS.selL];if(!t||!rl)return null;const G=geom(shOf(t));
- return[{u:rl.u,name:'Stamp',vis:true,st:[t.id],lay:'check',size:180,ox:0,oy:0,rot:0,pst:0,pfl:0,free:true,pl:[{u:'ste',k:'pattern',lay:'grid',cn:1,rn:1,sz:STSZ,rt:0,ds:'cycle',sd:1,src:[{k:'stamp',t:t.id,w:1}],x:+(G.SW/2).toFixed(1),y:+(G.SH/2).toFixed(1),s:Math.min(G.SW,G.SH),r:0,f:1}]}]}
+ return[{u:rl.u,name:'Stamp',vis:true,st:[t.id],lay:'check',size:180,ox:0,oy:0,rot:0,pst:0,pfl:0,free:true,pl:[{u:'ste',k:'pattern',lay:'grid',cn:1,rn:1,sz:+(STSZ*Math.max(G.SW,G.SH)/Math.min(G.SW,G.SH)).toFixed(4),rt:0,ds:'cycle',sd:1,src:[{k:'stamp',t:t.id,w:1}],x:+(G.SW/2).toFixed(1),y:+(G.SH/2).toFixed(1),s:Math.min(G.SW,G.SH),r:0,f:1}]}]}
+// a pattern piece's long side is the cell's short side, so a stamp that is not square is drawn larger by long / short to fill its own stage (2.50.1: it was 87% of it on a hexagon or a triangle)
 const STSZ=100;
 // switch the stage between the Canvas and a stamp (the canvas size is the stamp's while one is shown)
 function steStage(id){STID=id;const t=id==null?null:WBS.tiles.find(x=>x.id==id);if(t){const G=geom(shOf(t));stvSet(G.SW,G.SH)}else{STID=null;stvSet(null)}if(WBX.wbApplyZ)WBX.wbApplyZ()}
+// 2.50.1 (owner Oct 26 2026: the symmetry lines were off on hexagon and triangle stamps): the stage keeps the size of the stamp that is shown. A change of shape or
+// proportions in the tab (or its undo) changed the stamp but not the stage, so the outline was drawn from the corner of the old stage while the print and the lines
+// were centred on it (16 units off on a hexagon or a triangle opened as a rectangle). The build calls this first.
+function steFit(){if(STID==null)return;const t=WBS.tiles.find(x=>x.id==STID);if(!t)return;const G=geom(shOf(t));if(Math.abs(CW-G.SW)<1e-6&&Math.abs(CH-G.SH)<1e-6)return;stvSet(G.SW,G.SH);if(WBX.wbApplyZ)WBX.wbApplyZ()}
 // show a tab: a stamp id, or null for the Canvas
 function steGo(id){const cur=stUnlocked();if((cur==null?null:cur)===(id==null?null:id))return;
  STE.views[cur==null?'c':cur]=steView();
@@ -61,5 +66,5 @@ function init75(){const a=$('art');if(!a)return;
  $('stetabs').addEventListener('scroll',()=>steEdge($('stetabs')));addEventListener('resize',()=>steEdge($('stetabs')));
  const ed=$('smkedit');if(ed)ed.onclick=()=>{const t=WBS.tiles[WBS.cur];if(t)steGo(t.id)};
  ($('boardP')||a).addEventListener('dblclick',e=>{if(WBS.brush||WBS.txArm||WBS.fpB!=null)return;const c=stePt(e);if(!c)return;const h=stampAt(c.x,c.y,null);if(!h)return;e.preventDefault();const it=STP.items[h.i],id=it?it[0]:null;if(id==null)return;if(stUnlocked()===id){if(WBX.wbTxGrp&&WBX.wbTxGrp())return;steClose(id)}else steGo(id)});
- WBX.wbSteSync=steSync;WBX.wbSteReset=steReset;WBX.wbSteGo=steGo;WBX.wbSteEdit=steEdit;WBX.wbSteScene=steScene}
+ WBX.wbSteSync=steSync;WBX.wbSteReset=steReset;WBX.wbSteGo=steGo;WBX.wbSteEdit=steEdit;WBX.wbSteScene=steScene;WBX.wbSteFit=steFit}
 export {init75,steDone,steOpen};
