@@ -22,7 +22,7 @@ const RK='wb_cmd_recent';
 const recents=()=>{try{const a=JSON.parse(kv.get(RK)||'[]');return Array.isArray(a)?a.filter(x=>typeof x=='string').slice(0,5):[]}catch(e){return[]}};
 const remember=id=>{try{kv.set(RK,JSON.stringify([id,...recents().filter(x=>x!==id)].slice(0,5)))}catch(e){}};
 // a command whose button sits in a part of the page that is not showing now (the other view's tools) is out of view; menu items and file inputs count as in view
-const inView=c=>{const e=c.elId&&$(c.elId);if(!e)return true;if(e.matches('input')||e.closest('.pop,.menu'))return true;return e.getClientRects().length>0};
+const inView=c=>{const e=c.elId&&$(c.elId);if(!e)return true;if(e.matches('input')||e.closest('.pop,.menu,#pnop'))return true;return e.getClientRects().length>0};
 function search(q){
   const rec=recents(),all=cmdList().map((c,i)=>({c,i,on:cmdIsEnabled(c.id),v:inView(c),r:rec.indexOf(c.id)}));
   if(q.trim()){const hits=all.map(r=>({...r,s:score(r.c.label,q)})).filter(r=>r.s>=0);return hits.sort((a,b)=>(b.on-a.on)||(a.s-b.s)||(a.i-b.i))}

@@ -1,5 +1,8 @@
 # Development plan
 
+## 2.45.1 (Oct 25 2026): pixel goldens regenerated
+16 pictures in tests/__golden__/sandbox, after looking at each diff (top bar, no rail, version badge). Two state/SVG snapshots (randomize seed 2) are out of date and wait for the owner's approval. Full CI suite started by hand on this branch.
+
 ## Done: drawing speed (2.45.0, Oct 25 2026; 2.44.1 to 2.44.4 are its steps; built, not merged, not live)
 Outcome: work per step down 60 to 62% on the slider drag, shape drag and undo/redo of a 40 shapes x 4 effects project (docs/perf-baseline.md). Step 2.44.5 (draft while dragging) was not needed and is not built. Still open: a measurement on the owner's Mac, the full suite before going live (importance about 70%), and printing text, picture and pattern elements that carry effects.
 2.44.4: the canvas is no longer replaced whole on every redraw: `bkPut` (03) parses the new picture off the page and `bkMorph` replaces only the nodes that differ (compared two levels down, then whole), so unchanged parts are not restyled, laid out or repainted. Work per step down another 10 to 22%. Tests: 58 targeted specs passed (selection, resize, copy/paste, background, effects, flow, stamp panel, guides, filter shape, export, texture, grade, noise, misreg, randomize effects, history, undo), `npm run perf` OK, check:style and check:platform OK. Full suite not run.

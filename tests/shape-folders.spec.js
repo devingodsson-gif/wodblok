@@ -106,6 +106,8 @@ test('a sheet imports into the active folder; with no folder active, imports go 
 test('the import window can save into another folder, or a new one', async ({ page }) => {
   const { errors } = await open(page);
   await page.setInputFiles('#sfile', await sheet(page));
+  await page.waitForSelector('#idlg:not([hidden]) #ifold', { state: 'attached' });   // the window fills its folder list when the sheet is read; picking before that was undone by the fill (failed 1 run in 4, on 2.44.2 too)
+  await page.waitForTimeout(300);
   await pick(page, '#ifold', '+');
   await expect(page.locator('#ifnew')).toBeVisible();
   await page.fill('#ifnew', 'Dots sheet');
