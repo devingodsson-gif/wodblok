@@ -15,13 +15,13 @@ const zipNames = page => page.evaluate(() => {
   return out;
 });
 
-test('a new project has a four-colour tray (2.54.0): paper and ink link to it, the dock shows seven places and a +', async ({ page }) => {
+test('a new project has a two-colour tray: paper and ink link to it, the dock shows four places (2.54.1: two filled, two empty) and a +', async ({ page }) => {
   const { errors } = await openApp(page);
   const p = await proj(page);
-  expect(p.ts).toEqual(['k1', 'k2', 'k3', 'k4']);
+  expect(p.ts).toEqual(['k1', 'k2']);
   expect(p.bg).toBe('@k1'); expect(p.ink).toBe('@k2');
-  await expect(page.locator('#tyc .tys')).toHaveCount(4);
-  await expect(page.locator('#tyc .tye')).toHaveCount(3);
+  await expect(page.locator('#tyc .tys')).toHaveCount(2);
+  await expect(page.locator('#tyc .tye')).toHaveCount(2);
   await expect(page.locator('#tyc .tyadd')).toHaveCount(1);
   await expect(page.locator('#tycw')).toBeHidden();             // one colourway: no switcher
   expect(errors).toEqual([]);
@@ -87,11 +87,11 @@ test('removing a tray colour that is in use keeps what used it as a fixed colour
   const h1 = (await colours(page))[0];
   await page.click('#tyc .tys >> nth=0');
   await page.click('.cpka [data-a="0"]');                       // first press: says how many things use it
-  expect((await proj(page)).ts).toHaveLength(4);
+  expect((await proj(page)).ts).toHaveLength(2);
   await expect(page.locator('#pmsg')).toContainText('Used by');
   await page.click('.cpka [data-a="0"]'); await settle(page);   // second press removes it
   const p = await proj(page);
-  expect(p.ts).toHaveLength(3);
+  expect(p.ts).toHaveLength(1);
   expect(p.bg).toBe(h1);                                        // the paper kept its colour
   expect(errors).toEqual([]);
 });
@@ -118,7 +118,7 @@ test('saved trays: a Wada set fills the first places; your own tray is kept and 
   const first = page.locator('#stl button[data-st]').first(), name = (await first.locator('b').textContent()).trim();
   await first.click(); await settle(page);
   const p = await proj(page);
-  expect(p.ts).toHaveLength(4);
+  expect(p.ts).toHaveLength(3);
   expect(p.cw[0].m[p.ts[0]]).toBeTruthy();
   await expect(page.locator('#pmsg')).toContainText(name);
   await page.click('#tysave'); await page.fill('#tysvn', 'Qwerty Tray'); await page.press('#tysvn', 'Enter');
@@ -176,12 +176,12 @@ test('dragging a colour along the dock moves it in the tray; links stay with the
   const { errors } = await openApp(page);
   await page.click('#tyc .tyadd'); await setHex(page, '#AA3300'); await closePicker(page);
   const p0 = await proj(page);
-  expect(p0.ts).toEqual(['k1', 'k2', 'k3', 'k4', 'k5']);
-  const a = await page.locator('#tyc .tys[data-s="k5"]').boundingBox(), b = await page.locator('#tyc .tys[data-s="k1"]').boundingBox();
+  expect(p0.ts).toEqual(['k1', 'k2', 'k3']);
+  const a = await page.locator('#tyc .tys[data-s="k3"]').boundingBox(), b = await page.locator('#tyc .tys[data-s="k1"]').boundingBox();
   await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2); await page.mouse.down();
   await page.mouse.move(b.x + 2, b.y + b.height / 2, { steps: 8 }); await page.mouse.up(); await settle(page);
   const p1 = await proj(page);
-  expect(p1.ts).toEqual(['k5', 'k1', 'k2', 'k3', 'k4']);
+  expect(p1.ts).toEqual(['k3', 'k1', 'k2']);
   expect(p1.bg).toBe('@k1');                                      // the paper still follows the same colour
   await expect(page.locator('.cpk')).toBeHidden();                // a drag does not open the picker
   expect(errors).toEqual([]);

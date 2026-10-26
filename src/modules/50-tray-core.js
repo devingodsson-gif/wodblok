@@ -12,8 +12,8 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 // A colourway is one set of colours for the slots: proj.cw = [{id, n name, c:{slotId:'#hex'}, m:{slotId:'colour name'}}], proj.cwa = the
 // one in use. Every colourway has every slot, so links stay valid whichever colourway is showing; only the colours differ.
 // The tray lives in the document (WBS.proj), so history, saving, crash recovery and compare all carry it without anything extra.
-const TRAY_MAX=16;let TRAY_VIEW=7;   // places shown in the dock (Settings > Colour); an exported let, so every importer sees the change
-const setTrayView=n=>{TRAY_VIEW=Math.max(7,Math.min(TRAY_MAX,n|0||7))};
+const TRAY_MAX=16;let TRAY_VIEW=4;   // places shown in the dock (Settings > Colour); an exported let, so every importer sees the change
+const setTrayView=n=>{TRAY_VIEW=Math.max(4,Math.min(TRAY_MAX,n|0||4))};
 // '#rrggbb' / '#rrggbbaa' / 'rgb' forms in; '#rrggbb' (opaque) or '#rrggbbaa' out, lower case. null when it is not a colour.
 function normHexA(v){const m=/^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(String(v||'').trim());if(!m)return null;let h=m[1].toLowerCase();if(h.length==3)h=h.split('').map(c=>c+c).join('');if(h.length==8&&h.slice(6)=='ff')h=h.slice(0,6);return'#'+h}
 const hexAlpha=h=>h&&h.length==9?parseInt(h.slice(7,9),16)/255:1;
@@ -36,9 +36,7 @@ function refLabel(r){if(!r)return'';if(isLink(r)){const id=r.slice(1);return slo
 function trayNew(cols){const ts=[],c={},m={};(cols||[]).slice(0,TRAY_MAX).forEach(([h,n],i)=>{const id='k'+(i+1);ts.push(id);c[id]=normHexA(h)||'#888888';if(n)m[id]=String(n).slice(0,40)});
  if(!ts.length){ts.push('k1');c.k1='#f4f0e6'}if(ts.length<2){ts.push('k2');c.k2='#26221d'}
  return{bg:'@'+ts[0],ink:'@'+ts[1],ts,cw:[{id:'w1',n:'Colourway 1',c,m}],cwa:0}}
-// 2.54.0 (owner Oct 26 2026): a new tray starts with four colours: the paper, the ink, then two accents
-const TRAY_START=[PCOL.bg,PCOL.ink,'Jasper Red','Cossack Green'];
-const trayDefault=()=>trayNew(TRAY_START.map(n=>[CM[n],n]));
+const trayDefault=()=>trayNew([[CM[PCOL.bg],PCOL.bg],[CM[PCOL.ink],PCOL.ink]]);
 // ---- documents from before the tray: their colours were names (paper, ink, accent, accent 2, and inks on stamps and layers).
 // They become tray slots (up to 16; any more stay as fixed colours), linked where they were used. Works on {proj,tiles,layers}.
 function trayFromLegacy(c){const o=c.proj||{},cols=[],idx=new Map();

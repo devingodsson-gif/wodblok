@@ -77,7 +77,7 @@ function stAccentRow(){const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[
  return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">'+ICN.plus+'</svg></button></div></div>`}
 function stPageHtml(p){
  if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stTgl('stgtl',stFlag(stK_TPL,false),'Templates at launch')+stViewToggles()+stAccentRow();
- if(p=='colour')return`<div class="ctl stgr"><label for="stgtv">Places shown</label><input type="range" id="stgtv" min="7" max="${TRAY_MAX}" step="1" value="${stNumGet(stK_TRAY,7,7,TRAY_MAX)}"><output id="stgtvo">${stNumGet(stK_TRAY,7,7,TRAY_MAX)}</output></div><div class="stgr"><span>Recent colours</span><button type="button" class="alt" id="stgrc">Clear</button></div>`;
+ if(p=='colour')return`<div class="ctl stgr"><label for="stgtv">Places shown</label><input type="range" id="stgtv" min="4" max="${TRAY_MAX}" step="1" value="${stNumGet(stK_TRAY,4,4,TRAY_MAX)}"><output id="stgtvo">${stNumGet(stK_TRAY,4,4,TRAY_MAX)}</output></div><div class="stgr"><span>Recent colours</span><button type="button" class="alt" id="stgrc">Clear</button></div>`;
  // smart guides (2.40.0, 84-smart-guides.js): the switch, what to snap to, how close
  if(p=='guides')return stTgl('stgsg',sgFlag(SG_K.on,true),'Smart guides')+stTgl('stgsc',sgFlag(SG_K.cv,true),'Snap to canvas')+stTgl('stgse',sgFlag(SG_K.el,true),'Snap to elements')+stTgl('stgss',sgFlag(SG_K.sp,true),'Equal spacing')+stSegH('stgsd','Snap distance',SG_DIST,sgDist());
  if(p=='speed')return stTgl('stgdr',stFlag(stK_DRAFT,true),'Draft while dragging')+stTgl('stgca',stFlag(stK_CALM,false),'Reduce motion');
@@ -126,7 +126,7 @@ function stShow(){try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}
 function stHide(){if(stD().hidden)return;closePicker();stD().hidden=true;const b=stOpener&&stOpener.isConnected?stOpener:$('fileb');if(b&&b.focus)b.focus()}
 function init55(){WBX.wbStgOpen=p=>{stShow();stSetPage(p)};WBX.wbStgSync=()=>{if(stIsOpen()&&stPage=='guides')stPaint()};   // the Smart guides command (84) changed the switch
  accentApply(stAccentGet());acAccount.shareAccent(stAccentGet());stDraftApply(stFlag(stK_DRAFT,true));stCalmApply(stFlag(stK_CALM,false));
- {const tv=stNumGet(stK_TRAY,7,7,TRAY_MAX);setTrayView(tv);if(tv>7)try{paintDock(true)}catch(e){}}setAutosaveEvery(stNumGet(stK_SAVE,8,8,120)*1000);
+ {const tv=stNumGet(stK_TRAY,4,4,TRAY_MAX);setTrayView(tv);if(tv>4)try{paintDock(true)}catch(e){}}setAutosaveEvery(stNumGet(stK_SAVE,8,8,120)*1000);
  $('stgo').onclick=stShow;$('stgclose').onclick=stHide;stD().addEventListener('click',e=>{if(e.target===stD())stHide()});
  $('stgnav').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b){stSetPage(b.dataset.p);const n=$('stgnav').querySelector('.on');if(n)n.focus()}});
  // arrow keys move between the pages
