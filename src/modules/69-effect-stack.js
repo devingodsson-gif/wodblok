@@ -64,7 +64,7 @@ function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hid
 <div class="fxs" data-e="texture" hidden>
 <div class="ctl"><label>Type</label><select class="fxst" aria-label="Type">${TXF.map(([g,o])=>`<optgroup label="${g}">${Object.entries(o).map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</optgroup>`).join('')}</select></div>
 <div class="ctl"><label>Strength</label><input type="range" class="fxsa" min="0" max="100" value="40" data-def="40"></div>
-<div class="ctl"><label>Scale</label><input type="range" class="fxsc" min="25" max="300" value="100" data-u="%" data-def="100"></div>
+<div class="ctl"><label>Scale</label><input type="range" class="fxsc" min="25" max="200" value="100" data-u="%" data-def="100"></div>
 <div class="ctl"><label>Light from</label><input type="range" class="fxsz" min="0" max="359" value="225" data-u="&#176;" data-def="225"></div>
 <div class="ctl"><label>Mode</label><select class="fxsm" aria-label="Mode">${TXMD.map(m=>`<option value="${m}">${TXMN[m]}</option>`).join('')}</select></div>
 <div class="row"><button type="button" class="alt fxrr">Reroll</button></div>

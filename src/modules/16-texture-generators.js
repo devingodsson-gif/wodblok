@@ -19,7 +19,7 @@ function txEnsure(s){const m=WBS.texLib.find(x=>txSame(x,s));if(m)return m.id;co
 function txClean(a){if(!Array.isArray(a))return[];const ok=[],ids=new Set(),n=(v,lo,hi,d)=>{v=+v;return isFinite(v)?Math.max(lo,Math.min(hi,v)):d};
 a.slice(0,200).forEach(x=>{if(!x||typeof x!='object')return;const t=x.t;if(!t||!Object.prototype.hasOwnProperty.call(TXN,t))return;
 const id=String(x.id||'').replace(/[^\w-]/g,'').slice(0,24);if(!id||ids.has(id))return;ids.add(id);
-const L={id,name:String(x.name||TXN[t]).replace(/[<>&"]/g,'').slice(0,40),t,a:n(x.a,0,100,40),sc:n(x.sc,25,300,100),az:n(x.az,0,359,225),sd:n(x.sd,1,99999,1)|0,auto:!!x.auto};
+const L={id,name:String(x.name||TXN[t]).replace(/[<>&"]/g,'').slice(0,40),t,a:n(x.a,0,100,40),sc:n(x.sc,25,TXSCMAX,100),az:n(x.az,0,359,225),sd:n(x.sd,1,99999,1)|0,auto:!!x.auto};
 ok.push(L)});return ok}
 // a use -> everything the renderer needs (null = nothing to draw). def = the mode a use gets when it has none
 const txSpec=(u,def)=>{const L=u&&typeof u=='object'?txLib(u.x):null;if(!L||!TXN[L.t]||!(+L.a>0))return null;return{x:L.id,t:L.t,a:+L.a,sc:+L.sc||100,az:isFinite(+L.az)?+L.az:225,sd:((+u.sd||+L.sd||1)|0)||1,md:TXMD.includes(u.md)?u.md:def}};
@@ -92,7 +92,9 @@ else{const h=E.h,st=E.st,r=S.az*Math.PI/180,lx=Math.cos(r),ly=Math.sin(r),k=1/(E
 for(let j=0;j<ph;j++){const j0=Math.max(0,j-st),j1=Math.min(ph-1,j+st);for(let i=0;i<pw;i++){const i0=Math.max(0,i-st),i1=Math.min(pw-1,i+st),gx=(h[j*pw+i1]-h[j*pw+i0])/(i1-i0||1),gy=(h[j1*pw+i]-h[j0*pw+i])/(j1-j0||1),s=-(gx*lx+gy*ly)*st*k,al=Math.min(1,Math.abs(s))*a*.85,o=(j*pw+i)*4,w=s>0?255:0;px[o]=px[o+1]=px[o+2]=w;px[o+3]=Math.round(al*31)*8.2258}}}
 return px}
 let TXB;let TXBN=0;
-function txDims(W,H,R){const s=R/Math.max(W,H,1e-6);return[Math.max(8,Math.round(W*s)),Math.max(8,Math.round(H*s))]}
+// 2.49.0 (owner Oct 26 2026: textures render soft): every picture of 384 px or more is made 15% finer (the look is the same, only finer; the cost is about 1.3 times), and the Scale slider stops at 200%.
+const TXRES=1.15,TXSCMAX=200;
+function txDims(W,H,R){const s=(R>=384?R*TXRES:R)/Math.max(W,H,1e-6);return[Math.max(8,Math.round(W*s)),Math.max(8,Math.round(H*s))]}
 // Repeat tile: make the picture meet itself at the edges. The middle is the texture as it was; towards each edge it fades into a copy
 // moved half a picture across, and at the edge both sides show the same part of that copy, so the edges match.
 function txSeam(px,pw,ph){const src=new Uint8ClampedArray(px),hx=pw>>1,hy=ph>>1,wx=new Float32Array(pw),wy=new Float32Array(ph);
