@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.51.1 (Oct 26 2026): the folder tree is one component (step 1 of docs/library-update-plan.md)
+- `87-library-tree.js` is the folder tree of Part 9 section 12 as one component: rows, sets, hidden sets, folder menu and form, select mode, drag onto a folder, Export, messages, saving of open folders and size. A library gives it its items, sets, words and what Export writes (the `cfg` described at the top of the file).
+- The texture library (`86-texture-library.js`) now only holds what is special to textures (store, Add texture, the pictures); it runs on the component. Its tests are unchanged and pass.
+- The Shapes library keeps its own code (it already follows the standard; about 40 specs depend on its markup). Its folder "..." button is already always visible, so the gap table row is stale and was fixed.
+- Tested (Chromium): texture-library-2-51-0 (5), texture-library-2-50-0 (3), texture-effect (3): all passed. `npm run check:style` and `check:platform` OK. No snapshot or golden changed.
+
 ## 2.51.0 (Oct 26 2026): the texture library works like the Shapes library
 - Owner, Oct 26 2026: the follow-ups to the texture library, "it should all work the exact same way". Built on 2.50.2 (not merged), in `86-texture-library.js`, copied from the Shapes library (21-motif-library-ui.js) and Part 9 section 12.
 - Select mode (the marquee button): tick tiles (Shift for a range, Select all, Esc or Done to leave), then Move to (a folder, Yours, or "New folder..."), Take out of folder, Delete (two clicks; textures used in the project are kept). Selecting does not pick the texture.

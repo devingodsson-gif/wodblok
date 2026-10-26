@@ -638,7 +638,7 @@ Counts are occurrences of a declared value in `src/shell.html` and `src/modules/
 | Textures | the tree | Complete (2.51.0): Yours, your folders and the built-in sets with tiles, in the Texture effect; Add texture imports pictures and zips; nested folders (also inside sets), select mode, drag to folder, renamed and hidden sets, Export to a zip of pictures |
 | Colourways | the tree for saved colourways | Only this project's colourways exist (flat cards); no saved colourways library |
 | Templates, workspaces, export recipes | the tree | Flat list under two headings ("Starting points", "Yours"), three separate heading classes, no folders, no select mode |
-| Folder "…" button | always visible (rule 5) | Shapes library shows it only on hover, on the active row or on focus (`.lmo`); right-click is the other way in. Fix in the standardisation release |
+| Folder "…" button | always visible (rule 5) | Done: `.lmo` is always visible in the Shapes library and the shared tree (`87-library-tree.js`, 2.51.1) |
 | Deleting | items two-tap in place; folders by the inline form | Folder delete is a form; item delete is two-tap; trays and templates use their own confirm styles |
 | Heading styles | 3 | panel title (Fraunces 14/500), group title (Fraunces 14/500), `h3` 12px/600 with a border, `h3` uppercase 11px, dialog `h2` 14/600 |
 | Fonts | 1 (Hanken Grotesk) | Fraunces (serif) in the wordmark, splash, panel and group titles and the print proof sheet; 67 KB of font file |
