@@ -21,7 +21,7 @@ test('a Filter shape that runs off the right edge of a repeat tile comes back on
   const { errors } = await openApp(page, { seed: 4, background: true });
   await openPanel(page, 'canvas'); await page.click('#cfmt [data-f="tile"]'); await settle(page);
   await addShape(page, 'rect'); await settle(page);
-  const d = await st(page), bg = d.els.find(q => q.bgd), cw = +bg.s, ch = cw * (+bg.wy || 1);
+  const d = await st(page), bg = d.els.find(q => q.bgd), [cw, ch] = await page.locator('#art').evaluate(a => [a.viewBox.baseVal.width, a.viewBox.baseVal.height]);   // 2.53.0: the Background is a Sheet, with no size of its own
   bg.ink = '#e83a3a';
   // a filter shape a fifth of the canvas wide, centred on the right edge: it covers the last tenth and, wrapped, the first tenth
   Object.assign(d.els.find(q => q.k === 'motif' && !q.bgd), { x: cw, y: ch / 2, s: cw * .2, wy: 1.5, r: 0, flt: 1, fx: [{ u: 'g1', k: 'grade', on: true, sat: -100 }] });

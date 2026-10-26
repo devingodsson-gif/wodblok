@@ -6,7 +6,8 @@ function fmtValidate(p) {
   if (!p || typeof p !== 'object' || Array.isArray(p)) bad('shape', 'That file is not a WODBLOK project.');
   if (p.app !== 'WODBLOK') bad('app', 'That file is not a WODBLOK project.');
   if (p.v !== undefined && !(Number.isInteger(p.v) && p.v >= 1)) bad('version', 'That project file has a version number the app cannot read.');
-  if (!Array.isArray(p.tiles) || !p.tiles.length) bad('tiles', 'That project has no stamps, so it may be damaged.');
+  // 2.53.0: a project may have no stamps (a new project starts with none since 2.15.0, and was refused when opened again)
+  if (!Array.isArray(p.tiles)) bad('tiles', 'That project has no stamps list, so it may be damaged.');
   if (!Array.isArray(p.els)) bad('els', 'That project has no elements, so it may be damaged.');
   let n = 0;
   for (const t of p.tiles) {
@@ -15,7 +16,7 @@ function fmtValidate(p) {
     for (const q of t.items) if (!q || typeof q !== 'object' || typeof q.m !== 'string' || !Number.isFinite(+q.x) || !Number.isFinite(+q.y)) bad('items', 'A shape in that project is damaged.');
   }
   if (n > FMT_MAX_ITEMS) bad('size', 'That project is far larger than WODBLOK can open.');
-  if (p.els.length > FMT_MAX_ITEMS || p.els.some(q => !q || typeof q !== 'object' || typeof q.k !== 'string' || (q.k !== 'group' && (!Number.isFinite(+q.x) || !Number.isFinite(+q.y))) || (q.pts !== undefined && !(Array.isArray(q.pts) && q.pts.length <= 2000 && q.pts.every(a => Array.isArray(a) && a.length === 6 && a.every(Number.isFinite)))))) bad('items', 'That project has damaged pieces in its element list.');
+  if (p.els.length > FMT_MAX_ITEMS || p.els.some(q => !q || typeof q !== 'object' || typeof q.k !== 'string' || (q.k !== 'group' && q.k !== 'sheet' && (!Number.isFinite(+q.x) || !Number.isFinite(+q.y))) || (q.pts !== undefined && !(Array.isArray(q.pts) && q.pts.length <= 2000 && q.pts.every(a => Array.isArray(a) && a.length === 6 && a.every(Number.isFinite)))))) bad('items', 'That project has damaged pieces in its element list.');
   if (p.arts !== undefined && (p.arts === null || typeof p.arts !== 'object')) bad('arts', 'The pictures in that project are damaged.');
   if (p.texImgs !== undefined && (p.texImgs === null || typeof p.texImgs !== 'object' || Array.isArray(p.texImgs))) bad('texImgs', 'The texture pictures in that project are damaged.');
   return p;

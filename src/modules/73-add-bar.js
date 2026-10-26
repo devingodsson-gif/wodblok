@@ -13,7 +13,7 @@ import {stUnlocked} from './63-stamp-tool.js';
 // ===== The Add bar (2.3.0, Photoshop): the element bar makes things. Pattern, Text and Image make a new element at once, just above the selected one (at the top
 // of the list when nothing is selected), selects it, and shows its panel in Properties. Motif, Stamp and Text
 // also arm (Paint is hidden since 2.3.1) their tool, so the next clicks on the canvas carry on; Select (first button, V) puts any tool away. An imported picture makes a Rectangle motif filled with it
-// (2.3.1: there is no Image element and no Sheet; 2.31.0: no Shape element either, its shapes are the Basic shapes motifs). Owner, Oct 20 2026: "every click makes an element", "just above the selected one".
+// (2.3.1: there is no Image element; 2.31.0: no Shape element either, its shapes are the Basic shapes motifs; 2.53.0: the Sheet is back, made at once like Paint). Owner, Oct 20 2026: "every click makes an element", "just above the selected one".
 const AB_SEL=ICN.cursor;
 // where a new element goes: just above the selected element (in the same group), else at the top; `bottom` puts it at the bottom when nothing is selected
 function abInsert(q,bottom){const L=fpL();if(!L)return null;const a=(L.pl=L.pl||[]),s=elSel()||(WBS.fpSel!=null&&WBS.fpSel!==-1?a.find(x=>String(x.u)===String(WBS.fpSel)):null);
@@ -22,6 +22,8 @@ function abInsert(q,bottom){const L=fpL();if(!L)return null;const a=(L.pl=L.pl||
 const abDone=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 const abOpen=pn=>{if(WBX.wbOpenPanel)WBX.wbOpenPanel(pn)};
 const abCount=k=>{const L=fpL();return L?(L.pl||[]).filter(q=>q.k==k).length:0};
+// a Sheet (2.53.0) is made at once, with no fill (a filter until it gets a colour or a picture), just above the selected element, and its panel shows
+function abSheet(){plDisarm();const q=abInsert({u:fpU(),k:'sheet',n:'Sheet '+(1+((fpL()||{}).pl||[]).filter(x=>x.k=='sheet'&&!x.bgd).length),fl:'none'});if(!q)return;abDone();if(WBX.wbElSeen)WBX.wbElSeen(q.u);abOpen('sheet')}
 // Shape, Motif and Stamp (2.4.0), and Text and Pattern too (2.6.0), owner Oct 21 2026: the button makes nothing. It puts everything away, clears the selection and opens that kind's properties;
 // what is picked there is made (a Shape preset) or follows the pointer as a ghost and is placed as often as wanted (a Motif, a Stamp).
 let ABP='';   // which of 'motif', 'stamp', 'text', 'pattern' was last chosen on the bar and is waiting for a pick, '' for none
@@ -38,12 +40,14 @@ function abArm(k){const un=stUnlocked()!=null;if(un&&k!='motif'&&k!='text')retur
 const AB={
  pattern(){abPick('pattern');abArm('pattern')},
  text(){abPick('text');abArm('text')},   /* 2.26.0 (owner Oct 22 2026): a bar button opens the panel and arms the tool at once, as Add in the panel does (AD below) */
+ sheet(){abSheet()},
  paint(){const q=abInsert({u:fpU(),k:'paint',n:'Paint '+(abCount('paint')+1),x:0,y:0,st:[]});if(!q)return;WBS.paSel=q.u;if(WBX.wbPaArm)WBX.wbPaArm('brush');abDone();abOpen('elpaint')},
  stamp(){abPick('stamp');abArm('stamp')},
  motif(){abPick('motif');abArm('motif')},
  select(){abSelect()}};
 // what Add in an element panel makes (2.6.0; Motif and Stamp too from 2.7.0): just above the selected element
 const AD={
+ sheet(){abSheet()},
  stamp(){const t=WBS.tiles[WBS.cur];if(!t)return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpB=t.id;upd();abOpen('stmp')},
  motif(){if(WBX.wbMotifAdd)WBX.wbMotifAdd()},   // arms the last motif (74); in a stamp's tab it puts one in at once
  pattern(){plArm({k:'pattern',s:Math.min(CW,CH)})},

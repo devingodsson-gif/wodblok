@@ -20,8 +20,10 @@ const shot = async page => {
   });
 };
 const sat = ([r, g, b]) => Math.max(r, g, b) - Math.min(r, g, b);
-// a canvas-sized Rectangle filter, the Background's own outline
-const fullFilter = (d, fx) => { const bg = d.els.find(q => q.bgd), cw = +bg.s, ch = +bg.s * (+bg.wy || 1); return { u: 'flt1', k: 'motif', m: bg.m, x: cw / 2, y: ch / 2, s: cw, wy: ch / cw, r: 0, f: 1, flt: 1, fx }; };
+// the canvas size (2.53.0: the Background is a Sheet, which has no size of its own)
+const cv = page => page.locator('#art').evaluate(a => [a.viewBox.baseVal.width, a.viewBox.baseVal.height]);
+// a canvas-sized Rectangle filter (m: a Rectangle's motif key, taken from a Rectangle the test added)
+const fullFilter = (fx, cw, ch, m) => ({ u: 'flt1', k: 'motif', m, x: cw / 2, y: ch / 2, s: cw, wy: ch / cw, r: 0, f: 1, flt: 1, fx });
 
 test('the Filter switch: shown for a shape, not for the Background; it hides Fill and Outline', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, background: true });
@@ -35,11 +37,9 @@ test('the Filter switch: shown for a shape, not for the Background; it hides Fil
   await page.locator('#mf_flt').uncheck(); await settle(page);
   expect((await st(page)).els.find(q => q.k === 'motif' && !q.bgd).flt).toBeUndefined();
   await expect(page.locator('#mf_fk')).toBeVisible();
-  // the Background has no Filter switch (picked from the list, the bottom row)
+  // the Background (a Sheet, 2.53.0) has no Filter switch (picked from the list, the bottom row): it shows its Fill in the Sheet panel
   await showPanel(page, 'lyrs'); await page.locator('#lyl2 .lyr').last().locator('.lyn').click(); await settle(page);
-  await openPanel(page, 'motifs'); await settle(page);
-  expect(await page.locator('#fpov .sel').count()).toBe(1);
-  await expect(page.locator('#mf_fk')).toBeVisible();   // the Background's own Fill shows, so the panel is up
+  await expect(page.locator('section.pn[data-p="sheet"] #mf_fk')).toBeVisible();
   await expect(page.locator('#mf_fltr')).toBeHidden();
   expect(errors).toEqual([]);
 });
@@ -47,7 +47,7 @@ test('the Filter switch: shown for a shape, not for the Background; it hides Fil
 test('a heart filter greys only what is under the heart; strength 0 changes nothing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, background: true });
   await addShape(page, 'heart'); await settle(page);
-  const d = await st(page), bg = d.els.find(q => q.bgd), cw = +bg.s, ch = +bg.s * (+bg.wy || 1);
+  const d = await st(page), bg = d.els.find(q => q.bgd), [cw, ch] = await cv(page);
   bg.ink = '#e83a3a';
   Object.assign(d.els.find(q => q.k === 'motif' && !q.bgd), { x: cw / 2, y: ch / 2, s: cw * 0.5, r: 0, flt: 1, fx: [{ u: 'g1', k: 'grade', on: true, sat: -100 }] });
   await apply(page, d);
@@ -64,7 +64,7 @@ test('clicks go through a filter shape to what is under it', async ({ page }) =>
   const { errors } = await openApp(page, { seed: 4, background: true });
   await addShape(page, 'rect'); await settle(page);
   await addShape(page, 'rect'); await settle(page);
-  const d = await st(page), bg = d.els.find(q => q.bgd), cw = +bg.s, ch = +bg.s * (+bg.wy || 1), [under, top] = d.els.filter(q => q.k === 'motif' && !q.bgd);
+  const d = await st(page), bg = d.els.find(q => q.bgd), [cw, ch] = await cv(page), [under, top] = d.els.filter(q => q.k === 'motif' && !q.bgd);
   Object.assign(under, { x: cw / 2, y: ch / 2, s: cw * 0.3, wy: 1, r: 0 });
   Object.assign(top, { x: cw / 2, y: ch / 2, s: cw, wy: ch / cw, r: 0, flt: 1, fx: [{ u: 'b1', k: 'blur', on: true, amt: 5 }] });
   await apply(page, d);
@@ -86,11 +86,11 @@ test('inside a group a filter works only on the group\'s members under it', asyn
   const { errors } = await openApp(page, { seed: 4, background: true });
   await addShape(page, 'rect'); await settle(page);
   await addShape(page, 'rect'); await settle(page);
-  const d = await st(page), bg = d.els.find(q => q.bgd), cw = +bg.s, ch = +bg.s * (+bg.wy || 1), [a, b] = d.els.filter(q => q.k === 'motif' && !q.bgd);
+  const d = await st(page), bg = d.els.find(q => q.bgd), [cw, ch] = await cv(page), [a, b] = d.els.filter(q => q.k === 'motif' && !q.bgd);
   bg.ink = '#f4f4f4';
   Object.assign(a, { x: cw * 0.25, y: ch * 0.3, s: cw * 0.3, wy: 1, r: 0, ink: '#e83a3a' });
   Object.assign(b, { x: cw * 0.75, y: ch * 0.3, s: cw * 0.3, wy: 1, r: 0, ink: '#2a9a3a', g: 'grp1' });
-  const f = { ...fullFilter(d, [{ u: 'g1', k: 'grade', on: true, sat: -100 }]), g: 'grp1' };
+  const f = { ...fullFilter([{ u: 'g1', k: 'grade', on: true, sat: -100 }], cw, ch, a.m), g: 'grp1' };
   d.els = [bg, a, { u: 'grp1', k: 'group', nm: 'Group 1' }, b, f];
   await apply(page, d);
   const p = await shot(page);
@@ -102,12 +102,12 @@ test('inside a group a filter works only on the group\'s members under it', asyn
 test('Halftone and Misregistration over a picture read its darkness; the paper stays paper', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, background: true });
   await addShape(page, 'rect'); await settle(page);
-  const d = await st(page), bg = d.els.find(q => q.bgd), cw = +bg.s, ch = +bg.s * (+bg.wy || 1), sq = d.els.find(q => q.k === 'motif' && !q.bgd);
+  const d = await st(page), bg = d.els.find(q => q.bgd), [cw, ch] = await cv(page), sq = d.els.find(q => q.k === 'motif' && !q.bgd);
   bg.ink = '#ffffff';
   Object.assign(sq, { x: cw / 2, y: ch / 2, s: cw * 0.6, wy: 1, r: 0, ink: '#101820' });
   await apply(page, d);
   const plain = await shot(page);
-  const d2 = await st(page); d2.els.push(fullFilter(d2, [{ u: 'h1', k: 'halftone', on: true, sz: 30, tone: 55, ang: 45, spr: 40 }])); await apply(page, d2);
+  const d2 = await st(page); d2.els.push(fullFilter([{ u: 'h1', k: 'halftone', on: true, sz: 30, tone: 55, ang: 45, spr: 40 }], cw, ch, sq.m)); await apply(page, d2);
   const ht = await shot(page);
   expect(ht.dark).toBeLessThan(plain.dark * 0.85);   // the square is dots now
   expect(ht.dark).toBeGreaterThan(plain.dark * 0.2);

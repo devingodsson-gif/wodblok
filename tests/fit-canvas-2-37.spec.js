@@ -1,4 +1,4 @@
-// 2.37.0: Fit to canvas and Stretch to canvas in a Shape's Align group; a Randomize roll that changes the canvas size refits the Background.
+// 2.37.0: Fit to canvas and Stretch to canvas in a Shape's Align group; a Randomize roll that changes the canvas size refits the Background (2.53.0: a Sheet, which always covers the canvas).
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState, addShape } = require('./helpers/harness');
 
@@ -70,26 +70,20 @@ test('the Fit buttons show for a selected shape, hide when nothing is selected, 
   expect(errors).toEqual([]);
 });
 
-test('a Randomize roll that changes the canvas size refits the Background; one moved on purpose stays put', async ({ page }) => {
+test('a Randomize roll that changes the canvas size: the Background Sheet still covers the canvas', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 7, background: true });
   await openPanel(page, 'rand');
   await page.evaluate(() => { document.querySelectorAll('[data-ft]').forEach(c => { if (c.type === 'checkbox' && c.checked) { c.checked = false; c.dispatchEvent(new Event('change', { bubbles: true })); } }); const c = document.querySelector('[data-ft="size"]'); if (c.type === 'range') { c.value = 100; c.dispatchEvent(new Event('input', { bubbles: true })); } else { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); } });
-  const look = () => page.evaluate(() => { const a = document.getElementById('art').viewBox.baseVal, b = JSON.parse(__wbTest.state()).els.find(q => q.bgd); return { cw: a.width, ch: a.height, x: b.x, y: b.y, w: +b.s * (+b.wx || 1), h: +b.s * (+b.wy || 1) }; });
+  // 2.53.0: the Background is a Sheet, which is always the whole canvas, so nothing is refitted
+  const look = () => page.evaluate(() => { const a = document.getElementById('art'), v = a.viewBox.baseVal, s = JSON.parse(__wbTest.state()); return { cw: v.width, ch: v.height, bg: s.els.filter(q => q.bgd && q.k === 'sheet').length, full: [...a.querySelectorAll('rect')].some(r => r.getAttribute('x') === '0' && r.getAttribute('y') === '0' && Math.abs(+r.getAttribute('width') - v.width) < .02 && Math.abs(+r.getAttribute('height') - v.height) < .02) }; });
   let changed = 0;
   for (let i = 0; i < 3; i++) {
     const a = await look();
     await page.click('#rzdo'); await settle(page); await page.waitForTimeout(300);
     const b = await look();
     if (b.cw !== a.cw || b.ch !== a.ch) changed++;
-    expect(Math.abs(b.w - b.cw)).toBeLessThan(1); expect(Math.abs(b.h - b.ch)).toBeLessThan(1);
-    expect(Math.abs(b.x - b.cw / 2)).toBeLessThan(1); expect(Math.abs(b.y - b.ch / 2)).toBeLessThan(1);
+    expect(b.bg).toBe(1); expect(b.full).toBe(true);
   }
   expect(changed).toBeGreaterThan(0);
-  // a Background moved off the middle is the person's choice: a roll leaves it where it is
-  const d = await st(page); const bg = d.els.find(q => q.bgd); bg.x = +bg.x + 40; await page.evaluate(s => __wbTest.apply(s), JSON.stringify(d)); await settle(page);
-  const moved = await look();
-  for (let i = 0; i < 3; i++) { await page.click('#rzdo'); await settle(page); await page.waitForTimeout(300); }
-  const after = await look();
-  expect(after.x).toBe(moved.x); expect(after.w).toBe(moved.w);
   expect(errors).toEqual([]);
 });

@@ -887,6 +887,7 @@ body.eyedrop{cursor:crosshair}
  <button type="button" id="rail-text" data-pn="text" aria-label="Text"></button>
  <button type="button" id="rail-mlist" data-pn="mlist" aria-label="Element"></button>
  <button type="button" id="rail-elpaint" data-pn="elpaint" aria-label="Paint"></button>
+ <button type="button" id="rail-sheet" data-pn="sheet" aria-label="Sheet"></button>
 </div>
 
 <main class="stage">
@@ -1076,12 +1077,13 @@ body.eyedrop{cursor:crosshair}
   <details class="g" open id="mf_f" hidden><summary>Fill</summary><div class="gb">
    <label class="chk" id="mf_fltr" hidden><input type="checkbox" id="mf_flt"><span>Filter</span></label>
    <div class="seg" id="mf_fk" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-f="none" aria-pressed="false">None</button><button type="button" data-f="solid" aria-pressed="true">Colour</button><button type="button" data-f="img" aria-pressed="false">Image</button></div>
+   <div class="cwrow" id="mf_fcr" hidden><span class="cwk">Colour</span><div class="cwell" id="mf_fcw"></div></div>
    <div id="mf_img" hidden>
     <div class="strip" id="lfars"></div>
     <div class="row"><button type="button" class="primary" id="lfaimp">Import image&#8230;</button></div>
     <div class="row"><button class="alt" id="lfaprj">Use a project&#8230;</button></div>
     <input type="file" id="lfafile" class="vh" accept="image/*" tabindex="-1"><input type="file" id="lfapfile" class="vh" accept=".wodblok,application/zip" tabindex="-1">
-    <div class="seg" id="mf_im" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-i="cover" aria-pressed="true">Cover</button><button type="button" data-i="contain" aria-pressed="false">Fit</button></div>
+    <div class="seg" id="mf_im" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-i="cover" aria-pressed="true">Cover</button><button type="button" data-i="contain" aria-pressed="false">Fit</button><button type="button" data-i="stretch" aria-pressed="false" hidden>Stretch</button><button type="button" data-i="tile" aria-pressed="false" hidden>Tile</button></div>
     <div class="ctl"><label>Zoom</label><input type="range" id="mf_iz" min="10" max="400" value="100" data-u="%" data-def="100"></div>
    </div>
   </div></details>
@@ -1112,6 +1114,7 @@ body.eyedrop{cursor:crosshair}
   </div></details>
  </section>
 
+ <section class="pn" data-p="sheet" hidden></section>
  <section class="pn" data-p="mlist" hidden>
   <details class="g" open><summary>Element</summary><div class="gb">
    <div id="lfree">

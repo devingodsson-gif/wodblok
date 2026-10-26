@@ -23,7 +23,7 @@ function artLoad(o){const r={};Object.entries(o||{}).forEach(([id,A])=>{if(!A||!
 const artEnc=c=>{const w=c.toDataURL('image/webp',.88);return w.startsWith('data:image/webp')?w:c.toDataURL('image/png')};
 // A flat picture of this project as it is now (transparent outside a shaped canvas). It is saved with the project so other projects can use it as art.
 function artSnap(){return new Promise(res=>{try{const k=1400/Math.max(CW,CH),w=Math.max(1,Math.round(CW*k)),h=Math.max(1,Math.round(CH*k)),img=new Image(),to=setTimeout(()=>res(null),8000);img.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);clearTimeout(to);res({src:artEnc(c),w,h})}catch(e){res(null)}};img.onerror=()=>res(null);img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser())}catch(e){res(null)}})}
-function fpWH(p){if(p.k=='motif'){const s=+p.s||100;return[s*(p.wx||1),s*(p.wy||1)]}if(p.tx){const k=p.s/Math.max(p.n||1,.01);return[(+p.bw||1)*k,(+p.bh||1)*k]}const tt=WBS.tiles.find(t=>t.id==p.t);if(!tt)return null;const G=geom(shOf(tt)),k=p.s/Math.max(G.SW,G.SH);return[G.SW*k*(p.wx||1),G.SH*k*(p.wy||1)]}
+function fpWH(p){if(p.k=='sheet'||p.k=='group')return null;if(p.k=='motif'){const s=+p.s||100;return[s*(p.wx||1),s*(p.wy||1)]}if(p.tx){const k=p.s/Math.max(p.n||1,.01);return[(+p.bw||1)*k,(+p.bh||1)*k]}const tt=WBS.tiles.find(t=>t.id==p.t);if(!tt)return null;const G=geom(shOf(tt)),k=p.s/Math.max(G.SW,G.SH);return[G.SW*k*(p.wx||1),G.SH*k*(p.wy||1)]}
 // selection outline and the ghost of the stamp you're about to place
 // The selection box (2.15.0): a one-pixel line in the accent, square handles and a round rotate handle in the panel colours, every size in screen pixels at any zoom.
 // Colours and line come from the style tokens in the page CSS (#fpov .sel, .gh, .fhd, .frt, .frl); nothing here sets a colour.
@@ -62,7 +62,8 @@ $('lfpr').addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();i
 ['lfpx','lfpy'].forEach((id,ax)=>$(id).addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p)return;const k=ax?'y':'x',W=ax?CH:CW,v=+$(id).value/100*W,d=v-p[k];if(Math.abs(d)<.01)return;fpGrp().forEach(q=>{q[k]=+(q[k]+d).toFixed(1)});store();upd()}));
 ['lfps','lfpr','lfpx','lfpy'].forEach(id=>$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()}));
 $('lfpfl').onclick=()=>{const p=cur2();if(p){fpGrp().forEach(q=>{q.f=(q.f||1)*-1});ch()}else if(WBS.fpB){fpFlip*=-1;WBH.fpOverlay()}};
-$('lfpdu').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;const d=Math.min(CW,CH)*.04,g=fpGrp(),ns=[];g.forEach(o=>{const q={...o,u:fpU(),x:o.x+d,y:o.y+d};L.pl.push(q);ns.push(q);if(o===p)WBS.fpSel=q.u});WBS.fpMS=ns.length>1?new Set(ns.map(q=>String(q.u))):new Set();ch()};
+$('lfpdu').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;const d=Math.min(CW,CH)*.04,g=fpGrp(),ns=[];g.forEach(o=>{const q={...o,u:fpU()};if(o.x!=null){q.x=o.x+d;q.y=o.y+d}   // a Sheet has no place (2.53.0)
+L.pl.push(q);ns.push(q);if(o===p)WBS.fpSel=q.u});WBS.fpMS=ns.length>1?new Set(ns.map(q=>String(q.u))):new Set();ch()};
 $('lfpup').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;const g=fpGrp();g.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));L.pl.push(...g);ch()};
 $('lfpdn').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;const g=fpGrp();g.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));L.pl.unshift(...g);ch()};
 $('lfpdl').onclick=()=>{const L=fpL(),p=cur2();if(!p)return;fpGrp().forEach(q=>L.pl.splice(L.pl.indexOf(q),1));WBS.fpSel=-1;WBS.fpMS=new Set();ch()};}

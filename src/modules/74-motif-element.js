@@ -63,7 +63,8 @@ function mtfLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='motif'&&p.m);if(!
 // The shape's opacity is the filter's strength. Jitter and Pressure offset do not apply. Effects that read an outline (Halftone, Line Screen, Stipple, Ink Bleed,
 // Misregistration, Dust's holes) read the picture's darkness instead and fill their gaps with the Background's colour (white without one): they get {__fm:{paper}}.
 const FLT_U='@@UNDER@@',FLT_I='@@UID@@',FLT_S='@@FSPLIT@@';   // 2.40.1: FLT_S splits the picture drawn so far from the filtered copy, which a repeat tile copies to the neighbouring tiles on its own
-function mtPaper(){for(const L of WBS.layers||[])for(const q of L.pl||[])if(q.bgd&&q.v!==false&&q.k=='motif')return okC(q.ink)?col(q.ink):'#ffffff';return'#ffffff'}
+// 2.53.0: the Background is a Sheet; with a colour fill its colour is the paper, otherwise white
+function mtPaper(){for(const L of WBS.layers||[])for(const q of L.pl||[])if(q.bgd&&q.v!==false&&q.k=='sheet'&&!q.fl)return okC(q.ink)?col(q.ink):col(WBS.proj.bg);return'#ffffff'}
 function mtFilter(p,li,seen){if(WBS.DRAFT&&WBS.DRAFTCV)return{defs:'',piece:FLT_U};   // while something is dragged on the canvas the picture is drawn without the filter, and with it once the drag ends (a slider drag keeps it, so the filter is seen while it is set)
  const id=String(p.u).replace(/[^\w-]/g,''),s=Math.max(1,+p.s||100),w=s*(+p.wx||1),h=s*(+p.wy||1),op=p.op!=null?Math.max(0,Math.min(100,+p.op))/100:1,
  box={x:(+p.x||0)-w*.6,y:(+p.y||0)-h*.6,W:w*1.2,H:h*1.2,R:400},q={...p,__fm:{paper:mtPaper()}},T=fxTex(q,'flx'+li+'_'+id,box),G=fxGr(q,'flg'+li+'_'+id,box),
@@ -92,4 +93,4 @@ function init74(){
  // picking a library shape while a Motif element is selected changes that element's shape
  WBX.wbMotifSwap=m=>{if(WBS.brush)return false;const L=fpL(),q=L&&(L.pl||[]).find(x=>String(x.u)===String(WBS.fpSel));if(!q||q.k!='motif')return false;q.m=m;mtLast=m;store();upd();if(WBX.wbCap)WBX.wbCap();return true};
 }
-export {FLT_I,FLT_S,FLT_U,init74,mtfLayer,mtDraw,mtPic};
+export {FLT_I,FLT_S,FLT_U,init74,mtfLayer,mtDraw,mtPaper,mtPic};

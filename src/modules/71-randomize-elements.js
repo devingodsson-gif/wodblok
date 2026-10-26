@@ -86,7 +86,7 @@ function rzEffectsEls(L,opt){const R=rzRng(opt.seed),n0=Date.now().toString(36);
  o.wpick=w=>{let t=R()*w.reduce((x,y)=>x+y[1],0);for(const x of w){if((t-=x[1])<=0)return x[0]}return w[0][0]};
  const all=L.flatMap(l=>l.pl||[]),isQ=e=>!!FQ[e.k],tg=[],changed={n:0};
  // the last roll's Filter shapes go; a rework clears the effects a roll can give
- if(opt.prev&&opt.prev.size)L.forEach(l=>{if(l.pl)l.pl=l.pl.filter(q=>!(q.flt&&opt.prev.has(String(q.u))))});
+ if(opt.prev&&opt.prev.size)L.forEach(l=>{if(l.pl)l.pl=l.pl.filter(q=>!((q.flt||q.k=='sheet'&&!q.bgd)&&opt.prev.has(String(q.u))))});
  all.forEach(q=>{if(q.bgd||q.flt||!['pattern','stamp','motif','paint'].includes(q.k))return;if(!opt.rework&&!opt.isNew(q))return;
   if(opt.rework&&q.fx){const fx=q.fx.filter(e=>!isQ(e));if(fx.length)q.fx=fx;else delete q.fx}tg.push(q)});
  const put=(q,e)=>{q.fx=(q.fx||[]).concat([e]);changed.n++};
@@ -94,11 +94,11 @@ function rzEffectsEls(L,opt){const R=rzRng(opt.seed),n0=Date.now().toString(36);
  if(opt.groups.length&&tg.length){let n=o.wpick([[0,.35],[1,.45],[2,.2]]);if(!n&&opt.only&&!opt.filter)n=1;
   const pats=tg.filter(q=>q.k=='pattern'),order=[];if(pats.length&&o.ch(.6))order.push(pats[0]);
   tg.slice().sort(()=>R()-.5).forEach(q=>{if(!order.includes(q))order.push(q)});order.slice(0,n).forEach(q=>put(q,rzQPick(opt.groups,o)))}
- // a Filter shape on top: over the whole canvas most often, otherwise a shape round the middle
+ // a filter on top: over the whole canvas most often (a Sheet with no fill, 2.53.0), otherwise a Filter shape round the middle
  if(opt.filter&&(o.ch(.4)||(opt.only&&!changed.n))){const full=o.ch(.6),k=full?'rect':o.pick(RZFK),m=basicKey(k)||basicKey('rect');
   if(m){const S=Math.min(CW,CH)*o.rr(.5,.85),fx=opt.groups.length?[rzQPick(opt.groups,o)]:[{u:o.id(),k:'grade',on:true,ex:0,ct:0,hi:0,sh:0,wh:0,bl:0,tp:0,tn:0,sat:0,vib:0,hue:0,fd:0,...o.pick(RZFG)}];
-   const q=full?{u:o.id(),k:'motif',m,x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:+CW.toFixed(1),wy:+(CH/CW).toFixed(4),r:0,f:1}
+   const q=full?{u:o.id(),k:'sheet',n:'Filter',fl:'none'}
     :{u:o.id(),k:'motif',m,x:+(CW/2+o.rr(-.12,.12)*CW).toFixed(1),y:+(CH/2+o.rr(-.12,.12)*CH).toFixed(1),s:+S.toFixed(1),r:k=='heart'||o.ch(.6)?0:o.pick([15,-15,30,45]),f:1};
-   const top=L[L.length-1];if(top){q.nm='Filter';q.flt=1;q.fx=fx;top.pl=(top.pl||[]).concat([q]);changed.n++}}}
+   const top=L[L.length-1];if(top){if(!full){q.nm='Filter';q.flt=1}q.fx=fx;top.pl=(top.pl||[]).concat([q]);changed.n++}}}
  return changed.n}
 export {GRAD,arrOpts,gArrAll,mkEL,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPressEls,rzTexEls,rzEffectsEls};
