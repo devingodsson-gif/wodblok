@@ -106,6 +106,7 @@ None at the moment. Add new ones here.
 - Still open from before: owner's Mac `npm run perf:draw`; printing text, picture and pattern elements with effects (2.44.3 prints only shapes); stale remote branch docs/2.44.0-live could not be deleted.
 
 ## Suggestions (my recommendations, not decisions)
+- Library standard release: the owner wants every library to work the same way as the Shapes library (Oct 26 2026). Saved stamps (no folders), Saved trays (one level, no select mode, no drag), templates, workspaces and export recipes (flat lists) and colourways (no library) still differ; one release per library, starting with Saved stamps.
 - Drawing speed: plan in docs/speed-plan.md (Oct 25 2026). Owner said yes to the order below. 2.44.1 to 2.44.4 (now released as 2.45.0) are built on feat/2.44.1-perf-draw (not merged; 2.44.2: -8% work per slider/shape step, -21% undo/redo; 2.44.3 on top: another -50%, see docs/perf-baseline.md). 2.44.4 updates the canvas in place (another -10 to -22%). 2.44.3 prints shapes with effects once; text, picture and pattern elements with effects are still drawn live (a later step if wanted). Order: 2.44.1 measure, 2.44.2 stop refreshing unchanged panels, 2.44.3 print effect elements once (the big one), 2.44.4 update the canvas in place.
 - Known bug found while measuring: `npm run dev` (unbundled modules) fails at start, "teD is not defined" (22-text-tool.js uses teD from 60-text-engine.js without importing it). Fixed in 2.44.1.
 - Window > Close all panels could change its label to Default panels when that is what it does (the command label is fixed today).
@@ -114,6 +115,7 @@ None at the moment. Add new ones here.
 - Run the CI shard suite once before the next release goes live (my estimate: high importance, because 2.4.0 to 2.9.0 changed the Add bar, panels, stamp view and removed tools with no recorded full run). The owner said to ask him first, so suggest it with the importance percentage and wait.
 
 ## Changelog of this page
+- Oct 26 2026: 2.51.0 (texture library follow-ups: select mode, drag to folder, hidden sets, export and zip import, stamp pictures) on branch feat/2.51.0-texture-library-follow-up (built on 2.50.2), not merged. The saved-stamps, saved-trays, templates and colourways libraries still lack folders or select mode (see the table in docs/developing-wodblok.md); bringing them to the same standard is a separate release, suggested below.
 - Oct 21 2026 (night): updated for 2.10.0 to 2.15.0, the handover to another agent.
 - Oct 21 2026: first version, written from a fresh clone of `main` at 2.9.0 and the existing docs. Same day: owner's answers recorded.
 - Oct 26 2026: handover to another agent; 2.45.2 to 2.47.0 recorded.

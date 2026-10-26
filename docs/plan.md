@@ -1,5 +1,15 @@
 # Development plan
 
+## 2.51.0 (Oct 26 2026): the texture library works like the Shapes library
+- Owner, Oct 26 2026: the follow-ups to the texture library, "it should all work the exact same way". Built on 2.50.2 (not merged), in `86-texture-library.js`, copied from the Shapes library (21-motif-library-ui.js) and Part 9 section 12.
+- Select mode (the marquee button): tick tiles (Shift for a range, Select all, Esc or Done to leave), then Move to (a folder, Yours, or "New folder..."), Take out of folder, Delete (two clicks; textures used in the project are kept). Selecting does not pick the texture.
+- Drag a tile onto a folder row to move it there (pointer events; the folder lights up). A built-in texture dropped on a folder is added to it and also stays in its own set; dropped on its own set or on Yours it comes out again.
+- Built-in sets: Rename, Reset name, Hide from the list / Show in the list (hidden sets collect in a closed "Hidden sets" row with a count), New folder inside; your folders can sit inside a set ("s:Natural/Mine"). Folders get Move to... as in the Shapes library. Hiding is per set only.
+- Export (the download button for the whole library, a folder's menu for one folder, asking about the folders inside): a zip of the pictures, one zip folder per library folder (`src/format/textures.js`, `buildMotifZip` takes items with their own bytes). Add texture takes several pictures at once and a zip of pictures (its folders come back as your folders).
+- A stamp saved to the stamp library or to a stamp file carries the pictures of the imported textures it uses (`tximgs`, optional, no format bump); adding it in another browser brings them into Yours.
+- The library store gained `b` (built-in textures added to folders), `h` (hidden sets) and `r` (set names); older stores load unchanged.
+- Tested (Chromium): texture-library-2-51-0 (5 tests: hide and rename a set, select mode, drag, export and zip import, stamp pictures), texture-library-2-50-0, texture-effect, project-files, format, shape-folders, motif-export, stamp-library-search, nothing-lost, templates: all passed. `npm run check:style` OK. Not run: perf (no drawing, dragging or slider path touched), WebKit, the full suite or CI (importance about 35%: library and stamp-file code, no drawing change). No snapshot or golden changed.
+
 ## 2.50.2 (Oct 26 2026): fixes from the whole-app bug test
 - The bug test and what it found are in docs/known-issues.md ("Whole-app bug test, Oct 26 2026"): full Chromium suite (593 of 617 passed), a crawl of every command and panel (no errors), screenshots of every panel, shape and symmetry.
 - A text or shape drawn over every pattern takes a double-click (starts typing) instead of the stamp under it opening its tab; broken since 2.48.0 put a stamp under the middle of the canvas (75-stamp-edit-mode.js).
