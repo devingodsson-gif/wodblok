@@ -1,7 +1,7 @@
 {
   "name": "wodblok",
   "private": true,
-  "version": "2.45.1",
+  "version": "2.46.0",
   "description": "WODBLOK stamped-pattern editor (web app first). Phase 0: safety net around the v100 baseline.",
   "scripts": {
     "build": "node tools/build.js",
