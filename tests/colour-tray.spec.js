@@ -114,18 +114,17 @@ test('a saved project opens with its colours in the tray, linked where they were
 test('saved trays: a Wada set fills the first places; your own tray is kept and found by search', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'colors');
-  await page.click('.stf[data-f="wada3"]');
-  const first = page.locator('#stl .str').first(), name = (await first.locator('b').textContent()).trim();
+  await page.click('#stl .lfr[data-k="s:Wada · 3 colours"]');
+  const first = page.locator('#stl button[data-st]').first(), name = (await first.locator('b').textContent()).trim();
   await first.click(); await settle(page);
   const p = await proj(page);
   expect(p.ts).toHaveLength(3);
   expect(p.cw[0].m[p.ts[0]]).toBeTruthy();
   await expect(page.locator('#pmsg')).toContainText(name);
-  await page.click('#stnav [data-up]');
   await page.click('#tysave'); await page.fill('#tysvn', 'Qwerty Tray'); await page.press('#tysvn', 'Enter');
-  await expect(page.locator('#stl .str', { hasText: 'Qwerty Tray' })).toHaveCount(1);
+  await expect(page.locator('#stl button[data-st]', { hasText: 'Qwerty Tray' })).toHaveCount(1);
   await page.fill('#stq', 'qwerty');
-  await expect(page.locator('#stl .str')).toHaveCount(1);
+  await expect(page.locator('#stl button[data-st]')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
 

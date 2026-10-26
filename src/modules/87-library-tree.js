@@ -8,6 +8,8 @@ import {buildMotifZip,safeName} from '../format/motifs.js';
 // Every library (textures first, then saved stamps, saved trays, templates, workspaces, export recipes and saved colourways) is this tree: Home ("Yours") first, then your folders and the
 // built-in sets together A to Z, hidden sets in a row of their own, the folder row and its menu and form, select mode, drag onto a folder, Export, the same messages. A library gives
 // it only what differs, as `cfg`:
+//   open: set keys that start open (until the person closes them); cards: true for cards (a picture and a name) instead of plain tiles; z: the size the slider starts at (0 to 8);
+//   rows: true for a list of rows instead of tiles (no size slider); hay(id): the text a search looks in (default: the name)
 //   p: the class prefix of its markup (".{p}tr" the tree, "[data-{p}sel]" the select button ...); word, words: what its items are called in messages;
 //   ui: the settings key for open folders and size; exportName: the zip's name; cur(): the item in use (for the accent edge)
 //   read(): the library as {f: folder paths, at: {own item id: folder path}, b: {built-in item id: folder path}, h: hidden set names, r: {set name: your name for it}, d: whatever write needs back}
@@ -17,7 +19,7 @@ import {buildMotifZip,safeName} from '../format/motifs.js';
 // What it returns: pane() markup for the tree (after the library's own top row), show(pane, cur, pick), paintAll(), here() (the active folder, where new items go), init().
 function ltMake(cfg){
 const P=cfg.p,W=cfg.word,WS=cfg.words;
-const TL={q:'',active:'',open:new Set(['']),form:null,z:6,sm:false,sel:new Set(),anc:null,vis:[],hidOpen:false};
+const TL={q:'',active:'',open:new Set(['',...(cfg.open||[])]),form:null,z:cfg.z||6,sm:false,sel:new Set(),anc:null,vis:[],hidOpen:false};
 let drag=null,sw=false;
 const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const IC=d=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
@@ -65,12 +67,12 @@ function paint(host,cur,force){if(!host||!host.isConnected)return;const m=cfg.re
  // the folder of a newly picked item opens, so its tile shows
  if(cur!=null&&host.dataset.cur!==cur){host.dataset.cur=cur||'';if(cur&&cfg.name(cur)!=null){const k=cfg.own(cur)?(m.at[cur]||''):'s:'+((sets.find(s=>s.ids.includes(cur))||{n:''}).n);if(!TL.open.has(k)){TL.open.add(k);uiSave()}}}
  const vis=new Set();let h='';
- const grid=(list,depth)=>{list.forEach(i=>vis.add(i));return`<div class="lib${TL.sm?' sel':''}" style="--d:${depth}">${list.map(i=>tile(i,cur)).join('')}</div>`};
+ const grid=(list,depth)=>{list.forEach(i=>vis.add(i));return`<div class="lib${cfg.rows?' rws':''}${cfg.cards?' crd':''}${TL.sm?' sel':''}" style="--d:${depth}">${list.map(i=>tile(i,cur)).join('')}</div>`};
  const node=(k,label,depth,o)=>{let s=row(k,label,count(m,fs,k),depth,o);if(!TL.open.has(k))return s;
   if(TL.form&&TL.form.p===k&&TL.form.t!='mv')s+=form(m,fs,depth+1);
   const ks=k===''?[]:kids(fs,k);ks.forEach(c=>{s+=node(c,leaf(c),depth+1,{menu:1,hid:o.hid})});
   const list=ids(m,k);s+=list.length?grid(list,depth+1):ks.length?'':`<div class="lmt" style="--d:${depth+1}">${k===''?'No '+WS+' yet':'Empty folder'}</div>`;return s};
- if(q.length){const all=[...Object.keys(m.at),...sets.filter(s=>!m.h.includes(s.n)).flatMap(s=>s.ids)],hit=[...new Set(all)].filter(i=>cfg.name(i)!=null&&q.every(w=>cfg.name(i).toLowerCase().includes(w)));
+ if(q.length){const all=[...Object.keys(m.at),...sets.filter(s=>!m.h.includes(s.n)).flatMap(s=>s.ids)],hit=[...new Set(all)].filter(i=>cfg.name(i)!=null&&q.every(w=>(cfg.hay?cfg.hay(i):cfg.name(i)).toLowerCase().includes(w)));
   h=hit.length?grid(hit,0):`<div class="lmt" style="--d:0">No ${WS} found</div>`}
  else{
   h+=node('','Yours',0,{home:1,menu:1});
@@ -136,7 +138,7 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
  pane.querySelector(`[data-${P}new]`).onclick=()=>{if(TL.sm&&TL.sel.size){TL.form={t:'mv',p:'',v:''};paintAll(true);return}const p=here();TL.open.add(p);TL.form={t:'new',p,v:''};paintAll(true)};
  pane.querySelector(`[data-${P}sel]`).onclick=()=>{if(TL.sm)exit();else{TL.sm=true;TL.sel.clear();TL.anc=null;paintAll(true)}};
  pane.querySelector(`[data-${P}exp]`).onclick=e=>{e.stopPropagation();save(exportList('/',true))};
- const z=pane.querySelector(`.${P}sz`);z.addEventListener('input',()=>{TL.z=+z.value;uiSave();paintAll(true)});
+ const z=pane.querySelector(`.${P}sz`);if(z)z.addEventListener('input',()=>{TL.z=+z.value;uiSave();paintAll(true)});
  const q=pane.querySelector(`.${P}q`);q.addEventListener('keydown',e=>e.stopPropagation());q.addEventListener('input',()=>{TL.q=q.value;document.querySelectorAll(`.${P}q`).forEach(o=>{if(o!==q)o.value=q.value});paintAll(true)});
  const b=pane.querySelector(`.${P}bar`);
  b.querySelector(`.${P}done`).onclick=exit;
@@ -153,7 +155,7 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
   if(isSet(k)){const n=k.slice(2),hid=m.h.includes(n);return rowMenu(btn,[sub,['Rename',()=>{TL.open.add(k);TL.form={t:'ren',p:k,v:shown(m,n),ph:n};paintAll(true)}],['Reset name',()=>{const e=cfg.read();delete e.r[n];cfg.write(e);paintAll(true);pmsg('Set name reset.')},!m.r[n]],
    [hid?'Show in the list':'Hide from the list',()=>{const e=cfg.read();e.h=hid?e.h.filter(x=>x!==n):[...e.h,n];cfg.write(e);if(!hid&&within(TL.active,k))TL.active='';uiSave();paintAll(true);pmsg(hid?`“${shown(m,n)}” is back in the list.`:`Hid “${shown(m,n)}”.`)}],exp])}
   rowMenu(btn,[sub,['Rename',()=>{TL.open.add(k);TL.form={t:'ren',p:k,v:leaf(k)};paintAll(true)}],['Move to…',()=>{TL.open.add(k);TL.form={t:'mvf',p:k};paintAll(true)}],exp,['Delete folder',()=>{TL.open.add(k);TL.form={t:'del',p:k};paintAll(true)}]])};
- const itemMenu=(btn,id)=>{const m=cfg.read();if(!cfg.own(id)||cfg.name(id)==null)return;const at=m.at[id]||'',items=[...(cfg.itemMenu?cfg.itemMenu(id):[]),['Rename',()=>{TL.form={t:'iren',p:at,id,v:cfg.name(id)};TL.open.add(at);paintAll(true)}]];
+ const itemMenu=(btn,id)=>{const m=cfg.read();if(cfg.name(id)==null)return;const extra=cfg.itemMenu?cfg.itemMenu(id):[];if(!cfg.own(id)){if(extra.length)rowMenu(btn,extra);return}const at=m.at[id]||'',items=[...extra,['Rename',()=>{TL.form={t:'iren',p:at,id,v:cfg.name(id)};TL.open.add(at);paintAll(true)}]];
   if(at)items.push(['Move to Yours',()=>moveIds([id],'')]);folders(m).sort(cmp).filter(p=>p!==at).slice(0,40).forEach(p=>items.push(['Move to “'+pathName(p)+'”',()=>moveIds([id],p)]));items.push(['Delete',()=>removeOne(id)]);rowMenu(btn,items)};
  const ok=()=>{const f=TL.form,m=cfg.read();if(!f)return;
   if(f.t=='del'){const gone=p=>within(p,f.p);m.f=m.f.filter(p=>!gone(p));Object.keys(m.at).forEach(i=>{if(gone(m.at[i]))m.at[i]=''});Object.keys(m.b).forEach(i=>{if(gone(m.b[i]))delete m.b[i]});cfg.write(m);TL.form=null;TL.open.delete(f.p);if(gone(TL.active))TL.active=parent(f.p);uiSave();paintAll(true);pmsg(`Deleted the folder “${leaf(f.p)}”. Its ${WS} went back to Yours.`);return}
@@ -179,7 +181,7 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
   const x=e.target.closest(`[data-${P}x]`);if(x){removeAsk(x);return}
   const t=e.target.closest(`[data-${P}]`);if(!t)return;if(TL.sm||e.ctrlKey||e.metaKey||e.shiftKey){pick(t.dataset[P],e);return}if(host._pick)host._pick(t.dataset[P])});
  host.addEventListener('contextmenu',e=>{const fr=e.target.closest('.lrw'),b=fr&&fr.querySelector('[data-fm]');if(b){e.preventDefault();b.click();return}
-  const t=e.target.closest(`[data-${P}]`);if(t&&cfg.own(t.dataset[P])){e.preventDefault();itemMenu(t,t.dataset[P])}});
+  const t=e.target.closest(`[data-${P}]`);if(t&&(cfg.own(t.dataset[P])||cfg.itemMenu)){e.preventDefault();itemMenu(t,t.dataset[P])}});
  host.addEventListener('keydown',e=>{const t=e.target;
   if(t.matches&&t.matches('.fform input')){e.stopPropagation();if(e.key=='Enter'){e.preventDefault();ok()}else if(e.key=='Escape'){TL.form=null;paintAll(true)}return}
   if(t.matches&&t.matches('[data-fdest]')){e.stopPropagation();if(e.key=='Escape'){TL.form=null;paintAll(true)}return}
@@ -188,14 +190,14 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
  // drag an item onto a folder to move it there (not in select mode)
  host.addEventListener('pointerdown',e=>{if(e.button!==0||e.shiftKey||e.ctrlKey||e.metaKey||TL.sm)return;const b=e.target.closest(`.lib button[data-${P}]`);if(!b)return;const im=b.querySelector('img');drag={id:b.dataset[P],x:e.clientX,y:e.clientY,on:false,g:null,src:im?im.src:''}})}
 // the markup of the tree: the library's own top row first (Add texture), then the bar, the search, the tree and the select bar
-const paneHtml=()=>`${cfg.top||''}<div class="lnav ${P}nav"><button type="button" class="ib" data-${P}all aria-label="Expand all folders">${IC(ICN.unfold)}</button><input type="range" class="${P}sz" min="0" max="8" step="1" value="6" aria-label="${W[0].toUpperCase()+W.slice(1)} size" data-plain><button type="button" class="ib" data-${P}new aria-label="New folder">${IC(ICN.folderNew)}</button><button type="button" class="ib" data-${P}sel aria-label="Select ${WS}" aria-pressed="false">${IC(ICN.marquee)}</button><button type="button" class="ib" data-${P}exp aria-label="Export all ${WS}" aria-haspopup="menu" data-more>${IC(ICN.download)}</button></div>
+const paneHtml=()=>`${cfg.top||''}<div class="lnav ${P}nav"><button type="button" class="ib" data-${P}all aria-label="Expand all folders">${IC(ICN.unfold)}</button>${cfg.rows?'':`<input type="range" class="${P}sz" min="0" max="8" step="1" value="${cfg.z||6}" aria-label="${W[0].toUpperCase()+W.slice(1)} size" data-plain>`}<button type="button" class="ib" data-${P}new aria-label="New folder">${IC(ICN.folderNew)}</button><button type="button" class="ib" data-${P}sel aria-label="Select ${WS}" aria-pressed="false">${IC(ICN.marquee)}</button><button type="button" class="ib" data-${P}exp aria-label="Export all ${WS}" aria-haspopup="menu" data-more>${IC(ICN.download)}</button></div>
 <input type="text" class="${P}q"${cfg.qId?` id="${cfg.qId}"`:''} maxlength="40" placeholder="Find a ${W}" aria-label="Find a ${W}"><div class="ltr ${P}tr"${cfg.trId?` id="${cfg.trId}"`:''} role="tree" aria-label="${W[0].toUpperCase()+W.slice(1)}s"></div>
 <div class="fsbar ${P}bar" hidden><div class="r"><span class="fscnt"></span><button type="button" class="alt ${P}sa">Select all</button><button type="button" class="primary ${P}done">Done</button></div><select class="${P}mv" aria-label="Move to folder"></select><div class="r"><button type="button" class="alt ${P}out">Take out of folder</button><button type="button" class="alt ${P}delm">Delete</button></div></div>`;
 // shows the tree in a pane, with the item in use; pick(id) is called when a tile is chosen
 function show(pane,cur,pk){wire(pane);if(cfg.wire)cfg.wire(pane,pk);const host=pane.querySelector(`.${P}tr`);host._pick=pk;paint(host,cur)}
 function init(){uiLoad();
  // an item dragged over the page: it carries a small picture of itself, the folder under it lights up, and letting go there moves it
- document.addEventListener('pointermove',e=>{if(!drag)return;if(!drag.on){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<6)return;drag.on=true;const g=document.createElement('img');g.id=P+'dg';g.alt='';g.src=drag.src;g.style.cssText='position:fixed;width:44px;height:44px;object-fit:cover;border-radius:var(--r-s);pointer-events:none;z-index:70;opacity:.85;transform:translate(-50%,-50%)';document.body.appendChild(g);drag.g=g}
+ document.addEventListener('pointermove',e=>{if(!drag)return;if(!drag.on){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<6)return;drag.on=true;const g=document.createElement(drag.src?'img':'div');g.id=P+'dg';if(drag.src){g.alt='';g.src=drag.src}else g.textContent=cfg.name(drag.id)||'';g.style.cssText='position:fixed;'+(drag.src?'width:44px;height:44px;object-fit:cover;':'max-width:180px;padding:4px 8px;background:var(--raise);border:1px solid var(--line2);font-size:var(--fs-s);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;')+'border-radius:var(--r-s);pointer-events:none;z-index:70;opacity:.85;transform:translate(-50%,-50%)';document.body.appendChild(g);drag.g=g}
   drag.g.style.left=e.clientX+'px';drag.g.style.top=e.clientY+'px';const f=document.elementFromPoint(e.clientX,e.clientY),r=f&&f.closest&&f.closest(`.${P}tr .lfr[data-k]`);
   document.querySelectorAll(`.${P}tr .lfr.dropt`).forEach(x=>{if(x!==r)x.classList.remove('dropt')});if(r)r.classList.add('dropt')});
  const end=e=>{if(!drag)return;const x=drag;drag=null;if(x.g)x.g.remove();if(!x.on)return;sw=true;setTimeout(()=>{sw=false},0);document.querySelectorAll(`.${P}tr .lfr.dropt`).forEach(r=>r.classList.remove('dropt'));

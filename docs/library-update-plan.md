@@ -23,3 +23,6 @@ The Shapes library already follows the standard (home folder named Yours, hidden
 - Folder, item paths and open state are saved through `src/platform` under a per-library key. Nothing is lost when a library has no folders yet.
 - A project file keeps an item's folder as a plain path string; no format bump unless a step says so.
 - Tests: one spec per library (folders, select mode, drag, hide, export), plus the specs of the library it replaces. Quick targeted runs only; the full suite only when the owner says.
+
+## Status (Oct 26 2026)
+Done: 2.51.1 shared component and textures, 2.51.2 saved stamps, 2.51.3 saved trays, 2.51.4 templates, 2.51.7 saved colourways, closed as 2.52.0. Skipped on the owner's word: 2.51.5 workspaces and 2.51.6 export recipes (still on their own flat lists). Not built: import of `.wodblok-tray` and `.wodblok-colourway` files.

@@ -406,9 +406,7 @@ select{appearance:none;-webkit-appearance:none;padding-right:26px;background-ima
 input[type=number]{-moz-appearance:textfield;text-align:right;font-variant-numeric:tabular-nums;padding:4px 6px}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .board.off{position:absolute;left:-20000px;top:0;width:40px;height:40px;overflow:hidden;pointer-events:none;flex:none}
-.tpd{width:min(820px,100%)}.tpd .seg{margin-bottom:6px}.tpd .glb{padding:12px 2px 6px}.tpd .pgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.tpc{cursor:pointer;position:relative}.tpc:hover,.tpc:focus-visible{border-color:var(--line2);outline:none}.tpc:focus-visible{box-shadow:0 0 0 2px var(--acc-soft);border-color:var(--acc)}.tpc.sure{border-color:var(--acc)}.tpc.sure b{color:var(--acc-ink)}
-.tpc img,.tpc .nt{aspect-ratio:3/4}.tpc .nt svg{width:42%;height:auto}.tpm{display:flex;align-items:center;gap:4px;min-height:var(--h-sm)}.tpm b{flex:1;min-width:0}.tpm input{flex:1;min-width:0;height:var(--h-sm)}.tpm .ib{width:var(--h-sm);height:var(--h-sm);flex:none}.tpc .row{margin-top:0}
+.tpd{width:min(820px,100%)}.tpd .seg{margin-bottom:6px}.tpnav{position:static}
 .stgd,.dlg.stgd{width:min(640px,100%);height:min(460px,100%)}.stgd .dlg-b{flex:1;min-height:0;padding:0;overflow:hidden}.stgw{display:grid;grid-template-columns:150px minmax(0,1fr);height:100%}
 .stgn{display:flex;flex-direction:column;gap:2px;padding:8px;border-right:1px solid var(--line);overflow-y:auto}.stgn button{height:var(--h-row);padding:0 9px;border:0;border-radius:var(--r-m);background:transparent;color:var(--fg);font-size:var(--fs-m);text-align:left}.stgn button:hover{background:var(--raise)}.stgn button.on{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}
 .stgb{padding:8px 16px 16px;overflow-y:auto;min-width:0}.stgr{display:flex;align-items:center;gap:8px;min-height:var(--h-row);padding:4px 0;border-bottom:1px solid var(--line);font-size:var(--fs-m)}.stgr:last-child{border-bottom:0}.stgr>span,.stgr>label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stgr b{font-weight:500;color:var(--mut);white-space:nowrap}
@@ -791,21 +789,20 @@ body.eyedrop{cursor:crosshair}
 .tyt b{font-size:var(--fs-m);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tyt small{font-size:var(--fs-s);color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
 .tyr .ib{width:var(--h-md);height:var(--h-md)}
-.tyft{margin-top:8px;gap:6px}.tyft button,#stnewr button{display:inline-flex;align-items:center;gap:6px}.tyft .ic,#stnewr .ic{width:15px;height:15px}
+.tyft{margin-top:8px;gap:6px}.tyft button{display:inline-flex;align-items:center;gap:6px}.tyft .ic{width:15px;height:15px}
 .tysvf{display:flex;gap:6px;margin-top:8px}.tysvf input{flex:1;min-width:0}
 /* saved trays */
-.stnav{display:flex;align-items:center;gap:6px;margin:8px 0 2px;font-size:var(--fs-m)}.stnav[hidden]{display:none}.stnav .ib{width:var(--h-md);height:var(--h-md)}
 .stl{display:flex;flex-direction:column;gap:2px;margin:6px -6px 0;max-height:420px;overflow:auto}
-.str,.stf{display:grid;align-items:center;gap:8px;padding:4px 4px 4px 8px;border-radius:var(--r-m);cursor:pointer;font-size:var(--fs-m);min-height:var(--h-md)}
-.str{grid-template-columns:auto minmax(0,1fr) auto auto}.stf{grid-template-columns:18px minmax(0,1fr) auto auto}
-.str:hover,.str:focus-visible,.stf:hover,.stf:focus-visible{background:var(--raise);outline:none}
-.str b,.stf b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.str small,.stf small{color:var(--faint);font-size:var(--fs-s);font-variant-numeric:tabular-nums}
-.stf .ic{width:18px;height:18px;color:var(--mut)}
-.str .ib,.stf .ib{width:var(--h-sm);height:var(--h-sm)}
-.str.ren,.stf.ren{grid-template-columns:auto minmax(0,1fr)}.str.ren input,.stf.ren input{height:var(--h-sm)}
+.str{display:grid;align-items:center;gap:8px;padding:4px 4px 4px 8px;border-radius:var(--r-m);cursor:pointer;font-size:var(--fs-m);min-height:var(--h-md)}
+.str{grid-template-columns:auto minmax(0,1fr) auto auto}
+.str:hover,.str:focus-visible{background:var(--raise);outline:none}
+.str b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.str small{color:var(--faint);font-size:var(--fs-s);font-variant-numeric:tabular-nums}
+.str .ib{width:var(--h-sm);height:var(--h-sm)}
+.str.ren{grid-template-columns:auto minmax(0,1fr)}.str.ren input{height:var(--h-sm)}
 .sts{display:flex;border-radius:var(--r-s);overflow:hidden;box-shadow:0 0 0 1px rgba(128,128,128,.35)}.sts i{display:block;width:12px;height:20px}
 .stno{padding:8px 8px;color:var(--faint);font-size:var(--fs-m)}
+.sttr{max-height:420px;overflow:auto}.stnav{position:static}.cvnav{position:static}.lib.crd>div>button:first-child{display:flex;flex-direction:column;align-items:stretch;gap:6px;aspect-ratio:auto;padding:8px;background:var(--raise);text-align:left;font-size:var(--fs-m)}.lib.crd img,.lib.crd .nt{width:100%;aspect-ratio:3/4;object-fit:contain;background:var(--stage);border-radius:var(--r-s);display:block}.lib.crd .nt{display:flex;align-items:center;justify-content:center;color:var(--mut)}.lib.crd .nt svg{width:42%;height:auto}.lib.crd b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lib.rws{grid-template-columns:minmax(0,1fr);gap:2px}.lib.rws>div>button:first-child{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;aspect-ratio:auto;border-color:transparent;background:transparent;padding:4px 8px;min-height:var(--h-md);text-align:left;font-size:var(--fs-m)}.lib.rws>div>button:first-child:hover{background:var(--raise)}.lib.rws>div>button.on{background:var(--raise)}.lib.rws b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lib.rws small{color:var(--faint);font-size:var(--fs-s);font-variant-numeric:tabular-nums}.lib.rws .dx{top:50%;transform:translateY(-50%)}
 .sctb{display:flex;align-items:center;gap:6px;margin-bottom:6px}.sctb .alt{margin-left:auto;width:auto}.sctb .ic,.scl .ib .ic{width:16px;height:16px}.scl .lfi .ic{width:16px;height:16px}
 .scl{max-height:560px}.scl .lfr{margin-left:calc(var(--d,0)*12px);width:calc(100% - var(--d,0)*12px);flex:none}.scl .lfr.act{background:var(--raise);box-shadow:inset 2px 0 0 var(--acc)}.scl .lfr .ib{width:var(--h-sm);height:var(--h-sm)}.scl .lfa{transition:transform var(--t-fast)}.scl .lfr[aria-expanded="true"] .lfa{transform:rotate(90deg)}
 .scr{margin-left:calc(var(--d,0)*12px + 8px);grid-template-columns:auto minmax(0,1fr) auto auto auto}.scr.ren{grid-template-columns:auto minmax(0,1fr)}.scl .stno{margin-left:calc(var(--d,0)*12px + 8px)}
@@ -967,15 +964,15 @@ body.eyedrop{cursor:crosshair}
    <div class="stl scl" id="scl" role="tree" aria-label="Saved colours"></div>
   </div></details>
   <details class="g" open><summary>Saved trays <span class="aux" id="stcnt"></span></summary><div class="gb">
-   <div class="sctb" id="stnewr"><button type="button" class="ib" id="stnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="folderNew"></svg></button></div>
-   <input type="text" id="stq" maxlength="40" placeholder="Find a tray" aria-label="Find a tray">
-   <div class="stnav" id="stnav"></div>
-   <div class="stl" id="stl" role="list"></div>
+   <div id="stpane"></div>
   </div></details>
  <details class="g" open><summary>Colourways</summary><div class="gb"><div class="cwx">
    <div class="cwg" id="cwg" role="list" aria-label="Colourways"></div>
    <div class="row"><button type="button" class="alt" id="cwnew"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" data-ic="plus"></svg>New colourway</button><button type="button" id="cwgo">Export…</button></div>
   </div></div></details>
+ <details class="g" open><summary>Saved colourways <span class="aux" id="cvcnt"></span></summary><div class="gb">
+   <div id="cvpane"></div>
+  </div></details>
   </section>
 
  
@@ -1414,8 +1411,7 @@ body.eyedrop{cursor:crosshair}
  <div class="dlg-h"><h2 id="tpt">New from template</h2><button type="button" class="alt" id="tpadd">Add from file</button><button class="ib" id="tpclose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-b">
   <div class="seg" id="tpty" role="group" aria-label="Kind"><button type="button" data-k="canvas">Free canvas</button><button type="button" data-k="tile">Repeat tile</button><button type="button" data-k="book">Book cover</button></div>
-  <div class="glb">Starting points</div><div class="pgrid" id="tpg" role="list"></div>
-  <div class="glb" id="tpyh" hidden>Yours</div><div class="pgrid" id="tpy" role="list" hidden></div>
+  <div id="tppane"></div>
   <input type="file" id="tpfile" class="vh" accept=".wodblok,application/zip" tabindex="-1">
  </div>
 </div></div>

@@ -632,12 +632,13 @@ Counts are occurrences of a declared value in `src/shell.html` and `src/modules/
 | Same-size controls with different radii | one radius per size | 30px tall controls use 6, 7, 8 and 15 |
 | Gaps | 2, 4, 6, 8, 12, 16 | also 1, 3, 5, 7, 9, 10, 14. 9px ×8, 5px ×8 |
 | Group labels | one style | duplicated as `.wxh` (workspaces), `.xrh` (export recipes), `h3` uppercase, with different paddings |
-| Shapes library | the model (section 12) | Complete: nested tree, many open, select mode, drag to folder, hidden sets. Home is called "My imports" and an old "Drawn by Claude" folder shows only for old projects (do not copy it) |
-| Saved trays (colours) | the tree | One level of folders only; you drill in and use a Back button; its own rows (`.stf`), search and rename; no nesting, no select mode, no Move to…, no drag; Wada sets sit in three fixed folders instead of being sets in the list |
+| Shapes library | the model (section 12) | Complete: nested tree, many open, select mode, drag to folder, hidden sets; home is "Yours". Still its own code (about 40 specs depend on its markup); the shared component is written from it |
+| Saved trays (colours) | the tree | Complete (2.52.0): rows with a strip of colours on the shared tree; nested folders, select mode, Move to…, drag; Wada's 348 combinations are three sets (can be hidden, renamed); Export writes a zip of `.wodblok-tray` files (no import yet) |
 | Saved stamps | the tree | Complete (2.51.2); a stamp carries the pictures of the imported textures it uses since 2.51.0 |
 | Textures | the tree | Complete (2.51.0): Yours, your folders and the built-in sets with tiles, in the Texture effect; Add texture imports pictures and zips; nested folders (also inside sets), select mode, drag to folder, renamed and hidden sets, Export to a zip of pictures |
-| Colourways | the tree for saved colourways | Only this project's colourways exist (flat cards); no saved colourways library |
-| Templates, workspaces, export recipes | the tree | Flat list under two headings ("Starting points", "Yours"), three separate heading classes, no folders, no select mode |
+| Colourways | the tree for saved colourways | Complete (2.52.0): this project's colourways stay flat cards; "Save to library" in a colourway's menu keeps one in a saved colourways library (cards on the shared tree, folders, select mode, drag, Export); clicking a card adds it back as a new colourway |
+| Templates | the tree | Complete (2.52.0): cards on the shared tree; "Starting points" is a set (open at first, can be hidden); your templates in Yours and folders, select mode, drag, Export to a zip of project files |
+| Workspaces, export recipes | the tree | Not done (owner, Oct 26 2026: skipped for now): flat list under two headings, three separate heading classes, no folders, no select mode |
 | Folder "…" button | always visible (rule 5) | Done: `.lmo` is always visible in the Shapes library and the shared tree (`87-library-tree.js`, 2.51.1) |
 | Deleting | items two-tap in place; folders by the inline form | Folder delete is a form; item delete is two-tap; trays and templates use their own confirm styles |
 | Heading styles | 3 | panel title (Fraunces 14/500), group title (Fraunces 14/500), `h3` 12px/600 with a border, `h3` uppercase 11px, dialog `h2` 14/600 |

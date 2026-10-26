@@ -95,7 +95,7 @@ test('selecting a motif on the canvas opens the Motif panel (not Shape); its Ele
 test('the template picker has starting points: a stamped pattern and a framed border, a repeat tile and a book cover, after Blank', async ({ page }) => {
   const { errors } = await H.openApp(page, { pattern: false });
   await page.click('#fileb'); await page.click('#tpnew');
-  const names = async k => { await page.click(`#tpty [data-k="${k}"]`); await H.settle(page, { quiet: 4 }); return page.locator('#tpg .tpc').evaluateAll(c => c.map(x => x.getAttribute('aria-label'))); };
+  const names = async k => { await page.click(`#tpty [data-k="${k}"]`); await H.settle(page, { quiet: 4 }); return page.locator('#tppane .lrw:has(.lfr[data-k="s:Starting points"]) + .lib button[data-tp]').evaluateAll(c => c.map(x => x.getAttribute('aria-label'))); };
   expect(await names('canvas')).toEqual(['Blank', 'Framed border', 'Stamped flowers']);
   expect(await names('tile')).toEqual(['Blank', 'Half-drop diamonds']);
   expect(await names('book')).toEqual(['Blank', 'Cover 6 × 9 in']);

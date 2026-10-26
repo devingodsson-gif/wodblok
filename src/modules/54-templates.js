@@ -6,6 +6,7 @@ import {$,WBS,WBX} from './01-launch-and-version.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {coreStr,dirty,fileSnap,newId,openData,paintPst,pmsg,thumb} from './18-projects-and-cover-overlay.js';
 import {fileUnlink,thumbPng} from './33-clear.js';
+import {ltMake} from './87-library-tree.js';
 // ===== Templates =====
 // A template is an ordinary saved project (a .wodblok file). "New from template" opens one as a new, unsaved project and never changes the
 // template. Three kinds, found from the project itself: a book (the book cover is on), a repeating pattern (the canvas is a repeat tile), or a
@@ -19,13 +20,13 @@ const TP_MORE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentCo
 const TP_BLANK={canvas:'<svg viewBox="0 0 60 80" aria-hidden="true"><rect x="14" y="10" width="32" height="60" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
  tile:'<svg viewBox="0 0 60 80" aria-hidden="true"><rect x="16" y="22" width="28" height="36" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 22h6M44 22h6M10 58h6M44 58h6M16 16v6M44 16v6M16 58v6M44 58v6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>',
  book:'<svg viewBox="0 0 60 80" aria-hidden="true"><rect x="8" y="14" width="44" height="52" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M26 14v52M34 14v52" stroke="currentColor" stroke-width="2" fill="none"/></svg>'};
-const TPS={kind:'canvas',ren:null,del:null,arm:null,list:[]};   // the kind shown, the card being renamed or deleted, the card waiting for a second click
+const TPS={kind:'canvas',arm:null,list:[]};   // the kind shown, the card waiting for a second click, your templates as last read
 let tpStore=null;                                              // the records collection (null: this browser keeps none)
 const tpB64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
 const tpBytes=s=>{const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u};
 const tpKind=d=>d&&d.cover&&d.cover.book&&d.cover.book.on?'book':d&&d.dim&&d.dim.rt?'tile':'canvas';
 const tpNow=()=>WBS.book&&WBS.book.on?'book':WBS.dim&&WBS.dim.rt?'tile':'canvas';
-function tpIndex(){let a=[];try{a=JSON.parse(kv.get(TP_INDEX)||'[]')}catch(e){}return(Array.isArray(a)?a:[]).filter(t=>t&&typeof t.id=='string'&&typeof t.n=='string'&&TP_KINDS.some(k=>k[0]===t.type)).map(t=>({id:t.id,n:t.n.slice(0,40),type:t.type,t:+t.t||0,th:typeof t.th=='string'&&/^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(t.th)?t.th:''}))}
+function tpIndex(){let a=[];try{a=JSON.parse(kv.get(TP_INDEX)||'[]')}catch(e){}return(Array.isArray(a)?a:[]).filter(t=>t&&typeof t.id=='string'&&typeof t.n=='string'&&TP_KINDS.some(k=>k[0]===t.type)).map(t=>({id:t.id,n:t.n.slice(0,40),type:t.type,t:+t.t||0,f:typeof t.f=='string'&&!t.f.startsWith('s:')&&t.f.length<=200?t.f:'',th:typeof t.th=='string'&&/^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(t.th)?t.th:''}))}
 const tpIndexSet=a=>{try{kv.set(TP_INDEX,JSON.stringify(a));return true}catch(e){return false}};
 async function tpOpenStore(){if(tpStore===null)tpStore=(await collection('templates'))||false;return tpStore||null}
 // a small JPEG picture from a PNG (the picture inside a project file)
@@ -34,21 +35,37 @@ const tpSmall=png=>new Promise(res=>{if(!png)return res('');const u=URL.createOb
  im.onerror=()=>{clearTimeout(to);URL.revokeObjectURL(u);res('')};im.src=u});
 // ---------------------------------------------------------------- the picker
 const tpD=()=>$('tpdlg'),tpIsOpen=()=>!tpD().hidden;
-function tpCard(t,own){const sel=TPS.arm===t.id,ren=own&&TPS.ren===t.id,del=own&&TPS.del===t.id;
- const pic=t.blank?`<div class="nt">${TP_BLANK[t.type]}</div>`:t.th?`<img src="${t.th}" alt="" loading="lazy" decoding="async">`:'<div class="nt"></div>';
- const nm=ren?`<input type="text" maxlength="40" value="${tpEsc(t.n)}" aria-label="Template name">`:`<b>${tpEsc(sel?'Discard changes?':t.n)}</b>`;
- const act=del?`<div class="row"><button type="button" class="alt" data-del="1">Delete</button><button type="button" class="alt" data-keep="1">Keep</button></div>`:'';
- return`<div class="pc tpc${sel?' sure':''}" role="listitem" tabindex="0" data-id="${tpEsc(t.id)}" aria-label="${tpEsc(t.n)}">${pic}<div class="tpm">${nm}${own&&!ren&&!del?`<button type="button" class="ib" data-more aria-haspopup="menu" aria-expanded="false" aria-label="Actions for ${tpEsc(t.n)}">${TP_MORE}</button>`:''}</div>${act}</div>`}
-function tpPaint(){if(!tpIsOpen())return;const k=TPS.kind,mine=TPS.list.filter(t=>t.type===k).sort((a,b)=>b.t-a.t);
+// The picker's list is the shared folder tree (87-library-tree.js, 2.51.4): cards in Yours and your folders, "Starting points" a set. Only the templates of the kind shown are in the tree.
+// The folders, the set's name and whether it is hidden are kept in settings (TP_FKEY); a template's folder is its `f` in the list.
+const TP_FKEY='wb251_tplfolders',TP_UI='wb251_templatesui',TP_SET='Starting points';
+let TPT=null;
+const tpIsBuilt=id=>id.startsWith('blank:')||TPL_BUILTIN.some(t=>t.id===id);
+const tpBuiltIn=()=>[{id:'blank:'+TPS.kind,n:'Blank',type:TPS.kind,blank:1},...TPL_BUILTIN.filter(t=>t.type===TPS.kind)];
+const tpItem=id=>{if(id.startsWith('blank:'))return id==='blank:'+TPS.kind?tpBuiltIn()[0]:null;const b=TPL_BUILTIN.find(t=>t.id===id);if(b)return b.type===TPS.kind?b:null;const t=TPS.list.find(x=>x.id===id);return t&&t.type===TPS.kind?t:null};
+function tpFold(){let d=null;try{d=JSON.parse(kv.get(TP_FKEY)||'null')}catch(e){}d=d&&typeof d=='object'?d:{};
+ const r=d.r&&typeof d.r[TP_SET]=='string'&&/^[^\\"<>&|/]{1,30}$/.test(d.r[TP_SET])&&!/^s:/i.test(d.r[TP_SET])?{[TP_SET]:d.r[TP_SET]}:{},b={};
+ if(d.b&&typeof d.b=='object')Object.keys(d.b).forEach(k=>{if(tpIsBuilt(k)&&typeof d.b[k]=='string'&&d.b[k]&&d.b[k].length<=200)b[k]=d.b[k]});
+ return{f:(Array.isArray(d.f)?d.f:[]).filter(x=>typeof x=='string'&&x&&x.length<=200&&!x.startsWith('s:')),h:Array.isArray(d.h)&&d.h.includes(TP_SET)?[TP_SET]:[],r,b}}
+const tpHere=()=>{const h=TPT?TPT.here():'';return h.startsWith('s:')?'':h};
+const tpCfg=()=>({p:'tp',word:'template',words:'templates',ui:TP_UI,cards:true,z:7,open:['s:'+TP_SET],exportName:'wodblok-templates',exportAs:'project files',usedFix:'',pane:'#tppane',
+ read(){const d=tpFold(),at={};TPS.list.filter(t=>t.type===TPS.kind).forEach(t=>{at[t.id]=t.f});return{f:d.f,at,b:d.b,h:d.h,r:d.r}},
+ write(m){try{kv.set(TP_FKEY,JSON.stringify({f:m.f,b:m.b,h:m.h,r:m.r}))}catch(e){}const a=tpIndex();let ch=false;a.forEach(t=>{if(t.id in m.at&&m.at[t.id]!==t.f){t.f=m.at[t.id];ch=true}});if(ch){tpIndexSet(a);TPS.list=tpIndex()}},
+ sets:()=>[{k:'s:'+TP_SET,n:TP_SET,ids:tpBuiltIn().map(t=>t.id)}],
+ name:id=>{const t=tpItem(id);return t?t.n:null},own:id=>!tpIsBuilt(id),used:()=>false,
+ tile(id){const t=tpItem(id);if(!t)return'';const pic=t.blank?`<div class="nt">${TP_BLANK[t.type]}</div>`:t.th?`<img src="${t.th}" alt="" loading="lazy" decoding="async" draggable="false">`:'<div class="nt"></div>';return pic+`<b>${tpEsc(TPS.arm===id?'Discard changes?':t.n)}</b>`},
+ remove(list){tpOpenStore().then(st=>{if(st)list.forEach(id=>st.doc(id).delete().catch(()=>{}))});tpIndexSet(tpIndex().filter(x=>!list.includes(x.id)));TPS.list=tpIndex()},
+ rename(id,v){const a=tpIndex(),t=a.find(x=>x.id===id);if(!t)return;t.n=v;tpIndexSet(a);TPS.list=tpIndex();
+  tpOpenStore().then(st=>st&&st.doc(id).get().then(r=>{const d=r&&r.exists?r.data():null;if(d)return st.doc(id).set({...d,n:v})})).catch(()=>{})},
+ async file(id){const b=TPL_BUILTIN.find(t=>t.id===id);if(b)return{name:b.n,data:tpBytes(b.b),ext:'.wodblok',fb:'Template'};if(id.startsWith('blank:'))return null;
+  const st=await tpOpenStore(),r=st&&await st.doc(id).get(),v=r&&r.exists?r.data():null;return v&&typeof v.b=='string'?{name:v.n||'Template',data:tpBytes(v.b),ext:'.wodblok',fb:'Template'}:null},
+ itemMenu(id){const t=TPS.list.find(x=>x.id===id);return t?[['Download',()=>tpDownload(t)]]:[]}});
+function tpPaint(){if(!tpIsOpen()||!TPT)return;const k=TPS.kind;
  $('tpty').querySelectorAll('[data-k]').forEach(b=>{const on=b.dataset.k===k;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});
- const base=[{id:'blank:'+k,n:'Blank',type:k,blank:1},...TPL_BUILTIN.filter(t=>t.type===k)];
- $('tpg').innerHTML=base.map(t=>tpCard(t,false)).join('');
- $('tpyh').hidden=$('tpy').hidden=!mine.length;$('tpy').innerHTML=mine.map(t=>tpCard(t,true)).join('');
- const r=tpD().querySelector('.tpc input');if(r){r.focus();r.select()}}
-async function tpShow(){TPS.list=tpIndex();TPS.ren=TPS.del=TPS.arm=null;try{const k=kv.get(TP_TYPE);if(TP_KINDS.some(x=>x[0]===k))TPS.kind=k}catch(e){}
+ TPT.show($('tppane'),'',tpPick);TPT.paintAll(true)}
+async function tpShow(){TPS.list=tpIndex();TPS.arm=null;try{const k=kv.get(TP_TYPE);if(TP_KINDS.some(x=>x[0]===k))TPS.kind=k}catch(e){}
  try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}catch(e){}
  tpD().hidden=false;tpPaint();const f=tpD().querySelector('.tpc');if(f)f.focus()}
-function tpHide(){if(!tpD().hidden){tpD().hidden=true;TPS.ren=TPS.del=TPS.arm=null;const b=$('fileb');if(b&&b.focus)b.focus()}}
+function tpHide(){if(!tpD().hidden){tpD().hidden=true;TPS.arm=null;const b=$('fileb');if(b&&b.focus)b.focus()}}
 // ---------------------------------------------------------------- starting a project from a template
 const tpWait=ms=>new Promise(r=>setTimeout(r,ms));
 // every start is a new project: nothing is tied to a file, history starts again, and the unsaved dot stays off until the first change
@@ -81,7 +98,7 @@ async function tpSave(){const ok=$('tpsok'),name=$('tpsn').value.trim().slice(0,
  ok.disabled=true;
  try{const sn=await fileSnap(),th=await thumb(240),png=await thumbPng(th),bytes=await fmtPack({name,...sn},{thumbnail:png}),id=same?same.id:newId(),type=tpNow(),t=Date.now();
   await st.doc(id).set({id,n:name,type,t,b:tpB64(bytes)});
-  const a=tpIndex().filter(x=>x.id!==id);a.unshift({id,n:name,type,t,th});
+  const a=tpIndex().filter(x=>x.id!==id);a.unshift({id,n:name,type,t,f:same?same.f:tpHere(),th});
   if(!tpIndexSet(a)){await st.doc(id).delete().catch(()=>{});throw new Error('Could not keep the template list in this browser.')}
   tpSaveHide();pmsg((same?'Replaced the template “':'Saved the template “')+name+'”.')}
  catch(e){pmsg((e&&e.message)||'Could not save the template.')}
@@ -99,33 +116,17 @@ async function tpAddFile(fl){const st=await tpOpenStore();if(!st)return pmsg('Th
   // always keep it as the current container format
   const packed=await fmtPack({...r.project,name},{thumbnail:pk.thumbnail||undefined});
   await st.doc(id).set({id,n:name,type,t,b:tpB64(packed)});
-  const a=tpIndex();a.unshift({id,n:name,type,t,th});if(!tpIndexSet(a)){await st.doc(id).delete().catch(()=>{});throw new Error('Could not keep the template list in this browser.')}
-  TPS.list=tpIndex();TPS.kind=type;try{kv.set(TP_TYPE,type)}catch(e){}tpPaint();pmsg('Added “'+name+'” to your templates.')}
+  const a=tpIndex(),f=tpHere();a.unshift({id,n:name,type,t,f,th});if(!tpIndexSet(a)){await st.doc(id).delete().catch(()=>{});throw new Error('Could not keep the template list in this browser.')}
+  TPS.list=tpIndex();TPS.kind=type;try{kv.set(TP_TYPE,type)}catch(e){}if(f&&TPT)TPT.open(f);tpPaint();pmsg('Added “'+name+'” to your templates.')}
  catch(e){pmsg((e&&e.message)||'That file could not be added.')}}
-async function tpRename(id,v){v=v.trim().slice(0,40);const a=tpIndex(),t=a.find(x=>x.id===id);if(!t||!v||v===t.n)return;const st=await tpOpenStore();
- try{if(st){const r=await st.doc(id).get(),d=r&&r.exists?r.data():null;if(d)await st.doc(id).set({...d,n:v})}t.n=v;tpIndexSet(a);TPS.list=tpIndex()}catch(e){pmsg('Could not rename the template.')}}
-async function tpDelete(id){const st=await tpOpenStore();try{if(st)await st.doc(id).delete()}catch(e){}tpIndexSet(tpIndex().filter(x=>x.id!==id));TPS.list=tpIndex();TPS.del=null;tpPaint();pmsg('Deleted the template.')}
 function init54(){
+ TPT=ltMake(tpCfg());TPT.init();$('tppane').innerHTML=TPT.paneHtml();
  $('tpnew').onclick=()=>tpShow();$('tpsave').onclick=()=>tpSaveShow();
  $('tpclose').onclick=tpHide;tpD().addEventListener('click',e=>{if(e.target===tpD())tpHide()});
- $('tpty').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;TPS.kind=b.dataset.k;TPS.ren=TPS.del=TPS.arm=null;try{kv.set(TP_TYPE,TPS.kind)}catch(err){}tpPaint()});
- const onGrid=e=>{const c=e.target.closest('.tpc');if(!c||e.target.closest('input'))return;const id=c.dataset.id,t=TPS.list.find(x=>x.id===id);
-  const more=e.target.closest('[data-more]');
-  if(more){e.stopPropagation();if(!t)return;rowMenu(more,[['Rename',()=>{TPS.ren=id;tpPaint()}],['Download',()=>tpDownload(t)],['Delete',()=>{TPS.del=id;tpPaint()}]]);return}
-  if(e.target.closest('[data-del]')){tpDelete(id);return}
-  if(e.target.closest('[data-keep]')){TPS.del=null;tpPaint();return}
-  if(TPS.del===id||TPS.ren===id)return;tpPick(id)};
- ['tpg','tpy'].forEach(i=>{const g=$(i);g.addEventListener('click',onGrid);
-  g.addEventListener('keydown',e=>{const t=e.target;
-   if(t.matches&&t.matches('.tpc input')){e.stopPropagation();if(e.key=='Enter')t.blur();else if(e.key=='Escape'){TPS.ren=null;tpPaint()}return}
-   if(t.classList&&t.classList.contains('tpc')&&(e.key=='Enter'||e.key==' ')){e.preventDefault();t.click()}});
-  g.addEventListener('focusout',e=>{const t=e.target;if(!t.matches||!t.matches('.tpc input')||TPS.ren==null)return;const id=TPS.ren,v=t.value;TPS.ren=null;tpRename(id,v).then(()=>{TPS.list=tpIndex();tpPaint()})})});
- // arrow keys move between the cards
- tpD().addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)||(e.target.matches&&e.target.matches('input')))return;const cs=[...tpD().querySelectorAll('.tpc')],i=cs.indexOf(document.activeElement);if(i<0)return;e.preventDefault();
-  const step=e.key=='ArrowLeft'||e.key=='ArrowUp'?-1:1,j=Math.max(0,Math.min(cs.length-1,i+step));cs[j].focus()});
+ $('tpty').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;TPS.kind=b.dataset.k;TPS.arm=null;try{kv.set(TP_TYPE,TPS.kind)}catch(err){}tpPaint()});
  $('tpadd').onclick=()=>$('tpfile').click();$('tpfile').onchange=()=>{const f=$('tpfile').files[0];$('tpfile').value='';if(f)tpAddFile(f)};
  // Escape closes whichever of the two dialogs is open (before the app's own Escape handling)
- document.addEventListener('keydown',e=>{if(e.key!='Escape')return;if(!tpSd().hidden){e.stopImmediatePropagation();e.preventDefault();tpSaveHide()}else if(tpIsOpen()&&!(e.target.matches&&e.target.matches('.tpc input'))&&!document.querySelector('.rowm')){e.stopImmediatePropagation();e.preventDefault();tpHide()}},true);
+ document.addEventListener('keydown',e=>{if(e.key!='Escape')return;if(!tpSd().hidden){e.stopImmediatePropagation();e.preventDefault();tpSaveHide()}else if(tpIsOpen()&&!(e.target.matches&&e.target.matches('.fform input'))&&!document.querySelector('.rowm')){e.stopImmediatePropagation();e.preventDefault();tpHide()}},true);
  $('tpsx').onclick=tpSaveHide;$('tpscx').onclick=tpSaveHide;tpSd().addEventListener('click',e=>{if(e.target===tpSd())tpSaveHide()});
  $('tpsn').addEventListener('input',()=>{$('tpsok').dataset.arm='';tpSaveLabel()});
  $('tpsn').addEventListener('keydown',e=>{e.stopPropagation();if(e.key=='Enter'){e.preventDefault();tpSave()}});
