@@ -297,7 +297,7 @@
   {
    "u": "pmuzhi800ejk",
    "k": "pattern",
-   "n": "Pattern 1",
+   "n": "Pattern 3",
    "lay": "brick",
    "cn": 2,
    "rn": 3,
@@ -331,15 +331,6 @@
      "rot": 7,
      "sz": 20,
      "sd": 37621
-    },
-    {
-     "u": "pmuzhi800e1x8",
-     "k": "bleed",
-     "on": true,
-     "amt": 35,
-     "rag": 37,
-     "soft": 12,
-     "sd": 45551
     }
    ]
   },
@@ -367,16 +358,7 @@
    "r": 0,
    "f": 1,
    "ox": 50,
-   "oy": 0,
-   "fx": [
-    {
-     "u": "pmuzhi800e228i",
-     "k": "motion",
-     "on": true,
-     "amt": 17,
-     "ang": 146
-    }
-   ]
+   "oy": 0
   },
   {
    "u": "pmuzhi800hqn",
@@ -402,7 +384,18 @@
    "r": 0,
    "f": 1,
    "in": 2,
-   "g": "glah2larm"
+   "g": "glah2larm",
+   "fx": [
+    {
+     "u": "pmuzhi800e12q3",
+     "k": "lines",
+     "on": true,
+     "sz": 20,
+     "tone": 45,
+     "ang": 121,
+     "spr": 51
+    }
+   ]
   },
   {
    "u": "glah2larm",
@@ -415,9 +408,9 @@
    "k": "pattern",
    "n": "Pattern 1",
    "lay": "grid",
-   "cn": 4,
-   "rn": 4,
-   "sz": 80,
+   "cn": 5,
+   "rn": 7,
+   "sz": 100,
    "rt": 0,
    "ds": "cycle",
    "sd": 1545,
@@ -509,6 +502,9 @@
    "sc": 103,
    "az": 135,
    "sd": 62431,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
    "auto": true
   },
   {
@@ -519,6 +515,9 @@
    "sc": 113,
    "az": 250,
    "sd": 33029,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
    "auto": true
   },
   {
@@ -529,6 +528,9 @@
    "sc": 98,
    "az": 200,
    "sd": 56503,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
    "auto": true
   },
   {
@@ -539,6 +541,9 @@
    "sc": 95,
    "az": 135,
    "sd": 50501,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
    "auto": true
   },
   {
@@ -549,6 +554,9 @@
    "sc": 168,
    "az": 225,
    "sd": 38870,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
    "auto": true
   },
   {
@@ -559,6 +567,9 @@
    "sc": 142,
    "az": 225,
    "sd": 28965,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
    "auto": true
   }
  ],
