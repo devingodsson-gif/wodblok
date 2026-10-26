@@ -18,7 +18,7 @@ GitHub Actions on standard runners are free and unlimited for public repositorie
 10. **To test a branch without a pull request**, run the `tests` workflow by hand (Actions tab > tests > Run workflow).
 11. **Check the Usage page** (GitHub > Settings > Billing and licensing > Usage) on the 1st and 15th. Consider a small spending budget as a safety net so CI keeps running at the limit.
 
-12. **The Chromium suite runs in four parts at once** (`chromium-shard 1/4` to `4/4`, Playwright `--shard`), the picture comparison with `main` is its own job, and a last job named `chromium` collects them so the required check name stays `chromium`. A run takes about a quarter of the time but uses a little more minutes in total (each part installs and builds). Keep new work inside these jobs; do not add more parallel jobs.
+12. **The Chromium suite runs in eight parts at once** (`chromium-shard 1/8` to `8/8`, Playwright `--shard`), the picture comparison with `main` is its own job, and a last job named `chromium` collects them so the required check name stays `chromium`. A run takes about a quarter of the time but uses a little more minutes in total (each part installs and builds). Keep new work inside these jobs; do not add more parallel jobs.
 
 ## What a month should cost
 About one full run per release (about 25-40 minutes for Chromium plus WebKit), a few more when CI finds something, so roughly 4-8 releases use 150-400 minutes. If a month needs more, the cheapest next step is a `test:quick` subset for early pull request updates; a paid plan comes after that.
