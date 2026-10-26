@@ -21,14 +21,13 @@ for (const k of ['pattern', 'stamp']) {
   });
 }
 
-test('the Text bar button arms text at once; Select (V) is the first button, shown pressed, and takes the tool away', async ({ page }) => {
+test('the Text bar button arms text at once; V takes the tool away (2.54.0: there is no Select button)', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4 });
   await H.noPattern(page);
-  await expect(page.locator('#elb .elbb').first()).toHaveAttribute('data-k', 'select');
-  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#elb [data-k="select"]')).toHaveCount(0);
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(0);
   await page.click('#elb [data-k="text"]'); await H.settle(page);
   await expect(page.locator('#elb [data-k="text"]')).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'false');
   const b = await page.locator('#art').boundingBox();
   await page.mouse.move(b.x + b.width * 0.4, b.y + b.height * 0.4);
   await page.waitForFunction(() => document.querySelector('#fpov .gh'), null, { timeout: 5000 });
@@ -36,8 +35,8 @@ test('the Text bar button arms text at once; Select (V) is the first button, sho
   expect((await els(page, 'text')).length).toBe(1);
   await page.keyboard.press('Escape'); await H.settle(page);
   await page.click('#elb [data-k="pattern"]'); await H.settle(page);
-  await page.click('#elb [data-k="select"]'); await H.settle(page);
-  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('v'); await H.settle(page);
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(0);
   await expect(page.locator('#elb [data-k="pattern"]')).toHaveAttribute('aria-pressed', 'false');
   await page.mouse.click(b.x + b.width * 0.8, b.y + b.height * 0.8); await H.settle(page);
   expect((await els(page, 'pattern')).length, 'Select puts the tool away: a click places nothing').toBe(0);

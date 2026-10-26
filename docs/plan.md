@@ -1,5 +1,13 @@
 # Development plan
 
+## 2.54.0 (Oct 26 2026): no Select button, four colours in a new tray
+Owner, Oct 26 2026: "remove the pointer/mouse cursor icon from the element bar, it does nothing. Also make there be 4 slots in the colour tray by default plus the +."
+- The element bar has no Select button (and the unused cursor icon is gone). `V` and Esc still put an armed tool away; with no tool armed, no bar button shows pressed.
+- A new project's tray starts with four colours: Pale Lemon Yellow (paper), Dark Tyrian Blue (ink), Jasper Red, Cossack Green (Wada names; the two accents are my pick, the owner can change them in `TRAY_START`, 50-tray-core.js). Opening a Wada set fills the first places and keeps the rest.
+- CI: the Chromium suite runs in eight shards (four ran past the 25 minute limit).
+- Tests: element-bar, first-five-2-26 and colour-tray updated (no Select button; four places, three empty). Related specs (tray, colour, palette, randomize, templates, Sheet, file format; 123 tests) pass in the sandbox except the five Randomize scenario snapshots, which only CI can make (docs/PROJECT_STATUS.md).
+- Not run: full suite, pixel goldens, `npm run perf` (nothing on the drawing path changed).
+
 ## 2.53.0 (Oct 26 2026): the Sheet (docs/sheet-plan.md)
 Owner, Oct 26 2026: an element called a Sheet that always covers the whole canvas and cannot be resized; the Background is a Sheet with a colour; a new Sheet has no colour and works as a filter; a Sheet can show an image. One big release.
 - **Sheet element** (`89-sheet-element.js`, kind `sheet` in the registry, panel "Sheet", element bar button and Add sheet command). Fill None (new Sheets), Colour (a tray link; the paper colour when none is set) or Image with Cover, Fit, Stretch or Tile and Zoom. The Shape panel's Fill group moves to the Sheet panel for a selected Sheet; it gains a Colour well and the Stretch and Tile fits for Sheets only; no Filter switch or Outline.

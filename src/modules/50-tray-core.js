@@ -36,7 +36,9 @@ function refLabel(r){if(!r)return'';if(isLink(r)){const id=r.slice(1);return slo
 function trayNew(cols){const ts=[],c={},m={};(cols||[]).slice(0,TRAY_MAX).forEach(([h,n],i)=>{const id='k'+(i+1);ts.push(id);c[id]=normHexA(h)||'#888888';if(n)m[id]=String(n).slice(0,40)});
  if(!ts.length){ts.push('k1');c.k1='#f4f0e6'}if(ts.length<2){ts.push('k2');c.k2='#26221d'}
  return{bg:'@'+ts[0],ink:'@'+ts[1],ts,cw:[{id:'w1',n:'Colourway 1',c,m}],cwa:0}}
-const trayDefault=()=>trayNew([[CM[PCOL.bg],PCOL.bg],[CM[PCOL.ink],PCOL.ink]]);
+// 2.54.0 (owner Oct 26 2026): a new tray starts with four colours: the paper, the ink, then two accents
+const TRAY_START=[PCOL.bg,PCOL.ink,'Jasper Red','Cossack Green'];
+const trayDefault=()=>trayNew(TRAY_START.map(n=>[CM[n],n]));
 // ---- documents from before the tray: their colours were names (paper, ink, accent, accent 2, and inks on stamps and layers).
 // They become tray slots (up to 16; any more stay as fixed colours), linked where they were used. Works on {proj,tiles,layers}.
 function trayFromLegacy(c){const o=c.proj||{},cols=[],idx=new Map();
