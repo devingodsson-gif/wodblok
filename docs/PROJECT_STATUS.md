@@ -100,8 +100,8 @@ None at the moment. Add new ones here.
 ### Handover Oct 26 2026 (owner moved to another agent)
 - `main` is at 2.47.0 (merged Oct 25 night on his word "merge": 2.45.2 square shape previews, 2.46.0 symmetry lines on the stamp tab plus six new symmetry types, 2.47.0 a new Pattern starts at 100% of its cell). Preview artifact not republished since 2.44.x.
 - **Not started: hexagon and triangle stamp shapes render with an offset** (owner: hexagon offset to the right, triangle offset down). Suspect `src/modules/04-canvas-and-stamp-outlines.js` (hex lattice `HL`, `SW`/`SH`; the triangle's centre is at `SH*2/3`, not `SH/2`) and how a stamp block is placed in a pattern. Not confirmed; reproduce with a screenshot first, add a test.
-- **Open question for the owner:** should a new Pattern's columns and rows come from the stamp size (canvas / stamp, e.g. 1000 / 100 = 10 x 10) instead of a fixed 4 x 4, with a separate Spacing slider? 2.47.0 only changed the default size to 100%. Hexagon and triangle cannot fill a square cell, so they still leave gaps.
-- Idea awaiting his direction: a "most used items" strip on the top bar (my recommendation: pinned plus usage-filled slots, fixed order, counts kept local; he has not decided the look).
+- **Answered Oct 26 2026 (2.48.0): yes, columns and rows come from the stamp size.** (Original question: should a new Pattern's columns and rows come from the stamp size (canvas / stamp, e.g. 1000 / 100 = 10 x 10) instead of a fixed 4 x 4, with a separate Spacing slider? 2.47.0 only changed the default size to 100%. Hexagon and triangle cannot fill a square cell, so they still leave gaps.) A separate Spacing slider is not built.
+- Dropped by the owner Oct 26 2026: the "most used items" strip on the top bar. (Was: a "most used items" strip on the top bar (my recommendation: pinned plus usage-filled slots, fixed order, counts kept local; he had not decided the look.)
 - Open CI notes: top-bar-2-43 (Ctrl+S after a body click), saved-colours-list ("element is not stable") and the commands.spec 'documented shortcuts' test were flaky in CI; the baseline run on v2.44.0 listed no failing shards.
 - Still open from before: owner's Mac `npm run perf:draw`; printing text, picture and pattern elements with effects (2.44.3 prints only shapes); stale remote branch docs/2.44.0-live could not be deleted.
 
@@ -117,3 +117,4 @@ None at the moment. Add new ones here.
 - Oct 21 2026 (night): updated for 2.10.0 to 2.15.0, the handover to another agent.
 - Oct 21 2026: first version, written from a fresh clone of `main` at 2.9.0 and the existing docs. Same day: owner's answers recorded.
 - Oct 26 2026: handover to another agent; 2.45.2 to 2.47.0 recorded.
+- Oct 26 2026: 2.48.0 (new Pattern columns and rows from the stamp size) recorded; the 'most used items' strip dropped by the owner.

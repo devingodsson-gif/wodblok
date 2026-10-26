@@ -1,5 +1,8 @@
 # Development plan
 
+## 2.48.0 (Oct 26 2026): a new Pattern takes its columns and rows from the stamp size
+- A new Pattern (Add bar, and New in the Patterns panel) starts with columns = canvas width / stamp size and rows = canvas height / stamp size, rounded and kept between 1 and 40 (`patStart` in 67-pattern-element.js). The stamp size is the size a stamp is placed at (`fpSz`: the last size used, else 20% of the short side), because a new Pattern has no stamp yet. Example: the default 533 x 800 canvas gives 5 x 7. Owner, Oct 26 2026: "get the rows and columns from the stamp size". Columns and rows are still set by hand with the sliders afterwards; there is no separate Spacing slider yet.
+- Tested (Chromium only, pixels off): tests/element-pattern.spec.js (updated: 5 x 7, 35 points; the Shift test sets 4 x 4 first) and 11 related specs that make a Pattern (pattern-default-2-47-0, add-arm, element-effects, element-jitter, nothing-lost, noise-blur-effects, map-to-shape, first-five, any-layer-items, element-bar, element-panels), 51 passed. Not run: full suite, WebKit (no WebKit browser in this container), perf (no drawing path touched), check:style.
 ## 2.47.0 (Oct 25 2026): a new Pattern lays its stamps edge to edge
 - A new Pattern element starts at size 100% of its cell (it was 80%), so neighbouring stamps touch with no gap; the Size slider (and Randomize's own values) still make gaps or overlaps. Counts stay 4 x 4. Open question for the owner: derive columns and rows from the stamp size (canvas / stamp) instead of a fixed 4 x 4, and add a separate Spacing slider.
 - Tested: tests/pattern-default-2-47-0.spec.js, element-pattern, add-arm, bug-fixes-2-16, motif-look specs. Not run: full suite.
