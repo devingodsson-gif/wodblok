@@ -3,6 +3,8 @@ import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,geom,hEsc,shOf,stNmId,stvSet} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {STP,stLock,stUnlocked,stampAt} from './63-stamp-tool.js';
+import {fpL} from './24-free-place-layers.js';
+import {fpHit} from './25-art-layers.js';
 
 // ===== Stamp editing in tabs (2.5.0; as a mode since 2.3.0, like a Photoshop smart object). A strip over the stage holds the Canvas tab and one tab for each stamp that is
 // open; the strip is hidden while no stamp is open. A stamp tab shows the stamp on its own (2.5.1): the stage becomes a canvas of the stamp's own size with just that stamp on it
@@ -65,6 +67,9 @@ function init75(){const a=$('art');if(!a)return;
  $('stetabs').onclick=e=>{const sc=e.target.closest('[data-sc]');if(sc){const b=$('stetabs');b.scrollBy({left:+sc.dataset.sc*Math.max(80,Math.round(b.clientWidth*.7)),behavior:'smooth'});return}const x=e.target.closest('[data-sx]');if(x){steClose(+x.dataset.sx);return}const t=e.target.closest('[data-sv]');if(!t)return;steGo(t.dataset.sv=='c'?null:+t.dataset.sv)};
  $('stetabs').addEventListener('scroll',()=>steEdge($('stetabs')));addEventListener('resize',()=>steEdge($('stetabs')));
  const ed=$('smkedit');if(ed)ed.onclick=()=>{const t=WBS.tiles[WBS.cur];if(t)steGo(t.id)};
- ($('boardP')||a).addEventListener('dblclick',e=>{if(WBS.brush||WBS.txArm||WBS.fpB!=null)return;const c=stePt(e);if(!c)return;const h=stampAt(c.x,c.y,null);if(!h)return;e.preventDefault();const it=STP.items[h.i],id=it?it[0]:null;if(id==null)return;if(stUnlocked()===id){if(WBX.wbTxGrp&&WBX.wbTxGrp())return;steClose(id)}else steGo(id)});
+ ($('boardP')||a).addEventListener('dblclick',e=>{if(WBS.brush||WBS.txArm||WBS.fpB!=null)return;const c=stePt(e);if(!c)return;
+  // 2.50.2: a text or shape drawn over every pattern takes the double click (it starts typing), not the pattern's stamp under it
+  if(stUnlocked()==null){const L=fpL(),q=L&&fpHit(L,c.x,c.y),pl=L&&L.pl||[];if(q&&q.k!='stamp'&&pl.indexOf(q)>Math.max(-1,...pl.map((p,i)=>p.k=='pattern'?i:-1)))return}
+  const h=stampAt(c.x,c.y,null);if(!h)return;e.preventDefault();const it=STP.items[h.i],id=it?it[0]:null;if(id==null)return;if(stUnlocked()===id){if(WBX.wbTxGrp&&WBX.wbTxGrp())return;steClose(id)}else steGo(id)});
  WBX.wbSteSync=steSync;WBX.wbSteReset=steReset;WBX.wbSteGo=steGo;WBX.wbSteEdit=steEdit;WBX.wbSteScene=steScene;WBX.wbSteFit=steFit}
 export {init75,steDone,steOpen};

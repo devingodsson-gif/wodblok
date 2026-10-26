@@ -58,9 +58,9 @@ function txThumb(id){const e=TXS.get(id);if(!e)return null;if(e.th)return e.th;c
 // ---------- height maps, then the three looks ----------
 let TXHC;
 function txEq(h){const n=h.length,b=new Uint32Array(1026);for(let i=0;i<n;i++){const k=(h[i]*1024)|0;b[k<0?0:k>1024?1024:k]++}const cdf=new Float32Array(1026);let s=0;for(let i=0;i<1026;i++){s+=b[i];cdf[i]=s/n}const q=new Float32Array(n);for(let i=0;i<n;i++){const k=(h[i]*1024)|0;q[i]=cdf[k<0?0:k>1024?1024:k]}return q}
-// The picture repeated over pw x ph pixels: one repeat is Scale % of the long side, turned by Rotate, flipped, and moved by the use's variation. null while the picture is being read
+// The picture repeated over pw x ph pixels: one repeat is Scale % of the long side (times the picture's span: how many repeats it holds, textures/span.json), turned by Rotate, flipped, and moved by the use's variation. null while the picture is being read
 function txHeight(S,pw,ph){const key=[S.t,S.sc,S.sd,S.rot||0,S.fh?1:0,S.fv?1:0,pw,ph].join('|'),hit=TXHC.get(key);if(hit){TXHC.delete(key);TXHC.set(key,hit);return hit}
-const img=txImg(S.t);if(!img)return null;const P=Math.max(pw,ph),iw=img.naturalWidth,ih=img.naturalHeight,k=P*Math.max(5,S.sc)/100/Math.max(iw,ih),R=sRng((S.sd|0)*977+5),ox=R()*iw,oy=R()*ih;
+const img=txImg(S.t);if(!img)return null;const P=Math.max(pw,ph),iw=img.naturalWidth,ih=img.naturalHeight,k=P*Math.max(5,S.sc)/100*((TXS.get(S.t)||{}).span||1)/Math.max(iw,ih),R=sRng((S.sd|0)*977+5),ox=R()*iw,oy=R()*ih;
 const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;const x=cv.getContext('2d',{willReadFrequently:true});x.imageSmoothingQuality='high';
 x.translate(pw/2,ph/2);x.rotate((+S.rot||0)*Math.PI/180);x.scale(S.fh?-k:k,S.fv?-k:k);x.translate(-ox,-oy);x.fillStyle=x.createPattern(img,'repeat');const D=Math.hypot(pw,ph)/2/k+Math.max(iw,ih);x.fillRect(ox-D,oy-D,2*D,2*D);
 const d=x.getImageData(0,0,pw,ph).data,h=new Float32Array(pw*ph);for(let i=0;i<h.length;i++)h[i]=d[i*4]/255;
@@ -111,7 +111,7 @@ function init16(){// ===== Texture library (v87) =====
 //   stain  = the pattern tints / darkens
 WBS.texLib=[];WBS.txSel='';TXS=new Map();
 // the built-in pictures: the sets above first, in their order (Randomize counts on it), then any set or picture that only the textures/ folder has
-TXIMG.forEach(e=>{let g=TXF.find(f=>f[0]===e.set);if(!g){g=[e.set,{}];TXF.push(g)}const n=g[1][e.id]||e.id.replace(/-/g,' ').replace(/^./,c=>c.toUpperCase());g[1][e.id]=n;TXS.set(e.id,{n,set:e.set,src:e.src,st:0,img:null,th:''})});
+TXIMG.forEach(e=>{let g=TXF.find(f=>f[0]===e.set);if(!g){g=[e.set,{}];TXF.push(g)}const n=g[1][e.id]||e.id.replace(/-/g,' ').replace(/^./,c=>c.toUpperCase());g[1][e.id]=n;TXS.set(e.id,{n,set:e.set,src:e.src,span:+e.span||1,st:0,img:null,th:''})});
 TXF.forEach(([g,o])=>Object.keys(o).forEach(k=>{if(TXS.has(k))TXN[k]=o[k];else delete o[k]}));
 WBX.wbTexBusy=txBusy;WBX.wbTexImgsLoad=txImgsLoad;WBX.wbTexImgsUsed=txImgsUsed;
 TXHC=new Map();

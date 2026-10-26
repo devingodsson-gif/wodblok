@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.50.2 (Oct 26 2026): fixes from the whole-app bug test
+- The bug test and what it found are in docs/known-issues.md ("Whole-app bug test, Oct 26 2026"): full Chromium suite (593 of 617 passed), a crawl of every command and panel (no errors), screenshots of every panel, shape and symmetry.
+- A text or shape drawn over every pattern takes a double-click (starts typing) instead of the stamp under it opening its tab; broken since 2.48.0 put a stamp under the middle of the canvas (75-stamp-edit-mode.js).
+- A roll's elements named like yours take the next free number (no second "Pattern 1").
+- Texture pictures say how many repeats at Scale 100% they hold (`textures/span.json`, 1 to 8; the build reads it); the placeholders were baked again (broad ones over 2 or 3 repeats), so a broad texture on a whole canvas no longer shows a grid. The folder is 4.4 MB, the build 13.5 MB.
+- Tested (Chromium): text-paragraph, texture-effect, texture-library, texture-scale, randomize-mode, randomize-elements, randomize-new, nothing-lost, element-effects, roundtrip, scenarios, launch, stamp-tab-shapes, stamp tabs: 58 passed plus the known five scenario snapshots. Regenerated (owner: "regenerate snapshots when all is done"): SVG snapshots of the three roundtrip projects and light theme (only the texture picture hashes) and the pixel golden roundtrip open-project-3-rect-16x9 (same picture, the marks worn a little differently).
 ## 2.50.1 (Oct 26 2026): hexagon and triangle stamps line up in their tab
 - Owner, Oct 26 2026: "visually inspect each stamp shape and each symmetry type, the lines are misaligned on hex and triangle". Every stamp shape (rectangle, hexagon pointy and flat, circle, diamond, triangle, arch, octagon, star, quatrefoil, lancet) was screenshot with every symmetry type in its tab.
 - Cause 1: changing a stamp's shape (or proportions, or undoing that) inside its open tab changed the stamp but not the stage, which kept the old size (240 x 240). The outline was drawn from the stage's corner while the print and the lines were centred on it: 16 units off on a hexagon (to the side) and a triangle (up and down). The build now refits the stage to the shown stamp first (`steFit`, 75-stamp-edit-mode.js). This is the "hexagon offset right, triangle offset down" item of the handover.

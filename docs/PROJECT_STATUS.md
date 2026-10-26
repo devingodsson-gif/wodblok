@@ -117,5 +117,6 @@ None at the moment. Add new ones here.
 - Oct 21 2026 (night): updated for 2.10.0 to 2.15.0, the handover to another agent.
 - Oct 21 2026: first version, written from a fresh clone of `main` at 2.9.0 and the existing docs. Same day: owner's answers recorded.
 - Oct 26 2026: handover to another agent; 2.45.2 to 2.47.0 recorded.
+- Oct 26 2026: whole-app bug test and 2.50.2 fixes on branch fix/2.50.2-bug-test (built on 2.50.1, on 2.50.0, on 2.49.0), not merged. Findings: docs/known-issues.md. Open for the owner: the five Randomize scenario snapshots (regenerate or investigate). Note: `main` (2.48.0) has the double-click-on-text bug until this is merged.
 - Oct 26 2026: 2.49.0 (sharper textures, Scale max 200%) and 2.50.0 (textures are pictures, texture library, Add texture, Rotate and Flip) on branch feat/2.50.0-image-textures (built on 2.49.0), not merged. Snapshots regenerated on the owner's word; the five Randomize scenario snapshots that also fail on main were left as they are.
 - Oct 26 2026: 2.48.0 (new Pattern columns and rows from the stamp size) recorded; the 'most used items' strip dropped by the owner.
