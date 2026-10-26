@@ -634,7 +634,7 @@ Counts are occurrences of a declared value in `src/shell.html` and `src/modules/
 | Group labels | one style | duplicated as `.wxh` (workspaces), `.xrh` (export recipes), `h3` uppercase, with different paddings |
 | Shapes library | the model (section 12) | Complete: nested tree, many open, select mode, drag to folder, hidden sets. Home is called "My imports" and an old "Drawn by Claude" folder shows only for old projects (do not copy it) |
 | Saved trays (colours) | the tree | One level of folders only; you drill in and use a Back button; its own rows (`.stf`), search and rename; no nesting, no select mode, no Move to…, no drag; Wada sets sit in three fixed folders instead of being sets in the list |
-| Saved stamps | the tree | No folders (a stamp carries the pictures of the imported textures it uses since 2.51.0) |
+| Saved stamps | the tree | Complete (2.51.2); a stamp carries the pictures of the imported textures it uses since 2.51.0 |
 | Textures | the tree | Complete (2.51.0): Yours, your folders and the built-in sets with tiles, in the Texture effect; Add texture imports pictures and zips; nested folders (also inside sets), select mode, drag to folder, renamed and hidden sets, Export to a zip of pictures |
 | Colourways | the tree for saved colourways | Only this project's colourways exist (flat cards); no saved colourways library |
 | Templates, workspaces, export recipes | the tree | Flat list under two headings ("Starting points", "Yours"), three separate heading classes, no folders, no select mode |

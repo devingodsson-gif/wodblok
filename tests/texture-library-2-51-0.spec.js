@@ -3,7 +3,7 @@
 const { test, expect } = require('@playwright/test');
 const fs = require('fs'), path = require('path');
 const { zipSync, unzipSync } = require('fflate');
-const { openApp, settle, addShape } = require('./helpers/harness');
+const { openApp, settle, addShape, stampMenu } = require('./helpers/harness');
 
 const G = '.fxg[data-fxk="motif"]';
 const PIC = path.join(__dirname, 'fixtures', 'picture.png');
@@ -143,9 +143,9 @@ test('a stamp saved to the stamp library carries the picture of an imported text
   await p1.evaluate(j => window.__wbTest.apply(j), JSON.stringify(s)); await settle(p1);
   await openPanel(p1, 'stmp'); await settle(p1);
   await p1.fill('#slname', 'Textured'); await p1.click('#slsave');
-  await expect(p1.locator('#slgrid .slc')).toHaveCount(1);
+  await expect(p1.locator('#slgrid button[data-sl]')).toHaveCount(1);
   await p1.evaluate(() => { window.__wbDownloads.length = 0; });
-  await p1.click('#slgrid [data-sa="file"]');
+  await stampMenu(p1, 'Save as file');
   await p1.waitForFunction(() => window.__wbDownloads.length > 0);
   const dl = await p1.evaluate(() => window.__wbDownloads[0]), rec = JSON.parse(dl.data);
   expect(Object.keys(rec.tximgs)).toEqual([L.t]);
@@ -155,8 +155,8 @@ test('a stamp saved to the stamp library carries the picture of an imported text
   const b = await openApp(p2, { seed: 4, pattern: false });
   await openPanel(p2, 'stmp');
   await p2.setInputFiles('#slimpf', file); await settle(p2);
-  await expect(p2.locator('#slgrid .slc')).toHaveCount(1);
-  await p2.click('#slgrid [data-sa="add"]'); await settle(p2);
+  await expect(p2.locator('#slgrid button[data-sl]')).toHaveCount(1);
+  await p2.locator('#slgrid button[data-sl]').first().click(); await settle(p2);
   const d2 = JSON.parse(await getState(p2)), t2 = d2.texLib.find(x => x.t === L.t);
   expect(t2).toBeTruthy();
   expect(d2.tiles.some(t => (t.tu || []).some(u => u.x === t2.id))).toBe(true);

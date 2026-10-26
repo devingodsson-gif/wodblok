@@ -34,7 +34,7 @@ test('damaged files give a plain message and leave the document alone', async ({
 });
 
 test('named snapshots are saved inside the file and come back when it is opened', async ({ browser }) => {
-  const { openPanel } = require('./helpers/harness');
+  const { openPanel, stampMenu } = require('./helpers/harness');
   const c1 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p1 = await c1.newPage(), a = await openApp(p1);
   await openFile(p1, path.join(FX, 'project-1-diamond.wodblok'));
   await openPanel(p1, 'hist');
@@ -54,22 +54,22 @@ test('named snapshots are saved inside the file and come back when it is opened'
 });
 
 test('a library stamp can be saved as its own file and imported into another browser', async ({ browser }) => {
-  const { openPanel } = require('./helpers/harness');
+  const { openPanel, stampMenu } = require('./helpers/harness');
   const c1 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p1 = await c1.newPage(), a = await openApp(p1);
   await openFile(p1, path.join(FX, 'project-1-diamond.wodblok'));
   await openPanel(p1, 'stmp');
   await p1.fill('#slname', 'Test stamp'); await p1.click('#slsave');
-  await expect(p1.locator('#slgrid .slc')).toHaveCount(1);
+  await expect(p1.locator('#slgrid button[data-sl]')).toHaveCount(1);
   await p1.evaluate(() => { window.__wbDownloads.length = 0; });
-  await p1.click('#slgrid [data-sa="file"]');
+  await stampMenu(p1, 'Save as file');
   await p1.waitForFunction(() => window.__wbDownloads.length > 0);
   const dl = await p1.evaluate(() => window.__wbDownloads[0]);
   expect(dl.filename).toBe('test-stamp.wodblok-stamp');
   const c2 = await browser.newContext({ viewport: { width: 1440, height: 900 } }), p2 = await c2.newPage(), b = await openApp(p2);
   await openPanel(p2, 'stmp');
   await p2.setInputFiles('#slimpf', tmp('s.wodblok-stamp', dl.data)); await settle(p2);
-  await expect(p2.locator('#slgrid .slc')).toHaveCount(1);
-  await expect(p2.locator('#slgrid .slc b')).toHaveText('Test stamp');
+  await expect(p2.locator('#slgrid button[data-sl]')).toHaveCount(1);
+  await expect(p2.locator('#slgrid button[data-sl]')).toHaveAttribute('aria-label', 'Test stamp');
   await p2.setInputFiles('#slimpf', tmp('bad.wodblok-stamp', 'nope')); await settle(p2);
   await expect(p2.locator('#pmsg')).toContainText('not a WODBLOK stamp');       // stamp library messages show in the status line since 1.0.16
   expect(a.errors.concat(b.errors)).toEqual([]);

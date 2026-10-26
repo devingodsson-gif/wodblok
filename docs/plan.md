@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.51.2 (Oct 26 2026): saved stamps on the folder tree (step 2 of docs/library-update-plan.md)
+- The Library in the Stamp panel is the shared tree (`27-stamp-library.js` gives `ltMake` its config): tiles, Yours and your folders, search, size slider, select mode (Move to, Take out of folder, Delete), drag onto a folder, folder menu, Export to a zip of `.wodblok-stamp` files. A stamp record gets an optional folder path `g`; the folder list is kept in this browser (`wb251_stampfolders`). No format bump.
+- A tile adds the stamp to the project; the right-click menu has Add to project, Save as PNG, Save as file, Rename, Move to, Delete. The old card buttons are gone. The count beside "Library" is the whole library.
+- Save to library and Import stamp file put stamps in the open folder; Import takes several `.wodblok-stamp` files and zips of them (folders come back as folders; `src/format/libzip.js`).
+- Tested (Chromium): new stamp-library-2-51-2 (3), stamp-library-search, stamp-library-tool, project-files, texture-library-2-51-0, easy-wins, nothing-lost: 28 passed, 2 skipped. `check:style` and `check:platform` OK. perf not run (no drawing path touched). No snapshot or golden changed.
+
 ## 2.51.1 (Oct 26 2026): the folder tree is one component (step 1 of docs/library-update-plan.md)
 - `87-library-tree.js` is the folder tree of Part 9 section 12 as one component: rows, sets, hidden sets, folder menu and form, select mode, drag onto a folder, Export, messages, saving of open folders and size. A library gives it its items, sets, words and what Export writes (the `cfg` described at the top of the file).
 - The texture library (`86-texture-library.js`) now only holds what is special to textures (store, Add texture, the pictures); it runs on the component. Its tests are unchanged and pass.

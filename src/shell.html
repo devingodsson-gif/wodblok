@@ -514,7 +514,7 @@ select:focus-visible,input[type=text]:focus-visible,input[type=number]:focus-vis
 .strip{display:flex;gap:6px;overflow-x:auto;padding:2px}
 .strip button{flex:none;width:46px;height:46px;padding:4px;background:var(--field);border:1px solid var(--line);border-radius:var(--r-m)}
 .strip svg{width:100%;height:100%}
-.slg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.slc{border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);padding:6px;display:flex;flex-direction:column;gap:6px;min-width:0}.slc .im{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:var(--r-m);background:repeating-conic-gradient(rgba(128,128,128,.14) 0 25%,transparent 0 50%) 0 0/12px 12px,var(--panel)}.slc .im img{max-width:92%;max-height:92%;object-fit:contain}.slc b{font-size:var(--fs-s);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.slc .row{gap:4px;flex-wrap:wrap}.slc button{padding:4px 8px;font-size:var(--fs-s)}
+.slnav{position:static}.sltr{max-height:440px;overflow:auto}.sltr .lib img{display:block;width:100%;height:100%;object-fit:contain;border-radius:var(--r-s)}.sltr .lib .dx{display:block}
 .strip button img,.ath{display:block;width:100%;height:100%;object-fit:contain}.strip button{position:relative}#lfars button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}#lfars .alk{position:absolute;left:3px;bottom:3px;width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 1.5px var(--field)}#lfars i{position:absolute;top:-5px;right:-5px;width:15px;height:15px;line-height:13px;border-radius:50%;background:var(--panel);border:1px solid var(--line2);font-style:normal;font-size:var(--fs-s);color:var(--mut)}
 #lfpst button.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-soft)}.fpn{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:var(--fs-m);color:var(--mut)}.fpn span{flex:1}.fpn button{margin:0}.fprow{gap:2px}
 .fpl{min-height:0;max-height:210px;overflow:auto;margin-top:6px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);padding:4px}.fpl .mr.on button{visibility:visible}.fpl .mr svg{background:var(--panel)}
@@ -1209,7 +1209,7 @@ body.eyedrop{cursor:crosshair}
   </div></details>
   <details class="g" open><summary>Save and export</summary><div class="gb">
    <label>Name</label><input type="text" id="slname" maxlength="40" placeholder="e.g. Lion in a ring">
-   <div class="row"><button class="primary" id="slsave">Save to library</button><button class="alt" id="slimp">Import stamp file</button></div><input type="file" id="slimpf" class="vh" accept=".wodblok-stamp,.json,application/json" tabindex="-1">
+   <div class="row"><button class="primary" id="slsave">Save to library</button><button class="alt" id="slimp">Import stamp file</button></div><input type="file" id="slimpf" class="vh" accept=".wodblok-stamp,.json,application/json,.zip,application/zip" multiple tabindex="-1">
    <label>Export as PNG</label>
    <div class="row"><select id="slpx" aria-label="Size"><option value="512">512 px</option><option value="1024" selected>1024 px</option><option value="2048">2048 px</option><option value="4096">4096 px</option></select><select id="slbg" aria-label="Background"><option value="">Transparent</option><option value="paper">Paper colour</option></select></div>
    <label class="chk"><input type="checkbox" id="slfx"><span>With my print settings</span></label>
@@ -1218,8 +1218,7 @@ body.eyedrop{cursor:crosshair}
   </div></details>
   <details class="g" open><summary>Library <span class="aux" id="slcount"></span></summary><div class="gb">
    <div class="hint" id="slwhere"></div>
-   <input type="text" id="slq" maxlength="40" placeholder="Find a stamp" aria-label="Find a stamp">
-   <div class="slg" id="slgrid"></div>
+   <div id="slpane"></div>
    <div class="hint" id="slmsg"></div>
   </div></details>
  </div></section>

@@ -287,4 +287,11 @@ async function placeArmed(page, k) {
   await page.keyboard.press('v'); await settle(page);
 }
 
-module.exports = { addKind, placeArmed, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+// a saved stamp's right-click menu (2.51.2): item = "Add to project", "Save as PNG", "Save as file", "Rename", "Delete" ...
+async function stampMenu(page, item, n = 0) {
+  const t = page.locator('#slgrid button[data-sl]').nth(n);
+  await t.scrollIntoViewIfNeeded(); await settle(page);
+  await t.click({ button: 'right' });
+  await page.locator('.rowm').getByRole('menuitem', { name: item, exact: true }).click();
+}
+module.exports = { stampMenu, addKind, placeArmed, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

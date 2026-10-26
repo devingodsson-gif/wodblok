@@ -13,7 +13,7 @@ import {buildMotifZip,safeName} from '../format/motifs.js';
 //   read(): the library as {f: folder paths, at: {own item id: folder path}, b: {built-in item id: folder path}, h: hidden set names, r: {set name: your name for it}, d: whatever write needs back}
 //   write(m): saves that; sets(): [{k: "s:Name", n: "Name", ids: [built-in item ids]}]; name(id); own(id): true for an item you made
 //   tile(id, {cur, pk}): the inside of an item's tile (a picture); used(id): in use in the project (cannot be deleted); remove(ids): deletes your items
-//   rename(id, name): your item gets a name; file(id): {name, data, ext, fb} for Export, or null; usedFix: what to do when an item in use cannot be deleted; top: markup above the bar; wire(pane, pick): its listeners; pane: the pane's selector
+//   rename(id, name): your item gets a name; file(id): {name, data, ext, fb} for Export, or null; usedFix: what to do when an item in use cannot be deleted; itemMenu(id): more entries at the top of an item's right-click menu; ids trId, qId: ids for the tree and the search field; top: markup above the bar; wire(pane, pick): its listeners; pane: the pane's selector
 // What it returns: pane() markup for the tree (after the library's own top row), show(pane, cur, pick), paintAll(), here() (the active folder, where new items go), init().
 function ltMake(cfg){
 const P=cfg.p,W=cfg.word,WS=cfg.words;
@@ -104,15 +104,18 @@ function moveIds(list,k){const m=cfg.read();if(k&&!isSet(k)&&!folders(m).include
   if(cfg.own(id)){m.at[id]=k;n++}else{const s=cfg.sets().find(z=>z.ids.includes(id)),home=s?s.k:'';if(!k||k===home)delete m.b[id];else{m.b[id]=k;nb++}n++}});
  if(!n)return;cfg.write(m);if(k){TL.open.add(k);uiSave()}TL.sel.clear();TL.anc=null;paintAll(true);
  pmsg(`Moved ${n} ${n>1?WS:W} to “${pathName(k)}”.`+(nb?` Built-in ${WS} also stay in their own set.`:''))}
+// the × on a tile is two taps in place (Part 9 section 12.7): the first turns it into a ?, the second deletes
+function removeAsk(x){const id=x.dataset[P+'x'];if(cfg.used(id)||x.dataset.sure){delete x.dataset.sure;removeOne(id);return}x.dataset.sure=1;x.textContent='?';setTimeout(()=>{if(x.isConnected&&x.dataset.sure){delete x.dataset.sure;x.innerHTML='&#215;'}},2500)}
 function removeOne(id){if(!cfg.own(id))return;if(cfg.used(id)){pmsg(`That ${W} is used in this project.${cfg.usedFix?' '+cfg.usedFix:''}`);return}const n=cfg.name(id);cfg.remove([id]);TL.sel.delete(id);paintAll(true);pmsg(`Deleted the ${W} “${n}”.`)}
 // what an export holds, as a flat list of folders each named by its path. deep: the folders inside too. At the top (k '/') it is the whole library, hidden sets included.
 function exportList(k,deep){const m=cfg.read(),fs=folders(m),sets=cfg.sets(),top=k==='/';
  const nm=kk=>kk===''?'Yours':isSet(kk)?shown(m,kk.slice(2)):leaf(kk);
- const item=i=>{const f=cfg.file(i);return f||null};
- const out=[],walk=(kk,pre)=>{const p=[...pre,nm(kk)];out.push({path:p,items:ids(m,kk).map(item).filter(Boolean)});if(deep||top)kids(fs,kk).forEach(c=>walk(c,p))};
+ const item=i=>cfg.file(i);
+ const out=[],walk=(kk,pre)=>{const p=[...pre,nm(kk)];out.push({path:p,items:ids(m,kk).map(item)});if(deep||top)kids(fs,kk).forEach(c=>walk(c,p))};
  if(top){walk('',[]);[...tops(m,fs,sets,false),...tops(m,fs,sets,true)].forEach(t=>walk(t.k,[]))}else walk(k,[]);
  return{root:top,name:top?'':nm(k),folders:out,sub:!top&&kids(fs,k).length>0}}
-async function save(l){const dl=await use('downloads');if(!dl)return pmsg('Saving is not available here.');
+async function save(l0){const dl=await use('downloads');if(!dl)return pmsg('Saving is not available here.');
+ const l={...l0,folders:await Promise.all(l0.folders.map(async f=>({...f,items:(await Promise.all(f.items)).filter(Boolean)})))};
  const name=safeName(l.root?cfg.exportName:l.name+' '+WS,WS)+'.zip';
  try{const {zip,count:n}=buildMotifZip(l.folders);if(!zip)return pmsg(`There are no ${WS} to export.`);
   const h0=dl.pick?await dl.pick({filename:name}):null;await dl.save({filename:name,data:new Blob([zip],{type:'application/zip'}),handle:h0});pmsg(`Exported ${n} ${n>1?WS:W} as ${cfg.exportAs||'files'}.`)}
@@ -150,7 +153,7 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
   if(isSet(k)){const n=k.slice(2),hid=m.h.includes(n);return rowMenu(btn,[sub,['Rename',()=>{TL.open.add(k);TL.form={t:'ren',p:k,v:shown(m,n),ph:n};paintAll(true)}],['Reset name',()=>{const e=cfg.read();delete e.r[n];cfg.write(e);paintAll(true);pmsg('Set name reset.')},!m.r[n]],
    [hid?'Show in the list':'Hide from the list',()=>{const e=cfg.read();e.h=hid?e.h.filter(x=>x!==n):[...e.h,n];cfg.write(e);if(!hid&&within(TL.active,k))TL.active='';uiSave();paintAll(true);pmsg(hid?`“${shown(m,n)}” is back in the list.`:`Hid “${shown(m,n)}”.`)}],exp])}
   rowMenu(btn,[sub,['Rename',()=>{TL.open.add(k);TL.form={t:'ren',p:k,v:leaf(k)};paintAll(true)}],['Move to…',()=>{TL.open.add(k);TL.form={t:'mvf',p:k};paintAll(true)}],exp,['Delete folder',()=>{TL.open.add(k);TL.form={t:'del',p:k};paintAll(true)}]])};
- const itemMenu=(btn,id)=>{const m=cfg.read();if(!cfg.own(id)||cfg.name(id)==null)return;const at=m.at[id]||'',items=[['Rename',()=>{TL.form={t:'iren',p:at,id,v:cfg.name(id)};TL.open.add(at);paintAll(true)}]];
+ const itemMenu=(btn,id)=>{const m=cfg.read();if(!cfg.own(id)||cfg.name(id)==null)return;const at=m.at[id]||'',items=[...(cfg.itemMenu?cfg.itemMenu(id):[]),['Rename',()=>{TL.form={t:'iren',p:at,id,v:cfg.name(id)};TL.open.add(at);paintAll(true)}]];
   if(at)items.push(['Move to Yours',()=>moveIds([id],'')]);folders(m).sort(cmp).filter(p=>p!==at).slice(0,40).forEach(p=>items.push(['Move to “'+pathName(p)+'”',()=>moveIds([id],p)]));items.push(['Delete',()=>removeOne(id)]);rowMenu(btn,items)};
  const ok=()=>{const f=TL.form,m=cfg.read();if(!f)return;
   if(f.t=='del'){const gone=p=>within(p,f.p);m.f=m.f.filter(p=>!gone(p));Object.keys(m.at).forEach(i=>{if(gone(m.at[i]))m.at[i]=''});Object.keys(m.b).forEach(i=>{if(gone(m.b[i]))delete m.b[i]});cfg.write(m);TL.form=null;TL.open.delete(f.p);if(gone(TL.active))TL.active=parent(f.p);uiSave();paintAll(true);pmsg(`Deleted the folder “${leaf(f.p)}”. Its ${WS} went back to Yours.`);return}
@@ -173,7 +176,7 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
   if(e.target.closest(`[data-${P}hid]`)){TL.hidOpen=!TL.hidOpen;uiSave();paintAll(true);return}
   const fm=e.target.closest('[data-fm]');if(fm){e.stopPropagation();TL.active=fm.dataset.fm;folderMenu(fm,fm.dataset.fm);return}
   const fr=e.target.closest('.lfr[data-k]');if(fr){toggle(fr.dataset.k);return}
-  const x=e.target.closest(`[data-${P}x]`);if(x){removeOne(x.dataset[P+'x']);return}
+  const x=e.target.closest(`[data-${P}x]`);if(x){removeAsk(x);return}
   const t=e.target.closest(`[data-${P}]`);if(!t)return;if(TL.sm||e.ctrlKey||e.metaKey||e.shiftKey){pick(t.dataset[P],e);return}if(host._pick)host._pick(t.dataset[P])});
  host.addEventListener('contextmenu',e=>{const fr=e.target.closest('.lrw'),b=fr&&fr.querySelector('[data-fm]');if(b){e.preventDefault();b.click();return}
   const t=e.target.closest(`[data-${P}]`);if(t&&cfg.own(t.dataset[P])){e.preventDefault();itemMenu(t,t.dataset[P])}});
@@ -186,7 +189,7 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
  host.addEventListener('pointerdown',e=>{if(e.button!==0||e.shiftKey||e.ctrlKey||e.metaKey||TL.sm)return;const b=e.target.closest(`.lib button[data-${P}]`);if(!b)return;const im=b.querySelector('img');drag={id:b.dataset[P],x:e.clientX,y:e.clientY,on:false,g:null,src:im?im.src:''}})}
 // the markup of the tree: the library's own top row first (Add texture), then the bar, the search, the tree and the select bar
 const paneHtml=()=>`${cfg.top||''}<div class="lnav ${P}nav"><button type="button" class="ib" data-${P}all aria-label="Expand all folders">${IC(ICN.unfold)}</button><input type="range" class="${P}sz" min="0" max="8" step="1" value="6" aria-label="${W[0].toUpperCase()+W.slice(1)} size" data-plain><button type="button" class="ib" data-${P}new aria-label="New folder">${IC(ICN.folderNew)}</button><button type="button" class="ib" data-${P}sel aria-label="Select ${WS}" aria-pressed="false">${IC(ICN.marquee)}</button><button type="button" class="ib" data-${P}exp aria-label="Export all ${WS}" aria-haspopup="menu" data-more>${IC(ICN.download)}</button></div>
-<input type="text" class="${P}q" maxlength="40" placeholder="Find a ${W}" aria-label="Find a ${W}"><div class="ltr ${P}tr" role="tree" aria-label="${W[0].toUpperCase()+W.slice(1)}s"></div>
+<input type="text" class="${P}q"${cfg.qId?` id="${cfg.qId}"`:''} maxlength="40" placeholder="Find a ${W}" aria-label="Find a ${W}"><div class="ltr ${P}tr"${cfg.trId?` id="${cfg.trId}"`:''} role="tree" aria-label="${W[0].toUpperCase()+W.slice(1)}s"></div>
 <div class="fsbar ${P}bar" hidden><div class="r"><span class="fscnt"></span><button type="button" class="alt ${P}sa">Select all</button><button type="button" class="primary ${P}done">Done</button></div><select class="${P}mv" aria-label="Move to folder"></select><div class="r"><button type="button" class="alt ${P}out">Take out of folder</button><button type="button" class="alt ${P}delm">Delete</button></div></div>`;
 // shows the tree in a pane, with the item in use; pick(id) is called when a tile is chosen
 function show(pane,cur,pk){wire(pane);if(cfg.wire)cfg.wire(pane,pk);const host=pane.querySelector(`.${P}tr`);host._pick=pk;paint(host,cur)}
