@@ -1,0 +1,38 @@
+name: update-snapshots
+# Manual only (Actions > update-snapshots > Run workflow; owner, Oct 26 2026). Some state and SVG snapshots depend on the machine (text metrics, so Randomize picks
+# differently in the sandbox), and CI is the reference. This reruns the chosen spec files with --update-snapshots=changed and hands the changed
+# snapshot files back as a download (artifact `snapshots`). It never commits or pushes: an agent downloads them, looks at each diff, and commits them
+# once the owner has approved (CLAUDE.md: state and SVG snapshots need his approval). Runs one job, only when started by hand.
+on:
+  workflow_dispatch:
+    inputs:
+      specs:
+        description: 'Spec files to rerun, separated by spaces'
+        required: true
+        default: 'tests/scenarios.spec.js'
+permissions:
+  contents: read
+concurrency:
+  group: update-snapshots-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  update:
+    name: update-snapshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container: mcr.microsoft.com/playwright:v1.56.0-noble
+    env:
+      WB_ENV: ci
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright test ${{ inputs.specs }} --project=chromium --update-snapshots=changed --reporter=list
+        env:
+          WB_TARGET: build
+          WB_PIXELS: '0'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snapshots
+          path: tests/__snapshots__
+          retention-days: 3
