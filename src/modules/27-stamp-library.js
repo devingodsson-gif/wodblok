@@ -8,10 +8,13 @@ import {clean,cust,inkOf,selOne,store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC,inkCatch,txMerge,txPack} from './17-texture-panel-and-previews.js';
+import {txSrc} from './16-texture-generators.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
 import {refAdopt} from './50-tray-core.js';
 import {fpPick} from './24-free-place-layers.js';
 import {artEnc,artId,artOk,artRefd} from './25-art-layers.js';
+import {ltMake} from './87-library-tree.js';
+import {zipRead} from '../format/libzip.js';
 // ===== Stamp library: keep stamps between projects, and export a stamp as a PNG =====
 // A library record: {name, updated, w, h, img (transparent picture), tile (the stamp, as JSON), motifs (the custom motifs it uses), colors (its custom ink)}.
 // Stored privately with your Claude account when that is available, otherwise in this browser.
@@ -58,36 +61,60 @@ const slNo=()=>{const t=slTile();return t?WBS.tiles.indexOf(t)+1:0};
 function slSync(){const g=$('slname')&&$('slname').closest('details.g');if(!g)return;
  {const sec=g.closest('section.pn'),lib=$('slgrid').closest('details.g');if(sec&&lib&&sec.lastElementChild!==lib){sec.appendChild(g);sec.appendChild(lib)}}   // last in the panel, below a placed stamp's Effects (2.24.0)
 const none=!WBS.tiles.length;if(g.hidden!==none)g.hidden=none;const ph=stNm(slTile());if($('slname').placeholder!==ph)$('slname').placeholder=ph}
-async function slPaint(){if(!$('slgrid'))return;slSync();await SL.init();$('slwhere').textContent=SL.kind=='account'?'Saved to your Claude account':'Saved in this browser';
-try{const all=await SL.list(),q=($('slq').value||'').trim().toLowerCase().split(/\s+/).filter(Boolean),ps=q.length?all.filter(p=>q.every(w=>(p.name||'Stamp').toLowerCase().includes(w))):all;$('slcount').textContent=q.length?ps.length+' found':all.length?String(all.length):'';$('slgrid').innerHTML=ps.length?ps.map(p=>`<div class="slc" data-sl="${hx(p.id)}">${slOkImg(p.img)?`<div class="im"><img src="${hx(p.img)}" alt=""></div>`:'<div class="im"></div>'}<b title="${hx(p.name||'Stamp')}">${hx(p.name||'Stamp')}</b><div class="row"><button class="alt" data-sa="add">Add</button><button class="alt" data-sa="png">PNG</button><button class="alt" data-sa="file">File</button><button class="alt" data-sa="del">Delete</button></div></div>`).join(''):`<div class="hint" style="grid-column:1/-1">${q.length?'No matching stamp':'No saved stamps'}</div>`}
-catch(e){$('slgrid').innerHTML='<div class="hint" style="grid-column:1/-1">Could not load the library.</div>'}}
+// The library is the shared folder tree (87-library-tree.js, 2.51.2): tiles of your stamps in Yours and your folders. A record's folder is its optional `g`; the folder list is kept in this browser.
+// A tile adds the stamp to the project; the right-click menu adds Save as PNG and Save as file. slRecs is the list as last loaded (the tree reads it without waiting).
+const SLF_KEY='wb251_stampfolders',SLF_UI='wb251_stampsui';
+let SLT=null,slRecs=[];
+const slFold=()=>{let d=null;try{d=JSON.parse(kv.get(SLF_KEY)||'null')}catch(e){}return(d&&Array.isArray(d.f)?d.f:[]).filter(x=>typeof x=='string'&&x&&x.length<=200&&!x.startsWith('s:'))};
+const slPathOk=p=>typeof p=='string'&&p.length<=200&&!p.startsWith('s:')?p:'';
+const slRec=id=>slRecs.find(x=>x.id===id);
+const slPatch=(id,o)=>SL.get(id).then(r=>{if(r){delete r.id;return SL.put(id,{...r,...o})}}).catch(()=>{});
+const slCfg=()=>({p:'sl',word:'stamp',words:'stamps',ui:SLF_UI,exportName:'wodblok-stamps',exportAs:'stamp files',pane:'#slpane',trId:'slgrid',qId:'slq',
+ read(){const at={};slRecs.forEach(x=>{at[x.id]=x.g||''});return{f:slFold(),at,b:{},h:[],r:{}}},
+ write(m){try{kv.set(SLF_KEY,JSON.stringify({f:m.f}))}catch(e){}slRecs.forEach(x=>{const g=slPathOk(m.at[x.id]);if(g!==(x.g||'')){x.g=g;slPatch(x.id,{g})}})},
+ sets:()=>[],name:id=>{const x=slRec(id);return x?x.name||'Stamp':null},own:()=>true,used:()=>false,
+ tile:id=>{const x=slRec(id);return x&&slOkImg(x.img)?`<img src="${hx(x.img)}" alt="" draggable="false">`:''},
+ remove(list){list.forEach(id=>{slRecs=slRecs.filter(x=>x.id!==id);SL.del(id).catch(()=>{})});$('slcount').textContent=slRecs.length?String(slRecs.length):''},
+ rename(id,v){const x=slRec(id);if(x)x.name=v;slPatch(id,{name:v})},
+ async file(id){const r=await SL.get(id);return r?{name:r.name||'Stamp',data:new TextEncoder().encode(fmtStampPack(r)),ext:'.wodblok-stamp',fb:'Stamp'}:null},
+ itemMenu:id=>[['Add to project',()=>slAct(id,'add')],['Save as PNG',()=>slAct(id,'png')],['Save as file',()=>slAct(id,'file')]]});
+async function slPaint(){if(!$('slpane'))return;slSync();await SL.init();$('slwhere').textContent=SL.kind=='account'?'Saved to your Claude account':'Saved in this browser';
+try{const all=await SL.list();slRecs=all.map(p=>({id:p.id,name:p.name||'Stamp',img:p.img,g:slPathOk(p.g)}));$('slcount').textContent=all.length?String(all.length):'';SLT.show($('slpane'),'',slAct0);SLT.paintAll(true)}
+catch(e){slMsg('Could not load the library.')}}
 // --- Art: import an image, or use a saved project
 async function artImport(f){if(!f||!/^image\//.test(f.type))return pmsg('That file is not an image.');if(f.size>30e6)return pmsg('That image is too large. Try one under 30 MB.');
 const url=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=()=>r(null);fr.readAsDataURL(f)}),img=url&&await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=url});
 if(!img)return pmsg('Could not read that image.');let nw=img.naturalWidth||img.width||1000,nh=img.naturalHeight||img.height||1000;const k=Math.min(1,2000/Math.max(nw,nh)),w=Math.max(1,Math.round(nw*k)),h=Math.max(1,Math.round(nh*k)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
 const id=artId();WBS.ARTS[id]={n:(f.name||'Art').replace(/\.[^.]+$/,'').replace(/["<>&|]/g,'').slice(0,40)||'Art',k:'img',src:artEnc(c),w,h};if(WBX.wbMotifImage)WBX.wbMotifImage(id);pmsg('Image added.');upd()}
+async function slAct(id,a){try{const rec=await SL.get(id);if(!rec)return slMsg('That stamp is gone.');
+if(a=='add'){let t=null;try{t=JSON.parse(rec.tile)}catch(er){}if(!t||!Array.isArray(t.items))return slMsg('That library entry is damaged.');
+libMotifs({motifs:rec.motifs});libColors({colors:rec.colors});if(WBX.wbTexImgsLoad)WBX.wbTexImgsLoad(rec.tximgs);txMerge(t);if(t.ink){const h=okC(t.ink)&&t.ink[0]!='@'?col(t.ink):CM[t.ink]||null;const r=h?refAdopt(h):null;if(r)t.ink=r;else delete t.ink}t.id=WBS.nid++;t.nm=String(rec.name||'').trim().slice(0,40)||'Stamp '+t.id;shOf(t);WBS.tiles.push(t);{const Ls=WBS.layers[WBS.selL];if(Ls&&!(Ls.st||[]).includes(t.id)){Ls.st=Ls.st||[];Ls.st.push(t.id)}}WBS.cur=WBS.tiles.length-1;selOne(-1);WBS.symKey='';store();upd();if(WBX.wbCap)WBX.wbCap();slMsg('Added “'+rec.name+'” as a new stamp. Tick it under Stamps in the Layout to print it.')}
+else if(a=='png'){if(!slOkImg(rec.img))return slMsg('That entry has no picture.');const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Could not read the picture'));i.src=rec.img}),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);await slSavePng(await slBlob(c),rec.name||'Stamp')}
+else if(a=='file'){const d=await use('downloads');if(!d)return slMsg('Saving is not available here.');try{await d.save({filename:(rec.name||'stamp').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase()+'.wodblok-stamp',data:fmtStampPack(rec)});slMsg('Saved “'+rec.name+'” as a file.')}catch(er){if(!er||er.code!='declined')slMsg('Could not save: '+((er&&er.message)||'unknown error'))}}}
+catch(er){slMsg('Something went wrong: '+((er&&er.message)||'unknown error'))}}
+const slAct0=id=>slAct(id,'add');
+// stamp files (and zips of them, whose folders come back as your folders) go into the folder that is open
+async function slImport(files){const g0=slPathOk(SLT.here());let n=0,bad=0,last='',err='';
+ const put=async(text,g)=>{try{const rec=fmtStampOpen(text);rec.g=g;await SL.put(newId(),rec);n++;last=rec.name}catch(er){bad++;err=er&&er.name=='FormatError'&&er.message||''}};
+ for(const f of files){if(/\.zip$/i.test(f.name)||/zip/.test(f.type)){const r=zipRead(new Uint8Array(await f.arrayBuffer()),/\.(wodblok-stamp|json)$/i);if(!r||!r.length){bad++;continue}
+   for(const e of r){const dir=e.dir.map(x=>String(x).replace(/[\\"<>&|/]/g,'').trim().slice(0,30)).filter(x=>x&&!/^s:/i.test(x));await put(new TextDecoder().decode(e.data),dir.length?(g0?g0+'/':'')+dir.join('/'):g0)}}
+  else await put(await f.text(),g0)}
+ await slPaint();if(g0)SLT.open(g0);
+ slMsg(n==1?'Added “'+last+'” to the library.':n?'Added '+n+' stamps.'+(bad?' '+bad+' file'+(bad>1?'s were':' was')+' not a stamp.':''):err||'Could not read that file.')}
 function init27(){
+SLT=ltMake(slCfg());SLT.init();$('slpane').innerHTML=SLT.paneHtml();
 try{const so=JSON.parse(kv.get('wb50_slopt')||'{}');$('slfx').checked=!!so.fx;$('sltx').checked=!!so.tx;if(so.px)$('slpx').value=so.px;if(so.bg!=null)$('slbg').value=so.bg}catch(e){}['slfx','sltx','slpx','slbg'].forEach(id=>$(id).addEventListener('change',slOptSave));
 $('slpng').onclick=async()=>{const t=slTile();if(!t)return slMsg('There is no stamp to export.');$('slpng').disabled=true;try{const c=await stampCanvas(t,+$('slpx').value||1024,$('slbg').value=='paper',{fx:$('slfx').checked,tx:$('sltx').checked});await slSavePng(await slBlob(c),$('slname').value.trim()||stNm(t))}catch(e){slMsg((e&&e.message)||'Could not export that stamp.')}$('slpng').disabled=false};
 // A stamp in the library keeps its own colour as a fixed colour (tray places belong to a project); when it is added to a project,
 // a colour that is in that project's tray links to it.
 $('slsave').onclick=async()=>{const t=slTile();if(!t)return slMsg('There is no stamp to save.');const b=$('slsave');b.disabled=true;slMsg('Saving…');
 try{const G=geom(shOf(t)),c=await stampCanvas(t,1400,false),w=c.toDataURL('image/webp',.9),img=w.startsWith('data:image/webp')?w:c.toDataURL('image/png'),used=new Set(),cm={};t.items.forEach(q=>used.add(q.m));used.forEach(k=>{if(cust[k])cm[k]=cust[k]});
-const nm=($('slname').value.trim()||stNm(t)).replace(/["<>&|]/g,'').slice(0,40),clone=JSON.parse(JSON.stringify(t));delete clone.id;clone.txl=txPack(t);if(clone.ink)clone.ink=col(clone.ink);
-const rec={name:nm,updated:Date.now(),w:+G.SW.toFixed(2),h:+G.SH.toFixed(2),img,tile:JSON.stringify(clone),motifs:cm,colors:t.ink&&CC.includes(t.ink)?[[t.ink,CM[t.ink]]]:[]};
+const nm=($('slname').value.trim()||stNm(t)).replace(/["<>&|]/g,'').slice(0,40),clone=JSON.parse(JSON.stringify(t));delete clone.id;clone.txl=txPack(t);const tximgs={};clone.txl.forEach(x=>{const e=x&&txSrc(x.t);if(e&&e.imp)tximgs[x.t]={n:e.n,src:e.src}});if(clone.ink)clone.ink=col(clone.ink);
+const rec={name:nm,updated:Date.now(),w:+G.SW.toFixed(2),h:+G.SH.toFixed(2),img,tile:JSON.stringify(clone),motifs:cm,colors:t.ink&&CC.includes(t.ink)?[[t.ink,CM[t.ink]]]:[],tximgs,g:slPathOk(SLT.here())};
 await SL.put(newId(),rec);$('slname').value='';slMsg('Saved “'+nm+'” to the library.');slPaint()}
 catch(e){slMsg(e&&/quota|storage/i.test(e.message||'')?'The library is full in this browser. Delete a stamp or two, then try again.':'Could not save: '+((e&&e.message)||'unknown error'))}b.disabled=false};
-$('slq').addEventListener('keydown',e=>e.stopPropagation());$('slq').addEventListener('input',()=>slPaint());
-$('slgrid').onclick=async e=>{const b=e.target.closest('[data-sa]');if(!b)return;const id=b.closest('[data-sl]').dataset.sl,a=b.dataset.sa;
-try{const rec=await SL.get(id);if(!rec)return slMsg('That stamp is gone.');
-if(a=='add'){let t=null;try{t=JSON.parse(rec.tile)}catch(er){}if(!t||!Array.isArray(t.items))return slMsg('That library entry is damaged.');
-libMotifs({motifs:rec.motifs});libColors({colors:rec.colors});txMerge(t);if(t.ink){const h=okC(t.ink)&&t.ink[0]!='@'?col(t.ink):CM[t.ink]||null;const r=h?refAdopt(h):null;if(r)t.ink=r;else delete t.ink}t.id=WBS.nid++;t.nm=String(rec.name||'').trim().slice(0,40)||'Stamp '+t.id;shOf(t);WBS.tiles.push(t);{const Ls=WBS.layers[WBS.selL];if(Ls&&!(Ls.st||[]).includes(t.id)){Ls.st=Ls.st||[];Ls.st.push(t.id)}}WBS.cur=WBS.tiles.length-1;selOne(-1);WBS.symKey='';store();upd();if(WBX.wbCap)WBX.wbCap();slMsg('Added “'+rec.name+'” as a new stamp. Tick it under Stamps in the Layout to print it.')}
-else if(a=='png'){if(!slOkImg(rec.img))return slMsg('That entry has no picture.');const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Could not read the picture'));i.src=rec.img}),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);await slSavePng(await slBlob(c),rec.name||'Stamp')}
-else if(a=='file'){const d=await use('downloads');if(!d)return slMsg('Saving is not available here.');try{await d.save({filename:(rec.name||'stamp').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase()+'.wodblok-stamp',data:fmtStampPack(rec)});slMsg('Saved “'+rec.name+'” as a file.')}catch(er){if(!er||er.code!='declined')slMsg('Could not save: '+((er&&er.message)||'unknown error'))}}
-else if(a=='del'){if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Sure?';setTimeout(()=>{delete b.dataset.sure;b.textContent='Delete'},3000);return}await SL.del(id);slMsg('Deleted “'+rec.name+'”.');slPaint()}}
-catch(er){slMsg('Something went wrong: '+((er&&er.message)||'unknown error'))}};
 $('slimp').onclick=()=>$('slimpf').click();
-$('slimpf').onchange=async()=>{const f=$('slimpf').files[0];$('slimpf').value='';if(!f)return;try{const rec=fmtStampOpen(await f.text());await SL.put(newId(),rec);slMsg('Added “'+rec.name+'” to the library.');slPaint()}catch(er){slMsg((er&&er.name=='FormatError'&&er.message)||'Could not read that file.')}};
+$('slimpf').onchange=async()=>{const fl=[...($('slimpf').files||[])];$('slimpf').value='';if(fl.length)slImport(fl)};
 WBX.wbSlSync=slSync;
 {const sp=document.querySelector('section.pn[data-p="stmp"]');if(sp){new MutationObserver(()=>{if(!sp.hidden)setTimeout(slPaint,60)}).observe(sp,{attributes:true,attributeFilter:['hidden']});if(!sp.hidden)setTimeout(slPaint,60)}}   // the library lives in the Stamp panel (2.23.0); paint it when the panel is shown
 $('lfaimp').onclick=()=>$('lfafile').click();

@@ -1,0 +1,62 @@
+[
+ [
+  "Paper and board",
+  {
+   "cotton": "Cotton Rag",
+   "cold": "Cold Press",
+   "laid": "Laid Lines",
+   "washi": "Washi",
+   "kraft": "Kraft",
+   "news": "Newsprint",
+   "crumple": "Crumpled"
+  }
+ ],
+ [
+  "Cloth and weave",
+  {
+   "linen": "Linen",
+   "canvas": "Canvas",
+   "burlap": "Burlap",
+   "denim": "Denim Twill",
+   "felt": "Felt"
+  }
+ ],
+ [
+  "Natural",
+  {
+   "wood": "Wood Grain",
+   "bark": "Bark",
+   "cork": "Cork",
+   "leather": "Leather"
+  }
+ ],
+ [
+  "Stone and mineral",
+  {
+   "plaster": "Plaster",
+   "granite": "Granite",
+   "marble": "Marble Veins",
+   "concrete": "Concrete"
+  }
+ ],
+ [
+  "Metal and made",
+  {
+   "brushed": "Brushed Metal",
+   "hammered": "Hammered",
+   "halftone": "Halftone Dots",
+   "riso": "Riso Grain"
+  }
+ ],
+ [
+  "Print faults and wear",
+  {
+   "dry": "Dry Roller",
+   "pinholes": "Pinholes",
+   "blotchy": "Blotchy Wash",
+   "worn": "Worn Block",
+   "scuff": "Scuffed",
+   "foxing": "Foxing"
+  }
+ ]
+]

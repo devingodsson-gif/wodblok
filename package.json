@@ -1,7 +1,7 @@
 {
   "name": "wodblok",
   "private": true,
-  "version": "2.48.0",
+  "version": "2.52.0",
   "description": "WODBLOK stamped-pattern editor (web app first). Phase 0: safety net around the v100 baseline.",
   "scripts": {
     "build": "node tools/build.js",
@@ -14,6 +14,7 @@
     "test:webkit": "playwright test --project=webkit --grep @smoke",
     "perf-baseline": "WB_PERF=1 playwright test --project=chromium tests/perf-baseline.spec.js",
     "perf": "node tools/perf.js",
+    "textures": "node tools/textures/make.js",
     "perf:draw": "node tools/perf-draw.js",
     "typecheck": "tsc -p .",
     "check:platform": "node tools/check-platform.js",

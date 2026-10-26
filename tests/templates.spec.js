@@ -10,7 +10,10 @@ for (const t of FOLDER) HAND[t.type]++;
 
 const openPicker = async page => { await page.click('#fileb'); await page.click('#tpnew'); await expect(page.locator('#tpdlg')).toBeVisible(); };
 const kind = async (page, k) => { await page.click(`#tpty [data-k="${k}"]`); await settle(page, { quiet: 4 }); };
-const cards = page => page.locator('#tpg .tpc');
+// the picker is the shared folder tree: Starting points is a set (open at first), your templates sit in Yours
+const SP = '#tppane .lrw:has(.lfr[data-k="s:Starting points"]) + .lib', YO = '#tppane .lrw:has(.lfr[data-k=""]) + .lib';
+const cards = page => page.locator(SP + ' button[data-tp]'), yours = page => page.locator(YO + ' button[data-tp]');
+const menu = async (page, item) => { const t = yours(page).first(); await t.scrollIntoViewIfNeeded(); await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))); await t.click({ button: 'right' }); await page.locator('.rowm').getByRole('menuitem', { name: item, exact: true }).click(); };
 const roll = async page => { await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
 const meta = page => page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()), b = document.querySelector('#cfmt [data-f="book"]'); return { book: !!b && (b.classList.contains('on') || b.getAttribute('aria-pressed') === 'true' || b.getAttribute('aria-selected') === 'true'), rt: !!(s.dim && s.dim.rt), ts: !!(s.proj && s.proj.ts && s.proj.ts.length) }; });
 
@@ -24,7 +27,7 @@ test('the File menu has both template items and the picker lists three kinds wit
     await kind(page, k);
     await expect(cards(page)).toHaveCount(1 + HAND[k]);          // Blank, and one for every file in the templates/ folder of that kind
     await expect(cards(page).first()).toHaveAttribute('aria-label', 'Blank');
-    await expect(page.locator('#tpyh')).toBeHidden();
+    await expect(yours(page)).toHaveCount(0);
   }
   await page.keyboard.press('Escape');
   await expect(page.locator('#tpdlg')).toBeHidden();
@@ -82,32 +85,30 @@ test('your templates: save, thumbnail, reload, rename, replace, delete, download
   await page.click('#tpsok');
   await expect(page.locator('#tpsd')).toBeHidden();
   await openPicker(page); await kind(page, 'canvas');
-  await expect(page.locator('#tpyh')).toBeVisible();
-  await expect(page.locator('#tpy .tpc')).toHaveCount(1);
-  await expect(page.locator('#tpy .tpc img')).toHaveCount(1);
-  await expect(page.locator('#tpg [data-more]')).toHaveCount(0);
+  await expect(yours(page)).toHaveCount(1);
+  await expect(yours(page).locator('img')).toHaveCount(1);
+  await expect(page.locator(SP + ' .dx')).toHaveCount(0);       // the starting points cannot be deleted
   await page.keyboard.press('Escape');
   // survives a reload
   await page.reload(); await page.waitForFunction(() => !!window.__wbTest);
   await openPicker(page); await kind(page, 'canvas');
-  await expect(page.locator('#tpy .tpc')).toHaveCount(1);
+  await expect(yours(page)).toHaveCount(1);
   // rename
-  await page.click('#tpy [data-more]'); await page.getByRole('menuitem', { name: /Rename/ }).click();
-  await page.locator('#tpy .tpc input').fill('Renamed'); await page.keyboard.press('Enter');
-  await expect(page.locator('#tpy .tpc').first()).toHaveAttribute('aria-label', 'Renamed');
+  await menu(page, 'Rename');
+  await page.locator('#tppane .fform input').fill('Renamed'); await page.keyboard.press('Enter');
+  await expect(yours(page).first()).toHaveAttribute('aria-label', 'Renamed');
   // download
   await page.evaluate(() => { window.__wbDownloads.length = 0; });
-  await page.click('#tpy [data-more]'); await page.getByRole('menuitem', { name: /Download/ }).click();
+  await menu(page, 'Download');
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   const dl = await page.evaluate(() => window.__wbDownloads[0]);
   expect(dl.filename).toMatch(/\.wodblok$/); expect(Buffer.from(dl.base64, 'base64').slice(0, 2).toString()).toBe('PK');
-  // delete (two taps)
-  await page.click('#tpy [data-more]'); await page.getByRole('menuitem', { name: /Delete/ }).click();
-  await page.click('#tpy [data-del]');
-  await expect(page.locator('#tpyh')).toBeHidden();
+  // delete
+  await menu(page, 'Delete');
+  await expect(yours(page)).toHaveCount(0);
   // add from file
   await page.setInputFiles('#tpfile', { name: 'again.wodblok', mimeType: 'application/zip', buffer: Buffer.from(dl.base64, 'base64') });
-  await expect(page.locator('#tpy .tpc')).toHaveCount(1);
+  await expect(yours(page)).toHaveCount(1);
   expect(errors).toEqual([]);
 });
 

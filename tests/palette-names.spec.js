@@ -15,16 +15,13 @@ test('348 different names, written in plain Latin letters', () => {
 test('the saved trays list the names with the book numbers and loading one fills the tray', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'colors');
-  await page.click('.stf[data-f="wada2"]');
-  const rows = page.locator('#stl .str');
+  await page.click('#stl .lfr[data-k="s:Wada · 2 colours"]');
+  const rows = page.locator('#stl button[data-st]');
   await expect(rows.first().locator('small')).toHaveText(/^No\. \d+$/);
-  const counts = await page.locator('.stf').count();
-  expect(counts).toBe(0);                                                     // inside a folder: just its trays
-  await page.click('#stnav [data-up]');
-  const total = await page.$$eval('.stf[data-f^="wada"] small', s => s.reduce((a, x) => a + +x.textContent, 0));
+  const total = await page.$$eval('#stl .lfr[data-k^="s:Wada"] .lfc', s => s.reduce((a, x) => a + +x.textContent, 0));
   expect(total).toBe(348);
   await page.fill('#stq', names[2]);
-  await page.locator('#stl .str', { hasText: names[2] }).first().click();
+  await page.locator('#stl button[data-st]', { hasText: names[2] }).first().click();
   const proj = await page.evaluate(() => JSON.parse(window.__wbTest.state()).proj), w = proj.cw[proj.cwa];
   expect([w.m[proj.ts[0]], w.m[proj.ts[1]]]).toEqual(['Pale Lemon Yellow', 'Raw Sienna']);   // combination No. 3, paper first
   expect(errors).toEqual([]);

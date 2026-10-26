@@ -24,7 +24,7 @@ async function setSub(page, key, on) {
 async function loadCombo(page, i) {
   await openPanel(page, 'colors');
   await page.fill('#stq', 'No. ' + (i + 1));
-  await page.locator('#stl .str', { has: page.locator('small', { hasText: new RegExp('^No\\. ' + (i + 1) + '$') }) }).click();
+  await page.locator('#stl button[data-st]', { has: page.locator('small', { hasText: new RegExp('^No\\. ' + (i + 1) + '$') }) }).click();
   await settle(page);
   await page.fill('#stq', '');
 }

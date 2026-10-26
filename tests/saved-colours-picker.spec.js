@@ -36,7 +36,7 @@ test('the picker from a tray colour has a Saved colours dropdown with a search; 
 
 test('the search finds a colour by its hex, says when nothing matches, and lists colours from your saved trays first', async ({ page }) => {
   const { errors } = await openApp(page);
-  await page.evaluate(() => localStorage.setItem('wb200_trays', JSON.stringify({ f: [], t: [{ id: 'tt1', n: 'Harbour set', f: '', c: [['#123456', 'Deep harbour'], ['#abcdef', '']] }] })));
+  await page.evaluate(() => localStorage.setItem('wb251_trays', JSON.stringify({ f: [], t: [{ id: 'tt1', n: 'Harbour set', f: '', c: [['#123456', 'Deep harbour'], ['#abcdef', '']] }] })));
   await openList(page);
   await expect(page.locator('.cpkl .ddg').first()).toHaveText('Your trays');
   await expect(page.locator('.cpkl .ddi').first()).toContainText('Deep harbour');
@@ -54,7 +54,7 @@ test('the search finds a colour by its hex, says when nothing matches, and lists
 
 test('arrow keys and Enter pick a saved colour; Esc closes the list but leaves the picker open', async ({ page }) => {
   const { errors } = await openApp(page);
-  await page.evaluate(() => localStorage.setItem('wb200_trays', JSON.stringify({ f: [], t: [{ id: 'tt1', n: 'Harbour set', f: '', c: [['#123456', 'Deep harbour'], ['#654321', 'Dark roast']] }] })));
+  await page.evaluate(() => localStorage.setItem('wb251_trays', JSON.stringify({ f: [], t: [{ id: 'tt1', n: 'Harbour set', f: '', c: [['#123456', 'Deep harbour'], ['#654321', 'Dark roast']] }] })));
   await openList(page);
   await page.press('.cpkl input', 'ArrowDown');
   await page.press('.cpkl input', 'Enter');

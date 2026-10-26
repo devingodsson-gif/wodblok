@@ -1,0 +1,9 @@
+{
+ "_": "How much of a texture one picture holds, in repeats at Scale 100% (default 1). A broad texture held over a larger area repeats less often on a big canvas. Fine textures stay at 1 so their detail is not lost.",
+ "cotton": 3, "cold": 3, "laid": 2, "washi": 2, "kraft": 2, "news": 2, "crumple": 3,
+ "linen": 2, "canvas": 3, "burlap": 3, "denim": 2, "felt": 2,
+ "wood": 1, "bark": 3, "cork": 3, "leather": 2,
+ "plaster": 3, "granite": 2, "marble": 3, "concrete": 3,
+ "brushed": 1, "hammered": 3, "halftone": 3, "riso": 1,
+ "dry": 2, "pinholes": 3, "blotchy": 3, "worn": 3, "scuff": 3, "foxing": 3
+}

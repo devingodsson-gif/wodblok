@@ -8,6 +8,7 @@ import {LY} from './14-presets-and-layer-grid-ui.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
 import {fxCols,TRAY_MAX,TRAY_VIEW,cwAdd,cwNow,cwUse,hexAlpha,isFixed,isLink,lockRef,normHexA,refSlot,slotHex,slotName,trayAdd,trayDone,trayLoad,trayMove,trayRemove,traySet,trayUses,unlockRef} from './50-tray-core.js';
 import {closePicker,openPicker,swBg} from './51-colour-picker.js';
+import {ltMake} from './87-library-tree.js';
 // ===== The tray on screen =====
 // 1. The dock: the tray's colours above the canvas in both views (7 places, "+" to add more, up to 16). Click a colour to edit it; drag
 //    one along the tray to move it. With more than one colourway, a switcher sits next to it.
@@ -18,7 +19,7 @@ const TY_IC=(d,w)=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="curr
 const LOCK_ON=TY_IC(ICN.lock),LOCK_OFF=TY_IC(ICN.unlock);
 const TRASH=TY_IC(ICN.trash),TY_MORE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.more+'</svg>';
 const TY_CHEV='<svg class="chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l5 5 5-5"/></svg>';
-const FOLDER=TY_IC(ICN.folder,1.8),BACK=TY_IC(ICN.chevL);
+
 const tyEsc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const tyP=()=>WBS.proj;
 // the label a well shows for a reference, and the small number of its tray place
@@ -131,58 +132,52 @@ function listEvents(){const box=$('tyl');
  box.addEventListener('keydown',e=>{const r=e.target.closest('.tyr');if(r&&e.target===r&&(e.key=='Enter'||e.key==' ')){e.preventDefault();editSlot(r.dataset.s,r)}});
  $('tyaddl').onclick=()=>addSlot(id=>$('tyl').querySelector(`[data-s="${id}"]`));
  $('tysave').onclick=()=>{$('tysvf').hidden=false;$('tysave').parentNode.hidden=true;const o=tyP(),w=cwNow(o);$('tysvn').value=o.cw.length>1?w.n:'';$('tysvn').focus()};
- const done=ok=>{if(ok){const n=$('tysvn').value.trim().slice(0,40)||'Tray '+(stLoad().t.length+1),o=tyP(),w=cwNow(o),d=stLoad();d.t.unshift({id:newId(),n,f:ST.f&&!ST.f.startsWith('wada')?ST.f:'',c:o.ts.map(id=>[w.c[id],w.m[id]||''])});stStore(d);pmsg('Saved tray “'+n+'”.');paintST(true)}$('tysvf').hidden=true;$('tysave').parentNode.hidden=false};
+ const done=ok=>{if(ok){const n=$('tysvn').value.trim().slice(0,40)||'Tray '+(stLoad().t.length+1),o=tyP(),w=cwNow(o),d=stLoad();d.t.unshift({id:newId(),n,f:stHere(),c:o.ts.map(id=>[w.c[id],w.m[id]||''])});stStore(d);pmsg('Saved tray “'+n+'”.');paintST(true)}$('tysvf').hidden=true;$('tysave').parentNode.hidden=false};
  $('tysvok').onclick=()=>done(true);$('tysvcx').onclick=()=>done(false);
  $('tysvn').addEventListener('keydown',e=>{e.stopPropagation();if(e.key=='Enter')done(true);else if(e.key=='Escape')done(false)})}
-// ---------------------------------------------------------------- 3b. saved trays: your own in folders (settings), and Wada's sets built in
-const ST_KEY='wb200_trays';
-const ST={f:'',q:'',ren:null};   // the folder open ('' = the top), the search words, the tray or folder being renamed
-function stLoad(){let d=null;try{d=JSON.parse(kv.get(ST_KEY)||'null')}catch(e){}
- if(!d||typeof d!='object'||!Array.isArray(d.t)){d={f:[],t:[]};
-  try{kv.set(ST_KEY,JSON.stringify(d))}catch(e){}}
- d.f=(Array.isArray(d.f)?d.f:[]).filter(f=>f&&typeof f.id=='string'&&typeof f.n=='string');
- d.t=d.t.filter(t=>t&&typeof t.id=='string'&&typeof t.n=='string'&&Array.isArray(t.c)).map(t=>({...t,c:t.c.map(x=>Array.isArray(x)?[normHexA(x[0]),String(x[1]||'')]:null).filter(x=>x&&x[0]).slice(0,TRAY_MAX)})).filter(t=>t.c.length);
- return d}
+// ---------------------------------------------------------------- 3b. saved trays: the shared folder tree (87-library-tree.js, 2.51.3)
+// Rows with a strip of the tray's colours. Yours holds your trays and your folders (nested, with select mode, Move to and drag), Wada's 348 combinations are three built-in sets.
+// The store: {f: folder paths, t: [{id, n, f: folder path, c: colours}] your trays, b: {built-in id: folder path}, h: hidden set names, r: {set name: your name for it}}. Kept in this browser.
+const ST_KEY='wb251_trays',ST_UI='wb251_traysui';
+let stC=null,stCr=null,STT=null;
+const stNameOk=x=>{x=String(x||'').trim();return x&&x.length<=30&&!/[\\"<>&|/]/.test(x)&&!/^s:/i.test(x)?x:''};
+function stCache(){let raw=null;try{raw=kv.get(ST_KEY)}catch(e){}
+ if(stC===null||raw!==stCr){let d=null;try{d=JSON.parse(raw||'null')}catch(e){}if(!d||typeof d!='object')d={};
+  d.f=(Array.isArray(d.f)?d.f:[]).filter(x=>typeof x=='string'&&x&&x.length<=200&&!x.startsWith('s:'));
+  d.t=(Array.isArray(d.t)?d.t:[]).filter(t=>t&&typeof t.id=='string'&&typeof t.n=='string'&&Array.isArray(t.c)).map(t=>({id:t.id,n:t.n,f:typeof t.f=='string'&&!t.f.startsWith('s:')?t.f:'',c:t.c.map(x=>Array.isArray(x)?[normHexA(x[0]),String(x[1]||'')]:null).filter(x=>x&&x[0]).slice(0,TRAY_MAX)})).filter(t=>t.c.length);
+  d.h=(Array.isArray(d.h)?d.h:[]).filter(x=>typeof x=='string'&&x.length<=60);
+  const r=d.r&&typeof d.r=='object'&&!Array.isArray(d.r)?d.r:{},b=d.b&&typeof d.b=='object'&&!Array.isArray(d.b)?d.b:{};d.r={};d.b={};
+  Object.keys(r).forEach(k=>{const v=stNameOk(r[k]);if(v)d.r[k]=v});Object.keys(b).forEach(k=>{if(/^wada\d{1,3}$/.test(k)&&typeof b[k]=='string'&&b[k]&&b[k].length<=200)d.b[k]=b[k]});
+  stC=d;stCr=raw}
+ return stC}
+const stLoad=()=>JSON.parse(JSON.stringify(stCache()));
 const stStore=d=>{try{kv.set(ST_KEY,JSON.stringify(d))}catch(e){pmsg('Could not keep the trays in this browser.')}};
-// Wada's 348 combinations, paper first, as saved trays in three folders by size
+// Wada's 348 combinations, paper first, as saved trays in three sets by size
 let WADA=null;
 function wada(){if(WADA)return WADA;WADA=PL.map((p,i)=>({id:'wada'+i,n:p[0],no:i+1,f:'wada'+[p[1],p[2],p[3],p[4]].filter(Boolean).length,c:[p[2],p[1],p[3],p[4]].filter(Boolean).map(n=>[CM[n],n])}));return WADA}
 const WF=[['wada2','Wada · 2 colours'],['wada3','Wada · 3 colours'],['wada4','Wada · 4 colours']];
 const tyStrip=c=>`<span class="sts">${c.map(([h])=>`<i style="background:${h}"></i>`).join('')}</span>`;
-let stK='';
-function paintST(force){const box=$('stl');if(!box||!box.isConnected)return;const d=stLoad(),W=wada(),q=ST.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
- const k=JSON.stringify([d,ST]);if(!force&&k===stK)return;stK=k;
- const row=(t,own)=>ST.ren===t.id?`<div class="str ren" data-t="${t.id}">${tyStrip(t.c)}<input type="text" maxlength="40" value="${tyEsc(t.n)}" aria-label="Tray name"></div>`:`<div class="str" data-t="${t.id}" role="listitem" tabindex="0">${tyStrip(t.c)}<b>${tyEsc(t.n)}</b>${t.no?`<small>No. ${t.no}</small>`:''}<button type="button" class="ib" data-more aria-haspopup="menu" aria-expanded="false" aria-label="Actions for ${tyEsc(t.n)}">${TY_MORE}</button></div>`;
- const frow=(id,n,c,own)=>ST.ren===id?`<div class="stf ren" data-f="${id}">${FOLDER}<input type="text" maxlength="40" value="${tyEsc(n)}" aria-label="Folder name"></div>`:`<div class="stf" data-f="${id}" role="listitem" tabindex="0">${FOLDER}<b>${tyEsc(n)}</b><small>${c}</small>${own?`<button type="button" class="ib" data-more aria-haspopup="menu" aria-expanded="false" aria-label="Actions for ${tyEsc(n)}">${TY_MORE}</button>`:''}</div>`;
- let h='',nav='';
- if(q.length){const hay=t=>(t.n+' '+t.c.map(x=>x[1]).join(' ')+(t.no?' no '+t.no+' no. '+t.no+' no.'+t.no:'')).toLowerCase();const hit=[...d.t,...W].filter(t=>q.every(w=>hay(t).includes(w)));
-  h=hit.slice(0,200).map(t=>row(t,!t.no)).join('')||'<div class="stno">No matching tray</div>';$('stcnt').textContent=hit.length+' found'}
- else if(!ST.f){h=d.f.map(f=>frow(f.id,f.n,d.t.filter(t=>t.f===f.id).length,true)).join('')+d.t.filter(t=>!t.f||!d.f.some(f=>f.id===t.f)).map(t=>row(t,true)).join('')+WF.map(([id,n])=>frow(id,n,W.filter(t=>t.f===id).length,false)).join('');$('stcnt').textContent=String(d.t.length+W.length)}
- else{const wf=WF.find(x=>x[0]===ST.f),uf=d.f.find(f=>f.id===ST.f);if(!wf&&!uf){ST.f='';return paintST(true)}
-  nav=`<button type="button" class="ib" data-up aria-label="Back to all trays">${BACK}</button><b>${tyEsc(wf?wf[1]:uf.n)}</b>`;
-  h=(wf?W.filter(t=>t.f===ST.f):d.t.filter(t=>t.f===ST.f)).map(t=>row(t,!wf)).join('')||'<div class="stno">Empty folder</div>';$('stcnt').textContent=''}
- $('stnav').innerHTML=nav;$('stnav').hidden=!nav;box.innerHTML=h;$('stnew').disabled=!!(ST.f||q.length);
- const ri=box.querySelector('.ren input');if(ri){ri.focus();ri.select()}}
-function stFind(id){return stLoad().t.find(t=>t.id===id)||wada().find(t=>t.id===id)}
+const stIsWada=id=>/^wada\d{1,3}$/.test(id);
+function stFind(id){return stIsWada(id)?wada()[+id.slice(4)]||null:stCache().t.find(t=>t.id===id)||null}
 function stUse(t){trayLoad(t.c);trayDone('Tray “'+t.n+'”');pmsg('Loaded “'+t.n+'” into the tray.')}
 function stAsCw(t){const i=cwAdd();cwUse(i);const w=cwNow();w.n=t.n.slice(0,40);trayLoad(t.c);trayDone('New colourway “'+t.n+'”');pmsg('Added the colourway “'+t.n+'”.')}
-function stEvents(){const box=$('stl');
- box.addEventListener('click',e=>{if(e.target.closest('input'))return;const f=e.target.closest('.stf'),r=e.target.closest('.str'),more=e.target.closest('[data-more]');
-  if(f&&!more){ST.f=f.dataset.f;paintST(true);return}
-  if(more)e.stopPropagation();
-  if(f&&more){const id=f.dataset.f;rowMenu(more,[['Rename',()=>{ST.ren=id;paintST(true)}],['Delete folder',()=>{const d=stLoad();d.f=d.f.filter(x=>x.id!==id);d.t.forEach(t=>{if(t.f===id)t.f=''});stStore(d);paintST(true);pmsg('Deleted the folder. Its trays moved to the top.')}]]);return}
-  if(!r)return;const t=stFind(r.dataset.t);if(!t)return;
-  if(more){const own=!t.no,d=stLoad(),items=[['Load into the tray',()=>stUse(t)],['Add as a colourway',()=>stAsCw(t)]];
-   if(own){items.push(['Rename',()=>{ST.ren=t.id;paintST(true)}]);if(d.f.length)d.f.filter(x=>x.id!==t.f).forEach(x=>items.push(['Move to “'+tyEsc(x.n)+'”',()=>{const d2=stLoad(),y=d2.t.find(z=>z.id===t.id);if(y){y.f=x.id;stStore(d2);paintST(true)}}]));if(t.f)items.push(['Move to the top',()=>{const d2=stLoad(),y=d2.t.find(z=>z.id===t.id);if(y){y.f='';stStore(d2);paintST(true)}}]);items.push(['Delete',()=>{const d2=stLoad();d2.t=d2.t.filter(z=>z.id!==t.id);stStore(d2);paintST(true)}])}
-   else items.push(['Copy to your trays',()=>{const d2=stLoad();d2.t.unshift({id:newId(),n:t.n,f:'',c:t.c.map(x=>[...x])});stStore(d2);paintST(true);pmsg('Copied “'+t.n+'” to your trays.')}]);
-   rowMenu(more,items);return}
-  stUse(t)});
- box.addEventListener('keydown',e=>{const r=e.target;if(r.classList&&(r.classList.contains('str')||r.classList.contains('stf'))&&(e.key=='Enter'||e.key==' ')){e.preventDefault();r.click()}
-  if(r.matches&&r.matches('.ren input')){e.stopPropagation();if(e.key=='Enter')r.blur();else if(e.key=='Escape'){ST.ren=null;paintST(true)}}});
- box.addEventListener('focusout',e=>{const i=e.target;if(!i.matches||!i.matches('.ren input')||!ST.ren)return;const v=i.value.trim().slice(0,40),id=ST.ren;ST.ren=null;if(v){const d=stLoad(),t=d.t.find(x=>x.id===id),f=d.f.find(x=>x.id===id);if(t)t.n=v;if(f)f.n=v;stStore(d)}paintST(true)});
- $('stnav').addEventListener('click',e=>{if(e.target.closest('[data-up]')){ST.f='';paintST(true)}});
- $('stq').addEventListener('keydown',e=>e.stopPropagation());$('stq').addEventListener('input',()=>{ST.q=$('stq').value;paintST(true)});
- $('stnew').onclick=()=>{const d=stLoad(),id=newId();let n='New folder',k=2;while(d.f.some(f=>f.n===n))n='New folder '+(k++);d.f.push({id,n});stStore(d);ST.ren=id;paintST(true)}}
+const stUse0=id=>{const t=stFind(id);if(t)stUse(t)};
+const stCfg=()=>({p:'st',word:'tray',words:'trays',ui:ST_UI,rows:true,exportName:'wodblok-trays',exportAs:'tray files',pane:'#stpane',trId:'stl',qId:'stq',
+ read(){const d=stLoad(),at={};d.t.forEach(t=>{at[t.id]=t.f});return{f:d.f,at,b:d.b,h:d.h,r:d.r}},
+ write(m){const d=stLoad();d.f=m.f;d.t.forEach(t=>{if(t.id in m.at)t.f=m.at[t.id]});d.b=m.b;d.h=m.h;d.r=m.r;stStore(d)},
+ sets:()=>WF.map(([id,n])=>({k:'s:'+n,n,ids:wada().filter(t=>t.f===id).map(t=>t.id)})),
+ name:id=>{const t=stFind(id);return t?t.n:null},own:id=>!stIsWada(id),used:()=>false,
+ hay:id=>{const t=stFind(id);return t?t.n+' '+t.c.map(x=>x[1]).join(' ')+(t.no?' no '+t.no+' no. '+t.no+' no.'+t.no:''):''},
+ tile:id=>{const t=stFind(id);return t?tyStrip(t.c)+`<b>${tyEsc(t.n)}</b>`+(t.no?`<small>No. ${t.no}</small>`:''):''},
+ remove(list){const d=stLoad();d.t=d.t.filter(t=>!list.includes(t.id));stStore(d);paintST(true)},
+ rename(id,v){const d=stLoad(),t=d.t.find(x=>x.id===id);if(t){t.n=v;stStore(d)}},
+ file(id){const t=stFind(id);return t?{name:t.n,data:new TextEncoder().encode(JSON.stringify({app:'WODBLOK',kind:'tray',name:t.n,colours:t.c})),ext:'.wodblok-tray',fb:'Tray'}:null},
+ itemMenu(id){const t=stFind(id);if(!t)return[];const r=[['Load into the tray',()=>stUse(t)],['Add as a colourway',()=>stAsCw(t)]];
+  if(stIsWada(id))r.push(['Copy to your trays',()=>{const d=stLoad();d.t.unshift({id:newId(),n:t.n,f:stHere(),c:t.c.map(x=>[...x])});stStore(d);paintST(true);pmsg('Copied “'+t.n+'” to your trays.')}]);return r}});
+const stHere=()=>{const h=STT?STT.here():'';return h.startsWith('s:')?'':h};
+// the tree is drawn when the Colours tool opens and whenever the tray changes; the count beside "Saved trays" is every tray
+function paintST(force){const p=$('stpane');if(!STT||!p||!p.isConnected)return;STT.show(p,'',stUse0);if(force)STT.paintAll(true);$('stcnt').textContent=String(stCache().t.length+wada().length)}
+function stEvents(){STT=ltMake(stCfg());STT.init();$('stpane').innerHTML=STT.paneHtml()}
 // ---------------------------------------------------------------- painting everything that shows the tray
 function paintAll(force){paintDock(force);paintList(force);paintWells(force)}
 // the wells for the stamp, layer and text depend on what is selected; their specs read it each time

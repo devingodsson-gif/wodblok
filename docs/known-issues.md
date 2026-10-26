@@ -11,6 +11,25 @@ Fixed in v107: Undo after Clear leaving the colour grade blank (the grade was re
 opening a file nudging a frame inset from 9.6 to 9.5 (the panel wrote the slider's rounded value back). Also fixed in
 v107: Undo stalling after several Randomize rolls in a row (loading a step added a stray history step).
 
+
+## Whole-app bug test, Oct 26 2026 (2.50.1 to 2.50.2)
+Owner, Oct 26 2026: "do a bug test on the whole application, document it, and implement fixes".
+**How:** the full Chromium suite on the 2.50.1 build (617 tests, 3 at a time); a crawl that ran every command in the registry on a rolled project (101 run, 20 skipped: file pickers, network, reload, print), opened every panel and recorded page errors, console errors and dialogs; screenshots of every panel and of every stamp shape with every symmetry type; three seeded rolls compared side by side with `main`.
+**Result:** 593 passed, 12 failed, 12 skipped (perf and WebKit-only specs). The crawl found no error, console error or dialog in any command or panel.
+
+Fixed:
+- **Double-click on a text that lies over a pattern opened the pattern's stamp instead of typing** (live since 2.48.0, found by text-paragraph "a double-click starts typing"): since a new Pattern is 5 x 7, a stamp sits under the middle of the canvas, and the stamp tab's double-click came first. A text or shape drawn over every pattern now takes the double-click (75-stamp-edit-mode.js). Fixed in 2.50.2.
+- **A roll named its patterns like yours** (two "Pattern 1" in the Elements list when you had made one): a roll's element named like one of yours takes the next free number, after the roll is built, so seeded rolls are unchanged otherwise (20-before-after-and-randomizer.js). Fixed in 2.50.2.
+- **Broad picture textures repeated as a visible grid on the canvas** (2.50.0; Blotchy Wash on a whole canvas): a picture now says how many repeats at Scale 100% it holds (`textures/span.json`); the placeholders were baked again with 2 or 3 for the broad ones. Fixed in 2.50.2.
+- **Hexagon and triangle stamps were misaligned in their tab** (stage size, stamp at 87%, triangle centre): fixed in 2.50.1.
+
+Not fixed (all also on `main`):
+- scenarios randomize seed 1, 2, 3, before / after compare and split view: state snapshots differ from what a roll makes now (stamp b434 instead of b435 in seed 2, seed 1 without its Bleed and Motion blur effects, seed 3 positions a little different). The differences are exactly the same on `main`; they came from an earlier release whose snapshots were not regenerated. Needs the owner to decide: regenerate (if the rolls are right) or find the change.
+- recovery.spec.js (3 tests) and randomize-effects-2-39 "on a repeat tile a roll...": `settle` times out, the page keeps redrawing for over 15 s after a roll. Fails on `main` too when several tests run at once (randomize-effects 4 of 4 with four at once, recovery 1 of 6); passes alone. A roll on a repeat tile or after opening the 16 x 9 sample is slow to finish drawing.
+- commands.spec "documented shortcuts really work" (Before stayed on) and text-randomize (the Randomize cover did not go away within 120 s): failed once under load, passed 2 of 2 alone. Known CI flakes.
+- roundtrip "round trip project-1-diamond": the saved file had no thumbnail.png once under load; passed 3 of 3 after.
+- Texture library: no select mode, drag to folder, hidden sets, Export or Import from file yet. A stamp saved to the stamp library with an imported texture carries the texture's settings but not its picture, so in another browser that texture is missing.
+
 ## Test flake: canvas shape "hex" SVG summary (seen once, Phase 2d run)
 One full-suite run produced a different SVG summary for `canvas shape: hex` (clipPath 11→9, polygon 6→4, use 38→39); the same test passed 6 of 6 repeats on both the build and the untouched v100 file straight afterwards. So it is rare timing in the app (something drawn after the settle check), not a change from the build. Snapshot not touched. If it recurs, make `settle` also wait for pending frames before the summary is taken.
 
