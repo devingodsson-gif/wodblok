@@ -1,5 +1,8 @@
 # Development plan
 
+## 2.47.0 (Oct 25 2026): a new Pattern lays its stamps edge to edge
+- A new Pattern element starts at size 100% of its cell (it was 80%), so neighbouring stamps touch with no gap; the Size slider (and Randomize's own values) still make gaps or overlaps. Counts stay 4 x 4. Open question for the owner: derive columns and rows from the stamp size (canvas / stamp) instead of a fixed 4 x 4, and add a separate Spacing slider.
+- Tested: tests/pattern-default-2-47-0.spec.js, element-pattern, add-arm, bug-fixes-2-16, motif-look specs. Not run: full suite.
 ## 2.46.0 (Oct 25 2026): symmetry lines on the stamp tab, six new symmetry types
 - The stamp tab canvas draws the dividing lines (and the shaded base part) of the chosen symmetry in the stamp's own frame, with or without a selection, and redraws when the mode changes (`sceSymG` in 64, `symG` in 07).
 - New types: Diagonal ╲, Diagonal ╱, Both diagonals, Glide, Brick (rows), Half-drop (columns). Brick and Half-drop are repeat modes (rectangle shape only). Randomize does not roll them, so seeded results are unchanged.
