@@ -30,12 +30,12 @@ let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[pa
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={xrec:'Export',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',mlist:'Element',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
+const PNAME={xrec:'Export',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',sheet:'Sheet',mlist:'Element',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
-const EL_ONLY=['layers','stmp','motifs','text','elpaint','mlist'];
+const EL_ONLY=['layers','stmp','motifs','sheet','text','elpaint','mlist'];
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
 const ELP=EL_ONLY,wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
-const MODEP={pattern:['lyrs','layers','stmp','motifs','mlist','elpaint','text','pgrid','canvas','colors','rand','hist','xrec']};
+const MODEP={pattern:['lyrs','layers','stmp','motifs','sheet','mlist','elpaint','text','pgrid','canvas','colors','rand','hist','xrec']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85,lk:1}),wsG(['layers']),wsG(['canvas','colors'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)

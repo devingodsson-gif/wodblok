@@ -18,11 +18,13 @@ import {basicKey} from './76-basic-shapes.js';
 //  - the selected motifs of the stamp open in its tab;
 //  - the selected Motif element on the canvas.
 // The same fields everywhere (fl, a, iz, im, sw, sk; ink on an element or a source, ic on a stamp's motif, which its Colour sets). One set of controls, so one set of ids: the groups move, they are not copied.
+// 2.53.0: a selected Sheet takes the Fill group too, in the Sheet panel ({k:'sheet'}): its Colour well shows in the group, the picture also fits by Stretch or Tile, and there is no Filter switch or Outline.
 const MF_G=['mf_s','mf_f','mf_o'];
 // what the groups set: {k:'src'|'items'|'el', list}
 function mfT(){const q=elSel(),p=patCur();
  if(p&&q&&q.u==p.u&&WBS.patSrc!=null){const s=(p.src||[])[WBS.patSrc];if(s&&s.k=='motif')return{k:'src',list:[s]}}
  if(stUnlocked()!=null){const t=WBS.tiles[WBS.cur];if(!t)return null;const it=[...(WBS.msel||[])].map(i=>t.items[i]).filter(z=>z&&!z.k&&z.m);return it.length?{k:'items',list:it}:null}
+ if(q&&q.k=='sheet')return{k:'sheet',list:[q]};
  const m=WBX.wbMtSel&&WBX.wbMtSel();return m?{k:'el',list:[m]}:null}
 const mfOw=T=>Math.max(1,Math.round(T.k=='items'?Math.min(SW,SH)/80:Math.min(CW,CH)/80));
 const mfCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
@@ -30,17 +32,18 @@ const mfSet=(el,on)=>{if(el.getAttribute('aria-pressed')!=String(on)){el.setAttr
 const mfVis=(id,v)=>{const e=$(id);if(e&&e.hidden===v)e.hidden=!v};
 const mfVal=(id,v)=>{const e=$(id);if(e&&+e.value!==v){e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}))}};
 // the groups go where the thing they set is edited: under a Pattern's sources, else under the Motif panel's Edit group
-function mfPlace(T){const at=T&&T.k=='src'?$('pesrc').closest('details.g'):document.querySelector('section.pn[data-p="motifs"] #sel').closest('details.g');if(!at)return;
+function mfPlace(T){const at=T&&T.k=='src'?$('pesrc').closest('details.g'):T&&T.k=='sheet'?document.querySelector('section.pn[data-p="sheet"] .elk'):document.querySelector('section.pn[data-p="motifs"] #sel').closest('details.g');if(!at)return;
  let prev=at;MF_G.forEach(id=>{const g=$(id);if(!g)return;if(prev.nextElementSibling!==g)prev.insertAdjacentElement('afterend',g);prev=g})}
 // the pictures of this project, as a strip to choose from
 function mfStrip(a){const ids=Object.keys(WBS.ARTS),st=$('lfars');if(!st)return;const ky=ids.map(i=>i+':'+WBS.ARTS[i].src.length+(artRefd(i)?'u':'')).join('|')+'#'+a;
  if(st.dataset.k==ky)return;st.dataset.k=ky;st.innerHTML=ids.map(i=>{const A=WBS.ARTS[i];return`<button type="button" data-a="${hx(i)}" class="${a==i?'on':''}" title="${hx(A.n)}"><img src="${artBU(A)}" alt="">${artRefd(i)?'':`<i data-ax="${hx(i)}" title="Remove from this project">&#215;</i>`}</button>`}).join('')}
-function mfSync(){if(!$('mf_f'))return;const T=mfT();MF_G.forEach(id=>mfVis(id,!!T&&(id!='mf_s'||T.k=='src')));if(!T)return;mfPlace(T);const p=T.list[0];
+function mfSync(){if(!$('mf_f'))return;const T=mfT();MF_G.forEach(id=>mfVis(id,!!T&&(id!='mf_s'||T.k=='src')&&(id!='mf_o'||T.k!='sheet')));if(!T)return;mfPlace(T);const p=T.list[0],sh=T.k=='sheet';
  if(T.k=='src'){mfVal('mf_sx',Math.round((+p.wx||1)*100));mfVal('mf_sy',Math.round((+p.wy||1)*100))}
  // Filter (2.38.0): a shape on the canvas (not the Background) can be a filter; its fill and outline then do nothing, so they hide
- const fo=T.k=='el'&&!p.bgd,fl=fo&&!!p.flt;mfVis('mf_fltr',fo);{const c=$('mf_flt');if(c.checked!==fl)c.checked=fl}mfVis('mf_fk',!fl);mfVis('mf_o',!fl);if(fl){mfVis('mf_img',false);if(WBX.wbPaintWells)WBX.wbPaintWells();return}
- const fk=p.fl=='none'?'none':p.fl=='img'?'img':'solid';$('mf_fk').querySelectorAll('[data-f]').forEach(b=>mfSet(b,b.dataset.f==fk));mfVis('mf_img',fk=='img');
- if(fk=='img'){mfStrip(p.a);mfVal('mf_iz',Math.round(+p.iz||100));$('mf_im').querySelectorAll('[data-i]').forEach(b=>mfSet(b,(b.dataset.i=='contain')==(p.im=='contain')))}
+ const fo=T.k=='el'&&!p.bgd,fl=fo&&!!p.flt;mfVis('mf_fltr',fo);{const c=$('mf_flt');if(c.checked!==fl)c.checked=fl}mfVis('mf_fk',!fl);mfVis('mf_o',!fl&&!sh);if(fl){mfVis('mf_img',false);if(WBX.wbPaintWells)WBX.wbPaintWells();return}
+ const fk=p.fl=='none'?'none':p.fl=='img'?'img':'solid';$('mf_fk').querySelectorAll('[data-f]').forEach(b=>mfSet(b,b.dataset.f==fk));mfVis('mf_img',fk=='img');mfVis('mf_fcr',sh&&fk=='solid');
+ if(fk=='img'){mfStrip(p.a);mfVal('mf_iz',Math.round(+p.iz||100));const im=$('mf_im'),fit=p.im&&(sh||p.im=='contain')?p.im:'cover';im.style.gridTemplateColumns=`repeat(${sh?4:2},1fr)`;im.querySelectorAll('[data-i]').forEach(b=>{const x=b.dataset.i=='stretch'||b.dataset.i=='tile';if(b.hidden!==(x&&!sh))b.hidden=x&&!sh;mfSet(b,b.dataset.i==fit)})}
+ if(sh){if(WBX.wbPaintWells)WBX.wbPaintWells();return}
  const so=+p.sw>0,oc=$('mf_oon');if(oc.checked!==so)oc.checked=so;mfVis('mf_owr',so);mfVis('mf_ocr',so);if(so)mfVal('mf_ow',Math.round(+p.sw));
  if(WBX.wbPaintWells)WBX.wbPaintWells()}
 // a picture: the picked motifs take it; with nothing picked it makes a Rectangle motif the shape of the picture, filled with it (Import image, Use a project)
@@ -64,13 +67,14 @@ function mtHit(p,lx,ly){const e=mtShape(p.m);if(!e.a)return undefined;const s=Ma
 function init82(){if(!$('mf_f'))return;
  const each=f=>{const T=mfT();if(!T)return null;T.list.forEach(q=>f(q,T));return T};
  $('mf_fk').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const f=b.dataset.f;each(q=>{if(f=='none')q.fl='none';else if(f=='img'){q.fl='img';if(!WBS.ARTS[q.a]){const k=Object.keys(WBS.ARTS);if(k.length)q.a=k[0];else delete q.a}}else delete q.fl});mfCh();mfSync()};
- $('mf_im').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;each(q=>{if(b.dataset.i=='contain')q.im='contain';else delete q.im});mfCh();mfSync()};
+ $('mf_im').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;const i=b.dataset.i;each((q,T)=>{if(i=='contain'||(T.k=='sheet'&&(i=='stretch'||i=='tile')))q.im=i;else delete q.im});mfCh();mfSync()};
  const sl=(id,f,k)=>{$(id).addEventListener('input',()=>{const v=+$(id).value;each(q=>{const n=k?+(v/100).toFixed(3):v;if(k&&n==1)delete q[f];else q[f]=n});store();upd()});$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()})};
  sl('mf_iz','iz');sl('mf_ow','sw');sl('mf_sx','wx',1);sl('mf_sy','wy',1);
  $('mf_flt').onchange=()=>{const T=mfT();if(!T||T.k!='el')return;const on=$('mf_flt').checked;T.list.forEach(q=>{if(q.bgd)return;if(on)q.flt=1;else delete q.flt});mfCh();mfSync()};
  $('mf_oon').onchange=()=>{const on=$('mf_oon').checked;each((q,T)=>{if(on){if(!(+q.sw>0))q.sw=mfOw(T)}else delete q.sw});mfCh();mfSync()};
  if(WBX.wbMkWell){const pj=()=>WBS.proj,first=()=>{const T=mfT();return T?T.list[0]:null};
   WBX.wbMkWell($('mf_ow2'),{label:'Outline colour',what:'Outline',defRef:()=>{const T=mfT();if(T&&T.k=='items'){const t=WBS.tiles[WBS.cur];return T.list[0].ic||(t&&t.ink)||pj().ink}return pj().ink},get:()=>{const q=first();return q&&q.sk||''},set:v=>{each(q=>{if(v)q.sk=v;else delete q.sk})}});
-  WBX.wbMkWell($('mf_cw'),{label:'Shape colour',what:'Shape',defRef:()=>pj().ink,get:()=>{const q=first();return q&&q.ink||''},set:v=>{each(q=>{if(v)q.ink=v;else delete q.ink})}})}
+  WBX.wbMkWell($('mf_cw'),{label:'Shape colour',what:'Shape',defRef:()=>pj().ink,get:()=>{const q=first();return q&&q.ink||''},set:v=>{each(q=>{if(v)q.ink=v;else delete q.ink})}});
+  WBX.wbMkWell($('mf_fcw'),{label:'Sheet colour',what:'Sheet',defRef:()=>pj().bg,get:()=>{const q=first();return q&&q.ink||''},set:v=>{each(q=>{if(v)q.ink=v;else delete q.ink})}})}
  WBX.wbMfSync=mfSync;WBX.wbMotifImage=mfImage;WBX.wbMtHit=mtHit;WBX.wbMtWarm=mtShape}
 export {init82,mfSync,mtHit};

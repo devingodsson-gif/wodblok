@@ -613,7 +613,7 @@ Starting points (built-in templates, workspaces, recipes, shape sets, Wada tray 
 
 - **British spelling:** Colours, Colourways, Colour grading, Grey.
 - **Sentence case** for every label, button, menu item and title. Uppercase only for group labels (done by CSS, so the source text stays in sentence case).
-- **Vocabulary:** Tray (the working colours), Saved trays, Colourways, Folder, Set, Yours (the home folder), Hidden sets, Starting points (a set), Untitled pattern, Stamp, Layer, Canvas, Project, Template. Use these words and no synonyms (not "palette", "category", "collection", "preset pack", "my items").
+- **Vocabulary:** Tray (the working colours), Saved trays, Colourways, Folder, Set, Yours (the home folder), Hidden sets, Starting points (a set), Untitled pattern, Stamp, Layer, Canvas, Project, Template, Sheet (the element that always covers the whole canvas; a new project's Background is one, 2.53.0). "Sheet" means only that element: the drawing area is the canvas. Use these words and no synonyms (not "palette", "category", "collection", "preset pack", "my items").
 - Verbs on buttons: Save, Open, Add, Rename, Duplicate, Download, Delete, Replace, Clear, Import, Export. Not "OK", "Yes", "Submit".
 - Units: a space between number and unit (`12 px`, `300 dpi`), `%` without a space, `×` for sizes (`6 × 9 in`).
 - No exclamation marks (except the account chip, 9.9), no emoji, no first person in the UI.

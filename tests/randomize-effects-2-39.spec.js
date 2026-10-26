@@ -7,8 +7,10 @@ const QK = ['noise', 'grain', 'dust', 'blur', 'motion', 'halftone', 'lines', 'st
 const GRP = { noise: ['noise', 'grain', 'dust'], blur: ['blur', 'motion'], print: ['halftone', 'lines', 'stipple', 'bleed', 'misreg'], distort: ['rough', 'ripple'] };
 const els = async page => JSON.parse(await getState(page)).els || [];
 // the roll-able effects on elements, and the Filter shapes
-const fxOf = list => list.filter(q => !q.flt).flatMap(q => (q.fx || []).map(e => e.k)).filter(k => QK.includes(k));
-const filters = list => list.filter(q => q.flt);
+// a roll's filter: a Filter shape, or (2.53.0) a Sheet over the whole canvas
+const isF = q => !!q.flt || (q.k === 'sheet' && !q.bgd);
+const fxOf = list => list.filter(q => !isF(q)).flatMap(q => (q.fx || []).map(e => e.k)).filter(k => QK.includes(k));
+const filters = list => list.filter(isF);
 async function only(page, fts, subs) {
   await page.evaluate(([fts, subs]) => {
     document.querySelectorAll('[data-ft]').forEach(c => { if (c.type === 'range') c.value = fts.includes(c.dataset.ft) ? 100 : 0; else c.checked = fts.includes(c.dataset.ft); c.dispatchEvent(new Event('input', { bubbles: true })); c.dispatchEvent(new Event('change', { bubbles: true })); });
@@ -52,13 +54,13 @@ test('Effects alone reworks what is there; a Filter shape from the last roll is 
   await openPanel(page, 'rand');
   await roll(page);   // a piece to work on
   await only(page, ['efx']);
-  const before = (await els(page)).filter(q => !q.flt).map(q => q.u);
+  const before = (await els(page)).filter(q => !isF(q)).map(q => q.u);
   let seen = 0;
   for (let i = 0; i < 6; i++) {
     await roll(page);
     const L = await els(page);
     expect(filters(L).length).toBeLessThanOrEqual(1);
-    expect(L.filter(q => !q.flt).map(q => q.u)).toEqual(before);   // nothing else comes or goes
+    expect(L.filter(q => !isF(q)).map(q => q.u)).toEqual(before);   // nothing else comes or goes
     if (fxOf(L).length || filters(L).length) seen++;
   }
   expect(seen).toBe(6);   // with only Effects on, every roll changes something

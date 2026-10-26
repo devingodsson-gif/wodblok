@@ -9,7 +9,7 @@ const shapes = d => d.els.filter(q => q.k === 'motif' && !q.bgd);
 async function setup(page, a = [[.2, .3, .2], [.7, .3, .2], [.45, .7, .15]]) {
   const { errors } = await openApp(page, { seed: 4, background: true });
   for (let i = 0; i < a.length; i++) { await addShape(page, 'rect'); await settle(page); }
-  const d = await st(page), bg = d.els.find(q => q.bgd), cw = +bg.s, ch = cw * (+bg.wy || 1);
+  const d = await st(page), [cw, ch] = await page.locator('#art').evaluate(a => [a.viewBox.baseVal.width, a.viewBox.baseVal.height]);   // 2.53.0: the Background is a Sheet, with no size of its own
   shapes(d).forEach((q, i) => Object.assign(q, { x: cw * a[i][0], y: ch * a[i][1], s: cw * a[i][2], wy: 1, r: 0 }));
   await page.evaluate(s => __wbTest.apply(s), JSON.stringify(d)); await settle(page);
   await page.keyboard.press('Escape'); await settle(page);

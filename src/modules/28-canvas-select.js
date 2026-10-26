@@ -65,8 +65,8 @@ if(e.key=='Escape'&&WBS.fpMq){e.preventDefault();WBS.fpMq=null;WBS.fpSel=-1;WBS.
 if(e.key=='Escape'&&(WBS.fpDrag||WBS.fpXf)){e.preventDefault();fpCancel();return}
 if(e.key=='Escape'&&(WBS.fpB||WBS.txArm||WBS.plArm||WBS.fpSel!==-1)){WBS.plArm=null;WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}
 if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()=='a'&&(L.pl||[]).length){e.preventDefault();WBS.fpMS=new Set(L.pl.map(q=>String(q.u)));WBS.fpSel=L.pl[L.pl.length-1].u;WBS.fpB=null;WBS.fpGhost=null;upd();return}
-const gr=fpGrp(),p=gr[0];if(!p)return;
+const gr=fpGrp(),p=gr.find(q=>q.x!=null)||gr[0];if(!p)return;   // 2.53.0: a Sheet has no place, so the arrows move the others
 if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();gr.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));WBS.fpSel=-1;WBS.fpMS=new Set();store();upd();if(WBX.wbCap)WBX.wbCap();return}
-const gg=fpFG(L),st=gg.snap?fpCell(L)*(e.shiftKey?5:1):(e.shiftKey?10:1)*Math.min(CW,CH)/400,mv={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[e.key];if(mv){e.preventDefault();let ddx=mv[0],ddy=mv[1];if(gg.snap){const pr=fpGrp().find(q=>q.u==WBS.fpSel)||p,[sx,sy]=fpSnap(L,pr.x+mv[0],pr.y+mv[1],null);ddx=sx-pr.x;ddy=sy-pr.y}ddx=fpOn(p.x+ddx,CW)-p.x;ddy=fpOn(p.y+ddy,CH)-p.y;gr.forEach(q=>{q.x=+(q.x+ddx).toFixed(1);q.y=+(q.y+ddy).toFixed(1)});store();upd()}});
+const gg=fpFG(L),st=gg.snap?fpCell(L)*(e.shiftKey?5:1):(e.shiftKey?10:1)*Math.min(CW,CH)/400,mv={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[e.key];if(mv){e.preventDefault();let ddx=mv[0],ddy=mv[1];if(gg.snap){const pr=fpGrp().find(q=>q.u==WBS.fpSel)||p,[sx,sy]=fpSnap(L,pr.x+mv[0],pr.y+mv[1],null);ddx=sx-pr.x;ddy=sy-pr.y}ddx=fpOn(p.x+ddx,CW)-p.x;ddy=fpOn(p.y+ddy,CH)-p.y;if(p.x==null)return;gr.forEach(q=>{if(q.x==null)return;q.x=+(q.x+ddx).toFixed(1);q.y=+(q.y+ddy).toFixed(1)});store();upd()}});
 }
 export {init28};

@@ -31,7 +31,7 @@ test('motif: the Motif button makes nothing, a pick arms it, each click on the c
   expect(JSON.parse(await getState(page)).tiles[0].items.length).toBe(0);   // nothing went into the stamp
   expect(errors).toEqual([]);
 });
-test('motif: with nothing armed, picking a shape changes the selected Motif; the Element bar has no Background', async ({ page }) => {
+test('motif: with nothing armed, picking a shape changes the selected Motif; the Element bar has no Background (2.53.0: it has a Sheet)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openLib(page);
   const btns = page.locator('#lib button[data-m]:visible');
@@ -46,7 +46,8 @@ test('motif: with nothing armed, picking a shape changes the selected Motif; the
   expect(ms).toHaveLength(1);
   expect(ms[0].m).not.toBe(m0);
   const ks = await page.$$eval('#elb .elbb', b => b.map(x => x.dataset.k));
-  expect(ks.some(k => /back|bg|sheet/i.test(k))).toBe(false);
+  expect(ks.some(k => /back|bg/i.test(k))).toBe(false);
+  expect(ks).toContain('sheet');
   expect(errors).toEqual([]);
 });
 test('motif: a dragged Motif is drawn moving while the pointer is down, not only when it is let go', async ({ page }) => {

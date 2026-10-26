@@ -6,6 +6,8 @@ const fs = require('fs'), path = require('path');
 const { chromium } = require('@playwright/test');
 const H = require('../../tests/helpers/harness');
 const ROOT = path.join(__dirname, '..', '..');
+// the picker is the shared folder tree (2.52.0): Starting points is a set, your templates sit in Yours
+const SP = '#tppane .lrw:has(.lfr[data-k="s:Starting points"]) + .lib', YO = '#tppane .lrw:has(.lfr[data-k=""]) + .lib';
 // stamps are 240 units square (the middle is 120, 120); an item is [shape, x, y, size, turn]
 // shapes: b151 Five-petal flower, b287 Dot, b288 Eight-point star, b285 Diamond, b313 Greek key square, b324 Star tile, b300 Star, b292 Lozenge
 const RECIPES = [
@@ -26,21 +28,22 @@ const RECIPES = [
 ];
 const only = process.argv[2];
 (async () => {
-  const browser = await chromium.launch();
+  const exe = process.env.WB_CHROMIUM && fs.existsSync(process.env.WB_CHROMIUM) ? { executablePath: process.env.WB_CHROMIUM } : {};   // as tools/textures/make.js
+  const browser = await chromium.launch(exe);
   for (const R of RECIPES) {
     if (only && R.file !== only) continue;
     const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true })).newPage();
     const { errors } = await H.openApp(page, { seed: 4, pattern: false, background: true });
     if (R.kind !== 'canvas') {                                           // a blank project of the kind, as the picker starts it
       await page.click('#fileb'); await page.click('#tpnew'); await page.click(`#tpty [data-k="${R.kind}"]`); await H.settle(page, { quiet: 4 });
-      await page.locator('#tpg .tpc').first().click(); await H.settle(page, { quiet: 6 });
+      await page.locator(SP + ' button[data-tp]').first().click(); await H.settle(page, { quiet: 6 });
       if (await page.locator('#tpdlg').isVisible()) await page.keyboard.press('Escape');
     }
     for (let i = 0; i < R.stamps.length; i++) await H.addStamp(page);
     const dims = await page.evaluate(() => { const v = document.getElementById('art').viewBox.baseVal; return { w: v.width, h: v.height }; });
     const s = JSON.parse(await H.getState(page));
     s.tiles.forEach((t, i) => { t.items = R.stamps[i].map(([m, x, y, sc, r]) => ({ m, x, y, s: sc, r, f: 1 })); });
-    const bg = s.els.filter(q => q.bgd).map(q => ({ ...q, x: +(dims.w / 2).toFixed(1), y: +(dims.h / 2).toFixed(1), s: +dims.w.toFixed(1), wy: +(dims.h / dims.w).toFixed(4) }));   // the Background fits this canvas
+    const bg = s.els.filter(q => q.bgd);   // the Background (a Sheet since 2.53.0, so it always covers the canvas)
     s.els = [...bg, ...R.els(dims).map((q, i) => ({ u: 'tp' + i, ...q }))];
     s.name = R.name;
     await page.evaluate(j => window.__wbTest.apply(j), JSON.stringify(s)); await H.settle(page);
@@ -48,7 +51,7 @@ const only = process.argv[2];
     await page.click('#fileb'); await page.click('#tpsave'); await page.fill('#tpsn', R.name); await page.click('#tpsok'); await H.settle(page);
     await page.evaluate(() => { window.__wbDownloads.length = 0; });
     await page.click('#fileb'); await page.click('#tpnew'); await page.click(`#tpty [data-k="${R.kind}"]`);
-    await page.click('#tpy [data-more]'); await page.getByRole('menuitem', { name: /Download/ }).click();
+    await page.locator(YO + ' button[data-tp]').first().click({ button: 'right' }); await page.locator('.rowm').getByRole('menuitem', { name: 'Download', exact: true }).click();
     await page.waitForFunction(() => window.__wbDownloads.length > 0);
     const dl = await page.evaluate(() => window.__wbDownloads[0]);
     const dir = path.join(ROOT, 'templates', R.kind); fs.mkdirSync(dir, { recursive: true });

@@ -9,7 +9,7 @@ import {txtLayer} from './26-text-boxes.js';
 // so the elements made before the format stores `k` are still read correctly.
 // A kind registers: label, dz (the order kinds write their shared definitions in), icon (the inside of a 24 x 24 line icon), pn (the panel that creates and edits it; none yet means its button is shown but off),
 // name(q) (what the panel's "Editing" line calls one element), is(q) (does this record belong to me),
-// draw(L, li, pa, lgB) returning [defs, wrapped markup, open tag, close tag, Map(id -> markup)].
+// draw(L, li, pa, lgB) returning [defs, wrapped markup, open tag, close tag, Map(id -> markup)]. under: its pieces may take what is drawn under them (a Sheet, 2.53.0).
 // Adding a kind or an effect later is one module that calls elRegister / fxRegister from its init; nothing else lists them.
 const EL_K={},EL_O=[];
 function elRegister(k,o){if(!EL_K[k])EL_O.push(k);EL_K[k]={k,...o}}
@@ -40,7 +40,7 @@ for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
  if(G){let j=i;while(j<its.length&&its[j].path[d]&&its[j].path[d].u==G.u)j++;const inner=render(its.slice(i,j),d+1);i=j-1;emit();flush();out+=gWrap(G,T(inner));continue}
  const q=it.q;if(q.v===false)continue;const k=elKind(q),r=R[k];if(!r)continue;const s=r[4].get(String(q.u));if(s==null)continue;const a=elOB(q);
  // a filter (2.38.0: a shape in Filter mode) takes what is drawn so far at this level (only its group's members inside a group) and redraws it through its effects
- if(q.flt&&s.includes('@@UNDER@@')){emit();flush();const fid='flu'+li+'_'+gid(q)+'_'+d;{const[pa,pb]=s.split('@@FSPLIT@@');out=pa.split('@@UNDER@@').join(out).split('@@UID@@').join(fid)+(pb?T(pb.split('@@UID@@').join(fid),false):'')}continue}   // 2.40.1: on a repeat tile the filtered copy (the shape's outline and its effects) is copied to the neighbouring tiles
+ if((q.flt||EL_K[k].under)&&s.includes('@@UNDER@@')){emit();flush();const fid='flu'+li+'_'+gid(q)+'_'+d;{const[pa,pb]=s.split('@@FSPLIT@@');out=pa.split('@@UNDER@@').join(out).split('@@UID@@').join(fid)+(pb?T(pb.split('@@UID@@').join(fid),false):'')}continue}   // 2.40.1: on a repeat tile the filtered copy (the shape's outline and its effects) is copied to the neighbouring tiles
  if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a;wn=!!EL_K[k].notile}wb+=r[2]+s+r[3];continue}
  emit();if(k!==run){flush();run=k}buf+=s}
 flush();emit();return out}
@@ -83,8 +83,9 @@ elRegister('motif',{label:'Shape',pn:'motifs',icon:ICN.motif});
 elRegister('text',{label:'Text',pn:'text',icon:ICN.text,dz:3,is:q=>q.tx!=null,name:q=>String((q.tx&&q.tx.text)||'').replace(/\n/g,' ').slice(0,28),draw:(L,li)=>txtLayer(L,li)});
 elRegister('stamp',{label:'Stamp',pn:'stmp',icon:ICN.stamp,dz:1,is:q=>q.t!=null,name:q=>stNmId(q.t),draw:(L,li,pa,lgB)=>freeLayer(L,li,pa,lgB)});
 elRegister('pattern',{label:'Pattern',pn:'layers',icon:ICN.pattern});
+elRegister('sheet',{label:'Sheet',pn:'sheet',icon:ICN.sheet,dz:6,under:true,is:q=>q.k=='sheet',name:q=>q.n||'Sheet'});   // 2.53.0: drawn by 89-sheet-element.js
 elBar();
 const b=$('elb');if(b)b.onclick=e=>{const x=e.target.closest('.elbb');if(!x||x.disabled)return;const d=EL_K[x.dataset.k];if(d&&d.pn&&WBX.wbOpenPanel)WBX.wbOpenPanel(d.pn)};
 WBX.wbElSync=elSync;WBX.wbElSeen=u=>{elLast=String(u)};
 }
-export {elExtend,elDef,elDraw,elKind,elKinds,elRegister,elSel,elSync,fxAll,fxDef,fxFor,fxOf,fxRegister,init65};
+export {elExtend,elDef,elDraw,elKind,elKinds,elOB,elRegister,elSel,elSync,fxAll,fxDef,fxFor,fxOf,fxRegister,init65};

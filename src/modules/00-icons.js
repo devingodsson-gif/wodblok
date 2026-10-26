@@ -81,6 +81,7 @@ books:'<rect x="4" y="5" width="4.5" height="14.5" rx="1"/><rect x="10" y="5" wi
 pattern:'<rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/>',
 stamp:'<circle cx="12" cy="6.5" r="2.5"/><path d="M10.6 9l-.6 3.5h4L13.4 9"/><path d="M5 12.5h14a1 1 0 011 1v3H4v-3a1 1 0 011-1z"/><path d="M5.5 19.5h13"/>',
 motif:'<circle cx="8.5" cy="8.5" r="4.5"/><rect x="12.5" y="12.5" width="8" height="8" rx="1"/><path d="M4.5 20.5l3.3-6 3.3 6z"/>',
+sheet:'<rect x="3.5" y="4.5" width="17" height="15" '+R+'/><path d="M3.5 15.5l11-11M9.5 19.5l11-11"/>',
 shape:'<rect x="4" y="4" width="10" height="10" '+R+'/><circle cx="15.5" cy="15.5" r="4.75"/>',
 text:'<path d="M5 7V5h14v2M12 5v14M9.5 19h5"/>',
 brush:'<path d="M19.5 4.5c-1 2.6-4.9 6.5-7.6 8.1l-1.5-1.5c1.6-2.7 5.5-6.6 8.1-7.6z"/><path d="M10.2 13.3c-2 0-3.4 1.4-3.4 3.2 0 1.3-.8 2.3-2.3 2.6 1 .6 2.2.9 3.4.9 2.5 0 4-1.6 4-3.7"/>',

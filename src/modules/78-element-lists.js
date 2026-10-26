@@ -5,7 +5,7 @@ import {elKind,elSel} from './65-element-core.js';
 
 // ===== An Add button at the top of every element panel (2.6.0). 2.19.0 (owner Oct 22 2026): the per-kind lists are gone; the Elements panel is the only list. Add makes a new element of the kind,
 // selects it and shows its properties just below. Motifs and Stamps are also placed from their libraries. While a stamp is being edited in its tab only Motif and Text keep their Add.
-const ELK={text:{pn:'text',add:'Add text'},pattern:{pn:'layers',add:'Add pattern'},motif:{pn:'motifs',add:'Add shape'},stamp:{pn:'stmp',add:'Add stamp'}};
+const ELK={text:{pn:'text',add:'Add text'},pattern:{pn:'layers',add:'Add pattern'},motif:{pn:'motifs',add:'Add shape'},stamp:{pn:'stmp',add:'Add stamp'},sheet:{pn:'sheet',add:'Add sheet'}};
 // One Element group (Size, Rotate, Position, Flip, Duplicate, Order, Delete) for every kind (2.19.0): it sits at the top of the panel of the kind that is selected (a Motif's, a Text's, a placed Stamp's).
 // A Pattern keeps its own grid controls. One set of controls, so one set of ids: the group moves, it is not copied.
 const ELG_PN={motif:'motifs',text:'text',stamp:'stmp'};

@@ -64,7 +64,7 @@ const RAT={portrait:[[2,3],[3,4],[4,5],[5,7]],square:[[1,1]],landscape:[[3,2],[4
 const SLCn=(window.SLC||[]).length,libFree=!!(FT.lib&&sOn('lib','free')&&SLCn),libPat=!!(FT.lib&&sOn('lib','pat')&&SLCn);let libDone=false;
 const libTile=id=>{const r=pick(window.SLC);let t=null;try{t=JSON.parse(r.tile)}catch(e){}if(!t||!Array.isArray(t.items))return null;try{libMotifs({motifs:r.motifs});libColors({colors:r.colors})}catch(e){}txMerge(t);t.id=id;shOf(t);return t};
 if(!(FT.stamps||FT.frame||FT.col||FT.gr||FT.masks||FT.tx||FT.pr||FT.free||FT.layout||FT.size||FT.look||FT.lib||FT.efx)){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
-const dim0=JSON.parse(JSON.stringify(WBS.dim));const cw0=CW,ch0=CH;   // 2.37.0: the canvas size before the roll, for the Background refit at the end
+const dim0=JSON.parse(JSON.stringify(WBS.dim));
 if(!fresh&&WBX.wbCap)WBX.wbCap();
 const OWN=fresh||!FT.stamps?null:rzTake();   // 2.21.0: a roll that builds new stamps drops the previous roll and holds your own elements aside until the new ones are built (a roll that only reworks what is there, such as Layout or Colours alone, changes it in place)
 // --- the bold moves for this roll (only used when Stamps is on)
@@ -294,8 +294,6 @@ if((FT.free||libFree)&&ch(.65)){
   reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0))}
  setDim();useT(WBS.tiles[WBS.cur]);store();upd()}
 rzPut(OWN,fzU);
-// 2.37.0 (owner Oct 24 2026): a roll that changes the canvas size refits a Background that covered the old canvas, once the roll's elements are all back (the refit inside setDim runs while they are held aside)
-if((CW!=cw0||CH!=ch0)&&WBX.wbBgFit){WBX.wbBgFit(cw0,ch0);store();upd()}
 // 2.39.0 (owner Oct 24 2026): Effects. The roll's new elements may get a Noise, Blur, Print or Distort effect, and a Filter shape may go on top (it replaces the last roll's).
 // Not on a repeat tile: a blur, a displacement or a filter over the whole canvas does not wrap round its edges, so the seams would show (frames and gradients are left out of a tile for the same reason).
 // With Stamps off it reworks the effects of what is there. It draws from its own number stream, so the rest of a seeded roll is unchanged.
