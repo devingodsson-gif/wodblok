@@ -52,7 +52,7 @@ const check = (page, pass, pub, seen) => page.evaluate(async ([pass, pub, seen])
 test('where no account server answers, nothing shows and the menu and commands are as before', async ({ page }) => {
   const { errors } = await open(page, { '/api/me': { status: 404, body: null } });
   await expect(page.locator('#pacct')).toBeHidden();
-  await expect(await fileMenu(page)).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save projectCtrl+S', 'Save project as…', 'Save as template…', 'Import image as shape…', 'Export…', 'Settings…']);
+  await expect(await fileMenu(page)).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Open projects folder…', 'Save projectCtrl+S', 'Save project as…', 'Save as template…', 'Import image as shape…', 'Export…', 'Settings…']);
   expect(await page.evaluate(() => !!window.__wbTest.commands.get('account.open') || !!window.__wbTest.commands.get('feedback.open'))).toBe(false);
   await expect(page.locator('#aclk')).toBeHidden();
   expect(await calls(page, '/api/usage')).toEqual([]);
@@ -77,7 +77,7 @@ test('an account host that says "not signed in" but is not gated (a preview) ask
 test('signed in: a name chip, File > Account… and File > Send feedback…, with commands', async ({ page }) => {
   const { errors } = await open(page, { '/api/me': ME() });
   await expect(page.locator('#pacct')).toHaveText('Hi Ana!');
-  await expect(await fileMenu(page)).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Save projectCtrl+S', 'Save project as…', 'Save as template…', 'Import image as shape…', 'Export…', 'Settings…', 'Account…', 'Send feedback…']);
+  await expect(await fileMenu(page)).toHaveText(['New project', 'New from template…', 'Clear canvas', 'Open project…', 'Open projects folder…', 'Save projectCtrl+S', 'Save project as…', 'Save as template…', 'Import image as shape…', 'Export…', 'Settings…', 'Account…', 'Send feedback…']);
   const c = await page.evaluate(() => ['account.open', 'feedback.open'].map(id => { const x = window.__wbTest.commands.get(id); return x && [x.label, x.enabled()]; }));
   expect(c).toEqual([['Account', true], ['Send feedback', true]]);
   await page.click('#acgo');
