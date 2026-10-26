@@ -9,6 +9,11 @@ on:
     branches: [main]
     types: [opened, synchronize, reopened, ready_for_review, labeled]
   workflow_dispatch:
+    inputs:
+      snap:
+        description: 'TEMPORARY (2.45.1): only write the scenario snapshots made in CI to branch ci/snapshots-2.45.1'
+        type: boolean
+        default: false
 permissions:
   contents: read
   pull-requests: read
@@ -61,10 +66,34 @@ jobs:
       - run: node --test tests/site-marketing-page.test.mjs
   # The Chromium suite is split in four parts that run at the same time (Playwright --shard, by test file). Each part rebuilds the app, which is quick.
   # The picture comparison with `main` is its own job. A last job called `chromium` collects them, so the required check name does not change.
+  snap:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.snap }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    container: mcr.microsoft.com/playwright:v1.56.0-noble
+    env:
+      WB_ENV: ci
+      WB_TARGET: build
+      WB_PIXELS: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright test --project=chromium tests/scenarios.spec.js --update-snapshots=changed --reporter=list || true
+      - run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name ci
+          git config user.email ci@users.noreply.github.com
+          git checkout -b ci/snapshots-2.45.1
+          git add tests/__snapshots__
+          git diff --cached --stat
+          git commit -m "scenario snapshots made in CI" && git push origin ci/snapshots-2.45.1
   chromium-shard:
     name: chromium-shard ${{ matrix.shard }}/4
     needs: changes
-    if: ${{ always() && (github.event_name == 'workflow_dispatch' || (needs.changes.outputs.app == 'true' && contains(github.event.pull_request.labels.*.name, 'run-suite'))) }}
+    if: ${{ always() && ((github.event_name == 'workflow_dispatch' && !inputs.snap) || (needs.changes.outputs.app == 'true' && contains(github.event.pull_request.labels.*.name, 'run-suite'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     container: mcr.microsoft.com/playwright:v1.56.0-noble
