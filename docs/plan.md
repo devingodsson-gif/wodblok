@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.47.0 (Oct 25 2026): a new Pattern lays its stamps edge to edge
+- A new Pattern element starts at size 100% of its cell (it was 80%), so neighbouring stamps touch with no gap; the Size slider (and Randomize's own values) still make gaps or overlaps. Counts stay 4 x 4. Open question for the owner: derive columns and rows from the stamp size (canvas / stamp) instead of a fixed 4 x 4, and add a separate Spacing slider.
+- Tested: tests/pattern-default-2-47-0.spec.js, element-pattern, add-arm, bug-fixes-2-16, motif-look specs. Not run: full suite.
+
 ## 2.45.1 (Oct 25 2026): pixel goldens regenerated
 16 pictures in tests/__golden__/sandbox, after looking at each diff (top bar, no rail, version badge). Two state/SVG snapshots (randomize seed 2) are out of date and wait for the owner's approval. Full CI suite started by hand on this branch.
 
