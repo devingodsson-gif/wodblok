@@ -17,7 +17,7 @@ test('the element bar has one button per kind, left of centre; the tray starts r
   const { errors } = await openApp(page);
   const btn = page.locator('#elb .elbb');
   await expect(btn).toHaveCount(6);   // 2.26.0: Select (V) comes first again; still no Image button
-  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Select', 'Paint', 'Shape', 'Text', 'Stamp', 'Pattern']);
+  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Paint', 'Shape', 'Text', 'Stamp', 'Pattern', 'Sheet']);
   await expect(page.locator('#elb [data-k="paint"]')).toBeHidden();   // the brush is put away for now
   for (const pn of ['stmp', 'layers']) await expect(page.locator(`.rail [data-pn="${pn}"]`)).toBeHidden();   // element panels have no rail button
   const vb = await page.locator('.viewbar').boundingBox(), el = await page.locator('#elb').boundingBox(), ty = await page.locator('#tyc').boundingBox();
@@ -33,9 +33,8 @@ test('a bar button opens its panel and Add there makes the element, just above t
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   const kinds = async () => JSON.parse(await getState(page)).els.map(q => q.k);
-  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');   // 2.26.0: Select is the tool in hand until another is armed
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(0);   // no tool in hand
   await expect(page.locator('#elb [data-k="image"]')).toHaveCount(0);    // there is no Image button
-  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
   await page.click('#elb [data-k="pattern"]'); await settle(page);
   expect(await kinds()).toEqual([]);                      // the button makes nothing
   await expect(page.locator('#elb [data-k="pattern"]')).toHaveAttribute('aria-pressed', 'true');
@@ -51,9 +50,8 @@ test('a bar button opens its panel and Add there makes the element, just above t
   expect((await kinds()).filter(k => k == 'motif').length).toBe(1);   // 2.4.0: the Motif button makes nothing more, a pick arms it
   await expect(page.locator('#elb [data-k="motif"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
-  await page.keyboard.press('Escape'); await settle(page);            // Escape (or V) puts the tool away: Select is in hand again
-  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(1);
-  await expect(page.locator('#elb [data-k="select"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Escape'); await settle(page);            // Escape (or V) puts the tool away: no tool is in hand
+  await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(0);   // no tool in hand
   expect(errors).toEqual([]);
 });
 
