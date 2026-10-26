@@ -90,7 +90,8 @@ Only items the owner has stated are listed as next. Nothing is started unless he
 None at the moment. Add new ones here.
 
 ### Found Oct 25 2026 (speed work)
-- The pixel goldens in tests/__golden__/sandbox (scenarios, roundtrip, launch) fail on 2.44.2 and 2.44.3 alike: the stage is 44 px wider since the rail left (2.44.0). They need regenerating after the owner looks at them; not done here (rule: only goldens a release explains, and with a look at each diff).
+- The pixel goldens in tests/__golden__/sandbox (scenarios, roundtrip, launch, 16 pictures) were regenerated in 2.45.1 (owner, Oct 25 2026): I looked at the diffs; they showed the new top bar and menus, no rail (stage 44 px wider), the newer version badge and date. They had been stale since about 2.33.
+- `tests/__snapshots__/scenarios.spec.js/randomize-seed-2-state.json` and `-svg.json` no longer match: Randomize with seed 2 now picks stamp b434 (and more items) where the snapshot has b435. Not caused by the speed work (it does not change the document). NOT updated: needs the owner's approval.
 - `tests/repeat-tile.spec.js` roll 4 failed once in a long run under load (down seam 24.8, limit 19.0) and passed alone and in its spec; stamp prints finishing during the measurement is the likely cause, not checked further.
 - tests/helpers/harness.js: `WB_BUILD_FILE=<path>` loads another built file than dist/wodblok.html (used to compare two builds picture by picture).
 
