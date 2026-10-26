@@ -145,3 +145,12 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 - Oct 25 2026: he chose to move the rail's eight buttons into the top bar instead of a tool strip: Canvas and Grid in a new Image menu (his pick over View), Elements list in Elements, History beside undo (and in Edit), a gear beside Randomize for its panel, Export recipes in Export, Colours in Colour. Built as 2.44.0; the rail is gone.
 - Oct 25 2026: he said "Merge everything": 2.42.0, 2.43.0 and 2.44.0 went live together (pull request #125).
 - Oct 25 2026: he asked for a speed analysis with a pie chart and a clean plan ("when there's many elements and effects it's very slow"). Plan saved in docs/speed-plan.md, not started; open questions at its end.
+
+## Oct 25-26 2026: stamp tab and pattern
+- He wants the stamp tab canvas to show the actual dividing lines of the chosen symmetry (vertical line for left-right, and so on) on the stamp's own shape, and asked for more symmetry types (built in 2.46.0).
+- The shape library previews must be squares (2.45.2).
+- A new Pattern should put stamps right next to each other by default (canvas 1000 and stamp 100 = 10 x 10, no gaps), with size or a spacing setting to move them closer or further apart; he says the old default row/column system was better. 2.47.0 set the default size to 100%; the stamp-size based count is an open question.
+- Hexagon and triangle stamp shapes render offset (hexagon right, triangle down): to fix.
+- He approves steps with short words ("merge", "Yes next"); on Oct 25 he said "merge" for three finished branches and they went live together.
+- Oct 26 2026: he moved to another Claude agent; handover notes are in docs/PROJECT_STATUS.md.
+

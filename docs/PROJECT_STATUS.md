@@ -97,6 +97,14 @@ None at the moment. Add new ones here.
 - `tests/repeat-tile.spec.js` roll 4 failed once in a long run under load (down seam 24.8, limit 19.0) and passed alone and in its spec; stamp prints finishing during the measurement is the likely cause, not checked further.
 - tests/helpers/harness.js: `WB_BUILD_FILE=<path>` loads another built file than dist/wodblok.html (used to compare two builds picture by picture).
 
+### Handover Oct 26 2026 (owner moved to another agent)
+- `main` is at 2.47.0 (merged Oct 25 night on his word "merge": 2.45.2 square shape previews, 2.46.0 symmetry lines on the stamp tab plus six new symmetry types, 2.47.0 a new Pattern starts at 100% of its cell). Preview artifact not republished since 2.44.x.
+- **Not started: hexagon and triangle stamp shapes render with an offset** (owner: hexagon offset to the right, triangle offset down). Suspect `src/modules/04-canvas-and-stamp-outlines.js` (hex lattice `HL`, `SW`/`SH`; the triangle's centre is at `SH*2/3`, not `SH/2`) and how a stamp block is placed in a pattern. Not confirmed; reproduce with a screenshot first, add a test.
+- **Open question for the owner:** should a new Pattern's columns and rows come from the stamp size (canvas / stamp, e.g. 1000 / 100 = 10 x 10) instead of a fixed 4 x 4, with a separate Spacing slider? 2.47.0 only changed the default size to 100%. Hexagon and triangle cannot fill a square cell, so they still leave gaps.
+- Idea awaiting his direction: a "most used items" strip on the top bar (my recommendation: pinned plus usage-filled slots, fixed order, counts kept local; he has not decided the look).
+- Open CI notes: top-bar-2-43 (Ctrl+S after a body click), saved-colours-list ("element is not stable") and the commands.spec 'documented shortcuts' test were flaky in CI; the baseline run on v2.44.0 listed no failing shards.
+- Still open from before: owner's Mac `npm run perf:draw`; printing text, picture and pattern elements with effects (2.44.3 prints only shapes); stale remote branch docs/2.44.0-live could not be deleted.
+
 ## Suggestions (my recommendations, not decisions)
 - Drawing speed: plan in docs/speed-plan.md (Oct 25 2026). Owner said yes to the order below. 2.44.1 to 2.44.4 (now released as 2.45.0) are built on feat/2.44.1-perf-draw (not merged; 2.44.2: -8% work per slider/shape step, -21% undo/redo; 2.44.3 on top: another -50%, see docs/perf-baseline.md). 2.44.4 updates the canvas in place (another -10 to -22%). 2.44.3 prints shapes with effects once; text, picture and pattern elements with effects are still drawn live (a later step if wanted). Order: 2.44.1 measure, 2.44.2 stop refreshing unchanged panels, 2.44.3 print effect elements once (the big one), 2.44.4 update the canvas in place.
 - Known bug found while measuring: `npm run dev` (unbundled modules) fails at start, "teD is not defined" (22-text-tool.js uses teD from 60-text-engine.js without importing it). Fixed in 2.44.1.
@@ -108,3 +116,4 @@ None at the moment. Add new ones here.
 ## Changelog of this page
 - Oct 21 2026 (night): updated for 2.10.0 to 2.15.0, the handover to another agent.
 - Oct 21 2026: first version, written from a fresh clone of `main` at 2.9.0 and the existing docs. Same day: owner's answers recorded.
+- Oct 26 2026: handover to another agent; 2.45.2 to 2.47.0 recorded.
