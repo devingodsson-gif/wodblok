@@ -1,4 +1,4 @@
-// 2.9.0: texture and colour grade are effects only. The Texture effect carries Type, Strength, Scale and Light from; the old tools are gone.
+// 2.9.0 (type from a list; 2.50.0 from the texture library): texture and colour grade are effects only. The Texture effect carries Type, Strength, Scale and Light from; the old tools are gone.
 const { test, expect } = require('@playwright/test');
 const { openApp, settle, getState, addShape } = require('./helpers/harness');
 
@@ -18,11 +18,12 @@ test('the Texture effect has Type, Strength, Scale and Light from, and each effe
   await addEffect(page, 'motif', 'Texture');
   await addEffect(page, 'motif', 'Texture');
   const g = '.fxg[data-fxk="motif"]';
-  for (const c of ['.fxst', '.fxsa', '.fxsc', '.fxsz']) await expect(page.locator(`${g} ${c}`)).toHaveCount(1);
+  for (const c of ['.txtr', '.fxsa', '.fxsc', '.fxsz']) await expect(page.locator(`${g} ${c}`)).toHaveCount(1);
   for (const c of ['.fxsa', '.fxsc', '.fxsz']) await expect(page.locator(`${g} ${c}`)).toBeVisible();
-  const opts = await page.locator(`${g} .fxst option`).evaluateAll(o => o.map(x => x.value));
-  const pick = opts[opts.length - 1];
-  await page.evaluate(([s, v]) => { const e = document.querySelector(s); e.value = v; e.dispatchEvent(new Event('change', { bubbles: true })); }, [`${g} .fxst`, pick]);
+  // 2.50.0: the type is picked from the texture library in the effect (a tile per texture, in its set)
+  await page.click(`${g} .txtr .lfr[data-k="s:Print faults and wear"]`);
+  const pick = 'foxing';
+  await page.click(`${g} .txtr [data-tx="${pick}"]`);
   await setRange(page, `${g} .fxsa`, 77); await setRange(page, `${g} .fxsc`, 150); await setRange(page, `${g} .fxsz`, 90);
   await settle(page);
   const d = await st(page), fx = sheetOf(d).fx;

@@ -22,6 +22,7 @@ function fmtImageSlots(p) {
   const s = [];
   if (p.arts && typeof p.arts === 'object') for (const a of Object.values(p.arts)) if (a && typeof a === 'object') s.push([a, 'src']);
   if (p.art && typeof p.art === 'object') s.push([p.art, 'src']);          // the project picture used when this project is placed as Art
+  if (p.texImgs && typeof p.texImgs === 'object') for (const a of Object.values(p.texImgs)) if (a && typeof a === 'object') s.push([a, 'src']);   // imported texture pictures (2.50.0)
   const c = p.cover;
   if (c && typeof c === 'object') { s.push([c, 'img']); for (const k of ['back', 'spine']) if (c[k] && typeof c[k] === 'object') s.push([c[k], 'img']); }
   return s;

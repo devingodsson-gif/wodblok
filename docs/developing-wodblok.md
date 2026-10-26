@@ -98,6 +98,14 @@ These are from CLAUDE.md and the owner's instructions. They win over anything el
 - Add a new panel control by adding the markup in `src/shell.html` and reading it through the module that owns that panel. Use the existing component classes (Part 9); never new ad-hoc CSS.
 - Keep the **document plain data with stable ids**; keep anything that needs a browser, network or storage behind `src/platform`.
 
+**Textures (2.50.0)**
+- Every texture is a **picture**: a grayscale WebP, at most 1024 px on its long side, that repeats without a seam. One picture is one repeat of the texture at Scale 100%.
+- The built-in ones are the files in `textures/<set>/<id>.webp`. The build puts them into the app (`tools/textures/folders.js` fills `src/data/textures.js`), as it does with `templates/`. To change one, replace the file; to add one, drop a file in a set folder (the file name is the id: lower case, digits and `-`; the name shown is from `tools/textures/sets.json`, or made from the file name). Sets and ids in `sets.json` keep their order, because Randomize and saved projects use them.
+- A dropped PNG or JPEG must be converted first: `npm run textures` (`tools/textures/make.js`) makes it a grayscale WebP of the right size and removes the original (`--seam` also blends the edges of a picture that was not made to repeat). The build refuses any other picture, and any file over 600 KB. Keep the whole folder under about 5 MB: it is inside the app.
+- The placeholders were drawn by `tools/textures/bake.js` from the generators the app had until 2.49.0 (the generators live in that tool now, for later procedural effects).
+- `16-texture-generators.js` draws a texture by repeating its picture (Scale, Rotate, Flip across, Flip down; a use's variation moves it) and then makes the wear, relief or stain picture as before. Pictures are read the first time they are wanted; everything is drawn again when they are ready (`WBX.wbTexPicReady`), and the tests wait for them (`printsBusy`).
+- The texture library (`86-texture-library.js`) is the folder tree of Part 9 section 12, shown in the Texture effect. Your imported textures are kept in the browser (`wb250_textures`, through the platform); a project saves the imported textures it uses as files in its zip (`texImgs`), and opening it adds them to the library. No file format change: an older app ignores `texImgs`.
+
 **The text system (1.39-1.46), the part most likely to be extended**
 - `60-text-engine.js` is a pure engine: one options object in, positioned letter outlines out. Real outlines come from font files via opentype.js (`teReal`); the old tracing is the fallback. Layout and kerning use canvas `measureText`. Glyph key `t|<fontId>|<codepoint base36>`. Allowed stored path characters are `[MLQZ0-9.,\- ]`.
 - `61-text-panel.js` reads and writes **all** Text panel controls (`txoRead`, `txoWrite`, `txoBind`, `txoSelBind`). A new text option is added **here, in the engine and in `src/shell.html` only**.
@@ -627,7 +635,7 @@ Counts are occurrences of a declared value in `src/shell.html` and `src/modules/
 | Shapes library | the model (section 12) | Complete: nested tree, many open, select mode, drag to folder, hidden sets. Home is called "My imports" and an old "Drawn by Claude" folder shows only for old projects (do not copy it) |
 | Saved trays (colours) | the tree | One level of folders only; you drill in and use a Back button; its own rows (`.stf`), search and rename; no nesting, no select mode, no Move to…, no drag; Wada sets sit in three fixed folders instead of being sets in the list |
 | Saved stamps | the tree | No folders |
-| Textures | the tree | No library yet (imports are planned) |
+| Textures | the tree | 2.50.0: Yours, your folders and the built-in sets with tiles, in the Texture effect; Add texture imports. Not yet: select mode, drag to a folder, hiding sets, Export and Import from file |
 | Colourways | the tree for saved colourways | Only this project's colourways exist (flat cards); no saved colourways library |
 | Templates, workspaces, export recipes | the tree | Flat list under two headings ("Starting points", "Yours"), three separate heading classes, no folders, no select mode |
 | Folder "…" button | always visible (rule 5) | Shapes library shows it only on hover, on the active row or on focus (`.lmo`); right-click is the other way in. Fix in the standardisation release |

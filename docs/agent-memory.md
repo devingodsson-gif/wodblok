@@ -153,4 +153,5 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 - Hexagon and triangle stamp shapes render offset (hexagon right, triangle down): to fix.
 - He approves steps with short words ("merge", "Yes next"); on Oct 25 he said "merge" for three finished branches and they went live together.
 - Oct 26 2026: he moved to another Claude agent; handover notes are in docs/PROJECT_STATUS.md.
-
+- Oct 26 2026: textures are pictures, not procedural (procedural looks can come later as effects). Built-in pictures are embedded in the app; imported textures go both in the project and in the texture library. Placeholders now; the owner will have ChatGPT make the final pictures. Rotation and flipping for variation. Snapshots may be regenerated once a release is done ("regenerate snapshots when all is done").
+- Oct 26 2026: the "most used items" strip is dropped. A new Pattern takes its columns and rows from the stamp size (2.48.0).

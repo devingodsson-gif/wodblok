@@ -71,6 +71,7 @@ import {init81} from './modules/81-recent-files.js';
 import {init82} from './modules/82-motif-look.js';
 import {init84} from './modules/84-smart-guides.js';
 import {init85} from './modules/85-menu-bar.js';
+import {init86} from './modules/86-texture-library.js';
 import {init58} from './modules/58-account.js';
 import {init59} from './modules/59-align.js';
 import {acAccount} from './platform/account.js';
@@ -83,7 +84,7 @@ icNamesWatch();   // every icon-only button: a hover name and the same accessibl
 init01();
 // the element and effect registries are filled first, before anything draws
 init65();
-init69();
+init86();init69();
 init02();
 init03();
 init04();
@@ -155,4 +156,4 @@ init85();
 // a launch with no template picker is an untouched new project: no unsaved dot, nothing to confirm before opening another (2.22.1; the picker's own finish used to set this)
 if(!WBS.cp.id&&WBS.cp.saved===''){WBS.cp.saved=coreStr()}
 if(WBX.wbEnhance)WBX.wbEnhance();   // value boxes on the slider rows that panels wrote themselves
-window.__wbTest = { stampIdOf: i => { const it = STP.items[i]; return it ? it[0] : null; }, histLabels: () => WBX.wbHistLabels(), markClean: () => { WBS.cp.saved = coreStr(); WBX.wbPaintPst && WBX.wbPaintPst(); }, apply: s => WBX.wbApply(JSON.parse(s)), resetHistory: () => WBX.wbResetHist && WBX.wbResetHist(), stampAt, stampToCanvas, unlockedStamp: stUnlocked, state: () => coreStr(), kv, account: acAccount, recoveryTick: rcTick, printsBusy: () => !BK.off && !!(BK.busy || BK.q.size), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
+window.__wbTest = { stampIdOf: i => { const it = STP.items[i]; return it ? it[0] : null; }, histLabels: () => WBX.wbHistLabels(), markClean: () => { WBS.cp.saved = coreStr(); WBX.wbPaintPst && WBX.wbPaintPst(); }, apply: s => WBX.wbApply(JSON.parse(s)), resetHistory: () => WBX.wbResetHist && WBX.wbResetHist(), stampAt, stampToCanvas, unlockedStamp: stUnlocked, state: () => coreStr(), kv, account: acAccount, recoveryTick: rcTick, printsBusy: () => (!BK.off && !!(BK.busy || BK.q.size)) || !!(WBX.wbTexBusy && WBX.wbTexBusy()), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };

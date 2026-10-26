@@ -75,5 +75,7 @@ WBS.tex={};
 try{const q=JSON.parse(kv.get('wb10_tex')||'null');if(q&&typeof q=='object')WBS.tex=q}catch(e){}
 {const c=$('ctxon');if(c)c.onchange=()=>{if(!WBS.tex)return;if(c.checked)delete WBS.tex.off;else WBS.tex.off=1;saveTex();upd();if(WBX.wbCap)WBX.wbCap()}}
 WBH.syncTex();buildTex();WBX.wbTexReady=1;
+// 2.50.0: a texture picture is read the first time it is wanted; when it is ready, everything that uses it is drawn again
+{const prev=WBX.wbTexPicReady;WBX.wbTexPicReady=()=>{if(prev)prev();buildTex()}}
 }
 export {SURFC,buildTex,inkCatch,layTexMask,layTexOv,roughFilter,saveTex,surfFor,texNorm,txMerge,txPack,txoG,init17};

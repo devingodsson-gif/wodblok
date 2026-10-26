@@ -17,6 +17,7 @@ function fmtValidate(p) {
   if (n > FMT_MAX_ITEMS) bad('size', 'That project is far larger than WODBLOK can open.');
   if (p.els.length > FMT_MAX_ITEMS || p.els.some(q => !q || typeof q !== 'object' || typeof q.k !== 'string' || (q.k !== 'group' && (!Number.isFinite(+q.x) || !Number.isFinite(+q.y))) || (q.pts !== undefined && !(Array.isArray(q.pts) && q.pts.length <= 2000 && q.pts.every(a => Array.isArray(a) && a.length === 6 && a.every(Number.isFinite)))))) bad('items', 'That project has damaged pieces in its element list.');
   if (p.arts !== undefined && (p.arts === null || typeof p.arts !== 'object')) bad('arts', 'The pictures in that project are damaged.');
+  if (p.texImgs !== undefined && (p.texImgs === null || typeof p.texImgs !== 'object' || Array.isArray(p.texImgs))) bad('texImgs', 'The texture pictures in that project are damaged.');
   return p;
 }
 export {fmtValidate};

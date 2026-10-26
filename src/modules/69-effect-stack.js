@@ -4,13 +4,14 @@ import {rng,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
-import {TXF,TXMD,TXMN,TXN,txFilt,txImgs,txIsW,txLib,txMake,txRid,txSpecs} from './16-texture-generators.js';
+import {TXMD,TXMN,TXN,txFilt,txImgs,txIsW,txLib,txMake,txRid,txSpecs} from './16-texture-generators.js';
 import {fpU} from './24-free-place-layers.js';
 import {elKind,elSel,fxDef,fxFor,fxOf,fxRegister} from './65-element-core.js';
 import {patCur} from './67-pattern-element.js';
 import {paCur} from './70-paint-element.js';
 import {mkWell} from './52-tray-ui.js';
 import {fqRegister,fqVal} from './83-filter-effects.js';
+import {tlPane,tlShow} from './86-texture-library.js';
 
 // ===== The effect stack (element update, step 7, 2.1.7): an ordered list `fx` on an element, each {u, k, on, ...settings}, shown at the bottom of the element's panel.
 // An effect can be switched off, moved up or down, and deleted; several of a kind are allowed. Effects that apply to a pattern apply to every placement.
@@ -62,9 +63,12 @@ const FXI={eye:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentC
 function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hidden><summary>Effects<button type="button" class="ib fxadd" aria-haspopup="menu" aria-label="Add effect">${FXI.plus}</button></summary><div class="gb">
 <div class="fxl"></div><div class="fxpane">
 <div class="fxs" data-e="texture" hidden>
-<div class="ctl"><label>Type</label><select class="fxst" aria-label="Type">${TXF.map(([g,o])=>`<optgroup label="${g}">${Object.entries(o).map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</optgroup>`).join('')}</select></div>
+${tlPane()}
 <div class="ctl"><label>Strength</label><input type="range" class="fxsa" min="0" max="100" value="40" data-def="40"></div>
 <div class="ctl"><label>Scale</label><input type="range" class="fxsc" min="25" max="200" value="100" data-u="%" data-def="100"></div>
+<div class="ctl"><label>Rotate</label><input type="range" class="fxsr" min="0" max="359" value="0" data-u="&#176;" data-def="0"></div>
+<label class="chk"><input type="checkbox" class="fxsfh"><span>Flip across</span></label>
+<label class="chk"><input type="checkbox" class="fxsfv"><span>Flip down</span></label>
 <div class="ctl"><label>Light from</label><input type="range" class="fxsz" min="0" max="359" value="225" data-u="&#176;" data-def="225"></div>
 <div class="ctl"><label>Mode</label><select class="fxsm" aria-label="Mode">${TXMD.map(m=>`<option value="${m}">${TXMN[m]}</option>`).join('')}</select></div>
 <div class="row"><button type="button" class="alt fxrr">Reroll</button></div>
@@ -93,7 +97,9 @@ const host=g.querySelector('.fxl'),host2=g.querySelector('.fxl2');if(host.datase
 const row=e=>{const d=fxDef(e.k),on=e.on!==false,op=sel&&e.u==sel.u;return`<div class="fxr${op?' on':''}${on?'':' off'}" data-fu="${e.u}" draggable="true"><button type="button" class="ib" data-fon aria-pressed="${on}" aria-label="${on?'Hide':'Show'} this effect">${on?FXI.eye:FXI.off}</button><span class="fxc${op?' open':''}">${FXI.car}</span><b>${fxHx(d?d.label:e.k)}</b><button type="button" class="ib" data-fmore aria-haspopup="menu" aria-label="More">${FXI.more}</button></div>`};
 const si=sel?list.indexOf(sel):list.length-1;host.innerHTML=list.slice(0,si+1).map(row).join('');host2.innerHTML=list.slice(si+1).map(row).join('');}
 g.querySelectorAll('.fxs').forEach(s=>{const on=!!sel&&s.dataset.e==sel.k;if(s.hidden===on)s.hidden=!on});
-if(sel&&sel.k=='texture'){const L=txLib(sel.x)||{t:Object.keys(TXN)[0],a:40,sc:100,az:225},st=g.querySelector('.fxst'),sm=g.querySelector('.fxsm'),set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};if(st.value!==L.t)st.value=L.t;set('.fxsa',+L.a);set('.fxsc',+L.sc);set('.fxsz',+L.az);if(sm.value!==(sel.md||'wear'))sm.value=sel.md||'wear'}
+if(sel&&sel.k=='texture'){const L=txLib(sel.x)||{t:Object.keys(TXN)[0],a:40,sc:100,az:225},sm=g.querySelector('.fxsm'),set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxsa',+L.a);set('.fxsc',+L.sc);set('.fxsr',+L.rot||0);set('.fxsz',+L.az);g.querySelector('.fxsfh').checked=!!L.fh;g.querySelector('.fxsfv').checked=!!L.fv;if(sm.value!==(sel.md||'wear'))sm.value=sel.md||'wear';
+ // 2.50.0: the texture is picked from the texture library, shown right here
+ tlShow(g.querySelector('.fxs[data-e="texture"]'),L.t,id=>{if(WBX.wbFxTexSet)WBX.wbFxTexSet(kind,'t',id)})}
 if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxjp',+sel.pos||0);set('.fxjr2',+sel.rot||0);set('.fxjz',+sel.sz||0);g.querySelector('.fxjh').checked=!!sel.fh;g.querySelector('.fxjv').checked=!!sel.fv}
 if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=g.querySelector('.fxg_'+k),v=+sel[k]||0;if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}});
 if(sel){const d=fxDef(sel.k),pane=d&&d.sync&&g.querySelector(`.fxs[data-e="${sel.k}"]`);if(pane)d.sync(pane,sel)}
@@ -133,10 +139,12 @@ lists.forEach(h=>{h.onclick=e=>{const t=tg();if(!t)return;const r=e.target.close
  h.addEventListener('dragend',()=>{dragU=null})});
 // a Texture effect owns its settings (2.9.0: there is no Textures tool): its own library entry, copied first when another element or a library texture shares it
 const txOwn=e=>{let L=txLib(e.x);const n=WBS.layers.reduce((c,l)=>c+(l.pl||[]).reduce((c2,p)=>c2+fxOf(p).filter(f=>f.k=='texture'&&f.x===e.x).length,0),0);
- if(!L||n>1||!L.auto){const b=L||{t:Object.keys(TXN)[0],a:40,sc:100,az:225};L=txMake(b.t,{a:b.a,sc:b.sc,az:b.az,auto:true});WBS.texLib.push(L);e.x=L.id}return L};
+ if(!L||n>1||!L.auto){const b=L||{t:Object.keys(TXN)[0],a:40,sc:100,az:225};L=txMake(b.t,{a:b.a,sc:b.sc,az:b.az,rot:+b.rot||0,fh:b.fh?1:0,fv:b.fv?1:0,auto:true});WBS.texLib.push(L);e.x=L.id}return L};
 const txSet=(k,v)=>{const e=cur();if(!e||e.k!='texture')return;const L=txOwn(e);if(L[k]===v)return;L[k]=v;fxCh()};
-g.querySelector('.fxst').onchange=()=>txSet('t',g.querySelector('.fxst').value);
-[['.fxsa','a'],['.fxsc','sc'],['.fxsz','az']].forEach(([c,k])=>g.querySelector(c).addEventListener('input',()=>txSet(k,+g.querySelector(c).value)));
+// a tile of the library picks the texture (the library calls this for the panel it is in)
+(WBX.wbFxTexSets=WBX.wbFxTexSets||{})[kind]=txSet;
+[['.fxsa','a'],['.fxsc','sc'],['.fxsr','rot'],['.fxsz','az']].forEach(([c,k])=>g.querySelector(c).addEventListener('input',()=>txSet(k,+g.querySelector(c).value)));
+[['.fxsfh','fh'],['.fxsfv','fv']].forEach(([c,k])=>g.querySelector(c).onchange=()=>txSet(k,g.querySelector(c).checked?1:0));
 g.querySelector('.fxsm').onchange=()=>{const e=cur();if(e){e.md=g.querySelector('.fxsm').value;fxCh()}};
 g.querySelector('.fxrr').onclick=()=>{const e=cur();if(e){e.sd=txRid();fxCh()}};
 GRL.forEach(([k])=>g.querySelector('.fxg_'+k).addEventListener('input',()=>{const e=cur();if(!e||e.k!='grade')return;const v=+g.querySelector('.fxg_'+k).value;if(e[k]!==v){e[k]=v;fxCh()}}));
@@ -144,7 +152,7 @@ GRL.forEach(([k])=>g.querySelector('.fxg_'+k).addEventListener('input',()=>{cons
 [['.fxjh','fh'],['.fxjv','fv']].forEach(([c,f])=>g.querySelector(c).onchange=()=>{const e=cur();if(e&&e.k=='jitter'){e[f]=g.querySelector(c).checked;fxCh()}});
 g.querySelector('.fxjrr').onclick=()=>{const e=cur();if(e&&e.k=='jitter'){e.sd=txRid();fxCh()}};
 [['.fxpp','pst'],['.fxpf','pfl']].forEach(([c,f])=>g.querySelector(c).addEventListener('input',()=>{const e=cur();if(!e||e.k!='pressure')return;const v=+g.querySelector(c).value;if(e[f]!==v){e[f]=v;fxCh()}}))});
-WBX.wbFxSync=fxSync}
+WBX.wbFxSync=fxSync;WBX.wbFxTexSet=(kind,k,v)=>{const f=WBX.wbFxTexSets&&WBX.wbFxTexSets[kind];if(f)f(k,v)}}
 // a text's Jitter is rolled per letter: letter i of text p gets its own seed, and the size it moves by is the font size
 const fxJitL=(p,i,fs)=>fxJit({u:p.u+'#'+i,s:fs,fx:p.fx});
 export {fxAddTo,fxMenuAdd,fxMenuKind,fxGr,fxJit,fxJitL,fxPad,fxPress,fxSync,fxTex,fxTexUses,init69};
