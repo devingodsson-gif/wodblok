@@ -59,10 +59,10 @@ jobs:
           node-version: 22
       - run: npm run test:site
       - run: node --test tests/site-marketing-page.test.mjs
-  # The Chromium suite is split in four parts that run at the same time (Playwright --shard, by test file). Each part rebuilds the app, which is quick.
+  # The Chromium suite is split in eight parts that run at the same time (Playwright --shard, by test file). Each part rebuilds the app, which is quick.
   # The picture comparison with `main` is its own job. A last job called `chromium` collects them, so the required check name does not change.
   chromium-shard:
-    name: chromium-shard ${{ matrix.shard }}/4
+    name: chromium-shard ${{ matrix.shard }}/8
     needs: changes
     if: ${{ always() && (github.event_name == 'workflow_dispatch' || (needs.changes.outputs.app == 'true' && contains(github.event.pull_request.labels.*.name, 'run-suite'))) }}
     runs-on: ubuntu-latest
@@ -71,14 +71,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     env:
       WB_ENV: ci
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
       - run: npm run build
-      - run: npx playwright test --project=chromium --shard=${{ matrix.shard }}/4 --reporter=list,github
+      - run: npx playwright test --project=chromium --shard=${{ matrix.shard }}/8 --reporter=list,github
         env:
           WB_TARGET: build
           WB_PIXELS: '0'
