@@ -8,6 +8,7 @@ import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {fpL,fpU} from './24-free-place-layers.js';
+import {fpSz} from './25-art-layers.js';
 import {elExtend,elSel} from './65-element-core.js';
 
 // ===== The Pattern element (element update, step 5, 2.1.5): a list of points plus sources placed at them.
@@ -16,6 +17,8 @@ import {elExtend,elSel} from './65-element-core.js';
 // Sources are references: editing a stamp changes every placement. A pattern draws by turning itself into ordinary stamp, image and text elements (with the pattern's id in `pu`),
 // which the kinds draw as always; nothing is drawn twice and nothing is stored for them.
 const patClamp=(v,a,b)=>Math.max(a,Math.min(b,+v||0));
+// A new Pattern starts with as many columns and rows as the canvas holds stamps of the size a stamp is placed at (2.48.0, owner Oct 26 2026): canvas 1000 and stamp 100 make 10 x 10.
+const patStart=()=>{const s=Math.max(1,fpSz());return{cn:patClamp(Math.round(CW/s),1,40),rn:patClamp(Math.round(CH/s),1,40)}};
 function patRnd(sd){let a=(+sd||1)>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
 // the points: [x, y] and the size of the cell around each
 function patPts(p){{const S=mapShape(p);if(S){const m=mapPts(p,S);if(m)return m}}
@@ -71,7 +74,7 @@ function patAddMenu(){const p=patCur(),b=$('peadd');if(!p||!b)return;const L=fpL
 function init67(){
 elExtend('pattern',{expand:patExpand,name:q=>q.n});
 if(!$('pelist'))return;
-$('penew').onclick=()=>{const L=fpL();if(!L)return;L.pl=L.pl||[];const n=patList().length+1,q={u:fpU(),k:'pattern',n:'Pattern '+n,lay:'grid',cn:4,rn:4,sz:100,rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:Math.min(CW,CH),r:0,f:1};L.pl.push(q);WBS.patSel=q.u;patCh()};
+$('penew').onclick=()=>{const L=fpL();if(!L)return;L.pl=L.pl||[];const n=patList().length+1,q={u:fpU(),k:'pattern',n:'Pattern '+n,lay:'grid',...patStart(),sz:100,rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:Math.min(CW,CH),r:0,f:1};L.pl.push(q);WBS.patSel=q.u;patCh()};
 $('pelist').onclick=e=>{const L=fpL();if(!L)return;WBS.patSrc=null;const d=e.target.closest('[data-pd]');if(d){const i=L.pl.findIndex(q=>q.u==d.dataset.pd);if(i>=0){L.pl.splice(i,1);if(WBS.patSel==d.dataset.pd)WBS.patSel=null;patCh()}return}const r=e.target.closest('[data-pe]');if(r){WBS.patSel=r.dataset.pe;patSync();}};
 const set=(f,v)=>{const p=patCur();if(!p)return;if(p[f]===v)return;p[f]=v;patCh()};
 $('pelay').onclick=e=>{const b=e.target.closest('[data-l]');if(b){set('lay',b.dataset.l);$('peinr').hidden=b.dataset.l!='frame'}};
@@ -85,4 +88,4 @@ document.addEventListener('keydown',e=>{if(e.key=='Escape'&&WBX.wbLibPick){WBX.w
 $('pesrc').onclick=e=>{const p=patCur(),x=e.target.closest('[data-sx]');if(p&&x){p.src.splice(+x.dataset.sx,1);WBS.patSrc=null;patCh();return}const r=e.target.closest('[data-look]');if(p&&r&&!e.target.closest('input')){const i=+r.dataset.si;WBS.patSrc=WBS.patSrc===i?null:i;patSync();if(WBX.wbMfSync)WBX.wbMfSync()}};
 $('pesrc').addEventListener('change',e=>{const p=patCur(),w=e.target.closest('[data-sw]');if(p&&w){p.src[+w.dataset.sw].w=Math.max(1,Math.min(99,Math.round(+w.value||1)));patCh()}});
 WBX.wbPatSync=patSync;WBX.wbPatArrows=patArrows;patSync()}
-export {init67,patCur,patExpand,patItems,patPts,patSync};
+export {init67,patCur,patExpand,patItems,patPts,patStart,patSync};
