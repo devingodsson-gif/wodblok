@@ -47,6 +47,7 @@ Source: the owner's rough notes from watching one artist use the app. Raw notes 
 
 ## Text overhaul (release 3)
 The owner wants to overhaul text and will give more for release 3 when we get there: ask him then. Bold, italic and the Text styles naming (section 3) wait for that.
+- [x] Style parts of a text: Letter colour (2.62.0). Fonts, bold and italic: waiting (owner, Oct 27 2026).
 
 ## Unfinished note
 The last note stops mid-sentence: "Say there are 100 elements in the element list, so the list is super full and". Ask the owner how it ends (probably a full Elements list being hard to use).

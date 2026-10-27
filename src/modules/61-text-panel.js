@@ -12,10 +12,11 @@ const txoSegV=(id,dk,d)=>{const b=document.querySelector('#'+id+' .on');return b
 const txoSegD={al:'c',tc:'',va:'t',ov:'',sc:'',bal:''};
 // letter i of the text, counting letters not UTF-16 units
 const txoCp=(s,u)=>[...s.slice(0,u)].length;
-function txoCompile(sty,n){const a=new Array(n).fill(null);sty.forEach(r=>{for(let i=r[0];i<r[1]&&i<n;i++)a[i]=[r[2],r[3],r[4]]});return a}
-function txoPack(a){const out=[];let i=0;while(i<a.length){const v=a[i];if(!v||(v[0]==100&&!v[1]&&!v[2])){i++;continue}let j=i+1;while(j<a.length&&a[j]&&a[j][0]==v[0]&&a[j][1]==v[1]&&a[j][2]==v[2])j++;out.push([i,j,v[0],v[1],v[2]]);i=j}return out}
+// a run is [from, to, size %, raise %, spacing %] and, since 2.62.0, a colour (a tray colour or a hex) as its sixth item when the letters have one
+function txoCompile(sty,n){const a=new Array(n).fill(null);sty.forEach(r=>{for(let i=r[0];i<r[1]&&i<n;i++)a[i]=[r[2],r[3],r[4],r[5]||'']});return a}
+function txoPack(a){const out=[];let i=0;while(i<a.length){const v=a[i];if(!v||(v[0]==100&&!v[1]&&!v[2]&&!v[3])){i++;continue}let j=i+1;while(j<a.length&&a[j]&&a[j][0]==v[0]&&a[j][1]==v[1]&&a[j][2]==v[2]&&(a[j][3]||'')==(v[3]||''))j++;out.push(v[3]?[i,j,v[0],v[1],v[2],v[3]]:[i,j,v[0],v[1],v[2]]);i=j}return out}
 // set (or with patch null, clear) the size / raise / spacing of letters A to B
-function txoApply(sty,n,A,B,patch){const a=txoCompile(sty,n);for(let i=Math.max(0,A);i<B&&i<n;i++){if(!patch){a[i]=null;continue}const v=a[i]||[100,0,0];a[i]=[patch.z!=null?patch.z:v[0],patch.d!=null?patch.d:v[1],patch.l!=null?patch.l:v[2]]}return txoPack(a)}
+function txoApply(sty,n,A,B,patch){const a=txoCompile(sty,n);for(let i=Math.max(0,A);i<B&&i<n;i++){if(!patch){a[i]=null;continue}const v=a[i]||[100,0,0,''];a[i]=[patch.z!=null?patch.z:v[0],patch.d!=null?patch.d:v[1],patch.l!=null?patch.l:v[2],patch.c!=null?patch.c:(v[3]||'')]}return txoPack(a)}
 // after the words are edited, the styles stay with their letters; new letters take the style of the letter before them
 function txoShift(sty,o,n){if(!sty.length||o===n)return sty;const A=[...o],B=[...n];let p=0;while(p<A.length&&p<B.length&&A[p]===B[p])p++;let s=0;while(s<A.length-p&&s<B.length-p&&A[A.length-1-s]===B[B.length-1-s])s++;const a=txoCompile(sty,A.length),ins=Math.max(0,B.length-p-s),fill=p>0?a[p-1]:null;return txoPack(a.slice(0,p).concat(new Array(ins).fill(fill),a.slice(A.length-s)))}
 function txoRead(){const t=$('tx_t').value.replace(/\r/g,'').slice(0,200);if(txoSty.length&&t!==txoPrev)txoSty=txoShift(txoSty,txoPrev,t);txoPrev=t;const n=id=>+$(id).value,o={text:t,f:$('tx_f').value||'cinzel'};
@@ -38,4 +39,7 @@ $('tx_sup').addEventListener('click',()=>{run({z:60,d:35});txoShow()});$('tx_sub
 ['select','keyup','mouseup','focus'].forEach(ev=>t.addEventListener(ev,()=>{if(guard())txoShow()}))}
 // the Align, Case, Vertical, Overflow, Scatter and Balance buttons
 function txoBind(guard,cb){TXO_SEG.forEach(([k,id,dk])=>{const el=$(id);el.addEventListener('click',e=>{if(!guard())return;const b=e.target.closest('[data-'+dk+']');if(!b)return;el.querySelectorAll('[data-'+dk+']').forEach(x=>x.classList.toggle('on',x===b));cb(k)})})}
-export {TXO_KEYS,TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed,txoShow};
+// 2.62.0 (owner Oct 27 2026, the text overhaul: style parts of a text): the colour of the selected letters (all of them when none are selected). '' takes the colour away.
+function txoLetterCol(){const t=$('tx_t'),n=[...t.value].length;if(!n)return'';const[a,b]=txoSel(),i=a<b?a:0,v=txoCompile(txoSty,n)[i];return v&&v[3]||''}
+function txoSetLetterCol(c,cb){const t=$('tx_t'),n=[...t.value].length;if(!n)return;let[a,b]=txoSel();if(a>=b){a=0;b=n}txoPrev=t.value;txoSty=txoApply(txoSty,n,a,b,{c:c||''});cb()}
+export {txoLetterCol,txoSetLetterCol,TXO_KEYS,TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed,txoShow};
