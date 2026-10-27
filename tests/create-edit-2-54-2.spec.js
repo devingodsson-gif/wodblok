@@ -70,3 +70,46 @@ test('Esc or a click outside closes the Replace popover without changing the sha
   await expect(page.locator('section.pn[data-p="motifs"] details.g #lib')).toHaveCount(1);
   expect(errors).toEqual([]);
 });
+
+// 2.55.0: the other kinds
+test('a placed stamp is edited without the Stamps list and the Library; Replace swaps it for another stamp of the project', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false, background: true });
+  await H.addStamp(page); await H.addStamp(page);
+  await H.addKind(page, 'stamp');
+  const bx = await page.locator('#art').boundingBox();
+  await page.mouse.click(bx.x + bx.width / 2, bx.y + bx.height / 2); await H.settle(page);   // select the placed stamp
+  const s = await st(page), q = s.els.find(x => x.t != null && x.k !== 'pattern'), other = s.tiles.find(t => t.id !== q.t).id;
+  const r = page.locator('section.pn[data-p="stmp"] .rprow[data-pmk="stamp"]');
+  await expect(r).toBeVisible();
+  await expect(page.locator('#stmpl')).toBeHidden();
+  await expect(page.locator('#slpane')).toBeHidden();
+  await r.locator('.rpgo').click();
+  await expect(page.locator('.rpop #stmpl')).toBeVisible();
+  await page.locator(`.rpop #stmpl .smkr[data-t="${other}"] .smkth`).click(); await H.settle(page);
+  await expect(page.locator('.rpop')).toHaveCount(0);
+  const q2 = (await st(page)).els.find(x => x.u === q.u);
+  expect(q2.t).toBe(other);
+  await expect(r).toBeVisible();   // still selected, still editing
+  await page.keyboard.press('Control+z'); await H.settle(page);
+  expect((await st(page)).els.find(x => x.u === q.u).t).toBe(q.t);
+  expect(errors).toEqual([]);
+});
+
+test('a selected text is edited without the Text styles library; the Text style row opens it', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false, background: true });
+  await page.click('#elb [data-k="text"]'); await H.settle(page);
+  await H.placeArmed(page, 'text');
+  const bx = await page.locator('#art').boundingBox();
+  await page.mouse.click(bx.x + bx.width / 2, bx.y + bx.height / 2); await H.settle(page);   // select the placed text
+  const r = page.locator('section.pn[data-p="text"] .rprow[data-pmk="text"]');
+  await expect(r).toBeVisible();
+  await expect(page.locator('#tsl')).toBeHidden();
+  await r.locator('.rpgo').click();
+  await expect(page.locator('.rpop #tsl')).toBeVisible();
+  await page.keyboard.press('Escape'); await H.settle(page);
+  await expect(page.locator('.rpop')).toHaveCount(0);
+  await page.keyboard.press('Escape'); await H.settle(page);   // nothing selected: creating, the library shows
+  await H.showPanel(page, 'text');
+  await expect(page.locator('#tsl')).toBeVisible();
+  expect(errors).toEqual([]);
+});

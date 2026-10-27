@@ -55,9 +55,11 @@ test('Effects adds an effect to the selected element; Align opens as a submenu',
   await addShape(page); await settle(page);
   await open(page, 'mnb-effects');
   await item(page, 'mnbm-effects', 'Jitter').click(); await settle(page);
+  // 2.55.0: its settings open in the effect pop-out; Apply keeps it
+  await expect(page.locator('.fxwin .fxs[data-e="jitter"]')).toBeVisible();
+  await page.click('.fxwin .fxwa'); await settle(page);
   const d = JSON.parse(await getState(page)), q = (d.els || []).find(x => x.k === 'motif' && !x.bgd);
   expect((q.fx || []).map(e => e.k)).toEqual(['jitter']);
-  await expect(page.locator('.fxg[data-fxk="motif"] .fxs[data-e="jitter"]')).toBeVisible();   // its settings are open in the Shape panel
   // a group of effects (Blur) is a submenu
   await open(page, 'mnb-effects');
   await page.locator('#mnbm-effects .mnbs', { hasText: 'Blur' }).hover();

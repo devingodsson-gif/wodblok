@@ -84,5 +84,6 @@
  "86-texture-library.js",
  "88-saved-colourways.js",
  "89-sheet-element.js",
- "90-panel-modes.js"
+ "90-panel-modes.js",
+ "91-effect-popout.js"
 ]

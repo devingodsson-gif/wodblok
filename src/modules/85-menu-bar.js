@@ -2,7 +2,7 @@ import {ic} from './00-icons.js';
 import {$,WBX} from './01-launch-and-version.js';
 import {cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdRegister,cmdRun} from '../commands/registry.js';
 import {fxAll} from './65-element-core.js';
-import {fxMenuAdd,fxMenuKind} from './69-effect-stack.js';
+import {foCan,foOpen} from './91-effect-popout.js';
 
 // ===== The menu bar (2.42.0, owner Oct 24 2026: "a top bar with File, Export, Effects, Elements and more", Photoshop's menu bar).
 // Every item is a command from the registry, so a menu, its shortcut and command search can never disagree: the label is the command's label,
@@ -71,7 +71,7 @@ function init85(){const bar=$('mbar');if(!bar||!WBX.wbMenuWire)return;
  // the commands only the menus give a name to: adding each element kind, each effect, and the two Help pages
  mnbAdds().forEach(id=>{const k=id.slice(12),b=()=>document.querySelector(`#elb .elbb[data-k="${k}"]`),lb=b().getAttribute('aria-label')||k;
   if(!cmdGet(id))cmdRegister({id,label:'Add '+lb.toLowerCase(),enabled:()=>{const x=b();return!!x&&!x.hidden&&!x.disabled},run:()=>b().click()})});
- fxAll().forEach(d=>{const id='effect.'+d.k;if(!cmdGet(id))cmdRegister({id,label:d.label,enabled:()=>{const k=fxMenuKind();return!!k&&d.kinds.includes(k)},run:()=>fxMenuAdd(d.k)})});
+ fxAll().forEach(d=>{const id='effect.'+d.k;if(!cmdGet(id))cmdRegister({id,label:d.label,enabled:()=>foCan(d.k),run:()=>foOpen(d.k)})});   /* 2.55.0: an Effects item opens the effect pop-out (91-effect-popout.js) */
  [['help.shortcuts','Keyboard shortcuts','keys'],['help.about','About Wodblok','about']].forEach(([id,label,p])=>{if(!cmdGet(id))cmdRegister({id,label,enabled:()=>!!WBX.wbStgOpen,run:()=>WBX.wbStgOpen(p)})});
  // the bar: File first (already in the page), then one button and one menu per entry
  bar.insertAdjacentHTML('beforeend',MNB.map(([k,t])=>`<div class="menu"><button type="button" class="mnbb" id="mnb-${k}" role="menuitem" aria-haspopup="menu" aria-expanded="false" aria-controls="mnbm-${k}">${t}</button><div class="pop mnbm" id="mnbm-${k}" data-mnb="${k}" role="menu" aria-label="${t}" hidden></div></div>`).join(''));
