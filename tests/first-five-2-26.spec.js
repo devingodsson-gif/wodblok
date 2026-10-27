@@ -105,7 +105,8 @@ test('a panel with more tabs than fit gets arrows at the ends that have more beh
   await page.setViewportSize({ width: 900, height: 700 });
   const { errors } = await H.openApp(page, { seed: 4, workspaces: true });
   for (const pn of ['hist', 'xrec', 'rand', 'canvas', 'colors', 'pgrid']) { const b = page.locator(`.rail [data-pn="${pn}"]:not([hidden])`); if (await b.count()) { await b.dispatchEvent('click'); await H.settle(page); } }
-  const wh = page.locator('.wg .wh').first(), wt = page.locator('.wg .wt').first();
+  // 2.55.0: the tools open on the left, so the group that collects them is the one holding the last one opened
+  const grp = page.locator('.wg:has(section.pn[data-p="pgrid"])'), wh = grp.locator('.wh').first(), wt = grp.locator('.wt').first();
   await expect(wh).toHaveClass(/ovl/);                                  // the open tab is the last one, in view; the earlier ones are behind the left edge
   await expect(wh.locator('.wta.l')).toBeVisible();
   const x0 = await wt.evaluate(t => t.scrollLeft);

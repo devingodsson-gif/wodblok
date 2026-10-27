@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.55.1 (Oct 26 2026): Panels follow-up
+- Found by the 57 related specs run after 2.55.0 went live (17 failed). Two were bugs, fixed: the Shape panel that opens by itself when a shape is added gets a group of its own again (2.55.0 put it in the same group as Text, so text in a stamp was selected with its panel hidden behind the Shape tab); the stamp's Replace row comes after New stamp (New stamp stays first). One more: a menu opened from inside the Replace popover (a folder's "…") no longer closes the popover; the texture tree finds its own pane (`pane: '.fxtl'`) inside the popover.
+- The rest were tests of behaviour 2.55.0 changed on purpose, updated: tools open on the left (`dock-default`, the tab-arrows test in `first-five-2-26`); the Texture effect's library opens from Replace (`texture-effect`, `texture-library-2-50-0`, `texture-library-2-51-0`: an `openLib` helper); a selected text's styles open from the Text style row (`text-styles`); a selected stamp puts the saved stamps Library away (`nothing-lost-2-24`).
+- Not run: full suite, pixel goldens.
+
 ## 2.55.0 (Oct 26 2026): Panels (docs/polish-plan.md release 1; closes docs/panel-modes-plan.md)
 - **Launch:** only the Elements list is open, docked on the right and locked (owner: "start with the Elements list on the right side and locked"). The Never-break rule in CLAUDE.md and the guide is rewritten.
 - **Panels open on the left** (every panel but the Elements list) and **come back where they were** (dock edge and group neighbours, or the floating box; kept in `wb255_pmem`). Settings > General > Open panels on: Left / Right (`wb255_pside`, default Left) for a panel with no remembered place. A random group id is drawn only where it was before, so the seeded test series is unchanged.
