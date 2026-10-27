@@ -5,6 +5,7 @@ const H = require('./helpers/harness');
 test('the shape library shows square previews', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4 });
   await H.addShape(page); await H.settle(page);
+  await page.keyboard.press('Escape'); await H.settle(page);   // 2.54.2: the library shows while creating
   await H.openPanel(page, 'motifs'); await H.settle(page);
   const sizes = await page.evaluate(() => [...document.querySelectorAll('section.pn[data-p="motifs"] .lib button')].filter(b => b.offsetParent).slice(0, 12).map(b => { const r = b.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }));
   expect(sizes.length).toBeGreaterThan(3);

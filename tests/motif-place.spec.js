@@ -31,7 +31,7 @@ test('motif: the Motif button makes nothing, a pick arms it, each click on the c
   expect(JSON.parse(await getState(page)).tiles[0].items.length).toBe(0);   // nothing went into the stamp
   expect(errors).toEqual([]);
 });
-test('motif: with nothing armed, picking a shape changes the selected Motif; the Element bar has no Background (2.53.0: it has a Sheet)', async ({ page }) => {
+test('motif: with nothing armed, picking a shape in Replace changes the selected Motif; the Element bar has no Background (2.53.0: it has a Sheet)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openLib(page);
   const btns = page.locator('#lib button[data-m]:visible');
@@ -41,7 +41,9 @@ test('motif: with nothing armed, picking a shape changes the selected Motif; the
   await page.keyboard.press('v'); await settle(page);
   await page.mouse.click(box.x + box.width * 0.4, box.y + box.height * 0.4); await settle(page);
   const m0 = (await motifs(page))[0].m;
-  await btns.nth(1).click(); await settle(page);
+  // 2.54.2: a selected shape is edited; its library opens from Replace
+  await page.click('.rprow[data-pmk="motif"] .rpgo'); await settle(page);
+  await page.locator('.rpop #lib button[data-m]:visible').nth(1).click(); await settle(page);
   const ms = await motifs(page);
   expect(ms).toHaveLength(1);
   expect(ms[0].m).not.toBe(m0);
