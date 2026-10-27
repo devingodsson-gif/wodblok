@@ -23,7 +23,7 @@ const pmLib=d=>pmLibs(d)[0]||null;
 // while its tool is armed a panel keeps creating, even with the element it just placed selected (each click places another)
 const pmEdit=kind=>{const d=PM_K[kind];if(d.armed&&d.armed())return null;const q=elSel();return q&&elKind(q)==kind?q:null};
 function pmRow(kind,d){const sec=document.querySelector(`section.pn[data-p="${d.pn}"]`);if(!sec)return null;let r=sec.querySelector(`.rprow[data-pmk="${kind}"]`);
- if(!r){const at=sec.querySelector(d.at);if(!at)return null;at.insertAdjacentHTML('afterbegin',`<div class="rprow" data-pmk="${kind}" hidden><span class="rpth"></span><span class="rpn"></span><button type="button" class="alt rpgo" aria-haspopup="dialog">Replace</button></div>`);r=at.querySelector(`.rprow[data-pmk="${kind}"]`);
+ if(!r){const at=sec.querySelector(d.at);if(!at)return null;at.insertAdjacentHTML(d.pos||'afterbegin',`<div class="rprow" data-pmk="${kind}" hidden><span class="rpth"></span><span class="rpn"></span><button type="button" class="alt rpgo" aria-haspopup="dialog">Replace</button></div>`);r=sec.querySelector(`.rprow[data-pmk="${kind}"]`);
   r.querySelector('.rpgo').onclick=e=>{e.stopPropagation();if(pmOpen&&pmOpen.kind==kind){pmClose();return}pmShow(kind,r.querySelector('.rpgo'))}}
  return r}
 function pmSync(){for(const kind in PM_K){const d=PM_K[kind],q=pmEdit(kind),lib=pmLib(d),r=pmRow(kind,d);if(!lib||!r)continue;const ed=!!q;
@@ -51,14 +51,15 @@ function init90(){
   thumb:q=>{const[pa,pb]=pal();return`<svg viewBox="-50 -50 100 100" style="background:${pa};border-radius:var(--r-s)" aria-hidden="true">${mk(q.m,pb,pa)}</svg>`},
   picked:e=>{const b=e.target.closest('#lib [data-m]');return!!b&&!WBS.lsm&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey},shown:()=>{const q=$('lq');if(q)q.focus()}});
  // Stamp (a placed stamp): the project's Stamps list opens in Replace and a row there swaps the stamp; the saved stamps Library shows only while creating
- pmRegister('stamp',{pn:'stmp',lib:'section.pn[data-p="stmp"] details.g:has(> .gb #stmpl),section.pn[data-p="stmp"] details.g:has(> .gb #slpane)',at:'.smkp',key:q=>String(q.t)+'|'+stNmId(q.t),name:q=>stNmId(q.t)||'Stamp',
+ pmRegister('stamp',{pn:'stmp',lib:'section.pn[data-p="stmp"] details.g:has(> .gb #stmpl),section.pn[data-p="stmp"] details.g:has(> .gb #slpane)',at:'.smkp > .elk',pos:'afterend',key:q=>String(q.t)+'|'+stNmId(q.t),name:q=>stNmId(q.t)||'Stamp',
   thumb:q=>{const[pa]=pal();return`<svg viewBox="0 0 ${SW} ${SH}" aria-hidden="true"><path d="${shp(0)}" fill="${pa}"/><use href="#s${q.t}"/></svg>`},
   armed:()=>!!(WBX.plKind&&WBX.plKind()=='stamp'),item:'#stmpl .smkr',skip:'[data-lk],.smkn input',swap:(q,r)=>{const id=+r.dataset.t;if(!WBS.tiles.some(t=>t.id==id)||q.t==id)return false;q.t=id}});
  // Text (a text selected): the Text styles library opens from the row, and a style picked there is applied to the text (the library's own click)
  pmRegister('text',{pn:'text',lib:'section.pn[data-p="text"] details.g:has(> .gb #tsl)',at:'section.pn[data-p="text"] details.g:has(#tx_go) > .gb',key:()=>'style',name:()=>'Text style',
   thumb:()=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICN.text}</svg>`,
   armed:()=>!!(WBX.plKind&&WBX.plKind()=='text'),picked:e=>!!e.target.closest('#tsl [data-c]')&&!e.target.closest('.lmo,[data-more],button[aria-haspopup]')});
- document.addEventListener('pointerdown',e=>{if(pmOpen&&!pmOpen.pop.contains(e.target)&&!(pmOpen.btn&&pmOpen.btn.contains(e.target)))pmClose()},true);
+ // a menu, dropdown or picker opened from inside the popover is part of it
+ document.addEventListener('pointerdown',e=>{if(pmOpen&&!pmOpen.pop.contains(e.target)&&!(pmOpen.btn&&pmOpen.btn.contains(e.target))&&!(e.target.closest&&e.target.closest('.rowm,.rowsub,.ddl,.pop,.cpk,.cpop,.cwp')))pmClose()},true);
  document.addEventListener('keydown',e=>{if(e.key=='Escape'&&pmOpen){e.stopPropagation();pmClose()}},true);
  WBX.wbPmSync=pmSync;WBX.wbPmClose=pmClose}
 export {init90,pmClose,pmIsOpen,pmPop,pmRegister,pmSync};
