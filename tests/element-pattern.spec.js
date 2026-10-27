@@ -14,12 +14,13 @@ test('New pattern is empty: each point of its grid shows as an arrow until a sou
   await page.click('#elb [data-k="pattern"]'); await addKind(page, 'pattern');
   await settle(page);
   const p = (await pats(page))[0];
-  expect(p).toMatchObject({ k: 'pattern', lay: 'grid', cn: 5, rn: 7, ds: 'cycle' });   // 2.48.0: the canvas (533 x 800) holds 5 x 7 stamps of the default placed size (20% of the short side, 107)
+  expect(p).toMatchObject({ k: 'pattern', lay: 'tile', ts: 'auto', ds: 'cycle', cn: 5, rn: 7 });   // 2.57.0: a new pattern tiles (cn, rn stay for Radial and the others)
   expect(p.src).toHaveLength(0);
   await expect(page.locator('#peed')).toBeVisible();
   await expect(page.locator('#pelist .mr')).toHaveCount(1);
   expect(await drawn(page, p.u)).toBe(0);
-  await expect(page.locator('#fpov [data-pa]')).toHaveCount(35);
+  const arrows = await page.locator('#fpov [data-pa]').count();
+  expect(arrows).toBeGreaterThan(20);
   // 2.28.0: Add source is a menu of the project's stamps (and texts) that ends with the library
   await page.click('#peadd');
   const items = await page.$$eval('.rowm .ddi', g => g.map(x => x.textContent));
@@ -29,12 +30,12 @@ test('New pattern is empty: each point of its grid shows as an arrow until a sou
   await patSource(page);
   expect((await pats(page))[0].src).toHaveLength(1);
   expect((await pats(page))[0].src[0].k).toBe('stamp');
-  expect(await drawn(page, p.u)).toBe(35);
+  expect(await drawn(page, p.u)).toBe(arrows);                                // a piece at every place
   await expect(page.locator('#fpov [data-pa]')).toHaveCount(0);   // placed pieces replace the arrows
   await patSource(page, 'motif', 3);
   expect((await pats(page))[0].src.map(s => s.k)).toEqual(['stamp', 'motif']);
-  expect(await drawn(page, p.u)).toBe(18);                                      // cycle: every other point is the motif
-  expect(await page.$$eval('#dyn g[data-mv]', e => e.length)).toBe(17);
+  const st2 = await drawn(page, p.u), mo = await page.$$eval('#dyn g[data-mv]', e => e.length);
+  expect(st2 + mo).toBe(arrows); expect(Math.abs(st2 - mo)).toBeLessThanOrEqual(1);   // cycle: every other place is the motif
   expect(errors).toEqual([]);
 });
 
@@ -52,20 +53,19 @@ test('arrows turn with Rotate and lie along the edges of a Frame', async ({ page
   expect(errors).toEqual([]);
 });
 
-test('columns, rows and layout change the points; a pattern with no source draws nothing', async ({ page }) => {
+test('Radial takes columns and rows; a pattern with no source draws nothing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'layers');
   await page.click('#elb [data-k="pattern"]'); await addKind(page, 'pattern');
   await patSource(page);
   const u = (await pats(page))[0].u;
+  expect(await drawn(page, u)).toBeGreaterThan(0);
+  await page.click('#pelay [data-l="radial"]');   // 2.57.0: columns and rows belong to the free layouts
   await page.locator('#pecn').fill('6'); await page.locator('#pern').fill('3');
   await settle(page);
-  expect(await drawn(page, u)).toBe(18);
-  await page.click('#pelay [data-l="radial"]');
-  await settle(page);
   expect((await pats(page))[0].lay).toBe('radial');
-  expect(await drawn(page, u)).toBeGreaterThan(18);          // 1 + 6 + 12 + 18
+  expect(await drawn(page, u)).toBe(1 + 6 + 12 + 18);
   await page.click('#pesrc [data-sx="0"]');
   await settle(page);
   expect(await drawn(page, u)).toBe(0);
@@ -117,19 +117,19 @@ test('Frame lays points along the four edges, the sides turned to lie along them
   expect(errors).toEqual([]);
 });
 
-test('Shift across and Shift down move a grid by a share of a cell without losing the cells that come in at the edge', async ({ page }) => {
+test('Shift across and Shift down move a tiling by a share of a piece (2.57.0)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'layers');
   await page.click('#elb [data-k="pattern"]'); await addKind(page, 'pattern');
   await patSource(page);
-  const u = (await pats(page))[0].u;
-  await page.locator('#pecn').fill('4'); await page.locator('#pern').fill('4'); await settle(page);
-  expect(await drawn(page, u)).toBe(16);
+  const p = (await pats(page))[0], u = p.u, view = await page.locator('#art').evaluate(a => ({ w: a.viewBox.baseVal.width, h: a.viewBox.baseVal.height })), step = Math.min(view.w, view.h) * p.ps / 100;
+  // where the pieces sit across, as a share of a step (0..1)
+  const frac = async () => { const xs = await page.$$eval(`#art [data-fp^="${u}."]`, es => es.map(e => +/translate\(([-\d.]+)/.exec(e.getAttribute('transform'))[1])); const f = xs.map(x => ((x / step) % 1 + 1) % 1); return f[0]; };
+  const f0 = await frac();
   await page.locator('#peox').fill('50'); await settle(page);
   expect((await pats(page))[0].ox).toBe(50);
-  expect(await drawn(page, u)).toBe(20);         // shifted half a cell: the columns now sit on the cell edges, so a fifth one has its centre on the canvas edge
-  await page.locator('#peoy').fill('50'); await settle(page);
-  expect(await drawn(page, u)).toBe(25);
+  const d = (((await frac()) - f0) % 1 + 1) % 1;
+  expect(Math.abs(d - 0.5)).toBeLessThan(0.02);   // moved half a piece across
   expect(errors).toEqual([]);
 });

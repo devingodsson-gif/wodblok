@@ -1,5 +1,5 @@
 import {WBS} from './01-launch-and-version.js';
-import {CH,CW,geom,shOf} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,geom,shOf,tileOn} from './04-canvas-and-stamp-outlines.js';
 
 // ===== Pattern tiling (2.57.0, owner Oct 26 2026: "patterns should place stamps right next to each other, not defined by rows and columns: square stamps edge to edge
 // in a checkerboard or a descending diagonal, hex stamps in a hex arrangement, triangles flipping to fit. A setting for which shape the pattern tiles by. A spacing
@@ -49,12 +49,20 @@ function tlPts(p,W,H){const sh=tlShape(p),ar=tlArr(p,sh),B=tlBox(p,sh),S=Math.ma
  else if(sh=='diamond'){a=[w*g/2,h*g/2];b=[-w*g/2,h*g/2];fn=(i,j)=>({c:ar=='harl'?tlMod(i+j,2):undefined})}
  else if(sh=='circle'){if(ar=='packed'){a=[w*g,0];b=[w*g/2,h*TL_S3/2*g]}}
  else if(sh=='oct'){a=[w*g,0];b=[0,h*g];if(ar=='octsq')fn=()=>({c:0})}
+ // on a repeat tile the arrangement must repeat with the tile: its rectangle of repeat (Px x Py: how far across and down it is the same again, sources
+ // included) is stretched, by at most half a step, so a whole number of them fits the tile; the pieces keep their size
+ if(tileOn()&&Math.abs(W-CW)<.01&&Math.abs(H-CH)<.01){const n=Math.max(1,(p.src||[]).length),lcm=(x,y)=>{let m=x;while(m%y)m+=x;return m},hexP=sh=='hex'&&Math.abs(a[1])<1e-9;
+  const P={square:{grid:[a[0]*n,b[1]],checker:[a[0]*2,b[1]*2],brick:[a[0]*n,b[1]*2],half:[a[0]*lcm(2,n),b[1]],diag:[a[0]*n,b[1]*n],basket:[a[0]*lcm(4,n),b[1]*4],turn:[a[0]*lcm(2,n),b[1]*2],pinwheel:[a[0]*lcm(2,n),b[1]*2],mirror:[a[0]*lcm(2,n),b[1]*2]}[ar],
+   hex:hexP?[a[0]*(ar=='three'?3:n),b[1]*2]:[a[0]*2*(ar=='three'?1:n),b[1]*(ar=='three'?3:1)],
+   tri:[a[0]*2*lcm(2,n)/2,b[1]*2*(ar=='rows'?lcm(2,n)/2:1)],diamond:[a[0]*2*(ar=='harl'?1:n),a[1]*2],
+   circle:[a[0]*n,ar=='packed'?b[1]*2:b[1]],oct:[a[0]*(ar=='octsq'?1:n),b[1]]}[sh]||[a[0],b[1]];
+  const kx=P[0]>0?W/Math.max(1,Math.round(W/P[0]))/P[0]:1,ky=P[1]>0?H/Math.max(1,Math.round(H/P[1]))/P[1]:1;a=[a[0]*kx,a[1]*ky];b=[b[0]*kx,b[1]*ky]}
  // enough places to cover the area from its middle, wherever the turn and shift put them
  const R=Math.hypot(W,H)/2+S*g*2,da=Math.hypot(a[0],a[1]),db=Math.hypot(b[0],b[1]),cross=Math.abs(a[0]*b[1]-a[1]*b[0])||1,ni=Math.ceil(R*db/cross)+2,nj=Math.ceil(R*da/cross)+2;
  const rt=(+p.rt||0)*Math.PI/180,co=Math.cos(rt),si=Math.sin(rt),ox=W/2+(Math.max(-100,Math.min(100,+p.ox||0))/100)*w*g,oy=H/2+(Math.max(-100,Math.min(100,+p.oy||0))/100)*h*g,lim=Math.max(w,h)*g;
- let k=0;const put=(lx,ly,o,sz)=>{const x=ox+lx*co-ly*si,y=oy+lx*si+ly*co;if(x<-lim||x>W+lim||y<-lim||y>H+lim)return;pts.push([x,y]);rot.push((o.r||0)+(+p.rt||0));flip.push(o.f||1);cls.push(o.c==null?k:o.c);size.push(sz||S);gap.push(!!o.gap);k++};
- for(let j=-nj;j<=nj;j++)for(let i=-ni;i<=ni;i++){const lx=i*a[0]+j*b[0],ly=i*a[1]+j*b[1];if(Math.hypot(lx,ly)>R)continue;put(lx,ly,fn(i,j));
+ let k=0;const put=(lx,ly,o,sz)=>{const x=ox+lx*co-ly*si,y=oy+lx*si+ly*co;if(x<-lim||x>W+lim||y<-lim||y>H+lim)return;pts.push([x,y]);rot.push((o.r||0)+(+p.rt||0));flip.push(o.f||1);cls.push(o.c==null?o.i:o.c);size.push(sz||S);gap.push(!!o.gap);k++};
+ for(let j=-nj;j<=nj;j++)for(let i=-ni;i<=ni;i++){const lx=i*a[0]+j*b[0],ly=i*a[1]+j*b[1];if(Math.hypot(lx,ly)>R)continue;put(lx,ly,{i,...fn(i,j)});
   // Octagons and squares: the small square between four octagons takes the second source (left empty with one source) (a regular octagon's side is its width / (1 + √2))
-  if(sh=='oct'&&ar=='octsq'){const s=w/(1+Math.SQRT2);put(lx+a[0]/2+b[0]/2,ly+a[1]/2+b[1]/2,{r:45,c:1,gap:1},s*Math.SQRT2)}}
+  if(sh=='oct'&&ar=='octsq'){const s=w/(1+Math.SQRT2);put(lx+a[0]/2+b[0]/2,ly+a[1]/2+b[1]/2,{i,r:45,c:1,gap:1},s*Math.SQRT2)}}
  return{pts,rot,flip,cls,size,gap,shape:sh,arr:ar,box:{w:B.w,h:B.h}}}
 export {TL_AR,TL_TS,tlArr,tlPts,tlShape};
