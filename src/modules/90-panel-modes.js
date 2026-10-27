@@ -14,7 +14,8 @@ function pmRegister(kind,d){PM_K[kind]=d}
 let pmOpen=null;   // {kind, gb, home, pop}
 // the library group is found once: while the popover is open its body is elsewhere
 const pmLib=d=>d.el||(d.el=document.querySelector(d.lib));
-const pmEdit=kind=>{const q=elSel();return q&&elKind(q)==kind?q:null};
+// while its tool is armed a panel keeps creating, even with the element it just placed selected (each click places another)
+const pmEdit=kind=>{const d=PM_K[kind];if(d.armed&&d.armed())return null;const q=elSel();return q&&elKind(q)==kind?q:null};
 function pmRow(kind,d){const sec=document.querySelector(`section.pn[data-p="${d.pn}"]`);if(!sec)return null;let r=sec.querySelector(`.rprow[data-pmk="${kind}"]`);
  if(!r){const at=sec.querySelector(d.at);if(!at)return null;at.insertAdjacentHTML('afterbegin',`<div class="rprow" data-pmk="${kind}" hidden><span class="rpth"></span><span class="rpn"></span><button type="button" class="alt rpgo" aria-haspopup="dialog">Replace</button></div>`);r=at.querySelector(`.rprow[data-pmk="${kind}"]`);
   r.querySelector('.rpgo').onclick=e=>{e.stopPropagation();if(pmOpen&&pmOpen.kind==kind){pmClose();return}pmShow(kind,r.querySelector('.rpgo'))}}
@@ -22,7 +23,7 @@ function pmRow(kind,d){const sec=document.querySelector(`section.pn[data-p="${d.
 function pmSync(){for(const kind in PM_K){const d=PM_K[kind],q=pmEdit(kind),lib=pmLib(d),r=pmRow(kind,d);if(!lib||!r)continue;const ed=!!q;
  if(!ed&&pmOpen&&pmOpen.kind==kind)pmClose();
  if(lib.hidden!==ed)lib.hidden=ed;if(r.hidden!==!ed)r.hidden=!ed;if(!ed)continue;
- const key=d.key(q);if(r.dataset.key!==key){r.dataset.key=key;r.querySelector('.rpth').innerHTML=d.thumb(q);const n=d.name(q);r.querySelector('.rpn').textContent=n;r.querySelector('.rpn').title=n}}}
+ const key=d.key(q);if(r.dataset.key!==key){r.dataset.key=key;r.querySelector('.rpth').innerHTML=d.thumb(q);r.querySelector('.rpn').textContent=d.name(q)}}}
 // the popover: under the Replace button, the panel's width, the library's body inside
 function pmShow(kind,btn){pmClose();const d=PM_K[kind],lib=pmLib(d),gb=lib&&lib.querySelector(':scope > .gb');if(!gb)return;
  const pop=document.createElement('div');pop.className='rpop';pop.setAttribute('role','dialog');pop.setAttribute('aria-label','Replace');document.body.appendChild(pop);
@@ -35,7 +36,7 @@ function pmShow(kind,btn){pmClose();const d=PM_K[kind],lib=pmLib(d),gb=lib&&lib.
 function pmClose(){if(!pmOpen)return;const o=pmOpen;pmOpen=null;o.home.replaceWith(o.gb);o.pop.remove();if(o.btn)o.btn.setAttribute('aria-expanded','false')}
 function init90(){
  // Shape (a canvas motif): the Library group; the row starts the Edit group
- pmRegister('motif',{pn:'motifs',lib:'section.pn[data-p="motifs"] details.g:has(> .gb #lib)',at:'#sel',key:q=>String(q.m),name:q=>mNm(q.m)||'Shape',
+ pmRegister('motif',{pn:'motifs',lib:'section.pn[data-p="motifs"] details.g:has(> .gb #lib)',at:'#sel',key:q=>String(q.m),name:q=>mNm(q.m)||'Shape',armed:()=>!!(WBX.plKind&&WBX.plKind()=='motif'),
   thumb:q=>{const[pa,pb]=pal();return`<svg viewBox="-50 -50 100 100" style="background:${pa};border-radius:var(--r-s)" aria-hidden="true">${mk(q.m,pb,pa)}</svg>`},
   picked:e=>{const b=e.target.closest('#lib [data-m]');return!!b&&!WBS.lsm&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey},shown:()=>{const q=$('lq');if(q)q.focus()}});
  document.addEventListener('pointerdown',e=>{if(pmOpen&&!pmOpen.pop.contains(e.target)&&!(pmOpen.btn&&pmOpen.btn.contains(e.target)))pmClose()},true);

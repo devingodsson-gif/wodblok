@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.54.3 (Oct 26 2026): placing keeps the Shape panel creating
+- Owner, Oct 26 2026: "when I place a shape, it selects it and takes me out of the shape creation panel." While the shape tool is armed, the Shape panel stays in create mode (library shown) even though the shape just placed is selected; each click places another, as before. It edits once the tool is put away (Esc, V, a click in the interface) and a shape is selected.
+- A pick in Replace only swaps the shape; it no longer arms the tool too.
+- No tooltip on the Replace row's name (no-tooltip rule; caught by components-2-18).
+- Tests: motif-place (Replace swaps the selected shape), shape-previews-2-45-2 (Esc before measuring the library), components-2-18, create-edit-2-54-2 pass. The 55 specs using the Shape library ran on 2.54.2: 207 passed, 4 failed (these four, fixed here), 2 skipped.
+
 ## 2.54.2 (Oct 26 2026): creating and editing, step 1: the Shape panel (docs/panel-modes-plan.md)
 - **Editing a shape** (a canvas shape selected, on the canvas or in the Elements list): the Shape panel hides its Library group; the Edit group starts with one row (thumbnail, name, Replace). **Replace** opens the same library in a popover under it (the library's own body is moved in and put back, so search, folders and sets are the same); a pick swaps the shape (one history step) and closes it; Esc or a click outside closes it unchanged.
 - **Creating** (the Shape bar button, Esc, nothing selected) shows the library as before.

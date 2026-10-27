@@ -95,6 +95,6 @@ const lend=e=>{if(!ld)return;const x=ld;ld=null;if(x.g)x.g.remove();if(!x.on)ret
 document.addEventListener('pointerup',lend);document.addEventListener('pointercancel',lend);
 L.addEventListener('click',e=>{if(lsw){e.stopImmediatePropagation();e.preventDefault()}},true)}
 $('lib').onclick=e=>{const x=e.target.closest('[data-x]');if(x){const k=x.dataset.x;if(WBS.tiles.some(t=>t.items.some(q=>q.m==k))){$('pmsg').textContent='That shape is used on a stamp. Remove it from your stamps first.';return}if(!x.dataset.sure){x.dataset.sure=1;x.textContent='?';setTimeout(()=>{if(x.isConnected){delete x.dataset.sure;x.innerHTML='&#215;'}},2500);return}delete cust[k];store();build();$('pmsg').textContent='Removed from the library.';return}const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;if(WBX.wbLibPick&&!WBS.lsm){WBX.wbLibPick(k);return}   // (2.28.0) a pattern is waiting for a source
-if(WBS.lsm||e.ctrlKey||e.metaKey||e.shiftKey){libPick(k,e);return}if(WBX.wbMotifSwap&&WBX.wbMotifSwap(k)){WBS.brush={m:k,s:1,r:0};upd();return}WBS.brush=WBS.brush&&WBS.brush.m==k?null:{m:k,s:DOTK.has(k)?.22:.8,r:0};selOne(-1);upd()};
+if(WBS.lsm||e.ctrlKey||e.metaKey||e.shiftKey){libPick(k,e);return}if(WBX.wbMotifSwap&&WBX.wbMotifSwap(k)){upd();return}WBS.brush=WBS.brush&&WBS.brush.m==k?null:{m:k,s:DOTK.has(k)?.22:.8,r:0};selOne(-1);upd()};
 }
 export {renderML,sync,init13};
