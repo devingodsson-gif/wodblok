@@ -61,7 +61,7 @@ test('the pictures used by elements are saved with the project, and a saved mixe
   await page.keyboard.press('Escape');
   const dl = await page.evaluate(() => window.__wbDownloads[0]);
   const saved = JSON.parse(Buffer.from(require('fflate').unzipSync(new Uint8Array(Buffer.from(dl.base64, 'base64')))['project.json']).toString('utf8'));
-  expect(saved.v).toBe(28);
+  expect(saved.v).toBe(29);
   expect(Object.keys(saved.arts)).toEqual(['zart']);
   expect(saved.els.length).toBe(3);
   const out = path.join(testInfo.outputDir, 'again.wodblok');

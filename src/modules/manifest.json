@@ -85,5 +85,6 @@
  "88-saved-colourways.js",
  "89-sheet-element.js",
  "90-panel-modes.js",
- "91-effect-popout.js"
+ "91-effect-popout.js",
+ "92-pattern-tiling.js"
 ]

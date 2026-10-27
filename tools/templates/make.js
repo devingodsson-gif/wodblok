@@ -13,17 +13,17 @@ const SP = '#tppane .lrw:has(.lfr[data-k="s:Starting points"]) + .lib', YO = '#t
 const RECIPES = [
   { kind: 'canvas', file: 'stamped-flowers', name: 'Stamped flowers',
     stamps: [[['b151', 120, 120, 1.5, 0], ['b287', 28, 28, .45, 0], ['b287', 212, 212, .45, 0], ['b287', 212, 28, .45, 0], ['b287', 28, 212, .45, 0]]],
-    els: c => [{ k: 'pattern', n: 'Pattern 1', lay: 'grid', cn: 5, rn: 7, sz: 80, rt: 0, ds: 'cycle', sd: 11, src: [{ k: 'stamp', t: 1, w: 1 }], x: c.w / 2, y: c.h / 2, s: Math.min(c.w, c.h), r: 0, f: 1 }] },
+    els: c => [{ k: 'pattern', n: 'Pattern 1', lay: 'tile', ts: 'auto', ar: 'grid', ps: +(Math.min(c.w / 5, c.h / 7) * .8 / Math.min(c.w, c.h) * 100).toFixed(1), sp: 25, af: 1, cn: 5, rn: 7, sz: 80, rt: 0, ds: 'cycle', sd: 11, src: [{ k: 'stamp', t: 1, w: 1 }], x: c.w / 2, y: c.h / 2, s: Math.min(c.w, c.h), r: 0, f: 1 }] },
   { kind: 'canvas', file: 'framed-border', name: 'Framed border',
     stamps: [[['b313', 120, 120, 1.7, 0]], [['b288', 120, 120, 2, 0]]],
-    els: c => [{ k: 'pattern', n: 'Border', lay: 'frame', cn: 7, rn: 10, sz: 80, rt: 0, ds: 'cycle', sd: 5, in: 4, src: [{ k: 'stamp', t: 1, w: 1 }], x: c.w / 2, y: c.h / 2, s: Math.min(c.w, c.h), r: 0, f: 1 },
+    els: c => [{ k: 'pattern', n: 'Border', lay: 'frame', af: 1, cn: 7, rn: 10, sz: 80, rt: 0, ds: 'cycle', sd: 5, in: 4, src: [{ k: 'stamp', t: 1, w: 1 }], x: c.w / 2, y: c.h / 2, s: Math.min(c.w, c.h), r: 0, f: 1 },
       { k: 'stamp', t: 2, x: c.w / 2, y: c.h / 2, s: Math.min(c.w, c.h) * .55, r: 0, f: 1 }] },
   { kind: 'tile', file: 'half-drop-diamonds', name: 'Half-drop diamonds',
     stamps: [[['b285', 120, 120, 1.6, 0], ['b287', 30, 30, .45, 0], ['b287', 210, 210, .45, 0]]],
-    els: c => [{ k: 'pattern', n: 'Pattern 1', lay: 'half', cn: 3, rn: 3, sz: 80, rt: 0, ds: 'cycle', sd: 3, src: [{ k: 'stamp', t: 1, w: 1 }], x: c.w / 2, y: c.h / 2, s: Math.min(c.w, c.h), r: 0, f: 1 }] },
+    els: c => [{ k: 'pattern', n: 'Pattern 1', lay: 'tile', ts: 'auto', ar: 'half', ps: +(Math.min(c.w / 3, c.h / 3) * .8 / Math.min(c.w, c.h) * 100).toFixed(1), sp: 25, af: 1, cn: 3, rn: 3, sz: 80, rt: 0, ds: 'cycle', sd: 3, src: [{ k: 'stamp', t: 1, w: 1 }], x: c.w / 2, y: c.h / 2, s: Math.min(c.w, c.h), r: 0, f: 1 }] },
   { kind: 'book', file: 'cover-6x9', name: 'Cover 6 × 9 in',
     stamps: [[['b324', 120, 120, 1.7, 0]], [['b288', 120, 120, 2, 0]]],
-    els: c => [{ k: 'pattern', n: 'Border', lay: 'frame', cn: 16, rn: 12, sz: 70, rt: 0, ds: 'cycle', sd: 7, in: 3, src: [{ k: 'stamp', t: 1, w: 1 }], x: c.w / 2, y: c.h / 2, s: Math.min(c.w, c.h), r: 0, f: 1 },
+    els: c => [{ k: 'pattern', n: 'Border', lay: 'frame', af: 1, cn: 16, rn: 12, sz: 70, rt: 0, ds: 'cycle', sd: 7, in: 3, src: [{ k: 'stamp', t: 1, w: 1 }], x: c.w / 2, y: c.h / 2, s: Math.min(c.w, c.h), r: 0, f: 1 },
       { k: 'stamp', t: 2, x: c.w * .75, y: c.h / 2, s: Math.min(c.w * .4, c.h * .4), r: 0, f: 1 }] },
 ];
 const only = process.argv[2];

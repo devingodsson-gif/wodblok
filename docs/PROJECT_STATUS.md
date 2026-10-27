@@ -93,6 +93,9 @@ Only items the owner has stated are listed as next. Nothing is started unless he
 ## Open questions for the owner
 None at the moment. Add new ones here.
 
+### Oct 26 2026: polish plan built
+- 2.55.0 and 2.55.1 on main. 2.56.0 (Transform) and 2.57.0 (Patterns, format 29) built on their branches, waiting for the owner. Full CI suite suggested before 2.57.0 goes live. The Randomize scenario snapshots change with 2.57.0 (rolls are tilings): make them again with the update-snapshots workflow after the owner approves.
+
 ### Oct 26 2026: 2.55.0 (Panels) merged at the owner's word
 - Next: polish plan release 2, 2.56.0 Transform (corners both ways with Shift/Alt, pulling through mirrors, elements vanishing while dragged), then release 3, 2.57.0 Patterns (format 29).
 

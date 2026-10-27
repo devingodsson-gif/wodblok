@@ -19,7 +19,7 @@ const fpCancel=()=>{sgClear();const d=WBS.fpDrag,x=WBS.fpXf;if(d){if(d.g)d.g.for
 if(x){const o=JSON.parse(x.orig);Object.keys(x.p).forEach(k=>{if(!(k in o))delete x.p[k]});Object.assign(x.p,o);WBS.fpXf=null;if(x.p.tx&&typeof tbRelay=='function')tbRelay(x.p)}upd()};
 // Rubber band: every element the box touches is selected; Shift/Ctrl/Cmd adds to the selection (2.27.0)
 function fpMqPick(L){const m=WBS.fpMq,a=Math.min(m.x0,m.x1),b=Math.max(m.x0,m.x1),c=Math.min(m.y0,m.y1),d=Math.max(m.y0,m.y1),pl=L.pl||[],hit=new Set(m.base);
-pl.forEach(p=>{const wh=fpWH(p);if(!wh||p.bgd||p.flt||fpHid(pl,p))return;const r=-(+p.r||0)*Math.PI/180*-1,co=Math.cos(r),si=Math.sin(r),hw=wh[0]/2,hh=wh[1]/2,ex=Math.abs(hw*co)+Math.abs(hh*si),ey=Math.abs(hw*si)+Math.abs(hh*co);if(p.x+ex>=a&&p.x-ex<=b&&p.y+ey>=c&&p.y-ey<=d)hit.add(String(p.u))});
+pl.forEach(p=>{if(p.k=='pattern')return;const wh=fpWH(p);if(!wh||p.bgd||p.flt||fpHid(pl,p))return;const r=-(+p.r||0)*Math.PI/180*-1,co=Math.cos(r),si=Math.sin(r),hw=wh[0]/2,hh=wh[1]/2,ex=Math.abs(hw*co)+Math.abs(hh*si),ey=Math.abs(hw*si)+Math.abs(hh*co);if(p.x+ex>=a&&p.x-ex<=b&&p.y+ey>=c&&p.y-ey<=d)hit.add(String(p.u))});
 const arr=[...hit];WBS.fpMS=new Set(arr);WBS.fpSel=arr.length?arr[arr.length-1]:-1;WBS.fpAnc=WBS.fpSel===-1?null:String(WBS.fpSel);upd()}
 const fpMqEnd=()=>{if(!WBS.fpMq)return;const on=WBS.fpMq.on;WBS.fpMq=null;if(on)upd();else WBH.fpOverlay()};
 const fpEnd=()=>{sgClear();if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved;WBS.fpDrag=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};
@@ -27,20 +27,22 @@ function init28(){
  try{let raf=0;new ResizeObserver(()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(WBH.fpOverlay)WBH.fpOverlay()})}).observe($("art"))}catch(e){}   // the box keeps its pixel size when the view is zoomed (2.15.0)
 // --- canvas: place, select, drag
 $('art').addEventListener('pointerdown',e=>{const L=fpL();if(!L||e.button!==0||$('boardP').classList.contains('off'))return;const[x,y]=fpPt(e);if(!inShape(x,y)&&!(e.target.closest&&e.target.closest('[data-fh]'))&&(WBS.plArm||WBS.txArm||WBS.fpB||!fpHit(L,x,y)))return;   // outside a round or shaped canvas a click still reaches an element (2.24.0)
-const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,x0:hp.x,y0:hp.y,wx0:hp.wx||1,wy0:hp.wy||1,wh0:fpWH(hp)||[1,1],r0:+hp.r||0,f0:hp.f||1,moved:false,orig:JSON.stringify(hp)};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
+const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();fpPatOwn(hp);WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,x0:hp.x,y0:hp.y,wx0:hp.wx||1,wy0:hp.wy||1,wh0:fpWH(hp)||[1,1],r0:+hp.r||0,f0:hp.f||1,moved:false,orig:JSON.stringify(hp)};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
 if(WBS.plArm&&WBX.wbPlMake){e.preventDefault();const[sx,sy]=fpSnap(L,x,y,e);WBX.wbPlMake(WBS.plArm,+sx.toFixed(1),+sy.toFixed(1));return}
 if(WBS.txArm&&tbG){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),n=Math.max(tbG.bw,tbG.bh,.01);const nq={u:fpU(),k:'text',tx:{...tbRead()},G:tbG.G,Lt:tbG.Lt,bw:tbG.bw,bh:tbG.bh,n,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+n.toFixed(2),r:0,f:1,...(tbSty.tu.length?{tu:tbSty.tu.map(u=>({x:u.x,sd:txRid()}))}:{}),...(tbSty.ink?{ink:tbSty.ink}:{})};L.pl.push(nq);store();upd();if(WBX.wbCap)WBX.wbCap();if(WBX.wbTxInNew)WBX.wbTxInNew(nq);return}
 if(WBS.fpB&&(WBS.tiles.some(t=>t.id==WBS.fpB))){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),q={u:fpU(),k:'stamp',t:WBS.fpB,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+fpSnapS(L,fpSz(),e).toFixed(2),r:fpRot,f:fpFlip};L.pl.push(q);if(fpPoolOk()){const a=[...WBS.fpPool],nx=a[Math.floor(Math.random()*a.length)];WBS.fpB=+nx}store();upd();if(WBX.wbCap)WBX.wbCap();return}
 const p=fpHit(L,x,y);if(!p){const add=e.shiftKey||e.ctrlKey||e.metaKey,base=add?new Set(fpGrp().map(q=>String(q.u))):new Set();if(!add&&(WBS.fpSel!==-1||WBS.fpMS.size)){WBS.fpSel=-1;WBS.fpMS=new Set();upd()}
 if((L.pl||[]).length){WBS.fpMq={x0:x,y0:y,x1:x,y1:y,on:false,add,base,id:e.pointerId};try{$('art').setPointerCapture(e.pointerId)}catch(er){}}return}
 if(e.shiftKey||e.ctrlKey||e.metaKey){e.preventDefault();fpTog(p.u);return}
-e.preventDefault();const g0=fpGrp(),inG=g0.length>1&&g0.includes(p);if(!inG)WBS.fpMS=new Set();WBS.fpSel=p.u;WBS.fpAnc=String(p.u);const g=inG?g0.map(q=>[q,q.x,q.y]):null;WBS.fpDrag={p,g,s0:[p.x,p.y],dx:x-p.x,dy:y-p.y,moved:false,id:e.pointerId};try{$('art').setPointerCapture(e.pointerId)}catch(er){}upd()});
+e.preventDefault();fpPatOwn(p);const g0=fpGrp(),inG=g0.length>1&&g0.includes(p);if(!inG)WBS.fpMS=new Set();WBS.fpSel=p.u;WBS.fpAnc=String(p.u);const g=inG?g0.map(q=>[q,q.x,q.y]):null;WBS.fpDrag={p,g,s0:[p.x,p.y],dx:x-p.x,dy:y-p.y,moved:false,id:e.pointerId};try{$('art').setPointerCapture(e.pointerId)}catch(er){}upd()});
 // a drag keeps the element's centre on the sheet (2.24.0), so it can always be clicked and dragged back
 const fpOn=(v,m)=>Math.min(m,Math.max(0,v));
 $('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBS.fpMq){const m=WBS.fpMq,[x,y]=fpPt(e);m.x1=x;m.y1=y;if(!m.on&&Math.hypot(x-m.x0,y-m.y0)<Math.min(CW,CH)*.008)return;m.on=true;fpMqPick(L);return}if(WBS.fpDrag){const[x0,y0]=fpPt(e),p=WBS.fpDrag.p;let[nx,ny]=fpSnap(L,fpOn(x0-WBS.fpDrag.dx,CW),fpOn(y0-WBS.fpDrag.dy,CH),e);[nx,ny]=sgMove(WBS.fpDrag,L,nx,ny,e);nx=fpOn(nx,CW);ny=fpOn(ny,CH);WBS.fpDrag.moved=true;if(WBS.fpDrag.g){const ddx=+nx.toFixed(1)-WBS.fpDrag.s0[0],ddy=+ny.toFixed(1)-WBS.fpDrag.s0[1];let oh='',live=true;WBS.fpDrag.g.forEach(([q,qx,qy])=>{q.x=+(qx+ddx).toFixed(1);q.y=+(qy+ddy).toFixed(1);if(!fpLive(q))live=false;oh+=fpBox(q,'sel')});$('fpov').innerHTML=oh+WBS.sgG;if(!live)fpRedraw();return}
 p.x=+nx.toFixed(1);p.y=+ny.toFixed(1);
 if(!fpLive(p))fpRedraw();$('fpov').innerHTML=fpBox(p,'sel')+fpHandles(p)+WBS.sgG;return}
 if(WBS.fpB||WBS.txArm||WBS.plArm){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpPt(e),e);WBH.fpOverlay()}});
+// a pattern whose area follows the canvas gets an area of its own when it is moved or pulled (2.57.0)
+function fpPatOwn(p){if(p.k!='pattern'||!(p.af||!(+p.aw>0)))return;p.x=+(CW/2).toFixed(1);p.y=+(CH/2).toFixed(1);p.aw=+CW.toFixed(1);p.ah=+CH.toFixed(1);delete p.af}
 // Pulling a corner or a side square of a placed piece (2.56.0, owner Oct 26 2026): the opposite corner or side stays where it is; with Alt (Option) it grows from
 // the middle. A corner pulls both ways at once (width and height follow the pointer); with Shift it keeps the proportions. A side pulls only the width or the height.
 // Pulled past the opposite side, the piece turns over on that axis and keeps following the pointer (Photoshop's free transform): across, its flip f turns; down,
@@ -48,6 +50,12 @@ if(WBS.fpB||WBS.txArm||WBS.plArm){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpP
 // (its turn r0 and flip f0), so the frame does not move under the pointer while the piece turns over.
 function fpResize(h,x,y,e){const p=h.p,S0=Math.min(CW,CH),r0=h.r0!=null?h.r0:(+p.r||0),a=-r0*Math.PI/180,dx=x-h.x0,dy=y-h.y0,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),[w0,h0]=h.wh0,mid=e.altKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v)),k0=h.k;
  let ox=0,oy=0,fx=1,fy=1;   // fx, fy: -1 when the pull has gone past the opposite side on that axis
+ // a pattern's area (2.57.0): its sides and corners pull its size; the pieces keep theirs, so more or fewer fit; it never turns over
+ if(p.k=='pattern'){const sx=k0.includes('e')?1:k0.includes('w')?-1:0,sy=k0.includes('s')?1:k0.includes('n')?-1:0;let w=w0,hh=h0;
+  if(sx)w=Math.max(S0*.05,mid?2*Math.abs(lx):sx*lx+w0/2);if(sy)hh=Math.max(S0*.05,mid?2*Math.abs(ly):sy*ly+h0/2);
+  if(sx&&sy&&e.shiftKey){const k=Math.max(w/w0,hh/h0);w=w0*k;hh=h0*k}
+  p.aw=+w.toFixed(1);p.ah=+hh.toFixed(1);if(!mid){ox=sx*(w-w0)/2;oy=sy*(hh-h0)/2}
+  p.x=+(h.x0+ox).toFixed(1);p.y=+(h.y0+oy).toFixed(1);return}
  const turn=()=>{const f0=h.f0!=null?h.f0:(p.f||1),f=f0*fx*fy;if(f===-1)p.f=-1;else if(p.f!=null)p.f=1;const r=fy<0?r0+180:r0;p.r=Math.round(((r+180)%360+360)%360-180)};
  if(k0.length==2&&e.shiftKey){// a corner with Shift: the size along the line from the fixed corner (or the middle) through the pulled one; past the fixed point it turns right round
   const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Cx=cx*w0/2,Cy=cy*h0/2,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy);if(k<0){fx=-1;fy=-1;k=-k}
