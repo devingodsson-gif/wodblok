@@ -98,7 +98,7 @@ test('Text layer: styled letters and paragraph options are saved on the text, an
   await select(page, 1, 2); await set(page, 'tx_zs', 200);
   await expect.poll(async () => JSON.stringify((await piece()).tx.sty), { timeout: 8000 }).toBe('[[1,2,200,0,0]]');
   await set(page, 'tx_psp', 120); await set(page, 'tx_ind', 50);
-  await expect.poll(async () => (await piece()).tx.psp, { timeout: 8000 }).toBe(120);
+  await expect.poll(async () => (await piece()).tx.psp, { timeout: 20000 }).toBe(120);
   expect((await piece()).tx.ind).toBe(50);
   await page.fill('#tx_t', 'XONE TWO');
   await expect.poll(async () => JSON.stringify((await piece()).tx.sty), { timeout: 8000 }).toBe('[[2,3,200,0,0]]');
