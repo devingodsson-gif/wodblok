@@ -27,7 +27,7 @@ function init28(){
  try{let raf=0;new ResizeObserver(()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(WBH.fpOverlay)WBH.fpOverlay()})}).observe($("art"))}catch(e){}   // the box keeps its pixel size when the view is zoomed (2.15.0)
 // --- canvas: place, select, drag
 $('art').addEventListener('pointerdown',e=>{const L=fpL();if(!L||e.button!==0||$('boardP').classList.contains('off'))return;const[x,y]=fpPt(e);if(!inShape(x,y)&&!(e.target.closest&&e.target.closest('[data-fh]'))&&(WBS.plArm||WBS.txArm||WBS.fpB||!fpHit(L,x,y)))return;   // outside a round or shaped canvas a click still reaches an element (2.24.0)
-const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,x0:hp.x,y0:hp.y,wx0:hp.wx||1,wy0:hp.wy||1,wh0:fpWH(hp)||[1,1],moved:false,orig:JSON.stringify(hp)};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
+const hd=e.target.closest&&e.target.closest('[data-fh]');if(hd&&!WBS.fpB){const hp=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(hp){e.preventDefault();WBS.fpXf={p:hp,k:hd.dataset.fh,s0:hp.s,d0:Math.hypot(x-hp.x,y-hp.y)||1,x0:hp.x,y0:hp.y,wx0:hp.wx||1,wy0:hp.wy||1,wh0:fpWH(hp)||[1,1],r0:+hp.r||0,f0:hp.f||1,moved:false,orig:JSON.stringify(hp)};try{$('art').setPointerCapture(e.pointerId)}catch(er){}return}}
 if(WBS.plArm&&WBX.wbPlMake){e.preventDefault();const[sx,sy]=fpSnap(L,x,y,e);WBX.wbPlMake(WBS.plArm,+sx.toFixed(1),+sy.toFixed(1));return}
 if(WBS.txArm&&tbG){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),n=Math.max(tbG.bw,tbG.bh,.01);const nq={u:fpU(),k:'text',tx:{...tbRead()},G:tbG.G,Lt:tbG.Lt,bw:tbG.bw,bh:tbG.bh,n,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+n.toFixed(2),r:0,f:1,...(tbSty.tu.length?{tu:tbSty.tu.map(u=>({x:u.x,sd:txRid()}))}:{}),...(tbSty.ink?{ink:tbSty.ink}:{})};L.pl.push(nq);store();upd();if(WBX.wbCap)WBX.wbCap();if(WBX.wbTxInNew)WBX.wbTxInNew(nq);return}
 if(WBS.fpB&&(WBS.tiles.some(t=>t.id==WBS.fpB))){e.preventDefault();L.pl=L.pl||[];const[sx,sy]=fpSnap(L,x,y,e),q={u:fpU(),k:'stamp',t:WBS.fpB,x:+sx.toFixed(1),y:+sy.toFixed(1),s:+fpSnapS(L,fpSz(),e).toFixed(2),r:fpRot,f:fpFlip};L.pl.push(q);if(fpPoolOk()){const a=[...WBS.fpPool],nx=a[Math.floor(Math.random()*a.length)];WBS.fpB=+nx}store();upd();if(WBX.wbCap)WBX.wbCap();return}
@@ -41,16 +41,32 @@ $('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBS.fp
 p.x=+nx.toFixed(1);p.y=+ny.toFixed(1);
 if(!fpLive(p))fpRedraw();$('fpov').innerHTML=fpBox(p,'sel')+fpHandles(p)+WBS.sgG;return}
 if(WBS.fpB||WBS.txArm||WBS.plArm){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpPt(e),e);WBH.fpOverlay()}});
-// Pulling a corner or a side square of a placed piece: the opposite corner or side stays where it is; with Shift it grows from the middle. Corners keep the proportions, sides pull only the width or the height.
-function fpResize(h,x,y,e){const p=h.p,S0=Math.min(CW,CH),a=-(+p.r||0)*Math.PI/180,dx=x-h.x0,dy=y-h.y0,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),[w0,h0]=h.wh0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ox=0,oy=0,k0=h.k;
-// A corner stretches one side (2.15.0): the first clear pull sideways sets the width, up or down the height; Ctrl or Cmd keeps scaling both together.
-if(k0.length==2&&!(e.ctrlKey||e.metaKey)){{const mx=lx-(k0[1]=='e'?w0/2:-w0/2),my=ly-(k0[0]=='s'?h0/2:-h0/2);if(!h.ax&&Math.hypot(mx,my)>S0*.006)h.ax=Math.abs(mx)>=Math.abs(my)?'x':'y'}if(!h.ax)return;k0=h.ax=='x'?(k0[1]=='e'?'e':'w'):(k0[0]=='s'?'s':'n')}
-if(k0.length==2){const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Cx=cx*w0/2,Cy=cy*h0/2,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy),s=cl(h.s0*k,S0*.02,S0*3);s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);WBS.fpLast=p.s;k=p.s/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
-else if(p.tx&&k0.length==1){// a text: the sides pull its box (width wraps the lines, height makes it a fixed box)
-const ra=p.s/Math.max(p.n||1,.01),U=WBX.wbTxUnit(),side=k0=='e'||k0=='w',d=k0=='e'||k0=='s'?1:-1;if(side){const w=Math.max(U*3*ra,mid?Math.abs(lx)*2:d*lx+w0/2);p.tx={...p.tx,wd:+(w/ra/U).toFixed(2)};if(!mid)ox=d*(w-w0)/2}else{const hh=Math.max(U*3*ra,mid?Math.abs(ly)*2:d*ly+h0/2);p.tx={...p.tx,ht:+(hh/ra/U).toFixed(2)};if(!mid)oy=d*(hh-h0)/2}h.rel=[p,side&&!mid&&!(p.tx.ht>0)]}
-else if(k0=='e'||k0=='w'){const d=k0=='e'?1:-1,w=Math.max(w0*.02,mid?Math.abs(lx)*2:d*lx+w0/2),nx=cl(+(h.wx0*w/w0).toFixed(3),.05,20);if(nx!=1||p.wx)p.wx=nx;if(!mid)ox=d*(w0*nx/h.wx0-w0)/2}
-else{const d=k0=='s'?1:-1,hh=Math.max(h0*.02,mid?Math.abs(ly)*2:d*ly+h0/2),ny=cl(+(h.wy0*hh/h0).toFixed(3),.05,20);if(ny!=1||p.wy)p.wy=ny;if(!mid)oy=d*(h0*ny/h.wy0-h0)/2}
-const r=-a;p.x=+(h.x0+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(1);p.y=+(h.y0+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(1);if(h.rel&&WBX.wbTbRelay)WBX.wbTbRelay(h.rel[0],h.rel[1],h)}
+// Pulling a corner or a side square of a placed piece (2.56.0, owner Oct 26 2026): the opposite corner or side stays where it is; with Alt (Option) it grows from
+// the middle. A corner pulls both ways at once (width and height follow the pointer); with Shift it keeps the proportions. A side pulls only the width or the height.
+// Pulled past the opposite side, the piece turns over on that axis and keeps following the pointer (Photoshop's free transform): across, its flip f turns; down,
+// the flip turns and it makes a half turn (a mirror top to bottom), so no new field is needed. Everything is worked out from the piece as it was when the pull began
+// (its turn r0 and flip f0), so the frame does not move under the pointer while the piece turns over.
+function fpResize(h,x,y,e){const p=h.p,S0=Math.min(CW,CH),r0=h.r0!=null?h.r0:(+p.r||0),a=-r0*Math.PI/180,dx=x-h.x0,dy=y-h.y0,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),[w0,h0]=h.wh0,mid=e.altKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v)),k0=h.k;
+ let ox=0,oy=0,fx=1,fy=1;   // fx, fy: -1 when the pull has gone past the opposite side on that axis
+ const turn=()=>{const f0=h.f0!=null?h.f0:(p.f||1),f=f0*fx*fy;if(f===-1)p.f=-1;else if(p.f!=null)p.f=1;const r=fy<0?r0+180:r0;p.r=Math.round(((r+180)%360+360)%360-180)};
+ if(k0.length==2&&e.shiftKey){// a corner with Shift: the size along the line from the fixed corner (or the middle) through the pulled one; past the fixed point it turns right round
+  const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Cx=cx*w0/2,Cy=cy*h0/2,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy);if(k<0){fx=-1;fy=-1;k=-k}
+  let s=cl(h.s0*k,S0*.02,S0*3);s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);WBS.fpLast=p.s;k=p.s/h.s0;if(p.wx!=null||h.wx0!=1)p.wx=h.wx0;if(p.wy!=null||h.wy0!=1)p.wy=h.wy0;
+  const sx=fx*k;if(!mid){ox=Fx+sx*vx/2;oy=Fy+sx*vy/2}turn()}
+ else if(p.tx&&k0.length==2){// a text's corner keeps its proportions (its box holds lines of type), as before
+  const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Cx=cx*w0/2,Cy=cy*h0/2,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy),s=cl(h.s0*Math.max(k,.02),S0*.02,S0*3);s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);WBS.fpLast=p.s;k=p.s/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
+ else if(k0.length==2){// a corner: width and height follow the pointer; the fixed corner (or the middle) stays
+  const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Fx=mid?0:-cx*w0/2,Fy=mid?0:-cy*h0/2,sw=mid?2*lx*cx:(lx-Fx)*cx,sh=mid?2*ly*cy:(ly-Fy)*cy;
+  fx=sw<0?-1:1;fy=sh<0?-1:1;const w=Math.max(w0*.02,Math.abs(sw)),hh=Math.max(h0*.02,Math.abs(sh)),nx=cl(+(h.wx0*w/w0).toFixed(3),.05,20),ny=cl(+(h.wy0*hh/h0).toFixed(3),.05,20);
+  if(nx!=1||p.wx)p.wx=nx;if(ny!=1||p.wy)p.wy=ny;if(!mid){ox=Fx+cx*fx*w0*nx/h.wx0/2;oy=Fy+cy*fy*h0*ny/h.wy0/2}turn()}
+ else if(p.tx){// a text: the sides pull its box (width wraps the lines, height makes it a fixed box); past the other side it turns over
+  const ra=p.s/Math.max(p.n||1,.01),U=WBX.wbTxUnit(),side=k0=='e'||k0=='w',d=k0=='e'||k0=='s'?1:-1;
+  if(side){const sw=mid?2*d*lx:d*lx+w0/2;fx=sw<0?-1:1;const w=Math.max(U*3*ra,Math.abs(sw));p.tx={...p.tx,wd:+(w/ra/U).toFixed(2)};if(!mid)ox=-d*w0/2+d*fx*w/2}
+  else{const sh=mid?2*d*ly:d*ly+h0/2;fy=sh<0?-1:1;const hh=Math.max(U*3*ra,Math.abs(sh));p.tx={...p.tx,ht:+(hh/ra/U).toFixed(2)};if(!mid)oy=-d*h0/2+d*fy*hh/2}
+  turn();h.rel=[p,side&&!mid&&!(p.tx.ht>0)]}
+ else if(k0=='e'||k0=='w'){const d=k0=='e'?1:-1,sw=mid?2*d*lx:d*lx+w0/2;fx=sw<0?-1:1;const w=Math.max(w0*.02,Math.abs(sw)),nx=cl(+(h.wx0*w/w0).toFixed(3),.05,20);if(nx!=1||p.wx)p.wx=nx;if(!mid)ox=-d*w0/2+d*fx*(w0*nx/h.wx0)/2;turn()}
+ else{const d=k0=='s'?1:-1,sh=mid?2*d*ly:d*ly+h0/2;fy=sh<0?-1:1;const hh=Math.max(h0*.02,Math.abs(sh)),ny=cl(+(h.wy0*hh/h0).toFixed(3),.05,20);if(ny!=1||p.wy)p.wy=ny;if(!mid)oy=-d*h0/2+d*fy*(h0*ny/h.wy0)/2;turn()}
+ const r=-a;p.x=+(h.x0+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(1);p.y=+(h.y0+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(1);if(h.rel&&WBX.wbTbRelay)WBX.wbTbRelay(h.rel[0],h.rel[1],h)}
 $('art').addEventListener('pointermove',e=>{if(!WBS.fpXf)return;const[x,y]=fpPt(e),p=WBS.fpXf.p,S0=Math.min(CW,CH);
 if(WBS.fpXf.k!='rot'){const[sx,sy]=sgPull(WBS.fpXf,fpL(),x,y,e);fpResize(WBS.fpXf,sx,sy,e);sgPullShow(WBS.fpXf)}   // smart guides (2.40.0, 84)
 else{let r=Math.atan2(y-p.y,x-p.x)*180/Math.PI+90;r=((r+180)%360+360)%360-180;if(e.shiftKey)r=Math.round(r/15)*15;p.r=Math.round(r)}

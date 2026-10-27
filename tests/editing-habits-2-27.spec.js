@@ -67,7 +67,9 @@ test('a squeezed shape drops its side handles so the handles never pile up', asy
   expect(await page.locator('#fpov [data-fh]').count(), 'normal shape: 8 handles + rotate').toBe(9);
   const hd = page.locator('#fpov [data-fh="e"]'); const hb = await hd.boundingBox();
   await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2); await page.mouse.down();
-  await page.mouse.move(hb.x - 5000, hb.y, { steps: 12 }); await page.mouse.up(); await H.settle(page);
+  // 2.56.0: pulled past the other side a shape turns over, so squeeze it onto the other side's handle
+  const wb = await page.locator('#fpov [data-fh="w"]').boundingBox();
+  await page.mouse.move(wb.x + wb.width / 2 + 1, hb.y + hb.height / 2, { steps: 12 }); await page.mouse.up(); await H.settle(page);
   expect(await page.locator('#fpov [data-fh="n"]').count(), 'squeezed: no top/bottom middle handle').toBe(0);
   expect(await page.locator('#fpov [data-fh="se"]').count(), 'corners stay').toBe(1);
   expect(errors).toEqual([]);

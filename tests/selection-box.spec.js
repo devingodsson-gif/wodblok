@@ -23,18 +23,16 @@ test('the box and its handles use only style colours and the same pixel size at 
   expect(errors).toEqual([]);
 });
 
-test('a corner stretches one side: sideways widens, down makes taller; Ctrl scales both', async ({ page }) => {
+test('a corner pulls both ways at once; Shift keeps the proportions (2.56.0)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
   await addShape(page);
   const a = await el(page);
-  await pull(page, 'se', 60, 3);
+  await pull(page, 'se', 60, 30);
   const b = await el(page);
-  expect(b.wx || 1).toBeGreaterThan((a.wx || 1) * 1.05); expect(b.wy || 1).toBe(a.wy || 1); expect(b.s).toBe(a.s);
-  await pull(page, 'se', 3, 60);
-  const c = await el(page);
-  expect(c.wy || 1).toBeGreaterThan((b.wy || 1) * 1.05); expect(c.wx || 1).toBe(b.wx || 1); expect(c.s).toBe(b.s);
-  await pull(page, 'se', 40, 40, 'Control');
+  expect(b.wx || 1).toBeGreaterThan((a.wx || 1) * 1.05); expect(b.wy || 1).toBeGreaterThan((a.wy || 1) * 1.02); expect(b.s).toBe(a.s);
+  expect(b.wx).not.toBeCloseTo(b.wy, 2);   // width and height followed the pointer separately
+  await pull(page, 'se', 40, 40, 'Shift');
   const d = await el(page);
-  expect(d.s).toBeGreaterThan(c.s * 1.05); expect(d.wx || 1).toBe(c.wx || 1);
+  expect(d.s).toBeGreaterThan(b.s * 1.05); expect(d.wx || 1).toBe(b.wx || 1); expect(d.wy || 1).toBe(b.wy || 1);
   expect(errors).toEqual([]);
 });

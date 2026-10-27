@@ -50,10 +50,13 @@ function mtfLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='motif'&&p.m);if(!
   w=k*(+p.wx||1),h=k*(+p.wy||1),sw=+p.sw>0?+p.sw:0,box={x:(+p.x||0)-w*.6-sw,y:(+p.y||0)-h*.6-sw,W:w*1.2+2*sw,H:h*1.2+2*sw,R:400},T=p.fx&&p.fx.length?fxTex(p,'mtx'+li+'_'+id,box):null,G=p.fx&&p.fx.length?fxGr(p,'mtg'+li+'_'+id,box):null,
   da={w,h,fill:p.fl=='none'?'':okC(p.ink)?col(p.ink):col(WBS.proj.ink),pic:mtPic(p),sw,sk:col(okC(p.sk)?p.sk:WBS.proj.ink)},D=mtDraw(p.m,da,'mt'+li+'_'+id,seen);
   defs+=D.defs;if(T)defs+=T.defs;if(G)defs+=G.defs;
-  const body=`<g${ed?` data-mv="${p.u}" data-mx="${+p.x||0}" data-my="${+p.y||0}"`:''} transform="translate(${mtF((+p.x||0)+fx)} ${mtF((+p.y||0)+fy)}) rotate(${mtF(rr)}) scale(${fl} ${fv})">${D.body}</g>`;
+  const body=`<g transform="translate(${mtF((+p.x||0)+fx)} ${mtF((+p.y||0)+fy)}) rotate(${mtF(rr)}) scale(${fl} ${fv})">${D.body}</g>`;
   let one=T||G?`<g${T?T.attrs:''}>${G?G.wrap(body):body}</g>`:body;
   // 2.44.3: a shape with effects that is not being edited or moved is printed once into an image (03-stamp-prints-and-drawing.js); the picture it shows is the same, only the browser stops redrawing its effects on every change
   if((T||G)&&!mtLive(p))one=bkElMark('m'+li+'_'+id,one,(da.pic?mtDraw(p.m,da,'mt'+li+'_'+id,null).defs:D.defs)+(T?T.defs:'')+(G?G.defs:''),{x:(+p.x||0)+fx,y:(+p.y||0)+fy,r:Math.hypot(w,h)*.6+sw});
+  // 2.56.0: the [data-mv] group a drag moves (28-canvas-select.js fpLive) is the outermost one, round the effects too: their filter regions are in canvas units,
+  // so moving only the body inside them took the shape out of its effects' region and it vanished once it left its old box
+  if(ed)one=`<g data-mv="${p.u}" data-mx="${+p.x||0}" data-my="${+p.y||0}">${one}</g>`;
   out+=one;fr.set(String(p.u),one)});
  return[defs,out,'','',fr]}
 // ===== Filter mode (2.38.0, owner Oct 24 2026): a shape with {flt:1} draws no ink of its own; its effects work on what is drawn under it, inside its outline.

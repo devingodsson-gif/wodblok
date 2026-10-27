@@ -16,13 +16,14 @@ async function setup(page) {
   await page.mouse.click(b.x + b.width * 0.4, b.y + b.height * 0.4); await settle(page);
   return r;
 }
+// 2.56.0: the key that grows from the middle is Alt (it was Shift; Shift now keeps a corner's proportions)
 const pull = async (page, h, dx, dy, shift) => {
   const b = await page.locator(`#fpov [data-fh="${h}"]`).boundingBox();
   const x = b.x + b.width / 2, y = b.y + b.height / 2;
   await page.mouse.move(x, y); await page.mouse.down();
-  if (shift) await page.keyboard.down('Shift');
+  if (shift) await page.keyboard.down('Alt');
   await page.mouse.move(x + dx / 2, y + dy / 2, { steps: 3 }); await page.mouse.move(x + dx, y + dy, { steps: 3 });
-  await page.mouse.up(); if (shift) await page.keyboard.up('Shift'); await settle(page);
+  await page.mouse.up(); if (shift) await page.keyboard.up('Alt'); await settle(page);
 };
 
 test('a placed stamp has eight squares; a side one stretches only that way and the far side stays', async ({ page }) => {
@@ -44,7 +45,7 @@ test('a placed stamp has eight squares; a side one stretches only that way and t
   expect(errors).toEqual([]);
 });
 
-test('a corner keeps the opposite corner, and Shift grows from the middle', async ({ page }) => {
+test('a corner keeps the opposite corner, and Alt grows from the middle', async ({ page }) => {
   const { errors } = await setup(page);
   const a = box(await piece(page));
   await pull(page, 'ne', 30, 0);   // a corner moved sideways only changes the width (2.15.0)

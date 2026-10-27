@@ -1,5 +1,12 @@
 # Development plan
 
+## 2.56.0 (Oct 26 2026): Transform (docs/polish-plan.md release 2)
+- **Corners pull both ways:** a corner moves width and height with the pointer (the 2.15.0 one-axis rule is gone). **Shift** keeps the proportions; **Alt** (Option) grows from the middle (it was Shift). Sides still pull one way. A text's corner keeps its proportions, as before.
+- **Pulling through mirrors:** pulled past the opposite side, a piece turns over on that axis and keeps following the pointer: across, its flip `f` turns; down, the flip turns and it makes a half turn (a mirror top to bottom), so the file format is unchanged. Worked out from the piece as it was when the pull began (`r0`, `f0`), so the frame does not move under the pointer. Text sides too.
+- **Shapes no longer vanish while dragged:** a shape with Noise, Blur or Texture vanished once it left its old box: a drag moved only its body, inside effects whose filter region is in canvas units. The [data-mv] group a drag moves is now the outermost one, round the effects (74-motif-element.js).
+- Tests: new `transform-2-56` (3); `selection-box`, `resize-handles-pattern` (Alt from the middle) and `editing-habits-2-27` (the squeeze stops at the other side) updated. Handle, selection, smart-guide and text-box specs pass (18). `npm run perf` (with 2.57.0 on top): ratio 1.029.
+- Not run: full suite, pixel goldens.
+
 ## 2.55.1 (Oct 26 2026): Panels follow-up
 - Found by the 57 related specs run after 2.55.0 went live (17 failed). Two were bugs, fixed: the Shape panel that opens by itself when a shape is added gets a group of its own again (2.55.0 put it in the same group as Text, so text in a stamp was selected with its panel hidden behind the Shape tab); the stamp's Replace row comes after New stamp (New stamp stays first). One more: a menu opened from inside the Replace popover (a folder's "…") no longer closes the popover; the texture tree finds its own pane (`pane: '.fxtl'`) inside the popover.
 - The rest were tests of behaviour 2.55.0 changed on purpose, updated: tools open on the left (`dock-default`, the tab-arrows test in `first-five-2-26`); the Texture effect's library opens from Replace (`texture-effect`, `texture-library-2-50-0`, `texture-library-2-51-0`: an `openLib` helper); a selected text's styles open from the Text style row (`text-styles`); a selected stamp puts the saved stamps Library away (`nothing-lost-2-24`).
