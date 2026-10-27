@@ -1,5 +1,8 @@
 # Development plan
 
+## 2.59.1 (Oct 27 2026): Randomize scenario snapshots regenerated in CI
+Owner, Oct 27 2026: "Regenerate the scenarios". Made by the update-snapshots workflow on 2.59.0 (they predated the 2.57.0 tilings): before-view, split-view and randomize seeds 1 to 3, state and SVG. Nothing else changed.
+
 ## 2.59.0 (Oct 27 2026): export recipes on the library tree; no more workspaces. Format 29 unchanged
 Owner, Oct 27 2026: "fully remove workspaces", "the export recipes, go ahead and update that".
 - **Export recipes** are the shared folder tree (`ltMake`, prefix `rc`): Starting points (Web, Print, Preview) is a set; your recipes sit in Yours and your folders; select mode, Move to, drag, hide or rename the set, Export (a zip of `.wodblok-recipe` files) and Import. A click loads a recipe into Custom export; the row's own button exports with it (`act` added to `ltMake`). The old flat list and its CSS are gone.
