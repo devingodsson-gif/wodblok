@@ -33,7 +33,9 @@ function pkBuild(){const el=document.createElement('div');el.className='cpk';el.
 <div class="cpkf"><label>Hex<input type="text" data-f="hex" maxlength="9" spellcheck="false"></label><label class="cpkaf">Opacity<input type="text" data-f="a" inputmode="numeric" maxlength="3"></label></div>
 <div class="cpkf3"><label>R<input type="text" data-f="r" inputmode="numeric" maxlength="3"></label><label>G<input type="text" data-f="g" inputmode="numeric" maxlength="3"></label><label>B<input type="text" data-f="b" inputmode="numeric" maxlength="3"></label></div>
 <div class="cpkf3"><label>H<input type="text" data-f="h" inputmode="numeric" maxlength="3"></label><label>S<input type="text" data-f="s" inputmode="numeric" maxlength="3"></label><label>B<input type="text" data-f="v" inputmode="numeric" maxlength="3"></label></div>
-<div class="cpkrc" role="list" aria-label="Recent colours"></div>`;
+<div class="cpkrc" role="list" aria-label="Recent colours"></div>
+<div class="cpkok"><button type="button" class="primary">Done</button></div>`;
+ el.querySelector('.cpkok button').addEventListener('click',()=>closePicker());   // 2.60.1 (artist test: after making a colour the picker stayed open): Done keeps the colour and closes it
  document.body.appendChild(el);return el}
 function pkPaint(skip){const p=PK;if(!p)return;const e=p.el,h=hexOf(p.H,p.S,p.V,p.A),rgb=hsv2rgb(p.H,p.S,p.V).map(Math.round),op=hexOf(p.H,p.S,p.V,1);
  const sv=e.querySelector('.cpksv');sv.style.background=`linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,hsl(${p.H},100%,50%))`;sv.firstChild.style.left=p.S*100+'%';sv.firstChild.style.top=(1-p.V)*100+'%';

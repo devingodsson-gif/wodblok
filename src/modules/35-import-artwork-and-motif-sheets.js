@@ -12,7 +12,7 @@ function init35(){// ===== Import: an image -> clean black & white -> traced vec
 // folder that is open in the Shapes panel, unless you pick another one here.
 (()=>{
 const IMP_RE=/^<path d="[MLQZ0-9.,\- ]+" fill="FILL" fill-rule="evenodd"\/>$/;
-let src=null,W=0,H=0,lum=null,last=null,tmr=0,mode='one',view='t',srcName='',fprev='i';
+let cr=null,crd=null,src=null,W=0,H=0,lum=null,last=null,tmr=0,mode='one',view='t',srcName='',fprev='i';
 const PROMPT=s=>`Create a single ${s||'[subject]'} designed as a bold woodblock stamp shape. Pure solid black shapes on a plain white background. No gray, no shading, no gradients, no texture, no frame, no text. Clean, smooth edges and a simple, readable silhouette, with a few thin white carved lines for detail. Centered, with generous white margin, square image.`;
 const SPROMPT=(sub,c,r)=>`Create a sheet of ${c*r} different ${sub||'[subject]'} designed as bold woodblock stamp shapes, arranged in a neat grid of ${c} columns and ${r} rows. Every shape: pure solid black shapes on a plain white background, no gray, no shading, no gradients, no texture, with a few thin white carved lines for detail, clean smooth edges and a simple readable silhouette. Each shape is about the same size and centered in its own cell. Leave wide empty white space between all shapes (at least a fifth of a cell); nothing may touch, overlap or cross into a neighbouring cell. No grid lines, no borders, no frames, no labels, no numbers, no text. ${c>r?'Wide landscape image.':c<r?'Tall portrait image.':'Square image.'}`;
 const say2=t=>{$('imsg').textContent=t};
@@ -35,7 +35,7 @@ const url=URL.createObjectURL(f),img=new Image();img.onload=()=>{URL.revokeObjec
 img.onerror=()=>{URL.revokeObjectURL(url);say2('That image could not be read. Try a PNG or JPG (some phones save photos as HEIC).')};img.src=url}
 // ---- the window
 const sc=document.createElement('canvas');
-function openImg(img,nm,m){say2('');src=img;srcName=(nm||'').replace(/["<>&|]/g,'').trim().slice(0,40);
+function openImg(img,nm,m){say2('');src=img;cr=null;srcName=(nm||'').replace(/["<>&|]/g,'').trim().slice(0,40);
 // the picture shown on the left (both modes), at up to 2000 px
 const MX=2000,k=Math.min(1,MX/Math.max(img.naturalWidth,img.naturalHeight)),w=Math.max(8,Math.round(img.naturalWidth*k)),h=Math.max(8,Math.round(img.naturalHeight*k));
 sc.width=w;sc.height=h;const c=sc.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,w,h);c.drawImage(img,0,0,w,h);
@@ -95,7 +95,9 @@ function rdp(p,eps){if(p.length<4)return p;const keep=new Uint8Array(p.length);k
 while(st.length){const[a,z]=st.pop();let md=0,mi=-1;const[ax,ay]=p[a],[zx,zy]=p[z],dx=zx-ax,dy=zy-ay,L=Math.hypot(dx,dy)||1;
 for(let i=a+1;i<z;i++){const d=Math.abs(dy*p[i][0]-dx*p[i][1]+zx*ay-zy*ax)/L;if(d>md){md=d;mi=i}}if(md>eps&&mi>0){keep[mi]=1;st.push([a,mi],[mi,z])}}return p.filter((_,i)=>keep[i])}
 function run(){if(!lum)return;const th=+$('ith').value,r=+$('ism').value,area=Math.round(+$('isp').value/100*W*H*.0008+(+$('isp').value?2:0)),inv=$('iinv').checked,eps=+$('idt').value;knobs();
-const a=blur(lum,r),b=new Uint8Array(W*H);for(let i=0;i<W*H;i++)b[i]=(a[i]<th)!=inv?1:0;despeckle(b,area);
+const a=blur(lum,r),b=new Uint8Array(W*H);for(let i=0;i<W*H;i++)b[i]=(a[i]<th)!=inv?1:0;
+if(cr){const[c0,r0,c1,r1]=cr.map(Math.round);for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(x<c0||x>=c1||y<r0||y>=r1)b[y*W+x]=0}   // 2.60.3: only the ink inside the crop is traced
+despeckle(b,area);
 let x0=W,y0=H,x1=-1,y1=-1;for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(b[y*W+x]){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
 if(x1<0){last=null;drawOne();$('iinfo').textContent='No ink found. Lower the threshold or turn on Invert.';$('iadd').disabled=true;return}
 let loops=trace(b).map(l=>{let fi=0,fd=0;l.forEach((p,i)=>{const d=(p[0]-l[0][0])**2+(p[1]-l[0][1])**2;if(d>fd){fd=d;fi=i}});const A=rdp(l.slice(0,fi+1),eps),B=rdp(l.slice(fi).concat([l[0]]),eps);return dens(A.concat(B.slice(1,-1)),3)}).filter(l=>l.length>=3);
@@ -107,7 +109,19 @@ const kb=(d.length/1024).toFixed(0);$('iinfo').textContent=`${loops.length} part
 // single shape: the traced shape drawn over the picture, where it was found
 function drawOne(){const ink=col(WBS.proj.ink),bg=col(WBS.proj.bg);$('sov').setAttribute('viewBox',`0 0 ${W} ${H}`);let o='';
 if(view=='t'){o=`<rect width="${W}" height="${H}" fill="${bg}"/>`;if(last)o+=`<path d="${last.d}" transform="translate(${last.cx} ${last.cy}) scale(${(1/last.k).toFixed(5)})" fill="${ink}" fill-rule="evenodd"/>`}
-$('sov').innerHTML=o;viewSeg();$('shint').textContent=''}
+o+=crSvg();$('sov').innerHTML=o;viewSeg();$('shint').textContent=''}
+// ---- crop (2.60.3, owner Oct 27 2026: "in the import window, when I am controlling the threshold, I want a crop selection active"): in Single shape, a drag on the
+// picture draws the part to trace; its corners pull it; a click without a drag takes the whole picture again. The settings re-trace inside it.
+const crPx=()=>{const r=$('sov').getBoundingClientRect();return r.width?W/r.width:1};
+function crSvg(){if(mode!='one'||!cr)return'';const[x0,y0,x1,y1]=cr,k=crPx(),hs=8*k,f=v=>(+v).toFixed(2);
+ return`<path class="crdim" fill-rule="evenodd" d="M0 0H${W}V${H}H0Z M${f(x0)} ${f(y0)}V${f(y1)}H${f(x1)}V${f(y0)}Z"/><rect class="crln" x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}"/>`+
+  [[x0,y0,'nw'],[x1,y0,'ne'],[x0,y1,'sw'],[x1,y1,'se']].map(([x,y,c])=>`<rect class="crhd" data-crh="${c}" x="${f(x-hs/2)}" y="${f(y-hs/2)}" width="${f(hs)}" height="${f(hs)}"/>`).join('')}
+const crAt=e=>{const r=$('sov').getBoundingClientRect();return[Math.max(0,Math.min(W,(e.clientX-r.left)/r.width*W)),Math.max(0,Math.min(H,(e.clientY-r.top)/r.height*H))]};
+$('sov').addEventListener('pointerdown',e=>{if(mode!='one'||!src||e.button!==0)return;e.preventDefault();$('sov').setPointerCapture(e.pointerId);const p=crAt(e),h=e.target.closest&&e.target.closest('[data-crh]');
+ if(h&&cr){const c=h.dataset.crh;crd={fx:c[1]=='w'?cr[2]:cr[0],fy:c[0]=='n'?cr[3]:cr[1],moved:true}}else crd={fx:p[0],fy:p[1],sx:e.clientX,sy:e.clientY,moved:false}});
+$('sov').addEventListener('pointermove',e=>{if(!crd)return;if(!crd.moved&&Math.hypot(e.clientX-crd.sx,e.clientY-crd.sy)<4)return;crd.moved=true;const p=crAt(e);cr=[Math.min(crd.fx,p[0]),Math.min(crd.fy,p[1]),Math.max(crd.fx,p[0]),Math.max(crd.fy,p[1])];drawOne()});
+const crEnd=()=>{if(!crd)return;const d=crd;crd=null;if(!d.moved||(cr&&(cr[2]-cr[0]<3||cr[3]-cr[1]<3)))cr=null;run()};
+$('sov').addEventListener('pointerup',crEnd);$('sov').addEventListener('pointercancel',crEnd);
 function addOne(){if(!last)return;const d=dest();if(!d)return;const g=libG(d),nm=($('inm').value.trim()||'Imported shape').replace(/["<>&|]/g,'').slice(0,40),key='i|'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 cust[key]={n:nm,svg:`<path d="${last.d}" fill="FILL" fill-rule="evenodd"/>`,imp:1,...(g?{g}:{})};
 const t=WBS.tiles[WBS.cur];if(!t)return done(d,`Added “${nm}” to ${libPath(d)}.`);// no stamp in the project: the shape goes to the library only

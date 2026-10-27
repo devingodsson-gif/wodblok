@@ -7,6 +7,7 @@ import {fpCell,fpFG,fpGrp,fpL,fpPoolOk,fpSnap,fpSnapS,fpTog,fpU} from './24-free
 import {fpBox,fpFlip,fpHandles,fpHid,fpHit,fpPt,fpRot,fpSz,fpWH} from './25-art-layers.js';
 import {sgClear,sgMove,sgPull,sgPullShow} from './84-smart-guides.js';
 import {tbG,tbSty} from './26-text-boxes.js';
+import {tlPts} from './92-pattern-tiling.js';
 const xfEnd=()=>{sgClear();if(!WBS.fpXf)return;const mv=WBS.fpXf.moved;WBS.fpXf=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};
 // moving a piece while it is dragged (2.4.0, owner Oct 21 2026: "render them as I'm dragging, not just when I'm done"): a stamp is a [data-fp] group whose transform is its position;
 // a Motif or Shape has a [data-mv] body (it knows where it was drawn: data-mx, data-my) whose own transform is kept and shifted by how far it has moved since; anything else is drawn again, at most once a frame
@@ -57,7 +58,9 @@ function fpResize(h,x,y,e){const p=h.p,S0=Math.min(CW,CH),r0=h.r0!=null?h.r0:(+p
  let ox=0,oy=0,fx=1,fy=1;   // fx, fy: -1 when the pull has gone past the opposite side on that axis
  // a pattern's area (2.57.0): its sides and corners pull its size; the pieces keep theirs, so more or fewer fit; it never turns over
  if(p.k=='pattern'){const sx=k0.includes('e')?1:k0.includes('w')?-1:0,sy=k0.includes('s')?1:k0.includes('n')?-1:0;let w=w0,hh=h0;
-  if(sx)w=Math.max(S0*.05,mid?2*Math.abs(lx):sx*lx+w0/2);if(sy)hh=Math.max(S0*.05,mid?2*Math.abs(ly):sy*ly+h0/2);
+  // 2.60.1 (artist test): the area is never smaller than one piece (Tiling: the piece box at its Size), else 5% of the canvas
+  if(!h.pmin){h.pmin=[S0*.05,S0*.05];if(p.lay=='tile'){const T=tlPts(p,1,1),S=Math.max(1,S0*Math.max(1,Math.min(100,+p.ps||12))/100);h.pmin=[Math.max(h.pmin[0],T.box.w*S),Math.max(h.pmin[1],T.box.h*S)]}}
+  if(sx)w=Math.max(h.pmin[0],mid?2*Math.abs(lx):sx*lx+w0/2);if(sy)hh=Math.max(h.pmin[1],mid?2*Math.abs(ly):sy*ly+h0/2);
   if(sx&&sy&&e.shiftKey){const k=Math.max(w/w0,hh/h0);w=w0*k;hh=h0*k}
   p.aw=+w.toFixed(1);p.ah=+hh.toFixed(1);if(!mid){ox=sx*(w-w0)/2;oy=sy*(hh-h0)/2}
   p.x=+(h.x0+ox).toFixed(1);p.y=+(h.y0+oy).toFixed(1);return}

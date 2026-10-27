@@ -13,6 +13,8 @@ import {FLT_I,FLT_S,FLT_U,mtPaper} from './74-motif-element.js';
 // (74-motif-element.js): the picture under it is kept and a copy through the effects is laid over it. The Sheet's opacity is how strong both are; its blend applies to its fill.
 // A Sheet is not hit by a click on the canvas: it is picked from the Elements list.
 const shF=v=>(+v).toFixed(2);
+// half way between two colours (#rgb, #rrggbb or #rrggbbaa), for the gradient's midpoint
+const shMix=(a,b)=>{const p=h=>{h=String(h).replace('#','');if(h.length<6)h=h.split('').map(c=>c+c).join('');return[0,2,4,6].map(i=>i<h.length?parseInt(h.slice(i,i+2),16):255)};const x=p(a),y=p(b);if(x.some(isNaN)||y.some(isNaN))return a;const m=x.map((v,i)=>Math.round((v+y[i])/2));return'#'+m.slice(0,3).map(v=>v.toString(16).padStart(2,'0')).join('')+(m[3]<255?m[3].toString(16).padStart(2,'0'):'')};
 // the fill, in canvas units: {defs, body}; seen: the pictures already defined (null: define them here)
 function shFill(q,id,seen){const R=`x="0" y="0" width="${shF(CW)}" height="${shF(CH)}"`;
  if(q.fl=='none')return{defs:'',body:''};
@@ -24,6 +26,14 @@ function shFill(q,id,seen){const R=`x="0" y="0" width="${shF(CW)}" height="${shF
   else{let sx,sy;if(q.im=='stretch'){sx=CW/A.w*z;sy=CH/A.h*z}else sx=sy=(q.im=='contain'?Math.min(CW/A.w,CH/A.h):Math.max(CW/A.w,CH/A.h))*z;
    inner=`<use href="#${aid}" transform="translate(${shF(CW/2)} ${shF(CH/2)}) scale(${sx.toFixed(5)} ${sy.toFixed(5)}) translate(${shF(-A.w/2)} ${shF(-A.h/2)})"/>`}
   return{defs,body:`<g clip-path="url(#${id}c)">${inner}</g>`}}
+ // 2.60.4 (owner Oct 27 2026: "linear and radial gradients that we can apply effects to"): fl 'grad', from ink (the paper colour when it has none) to ink2
+ // (the ink colour when it has none); gk 'rad' for Radial (centre gx, gy % of the canvas, size gs % of its long side), else Linear by ga degrees (90: top to bottom);
+ // gm % is where the two colours meet half way. The effects work on it as on any fill.
+ if(q.fl=='grad'){const c1=okC(q.ink)?col(q.ink):col(WBS.proj.bg),c2=okC(q.ink2)?col(q.ink2):col(WBS.proj.ink),m=Math.max(5,Math.min(95,q.gm!=null?+q.gm:50))/100;
+  const st=`<stop offset="0" stop-color="${c1}"/>${Math.abs(m-.5)>.001?`<stop offset="${m.toFixed(3)}" stop-color="${shMix(c1,c2)}"/>`:''}<stop offset="1" stop-color="${c2}"/>`;let g;
+  if(q.gk=='rad'){const cx=CW*(q.gx!=null?+q.gx:50)/100,cy=CH*(q.gy!=null?+q.gy:50)/100,r=Math.max(CW,CH)*Math.max(5,+(q.gs!=null?q.gs:70))/100;g=`<radialGradient id="${id}g" gradientUnits="userSpaceOnUse" cx="${shF(cx)}" cy="${shF(cy)}" r="${shF(r)}">${st}</radialGradient>`}
+  else{const a=(q.ga!=null?+q.ga:90)*Math.PI/180,dx=Math.cos(a),dy=Math.sin(a),L=(Math.abs(CW*dx)+Math.abs(CH*dy))/2;g=`<linearGradient id="${id}g" gradientUnits="userSpaceOnUse" x1="${shF(CW/2-dx*L)}" y1="${shF(CH/2-dy*L)}" x2="${shF(CW/2+dx*L)}" y2="${shF(CH/2+dy*L)}">${st}</linearGradient>`}
+  return{defs:g,body:`<rect ${R} fill="url(#${id}g)"/>`}}
  return{defs:'',body:`<rect ${R} fill="${okC(q.ink)?col(q.ink):col(WBS.proj.bg)}"/>`}}
 // the Sheet that is being edited draws live (its print would be out of date at every step)
 const shLive=q=>q.u==WBS.fpSel||!!(WBS.fpMS&&WBS.fpMS.has&&WBS.fpMS.has(q.u));

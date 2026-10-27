@@ -6,7 +6,8 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL,fpU} from './24-free-place-layers.js';
 import {fpSz} from './25-art-layers.js';
 import {patNew} from './67-pattern-element.js';
-import {elSel} from './65-element-core.js';
+import {elKind,elSel} from './65-element-core.js';
+import {pmsg} from './18-projects-and-cover-overlay.js';
 import {plDisarm} from './72-placing.js';
 import {stUnlocked} from './63-stamp-tool.js';
 
@@ -29,7 +30,11 @@ let ABP='';   // which of 'motif', 'stamp', 'text', 'pattern' was last chosen on
 const abPick=k=>{plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;ABP=k;upd();abOpen(k=='motif'?'motifs':k=='text'?'text':k=='pattern'?'layers':'stmp')};
 // 2.20.0 (owner Oct 22 2026): every Add arms its kind, a ghost follows the pointer and each click on the canvas places one; Esc or V puts it away. Text, Motif and Stamp use their own ghosts; Pattern uses a box.
 function plArm(o){plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;WBS.plArm=o;upd();abOpen('layers');abSync()}
-function plMake(o,x,y){if(o.k=='pattern'){const q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),...patNew(),rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x,y,s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone()}}
+// 2.60.2 (owner Oct 27 2026: "like a shape picked in the library, a selected element can be placed many times"): Place copies arms a copy of the selected element; it
+// follows the pointer and each click places one more (one history step each) until Esc, V, a right click or any other control puts it away.
+function plCopy(){const q=elSel();if(!q||q.k=='sheet'||q.bgd||q.k=='group'||elKind(q)=='group')return false;const c=JSON.parse(JSON.stringify(q));delete c.u;delete c.g;delete c.lk;
+ plDisarm();WBS.plArm={k:'copy',q:c};WBS.fpGhost=null;upd();pmsg('Click the canvas to place copies. Esc stops.');return true}
+function plMake(o,x,y){if(o.k=='copy'){const q=JSON.parse(JSON.stringify(o.q));q.u=fpU();q.x=x;q.y=y;const L=fpL();if(!L)return;(L.pl=L.pl||[]).push(q);abDone();return}if(o.k=='pattern'){const q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),...patNew(),rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x,y,s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone()}}
 // 2.26.0: what a bar button does after it opened the panel. In a stamp's tab only Motif and Text have an Add, so the other buttons stay as they were (they only open the panel).
 function abArm(k){const un=stUnlocked()!=null;if(un&&k!='motif'&&k!='text')return;
  if(k=='stamp'){if(!WBS.tiles.length)return;AD.stamp();return}
@@ -69,5 +74,6 @@ function init73(){const b=$('elb');if(!b)return;
  document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.matches&&t.matches('input,select,textarea,[contenteditable]'))return;if(e.ctrlKey||e.metaKey||e.altKey||e.shiftKey)return;if(e.key=='v'||e.key=='V'){abSelect()}else if(e.key=='Escape'&&((WBX.wbPaMode&&WBX.wbPaMode()!='off')||ABP||(WBX.plKind&&WBX.plKind()))){abSelect()}});
  const stg=document.querySelector('.stage');if(stg&&!$('elopt')){stg.insertAdjacentHTML('beforeend','<div class="elopt" id="elopt" hidden><div class="seg"><button type="button" data-m="brush">Brush</button><button type="button" data-m="erase">Eraser</button></div><label>Size</label><input type="range" min="1" max="200" value="14" aria-label="Brush size"></div>');
   const o=$('elopt');o.onclick=e=>{const x=e.target.closest('[data-m]');if(x&&WBX.wbPaArm)WBX.wbPaArm(x.dataset.m)};o.querySelector('input').addEventListener('input',e=>{const s=$('pasz');if(s){s.value=e.target.value;s.dispatchEvent(new Event('input',{bubbles:true}))}})}
- WBX.wbPlArm=plArm;WBX.wbPlMake=plMake;WBX.wbAbSync=abSync;WBX.wbAbPick=()=>ABP;WBX.wbAbAdd=k=>{const f=AD[k]||AB[k];if(f)f();abSync()}}
+ {const b=$('lfpcp');if(b)b.onclick=()=>{if(WBS.plArm&&WBS.plArm.k=='copy'){plDisarm();return}plCopy()}}
+ WBX.wbPlCopy=plCopy;WBX.wbPlArm=plArm;WBX.wbPlMake=plMake;WBX.wbAbSync=abSync;WBX.wbAbPick=()=>ABP;WBX.wbAbAdd=k=>{const f=AD[k]||AB[k];if(f)f();abSync()}}
 export {abInsert,init73};

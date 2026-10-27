@@ -41,7 +41,10 @@ function mfSync(){if(!$('mf_f'))return;const T=mfT();MF_G.forEach(id=>mfVis(id,!
  if(T.k=='src'){mfVal('mf_sx',Math.round((+p.wx||1)*100));mfVal('mf_sy',Math.round((+p.wy||1)*100))}
  // Filter (2.38.0): a shape on the canvas (not the Background) can be a filter; its fill and outline then do nothing, so they hide
  const fo=T.k=='el'&&!p.bgd,fl=fo&&!!p.flt;mfVis('mf_fltr',fo);{const c=$('mf_flt');if(c.checked!==fl)c.checked=fl}mfVis('mf_fk',!fl);mfVis('mf_o',!fl&&!sh);if(fl){mfVis('mf_img',false);if(WBX.wbPaintWells)WBX.wbPaintWells();return}
- const fk=p.fl=='none'?'none':p.fl=='img'?'img':'solid';$('mf_fk').querySelectorAll('[data-f]').forEach(b=>mfSet(b,b.dataset.f==fk));mfVis('mf_img',fk=='img');mfVis('mf_fcr',sh&&fk=='solid');
+ const fk=p.fl=='none'?'none':p.fl=='img'?'img':sh&&p.fl=='grad'?'grad':'solid';{const g=$('mf_fk').querySelector('[data-f=grad]');if(g.hidden===sh)g.hidden=!sh;$('mf_fk').style.gridTemplateColumns=`repeat(${sh?4:3},1fr)`}$('mf_fk').querySelectorAll('[data-f]').forEach(b=>mfSet(b,b.dataset.f==fk));mfVis('mf_img',fk=='img');mfVis('mf_fcr',sh&&(fk=='solid'||fk=='grad'));
+ // 2.60.4: a Sheet's gradient: the Colour well is its start, End its end; Linear by an angle, Radial by a centre and a size; Midpoint where the two meet
+ mfVis('mf_gr',fk=='grad');{const k=$('mf_fck'),t=fk=='grad'?'Start':'Colour';if(k.textContent!==t)k.textContent=t}
+ if(fk=='grad'){const rad=p.gk=='rad';$('mf_gk').querySelectorAll('[data-g]').forEach(b=>mfSet(b,b.dataset.g==(rad?'rad':'lin')));mfVis('mf_gar',!rad);mfVis('mf_grr',rad);mfVal('mf_ga',p.ga!=null?+p.ga:90);mfVal('mf_gx',p.gx!=null?+p.gx:50);mfVal('mf_gy',p.gy!=null?+p.gy:50);mfVal('mf_gs',p.gs!=null?+p.gs:70);mfVal('mf_gm',p.gm!=null?+p.gm:50)}
  if(fk=='img'){mfStrip(p.a);mfVal('mf_iz',Math.round(+p.iz||100));const im=$('mf_im'),fit=p.im&&(sh||p.im=='contain')?p.im:'cover';im.style.gridTemplateColumns=`repeat(${sh?4:2},1fr)`;im.querySelectorAll('[data-i]').forEach(b=>{const x=b.dataset.i=='stretch'||b.dataset.i=='tile';if(b.hidden!==(x&&!sh))b.hidden=x&&!sh;mfSet(b,b.dataset.i==fit)})}
  if(sh){if(WBX.wbPaintWells)WBX.wbPaintWells();return}
  const so=+p.sw>0,oc=$('mf_oon');if(oc.checked!==so)oc.checked=so;mfVis('mf_owr',so);mfVis('mf_ocr',so);if(so)mfVal('mf_ow',Math.round(+p.sw));
@@ -66,15 +69,19 @@ function mtHit(p,lx,ly){const e=mtShape(p.m);if(!e.a)return undefined;const s=Ma
 
 function init82(){if(!$('mf_f'))return;
  const each=f=>{const T=mfT();if(!T)return null;T.list.forEach(q=>f(q,T));return T};
- $('mf_fk').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const f=b.dataset.f;each(q=>{if(f=='none')q.fl='none';else if(f=='img'){q.fl='img';if(!WBS.ARTS[q.a]){const k=Object.keys(WBS.ARTS);if(k.length)q.a=k[0];else delete q.a}}else delete q.fl});mfCh();mfSync()};
+ $('mf_fk').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const f=b.dataset.f;each(q=>{if(f=='none')q.fl='none';else if(f=='grad')q.fl='grad';else if(f=='img'){q.fl='img';if(!WBS.ARTS[q.a]){const k=Object.keys(WBS.ARTS);if(k.length)q.a=k[0];else delete q.a}}else delete q.fl});mfCh();mfSync()};
  $('mf_im').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;const i=b.dataset.i;each((q,T)=>{if(i=='contain'||(T.k=='sheet'&&(i=='stretch'||i=='tile')))q.im=i;else delete q.im});mfCh();mfSync()};
  const sl=(id,f,k)=>{$(id).addEventListener('input',()=>{const v=+$(id).value;each(q=>{const n=k?+(v/100).toFixed(3):v;if(k&&n==1)delete q[f];else q[f]=n});store();upd()});$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()})};
- sl('mf_iz','iz');sl('mf_ow','sw');sl('mf_sx','wx',1);sl('mf_sy','wy',1);
+ sl('mf_iz','iz');
+ // the gradient's sliders: a value at its default is left out
+ [['mf_ga','ga',90],['mf_gx','gx',50],['mf_gy','gy',50],['mf_gs','gs',70],['mf_gm','gm',50]].forEach(([id,f,d])=>{$(id).addEventListener('input',()=>{const v=+$(id).value;each(q=>{if(v==d)delete q[f];else q[f]=v});store();upd()});$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()})});
+ $('mf_gk').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;each(q=>{if(b.dataset.g=='rad')q.gk='rad';else delete q.gk});mfCh();mfSync()};sl('mf_ow','sw');sl('mf_sx','wx',1);sl('mf_sy','wy',1);
  $('mf_flt').onchange=()=>{const T=mfT();if(!T||T.k!='el')return;const on=$('mf_flt').checked;T.list.forEach(q=>{if(q.bgd)return;if(on)q.flt=1;else delete q.flt});mfCh();mfSync()};
  $('mf_oon').onchange=()=>{const on=$('mf_oon').checked;each((q,T)=>{if(on){if(!(+q.sw>0))q.sw=mfOw(T)}else delete q.sw});mfCh();mfSync()};
  if(WBX.wbMkWell){const pj=()=>WBS.proj,first=()=>{const T=mfT();return T?T.list[0]:null};
   WBX.wbMkWell($('mf_ow2'),{label:'Outline colour',what:'Outline',defRef:()=>{const T=mfT();if(T&&T.k=='items'){const t=WBS.tiles[WBS.cur];return T.list[0].ic||(t&&t.ink)||pj().ink}return pj().ink},get:()=>{const q=first();return q&&q.sk||''},set:v=>{each(q=>{if(v)q.sk=v;else delete q.sk})}});
   WBX.wbMkWell($('mf_cw'),{label:'Shape colour',what:'Shape',defRef:()=>pj().ink,get:()=>{const q=first();return q&&q.ink||''},set:v=>{each(q=>{if(v)q.ink=v;else delete q.ink})}});
+  WBX.wbMkWell($('mf_g2w'),{label:'Gradient end',what:'Sheet',defRef:()=>pj().ink,get:()=>{const q=first();return q&&q.ink2||''},set:v=>{each(q=>{if(v)q.ink2=v;else delete q.ink2})}});
   WBX.wbMkWell($('mf_fcw'),{label:'Sheet colour',what:'Sheet',defRef:()=>pj().bg,get:()=>{const q=first();return q&&q.ink||''},set:v=>{each(q=>{if(v)q.ink=v;else delete q.ink})}})}
  WBX.wbMfSync=mfSync;WBX.wbMotifImage=mfImage;WBX.wbMtHit=mtHit;WBX.wbMtWarm=mtShape}
 export {init82,mfSync,mtHit};
