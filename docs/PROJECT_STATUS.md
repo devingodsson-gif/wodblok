@@ -4,6 +4,8 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
+**Oct 27 2026 (2.66.0).** About ninety built-in fonts in eight groups, 29 with real bold, italic and bold italic. The text plan (docs/text-plan.md) is complete with this release. The app is 17.5 MB, over the preview artifact's 16 MB limit: the preview is now published with the `<style id="wbfonts">` contents moved into a `fonts.css` file next to the page (a same-origin stylesheet, which the Text tool still reads its outlines from); `dist/` itself is unchanged.
+
 **Oct 27 2026 (2.65.0).** Bold, Italic, Underline, Strikethrough and Highlight on selected letters (drawn bold and slanted italic until the fonts release). Next: 2.66.0 about 90 built-in fonts with real bold and italic.
 
 **Oct 27 2026 (2.64.0).** The new Text panel (Text, Style, Character, Paragraph, Shape); the unused and random controls removed. Next: 2.65.0 bold, italic, underline, strikethrough, highlight; 2.66.0 about 90 built-in fonts.

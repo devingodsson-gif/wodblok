@@ -6,7 +6,7 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS,delItems,selSet} from './12-selection-and-split.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {TXO_KEYS,TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed} from './61-text-panel.js';
-import {teD,teRnd,teF,teFonts,teUF,teAddUF,teCss,teFitSz,teLayBox,teLayout,teLoadFonts,teReady,teSetNotify} from './60-text-engine.js';
+import {TE_FONTS0,TE_GROUPS,teD,teRnd,teF,teFonts,teUF,teAddUF,teCss,teFitSz,teLayBox,teLayout,teLoadFonts,teReady,teSetNotify} from './60-text-engine.js';
 import {stTxMode} from './63-stamp-tool.js';
 
 function init22(){// ===== Text tool: type text, it's traced into carved letter shapes. Each letter becomes its own shape on the stamp,
@@ -19,7 +19,9 @@ const grpOf=()=>{const qs=QS();if(!qs.length)return null;const g=qs[0].tg;if(!g|
 const idsOf=g=>(WBS.tiles[WBS.cur]||WBS.noTile).items.map((q,i)=>q.tg==g?i:-1).filter(i=>i>=0);
 const mean=ids=>{const it2=(WBS.tiles[WBS.cur]||WBS.noTile).items;let x=0,y=0;ids.forEach(i=>{x+=it2[i].x;y+=it2[i].y});return[x/ids.length,y/ids.length]};
 WBX.wbTxGrp=()=>grpOf();WBX.wbTxMeta=g=>A(WBS.tiles[WBS.cur])[g];
-function fillFonts(){const cur0=$('tx_f').value||st.f;$('tx_f').innerHTML=`<optgroup label="Built-in fonts">${teFonts.map(x=>`<option value="${x[0]}" data-font="${hx(x[1])}" data-w="${x[3]}">${hx(x[1])}</option>`).join('')}</optgroup>`+(teUF.length?`<optgroup label="Your fonts">${teUF.map(id=>`<option value="${id}" data-font="${hx(teF[id].fam)}" data-w="400">${hx(teF[id].lbl)}</option>`).join('')}</optgroup>`:'');$('tx_f').value=teF[cur0]?cur0:'cinzel'}
+// 2.66.0: the fonts in their groups (Serif, Sans, Slab, Display, Script, Blackletter, Handwritten, Mono), A to Z in each, then your own
+function fillFonts(){const cur0=$('tx_f').value||st.f,opt=x=>`<option value="${x[0]}" data-font="${hx(x[1])}" data-w="${x[3]}">${hx(x[1])}</option>`;
+ $('tx_f').innerHTML=TE_GROUPS.map(g=>{const a=teFonts.filter(x=>(x[5]||'Display')==g).sort((p,q)=>p[1].localeCompare(q[1]));return a.length?`<optgroup label="${g}">${a.map(opt).join('')}</optgroup>`:''}).join('')+(teUF.length?`<optgroup label="Your fonts">${teUF.map(id=>`<option value="${id}" data-font="${hx(teF[id].fam)}" data-w="400">${hx(teF[id].lbl)}</option>`).join('')}</optgroup>`:'');$('tx_f').value=teF[cur0]?cur0:'cinzel'}
 function toUI(){syncing++;try{toUI0()}finally{syncing--}}
 function toUI0(){txoWrite(st,null,true)}
 function fromUI(){const o=txoRead();TXO_KEYS.forEach(k=>delete st[k]);Object.assign(st,o)}
@@ -53,7 +55,7 @@ const[mx,my]=mean(nids);A(t)[g]={...st,ax,ay,mx,my};selSet(nids,false);store();u
 const live=()=>{if(syncing||!stTxMode())return;if(!edit)return;   // 2.12.0: typing no longer arms a click-to-place text
 clearTimeout(ltmr);ltmr=setTimeout(()=>update(true),150)};
 // used by Randomize: set text on a stamp (fonts load first; a newer roll cancels an older one)
-WBX.wbTxFonts=teFonts.map(x=>x[0]);
+WBX.wbTxFonts=TE_FONTS0.slice();   // Randomize keeps to the fonts it always had (2.66.0), so seeded rolls stay the same
 // Randomize uses the newer text options now and then. They come from the words themselves (not from Math.random), so a Randomize roll draws the same random numbers as before.
 function txRandom(o){if(o.inner||[...o.text].length<4||o.pt||o.wp||o.rp||o.bb)return;const h=[...o.text].reduce((a,c)=>(Math.imul(a,31)+c.codePointAt(0))|0,7),R=k=>teRnd(h,0,k);
 if(R(1)<.14){o.pt='w';o.pa=20+Math.floor(R(2)*25);o.pw=40+Math.floor(R(3)*30)}else if(R(4)<.16){o.wp='b';o.wa=30+Math.floor(R(5)*40)}else if(R(6)<.15){o.rp=5+Math.floor(R(7)*10);o.rr=3+Math.floor(R(8)*10)}else if(R(9)<.08)o.bb=20+Math.floor(R(10)*20)}

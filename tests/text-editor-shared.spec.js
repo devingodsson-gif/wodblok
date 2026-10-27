@@ -46,16 +46,13 @@ test('with every stamp locked, typing in the Text panel adds nothing until Add t
   expect(errors).toEqual([]);
 });
 
-test('thirty-four fonts, each written in its own face in the list', async ({ page }) => {
+test('the fonts (about ninety since 2.66.0), each written in its own face in the list', async ({ page }) => {
   const { errors } = await openApp(page);
   await openPanel(page, 'text');
   const n = await page.locator('#tx_f option[data-font]').count();
-  expect(n).toBe(34);
+  expect(n).toBeGreaterThanOrEqual(85);
   await page.click('#tx_f + .dd2 .ddb');
-  const first = page.locator('div.ddl:not([hidden]) .ddi').nth(14);        // the first of the new fonts
-  await expect(first).toBeVisible();
-  const ff = await first.evaluate(e => getComputedStyle(e).fontFamily);
-  expect(ff).toContain('Playfair Display');
+  await expect(page.locator('div.ddl:not([hidden]) .ddi').first()).toBeVisible();
   const items = await page.locator('div.ddl:not([hidden]) .ddi').evaluateAll(a => a.map(e => [e.textContent, getComputedStyle(e).fontFamily]));
   for (const [name, fam] of items) expect(fam, name).toContain(name);
   expect(errors).toEqual([]);
