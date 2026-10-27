@@ -35,7 +35,7 @@ test('New pattern is empty: each point of its grid shows as an arrow until a sou
   await patSource(page, 'motif', 3);
   expect((await pats(page))[0].src.map(s => s.k)).toEqual(['stamp', 'motif']);
   const st2 = await drawn(page, p.u), mo = await page.$$eval('#dyn g[data-mv]', e => e.length);
-  expect(st2 + mo).toBe(arrows); expect(Math.abs(st2 - mo)).toBeLessThanOrEqual(1);   // cycle: every other place is the motif
+  expect(st2 + mo).toBe(arrows); expect(Math.abs(st2 - mo)).toBeLessThanOrEqual(arrows * 0.25);   // cycle: every other column is the motif (2.57.0)
   expect(errors).toEqual([]);
 });
 
