@@ -578,7 +578,8 @@ body.dropping::after{content:"Drop the image to import it";position:fixed;inset:
 .isec .shrow input[type=number]{width:46px}
 @media (max-width:860px){.idl{height:auto}.idl .dlg-b{overflow-y:auto}.iwrap{grid-template-columns:1fr;height:auto}.iside{border-left:0;border-top:1px solid var(--line)}.istg{overflow:visible}}
 .sstage{position:relative;line-height:0;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden;touch-action:none}.sstage img{width:100%;height:auto;display:block}
-#sov{position:absolute;inset:0;width:100%;height:100%}#sov [data-lx]{cursor:col-resize}#sov [data-ly]{cursor:row-resize}
+#sov{position:absolute;inset:0;width:100%;height:100%}
+.idl:not(:has(#imode [data-m=sheet].on)) #sov{cursor:crosshair}#sov .crdim{fill:#000;fill-opacity:.4;pointer-events:none}#sov .crln{fill:none;stroke:var(--hl);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}#sov .crhd{fill:var(--fg);stroke:var(--panel);stroke-width:1px;vector-effect:non-scaling-stroke;cursor:nwse-resize}#sov .crhd[data-crh=ne],#sov .crhd[data-crh=sw]{cursor:nesw-resize}#sov [data-lx]{cursor:col-resize}#sov [data-ly]{cursor:row-resize}
 .scells{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px;margin-top:12px}
 .scells button{position:relative;margin:0;padding:4px;aspect-ratio:1;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field)}.scells button svg{width:100%;height:100%;border-radius:var(--r-s)}
 .scells button.off{opacity:.35}.scells button.off::after{content:'';position:absolute;inset:0;border-radius:var(--r-m);background:linear-gradient(45deg,transparent 48%,var(--warn) 48%,var(--warn) 52%,transparent 52%)}
