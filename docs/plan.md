@@ -5,7 +5,7 @@ Owner, Oct 27 2026: the text fits its box; the corners and sides change the box;
 - A text on the canvas is a box its letters always fill (the engine's Fill the box). A new text's box is 60 x 20 % of the canvas's short side. The corners pull width and height (Shift keeps the proportions, Alt from the middle), the sides one of them; the letters are laid out again to fill the box; a text never turns over.
 - Size, Box width, Box height, Padding, Fit to box and Overflow are hidden for a text on the canvas. A stamp's tab keeps them until the panel release (2.64.0), when stamp texts get the same treatment (owner: yes).
 - A text from before keeps its look until it is edited; editing gives it a box. No format change.
-- Tests: new `text-box-2-63`; the text, handle, selection and copy specs.
+- Tests: new `text-box-2-63`; 22 text, handle, selection and copy spec files: all pass after these intentional updates: `text-box-wrap` (the side squares set the box width with letters fixed) removed for the new rule, `text-fit` (a text now always saves `ft:'f'` with a box), `text-colour-2-62` (waits for the slower fill layout; Undo checked loosely). `text-paragraph` failed once in the long run and passed alone.
 
 ## 2.62.0 (Oct 27 2026): letter colour (release 3 of docs/artist-test-todo.md, the text overhaul's first part)
 Owner, Oct 27 2026: "just do 4 and we will wait on the font updates" (4: style parts of the text; fonts, bold and italic wait).

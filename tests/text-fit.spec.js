@@ -86,8 +86,8 @@ test('Text layer: the new options are saved only when set', async ({ page }) => 
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await settle(page);   // stop placing, then select the text
   const tx = async () => JSON.parse(await getState(page)).els.find(p => p.tx).tx;
   await expect.poll(async () => (await tx()).text, { timeout: 10000 }).toBe('HELLO WORLD');
-  expect(Object.keys(await tx()).filter(k => ['pd', 'ft', 'ov'].includes(k))).toEqual([]);
-  await set(page, 'tx_wd', 60); await set(page, 'tx_ht', 30); await set(page, 'tx_ft', 'f');
-  await expect.poll(async () => (await tx()).ft, { timeout: 10000 }).toBe('f');
+  // 2.63.0: a text on the canvas always fills its box: ft 'f' with a box, never padding or overflow
+  expect(Object.keys(await tx()).filter(k => ['pd', 'ft', 'ov'].includes(k))).toEqual(['ft']);
+  expect(await tx()).toMatchObject({ ft: 'f', wd: 60, ht: 20 });
   expect(errors).toEqual([]);
 });
