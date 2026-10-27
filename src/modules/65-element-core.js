@@ -67,7 +67,7 @@ function elSel(){const L=WBS.layers[WBS.selL];if(!L||WBS.fpSel==null||WBS.fpSel=
 let elLast='',elLastK='';
 function elSync(){if(WBX.wbTxInPlace)WBX.wbTxInPlace();if(WBX.wbAbSync)WBX.wbAbSync();if(WBX.wbElkSync)WBX.wbElkSync();if(WBX.wbSteSync)WBX.wbSteSync();if(WBX.wbMapSync)WBX.wbMapSync();if(WBX.wbMtSync)WBX.wbMtSync();
 // each element panel says which element it is editing; with nothing of its kind selected it is creating, and the line is hidden
-if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbMfSync)WBX.wbMfSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();if(WBX.wbPmSync)WBX.wbPmSync();
+if(WBX.wbBgSync)WBX.wbBgSync();if(WBX.wbPatSync)WBX.wbPatSync();if(WBX.wbMfSync)WBX.wbMfSync();if(WBX.wbStcSync)WBX.wbStcSync();if(WBX.wbPaSync)WBX.wbPaSync();if(WBX.wbFxSync)WBX.wbFxSync();if(WBX.wbPmSync)WBX.wbPmSync();if(WBX.wbFoSync)WBX.wbFoSync();
 const q=elSel(),k=elKind(q);
 // 2.27.0 (review 33): when the selection leaves a text, the Text panel's field empties (it kept the old words with nothing selected, and the next Add text took them)
 if(k!==elLastK){if(elLastK=='text'&&k!='text'&&!WBS.txArm&&!document.body.classList.contains('stedit')){const t=$('tx_t');if(t&&t.value)t.value=''}elLastK=k}

@@ -58,7 +58,7 @@ body.plain{--stage-dot:transparent}
 .pop:not([hidden]),.ddl:not([hidden]),.cpop:not([hidden]){animation:popin .13s ease-out}
 @keyframes popin{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}
 button,.ddi,.wtab,.lyr{transition:background-color var(--t-fast),border-color var(--t-fast),color var(--t-fast),box-shadow var(--t-fast)}
-@media (prefers-reduced-motion:reduce){#splash,.spl,.spl i::after,.pop,.ddl,.cpop,.rpop{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){#splash,.spl,.spl i::after,.pop,.ddl,.cpop,.rpop,.fxwin{animation:none!important;transition:none!important}}
 /* v95 history */
 .hs{display:flex;flex-direction:column;min-height:100%}
 .hsh{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:var(--h-row);box-sizing:border-box;padding:6px 8px 6px 12px;font-weight:600;font-size:var(--fs-l);border-bottom:1px solid var(--line)}
@@ -393,6 +393,7 @@ details.g>summary{list-style:none;cursor:pointer;display:flex;align-items:center
 details.g>summary::-webkit-details-marker{display:none}
 details.g>summary::before{content:"";width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--faint);transition:transform var(--t-fast);transform:rotate(-90deg)}
 details.g[open]>summary::before{transform:none}
+.fxg.fxnone>summary{cursor:default}.fxg.fxnone>summary::before{visibility:hidden}.fxg.fxnone>summary:hover{background:none}.fxg.fxnone>.gb{display:none}
 details.g>summary:hover{background:color-mix(in srgb,var(--raise) 60%,transparent)}
 details.g>summary .aux{margin-left:auto;font-weight:400;color:var(--mut);font-size:var(--fs-s)}
 .gb{padding:2px 12px 12px}
@@ -773,6 +774,11 @@ body.eyedrop{cursor:crosshair}
 .rpn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs-m)}
 .rpgo{flex:none}
 .rpop{position:fixed;z-index:55;padding:var(--sp-4);background:var(--raise);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow);overflow:auto}.rpop:not([hidden]){animation:popin .13s ease-out}
+/* 2.55.0: the effect pop-out, a floating panel (Part 9: --r-l, --shadow, above the docked panels) holding the Effects group's own settings pane */
+.fxwin{position:fixed;z-index:9001;width:300px;max-height:80vh;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow)}.fxwin:not([hidden]){animation:popin .13s ease-out}
+.fxwh{display:flex;align-items:center;gap:var(--sp-4);min-height:var(--h-row);padding:0 var(--sp-2) 0 var(--sp-5);font-size:var(--fs-l);font-weight:600;border-bottom:1px solid var(--line);cursor:move;touch-action:none;user-select:none}.fxwt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fxwb{overflow:auto;padding:var(--sp-4) var(--sp-5)}.fxwb .fxpane,.fxwb .fxpane:has(.fxs:not([hidden])){padding:0;margin:0;border-left:0}
+.fxwf{display:flex;justify-content:flex-end;gap:var(--sp-4);padding:var(--sp-4);border-top:1px solid var(--line)}
 .cwp:not([hidden]){animation:popin .13s ease-out}
 .cwpd{display:flex;align-items:center;gap:8px;width:100%;height:var(--h-row);padding:0 8px 0 4px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);color:var(--fg);font-size:var(--fs-m);text-align:left}
 .cwpd i{width:var(--h-sm);height:var(--h-sm);border-radius:var(--r-m);border:1px dashed var(--line2)}
