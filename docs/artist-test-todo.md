@@ -57,3 +57,18 @@ The last note stops mid-sentence: "Say there are 100 elements in the element lis
 3. Highlight colour, copy-and-place and import crop (all defined now).
 4. Film grain, then gradients (confirm the Sheet fill idea first).
 5. Release 3: the text overhaul (ask the owner).
+
+## Release plan (three releases, each raises the minor once; steps inside are patches)
+**Release 1, 2.60.0: Selection and control.** The only frustration, so it goes first.
+- 2.59.2 Overlap and drag: a larger drag before a box starts; higher in the Elements list wins; text selected only on the text itself; a click outside the canvas deselects.
+- 2.59.3 Control: lock from the bar; Shift while dragging turns smart guides off; Highlight colour in Settings (smart guides and the selection box).
+- Tests: selection and guide specs; perf (touches dragging).
+
+**Release 2, 2.61.0: Smaller fixes, new tools and the look.**
+- 2.60.1 Fixes: paste clamped to the canvas; Pattern minimum size; Done button on the colour maker; Import button overlap; transparency squares one size; close each panel tab; shape menus.
+- 2.60.2 Place copies: a button on a selected element copies it to the pointer and each click places one.
+- 2.60.3 Import crop: a crop selection beside the Threshold in the shape import window.
+- 2.60.4 Gradients: the Sheet Fill (Solid, Linear, Radial) once confirmed; touches drawing and the file format (v30), so perf and the broader checks.
+- 2.60.5 Film grain: redone.
+
+**Release 3, 2.62.0: Text overhaul.** Bold, italic and the other options, the Text styles naming and whatever the owner adds; ask him when we start.
