@@ -92,6 +92,8 @@ ${fxFor(kind).filter(d=>d.pane).map(d=>d.pane()).join('')}
 </div><div class="fxl fxl2"></div>
 </div></details>`}
 function fxSync(){if(!WBS.layers||!WBS.proj)return;document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,t=fxTarget(kind);if(g.hidden!==!t)g.hidden=!t;if(!t)return;const list=fxOf(t),sel=list.find(e=>e.u==SEL[kind])||null;
+// 2.55.0 (owner Oct 26 2026): with no effects the group is only its title and +, with no fold arrow
+if(g.classList.contains('fxnone')!==!list.length){g.classList.toggle('fxnone',!list.length);if(list.length)g.open=true}
 const key=JSON.stringify([t.u||'x',list.map(e=>[e.u,e.k,e.on,e.x,e.md]),sel&&sel.u]);
 const host=g.querySelector('.fxl'),host2=g.querySelector('.fxl2');if(host.dataset.k!==key){host.dataset.k=key;
 const row=e=>{const d=fxDef(e.k),on=e.on!==false,op=sel&&e.u==sel.u;return`<div class="fxr${op?' on':''}${on?'':' off'}" data-fu="${e.u}" draggable="true"><button type="button" class="ib" data-fon aria-pressed="${on}" aria-label="${on?'Hide':'Show'} this effect">${on?FXI.eye:FXI.off}</button><span class="fxc${op?' open':''}">${FXI.car}</span><b>${fxHx(d?d.label:e.k)}</b><button type="button" class="ib" data-fmore aria-haspopup="menu" aria-label="More">${FXI.more}</button></div>`};
@@ -105,6 +107,7 @@ if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=g.querySelector('.fxg_'+k),v
 if(sel){const d=fxDef(sel.k),pane=d&&d.sync&&g.querySelector(`.fxs[data-e="${sel.k}"]`);if(pane)d.sync(pane,sel)}
 if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=g.querySelector(c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxpp',+sel.pst||0);set('.fxpf',+sel.pfl||0)}})}
 function init69(){
+document.addEventListener('click',e=>{const sm=e.target.closest&&e.target.closest('.fxg.fxnone>summary');if(sm&&!e.target.closest('.fxadd'))e.preventDefault()},true);
 // the Elements list opens an effect: select its element, show its panel, open that effect's settings
 WBX.wbFxOpen=(kind,u)=>{SEL[kind]=u;const pn=KIND_PANEL[kind];if(pn&&WBX.wbOpenPanel)WBX.wbOpenPanel(pn);document.querySelectorAll('.fxl').forEach(x=>x.dataset.k='');fxSync()};
 fxRegister('texture',{label:'Texture',kinds:['stamp','text','pattern','paint','motif','sheet'],make:()=>{const first=Object.keys(TXN)[0];let x='';if(first){const L=txMake(first,{auto:true});WBS.texLib.push(L);x=L.id}return{k:'texture',on:true,x,sd:txRid(),md:'wear'}}});

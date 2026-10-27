@@ -45,3 +45,20 @@ test('a panel comes back where it was: closed on the left, it opens on the left 
   expect(await dockOf(page, 'canvas')).toBe('l');
   expect(errors).toEqual([]);
 });
+
+test('the Effects group has no fold arrow and no body while the element has no effects; adding one opens it', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false, background: true });
+  await H.addShape(page, 'rect');
+  const g = page.locator('.fxg[data-fxk="motif"]');
+  await expect(g).toBeVisible();
+  await expect(g).toHaveClass(/fxnone/);
+  const arrow = () => g.locator('summary').evaluate(s => getComputedStyle(s, '::before').visibility);
+  expect(await arrow()).toBe('hidden');
+  await g.locator('summary').click({ position: { x: 30, y: 8 } });
+  expect(await g.evaluate(d => d.open)).toBe(true);   // a click on the title does not fold it
+  await g.locator('.fxadd').click();
+  await page.locator('.rowm:not(.rowsub) .ddi', { hasText: 'Colour grade' }).first().click(); await H.settle(page);
+  await expect(g).not.toHaveClass(/fxnone/);
+  expect(await arrow()).toBe('visible');
+  expect(errors).toEqual([]);
+});
