@@ -126,10 +126,8 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 /* export recipes */
 .xrw{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:var(--fs-m)}.xrw span,.xrw label{color:var(--mut)}.xrw label{flex:1}.xrw input[type=checkbox]{margin:0;accent-color:var(--acc)}.xrw .seg{flex:1}#xrcw{grid-template-columns:1fr 1fr}#xrf{grid-template-columns:repeat(4,1fr)}.xrs{display:flex;flex-direction:column;gap:8px}.xrs .ctl{grid-template-columns:90px minmax(0,1fr)}
 .xrd{font-size:var(--fs-s);color:var(--mut);min-height:16px}.xrn{display:flex;gap:8px}.xrn input{flex:1;min-width:0}
-.xrl{margin:-2px -4px 0}
-.xrr{display:grid;grid-template-columns:minmax(0,1fr);grid-auto-flow:column;grid-auto-columns:auto;align-items:center;gap:4px;padding:4px 4px 4px 8px;border-radius:var(--r-m);font-size:var(--fs-m);border:1px solid transparent}
-.xrr:hover{background:var(--raise)}.xrr b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.xrr small{display:block;color:var(--mut);font-size:var(--fs-s)}
-.xrp select{width:auto;flex:1}.xrr .ib{width:var(--h-sm);height:var(--h-sm)}.xrr .ib svg{width:14px;height:14px}.xrr input{height:var(--h-sm)}.xrall{margin-top:12px}.xrq{margin-top:8px;gap:6px;flex-wrap:wrap}.xrq button{display:inline-flex;align-items:center;gap:6px;height:var(--h-md);padding:0 8px;font-size:var(--fs-m)}.xrq button svg{width:14px;height:14px;flex:none}.xrq kbd{font-size:var(--fs-s);color:var(--mut)}.xrq:not(:has(button:not([hidden]))){display:none}
+.rctr .lib.rws>div>button:first-child{grid-template-columns:minmax(0,1fr) auto;padding-right:56px}.rctr .lib.rws .rcact{position:absolute;right:24px;top:50%;transform:translateY(-50%);width:var(--h-sm);height:var(--h-sm)}.rctr .lib.rws .rcact svg{width:14px;height:14px}
+.xrp select{width:auto;flex:1}.xrall{margin-top:12px}.xrq{margin-top:8px;gap:6px;flex-wrap:wrap}.xrq button{display:inline-flex;align-items:center;gap:6px;height:var(--h-md);padding:0 8px;font-size:var(--fs-m)}.xrq button svg{width:14px;height:14px;flex:none}.xrq kbd{font-size:var(--fs-s);color:var(--mut)}.xrq:not(:has(button:not([hidden]))){display:none}
 #artwrap.tpv>*{pointer-events:none}
 /* 3 x 3 repeat preview: faint lines mark where each tile ends, so seams can be checked; the picture is not editable here */
 #artwrap.tpv::after{content:"";position:absolute;inset:28px;pointer-events:none;z-index:3;--tl:color-mix(in srgb,var(--acc) var(--tlo,92%),transparent);background:
@@ -1331,7 +1329,7 @@ body.eyedrop{cursor:crosshair}
  <div class="xrw"><label for="xrwm">Watermark</label><input type="checkbox" id="xrwm"></div>
  <div class="xrw" id="xrcwr" hidden><span>Colourways</span><div class="seg" id="xrcw" role="group" aria-label="Colourways to export"><button type="button" class="on" data-s="one">Showing</button><button type="button" data-s="all" id="xrcwall">All</button></div></div>
  <details class="g" open><summary>Recipes</summary><div class="gb">
-  <div class="xrl" id="xrl" role="list"></div>
+  <div id="xrpane"></div>
   <div class="row"><button type="button" id="xrall">Export all recipes</button></div>
  </div></details>
  <details class="g" open><summary>Custom export</summary><div class="gb xrs">

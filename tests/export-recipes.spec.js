@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle } = require('./helpers/harness');
 
-const row = (page, name) => page.locator('#xrl .xrr', { hasText: name });
+const row = (page, name) => page.locator('#xrl .lib > div', { hasText: name });
 const downloads = page => page.evaluate(() => window.__wbDownloads.map(d => ({ filename: d.filename, type: d.type, size: (d.base64 || '').length })));
 // pixel size of a downloaded PNG or JPG
 const pixels = (page, i) => page.evaluate(async i => {
@@ -15,7 +15,7 @@ test('a starting recipe exports a picture of the right size, with its ending in 
   const { errors } = await openApp(page);
   await openPanel(page, 'xrec');
   await expect(page.locator('#xrd')).toHaveText(/\d+ × \d+ px/);
-  await row(page, 'Preview').locator('[data-act="exp"]').click();             // JPG, 800 px long side (2.26.0: the recipe's own Export button)
+  await row(page, 'Preview').locator('.rcact').click();             // JPG, 800 px long side (2.26.0: the recipe's own Export button)
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   const d = await downloads(page);
   expect(d[0].filename).toMatch(/-preview\.jpg$/);
@@ -91,18 +91,19 @@ test('save a recipe, use it, rename it, keep it after a reload, delete it', asyn
   await expect(row(page, 'Mine')).toBeVisible();
   await expect(row(page, 'Mine').locator('small')).toHaveText('JPG · 1200 px');
   await page.click('#xrf [data-f="png"]'); await page.fill('#xrpx', '300');   // change the settings, then use the recipe
-  await row(page, 'Mine').locator('[data-act="exp"]').click();
+  await row(page, 'Mine').locator('.rcact').click();
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   expect((await downloads(page))[0].filename).toMatch(/-mine\.jpg$/);
   expect(Math.max(...await pixels(page, 0))).toBe(1200);
   await expect(page.locator('#xrpx')).toHaveValue('1200');                      // exporting a recipe also loads its settings
-  await row(page, 'Mine').locator('[data-act="ren"]').click();
-  await page.locator('#xrl .xrr input').fill('Mine two'); await page.keyboard.press('Enter');
+  await row(page, 'Mine').locator('button').first().click({ button: 'right' });   // the row's menu: Rename
+  await page.locator('.rowm .ddi', { hasText: 'Rename' }).first().click();
+  await page.locator('#xrl .fform input').fill('Mine two'); await page.keyboard.press('Enter');
   await expect(row(page, 'Mine two')).toBeVisible();
   await page.reload(); await page.waitForFunction(() => window.__wbTest);
   await openPanel(page, 'xrec');
   await expect(row(page, 'Mine two')).toBeVisible();
-  await row(page, 'Mine two').locator('[data-act="del"]').click();
+  await row(page, 'Mine two').hover(); await row(page, 'Mine two').locator('.dx').click(); await row(page, 'Mine two').locator('.dx').click();   // two taps
   await expect(row(page, 'Mine two')).toHaveCount(0);
   expect(errors).toEqual([]);
 });

@@ -6,7 +6,7 @@ import {buildMotifZip,safeName} from '../format/motifs.js';
 import {zipRead} from '../format/libzip.js';
 
 // ===== The folder tree of the style guide (Part 9, section 12), as one component (2.51.1) =====
-// Every library (textures first, then saved stamps, saved trays, templates, workspaces, export recipes and saved colourways) is this tree: Home ("Yours") first, then your folders and the
+// Every library (textures first, then saved stamps, saved trays, templates, export recipes and saved colourways) is this tree: Home ("Yours") first, then your folders and the
 // built-in sets together A to Z, hidden sets in a row of their own, the folder row and its menu and form, select mode, drag onto a folder, Export, the same messages. A library gives
 // it only what differs, as `cfg`:
 //   open: set keys that start open (until the person closes them); cards: true for cards (a picture and a name) instead of plain tiles; z: the size the slider starts at (0 to 8);
@@ -16,7 +16,7 @@ import {zipRead} from '../format/libzip.js';
 //   read(): the library as {f: folder paths, at: {own item id: folder path}, b: {built-in item id: folder path}, h: hidden set names, r: {set name: your name for it}, d: whatever write needs back}
 //   write(m): saves that; sets(): [{k: "s:Name", n: "Name", ids: [built-in item ids]}]; name(id); own(id): true for an item you made
 //   tile(id, {cur, pk}): the inside of an item's tile (a picture); used(id): in use in the project (cannot be deleted); remove(ids): deletes your items
-//   rename(id, name): your item gets a name; file(id): {name, data, ext, fb} for Export, or null; usedFix: what to do when an item in use cannot be deleted; itemMenu(id): more entries at the top of an item's right-click menu; ids trId, qId: ids for the tree and the search field; top: markup above the bar; wire(pane, pick): its listeners; pane: the pane's selector
+//   rename(id, name): your item gets a name; file(id): {name, data, ext, fb} for Export, or null; usedFix: what to do when an item in use cannot be deleted; itemMenu(id): more entries at the top of an item's right-click menu; act: {icon, label, run(id)} puts a small button at the end of each item's row (rows only); ids trId, qId: ids for the tree and the search field; top: markup above the bar; wire(pane, pick): its listeners; pane: the pane's selector
 // What it returns: pane() markup for the tree (after the library's own top row), show(pane, cur, pick), paintAll(), here() (the active folder, where new items go), init().
 function ltMake(cfg){
 const P=cfg.p,W=cfg.word,WS=cfg.words;
@@ -54,7 +54,7 @@ function tree(m,fs){const o=[{v:'y',n:'Yours',d:0}],walk=(k,n,dep)=>{o.push({v:k
 const here=()=>TL.active||'';
 const pathName=p=>{if(!p)return'Yours';const m=cfg.read();return p.split('/').map((s,i)=>i==0&&isSet(s)?shown(m,s.slice(2)):s).join(' / ')};
 function tile(id,cur){const n=cfg.name(id);if(n==null)return'';const pk=TL.sel.has(id),own=cfg.own(id);
- return`<div><button type="button" data-${P}="${esc(id)}" class="${id===cur?'on':''}${pk?' pk':''}" aria-label="${esc(n)}" aria-pressed="${id===cur}">${cfg.tile(id,{cur,pk})}</button>${pk?`<i class="ck">${CK}</i>`:''}${own&&!TL.sm?`<button type="button" class="dx" data-${P}x="${esc(id)}" aria-label="Delete ${esc(n)}">&#215;</button>`:''}</div>`}
+ return`<div><button type="button" data-${P}="${esc(id)}" class="${id===cur?'on':''}${pk?' pk':''}" aria-label="${esc(n)}" aria-pressed="${id===cur}">${cfg.tile(id,{cur,pk})}</button>${pk?`<i class="ck">${CK}</i>`:''}${cfg.act&&!TL.sm?`<button type="button" class="ib ${P}act" data-${P}a="${esc(id)}" aria-label="${esc(cfg.act.label)} ${esc(n)}">${IC(cfg.act.icon)}</button>`:''}${own&&!TL.sm?`<button type="button" class="dx" data-${P}x="${esc(id)}" aria-label="Delete ${esc(n)}">&#215;</button>`:''}</div>`}
 function row(key,label,n,depth,o){const open=TL.open.has(key);
  return`<div class="lrw${TL.active===key?' act':''}${o.hid?' hid':''}" style="--d:${depth}"><button type="button" class="lfr" data-k="${esc(key)}" aria-expanded="${open}">${CHEV}<span class="lfi">${IC(o.home?ICN.home:open?ICN.folderOpen:ICN.folder)}</span><span class="lfn">${esc(label)}</span><span class="lfc">${n}</span></button>${o.menu?`<button type="button" class="lmo" data-fm="${esc(key)}" aria-haspopup="menu" aria-label="Folder options">${IC(ICN.more)}</button>`:''}</div>`}
 function form(m,fs,depth){const f=TL.form;if(!f)return'';
@@ -189,6 +189,7 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
   const fm=e.target.closest('[data-fm]');if(fm){e.stopPropagation();TL.active=fm.dataset.fm;folderMenu(fm,fm.dataset.fm);return}
   const fr=e.target.closest('.lfr[data-k]');if(fr){toggle(fr.dataset.k);return}
   const x=e.target.closest(`[data-${P}x]`);if(x){removeAsk(x);return}
+  const ac=e.target.closest(`[data-${P}a]`);if(ac){e.stopPropagation();cfg.act.run(ac.dataset[P+'a']);return}
   const t=e.target.closest(`[data-${P}]`);if(!t)return;if(TL.sm||e.ctrlKey||e.metaKey||e.shiftKey){pick(t.dataset[P],e);return}if(host._pick)host._pick(t.dataset[P])});
  host.addEventListener('contextmenu',e=>{const fr=e.target.closest('.lrw'),b=fr&&fr.querySelector('[data-fm]');if(b){e.preventDefault();b.click();return}
   const t=e.target.closest(`[data-${P}]`);if(t&&(cfg.own(t.dataset[P])||cfg.itemMenu)){e.preventDefault();itemMenu(t,t.dataset[P])}});

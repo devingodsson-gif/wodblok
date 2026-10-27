@@ -4,6 +4,8 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
+**Oct 27 2026 (2.59.0).** Export recipes are on the shared library tree; workspaces are gone (the Default panels mode went). The hexagon/triangle stamp offset is fixed (owner). Randomize scenario snapshots regenerated in CI. Full suite not run for 2.56.0 to 2.59.0.
+
 **Oct 26 2026 (Sheet).** Branch `feat/2.53.0-sheets` (2.53.0, not merged, waiting for the owner's word): the Sheet element (docs/sheet-plan.md); the Background is a Sheet; file format 28 (older files refused); a project with no stamps can be opened again (bug found and fixed). Known, not caused by it: `repeat-tile` "repeat 3 x 3" never settles (also on `main`); the five Randomize scenario snapshots still fail (owner to decide).
 
 **Oct 26 2026 (library update).** Branches stacked and unmerged (owner's word needed): 2.49.0 to 2.52.0. The libraries now run on one folder-tree component (docs/library-update-plan.md): textures (2.51.1), saved stamps (2.51.2), saved trays, templates and a new saved-colourways library (all in 2.52.0). Workspaces and export recipes were skipped by the owner. Trays saved under the old key (`wb200_trays`) are not shown any more (no conversion, by his rule). Tested with the specs listed in docs/plan.md (Chromium), perf not run, no snapshot changed.

@@ -8,7 +8,7 @@ const shapeOf = d => (d.els || []).find(q => q.k === 'motif' && !q.bgd);
 const inkBox = async page => {
   await page.evaluate(() => { window.__wbDownloads.length = 0; });
   if (await page.locator('section.pn[data-p="xrec"]:not([hidden])').count() === 0) await openPanel(page, 'xrec');
-  await page.locator('#xrl .xrr', { hasText: 'Preview' }).locator('[data-act="exp"]').click();
+  await page.locator('#xrl .lib > div', { hasText: 'Preview' }).locator('.rcact').click();
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   return page.evaluate(async () => {
     const x = window.__wbDownloads[0], bin = atob(x.base64), u = new Uint8Array(bin.length); for (let k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k);

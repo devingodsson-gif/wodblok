@@ -138,7 +138,7 @@ test('a Halftone shape exports as dots: less ink than the plain shape, but not n
   const ink = async () => {
     await page.evaluate(() => { window.__wbDownloads.length = 0; });
     await openPanel(page, 'xrec');
-    await page.locator('#xrl .xrr', { hasText: 'Preview' }).locator('[data-act="exp"]').click();
+    await page.locator('#xrl .lib > div', { hasText: 'Preview' }).locator('.rcact').click();
     await page.waitForFunction(() => window.__wbDownloads.length > 0);
     return page.evaluate(async () => {
       const x = window.__wbDownloads[0], bin = atob(x.base64), u = new Uint8Array(bin.length); for (let k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k);
@@ -165,7 +165,7 @@ test('Print and Distort effects change what is drawn, and Misregistration offset
   const ink = async () => {
     await page.evaluate(() => { window.__wbDownloads.length = 0; });
     if (await page.locator('section.pn[data-p="xrec"]:not([hidden])').count() === 0) await openPanel(page, 'xrec');
-    await page.locator('#xrl .xrr', { hasText: 'Preview' }).locator('[data-act="exp"]').click();
+    await page.locator('#xrl .lib > div', { hasText: 'Preview' }).locator('.rcact').click();
     await page.waitForFunction(() => window.__wbDownloads.length > 0);
     return page.evaluate(async () => {
       const x = window.__wbDownloads[0], bin = atob(x.base64), u = new Uint8Array(bin.length); for (let k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k);
