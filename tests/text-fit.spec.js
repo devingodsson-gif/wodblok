@@ -64,18 +64,6 @@ test('Spread puts the first line at the top of the box and the last at the botto
   expect(errors).toEqual([]);
 });
 
-test('Overflow Hide drops the lines that run past the box; padding shrinks the room', async ({ page }) => {
-  const { errors } = await openApp(page);
-  await start(page, 'ONE TWO THREE FOUR FIVE SIX', 10);
-  await set(page, 'tx_wd', 40); await set(page, 'tx_ht', 25); await wait(page);
-  const all = (await items(page)).length;
-  await page.click('#tx_ov [data-o="h"]'); await wait(page);
-  await expect.poll(async () => (await items(page)).length, { timeout: 15000 }).toBeLessThan(all);
-  await page.click('#tx_ov [data-o=""]'); await wait(page);
-  await expect.poll(async () => (await items(page)).length, { timeout: 15000 }).toBe(all);
-  expect(errors).toEqual([]);
-});
-
 test('Text layer: the new options are saved only when set', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'text');
@@ -91,3 +79,4 @@ test('Text layer: the new options are saved only when set', async ({ page }) => 
   expect(await tx()).toMatchObject({ ft: 'f', wd: 60, ht: 20 });
   expect(errors).toEqual([]);
 });
+// 2.64.0 (docs/text-plan.md): removed with the controls they tested: Overflow and Padding (a text fills its box)

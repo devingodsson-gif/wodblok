@@ -8,7 +8,7 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {mkWell,paintWell} from './52-tray-ui.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
-import {txoLetterCol,txoRead,txoSetLetterCol,txoWrite,txoBind,txoSelBind,txoSeed,TXO_IDS} from './61-text-panel.js';
+import {txoShapeBind,txoLetterCol,txoRead,txoSetLetterCol,txoWrite,txoBind,txoSelBind,txoSeed,TXO_IDS} from './61-text-panel.js';
 import {stTxMode} from './63-stamp-tool.js';
 import {fxGr,fxJit,fxJitL,fxPad,fxTexUses} from './69-effect-stack.js';
 // ===== Text boxes. Any layer may hold them, in L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
@@ -56,9 +56,6 @@ const tbSel=()=>{const L=fpL();return L?(L.pl||[]).find(q=>q.u==WBS.fpSel&&q.tx)
 const TB_W=60,TB_H=20;
 const tbBox=o=>{if(!(o.wd>0))o.wd=TB_W;if(!(o.ht>0))o.ht=TB_H;o.ft='f';delete o.pd;delete o.ov;return o};
 const tbRead=()=>tbBox(txoRead());
-// the controls box-first sizing replaces: hidden for a text on the canvas (a stamp's tab keeps them for now)
-const TB_GONE=['tx_sz','tx_wd','tx_ht','tx_pd','tx_ft','tx_ov'];
-function tbGone(h){TB_GONE.forEach(id=>{const e=$(id);if(!e)return;const c=e.closest('.ctl');if(c){if(c.hidden!==h)c.hidden=h;return}if(e.hidden!==h)e.hidden=h;const l=e.previousElementSibling;if(l&&l.tagName=='LABEL'&&l.hidden!==h)l.hidden=h})}
 // A placed text after its box width or height was pulled with a handle: the letters keep their size and the lines break again. keepTop keeps the top edge where it is while the height follows the lines.
 async function tbRelay(p,keepTop,drag){const tok=++tbRelTok,R=await WBX.wbTxLay(p.tx);if(tok!==tbRelTok||!R)return;const L=fpL();if(!L||!(L.pl||[]).includes(p))return;const ra=p.s/Math.max(p.n||1,.01),dh=(R.bh-p.bh)*ra/2,r=(+p.r||0)*Math.PI/180;p.G=R.G;p.Lt=R.Lt;p.bw=R.bw;p.bh=R.bh;p.n=Math.max(R.bw,R.bh);p.s=+(ra*p.n).toFixed(2);if(keepTop){p.x=+(p.x-dh*Math.sin(r)).toFixed(1);p.y=+(p.y+dh*Math.cos(r)).toFixed(1);if(drag){drag.x0-=dh*Math.sin(r);drag.y0+=dh*Math.cos(r)}}tbKey='';upd()}
 function tbArmUI(){const b=$('tx_go');if(b){b.classList.toggle('on',WBS.txArm);b.setAttribute('aria-pressed',String(WBS.txArm))}}
@@ -70,7 +67,7 @@ function tbStyle(k,v){const grp=fpGrp().filter(q=>q.tx);if(k=='ink'){tbSty.ink=v
 function tbStySet(a){const grp=fpGrp().filter(q=>q.tx);tbSty.tu=a.map(u=>({...u}));grp.forEach(q=>{q.tu=a.map((u,i)=>{const o=(q.tu||[])[i];return o&&o.x===u.x?o:{x:u.x,sd:grp.length>1?txRid():u.sd}})});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();if(WBS.txArm)WBH.fpOverlay()}
 function tbStyVary(i){const grp=fpGrp().filter(q=>q.tx);if(tbSty.tu[i])tbSty.tu[i]={...tbSty.tu[i],sd:txRid()};grp.forEach(q=>{if(q.tu&&q.tu[i])q.tu[i]={...q.tu[i],sd:txRid()}});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd()}
 function txbSync(L){if(WBS.txArm&&(tbSel()||WBS.fpB)){WBS.txArm=false;tbG=null;tbArmUI()}
-document.querySelectorAll('.txlay').forEach(e=>{const h=stTxMode();if(e.hidden!==h)e.hidden=h});tbGone(!stTxMode());if(!stTxMode()&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;const tx=tbSel()||WBS.txArm;sw.style.display=tx?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=tx?'none':''}if(!$('tx_t')||stTxMode())return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
+document.querySelectorAll('.txlay').forEach(e=>{const h=stTxMode();if(e.hidden!==h)e.hidden=h});if(!stTxMode()&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;const tx=tbSel()||WBS.txArm;sw.style.display=tx?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=tx?'none':''}if(!$('tx_t')||stTxMode())return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
 const key=p?p.u+'|'+Math.round(p.s*10)+'|'+(p.tx.wd||0)+'|'+(p.tx.ht||0)+'|'+(p.tx.va||'t')+'|'+(p.tx.pd||0)+(p.tx.ft||'')+(p.tx.ov||'')+(p.tx.rp||0)+(p.tx.rr||0)+(p.tx.rs||0)+(p.tx.bb||0)+(p.tx.sc||'')+(p.tx.sd||0)+'|'+(p.tx.ind||0)+'|'+(p.tx.psp||0)+(p.tx.bal||'')+JSON.stringify(p.tx.sty||0)+(p.tx.wp||'')+(p.tx.wa||0)+(p.tx.pt||'')+(p.tx.pa||0)+(p.tx.pw||0):'-';if(key===tbKey)return;tbKey=key;if(!p)return;
 tbSty={tu:(Array.isArray(p.tu)?p.tu:[]).map(u=>({...u})),ink:p.ink||''};tbStyUI();tbLoad=true;try{const o=p.tx,ra=p.s/Math.max(p.n||1,.01);txoWrite(o,{sz:Math.max(2,Math.min(60,+(o.sz*ra).toFixed(1))),wd:Math.max(0,Math.min(400,Math.round((o.wd||0)*ra))),ht:Math.max(0,Math.min(400,Math.round((o.ht||0)*ra)))},false)}finally{tbLoad=false}}
 // the Text tool in the Pattern editor: with no Text layer selected, typing makes one
@@ -81,7 +78,7 @@ p.tx=o;p.G=R.G;p.Lt=R.Lt;p.bw=R.bw;p.bh=R.bh;p.n=Math.max(R.bw,R.bh);p.s=+p.n.to
 async function tbAdd(){const L=fpL();if(!L)return;const o=tbRead();if(!o.text.trim())return;const R=await WBX.wbTxLay(o);if(!R){pmsg('No letters came out. Try another font.');return}
 L.pl=L.pl||[];const c=L.pl.filter(z=>z.tx).length,n=Math.max(R.bw,R.bh),q={u:fpU(),k:'text',tx:o,G:R.G,Lt:R.Lt,bw:R.bw,bh:R.bh,n,x:+(CW/2+((c%4)-1.5)*CW*.03).toFixed(1),y:+(CH/2+((c%4)-1.5)*CW*.03).toFixed(1),s:+n.toFixed(2),r:0,f:1};
 L.pl.push(q);WBS.fpSel=q.u;WBS.fpMS=new Set();WBS.fpB=null;WBS.fpGhost=null;tbKey='';store();upd();if(WBX.wbCap)WBX.wbCap()}
-function init26(){WBX.wbTxHit=txHit;
+function init26(){WBX.wbTxHit=txHit;txoShapeBind();
 WBX.wbTbAdd=tbAdd;
 TXM=new Map();WBS.txArm=false;
 {['tx_t',...TXO_IDS].forEach(id=>$(id).addEventListener('input',tbLive));

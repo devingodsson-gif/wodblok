@@ -999,53 +999,67 @@ body.eyedrop{cursor:crosshair}
    <div class="txed" id="tx_ed" hidden><span>Editing <b id="tx_edn"></b></span><button class="alt" id="tx_new">New text</button></div>
    <div class="row" id="tx_convrow" hidden><button class="alt" id="tx_conv">Convert to shapes</button></div>
    <textarea id="tx_t" rows="2" maxlength="200" placeholder="Text" aria-label="Text"></textarea>
+   <div class="txpv" id="tx_pv"></div>
+   <div class="row" id="tx_sprow" hidden><button class="alt" id="tx_split">Split into letters</button></div>
+   <div class="row" hidden><button class="primary" id="tx_go" aria-pressed="false">Add text</button></div>
+  </div></details>
+   <details class="g" open><summary>Style <span class="aux" id="tsn"></span></summary><div class="gb">
+    <div class="sctb"><button type="button" class="ib" id="tsall" aria-pressed="false" aria-label="Expand all"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="chevsD"></svg></button><button type="button" class="ib" id="tsnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="folderNew"></svg></button><button type="button" class="alt" id="tsadd"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" data-ic="plus"></svg>Save style</button></div>
+    <input type="text" id="tsq" maxlength="40" placeholder="Find a style" aria-label="Find a style">
+    <div class="stl scl" id="tsl" role="tree" aria-label="Text styles"></div>
+   </div></details>
+  <details class="g" open><summary>Character</summary><div class="gb">
    <label>Font</label><select id="tx_f"></select>
    <div class="row" style="margin-top:6px"><label class="btn alt" for="tx_file" role="button" tabindex="0">Load a font file&#8230;</label></div><input type="file" id="tx_file" class="vh" accept=".ttf,.otf,.woff,.woff2,font/*" tabindex="-1">
-   <label>Size</label><input type="range" id="tx_sz" min="5" max="100" value="30" data-u="%" data-def="30">
+   <label>Case</label><div class="seg" id="tx_tc" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-c="" class="on">Typed</button><button type="button" data-c="u">UPPER</button><button type="button" data-c="l">lower</button><button type="button" data-c="t">Title</button></div>
+   <div id="tx_lay" hidden>
+    <label>Colour</label><div class="cwell" id="wl_tx"></div>
+   </div>
+   <label class="txlay">Letter colour</label><div class="cwell txlay" id="wl_txl"></div>
    <label>Letter spacing</label><input type="range" id="tx_ls" min="-20" max="100" value="0" data-u="%" data-def="0">
-   <label>Word spacing</label><input type="range" id="tx_ws" min="-50" max="200" value="0" data-u="%" data-def="0">
+   <div class="row"><button class="alt" id="tx_clr">Clear letter styles</button></div>
+  </div></details>
+  <details class="g" open><summary>Paragraph</summary><div class="gb">
+   <label>Align</label><div class="seg" id="tx_al" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-a="l">Left</button><button type="button" data-a="c" class="on">Centre</button><button type="button" data-a="r">Right</button><button type="button" data-a="j">Justify</button></div>
+   <label>Vertical</label><div class="seg" id="tx_va" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-v="t" class="on">Top</button><button type="button" data-v="m">Middle</button><button type="button" data-v="b">Bottom</button><button type="button" data-v="s">Spread</button></div>
    <label>Line spacing</label><input type="range" id="tx_lh" min="60" max="220" value="115" data-u="%" data-def="115">
+   <label>Paragraph spacing</label><input type="range" id="tx_psp" min="0" max="300" value="0" data-u="%" data-def="0">
+   <label>First-line indent</label><input type="range" id="tx_ind" min="0" max="300" value="0" data-u="%" data-def="0">
+  </div></details>
+  <details class="g" open><summary>Shape</summary><div class="gb">
+   <label>Shape</label><select id="tx_shk" aria-label="Shape of the line"><option value="">None</option><option value="arc">Arc</option><option value="wave">Wave</option><option value="spiral">Spiral</option><option value="b">Bulge</option><option value="r">Rise</option><option value="f">Flag</option></select>
+   <div class="ctl" id="tx_shar" hidden><label for="tx_sha">Amount</label><input type="range" id="tx_sha" min="-100" max="100" value="0" data-u="%" data-def="0"></div>
+   <div class="ctl" id="tx_shlr" hidden><label for="tx_shl">Length</label><input type="range" id="tx_shl" min="5" max="100" value="50" data-u="%" data-def="50"></div>
+   <div id="tx_shold" hidden>
+    <label>Curve</label><input type="range" id="tx_cv" min="-100" max="100" value="0" data-u="%" data-def="0">
+    <label>Warp</label><select id="tx_wp"><option value="">None</option><option value="b">Bulge</option><option value="r">Rise</option><option value="f">Flag</option></select>
+    <label>Warp amount</label><input type="range" id="tx_wa" min="-100" max="100" value="0" data-u="%" data-def="0">
+    <label>Path</label><select id="tx_pt"><option value="">None</option><option value="w">Wave</option><option value="s">Spiral</option></select>
+    <label>Path amount</label><input type="range" id="tx_pa" min="0" max="100" value="50" data-u="%" data-def="50">
+    <label>Path length</label><input type="range" id="tx_pw" min="5" max="100" value="50" data-u="%" data-def="50">
+   </div>
+  </div></details>
+  <div id="tx_gone" hidden>
+   <label>Size</label><input type="range" id="tx_sz" min="5" max="100" value="30" data-u="%" data-def="30">
+   <label>Word spacing</label><input type="range" id="tx_ws" min="-50" max="200" value="0" data-u="%" data-def="0">
    <label>Box width</label><input type="range" id="tx_wd" min="0" max="400" value="0" data-u="%" data-def="0">
    <label>Box height</label><input type="range" id="tx_ht" min="0" max="400" value="0" data-u="%" data-def="0">
    <label>Padding</label><input type="range" id="tx_pd" min="0" max="40" value="0" data-u="%" data-def="0">
    <label>Fit to box</label><select id="tx_ft"><option value="">Off</option><option value="s">Shrink to fit</option><option value="f">Fill the box</option><option value="l">Fit each line to width</option><option value="w">Fit width</option></select>
    <label>Overflow</label><div class="seg" id="tx_ov" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-o="" class="on">Show</button><button type="button" data-o="h">Hide</button></div>
-   <label>Align</label><div class="seg" id="tx_al" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-a="l">Left</button><button type="button" data-a="c" class="on">Centre</button><button type="button" data-a="r">Right</button><button type="button" data-a="j">Justify</button></div>
-   <label>Vertical</label><div class="seg" id="tx_va" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-v="t" class="on">Top</button><button type="button" data-v="m">Middle</button><button type="button" data-v="b">Bottom</button><button type="button" data-v="s">Spread</button></div>
-   <label>Case</label><div class="seg" id="tx_tc" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-c="" class="on">Typed</button><button type="button" data-c="u">UPPER</button><button type="button" data-c="l">lower</button><button type="button" data-c="t">Title</button></div>
-    <label>First-line indent</label><input type="range" id="tx_ind" min="0" max="300" value="0" data-u="%" data-def="0">
-    <label>Paragraph spacing</label><input type="range" id="tx_psp" min="0" max="300" value="0" data-u="%" data-def="0">
-    <label>Balance lines</label><div class="seg" id="tx_bal" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-b="" class="on">Off</button><button type="button" data-b="1">On</button></div>
-    <label>Letter size</label><input type="range" id="tx_zs" min="30" max="300" value="100" data-u="%" data-def="100">
-    <label>Letter raise</label><input type="range" id="tx_dy" min="-60" max="100" value="0" data-u="%" data-def="0">
-    <label>Letter spacing</label><input type="range" id="tx_sl" min="-30" max="100" value="0" data-u="%" data-def="0">
-    <label class="txlay">Letter colour</label><div class="cwell txlay" id="wl_txl"></div>
-    <div class="row"><button class="alt" id="tx_sup">Super</button><button class="alt" id="tx_sub">Sub</button><button class="alt" id="tx_clr">Clear</button></div>
-   <label>Curve</label><input type="range" id="tx_cv" min="-100" max="100" value="0" data-u="%" data-def="0">
-   <label>Warp</label><select id="tx_wp"><option value="">None</option><option value="b">Bulge</option><option value="r">Rise</option><option value="f">Flag</option></select>
-   <label>Warp amount</label><input type="range" id="tx_wa" min="-100" max="100" value="0" data-u="%" data-def="0">
-   <label>Path</label><select id="tx_pt"><option value="">None</option><option value="w">Wave</option><option value="s">Spiral</option></select>
-   <label>Path amount</label><input type="range" id="tx_pa" min="0" max="100" value="50" data-u="%" data-def="50">
-   <label>Path length</label><input type="range" id="tx_pw" min="5" max="100" value="50" data-u="%" data-def="50">
+   <label>Balance lines</label><div class="seg" id="tx_bal" style="grid-template-columns:repeat(2,1fr)"><button type="button" data-b="" class="on">Off</button><button type="button" data-b="1">On</button></div>
+   <label>Letter size</label><input type="range" id="tx_zs" min="30" max="300" value="100" data-u="%" data-def="100">
+   <label>Letter raise</label><input type="range" id="tx_dy" min="-60" max="100" value="0" data-u="%" data-def="0">
+   <label>Letter spacing</label><input type="range" id="tx_sl" min="-30" max="100" value="0" data-u="%" data-def="0">
    <label>Rotate letters</label><input type="range" id="tx_rot" min="-180" max="180" value="0" data-u="&#176;" data-def="0">
    <label>Random position</label><input type="range" id="tx_rp" min="0" max="100" value="0" data-u="%" data-def="0">
    <label>Random rotation</label><input type="range" id="tx_rr" min="0" max="180" value="0" data-u="&#176;" data-def="0">
    <label>Random size</label><input type="range" id="tx_rs" min="0" max="100" value="0" data-u="%" data-def="0">
    <label>Bounce</label><input type="range" id="tx_bb" min="0" max="100" value="0" data-u="%" data-def="0">
    <label>Scatter</label><div class="seg" id="tx_scat" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-s="" class="on">Off</button><button type="button" data-s="l">Loose</button><button type="button" data-s="f">Full</button></div>
+   <div class="row"><button class="alt" id="tx_sup">Super</button><button class="alt" id="tx_sub">Sub</button><button class="alt" id="tx_clr">Clear</button></div>
    <div class="row"><button class="alt" id="tx_vary">Vary</button></div>
-   <div id="tx_lay" hidden>
-    <label>Ink</label><div class="cwell" id="wl_tx"></div>
-   </div>
-   <div class="txpv" id="tx_pv"></div>
-   <div class="row" id="tx_sprow" hidden><button class="alt" id="tx_split">Split into letters</button></div>
-   <div class="row" hidden><button class="primary" id="tx_go" aria-pressed="false">Add text</button></div>
-  </div></details>
-   <details class="g" open><summary>Text styles <span class="aux" id="tsn"></span></summary><div class="gb">
-    <div class="sctb"><button type="button" class="ib" id="tsall" aria-pressed="false" aria-label="Expand all"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="chevsD"></svg></button><button type="button" class="ib" id="tsnew" aria-label="New folder"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="folderNew"></svg></button><button type="button" class="alt" id="tsadd"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" data-ic="plus"></svg>Save style</button></div>
-    <input type="text" id="tsq" maxlength="40" placeholder="Find a style" aria-label="Find a style">
-    <div class="stl scl" id="tsl" role="tree" aria-label="Text styles"></div>
-   </div></details>
+  </div>
   <details class="g" open id="mt_g" hidden><summary>Map to shape</summary><div class="gb">
    <label>Shape</label><select id="mt_s" aria-label="Shape"></select>
    <div class="seg" id="mt_m" style="grid-template-columns:repeat(2,1fr)" hidden><button type="button" data-m="on" aria-pressed="false">Follow outline</button><button type="button" data-m="in" aria-pressed="false">Inside</button></div>

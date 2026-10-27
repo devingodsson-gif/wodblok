@@ -90,7 +90,10 @@ res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c
 const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI+(c.rw||0),q:c.q,rr:c.rr,cl:c.cl}})}
 if(o.pt=='w'){const A=(o.pa==null?50:o.pa)/100*teP*.9,lam=Math.max(teP*.5,maxW*Math.max(5,o.pw==null?50:o.pw)/100);res.forEach(c=>{const ph=2*Math.PI*c.x/lam;c.y+=A*Math.sin(ph);c.r+=Math.atan(A*2*Math.PI/lam*Math.cos(ph))*180/Math.PI})}
 else if(o.pt=='s'){const n=.4+(o.pw==null?50:o.pw)/100*2,d=(o.pa==null?50:o.pa)/100*.7,F=d>0?-Math.log(1-d)/d:1,r0=maxW*F/(2*Math.PI*n);res.forEach(c=>{const t=Math.max(0,Math.min(1,(c.x+maxW/2)/maxW)),Gt=d>0?-Math.log(1-d*t)/d:t,t0=2*Math.PI*n*Gt/F,r=r0*(1-d*t),th=-Math.PI/2+t0,rho=Math.max(.0001,r-c.y);c.x=rho*Math.cos(th);c.y=rho*Math.sin(th);c.r+=t0*180/Math.PI})}
-const out=res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0)+(p.rr||0),s:+(em/teE*p.q).toFixed(4),cl:p.cl||''}));out.over=over;out.tw=Math.max(0,...L.map((l,j)=>l.W*fj[j]))*k;return out}
+const out=res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0)+(p.rr||0),s:+(em/teE*p.q).toFixed(4),cl:p.cl||''}));// 2.64.0: a text on a curve, a path or a warp fills its box by what it looks like after the shaping (the straight lines can fit while the arc does not)
+if((limP||hbP)&&(Math.abs(cvv)>=.005||o.pt||(o.wp&&o.wa))&&out.length){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;out.forEach(p=>{const h=p.s*teE*.5;x0=Math.min(x0,p.x-h);x1=Math.max(x1,p.x+h);y0=Math.min(y0,p.y-h);y1=Math.max(y1,p.y+h)});
+ if((limP&&x1-x0>limP*k+.5*k)||(hbP&&y1-y0>hbP*k+.5*k))over=true}
+out.over=over;out.tw=Math.max(0,...L.map((l,j)=>l.W*fj[j]))*k;return out}
 // The layout, with the fit modes: Shrink to fit and Fill the box look for the size that fits (about 12 tries); Fit the width scales one run of lines to the box width.
 function teLayout(o){const bx=o.wd>0||o.ht>0,ft=bx?(o.ft||''):'';if(!ft)return teCore({...o,ft:''});if(ft=='l')return teCore(o);
 if(ft=='w'){if(!(o.wd>0))return teCore({...o,ft:''});const r0=teCore({...o,ft:'',sz:100,nw:1});if(!r0.length)return r0;const U=Math.min(SW,SH)/100,inner=Math.max(1,o.wd*U-2*(o.pd||0)*U);return teCore({...o,ft:'',sz:Math.max(1,100*inner/Math.max(1,r0.tw)),nw:1})}
@@ -109,7 +112,9 @@ const G={},Lt=[];let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
 ps.forEach(p=>{const d=p.g.d;if(!/^[MLQZ0-9.,\- ]+$/.test(d))return;G[p.g.k]=d;const nm=(d.match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);let a=1e9,b=1e9,c=-1e9,e=-1e9;for(let i=0;i+1<nm.length;i+=2){a=Math.min(a,nm[i]);c=Math.max(c,nm[i]);b=Math.min(b,nm[i+1]);e=Math.max(e,nm[i+1])}
 const r=p.r*Math.PI/180,cs=Math.cos(r),sn=Math.sin(r),X=p.x*kk,Y=p.y*kk,S=p.s*kk;[[a,b],[c,b],[c,e],[a,e]].forEach(([u,v])=>{const px=X+(u*cs-v*sn)*S,py=Y+(u*sn+v*cs)*S;x0=Math.min(x0,px);x1=Math.max(x1,px);y0=Math.min(y0,py);y1=Math.max(y1,py)});
 const ent=[p.g.k,X,Y,+p.r.toFixed(1),+S.toFixed(4)];if(p.cl)ent.push(p.cl);Lt.push(ent)});   // a coloured letter carries its colour as a sixth item (2.62.0)
-if(!Lt.length)return null;const U=kk*Math.min(SW,SH)/100,boxW=q.wd>0,boxH=q.ht>0,mx=boxW?0:(x0+x1)/2,my=boxH?0:(y0+y1)/2;Lt.forEach(l=>{l[1]=+(l[1]-mx).toFixed(2);l[2]=+(l[2]-my).toFixed(2)});
+if(!Lt.length)return null;const U=kk*Math.min(SW,SH)/100,boxW=q.wd>0,boxH=q.ht>0,shp2=Math.abs(+q.cv||0)>=.5||!!q.pt||!!(q.wp&&q.wa),mx=boxW&&!shp2?0:(x0+x1)/2,my=boxH&&!shp2?0:(y0+y1)/2;
+// a shaped text sits in the middle of its box (2.64.0)
+Lt.forEach(l=>{l[1]=+(l[1]-mx).toFixed(2);l[2]=+(l[2]-my).toFixed(2)});
 // with a box width or height, the box (not the letters) is what the piece measures, so Align and Vertical sit inside it
 return{G,Lt,bw:+(boxW?q.wd*U:x1-x0).toFixed(2),bh:+(boxH?q.ht*U:y1-y0).toFixed(2),over}}
 
