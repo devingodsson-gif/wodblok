@@ -130,8 +130,10 @@ test('Stamp panel: Save and export and Library come last, Save and export only w
   await page.evaluate(j => window.__wbTest.apply(j), JSON.stringify(s)); await H.settle(page);
   const c = await H.canvasToClient(page, 300, 300); await page.mouse.click(c.x, c.y); await H.settle(page);
   await expect(page.locator('#slname')).toHaveAttribute('placeholder', 'Stamp 2');
+  // 2.55.0: with the stamp selected the panel edits it, so the saved stamps Library is put away; Save and export is last
   const last = await page.evaluate(() => [...document.querySelectorAll('section.pn[data-p="stmp"] details.g')].filter(d => !d.hidden).map(d => d.querySelector('summary').textContent.trim()).slice(-3));
-  expect(last.slice(-2)).toEqual(['Save and export', 'Library']);
+  expect(last.slice(-1)).toEqual(['Save and export']);
+  await expect(page.locator('#slpane')).toBeHidden();
   await page.keyboard.press('Control+z'); await H.settle(page); await page.keyboard.press('Control+Shift+z'); await H.settle(page);
   await H.openPanel(page, 'stmp'); await H.settle(page);
   await page.click('#slsave'); await expect(page.locator('#pmsg')).toContainText('Saved');

@@ -58,7 +58,8 @@ function init90(){
  pmRegister('text',{pn:'text',lib:'section.pn[data-p="text"] details.g:has(> .gb #tsl)',at:'section.pn[data-p="text"] details.g:has(#tx_go) > .gb',key:()=>'style',name:()=>'Text style',
   thumb:()=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICN.text}</svg>`,
   armed:()=>!!(WBX.plKind&&WBX.plKind()=='text'),picked:e=>!!e.target.closest('#tsl [data-c]')&&!e.target.closest('.lmo,[data-more],button[aria-haspopup]')});
- document.addEventListener('pointerdown',e=>{if(pmOpen&&!pmOpen.pop.contains(e.target)&&!(pmOpen.btn&&pmOpen.btn.contains(e.target)))pmClose()},true);
+ // a menu, dropdown or picker opened from inside the popover is part of it
+ document.addEventListener('pointerdown',e=>{if(pmOpen&&!pmOpen.pop.contains(e.target)&&!(pmOpen.btn&&pmOpen.btn.contains(e.target))&&!(e.target.closest&&e.target.closest('.rowm,.rowsub,.ddl,.pop,.cpk,.cpop,.cwp')))pmClose()},true);
  document.addEventListener('keydown',e=>{if(e.key=='Escape'&&pmOpen){e.stopPropagation();pmClose()}},true);
  WBX.wbPmSync=pmSync;WBX.wbPmClose=pmClose}
 export {init90,pmClose,pmIsOpen,pmPop,pmRegister,pmSync};

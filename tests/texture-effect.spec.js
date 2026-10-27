@@ -1,6 +1,9 @@
 // 2.9.0 (type from a list; 2.50.0 from the texture library): texture and colour grade are effects only. The Texture effect carries Type, Strength, Scale and Light from; the old tools are gone.
 const { test, expect } = require('@playwright/test');
 const { openApp, settle, getState, addShape } = require('./helpers/harness');
+// 2.55.0: the Texture effect shows its texture as a row; the library opens from Replace in a popover (90-panel-modes.js)
+const T = '.rpop';
+const openLib = async page => { if (!(await page.locator('.rpop .txtr').count())) { const b = page.locator('.fxg:not([hidden]) .fxs[data-e="texture"]:not([hidden]) .fxtr .rpgo').first(); await b.scrollIntoViewIfNeeded(); await b.click(); await page.locator('.rpop .txtr').waitFor(); } };
 
 const st = async page => JSON.parse(await getState(page));
 const sheetOf = d => (d.els || []).find(q => q.k === 'motif' && !q.bgd);
@@ -21,9 +24,9 @@ test('the Texture effect has Type, Strength, Scale and Light from, and each effe
   for (const c of ['.txtr', '.fxsa', '.fxsc', '.fxsz']) await expect(page.locator(`${g} ${c}`)).toHaveCount(1);
   for (const c of ['.fxsa', '.fxsc', '.fxsz']) await expect(page.locator(`${g} ${c}`)).toBeVisible();
   // 2.50.0: the type is picked from the texture library in the effect (a tile per texture, in its set)
-  await page.click(`${g} .txtr .lfr[data-k="s:Print faults and wear"]`);
+  await openLib(page); await page.click(`${T} .txtr .lfr[data-k="s:Print faults and wear"]`);
   const pick = 'foxing';
-  await page.click(`${g} .txtr [data-tx="${pick}"]`);
+  await openLib(page); await page.click(`${T} .txtr [data-tx="${pick}"]`);
   await setRange(page, `${g} .fxsa`, 77); await setRange(page, `${g} .fxsc`, 150); await setRange(page, `${g} .fxsz`, 90);
   await settle(page);
   const d = await st(page), fx = sheetOf(d).fx;

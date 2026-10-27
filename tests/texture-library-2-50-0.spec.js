@@ -7,6 +7,9 @@ const { openApp, settle, getState, addShape, openProjectFile } = require('./help
 
 const st = async page => JSON.parse(await getState(page));
 const G = '.fxg[data-fxk="motif"]';
+// 2.55.0: the Texture effect shows its texture as a row; the library opens from Replace in a popover (90-panel-modes.js)
+const T = '.rpop';
+const openLib = async page => { if (!(await page.locator('.rpop .txtr').count())) { const b = page.locator('.fxg:not([hidden]) .fxs[data-e="texture"]:not([hidden]) .fxtr .rpgo').first(); await b.scrollIntoViewIfNeeded(); await b.click(); await page.locator('.rpop .txtr').waitFor(); } };
 const sheetOf = d => (d.els || []).find(q => q.k === 'motif' && !q.bgd);
 const texOf = d => { const e = sheetOf(d).fx.find(f => f.k === 'texture'); return d.texLib.find(x => x.id === e.x); };
 const setRange = (page, sel, v) => page.evaluate(([s, v]) => { const e = document.querySelector(s); e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); }, [sel, v]);
@@ -21,32 +24,32 @@ const drawn = page => page.$$eval('#txd image', es => es.map(e => e.getAttribute
 test('the library shows Yours and every built-in set as folders with a tile per texture; a tile picks the texture', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addTexture(page);
-  const rows = await page.locator(`${G} .txtr .lfr .lfn`).allTextContents();
+  await openLib(page); const rows = await page.locator(`${T} .txtr .lfr .lfn`).allTextContents();
   expect(rows[0]).toBe('Yours');
   for (const s of ['Cloth and weave', 'Metal and made', 'Natural', 'Paper and board', 'Print faults and wear', 'Stone and mineral']) expect(rows).toContain(s);
   expect(rows.slice(1)).toEqual([...rows.slice(1)].sort((a, b) => a.localeCompare(b)));   // your folders and the sets together, A to Z
-  await expect(page.locator(`${G} [data-txadd]`)).toHaveText('Add texture');
+  await openLib(page); await expect(page.locator(`${T} [data-txadd]`)).toHaveText('Add texture');
   // the set of the texture in use is open, and its tile has the accent
-  await expect(page.locator(`${G} .txtr [data-tx="cotton"].on`)).toHaveCount(1);
-  await page.click(`${G} .txtr .lfr[data-k="s:Stone and mineral"]`);
-  await expect(page.locator(`${G} .txtr .lfr[data-k="s:Stone and mineral"]`)).toHaveAttribute('aria-expanded', 'true');
-  await page.click(`${G} .txtr [data-tx="marble"]`); await settle(page);
+  await openLib(page); await expect(page.locator(`${T} .txtr [data-tx="cotton"].on`)).toHaveCount(1);
+  await openLib(page); await page.click(`${T} .txtr .lfr[data-k="s:Stone and mineral"]`);
+  await openLib(page); await expect(page.locator(`${T} .txtr .lfr[data-k="s:Stone and mineral"]`)).toHaveAttribute('aria-expanded', 'true');
+  await openLib(page); await page.click(`${T} .txtr [data-tx="marble"]`); await settle(page);
   expect(texOf(await st(page)).t).toBe('marble');
-  await expect(page.locator(`${G} .txtr [data-tx="marble"].on`)).toHaveCount(1);
+  await openLib(page); await expect(page.locator(`${T} .txtr [data-tx="marble"].on`)).toHaveCount(1);
   // every tile has its picture once it has been read
-  await expect.poll(() => page.locator(`${G} .txtr .lib button[data-tx] img`).count()).toBeGreaterThanOrEqual(11);
+  await openLib(page); await expect.poll(() => page.locator(`${T} .txtr .lib button[data-tx] img`).count()).toBeGreaterThanOrEqual(11);
   // Find narrows the tiles to the names that match
-  await page.fill(`${G} .txq`, 'denim');
-  await expect(page.locator(`${G} .txtr [data-tx]`)).toHaveCount(1);
-  await expect(page.locator(`${G} .txtr [data-tx="denim"]`)).toHaveCount(1);
+  await openLib(page); await page.fill(`${T} .txq`, 'denim');
+  await openLib(page); await expect(page.locator(`${T} .txtr [data-tx]`)).toHaveCount(1);
+  await openLib(page); await expect(page.locator(`${T} .txtr [data-tx="denim"]`)).toHaveCount(1);
   expect(errors).toEqual([]);
 });
 
 test('Rotate and Flip turn the texture: they are kept on the texture and change the picture drawn', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addTexture(page);
-  await page.click(`${G} .txtr [data-tx="cotton"]`); await settle(page);
-  await page.click(`${G} .txtr .lfr[data-k="s:Natural"]`); await page.click(`${G} .txtr [data-tx="wood"]`); await settle(page);
+  await openLib(page); await page.click(`${T} .txtr [data-tx="cotton"]`); await settle(page);
+  await openLib(page); await page.click(`${T} .txtr .lfr[data-k="s:Natural"]`); await page.click(`${T} .txtr [data-tx="wood"]`); await settle(page);
   const before = await drawn(page);
   expect(before.length).toBeGreaterThan(0);
   await setRange(page, `${G} .fxsr`, 90); await settle(page);
@@ -66,17 +69,17 @@ test('Rotate and Flip turn the texture: they are kept on the texture and change 
 test('Add texture imports a picture into Yours and uses it; the project saves it and opens with it; the library keeps it', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
   await addTexture(page);
-  await page.setInputFiles(`${G} .txfile`, path.join(__dirname, 'fixtures', 'picture.png'));
+  await openLib(page); await page.setInputFiles(`${T} .txfile`, path.join(__dirname, 'fixtures', 'picture.png'));
   await expect(page.locator('#pmsg')).toHaveText('Added the texture “picture”.');
   await settle(page);
   let d = await st(page);
   const t = texOf(d).t;
   expect(t).toMatch(/^u/);
-  await expect(page.locator(`${G} .txtr .lfr[data-k=""] .lfc`)).toHaveText('1');
-  await expect(page.locator(`${G} .txtr [data-tx="${t}"].on`)).toHaveCount(1);
+  await openLib(page); await expect(page.locator(`${T} .txtr .lfr[data-k=""] .lfc`)).toHaveText('1');
+  await openLib(page); await expect(page.locator(`${T} .txtr [data-tx="${t}"].on`)).toHaveCount(1);
   expect((await drawn(page)).length).toBeGreaterThan(0);
   // it is used, so it cannot be deleted from the library
-  await page.click(`${G} .txtr [data-txx="${t}"]`);
+  await openLib(page); await page.click(`${T} .txtr [data-txx="${t}"]`);
   await expect(page.locator('#pmsg')).toContainText('used in this project');
   // the saved project carries the picture as a file of its own
   await page.evaluate(() => { window.__wbDownloads.length = 0; });

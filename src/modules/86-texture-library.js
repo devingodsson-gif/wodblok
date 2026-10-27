@@ -32,7 +32,7 @@ const tlSets=()=>TXF.map(([n,o])=>({k:'s:'+n,n,ids:Object.keys(o)}));
 const tlUsed=id=>(WBS.texLib||[]).some(L=>L.t===id);
 const tlOwn=id=>{const e=txSrc(id);return!!(e&&e.imp)};
 // what the tree needs to know about textures
-const tlCfg=()=>({p:'tx',word:'texture',words:'textures',ui:TL_UI,exportName:'wodblok-textures',exportAs:'pictures',usedFix:'Choose another texture for those effects first.',
+const tlCfg=()=>({p:'tx',pane:'.fxtl',word:'texture',words:'textures',ui:TL_UI,exportName:'wodblok-textures',exportAs:'pictures',usedFix:'Choose another texture for those effects first.',
  top:`<div class="row txrow"><button type="button" class="alt" data-txadd>Add texture</button></div><input type="file" class="txfile vh" accept="image/*,.zip,application/zip" multiple tabindex="-1">`,
  read(){const d=tlLoad(),at={};d.t.forEach(x=>{at[x.id]=x.f});return{f:d.f,at,b:d.b,h:d.h,r:d.r}},
  write(m){const d=tlLoad();d.f=m.f;d.t.forEach(x=>{if(x.id in m.at)x.f=m.at[x.id]});d.b=m.b;d.h=m.h;d.r=m.r;tlStore(d)},
