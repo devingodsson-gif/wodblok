@@ -5,7 +5,7 @@ import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL,fpU} from './24-free-place-layers.js';
 import {fpSz} from './25-art-layers.js';
-import {patStart} from './67-pattern-element.js';
+import {patNew} from './67-pattern-element.js';
 import {elSel} from './65-element-core.js';
 import {plDisarm} from './72-placing.js';
 import {stUnlocked} from './63-stamp-tool.js';
@@ -29,7 +29,7 @@ let ABP='';   // which of 'motif', 'stamp', 'text', 'pattern' was last chosen on
 const abPick=k=>{plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;ABP=k;upd();abOpen(k=='motif'?'motifs':k=='text'?'text':k=='pattern'?'layers':'stmp')};
 // 2.20.0 (owner Oct 22 2026): every Add arms its kind, a ghost follows the pointer and each click on the canvas places one; Esc or V puts it away. Text, Motif and Stamp use their own ghosts; Pattern uses a box.
 function plArm(o){plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;WBS.plArm=o;upd();abOpen('layers');abSync()}
-function plMake(o,x,y){if(o.k=='pattern'){const q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),lay:'grid',...patStart(),sz:100,rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x,y,s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone()}}
+function plMake(o,x,y){if(o.k=='pattern'){const q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),...patNew(),rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x,y,s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone()}}
 // 2.26.0: what a bar button does after it opened the panel. In a stamp's tab only Motif and Text have an Add, so the other buttons stay as they were (they only open the panel).
 function abArm(k){const un=stUnlocked()!=null;if(un&&k!='motif'&&k!='text')return;
  if(k=='stamp'){if(!WBS.tiles.length)return;AD.stamp();return}

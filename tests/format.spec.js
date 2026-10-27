@@ -18,7 +18,7 @@ test('every sample project opens as the current format (28) and the original byt
   for (const f of fixtures) {
     const bytes = new Uint8Array(fs.readFileSync(path.join(FX, f))), before = Buffer.from(bytes).toString('base64');
     const r = await fmtOpen(bytes);
-    expect(r.newer).toBe(false); expect(r.project.v).toBe(28); expect(r.project.app).toBe('WODBLOK');
+    expect(r.newer).toBe(false); expect(r.project.v).toBe(29); expect(r.project.app).toBe('WODBLOK');
     expect(Buffer.from(bytes).toString('base64')).toBe(before);
   }
 });
@@ -91,7 +91,7 @@ test('a project that points at a missing picture still opens, and says so', asyn
   const { fmtOpen } = await load('container.js');
   const base = baseOf(fixtures[0]);
   delete base.cover; delete base.art;                                                         // the sample's own pictures are not in this file
-  const p = { ...base, v: 28, arts: { a: { n: 'A', src: 'wbasset:assets/' + 'a'.repeat(64) + '.png' } } };
+  const p = { ...base, v: 29, arts: { a: { n: 'A', src: 'wbasset:assets/' + 'a'.repeat(64) + '.png' } } };
   const zip = zipSync({ mimetype: [strToU8('application/vnd.wodblok+zip'), { level: 0 }], 'project.json': strToU8(JSON.stringify(p)) });
   const r = await fmtOpen(zip);
   expect(r.missingAssets).toBe(1); expect(r.project.arts.a.src).toBe('');

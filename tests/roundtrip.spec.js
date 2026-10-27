@@ -53,7 +53,7 @@ for (const f of FIXTURES) {
     const saved = JSON.parse(strFromU8(files['project.json']));
     expect(saved.app).toBe('WODBLOK');
     expect(Object.keys(files)).toContain('thumbnail.png');
-    expect(saved.v).toBe(28);
+    expect(saved.v).toBe(29);
     // What was saved is exactly what the app held after opening (no loss on save).
     const held = JSON.parse(before);
     for (const k of ['tiles', 'layers', 'proj', 'dim', 'pr', 'tex', 'texLib', 'pg', 'grade'])
