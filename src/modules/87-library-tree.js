@@ -3,6 +3,7 @@ import {kv,use} from '../platform/index.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {buildMotifZip,safeName} from '../format/motifs.js';
+import {zipRead} from '../format/libzip.js';
 
 // ===== The folder tree of the style guide (Part 9, section 12), as one component (2.51.1) =====
 // Every library (textures first, then saved stamps, saved trays, templates, workspaces, export recipes and saved colourways) is this tree: Home ("Yours") first, then your folders and the
@@ -133,11 +134,20 @@ function pick(id,e){if(!TL.sm){TL.sm=true;TL.sel.clear()}const ks=TL.vis;
  if(e.shiftKey&&TL.anc&&ks.includes(TL.anc)){const a=ks.indexOf(TL.anc),b=ks.indexOf(id);ks.slice(Math.min(a,b),Math.max(a,b)+1).forEach(x=>TL.sel.add(x))}else{TL.sel.has(id)?TL.sel.delete(id):TL.sel.add(id);TL.anc=id}paintAll(true)}
 function exit(){TL.sm=false;TL.sel.clear();TL.anc=null;TL.form=null;paintAll(true)}
 // one set of listeners per pane (a library can be shown in more than one place)
+async function importFiles(files){const I=cfg.importFile,h=here(),g0=h.startsWith('s:')?'':h;let n=0,bad=0,last='';const re=new RegExp('\\'+I.ext.replace(/^\./,'.')+'$|\\.json$','i');
+ const put=(text,g)=>{try{last=I.add(text,g);n++}catch(e){bad++}};
+ for(const f of files){if(/\.zip$/i.test(f.name)||/zip/.test(f.type)){const r=zipRead(new Uint8Array(await f.arrayBuffer()),re);if(!r||!r.length){bad++;continue}
+   for(const e of r){const dir=e.dir.map(x=>String(x).replace(/[\\"<>&|/]/g,'').trim().slice(0,30)).filter(x=>x&&!/^s:/i.test(x));put(new TextDecoder().decode(e.data),dir.length?(g0?g0+'/':'')+dir.join('/'):g0)}}
+  else put(await f.text(),g0)}
+ if(g0)TL.open.add(g0);uiSave();paintAll(true);if(I.done)I.done();
+ pmsg(n==1?`Added “${last}” to the library.`:n?`Added ${n} ${WS}.`+(bad?` ${bad} file${bad>1?'s were':' was'} not a ${W}.`:''):`Could not read that file.`)}
 function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.dataset.w)return;host.dataset.w='1';
  pane.querySelector(`[data-${P}all]`).onclick=()=>{const any=[...TL.open].some(Boolean);if(any){TL.open=new Set(['']);TL.active=''}else{const m=cfg.read();TL.open=new Set(['',...folders(m),...cfg.sets().map(s=>s.k)])}uiSave();paintAll(true)};
  pane.querySelector(`[data-${P}new]`).onclick=()=>{if(TL.sm&&TL.sel.size){TL.form={t:'mv',p:'',v:''};paintAll(true);return}const p=here();TL.open.add(p);TL.form={t:'new',p,v:''};paintAll(true)};
  pane.querySelector(`[data-${P}sel]`).onclick=()=>{if(TL.sm)exit();else{TL.sm=true;TL.sel.clear();TL.anc=null;paintAll(true)}};
  pane.querySelector(`[data-${P}exp]`).onclick=e=>{e.stopPropagation();save(exportList('/',true))};
+ // 2.58.0: Import, the counterpart of Export: the library's own files (cfg.importFile: {ext, add(text, folder) -> name}) or a zip of them, its folders kept
+ const ib=pane.querySelector(`[data-${P}imp]`),inp=pane.querySelector(`.${P}impf`);if(ib&&inp){ib.onclick=()=>inp.click();inp.onchange=async()=>{const fl=[...(inp.files||[])];inp.value='';if(fl.length)importFiles(fl)}}
  const z=pane.querySelector(`.${P}sz`);if(z)z.addEventListener('input',()=>{TL.z=+z.value;uiSave();paintAll(true)});
  const q=pane.querySelector(`.${P}q`);q.addEventListener('keydown',e=>e.stopPropagation());q.addEventListener('input',()=>{TL.q=q.value;document.querySelectorAll(`.${P}q`).forEach(o=>{if(o!==q)o.value=q.value});paintAll(true)});
  const b=pane.querySelector(`.${P}bar`);
@@ -190,7 +200,7 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
  // drag an item onto a folder to move it there (not in select mode)
  host.addEventListener('pointerdown',e=>{if(e.button!==0||e.shiftKey||e.ctrlKey||e.metaKey||TL.sm)return;const b=e.target.closest(`.lib button[data-${P}]`);if(!b)return;const im=b.querySelector('img');drag={id:b.dataset[P],x:e.clientX,y:e.clientY,on:false,g:null,src:im?im.src:''}})}
 // the markup of the tree: the library's own top row first (Add texture), then the bar, the search, the tree and the select bar
-const paneHtml=()=>`${cfg.top||''}<div class="lnav ${P}nav"><button type="button" class="ib" data-${P}all aria-label="Expand all folders">${IC(ICN.unfold)}</button>${cfg.rows?'':`<input type="range" class="${P}sz" min="0" max="8" step="1" value="${cfg.z||6}" aria-label="${W[0].toUpperCase()+W.slice(1)} size" data-plain>`}<button type="button" class="ib" data-${P}new aria-label="New folder">${IC(ICN.folderNew)}</button><button type="button" class="ib" data-${P}sel aria-label="Select ${WS}" aria-pressed="false">${IC(ICN.marquee)}</button><button type="button" class="ib" data-${P}exp aria-label="Export all ${WS}" aria-haspopup="menu" data-more>${IC(ICN.download)}</button></div>
+const paneHtml=()=>`${cfg.top||''}<div class="lnav ${P}nav"><button type="button" class="ib" data-${P}all aria-label="Expand all folders">${IC(ICN.unfold)}</button>${cfg.rows?'':`<input type="range" class="${P}sz" min="0" max="8" step="1" value="${cfg.z||6}" aria-label="${W[0].toUpperCase()+W.slice(1)} size" data-plain>`}<button type="button" class="ib" data-${P}new aria-label="New folder">${IC(ICN.folderNew)}</button><button type="button" class="ib" data-${P}sel aria-label="Select ${WS}" aria-pressed="false">${IC(ICN.marquee)}</button>${cfg.importFile?`<button type="button" class="ib" data-${P}imp aria-label="Import ${WS}">${IC(ICN.importIc)}</button>`:''}<button type="button" class="ib" data-${P}exp aria-label="Export all ${WS}" aria-haspopup="menu" data-more>${IC(ICN.download)}</button></div>${cfg.importFile?`<input type="file" class="${P}impf vh" accept="${cfg.importFile.ext},.json,.zip,application/zip,application/json" multiple tabindex="-1">`:''}
 <input type="text" class="${P}q"${cfg.qId?` id="${cfg.qId}"`:''} maxlength="40" placeholder="Find a ${W}" aria-label="Find a ${W}"><div class="ltr ${P}tr"${cfg.trId?` id="${cfg.trId}"`:''} role="tree" aria-label="${W[0].toUpperCase()+W.slice(1)}s"></div>
 <div class="fsbar ${P}bar" hidden><div class="r"><span class="fscnt"></span><button type="button" class="alt ${P}sa">Select all</button><button type="button" class="primary ${P}done">Done</button></div><select class="${P}mv" aria-label="Move to folder"></select><div class="r"><button type="button" class="alt ${P}out">Take out of folder</button><button type="button" class="alt ${P}delm">Delete</button></div></div>`;
 // shows the tree in a pane, with the item in use; pick(id) is called when a tile is chosen

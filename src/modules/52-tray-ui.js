@@ -162,6 +162,11 @@ function stFind(id){return stIsWada(id)?wada()[+id.slice(4)]||null:stCache().t.f
 function stUse(t){trayLoad(t.c);trayDone('Tray “'+t.n+'”');pmsg('Loaded “'+t.n+'” into the tray.')}
 function stAsCw(t){const i=cwAdd();cwUse(i);const w=cwNow();w.n=t.n.slice(0,40);trayLoad(t.c);trayDone('New colourway “'+t.n+'”');pmsg('Added the colourway “'+t.n+'”.')}
 const stUse0=id=>{const t=stFind(id);if(t)stUse(t)};
+// 2.58.0: a file this library exported ({app:'WODBLOK', kind, name, colours: [[hex, name], ...]}) comes back in, into folder g (its folders made)
+const libColoursIn=(text,kind)=>{const o=JSON.parse(text);if(!o||o.app!=='WODBLOK'||o.kind!==kind||!Array.isArray(o.colours))throw new Error('not a '+kind);
+ const c=o.colours.filter(x=>Array.isArray(x)&&/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(String(x[0]))).slice(0,16).map(x=>[String(x[0]).toLowerCase(),String(x[1]||'').slice(0,40)]);if(!c.length)throw new Error('no colours');
+ return{n:String(o.name||kind[0].toUpperCase()+kind.slice(1)).replace(/["<>&|]/g,'').slice(0,40),c}};
+const libFolderAdd=(d,g)=>{if(!g)return;let q='';g.split('/').forEach(part=>{q=q?q+'/'+part:part;if(!d.f.includes(q))d.f.push(q)})};
 const stCfg=()=>({p:'st',word:'tray',words:'trays',ui:ST_UI,rows:true,exportName:'wodblok-trays',exportAs:'tray files',pane:'#stpane',trId:'stl',qId:'stq',
  read(){const d=stLoad(),at={};d.t.forEach(t=>{at[t.id]=t.f});return{f:d.f,at,b:d.b,h:d.h,r:d.r}},
  write(m){const d=stLoad();d.f=m.f;d.t.forEach(t=>{if(t.id in m.at)t.f=m.at[t.id]});d.b=m.b;d.h=m.h;d.r=m.r;stStore(d)},
@@ -172,6 +177,7 @@ const stCfg=()=>({p:'st',word:'tray',words:'trays',ui:ST_UI,rows:true,exportName
  remove(list){const d=stLoad();d.t=d.t.filter(t=>!list.includes(t.id));stStore(d);paintST(true)},
  rename(id,v){const d=stLoad(),t=d.t.find(x=>x.id===id);if(t){t.n=v;stStore(d)}},
  file(id){const t=stFind(id);return t?{name:t.n,data:new TextEncoder().encode(JSON.stringify({app:'WODBLOK',kind:'tray',name:t.n,colours:t.c})),ext:'.wodblok-tray',fb:'Tray'}:null},
+ importFile:{ext:'.wodblok-tray',add(text,g){const r=libColoursIn(text,'tray'),d=stLoad();libFolderAdd(d,g);d.t.unshift({id:newId(),n:r.n,f:g,c:r.c});stStore(d);return r.n},done:()=>paintST(true)},
  itemMenu(id){const t=stFind(id);if(!t)return[];const r=[['Load into the tray',()=>stUse(t)],['Add as a colourway',()=>stAsCw(t)]];
   if(stIsWada(id))r.push(['Copy to your trays',()=>{const d=stLoad();d.t.unshift({id:newId(),n:t.n,f:stHere(),c:t.c.map(x=>[...x])});stStore(d);paintST(true);pmsg('Copied “'+t.n+'” to your trays.')}]);return r}});
 const stHere=()=>{const h=STT?STT.here():'';return h.startsWith('s:')?'':h};
@@ -199,4 +205,4 @@ function init52(){
  {const mo=new MutationObserver(()=>paintWells(false));document.querySelectorAll('section.pn').forEach(sc=>{if(sc.querySelector('.cwl'))mo.observe(sc,{attributes:true,attributeFilter:['hidden']})})}
  const sec=document.querySelector('section.pn[data-p="colors"]');new MutationObserver(()=>{if(!sec.hidden){paintList(true);paintST(false)}}).observe(sec,{attributes:true,attributeFilter:['hidden']});
  paintAll(true)}
-export {init52,mkWell,paintDock,paintWell,paintWells};
+export {init52,mkWell,paintDock,paintWell,paintWells,libColoursIn,libFolderAdd};
