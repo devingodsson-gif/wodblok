@@ -93,6 +93,9 @@ Only items the owner has stated are listed as next. Nothing is started unless he
 ## Open questions for the owner
 None at the moment. Add new ones here.
 
+### Planned Oct 26 2026: create and edit, the effect pop-out
+- docs/panel-modes-plan.md (plan only, nothing built): element panels show a library only while creating, a Replace row while editing; an Effects menu item opens a detached window with the same settings pane and Apply. Owner answered its three questions Oct 26 2026.
+
 ### Found Oct 26 2026 (2.53.0 and 2.54.0)
 - Full CI run on main's code (eight shards, 17 minutes): failing are element-bar (stale since 2.53.0, fixed in 2.54.0), the five Randomize scenario snapshots (they fail on main in CI; the sandbox cannot make matching ones, see the Oct 25 note), `repeat-tile` "repeat 3 x 3", and `saved-colours-list` (the row menu's Rename is "not stable" in CI; passes in the sandbox). `history-thumbs` and `recovery` failed once each and passed on a rerun (flaky).
 - Owner (Oct 26 2026): eight CI shards; a manual workflow that regenerates the scenario snapshots in CI.
