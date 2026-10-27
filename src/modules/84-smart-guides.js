@@ -11,7 +11,7 @@ import {fpHid,fpUnit,fpWH} from './25-art-layers.js';
 // them, and marks the equal gaps. Pulling a side of an upright element snaps that side the same way. Alt held turns snapping off for the moment,
 // as it does for the grid; with the grid's snapping on, the grid wins and there are no smart guides.
 // Everything is measured in the boxes the selection outline shows (a turned element counts by the upright box round it). The targets are worked out
-// once, when the drag starts; each frame only compares numbers. The lines are drawn in the selection overlay (#fpov) in the accent colour, one
+// once, when the drag starts; each frame only compares numbers. The lines are drawn in the selection overlay (#fpov) in the highlight colour (2.60.0; the accent unless Settings says otherwise), one
 // screen pixel wide at any zoom (classes .sgl and .sgs in the page CSS; nothing here sets a colour).
 const SG_K={on:'wb114_sg',cv:'wb114_sgcv',el:'wb114_sgel',sp:'wb114_sgsp',d:'wb114_sgd'};
 // how close, in screen pixels, an edge has to come before it snaps
@@ -58,7 +58,8 @@ function sgDraw(S,B,u,gx,gy,edges){const eps=Math.max(.06,u*.5),T=S.T;let h='';
  return h?`<g class="sgg">${h}</g>`:''}
 const sgLive=(L,e,o)=>o.on&&(o.cv||o.el)&&!(e&&e.altKey)&&!fpFG(L).snap;
 // A move: D is the drag (WBS.fpDrag: p, g, s0); (nx, ny) where its anchor would go. Returns where it goes; the guides are left in WBS.sgG for the overlay.
-function sgMove(D,L,nx,ny,e){WBS.sgG='';if(!D.sgO)D.sgO=sgOpts();const o=D.sgO;if(!sgLive(L,e,o))return[nx,ny];
+// 2.60.0 (artist test): Shift held while moving turns the guides off too (Alt still does; Shift is not used for a move otherwise)
+function sgMove(D,L,nx,ny,e){WBS.sgG='';if(!D.sgO)D.sgO=sgOpts();const o=D.sgO;if(!sgLive(L,e,o)||(e&&e.shiftKey))return[nx,ny];
  if(!D.sg)D.sg=sgPrep(L,D.g?D.g.map(z=>z[0]):[D.p],D.s0[0],D.s0[1],o);const S=D.sg;if(!S.off)return[nx,ny];
  const u=fpUnit(),lim=o.d*u,box=(x,y)=>({l:x+S.off.l,r:x+S.off.r,t:y+S.off.t,b:y+S.off.b});let B=box(nx,ny),fx=0,fy=0,gx=null,gy=null;
  const ax=sgNear([B.l,(B.l+B.r)/2,B.r],S.X,lim),ay=sgNear([B.t,(B.t+B.b)/2,B.b],S.Y,lim);if(ax)fx=ax[0];if(ay)fy=ay[0];

@@ -21,6 +21,19 @@ const id=pre+'_'+String(l[0]).replace(/[^\w-]/g,'_');if(!seen[id]){seen[id]=1;d0
 if(map){const m=map(x,y,r),K=map.k;o+=`<use href="#${id}" transform="translate(${m[0].toFixed(2)} ${m[1].toFixed(2)}) rotate(${m[2].toFixed(2)}) scale(${(s*sx*K).toFixed(4)} ${(s*sy*K).toFixed(4)})"/>`}else o+=`<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s*sx} ${s*sy})"/>`}
 return`<defs>${d0}</defs><g fill="${fill}" fill-rule="evenodd">${o}</g>`}
 let TXM;
+// 2.60.0 (artist test, Oct 27 2026: "a text element should only be selected if the actual text is touched"): where a text's letters are, with a little slack round
+// them, drawn once into a small picture of its box (kept until the letters change). lx, ly: the point in the text's own frame (turned back, canvas units).
+// false: the point misses the letters; true: it is on them; undefined: not known (text on a shape, or no canvas)
+const TXH=new WeakMap();
+function txHit(p,lx,ly){if(p.mm=='on'||!Array.isArray(p.Lt)||!p.G||typeof p.G!='object')return undefined;
+ const k=(+p.s||1)/Math.max(+p.n||1,.01),gx=lx/(k*(+p.f||1)),gy=ly/k,W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1),pw=W*1.3,ph=H*1.3;
+ let c=TXH.get(p.Lt);
+ if(!c||c.G!==p.G||c.W!==W||c.H!==H){let cv=null;try{cv=document.createElement('canvas')}catch(e){}if(!cv)return undefined;const sc=192/Math.max(pw,ph),cw=Math.max(1,Math.round(pw*sc)),ch=Math.max(1,Math.round(ph*sc));cv.width=cw;cv.height=ch;
+  const x=cv.getContext('2d',{willReadFrequently:true});if(!x)return undefined;const fs=+(p.tx&&p.tx.sz)||40;x.setTransform(sc,0,0,sc,cw/2,ch/2);x.lineJoin='round';
+  for(const l of p.Lt){if(!Array.isArray(l))continue;const d=p.G[l[0]];if(typeof d!='string'||!/^[MLQZ0-9.,\- ]+$/.test(d))continue;const X=+l[1],Y=+l[2],R=+l[3],S=+l[4];if(![X,Y,R,S].every(isFinite)||!S)continue;
+   x.save();x.translate(X,Y);x.rotate(R*Math.PI/180);x.scale(S,S);const P=new Path2D(d);x.fill(P,'evenodd');x.lineWidth=fs*.16/Math.abs(S);x.stroke(P);x.restore()}
+  c={G:p.G,W,H,sc,cw,ch,a:x.getImageData(0,0,cw,ch).data};TXH.set(p.Lt,c)}
+ const u=Math.floor(gx*c.sc+c.cw/2),v=Math.floor(gy*c.sc+c.ch/2);if(u<0||v<0||u>=c.cw||v>=c.ch)return false;return c.a[(v*c.cw+u)*4+3]>20}
 // a text's textures: the ones from the Text panel, then the Texture effects on it
 const txAll=p=>(Array.isArray(p.tu)?p.tu:[]).concat(fxTexUses(p));
 function txMask(id,p){const q=txSpecs(txAll(p),'wear');if(!q.length||!WBS.edInk)return'';const W=Math.max(1,+p.bw||1),H=Math.max(1,+p.bh||1),x=(-W/2).toFixed(2),y=(-H/2).toFixed(2),v=txImgs(q,W,H,384,'host',txIsW,x,y);if(!v)return'';
@@ -59,7 +72,7 @@ p.tx=o;p.G=R.G;p.Lt=R.Lt;p.bw=R.bw;p.bh=R.bh;p.n=Math.max(R.bw,R.bh);p.s=+p.n.to
 async function tbAdd(){const L=fpL();if(!L)return;const o=tbRead();if(!o.text.trim())return;const R=await WBX.wbTxLay(o);if(!R){pmsg('No letters came out. Try another font.');return}
 L.pl=L.pl||[];const c=L.pl.filter(z=>z.tx).length,n=Math.max(R.bw,R.bh),q={u:fpU(),k:'text',tx:o,G:R.G,Lt:R.Lt,bw:R.bw,bh:R.bh,n,x:+(CW/2+((c%4)-1.5)*CW*.03).toFixed(1),y:+(CH/2+((c%4)-1.5)*CW*.03).toFixed(1),s:+n.toFixed(2),r:0,f:1};
 L.pl.push(q);WBS.fpSel=q.u;WBS.fpMS=new Set();WBS.fpB=null;WBS.fpGhost=null;tbKey='';store();upd();if(WBX.wbCap)WBX.wbCap()}
-function init26(){
+function init26(){WBX.wbTxHit=txHit;
 WBX.wbTbAdd=tbAdd;
 TXM=new Map();WBS.txArm=false;
 {['tx_t',...TXO_IDS].forEach(id=>$(id).addEventListener('input',tbLive));

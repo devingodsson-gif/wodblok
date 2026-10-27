@@ -52,9 +52,9 @@ function accentApply(hex){let el=$('accstyle');if(!stHEX6.test(hex||'')){if(el)e
  if(!el){el=document.createElement('style');el.id='accstyle';document.body.appendChild(el)}   // last in the page, after the app's own colour rules
  const v=accentVars(hex),css=stRule('html:root[data-theme="light"]',v.light)+stRule('html:root[data-theme="dark"]',v.dark);el.textContent=css;try{kv.set('wb_accentcss',css)}catch(e){}}
 const stAccentGet=()=>{let v='';try{v=kv.get(stK_ACC)||''}catch(e){}return stHEX6.test(v)?v.toLowerCase():''};
-const stAccentSet=hex=>{try{if(hex)kv.set(stK_ACC,hex);else kv.remove(stK_ACC)}catch(e){}accentApply(hex);acAccount.shareAccent(hex);acAccount.saveAccent(hex)};   // the website reads the same colour, and the account keeps it for other devices (platform/account.js)
+const stAccentSet=hex=>{try{if(hex)kv.set(stK_ACC,hex);else kv.remove(stK_ACC)}catch(e){}accentApply(hex);hlApply();stHlMarks();acAccount.shareAccent(hex);acAccount.saveAccent(hex)};   // the website reads the same colour, and the account keeps it for other devices (platform/account.js)
 // the account's saved colour arrived (another device changed it): show it here without sending it back
-const accentFromAccount=hex=>{hex=stHEX6.test(hex||'')?hex.toLowerCase():'';try{if(hex)kv.set(stK_ACC,hex);else kv.remove(stK_ACC)}catch(e){}accentApply(hex);acAccount.shareAccent(hex);stAccentMarks()};
+const accentFromAccount=hex=>{hex=stHEX6.test(hex||'')?hex.toLowerCase():'';try{if(hex)kv.set(stK_ACC,hex);else kv.remove(stK_ACC)}catch(e){}accentApply(hex);acAccount.shareAccent(hex);stAccentMarks();hlApply();stHlMarks()};
 // ---------------------------------------------------------------- remembered flags
 const stFlag=(k,d)=>{try{const v=kv.get(k);return v==null?d:v==='1'}catch(e){return d}};
 const stFlagSet=(k,on)=>{try{kv.set(k,on?'1':'0')}catch(e){}};
@@ -75,10 +75,23 @@ const stVIEW=[['stgti','gti','Stamp texture'],['stgtx','gtx','Canvas texture'],[
 const stViewOn=id=>$(id)?.getAttribute('aria-pressed')==='true';
 const stViewToggles=()=>stVIEW.map(([sid,bid,t])=>stTgl(sid,stViewOn(bid),t)).join('');
 const stThemeNow=()=>document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
+// ---------------------------------------------------------------- highlight colour (2.60.0, owner Oct 27 2026: "a highlight colour for the smart alignment guides and when we
+// draw selection boxes"). '' follows the accent, 'opp' is the accent's opposite (its hue turned half way round), else a colour; it is the --hl token.
+const stK_HL='wb260_highlight';
+const stHLS=[['Accent',''],['Opposite','opp'],['Blue','#2f7fe0'],['Magenta','#d6336c'],['Lime','#7cc23a']];
+const stHlGet=()=>{let v='';try{v=kv.get(stK_HL)||''}catch(e){}return v=='opp'||stHEX6.test(v)?v.toLowerCase():''};
+const stHlColour=v=>{if(v=='opp'){const[h,s,l]=stRgb2hsl(stToRgb(stAccentGet()||'#b8914f'));return stToHex(stHsl2rgb([(h+.5)%1,Math.max(.55,Math.min(.8,s)),Math.max(.45,Math.min(.55,l))]))}return v};
+function hlApply(){let el=$('hlstyle');const c=stHlColour(stHlGet());if(!c){if(el)el.textContent='';return}if(!el){el=document.createElement('style');el.id='hlstyle';document.head.appendChild(el)}el.textContent=`html:root{--hl:${c}}`}
+const stHlName=v=>{const a=stHLS.find(x=>x[1]===v);return a?a[0]:'Custom'};
+function stHlRow(){const cur=stHlGet(),custom=!!cur&&!stHLS.some(a=>a[1]===cur);
+ return`<div class="stgr stgacc"><span>Highlight</span><b id="stghn">${stHlName(cur)}</b><div class="stga" id="stghl" role="group" aria-label="Highlight colour">${stHLS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${h===cur}" style="--c:${h?stHlColour(h):'var(--acc)'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">${ICN.plus}</svg></button></div></div>`}
+function stHlMarks(){const g=$('stghl');if(!g)return;const cur=stHlGet(),custom=!!cur&&!stHLS.some(a=>a[1]===cur),n=$('stghn');if(n)n.textContent=stHlName(cur);
+ g.querySelectorAll('.stgab').forEach(b=>{const c=b.dataset.custom;b.setAttribute('aria-pressed',String(c?custom:b.dataset.h===cur));if(c)b.style.setProperty('--c',custom?cur:'transparent');else if(b.dataset.h=='opp')b.style.setProperty('--c',stHlColour('opp'))})}
+const stHlSet=v=>{try{if(v)kv.set(stK_HL,v);else kv.remove(stK_HL)}catch(e){}hlApply();stHlMarks()};
 function stAccentRow(){const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur);
- return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">'+ICN.plus+'</svg></button></div></div>`}
+ return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">${ICN.plus}</svg></button></div></div>`}
 function stPageHtml(p){
- if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stSegH('stgps','Open panels on',[['l','Left'],['r','Right']],stPside())+stTgl('stgtl',stFlag(stK_TPL,false),'Templates at launch')+stViewToggles()+stAccentRow();
+ if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stSegH('stgps','Open panels on',[['l','Left'],['r','Right']],stPside())+stTgl('stgtl',stFlag(stK_TPL,false),'Templates at launch')+stViewToggles()+stAccentRow()+stHlRow();
  if(p=='colour')return`<div class="ctl stgr"><label for="stgtv">Places shown</label><input type="range" id="stgtv" min="4" max="${TRAY_MAX}" step="1" value="${stNumGet(stK_TRAY,4,4,TRAY_MAX)}"><output id="stgtvo">${stNumGet(stK_TRAY,4,4,TRAY_MAX)}</output></div><div class="stgr"><span>Recent colours</span><button type="button" class="alt" id="stgrc">Clear</button></div>`;
  // smart guides (2.40.0, 84-smart-guides.js): the switch, what to snap to, how close
  if(p=='guides')return stTgl('stgsg',sgFlag(SG_K.on,true),'Smart guides')+stTgl('stgsc',sgFlag(SG_K.cv,true),'Snap to canvas')+stTgl('stgse',sgFlag(SG_K.el,true),'Snap to elements')+stTgl('stgss',sgFlag(SG_K.sp,true),'Equal spacing')+stSegH('stgsd','Snap distance',SG_DIST,sgDist());
@@ -106,6 +119,9 @@ function stWire(){const b=$('stgbody');
  const g=$('stgacc');if(g)g.addEventListener('click',e=>{const x=e.target.closest('.stgab');if(!x)return;
   if(x.dataset.custom){const cur=stAccentGet()||'#b8914f';openPicker(x,{value:cur,alpha:false,onInput:h=>{const v=String(h).slice(0,7).toLowerCase();if(stHEX6.test(v)){stAccentSet(v);stAccentMarks()}},onClose:()=>stAccentMarks()});return}
   closePicker();stAccentSet(x.dataset.h);stAccentMarks()});
+ const hg=$('stghl');if(hg)hg.addEventListener('click',e=>{const x=e.target.closest('.stgab');if(!x)return;
+  if(x.dataset.custom){const c0=stHlGet(),cur=stHEX6.test(c0)?c0:'#2f7fe0';openPicker(x,{value:cur,alpha:false,onInput:h=>{const v=String(h).slice(0,7).toLowerCase();if(stHEX6.test(v))stHlSet(v)},onClose:()=>stHlMarks()});return}
+  closePicker();stHlSet(x.dataset.h)});
  const tv=$('stgtv');if(tv)tv.addEventListener('input',()=>{const n=+tv.value;$('stgtvo').textContent=n;try{kv.set(stK_TRAY,String(n))}catch(e){}setTrayView(n);try{paintDock(true)}catch(e){}});
  on('stgrc',()=>{try{kv.remove('wb200_recent')}catch(e){}const c=$('stgrc');c.textContent='Cleared';c.disabled=true});
  flip('stgsg',SG_K.on,stSgSync);flip('stgsc',SG_K.cv,stSgSync);flip('stgse',SG_K.el,stSgSync);flip('stgss',SG_K.sp,()=>{});seg('stgsd',v=>sgSet('d',+v));stSgSync();
@@ -127,7 +143,7 @@ function stShow(){try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}
  stKeyQ='';stPaint();stD().hidden=false;const t=$('stgnav').querySelector('.on');if(t)t.focus()}
 function stHide(){if(stD().hidden)return;closePicker();stD().hidden=true;const b=stOpener&&stOpener.isConnected?stOpener:$('fileb');if(b&&b.focus)b.focus()}
 function init55(){WBX.wbStgOpen=p=>{stShow();stSetPage(p)};WBX.wbStgSync=()=>{if(stIsOpen()&&stPage=='guides')stPaint()};   // the Smart guides command (84) changed the switch
- accentApply(stAccentGet());acAccount.shareAccent(stAccentGet());stDraftApply(stFlag(stK_DRAFT,true));stCalmApply(stFlag(stK_CALM,false));
+ accentApply(stAccentGet());hlApply();acAccount.shareAccent(stAccentGet());stDraftApply(stFlag(stK_DRAFT,true));stCalmApply(stFlag(stK_CALM,false));
  {const tv=stNumGet(stK_TRAY,4,4,TRAY_MAX);setTrayView(tv);if(tv>4)try{paintDock(true)}catch(e){}}setAutosaveEvery(stNumGet(stK_SAVE,8,8,120)*1000);
  $('stgo').onclick=stShow;$('stgclose').onclick=stHide;stD().addEventListener('click',e=>{if(e.target===stD())stHide()});
  $('stgnav').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b){stSetPage(b.dataset.p);const n=$('stgnav').querySelector('.on');if(n)n.focus()}});

@@ -1,5 +1,13 @@
 # Development plan
 
+## 2.60.0 (Oct 27 2026): selection and control (artist test, release 1 of docs/artist-test-todo.md). Format 29 unchanged
+Owner, Oct 27 2026: "start on release 1". Built as one step (the plan's 2.59.2 and 2.59.3 together).
+- **Picking:** a text is picked on its letters (a small picture of where its letters are, `txHit` in 26-text-boxes.js, kept until they change), not anywhere in its box, unless it is the selected element; the box on the canvas starts after 10 screen pixels (was 0.8% of the canvas, which at some zooms was a few pixels); a click on the empty space round the canvas ends the selection. The highest element in the list already won a click; the text box catching clicks over shapes was the cause of wrong picks.
+- **Lock:** Lock / Unlock in an Elements list row's menu; a locked row shows a lock button that unlocks. Locked (`lk: 1`, saved in the project) means no pick by a click or by the box, and its handles do nothing on the canvas; it is still picked in the list. One history step.
+- **Shift while moving** turns the smart guides off (Alt still turns off guides and grid snap).
+- **Highlight colour:** Settings > General > Highlight: Accent (default), Opposite (the accent's hue turned half way, follows the accent), Blue, Magenta, Lime or a custom colour; the new `--hl` token colours the smart guides and the canvas selection box. Also fixed: the Accent row's custom button showed no plus sign.
+- Tests: new `selection-2-60` (6); the related canvas, text, list, guide, transform and settings specs.
+
 ## 2.59.1 (Oct 27 2026): Randomize scenario snapshots regenerated in CI
 Owner, Oct 27 2026: "Regenerate the scenarios". Made by the update-snapshots workflow on 2.59.0 (they predated the 2.57.0 tilings): before-view, split-view and randomize seeds 1 to 3, state and SVG. Nothing else changed.
 
