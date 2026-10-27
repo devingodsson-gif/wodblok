@@ -4,6 +4,8 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
+**Oct 27 2026 (2.65.0).** Bold, Italic, Underline, Strikethrough and Highlight on selected letters (drawn bold and slanted italic until the fonts release). Next: 2.66.0 about 90 built-in fonts with real bold and italic.
+
 **Oct 27 2026 (2.64.0).** The new Text panel (Text, Style, Character, Paragraph, Shape); the unused and random controls removed. Next: 2.65.0 bold, italic, underline, strikethrough, highlight; 2.66.0 about 90 built-in fonts.
 
 **Oct 27 2026 (2.63.0).** Text plan (docs/text-plan.md) answered by the owner; release 1, box-first text on the canvas, built. Next: 2.64.0 the new Text panel (also in a stamp's tab), 2.65.0 bold, italic, underline, strikethrough, highlight, 2.66.0 about 90 built-in fonts with real bold and italic.

@@ -1,5 +1,12 @@
 # Development plan
 
+## 2.65.0 (Oct 27 2026): Bold, Italic, Underline, Strikethrough, Highlight (release 3 of docs/text-plan.md)
+- In Character, four buttons B, I, U, S and a Highlight well act on the selected letters of a text on the canvas (all of them when none are selected); a button is on when every selected letter has the style, and pressing it then takes it off.
+- Stored in the letter runs (`tx.sty` items 7 and 8: the styles 'b' 'i' 'u' 's' and the highlight colour) and per laid-out letter (`Lt` item 7: {f, h, px, by, w}), only when set.
+- Drawn: Bold is an outline of the letter's own colour round it (and a little more room after it) until 2.66.0 brings real bold fonts; Italic a slant until real italic fonts; Underline and Strikethrough a bar per letter that joins up across the word and the spaces between styled words; Highlight a band behind the letters (all bands under all letters). They follow curves and warps with their letters.
+- Not in a stamp's tab (its letters print in the stamp's ink).
+- Tests: new `text-styles-2-65`; the text specs.
+
 ## 2.64.0 (Oct 27 2026): the new Text panel (release 2 of docs/text-plan.md)
 - The Text panel is five groups: **Text** (the words; a stamp's preview), **Style** (the saved text styles, was "Text styles"), **Character** (Font and Load a font file, Case, Colour, Letter colour, Letter spacing, Clear letter styles), **Paragraph** (Align, Vertical, Line spacing, Paragraph spacing, First-line indent) and **Shape** (one choice: None, Arc, Wave, Spiral, Bulge, Rise, Flag, with Amount, and Length for a wave or a spiral; it writes the same fields as before: cv, pt/pa/pw, wp/wa).
 - Removed (owner: "a lot of sliders that don't do anything"; random letters are the Jitter effect's): Size, Box width and height, Padding, Fit to box, Overflow (a text fills its box), Word spacing, Balance lines, Letter size and raise with Super and Sub, Rotate letters, Random position, rotation and size, Bounce, Scatter, Vary. They are never saved again (a text that had them loses them when edited). The same panel in a stamp's tab: its texts fit the stamp (their Size was already worked out by Auto-fit).
