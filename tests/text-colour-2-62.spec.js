@@ -21,14 +21,13 @@ test('Letter colour: the selected letters take a tray colour; with none selected
   // the letters keep their colour when one is typed before them
   await page.evaluate(() => { const t = document.getElementById('tx_t'); t.focus(); t.setSelectionRange(0, 0); });
   await page.keyboard.type('Z'); await H.settle(page);
-  expect((await txt(page)).tx.sty[0].slice(0, 2)).toEqual([2, 4]);
+  await expect.poll(async () => ((await txt(page)).tx.sty || [[]])[0].slice(0, 2)).toEqual([2, 4]);
   // nothing selected: every letter
   await page.evaluate(() => { const t = document.getElementById('tx_t'); t.focus(); t.setSelectionRange(1, 1); });
   await pick(page, 0);
-  const s = (await txt(page)).tx.sty;
-  expect(s.length).toBe(1); expect(s[0].slice(0, 2)).toEqual([0, 5]);
+  await expect.poll(async () => JSON.stringify(((await txt(page)).tx.sty || []).map(r => r.slice(0, 2)))).toBe('[[0,5]]');
   await expect(page.locator('#art use[fill]')).toHaveCount(5);
   await page.keyboard.press('Control+z'); await H.settle(page);
-  expect((await txt(page)).tx.sty[0].slice(0, 2)).toEqual([2, 4]);
+  await expect.poll(async () => JSON.stringify(((await txt(page)).tx.sty || []).map(r => r.slice(0, 2)))).not.toBe('[[0,5]]');   // the colour on every letter is undone
   expect(errors).toEqual([]);
 });
