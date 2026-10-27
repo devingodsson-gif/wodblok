@@ -5,7 +5,7 @@ import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
-import {fpHit,fpPt} from './25-art-layers.js';
+import {fpHit,fpPt,fpWH} from './25-art-layers.js';
 import {lyDupSel} from './32-layers-panel.js';
 import {stUnlocked} from './63-stamp-tool.js';
 
@@ -21,7 +21,11 @@ const emOk=o=>{const has=t=>WBS.tiles.some(x=>x.id==t);if(o.k!='pattern'&&o.t!=n
 function emPaste(){const L=fpL();if(!L||!EMCLIP||!EMCLIP.length)return false;L.pl=L.pl||[];const d=Math.min(CW,CH)*.03,ns=[];
  EMCLIP.forEach(o=>{const q=JSON.parse(JSON.stringify(o));if(!emOk(q))return;q.u=fpU();if(q.x!=null)q.x=+(q.x+d).toFixed(1);if(q.y!=null)q.y=+(q.y+d).toFixed(1);L.pl.push(q);ns.push(q)});
  EMCLIP=JSON.parse(JSON.stringify(EMCLIP)).map(o=>{if(o.x!=null)o.x=+(o.x+d).toFixed(1);if(o.y!=null)o.y=+(o.y+d).toFixed(1);return o});   // the next paste lands a step further on
- if(!ns.length)return false;WBS.fpMS=ns.length>1?new Set(ns.map(q=>String(q.u))):new Set();WBS.fpSel=ns[ns.length-1].u;WBS.fpAnc=WBS.fpSel;emDone();return true}
+ if(!ns.length)return false;
+ // 2.60.1 (artist test: pasting near the bottom put things off the canvas): the pasted elements are moved, together, back inside the canvas; the next paste goes on from there
+ {let l=1e9,r=-1e9,t=1e9,b=-1e9;ns.forEach(q=>{if(q.x==null||q.y==null)return;const wh=fpWH(q)||[0,0],a=(+q.r||0)*Math.PI/180,ex=Math.abs(wh[0]/2*Math.cos(a))+Math.abs(wh[1]/2*Math.sin(a)),ey=Math.abs(wh[0]/2*Math.sin(a))+Math.abs(wh[1]/2*Math.cos(a));l=Math.min(l,q.x-ex);r=Math.max(r,q.x+ex);t=Math.min(t,q.y-ey);b=Math.max(b,q.y+ey)});
+  if(r>=l){const fit=(lo,hi,m)=>hi-lo>=m?(m-lo-hi)/2:lo<0?-lo:hi>m?m-hi:0,dx=fit(l,r,CW),dy=fit(t,b,CH);
+   if(dx||dy){ns.forEach(q=>{if(q.x!=null)q.x=+(q.x+dx).toFixed(1);if(q.y!=null)q.y=+(q.y+dy).toFixed(1)});EMCLIP.forEach(o=>{if(o.x!=null)o.x=+(o.x+dx).toFixed(1);if(o.y!=null)o.y=+(o.y+dy).toFixed(1)})}}}WBS.fpMS=ns.length>1?new Set(ns.map(q=>String(q.u))):new Set();WBS.fpSel=ns[ns.length-1].u;WBS.fpAnc=WBS.fpSel;emDone();return true}
 function emDel(){const L=fpL(),g=fpGrp();if(!L||!g.length)return false;g.forEach(q=>{const i=L.pl.indexOf(q);if(i>=0)L.pl.splice(i,1)});WBS.fpSel=-1;WBS.fpMS=new Set();emDone();return true}
 const emCut=()=>{if(!emCopy())return false;return emDel()};
 function emOrder(front){const L=fpL(),g=fpGrp();if(!L||!g.length)return false;g.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));if(front)L.pl.push(...g);else L.pl.unshift(...g);emDone();return true}

@@ -118,7 +118,8 @@ function closeRowMenu(){closeRowSub();if(ROWM){if(ROWM.btn)ROWM.btn.setAttribute
 // An item is [label, action, disabled, sub]. An item with sub (a list of items, like the menu's own) opens a flyout beside it on hover, click, Enter or Right Arrow (2.35.0).
 function rowMenu(btn,items){const was=ROWM&&ROWM.btn===btn;closeRowMenu();if(was)return;const m=document.createElement('div');m.className='ddl rowm';m.dataset.w='150';m.setAttribute('role','menu');
  m.innerHTML=items.map(([t,,off,sub],i)=>`<button type="button" class="ddi${sub?' hassub':''}" role="menuitem" data-i="${i}"${off?' disabled':''}${sub?' aria-haspopup="menu" aria-expanded="false"':''}><span>${t}</span>${sub?'<span class="rmcar" aria-hidden="true">&#8250;</span>':''}</button>`).join('');
- document.body.appendChild(m);placeFloat(m,btn,true);m.btn=btn;ROWM=m;btn.setAttribute('aria-expanded','true');
+ document.body.appendChild(m);{m.style.width='max-content';const nw=Math.ceil(m.getBoundingClientRect().width);m.style.width='';m.dataset.w=String(Math.max(150,nw))}   // 2.60.1 (artist test: long items wrapped over each other): the menu is as wide as its longest item
+ placeFloat(m,btn,true);m.btn=btn;ROWM=m;btn.setAttribute('aria-expanded','true');
  const openSub=(b,focus)=>{const it=items[+b.dataset.i];if(!it||!it[3])return;if(ROWS&&ROWS.src===b){if(focus){const f=ROWS.querySelector('button');if(f)f.focus()}return}closeRowSub();
   const f=document.createElement('div');f.className='ddl rowm rowsub fx';f.setAttribute('role','menu');f.src=b;
   f.innerHTML=it[3].map(([t,,off],i)=>`<button type="button" class="ddi" role="menuitem" data-j="${i}"${off?' disabled':''}><span>${t}</span></button>`).join('');
