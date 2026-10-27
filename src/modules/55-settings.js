@@ -12,6 +12,8 @@ import {SG_DIST,SG_K,sgDist,sgFlag,sgSet,sgSyncBox} from './84-smart-guides.js';
 // One dialog, seven pages (General, Colour, Guides, Speed, Files, Shortcuts, About). Every control here changes something that already exists in the
 // app and is remembered in the settings record (kv). Nothing opens at launch; the dialog opens from File > Settings… or the command.
 // The accent colour is made here: one picked colour becomes the four accent tokens of both themes (see accentVars).
+// 2.55.0: the side a panel opens on when it has no remembered place (34-desktop-shell.js reads it)
+const stK_PSIDE='wb255_pside',stPside=()=>{let v='';try{v=kv.get(stK_PSIDE)||''}catch(e){}return v=='r'?'r':'l'};
 const stK_ACC='wb114_accent',stK_DRAFT='wb114_draft',stK_CALM='wb114_calm',stK_TRAY='wb114_trayview',stK_SAVE='wb114_autosave',stK_PAGE='wb114_page',stK_TPL='wb111_tplstart';
 const stPAGES=[['general','General'],['colour','Colour'],['guides','Guides'],['speed','Speed'],['files','Files'],['keys','Shortcuts'],['about','About']];
 // Accent presets. They are the person's colours, not chrome, so literal values are allowed (style guide 3). The first, Oak, is the built-in one
@@ -76,7 +78,7 @@ const stThemeNow=()=>document.documentElement.getAttribute('data-theme')==='ligh
 function stAccentRow(){const cur=stAccentGet(),custom=cur&&!stACCENTS.some(a=>a[1]===cur);
  return`<div class="stgr stgacc"><span>Accent</span><b id="stgan">${stAccentName(cur)}</b><div class="stga" id="stgacc" role="group" aria-label="Accent colour">${stACCENTS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${(h||'')===cur}" style="--c:${h||'#b8914f'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${!!custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">'+ICN.plus+'</svg></button></div></div>`}
 function stPageHtml(p){
- if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stTgl('stgtl',stFlag(stK_TPL,false),'Templates at launch')+stViewToggles()+stAccentRow();
+ if(p=='general')return stSegH('stgth','Theme',[['light','Light'],['dark','Dark']],stThemeNow())+stSegH('stgps','Open panels on',[['l','Left'],['r','Right']],stPside())+stTgl('stgtl',stFlag(stK_TPL,false),'Templates at launch')+stViewToggles()+stAccentRow();
  if(p=='colour')return`<div class="ctl stgr"><label for="stgtv">Places shown</label><input type="range" id="stgtv" min="4" max="${TRAY_MAX}" step="1" value="${stNumGet(stK_TRAY,4,4,TRAY_MAX)}"><output id="stgtvo">${stNumGet(stK_TRAY,4,4,TRAY_MAX)}</output></div><div class="stgr"><span>Recent colours</span><button type="button" class="alt" id="stgrc">Clear</button></div>`;
  // smart guides (2.40.0, 84-smart-guides.js): the switch, what to snap to, how close
  if(p=='guides')return stTgl('stgsg',sgFlag(SG_K.on,true),'Smart guides')+stTgl('stgsc',sgFlag(SG_K.cv,true),'Snap to canvas')+stTgl('stgse',sgFlag(SG_K.el,true),'Snap to elements')+stTgl('stgss',sgFlag(SG_K.sp,true),'Equal spacing')+stSegH('stgsd','Snap distance',SG_DIST,sgDist());
@@ -99,7 +101,7 @@ function stWire(){const b=$('stgbody');
  const on=(id,fn)=>{const e=$(id);if(e)e.addEventListener('click',fn)};
  const seg=(id,fn)=>{const g=$(id);if(g)g.addEventListener('click',e=>{const x=e.target.closest('[data-v]');if(!x)return;fn(x.dataset.v);g.querySelectorAll('[data-v]').forEach(y=>{y.classList.toggle('on',y===x);y.setAttribute('aria-pressed',String(y===x))})})};
  const flip=(id,k,fn)=>on(id,()=>{const e=$(id),v=e.getAttribute('aria-pressed')!=='true';e.setAttribute('aria-pressed',String(v));e.textContent=v?'On':'Off';stFlagSet(k,v);fn(v)});
- seg('stgth',v=>{if(stThemeNow()!==v)$('thm').click()});
+ seg('stgth',v=>{if(stThemeNow()!==v)$('thm').click()});seg('stgps',v=>{try{kv.set(stK_PSIDE,v)}catch(e){}});
  stVIEW.forEach(([sid,bid])=>on(sid,()=>{$(bid).click();const v=stViewOn(bid),e=$(sid);e.setAttribute('aria-pressed',String(v));e.textContent=v?'On':'Off'}));
  const g=$('stgacc');if(g)g.addEventListener('click',e=>{const x=e.target.closest('.stgab');if(!x)return;
   if(x.dataset.custom){const cur=stAccentGet()||'#b8914f';openPicker(x,{value:cur,alpha:false,onInput:h=>{const v=String(h).slice(0,7).toLowerCase();if(stHEX6.test(v)){stAccentSet(v);stAccentMarks()}},onClose:()=>stAccentMarks()});return}

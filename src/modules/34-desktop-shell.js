@@ -42,7 +42,13 @@ const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85,lk:1}),wsG(['layers']),wsG(['canvas'
 let WS={pattern:wsDef()};
 try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;if(g.lk===undefined&&g.tabs.includes('lyrs'))g.lk=1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}})}catch(e){}
 
-const wsSave=()=>{try{kv.set('wb30_ws',JSON.stringify(WS))}catch(e){}};
+// 2.55.0 (owner Oct 26 2026): "every panel opens on the left by default (the Elements list on the right), and panels remember where they were opened".
+// Each panel's last place is kept across sessions: its dock edge and the panels it shared a group with, or its floating box. A panel with no place yet opens on
+// the side set in Settings > General > Open panels on (wb255_pside, default left).
+let wsMem={},wsN=0;try{const m=JSON.parse(kv.get('wb255_pmem')||'null');if(m&&typeof m=='object')wsMem=m}catch(e){}
+const wsSide=()=>{let v='';try{v=kv.get('wb255_pside')||''}catch(e){}return v=='r'?'r':'l'};
+const wsRemember=()=>{const L=WS.pattern;L.float.forEach(g=>g.tabs.forEach(p=>{wsMem[p]={fl:{x:g.x,y:g.y,w:g.w,h:g.h},with:g.tabs.filter(t=>t!=p)}}));L.dock.forEach(g=>g.tabs.forEach(p=>{wsMem[p]={e:g.e||'r',with:g.tabs.filter(t=>t!=p)}}));try{kv.set('wb255_pmem',JSON.stringify(wsMem))}catch(e){}};
+const wsSave=()=>{wsRemember();try{kv.set('wb30_ws',JSON.stringify(WS))}catch(e){}};
 const wsL=()=>WS.pattern;
 const wsAll=()=>[...wsL().dock,...wsL().float];
 const wsFind=p=>wsAll().find(g=>g.tabs.includes(p))||null;
@@ -171,13 +177,19 @@ const stage=document.querySelector('.stage');
 function setView(){if(window.bkZ)requestAnimationFrame(()=>bkZ());$('boardP').classList.remove('off');$('zoomc').style.display='';requestAnimationFrame(applyZ);tbSync();if(WBX.wbTxMode)WBX.wbTxMode(stUnlocked()==null?'pattern':'stamp');wsRender()}
 function setPanel(p,bot){if(!PNAME[p])p='canvas';if(!wsReady)setView();
 const L=wsL();let g=wsFind(p);
-// the Shape panel that opens by itself when a shape is added opens as its own group along the bottom, so the panel you are working in stays in front
-if(!g&&bot){g=wsG([p],{e:'b'});L.dock.push(g)}
-// an element panel joins the Properties group; with none, a Properties group opens under the Elements list (its id is fixed, so no random number is used)
-if(!g&&ELP.includes(p)){g=wsAll().find(wsIsP)||null;if(g)g.tabs.push(p);else{const E=L.dock.find(x=>x.tabs.includes('lyrs'));if(E){g={id:'gprops',tabs:[p],a:p,f:1,e:E.e||'r'};L.dock.splice(L.dock.indexOf(E)+1,0,g)}}}
-// a tool that is not open yet opens docked on the right: Randomize beside the colour tools, anything else as a tab in the first group
-if(!g){const own=(p=='rand'||!L.dock.length)?wsG([p]):null;   // made in the same cases as before, so the series of random ids (and the seeded test runs) stays as it was
-g=(p=='rand'&&L.dock.find(x=>x.tabs.includes('colors')))||L.dock[0];if(g)g.tabs.push(p);else{g=own;L.dock.push(g)}}g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
+// where a panel that is not open goes (2.55.0): back to its remembered place (beside a panel it shared a group with, else its edge or its floating box);
+// with none, the side set in Settings. An element panel joins the open element panels' group; Randomize goes beside the colour tools. Locked groups take no new tab.
+if(!g){const m=wsMem[p],e=m&&m.e?m.e:wsSide(),free=x=>!x.lk;
+ // a random group id is drawn in the same cases as before 2.55.0, so the seeded series (and the tests' rolls) stays as it was; other new groups count up
+ const own=!ELP.includes(p)&&(p=='rand'||!L.dock.length)?wsG([]):null,nid=()=>own?own.id:'gn'+(++wsN);
+ if(m&&m.with&&m.with.length)g=wsAll().find(x=>free(x)&&x.tabs.some(t=>m.with.includes(t)))||null;
+ if(!g&&m&&m.fl){g={id:nid(),tabs:[],a:p,f:1,e:'r',x:m.fl.x,y:m.fl.y,w:m.fl.w,h:m.fl.h};L.float.push(g)}
+ if(!g&&ELP.includes(p))g=wsAll().find(x=>free(x)&&wsIsP(x))||null;
+ if(!g&&p=='rand')g=L.dock.find(x=>free(x)&&x.tabs.includes('colors'))||null;
+ if(!g&&!ELP.includes(p))g=L.dock.find(x=>free(x)&&(x.e||'r')==e&&!wsIsP(x))||null;
+ if(!g){g={id:ELP.includes(p)?'gprops':nid(),tabs:[],a:p,f:1,e};L.dock.push(g)}
+ g.tabs.push(p)}
+g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
 WBX.wbApart=pn=>{const a=wsFind('lyrs'),b=wsFind(pn);return!(a&&b&&a===b)};   // false when the panel is a tab beside the Elements list: showing it would hide the list
@@ -479,7 +491,7 @@ if(typeof nums=='function'){const _n=nums;nums=function(){_n();WBX.wbDDsync()}}
 })();
 
 enhance();
-WS.pattern={dock:[],float:[]};setView();{let st='';try{st=kv.get('wb96_launch')||''}catch(e){}if(st==='on')WBX.wbWsSet(wsLaunch())}info();nums();requestAnimationFrame(()=>{applyZ();nums()});
+WS.pattern={dock:[],float:[]};setView();{let st='';try{st=kv.get('wb96_launch')||''}catch(e){}if(st==='on')WBX.wbWsSet(wsLaunch());else if(st!=='none')WBX.wbWsSet({pattern:{dock:[wsG(['lyrs'],{e:'r',lk:1})],float:[]}})}   /* 2.55.0 (owner Oct 26 2026): the app starts with the Elements list on the right, locked ('none' is the tests' empty start) */info();nums();requestAnimationFrame(()=>{applyZ();nums()});
 
 {const sp=document.getElementById('splash'),t0=performance.now();if(sp){const go=()=>{const w=Math.max(0,520-(performance.now()-t0));setTimeout(()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),320)},w)};const f=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1400))]):Promise.resolve();requestAnimationFrame(()=>requestAnimationFrame(()=>f.then(go)))}}
 {const b=$('gdt');let on=true;try{on=kv.get('wb93_dots')!=='0'}catch(e){}const ap=()=>{document.body.classList.toggle('plain',!on);b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))};ap();b.onclick=()=>{on=!on;try{kv.set('wb93_dots',on?'1':'0')}catch(e){}ap()}}

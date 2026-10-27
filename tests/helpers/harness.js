@@ -21,9 +21,9 @@ const FIXED_TIME = Date.UTC(2026, 9, 8, 12, 0, 0);   // 2026-10-08 12:00:00 UTC,
 // artifact runtime (`window.claude.use('db'|'user'|'downloads')`).
 function initScript({ seed, runtime, workspaces, templates }) {
   return `(() => {
-    // Tests start with no panel open at launch unless a test asks for the Default panels (workspaces: true).
+    // Tests start with no panel open at launch unless a test asks for the Default panels (workspaces: true) or the app's own start (workspaces: 'launch').
     try { if (!sessionStorage.getItem('wb_t_ws')) {
-      localStorage.setItem('wb96_launch', ${workspaces ? "'on'" : "'none'"});
+      if (${workspaces === 'launch'}) localStorage.removeItem('wb96_launch'); else localStorage.setItem('wb96_launch', ${workspaces ? "'on'" : "'none'"});   // 'launch': the app's own start (2.55.0: the Elements list on the right, locked)
       if (${templates !== 'default'} && localStorage.getItem('wb111_tplstart') == null) localStorage.setItem('wb111_tplstart', ${templates ? "'1'" : "'0'"});      // the template picker opens at launch only when a test asks (2.21.0: it is off by default; 'default' leaves the setting alone)
       sessionStorage.setItem('wb_t_ws', '1');
     } } catch (e) {}
