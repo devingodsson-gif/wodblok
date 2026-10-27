@@ -65,7 +65,14 @@ function fpResize(h,x,y,e){const p=h.p,S0=Math.min(CW,CH),r0=h.r0!=null?h.r0:(+p
   p.aw=+w.toFixed(1);p.ah=+hh.toFixed(1);if(!mid){ox=sx*(w-w0)/2;oy=sy*(hh-h0)/2}
   p.x=+(h.x0+ox).toFixed(1);p.y=+(h.y0+oy).toFixed(1);return}
  const turn=()=>{const f0=h.f0!=null?h.f0:(p.f||1),f=f0*fx*fy;if(f===-1)p.f=-1;else if(p.f!=null)p.f=1;const r=fy<0?r0+180:r0;p.r=Math.round(((r+180)%360+360)%360-180)};
- if(k0.length==2&&e.shiftKey){// a corner with Shift: the size along the line from the fixed corner (or the middle) through the pulled one; past the fixed point it turns right round
+ // 2.63.0: a text on the canvas is a box its letters fill: a corner pulls width and height (Shift keeps the box's proportions), a side one of them; the letters are laid
+ // out again to fill it. It never turns over and is at least a few letters' worth across and down.
+ if(p.tx&&p.mm!='on'){const ra=p.s/Math.max(p.n||1,.01),U=WBX.wbTxUnit(),mn=U*4*ra,ex=k0.includes('e')?1:k0.includes('w')?-1:0,ey=k0.includes('s')?1:k0.includes('n')?-1:0;let w=w0,hh=h0;
+  if(ex)w=Math.max(mn,mid?2*Math.abs(lx):ex*lx+w0/2);if(ey)hh=Math.max(mn,mid?2*Math.abs(ly):ey*ly+h0/2);
+  if(ex&&ey&&e.shiftKey){const k=Math.max(w/w0,hh/h0);w=Math.max(mn,w0*k);hh=Math.max(mn,h0*k)}
+  p.tx={...p.tx,wd:+(w/ra/U).toFixed(2),ht:+(hh/ra/U).toFixed(2),ft:'f'};delete p.tx.pd;delete p.tx.ov;
+  if(!mid){ox=ex*(w-w0)/2;oy=ey*(hh-h0)/2}h.rel=[p,false]}
+ else if(k0.length==2&&e.shiftKey){// a corner with Shift: the size along the line from the fixed corner (or the middle) through the pulled one; past the fixed point it turns right round
   const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Cx=cx*w0/2,Cy=cy*h0/2,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy);if(k<0){fx=-1;fy=-1;k=-k}
   let s=cl(h.s0*k,S0*.02,S0*3);s=fpSnapS(fpL(),s,e);p.s=+s.toFixed(2);WBS.fpLast=p.s;k=p.s/h.s0;if(p.wx!=null||h.wx0!=1)p.wx=h.wx0;if(p.wy!=null||h.wy0!=1)p.wy=h.wy0;
   const sx=fx*k;if(!mid){ox=Fx+sx*vx/2;oy=Fy+sx*vy/2}turn()}
