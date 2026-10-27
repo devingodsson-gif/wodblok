@@ -1,6 +1,6 @@
 # Polish plan (Oct 26 2026)
 
-Owner, Oct 26 2026: "Make a plan for this. It should be as few updates as possible, super clean and effective to present a polished product." Status: release 1 (2.55.0, Panels) **done**; releases 2 (Transform) and 3 (Patterns) to do. The owner reads it and answers the questions at the end before any release starts.
+Owner, Oct 26 2026: "Make a plan for this. It should be as few updates as possible, super clean and effective to present a polished product." Status: **done** (2.55.0 Panels, 2.55.1 its follow-up, 2.56.0 Transform, 2.57.0 Patterns; see docs/plan.md). The owner reads it and answers the questions at the end before any release starts.
 
 His list, in his words (shortened only where marked):
 1. Dragging a corner of a selected element should allow dragging in both axes, not locked to one axis.
