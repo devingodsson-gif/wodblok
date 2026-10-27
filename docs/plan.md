@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.64.0 (Oct 27 2026): the new Text panel (release 2 of docs/text-plan.md)
+- The Text panel is five groups: **Text** (the words; a stamp's preview), **Style** (the saved text styles, was "Text styles"), **Character** (Font and Load a font file, Case, Colour, Letter colour, Letter spacing, Clear letter styles), **Paragraph** (Align, Vertical, Line spacing, Paragraph spacing, First-line indent) and **Shape** (one choice: None, Arc, Wave, Spiral, Bulge, Rise, Flag, with Amount, and Length for a wave or a spiral; it writes the same fields as before: cv, pt/pa/pw, wp/wa).
+- Removed (owner: "a lot of sliders that don't do anything"; random letters are the Jitter effect's): Size, Box width and height, Padding, Fit to box, Overflow (a text fills its box), Word spacing, Balance lines, Letter size and raise with Super and Sub, Rotate letters, Random position, rotation and size, Bounce, Scatter, Vary. They are never saved again (a text that had them loses them when edited). The same panel in a stamp's tab: its texts fit the stamp (their Size was already worked out by Auto-fit).
+- A shaped text (arc, path, warp) fills its box by how it looks after the shaping and sits in its middle (it ran out of the box before).
+- Tests: new `text-panel-2-64` (2). Removed with their controls: `text-effects` (random letters, Vary, Bounce, Scatter), `text-fit` Overflow and padding, `text-paragraph` Super/Sub and Balance; `text-styles` saves Line spacing instead of Bounce; `text-editor-shared` no longer checks word spacing. All 26 text spec files pass.
+
 ## 2.63.0 (Oct 27 2026): box-first text (release 1 of docs/text-plan.md)
 Owner, Oct 27 2026: the text fits its box; the corners and sides change the box; "as simple as possible" (no Fixed size switch).
 - A text on the canvas is a box its letters always fill (the engine's Fill the box). A new text's box is 60 x 20 % of the canvas's short side. The corners pull width and height (Shift keeps the proportions, Alt from the middle), the sides one of them; the letters are laid out again to fill the box; a text never turns over.

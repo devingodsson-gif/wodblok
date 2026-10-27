@@ -44,17 +44,17 @@ test('Starter styles are listed, and clicking one applies it to the text', async
 test('Save style keeps the panel, can be renamed and applied again', async ({ page }) => {
   const { errors } = await openApp(page);
   await start(page, 'ABC');
-  await set(page, 'tx_ls', 17); await set(page, 'tx_bb', 33);
+  await set(page, 'tx_ls', 17); await set(page, 'tx_lh', 140);
   await page.click('#tsadd');
   await expect(page.locator('#tsl .scr.ren input')).toBeVisible();
   await page.fill('#tsl .scr.ren input', 'Mine'); await page.keyboard.press('Enter');
   await expect(page.locator('#tsl .scr:has-text("Mine")')).toBeVisible();
   const d = await stored(page);
-  expect(d.c.length).toBe(1); expect(d.c[0].n).toBe('Mine'); expect(d.c[0].o.ls).toBe(17); expect(d.c[0].o.bb).toBe(33);
+  expect(d.c.length).toBe(1); expect(d.c[0].n).toBe('Mine'); expect(d.c[0].o.ls).toBe(17); expect(d.c[0].o.lh).toBe(140);
   expect(d.c[0].o.text).toBeUndefined();
-  await set(page, 'tx_ls', 0); await set(page, 'tx_bb', 0);
+  await set(page, 'tx_ls', 0); await set(page, 'tx_lh', 115);
   await page.click('#tsl .scr:has-text("Mine")'); await settle(page, { max: 30000 });
-  expect(await page.inputValue('#tx_ls')).toBe('17'); expect(await page.inputValue('#tx_bb')).toBe('33');
+  expect(await page.inputValue('#tx_ls')).toBe('17'); expect(await page.inputValue('#tx_lh')).toBe('140');
   expect(await page.inputValue('#tx_t')).toBe('ABC');
   await page.click('#tsl .scr:has-text("Mine") [data-del]');
   await expect(page.locator('#tsl .scr:has-text("Mine")')).toHaveCount(0);

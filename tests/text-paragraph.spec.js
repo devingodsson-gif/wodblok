@@ -41,18 +41,6 @@ test('selected letters can be made bigger, raised and spaced; Clear puts them ba
   expect(errors).toEqual([]);
 });
 
-test('Super and Sub shrink the selected letters and move them up or down', async ({ page }) => {
-  const { errors } = await openApp(page);
-  await start(page, 'III');
-  await select(page, 2, 3); await page.click('#tx_sup'); await settle(page, { max: 30000 });
-  await expect.poll(async () => { const a = await items(page); return a[0].y - a[2].y; }, { timeout: 15000 }).toBeGreaterThan(3);
-  const a = await items(page);
-  expect(a[2].s / a[0].s).toBeLessThan(0.7);
-  await select(page, 2, 3); await page.click('#tx_sub'); await settle(page, { max: 30000 });
-  await expect.poll(async () => { const b = await items(page); return b[2].y - b[0].y; }, { timeout: 15000 }).toBeGreaterThan(0);
-  expect(errors).toEqual([]);
-});
-
 test('a styled letter keeps its style when letters are typed before it', async ({ page }) => {
   const { errors } = await openApp(page);
   await start(page, 'III');
@@ -94,19 +82,6 @@ test('Paragraph spacing opens a gap between paragraphs only', async ({ page }) =
   expect(errors).toEqual([]);
 });
 
-test('Balance lines evens out the lines of a paragraph', async ({ page }) => {
-  const { errors } = await openApp(page);
-  await start(page, 'ii ii ii ii ii ii', 10);
-  await page.click('#tx_al [data-a="l"]'); await set(page, 'tx_wd', 40); await settle(page, { max: 30000 });
-  await expect.poll(async () => (await rows(page)).length, { timeout: 15000 }).toBeGreaterThan(1);
-  const spread = async () => { const l = (await rows(page)).map(r => r.n); return Math.max(...l) - Math.min(...l); };
-  const before = await spread();
-  expect(before).toBeGreaterThan(0);
-  await page.click('#tx_bal [data-b="1"]'); await settle(page, { max: 30000 });
-  await expect.poll(spread, { timeout: 15000 }).toBeLessThan(before);
-  expect(errors).toEqual([]);
-});
-
 test('Text layer: styled letters and paragraph options are saved on the text, and a double-click starts typing', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'lyrs');
@@ -145,3 +120,4 @@ test('double-clicking a text in the unlocked stamp on the canvas focuses the tex
   await expect(page.locator('#tx_t')).toBeFocused();
   expect(errors).toEqual([]);
 });
+// 2.64.0 (docs/text-plan.md): removed with the controls they tested: Super, Sub and Balance lines

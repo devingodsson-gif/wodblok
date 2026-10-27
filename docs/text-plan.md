@@ -2,7 +2,7 @@
 
 Owner, Oct 27 2026 (by voice): "the text system is a little too complicated: a lot of sliders and settings, and a lot of them don't do anything." Keep saved text styles; 80 to 100 fonts by default plus importing a font; standard editor options (highlight, underline, italic, strikethrough, bold); ways to morph the text (curve, wave, spiral, round a circle); paragraph options. "Text sizing is complicated: when you create a text, whatever the box size is, the text fits to that size, and we adjust the box by dragging the four corners and the four sides."
 
-Status: answered (owner, Oct 27 2026, below); release 1 (2.63.0) built.
+Status: answered (owner, Oct 27 2026, below); release 1 (2.63.0) live; release 2 (2.64.0) built. Shape: Circle is an Arc at 100%; Fit to a shape stays its own group (Map to shape).
 
 ## What is there today (2.62.0)
 One long Text panel: Font, Size, Letter / Word / Line spacing, Box width, Box height, Padding, Fit to box, Overflow, Align, Vertical, Case, First-line indent, Paragraph spacing, Balance lines, Letter size / raise / spacing / colour with Super, Sub, Clear, Curve, Warp and Warp amount, Path with amount and length, Rotate letters, Random position / rotation / size, Bounce, Scatter, Ink; then Text styles and Map to shape. 34 bundled fonts (about 1 MB) and Load a font file. The handles on the canvas scale the letters; the box is set by sliders.

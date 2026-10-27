@@ -61,7 +61,7 @@ test('thirty-four fonts, each written in its own face in the list', async ({ pag
   expect(errors).toEqual([]);
 });
 
-test('case, word spacing and justify change the letters on the stamp; Enter is a new line', async ({ page }) => {
+test('case and justify change the letters on the stamp; Enter is a new line', async ({ page }) => {
   const { errors } = await openApp(page);
   await unlockStamp(page); await showPanel(page, 'text');
   const keys = async () => JSON.parse(await getState(page)).tiles[0].items.map(i => i.m);
@@ -73,17 +73,9 @@ test('case, word spacing and justify change the letters on the stamp; Enter is a
   await expect.poll(keys, { timeout: 15000 }).not.toEqual(k0);       // A and B instead of a and b
   await page.click('#tx_tc [data-c=""]');
   await expect.poll(keys, { timeout: 15000 }).toEqual(k0);
-  // word spacing moves the second word away
-  await page.fill('#tx_t', 'a b');
-  await expect.poll(async () => (await keys()).length, { timeout: 15000 }).toBe(2);
-  await settle(page);
-  const x0 = await xs();
-  await page.evaluate(() => { const r = document.getElementById('tx_ws'); r.value = 120; r.dispatchEvent(new Event('input', { bubbles: true })); });
-  await expect.poll(async () => { const x = await xs(); return Math.abs(x[1] - x[0]); }, { timeout: 15000 }).toBeGreaterThan(Math.abs(x0[1] - x0[0]) + 5);
   // justify: the first line of two stretches to the width of the longer one
   await page.fill('#tx_t', 'a b\ncccccc');
   await page.click('#tx_al [data-a="l"]');
-  await page.evaluate(() => { const r = document.getElementById('tx_ws'); r.value = 0; r.dispatchEvent(new Event('input', { bubbles: true })); });
   await expect.poll(async () => (await keys()).length, { timeout: 15000 }).toBe(8);
   await settle(page);
   const left = (await xs())[1];
