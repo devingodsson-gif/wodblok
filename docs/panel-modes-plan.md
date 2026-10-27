@@ -1,6 +1,6 @@
 # Creating and editing, and the effect pop-out (plan, Oct 26 2026)
 
-Two owner requests from Oct 26 2026, planned together because both change what an element panel shows. Status: **plan only, nothing built.** The owner reads it before any step starts.
+Two owner requests from Oct 26 2026, planned together because both change what an element panel shows. Status: **done** (2.54.2, 2.54.3, 2.55.0; see docs/plan.md). The panel title ("New shape") was left out: the Replace row shows the mode, and the tab name is what workspaces use. The owner reads it before any step starts.
 
 ## 1. Creating is not editing
 

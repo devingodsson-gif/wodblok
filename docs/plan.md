@@ -1,5 +1,14 @@
 # Development plan
 
+## 2.55.0 (Oct 26 2026): Panels (docs/polish-plan.md release 1; closes docs/panel-modes-plan.md)
+- **Launch:** only the Elements list is open, docked on the right and locked (owner: "start with the Elements list on the right side and locked"). The Never-break rule in CLAUDE.md and the guide is rewritten.
+- **Panels open on the left** (every panel but the Elements list) and **come back where they were** (dock edge and group neighbours, or the floating box; kept in `wb255_pmem`). Settings > General > Open panels on: Left / Right (`wb255_pside`, default Left) for a panel with no remembered place. A random group id is drawn only where it was before, so the seeded test series is unchanged.
+- **Effects group:** with no effects, only its title and `+` (no fold arrow, no body); it opens when the first effect is added.
+- **Creating and editing** for Stamp (Replace swaps a placed stamp for another of the project's stamps, one history step; the Stamps list and the saved stamps Library show only while creating) and Text (a "Text style" row opens the Text styles library), and the Texture effect (its texture is a row with Replace). Pattern, Sheet and Paint have no library, so they have nothing to hide. One registry, `90-panel-modes.js`; its popover (`pmPop`) also serves the texture row and sits above the effect pop-out.
+- **Effect pop-out** (`91-effect-popout.js`): an Effects menu item is on when every selected element takes the effect; it adds the effect to all of them and opens a floating window (title = the effect's name, Cancel, Apply). The window borrows the Effects group's own settings pane (`.fxpane`), so its options are the panel's; the group finds its controls wherever the pane is (`gQ`). Changes are copied to the other selected elements (each keeps its seed). Apply = one history step named after the effect; Cancel, Esc, Undo/Redo or a new selection leave nothing. It remembers where it was dragged (session).
+- Tests: new `panels-2-55` (4), `effect-popout-2-55` (2), `create-edit-2-54-2` (+2: stamp, text); `menu-bar-2-42` applies the effect in the pop-out. Harness: `workspaces: 'launch'` opens the app's own start. The 57 related spec files were still running when the owner said merge; their result goes in PROJECT_STATUS.
+- Not run: full suite (suggested 40%: shared panel code and the Effects group), pixel goldens, perf (nothing on the drawing path).
+
 ## 2.54.3 (Oct 26 2026): placing keeps the Shape panel creating
 - Owner, Oct 26 2026: "when I place a shape, it selects it and takes me out of the shape creation panel." While the shape tool is armed, the Shape panel stays in create mode (library shown) even though the shape just placed is selected; each click places another, as before. It edits once the tool is put away (Esc, V, a click in the interface) and a shape is selected.
 - A pick in Replace only swaps the shape; it no longer arms the tool too.

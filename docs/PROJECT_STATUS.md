@@ -93,6 +93,9 @@ Only items the owner has stated are listed as next. Nothing is started unless he
 ## Open questions for the owner
 None at the moment. Add new ones here.
 
+### Oct 26 2026: 2.55.0 (Panels) merged at the owner's word
+- Next: polish plan release 2, 2.56.0 Transform (corners both ways with Shift/Alt, pulling through mirrors, elements vanishing while dragged), then release 3, 2.57.0 Patterns (format 29).
+
 ### Planned Oct 26 2026: the polish plan
 - docs/polish-plan.md (plan only): three releases. 2.55.0 Panels (panels open on the left, launch with the Elements list on the right, no Effects arrow without effects, and the rest of docs/panel-modes-plan.md); 2.56.0 Transform (corners both ways, pulling through mirrors, elements vanishing while dragged); 2.57.0 Patterns (edge-to-edge tiling by tile shape, many arrangements, pattern area with corners; format 29). The owner answered its five questions Oct 26 2026.
 
