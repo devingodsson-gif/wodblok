@@ -7,7 +7,7 @@ Owner, Oct 27 2026: "80 to 100 fonts by default", built in, real bold and italic
 - Bold and Italic letters are set in the font's own bold and italic when it has them (also wider letters take their room); otherwise they are drawn as before (outline, slant).
 - Randomize keeps to the 34 fonts it had, so seeded rolls and their snapshots do not change.
 - The app grows from 13.6 MB to 17.5 MB.
-- Tests: new `fonts-2-66` (2); `text-editor-shared` counts at least 85 fonts.
+- Tests: new `fonts-2-66` (2); `text-editor-shared` counts at least 85 fonts. 30 spec files: all text specs, launch, round trip and web app pass; `text-panel-2-64` failed once under load and passed twice alone. The five Randomize scenario snapshots fail locally, but they fail the same locally on 2.59.1, the version CI made them on (they only match in the CI machine), so this run cannot say whether 2.63.0 to 2.66.0 changed them; only a CI run can.
 
 ## 2.65.0 (Oct 27 2026): Bold, Italic, Underline, Strikethrough, Highlight (release 3 of docs/text-plan.md)
 - In Character, four buttons B, I, U, S and a Highlight well act on the selected letters of a text on the canvas (all of them when none are selected); a button is on when every selected letter has the style, and pressing it then takes it off.
