@@ -23,6 +23,7 @@ chevD:'<path d="M6.5 10l5.5 5.5 5.5-5.5"/>',
 chevsD:'<path d="M7 6.5l5 5 5-5M7 12.5l5 5 5-5"/>',
 unfold:'<path d="M8 8.5l4-4 4 4M8 15.5l4 4 4-4"/>',
 fold:'<path d="M8 4.5l4 4 4-4M8 19.5l4-4 4 4"/>',
+placeCopies:'<rect x="3.5" y="3.5" width="11" height="11" '+R+' stroke-dasharray="2.4 2.2"/><path d="M13 13l7.5 2.8-3.3 1.4-1.4 3.3z"/>',   // 2.60.2: a ghost copy and the pointer that places it
 duplicate:'<rect x="8.5" y="8.5" width="11.5" height="11.5" '+R+'/><path d="M15.5 8.5V5.5A1.5 1.5 0 0014 4H5.5A1.5 1.5 0 004 5.5V14a1.5 1.5 0 001.5 1.5h3"/>',
 trash:'<path d="M4.5 6.5h15M9.5 6.5v-2h5v2M6.5 6.5l.9 13h9.2l.9-13"/><path d="M10.2 10.5v5.5M13.8 10.5v5.5"/>',
 pencil:'<path d="M5 19l.9-3.9L15.6 5.4a1.9 1.9 0 012.7 0l.3.3a1.9 1.9 0 010 2.7L8.9 18.1z"/><path d="M13.8 7.2l3 3"/>',
