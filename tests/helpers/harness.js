@@ -235,6 +235,8 @@ async function armStamp(page) {
 const BASIC = { rect: 'Rectangle', rrect: 'Rounded rectangle', ellipse: 'Oval', tri: 'Triangle', dia: 'Diamond', pent: 'Pentagon', hex: 'Hexagon', star: 'Star', arrow: 'Arrow', heart: 'Heart', line: 'Line' };
 async function addShape(page, g = 'rect') {
   await showPanel(page, 'motifs');
+  // 2.54.2: while a shape is selected the panel edits it and its library is hidden; Esc ends the selection, so the panel is creating again
+  if (!(await page.locator('#lib').isVisible())) { await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur()); await page.keyboard.press('Escape'); await settle(page); await showPanel(page, 'motifs'); }
   const set = page.locator('#lib .lfr[data-f="b:Basic shapes"]');
   if (!(await page.locator(`#lib button[data-m][aria-label="${BASIC[g]}"]`).count())) { await set.click(); await settle(page); }
   await page.locator(`#lib button[data-m][aria-label="${BASIC[g]}"]`).click(); await settle(page);

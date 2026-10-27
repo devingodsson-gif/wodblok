@@ -1,5 +1,13 @@
 # Development plan
 
+## 2.54.2 (Oct 26 2026): creating and editing, step 1: the Shape panel (docs/panel-modes-plan.md)
+- **Editing a shape** (a canvas shape selected, on the canvas or in the Elements list): the Shape panel hides its Library group; the Edit group starts with one row (thumbnail, name, Replace). **Replace** opens the same library in a popover under it (the library's own body is moved in and put back, so search, folders and sets are the same); a pick swaps the shape (one history step) and closes it; Esc or a click outside closes it unchanged.
+- **Creating** (the Shape bar button, Esc, nothing selected) shows the library as before.
+- New `90-panel-modes.js` (one place for every kind: `pmRegister(kind, {pn, lib, at, key, name, thumb, picked})`), called from `elSync`. The other kinds come in step 2.
+- Not done from the plan: the panel title ("New shape" / the element's name). The tab's name is what workspaces and tests use, and the Replace row already shows the panel is editing; to discuss with the owner.
+- Tests: new `create-edit-2-54-2` (3). `addShape` in the test harness presses Esc first when a shape is selected (the library is hidden then). The specs that use the Shape library (55 files) were still running when the owner said merge; their result goes in PROJECT_STATUS.
+- Not run: full suite, pixel goldens, perf (no drawing change).
+
 ## 2.54.1 (Oct 26 2026): four places in the colour dock
 Owner, Oct 26 2026, correcting 2.54.0: "I meant four colour slots: keep the two default colours, a total of 4 slots, 2 have the colours and 2 are empty, with the plus icon."
 - A new tray is the two colours again (paper Pale Lemon Yellow, ink Dark Tyrian Blue). The dock shows four places by default (two filled, two empty) and the + after them. Settings > Colour > Places shown now goes from 4 to 16 (was 7 to 16, default 7); a saved setting still wins.

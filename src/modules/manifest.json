@@ -83,5 +83,6 @@
  "87-library-tree.js",
  "86-texture-library.js",
  "88-saved-colourways.js",
- "89-sheet-element.js"
+ "89-sheet-element.js",
+ "90-panel-modes.js"
 ]
