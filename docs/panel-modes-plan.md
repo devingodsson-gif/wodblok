@@ -18,7 +18,7 @@ The model is Photoshop's: with a tool in hand and nothing selected, the options 
 Per kind (to be checked against the code in step 1; the list below is the plan, not yet verified):
 - **Shape (motif):** create shows the Shapes library; edit shows Element, Fill, Outline, Effects and the Replace row.
 - **Stamp:** create shows the Stamp library; edit shows the stamp instance's groups and a Replace row (another stamp).
-- **Pattern:** create shows the starting settings and the sources picker; edit shows the pattern's own settings and its sources list (the sources list is the pattern itself, so it stays, with its Add source).
+- **Pattern:** create shows the starting settings and the sources picker; edit shows the pattern's own settings and its sources list (the sources list is the pattern itself, so it stays, with its Add source; owner, Oct 26 2026: yes).
 - **Text:** create shows the typing settings and text styles; edit shows the selected text's settings; a style library, if shown, becomes a Replace row ("Style").
 - **Sheet:** has no library; create is Add sheet; edit shows Fill (the picture's library row becomes Replace when the fill is a picture) and Effects.
 - **Paint:** create is the brush; edit is the painted element's own settings.
@@ -41,7 +41,7 @@ How it works:
 - **Identical options, by construction:** the window does not hold a copy of the controls. It shows the very same settings pane the Effects group uses (the `.fxs[data-e=…]` pane from `fxGroup`, moved into the window while it is open and put back after, as the Fill group already moves between panels in 82-motif-look.js). One pane means one set of controls, one sync, one place to add an option; a test checks the window's controls equal the panel's.
 - **Several elements:** the window edits the first selected element's new effect; each change is copied to the matching new effect on the others (same settings, own seed where the effect has one, so Reroll still differs per element). One history step for the whole Apply.
 - **Apply** keeps the effects (one history step, named after the effect) and closes the window; the effect is then in each element's Effects list, edited there afterwards. **Cancel**, Esc or closing the window removes the new effects and leaves no history step.
-- **While it is open:** the canvas stays live (zoom and pan work). Proposed: another Effects menu item, a change of selection or Undo **cancels** the open one, so nothing half-applied stays behind (to confirm with the owner).
+- **While it is open:** the canvas stays live (zoom and pan work). Another Effects menu item, a change of selection or Undo **cancels** the open one, so nothing half-applied stays behind (owner, Oct 26 2026: yes).
 - Speed: the preview is the normal effect drawing; `npm run perf` before committing, as for any drawing change.
 
 ## Steps
@@ -54,7 +54,7 @@ The plan raises the minor once at the end (CLAUDE.md, release workflow).
 
 Risk: shared panel code and the Effects group (30–50% for the suite at the end of step 4); step 3 touches drawing only through the live preview.
 
-## Open questions for the owner
-- While the pop-out is open, should picking another Effects item or another element **cancel** the open effect (proposed), or apply it?
-- Pattern: its sources list is part of the pattern, so it stays in edit mode with its Add source. Agreed?
-- Should the pop-out remember where it was dragged to (per session), or always open by the canvas?
+## Answered (owner, Oct 26 2026)
+- The open pop-out is cancelled by another Effects item, a change of selection or Undo: yes.
+- A Pattern keeps its sources list (with Add source) in edit mode: yes.
+- The pop-out remembers where it was dragged to (for the session; opens by the canvas the first time): yes.
