@@ -1,3 +1,4 @@
+import {libColoursIn,libFolderAdd} from './52-tray-ui.js';
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
@@ -32,6 +33,7 @@ const cvCfg=()=>({p:'cv',word:'colourway',words:'colourways',ui:CV_UI,cards:true
  remove(list){const d=cvLoad();d.t=d.t.filter(t=>!list.includes(t.id));cvStore(d);cvPaint(true)},
  rename(id,v){const d=cvLoad(),t=d.t.find(x=>x.id===id);if(t){t.n=v;cvStore(d)}},
  file(id){const t=cvFind(id);return t?{name:t.n,data:new TextEncoder().encode(JSON.stringify({app:'WODBLOK',kind:'colourway',name:t.n,colours:t.c})),ext:'.wodblok-colourway',fb:'Colourway'}:null},
+ importFile:{ext:'.wodblok-colourway',add(text,g){const r=libColoursIn(text,'colourway'),d=cvLoad();libFolderAdd(d,g);d.t.unshift({id:newId(),n:r.n,f:g,c:r.c});cvStore(d);return r.n},done:()=>cvPaint(true)},
  itemMenu:id=>[['Add to this project',()=>cvUse(id)]]});
 // a saved colourway joins this project as a new colourway and is the one showing
 function cvUse(id){const t=cvFind(id);if(!t)return;const i=cwAdd();cwUse(i);cwNow().n=t.n.slice(0,40);trayLoad(t.c);trayDone('New colourway “'+t.n+'”');pmsg('Added the colourway “'+t.n+'”.')}
