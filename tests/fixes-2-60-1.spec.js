@@ -78,3 +78,17 @@ test('each tab of a panel group has its own close button', async ({ page }) => {
   expect(await g.locator('.wtab').count()).toBe(n - 1);
   expect(errors).toEqual([]);
 });
+
+// 2.60.5: Film Grain is fine grain laid over the picture by Overlay: the picture keeps its brightness
+test('Film Grain is fine and keeps the brightness: Overlay, no grey shift', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false, background: true });
+  const s = JSON.parse(await H.getState(page)), q = s.els.find(x => x.k === 'sheet');
+  q.ink = '#808080'; q.fx = [{ u: 'fg1', k: 'grain', sd: 7 }];
+  await page.evaluate(x => __wbTest.apply(x), JSON.stringify(s)); await H.settle(page);
+  await expect(page.locator('#art filter feBlend[mode="overlay"]')).toHaveCount(1);
+  const b = await page.locator('#art').boundingBox(), shot = await page.screenshot({ clip: { x: b.x + b.width * .3, y: b.y + b.height * .3, width: 200, height: 200 } });
+  const [mean, sd] = await page.evaluate(async b64 => { const im = new Image(); im.src = 'data:image/png;base64,' + b64; await im.decode(); const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, c.width, c.height).data; let s = 0, s2 = 0, n = 0; for (let i = 0; i < d.length; i += 4) { const v = d[i]; s += v; s2 += v * v; n++ } const m = s / n; return [m, Math.sqrt(s2 / n - m * m)]; }, shot.toString('base64'));
+  expect(Math.abs(mean - 128)).toBeLessThan(12);   // the grey stays grey
+  expect(sd).toBeGreaterThan(4);                   // there is grain
+  expect(errors).toEqual([]);
+});

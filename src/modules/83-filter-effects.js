@@ -56,9 +56,13 @@ const FQ={
     +(un?`<feComponentTransfer in="n2" result="n3">${['R','G','B'].map(c=>`<feFunc${c} type="table" tableValues="0 .08 .5 .92 1"/>`).join('')}</feComponentTransfer>`:'')+fqAdd(un?'n3':'n2',amt/100*1.2);
    return{defs:fqFilter(id,b.x,b.y,b.W,b.H,body),wrap:fqWrap(id)}}},
  grain:{label:'Film Grain',grp:'Noise',seed:true,P:[['amt','Amount',0,100,35,'%'],['sz','Size',1,100,30,''],['soft','Clumping',0,100,40,'%']],
-  filt:(e,id,b)=>{const amt=fqPar(e,'amt',0,100,35);if(!amt)return null;const S=fqSize(b),g=S*(.003+fqPar(e,'sz',1,100,30)/100*.03),so=fqPar(e,'soft',0,100,40);
-   const body=`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/g)}" numOctaves="2" seed="${fqSeed(e)}" result="n0"/><feColorMatrix in="n0" type="matrix" values="${fqMono}" result="n1"/>`
-    +(so?`<feGaussianBlur in="n1" stdDeviation="${q4(g*so/100*.6)}" result="n1b"/>`:'')+fqLin(3*(1+so/40),'n2',so?'n1b':'n1')+fqAdd('n2',amt/100*.9);
+  // 2.60.5 (artist test: "film grain looks horrible"; it was a coarse, blotchy pattern that greyed the picture): fine grain a pixel or two across at the default size,
+  // with Clumping mixing in a larger, softer grain; laid over the picture by Overlay, so it shows most in the mid tones and leaves the blacks and whites, and the
+  // picture's brightness is unchanged
+  filt:(e,id,b)=>{const amt=fqPar(e,'amt',0,100,35);if(!amt)return null;const S=fqSize(b),g=S*(.0012+fqPar(e,'sz',1,100,30)/100*.006),so=fqPar(e,'soft',0,100,40)/100,sd=fqSeed(e);
+   let body=`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/g)}" numOctaves="1" seed="${sd}" result="g0"/><feColorMatrix in="g0" type="matrix" values="${fqMono}" result="g1"/>`,src='g1';
+   if(so){body+=`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/(g*3))}" numOctaves="1" seed="${sd+3}" result="c0"/><feColorMatrix in="c0" type="matrix" values="${fqMono}" result="c1"/><feComposite in="g1" in2="c1" operator="arithmetic" k2="${q4(1-so*.55)}" k3="${q4(so*.55)}" result="gm"/>`;src='gm'}
+   body+=fqLin(amt/100*3.4,'g2',src)+`<feBlend in="g2" in2="SourceGraphic" mode="overlay" result="fqm"/><feComposite in="fqm" in2="SourceAlpha" operator="in"/>`;
    return{defs:fqFilter(id,b.x,b.y,b.W,b.H,body),wrap:fqWrap(id)}}},
  dust:{label:'Dust & Scratches',grp:'Noise',seed:true,P:[['amt','Dust',0,100,30,'%'],['sz','Size',1,100,30,''],['scr','Scratches',0,100,30,'%']],S:[['col','Show as',[['holes','Holes'],['specks','Dark specks']],'holes']],
   filt:(e,id,b,q)=>{const fm=fqFm(q),amt=fqPar(e,'amt',0,100,30),scr=fqPar(e,'scr',0,100,30);if(!amt&&!scr)return null;const S=fqSize(b),g=S*(.004+fqPar(e,'sz',1,100,30)/100*.02),sd=fqSeed(e);let body='',parts=[];

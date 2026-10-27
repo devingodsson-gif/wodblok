@@ -1,5 +1,15 @@
 # Development plan
 
+## 2.61.0 (Oct 27 2026): fixes, place copies, import crop, Sheet gradients, film grain (artist test, release 2 of docs/artist-test-todo.md)
+Owner, Oct 27 2026: "start on release 2". Five steps, one commit each:
+- **2.60.1 Fixes.** Paste moves the pasted elements together back inside the canvas (repeated pastes near an edge stayed off it). A Tiling Pattern's area cannot be pulled smaller than one piece. The colour picker has a Done button. Row menus are as wide as their longest item (the Shapes library's Import menu wrapped its items over each other). A shaped stamp or canvas draws its see-through squares at 8 screen pixels like the rectangle (they were in canvas units, so much larger). Each tab of a panel group has its own close button (not on a locked group or a group of one tab, which has the group's close).
+- **2.60.2 Place copies.** A button in the element's own group (beside Duplicate, new icon `placeCopies`): a copy of the selected element follows the pointer as a ghost and each click places one (one history step each); Esc, V, a right click or another control stop it.
+- **2.60.3 Import crop.** Shapes > Import, Single shape: a drag on the picture draws a crop (drawn in the highlight colour, the outside dimmed); its corners pull it; a click takes the whole picture again; only the ink inside it is traced, and the settings re-trace inside it.
+- **2.60.4 Sheet gradients.** The Sheet's Fill has Gradient (the owner's question "add gradient settings to the Sheet?"; the Sheet already takes effects, so gradients do): Start (the Colour well) and End colours, Linear (Angle) or Radial (Across, Down, Size), and Midpoint. Fields `fl:'grad'`, `ink2`, `gk`, `ga`, `gx`, `gy`, `gs`, `gm` (defaults left out); `ink2` follows the tray like the other colour fields. No format number change: the new fields are optional and nothing is converted (a 2.60 app shows such a Sheet in its Start colour).
+- **2.60.5 Film Grain** redone: fine grain (a pixel or two at the default size), Clumping mixes in a larger softer grain, laid on by Overlay so it shows in the mid tones and keeps the picture's brightness (it was coarse blotches that greyed the picture).
+- Not done from the to-do: "shape menus slightly confusing" needs the owner to say which menus.
+- Tests: `fixes-2-60-1` (7), `place-copies-2-60-2`, `import-crop-2-60-3`, `sheet-gradient-2-60-4`, and the related specs (see PROJECT_STATUS).
+
 ## 2.60.0 (Oct 27 2026): selection and control (artist test, release 1 of docs/artist-test-todo.md). Format 29 unchanged
 Owner, Oct 27 2026: "start on release 1". Built as one step (the plan's 2.59.2 and 2.59.3 together).
 - **Picking:** a text is picked on its letters (a small picture of where its letters are, `txHit` in 26-text-boxes.js, kept until they change), not anywhere in its box, unless it is the selected element; the box on the canvas starts after 10 screen pixels (was 0.8% of the canvas, which at some zooms was a few pixels); a click on the empty space round the canvas ends the selection. The highest element in the list already won a click; the text box catching clicks over shapes was the cause of wrong picks.
