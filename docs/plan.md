@@ -6,7 +6,7 @@ Owner, Oct 27 2026: "start on release 1". Built as one step (the plan's 2.59.2 a
 - **Lock:** Lock / Unlock in an Elements list row's menu; a locked row shows a lock button that unlocks. Locked (`lk: 1`, saved in the project) means no pick by a click or by the box, and its handles do nothing on the canvas; it is still picked in the list. One history step.
 - **Shift while moving** turns the smart guides off (Alt still turns off guides and grid snap).
 - **Highlight colour:** Settings > General > Highlight: Accent (default), Opposite (the accent's hue turned half way, follows the accent), Blue, Magenta, Lime or a custom colour; the new `--hl` token colours the smart guides and the canvas selection box. Also fixed: the Accent row's custom button showed no plus sign.
-- Tests: new `selection-2-60` (6); the related canvas, text, list, guide, transform and settings specs.
+- Tests: new `selection-2-60` (6); 18 related spec files (canvas, text, list, guides, transform, settings): 51 of 52 pass; the one failure, `smart-guides-2-40` "Settings > Guides…" (the last drag still snaps to the middle with Snap to canvas off), fails the same on main (2.59.1), so it is not from this release; noted in PROJECT_STATUS. Perf: 1.058 of the 2.59.1 baseline (under 10%).
 
 ## 2.59.1 (Oct 27 2026): Randomize scenario snapshots regenerated in CI
 Owner, Oct 27 2026: "Regenerate the scenarios". Made by the update-snapshots workflow on 2.59.0 (they predated the 2.57.0 tilings): before-view, split-view and randomize seeds 1 to 3, state and SVG. Nothing else changed.

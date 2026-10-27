@@ -4,7 +4,7 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**Oct 27 2026 (2.60.0).** Release 1 of the artist test (docs/artist-test-todo.md): selection and control (text picked on its letters, longer drag before a box, click round the canvas deselects, Lock in the Elements list, Shift turns guides off, Highlight colour). Next: release 2 (fixes, place copies, import crop, gradients, film grain), then release 3 (text overhaul; ask the owner first). A locked element is a new optional field in the project (`lk`), no format change.
+**Oct 27 2026 (2.60.0).** Release 1 of the artist test (docs/artist-test-todo.md): selection and control (text picked on its letters, longer drag before a box, click round the canvas deselects, Lock in the Elements list, Shift turns guides off, Highlight colour). Next: release 2 (fixes, place copies, import crop, gradients, film grain), then release 3 (text overhaul; ask the owner first). A locked element is a new optional field in the project (`lk`), no format change. Known, not from 2.60.0: `smart-guides-2-40` "Settings > Guides: the switches, the distance, and the command" fails on main too (with Snap to canvas off the shape still lands on the canvas middle); to look at.
 
 **Oct 27 2026 (2.59.0).** Export recipes are on the shared library tree; workspaces are gone (the Default panels mode went). The hexagon/triangle stamp offset is fixed (owner). Randomize scenario snapshots regenerated in CI. Full suite not run for 2.56.0 to 2.59.0.
 
