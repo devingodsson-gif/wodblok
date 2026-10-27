@@ -8,19 +8,29 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {mkWell,paintWell} from './52-tray-ui.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
-import {txoShapeBind,txoLetterCol,txoRead,txoSetLetterCol,txoWrite,txoBind,txoSelBind,txoSeed,TXO_IDS} from './61-text-panel.js';
+import {txoFlag,txoFlagOn,txoHl,txoSetHl,txoShapeBind,txoLetterCol,txoRead,txoSetLetterCol,txoWrite,txoBind,txoSelBind,txoSeed,TXO_IDS} from './61-text-panel.js';
 import {stTxMode} from './63-stamp-tool.js';
 import {fxGr,fxJit,fxJitL,fxPad,fxTexUses} from './69-effect-stack.js';
 // ===== Text boxes. Any layer may hold them, in L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
 // The letters are stored as outlines (centred on the box), so the project needs no fonts to show them. s = the box's long side on the canvas.
 const fx1=v=>(+v).toFixed(1);
+// 2.65.0: a letter's styles (l[6] = {f: 'b' bold, 'i' italic, 'u' underline, 's' strikethrough; h: highlight colour; px, by: its pen start and baseline from its middle;
+// w: its width}, in the letter's own units, 60 to the font size): Highlight is a band behind it, Bold an outline of its own colour round it, Italic a slant,
+// Underline and Strikethrough a bar under or through it. Next to each other the bands and bars join up.
+function txDec(d,id,tr,lf,c,bg){if(!d||typeof d!='object')return`<use href="#${id}" transform="${tr}"${lf}/>`;const f=String(d.f||''),E=60,px=+d.px||0,by=+d.by||0,w=Math.max(0,+d.w||0),n=v=>(+v).toFixed(2);
+ let g='';if(d.h&&okC(d.h))bg.push(`<rect transform="${tr}" x="${n(px)}" y="${n(by-E*.86)}" width="${n(w+.6)}" height="${n(E*1.12)}" fill="${col(d.h)}"/>`);   // every highlight goes under every letter
+ g+=`<use href="#${id}"${f.includes('i')?` transform="skewX(-12)"`:''}${f.includes('b')?` stroke="${c}" stroke-width="${n(E*.045)}" stroke-linejoin="round"`:''}${lf}/>`;
+ if(f.includes('u'))g+=`<rect x="${n(px)}" y="${n(by+E*.1)}" width="${n(w+.6)}" height="${n(E*.06)}" fill="${c}"/>`;
+ if(f.includes('s'))g+=`<rect x="${n(px)}" y="${n(by-E*.3)}" width="${n(w+.6)}" height="${n(E*.06)}" fill="${c}"/>`;
+ return`<g transform="${tr}">${g}</g>`}
 function txtGl(p,fill,pre,jit,map){const G=p.G,Lt=p.Lt;let li=0;const fs=+(p.tx&&p.tx.sz)||40;if(!G||typeof G!='object'||!Array.isArray(Lt)||Lt.length>800)return'';let d0='',o='';const seen={};
-for(const l of Lt){if(!Array.isArray(l))continue;const d=G[l[0]];if(typeof d!='string'||!/^[MLQZ0-9.,\- ]+$/.test(d))continue;let x=+l[1],y=+l[2],r=+l[3],s=+l[4],sx=1,sy=1;if(![x,y,r,s].every(isFinite))continue;
+const BG=[];for(const l of Lt){if(!Array.isArray(l))continue;const d=G[l[0]];if(typeof d!='string'||!/^[MLQZ0-9.,\- ]+$/.test(d))continue;let x=+l[1],y=+l[2],r=+l[3],s=+l[4],sx=1,sy=1;if(![x,y,r,s].every(isFinite))continue;
 if(jit){const J=fxJitL(p,li,fs);if(J){x+=J.dx;y+=J.dy;r+=J.dr;s*=J.sz;sx=J.sx;sy=J.sy}}li++;
 const id=pre+'_'+String(l[0]).replace(/[^\w-]/g,'_');if(!seen[id]){seen[id]=1;d0+=`<path id="${id}" d="${d}"/>`}
 const lf=typeof l[5]=='string'&&okC(l[5])?` fill="${col(l[5])}"`:'';   // 2.62.0: a letter with its own colour
-if(map){const m=map(x,y,r),K=map.k;o+=`<use href="#${id}" transform="translate(${m[0].toFixed(2)} ${m[1].toFixed(2)}) rotate(${m[2].toFixed(2)}) scale(${(s*sx*K).toFixed(4)} ${(s*sy*K).toFixed(4)})"${lf}/>`}else o+=`<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s*sx} ${s*sy})"${lf}/>`}
-return`<defs>${d0}</defs><g fill="${fill}" fill-rule="evenodd">${o}</g>`}
+const tr=map?(()=>{const m=map(x,y,r),K=map.k;return`translate(${m[0].toFixed(2)} ${m[1].toFixed(2)}) rotate(${m[2].toFixed(2)}) scale(${(s*sx*K).toFixed(4)} ${(s*sy*K).toFixed(4)})`})():`translate(${x} ${y}) rotate(${r}) scale(${s*sx} ${s*sy})`;
+o+=txDec(l[6],id,tr,lf,typeof l[5]=='string'&&okC(l[5])?col(l[5]):fill,BG)}
+return`<defs>${d0}</defs>${BG.join('')}<g fill="${fill}" fill-rule="evenodd">${o}</g>`}
 let TXM;
 // 2.60.0 (artist test, Oct 27 2026: "a text element should only be selected if the actual text is touched"): where a text's letters are, with a little slack round
 // them, drawn once into a small picture of its box (kept until the letters change). lx, ly: the point in the text's own frame (turned back, canvas units).
@@ -69,7 +79,7 @@ function tbStyVary(i){const grp=fpGrp().filter(q=>q.tx);if(tbSty.tu[i])tbSty.tu[
 function txbSync(L){if(WBS.txArm&&(tbSel()||WBS.fpB)){WBS.txArm=false;tbG=null;tbArmUI()}
 document.querySelectorAll('.txlay').forEach(e=>{const h=stTxMode();if(e.hidden!==h)e.hidden=h});if(!stTxMode()&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;const tx=tbSel()||WBS.txArm;sw.style.display=tx?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=tx?'none':''}if(!$('tx_t')||stTxMode())return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
 const key=p?p.u+'|'+Math.round(p.s*10)+'|'+(p.tx.wd||0)+'|'+(p.tx.ht||0)+'|'+(p.tx.va||'t')+'|'+(p.tx.pd||0)+(p.tx.ft||'')+(p.tx.ov||'')+(p.tx.rp||0)+(p.tx.rr||0)+(p.tx.rs||0)+(p.tx.bb||0)+(p.tx.sc||'')+(p.tx.sd||0)+'|'+(p.tx.ind||0)+'|'+(p.tx.psp||0)+(p.tx.bal||'')+JSON.stringify(p.tx.sty||0)+(p.tx.wp||'')+(p.tx.wa||0)+(p.tx.pt||'')+(p.tx.pa||0)+(p.tx.pw||0):'-';if(key===tbKey)return;tbKey=key;if(!p)return;
-tbSty={tu:(Array.isArray(p.tu)?p.tu:[]).map(u=>({...u})),ink:p.ink||''};tbStyUI();tbLoad=true;try{const o=p.tx,ra=p.s/Math.max(p.n||1,.01);txoWrite(o,{sz:Math.max(2,Math.min(60,+(o.sz*ra).toFixed(1))),wd:Math.max(0,Math.min(400,Math.round((o.wd||0)*ra))),ht:Math.max(0,Math.min(400,Math.round((o.ht||0)*ra)))},false)}finally{tbLoad=false}}
+tbSty={tu:(Array.isArray(p.tu)?p.tu:[]).map(u=>({...u})),ink:p.ink||''};tbStyUI();tbLoad=true;try{const o=p.tx,ra=p.s/Math.max(p.n||1,.01);txoWrite(o,{sz:Math.max(2,Math.min(60,+(o.sz*ra).toFixed(1))),wd:Math.max(0,Math.min(400,Math.round((o.wd||0)*ra))),ht:Math.max(0,Math.min(400,Math.round((o.ht||0)*ra)))},false)}finally{tbLoad=false}if(WBX.wbTxFxPaint)WBX.wbTxFxPaint()}
 // the Text tool in the Pattern editor: with no Text layer selected, typing makes one
 function tbEnsure(){return fpL()}
 function tbLive(){if(tbLoad||stTxMode())return;let p=tbSel(),L=fpL();if(!p)return;   // 2.12.0: typing no longer arms a click-to-place text; Add text makes it
@@ -85,6 +95,11 @@ TXM=new Map();WBS.txArm=false;
 txoBind(()=>!stTxMode(),()=>tbLive());txoSelBind(()=>!stTxMode(),()=>tbLive());
 $('tx_vary').addEventListener('click',()=>{if(stTxMode())return;txoSeed(1+Math.floor(Math.random()*1e6));tbLive()});
 {const lh=$('wl_txl'),lw=lh?mkWell(lh,{label:'Letter colour',what:'Letters',def:'Text colour',defRef:()=>okC(tbSty.ink)?tbSty.ink:(()=>{const L=fpL();return L&&okC(L.ink)?L.ink:WBS.proj.ink})(),get:()=>txoLetterCol(),set:v=>{if(stTxMode())return;txoSetLetterCol(v||'',()=>tbLive())}}):null;
+ const hh=$('wl_txh'),hw=hh?mkWell(hh,{label:'Highlight',what:'Highlight',def:'None',defSwatch:()=>'transparent',get:()=>txoHl(),set:v=>{if(stTxMode())return;txoSetHl(v||'',()=>tbLive())}}):null;
+ // 2.65.0: the style buttons follow the selected letters
+ const fxPaint=()=>{if(stTxMode())return;document.querySelectorAll('#tx_fx [data-fl]').forEach(b=>{const on=txoFlagOn(b.dataset.fl);b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});if(hw)paintWell(hw)};
+ $('tx_fx').addEventListener('click',e=>{const b=e.target.closest('[data-fl]');if(!b||stTxMode())return;txoFlag(b.dataset.fl,()=>tbLive());fxPaint()});
+ ['select','keyup','mouseup','focus'].forEach(ev=>$('tx_t').addEventListener(ev,fxPaint));WBX.wbTxFxPaint=fxPaint;
  $('tx_t').addEventListener('select',()=>{if(lw&&!stTxMode())paintWell(lw)});$('tx_t').addEventListener('keyup',()=>{if(lw&&!stTxMode())paintWell(lw)});$('tx_t').addEventListener('mouseup',()=>{if(lw&&!stTxMode())paintWell(lw)})}
 TBW=mkWell($('wl_tx'),{label:'Text colour',what:'Text',def:'Layer colour',defRef:()=>{const L=fpL();return L&&okC(L.ink)?L.ink:WBS.proj.ink},get:()=>okC(tbSty.ink)?tbSty.ink:'',set:v=>{if(!tbLoad)tbStyle('ink',v||'')}});
 WBX.wbTbRelay=tbRelay;WBX.wbTxUses=()=>tbSty.tu;WBX.wbTxCut=id=>{tbSty.tu=tbSty.tu.filter(u=>u.x!==id)};

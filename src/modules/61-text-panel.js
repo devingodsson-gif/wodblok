@@ -13,10 +13,12 @@ const txoSegD={al:'c',tc:'',va:'t',ov:'',sc:'',bal:''};
 // letter i of the text, counting letters not UTF-16 units
 const txoCp=(s,u)=>[...s.slice(0,u)].length;
 // a run is [from, to, size %, raise %, spacing %] and, since 2.62.0, a colour (a tray colour or a hex) as its sixth item when the letters have one
-function txoCompile(sty,n){const a=new Array(n).fill(null);sty.forEach(r=>{for(let i=r[0];i<r[1]&&i<n;i++)a[i]=[r[2],r[3],r[4],r[5]||'']});return a}
-function txoPack(a){const out=[];let i=0;while(i<a.length){const v=a[i];if(!v||(v[0]==100&&!v[1]&&!v[2]&&!v[3])){i++;continue}let j=i+1;while(j<a.length&&a[j]&&a[j][0]==v[0]&&a[j][1]==v[1]&&a[j][2]==v[2]&&(a[j][3]||'')==(v[3]||''))j++;out.push(v[3]?[i,j,v[0],v[1],v[2],v[3]]:[i,j,v[0],v[1],v[2]]);i=j}return out}
+function txoCompile(sty,n){const a=new Array(n).fill(null);sty.forEach(r=>{for(let i=r[0];i<r[1]&&i<n;i++)a[i]=[r[2],r[3],r[4],r[5]||'',r[6]||'',r[7]||'']});return a}   // 2.65.0: r[6] styles (b, i, u, s), r[7] highlight colour
+function txoPack(a){const out=[];let i=0;while(i<a.length){const v=a[i];if(!v||(v[0]==100&&!v[1]&&!v[2]&&!v[3]&&!v[4]&&!v[5])){i++;continue}let j=i+1;while(j<a.length&&a[j]&&[0,1,2,3,4,5].every(k=>(a[j][k]||'')==(v[k]||'')))j++;
+ const r=[i,j,v[0],v[1],v[2]];if(v[3]||v[4]||v[5])r.push(v[3]||'');if(v[4]||v[5])r.push(v[4]||'');if(v[5])r.push(v[5]);out.push(r);i=j}return out}
 // set (or with patch null, clear) the size / raise / spacing of letters A to B
-function txoApply(sty,n,A,B,patch){const a=txoCompile(sty,n);for(let i=Math.max(0,A);i<B&&i<n;i++){if(!patch){a[i]=null;continue}const v=a[i]||[100,0,0,''];a[i]=[patch.z!=null?patch.z:v[0],patch.d!=null?patch.d:v[1],patch.l!=null?patch.l:v[2],patch.c!=null?patch.c:(v[3]||'')]}return txoPack(a)}
+function txoApply(sty,n,A,B,patch){const a=txoCompile(sty,n);for(let i=Math.max(0,A);i<B&&i<n;i++){if(!patch){a[i]=null;continue}const v=a[i]||[100,0,0,'','',''];let fl=v[4]||'';if(patch.fon)fl=[...new Set((fl+patch.fon).split(''))].sort().join('');if(patch.foff)fl=fl.split('').filter(x=>x!=patch.foff).join('');
+ a[i]=[patch.z!=null?patch.z:v[0],patch.d!=null?patch.d:v[1],patch.l!=null?patch.l:v[2],patch.c!=null?patch.c:(v[3]||''),fl,patch.h!=null?patch.h:(v[5]||'')]}return txoPack(a)}
 // after the words are edited, the styles stay with their letters; new letters take the style of the letter before them
 function txoShift(sty,o,n){if(!sty.length||o===n)return sty;const A=[...o],B=[...n];let p=0;while(p<A.length&&p<B.length&&A[p]===B[p])p++;let s=0;while(s<A.length-p&&s<B.length-p&&A[A.length-1-s]===B[B.length-1-s])s++;const a=txoCompile(sty,A.length),ins=Math.max(0,B.length-p-s),fill=p>0?a[p-1]:null;return txoPack(a.slice(0,p).concat(new Array(ins).fill(fill),a.slice(A.length-s)))}
 function txoRead(){const t=$('tx_t').value.replace(/\r/g,'').slice(0,200);if(txoSty.length&&t!==txoPrev)txoSty=txoShift(txoSty,txoPrev,t);txoPrev=t;const n=id=>+$(id).value,o={text:t,f:$('tx_f').value||'cinzel'};
@@ -56,4 +58,11 @@ function txoShapeSet(k,amt,len){const d=TXO_SHK[k];txoSetR('tx_cv',k=='arc'?amt:
 function txoShapeBind(){$('tx_shk').addEventListener('change',()=>{const k=$('tx_shk').value,d=TXO_SHK[k];txoShapeSet(k,d?(k=='arc'?40:d.len?50:50):0,50);txoShapeShow()});
  $('tx_sha').addEventListener('input',()=>{if(txoQuiet)return;const k=$('tx_shk').value;if(TXO_SHK[k])txoShapeSet(k,+$('tx_sha').value,+$('tx_shl').value)});
  $('tx_shl').addEventListener('input',()=>{if(txoQuiet)return;const k=$('tx_shk').value;if(TXO_SHK[k]&&TXO_SHK[k].len)txoShapeSet(k,+$('tx_sha').value,+$('tx_shl').value)})}
-export {txoShapeBind,txoLetterCol,txoSetLetterCol,TXO_KEYS,TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed,txoShow};
+// 2.65.0: Bold, Italic, Underline and Strikethrough (b, i, u, s) and the Highlight colour of the selected letters (all of them when none are selected). A style button
+// shows on when every one of those letters has it, and pressing it then takes it off them; otherwise it puts it on all of them.
+function txoRange(){const t=$('tx_t'),n=[...t.value].length;let[a,b]=txoSel();if(a>=b){a=0;b=n}return[a,b,n]}
+function txoFlagOn(f){const[a,b,n]=txoRange();if(!n||a>=b)return false;const c=txoCompile(txoSty,n);for(let i=a;i<b;i++){if(/\s/.test([...$('tx_t').value][i]))continue;if(!(c[i]&&(c[i][4]||'').includes(f)))return false}return true}
+function txoFlag(f,cb){const[a,b,n]=txoRange();if(!n)return;const on=txoFlagOn(f);txoPrev=$('tx_t').value;txoSty=txoApply(txoSty,n,a,b,on?{foff:f}:{fon:f});cb()}
+function txoHl(){const[a,b,n]=txoRange();if(!n)return'';const v=txoCompile(txoSty,n)[a];return v&&v[5]||''}
+function txoSetHl(h,cb){const[a,b,n]=txoRange();if(!n)return;txoPrev=$('tx_t').value;txoSty=txoApply(txoSty,n,a,b,{h:h||''});cb()}
+export {txoFlag,txoFlagOn,txoHl,txoSetHl,txoShapeBind,txoLetterCol,txoSetLetterCol,TXO_KEYS,TXO_IDS,txoRead,txoWrite,txoBind,txoSelBind,txoSeed,txoShow};

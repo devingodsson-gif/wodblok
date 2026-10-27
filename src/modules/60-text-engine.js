@@ -21,6 +21,7 @@ const ff=new FontFace('wbu-'+id,buf);await ff.load();document.fonts.add(ff);teF[
 if(save){try{const b=new Uint8Array(buf);let s='';for(let i=0;i<b.length;i+=8192)s+=String.fromCharCode.apply(null,b.subarray(i,i+8192));const all=JSON.parse(kv.get('wb17_fonts')||'{}');all[name]=btoa(s);kv.set('wb17_fonts',JSON.stringify(all))}catch(e){teNotify(`“${name}” is loaded for now, but it's too big to keep in this browser. Load it again next time.`)}}return id};
 const teLoadFonts=done=>{try{const all=JSON.parse(kv.get('wb17_fonts')||'{}');Object.entries(all).forEach(([n,b64])=>{const s=atob(b64),b=new Uint8Array(s.length);for(let i=0;i<s.length;i++)b[i]=s.charCodeAt(i);teAddUF(n,b.buffer,false).then(()=>done&&done()).catch(()=>{})})}catch(e){}};
 
+const TE_BOLD=.05;   // 2.65.0: extra room after a bold letter, a share of the font size
 const teP=160,teE=60,teGL=new Map();let teCv=null,teCx=null;const teEns=()=>{if(!teCv){teCv=document.createElement('canvas');teCx=teCv.getContext('2d',{willReadFrequently:true})}};
 const teCss=f=>`${f.w} ${teP}px "${f.fam}", Georgia, serif`;
 // --- tracing (marching squares -> simplified closed loops -> smooth quadratic path)
@@ -64,9 +65,9 @@ function teRnd(sd,i,k){let h=(Math.imul(sd|0,374761393)+Math.imul(i+1,668265263)
 // Letter effects (all optional, saved only when set): rp random position, rr random rotation (degrees), rs random size, bb baseline bounce (all 0 to 100), sc scatter in the box ('l' loose, 'f' full), sd the seed (Vary picks a new one).
 function teCore(o){teEns();const f=teF[o.f]||teF.cinzel;teCx.font=teCss(f);const T0=o.tc=='u'?o.text.toUpperCase():o.tc=='l'?o.text.toLowerCase():o.tc=='t'?o.text.toLowerCase().replace(/(^|[\s(\-])(\S)/g,(m,a,b)=>a+b.toUpperCase()):o.text,cps=[...T0],em=o.sz/100*Math.min(SW,SH),k=em/teP,ls=o.ls/100*teP,wsp=(o.ws||0)/100*teP,capH=teCx.measureText('H').actualBoundingBoxAscent||teP*.7,lhp=o.lh/100*teP;
 // Styled letters (o.sty = runs [from, to, size %, raise %, spacing %] over the typed letters): SC[i] = [size, raise, spacing] for letter i, or null
-const SC=o.sty&&o.sty.length&&[...o.text].length===cps.length?new Array(cps.length).fill(null):null;if(SC)o.sty.forEach(r=>{for(let i=Math.max(0,r[0]);i<r[1]&&i<cps.length;i++)SC[i]=[(r[2]||100)/100,(r[3]||0)/100,(r[4]||0)/100,typeof r[5]=='string'?r[5]:'']});   // r[5]: the letters' colour (2.62.0)
+const SC=o.sty&&o.sty.length&&[...o.text].length===cps.length?new Array(cps.length).fill(null):null;if(SC)o.sty.forEach(r=>{for(let i=Math.max(0,r[0]);i<r[1]&&i<cps.length;i++)SC[i]=[(r[2]||100)/100,(r[3]||0)/100,(r[4]||0)/100,typeof r[5]=='string'?r[5]:'',typeof r[6]=='string'?r[6]:'',typeof r[7]=='string'?r[7]:'']});   // r[6]: b bold, i italic, u underline, s strikethrough; r[7]: highlight colour (2.65.0)   // r[5]: the letters' colour (2.62.0)
 const lines0=[];{let a=0;T0.split('\n').forEach(s=>{const n=[...s].length;lines0.push({s,st:SC?SC.slice(a,a+n):null});a+=n+1})}
-const AV=new Map(),adv=c=>{let v=AV.get(c);if(v==null){v=teCx.measureText(c).width;AV.set(c,v)}return v},exs=(ch,st)=>{let e=0;if(st)for(let i=0;i<ch.length;i++){const q=st[i];if(q)e+=(q[0]-1)*adv(ch[i])+q[2]*teP}return e};
+const AV=new Map(),adv=c=>{let v=AV.get(c);if(v==null){v=teCx.measureText(c).width;AV.set(c,v)}return v},exs=(ch,st)=>{let e=0;if(st)for(let i=0;i<ch.length;i++){const q=st[i];if(q)e+=(q[0]-1)*adv(ch[i])+q[2]*teP+(q[4]&&q[4].includes('b')?TE_BOLD*teP*q[0]:0)}return e};
 // Box width: lines are broken at spaces so none is wider than the box (a single long word is left whole). Box height + Vertical: where the block of lines sits in a box of that height.
 // Paragraph options: ind = first-line indent (% of the size), psp = space after a paragraph (% of the line height), bal = balance the lines of a paragraph.
 const U=Math.min(SW,SH)/100,pdc=(o.pd||0)*U,limP=o.wd>0?Math.max(1,o.wd*U-2*pdc)/k:0,indP=(o.ind||0)/100*teP,wd1=(s,st)=>{let n=0,sp=0;const ch=[...s];for(const c of ch){n++;if(/\s/.test(c))sp++}return teCx.measureText(s).width+ls*Math.max(0,n-1)+wsp*sp+exs(ch,st)};
@@ -74,23 +75,28 @@ const wrapPar=(P,lim)=>{const ln=P.s,sl=P.st;if(!ln.trim())return[P];const out=[
 wrapB=(P,lim)=>{let r=wrapPar(P,lim);if(!o.bal||r.length<2)return r;const n=r.length;let lo=lim*.3,hi=lim;for(let i=0;i<9;i++){const mid=(lo+hi)/2,t=wrapPar(P,mid);if(t.length>n)lo=mid;else{hi=mid;r=t}}return r};
 const lines=[];lines0.forEach(P=>{const rr=limP&&!o.nw&&o.ft!='l'?wrapB(P,limP):[P];rr.forEach((q,ii)=>lines.push({s:q.s,st:q.st,fi:ii==0,pe:ii==rr.length-1}))});
 const hbP=o.ht>0?Math.max(1,o.ht*U-2*pdc)/k:0;
-const L=lines.map(line=>{const ch=[...line.s],out=[],sl=line.st;let sp=0,xe=0;ch.forEach((c,i)=>{const z=sl&&sl[i]?sl[i]:null,e1=z?(z[0]-1)*adv(c)+z[2]*teP:0;if(/\s/.test(c)){sp++;xe+=e1;return}const g=teGlyph(f,c);if(!g)return;const zz=z?z[0]:1,pen=teCx.measureText(ch.slice(0,i).join('')).width+ls*i+wsp*sp+xe;out.push({g,c,x:pen+g.cx*zz,y:g.cy*zz-(z?z[1]*teP:0),sp,z:zz,cl:z&&z[3]||''});xe+=e1});teCx.font=teCss(f);return{out,ns:sp,fi:line.fi,pe:line.pe,W:teCx.measureText(line.s).width+ls*Math.max(0,ch.length-1)+wsp*sp+xe}});
+const TU=teE/teP;   // 2.65.0: a letter's decorations are kept in its own outline's units (the outline is TU per px of the font at teP)
+const L=lines.map(line=>{const ch=[...line.s],out=[],sl=line.st;let sp=0,xe=0;ch.forEach((c,i)=>{const z=sl&&sl[i]?sl[i]:null,bo=z&&z[4]&&z[4].includes('b')?TE_BOLD*teP*z[0]:0,e1=z?(z[0]-1)*adv(c)+z[2]*teP+bo:0,dk=z&&(/[us]/.test(z[4]||'')||z[5]);
+ if(/\s/.test(c)){sp++;xe+=e1;const pv=out[out.length-1];if(dk&&pv&&pv.dec&&pv.dec.f==z[4]&&pv.dec.h==z[5])pv.dec.w=+(pv.dec.w+(adv(c)+ls+wsp+e1)/pv.z*TU).toFixed(2);return}   // a space between decorated words carries the line on
+ const g=teGlyph(f,c);if(!g)return;const zz=z?z[0]:1,pen=teCx.measureText(ch.slice(0,i).join('')).width+ls*i+wsp*sp+xe;
+ const dec=z&&(z[4]||z[5])?{f:z[4]||'',h:z[5]||'',px:+(-g.cx*TU).toFixed(2),by:+(-g.cy*TU).toFixed(2),w:+((adv(c)*zz+ls+z[2]*teP+bo)/zz*TU).toFixed(2)}:null;
+ out.push({g,c,x:pen+g.cx*zz,y:g.cy*zz-(z?z[1]*teP:0),sp,z:zz,cl:z&&z[3]||'',dec});xe+=e1});teCx.font=teCss(f);return{out,ns:sp,fi:line.fi,pe:line.pe,W:teCx.measureText(line.s).width+ls*Math.max(0,ch.length-1)+wsp*sp+xe}});
 const fj=L.map(l=>o.ft=='l'&&limP&&l.W>0?Math.min(8,limP/l.W):1),hj=fj.map(q=>lhp*q),pa=L.map((l,j)=>l.pe&&j<L.length-1?(o.psp||0)/100*lhp:0),H=hj.reduce((a,b)=>a+b,0)+pa.reduce((a,b)=>a+b,0),n=lines.length,fr2=hbP?(hbP-H)/2:0,vOff=hbP?(o.va=='b'?fr2:o.va=='m'?0:-fr2):0,spr=hbP&&o.va=='s'&&n>1,gap=spr?Math.max(0,hbP-H)/(n-1):0;
 const maxW=limP||Math.max(1,...L.map((l,j)=>l.W*fj[j])),pts=[];let cum=hbP?(spr?-hbP/2:-H/2+vOff):-H/2,over=!!((hbP&&H>hbP+.5)||(limP&&Math.max(0,...L.map((l,j)=>l.W*fj[j]))>limP+.5));const cut=o.ov=='h'&&hbP;let ix=0;
 L.forEach((l,j)=>{const q=fj[j],Wj=l.W*q,id=l.fi?indP:0,ex=o.al=='j'&&j<L.length-1&&l.ns>0&&q==1?(maxW-l.W-id)/l.ns:0,sh=o.al=='l'||o.al=='j'?-maxW/2+id:o.al=='r'?maxW/2-Wj:-Wj/2,yc=cum+hj[j]/2,by=yc+capH*q/2,n0=ix;ix+=l.out.length;cum+=hj[j]+gap+pa[j];
-if(cut&&(yc-hj[j]/2<-hbP/2-.5||yc+hj[j]/2>hbP/2+.5))return;l.out.forEach((c,k)=>pts.push({g:c.g,c:c.c,px:sh+c.x*q+ex*c.sp,py:by+c.y*q,q:q*c.z,i:n0+k,cl:c.cl}))});
+if(cut&&(yc-hj[j]/2<-hbP/2-.5||yc+hj[j]/2>hbP/2+.5))return;l.out.forEach((c,k)=>pts.push({g:c.g,c:c.c,px:sh+c.x*q+ex*c.sp,py:by+c.y*q,q:q*c.z,i:n0+k,cl:c.cl,dec:c.dec}))});
 if(o.rp||o.rr||o.rs||o.bb||o.sc){const sd=o.sd||1,sw=limP||maxW,sh2=hbP||Math.max(H,lhp);pts.forEach(c=>{const i=c.i,R=k=>teRnd(sd,i,k);if(o.sc=='f'){c.px=(R(1)-.5)*sw;c.py=(R(2)-.5)*sh2}else if(o.sc=='l'){c.px+=(R(1)-.5)*sw*.3;c.py+=(R(2)-.5)*sh2*.3}
 if(o.rp){const a=o.rp/100*teP*.5;c.px+=(R(3)-.5)*2*a;c.py+=(R(4)-.5)*2*a}if(o.bb)c.py+=(i%2?1:-1)*o.bb/100*teP*.3;if(o.rs)c.q*=1+(R(5)-.5)*o.rs/100;c.rr=o.rr?(R(6)-.5)*2*o.rr:0})}
 // Warp (wp: 'b' bulge, 'r' rise, 'f' flag; wa = amount, -100 to 100) changes the size and height of letters along the line; Path (pt: 'w' wave, 's' spiral; pa = amount, pw = length) lays the line on a curve instead of the Curve arc.
 if(o.wp&&o.wa){const a=o.wa/100;pts.forEach(c=>{const u=Math.max(-.5,Math.min(.5,c.px/maxW));if(o.wp=='b'){const f=1+a*.9*(1-4*u*u);c.q*=f;c.py*=f}else if(o.wp=='r'){const f=1+a*u*1.2;c.q*=f;c.py=c.py*f-a*u*maxW*.12}else if(o.wp=='f'){const f=1+a*(u+.5)*.5,w=(u+.5)*Math.PI*3;c.q*=f;c.py=c.py*f+a*lhp*.45*Math.sin(w);c.rw=Math.atan(a*lhp*.45*3*Math.PI*Math.cos(w)/maxW)*180/Math.PI}})}
 const cvv=o.pt?0:Math.max(-1,Math.min(1,o.cv/100)),rt=(o.rot||0)*Math.PI/180,cs=Math.cos(rt),sn=Math.sin(rt);let res;
-if(Math.abs(cvv)<.005)res=pts.map(c=>({g:c.g,c:c.c,x:c.px,y:c.py,r:c.rw||0,q:c.q,rr:c.rr,cl:c.cl}));
+if(Math.abs(cvv)<.005)res=pts.map(c=>({g:c.g,c:c.c,x:c.px,y:c.py,r:c.rw||0,q:c.q,rr:c.rr,cl:c.cl,dec:c.dec}));
 else{const phi=Math.abs(cvv)*2*Math.PI,R=maxW/phi,off=R*Math.max(0,Math.min(1,1-phi/Math.PI));
-res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:off+rho*Math.sin(th),r:(th+Math.PI/2)*180/Math.PI+(c.rw||0),q:c.q,rr:c.rr,cl:c.cl}}
-const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI+(c.rw||0),q:c.q,rr:c.rr,cl:c.cl}})}
+res=pts.map(c=>{if(cvv>0){const th=-Math.PI/2+c.px/R,rho=R-c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:off+rho*Math.sin(th),r:(th+Math.PI/2)*180/Math.PI+(c.rw||0),q:c.q,rr:c.rr,cl:c.cl,dec:c.dec}}
+const th=Math.PI/2-c.px/R,rho=R+c.py;return{g:c.g,c:c.c,x:rho*Math.cos(th),y:-off+rho*Math.sin(th),r:(th-Math.PI/2)*180/Math.PI+(c.rw||0),q:c.q,rr:c.rr,cl:c.cl,dec:c.dec}})}
 if(o.pt=='w'){const A=(o.pa==null?50:o.pa)/100*teP*.9,lam=Math.max(teP*.5,maxW*Math.max(5,o.pw==null?50:o.pw)/100);res.forEach(c=>{const ph=2*Math.PI*c.x/lam;c.y+=A*Math.sin(ph);c.r+=Math.atan(A*2*Math.PI/lam*Math.cos(ph))*180/Math.PI})}
 else if(o.pt=='s'){const n=.4+(o.pw==null?50:o.pw)/100*2,d=(o.pa==null?50:o.pa)/100*.7,F=d>0?-Math.log(1-d)/d:1,r0=maxW*F/(2*Math.PI*n);res.forEach(c=>{const t=Math.max(0,Math.min(1,(c.x+maxW/2)/maxW)),Gt=d>0?-Math.log(1-d*t)/d:t,t0=2*Math.PI*n*Gt/F,r=r0*(1-d*t),th=-Math.PI/2+t0,rho=Math.max(.0001,r-c.y);c.x=rho*Math.cos(th);c.y=rho*Math.sin(th);c.r+=t0*180/Math.PI})}
-const out=res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0)+(p.rr||0),s:+(em/teE*p.q).toFixed(4),cl:p.cl||''}));// 2.64.0: a text on a curve, a path or a warp fills its box by what it looks like after the shaping (the straight lines can fit while the arc does not)
+const out=res.map(p=>({g:p.g,c:p.c,x:(p.x*cs-p.y*sn)*k,y:(p.x*sn+p.y*cs)*k,r:p.r+(o.rot||0)+(p.rr||0),s:+(em/teE*p.q).toFixed(4),cl:p.cl||'',dec:p.dec||null}));// 2.64.0: a text on a curve, a path or a warp fills its box by what it looks like after the shaping (the straight lines can fit while the arc does not)
 if((limP||hbP)&&(Math.abs(cvv)>=.005||o.pt||(o.wp&&o.wa))&&out.length){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;out.forEach(p=>{const h=p.s*teE*.5;x0=Math.min(x0,p.x-h);x1=Math.max(x1,p.x+h);y0=Math.min(y0,p.y-h);y1=Math.max(y1,p.y+h)});
  if((limP&&x1-x0>limP*k+.5*k)||(hbP&&y1-y0>hbP*k+.5*k))over=true}
 out.over=over;out.tw=Math.max(0,...L.map((l,j)=>l.W*fj[j]))*k;return out}
@@ -111,7 +117,7 @@ const q={...teD,...o};if(!q.text.trim())return null;const kk=Math.min(CW,CH)/Mat
 const G={},Lt=[];let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
 ps.forEach(p=>{const d=p.g.d;if(!/^[MLQZ0-9.,\- ]+$/.test(d))return;G[p.g.k]=d;const nm=(d.match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);let a=1e9,b=1e9,c=-1e9,e=-1e9;for(let i=0;i+1<nm.length;i+=2){a=Math.min(a,nm[i]);c=Math.max(c,nm[i]);b=Math.min(b,nm[i+1]);e=Math.max(e,nm[i+1])}
 const r=p.r*Math.PI/180,cs=Math.cos(r),sn=Math.sin(r),X=p.x*kk,Y=p.y*kk,S=p.s*kk;[[a,b],[c,b],[c,e],[a,e]].forEach(([u,v])=>{const px=X+(u*cs-v*sn)*S,py=Y+(u*sn+v*cs)*S;x0=Math.min(x0,px);x1=Math.max(x1,px);y0=Math.min(y0,py);y1=Math.max(y1,py)});
-const ent=[p.g.k,X,Y,+p.r.toFixed(1),+S.toFixed(4)];if(p.cl)ent.push(p.cl);Lt.push(ent)});   // a coloured letter carries its colour as a sixth item (2.62.0)
+const ent=[p.g.k,X,Y,+p.r.toFixed(1),+S.toFixed(4)];if(p.cl||p.dec)ent.push(p.cl||'');if(p.dec)ent.push(p.dec);Lt.push(ent)});   // 2.65.0: a seventh item, the letter's styles {f, h, px, by, w}   // a coloured letter carries its colour as a sixth item (2.62.0)
 if(!Lt.length)return null;const U=kk*Math.min(SW,SH)/100,boxW=q.wd>0,boxH=q.ht>0,shp2=Math.abs(+q.cv||0)>=.5||!!q.pt||!!(q.wp&&q.wa),mx=boxW&&!shp2?0:(x0+x1)/2,my=boxH&&!shp2?0:(y0+y1)/2;
 // a shaped text sits in the middle of its box (2.64.0)
 Lt.forEach(l=>{l[1]=+(l[1]-mx).toFixed(2);l[2]=+(l[2]-my).toFixed(2)});
