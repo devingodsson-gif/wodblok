@@ -1,5 +1,14 @@
 # Development plan
 
+## 2.66.0 (Oct 27 2026): about ninety built-in fonts with real bold and italic (release 4 of docs/text-plan.md, the last)
+Owner, Oct 27 2026: "80 to 100 fonts by default", built in, real bold and italic ("I'm fine with a bigger file size").
+- 56 fonts added (90 in all), from Google Fonts (SIL Open Font Licence, four under the Apache licence), Latin subsets made by `tools/fonts-make.py` from a checkout of github.com/google/fonts (fontTools; variable fonts set at 400 and 700). 29 of them have their own bold, italic and bold italic, each bundled as a family of its own ("Lora:b", "Lora:i", "Lora:bi") so the Text tool reads each one's outlines. Licences in `src/fonts/licences/`.
+- The font list is in eight groups: Serif, Sans, Slab, Display, Script, Blackletter, Handwritten, Mono (the 34 fonts from before are placed in them), A to Z in each, then your own fonts.
+- Bold and Italic letters are set in the font's own bold and italic when it has them (also wider letters take their room); otherwise they are drawn as before (outline, slant).
+- Randomize keeps to the 34 fonts it had, so seeded rolls and their snapshots do not change.
+- The app grows from 13.6 MB to 17.5 MB.
+- Tests: new `fonts-2-66` (2); `text-editor-shared` counts at least 85 fonts.
+
 ## 2.65.0 (Oct 27 2026): Bold, Italic, Underline, Strikethrough, Highlight (release 3 of docs/text-plan.md)
 - In Character, four buttons B, I, U, S and a Highlight well act on the selected letters of a text on the canvas (all of them when none are selected); a button is on when every selected letter has the style, and pressing it then takes it off.
 - Stored in the letter runs (`tx.sty` items 7 and 8: the styles 'b' 'i' 'u' 's' and the highlight colour) and per laid-out letter (`Lt` item 7: {f, h, px, by, w}), only when set.

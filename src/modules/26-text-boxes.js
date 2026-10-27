@@ -19,7 +19,8 @@ const fx1=v=>(+v).toFixed(1);
 // Underline and Strikethrough a bar under or through it. Next to each other the bands and bars join up.
 function txDec(d,id,tr,lf,c,bg){if(!d||typeof d!='object')return`<use href="#${id}" transform="${tr}"${lf}/>`;const f=String(d.f||''),E=60,px=+d.px||0,by=+d.by||0,w=Math.max(0,+d.w||0),n=v=>(+v).toFixed(2);
  let g='';if(d.h&&okC(d.h))bg.push(`<rect transform="${tr}" x="${n(px)}" y="${n(by-E*.86)}" width="${n(w+.6)}" height="${n(E*1.12)}" fill="${col(d.h)}"/>`);   // every highlight goes under every letter
- g+=`<use href="#${id}"${f.includes('i')?` transform="skewX(-12)"`:''}${f.includes('b')?` stroke="${c}" stroke-width="${n(E*.045)}" stroke-linejoin="round"`:''}${lf}/>`;
+ const rv=String(d.rv||'');   // 2.66.0: set in the font's own bold or italic: not drawn bold or slanted again
+ g+=`<use href="#${id}"${f.includes('i')&&!rv.includes('i')?` transform="skewX(-12)"`:''}${f.includes('b')&&!rv.includes('b')?` stroke="${c}" stroke-width="${n(E*.045)}" stroke-linejoin="round"`:''}${lf}/>`;
  if(f.includes('u'))g+=`<rect x="${n(px)}" y="${n(by+E*.1)}" width="${n(w+.6)}" height="${n(E*.06)}" fill="${c}"/>`;
  if(f.includes('s'))g+=`<rect x="${n(px)}" y="${n(by-E*.3)}" width="${n(w+.6)}" height="${n(E*.06)}" fill="${c}"/>`;
  return`<g transform="${tr}">${g}</g>`}
