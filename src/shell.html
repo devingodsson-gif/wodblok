@@ -58,7 +58,7 @@ body.plain{--stage-dot:transparent}
 .pop:not([hidden]),.ddl:not([hidden]),.cpop:not([hidden]){animation:popin .13s ease-out}
 @keyframes popin{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}
 button,.ddi,.wtab,.lyr{transition:background-color var(--t-fast),border-color var(--t-fast),color var(--t-fast),box-shadow var(--t-fast)}
-@media (prefers-reduced-motion:reduce){#splash,.spl,.spl i::after,.pop,.ddl,.cpop{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){#splash,.spl,.spl i::after,.pop,.ddl,.cpop,.rpop{animation:none!important;transition:none!important}}
 /* v95 history */
 .hs{display:flex;flex-direction:column;min-height:100%}
 .hsh{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:var(--h-row);box-sizing:border-box;padding:6px 8px 6px 12px;font-weight:600;font-size:var(--fs-l);border-bottom:1px solid var(--line)}
@@ -767,6 +767,12 @@ body.eyedrop{cursor:crosshair}
 .cwrow{display:flex;align-items:center;gap:8px;margin-top:6px}.cwrow:first-child{margin-top:0}
 .cwk{flex:none;width:46px;font-size:var(--fs-m);color:var(--fg)}
 .cwp{position:fixed;z-index:9050;width:244px;padding:8px;background:var(--raise);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+/* 2.54.2: an element panel while editing: what the element is made from, with Replace (a list row, Part 9.10); Replace opens the library in a popover */
+.rprow{display:flex;align-items:center;gap:var(--sp-4);min-height:var(--h-row);margin-bottom:var(--sp-3)}.rprow[hidden]{display:none}
+.rpth{flex:none;width:20px;height:20px;display:inline-flex}.rpth svg{width:20px;height:20px}
+.rpn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs-m)}
+.rpgo{flex:none}
+.rpop{position:fixed;z-index:55;padding:var(--sp-4);background:var(--raise);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow);overflow:auto}.rpop:not([hidden]){animation:popin .13s ease-out}
 .cwp:not([hidden]){animation:popin .13s ease-out}
 .cwpd{display:flex;align-items:center;gap:8px;width:100%;height:var(--h-row);padding:0 8px 0 4px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);color:var(--fg);font-size:var(--fs-m);text-align:left}
 .cwpd i{width:var(--h-sm);height:var(--h-sm);border-radius:var(--r-m);border:1px dashed var(--line2)}
