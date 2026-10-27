@@ -1,5 +1,7 @@
 # Artist test, Oct 27 2026: what was seen and what to fix
 
+**Closed (owner, Oct 27 2026):** everything not done below is dropped.
+
 Source: the owner's rough notes from watching one artist use the app. Raw notes grouped; the order is a suggestion until the owner approves it. Features he has defined are marked Defined; the rest wait for his word.
 
 ## What she did (observations, not tasks)
