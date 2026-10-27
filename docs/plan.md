@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.62.0 (Oct 27 2026): letter colour (release 3 of docs/artist-test-todo.md, the text overhaul's first part)
+Owner, Oct 27 2026: "just do 4 and we will wait on the font updates" (4: style parts of the text; fonts, bold and italic wait).
+- **Letter colour** in the Text panel, beside Letter size, raise and spacing (Text elements; not in a stamp's tab, whose letters print in the stamp's ink): the selected letters in the text field take a colour (a tray colour or a fixed one); with nothing selected every letter does. Clear takes the letter styles away as before. The colour follows the letters when the words are edited.
+- Stored as a sixth item of a letter run (`tx.sty`: [from, to, size, raise, spacing, colour]) and of a laid-out letter (`Lt`), only when set, so texts without it are unchanged; the tray follows it (removing a tray colour fixes it, recolouring follows it). No format number change.
+- Tests: new `text-colour-2-62`; the text, tray, selection and snapshot specs.
+
 ## 2.61.0 (Oct 27 2026): fixes, place copies, import crop, Sheet gradients, film grain (artist test, release 2 of docs/artist-test-todo.md)
 Owner, Oct 27 2026: "start on release 2". Five steps, one commit each:
 - **2.60.1 Fixes.** Paste moves the pasted elements together back inside the canvas (repeated pastes near an edge stayed off it). A Tiling Pattern's area cannot be pulled smaller than one piece. The colour picker has a Done button. Row menus are as wide as their longest item (the Shapes library's Import menu wrapped its items over each other). A shaped stamp or canvas draws its see-through squares at 8 screen pixels like the rectangle (they were in canvas units, so much larger). Each tab of a panel group has its own close button (not on a locked group or a group of one tab, which has the group's close).

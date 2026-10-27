@@ -8,7 +8,7 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {mkWell,paintWell} from './52-tray-ui.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
-import {txoRead,txoWrite,txoBind,txoSelBind,txoSeed,TXO_IDS} from './61-text-panel.js';
+import {txoLetterCol,txoRead,txoSetLetterCol,txoWrite,txoBind,txoSelBind,txoSeed,TXO_IDS} from './61-text-panel.js';
 import {stTxMode} from './63-stamp-tool.js';
 import {fxGr,fxJit,fxJitL,fxPad,fxTexUses} from './69-effect-stack.js';
 // ===== Text boxes. Any layer may hold them, in L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
@@ -18,7 +18,8 @@ function txtGl(p,fill,pre,jit,map){const G=p.G,Lt=p.Lt;let li=0;const fs=+(p.tx&
 for(const l of Lt){if(!Array.isArray(l))continue;const d=G[l[0]];if(typeof d!='string'||!/^[MLQZ0-9.,\- ]+$/.test(d))continue;let x=+l[1],y=+l[2],r=+l[3],s=+l[4],sx=1,sy=1;if(![x,y,r,s].every(isFinite))continue;
 if(jit){const J=fxJitL(p,li,fs);if(J){x+=J.dx;y+=J.dy;r+=J.dr;s*=J.sz;sx=J.sx;sy=J.sy}}li++;
 const id=pre+'_'+String(l[0]).replace(/[^\w-]/g,'_');if(!seen[id]){seen[id]=1;d0+=`<path id="${id}" d="${d}"/>`}
-if(map){const m=map(x,y,r),K=map.k;o+=`<use href="#${id}" transform="translate(${m[0].toFixed(2)} ${m[1].toFixed(2)}) rotate(${m[2].toFixed(2)}) scale(${(s*sx*K).toFixed(4)} ${(s*sy*K).toFixed(4)})"/>`}else o+=`<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s*sx} ${s*sy})"/>`}
+const lf=typeof l[5]=='string'&&okC(l[5])?` fill="${col(l[5])}"`:'';   // 2.62.0: a letter with its own colour
+if(map){const m=map(x,y,r),K=map.k;o+=`<use href="#${id}" transform="translate(${m[0].toFixed(2)} ${m[1].toFixed(2)}) rotate(${m[2].toFixed(2)}) scale(${(s*sx*K).toFixed(4)} ${(s*sy*K).toFixed(4)})"${lf}/>`}else o+=`<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s*sx} ${s*sy})"${lf}/>`}
 return`<defs>${d0}</defs><g fill="${fill}" fill-rule="evenodd">${o}</g>`}
 let TXM;
 // 2.60.0 (artist test, Oct 27 2026: "a text element should only be selected if the actual text is touched"): where a text's letters are, with a little slack round
@@ -61,7 +62,7 @@ function tbStyle(k,v){const grp=fpGrp().filter(q=>q.tx);if(k=='ink'){tbSty.ink=v
 function tbStySet(a){const grp=fpGrp().filter(q=>q.tx);tbSty.tu=a.map(u=>({...u}));grp.forEach(q=>{q.tu=a.map((u,i)=>{const o=(q.tu||[])[i];return o&&o.x===u.x?o:{x:u.x,sd:grp.length>1?txRid():u.sd}})});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();if(WBS.txArm)WBH.fpOverlay()}
 function tbStyVary(i){const grp=fpGrp().filter(q=>q.tx);if(tbSty.tu[i])tbSty.tu[i]={...tbSty.tu[i],sd:txRid()};grp.forEach(q=>{if(q.tu&&q.tu[i])q.tu[i]={...q.tu[i],sd:txRid()}});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd()}
 function txbSync(L){if(WBS.txArm&&(tbSel()||WBS.fpB)){WBS.txArm=false;tbG=null;tbArmUI()}
-if(!stTxMode()&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;const tx=tbSel()||WBS.txArm;sw.style.display=tx?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=tx?'none':''}if(!$('tx_t')||stTxMode())return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
+document.querySelectorAll('.txlay').forEach(e=>{const h=stTxMode();if(e.hidden!==h)e.hidden=h});if(!stTxMode()&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;const tx=tbSel()||WBS.txArm;sw.style.display=tx?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=tx?'none':''}if(!$('tx_t')||stTxMode())return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
 const key=p?p.u+'|'+Math.round(p.s*10)+'|'+(p.tx.wd||0)+'|'+(p.tx.ht||0)+'|'+(p.tx.va||'t')+'|'+(p.tx.pd||0)+(p.tx.ft||'')+(p.tx.ov||'')+(p.tx.rp||0)+(p.tx.rr||0)+(p.tx.rs||0)+(p.tx.bb||0)+(p.tx.sc||'')+(p.tx.sd||0)+'|'+(p.tx.ind||0)+'|'+(p.tx.psp||0)+(p.tx.bal||'')+JSON.stringify(p.tx.sty||0)+(p.tx.wp||'')+(p.tx.wa||0)+(p.tx.pt||'')+(p.tx.pa||0)+(p.tx.pw||0):'-';if(key===tbKey)return;tbKey=key;if(!p)return;
 tbSty={tu:(Array.isArray(p.tu)?p.tu:[]).map(u=>({...u})),ink:p.ink||''};tbStyUI();tbLoad=true;try{const o=p.tx,ra=p.s/Math.max(p.n||1,.01);txoWrite(o,{sz:Math.max(2,Math.min(60,+(o.sz*ra).toFixed(1))),wd:Math.max(0,Math.min(400,Math.round((o.wd||0)*ra))),ht:Math.max(0,Math.min(400,Math.round((o.ht||0)*ra)))},false)}finally{tbLoad=false}}
 // the Text tool in the Pattern editor: with no Text layer selected, typing makes one
@@ -78,6 +79,8 @@ TXM=new Map();WBS.txArm=false;
 {['tx_t',...TXO_IDS].forEach(id=>$(id).addEventListener('input',tbLive));
 txoBind(()=>!stTxMode(),()=>tbLive());txoSelBind(()=>!stTxMode(),()=>tbLive());
 $('tx_vary').addEventListener('click',()=>{if(stTxMode())return;txoSeed(1+Math.floor(Math.random()*1e6));tbLive()});
+{const lh=$('wl_txl'),lw=lh?mkWell(lh,{label:'Letter colour',what:'Letters',def:'Text colour',defRef:()=>okC(tbSty.ink)?tbSty.ink:(()=>{const L=fpL();return L&&okC(L.ink)?L.ink:WBS.proj.ink})(),get:()=>txoLetterCol(),set:v=>{if(stTxMode())return;txoSetLetterCol(v||'',()=>tbLive())}}):null;
+ $('tx_t').addEventListener('select',()=>{if(lw&&!stTxMode())paintWell(lw)});$('tx_t').addEventListener('keyup',()=>{if(lw&&!stTxMode())paintWell(lw)});$('tx_t').addEventListener('mouseup',()=>{if(lw&&!stTxMode())paintWell(lw)})}
 TBW=mkWell($('wl_tx'),{label:'Text colour',what:'Text',def:'Layer colour',defRef:()=>{const L=fpL();return L&&okC(L.ink)?L.ink:WBS.proj.ink},get:()=>okC(tbSty.ink)?tbSty.ink:'',set:v=>{if(!tbLoad)tbStyle('ink',v||'')}});
 WBX.wbTbRelay=tbRelay;WBX.wbTxUses=()=>tbSty.tu;WBX.wbTxCut=id=>{tbSty.tu=tbSty.tu.filter(u=>u.x!==id)};
 $('tx_split').addEventListener('click',async()=>{if(stTxMode())return;const L=fpL();if(!L)return;const grp=fpGrp().filter(q=>q.tx);if(!grp.length)return;if(WBX.wbCap)WBX.wbCap();const cache=new Map(),made=[];let total=0;
