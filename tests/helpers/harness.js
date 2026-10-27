@@ -21,7 +21,7 @@ const FIXED_TIME = Date.UTC(2026, 9, 8, 12, 0, 0);   // 2026-10-08 12:00:00 UTC,
 // artifact runtime (`window.claude.use('db'|'user'|'downloads')`).
 function initScript({ seed, runtime, workspaces, templates }) {
   return `(() => {
-    // Tests start with no panel open at launch unless a test asks for the Default panels (workspaces: true) or the app's own start (workspaces: 'launch').
+    // Tests start with no panel open at launch unless a test asks for the built-in panel layout (workspaces: true) or the app's own start (workspaces: 'launch').
     try { if (!sessionStorage.getItem('wb_t_ws')) {
       if (${workspaces === 'launch'}) localStorage.removeItem('wb96_launch'); else localStorage.setItem('wb96_launch', ${workspaces ? "'on'" : "'none'"});   // 'launch': the app's own start (2.55.0: the Elements list on the right, locked)
       if (${templates !== 'default'} && localStorage.getItem('wb111_tplstart') == null) localStorage.setItem('wb111_tplstart', ${templates ? "'1'" : "'0'"});      // the template picker opens at launch only when a test asks (2.21.0: it is off by default; 'default' leaves the setting alone)
@@ -171,7 +171,7 @@ async function openProjectFile(page, filePath) {
 // the element panels have no rail button: they open from the element bar
 const EL_BAR = { mlist: 'shape', layers: 'pattern', stmp: 'stamp', motifs: 'motif', text: 'text', elpaint: 'paint' };
 // Since 2.3.0 the element bar makes a new element on every press, so an element panel is opened through its (hidden) tool-bar button instead, which only opens it.
-// Close all panels (the button reads "Default panels" when none is open, and then opens them instead)
+// Close all panels (a locked panel stays)
 const closeAllPanels = async page => { if ((await page.getAttribute('#rcls', 'aria-label')) == 'Close all panels') await page.locator('#rcls').dispatchEvent('click'); };
 // 2.44.0: there is no rail on screen any more; every panel opens through its hidden opener (the one the menus and commands press)
 async function openPanel(page, id) { await page.evaluate(id => document.querySelector(`.rail [data-pn="${id}"]`).click(), id);

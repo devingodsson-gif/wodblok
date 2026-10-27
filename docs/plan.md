@@ -1,5 +1,12 @@
 # Development plan
 
+## 2.59.0 (Oct 27 2026): export recipes on the library tree; no more workspaces. Format 29 unchanged
+Owner, Oct 27 2026: "fully remove workspaces", "the export recipes, go ahead and update that".
+- **Export recipes** are the shared folder tree (`ltMake`, prefix `rc`): Starting points (Web, Print, Preview) is a set; your recipes sit in Yours and your folders; select mode, Move to, drag, hide or rename the set, Export (a zip of `.wodblok-recipe` files) and Import. A click loads a recipe into Custom export; the row's own button exports with it (`act` added to `ltMake`). The old flat list and its CSS are gone.
+- **Workspaces**: the saved layouts were already gone (2.9.0); the Default panels mode of the Close all panels button, the last trace, is removed (`wbWsDefault`, `wbRcls`). The docking system stays; panels are made of it. Docs cleaned.
+- Tests: new `recipes-library-2-59`; `export-recipes` and the specs that press a recipe's button use the tree's rows; `panels-default` removed. Run: those, the export, watermark, panel and spelling specs and `check:style` (all green).
+- Not run: the full suite. Randomize scenario snapshots regenerated in CI on this branch (owner approved).
+
 ## 2.58.0 (Oct 26 2026): Import for saved trays and saved colourways
 - The owner had no preference for the next step; this one finishes the library standard (every library works like the others): Saved trays and Saved colourways exported files but could not take them back. The library tree (`87-library-tree.js`) gets an **Import** button beside Export (the Shapes library's import icon) for a library that gives `importFile: {ext, add(text, folder), done}`; it takes the library's own files and zips of them (folders kept, as the stamp library's import does). Trays read `.wodblok-tray`, colourways `.wodblok-colourway`; a file of another kind is refused ("Could not read that file.").
 - Checked on the way: `repeat-tile` "repeat 3 x 3" now passes (it never settled before 2.57.0); `saved-colours-list` passes in the sandbox (it failed only in CI). Still failing: `repeat-tile` "seamless with more of Randomize switched on: roll 7" (a roll-dependent seam, known since 2.15.0).

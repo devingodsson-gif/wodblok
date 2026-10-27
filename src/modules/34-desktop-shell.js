@@ -105,7 +105,7 @@ if(!nar)L.float.forEach(g=>wsFl.appendChild(wsEl(g,true)));
 // the openers of the element panels are hidden (their commands check that the button exists, not that it shows); a top bar button that opens a panel is pressed while that panel shows
 document.querySelectorAll('#pnop [data-pn]').forEach(b=>{const p=b.dataset.pn;b.hidden=!MODEP.pattern.includes(p)||EL_ONLY.includes(p)});
 document.querySelectorAll('[data-opn]').forEach(b=>{const g=wsFind(b.dataset.opn),on=String(!!g&&g.a==b.dataset.opn&&!g.col);if(b.getAttribute('aria-pressed')!=on)b.setAttribute('aria-pressed',on)});
-wsTabFit();nums();if(WBX.wbRcls)WBX.wbRcls();if(WBX.wbElSync)WBX.wbElSync()}
+wsTabFit();nums();if(WBX.wbElSync)WBX.wbElSync()}
 // a panel with more tabs than fit: the chosen tab is scrolled into view and the edge that hides more tabs fades
 function wsTabEdge(t){const h=t.parentElement;h.classList.toggle('ovr',t.scrollLeft+t.clientWidth<t.scrollWidth-1);h.classList.toggle('ovl',t.scrollLeft>1)}
 function wsTabFit(){document.querySelectorAll('.wh .wt').forEach(t=>{for(let k=0;k<3;k++){wsTabEdge(t);const a=t.querySelector('.wtab.on');if(!a)break;let m=0;if(a.offsetLeft+a.offsetWidth>t.scrollLeft+t.clientWidth){t.scrollLeft=a.offsetLeft+a.offsetWidth-t.clientWidth;m=1}else if(a.offsetLeft<t.scrollLeft){t.scrollLeft=a.offsetLeft;m=1}wsTabEdge(t);if(!m)break}})}   // the arrows (2.26.0) change the strip's width as they show or hide, so fit again until the open tab is in view
@@ -195,18 +195,13 @@ g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
 WBX.wbApart=pn=>{const a=wsFind('lyrs'),b=wsFind(pn);return!(a&&b&&a===b)};   // false when the panel is a tab beside the Elements list: showing it would hide the list
-// The panels the app opens with (2.9.0: the Workspaces tool is gone; this is the one built-in layout, opened at launch and by the Default panels button). Read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
-WBX.wbWsGet=()=>JSON.parse(JSON.stringify({pattern:WS.pattern}));
+// The panels the app opens with (2.9.0: the Workspaces tool is gone; this is the one built-in layout, opened at launch). Read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
 const wsLaunch=()=>({pattern:{dock:[wsG(['canvas','colors'],{e:'l'}),wsG(['lyrs','layers'],{e:'r',lk:1})],float:[]}});
-WBX.wbWsDefault=()=>({layout:wsLaunch()});
 WBX.wbWsSet=o=>{['pattern'].forEach(m=>{const L=o&&o[m];if(!L)return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=wsG([]).id;g.f=+g.f||1;g.e=g.e||'r';g.col=false;return g.tabs.length>0};
  const c=JSON.parse(JSON.stringify(L));WS[m]={dock:(c.dock||[]).filter(ok),float:(c.float||[]).filter(ok)}});
   wsSave();wsRender();info();nums()};
-// The Close all panels button turns into Default when no panel is open and a Default workspace exists: pressing it opens that layout, and it turns back into Close.
-{const b=$('rcls');let dm=null;
-const paint=()=>{const L=wsL(),d=!L.dock.length&&!L.float.length&&!!(WBX.wbWsDefault&&WBX.wbWsDefault());if(d===dm)return;dm=d;b.dataset.m=d?'d':'c';b.setAttribute('aria-label',d?'Default panels':'Close all panels')};
-WBX.wbRcls=paint;
-b.onclick=()=>{const L=wsL();if(!L.dock.length&&!L.float.length){const w=WBX.wbWsDefault&&WBX.wbWsDefault();if(w){WBX.wbWsSet(w.layout);pmsg('Default panels.')}return}L.dock=L.dock.filter(g=>g.lk);L.float=L.float.filter(g=>g.lk);wsSave();wsRender();pmsg('Closed all panels.')}}
+// The Close all panels button closes every panel that is not locked.
+{const b=$('rcls');b.onclick=()=>{const L=wsL();L.dock=L.dock.filter(g=>g.lk);L.float=L.float.filter(g=>g.lk);wsSave();wsRender();pmsg('Closed all panels.')}}
 // a panel opener (2.44.0: the hidden openers, and the top bar buttons with data-opn): it opens the panel, and pressing it again while the panel shows closes it.
 // A real click only; when the app or a command presses an opener, the panel opens (or stays open).
 function wsToggle(p,user){const g=wsFind(p);

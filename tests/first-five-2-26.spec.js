@@ -151,11 +151,11 @@ test('Copy a prompt is in the Import menu of the motif library (an image prompt,
 test('a recipe exports from its own Export button; a click on its name exports nothing', async ({ page }) => {
   const { errors } = await H.openApp(page);
   await H.openPanel(page, 'xrec');
-  const row = page.locator('#xrl .xrr', { hasText: 'Preview' });
-  await expect(row.locator('[data-act="exp"]')).toHaveAttribute('aria-label', 'Export Preview');
+  const row = page.locator('#xrl .lib > div', { hasText: 'Preview' });
+  await expect(row.locator('.rcact')).toHaveAttribute('aria-label', 'Export Preview');
   await row.locator('b').click(); await H.settle(page);
   expect(await page.evaluate(() => window.__wbDownloads.length), 'the name is not a button').toBe(0);
-  await row.locator('[data-act="exp"]').click();
+  await row.locator('.rcact').click();
   await page.waitForFunction(() => window.__wbDownloads.length > 0);
   expect((await page.evaluate(() => window.__wbDownloads[0].filename))).toMatch(/-preview\.jpg$/);
   expect(errors).toEqual([]);
