@@ -777,7 +777,7 @@ body.eyedrop{cursor:crosshair}
 /* 2.55.0: the effect pop-out, a floating panel (Part 9: --r-l, --shadow, above the docked panels) holding the Effects group's own settings pane */
 .fxwin{position:fixed;z-index:9001;width:300px;max-height:80vh;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow)}.fxwin:not([hidden]){animation:popin .13s ease-out}
 .fxwh{display:flex;align-items:center;gap:var(--sp-4);min-height:var(--h-row);padding:0 var(--sp-2) 0 var(--sp-5);font-size:var(--fs-l);font-weight:600;border-bottom:1px solid var(--line);cursor:move;touch-action:none;user-select:none}.fxwt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fxwb{overflow:auto;padding:var(--sp-4) 0}
+.fxwb{overflow:auto;padding:var(--sp-4) var(--sp-5)}.fxwb .fxpane,.fxwb .fxpane:has(.fxs:not([hidden])){padding:0;margin:0;border-left:0}
 .fxwf{display:flex;justify-content:flex-end;gap:var(--sp-4);padding:var(--sp-4);border-top:1px solid var(--line)}
 .cwp:not([hidden]){animation:popin .13s ease-out}
 .cwpd{display:flex;align-items:center;gap:8px;width:100%;height:var(--h-row);padding:0 8px 0 4px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--field);color:var(--fg);font-size:var(--fs-m);text-align:left}

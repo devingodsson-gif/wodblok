@@ -34,7 +34,8 @@ function pmSync(){for(const kind in PM_K){const d=PM_K[kind],q=pmEdit(kind),lib=
 function pmPop(btn,body,kind){pmClose();if(!body)return null;
  const pop=document.createElement('div');pop.className='rpop';pop.setAttribute('role','dialog');pop.setAttribute('aria-label','Replace');document.body.appendChild(pop);
  const home=document.createComment('pm');body.before(home);pop.appendChild(body);pmOpen={kind:kind||'',gb:body,home,pop,btn};btn.setAttribute('aria-expanded','true');
- const sec=btn.closest('section.pn'),R=(sec||btn).getBoundingClientRect(),B=btn.getBoundingClientRect(),w=Math.max(220,Math.min(R.width-8,360));
+ const win=btn.closest('.fxwin');if(win)pop.style.zIndex='9050';   // above the effect pop-out it opens from
+ const sec=win||btn.closest('section.pn'),R=(sec||btn).getBoundingClientRect(),B=btn.getBoundingClientRect(),w=Math.max(220,Math.min(R.width-8,360));
  pop.style.width=w+'px';pop.style.left=Math.max(8,Math.min(innerWidth-w-8,R.left+4))+'px';const top=B.bottom+6,room=innerHeight-top-8;
  if(room>=240){pop.style.top=top+'px';pop.style.maxHeight=room+'px'}else{const h=Math.min(innerHeight*.7,B.top-14);pop.style.top=Math.max(8,B.top-6-h)+'px';pop.style.maxHeight=h+'px'}
  return pop}

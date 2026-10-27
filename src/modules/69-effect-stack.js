@@ -108,7 +108,7 @@ if(sel&&sel.k=='texture'){const L=txLib(sel.x)||{t:Object.keys(TXN)[0],a:40,sc:1
  // 2.50.0: the texture is picked from the texture library; 2.55.0 (creating and editing, docs/panel-modes-plan.md): an effect is always being edited, so its texture
  // shows as a row (thumbnail, name, Replace) and the library opens from Replace in a popover; the library keeps its place on the group while it is moved
  {const tl=g._fxtl||(g._fxtl=gQ(g,'.fxtl')),row=gQ(g,'.fxtr');tlShow(tl,L.t,id=>{if(WBX.wbFxTexSet)WBX.wbFxTexSet(kind,'t',id);pmClose()});
-  if(row&&row.dataset.key!==L.t){row.dataset.key=L.t;const th=txThumb(L.t),e=txSrc(L.t);row.querySelector('.rpth').innerHTML=th?`<img src="${th}" alt="" draggable="false">`:'';row.querySelector('.rpn').textContent=e?e.n:'Texture'}
+  const th=txThumb(L.t),rk=L.t+(th?'+':'');if(row&&row.dataset.key!==rk){row.dataset.key=rk;const e=txSrc(L.t);row.querySelector('.rpth').innerHTML=th?`<img src="${th}" alt="" draggable="false">`:'';row.querySelector('.rpn').textContent=e?e.n:'Texture'}
   if(row&&!row.dataset.w){row.dataset.w=1;row.querySelector('.rpgo').onclick=ev=>{ev.stopPropagation();const b=ev.currentTarget;if(pmIsOpen(b)){pmClose();return}tl.hidden=false;pmPop(b,tl,'')}}}}
 if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=gQ(g,c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxjp',+sel.pos||0);set('.fxjr2',+sel.rot||0);set('.fxjz',+sel.sz||0);gQ(g,'.fxjh').checked=!!sel.fh;gQ(g,'.fxjv').checked=!!sel.fv}
 if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=gQ(g,'.fxg_'+k),v=+sel[k]||0;if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}});

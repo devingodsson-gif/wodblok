@@ -17,8 +17,9 @@ let FO=null,foPos=null;
 const foKey=a=>a.map(q=>String(q.u)).sort().join(',');
 function foSel(){const L=fpL();if(!L)return[];const S=new Set(WBS.fpMS&&WBS.fpMS.size>1?[...WBS.fpMS].map(String):[]);if(WBS.fpSel!==-1&&WBS.fpSel!=null)S.add(String(WBS.fpSel));return(L.pl||[]).filter(q=>S.has(String(q.u)))}
 // the menu item is on when an element is selected and every selected element's kind takes the effect
-function foCan(k){const d=fxDef(k),q=elSel();if(!d||!q)return false;const a=foSel();return a.length>0&&a.every(x=>d.kinds.includes(elKind(x)))}
-function foOpen(k){if(FO)foCancel();if(!foCan(k))return false;pmClose();const d=fxDef(k),a=foSel(),q0=elSel(),kind=elKind(q0),g=document.querySelector(`.fxg[data-fxk="${kind}"]`);if(!g)return false;
+function foCan(k){const d=fxDef(k);if(!d)return false;const a=foSel();return a.length>0&&a.every(x=>d.kinds.includes(elKind(x)))}
+function foOpen(k){if(FO)foCancel();if(!foCan(k))return false;pmClose();const d=fxDef(k),a=foSel();if(!elSel())WBS.fpSel=a[0].u;   // several selected with no first one (Select all): the first in the list leads, its panel's pane is lent
+ const q0=elSel(),kind=elKind(q0),g=document.querySelector(`.fxg[data-fxk="${kind}"]`);if(!g)return false;
  WBX.wbNoCap=1;
  const list=[q0,...a.filter(x=>x!==q0)].map(q=>{const e=d.make();e.u=fpU();q.fx=Array.isArray(q.fx)?q.fx:[];q.fx.push(e);return[q,e]});
  if(WBX.wbFxSel)WBX.wbFxSel(kind,list[0][1].u);
@@ -33,7 +34,7 @@ function foOpen(k){if(FO)foCancel();if(!foCan(k))return false;pmClose();const d=
  ['input','change','click'].forEach(t=>win.addEventListener(t,()=>setTimeout(copy,0)));
  win.querySelector('.fxwa').onclick=foApply;win.querySelector('.fxwc').onclick=foCancel;win.querySelector('.fxwx').onclick=foCancel;
  // place: where it was last dragged, else by the top left of the canvas area
- const st=document.querySelector('.stage'),R=st?st.getBoundingClientRect():{left:60,top:80};const p=foPos||{x:Math.round(R.left+16),y:Math.round(R.top+16)};foPlace(p.x,p.y);
+ const st=document.querySelector('.stage'),R=st?st.getBoundingClientRect():{left:60,top:80};const p=foPos||{x:Math.round(R.left+16),y:Math.round(R.top+48)};foPlace(p.x,p.y);
  const head=win.querySelector('.fxwh');head.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();const b=win.getBoundingClientRect(),ox=e.clientX-b.left,oy=e.clientY-b.top;head.setPointerCapture(e.pointerId);
   const mv=ev=>{foPlace(ev.clientX-ox,ev.clientY-oy)},up=()=>{head.removeEventListener('pointermove',mv);head.removeEventListener('pointerup',up);head.removeEventListener('pointercancel',up);const r=win.getBoundingClientRect();foPos={x:Math.round(r.left),y:Math.round(r.top)}};
   head.addEventListener('pointermove',mv);head.addEventListener('pointerup',up);head.addEventListener('pointercancel',up)});

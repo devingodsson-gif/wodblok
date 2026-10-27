@@ -36,7 +36,7 @@ test('the Effects items are greyed with nothing selected; with a shape selected 
   await expect(page.locator('.fxg[data-fxk="motif"] .fxpane')).toHaveCount(1);   // the pane is back in the panel
   // the same effect opened in the panel shows the same controls
   await H.showPanel(page, 'motifs');
-  await page.locator('.fxg[data-fxk="motif"] .fxr .fxc').first().click(); await H.settle(page);
+  await expect(page.locator('.fxg[data-fxk="motif"] .fxs[data-e="grade"]')).toBeVisible();   // the effect just applied is the open one
   expect(await labels(page, '.fxg[data-fxk="motif"] .fxpane')).toEqual(inWin);
   // one step: Undo takes the effect away
   await page.keyboard.press('Control+z'); await H.settle(page);
@@ -59,11 +59,12 @@ test('Cancel, Esc and Undo leave nothing; several selected shapes all get the ef
   await expect(page.locator('.fxwin')).toHaveCount(0);
   expect((await shapes(page)).length).toBe(1);   // Undo cancelled the pop-out, it did not undo the shape
   expect((await shapes(page))[0].fx).toBeUndefined();
-  // two shapes selected (Ctrl+A selects all but the Background): both get it
+  // two shapes selected in the Elements list: both get it
   await H.addShape(page, 'ellipse');
-  await page.keyboard.press('Control+a'); await H.settle(page);
-  const sel = (await shapes(page)).length;
-  expect(sel).toBe(2);
+  await H.showPanel(page, 'lyrs');
+  const rows = page.locator('#lyl2 .lyr');
+  await rows.nth(0).locator('.lyn').click(); await rows.nth(1).locator('.lyn').click({ modifiers: ['Shift'] }); await H.settle(page);
+  await expect(page.locator('#lyl2 .lyr.on')).toHaveCount(2);
   await openFx(page, 'Jitter');
   await expect(page.locator('.fxwin')).toBeVisible();
   await page.click('.fxwin .fxwa'); await H.settle(page);
