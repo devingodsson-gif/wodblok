@@ -93,6 +93,9 @@ Only items the owner has stated are listed as next. Nothing is started unless he
 ## Open questions for the owner
 None at the moment. Add new ones here.
 
+### Planned Oct 26 2026: the polish plan
+- docs/polish-plan.md (plan only): three releases. 2.55.0 Panels (panels open on the left, launch with the Elements list on the right, no Effects arrow without effects, and the rest of docs/panel-modes-plan.md); 2.56.0 Transform (corners both ways, pulling through mirrors, elements vanishing while dragged); 2.57.0 Patterns (edge-to-edge tiling by tile shape, many arrangements, pattern area with corners; format 29). Five questions for the owner at its end.
+
 ### Planned Oct 26 2026: create and edit, the effect pop-out
 - docs/panel-modes-plan.md (plan only, nothing built): element panels show a library only while creating, a Replace row while editing; an Effects menu item opens a detached window with the same settings pane and Apply. Owner answered its three questions Oct 26 2026.
 
