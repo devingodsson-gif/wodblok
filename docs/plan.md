@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.66.1 (Oct 27 2026): fixes from the CI suite on 2.66.0
+Owner, Oct 27 2026: "run shard CI". The suite on main (2.66.0): WebKit and shards 2 and 8 passed; 13 tests failed in six shards.
+- Fixed here (from this session's releases): a panel tab's close button was 27 px tall (off the height scale; now `--h-sm`); `tx_clr` was on the page twice (the old Super / Sub / Clear row kept in the hidden controls).
+- Not from these releases (they fail the same on 2.59.1 locally): `nothing-lost-2-24` (seed 23 no longer places stamps on their own), `repeat-tile` 3 x 3 and seamless rolls, `stamp-tab-shapes-2-50-1` (rect stage width), `smart-guides-2-40` and `randomize-effects-2-39` (the owner dropped those two). Flaky in CI, pass locally: `saved-colours-list`, `history-thumbs`.
+- The Randomize scenario snapshots (seeds 2 and 3, before/after, split view) changed since they were made on 2.59.1: to regenerate in CI with the owner's approval.
+
 ## 2.66.0 (Oct 27 2026): about ninety built-in fonts with real bold and italic (release 4 of docs/text-plan.md, the last)
 Owner, Oct 27 2026: "80 to 100 fonts by default", built in, real bold and italic ("I'm fine with a bigger file size").
 - 56 fonts added (90 in all), from Google Fonts (SIL Open Font Licence, four under the Apache licence), Latin subsets made by `tools/fonts-make.py` from a checkout of github.com/google/fonts (fontTools; variable fonts set at 400 and 700). 29 of them have their own bold, italic and bold italic, each bundled as a family of its own ("Lora:b", "Lora:i", "Lora:bi") so the Text tool reads each one's outlines. Licences in `src/fonts/licences/`.

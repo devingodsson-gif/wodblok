@@ -175,7 +175,7 @@ body.stedit #lybody>.lyo,body.stedit #lybody>.lyop{display:none}.stt{display:non
 .wb.wta{display:none;width:20px}.wh.ovl .wb.wta.l,.wh.ovr .wb.wta.r,.stt.ovl .wb.wta.l,.stt.ovr .wb.wta.r{display:flex}.wb.wta .ic{width:14px;height:14px}.wt{display:flex;min-width:0;flex:1;overflow-x:auto;scrollbar-width:none}.wt::-webkit-scrollbar{display:none}
 .wh.ovr .wt{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent)}.wh.ovl .wt{-webkit-mask-image:linear-gradient(270deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(270deg,#000 calc(100% - 24px),transparent)}.wh.ovl.ovr .wt{-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent)}
 .wtab{flex:none;border:0;border-right:1px solid var(--line);background:transparent;padding:0 10px;font-size:var(--fs-s);font-weight:500;color:var(--mut);white-space:nowrap;border-radius:0;cursor:inherit;margin:0}
-.wt .wtx{height:100%;width:var(--h-xs);border-right:1px solid var(--line)}.wtab:has(+.wtx){border-right:0;padding-right:2px}.wtab.on+.wtx{background:var(--panel);color:var(--fg)}
+.wt .wtx{height:var(--h-sm);width:var(--h-xs);align-self:center;border-right:1px solid var(--line)}.wtab:has(+.wtx){border-right:0;padding-right:2px}.wtab.on+.wtx{background:var(--panel);color:var(--fg)}
 .wtab.on{background:var(--panel);color:var(--fg);font-weight:600;box-shadow:none}
 .wtab:hover:not(.on){color:var(--fg);background:color-mix(in srgb,var(--panel) 50%,transparent)}
 .wb{flex:none;width:26px;border:0;background:transparent;padding:0;margin:0;color:var(--faint);display:flex;align-items:center;justify-content:center;border-radius:0;cursor:pointer}
@@ -1059,7 +1059,7 @@ body.eyedrop{cursor:crosshair}
    <label>Random size</label><input type="range" id="tx_rs" min="0" max="100" value="0" data-u="%" data-def="0">
    <label>Bounce</label><input type="range" id="tx_bb" min="0" max="100" value="0" data-u="%" data-def="0">
    <label>Scatter</label><div class="seg" id="tx_scat" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-s="" class="on">Off</button><button type="button" data-s="l">Loose</button><button type="button" data-s="f">Full</button></div>
-   <div class="row"><button class="alt" id="tx_sup">Super</button><button class="alt" id="tx_sub">Sub</button><button class="alt" id="tx_clr">Clear</button></div>
+   <div class="row"><button class="alt" id="tx_sup">Super</button><button class="alt" id="tx_sub">Sub</button></div>
    <div class="row"><button class="alt" id="tx_vary">Vary</button></div>
   </div>
   <details class="g" open id="mt_g" hidden><summary>Map to shape</summary><div class="gb">
