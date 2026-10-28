@@ -40,7 +40,7 @@ function rzTake(){rzDrop();const own=[],ids=new Set();WBS.layers.forEach(l=>{if(
 function rzPut(S,top){if(!S||!S.own.length)return;const L=WBS.layers[0];if(!L)return;let next=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));const map={};
  Object.keys(S.tiles).forEach(id=>{const cur=WBS.tiles.find(t=>String(t.id)==id);if(cur&&JSON.stringify(cur)===S.tiles[id])return;const c=JSON.parse(S.tiles[id]);c.id=next++;WBS.tiles.push(c);map[id]=c.id});
  S.own.forEach(q=>{if(q.t!=null&&map[q.t]!=null)q.t=map[q.t];(q.src||[]).forEach(x=>{if(x&&x.t!=null&&map[x.t]!=null)x.t=map[x.t]})});
- {const bg=S.own.filter(q=>q.bgd),mine=S.own.filter(q=>!q.bgd),pl=(L.pl||[]).filter(q=>!q.bgd),i=top?pl.findIndex(q=>top.has(String(q.u))):-1;L.pl=bg.concat(i<0?pl.concat(mine):pl.slice(0,i).concat(mine,pl.slice(i)))}   // the Background goes back under everything (2.28.0)   // under the stamps this roll placed on their own, which stay on top (2.24.0)
+ {const bg=S.own.filter(q=>q.bgd).concat((L.pl||[]).filter(q=>q.bgd)),mine=S.own.filter(q=>!q.bgd),pl=(L.pl||[]).filter(q=>!q.bgd),i=top?pl.findIndex(q=>top.has(String(q.u))):-1;L.pl=bg.concat(i<0?pl.concat(mine):pl.slice(0,i).concat(mine,pl.slice(i)))}   // the Background goes back under everything (2.28.0)   // under the stamps this roll placed on their own, which stay on top (2.24.0)
  // 2.50.2: a roll's element named like one of yours (Pattern 1 when you made a Pattern 1) takes the next free number
  {const mine=new Set(S.own.map(q=>q.n).filter(Boolean)),all=new Set((L.pl||[]).map(q=>q.n).filter(Boolean));(L.pl||[]).forEach(q=>{if(S.own.includes(q)||!q.n||!mine.has(q.n))return;const m=/^(.*?)(\d+)$/.exec(q.n),b=m?m[1]:q.n+' ';let k=m?+m[2]:2;while(all.has(b+k))k++;all.add(b+k);q.n=b+k})}
  WBS.nid=Math.max(WBS.nid||0,next)}
