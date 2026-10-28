@@ -1,5 +1,13 @@
 # Development plan
 
+## 2.73.0 (Oct 28 2026): Replace blend back, on an element (owner's request)
+- Blend list: Replace (overlap prints a colour). Where the element overlaps the elements below it (at its own level, inside a group only that group's members), that overlap prints in the element's Replace colour (`rp`: a tray link that follows the tray, or a fixed colour; the ink when none); the rest of both prints as it was. The row's colour well shows while a selected element is on Replace.
+- The Background never counts as "below" (it is set aside once drawn), so Replace works against the elements above it, not the paper.
+- Behind and Cancel stay gone (they were layer-only). A group on Replace does nothing (its blend is CSS only).
+- `rp` joins the tray references of an element (load, fix, uses); the old layer-level Replace well is removed.
+- Not tried: Replace inside a Repeat tile (the masks are sized for it, no test).
+- Tests: replace-blend-2-73 (new); element-list re-run.
+
 ## 2.72.0 (Oct 28 2026): Threshold effect (owner's request)
 - Print › Threshold: each pixel becomes Dark or Light by its brightness (Level); the element's edge is cut where its alpha passes Edge, so Blur or Noise earlier in the stack round or eat the edge; Softness widens both cuts; Invert swaps Dark and Light.
 - Dark and Light are tray colour wells (owner: black and white by default, tray colours easy to apply): fixed #000000 and #ffffff to start, a tray link on pick that follows the tray, and no "Same ink" entry. The effect-stack well wiring now reads the default entry from the effect's declaration (`W: [field, label, default entry or null, default colour]`).
