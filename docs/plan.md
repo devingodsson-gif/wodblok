@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.70.0 (Oct 28 2026): Add effect, like Add sheet
+- Owner: "in the effects section add 'Add effect' and treat it like the add element section; remove the plus button". The + in the Effects group's title is gone; the group starts with a full-width Add effect button (`alt`, in a `.row`), the same as Add sheet and Add shape, and it opens the same menu (with the Noise, Blur, Print and Distort flyouts). It sits at the top of the group so it stays in one place while an effect's settings are open between the rows. While an element has no effects, the group shows its title and the button only (before, it showed the title and the +). The unused plus icon of the effect stack went. The UI guide (Part 9, element panels) records the Add button pattern.
+- Tests: `panels-2-55` (no button in the title, Add effect full width at the top of the group, the only thing shown with no effects) and `sheet-gradient-2-60-4` (scrolls to the button before clicking: a scroll closes an open menu, and the button now sits lower) updated. All 15 specs that use the Add effect button ran: 50 passed after that fix. `npm run check:style` ran. Not run: the full suite, CI, `npm run perf` (no drawing touched).
+
 ## 2.69.0 (Oct 28 2026): the loading screen shows the version
 - Owner: "on the wodblok loading screen when the app first opens display the version number". The splash now shows the version (as the status bar writes it, for example v2.69) in the small label size and the faint colour, under the loading bar. It is filled in at start-up from the same version the build stamps (WB_VER), so it cannot differ from the status bar.
 - Tests: new `splash-version-2-69-0` (the splash text is the same as the status bar's, is shown, and is the small label size); `settings-menu` ran too. Looked at the held splash in dark, light and phone widths. Not run: the full suite, CI, `npm run perf` (no drawing code touched).

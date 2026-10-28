@@ -30,6 +30,7 @@ test('the Background Sheet takes a Linear gradient, then a Radial one; the setti
   if (SHOT) await page.screenshot({ path: SHOT });
   // effects work on it: a Colour grade
   const g = page.locator('.fxg[data-fxk="sheet"]');
+  await g.locator('.fxadd').scrollIntoViewIfNeeded(); await H.settle(page);   // 2.70.0: Add effect sits in the group's body, lower down; a scroll closes an open menu, so scroll first
   await g.locator('.fxadd').click();
   await page.locator('.rowm:not(.rowsub) .ddi', { hasText: 'Colour grade' }).first().click(); await H.settle(page);
   expect(((await sheet(page)).fx || []).length).toBe(1);
