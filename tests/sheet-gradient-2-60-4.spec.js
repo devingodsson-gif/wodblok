@@ -17,16 +17,16 @@ test('the Background Sheet takes a Linear gradient, then a Radial one; the setti
   expect((await sheet(page)).fl).toBe('grad');
   await expect(page.locator('#mf_fck')).toHaveText('Start');
   await expect(page.locator('#mf_gr')).toBeVisible();
-  await expect(page.locator('#art linearGradient')).toHaveCount(1);
+  await expect(page.locator('#art linearGradient:not([id^="shu"])')).toHaveCount(1);
   await range(page, '#mf_ga', 45); await H.settle(page);
   expect((await sheet(page)).ga).toBe(45);
   await page.click('#mf_gk [data-g="rad"]'); await H.settle(page);
   expect((await sheet(page)).gk).toBe('rad');
   await expect(page.locator('#mf_grr')).toBeVisible(); await expect(page.locator('#mf_gar')).toBeHidden();
-  await expect(page.locator('#art radialGradient')).toHaveCount(1);
+  await expect(page.locator('#art radialGradient:not([id^="shu"])')).toHaveCount(1);
   await range(page, '#mf_gs', 40); await range(page, '#mf_gm', 30); await H.settle(page);
   expect(await sheet(page)).toMatchObject({ gs: 40, gm: 30 });
-  expect(await page.locator('#art radialGradient stop').count()).toBe(3);
+  expect(await page.locator('#art radialGradient:not([id^="shu"]) stop').count()).toBe(3);
   if (SHOT) await page.screenshot({ path: SHOT });
   // effects work on it: a Colour grade
   const g = page.locator('.fxg[data-fxk="sheet"]');

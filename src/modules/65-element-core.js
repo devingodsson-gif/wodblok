@@ -33,12 +33,10 @@ const gWrap=(G,inner)=>{if(!inner)return'';const ink=okC(G.ink)?col(G.ink):'';le
 const its=pl.filter(q=>q.k!='group').map(q=>({q,path:gpath(q)})).filter(it=>!it.path.some(G=>G.v===false));
 // Repeat tile: every top-level piece (a group, a wrapped element, a run of one kind) is copied to the neighbouring tiles on its own, inside its own opacity, blend and ink, so a translucent piece spilling over a tile edge is not laid over its neighbour's copy twice
 const tU=h=>tileOn()?elTile(`${li}_${tn++}`,h):h;let tn=0;
-function render(its,d){let out='',base='',run='',buf='',wb='',wk=null,wa='',wn=false;const T=(h,own)=>d||own?h:tU(h);const flush=()=>{if(run&&buf){const r=R[run];out+=T(r[2]+buf+r[3],EL_K[run].notile)}buf='';run=''};
+function render(its,d){let out='',run='',buf='',wb='',wk=null,wa='',wn=false;const T=(h,own)=>d||own?h:tU(h);const flush=()=>{if(run&&buf){const r=R[run];out+=T(r[2]+buf+r[3],EL_K[run].notile)}buf='';run=''};
 // an element with its own opacity (op), blend (bl) or eye (v:false) is wrapped on its own; the placements a pattern prints share their pattern's wrapper (key wk)
 const emit=()=>{if(wb)out+=`<g${wa}>${T(wb,wn)}</g>`;wb='';wk=null;wn=false};
 for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
- // 2.73.0: the Background is set aside once drawn, so a Replace element works against the elements above it and never against the paper
- if(d==0&&i>0&&its[i-1].q.bgd&&!base){emit();flush();base=out;out=''}
  if(G){let j=i;while(j<its.length&&its[j].path[d]&&its[j].path[d].u==G.u)j++;const inner=render(its.slice(i,j),d+1);i=j-1;emit();flush();out+=gWrap(G,T(inner));continue}
  const q=it.q;if(q.v===false)continue;const k=elKind(q),r=R[k];if(!r)continue;let s=r[4].get(String(q.u));if(s==null)continue;let a=elOB(q);
  // 2.67.0: while copies of an element are being placed, its drawing has an id, so the ghost on the pointer is the element itself (25-art-layers.js)
@@ -47,17 +45,26 @@ for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
  if(q.clp){const cid='pc'+li+'_'+String(q.wk||q.u).replace(/[^\w-]/g,'');if(!defs.includes(`id="${cid}"`))defs+=`<clipPath id="${cid}" clipPathUnits="userSpaceOnUse"><rect x="${(+q.clp[0]).toFixed(2)}" y="${(+q.clp[1]).toFixed(2)}" width="${(+q.clp[2]).toFixed(2)}" height="${(+q.clp[3]).toFixed(2)}"/></clipPath>`;a+=` clip-path="url(#${cid})"`}
  // a filter (2.38.0: a shape in Filter mode) takes what is drawn so far at this level (only its group's members inside a group) and redraws it through its effects
  if((q.flt||EL_K[k].under)&&s.includes('@@UNDER@@')){emit();flush();const fid='flu'+li+'_'+gid(q)+'_'+d;{const[pa,pb]=s.split('@@FSPLIT@@');out=pa.split('@@UNDER@@').join(out).split('@@UID@@').join(fid)+(pb?T(pb.split('@@UID@@').join(fid),false):'')}continue}   // 2.40.1: on a repeat tile the filtered copy (the shape's outline and its effects) is copied to the neighbouring tiles
- // 2.73.0 Replace (owner Oct 28 2026): what this element overlaps among the elements below it (at its own level) prints in a colour (q.rp, the ink by default). Everything else of both prints as it was:
- // the elements below lose the overlap, the element loses it too, and a copy of the element cut to the overlap is flooded with the colour.
- if(q.bl=='replace'&&!q.bgd&&(out||buf||wb)){emit();flush();const id='rpl'+li+'_'+gid(q)+'_'+d,S=T(`<g${a}>${r[2]+s+r[3]}</g>`,EL_K[k].notile),rc=col(okC(q.rp)?q.rp:WBS.proj.ink),RB=tileOn()?`x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"`:`x="0" y="0" width="${CW}" height="${CH}"`,strip=h=>h.replace(/ opacity="[^"]*"/g,'');
-  defs+=`<mask id="${id}c" maskUnits="userSpaceOnUse" ${RB}><rect ${RB} fill="#fff"/><g filter="url(#bhk)">${strip(S)}</g></mask><mask id="${id}b" maskUnits="userSpaceOnUse" ${RB}><rect ${RB} fill="#fff"/><g filter="url(#bhk)">${strip(out)}</g></mask><mask id="${id}r" maskUnits="userSpaceOnUse" ${RB}><rect ${RB} fill="#000"/><g filter="url(#bhw)">${strip(out)}</g></mask><filter id="${id}f" filterUnits="userSpaceOnUse" ${RB} color-interpolation-filters="sRGB"><feFlood flood-color="${rc}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;
-  out=`<g mask="url(#${id}c)">${out}</g><g mask="url(#${id}b)">${S}</g><g mask="url(#${id}r)"><g filter="url(#${id}f)">${S}</g></g>`;continue}
+ // 2.74.0 Replace, two colours (owner Oct 28 2026): colour A is what the element draws (q.ra, else its own ink); colour B (q.rp, else the paper) is drawn instead wherever
+ // the pixel beneath is already colour A, to within Match (q.rm). "Beneath" is everything drawn before the element at its own level, the Background included.
+ // The element is drawn as usual (flat A when q.ra is set), then a copy of its shape flooded with B is laid on it through a mask that is white where the picture beneath is A.
+ if(q.bl=='replace'&&!q.bgd&&(out||buf||wb)){emit();flush();const id='rpl'+li+'_'+gid(q)+'_'+d,hx=v=>col(v).slice(0,7),A=hx(okC(q.ra)?q.ra:okC(q.ink)?q.ink:WBS.proj.ink),B=hx(okC(q.rp)?q.rp:WBS.proj.bg),
+   S=T(`<g${a}>${r[2]+s+r[3]}</g>`,EL_K[k].notile),flood=c=>`<g filter="url(#${id}${c})">${S}</g>`,
+   RB=tileOn()?`x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"`:`x="0" y="0" width="${CW}" height="${CH}"`,
+   tol=.02+fqRm(q)/100*.3,N=64,tab=v=>{const t=[];for(let i=0;i<N;i++)t.push(Math.abs((i+.5)/N-v)<=tol?1:0);return t.join(' ')},ch=n=>parseInt(A.slice(n,n+2),16)/255;
+  // the match: each channel is 1 where it is within the tolerance of A; alpha = R + G + B - 2 is 1 only where all three are; kept where the picture is drawn
+  defs+=`<filter id="${id}m" filterUnits="userSpaceOnUse" ${RB} color-interpolation-filters="sRGB"><feComponentTransfer>${[['R',1],['G',3],['B',5]].map(([c,n])=>`<feFunc${c} type="discrete" tableValues="${tab(ch(n))}"/>`).join('')}</feComponentTransfer><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 1 1 0 -2" result="mm"/><feComposite in="mm" in2="SourceAlpha" operator="in"/></filter>`
+   +`<mask id="${id}k" maskUnits="userSpaceOnUse" ${RB}><rect ${RB} fill="#000"/><g filter="url(#${id}m)">${out}</g></mask>`
+   +`<filter id="${id}a" filterUnits="userSpaceOnUse" ${RB} color-interpolation-filters="sRGB"><feFlood flood-color="${A}"/><feComposite in2="SourceAlpha" operator="in"/></filter><filter id="${id}b" filterUnits="userSpaceOnUse" ${RB} color-interpolation-filters="sRGB"><feFlood flood-color="${B}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;
+  out+=(okC(q.ra)?flood('a'):S)+`<g mask="url(#${id}k)">${flood('b')}</g>`;continue}
  if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a;wn=!!EL_K[k].notile}wb+=r[2]+s+r[3];continue}
  emit();if(k!==run){flush();run=k}buf+=s}
-flush();emit();return base+out}
+flush();emit();return out}
 const body=render(its,0);return[defs,body,'','',null,'']}   // render first: a group's ink adds its filter to defs while it draws
 function elTile(id,h){let o=`<g id="tw${id}">${h}</g>`;const R=[-1,0,1];for(const dx of R)for(const dy of R)if(dx||dy)o+=`<use href="#tw${id}" x="${dx*CW}" y="${dy*CH}"/>`;return o}
 // the opacity and blend attributes of one element ('' when it has neither); behind, cancel and replace stay layer-only
+// Replace's Match (0 to 100, default 25): how close to colour A a pixel beneath must be
+const fqRm=q=>{const v=+q.rm;return Number.isFinite(v)?Math.max(0,Math.min(100,v)):25};
 function elOB(q){const op=q.op!=null?Math.max(0,Math.min(100,+q.op)):100,bl=q.bl&&q.bl!='behind'&&q.bl!='cancel'&&q.bl!='replace'?q.bl:'';return(op<100?` opacity="${(op/100).toFixed(2)}"`:'')+(bl?` style="mix-blend-mode:${bl}"`:'')}
 
 // Effects: an ordered list `fx` on an element, each {u, k, on, sd, ...settings}. An effect registers: label, kinds (the element kinds it works on), defaults.

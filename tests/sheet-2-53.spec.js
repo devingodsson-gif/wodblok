@@ -9,7 +9,7 @@ const st = async page => JSON.parse(await H.getState(page));
 const view = page => page.locator('#art').evaluate(a => { const v = a.viewBox.baseVal; return { w: v.width, h: v.height }; });
 const sheetPanel = 'section.pn[data-p="sheet"]';
 // the rectangle a Sheet's colour draws: the whole canvas
-const fullRects = page => page.locator('#art').evaluate(a => { const v = a.viewBox.baseVal; return [...a.querySelectorAll('rect')].filter(r => r.getAttribute('x') === '0' && r.getAttribute('y') === '0' && Math.abs(+r.getAttribute('width') - v.width) < .02 && Math.abs(+r.getAttribute('height') - v.height) < .02).map(r => r.getAttribute('fill')); });
+const fullRects = page => page.locator('#art').evaluate(a => { const v = a.viewBox.baseVal; return [...a.querySelectorAll('rect')].filter(r => !r.closest('.bgu') && r.getAttribute('x') === '0' && r.getAttribute('y') === '0' && Math.abs(+r.getAttribute('width') - v.width) < .02 && Math.abs(+r.getAttribute('height') - v.height) < .02).map(r => r.getAttribute('fill')); });
 async function addSheet(page) { await page.click('#elb [data-k="sheet"]'); await H.settle(page); }
 async function addFx(page, grp, label) {
   await page.locator('.fxg[data-fxk="sheet"] .fxadd').scrollIntoViewIfNeeded(); await page.click('.fxg[data-fxk="sheet"] .fxadd');
