@@ -3,8 +3,8 @@
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
-const QK = ['noise', 'grain', 'dust', 'blur', 'motion', 'halftone', 'lines', 'stipple', 'bleed', 'misreg', 'rough', 'ripple'];
-const GRP = { noise: ['noise', 'grain', 'dust'], blur: ['blur', 'motion'], print: ['halftone', 'lines', 'stipple', 'bleed', 'misreg'], distort: ['rough', 'ripple'] };
+const QK = ['noise', 'grain', 'dust', 'blur', 'motion', 'halftone', 'lines', 'stipple', 'bleed', 'misreg', 'rough', 'ripple', 'wobble', 'warp', 'slip'];
+const GRP = { noise: ['noise', 'grain', 'dust'], blur: ['blur', 'motion'], print: ['halftone', 'lines', 'stipple', 'bleed', 'misreg'], distort: ['rough', 'ripple', 'wobble', 'warp', 'slip'] };
 const els = async page => JSON.parse(await getState(page)).els || [];
 // the roll-able effects on elements, and the Filter shapes
 // a roll's filter: a Filter shape, or (2.53.0) a Sheet over the whole canvas

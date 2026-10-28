@@ -16,7 +16,7 @@ const addFx = async (page, kind, grp, label) => {
   else await page.locator('.rowm:not(.rowsub) .ddi', { hasText: label }).first().click();
   await settle(page);
 };
-const ALL = [['Noise', 'Add Noise', 'noise'], ['Noise', 'Film Grain', 'grain'], ['Noise', 'Dust & Scratches', 'dust'], ['Blur', 'Gaussian Blur', 'blur'], ['Blur', 'Motion Blur', 'motion'], ['Print', 'Halftone', 'halftone'], ['Print', 'Line Screen', 'lines'], ['Print', 'Stipple', 'stipple'], ['Print', 'Ink Bleed', 'bleed'], ['Print', 'Misregistration', 'misreg'], ['Distort', 'Roughen', 'rough'], ['Distort', 'Ripple', 'ripple']];
+const ALL = [['Noise', 'Add Noise', 'noise'], ['Noise', 'Film Grain', 'grain'], ['Noise', 'Dust & Scratches', 'dust'], ['Blur', 'Gaussian Blur', 'blur'], ['Blur', 'Motion Blur', 'motion'], ['Print', 'Halftone', 'halftone'], ['Print', 'Line Screen', 'lines'], ['Print', 'Stipple', 'stipple'], ['Print', 'Ink Bleed', 'bleed'], ['Print', 'Misregistration', 'misreg'], ['Distort', 'Roughen', 'rough'], ['Distort', 'Ripple', 'ripple'], ['Distort', 'Wobble', 'wobble'], ['Distort', 'Warp', 'warp'], ['Distort', 'Slip', 'slip']];
 
 test('the Add effect menu groups Noise and Blur in flyouts; Print and Distort too', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
@@ -33,7 +33,7 @@ test('the Add effect menu groups Noise and Blur in flyouts; Print and Distort to
   await page.locator('.rowm .ddi', { hasText: 'Print' }).first().hover();
   await expect(page.locator('.rowsub .ddi')).toHaveText(['Halftone', 'Line Screen', 'Stipple', 'Ink Bleed', 'Misregistration']);
   await page.locator('.rowm .ddi', { hasText: 'Distort' }).first().hover();
-  await expect(page.locator('.rowsub .ddi')).toHaveText(['Roughen', 'Ripple']);
+  await expect(page.locator('.rowsub .ddi')).toHaveText(['Roughen', 'Ripple', 'Wobble', 'Warp', 'Slip']);
   await page.locator('.rowm .ddi', { hasText: 'Blur' }).first().click();
   await expect(page.locator('.rowsub .ddi')).toHaveText(['Gaussian Blur', 'Motion Blur']);
   await page.locator('.rowsub .ddi', { hasText: 'Motion Blur' }).click(); await settle(page);
@@ -77,7 +77,7 @@ test('each effect draws its filter on a Shape, and they chain in list order', as
   expect(art.blur).toBeGreaterThanOrEqual(1);
   expect(art.motion).toBeGreaterThanOrEqual(1);
   expect(art.tile).toBeGreaterThanOrEqual(3);   // Halftone, Line Screen and Ripple tile a cell
-  expect(await page.evaluate(() => { const f = [...document.querySelectorAll('#art filter')].map(x => x.innerHTML); return [f.some(h => h.includes('feMorphology')), f.some(h => h.includes('feOffset')), f.filter(h => h.includes('feDisplacementMap')).length]; })).toEqual([true, true, 3]);   // Ink Bleed, Misregistration, and Ink Bleed + Roughen + Ripple displace
+  expect(await page.evaluate(() => { const f = [...document.querySelectorAll('#art filter')].map(x => x.innerHTML); return [f.some(h => h.includes('feMorphology')), f.some(h => h.includes('feOffset')), f.filter(h => h.includes('feDisplacementMap')).length]; })).toEqual([true, true, 6]);   // Ink Bleed, Misregistration, and Ink Bleed + Roughen + Ripple + Wobble + Warp + Slip displace
   expect(art.turned).toBeGreaterThanOrEqual(4);   // Motion Blur, Halftone, Line Screen and Ripple work in a turned frame
   // switched off, an effect draws nothing
   const before = await page.evaluate(() => document.querySelectorAll('#art filter feTile').length);
@@ -174,7 +174,7 @@ test('Print and Distort effects change what is drawn, and Misregistration offset
     });
   };
   const plain = await ink();
-  const fxs = { lines: { k: 'lines', sz: 25, tone: 55, ang: 45, spr: 40 }, stipple: { k: 'stipple', sz: 20, den: 55, spr: 80, sd: 5 }, bleed: { k: 'bleed', amt: 40, rag: 0, soft: 30, sd: 5 }, misreg: { k: 'misreg', amt: 40, ang: 0, col: '#00aeef' }, rough: { k: 'rough', amt: 40, sz: 30, sd: 5 }, ripple: { k: 'ripple', amt: 40, wl: 30, ang: 0 } };
+  const fxs = { lines: { k: 'lines', sz: 25, tone: 55, ang: 45, spr: 40 }, stipple: { k: 'stipple', sz: 20, den: 55, spr: 80, sd: 5 }, bleed: { k: 'bleed', amt: 40, rag: 0, soft: 30, sd: 5 }, misreg: { k: 'misreg', amt: 40, ang: 0, col: '#00aeef' }, rough: { k: 'rough', amt: 40, sz: 30, sd: 5 }, ripple: { k: 'ripple', amt: 40, wl: 30, ang: 0 }, wobble: { k: 'wobble', amt: 40, sz: 40, sd: 5 }, warp: { k: 'warp', amt: 40, sz: 50, sd: 5 }, slip: { k: 'slip', amt: 40, bh: 30, ang: 0, sd: 5 } };
   const got = {};
   for (const [name, f] of Object.entries(fxs)) {
     const d2 = await st(page); shapeOf(d2).fx = [{ u: 'e1', on: true, ...f }];
@@ -190,5 +190,6 @@ test('Print and Distort effects change what is drawn, and Misregistration offset
   expect(got.misreg.cyan).toBeGreaterThan(50);                 // a cyan second copy shows beside the ink
   expect(got.rough.dark).not.toBe(plain.dark);
   expect(got.ripple.where).not.toBe(plain.where);   // a ripple moves ink sideways to the wave, so the amount stays and the places change
+  for (const k of ['wobble', 'warp', 'slip']) expect(got[k].where, k + ' moves the ink').not.toBe(plain.where);   // 2.68.0
   expect(errors).toEqual([]);
 });
