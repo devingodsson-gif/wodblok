@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.67.2 (Oct 28 2026): hotfix, the top bar scrolls sideways on a phone
+- On a phone the top bar stayed a three-column grid whose columns could shrink to nothing, so the menus, the name and the tools overlapped. At 860px and narrower it is now a flex row that scrolls sideways (swipe), every item keeps its own width, the tools sit at the right end, and the scroll bar is hidden. Menus open as floating pop-ups on the page (not inside the bar), so they are not clipped; scrolling the bar closes an open menu, as scrolling already does.
+- Tests: new `top-bar-scroll-2-67-2` (phone width: no item overlaps, the bar scrolls to the last button; desktop width: the bar does not scroll; the phone test fails without the fix). Ran with `top-bar-2-43` and `npm run check:style`; nothing else was run. No pictures or state change; no drawing, file or format code touched.
+
 ## 2.67.1 (Oct 28 2026): hotfix, stamps with Pressure offset vanished once printed
 - Found while building the Randomize rewrite. In the stamp printer (03-stamp-prints-and-drawing.js) a `//` comment added in 2.31.0 ran on into the line after it, so the definitions of the pressure variants never reached the print job: every printed pressure variant came out empty. A placed stamp or a Pattern with Pressure offset (and the patterns Randomize gives pressure) showed its stamps while they were drawn live and lost them once their print was ready. The comment is closed and the line is back.
 - Tests: new `pressure-prints-2-67-1` (2: a Pattern with Pressure offset in a sample project, a placed stamp given Pressure offset; both fail without the fix: every print had no ink). Pictures in the CI goldens that hold pressured stamps may now differ (the stamps now show).
