@@ -4,6 +4,8 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
+**Oct 28 2026 (2.67.3).** Hotfix: Randomize keeps the Background solid (no Wear canvas texture, no opacity or blend on it). Known issue: `randomize-effects-2-39` "a seeded roll is the same with Effects on" fails on main (found while testing this fix, not caused by it). The Randomize Looks branch must apply the same rule (never Wear on the canvas, solid Background) when it is rebased.
+
 **Oct 28 2026 (2.67.2).** Hotfix: on a phone the top bar scrolls sideways (swipe) and its items no longer overlap (CSS only, with a test). The Randomize rewrite (plans in docs/randomize-plan.md, branch feat/randomize-looks) is still in progress and was not touched.
 
 **Oct 28 2026 (2.67.1).** Hotfix: stamps with Pressure offset (placed stamps, Patterns, and the patterns Randomize makes) vanished once their print was ready, since 2.31.0 (a comment ran on into a line of code in the stamp printer). Fixed, with a test.
