@@ -1,5 +1,8 @@
 # Development plan
 
+## 2.66.3 (Oct 27 2026): Randomize scenario snapshots regenerated in CI
+Owner, Oct 27 2026: "do all of it". Made by the update-snapshots workflow on main at 2.66.2. Only the SVG summaries changed (before-view, split-view, seeds 2 and 3): the rolls' Film Grain is drawn the 2.60.5 way (an Overlay blend, no blur); the document states are the same.
+
 ## 2.66.2 (Oct 27 2026): the 3 x 3 view is a picture; the older failing specs fixed
 Owner, Oct 27 2026: "do all of it" (merge 2.66.1, regenerate the scenario snapshots, fix the older failures).
 - **Repeat 3 x 3** is now a picture of the tile, shown nine times (`#tpvi`, nine `<image>`s; the view box is still three by three). It drew the whole drawing twenty-five times with every filter widened to the 3 x 3, and a roll full of effects (seed 5: about 700 masks, 300 filters, 6,700 gradient stops) stalled the page for minutes. The picture is made as an export is (`ser()`, the tile as it is saved) at about the size it shows, and made again a moment after anything changes while the view is on. The drawing is now the same with the view on or off (tileExt, the copies round the tile, the texture copies and the grade's reach no longer change).
