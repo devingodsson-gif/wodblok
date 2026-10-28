@@ -244,7 +244,7 @@ fbox.addEventListener('click',e=>{if(e.target.closest('[data-rzfall]')){foff.cle
 fbtn.onclick=()=>{const open=fbox.hidden;if(open)fPaint();fbox.hidden=!open;fbtn.setAttribute('aria-expanded',open?'true':'false')};
 // null while every folder is ticked (the roll then works exactly as before); otherwise the shapes of each ticked folder, with the Dots set kept apart as the accents
 const folders=()=>{fLabel();const p=fPick();if(p.every(fOn)||!fHas())return null;const on=p.filter(x=>fOn(x)&&x.ks.length),dots=on.find(x=>x.v=='b:Dots'),th=on.filter(x=>x!==dots).map(x=>x.ks);return th.length||dots?{themes:th,dots:dots?dots.ks:null}:null};
-sync();fLabel();WBX.wbRZ={get,sub,amt,folders};
+sync();fLabel();WBX.wbRZ={get,sub,amt,folders,look:()=>{try{return kv.get('wb167_rzlook')||'any'}catch(e){return'any'}}};
 $('rzdo').onclick=()=>randomize(false);
 })();
 
