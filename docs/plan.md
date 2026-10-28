@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.67.4 (Oct 28 2026): hotfix, a kept canvas texture no longer keeps Wear
+- Owner (screenshots): Randomize still sometimes left the Background partly see-through although every opacity slider was at 100%. Cause: the canvas texture is saved in the browser's settings, and a roll whose Canvas texture amount is 0 keeps it; one saved by a roll before 2.67.3 could hold a Wear use, and a canvas Wear use knocks ink out of every layer, the Background included (measured: about 24% of the paper showed the checkerboard). A roll now drops the Wear use from a kept canvas texture; its other uses stay.
+- Checked: 20 and 50 seeded rolls with the new code showed no see-through paper; each Filter effect over the whole canvas keeps the paper solid (checked on a plain Background).
+- Tests: new `randomize-solid-background-2-67-4` (fails without the fix). `randomize-solid-background-2-67-3` and `randomize-new` ran and passed. Nothing else was run.
+- Open question for the owner (Suggestions): make the Background immune to a canvas Wear texture you choose by hand too (a change in how the canvas is drawn), or leave Wear as your own choice.
+
 ## 2.67.3 (Oct 28 2026): hotfix, Randomize keeps the Background solid
 - Owner: "when randomizing, the background should always have 100% opacity and never have the wear texture type; otherwise you see through it". A roll could give the canvas texture the Wear mode, which knocks ink out of every layer, the Background included, so the paper showed through. Randomize now never rolls Wear for the canvas texture (your own kept canvas texture is left alone), never rolls a layer opacity onto the layer that holds the Background, and at the end of a roll clears opacity, blend and any Wear texture from the Background and its layer.
 - Tests: new `randomize-solid-background-2-67-3` (five seeded rolls: no Wear on the canvas, the Background has no opacity, blend or Wear; fails without the fix, on roll 2). Related Randomize specs (new, amounts, mode, effects) ran: all passed except `randomize-effects-2-39` "a seeded roll is the same with Effects on", which also fails on main without this change (not caused by it; not looked into). Rolls change for the same seed (the texture pick), so the CI scenario snapshots of Randomize may differ; none were regenerated.

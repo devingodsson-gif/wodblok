@@ -190,7 +190,7 @@ rzMd=(m,w)=>{const a=rzMds(m).filter(x=>w[x]>0);if(!a.length)return null;let t=0
 rzUse=(pool,md)=>{const t=pick(pool),L=txMake(t,{a:md=='wear'?ri(18,60):md=='stain'?ri(25,70):ri(35,85),sc:ri(60,170),az:pick([225,225,200,250,135,315]),auto:true});WBS.texLib.push(L);return{x:L.id,sd:txRid(),md}},
 rzList=(m,w,n)=>{const pool=rzPool(m),u=[];if(!pool.length||!rzMds(m).length)return u;for(let i=0;i<n;i++){const md=rzMd(m,w);if(md)u.push(rzUse(pool,md))}return u},
 WCV={relief:3,stain:1,wear:1.4},WST={wear:4,relief:1.5,stain:1},
-rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u:(sOn('tx','none')&&ch(.2)?[]:rzList('tx',{...WCV,wear:0},ch(.3)?2:1));   /* 2.67.3: never Wear on the canvas: it knocks ink out of every layer, the Background too, and the Background must stay solid */
+rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u.filter(u=>u.md!='wear'):(sOn('tx','none')&&ch(.2)?[]:rzList('tx',{...WCV,wear:0},ch(.3)?2:1));   /* 2.67.3: never Wear on the canvas: it knocks ink out of every layer, the Background too, and the Background must stay solid; a kept canvas texture loses its Wear too (2.67.4: one saved by an older roll stayed) */
 const EO={pick,ri,rr,ch,jit:!!FT.jit,texOn:!!(FT.pr&&sOn('pr','lay')),gradeOn:!!FT.gr,tex:()=>rzList('pr',WST,1)};
 if(usedGen)mL=rzMainEls(mL,mT,EO);if(FT.frame)fL=rzFrameEls(fL,fT,EO);
 const cvU=rzCv();
