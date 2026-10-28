@@ -35,6 +35,13 @@ const FQ_CELL='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w
 const FQ_LINE='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient><rect width="64" height="64" fill="url(#g)"/></svg>`);
 // a ripple cell: one wave in the red channel (128 = no move in green)
 const FQ_WAVE='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><linearGradient id="g" x1="0" y1="0" x2="1" y2="0">${Array.from({length:17},(_,i)=>`<stop offset="${i/16}" stop-color="rgb(${Math.round(127.5+127.5*Math.sin(i/16*2*Math.PI))},128,128)"/>`).join('')}</linearGradient><rect width="64" height="64" fill="url(#g)"/></svg>`);
+// Slip's displacement picture: n bands of uneven height, each a sideways push (red; green stays at no push), about a third of them none. Kept for the last few seeds.
+const FQ_SLIP=new Map();
+function fqSlipMap(sd,n){const k=sd+':'+n;let u=FQ_SLIP.get(k);if(u)return u;
+ const w=Array.from({length:n},(_,i)=>.5+fqRnd(sd,100+i)),t=w.reduce((x,y)=>x+y,0);let y=0,r='';
+ w.forEach((x,i)=>{const hh=x/t,v=fqRnd(sd,200+i)<.35?0:fqRnd(sd,300+i)*2-1;r+=`<rect y="${q4(y)}" width="1" height="${q4(hh+.002)}" fill="rgb(${Math.round(127.5+127.5*v)},128,128)"/>`;y+=hh});
+ u='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" preserveAspectRatio="none" shape-rendering="crispEdges">${r}</svg>`);
+ if(FQ_SLIP.size>40)FQ_SLIP.delete(FQ_SLIP.keys().next().value);FQ_SLIP.set(k,u);return u}
 // Filter mode (2.38.0): q.__fm {paper} is set when the effect works on the picture under a filter shape. The effects that read an outline read darkness instead:
 // the picture blurred, 1 - its brightness, as a grey with alpha 1; and what would be a gap shows the paper colour.
 const fqFm=q=>q&&q.__fm||null;
@@ -112,7 +119,19 @@ const FQ={
    return{defs:fqFilter(id,b.x-m,b.y-m,b.W+2*m,b.H+2*m,`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/g)}" numOctaves="3" seed="${fqSeed(e)}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${q4(sc)}" xChannelSelector="R" yChannelSelector="G"/>`),wrap:fqWrap(id)}}},
  ripple:{label:'Ripple',grp:'Distort',P:[['amt','Amount',0,100,20,'%'],['wl','Wavelength',1,100,30,''],['ang','Angle',0,179,0,'&#176;']],
   filt:(e,id,b)=>{const S=fqSize(b),sc=S*fqPar(e,'amt',0,100,20)/100*.1;if(!(sc>0))return null;const c=S*(.02+fqPar(e,'wl',1,100,30)/100*.4),a=fqPar(e,'ang',0,179,0),cx=b.x+b.W/2,cy=b.y+b.H/2,h=Math.hypot(b.W,b.H)/2+sc,x0=cx-h,y0=cy-h;
-   return{defs:fqFilter(id,x0,y0,2*h,2*h,`<feImage href="${FQ_WAVE}" x="${q4(x0)}" y="${q4(y0)}" width="${q4(c)}" height="${q4(2*h)}" preserveAspectRatio="none" result="w"/><feTile in="w" result="wt"/><feDisplacementMap in="SourceGraphic" in2="wt" scale="${q4(sc*2)}" xChannelSelector="G" yChannelSelector="R"/>`),wrap:fqTurn(id,a,cx,cy)}}}
+   return{defs:fqFilter(id,x0,y0,2*h,2*h,`<feImage href="${FQ_WAVE}" x="${q4(x0)}" y="${q4(y0)}" width="${q4(c)}" height="${q4(2*h)}" preserveAspectRatio="none" result="w"/><feTile in="w" result="wt"/><feDisplacementMap in="SourceGraphic" in2="wt" scale="${q4(sc*2)}" xChannelSelector="G" yChannelSelector="R"/>`),wrap:fqTurn(id,a,cx,cy)}}},
+ // 2.68.0 (owner Oct 28 2026): Wobble, Warp and Slip join Roughen and Ripple. Wobble is Roughen's slow cousin: one soft, large wave of noise, a hand-drawn wiggle.
+ wobble:{label:'Wobble',grp:'Distort',seed:true,P:[['amt','Amount',0,100,25,'%'],['sz','Size',1,100,40,'']],
+  filt:(e,id,b)=>{const S=fqSize(b),sc=S*fqPar(e,'amt',0,100,25)/100*.2;if(!(sc>0))return null;const g=S*(.12+fqPar(e,'sz',1,100,40)/100*.7),m=sc;
+   return{defs:fqFilter(id,b.x-m,b.y-m,b.W+2*m,b.H+2*m,`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/g)}" numOctaves="2" seed="${fqSeed(e)}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${q4(sc)}" xChannelSelector="R" yChannelSelector="G"/>`),wrap:fqWrap(id)}}},
+ // Warp is liquid: the picture is pushed by a large noise, then pushed again by a finer one (a different seed and channels), so lines flow into each other like a melted print.
+ warp:{label:'Warp',grp:'Distort',seed:true,P:[['amt','Amount',0,100,30,'%'],['sz','Size',1,100,50,'']],
+  filt:(e,id,b)=>{const S=fqSize(b),sc=S*fqPar(e,'amt',0,100,30)/100*.3;if(!(sc>0))return null;const g=S*(.1+fqPar(e,'sz',1,100,50)/100*.5),m=sc*1.7,sd=fqSeed(e);
+   return{defs:fqFilter(id,b.x-m,b.y-m,b.W+2*m,b.H+2*m,`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/g)}" numOctaves="2" seed="${sd}" result="n1"/><feDisplacementMap in="SourceGraphic" in2="n1" scale="${q4(sc)}" xChannelSelector="R" yChannelSelector="G" result="d1"/><feTurbulence type="fractalNoise" baseFrequency="${q4(2.6/g)}" numOctaves="2" seed="${sd+7}" result="n2"/><feDisplacementMap in="d1" in2="n2" scale="${q4(sc*.7)}" xChannelSelector="B" yChannelSelector="R"/>`),wrap:fqWrap(id)}}},
+ // Slip: bands of the picture slide sideways by small, uneven amounts (some not at all), like a misfed press. The bands are a displacement picture made from the seed, run in a turned frame like Ripple.
+ slip:{label:'Slip',grp:'Distort',seed:true,P:[['amt','Amount',0,100,25,'%'],['bh','Band height',1,100,30,''],['ang','Angle',0,179,0,'&#176;']],
+  filt:(e,id,b)=>{const S=fqSize(b),sc=S*fqPar(e,'amt',0,100,25)/100*.16;if(!(sc>0))return null;const a=fqPar(e,'ang',0,179,0),cx=b.x+b.W/2,cy=b.y+b.H/2,h=Math.hypot(b.W,b.H)/2+sc,x0=cx-h,y0=cy-h,n=Math.max(3,Math.min(90,Math.round(2*h/(S*(.02+fqPar(e,'bh',1,100,30)/100*.18)))));
+   return{defs:fqFilter(id,x0,y0,2*h,2*h,`<feImage href="${fqSlipMap(fqSeed(e),n)}" x="${q4(x0)}" y="${q4(y0)}" width="${q4(2*h)}" height="${q4(2*h)}" preserveAspectRatio="none" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="${q4(sc*2)}" xChannelSelector="R" yChannelSelector="G"/>`),wrap:fqTurn(id,a,cx,cy)}}}
 };
 // the defaults of a new effect of kind k
 function fqMake(k){const d=FQ[k],o={k,on:true};(d.P||[]).forEach(p=>o[p[0]]=p[4]);(d.S||[]).forEach(s=>o[s[0]]=s[3]);(d.C||[]).forEach(c=>o[c[0]]=c[2]);(d.W||[]).forEach(w=>o[w[0]]=w[3]);if(d.seed)o.sd=txRid();return o}

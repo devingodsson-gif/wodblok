@@ -69,7 +69,7 @@ const mkEL=(name,st)=>{const n=mkL(name,st,'check',180);n.free=true;n.ak={};n.ma
 // Each effect's settings are drawn from a range that stays printable (a roll never lands on a picture lost in noise or blur); a setting not listed keeps its default.
 const RZQ={noise:{amt:[10,40],sz:[10,40]},grain:{amt:[20,50],sz:[15,45],soft:[20,60]},dust:{amt:[15,45],sz:[15,45],scr:[0,40]},blur:{amt:[3,14]},motion:{amt:[8,28],ang:[0,359]},
  halftone:{sz:[15,45],tone:[40,75],ang:[0,90],spr:[20,60]},lines:{sz:[15,40],tone:[40,70],ang:[0,180],spr:[20,60]},stipple:{sz:[10,35],den:[35,70],spr:[50,90]},
- bleed:{amt:[10,35],rag:[10,50],soft:[10,40]},misreg:{amt:[10,35],ang:[0,359],rnd:[0,35]},rough:{amt:[10,35],sz:[15,45]},ripple:{amt:[8,25],wl:[15,50],ang:[0,179]}};
+ bleed:{amt:[10,35],rag:[10,50],soft:[10,40]},misreg:{amt:[10,35],ang:[0,359],rnd:[0,35]},rough:{amt:[10,35],sz:[15,45]},ripple:{amt:[8,25],wl:[15,50],ang:[0,179]},wobble:{amt:[10,30],sz:[25,60]},warp:{amt:[10,30],sz:[30,65]},slip:{amt:[8,25],bh:[15,50],ang:[0,179]}};
 // the Randomize kinds (the panel's ticks) -> the effect menu's groups, with how often each comes up
 const RZG={noise:['Noise',1.2],blur:['Blur',.6],print:['Print',1],distort:['Distort',.6]};
 // what a Filter shape does when no effect group is ticked: a gentle colour grade

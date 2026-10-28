@@ -1,5 +1,13 @@
 # Development plan
 
+## 2.68.0 (Oct 28 2026): three new Distort effects, Wobble, Warp and Slip
+- Owner: "let's add Wobble, Warp and Slip; a single, clean, focused update" (he likes Roughen and Ripple). They join Roughen and Ripple in the Distort group of the Add effect menu, on every element kind that takes the filter effects (stamp, text, pattern, paint, motif, sheet, so also Filter shapes). Each is one SVG filter in the element's own units, so it looks the same on a small and a large element; each has a Reroll.
+  - **Wobble** (Amount, Size): one soft, large noise bends the picture, a hand-drawn wiggle (Roughen's slow cousin).
+  - **Warp** (Amount, Size): liquid; the picture is pushed by a large noise and again by a finer one (another seed and channels).
+  - **Slip** (Amount, Band height, Angle): bands of uneven height slide sideways by uneven amounts, about a third not at all, like a misfed press; the bands come from the seed (kept for the last 40) and run in a turned frame like Ripple.
+- Randomize: the three are in the Distort group with printable ranges, so a roll can pick them. A seeded roll that picked a Distort effect can now pick another one (the list is longer), so those rolls change.
+- Tests: `noise-blur-effects-2-35` (menu list, all effects chain, displacement count, each new effect moves the ink) and `randomize-effects-2-39` (the lists) updated. `npm run perf` ran: slider drag 1.02 times the baseline, Randomize roll about 2 s. Not run: the full suite, CI, the WebKit run. `randomize-effects-2-39` "a seeded roll is the same with Effects on" still fails as it does on main without this change.
+
 ## 2.67.4 (Oct 28 2026): hotfix, a kept canvas texture no longer keeps Wear
 - Owner (screenshots): Randomize still sometimes left the Background partly see-through although every opacity slider was at 100%. Cause: the canvas texture is saved in the browser's settings, and a roll whose Canvas texture amount is 0 keeps it; one saved by a roll before 2.67.3 could hold a Wear use, and a canvas Wear use knocks ink out of every layer, the Background included (measured: about 24% of the paper showed the checkerboard). A roll now drops the Wear use from a kept canvas texture; its other uses stay.
 - Checked: 20 and 50 seeded rolls with the new code showed no see-through paper; each Filter effect over the whole canvas keeps the paper solid (checked on a plain Background).
