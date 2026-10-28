@@ -43,7 +43,7 @@ const hEsc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 let STV=null;const stvOn=()=>!!STV;
 function stvSet(w,h){STV=w?[w,h]:null;setDim()}
 const tileOn=()=>!STV&&!!WBS.dim.rt&&!WBS.book.on;
-const tileExt=()=>tileOn()?(WBS.tilePv?[CW,CH]:[Math.min(CW,48),Math.min(CH,48)]):[0,0];
+const tileExt=()=>tileOn()?[Math.min(CW,48),Math.min(CH,48)]:[0,0];   // 2.66.2: the 3 x 3 view is a picture of the tile (44-repeat-tile.js), so the drawing is the same with it on
 const setDim=()=>{['cs','cr','n','co','g','cp'].forEach(x=>{if(x in WBS.dim)delete WBS.dim[x]});useG(geom(WBS.dim));try{useT(WBS.tiles[WBS.cur])}catch(e){}
 if(STV){CW=STV[0];CH=STV[1]}else if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims()};
 // Canvas (2.32.0, owner Oct 23 2026): the canvas is always a rectangle. The other outlines (rounded, circle, oval, arch, hex, triangle, diamond, polygon) are gone; setDim drops the old fields.

@@ -4,11 +4,11 @@ const H = require('./helpers/harness');
 const st = async page => JSON.parse(await H.getState(page));
 
 test('after Randomize, stamps placed on their own are in the Elements list and can be clicked', async ({ page }) => {
-  const { errors } = await H.openApp(page, { seed: 23, pattern: false });
+  const { errors } = await H.openApp(page, { seed: 3, pattern: false });   // 2.66.2: seed 23's roll no longer places stamps on their own (rolls changed with the tiling patterns); seed 3's places four
   await page.click('#rzdo'); await H.settle(page, { max: 60000 });
   const s = await st(page);
   const free = s.els.filter(e => e.k === 'stamp');
-  expect(free.length, 'seed 23 places stamps on their own').toBeGreaterThan(0);
+  expect(free.length, 'seed 3 places stamps on their own').toBeGreaterThan(0);
   await page.locator('.rail [data-pn="lyrs"]').dispatchEvent('click'); await H.settle(page);
   expect(await page.locator('#lyl2 [data-u].lyr').count(), 'one list row per element').toBe(s.els.length);
   const c = await H.canvasToClient(page, free[0].x, free[0].y);

@@ -20,6 +20,8 @@ test('a hexagon or triangle stamp fills its own stage in its tab, and the symmet
   for (const k of ['hex', 'tri', 'rect']) {
     await showPanel(page, 'stmp');
     await page.click(`#skind [data-k="${k}"]`); await settle(page);
+    // a rectangle keeps the stamp's own proportions; the seeded roll's stamp is no longer square (rolls changed since 2.50.1), so it is set to 1:1 here
+    if (k === 'rect') { await page.evaluate(() => { const s = document.getElementById('sasp'); s.value = '0'; s.dispatchEvent(new Event('input', { bubbles: true })); }); await settle(page); }
     await page.locator('#sym [data-y="star"]').click(); await settle(page);
     const m = await measure(page), w = want[k];
     expect(m.W, k + ' stage width').toBeCloseTo(w.W, 1);

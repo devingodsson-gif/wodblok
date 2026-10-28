@@ -20,8 +20,11 @@ async function wholeTiles(page) {
 }
 async function periodic(page) {
   await wholeTiles(page);
-  await page.click('#tpv'); await settle(page, { max: 60000 }); await page.waitForTimeout(500);
+  await page.click('#tpv'); await settle(page, { max: 60000 }); await expect(page.locator('#tpvi image')).toHaveCount(9, { timeout: 60000 }); await page.waitForTimeout(500);
+  // 2.66.2: the Exit pill sits over the top tiles, and the see-through squares behind a tile with no paper do not repeat with it: neither is part of the picture
+  await page.evaluate(() => { document.getElementById('tpx').style.visibility = 'hidden'; const a = document.getElementById('art'); a.dataset.ck = a.classList.contains('cvck') ? '1' : ''; a.classList.remove('cvck'); a.style.background = '#fff'; });
   const buf = await page.locator('#art').screenshot();
+  await page.evaluate(() => { document.getElementById('tpx').style.visibility = ''; const a = document.getElementById('art'); if (a.dataset.ck) a.classList.add('cvck'); a.style.background = ''; });
   await page.click('#tpv'); await settle(page);
   return page.evaluate(async b64 => {
     const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
@@ -73,12 +76,14 @@ test('the Format switch has Repeat tile: it is a rectangle, saved with the canva
 });
 
 test('repeat 3 x 3 shows the tile repeated; frames and canvas-wide gradients are left out and counted', async ({ page }) => {
+  test.setTimeout(240000);   // 2.66.2: seed 5's roll is a heavy piece (about 700 masks and 300 filters); the 3 x 3 view is now a picture of it, made as an export is
   const { errors } = await openApp(page, { seed: 5 });
   await roll(page); await tile(page);
   await expect(page.locator('#tpv')).toBeEnabled();
   const vb0 = await page.locator('#art').getAttribute('viewBox');
-  await page.click('#tpv'); await settle(page);
+  await page.click('#tpv'); await settle(page, { max: 120000 });
   await expect(page.locator('#tpv')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#tpvi image')).toHaveCount(9, { timeout: 120000 });   // the picture of the tile, nine times
   const [x, y, w, h] = (await page.locator('#art').getAttribute('viewBox')).split(' ').map(Number), [, , w0, h0] = vb0.split(' ').map(Number);
   expect([x, y, w, h]).toEqual([-w0, -h0, 3 * w0, 3 * h0]);
   await page.click('#tpv'); await settle(page);

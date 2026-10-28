@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.66.2 (Oct 27 2026): the 3 x 3 view is a picture; the older failing specs fixed
+Owner, Oct 27 2026: "do all of it" (merge 2.66.1, regenerate the scenario snapshots, fix the older failures).
+- **Repeat 3 x 3** is now a picture of the tile, shown nine times (`#tpvi`, nine `<image>`s; the view box is still three by three). It drew the whole drawing twenty-five times with every filter widened to the 3 x 3, and a roll full of effects (seed 5: about 700 masks, 300 filters, 6,700 gradient stops) stalled the page for minutes. The picture is made as an export is (`ser()`, the tile as it is saved) at about the size it shows, and made again a moment after anything changes while the view is on. The drawing is now the same with the view on or off (tileExt, the copies round the tile, the texture copies and the grade's reach no longer change).
+- `nothing-lost-2-24` uses seed 3 (seed 23's roll no longer places stamps on their own); `stamp-tab-shapes-2-50-1` sets the rectangle to 1:1 (the roll's stamp is no longer square); `repeat-tile` waits for the picture, and its seam check leaves out the Exit pill and the see-through squares (neither is part of the tile; they made roll 3 look seamed when its paper was see-through).
+- Scenario snapshots regenerated in CI on this branch.
+
 ## 2.66.1 (Oct 27 2026): fixes from the CI suite on 2.66.0
 Owner, Oct 27 2026: "run shard CI". The suite on main (2.66.0): WebKit and shards 2 and 8 passed; 13 tests failed in six shards.
 - Fixed here (from this session's releases): a panel tab's close button was 27 px tall (off the height scale; now `--h-sm`); `tx_clr` was on the page twice (the old Super / Sub / Clear row kept in the hidden controls).
