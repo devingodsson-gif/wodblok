@@ -4,6 +4,8 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
+**Oct 28 2026 (2.70.0).** Effects: a full-width Add effect button at the top of the group, like Add sheet; the + in the title is gone.
+
 **Oct 28 2026 (2.69.0).** The loading screen shows the version number.
 
 **Oct 28 2026 (2.68.0).** Three new Distort effects: Wobble, Warp and Slip (with Roughen and Ripple; also in Randomize's Distort group). Known issue unchanged: `randomize-effects-2-39` "a seeded roll is the same with Effects on" fails on main.

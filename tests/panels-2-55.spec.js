@@ -46,7 +46,7 @@ test('a panel comes back where it was: closed on the left, it opens on the left 
   expect(errors).toEqual([]);
 });
 
-test('the Effects group has no fold arrow and no body while the element has no effects; adding one opens it', async ({ page }) => {
+test('the Effects group has no fold arrow and only Add effect in its body while the element has no effects; adding one opens it', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, pattern: false, background: true });
   await H.addShape(page, 'rect');
   const g = page.locator('.fxg[data-fxk="motif"]');
@@ -54,6 +54,14 @@ test('the Effects group has no fold arrow and no body while the element has no e
   await expect(g).toHaveClass(/fxnone/);
   const arrow = () => g.locator('summary').evaluate(s => getComputedStyle(s, '::before').visibility);
   expect(await arrow()).toBe('hidden');
+  // 2.70.0: no plus in the title; a full-width Add effect button, like Add sheet, is all the body shows
+  await expect(g.locator('summary button')).toHaveCount(0);
+  await expect(g.locator('.fxadd')).toHaveText('Add effect');
+  await expect(g.locator('.fxadd')).toBeVisible();
+  await expect(g.locator(':scope>.gb>.fxl:not(.fxl2)')).toBeHidden();
+  const w = await g.locator('.fxadd').evaluate(b => b.getBoundingClientRect().width / b.closest('.gb').getBoundingClientRect().width);
+  expect(w).toBeGreaterThan(0.8);
+  expect(await g.evaluate(d => d.querySelector(':scope>.gb').firstElementChild.classList.contains('fxar'))).toBe(true);   // at the top of the group, like Add sheet
   await g.locator('summary').click({ position: { x: 30, y: 8 } });
   expect(await g.evaluate(d => d.open)).toBe(true);   // a click on the title does not fold it
   await g.locator('.fxadd').click();

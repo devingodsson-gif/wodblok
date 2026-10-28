@@ -55,14 +55,13 @@ function fxMenuKind(){const k=elKind(elSel());return k&&fxTarget(k)?k:''}
 // The Effects menu's run: add effect k to the selected element and show its settings in the element's panel
 function fxMenuAdd(k){const kind=fxMenuKind();if(!kind||!fxAddTo(kind,k))return false;if(WBX.wbFxOpen)WBX.wbFxOpen(kind,SEL[kind]);return true}
 // The list (2.3.0, Photoshop's layer effects): one row per effect (eye, name, ⋯), drag to reorder; the open effect's settings show right under its row.
-// The + in the group's title adds one. Rows before the open one and the open row are in .fxl, the settings follow, the rest are in .fxl2.
+// Add effect, a full-width button at the top of the group like Add sheet (2.70.0; it was a + in the title), adds one. Rows before the open one and the open row are in .fxl, the settings follow, the rest are in .fxl2.
 const FXI={eye:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.eye+'</svg>',
  off:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.eyeOff+'</svg>',
  more:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.more+'</svg>',
- plus:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.plus+'</svg>',
  car:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevR+'</svg>'};
-function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hidden><summary>Effects<button type="button" class="ib fxadd" aria-haspopup="menu" aria-label="Add effect">${FXI.plus}</button></summary><div class="gb">
-<div class="fxl"></div><div class="fxpane">
+function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hidden><summary>Effects</summary><div class="gb">
+<div class="row fxar"><button type="button" class="alt fxadd" aria-haspopup="menu" data-more>Add effect</button></div><div class="fxl"></div><div class="fxpane">
 <div class="fxs" data-e="texture" hidden>
 <div class="rprow fxtr"><span class="rpth"></span><span class="rpn"></span><button type="button" class="alt rpgo" aria-haspopup="dialog">Replace</button></div>
 <div class="fxtl" hidden>${tlPane()}</div>
@@ -115,7 +114,7 @@ if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=gQ(g,'.fxg_'+k),v=+sel[k]||0
 if(sel){const d=fxDef(sel.k),pane=d&&d.sync&&gQ(g,`.fxs[data-e="${sel.k}"]`);if(pane)d.sync(pane,sel)}
 if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=gQ(g,c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxpp',+sel.pst||0);set('.fxpf',+sel.pfl||0)}})}
 function init69(){
-document.addEventListener('click',e=>{const sm=e.target.closest&&e.target.closest('.fxg.fxnone>summary');if(sm&&!e.target.closest('.fxadd'))e.preventDefault()},true);
+document.addEventListener('click',e=>{const sm=e.target.closest&&e.target.closest('.fxg.fxnone>summary');if(sm)e.preventDefault()},true);
 // the Elements list opens an effect: select its element, show its panel, open that effect's settings
 // 2.55.0: the effect pop-out opens an effect's settings without showing the panel
 WBX.wbFxSel=(kind,u)=>{SEL[kind]=u;document.querySelectorAll('.fxl').forEach(x=>x.dataset.k='');fxSync()};
