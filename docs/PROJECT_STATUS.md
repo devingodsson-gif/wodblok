@@ -40,6 +40,8 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 
 **Oct 28 2026 (2.67.1).** Hotfix: stamps with Pressure offset (placed stamps, Patterns, and the patterns Randomize makes) vanished once their print was ready, since 2.31.0 (a comment ran on into a line of code in the stamp printer). Fixed, with a test.
 
+**Oct 27 2026 (plans).** Two plans saved: docs/book-cover-ideas.md (a possibility, not scheduled) and docs/randomize-plan.md (the Randomize rewrite: a roll is a composed picture from a Look; five steps, 2.67.2 to 2.67.6, then 2.68.0). The owner answered the four questions (Oct 27: simplify the panel, made-up titles plus sometimes the project name, the eight Looks, new stamp artwork with saved stamps by switch).
+
 **Oct 27 2026 (2.67.0).** The Place copies ghost is the element itself; a gradient Sheet's effects fade along the gradient (full at its End); a gradient end can be None.
 
 **Oct 27 2026 (2.66.2).** CI suite run on 2.66.0 (owner); its failures fixed in 2.66.1 and 2.66.2: the Repeat 3 x 3 view is a picture of the tile (it stalled on heavy rolls), three older specs updated. Still failing, dropped by the owner: `smart-guides-2-40` Settings > Guides, `randomize-effects-2-39` seeded roll.
