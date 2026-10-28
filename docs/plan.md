@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.69.0 (Oct 28 2026): the loading screen shows the version
+- Owner: "on the wodblok loading screen when the app first opens display the version number". The splash now shows the version (as the status bar writes it, for example v2.69) in the small label size and the faint colour, under the loading bar. It is filled in at start-up from the same version the build stamps (WB_VER), so it cannot differ from the status bar.
+- Tests: new `splash-version-2-69-0` (the splash text is the same as the status bar's, is shown, and is the small label size); `settings-menu` ran too. Looked at the held splash in dark, light and phone widths. Not run: the full suite, CI, `npm run perf` (no drawing code touched).
+
 ## 2.68.0 (Oct 28 2026): three new Distort effects, Wobble, Warp and Slip
 - Owner: "let's add Wobble, Warp and Slip; a single, clean, focused update" (he likes Roughen and Ripple). They join Roughen and Ripple in the Distort group of the Add effect menu, on every element kind that takes the filter effects (stamp, text, pattern, paint, motif, sheet, so also Filter shapes). Each is one SVG filter in the element's own units, so it looks the same on a small and a large element; each has a Reroll.
   - **Wobble** (Amount, Size): one soft, large noise bends the picture, a hand-drawn wiggle (Roughen's slow cousin).

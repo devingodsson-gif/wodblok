@@ -7,7 +7,7 @@ const WB_VER='0.100';
 // When this build was made (ISO time, written by the build from the commit date; empty when running the unbundled modules).
 const WB_BUILT='';
 const $=id=>document.getElementById(id),mod=(a,b)=>((a%b)+b)%b;
-function init01(){document.title='Wodblok v'+WB_VER;{const b=document.getElementById('pbuilt'),d=WB_BUILT&&new Date(WB_BUILT);if(b&&d&&!isNaN(d)){b.textContent='Updated '+d.toLocaleString(undefined,{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit'});b.title='Built '+WB_BUILT;b.hidden=false}}{const v=document.getElementById('ver');if(v){v.textContent='v'+WB_VER;v.title='Version '+WB_VER}}
+function init01(){document.title='Wodblok v'+WB_VER;{const b=document.getElementById('pbuilt'),d=WB_BUILT&&new Date(WB_BUILT);if(b&&d&&!isNaN(d)){b.textContent='Updated '+d.toLocaleString(undefined,{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit'});b.title='Built '+WB_BUILT;b.hidden=false}}{const v=document.getElementById('ver');if(v){v.textContent='v'+WB_VER;v.title='Version '+WB_VER}}{const v=document.getElementById('splver');if(v)v.textContent='v'+WB_VER}   /* 2.69.0: the loading screen shows the version */
 // Every launch starts fresh: one blank stamp, default settings everywhere, the Pattern view, and no panels open in either mode.
 // Kept between launches: your motif library and its folders, custom colours, and saved projects.
 try{['wb2_tiles','wb2_proj','wb4_layers','wb14_dim','wb10_tex','wb11_print','wb41_grade','wb33_grid','wb40_book','wb31_cover','wb40_coverB','wb40_coverS',
