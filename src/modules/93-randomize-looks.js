@@ -26,7 +26,7 @@ function rzRoles(PC,paper,dark){const all=[...new Set(PC.filter(Boolean))];let p
  const rest=all.filter(c=>c!==p),byC=rest.slice().sort((a,b)=>rzCon(b,p)-rzCon(a,p)),ink=byC[0]||(dark?paper:p),acc=byC.slice(1),soft=rest.slice().sort((a,b)=>rzCon(a,p)-rzCon(b,p))[0]||ink;
  const on=bg=>rest.concat(dark?[paper]:[]).filter(c=>c!==bg).sort((a,b)=>rzCon(b,bg)-rzCon(a,bg))[0]||ink;
  // a colour for words over bg (one colour or the two ends of a gradient): the one asked for when it reads well (contrast 3 or more), else the best there is
- const lo=(c,bg)=>Math.min(...[].concat(bg).map(b=>rzCon(c,b))),txt=(bg,want)=>{if(want&&lo(want,bg)>=3)return want;return[ink,...acc,p,...rest].filter(Boolean).sort((a,b)=>lo(b,bg)-lo(a,bg))[0]||ink};
+ const lo=(c,bg)=>Math.min(...[].concat(bg).map(b=>rzCon(c,b))),txt=(bg,want)=>{if(want&&lo(want,bg)>=3)return want;const b=[ink,...acc,p,...rest,'#ffffff','#111111'].filter(Boolean).sort((a,b)=>lo(b,bg)-lo(a,bg))[0]||ink;return b};
  return{paper:p,ink,acc,soft,all,dark:!!dark,on,txt}}
 
 // --- words. Made-up titles that fit each Look, and sometimes the project's name (owner, Oct 27 2026: "Mix")
@@ -94,7 +94,7 @@ RZL.poster={dark:1,w:1.2,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.07
  else if(dark)out.els.push(elSheet('Ground',{ink:R.paper}));
  // the quiet field: small shapes in the soft colour, see-through, on a Tiling or a Scatter
  if(E.ch(.7)){const bk=E.pick(['ellipse','star','dia','hex','rect']),mk=basicKey(bk);if(mk){const lay=E.pick(['tile','scatter']),p=patOf('Field',[],lay=='tile'?'tile':'scatter',E.ri(6,12),E.ri(8,16),E.ri(30,60),[],null);p.src=[{k:'motif',m:mk,w:1,ink:R.soft}];if(lay=='tile'){p.ts=E.pick(['square','hex','diamond']);p.ps=+E.rr(3,6).toFixed(1);p.sp=E.ri(120,260);p.ar=(TL_AR[p.ts]||[['grid']])[0][0]}else{p.cn=E.ri(5,8);p.rn=E.ri(6,10);p.sz=E.ri(18,35)}p.op=E.ri(15,35);out.els.push(p)}}
- const titleTop=E.ch(.3),fs=S*E.rr(.5,.62),fy=titleTop?CH*.58:CH*.4,id=1,sk=E.pick(['circle','circle','hex','rect','diamond']),t=rzTile(E,id,rzSh(sk),E.pick(['emblem','center','center','rosette']),mains,dots,R.txt(gnd,R.ink));out.tiles.push(t);
+ const titleTop=E.ch(.3),fs=S*E.rr(.78,.95),fy=titleTop?CH*.56:CH*.4,id=1,sk=E.pick(['circle','circle','hex','rect','diamond']),t=rzTile(E,id,rzSh(sk),E.pick(['emblem','center','center','rosette']),mains,dots,R.txt(gnd,R.ink));out.tiles.push(t);
  out.els.push(addFx(elStamp(t,CW/2,fy,fs,0),E.ch(.4)?rzQfx('misreg',{amt:E.ri(8,20),ang:E.ri(0,359),col:R.acc[0]||''},E):null,E.ch(.3)?fxP(E.ri(1,4),0):null));
  const [ti,sub]=E.pick(RZW.poster),nm=rzName(),title=nm&&E.ch(.3)?nm.toUpperCase().slice(0,22):ti,tf=rzFont(E,RZF.poster[0]),sf=rzFont(E,RZF.poster[1]),tw=CW-2*m,th=S*E.rr(.11,.16),bandY=titleTop?m+th/2:Math.min(CH-m-th*1.4,fy+fs/2+th*.9);
  const tink=R.txt(gnd,R.ink);out.texts.push(elText(E,title,tf,CW/2,bandY,tw,th,tink,{ls:/[a-z]/.test(title)?0:E.pick([2,4,8])}));
@@ -140,7 +140,7 @@ RZL.modern={dark:1,w:1,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.06,.
 RZL.sun={w:.9,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},mains=rzThemes(E,'sun').slice().sort(()=>E.R()-.5).slice(0,2),cx=CW/2,cy=CH*E.rr(.42,.5);
  out.els.push(elGrad(E,R.soft,R.paper,true));
  const rk=basicKey(E.pick(['tri','dia','ellipse','star'])),p=patOf('Rays',[],'radial',E.pick([12,16,20,24]),E.ri(2,4),E.ri(60,90),[],null);p.x=rzF(cx);p.y=rzF(cy);if(rk){p.src=[{k:'motif',m:rk,w:1,ink:[...R.acc,R.ink].find(c=>rzCon(c,R.soft)>=1.5&&rzCon(c,R.paper)>=1.5)||R.ink}];p.op=E.ri(70,95);out.els.push(addFx(p,rzQfx('bleed',{amt:E.ri(8,20),rag:E.ri(15,40),soft:E.ri(15,35)},E)))}
- const t=rzTile(E,1,rzSh('circle'),E.pick(['center','emblem']),mains,mains,R.ink);out.tiles.push(t);const fs=S*E.rr(.32,.42);out.els.push(addFx(elStamp(t,cx,cy,fs,0),E.ch(.5)?rzQfx('halftone',{sz:E.ri(15,30),tone:E.ri(50,70),ang:E.pick([15,45]),spr:E.ri(20,45)},E):null));
+ const t=rzTile(E,1,rzSh('circle'),E.pick(['center','emblem']),mains,mains,R.txt([R.soft,R.paper],R.ink));out.tiles.push(t);const fs=S*E.rr(.5,.65);out.els.push(addFx(elStamp(t,cx,cy,fs,0),E.ch(.5)?rzQfx('halftone',{sz:E.ri(15,30),tone:E.ri(50,70),ang:E.pick([15,45]),spr:E.ri(20,45)},E):null));
  const [ti,sub]=E.pick(RZW.sun),tf=rzFont(E,RZF.sun[0]),sf=rzFont(E,RZF.sun[1]),th=S*E.rr(.13,.17),ty=Math.min(CH-th*1.6,cy+fs/2+th*.75),hl=E.ch(.5)?(R.acc[1]||R.paper):'',gnd=[R.soft,R.paper],tc=R.txt(hl||gnd,R.ink);
  out.texts.push(elText(E,ti,tf,cx,ty,CW*.84,th,tc,{cv:E.pick([0,12,18]),...(hl?{sty:[[0,[...ti].length,100,0,0,'','',hl]]}:{})}));out.texts.push(elText(E,sub,sf,cx,ty+th*.95,CW*.5,th*.32,R.txt(gnd,R.acc[0]),{ls:16}));
  out.tex=E.ch(.6)?'paper':'none';out.grade='warm';return out}};
