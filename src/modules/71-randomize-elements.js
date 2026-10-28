@@ -107,4 +107,4 @@ function rzEffectsEls(L,opt){const R=rzRng(opt.seed),n0=Date.now().toString(36);
     :{u:o.id(),k:'motif',m,x:+(CW/2+o.rr(-.12,.12)*CW).toFixed(1),y:+(CH/2+o.rr(-.12,.12)*CH).toFixed(1),s:+S.toFixed(1),r:k=='heart'||o.ch(.6)?0:o.pick([15,-15,30,45]),f:1};
    const top=L[L.length-1];if(top){if(!full){q.nm='Filter';q.flt=1}q.fx=fx;top.pl=(top.pl||[]).concat([q]);changed.n++}}}
  return changed.n}
-export {GRAD,arrOpts,gArrAll,mkEL,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPressEls,rzTexEls,rzEffectsEls};
+export {GRAD,arrOpts,gArrAll,mkEL,patOf,fxG,fxJ,fxP,fxT,rzFx,rzFrameEls,rzLayoutEls,rzMainEls,rzPressEls,rzTexEls,rzEffectsEls};
