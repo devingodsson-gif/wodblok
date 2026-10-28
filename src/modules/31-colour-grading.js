@@ -79,7 +79,7 @@ let c=p+'b';if(ov){o+=`<feFlood flood-color="${OVC}" flood-opacity=".55" result=
 return[o,c]}
 const flt=(id,x,y,w,h,pr)=>`<filter id="${id}" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="${f4(x)}" y="${f4(y)}" width="${f4(w)}" height="${f4(h)}" color-interpolation-filters="sRGB">${pr||'<feComponentTransfer/>'}</filter>`;
 // The area the grade covers: the canvas, or on a repeat tile the tile and the part of its neighbours that is drawn (a margin, or a whole tile for the 3 x 3 view)
-const gRg=()=>{if(!(WBS.dim.rt&&!WBS.book.on))return[0,0,CW,CH];const ex=WBS.tilePv?CW:Math.min(CW,48),ey=WBS.tilePv?CH:Math.min(CH,48);return[-ex,-ey,CW+2*ex,CH+2*ey]};
+const gRg=()=>{if(!(WBS.dim.rt&&!WBS.book.on))return[0,0,CW,CH];const ex=Math.min(CW,48),ey=Math.min(CH,48);return[-ex,-ey,CW+2*ex,CH+2*ey]};
 // the whole print (texture=1: the paper texture, which skips colour/luminance masks since it has no print colours of its own)
 function canvasF(id,texture){let o='',c='SourceGraphic';if(hasA(grd)){const r=adjP(grd,c,'G');o+=r[0];c=r[1]}
 const ctx={W:CW,H:CH,X:0,Y:0,RW:CW,RH:CH,k:'c'};
