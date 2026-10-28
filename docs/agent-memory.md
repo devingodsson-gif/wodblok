@@ -172,3 +172,7 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 - He asked to bring **Replace** back as a blend (2.73.0): the overlap with the elements below prints in a chosen colour. I did Replace only, not Cancel or Behind.
 - Working preference he stated earlier: do not report stop-hook "unpushed commits" false alarms beyond a brief confirmation when the remote already matches HEAD; only speak up if commits really are unpushed.
 - Oct 28 2026 (afternoon): he moved to another Claude agent; handover notes are at the top of docs/PROJECT_STATUS.md.
+- Oct 28 2026 (evening): he asked for **Replace with two colours** (2.74.0, live): Colour A draws (default the element's ink); Colour B draws where the pixel beneath is already A (default paper); a third colour beneath gets A; "beneath" includes the Background and every element below. He confirmed "Your assumptions are accurate". Match slider added by me (default 25).
+- He said "Go ahead and regenerate the snapshots then run the full suite": approval given for regenerating state/SVG snapshots and for the full suite, this once. Pixel goldens still only for an intended change, saying which.
+- He also asked (questions only, nothing built): how hard background/subject/sky removal on images would be, and what to add to make WODBLOK a more rounded professional tool.
+- He wants memory kept current for the next agent; anything saved to Claude memory about WODBLOK is also written here.
