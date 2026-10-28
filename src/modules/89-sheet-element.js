@@ -60,5 +60,10 @@ function shLayer(L,li){const pl=(L.pl||[]).filter(q=>q.k=='sheet');if(!pl.length
   const under=T||G?`<g${op<1?` opacity="${op.toFixed(3)}"`:''}${fade?` mask="url(#${fade.id})"`:''}><g${T?T.attrs:''}>${G?G.wrap(use):use}</g></g>`:'';
   fr.set(String(q.u),`<g id="${FLT_I}">${FLT_U}</g>${FLT_S}${under}${self}`)});
  return[defs,'','','',fr]}
+// 2.70.1: the Background stays solid. The print settings (Roughness, Ink squash) and a canvas Wear texture work on the whole drawing, the Background with it: Ink squash
+// faded everything (the checkerboard showed through the paper) and Roughness frayed the paper's edge. A solid copy of the Background's fill is drawn under them, so what
+// they take away shows paper, not the checkerboard. A Background with no fill, or hidden, is left as it is (see-through on purpose).
+function shUnder(){const L=WBS.layers&&WBS.layers[0],q=L&&L.vis&&(L.pl||[]).find(p=>p&&p.bgd&&p.k=='sheet');if(!q||q.v===false||q.fl=='none')return{defs:'',body:''};
+ const s=q.fl=='grad'||q.fl=='img'?q:{...q,ink:(okC(q.ink)?col(q.ink):col(WBS.proj.bg)).slice(0,7)};return shFill(s,'shu',new Set())}
 function init89(){elExtend('sheet',{draw:(L,li)=>shLayer(L,li)})}
-export {init89};
+export {init89,shUnder};

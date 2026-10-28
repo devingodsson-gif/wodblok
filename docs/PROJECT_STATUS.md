@@ -4,6 +4,8 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
+**Oct 28 2026 (2.70.1).** Hotfix: the Background stays solid under Ink squash, Roughness and a canvas Wear texture (a solid copy is drawn under them).
+
 **Oct 28 2026 (2.70.0).** Effects: a full-width Add effect button at the top of the group, like Add sheet; the + in the title is gone.
 
 **Oct 28 2026 (2.69.0).** The loading screen shows the version number.
