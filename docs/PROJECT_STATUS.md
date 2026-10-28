@@ -4,7 +4,7 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
-**Oct 27 2026 (2.67.0).** The Place copies ghost is the element itself; a gradient Sheet's effects fade along the gradient (full at its End).
+**Oct 27 2026 (plans).** Two plans saved: docs/book-cover-ideas.md (a possibility, not scheduled) and docs/randomize-plan.md (the Randomize rewrite: a roll is a composed picture from a Look; five steps, 2.67.1 to 2.67.5, then 2.68.0). Waiting for the owner's answers to the plan's four questions before step 1.
 
 **Oct 27 2026 (2.67.0).** The Place copies ghost is the element itself; a gradient Sheet's effects fade along the gradient (full at its End); a gradient end can be None.
 
