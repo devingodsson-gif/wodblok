@@ -46,7 +46,7 @@ function renderLayers(){const host=$('lyl2');if(!host)return;const a=lyP(),S=new
    (fxOpen?fxs.map(e=>{const fd=fxDef(e.k),on=e.on!==false;return`<div class="lyfx${on?'':' off'}" data-u="${q.u}" data-lfx="${e.u}" style="margin-left:${12*d+24}px"><button type="button" class="eye" data-fxeye title="${on?'Hide':'Show'}">${on?EYE:NOEYE}</button><span class="lyn">${hx(fd?fd.label:e.k)}</span></div>`}).join(''):'')}).join('');
   const inp=host.querySelector('input');if(inp){inp.focus();inp.select();const lyDone=ok=>{if(lyRen==null)return;const q=lyBy(lyP(),lyRen);if(ok&&q&&inp.value.trim())q.nm=inp.value.trim().slice(0,30);lyRen=null;store();upd()};inp.onkeydown=e=>{if(e.key=='Enter')lyDone(1);else if(e.key=='Escape')lyDone(0)};inp.onblur=()=>lyDone(1);inp.onclick=e=>e.stopPropagation()}}
  const n=a.filter(q=>!lyIsG(q)).length;if(!document.body.classList.contains('stedit'))$('lycnt').textContent=`${n} element${n==1?'':'s'}`;
- const s=lySel(),one=s[0]||null;$('ly_bl').value=one&&one.bl||'';$('ly_rprow').hidden=!s.some(q=>q.bl=='replace');$('ly_bl').disabled=!s.length;$('ly_op').disabled=!s.length;const ov=one?(one.op==null?100:one.op):100;if(+$('ly_op').value!=ov){lySync=true;try{$('ly_op').value=ov;$('ly_op').dispatchEvent(new Event('input',{bubbles:true}))}finally{lySync=false}}
+ const s=lySel(),one=s[0]||null;$('ly_bl').value=one&&one.bl||'';{const rp=s.some(q=>q.bl=='replace');$('ly_rarow').hidden=$('ly_rprow').hidden=$('ly_rmrow').hidden=!rp;const q1=s.find(q=>q.bl=='replace'),rv=q1&&q1.rm!=null?+q1.rm:25;if(+$('ly_rm').value!=rv){lySync=true;try{$('ly_rm').value=rv;$('ly_rm').dispatchEvent(new Event('input',{bubbles:true}))}finally{lySync=false}}}$('ly_bl').disabled=!s.length;$('ly_op').disabled=!s.length;const ov=one?(one.op==null?100:one.op):100;if(+$('ly_op').value!=ov){lySync=true;try{$('ly_op').value=ov;$('ly_op').dispatchEvent(new Event('input',{bubbles:true}))}finally{lySync=false}}
  $('lygrp').disabled=s.length<2;$('lyung').disabled=!s.some(lyIsG)}
 // ---- changing the list
 const lyDone=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
@@ -74,7 +74,9 @@ function init32(){
  window.lyInkOn=1;
  // Behind and Cancel make no sense on one element; Replace (2.73.0) works against the elements below it
  ['behind','cancel'].forEach(v=>{const o=$('ly_bl').querySelector(`option[value="${v}"]`);if(o)o.remove()});
- mkWell($('wl_rp'),{label:'Replace colour',what:'Replace',def:'Ink',defRef:()=>WBS.proj.ink,get:()=>{const q=lySel().find(x=>x.bl=='replace');return q&&q.rp||''},set:v=>{lySel().forEach(q=>{if(q.bl!='replace')return;if(v)q.rp=v;else delete q.rp});lyDone()}});
+ mkWell($('wl_ra'),{label:'Replace colour A',what:'Replace',def:'Element ink',defRef:()=>WBS.proj.ink,get:()=>{const q=lySel().find(x=>x.bl=='replace');return q&&q.ra||''},set:v=>{lySel().forEach(q=>{if(q.bl!='replace')return;if(v)q.ra=v;else delete q.ra});lyDone()}});
+ mkWell($('wl_rp'),{label:'Replace colour B',what:'Replace',def:'Paper',defRef:()=>WBS.proj.bg,get:()=>{const q=lySel().find(x=>x.bl=='replace');return q&&q.rp||''},set:v=>{lySel().forEach(q=>{if(q.bl!='replace')return;if(v)q.rp=v;else delete q.rp});lyDone()}});
+ $('ly_rm').addEventListener('input',()=>{if(lySync||WBS.fpSyncing)return;const v=+$('ly_rm').value;lySel().forEach(q=>{if(q.bl=='replace'){if(v==25)delete q.rm;else q.rm=v}});lyDone()});
  const host=$('lyl2');
  host.onclick=e=>{const r=e.target.closest('[data-u]');if(!r||e.target.closest('input'))return;const u=r.dataset.u,a=lyP(),q=lyBy(a,u);if(!q)return;
   if(e.target.closest('[data-eye]')){if(q.v===false)delete q.v;else q.v=false;lyDone();return}

@@ -40,6 +40,6 @@ test('a gradient end can be None: the gradient fades to nothing there', async ({
   await page.click('.cwp [data-none]'); await H.settle(page);
   expect(JSON.parse(await H.getState(page)).els.find(x => x.k === 'sheet').ink2).toBe('#00000000');
   await expect(page.locator('#mf_g2w .cwsb span')).toHaveText('None');
-  await expect(page.locator('#art linearGradient stop[offset="1"]')).toHaveAttribute('stop-opacity', '0');
+  await expect(page.locator('#art linearGradient:not([id^="shu"]) stop[offset="1"]')).toHaveAttribute('stop-opacity', '0');
   expect(errors).toEqual([]);
 });

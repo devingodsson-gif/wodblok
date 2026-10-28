@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.74.0 (Oct 29 2026): Replace with two colours (owner's request); fixes a 2.73.0 regression
+- Replace now has Colour A (what the element draws: its own ink, or the colour set), Colour B (drawn instead wherever the pixel beneath is already colour A: the paper colour, or the colour set) and Match (how close to A counts as A, 0 to 100, default 25). The pixel test is on everything drawn before the element at its own level, the Background included. Rows: Colour A, Colour B, Match in the Elements panel while a selected element is on Replace.
+- Fix: 2.73.0 set the Background aside inside the element drawing so Replace would ignore it; that also hid the Background from Filter shapes and Sheet effects (they take what is drawn so far). Removed; found by the CI suite on Oct 28 (filter-shape-2-38, filter-tile-2-40-1, copy-ghost-gradient-fx-2-67 and related).
+- The solid Background copy from 2.70.1 sits in `<g class="bgu">` so tests can tell it from the real Background.
+- Tests: replace-two-colours-2-74 (new); sheet-2-53, sheet-gradient-2-60-4 and copy-ghost-gradient-fx-2-67 skip the underlay; accessibility now uses the Randomize panel's slider (Ink edges' sliders are gone); nothing-lost-2-24 rolls until one places stamps (2.71.0 changed the rolls).
+
 ## 2.73.0 (Oct 28 2026): Replace blend back, on an element (owner's request)
 - Blend list: Replace (overlap prints a colour). Where the element overlaps the elements below it (at its own level, inside a group only that group's members), that overlap prints in the element's Replace colour (`rp`: a tray link that follows the tray, or a fixed colour; the ink when none); the rest of both prints as it was. The row's colour well shows while a selected element is on Replace.
 - The Background never counts as "below" (it is set aside once drawn), so Replace works against the elements above it, not the paper.

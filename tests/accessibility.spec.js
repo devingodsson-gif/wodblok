@@ -17,8 +17,8 @@ for (const theme of ['dark', 'light']) {
 
 test('a slider thumb and a number field show a clear focus ring from the keyboard', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 1 });
-  await openPanel(page, 'canvas');
-  await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="canvas"] input[type=range]')].find(i => i.getBoundingClientRect().height > 0); e.setAttribute('data-a11y', '1'); });
+  await openPanel(page, 'rand');
+  await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="rand"] input[type=range]')].find(i => i.getBoundingClientRect().height > 0); e.setAttribute('data-a11y', '1'); });
   const thumb = async () => {
     const bb = await page.locator('[data-a11y]').boundingBox();
     return page.screenshot({ clip: { x: bb.x + bb.width / 2 - 24, y: bb.y - 8, width: 48, height: bb.height + 16 } });
@@ -40,6 +40,7 @@ test('a slider thumb and a number field show a clear focus ring from the keyboar
     return n;
   }, buf.toString('base64'));
   expect(await accentPixels(on)).toBeGreaterThan((await accentPixels(off)) + 40);
+  await openPanel(page, 'canvas');
   const num = await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="canvas"] input[type=number]')].find(i => i.getBoundingClientRect().width > 0); e.focus(); return getComputedStyle(e).boxShadow; });
   expect(num).not.toBe('none');
   expect(errors).toEqual([]);
@@ -47,8 +48,8 @@ test('a slider thumb and a number field show a clear focus ring from the keyboar
 
 test('slider rows are at least 24 px tall', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 1 });
-  await openPanel(page, 'canvas');
-  await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="canvas"] input[type=range]')].find(i => i.getBoundingClientRect().height > 0); e.setAttribute('data-a11y', '1'); });
+  await openPanel(page, 'rand');
+  await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="rand"] input[type=range]')].find(i => i.getBoundingClientRect().height > 0); e.setAttribute('data-a11y', '1'); });
   const h = await page.evaluate(() => document.querySelector('[data-a11y]').getBoundingClientRect().height);
   expect(h).toBeGreaterThanOrEqual(24);
   expect(errors).toEqual([]);

@@ -1,5 +1,4 @@
-// 2.73.0: the Replace blend is back, on an element. Where the element overlaps the elements below it, that overlap prints in a colour (the element's Replace colour,
-// the ink by default, a tray link or a fixed colour); the rest of both prints as it was. The Background is not "below": it never takes part.
+// 2.73.0: the Replace blend is back, on an element (2.74.0 made it two colours, see replace-two-colours-2-74.spec.js). This file keeps the Blend list and the colour wells.
 const { test, expect } = require('@playwright/test');
 const { openApp, showPanel, settle, getState, addShape } = require('./helpers/harness');
 
@@ -33,32 +32,7 @@ test('Replace is in the Blend list; Behind and Cancel are not', async ({ page })
   expect(o.errors).toEqual([]);
 });
 
-test('the overlap prints in the Replace colour; the rest of both keeps its ink; the paper stays paper', async ({ page }) => {
-  const { o, d } = await setup(page);
-  const [ink, , paper] = [d.proj.cw[d.proj.cwa].c[d.proj.ink.slice(1)] || '#12354e', 0, d.proj.cw[d.proj.cwa].c[d.proj.bg.slice(1)] || '#ffefae'];
-  const P = [[170, 400], [265, 400], [360, 400], [20, 20]];   // A only, the overlap, B only, paper
-  let c = await at(page, P);
-  expect(c.slice(0, 3).every((v, i) => i == 3 || near(v, ink.slice(0, 7)) || i == 1)).toBe(true);
-  expect(near(c[1], ink.slice(0, 7))).toBe(true);
-  const e = await st(page); e.els.find(q => q.u === 'rb').bl = 'replace'; e.els.find(q => q.u === 'rb').rp = '#ff0000'; await apply(page, e);
-  c = await at(page, P);
-  expect(near(c[0], ink.slice(0, 7))).toBe(true);        // A only: as it was
-  expect(near(c[1], '#ff0000')).toBe(true);              // the overlap: the Replace colour
-  expect(near(c[2], ink.slice(0, 7))).toBe(true);        // B only: as it was
-  expect(near(c[3], paper.slice(0, 7))).toBe(true);      // the paper is untouched
-  expect(o.errors).toEqual([]);
-});
-
-test('with no Replace colour set it prints in the ink; the colour is a tray link that follows the tray', async ({ page }) => {
-  const { o } = await setup(page);
-  const e = await st(page); const b = e.els.find(q => q.u === 'rb'); b.bl = 'replace'; b.rp = '@' + e.proj.ts[0]; await apply(page, e);
-  expect(near((await at(page, [[265, 400]]))[0], e.proj.cw[e.proj.cwa].c[e.proj.ts[0]].slice(0, 7))).toBe(true);
-  e.proj.cw[e.proj.cwa].c[e.proj.ts[0]] = '#12ab34'; await apply(page, e);
-  expect(near((await at(page, [[265, 400]]))[0], '#12ab34')).toBe(true);
-  expect(o.errors).toEqual([]);
-});
-
-test('choosing Replace in the Blend list shows its colour well; a picked colour is kept on the element', async ({ page }) => {
+test('choosing Replace in the Blend list shows its colour wells; a picked colour B is kept on the element', async ({ page }) => {
   const { o } = await setup(page);
   await showPanel(page, 'lyrs');
   await page.locator('#lyl2 .lyr[data-u="rb"] .lyn').click(); await settle(page);
