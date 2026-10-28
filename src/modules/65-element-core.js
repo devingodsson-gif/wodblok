@@ -38,7 +38,9 @@ function render(its,d){let out='',run='',buf='',wb='',wk=null,wa='',wn=false;con
 const emit=()=>{if(wb)out+=`<g${wa}>${T(wb,wn)}</g>`;wb='';wk=null;wn=false};
 for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
  if(G){let j=i;while(j<its.length&&its[j].path[d]&&its[j].path[d].u==G.u)j++;const inner=render(its.slice(i,j),d+1);i=j-1;emit();flush();out+=gWrap(G,T(inner));continue}
- const q=it.q;if(q.v===false)continue;const k=elKind(q),r=R[k];if(!r)continue;const s=r[4].get(String(q.u));if(s==null)continue;let a=elOB(q);
+ const q=it.q;if(q.v===false)continue;const k=elKind(q),r=R[k];if(!r)continue;let s=r[4].get(String(q.u));if(s==null)continue;let a=elOB(q);
+ // 2.67.0: while copies of an element are being placed, its drawing has an id, so the ghost on the pointer is the element itself (25-art-layers.js)
+ if(WBS.plArm&&WBS.plArm.k=='copy'&&WBS.plArm.su===String(q.u)&&!s.includes('@@UNDER@@'))s=`<g id="plsrc">${s}</g>`;
  // 2.57.0: a pattern whose area is not the whole canvas is clipped to it (clp: [x, y, w, h], on its wrapper)
  if(q.clp){const cid='pc'+li+'_'+String(q.wk||q.u).replace(/[^\w-]/g,'');if(!defs.includes(`id="${cid}"`))defs+=`<clipPath id="${cid}" clipPathUnits="userSpaceOnUse"><rect x="${(+q.clp[0]).toFixed(2)}" y="${(+q.clp[1]).toFixed(2)}" width="${(+q.clp[2]).toFixed(2)}" height="${(+q.clp[3]).toFixed(2)}"/></clipPath>`;a+=` clip-path="url(#${cid})"`}
  // a filter (2.38.0: a shape in Filter mode) takes what is drawn so far at this level (only its group's members inside a group) and redraws it through its effects

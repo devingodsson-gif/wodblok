@@ -33,7 +33,7 @@ function plArm(o){plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;WBS.
 // 2.60.2 (owner Oct 27 2026: "like a shape picked in the library, a selected element can be placed many times"): Place copies arms a copy of the selected element; it
 // follows the pointer and each click places one more (one history step each) until Esc, V, a right click or any other control puts it away.
 function plCopy(){const q=elSel();if(!q||q.k=='sheet'||q.bgd||q.k=='group'||elKind(q)=='group')return false;const c=JSON.parse(JSON.stringify(q));delete c.u;delete c.g;delete c.lk;
- plDisarm();WBS.plArm={k:'copy',q:c};WBS.fpGhost=null;upd();pmsg('Click the canvas to place copies. Esc stops.');return true}
+ plDisarm();WBS.plArm={k:'copy',q:c,su:String(q.u)};WBS.fpGhost=null;upd();pmsg('Click the canvas to place copies. Esc stops.');return true}
 function plMake(o,x,y){if(o.k=='copy'){const q=JSON.parse(JSON.stringify(o.q));q.u=fpU();q.x=x;q.y=y;const L=fpL();if(!L)return;(L.pl=L.pl||[]).push(q);abDone();return}if(o.k=='pattern'){const q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),...patNew(),rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x,y,s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone()}}
 // 2.26.0: what a bar button does after it opened the panel. In a stamp's tab only Motif and Text have an Add, so the other buttons stay as they were (they only open the panel).
 function abArm(k){const un=stUnlocked()!=null;if(un&&k!='motif'&&k!='text')return;

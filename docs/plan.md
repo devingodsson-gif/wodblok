@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.67.0 (Oct 27 2026): the copy ghost is the element; a gradient Sheet's effects follow the gradient
+- **Place copies** shows the element itself under the pointer (at 60%), as a shape picked in the library does: while copies are placed, the element's drawing gets the id `plsrc` and the ghost is a `<use>` of it, moved to the pointer; the ghost box is still drawn round it.
+- **Gradient Sheets**: the effects (Texture, Noise, Grain, the filter effects; on the Sheet's own fill and on what is under it) are at full strength at the gradient's End and fade out towards its Start, along the same line or circle and with the same Midpoint; the fill itself is drawn plain underneath. Owner: "normal on the gradient's positive side, and on the negative side it fades out".
+- Tests: new `copy-ghost-gradient-fx-2-67` (2); the place-copies, Sheet, gradient and effect specs.
+
 ## 2.66.3 (Oct 27 2026): Randomize scenario snapshots regenerated in CI
 Owner, Oct 27 2026: "do all of it". Made by the update-snapshots workflow on main at 2.66.2. Only the SVG summaries changed (before-view, split-view, seeds 2 and 3): the rolls' Film Grain is drawn the 2.60.5 way (an Overlay blend, no blur); the document states are the same.
 

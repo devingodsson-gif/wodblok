@@ -15,6 +15,14 @@ import {FLT_I,FLT_S,FLT_U,mtPaper} from './74-motif-element.js';
 const shF=v=>(+v).toFixed(2);
 // half way between two colours (#rgb, #rrggbb or #rrggbbaa), for the gradient's midpoint
 const shMix=(a,b)=>{const p=h=>{h=String(h).replace('#','');if(h.length<6)h=h.split('').map(c=>c+c).join('');return[0,2,4,6].map(i=>i<h.length?parseInt(h.slice(i,i+2),16):255)};const x=p(a),y=p(b);if(x.some(isNaN)||y.some(isNaN))return a;const m=x.map((v,i)=>Math.round((v+y[i])/2));return'#'+m.slice(0,3).map(v=>v.toString(16).padStart(2,'0')).join('')+(m[3]<255?m[3].toString(16).padStart(2,'0'):'')};
+// a Sheet's gradient (its line, or its circle) with the stops st
+function shGrad(q,gid,st){if(q.gk=='rad'){const cx=CW*(q.gx!=null?+q.gx:50)/100,cy=CH*(q.gy!=null?+q.gy:50)/100,r=Math.max(CW,CH)*Math.max(5,+(q.gs!=null?q.gs:70))/100;return`<radialGradient id="${gid}" gradientUnits="userSpaceOnUse" cx="${shF(cx)}" cy="${shF(cy)}" r="${shF(r)}">${st}</radialGradient>`}
+ const a=(q.ga!=null?+q.ga:90)*Math.PI/180,dx=Math.cos(a),dy=Math.sin(a),L=(Math.abs(CW*dx)+Math.abs(CH*dy))/2;return`<linearGradient id="${gid}" gradientUnits="userSpaceOnUse" x1="${shF(CW/2-dx*L)}" y1="${shF(CH/2-dy*L)}" x2="${shF(CW/2+dx*L)}" y2="${shF(CH/2+dy*L)}">${st}</linearGradient>`}
+// 2.67.0 (owner Oct 27 2026: "the gradient modes in a sheet should have the effects also be a gradient: a texture or noise is normal on the gradient's positive side and
+// fades out on the negative side"): a gradient Sheet's effects are at full strength at its End and fade out towards its Start, along the same line or circle, with the
+// same Midpoint. The fill itself is drawn as it is underneath. Returns the mask's defs and its id.
+function shFxFade(q,id){const m=Math.max(5,Math.min(95,q.gm!=null?+q.gm:50))/100,st=`<stop offset="0" stop-color="#000"/>${Math.abs(m-.5)>.001?`<stop offset="${m.toFixed(3)}" stop-color="#808080"/>`:''}<stop offset="1" stop-color="#fff"/>`;
+ return{defs:shGrad(q,id+'fg0',st)+`<mask id="${id}fm" maskUnits="userSpaceOnUse" x="0" y="0" width="${shF(CW)}" height="${shF(CH)}"><rect x="0" y="0" width="${shF(CW)}" height="${shF(CH)}" fill="url(#${id}fg0)"/></mask>`,id:id+'fm'}}
 // the fill, in canvas units: {defs, body}; seen: the pictures already defined (null: define them here)
 function shFill(q,id,seen){const R=`x="0" y="0" width="${shF(CW)}" height="${shF(CH)}"`;
  if(q.fl=='none')return{defs:'',body:''};
@@ -31,9 +39,7 @@ function shFill(q,id,seen){const R=`x="0" y="0" width="${shF(CW)}" height="${shF
  // gm % is where the two colours meet half way. The effects work on it as on any fill.
  if(q.fl=='grad'){const c1=okC(q.ink)?col(q.ink):col(WBS.proj.bg),c2=okC(q.ink2)?col(q.ink2):col(WBS.proj.ink),m=Math.max(5,Math.min(95,q.gm!=null?+q.gm:50))/100;
   const st=`<stop offset="0" stop-color="${c1}"/>${Math.abs(m-.5)>.001?`<stop offset="${m.toFixed(3)}" stop-color="${shMix(c1,c2)}"/>`:''}<stop offset="1" stop-color="${c2}"/>`;let g;
-  if(q.gk=='rad'){const cx=CW*(q.gx!=null?+q.gx:50)/100,cy=CH*(q.gy!=null?+q.gy:50)/100,r=Math.max(CW,CH)*Math.max(5,+(q.gs!=null?q.gs:70))/100;g=`<radialGradient id="${id}g" gradientUnits="userSpaceOnUse" cx="${shF(cx)}" cy="${shF(cy)}" r="${shF(r)}">${st}</radialGradient>`}
-  else{const a=(q.ga!=null?+q.ga:90)*Math.PI/180,dx=Math.cos(a),dy=Math.sin(a),L=(Math.abs(CW*dx)+Math.abs(CH*dy))/2;g=`<linearGradient id="${id}g" gradientUnits="userSpaceOnUse" x1="${shF(CW/2-dx*L)}" y1="${shF(CH/2-dy*L)}" x2="${shF(CW/2+dx*L)}" y2="${shF(CH/2+dy*L)}">${st}</linearGradient>`}
-  return{defs:g,body:`<rect ${R} fill="url(#${id}g)"/>`}}
+  return{defs:shGrad(q,id+'g',st),body:`<rect ${R} fill="url(#${id}g)"/>`}}
  return{defs:'',body:`<rect ${R} fill="${okC(q.ink)?col(q.ink):col(WBS.proj.bg)}"/>`}}
 // the Sheet that is being edited draws live (its print would be out of date at every step)
 const shLive=q=>q.u==WBS.fpSel||!!(WBS.fpMS&&WBS.fpMS.has&&WBS.fpMS.has(q.u));
@@ -43,11 +49,13 @@ function shLayer(L,li){const pl=(L.pl||[]).filter(q=>q.k=='sheet');if(!pl.length
   if(!on||(WBS.DRAFT&&WBS.DRAFTCV)){fr.set(String(q.u),F.body);return}
   const p=Math.max(CW,CH)*.05,box={x:-p,y:-p,W:CW+2*p,H:CH+2*p,R:400},op=q.op!=null?Math.max(0,Math.min(100,+q.op))/100:1;
   // the fill through the effects, as any element's
+  const fade=q.fl=='grad'?shFxFade(q,id):null;if(fade)defs+=fade.defs;
   let self='';if(F.body){const T=fxTex(q,id+'ft',box),G=fxGr(q,id+'fg',box),own=(T?T.defs:'')+(G?G.defs:'');defs+=own;self=T||G?`<g${T?T.attrs:''}>${G?G.wrap(F.body):F.body}</g>`:F.body;
-   if((T||G)&&!shLive(q))self=bkElMark('s'+li+'_'+id,self,shFill(q,id,null).defs+own,{x:CW/2,y:CH/2,r:Math.hypot(CW,CH)*.6});self=`<g${elOB(q)}>${self}</g>`}
+   if((T||G)&&!shLive(q))self=bkElMark('s'+li+'_'+id,self,shFill(q,id,null).defs+own,{x:CW/2,y:CH/2,r:Math.hypot(CW,CH)*.6});
+   if(fade&&(T||G))self=F.body+`<g mask="url(#${fade.id})">${self}</g>`;self=`<g${elOB(q)}>${self}</g>`}
   // what is under it through the effects; the outline-reading effects fill their gaps with the paper colour
   const z={...q,__fm:{paper:mtPaper()}},T=fxTex(z,id+'ut',box),G=fxGr(z,id+'ug',box),use=`<use href="#${FLT_I}"/>`;defs+=(T?T.defs:'')+(G?G.defs:'');
-  const under=T||G?`<g${op<1?` opacity="${op.toFixed(3)}"`:''}><g${T?T.attrs:''}>${G?G.wrap(use):use}</g></g>`:'';
+  const under=T||G?`<g${op<1?` opacity="${op.toFixed(3)}"`:''}${fade?` mask="url(#${fade.id})"`:''}><g${T?T.attrs:''}>${G?G.wrap(use):use}</g></g>`:'';
   fr.set(String(q.u),`<g id="${FLT_I}">${FLT_U}</g>${FLT_S}${under}${self}`)});
  return[defs,'','','',fr]}
 function init89(){elExtend('sheet',{draw:(L,li)=>shLayer(L,li)})}
