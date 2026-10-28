@@ -4,6 +4,8 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
+**Oct 28 2026 (2.69.0).** The loading screen shows the version number.
+
 **Oct 28 2026 (2.68.0).** Three new Distort effects: Wobble, Warp and Slip (with Roughen and Ripple; also in Randomize's Distort group). Known issue unchanged: `randomize-effects-2-39` "a seeded roll is the same with Effects on" fails on main.
 
 **Oct 28 2026 (2.67.4).** Hotfix: a roll that keeps the canvas texture drops its Wear use (an older roll could leave one, saved in the browser's settings, and it made the Background see-through). Suggestion waiting for the owner: make the Background immune to a hand-picked canvas Wear texture as well.
