@@ -4,6 +4,8 @@ The one page that says where development stands. **Every agent reads this after 
 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
+**Oct 28 2026 (2.71.0).** Ink edges (Roughness, Ink squash) and Cover overlay removed with their code and project fields; file format stays 29 (open question for the owner: bump to 30 to refuse older files, which would mean regenerating the fixtures). State snapshots containing `pr` need approval to regenerate. Not merged: 2.70.1 and 2.71.0 await the owner's "Merge".
+
 **Oct 28 2026 (2.70.1).** Hotfix: the Background stays solid under Ink squash, Roughness and a canvas Wear texture (a solid copy is drawn under them).
 
 **Oct 28 2026 (2.70.0).** Effects: a full-width Add effect button at the top of the group, like Add sheet; the + in the title is gone.

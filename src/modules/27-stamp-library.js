@@ -40,7 +40,6 @@ let defs=(BK.vdefs!=null?BK.vdefs:dd.innerHTML)+(fx&&SURFC[t.id]?SURFC[t.id].s:'
 if(fx&&L&&((L.pst||0)>0||(L.pfl||0)>0)){const key=t.id+'_'+Math.floor(Math.random()*16);defs+=pressDefs(L,li,[t],new Set([key]));useT(WBS.tiles[WBS.cur]);use=`<use href="#q${li}_${key}"/>`}
 if(fx&&L&&okC(L.ink)&&hasD('#lk'+li))use=`<g filter="url(#lk${li})">${use}</g>`;
 let g=`<g transform="${xf}">${use}</g>`;
-if(fx&&hasD('#rf'))g=`<g filter="url(#rf)">${g}</g>`;
 {const ic=tx?inkCatch(true):null;if(ic){defs+=ic.defs.replace('id="cw"','id="xcw"');g=`<g mask="url(#xcw)">${g}</g>`}}
 let bgs='',over='';
 if(onPaper){bgs=`<path d="${outline}" transform="${xf}" fill="${pa}"/>`;if(tx&&WBS.tex.t&&$('texg').innerHTML){defs+=`<clipPath id="xpclip"><path d="${outline}" transform="${xf}"/></clipPath>`;over=`<g clip-path="url(#xpclip)">${$('texg').innerHTML}</g>`}}

@@ -80,8 +80,8 @@ function bkMorph(a,b,depth){const x=a.childNodes,y=b.childNodes;let i=0;
 function bkPut(h){const d=$('dyn');if(!d||!d.firstChild||BK.noMorph){d.innerHTML=h;return}
  const t=document.createElementNS(SVGNS,'g');t.innerHTML=h;bkMorph(d,t,2)}
 function bkHost(sd){if(sd!==BK.sd){BK.sd=sd;const h=$('stdefs');if(h)h.innerHTML=sd}}
-function bkShow(f,defs,ik,lg,body,sd){sd=sd||'';const bd=body(lg);BK.vdefs=f+sd+defs+ik;BK.vdyn='<defs>'+BK.vdefs+'</defs>'+bd;BK.wasLive=BK.live;BK.sc0=BK.sc;
- if(BK.off||BK.live){bkHost(sd);bkPut('<defs>'+f+defs+ik+'</defs>'+bd);BK.shown=1;BK.defT=0;return}
+function bkShow(defs,ik,lg,body,sd){sd=sd||'';const bd=body(lg);BK.vdefs=sd+defs+ik;BK.vdyn='<defs>'+BK.vdefs+'</defs>'+bd;BK.wasLive=BK.live;BK.sc0=BK.sc;
+ if(BK.off||BK.live){bkHost(sd);bkPut('<defs>'+defs+ik+'</defs>'+bd);BK.shown=1;BK.defT=0;return}
  const now=performance.now();BK.cont=WBS.DRAFT||now-BK.inT<450;BK.gen++;BK.nHit=BK.nStale=BK.nRes=BK.nMiss=0;const used=new Set(),need=new Set();
  const d2=bkSub(defs,used,need),l2=bkSub(lg,used,need);bkNeed(l2,need);try{if(WBS.fpB!=null&&WBS.fpB!==false)need.add('E'+WBS.fpB)}catch(e){}
  BK.st.hit+=BK.nHit;BK.st.stale+=BK.nStale;BK.st.miss+=BK.nMiss;
@@ -89,7 +89,7 @@ function bkShow(f,defs,ik,lg,body,sd){sd=sd||'';const bd=body(lg);BK.vdefs=f+sd+
  // a mix of old and new. While something is being dragged or a slider moves, the picture always updates at once.
  const chg=BK.nStale+BK.nMiss,tot=chg+BK.nHit+BK.nRes;
  if(chg&&BK.shown&&!BK.cont&&BK.q.size&&(BK.nMiss||chg>=tot*.4)&&(!BK.defT||now-BK.defT<700||WBX.wbHoldOn&&now-BK.defT<15000)){if(!BK.defT)BK.defT=now;BK.st.defer++;bkKick(0);return}
- BK.defT=0;bkHost(sd);bkPut(`<defs>${f}${d2.replace(RXM,(m,k,id,b)=>need.has(k+id)?b:'')}${ik}${bkDefs(used)}</defs>`+body(l2));BK.shown=1;
+ BK.defT=0;bkHost(sd);bkPut(`<defs>${d2.replace(RXM,(m,k,id,b)=>need.has(k+id)?b:'')}${ik}${bkDefs(used)}</defs>`+body(l2));BK.shown=1;
  // prints that have not been shown for a while are let go
  if(BK.map.size>300)for(const[k,e]of BK.map)if(BK.gen-(e.u||0)>4){bkDrop(e);BK.map.delete(k)}
  bkFlush();bkKick(WBS.DRAFT?120:20)}

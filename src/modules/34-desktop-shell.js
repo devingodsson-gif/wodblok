@@ -12,7 +12,6 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS,doSplit} from './12-selection-and-split.js';
 import {sync} from './13-preview-and-stamp-tool.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
-import {savePr} from './15-print-effects-and-stamp-texture.js';
 import {txClean} from './16-texture-generators.js';
 import {buildTex,saveTex,texNorm} from './17-texture-panel-and-previews.js';
 import {coreStr,dirty,paintPst,pgFix,pmsg,thumb} from './18-projects-and-cover-overlay.js';
@@ -287,7 +286,7 @@ $('sinfo').innerHTML=`${WBS.book.on?`<span class="it">Print cover <b>${bk().W.to
 // wrap redraw hooks so the shell stays in sync
 {const f=$('rzfresh');if(f){try{f.checked=kv.get('wb121_rzfresh')==='1'}catch(e){}f.addEventListener('change',()=>{try{kv.set('wb121_rzfresh',f.checked?'1':'0')}catch(e){}})}}
 const _draw=WBH.draw;WBH.draw=function(){_draw();nums();info()};
-const _sp=WBH.syncPr;WBH.syncPr=function(){_sp();nums()};const _stx=WBH.syncTex;WBH.syncTex=function(){_stx();nums()};
+const _stx=WBH.syncTex;WBH.syncTex=function(){_stx();nums()};
 
 // ---- toast-style status messages
 let mt=0;new MutationObserver(()=>{clearTimeout(mt);$('pmsg').style.opacity=1;if($('pmsg').textContent)mt=setTimeout(()=>{$('pmsg').style.transition='opacity .6s';$('pmsg').style.opacity=0;setTimeout(()=>{$('pmsg').style.transition=''},700)},6000)}).observe($('pmsg'),{childList:true,characterData:true,subtree:true});
@@ -313,7 +312,7 @@ $('pgrid').addEventListener('click',e=>{const b=e.target.closest('[data-a="open"
 let hist=[coreStr()],hi=0;
 const ub=()=>{$('undo').disabled=hi<=0;$('redo').disabled=hi>=hist.length-1;if(WBX.wbHistPaint)WBX.wbHistPaint()};
 let histL=['Start'],histT=[Date.now()],histTh=[''],histU=[''];
-const HK={tiles:'Stamp change',els:'Element change',layers:'Layer change',proj:'Colours',dim:'Canvas size',pg:'Grid',pr:'Roughness',tex:'Texture',texLib:'Texture library',grade:'Grade'};
+const HK={tiles:'Stamp change',els:'Element change',layers:'Layer change',proj:'Colours',dim:'Canvas size',pg:'Grid',tex:'Texture',texLib:'Texture library',grade:'Grade'};
 // What one step did to the elements, in words (2.27.0): "Moved shape", "Edited text", "Resized 3 elements"... hLU keeps the uid when only one element changed
 let hLU='';
 const hKN={text:'text',motif:'shape',stamp:'stamp',pattern:'pattern',paint:'paint',group:'group'};
@@ -345,10 +344,10 @@ if(hi>0&&hi==hist.length-1&&!(WBX.wbLabelNext&&performance.now()-WBX.wbLabelNext
 hist.length=hi+1;histL.length=hi+1;histT.length=hi+1;histTh.length=hi+1;histU.length=hi+1;hist.push(s);{const nl=WBX.wbLabelNext,pl=WBX.wbLabelPlain;WBX.wbLabelNext=null;WBX.wbLabelPlain=null;const named=nl&&performance.now()-nl.at<3000,plain=!named&&pl&&performance.now()-pl.at<3000;histL.push(named?nl.t:plain?pl.t:hLabel(prev,s));histU[histL.length-1]=(!named&&!plain)?hLU:'';if(stUnlocked()!=null&&!named&&/^Added shape/.test(histL[histL.length-1])&&seAuto()&&!wsFind('motifs'))setPanel('motifs',1);if(named){thWant=s;clearTimeout(thT);thT=setTimeout(thRun,1500)}}histT.push(Date.now());histTh.push('');navDirty();if(hist.length>120){hist.shift();histL.shift();histT.shift();histTh.shift();histU.shift()}hi=hist.length-1}ub()}
 setInterval(cap,450);
 // the one list keeps its id (2.25.0): a stamp tab belongs to it, so Undo and Redo stay in the tab that is open (the id is not part of the document)
-function applyCore(c){const els=Array.isArray(c.els)?c.els:flatEls(c.layers),L0=WBS.layers&&WBS.layers[0];c.layers=[oneLayer(els,c.tiles.map(t=>t.id),L0&&L0.u)];trayIn(c);WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pr=c.pr;WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
+function applyCore(c){const els=Array.isArray(c.els)?c.els:flatEls(c.layers),L0=WBS.layers&&WBS.layers[0];c.layers=[oneLayer(els,c.tiles.map(t=>t.id),L0&&L0.u)];trayIn(c);WBS.tiles=c.tiles;WBS.layers=c.layers;WBS.proj=c.proj;WBS.dim=c.dim;WBS.pgrid=pgFix(c.pg,c.layers);WBS.cur=Math.min(WBS.cur,WBS.tiles.length-1);WBS.tiles.forEach(shOf);migLayers();setDim();WBS.tex=c.tex;if(Array.isArray(c.texLib))WBS.texLib=txClean(c.texLib);texNorm();if(c.grade&&WBX.wbGrade&&JSON.stringify(c.grade)!=JSON.stringify(WBX.wbGrade.get()))WBX.wbGrade.set(c.grade);WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));
 WBS.cur=Math.max(0,Math.min(WBS.cur,WBS.tiles.length-1));WBS.selL=0;   // (2.24.0) a current stamp after Undo, Redo and Open whenever the project has one
 selOne(-1);WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}
-store();savePr();saveTex();WBH.syncPr();WBH.syncTex();buildTex();upd();if(WBX.wbGrade&&WBX.wbGrade.sync)WBX.wbGrade.sync()}   // a stamp's own grade is part of the stamp, so the Grading sliders are read again after every step
+store();saveTex();WBH.syncTex();buildTex();upd();if(WBX.wbGrade&&WBX.wbGrade.sync)WBX.wbGrade.sync()}   // a stamp's own grade is part of the stamp, so the Grading sliders are read again after every step
 // Loading a step normalises the document a little (for example every stamp gets an empty texture list), so the entry is re-read
 // after loading; otherwise the next capture sees a difference, adds a step and cuts off the steps still to redo.
 function goTo(i){hi=i;applyCore(JSON.parse(hist[hi]));hist[hi]=coreStr();navDirty()}

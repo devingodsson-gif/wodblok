@@ -69,7 +69,7 @@ if(!fresh&&WBX.wbCap)WBX.wbCap();
 const OWN=fresh||!FT.stamps?null:rzTake();   // 2.21.0: a roll that builds new stamps drops the previous roll and holds your own elements aside until the new ones are built (a roll that only reworks what is there, such as Layout or Colours alone, changes it in place)
 // --- the bold moves for this roll (only used when Stamps is on)
 const MOVES=[['sym','new symmetry',1.3],['link','accents in the gaps',1.2],['shape','accent shapes',1],['mix','mixed shapes',.7],['rot','turned grid',.8],['inks','extra inks',.7],['motif','shape tweaks',.8],['swap','light on dark',.6],['blend','soft blending',.5],['radial','round arrangements',.7],['vary','size, gaps and offset',.6],['text','lettering',1],['frame','frame',1.1]];
-const RZ={mv:null,n:0,keep:{col:!FT.col,gr:!FT.gr,tx:!FT.tx,pr:!FT.pr}};
+const RZ={mv:null,n:0,keep:{col:!FT.col,gr:!FT.gr,tx:!FT.tx}};
 let inkMap={};const noAcc=!FT.col||!sOn('col','acc'),noPal=!FT.col||!sOn('col','pal');RZ.keep.col=noPal;
 const MV=MOVES.filter(x=>FT.stamps&&x[0]!='frame'&&!(x[0]=='text'&&!FT.text)&&!(x[0]=='swap'&&noPal)&&!(x[0]=='inks'&&noAcc)&&!(x[0]=='radial'&&WBS.dim.rt&&!WBS.book.on)&&(x[0]=='text'||sOn('stamps',x[0])));
 const F=new Set(),nf=Math.min(RZ.n||wpick([[1,.55],[2,.45]]),MV.length);while(F.size<nf){const m=wpick(MV.filter(x=>!F.has(x[0])).map(x=>[x[0],x[2]]));F.add(m)}
@@ -194,17 +194,13 @@ rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u.filter(u=>u.md!='wear'
 const EO={pick,ri,rr,ch,jit:!!FT.jit,texOn:!!(FT.pr&&sOn('pr','lay')),gradeOn:!!FT.gr,tex:()=>rzList('pr',WST,1)};
 if(usedGen)mL=rzMainEls(mL,mT,EO);if(FT.frame)fL=rzFrameEls(fL,fT,EO);
 const cvU=rzCv();
-const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(rzPic)?[]:WBS.layers.filter(rzPic)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,pr:{e:ri(0,6),q:ch(.6)?0:ri(1,5),t:'',a:0,sc:100,sd:1},tex:{u:cvU,v:87,...(RZ.keep.tx&&WBS.tex.off?{off:1}:{})}};
+const c={pg:{...WBS.pgrid},tiles:mT.concat(fT),layers:mL.concat(fL,mL.some(rzPic)?[]:WBS.layers.filter(rzPic)),proj:{...P0,ink:pInk,bg:pBg},dim:usedGen?WBS.dim:dim0,tex:{u:cvU,v:87,...(RZ.keep.tx&&WBS.tex.off?{off:1}:{})}};
 {const bgK=flatEls(WBS.layers).filter(p=>p.bgd);if(bgK.length&&!flatEls(c.layers).some(p=>p.bgd)){const L1=oneLayer(JSON.parse(JSON.stringify(bgK)),[]);c.layers.unshift(L1)}}   // the Background stays under a new roll (2.27.0)
-if(RZ.keep.pr)c.pr={...WBS.pr};
-if(FT.pr&&!sOn('pr','edges')){c.pr.e=WBS.pr.e;c.pr.q=WBS.pr.q}
-if(FT.pr&&sOn('pr','edges')&&AM('pr')<1){c.pr.e=Math.round(c.pr.e*AM('pr'));c.pr.q=Math.round(c.pr.q*AM('pr'))}
 // textures: a Print effects roll gives each stamp (and layer, and text box) its own textures, each in its own mode
 if(FT.pr&&sOn('pr','surf')){c.tiles.forEach(t=>{t.tu=sOn('pr','t_clean')&&ch(.25)?[]:rzList('pr',WST,ch(.3)?2:1);delete t.is})}
 else{const src=(WBS.tiles.find(t=>t.tu&&t.tu.length)||{}).tu;c.tiles.forEach(t=>{if(t.is===undefined&&t.tu===undefined)t.tu=src?src.map(u=>({x:u.x,sd:txRid(),md:u.md})):[]})}
 if(FT.pr&&sOn('pr','lay'))c.layers.forEach(l=>{if(!rzPic(l)&&!l.free&&ch(.3))l.tu=rzList('pr',WST,1)});
 if(FT.pr&&sOn('pr','txt'))c.layers=c.layers.map(l=>{if(!(l.pl||[]).some(p=>p.tx))return l;const q=JSON.parse(JSON.stringify(l));q.pl.forEach(p=>{if(p.tx&&ch(.6))p.tu=rzList('pr',WST,1)});return q});
-c.pr.t='';
 // Colours: when the palette changes (a new palette, or paper and ink swapped), kept stamps and layers that carry their own accent ink move to the new palette too
 if(FT.col&&(sOn('col','pal')||newPal)&&!noAcc){const keepN=new Set(PC),mapInk=n=>{if(!n||!okC(n)||isFixed(n)||keepN.has(n)||acc.includes(n))return n;if(!(n in inkMap))inkMap[n]=inkFor()||n;return inkMap[n]};
  c.tiles=c.tiles.map(t=>{const n=mapInk(t.ink);return n!==t.ink?{...t,ink:n}:t});c.layers=c.layers.map(l=>{const n=mapInk(l.ink);return n!==l.ink?{...l,ink:n}:l})}
@@ -218,7 +214,7 @@ if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:
   const LK=[{tp:[25,60],tn:[5,20],fd:[15,50],sat:[-35,-5],ct:[-15,10]},{tp:[-60,-22],ct:[12,45],sat:[-15,20]},{ct:[25,60],sat:[12,40],vib:[18,50],sh:[-25,0]},{ex:[-35,-10],ct:[15,45],sh:[-40,-10],sat:[-30,0]},{ex:[10,30],fd:[30,65],sat:[-55,-20],ct:[-30,0]},{tn:[-30,-10],tp:[-10,25],hi:[-40,-10],fd:[10,40]}];
   if(lookOn&&(!adjOn||ch(.35))){const lk=pick(LK);Object.keys(lk).forEach(k=>{gl[k]=Math.round(B(lk[k][0],lk[k][1])*.55)})}
   else gl={ex:z(B(-18,18)),ct:z(B(-24,40)),hi:z(B(-40,24)),sh:z(B(-24,40)),wh:z(B(-24,24)),bl:z(B(-30,24)),tp:z(B(-48,54)),tn:z(B(-18,18)),sat:z(B(-54,24)),vib:z(B(-24,36)),hue:R()<.12?B(-18,18):0,fd:R()<.38?B(10,48):0}}}
- else Object.keys(g0).forEach(k=>{if(k!='cov'&&k!='masks')gl[k]=g0[k]});
+ else Object.keys(g0).forEach(k=>{if(k!='masks')gl[k]=g0[k]});
  let masks;
  const nfN=WBS.layers.filter(l=>!isF(l)),r3=v=>+v.toFixed(3);
  if(FT.masks){const inks=[...new Set([pInk,...WBS.layers.map(l=>l.ink),...WBS.tiles.map(t=>t.ink)].filter(x=>okC(x)))],nm=wpick([[0,.2],[1,.45],[2,.35]]),usedK=new Set(),nz=(a,b,f)=>ri(a,b)||f;
@@ -239,7 +235,7 @@ if(WBX.wbGrade){const g0=oldG||WBX.wbGrade.get(),B=(a,b)=>ri(a,b),z=v=>ch(.4)?0:
   oldT.forEach((t,q)=>{if(WBS.tiles[q])mT[String(t.id)]=String(WBS.tiles[q].id)});
   masks=((g0&&g0.masks)||[]).map(m=>{const q=JSON.parse(JSON.stringify(m));if(q.t=='lay'&&q.lay&&mU[q.lay])q.lay=mU[q.lay];if(q.st&&mT[q.st])q.st=mT[q.st];if(q.t=='col'&&q.c){for(const k in inkMap){if(col(k).toLowerCase()==String(q.c).toLowerCase()){q.c=colP(inkMap[k]).slice(0,7).toLowerCase();break}}}return q})}
  if(FT.gr&&AM('gr')<1)Object.keys(gl).forEach(k=>{if(typeof gl[k]=='number')gl[k]=Math.round(gl[k]*AM('gr'))});
- WBX.wbGrade.set({...gl,cov:g0.cov,masks})}
+ WBX.wbGrade.set({...gl,masks})}
 store();upd();
 // Layout: pattern type, stamp size, spacing and scatter, offset, rotation and flips of the layers that repeat. Works on whatever layers the project has now.
 if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('layout','rot'),lty=sOn('layout','type'),lof=sOn('layout','offset'),

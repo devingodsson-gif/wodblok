@@ -5,7 +5,6 @@ import {store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
-import {savePr} from './15-print-effects-and-stamp-texture.js';
 import {TXF,TXMD,TXMN,TXN,isOf,txClean,txFilt,txImgs,txIsO,txIsW,txKey,txLib,txMake,txPix,txRid,txSame,txSpecs,txUid,txUniq} from './16-texture-generators.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 
@@ -43,20 +42,6 @@ function txMerge(t){const pk=txClean(t.txl);delete t.txl;if(!pk.length||!Array.i
 pk.forEach(p=>{const same=txLib(p.id);if(same&&txSame(same,p)){map[p.id]=p.id;return}const eq=WBS.texLib.find(x=>txSame(x,p));if(eq){map[p.id]=eq.id;return}const n={...p,id:same?txUid():p.id,name:txUniq(p.name),auto:false};WBS.texLib.push(n);map[p.id]=n.id});
 t.tu=t.tu.map(u=>({...u,x:map[u.x]||u.x}))}
 // projects made before this: the one canvas-wide surface is handed to every stamp (each with its own variation), then retired
-function roughFilter(){
-const E=WBS.pr.e,Q=WBS.pr.q,A=WBS.pr.a/100,k=100/Math.max(25,WBS.pr.sc),f=v=>+(v*k).toFixed(5),S=WBS.pr.sd;
-if(!E&&!Q)return'';
-const tl=tileOn(),nz=(id,type,bf,oc,sd)=>tl?`<feTurbulence type="${type}" baseFrequency="${bf}" numOctaves="${oc}" seed="${sd}" stitchTiles="stitch" x="0" y="0" width="${CW}" height="${CH}" result="${id}0"/><feTile in="${id}0" result="${id}"/>`:`<feTurbulence type="${type}" baseFrequency="${bf}" numOctaves="${oc}" seed="${sd}" result="${id}"/>`;
-const th=(src,id,sl,ic)=>`<feComponentTransfer in="${src}" result="${id}"><feFuncA type="linear" slope="${sl}" intercept="${(+ic).toFixed(3)}"/></feComponentTransfer>`;
-const mix=(a,b,ka,kb,id)=>`<feComposite in="${a}" in2="${b}" operator="arithmetic" k1="0" k2="${ka}" k3="${kb}" k4="0" result="${id}"/>`;
-let b='',cur='SourceGraphic';
-if(E){b+=nz('en','fractalNoise',.045,2,S)+`<feDisplacementMap in="SourceGraphic" in2="en" scale="${(E*1.1).toFixed(1)}" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="${(.5+E*.07).toFixed(2)}" result="bl"/>`+th('bl','th',7,-3)+th('d','ds',20,0)+`<feComposite in="th" in2="ds" operator="out" result="sp"/><feComposite in="d" in2="th" operator="in" result="di"/><feMerge result="r1"><feMergeNode in="sp"/><feMergeNode in="di"/></feMerge>`;cur='r1'}
-if(Q){const r=(.8+Q*.22).toFixed(2),dk=(1-Q*.04).toFixed(3),lt=(1-Q*.035).toFixed(3);
-b+=`<feColorMatrix in="${cur}" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 ${lt} 0" result="qc"/><feColorMatrix in="${cur}" type="matrix" values="${dk} 0 0 0 0 0 ${dk} 0 0 0 0 0 ${dk} 0 0 0 0 0 1 0" result="qd"/><feMorphology in="${cur}" operator="erode" radius="${r}" result="qe"/><feGaussianBlur in="qe" stdDeviation="${(r*.6).toFixed(2)}" result="qb"/><feComposite in="qd" in2="qb" operator="out" result="qr"/><feMerge result="r2"><feMergeNode in="qc"/><feMergeNode in="qr"/></feMerge>`;cur='r2'}
-
-if(tl){const[ex,ey]=tileExt();return`<filter id="rf" filterUnits="userSpaceOnUse" x="${-ex}" y="${-ey}" width="${CW+2*ex}" height="${CH+2*ey}" color-interpolation-filters="sRGB">${b}</filter>`}
-return`<filter id="rf" filterUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}" color-interpolation-filters="sRGB">${b}</filter>`}
-function syncPr(){$('rgh').value=WBS.pr.e;$('psq').value=WBS.pr.q;}
 const saveTex=()=>{try{kv.set('wb10_tex',JSON.stringify(WBS.tex))}catch(e){}};
 function buildTex(noPat,pv){let o='';try{o=txImgs(txSpecs(txCvU(),'relief').map(S=>pv&&S.x===pv&&txIsO(S)?{...S,a:100,op:(S.a/100).toFixed(3)}:S),CW,CH,900,'inline',txIsO,0,0,tileOn());}catch(e){o=''}
 TEXK=txCvKey();txSw();$('texg').innerHTML=o?`<g pointer-events="none">${o}</g>`:'';if(pv)$('texg').dataset.pv=pv;else delete $('texg').dataset.pv;if(typeof upd=='function'&&WBX.wbTexReady&&!noPat)upd()}
@@ -66,10 +51,8 @@ if(!v)return null;return tl?{defs:`<mask id="cw" maskUnits="userSpaceOnUse" x="$
 function syncTex(){texNorm()}
 // the Texture group of the Canvas panel: shown when the project has a canvas texture, with the switch for it
 function txSw(){const g=$('ctxg'),c=$('ctxon');if(!g||!c)return;const has=!!(WBS.tex&&Array.isArray(WBS.tex.u)&&WBS.tex.u.length);if(g.hidden===has)g.hidden=!has;const on=!(WBS.tex&&WBS.tex.off);if(c.checked!==on)c.checked=on}
-function init17(){WBH.syncPr=syncPr;WBH.syncTex=syncTex;WBS.SURFK='';
-[['rgh','e'],['psq','q']].forEach(([id,key])=>$(id).oninput=()=>{WBS.pr[key]=+$(id).value;WBH.syncPr();savePr();upd()});
+function init17(){WBH.syncTex=syncTex;WBS.SURFK='';
 
-WBH.syncPr();
 // ---- Canvas texture. Its uses live in tex.u: relief / stain become pictures laid over the canvas, wear knocks ink out of every layer ----
 WBS.tex={};
 try{const q=JSON.parse(kv.get('wb10_tex')||'null');if(q&&typeof q=='object')WBS.tex=q}catch(e){}
@@ -78,4 +61,4 @@ WBH.syncTex();buildTex();WBX.wbTexReady=1;
 // 2.50.0: a texture picture is read the first time it is wanted; when it is ready, everything that uses it is drawn again
 {const prev=WBX.wbTexPicReady;WBX.wbTexPicReady=()=>{if(prev)prev();buildTex()}}
 }
-export {SURFC,buildTex,inkCatch,layTexMask,layTexOv,roughFilter,saveTex,surfFor,texNorm,txMerge,txPack,txoG,init17};
+export {SURFC,buildTex,inkCatch,layTexMask,layTexOv,saveTex,surfFor,texNorm,txMerge,txPack,txoG,init17};

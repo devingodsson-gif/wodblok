@@ -12,7 +12,7 @@ import {mkEL} from './71-randomize-elements.js';
 function clearAll(fresh){if(fresh)link=null;if(!fresh&&WBX.wbCap)WBX.wbCap();if(WBX.wbGrade)WBX.wbGrade.set(null);const L=mkEL('Layer 1',[]),P0=trayDefault();L.pl=[bgNew(P0.bg)];   // 2.10.0: a new project starts with nothing in it (no Pattern)
 WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;
 const dim0={...WBS.dim};['cs','cr','n','co','g','cp'].forEach(k=>delete dim0[k]); // the canvas outline goes back to a plain rectangle (the ratio stays)
-(WBX.wbApply||applyCore)({texLib:[],tiles:[],layers:[L],proj:P0,dim:{...dim0,k:'rect',o:'p',s:[1,1]},pr:{e:0,q:0,t:'',a:0,sc:100,sd:811},tex:{u:[],v:87}});
+(WBX.wbApply||applyCore)({texLib:[],tiles:[],layers:[L],proj:P0,dim:{...dim0,k:'rect',o:'p',s:[1,1]},tex:{u:[],v:87}});
 store();if(fresh){if(WBX.wbResetHist)WBX.wbResetHist();pmsg('Started a new, empty project.')}else{if(WBX.wbCap)WBX.wbCap();pmsg('Cleared.')}}
 
 const fname=n=>(n||'untitled').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase().slice(0,50)||'untitled';

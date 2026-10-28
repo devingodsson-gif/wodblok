@@ -5,7 +5,6 @@ import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {luid,store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
-import {covOrder} from './18-projects-and-cover-overlay.js';
 import {fpL,fpTog,fpRange} from './24-free-place-layers.js';
 import {elDef,elKind,fxDef} from './65-element-core.js';
 // ===== The element list (2.2.2). There are no layers: the document is one ordered list of elements, drawn in list order, first = bottom.
@@ -97,7 +96,6 @@ function init32(){
  document.addEventListener('keydown',e=>{const t=e.target;if(t.matches&&t.matches('input,select,textarea'))return;if((e.ctrlKey||e.metaKey)&&!e.altKey&&e.key.toLowerCase()=='g'){e.preventDefault();if(e.shiftKey){if(!$('lyung').disabled)lyUngroup()}else if(!$('lygrp').disabled)lyGroup()}});   // Photoshop's: Ctrl+G groups, Ctrl+Shift+G ungroups (2.27.0; it was Shift+G)
  $('ly_bl').onchange=()=>{const v=$('ly_bl').value;lySel().forEach(q=>{if(v)q.bl=v;else delete q.bl});lyDone()};
  $('ly_op').addEventListener('input',()=>{if(lySync||WBS.fpSyncing)return;const v=+$('ly_op').value,s=lySel();if(!s.length)return;let ch=false;s.forEach(q=>{const o=q.op==null?100:q.op;if(o!==v){ch=true;if(v<100)q.op=v;else delete q.op}});if(ch){store();upd()}});
- covOrder();
 }
 // Ctrl/Cmd+D on the canvas: duplicate the selected element (the last one when several are selected)
 function lyDupSel(){const s=lySel();if(!s.length)return false;lyDup(s[s.length-1].u);return true}
