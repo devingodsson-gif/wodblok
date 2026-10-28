@@ -162,3 +162,13 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 - Oct 26 2026: an Effects menu item opens a detached effect window with Apply; its options must be identical to the in-panel effect options; the items are greyed with nothing selected; with several selected the effect goes on all of them; every Effects menu item, not only the filter effects.
 - Oct 26 2026: the colour dock shows four places by default (two default colours, two empty, then the +); the tray itself stays two colours (2.54.1, after a misreading in 2.54.0). The element bar has no Select button (2.54.0). CI runs eight Chromium shards.
 - Oct 27 2026: export recipes go onto the shared library tree (done, 2.59.0); workspaces are removed for good (the Default panels mode of Close all panels went); the hexagon/triangle stamp offset is fixed (owner); Randomize scenario snapshots regenerated in CI.
+
+## Oct 28 2026: removals, effects and blends
+- He approves with one word ("Merge", "Merge everything"); on Oct 28 he said it for 2.67.2 to 2.73.0, one release at a time, and each went live. Say before going live if saving, opening files or the file format is touched.
+- On a phone, the top bar must scroll sideways (2.67.2). The Background must always stay solid: 100% opacity, never a Wear canvas texture, and never see-through under any setting (2.67.3, 2.67.4, 2.70.1); he saw the checkerboard through it more than once, so test seeing through, not only the settings.
+- He liked Roughen and Ripple and asked for more Distort effects: Wobble, Warp and Slip, "a single, clean, focused update" (2.68.0). The loading screen shows the version number (2.69.0). Effects get a full-width "Add effect" button like "Add sheet", and the + in the title is gone (2.70.0).
+- He asked to **remove** the Ink edges section (Roughness, Ink squash) from the Canvas panel and the Cover overlay section from the Book canvas, "and delete them": code and fields too (2.71.0). The file format was left at 29; whether to bump it is his call.
+- He asked for a **Threshold** effect (2.72.0) with two colours, black and white by default, easy to set from the tray colours (Dark and Light colour wells).
+- He asked to bring **Replace** back as a blend (2.73.0): the overlap with the elements below prints in a chosen colour. I did Replace only, not Cancel or Behind.
+- Working preference he stated earlier: do not report stop-hook "unpushed commits" false alarms beyond a brief confirmation when the remote already matches HEAD; only speak up if commits really are unpushed.
+- Oct 28 2026 (afternoon): he moved to another Claude agent; handover notes are at the top of docs/PROJECT_STATUS.md.
