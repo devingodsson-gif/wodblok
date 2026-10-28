@@ -1,9 +1,8 @@
 # Development plan
 
-## 2.67.0 (Oct 27 2026): the copy ghost is the element; a gradient Sheet's effects follow the gradient
-- **Place copies** shows the element itself under the pointer (at 60%), as a shape picked in the library does: while copies are placed, the element's drawing gets the id `plsrc` and the ghost is a `<use>` of it, moved to the pointer; the ghost box is still drawn round it.
-- **Gradient Sheets**: the effects (Texture, Noise, Grain, the filter effects; on the Sheet's own fill and on what is under it) are at full strength at the gradient's End and fade out towards its Start, along the same line or circle and with the same Midpoint; the fill itself is drawn plain underneath. Owner: "normal on the gradient's positive side, and on the negative side it fades out".
-- Tests: new `copy-ghost-gradient-fx-2-67` (2); the place-copies, Sheet, gradient and effect specs.
+## 2.67.1 (Oct 28 2026): hotfix, stamps with Pressure offset vanished once printed
+- Found while building the Randomize rewrite. In the stamp printer (03-stamp-prints-and-drawing.js) a `//` comment added in 2.31.0 ran on into the line after it, so the definitions of the pressure variants never reached the print job: every printed pressure variant came out empty. A placed stamp or a Pattern with Pressure offset (and the patterns Randomize gives pressure) showed its stamps while they were drawn live and lost them once their print was ready. The comment is closed and the line is back.
+- Tests: new `pressure-prints-2-67-1` (2: a Pattern with Pressure offset in a sample project, a placed stamp given Pressure offset; both fail without the fix: every print had no ink). Pictures in the CI goldens that hold pressured stamps may now differ (the stamps now show).
 
 ## 2.67.0 (Oct 27 2026): the copy ghost is the element; gradient Sheets: effects follow the gradient, an end can be None
 - **Place copies** shows the element itself under the pointer (at 60%), as a shape picked in the library does: while copies are placed, the element's drawing gets the id `plsrc` and the ghost is a `<use>` of it moved to the pointer; the ghost box is still drawn round it.
