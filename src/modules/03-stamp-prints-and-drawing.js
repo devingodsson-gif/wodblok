@@ -102,7 +102,9 @@ async function bkBatch(){const MW=2048,MH=512,G=4,P=2,take=[],cells=[],tids=new 
    if(x&&x+cw>MW){x=0;y+=rh+G;rh=0}if(take.length&&y+ch>MH)break;
    j.c={x,y,cw,ch,sx,sy};cells.push(`<g transform="translate(${x+P} ${y+P}) scale(${sx} ${sy})">${j.inner}</g>`);take.push([slot,j]);x+=cw+G;rh=Math.max(rh,ch);aw=Math.max(aw,x);tids.add(j.tid);if(j.pk)pks.add(j.pk)}
   take.forEach(([k])=>BK.q.delete(k));
-  let defs='';tids.forEach(t=>defs+=(BK.TD[t]||'')+bkSurf(t));{const px=$('stpix');if(px&&px.firstChild)defs+=px.innerHTML}   // 2.31.0: the pictures that fill motifs of stampspks.forEach(k=>{const x=k.slice(0,k.lastIndexOf('_'));defs+=(BK.PF[x]||'')+(BK.PC[k]||'')});
+  let defs='';tids.forEach(t=>defs+=(BK.TD[t]||'')+bkSurf(t));{const px=$('stpix');if(px&&px.firstChild)defs+=px.innerHTML}   /* 2.31.0: the pictures that fill motifs of stamps */
+  /* 2.67.1: the pressure variants' definitions. The comment above used to run on into this line and hide it, so every printed pressure variant came out empty (a stamp with Pressure offset vanished once printed) */
+  pks.forEach(k=>{const x=k.slice(0,k.lastIndexOf('_'));defs+=(BK.PF[x]||'')+(BK.PC[k]||'')});
   take.forEach(([k,j])=>{if(j.xd!=null)defs+=bkXd(j.inner,j.xd)});
   const ah=y+rh,u=URL.createObjectURL(new Blob([`<svg xmlns="http://www.w3.org/2000/svg" width="${aw}" height="${ah}" viewBox="0 0 ${aw} ${ah}"><defs>${defs}</defs>${cells.join('')}</svg>`],{type:'image/svg+xml'}));
   let img;try{img=await new Promise((r,f)=>{const i=new Image();i.onload=()=>r(i);i.onerror=f;i.src=u})}finally{URL.revokeObjectURL(u)}
