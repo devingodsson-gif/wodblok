@@ -84,25 +84,29 @@ function mkWell(host,spec){if(!host)return null;host.classList.add('cwl');
  sb.onclick=e=>{e.stopPropagation();if(WP&&WP.W===W){closeWell();return}openWell(W)};
  paintWell(W,true);return W}
 const shown=el=>{const sc=el.closest('section.pn');return!sc||!sc.hidden};
-function paintWell(W,force){if(!W.host.isConnected||(!force&&!shown(W.host)))return;const r=W.spec.get(),show=r||(W.spec.defRef&&W.spec.defRef())||'',def=!r&&W.spec.def;
- const k=[r,col(show),wellText(show),isLink(show)?tyP().ts.indexOf(show.slice(1)):-1,def,def&&W.spec.defSwatch?W.spec.defSwatch():''].join('|');if(!force&&k===W.k)return;W.k=k;
+// 2.67.0: a well with spec.none offers None, a fixed colour with no opacity (WELL_NONE), shown as None
+const WELL_NONE='#00000000',wellNone=r=>/^#[0-9a-f]{6}00$/i.test(String(r||''));
+function paintWell(W,force){if(!W.host.isConnected||(!force&&!shown(W.host)))return;const r=W.spec.get(),show=r||(W.spec.defRef&&W.spec.defRef())||'',def=!r&&W.spec.def,nn=!!W.spec.none&&wellNone(r);
+ const k=[nn,r,col(show),wellText(show),isLink(show)?tyP().ts.indexOf(show.slice(1)):-1,def,def&&W.spec.defSwatch?W.spec.defSwatch():''].join('|');if(!force&&k===W.k)return;W.k=k;
  const i=W.sb.querySelector('i'),sp=W.sb.querySelector('span'),em=W.sb.querySelector('em');
- const ds=def&&W.spec.defSwatch?W.spec.defSwatch():'';i.style.background=ds||(show?swBg(col(show)):'transparent');i.classList.toggle('none',!show&&!ds);
- sp.textContent=def?W.spec.def:wellText(show);
+ const ds=def&&W.spec.defSwatch?W.spec.defSwatch():'';i.style.background=nn?'transparent':ds||(show?swBg(col(show)):'transparent');i.classList.toggle('none',nn||(!show&&!ds));
+ sp.textContent=nn?'None':def?W.spec.def:wellText(show);
  const n=isLink(r)?tyP().ts.indexOf(r.slice(1))+1:0;em.textContent=n?String(n):'';em.hidden=!n;
  const fixed=isFixed(r);W.lk.innerHTML=fixed?LOCK_ON:LOCK_OFF;W.lk.setAttribute('aria-pressed',String(fixed));W.lk.disabled=!r;
  W.lk.setAttribute('aria-label',fixed?'Fixed colour':'Follows tray');W.lk.title=fixed?'Fixed colour':'Follows tray';
- W.host.classList.toggle('fixed',fixed);W.sb.setAttribute('aria-label',(W.spec.label||'Colour')+': '+(def?W.spec.def:wellText(show)))}
+ W.host.classList.toggle('fixed',fixed);W.sb.setAttribute('aria-label',(W.spec.label||'Colour')+': '+(nn?'None':def?W.spec.def:wellText(show)))}
 let WP=null;   // the open well popover
 function closeWell(){if(!WP)return;WP.el.remove();WP.W.sb.setAttribute('aria-expanded','false');WP=null}
 function openWell(W){closeWell();closePicker();const o=tyP(),w=cwNow(o),r=W.spec.get(),el=document.createElement('div');el.className='cwp';el.setAttribute('role','dialog');el.setAttribute('aria-label',W.spec.label||'Colour');
  const cur=isLink(r)?r.slice(1):null;
  let h='';if(W.spec.def){const ds=W.spec.defSwatch?W.spec.defSwatch():W.spec.defRef?swBg(col(W.spec.defRef())):'';h+=`<button type="button" class="cwpd${!r?' on':''}" data-def="1"><i${ds?` style="background:${ds};border-style:solid"`:''}></i><span>${tyEsc(W.spec.def)}</span></button>`}
+ if(W.spec.none)h+=`<button type="button" class="cwpd${wellNone(r)?' on':''}" data-none="1"><i class="none"></i><span>None</span></button>`;
  h+=`<div class="cwpg" role="list">${o.ts.map((id,i)=>`<button type="button" role="listitem" class="cwpc${id===cur?' on':''}" data-s="${id}" aria-label="Colour ${i+1}${w.m[id]?': '+tyEsc(w.m[id]):''}" title="${tyEsc(w.m[id]||w.c[id].toUpperCase())}" style="--c:${w.c[id]}"><em>${i+1}</em></button>`).join('')}${o.ts.length<TRAY_MAX?`<button type="button" class="cwpc add" data-add="1" aria-label="Add a colour to the tray">${TY_IC(ICN.plus,2.2)}</button>`:''}</div>`;
  h+=`<div class="cwpr"><button type="button" class="alt" data-fix="1">${LOCK_ON}Fixed colour</button>${isFixed(r)&&o.ts.length<TRAY_MAX?`<button type="button" class="alt" data-adopt="1">${TY_IC(ICN.plus)}Add to tray</button>`:''}</div>`;
  el.innerHTML=h;document.body.appendChild(el);placeFloat(el,W.sb,false);el.style.width='';WP={el,W};W.sb.setAttribute('aria-expanded','true');
  el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();
   if(b.dataset.def){W.spec.set('');closeWell();trayDone(W.spec.what+' colour');return}
+  if(b.dataset.none){W.spec.set(WELL_NONE);closeWell();trayDone(W.spec.what+' colour');return}
   if(b.dataset.s){W.spec.set('@'+b.dataset.s);closeWell();trayDone(W.spec.what+' colour');return}
   if(b.dataset.add){const id=trayAdd(col(r||(W.spec.defRef&&W.spec.defRef())||o.ink).slice(0,7),'');if(!id)return;W.spec.set('@'+id);closeWell();trayDone('Added tray colour');paintAll(true);requestAnimationFrame(()=>{const c=$('tyc').querySelector(`[data-s="${id}"]`);editSlot(id,c||W.sb)});return}
   if(b.dataset.adopt){const h0=col(r),id=trayAdd(h0,'');if(!id)return;W.spec.set('@'+id);closeWell();trayDone('Added tray colour');return}
