@@ -10,7 +10,7 @@ import {elKind,elSel,fxDef,fxFor,fxOf,fxRegister} from './65-element-core.js';
 import {patCur} from './67-pattern-element.js';
 import {paCur} from './70-paint-element.js';
 import {mkWell} from './52-tray-ui.js';
-import {fqRegister,fqVal} from './83-filter-effects.js';
+import {FQ,fqRegister,fqVal} from './83-filter-effects.js';
 import {tlPane,tlShow} from './86-texture-library.js';
 import {pmClose,pmIsOpen,pmPop} from './90-panel-modes.js';
 
@@ -133,9 +133,10 @@ gQ(g,'.fxadd').onclick=e=>{e.stopPropagation();e.preventDefault();const t=tg();i
 // the declared settings of the filter effects: one listener for every field (data-q) and Reroll (data-qrr)
 const pn=gQ(g,'.fxpane');pn.addEventListener('input',ev=>{const el=ev.target.closest('[data-q]');if(!el)return;const ef=cur(),s=el.closest('.fxs');if(!ef||!s||ef.k!==s.dataset.e)return;const v=fqVal(el);if(ef[el.dataset.q]!==v){ef[el.dataset.q]=v;fxCh()}});
 pn.addEventListener('change',ev=>{const el=ev.target.closest('[data-q]');if(!el||el.type=='range')return;const ef=cur(),s=el.closest('.fxs');if(!ef||!s||ef.k!==s.dataset.e)return;const v=fqVal(el);if(ef[el.dataset.q]!==v){ef[el.dataset.q]=v;fxCh()}});
-// a colour field of an effect (Misregistration's second copy) is a tray colour well: '' = the same ink
-pn.querySelectorAll('[data-qw]').forEach(h=>{const f=h.dataset.qw,k=h.closest('.fxs').dataset.e,ef=()=>{const x=WBS.layers?cur():null;return x&&x.k===k?x:null};
- mkWell(h,{label:h.previousElementSibling.textContent,what:'Effect',def:'Same ink',defRef:()=>WBS.proj?WBS.proj.ink:'',get:()=>{const x=ef();return x&&x[f]||''},set:v=>{const x=ef();if(x&&(x[f]||'')!==(v||'')){x[f]=v||'';fxCh()}}})});
+// a colour field of an effect is a tray colour well. Its declaration [field, label, default entry, default colour] says what empty means:
+// a default entry ('Same ink', Misregistration) allows '' = the element's ink; null (Threshold's Dark and Light) has none, and an empty field shows the default colour
+pn.querySelectorAll('[data-qw]').forEach(h=>{const f=h.dataset.qw,k=h.closest('.fxs').dataset.e,ef=()=>{const x=WBS.layers?cur():null;return x&&x.k===k?x:null},w=((FQ[k]&&FQ[k].W)||[]).find(x=>x[0]==f)||[f,'','Same ink',''];
+ mkWell(h,{label:h.previousElementSibling.textContent,what:'Effect',...(w[2]?{def:w[2],defRef:()=>WBS.proj?WBS.proj.ink:''}:{defRef:()=>w[3]}),get:()=>{const x=ef();return x&&x[f]||''},set:v=>{const x=ef();if(!x)return;v=v||(w[2]?'':w[3]);if((x[f]||'')!==v){x[f]=v;fxCh()}}})});
 pn.addEventListener('click',ev=>{const b=ev.target.closest('[data-qrr]');if(!b)return;const ef=cur(),s=b.closest('.fxs');if(ef&&s&&ef.k===s.dataset.e){ef.sd=txRid();fxCh()}});
 const fxDel=(t,i)=>{const L=t.fx||[],u=L[i]&&L[i].u;L.splice(i,1);if(!L.length)delete t.fx;if(SEL[kind]==u)SEL[kind]=null;fxCh()};
 const fxMv=(t,i,d)=>{const L=t.fx||[],j=i+d;if(j<0||j>=L.length)return;[L[i],L[j]]=[L[j],L[i]];fxCh()};

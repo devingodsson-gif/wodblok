@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.72.0 (Oct 28 2026): Threshold effect (owner's request)
+- Print › Threshold: each pixel becomes Dark or Light by its brightness (Level); the element's edge is cut where its alpha passes Edge, so Blur or Noise earlier in the stack round or eat the edge; Softness widens both cuts; Invert swaps Dark and Light.
+- Dark and Light are tray colour wells (owner: black and white by default, tray colours easy to apply): fixed #000000 and #ffffff to start, a tray link on pick that follows the tray, and no "Same ink" entry. The effect-stack well wiring now reads the default entry from the effect's declaration (`W: [field, label, default entry or null, default colour]`).
+- Randomize: Level and Edge 35 to 65, Softness 0 to 30; the two colours stay black and white or take two different tray colours.
+- Tests: threshold-2-72 (new), noise-blur-effects-2-35 (Print list), misreg-tray-2-41 (unchanged, re-run).
+
 ## 2.71.0 (Oct 28 2026): Ink edges and Cover overlay removed (owner's request)
 - The Canvas panel no longer has Ink edges (Roughness, Ink squash) and the Book canvas no longer has Cover overlay (show cover image, texture over cover); also gone: "Also grade the cover images" in Grading and the Ink edges switch in Randomize.
 - Code deleted: `roughFilter`, the `#rf` filter, `WBS.pr` (project field `pr`, kv `wb11_print`), the cover images (`cover.img/back/spine`, `#covg`, `renderCover`), the grade's `cov` flag. The book guides and `cover.book` stay (`renderGuides`).

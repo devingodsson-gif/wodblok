@@ -69,7 +69,7 @@ const mkEL=(name,st)=>{const n=mkL(name,st,'check',180);n.free=true;n.ak={};n.ma
 // Each effect's settings are drawn from a range that stays printable (a roll never lands on a picture lost in noise or blur); a setting not listed keeps its default.
 const RZQ={noise:{amt:[10,40],sz:[10,40]},grain:{amt:[20,50],sz:[15,45],soft:[20,60]},dust:{amt:[15,45],sz:[15,45],scr:[0,40]},blur:{amt:[3,14]},motion:{amt:[8,28],ang:[0,359]},
  halftone:{sz:[15,45],tone:[40,75],ang:[0,90],spr:[20,60]},lines:{sz:[15,40],tone:[40,70],ang:[0,180],spr:[20,60]},stipple:{sz:[10,35],den:[35,70],spr:[50,90]},
- bleed:{amt:[10,35],rag:[10,50],soft:[10,40]},misreg:{amt:[10,35],ang:[0,359],rnd:[0,35]},rough:{amt:[10,35],sz:[15,45]},ripple:{amt:[8,25],wl:[15,50],ang:[0,179]},wobble:{amt:[10,30],sz:[25,60]},warp:{amt:[10,30],sz:[30,65]},slip:{amt:[8,25],bh:[15,50],ang:[0,179]}};
+ bleed:{amt:[10,35],rag:[10,50],soft:[10,40]},misreg:{amt:[10,35],ang:[0,359],rnd:[0,35]},thresh:{lv:[35,65],edge:[35,65],soft:[0,30]},rough:{amt:[10,35],sz:[15,45]},ripple:{amt:[8,25],wl:[15,50],ang:[0,179]},wobble:{amt:[10,30],sz:[25,60]},warp:{amt:[10,30],sz:[30,65]},slip:{amt:[8,25],bh:[15,50],ang:[0,179]}};
 // the Randomize kinds (the panel's ticks) -> the effect menu's groups, with how often each comes up
 const RZG={noise:['Noise',1.2],blur:['Blur',.6],print:['Print',1],distort:['Distort',.6]};
 // what a Filter shape does when no effect group is ticked: a gentle colour grade
@@ -81,7 +81,9 @@ function rzQ(k,o){const d=FQ[k],r=RZQ[k]||{},e={u:o.id(),k,on:true};
  (d.P||[]).forEach(([f,,,,v])=>{const g=r[f];e[f]=g?o.ri(g[0],g[1]):v});
  (d.S||[]).forEach(([f,,opts])=>{const xs=opts.map(x=>x[0]).filter(x=>x!='same');e[f]=o.pick(xs)});
  (d.C||[]).forEach(([f,,v])=>{e[f]=o.ch(.75)?v:!v});
- (d.W||[]).forEach(([f])=>{const ts=(WBS.proj&&WBS.proj.ts)||[];e[f]=ts.length?'@'+o.pick(ts):''});   // a colour from the tray
+ {const ts=(WBS.proj&&WBS.proj.ts)||[],own=(d.W||[]).filter(w=>w[2]===null);   // a colour from the tray; wells with no default entry (Threshold) keep their defaults or take different tray colours
+ (d.W||[]).forEach(([f,,dl])=>{if(dl!==null)e[f]=ts.length?'@'+o.pick(ts):''});
+ if(own.length){const left=[...ts],tray=ts.length>=own.length&&o.ch(.5);own.forEach(([f,,,v])=>{e[f]=tray?'@'+left.splice(o.ri(0,left.length-1),1)[0]:v})}}
  if(d.seed)e.sd=o.ri(1,99999);return e}
 // one effect from the ticked groups (a group by its weight, then any effect in it)
 function rzQPick(groups,o){const g=o.wpick(groups.map(k=>[k,RZG[k][1]])),ks=Object.keys(FQ).filter(k=>FQ[k].grp==RZG[g][0]);return rzQ(o.pick(ks),o)}

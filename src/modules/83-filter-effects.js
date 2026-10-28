@@ -1,6 +1,6 @@
 import {txRid} from './16-texture-generators.js';
 import {WBX} from './01-launch-and-version.js';
-import {col} from './04-canvas-and-stamp-outlines.js';
+import {col,okC} from './04-canvas-and-stamp-outlines.js';
 import {fxRegister} from './65-element-core.js';
 
 // 2.36.0 adds Print (Halftone moves in, with Line Screen, Stipple, Ink Bleed, Misregistration) and Distort (Roughen, Ripple).
@@ -114,6 +114,16 @@ const FQ={
     return{defs:fqFilter(id,b.x-m,b.y-m,b.W+2*m,b.H+2*m,body),wrap:fqWrap(id)}}
    const body=(ink?`<feOffset in="SourceAlpha" dx="${q4(dx)}" dy="${q4(dy)}" result="oa"/><feFlood flood-color="${ink}" result="fc"/><feComposite in="fc" in2="oa" operator="in" result="o"/>`:`<feOffset in="SourceGraphic" dx="${q4(dx)}" dy="${q4(dy)}" result="o"/>`)+`<feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>`;
    return{defs:fqFilter(id,b.x-m,b.y-m,b.W+2*m,b.H+2*m,body),wrap:fqWrap(id)}}},
+ // 2.72.0 (owner Oct 28 2026): Threshold. Each pixel becomes one of two colours by its brightness (Dark below Level, Light above; Invert swaps them), and the element's
+ // edge is cut where its alpha passes Edge, so Blur or Noise earlier in the stack round or eat the edge. Softness widens both cuts. Dark and Light are tray colour
+ // wells with no "same ink" entry: a fixed black and white to start, a tray link on pick (resolved here, so a tray edit recolours it).
+ thresh:{label:'Threshold',grp:'Print',P:[['lv','Level',1,99,50,'%'],['edge','Edge',1,99,50,'%'],['soft','Softness',0,100,0,'%']],C:[['inv','Invert',false]],W:[['dk','Dark',null,'#000000'],['lt','Light',null,'#ffffff']],
+  filt:(e,id,b)=>{const lv=fqPar(e,'lv',1,99,50)/100,ed=fqPar(e,'edge',1,99,50)/100,k=2+(1-fqPar(e,'soft',0,100,0)/100)*58,c=(v,d)=>col(okC(v)?v:d).slice(0,7),D=c(e.dk,'#000000'),Lt=c(e.lt,'#ffffff');
+   const t=e.inv?`slope="${q4(-k)}" intercept="${q4(.5+k*lv)}"`:`slope="${q4(k)}" intercept="${q4(.5-k*lv)}"`;
+   const body=`<feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .2126 .7152 .0722 0 0" result="lu"/><feComponentTransfer in="lu" result="t"><feFuncA type="linear" ${t}/></feComponentTransfer>`
+    +`<feFlood flood-color="${Lt}" result="lf"/><feComposite in="lf" in2="t" operator="in" result="lc"/><feFlood flood-color="${D}" result="df"/><feMerge result="mx"><feMergeNode in="df"/><feMergeNode in="lc"/></feMerge>`
+    +`<feComponentTransfer in="SourceAlpha" result="m"><feFuncA type="linear" slope="${q4(k)}" intercept="${q4(.5-k*ed)}"/></feComponentTransfer><feComposite in="mx" in2="m" operator="in"/>`;
+   return{defs:fqFilter(id,b.x,b.y,b.W,b.H,body),wrap:fqWrap(id)}}},
  rough:{label:'Roughen',grp:'Distort',seed:true,P:[['amt','Amount',0,100,25,'%'],['sz','Size',1,100,30,'']],
   filt:(e,id,b)=>{const S=fqSize(b),sc=S*fqPar(e,'amt',0,100,25)/100*.12;if(!(sc>0))return null;const g=S*(.01+fqPar(e,'sz',1,100,30)/100*.1),m=sc;
    return{defs:fqFilter(id,b.x-m,b.y-m,b.W+2*m,b.H+2*m,`<feTurbulence type="fractalNoise" baseFrequency="${q4(1/g)}" numOctaves="3" seed="${fqSeed(e)}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${q4(sc)}" xChannelSelector="R" yChannelSelector="G"/>`),wrap:fqWrap(id)}}},

@@ -16,7 +16,7 @@ const addFx = async (page, kind, grp, label) => {
   else await page.locator('.rowm:not(.rowsub) .ddi', { hasText: label }).first().click();
   await settle(page);
 };
-const ALL = [['Noise', 'Add Noise', 'noise'], ['Noise', 'Film Grain', 'grain'], ['Noise', 'Dust & Scratches', 'dust'], ['Blur', 'Gaussian Blur', 'blur'], ['Blur', 'Motion Blur', 'motion'], ['Print', 'Halftone', 'halftone'], ['Print', 'Line Screen', 'lines'], ['Print', 'Stipple', 'stipple'], ['Print', 'Ink Bleed', 'bleed'], ['Print', 'Misregistration', 'misreg'], ['Distort', 'Roughen', 'rough'], ['Distort', 'Ripple', 'ripple'], ['Distort', 'Wobble', 'wobble'], ['Distort', 'Warp', 'warp'], ['Distort', 'Slip', 'slip']];
+const ALL = [['Noise', 'Add Noise', 'noise'], ['Noise', 'Film Grain', 'grain'], ['Noise', 'Dust & Scratches', 'dust'], ['Blur', 'Gaussian Blur', 'blur'], ['Blur', 'Motion Blur', 'motion'], ['Print', 'Halftone', 'halftone'], ['Print', 'Line Screen', 'lines'], ['Print', 'Stipple', 'stipple'], ['Print', 'Ink Bleed', 'bleed'], ['Print', 'Misregistration', 'misreg'], ['Print', 'Threshold', 'thresh'], ['Distort', 'Roughen', 'rough'], ['Distort', 'Ripple', 'ripple'], ['Distort', 'Wobble', 'wobble'], ['Distort', 'Warp', 'warp'], ['Distort', 'Slip', 'slip']];
 
 test('the Add effect menu groups Noise and Blur in flyouts; Print and Distort too', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
@@ -31,7 +31,7 @@ test('the Add effect menu groups Noise and Blur in flyouts; Print and Distort to
   await page.locator('.rowm .ddi', { hasText: 'Jitter' }).first().hover();
   await expect(page.locator('.rowsub')).toHaveCount(0);
   await page.locator('.rowm .ddi', { hasText: 'Print' }).first().hover();
-  await expect(page.locator('.rowsub .ddi')).toHaveText(['Halftone', 'Line Screen', 'Stipple', 'Ink Bleed', 'Misregistration']);
+  await expect(page.locator('.rowsub .ddi')).toHaveText(['Halftone', 'Line Screen', 'Stipple', 'Ink Bleed', 'Misregistration', 'Threshold']);
   await page.locator('.rowm .ddi', { hasText: 'Distort' }).first().hover();
   await expect(page.locator('.rowsub .ddi')).toHaveText(['Roughen', 'Ripple', 'Wobble', 'Warp', 'Slip']);
   await page.locator('.rowm .ddi', { hasText: 'Blur' }).first().click();
