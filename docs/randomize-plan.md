@@ -1,4 +1,4 @@
-# Randomize rewrite: plan (draft, waiting for the owner's answers)
+# Randomize rewrite: plan (in progress; step 1 on `feat/2.74.1-randomize-looks`)
 
 Owner, Oct 27 2026: "rewrite Randomize so it touches every option we have right now, all the elements and everything, all the effects and settings. The random results should look appealing, like a real image."
 
@@ -49,12 +49,31 @@ A table in this document (made in step 1) lists every element kind, layout, Tili
 - Anything switched off in the Randomize panel stays as it is.
 - No runtime network; speed first (`npm run perf` on every step).
 
-## Steps (each a patch; 2.68.0 when the plan is done)
-1. **2.67.1 The frame of it**: the Look engine in a new module (one roller, small functions per part), colour roles, the margin grid and the checks; the Repeat Look moved onto it (today's roll, improved); the coverage table.
-2. **2.67.2 Type**: canvas Text boxes, font pairs, titles and second lines, text shapes and styles; Poster and Book plate.
-3. **2.67.3 More Looks**: Badge, Specimen, Modern, Sunburst, Quilt; gradient Sheets, Tilings on purpose, motif and text sources, Map to shape, Paint (a hand-drawn underline or swash).
-4. **2.67.4 Finish**: the effect budget, Filter Sheets with gradient fades, grade looks and masks, canvas texture, element opacity and blend.
-5. **2.67.5 The panel and tests**: the Randomize panel for the new roller, the coverage test, the old roller removed, docs. Then 2.68.0.
+## Owner's answers (Oct 28 2026)
+- Simplify the Randomize panel: a Look choice (Any, or one Look) and a few switches.
+- The Look list: the eight above.
+- A roll builds new stamp art from shapes by default (it does not take saved stamps).
+- "Spend more time on the looks: they should look more or less like finished art work ready to use, with all the features WODBLOK has to offer; a wide variety of possible outputs."
+
+## Steps (each a patch; 2.75.0 when the plan is done; renumbered Oct 28 2026, the plan was written against 2.67.0)
+1. **2.74.1 The Looks**: the Look engine (93-randomize-looks.js) with shared parts (grounds, fields, focal points, words round a circle, borders, corners, rules, ribbons, a brush swash) and several layouts per Look; Repeat moved onto it (the old roll is kept for a roll with Stamps off, a book cover and a repeat tile); colour roles read through the palette being rolled; a Look choice at the top of the Randomize panel. **Done, see docs/plan.md.**
+2. **2.74.2 The panel**: the simplified switches (Background, Pattern, Focal point, Text, Frame, Colours, Effects, Finish, Canvas size) replacing today's sliders.
+3. **2.74.3 Tests**: the `randomize-*` specs, `text-randomize`, `repeat-tile` and `nothing-lost-2-24` rewritten for the Looks; the coverage test; the Randomize scenario snapshots regenerated in CI with the owner's approval.
+4. **2.74.4 The old roller removed** (once Stamps off, book covers and repeat tiles have a Look), docs. Then 2.75.0.
+
+## What each Look makes (2.74.1)
+| Look | Layouts | Uses |
+|---|---|---|
+| Poster | Classic, Block (words in a band of colour), Sun (a disc on a horizon behind a silhouette), Type (the title set big), Framed (an ornament border) | gradient and halftone Sheets, a quiet Tiling or Scatter field, emblem stamps, Motif silhouettes, wreaths (a Pattern mapped onto a circle), print effects, rules, Film Grain |
+| Book plate | Classic (double rule, corner ornaments), Arch (curved title), Border (a Frame pattern of ornaments), Seal (words round a circle, Map to shape) | paper textures, emblem stamps with two-colour runs, italic second lines |
+| Badge | Seal (words all round a disc), Outline (a dotted ring, curved words top and bottom, stars), Banner (a shield or hexagon with a ribbon) | Roughen, Halftone or Wear on the seal, Map to shape text |
+| Specimen | Grid (every place a different specimen, numbered), Row, Single (one large specimen with details) | Stipple and Line Screen, Roman numerals, italic captions |
+| Modern | Shapes (a grid of basic shapes and one large overprinted shape), Tiles, Bands, Circles, Big type (the title over a large shape, Multiply or Screen) | blend modes, Halftone, Misregistration, Add Noise |
+| Sunburst | Rays (wedges on a circle round an emblem), Sunset (a striped half sun), Rainbow (arcs and clouds) | a highlight band or a brush swash (Paint) under a script title, wavy text, warm grade |
+| Quilt | Blocks, Sashing, Medallion | Tiling arrangements (turned, pinwheel, mirror, basket, checker), inverted (carved) blocks, binding, a label |
+| Repeat | Wallpaper (with a filler between), Pair, Stripe, Toile (a jittered half drop), Damask (a large tone stamp and a small sprig) | square, circle, hexagon and diamond Tilings, stamps made of one motif for repeated detail |
+
+Speed: a motif is drawn in full at every place it is put (about 10,000 characters each), so a repeated detailed motif goes into a stamp that prints once; a whole Pattern never gets a Pressure offset or a Texture effect (each placement would be drawn on its own: up to 7 million characters in tests). Rolls measured at most about 400,000 characters of `#dyn` markup.
 
 ## Tests and snapshots
 - Every seeded roll changes, so the Randomize scenario snapshots (`scenarios.spec.js`: seeds 1 to 3, before view, split view) and the specs that check rolled content (`randomize-*.spec.js`, `text-randomize`, `repeat-tile` seamless rolls, `nothing-lost-2-24`) change. Snapshots are regenerated in CI with the owner's approval; the specs are rewritten for the new roller.
