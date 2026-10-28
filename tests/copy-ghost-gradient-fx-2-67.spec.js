@@ -30,3 +30,16 @@ test('a gradient Sheet\'s noise is strong at its End and fades out towards its S
   expect(start).toBeLessThan(end * .4);
   expect(errors).toEqual([]);
 });
+
+test('a gradient end can be None: the gradient fades to nothing there', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false, background: true });
+  const u = JSON.parse(await H.getState(page)).els.find(x => x.k === 'sheet').u;
+  await H.showPanel(page, 'lyrs'); await page.locator(`#lyl2 .lyr[data-u="${u}"] .lyn`).click(); await H.settle(page);
+  await page.click('#mf_fk [data-f="grad"]'); await H.settle(page);
+  await page.locator('#mf_g2w .cwsb').scrollIntoViewIfNeeded(); await page.click('#mf_g2w .cwsb');
+  await page.click('.cwp [data-none]'); await H.settle(page);
+  expect(JSON.parse(await H.getState(page)).els.find(x => x.k === 'sheet').ink2).toBe('#00000000');
+  await expect(page.locator('#mf_g2w .cwsb span')).toHaveText('None');
+  await expect(page.locator('#art linearGradient stop[offset="1"]')).toHaveAttribute('stop-opacity', '0');
+  expect(errors).toEqual([]);
+});

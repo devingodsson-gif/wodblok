@@ -6,6 +6,8 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 
 **Oct 27 2026 (2.67.0).** The Place copies ghost is the element itself; a gradient Sheet's effects fade along the gradient (full at its End).
 
+**Oct 27 2026 (2.67.0).** The Place copies ghost is the element itself; a gradient Sheet's effects fade along the gradient (full at its End); a gradient end can be None.
+
 **Oct 27 2026 (2.66.2).** CI suite run on 2.66.0 (owner); its failures fixed in 2.66.1 and 2.66.2: the Repeat 3 x 3 view is a picture of the tile (it stalled on heavy rolls), three older specs updated. Still failing, dropped by the owner: `smart-guides-2-40` Settings > Guides, `randomize-effects-2-39` seeded roll.
 
 **Oct 27 2026 (2.66.0).** About ninety built-in fonts in eight groups, 29 with real bold, italic and bold italic. The text plan (docs/text-plan.md) is complete with this release. The app is 17.5 MB, over the preview artifact's 16 MB limit: the preview is now published with the `<style id="wbfonts">` contents moved into a `fonts.css` file next to the page (a same-origin stylesheet, which the Text tool still reads its outlines from); `dist/` itself is unchanged.

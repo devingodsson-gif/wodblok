@@ -37,8 +37,10 @@ function shFill(q,id,seen){const R=`x="0" y="0" width="${shF(CW)}" height="${shF
  // 2.60.4 (owner Oct 27 2026: "linear and radial gradients that we can apply effects to"): fl 'grad', from ink (the paper colour when it has none) to ink2
  // (the ink colour when it has none); gk 'rad' for Radial (centre gx, gy % of the canvas, size gs % of its long side), else Linear by ga degrees (90: top to bottom);
  // gm % is where the two colours meet half way. The effects work on it as on any fill.
- if(q.fl=='grad'){const c1=okC(q.ink)?col(q.ink):col(WBS.proj.bg),c2=okC(q.ink2)?col(q.ink2):col(WBS.proj.ink),m=Math.max(5,Math.min(95,q.gm!=null?+q.gm:50))/100;
-  const st=`<stop offset="0" stop-color="${c1}"/>${Math.abs(m-.5)>.001?`<stop offset="${m.toFixed(3)}" stop-color="${shMix(c1,c2)}"/>`:''}<stop offset="1" stop-color="${c2}"/>`;let g;
+ // 2.67.0: an end can be None (a colour with no opacity): the gradient fades from the other end's colour to nothing
+ if(q.fl=='grad'){const N=c=>/^#[0-9a-f]{6}00$/i.test(String(c||'')),n1=N(q.ink),n2=N(q.ink2);let c1=okC(q.ink)&&!n1?col(q.ink):col(WBS.proj.bg),c2=okC(q.ink2)&&!n2?col(q.ink2):col(WBS.proj.ink);if(n1)c1=c2;if(n2)c2=c1;
+  const m=Math.max(5,Math.min(95,q.gm!=null?+q.gm:50))/100,o1=n1?0:1,o2=n2?0:1,sc=(c,o)=>`stop-color="${c}"${o<1?` stop-opacity="${o}"`:''}`;
+  const st=`<stop offset="0" ${sc(c1,o1)}/>${Math.abs(m-.5)>.001?`<stop offset="${m.toFixed(3)}" ${sc(shMix(c1,c2),(o1+o2)/2)}/>`:''}<stop offset="1" ${sc(c2,o2)}/>`;let g;
   return{defs:shGrad(q,id+'g',st),body:`<rect ${R} fill="url(#${id}g)"/>`}}
  return{defs:'',body:`<rect ${R} fill="${okC(q.ink)?col(q.ink):col(WBS.proj.bg)}"/>`}}
 // the Sheet that is being edited draws live (its print would be out of date at every step)
