@@ -24,7 +24,10 @@ const rzCon=(a,b)=>{const x=rzLum(a),y=rzLum(b);return(Math.max(x,y)+.05)/(Math.
 // accents (the rest, best contrast first), soft (the colour closest to the paper: quiet fields and gradient partners)
 function rzRoles(PC,paper,dark){const all=[...new Set(PC.filter(Boolean))];let p=paper;if(dark){p=all.slice().sort((a,b)=>rzLum(a)-rzLum(b))[0]||paper}
  const rest=all.filter(c=>c!==p),byC=rest.slice().sort((a,b)=>rzCon(b,p)-rzCon(a,p)),ink=byC[0]||(dark?paper:p),acc=byC.slice(1),soft=rest.slice().sort((a,b)=>rzCon(a,p)-rzCon(b,p))[0]||ink;
- return{paper:p,ink,acc,soft,all,dark:!!dark,on:bg=>rest.concat(dark?[paper]:[]).filter(c=>c!==bg).sort((a,b)=>rzCon(b,bg)-rzCon(a,bg))[0]||ink}}
+ const on=bg=>rest.concat(dark?[paper]:[]).filter(c=>c!==bg).sort((a,b)=>rzCon(b,bg)-rzCon(a,bg))[0]||ink;
+ // a colour for words over bg (one colour or the two ends of a gradient): the one asked for when it reads well (contrast 3 or more), else the best there is
+ const lo=(c,bg)=>Math.min(...[].concat(bg).map(b=>rzCon(c,b))),txt=(bg,want)=>{if(want&&lo(want,bg)>=3)return want;return[ink,...acc,p,...rest].filter(Boolean).sort((a,b)=>lo(b,bg)-lo(a,bg))[0]||ink};
+ return{paper:p,ink,acc,soft,all,dark:!!dark,on,txt}}
 
 // --- words. Made-up titles that fit each Look, and sometimes the project's name (owner, Oct 27 2026: "Mix")
 const RZW={
@@ -87,15 +90,15 @@ const rzSh=(k,s)=>({k,o:'p',s:s||[1,1],z:100});
 const RZL={};
 // Poster: a ground (gradient or flat), a quiet field, one large focal stamp, a title with a small line under it, and a print finish
 RZL.poster={dark:1,w:1.2,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.07,.1),out={tiles:[],els:[],texts:[]},mains=rzThemes(E,'poster').slice().sort(()=>E.R()-.5).slice(0,3),dots=mains;
- const dark=R.dark;if(E.ch(.65))out.els.push(addFx(elGrad(E,R.paper,R.soft,E.ch(.35)),E.ch(.5)?rzQfx('halftone',{sz:E.ri(18,35),tone:E.ri(40,60),ang:E.pick([15,45,75]),spr:E.ri(25,50)},E):null));
+ const dark=R.dark,grad=E.ch(.65),gnd=grad?[R.paper,R.soft]:R.paper;if(grad)out.els.push(addFx(elGrad(E,R.paper,R.soft,E.ch(.35)),E.ch(.5)?rzQfx('halftone',{sz:E.ri(18,35),tone:E.ri(40,60),ang:E.pick([15,45,75]),spr:E.ri(25,50)},E):null));
  else if(dark)out.els.push(elSheet('Ground',{ink:R.paper}));
  // the quiet field: small shapes in the soft colour, see-through, on a Tiling or a Scatter
  if(E.ch(.7)){const bk=E.pick(['ellipse','star','dia','hex','rect']),mk=basicKey(bk);if(mk){const lay=E.pick(['tile','scatter']),p=patOf('Field',[],lay=='tile'?'tile':'scatter',E.ri(6,12),E.ri(8,16),E.ri(30,60),[],null);p.src=[{k:'motif',m:mk,w:1,ink:R.soft}];if(lay=='tile'){p.ts=E.pick(['square','hex','diamond']);p.ps=+E.rr(3,7).toFixed(1);p.sp=E.ri(80,220);p.ar=(TL_AR[p.ts]||[['grid']])[0][0]}p.op=E.ri(25,55);out.els.push(p)}}
- const titleTop=E.ch(.3),fs=S*E.rr(.5,.62),fy=titleTop?CH*.58:CH*.4,id=1,sk=E.pick(['circle','circle','hex','rect','diamond']),t=rzTile(E,id,rzSh(sk),E.pick(['emblem','center','center','rosette']),mains,dots,R.ink);out.tiles.push(t);
+ const titleTop=E.ch(.3),fs=S*E.rr(.5,.62),fy=titleTop?CH*.58:CH*.4,id=1,sk=E.pick(['circle','circle','hex','rect','diamond']),t=rzTile(E,id,rzSh(sk),E.pick(['emblem','center','center','rosette']),mains,dots,R.txt(gnd,R.ink));out.tiles.push(t);
  out.els.push(addFx(elStamp(t,CW/2,fy,fs,0),E.ch(.4)?rzQfx('misreg',{amt:E.ri(8,20),ang:E.ri(0,359),col:R.acc[0]||''},E):null,E.ch(.3)?fxP(E.ri(1,4),0):null));
  const [ti,sub]=E.pick(RZW.poster),nm=rzName(),title=nm&&E.ch(.3)?nm.toUpperCase().slice(0,22):ti,tf=rzFont(E,RZF.poster[0]),sf=rzFont(E,RZF.poster[1]),tw=CW-2*m,th=S*E.rr(.11,.16),bandY=titleTop?m+th/2:Math.min(CH-m-th*1.4,fy+fs/2+th*.9);
- const tink=R.on(R.paper);out.texts.push(elText(E,title,tf,CW/2,bandY,tw,th,tink,{ls:/[a-z]/.test(title)?0:E.pick([2,4,8])}));
- if(E.ch(.85)){const sh2=th*E.rr(.3,.4),sy=titleTop?bandY+th/2+sh2*1.1:bandY+th/2+sh2*1.1;out.texts.push(elText(E,sub,sf,CW/2,Math.min(CH-m,sy),tw*E.rr(.45,.7),sh2,R.acc[0]||tink,{ls:E.pick([10,20,30])}))}
+ const tink=R.txt(gnd,R.ink);out.texts.push(elText(E,title,tf,CW/2,bandY,tw,th,tink,{ls:/[a-z]/.test(title)?0:E.pick([2,4,8])}));
+ if(E.ch(.85)){const sh2=th*E.rr(.3,.4),sy=titleTop?bandY+th/2+sh2*1.1:bandY+th/2+sh2*1.1;out.texts.push(elText(E,sub,sf,CW/2,Math.min(CH-m,sy),tw*E.rr(.45,.7),sh2,R.txt(gnd,R.acc[0]),{ls:E.pick([10,20,30])}))}
  out.tex=E.ch(.6)?'paper':'none';out.grade=E.pick(['warm','fade','punch','none']);out.top=E.ch(.5)?rzQfx('grain',{amt:E.ri(18,35),sz:E.ri(15,35),soft:E.ri(20,50)},E):null;return out}};
 // Book plate: paper, a double frame rule, a centred emblem, EX LIBRIS above and a second line below
 RZL.plate={w:.9,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.06,.09),out={tiles:[],els:[],texts:[]},mains=rzThemes(E,'plate').slice().sort(()=>E.R()-.5).slice(0,3),rk=basicKey('rect'),ek=basicKey('ellipse');
@@ -103,47 +106,47 @@ RZL.plate={w:.9,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.06,.09),out
  const es=Math.min(fw,fh)*E.rr(.5,.62),ey=CH*.5,t=rzTile(E,1,rzSh(E.pick(['circle','circle','hex'])),E.pick(['emblem','rosette','center']),mains,mains,R.ink);out.tiles.push(t);out.els.push(addFx(elStamp(t,CW/2,ey,es,0),E.ch(.5)?fxP(E.ri(1,4),0):null));
  if(ek&&E.ch(.5))out.els.push(elMotif(ek,CW/2,ey,es*1.08,{fl:'none',sw:rzF(lw),sk:R.acc[0]||R.ink,nm:'Ring'}));
  const [ti,sub]=E.pick(RZW.plate),nm=rzName(),tf=rzFont(E,RZF.plate[0]),sf=rzFont(E,RZF.plate[1]),th=Math.min(S*.11,(ey-es/2-m)*.6),tw=fw*.8;
- out.texts.push(elText(E,ti,tf,CW/2,(m+ey-es/2)/2+m*.2,tw,th,R.ink,{ls:E.pick([4,8,12])}));
- const s2=nm&&E.ch(.6)?nm:sub,sth=th*.55,it2=rzHas(sf,'i');out.texts.push(elText(E,s2,sf,CW/2,(ey+es/2+CH-m)/2-m*.2,tw*.8,sth,R.acc[0]||R.ink,{ls:2,...(it2?{sty:[[0,[...s2].length,100,0,0,'','i']]}:{})}));
+ out.texts.push(elText(E,ti,tf,CW/2,(m+ey-es/2)/2+m*.2,tw,th,R.txt(R.paper,R.ink),{ls:E.pick([4,8,12])}));
+ const s2=nm&&E.ch(.6)?nm:sub,sth=th*.55,it2=rzHas(sf,'i');out.texts.push(elText(E,s2,sf,CW/2,(ey+es/2+CH-m)/2-m*.2,tw*.8,sth,R.txt(R.paper,R.acc[0]),{ls:2,...(it2?{sty:[[0,[...s2].length,100,0,0,'','i']]}:{})}));
  out.tex='paper';out.grade=E.pick(['fade','warm','none']);return out}};
 // Badge: a filled round (or hex) seal in the ink colour, a ring rule and a stamp inside in the paper colour, a title above and a line below
 RZL.badge={dark:1,w:.9,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},mains=rzThemes(E,'badge').slice().sort(()=>E.R()-.5).slice(0,3),shp=E.pick(['ellipse','ellipse','hex']),bk=basicKey(shp),ek=basicKey('ellipse'),bs=S*E.rr(.56,.68),cy=CH*.47;
  if(R.dark)out.els.push(elSheet('Ground',{ink:R.paper}));
  if(bk)out.els.push(addFx(elMotif(bk,CW/2,cy,bs,{ink:R.ink,nm:'Seal'}),E.ch(.6)?rzQfx('halftone',{sz:E.ri(15,28),tone:E.ri(55,75),ang:45,spr:E.ri(20,45)},E):rzQfx('rough',{amt:E.ri(8,18),sz:E.ri(15,30)},E)));
- if(ek)out.els.push(elMotif(ek,CW/2,cy,bs*.84,{fl:'none',sw:rzF(Math.max(1,S*.006)),sk:R.paper,nm:'Ring'}));
- const t=rzTile(E,1,rzSh('circle'),'center',mains,mains,R.paper);out.tiles.push(t);out.els.push(elStamp(t,CW/2,cy,bs*.56,0));
- const [ti,sub]=E.pick(RZW.badge),tf=rzFont(E,RZF.badge[0]),sf=rzFont(E,RZF.badge[1]),tw=CW*.8,th=S*E.rr(.08,.11),top=cy-bs/2,bot=cy+bs/2,ink=R.on(R.paper);
+ if(ek)out.els.push(elMotif(ek,CW/2,cy,bs*.84,{fl:'none',sw:rzF(Math.max(1,S*.006)),sk:R.txt(R.ink,R.paper),nm:'Ring'}));
+ const t=rzTile(E,1,rzSh('circle'),'center',mains,mains,R.txt(R.ink,R.paper));out.tiles.push(t);out.els.push(elStamp(t,CW/2,cy,bs*.56,0));
+ const [ti,sub]=E.pick(RZW.badge),tf=rzFont(E,RZF.badge[0]),sf=rzFont(E,RZF.badge[1]),tw=CW*.8,th=S*E.rr(.08,.11),top=cy-bs/2,bot=cy+bs/2,ink=R.txt(R.paper,R.ink);
  out.texts.push(elText(E,ti,tf,CW/2,Math.max(th*.8,top/2+th*.1),tw,th,ink,{ls:E.pick([4,8,12]),cv:E.pick([0,0,18,25])}));
- out.texts.push(elText(E,sub,sf,CW/2,Math.min(CH-th*.6,(bot+CH)/2),tw*.6,th*.7,R.acc[0]||ink,{ls:E.pick([6,10])}));
+ out.texts.push(elText(E,sub,sf,CW/2,Math.min(CH-th*.6,(bot+CH)/2),tw*.6,th*.7,R.txt(R.paper,R.acc[0]),{ls:E.pick([6,10])}));
  out.tex=E.ch(.5)?'paper':'none';out.grade=E.pick(['punch','fade','none']);return out}};
 // Specimen: shapes from one folder set out like plates in a book, a fine frame rule, an italic caption
 RZL.specimen={w:.9,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.08,.11),out={tiles:[],els:[],texts:[]},pool=rzThemes(E,'specimen'),ms=pool.slice().sort(()=>E.R()-.5).slice(0,E.ri(3,6)),rk=basicKey('rect');
  const fw=CW-2*m,fh=CH-2*m;if(rk&&E.ch(.7))out.els.push(elMotif(rk,CW/2,CH/2,Math.max(fw,fh),{wx:+(fw/Math.max(fw,fh)).toFixed(4),wy:+(fh/Math.max(fw,fh)).toFixed(4),fl:'none',sw:rzF(Math.max(1,S*.004)),sk:R.ink,nm:'Frame'}));
- const ah=fh*.8,p=patOf('Specimens',[],E.ch(.5)?'tile':'scatter',E.ri(3,4),E.ri(3,5),E.ri(60,80),[],null);p.af=0;p.x=rzF(CW/2);p.y=rzF(m+ah/2+fh*.03);p.aw=rzF(fw*.9);p.ah=rzF(ah);p.ds='random';
- p.src=ms.map((mm,i)=>({k:'motif',m:mm,w:1,ink:i%3==2&&R.acc[0]?R.acc[0]:R.ink}));if(p.lay=='tile'){p.ts='square';p.ar='grid';p.ps=+(Math.min(fw,ah)/S*100/E.ri(3,4)*.62).toFixed(1);p.sp=E.ri(40,70)}else{p.cn=E.ri(3,4);p.rn=E.ri(3,5)}
+ const ah=fh*.8,nc=CW>CH?E.ri(4,5):E.ri(3,4),p=patOf('Specimens',[],'tile',nc,nc,100,[],null);p.af=0;p.x=rzF(CW/2);p.y=rzF(m+ah/2+fh*.03);p.aw=rzF(fw*.9);p.ah=rzF(ah);p.ds='random';
+ const sp=E.ri(35,60),ac=R.txt(R.paper,R.acc[0]);p.src=ms.map((mm,i)=>({k:'motif',m:mm,w:1,ink:i%3==2?ac:R.ink}));p.ts='square';p.ar='grid';p.sp=sp;p.ps=+(fw*.9/nc/(1+sp/100)/S*100).toFixed(1);
  out.els.push(addFx(p,E.ch(.5)?rzQfx('stipple',{sz:E.ri(10,22),den:E.ri(55,75),spr:E.ri(60,85)},E):null,E.ch(.4)?fxJ(E.ri(4,12),E.ri(5,20),E.ri(5,15)):null));
  const [ti,sub]=E.pick(RZW.specimen),tf=rzFont(E,RZF.specimen[0]),sf=rzFont(E,RZF.specimen[1]),th=S*.06,cy=CH-m-th*.9;
- out.texts.push(elText(E,ti,tf,CW/2,cy,fw*.6,th,R.ink,rzHas(tf,'i')?{sty:[[0,[...ti].length,100,0,0,'','i']]}:{}));out.texts.push(elText(E,sub,sf,CW/2,cy-th*1.05,fw*.25,th*.45,R.acc[0]||R.ink,{ls:12}));
+ out.texts.push(elText(E,ti,tf,CW/2,cy,fw*.6,th,R.txt(R.paper,R.ink),rzHas(tf,'i')?{sty:[[0,[...ti].length,100,0,0,'','i']]}:{}));out.texts.push(elText(E,sub,sf,CW/2,cy-th*1.05,fw*.25,th*.45,R.txt(R.paper,R.acc[0]),{ls:12}));
  out.tex='paper';out.grade=E.pick(['fade','warm']);return out}};
 // Modern: a Tiling of basic shapes in the accent colours over part of the canvas, a bold title in the open part, misregistration
-RZL.modern={dark:1,w:1,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.06,.08),out={tiles:[],els:[],texts:[]},ks=['ellipse','rect','tri','dia','hex','star'].sort(()=>E.R()-.5).slice(0,E.ri(2,3)).map(basicKey).filter(Boolean),inks=[R.ink,...R.acc].slice(0,3);
+RZL.modern={dark:1,w:1,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.06,.08),out={tiles:[],els:[],texts:[]},ks=['ellipse','rect','tri','dia','hex','star'].sort(()=>E.R()-.5).slice(0,E.ri(2,3)).map(basicKey).filter(Boolean),inks=[R.ink,...R.acc].filter(c=>rzCon(c,R.paper)>=1.4).slice(0,3);
  if(R.dark)out.els.push(elSheet('Ground',{ink:R.paper}));
  const ts=E.pick(['square','square','hex','tri','diamond']),ar=E.pick((TL_AR[ts]||[['grid']]).map(x=>x[0])),blockH=CH*E.rr(.58,.7),top=E.ch(.5),p=patOf('Shapes',[],'tile',4,4,100,[],null);p.ts=ts;p.ar=ar;p.ps=+E.rr(9,16).toFixed(1);p.sp=E.ri(0,30);p.ds='random';p.af=0;p.x=rzF(CW/2);p.y=rzF(top?blockH/2:CH-blockH/2);p.aw=rzF(CW);p.ah=rzF(blockH);
  p.src=ks.flatMap((k,i)=>inks.map((c,j)=>({k:'motif',m:k,w:j==0?2:1,ink:c})));out.els.push(addFx(p,E.ch(.55)?rzQfx('misreg',{amt:E.ri(8,22),ang:E.ri(0,359),rnd:E.ri(0,20),col:''},E):null));
  const [ti,sub]=E.pick(RZW.modern),tf=rzFont(E,RZF.modern[0]),sf=rzFont(E,RZF.modern[1]),open=CH-blockH,th=Math.min(open*.42,S*.2),tw=CW-2*m,ty=top?blockH+open*.42:open*.42,al=E.pick(['l','c']),tx=al=='l'?m+tw/2:CW/2;
- out.texts.push(elText(E,ti,tf,tx,ty,tw,th,R.on(R.paper),{al,ls:E.pick([0,2,6]),...(rzHas(tf,'b')?{sty:[[0,[...ti].length,100,0,0,'','b']]}:{})}));out.texts.push(elText(E,sub,sf,tx,ty+th*.5+open*.12,tw,th*.3,R.acc[0]||R.ink,{al,ls:E.pick([8,14])}));
+ out.texts.push(elText(E,ti,tf,tx,ty,tw,th,R.txt(R.paper,R.ink),{al,ls:E.pick([0,2,6]),...(rzHas(tf,'b')?{sty:[[0,[...ti].length,100,0,0,'','b']]}:{})}));out.texts.push(elText(E,sub,sf,tx,ty+th*.5+open*.12,tw,th*.3,R.txt(R.paper,R.acc[0]),{al,ls:E.pick([8,14])}));
  out.tex=E.ch(.4)?'paper':'none';out.grade=E.pick(['punch','none','none']);out.top=E.ch(.35)?rzQfx('noise',{amt:E.ri(10,22),sz:E.ri(10,25)},E):null;return out}};
 // Sunburst: a radial gradient, a Radial pattern of rays round the middle, a script title with a highlight band, a capitals line, ink bleed
 RZL.sun={w:.9,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},mains=rzThemes(E,'sun').slice().sort(()=>E.R()-.5).slice(0,2),cx=CW/2,cy=CH*E.rr(.42,.5);
  out.els.push(elGrad(E,R.soft,R.paper,true));
  const rk=basicKey(E.pick(['tri','dia','ellipse','star'])),p=patOf('Rays',[],'radial',E.pick([12,16,20,24]),E.ri(2,4),E.ri(60,90),[],null);p.x=rzF(cx);p.y=rzF(cy);if(rk){p.src=[{k:'motif',m:rk,w:1,ink:R.acc[0]||R.ink}];p.op=E.ri(55,85);out.els.push(addFx(p,rzQfx('bleed',{amt:E.ri(8,20),rag:E.ri(15,40),soft:E.ri(15,35)},E)))}
  const t=rzTile(E,1,rzSh('circle'),E.pick(['center','emblem']),mains,mains,R.ink);out.tiles.push(t);const fs=S*E.rr(.32,.42);out.els.push(addFx(elStamp(t,cx,cy,fs,0),E.ch(.5)?rzQfx('halftone',{sz:E.ri(15,30),tone:E.ri(50,70),ang:E.pick([15,45]),spr:E.ri(20,45)},E):null));
- const [ti,sub]=E.pick(RZW.sun),tf=rzFont(E,RZF.sun[0]),sf=rzFont(E,RZF.sun[1]),th=S*E.rr(.13,.17),ty=Math.min(CH-th*1.6,cy+fs/2+th*.75),hl=E.ch(.5)?(R.acc[1]||R.paper):'';
- out.texts.push(elText(E,ti,tf,cx,ty,CW*.84,th,R.ink,{cv:E.pick([0,12,18]),...(hl?{sty:[[0,[...ti].length,100,0,0,'','',hl]]}:{})}));out.texts.push(elText(E,sub,sf,cx,ty+th*.95,CW*.5,th*.32,R.acc[0]||R.ink,{ls:16}));
+ const [ti,sub]=E.pick(RZW.sun),tf=rzFont(E,RZF.sun[0]),sf=rzFont(E,RZF.sun[1]),th=S*E.rr(.13,.17),ty=Math.min(CH-th*1.6,cy+fs/2+th*.75),hl=E.ch(.5)?(R.acc[1]||R.paper):'',gnd=[R.soft,R.paper],tc=R.txt(hl||gnd,R.ink);
+ out.texts.push(elText(E,ti,tf,cx,ty,CW*.84,th,tc,{cv:E.pick([0,12,18]),...(hl?{sty:[[0,[...ti].length,100,0,0,'','',hl]]}:{})}));out.texts.push(elText(E,sub,sf,cx,ty+th*.95,CW*.5,th*.32,R.txt(gnd,R.acc[0]),{ls:16}));
  out.tex=E.ch(.6)?'paper':'none';out.grade='warm';return out}};
 // Quilt: one rolled square stamp on a Tiling turned, pinwheel, mirrored or basket-woven, a frame rule and sometimes a small label
 RZL.quilt={w:.8,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.05,.08),out={tiles:[],els:[],texts:[]},mains=rzThemes(E,'quilt').slice().sort(()=>E.R()-.5).slice(0,3),rk=basicKey('rect');
- const a=rzTile(E,1,rzSh('rect'),E.pick(['quad','mirror','center']),mains,mains,R.ink),b=rzTile(E,2,rzSh('rect'),E.pick(['center','rosette']),mains,mains,R.acc[0]||R.ink);out.tiles.push(a,b);
+ const a=rzTile(E,1,rzSh('rect'),E.pick(['quad','mirror','center']),mains,mains,R.ink),b=rzTile(E,2,rzSh('rect'),E.pick(['center','rosette']),mains,mains,R.txt(R.paper,R.acc[0]));out.tiles.push(a,b);
  const p=patOf('Quilt',[1,2],'tile',4,4,100,[],null);p.ts='square';p.ar=E.pick(['turn','pinwheel','mirror','basket','checker']);p.ps=+E.rr(14,22).toFixed(1);p.sp=E.ri(0,8);p.af=0;p.x=rzF(CW/2);p.y=rzF(CH/2);p.aw=rzF(CW-2*m);p.ah=rzF(CH-2*m);p.ds='cycle';
  out.els.push(addFx(p,E.ch(.5)?fxP(E.ri(1,4),E.ri(0,2)):null));
  if(rk){const fw=CW-m,fh=CH-m;out.els.push(elMotif(rk,CW/2,CH/2,Math.max(fw,fh),{wx:+(fw/Math.max(fw,fh)).toFixed(4),wy:+(fh/Math.max(fw,fh)).toFixed(4),fl:'none',sw:rzF(Math.max(1,m*.35)),sk:R.acc[1]||R.ink,nm:'Binding'}))}

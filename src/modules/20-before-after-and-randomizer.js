@@ -114,12 +114,12 @@ if(LOOK!='repeat'&&RZL[LOOK]){const own0=OWN?OWN.own:flatEls(WBS.layers),bgq=own
  {const base=Math.max(0,...WBS.tiles.map(t=>+t.id||0),WBS.nid||0),mp={};res.tiles.forEach((t,i)=>{mp[t.id]=base+1+i;t.id=base+1+i});res.els.forEach(q=>{if(q.k=='stamp'&&mp[q.t]!=null)q.t=mp[q.t];(q.src||[]).forEach(x=>{if(x.k=='stamp'&&mp[x.t]!=null)x.t=mp[x.t]})});WBS.nid=base+1+res.tiles.length}
  let els=res.els.filter(q=>FT.frame||!['Frame','Rule','Binding'].includes(q.nm));els.forEach(q=>{if(q.fx){q.fx=q.fx.filter(keepFx);if(!q.fx.length)delete q.fx}});
  const top=res.top&&FT.efx?{u:fpU(),k:'sheet',n:'Filter',fl:'none',fx:[res.top]}:null,texts=FT.text?res.texts:[];
- const paperTex=()=>{const ks=Object.keys(TXF[0][1]);if(!ks.length)return[];const T=txMake(pick(ks),{a:ri(25,55),sc:ri(70,150),az:pick([225,200,250]),auto:true});WBS.texLib.push(T);return[{x:T.id,sd:txRid(),md:'relief'}]};
+ const paperTex=()=>{const ks=Object.keys(TXF[0][1]);if(!ks.length)return[];const T=txMake(pick(ks),{a:ri(10,24),sc:ri(90,170),az:pick([225,200,250]),auto:true});WBS.texLib.push(T);return[{x:T.id,sd:txRid(),md:'relief'}]};
  const cvU=!FT.tx?JSON.parse(JSON.stringify(WBS.tex)).u:res.tex=='paper'?paperTex():[];
  const GL={warm:()=>({tp:ri(12,28),tn:ri(0,8),fd:ri(4,16)}),fade:()=>({fd:ri(14,32),ct:-ri(0,10),sat:-ri(5,20)}),punch:()=>({ct:ri(8,22),vib:ri(8,24),sh:-ri(0,10)}),none:()=>({})};
  WBX.wbTxBusy=(WBX.wbTxBusy||0)+1;WBX.wbRollHold=tok;
  const done=lt=>{if(tok!==WBX.wbRndTok)return;WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;WBS.selL=0;
-  const c={pg:{...WBS.pgrid},tiles:res.tiles,els:(OWN?[]:own0.filter(p=>p.bgd)).concat(els,lt,top?[top]:[]),proj:{...P0},dim:WBS.dim,pr:{e:0,q:0,t:'',a:0,sc:100,sd:1},tex:{u:cvU,v:87,...(!FT.tx&&WBS.tex.off?{off:1}:{})}};
+  const c={pg:{...WBS.pgrid},tiles:res.tiles,els:(OWN?[]:own0.filter(p=>p.bgd)).concat(own0.some(p=>p.bgd)?[]:[{u:fpU(),k:'sheet',n:'Background',ink:paper,bgd:1}],els,lt,top?[top]:[]),proj:{...P0},dim:WBS.dim,pr:{e:0,q:0,t:'',a:0,sc:100,sd:1},tex:{u:cvU,v:87,...(!FT.tx&&WBS.tex.off?{off:1}:{})}};
   RZFZ=new Set();(WBX.wbApply||applyCore)(c);WBS.selL=0;rzPut(OWN,null);
   if(WBX.wbGrade){const g0=WBX.wbGrade.get();let gl={};if(FT.gr)gl=(GL[res.grade]||GL.none)();else Object.keys(g0).forEach(k=>{if(k!='cov'&&k!='masks')gl[k]=g0[k]});
    const masks=FT.masks?(ch(.45)?[{t:'rad',name:'Vignette',sp:'c',cx:.5,cy:.5,rx:+rr(.55,.7).toFixed(3),ry:+rr(.55,.7).toFixed(3),fe:ri(60,85),inv:true,a:{ex:-ri(10,22)}}]:[]):(g0.masks||[]);
