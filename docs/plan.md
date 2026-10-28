@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.74.1 (Oct 28 2026, branch feat/2.74.1-randomize-looks, not live): Randomize Looks, step 1 of docs/randomize-plan.md
+- 93-randomize-looks.js rewritten: shared parts and several layouts per Look (table in docs/randomize-plan.md); Repeat is a Look; the old roll stays for Stamps off, book covers and repeat tiles. Colour roles read the palette being rolled (they read the old tray before). A Look dropdown at the top of the Randomize panel (kv `wb167_rzlook`). Vignette mask rarer and lighter.
+- Checked by eye: 8 rolls per Look on contact sheets, portrait and 3:2. Markup at most about 400,000 characters per roll.
+- Tests: randomize-*, text-randomize, nothing-lost-2-24, speed-guard on Chromium: 28 passed, 8 failed (randomize-elements x2, randomize-folders, randomize-new, nothing-lost-2-24, speed-guard busy, text-randomize seeded result, one more). Expected: they check the old roll's content; to be rewritten in step 3. Not run: perf, full suite, WebKit.
+
 ## 2.74.0 (Oct 29 2026): Replace with two colours (owner's request); fixes a 2.73.0 regression
 - Replace now has Colour A (what the element draws: its own ink, or the colour set), Colour B (drawn instead wherever the pixel beneath is already colour A: the paper colour, or the colour set) and Match (how close to A counts as A, 0 to 100, default 25). The pixel test is on everything drawn before the element at its own level, the Background included. Rows: Colour A, Colour B, Match in the Elements panel while a selected element is on Replace.
 - Fix: 2.73.0 set the Background aside inside the element drawing so Replace would ignore it; that also hid the Background from Filter shapes and Sheet effects (they take what is drawn so far). Removed; found by the CI suite on Oct 28 (filter-shape-2-38, filter-tile-2-40-1, copy-ghost-gradient-fx-2-67 and related).

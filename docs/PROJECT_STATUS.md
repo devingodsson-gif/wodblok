@@ -5,6 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
+- **Late Oct 28: Randomize Looks 2.74.1** on `feat/2.74.1-randomize-looks` (pushed, not merged; supersedes `feat/randomize-looks`). Step 1 of docs/randomize-plan.md done (see docs/plan.md). Next: step 2 the simplified panel switches, step 3 rewrite the 8 failing Randomize specs for the Looks plus the coverage test and snapshot regeneration (owner's approval), step 4 remove the old roller. Not run: `npm run perf`, full suite. Unverified: wavy title text (pt 'w') renders.
 - **State (Oct 28 2026, evening):** `main` is at **2.74.0** (tag v2.74.0), live. 2.74.0 = Replace with two colours (A, B, Match) plus the fix for the Background being hidden from Filter shapes and Sheet effects (a 2.73.0 regression). Nothing unmerged except `feat/randomize-looks` and `docs/distort-suggestions`.
 - **Waiting for the owner's word (ask, do not assume):**
   1. **State snapshots**: the owner approved regenerating them and running the full suite (Oct 28). A full CI run on branch `chore/2.73.1-regenerate-snapshots` (28 locally regenerated files) gave 17 chromium failures, webkit passed. 2.74.0 fixed the ones we caused (2.73.0 Background regression, Background-underlay tests, accessibility, nothing-lost). Still open: the 5 machine-dependent scenario snapshot sets (randomize-seed-1/2/3, before-view, split-view; state and svg) must come from CI: the `update-snapshots` workflow was dispatched on `main` for `tests/scenarios.spec.js` (run 40771700196, finished with success); next step is to download artifact `snapshots`, review each diff, commit it to a branch, tell the owner which changed, then re-run the full suite. Older failures not ours: `smart-guides-2-40`, `history-thumbs`; `text-paragraph:85` (`tx.psp` undefined) is unexplained and may be flaky.
@@ -39,6 +40,8 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 **Oct 28 2026 (2.67.2).** Hotfix: on a phone the top bar scrolls sideways (swipe) and its items no longer overlap (CSS only, with a test). The Randomize rewrite (plans in docs/randomize-plan.md, branch feat/randomize-looks) is still in progress and was not touched.
 
 **Oct 28 2026 (2.67.1).** Hotfix: stamps with Pressure offset (placed stamps, Patterns, and the patterns Randomize makes) vanished once their print was ready, since 2.31.0 (a comment ran on into a line of code in the stamp printer). Fixed, with a test.
+
+**Oct 27 2026 (plans).** Two plans saved: docs/book-cover-ideas.md (a possibility, not scheduled) and docs/randomize-plan.md (the Randomize rewrite: a roll is a composed picture from a Look; five steps, 2.67.2 to 2.67.6, then 2.68.0). The owner answered the four questions (Oct 27: simplify the panel, made-up titles plus sometimes the project name, the eight Looks, new stamp artwork with saved stamps by switch).
 
 **Oct 27 2026 (2.67.0).** The Place copies ghost is the element itself; a gradient Sheet's effects fade along the gradient (full at its End); a gradient end can be None.
 

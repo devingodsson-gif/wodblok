@@ -15,6 +15,7 @@ import {coreStr,pmsg} from './18-projects-and-cover-overlay.js';
 import {wbHold} from './19-randomize-and-hold.js';
 import {fpU} from './24-free-place-layers.js';
 import {SL,libColors,libMotifs} from './27-stamp-library.js';
+import {RZL,RZ_FRAME,RZ_NAMES,rzLay,rzLookPick,rzRoles} from './93-randomize-looks.js';
 import {rzEffectsEls,rzFrameEls,rzFx,rzLayoutEls,rzMainEls,rzPressEls} from './71-randomize-elements.js';
 // a layer that holds pictures or text boxes: Randomize keeps these
 const rzPic=l=>(l.pl||[]).some(p=>p.a||p.tx);
@@ -39,7 +40,7 @@ function rzTake(){rzDrop();const own=[],ids=new Set();WBS.layers.forEach(l=>{if(
 function rzPut(S,top){if(!S||!S.own.length)return;const L=WBS.layers[0];if(!L)return;let next=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));const map={};
  Object.keys(S.tiles).forEach(id=>{const cur=WBS.tiles.find(t=>String(t.id)==id);if(cur&&JSON.stringify(cur)===S.tiles[id])return;const c=JSON.parse(S.tiles[id]);c.id=next++;WBS.tiles.push(c);map[id]=c.id});
  S.own.forEach(q=>{if(q.t!=null&&map[q.t]!=null)q.t=map[q.t];(q.src||[]).forEach(x=>{if(x&&x.t!=null&&map[x.t]!=null)x.t=map[x.t]})});
- {const bg=S.own.filter(q=>q.bgd),mine=S.own.filter(q=>!q.bgd),pl=(L.pl||[]).filter(q=>!q.bgd),i=top?pl.findIndex(q=>top.has(String(q.u))):-1;L.pl=bg.concat(i<0?pl.concat(mine):pl.slice(0,i).concat(mine,pl.slice(i)))}   // the Background goes back under everything (2.28.0)   // under the stamps this roll placed on their own, which stay on top (2.24.0)
+ {const bg=S.own.filter(q=>q.bgd).concat((L.pl||[]).filter(q=>q.bgd)),mine=S.own.filter(q=>!q.bgd),pl=(L.pl||[]).filter(q=>!q.bgd),i=top?pl.findIndex(q=>top.has(String(q.u))):-1;L.pl=bg.concat(i<0?pl.concat(mine):pl.slice(0,i).concat(mine,pl.slice(i)))}   // the Background goes back under everything (2.28.0)   // under the stamps this roll placed on their own, which stay on top (2.24.0)
  // 2.50.2: a roll's element named like one of yours (Pattern 1 when you made a Pattern 1) takes the next free number
  {const mine=new Set(S.own.map(q=>q.n).filter(Boolean)),all=new Set((L.pl||[]).map(q=>q.n).filter(Boolean));(L.pl||[]).forEach(q=>{if(S.own.includes(q)||!q.n||!mine.has(q.n))return;const m=/^(.*?)(\d+)$/.exec(q.n),b=m?m[1]:q.n+' ';let k=m?+m[2]:2;while(all.has(b+k))k++;all.add(b+k);q.n=b+k})}
  WBS.nid=Math.max(WBS.nid||0,next)}
@@ -101,6 +102,37 @@ if(tw&&!tw.st&&!tw.w)tw.w=1.2;
 const fx=q=>{if(tw){if(tw.st)q[tw.ax]=tw.st;if(tw.w)q.w=tw.w}return q};
 const ko=(x,y,r)=>{const q=it(pick(dots),x,y,r);q.k=1;return q};
 let symDone=false;
+// 2.67.1 (docs/randomize-plan.md): a roll first picks a Look. Each Look is built in 93-randomize-looks.js as plain elements and finished here: its texts are laid out,
+// then it replaces the last roll, and your own elements go back on top. 2.74.1: Repeat is a Look too; the roll built below is left for a roll with Stamps off (it reworks
+// what is there), a book cover and a repeat tile.
+const LOOK=FT.stamps&&!WBS.book.on&&!WBS.dim.rt?rzLookPick({FT,wpick,want:WBX.wbRZ&&WBX.wbRZ.look?WBX.wbRZ.look():'any'}):'';
+if(LOOK&&RZL[LOOK]){const own0=OWN?OWN.own:flatEls(WBS.layers),bgq=own0.find(p=>p.bgd),paper=bgq&&okC(bgq.ink)?bgq.ink:P0.bg;
+ const dark=RZL[LOOK].dark&&FT.col&&sOn('col','pal')&&ch(.3),hx=c=>{const s=String(c||'');if(s[0]=='@'){const w=P0.cw&&P0.cw[P0.cwa|0],v=w&&w.c&&w.c[s.slice(1)];if(v)return v}return col(c)},roles=rzRoles([...new Set([...PC,P0.bg,P0.ink])],paper,dark,hx);
+ // a texture for an element's effect: a new entry in the texture library (a roll's textures are its own)
+ const tex=(t,o)=>{const T=txMake(t,{a:ri(18,32),sc:ri(80,160),az:pick([225,200,250]),auto:true,...(o||{})});WBS.texLib.push(T);return T.id},shuf=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
+ const E={R,pick,ri,rr,ch,wpick,FT,sOn,FL,roles,tex:FT.pr?tex:null,shuf},res=RZL[LOOK].build(E),isQ=e=>e&&!['texture','pressure','jitter','grade'].includes(e.k);
+ // anything switched off stays out of the picture: effects (Effects), pressure and textures (Print effects), Jitter, the frame, the words
+ const keepFx=e=>!(isQ(e)&&!FT.efx)&&!((e.k=='pressure'||e.k=='texture')&&!FT.pr)&&!(e.k=='jitter'&&!FT.jit);
+ // the roll's stamps take ids no stamp has had in this session: a print kept for an old stamp with the same id must never stand in for a new one
+ {const base=Math.max(0,...WBS.tiles.map(t=>+t.id||0),WBS.nid||0),mp={};res.tiles.forEach((t,i)=>{mp[t.id]=base+1+i;t.id=base+1+i});res.els.forEach(q=>{if(q.k=='stamp'&&mp[q.t]!=null)q.t=mp[q.t];(q.src||[]).forEach(x=>{if(x.k=='stamp'&&mp[x.t]!=null)x.t=mp[x.t]})});WBS.nid=base+1+res.tiles.length}
+ let els=res.els.filter(q=>FT.frame||!RZ_FRAME.includes(q.nm));els.forEach(q=>{if(q.fx){q.fx=q.fx.filter(keepFx);if(!q.fx.length)delete q.fx}});
+ const top=res.top&&FT.efx?{u:fpU(),k:'sheet',n:'Filter',fl:'none',fx:[res.top]}:null,texts=FT.text?res.texts:[];
+ // a path (a shape with no fill that words or a pattern follow) that nothing follows any more is left out
+ {const used=new Set([...els,...texts].map(q=>q.mp).filter(Boolean));els=els.filter(q=>q.nm!='Path'||used.has(q.u))}
+ const paperTex=k=>{const ks=Object.keys(TXF[0][1]);if(!ks.length)return[];const T=txMake(k&&k!='paper'?k:pick(ks),{a:ri(10,24),sc:ri(90,170),az:pick([225,200,250]),auto:true});WBS.texLib.push(T);return[{x:T.id,sd:txRid(),md:'relief'}]};
+ const cvU=!FT.tx?JSON.parse(JSON.stringify(WBS.tex)).u.filter(u=>u.md!='wear'):res.tex?paperTex(res.tex):[];
+ const GL={warm:()=>({tp:ri(12,28),tn:ri(0,8),fd:ri(4,16)}),fade:()=>({fd:ri(14,32),ct:-ri(0,10),sat:-ri(5,20)}),punch:()=>({ct:ri(8,22),vib:ri(8,24),sh:-ri(0,10)}),none:()=>({})};
+ WBX.wbTxBusy=(WBX.wbTxBusy||0)+1;WBX.wbRollHold=tok;
+ const done=lt=>{if(tok!==WBX.wbRndTok)return;WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;WBS.selL=0;
+  const c={pg:{...WBS.pgrid},tiles:res.tiles,els:(OWN?[]:own0.filter(p=>p.bgd)).concat(own0.some(p=>p.bgd)?[]:[{u:fpU(),k:'sheet',n:'Background',ink:paper,bgd:1}],els,lt,top?[top]:[]),proj:{...P0},dim:WBS.dim,pr:{e:0,q:0,t:'',a:0,sc:100,sd:1},tex:{u:cvU,v:87,...(!FT.tx&&WBS.tex.off?{off:1}:{})}};
+  RZFZ=new Set();(WBX.wbApply||applyCore)(c);WBS.selL=0;rzPut(OWN,null);
+  if(WBX.wbGrade){const g0=WBX.wbGrade.get();let gl={};if(FT.gr)gl=(GL[res.grade]||GL.none)();else Object.keys(g0).forEach(k=>{if(k!='cov'&&k!='masks')gl[k]=g0[k]});
+   const masks=FT.masks?(ch(.2)?[{t:'rad',name:'Vignette',sp:'c',cx:.5,cy:.5,rx:+rr(.62,.78).toFixed(3),ry:+rr(.62,.78).toFixed(3),fe:ri(70,90),inv:true,a:{ex:-ri(6,14)}}]:[]):(g0.masks||[]);
+   if(FT.gr&&AM('gr')<1)Object.keys(gl).forEach(k=>{if(typeof gl[k]=='number')gl[k]=Math.round(gl[k]*AM('gr'))});WBX.wbGrade.set({...gl,cov:g0.cov,masks})}
+  store();upd();if(WBX.wbRollHold===tok)WBX.wbRollHold=0;
+  if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()}
+  {const b=$('rzdo');if(b){b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin')}}pmsg(fresh?'Started a new project with a fresh random piece.':'Randomized: '+(RZ_NAMES[LOOK]||LOOK)+'.')};
+ return rzLay(texts).then(done,()=>done([])).catch(e=>{rzPut(OWN,null);store();upd();throw e}).finally(()=>{if(WBX.wbRollHold===tok)WBX.wbRollHold=0;WBX.wbTxBusy=Math.max(0,(WBX.wbTxBusy||1)-1)})}
 // --- one stamp's artwork, composed inside its own shape
 const comp=(sh,accent)=>{useG(geom(sh));const k=SK,sq=Math.abs(SW-SH)<1,C0=[SW/2,k=='tri'?SH*2/3:SH/2],Rad=k=='tri'?SH/3:k=='diamond'?SW*SH/2/Math.hypot(SW,SH):k=='hex'?104:Math.min(SW,SH)/2;
 const S=r=>+(r/48).toFixed(3),W=(x,y)=>wrapP(x,y);let items=[],sym={m:'off'};const m=pick(mains),[cx,cy]=C0;

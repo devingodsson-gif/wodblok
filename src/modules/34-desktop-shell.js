@@ -244,7 +244,9 @@ fbox.addEventListener('click',e=>{if(e.target.closest('[data-rzfall]')){foff.cle
 fbtn.onclick=()=>{const open=fbox.hidden;if(open)fPaint();fbox.hidden=!open;fbtn.setAttribute('aria-expanded',open?'true':'false')};
 // null while every folder is ticked (the roll then works exactly as before); otherwise the shapes of each ticked folder, with the Dots set kept apart as the accents
 const folders=()=>{fLabel();const p=fPick();if(p.every(fOn)||!fHas())return null;const on=p.filter(x=>fOn(x)&&x.ks.length),dots=on.find(x=>x.v=='b:Dots'),th=on.filter(x=>x!==dots).map(x=>x.ks);return th.length||dots?{themes:th,dots:dots?dots.ks:null}:null};
-sync();fLabel();WBX.wbRZ={get,sub,amt,folders};
+sync();fLabel();WBX.wbRZ={get,sub,amt,folders,look:()=>{try{return kv.get('wb167_rzlook')||'any'}catch(e){return'any'}}};
+// 2.74.1: the Look a roll makes (Any, or one Look; the names are 93-randomize-looks.js's RZ_NAMES), kept in the settings
+{const ls=$('rzlook');if(ls){try{const v=kv.get('wb167_rzlook');if(v&&[...ls.options].some(o=>o.value==v))ls.value=v}catch(e){}ls.addEventListener('change',()=>{try{kv.set('wb167_rzlook',ls.value)}catch(e){}})}}
 $('rzdo').onclick=()=>randomize(false);
 })();
 
