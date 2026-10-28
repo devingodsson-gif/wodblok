@@ -1,13 +1,13 @@
 {
- "length": 1117,
- "sha256": "f36a11720480be0e00c886e579c09f5271bc5a3979588290097c03c461581634",
+ "length": 1100,
+ "sha256": "967fe8a9fb69ef9330f37fc2f51b0822bce5b6a67c135df94465b08d2785eeef",
  "tags": {
   "defs": 7,
   "feColorMatrix": 2,
   "feComponentTransfer": 2,
   "feFuncA": 2,
   "filter": 2,
-  "g": 9,
+  "g": 8,
   "svg": 1
  }
 }

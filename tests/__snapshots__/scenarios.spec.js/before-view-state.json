@@ -53,7 +53,13 @@
    "es": 249,
    "neg": false,
    "ink": null,
-   "tu": []
+   "tu": [
+    {
+     "x": "xmuzhi800e3kn",
+     "sd": 20868,
+     "md": "wear"
+    }
+   ]
   },
   {
    "id": 2,
@@ -110,14 +116,9 @@
    "ink": null,
    "tu": [
     {
-     "x": "xmuzhi800e4yi",
-     "sd": 61322,
+     "x": "xmuzhi80085gd",
+     "sd": 86572,
      "md": "wear"
-    },
-    {
-     "x": "xmuzhi800v5yy",
-     "sd": 50796,
-     "md": "relief"
     }
    ]
   },
@@ -174,7 +175,13 @@
    "es": 155,
    "neg": false,
    "ink": null,
-   "tu": []
+   "tu": [
+    {
+     "x": "xmuzhi800hito",
+     "sd": 51874,
+     "md": "wear"
+    }
+   ]
   },
   {
    "id": 4,
@@ -227,13 +234,7 @@
    "et": 2.2,
    "er": 0.6,
    "es": 361,
-   "tu": [
-    {
-     "x": "xmuzhi8006jg8",
-     "sd": 95501,
-     "md": "wear"
-    }
-   ]
+   "tu": []
   },
   {
    "id": 5,
@@ -311,8 +312,13 @@
    "es": 333,
    "tu": [
     {
-     "x": "xmuzhi800rk5p",
-     "sd": 55637,
+     "x": "xmuzhi800x5sr",
+     "sd": 76555,
+     "md": "relief"
+    },
+    {
+     "x": "xmuzhi800uyq6",
+     "sd": 36209,
      "md": "wear"
     }
    ]
@@ -459,7 +465,7 @@
     },
     {
      "m": "t|cinzeld|1x",
-     "x": 123.8925,
+     "x": 123.77996738433838,
      "y": 132.4425,
      "s": 3,
      "r": 0,
@@ -494,7 +500,7 @@
      "auto": false,
      "ax": 120,
      "ay": 120,
-     "mx": 123.8925,
+     "mx": 123.77996738433838,
      "my": 132.4425
     }
    }
@@ -658,11 +664,20 @@
      "md": "wear"
     },
     {
-     "u": "pmuzhi800l9i",
+     "u": "pmuzhi80024h",
      "k": "pressure",
      "on": true,
-     "pst": 5,
-     "pfl": 0
+     "pst": 2,
+     "pfl": 3
+    },
+    {
+     "u": "pmuzhi800e130x",
+     "k": "lines",
+     "on": true,
+     "sz": 29,
+     "tone": 57,
+     "ang": 90,
+     "spr": 32
     }
    ]
   },
@@ -717,13 +732,7 @@
      "k": "pressure",
      "on": true,
      "pst": 6,
-     "pfl": 0
-    },
-    {
-     "u": "pmuzhi800e15fi",
-     "k": "blur",
-     "on": true,
-     "amt": 10
+     "pfl": 2
     }
    ],
    "ox": 76,
@@ -890,23 +899,6 @@
      "fd": 0
     }
    ]
-  },
-  {
-   "u": "pmuzhi800e326h",
-   "k": "sheet",
-   "n": "Filter",
-   "fl": "none",
-   "fx": [
-    {
-     "u": "pmuzhi800e25kq",
-     "k": "grain",
-     "on": true,
-     "amt": 48,
-     "sz": 45,
-     "soft": 25,
-     "sd": 69090
-    }
-   ]
   }
  ],
  "proj": {
@@ -950,14 +942,6 @@
   "k": "tri",
   "o": "p"
  },
- "pr": {
-  "e": 2,
-  "q": 1,
-  "t": "",
-  "a": 0,
-  "sc": 100,
-  "sd": 1
- },
  "tex": {
   "u": [],
   "v": 87,
@@ -978,52 +962,65 @@
    "auto": true
   },
   {
-   "id": "xmuzhi800e4yi",
-   "name": "Felt",
-   "t": "felt",
-   "a": 23,
-   "sc": 83,
-   "az": 315,
-   "sd": 3079,
-   "rot": 0,
-   "fh": 0,
-   "fv": 0,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi800v5yy",
-   "name": "Riso Grain",
-   "t": "riso",
-   "a": 61,
-   "sc": 85,
-   "az": 225,
-   "sd": 95912,
-   "rot": 0,
-   "fh": 0,
-   "fv": 0,
-   "auto": true
-  },
-  {
-   "id": "xmuzhi8006jg8",
-   "name": "Washi",
-   "t": "washi",
-   "a": 38,
-   "sc": 169,
+   "id": "xmuzhi800e3kn",
+   "name": "Kraft",
+   "t": "kraft",
+   "a": 60,
+   "sc": 68,
    "az": 250,
-   "sd": 23168,
+   "sd": 13330,
    "rot": 0,
    "fh": 0,
    "fv": 0,
    "auto": true
   },
   {
-   "id": "xmuzhi800rk5p",
-   "name": "Cotton Rag",
-   "t": "cotton",
-   "a": 36,
-   "sc": 162,
+   "id": "xmuzhi80085gd",
+   "name": "Marble Veins",
+   "t": "marble",
+   "a": 47,
+   "sc": 145,
+   "az": 250,
+   "sd": 18821,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800hito",
+   "name": "Brushed Metal",
+   "t": "brushed",
+   "a": 39,
+   "sc": 94,
    "az": 225,
-   "sd": 49631,
+   "sd": 98575,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800x5sr",
+   "name": "Hammered",
+   "t": "hammered",
+   "a": 65,
+   "sc": 60,
+   "az": 200,
+   "sd": 138,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800uyq6",
+   "name": "Plaster",
+   "t": "plaster",
+   "a": 37,
+   "sc": 95,
+   "az": 250,
+   "sd": 26947,
    "rot": 0,
    "fh": 0,
    "fv": 0,
@@ -1065,45 +1062,17 @@
  },
  "grade": {
   "ex": 0,
-  "ct": 0,
-  "hi": -22,
-  "sh": 8,
-  "wh": 23,
-  "bl": 0,
-  "tp": -37,
+  "ct": 39,
+  "hi": 0,
+  "sh": -17,
+  "wh": 0,
+  "bl": 4,
+  "tp": -48,
   "tn": 0,
-  "sat": -4,
-  "vib": -24,
+  "sat": 0,
+  "vib": 29,
   "hue": 0,
-  "fd": 15,
-  "cov": false,
-  "masks": [
-   {
-    "sc": "",
-    "id": "mbz9et8",
-    "t": "lum",
-    "name": "Highlight tone",
-    "on": true,
-    "inv": false,
-    "amt": 100,
-    "a": {
-     "ex": 0,
-     "ct": 0,
-     "hi": 0,
-     "sh": 0,
-     "wh": 0,
-     "bl": 0,
-     "tp": -34,
-     "tn": 11,
-     "sat": 0,
-     "vib": 0,
-     "hue": 0,
-     "fd": 0
-    },
-    "lo": 73,
-    "hi": 100,
-    "sm": 32
-   }
-  ]
+  "fd": 0,
+  "masks": []
  }
 }

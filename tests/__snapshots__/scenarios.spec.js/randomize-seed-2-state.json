@@ -13,37 +13,23 @@
    },
    "items": [
     {
-     "m": "b441",
-     "x": 80.4721860076487,
-     "y": 64.39523446178133,
-     "s": 0.863,
-     "r": -45,
-     "f": 1
-    },
-    {
-     "m": "b434",
+     "m": "b437",
      "x": 120,
      "y": 103.92304845413263,
-     "s": 0.557,
-     "r": 0,
+     "s": 1.828,
+     "r": 45,
      "f": 1
     }
    ],
    "sym": {
-    "m": "quad"
+    "m": "off"
    },
-   "et": 2.1,
-   "er": 0.3,
-   "es": 777,
+   "et": 5.3,
+   "er": 5,
+   "es": 445,
    "neg": false,
    "ink": null,
-   "tu": [
-    {
-     "x": "xmuzhi800uupf",
-     "sd": 55108,
-     "md": "wear"
-    }
-   ]
+   "tu": []
   },
   {
    "id": 2,
@@ -54,38 +40,78 @@
      1,
      1
     ],
-    "z": 76
+    "z": 58
    },
    "items": [
     {
-     "m": "b441",
-     "x": 60,
-     "y": 51.96152422706631,
-     "s": 0.476,
+     "m": "b436",
+     "x": 40,
+     "y": 34.64101615137754,
+     "s": 0.318,
      "r": 0,
      "f": 1
     },
     {
-     "m": "b441",
-     "x": 60,
-     "y": 155.88457268119893,
-     "s": 0.476,
+     "m": "b436",
+     "x": 40,
+     "y": 103.92304845413263,
+     "s": 0.318,
      "r": 0,
      "f": 1
     },
     {
-     "m": "b441",
-     "x": 180,
-     "y": 51.96152422706631,
-     "s": 0.476,
+     "m": "b436",
+     "x": 220,
+     "y": 69.28203230275507,
+     "s": 0.318,
      "r": 0,
      "f": 1
     },
     {
-     "m": "b441",
-     "x": 180,
-     "y": 155.88457268119893,
-     "s": 0.476,
+     "m": "b436",
+     "x": 120,
+     "y": 34.64101615137754,
+     "s": 0.318,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b436",
+     "x": 120,
+     "y": 103.92304845413263,
+     "s": 0.318,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b436",
+     "x": 120,
+     "y": 173.2050807568877,
+     "s": 0.318,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b436",
+     "x": 20,
+     "y": 138.56406460551017,
+     "s": 0.318,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b436",
+     "x": 200,
+     "y": 103.92304845413263,
+     "s": 0.318,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b436",
+     "x": 200,
+     "y": 173.2050807568877,
+     "s": 0.318,
      "r": 0,
      "f": 1
     }
@@ -93,9 +119,9 @@
    "sym": {
     "m": "off"
    },
-   "et": 1.9,
-   "er": 1.7,
-   "es": 18,
+   "et": 0,
+   "er": 4.8,
+   "es": 313,
    "tu": []
   },
   {
@@ -111,7 +137,7 @@
    },
    "items": [
     {
-     "m": "b438",
+     "m": "b441",
      "x": 24,
      "y": 10,
      "s": 0.229,
@@ -119,7 +145,7 @@
      "f": 1
     },
     {
-     "m": "b441",
+     "m": "b435",
      "x": 0,
      "y": 10,
      "s": 0.054,
@@ -131,19 +157,68 @@
     "m": "rx",
     "n": 5
    },
-   "et": 2.4,
-   "er": 0.1,
-   "es": 288,
+   "et": 1.6,
+   "er": 0.7,
+   "es": 830,
    "tu": [
     {
-     "x": "xmuzhi80039se",
-     "sd": 1169,
-     "md": "stain"
+     "x": "xmuzhi8004fss",
+     "sd": 16176,
+     "md": "wear"
     }
    ]
   },
   {
    "id": 4,
+   "sh": {
+    "k": "rect",
+    "o": "p",
+    "s": [
+     1,
+     1
+    ],
+    "z": 100
+   },
+   "items": [
+    {
+     "m": "b441",
+     "x": 120,
+     "y": 70,
+     "s": 0.917,
+     "r": 0,
+     "f": 1
+    },
+    {
+     "m": "b437",
+     "x": 120,
+     "y": 120,
+     "s": 0.542,
+     "r": 0,
+     "f": 1
+    }
+   ],
+   "sym": {
+    "m": "rot",
+    "n": 4
+   },
+   "et": 1.4,
+   "er": 0.8,
+   "es": 843,
+   "tu": [
+    {
+     "x": "xmuzhi800xo0x",
+     "sd": 43329,
+     "md": "relief"
+    },
+    {
+     "x": "xmuzhi800ok0p",
+     "sd": 47895,
+     "md": "wear"
+    }
+   ]
+  },
+  {
+   "id": 5,
    "items": [],
    "sh": {
     "k": "rect",
@@ -166,21 +241,17 @@
  ],
  "els": [
   {
-   "u": "pmuzhi800ax7",
+   "u": "pmuzhi8002g8",
    "k": "pattern",
    "n": "Pattern 3",
-   "lay": "tile",
-   "cn": 4,
-   "rn": 7,
-   "sz": 85,
-   "ts": "auto",
-   "ar": "brick",
-   "ps": 18.2,
-   "sp": 18,
+   "lay": "scatter",
+   "cn": 2,
+   "rn": 4,
+   "sz": 100,
    "af": 1,
    "rt": 0,
    "ds": "cycle",
-   "sd": 2151,
+   "sd": 8626,
    "src": [
     {
      "k": "stamp",
@@ -195,62 +266,27 @@
    "f": 1,
    "fx": [
     {
-     "u": "pmuzhi800z47",
-     "k": "jitter",
+     "u": "pmuzhi800e125t",
+     "k": "wobble",
      "on": true,
-     "pos": 17,
-     "rot": 9,
-     "sz": 0,
-     "sd": 63047
-    },
-    {
-     "u": "pmuzhi800ieb",
-     "k": "texture",
-     "on": true,
-     "x": "xmuzhi800pu8j",
-     "sd": 42521,
-     "md": "wear"
-    },
-    {
-     "u": "pmuzhi800ir6",
-     "k": "grade",
-     "on": true,
-     "ex": 0,
-     "ct": 0,
-     "hi": 0,
-     "sh": 0,
-     "wh": 0,
-     "bl": 0,
-     "tp": 13,
-     "tn": 0,
-     "sat": 0,
-     "vib": 0,
-     "hue": 0,
-     "fd": 0
-    },
-    {
-     "u": "pmuzhi800e135j",
-     "k": "grain",
-     "on": true,
-     "amt": 45,
-     "sz": 18,
-     "soft": 43,
-     "sd": 31398
+     "amt": 12,
+     "sz": 33,
+     "sd": 83830
     }
    ]
   },
   {
-   "u": "pmuzhi800wt0",
+   "u": "pmuzhi800ir6",
    "k": "pattern",
    "n": "Pattern 2",
-   "lay": "tile",
-   "cn": 4,
-   "rn": 7,
-   "sz": 51,
+   "lay": "scatter",
+   "cn": 2,
+   "rn": 4,
+   "sz": 45,
    "af": 1,
    "rt": 0,
    "ds": "cycle",
-   "sd": 3723,
+   "sd": 3034,
    "src": [
     {
      "k": "stamp",
@@ -265,47 +301,35 @@
    "f": 1,
    "fx": [
     {
-     "u": "pmuzhi800bbv",
-     "k": "texture",
-     "on": true,
-     "x": "xmuzhi8008737",
-     "sd": 32245,
-     "md": "wear"
-    },
-    {
-     "u": "pmuzhi8005fa",
+     "u": "pmuzhi8000y5",
      "k": "pressure",
      "on": true,
-     "pst": 6,
+     "pst": 2,
      "pfl": 0
     }
    ],
-   "ar": "brick",
    "ox": 50,
-   "oy": 50,
-   "ts": "auto",
-   "ps": 10.9,
-   "sp": 97,
-   "g": "glba3n81j"
+   "oy": 0,
+   "g": "glsrr9zna"
   },
   {
-   "u": "glba3n81j",
+   "u": "glsrr9zna",
    "k": "group",
    "n": "Group 1",
-   "op": 78
+   "ink": "@k1"
   },
   {
-   "u": "pmuzhi800jdr",
+   "u": "pmuzhi800x7v",
    "k": "pattern",
    "n": "Frame",
    "lay": "frame",
-   "cn": 6,
-   "rn": 9,
+   "cn": 5,
+   "rn": 8,
    "sz": 100,
    "af": 1,
    "rt": 0,
    "ds": "cycle",
-   "sd": 8341,
+   "sd": 5383,
    "src": [
     {
      "k": "stamp",
@@ -318,7 +342,134 @@
    "s": 533,
    "r": 0,
    "f": 1,
-   "in": 3
+   "fx": [
+    {
+     "u": "pmuzhi800873",
+     "k": "jitter",
+     "on": true,
+     "pos": 7,
+     "rot": 26,
+     "sz": 30,
+     "sd": 81678
+    },
+    {
+     "u": "pmuzhi800ffm",
+     "k": "texture",
+     "on": true,
+     "x": "xmuzhi800tk2b",
+     "sd": 33752,
+     "md": "wear"
+    }
+   ],
+   "in": 2,
+   "g": "glphmzhvw"
+  },
+  {
+   "u": "glphmzhvw",
+   "k": "group",
+   "n": "Group 2",
+   "ink": "@k1"
+  },
+  {
+   "u": "pmuzhi800uup",
+   "k": "pattern",
+   "n": "Frame rule",
+   "lay": "frame",
+   "cn": 3,
+   "rn": 5,
+   "sz": 40,
+   "af": 1,
+   "rt": 0,
+   "ds": "cycle",
+   "sd": 1643,
+   "src": [
+    {
+     "k": "stamp",
+     "t": 3,
+     "w": 1
+    }
+   ],
+   "x": 266.5,
+   "y": 400,
+   "s": 533,
+   "r": 0,
+   "f": 1,
+   "fx": [
+    {
+     "u": "pmuzhi800vpd",
+     "k": "jitter",
+     "on": true,
+     "pos": 6,
+     "rot": 28,
+     "sz": 12,
+     "sd": 11874
+    },
+    {
+     "u": "pmuzhi800o9q",
+     "k": "texture",
+     "on": true,
+     "x": "xmuzhi800dd8o",
+     "sd": 5715,
+     "md": "wear"
+    },
+    {
+     "u": "pmuzhi800hxz",
+     "k": "pressure",
+     "on": true,
+     "pst": 3,
+     "pfl": 0
+    }
+   ],
+   "in": 6,
+   "g": "gl6rionx8"
+  },
+  {
+   "u": "gl6rionx8",
+   "k": "group",
+   "n": "Group 3",
+   "ink": "@k1"
+  },
+  {
+   "u": "pmuzhi800l6k",
+   "k": "pattern",
+   "n": "Frame rule 2",
+   "lay": "frame",
+   "cn": 3,
+   "rn": 5,
+   "sz": 40,
+   "af": 1,
+   "rt": 0,
+   "ds": "cycle",
+   "sd": 7483,
+   "src": [
+    {
+     "k": "stamp",
+     "t": 3,
+     "w": 1
+    }
+   ],
+   "x": 266.5,
+   "y": 400,
+   "s": 533,
+   "r": 0,
+   "f": 1,
+   "in": 4,
+   "g": "gl11a1ck7",
+   "fx": [
+    {
+     "u": "pmuzhi800iux",
+     "k": "pressure",
+     "on": true,
+     "pst": 2,
+     "pfl": 0
+    }
+   ]
+  },
+  {
+   "u": "gl11a1ck7",
+   "k": "group",
+   "n": "Group 4",
+   "ink": "@k1"
   },
   {
    "u": "pmuzhi800797",
@@ -338,7 +489,7 @@
    "src": [
     {
      "k": "stamp",
-     "t": 4,
+     "t": 5,
      "w": 1
     }
    ],
@@ -347,30 +498,6 @@
    "s": 533,
    "r": 0,
    "f": 1
-  },
-  {
-   "u": "pmuzhi800e3159",
-   "k": "motif",
-   "m": "b464",
-   "x": 224.5,
-   "y": 436.8,
-   "s": 320,
-   "r": 0,
-   "f": 1,
-   "nm": "Filter",
-   "flt": 1,
-   "fx": [
-    {
-     "u": "pmuzhi800e24j2",
-     "k": "misreg",
-     "on": true,
-     "amt": 22,
-     "ang": 22,
-     "rnd": 33,
-     "col": "@k2",
-     "sd": 4502
-    }
-   ]
   }
  ],
  "proj": {
@@ -408,20 +535,17 @@
   "k": "hex",
   "o": "f"
  },
- "pr": {
-  "e": 0,
-  "q": 4,
-  "t": "",
-  "a": 0,
-  "sc": 100,
-  "sd": 1
- },
  "tex": {
   "u": [
    {
-    "x": "xmuzhi800vpdj",
-    "sd": 20851,
-    "md": "wear"
+    "x": "xmuzhi8003ry6",
+    "sd": 53446,
+    "md": "stain"
+   },
+   {
+    "x": "xmuzhi8005644",
+    "sd": 60375,
+    "md": "relief"
    }
   ],
   "v": 87,
@@ -429,65 +553,91 @@
  },
  "texLib": [
   {
-   "id": "xmuzhi800pu8j",
-   "name": "Scuffed",
-   "t": "scuff",
-   "a": 19,
-   "sc": 124,
-   "az": 250,
-   "sd": 84661,
+   "id": "xmuzhi800tk2b",
+   "name": "Halftone Dots",
+   "t": "halftone",
+   "a": 57,
+   "sc": 101,
+   "az": 200,
+   "sd": 89377,
    "rot": 0,
    "fh": 0,
    "fv": 0,
    "auto": true
   },
   {
-   "id": "xmuzhi8008737",
-   "name": "Linen",
-   "t": "linen",
-   "a": 53,
-   "sc": 80,
+   "id": "xmuzhi800dd8o",
+   "name": "Brushed Metal",
+   "t": "brushed",
+   "a": 47,
+   "sc": 125,
+   "az": 135,
+   "sd": 85833,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi8003ry6",
+   "name": "Cotton Rag",
+   "t": "cotton",
+   "a": 36,
+   "sc": 71,
    "az": 315,
-   "sd": 81678,
+   "sd": 65150,
    "rot": 0,
    "fh": 0,
    "fv": 0,
    "auto": true
   },
   {
-   "id": "xmuzhi800vpdj",
-   "name": "Burlap",
-   "t": "burlap",
-   "a": 56,
-   "sc": 88,
-   "az": 225,
-   "sd": 11874,
+   "id": "xmuzhi8005644",
+   "name": "Cotton Rag 2",
+   "t": "cotton",
+   "a": 53,
+   "sc": 116,
+   "az": 315,
+   "sd": 66339,
    "rot": 0,
    "fh": 0,
    "fv": 0,
    "auto": true
   },
   {
-   "id": "xmuzhi800uupf",
+   "id": "xmuzhi8004fss",
+   "name": "Concrete",
+   "t": "concrete",
+   "a": 45,
+   "sc": 110,
+   "az": 135,
+   "sd": 45721,
+   "rot": 0,
+   "fh": 0,
+   "fv": 0,
+   "auto": true
+  },
+  {
+   "id": "xmuzhi800xo0x",
    "name": "Pinholes",
    "t": "pinholes",
-   "a": 20,
-   "sc": 134,
-   "az": 135,
-   "sd": 16431,
+   "a": 46,
+   "sc": 76,
+   "az": 200,
+   "sd": 37710,
    "rot": 0,
    "fh": 0,
    "fv": 0,
    "auto": true
   },
   {
-   "id": "xmuzhi80039se",
-   "name": "Granite",
-   "t": "granite",
-   "a": 59,
-   "sc": 62,
-   "az": 135,
-   "sd": 89308,
+   "id": "xmuzhi800ok0p",
+   "name": "Brushed Metal 2",
+   "t": "brushed",
+   "a": 36,
+   "sc": 67,
+   "az": 250,
+   "sd": 34696,
    "rot": 0,
    "fh": 0,
    "fv": 0,
@@ -504,78 +654,16 @@
  "grade": {
   "ex": 0,
   "ct": 0,
-  "hi": 0,
+  "hi": -16,
   "sh": 0,
   "wh": 0,
   "bl": 0,
-  "tp": 0,
-  "tn": 0,
+  "tp": -3,
+  "tn": -7,
   "sat": 0,
   "vib": 0,
   "hue": 0,
-  "fd": 0,
-  "cov": false,
-  "masks": [
-   {
-    "sc": "",
-    "id": "m5tmqaq",
-    "t": "rad",
-    "name": "Vignette",
-    "on": true,
-    "inv": true,
-    "amt": 100,
-    "a": {
-     "ex": -23,
-     "ct": 0,
-     "hi": 0,
-     "sh": 0,
-     "wh": 0,
-     "bl": 0,
-     "tp": 0,
-     "tn": 0,
-     "sat": 0,
-     "vib": 0,
-     "hue": 0,
-     "fd": 23
-    },
-    "sp": "c",
-    "st": "",
-    "cx": 0.524,
-    "cy": 0.506,
-    "rx": 0.58,
-    "ry": 0.485,
-    "fe": 67
-   },
-   {
-    "sc": "",
-    "id": "mnxqumc",
-    "t": "rad",
-    "name": "Uneven inking",
-    "on": true,
-    "inv": false,
-    "amt": 100,
-    "a": {
-     "ex": -22,
-     "ct": 0,
-     "hi": 0,
-     "sh": 0,
-     "wh": 0,
-     "bl": 0,
-     "tp": 0,
-     "tn": 0,
-     "sat": 0,
-     "vib": 0,
-     "hue": 0,
-     "fd": 0
-    },
-    "sp": "s",
-    "st": "",
-    "cx": 0.273,
-    "cy": 0.496,
-    "rx": 0.64,
-    "ry": 0.537,
-    "fe": 82
-   }
-  ]
+  "fd": 12,
+  "masks": []
  }
 }
