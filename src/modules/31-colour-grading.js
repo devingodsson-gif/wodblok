@@ -24,7 +24,7 @@ const cl01=v=>Math.max(0,Math.min(1,v)),f4=v=>(+v).toFixed(4),sst=t=>{t=cl01(t);
 function mFix(m){if(!m||!MT[m.t])return null;const d=MD[m.t],o={sc:m.sc?String(m.sc):'',id:String(m.id||('m'+Math.random().toString(36).slice(2,8))),t:m.t,name:String(m.name||MS[m.t]).slice(0,30),on:m.on!==false,inv:!!m.inv,amt:m.amt==null||!isFinite(+m.amt)?100:Math.max(0,Math.min(100,+m.amt)),a:zA()};
 GK.forEach(k=>{if(m.a&&isFinite(+m.a[k]))o.a[k]=+m.a[k]});Object.keys(d).forEach(k=>{const v=m[k]??d[k];o[k]=typeof d[k]=='number'?(isFinite(+v)?+v:d[k]):String(v)});
 if(o.sp!==undefined&&o.sp!='s')o.sp='c';if(!o.sc&&o.sp=='s'&&o.st)o.sc=o.st;if(o.c!==undefined&&!/^#[0-9a-f]{6}$/i.test(o.c))o.c=d.c;return o}
-const gFix=o=>{const g={...zA(),cov:false,masks:[]};if(o&&typeof o=='object'){GK.forEach(k=>{if(isFinite(+o[k]))g[k]=+o[k]});g.cov=!!o.cov;if(Array.isArray(o.masks))g.masks=o.masks.map(mFix).filter(Boolean)}return g};
+const gFix=o=>{const g={...zA(),masks:[]};if(o&&typeof o=='object'){GK.forEach(k=>{if(isFinite(+o[k]))g[k]=+o[k]});if(Array.isArray(o.masks))g.masks=o.masks.map(mFix).filter(Boolean)}return g};
 let grd;
 let gdLast='',gdBypass=false,gmSel=-1,gmOv=false,gmRen=-1,OVX=true,gBuilt='',gmVis=false;
 const gmVisM=m=>{if(!m)return false;if(inSt()){const t=WBS.tiles[WBS.cur];return !!t&&((m.sc&&m.sc==String(t.id))||(!m.sc&&isPos(m)&&m.sp=='s'&&!m.st))}return !m.sc};
@@ -104,7 +104,6 @@ function applyGrade(){if(gKey()!==gBuilt&&typeof upd=='function'){gBuilt=gKey();
 function refreshG(){gBuilt=gKey();const d=gDefs(true),has=id=>d.includes(`id="${id}"`);{const G=$('grdf');if(G._d!==d){G.innerHTML=d;G._d=d}}
 has('wbgrade')?$('dyn').setAttribute('filter','url(#wbgrade)'):$('dyn').removeAttribute('filter');
 has('wbgradeT')?$('texg').setAttribute('filter','url(#wbgradeT)'):$('texg').removeAttribute('filter');
-if(has('wbgrade')&&grd.cov)$('covg').setAttribute('filter','url(#wbgrade)');else $('covg').removeAttribute('filter');
 gmHandles()}
 const gdSave=()=>{try{kv.set('wb41_grade',JSON.stringify(grd))}catch(e){}};
 const gCap=()=>{if(WBX.wbCap)WBX.wbCap()};
@@ -115,7 +114,7 @@ function gmMeta(m){let s=m.t=='lay'?((WBS.layers.find(L=>L.u==m.lay)||{}).name||
 if(m.inv&&m.t!='lay')s+=', inverted';if(!hasA(m.a))s+=' · no changes yet';return s}
 function renderGM(){if(gmSel>=grd.masks.length)gmSel=grd.masks.length-1;if(gmSel>=0&&!gmVisM(grd.masks[gmSel]))gmSel=-1;const m=gmCur();
 $('gm_list').innerHTML=`<div class="lyr${gmSel<0?' on':''}" data-gm="-1"><span class="gmsp"></span><span class="gmi">${MIC.glob}</span><span class="lyn">${inSt()?stNm(WBS.tiles[WBS.cur])+' <span class="lym">This stamp only</span>':'Global <span class="lym">Whole print</span>'}</span></div>`+grd.masks.map((q,i)=>!gmVisM(q)?'':`<div class="lyr${i==gmSel?' on':''}${q.on?'':' off'}" data-gm="${i}"><button type="button" class="eye" data-eye title="${q.on?'Hide':'Show'}">${q.on?GEYE:GNOEYE}</button><span class="gmi">${MIC[q.t]}</span><span class="lyn">${i==gmRen?`<input value="${hx(q.name)}" maxlength="30">`:hx(q.name)} <span class="lym">${hx(gmMeta(q))}</span></span></div>`).join('');
-{const nv=grd.masks.filter(gmVisM).length;$('gm_cnt').textContent=nv?String(nv):''}$('gm_dup').disabled=$('gm_del').disabled=!m;$('gd_who').textContent=m?m.name:(inSt()?stNm(WBS.tiles[WBS.cur]):'Global');{const co=$('gdcov');if(co&&co.closest('label'))co.closest('label').hidden=inSt()}$('gm_body').hidden=!m;
+{const nv=grd.masks.filter(gmVisM).length;$('gm_cnt').textContent=nv?String(nv):''}$('gm_dup').disabled=$('gm_del').disabled=!m;$('gd_who').textContent=m?m.name:(inSt()?stNm(WBS.tiles[WBS.cur]):'Global');$('gm_body').hidden=!m;
 const inp=$('gm_list').querySelector('input');if(inp){inp.focus();inp.select();const done=ok=>{if(gmRen<0)return;const q=grd.masks[gmRen];if(ok&&q&&inp.value.trim())q.name=inp.value.trim().slice(0,30);gmRen=-1;gdSave();renderGM();gCap()};inp.onkeydown=e=>{if(e.key=='Enter')done(1);else if(e.key=='Escape')done(0);e.stopPropagation()};inp.onblur=()=>done(1)}
 if(!m)return;const T=m.t,show=(id,on)=>$(id).hidden=!on;
 show('gm_sp_r',isPos(m)&&!m.sc&&m.sp=='s');show('gm_st_r',isPos(m)&&m.sp=='s'&&!m.sc&&WBS.tiles.length>1);show('gm_eye',!m.sc);show('gm_lay_r',T=='lay');show('gm_col_r',T=='col');show('gm_lo_r',T=='lum');show('gm_hi_r',T=='lum');show('gm_rg_r',T=='col');show('gm_sm_r',T=='col'||T=='lum');show('gm_fe_r',T=='rad');show('gm_inv_r',T!='lay');
@@ -128,7 +127,7 @@ if(T=='col'){const used=[...new Set([...WBS.proj.ts.map(id=>'@'+id),WBS.proj.bg,
 $('gm_inv').checked=!!m.inv;$('gm_ov').checked=gmOv;
 const inEd=inSt();$('gm_hint').textContent='';
 $('gm_go').hidden=!(isPos(m)&&m.sp=='s'&&!inEd)}
-function gradeSync(){const A=tgtA();GK.forEach(k=>{const r=$('gd_'+k);if(+r.value!=+(A[k]||0)){r.value=A[k]||0;r.dispatchEvent(new Event('input',{bubbles:true}))}});$('gdcov').checked=!!grd.cov;renderGM()}
+function gradeSync(){const A=tgtA();GK.forEach(k=>{const r=$('gd_'+k);if(+r.value!=+(A[k]||0)){r.value=A[k]||0;r.dispatchEvent(new Event('input',{bubbles:true}))}});renderGM()}
 const gmSet=(k,v)=>{const m=gmCur();if(!m)return;m[k]=v;gdSave();applyGrade();renderGM();gCap()};
 // eyedropper: samples the print as the colour mask sees it (pattern only, before the canvas-wide grade)
 let gmPick=null;const gmPickEnd=()=>{gmPick=null;$('art').classList.remove('gmpick');$('gm_eye').setAttribute('aria-pressed','false');if(gmCur())renderGM()};
@@ -155,7 +154,7 @@ $('gm_sp').onclick=e=>{const b=e.target.closest('[data-gs]');if(b)gmSet('sp',b.d
 $('gm_st').onchange=()=>gmSet('st',$('gm_st').value);$('gm_lay').onchange=()=>gmSet('lay',$('gm_lay').value);
 $('gm_col').onchange=()=>gmSet('c',$('gm_col').value);$('gm_cc').addEventListener('input',()=>{const m=gmCur();if(!m)return;m.c=$('gm_cc').value;gdSave();applyGrade()});$('gm_cc').addEventListener('change',()=>{renderGM();gCap()});
 $('gm_eye').onclick=()=>{if(gmPick){gmPickEnd();return}
-const c=$('art').cloneNode(true);WBX.wbVec(c);['#texg','#covg','#guig','#gmov','#fpov'].forEach(q=>{const e=c.querySelector(q);if(e)e.remove()});c.querySelector('#dyn').removeAttribute('filter');c.querySelector('#grdf').innerHTML=gDefs(false);c.setAttribute('width',CW);c.setAttribute('height',CH);
+const c=$('art').cloneNode(true);WBX.wbVec(c);['#texg','#guig','#gmov','#fpov'].forEach(q=>{const e=c.querySelector(q);if(e)e.remove()});c.querySelector('#dyn').removeAttribute('filter');c.querySelector('#grdf').innerHTML=gDefs(false);c.setAttribute('width',CW);c.setAttribute('height',CH);
 const W=Math.round(CW),H=Math.round(CH),img=new Image();gmPick={d:null,W,H};$('art').classList.add('gmpick');$('gm_eye').setAttribute('aria-pressed','true');$('gm_hint').textContent='Click the print to pick the colour to mask. Esc cancels.';
 img.onload=()=>{if(!gmPick)return;try{const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');x.drawImage(img,0,0,W,H);gmPick.d=x.getImageData(0,0,W,H).data}catch(e){gmPickEnd()}};img.onerror=gmPickEnd;
 img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(c))};
@@ -175,7 +174,6 @@ $('gm_del').onclick=()=>{if(!gmCur())return;grd.masks.splice(gmSel,1);gmSel=Math
 $('gm_list').onclick=e=>{const r=e.target.closest('[data-gm]');if(!r||e.target.closest('input'))return;const i=+r.dataset.gm;
 if(e.target.closest('[data-eye]')){const m=grd.masks[i];m.on=!m.on;gdSave();applyGrade();renderGM();gCap();return}if(i!=gmSel){gmSel=i;gradeSync();refreshG()}};
 $('gm_list').ondblclick=e=>{const r=e.target.closest('[data-gm]');if(!r||+r.dataset.gm<0||e.target.closest('[data-eye]'))return;gmRen=+r.dataset.gm;gmSel=gmRen;gradeSync()};
-$('gdcov').onchange=()=>{grd.cov=$('gdcov').checked;gdSave();applyGrade()};
 $('gdrst').onclick=()=>{const A=tgtA(1);if(A!==grd&&!gmCur())store();GK.forEach(k=>A[k]=0);gdSave();gradeSync();applyGrade();gCap()};
 {const b=$('gdcmp'),dn=()=>{gdBypass=true;refreshG();b.textContent='Showing original'},up=()=>{if(!gdBypass)return;gdBypass=false;refreshG();b.textContent='Hold to compare'};
 b.addEventListener('pointerdown',dn);['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t,up))}

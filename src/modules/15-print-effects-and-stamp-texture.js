@@ -1,7 +1,4 @@
-import {kv} from '../platform/index.js';
-import {WBS} from './01-launch-and-version.js';
 
-const savePr=()=>{try{kv.set('wb11_print',JSON.stringify(WBS.pr))}catch(e){}};
 // Ink surface now belongs to each stamp: t.is = {t: type, a: amount 0-100, sc: scale %, sd: variation}. t.is.t === '' means clean.
 // It is drawn inside the stamp itself, in the stamp's own coordinates; ref keeps the grain at the size it had when it was one setting for the whole canvas.
 // ---- Stamp texture, drawn as real vector shapes (a mask over the ink) so it stays smooth at any zoom and in any browser ----
@@ -27,8 +24,6 @@ function init15(){// ---- Print effects (applied to all stamped ink, under the c
 // Edge roughness: outlines wobble and ink spreads a little, without flattening ink-density variation inside shapes.
 // Ink squash: a darker rim where ink is pushed out, lighter middle.
 // Ink surface: a mask that knocks ink out (fully or partly) in the pattern of a real printing fault.
-WBS.pr={e:3,q:0,t:'speckle',a:35,sc:100,sd:811};
-try{const q=JSON.parse(kv.get('wb11_print')||'null');if(q&&typeof q=='object')WBS.pr={...WBS.pr,...q}}catch(e){}
 SVC=new Map();
 }
-export {sRng,savePr,init15};
+export {sRng,init15};

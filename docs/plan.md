@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.71.0 (Oct 28 2026): Ink edges and Cover overlay removed (owner's request)
+- The Canvas panel no longer has Ink edges (Roughness, Ink squash) and the Book canvas no longer has Cover overlay (show cover image, texture over cover); also gone: "Also grade the cover images" in Grading and the Ink edges switch in Randomize.
+- Code deleted: `roughFilter`, the `#rf` filter, `WBS.pr` (project field `pr`, kv `wb11_print`), the cover images (`cover.img/back/spine`, `#covg`, `renderCover`), the grade's `cov` flag. The book guides and `cover.book` stay (`renderGuides`).
+- File format: NOT bumped (stays 29). Older files still open; their `pr` and cover images are ignored. State snapshots lose `pr` (needs the owner's OK to regenerate).
+- Tests: layout-cleanup rewritten; solid-background-2-70-1 no longer sets `pr`.
+
 ## 2.70.1 (Oct 28 2026): hotfix, the Background stays solid under the print settings
 - Owner: "sometimes the background sheet is generated with semi transparency; I can see the checkerboard through it" (again, after 2.67.4). Cause: Roughness and Ink squash (the print settings) work on the whole drawing, the Background with it. Ink squash fades everything it touches, so the paper let the checkerboard through (measured with the canvas shot over two colours: about 99.9% of the picture changed with the colour behind it); Randomize picks Ink squash on about 40% of rolls, so it looked random. Roughness frays the paper's edge too. A solid copy of the Background's fill is now drawn under the print filter and the canvas Wear mask, so what they take away shows paper, not the checkerboard. A Background with no fill or hidden is left alone (see-through on purpose).
 - Checked: 36 seeded rolls with every Randomize amount at 100 (three seeds, 12 each): the worst was 0.11% (the anti-aliased edge of the canvas). `npm run perf`: slider drag 1.01 times the baseline, a Randomize roll about 2 s.
