@@ -186,11 +186,11 @@ if(!FT.stamps){const kT=WBS.tiles.filter(t=>!curFrIds.has(t.id)&&!oldFz.has(t.id
 if(!FT.frame){fT=WBS.tiles.filter(t=>curFrIds.has(t.id));fL=curFrL}
 [fT,fL]=remap(fT,fL,idMax(mT));
 const rzPool=m=>{const a=[];TXFK.forEach((ks,i)=>{if(sOn(m,'f'+i))a.push(...ks)});return a},rzMds=m=>TXMD.filter(x=>sOn(m,'m_'+x)),
-rzMd=(m,w)=>{const a=rzMds(m);if(!a.length)return null;let t=0;a.forEach(x=>t+=w[x]);let r=Math.random()*t;for(const x of a){r-=w[x];if(r<=0)return x}return a[0]},
+rzMd=(m,w)=>{const a=rzMds(m).filter(x=>w[x]>0);if(!a.length)return null;let t=0;a.forEach(x=>t+=w[x]);let r=Math.random()*t;for(const x of a){r-=w[x];if(r<=0)return x}return a[0]},
 rzUse=(pool,md)=>{const t=pick(pool),L=txMake(t,{a:md=='wear'?ri(18,60):md=='stain'?ri(25,70):ri(35,85),sc:ri(60,170),az:pick([225,225,200,250,135,315]),auto:true});WBS.texLib.push(L);return{x:L.id,sd:txRid(),md}},
 rzList=(m,w,n)=>{const pool=rzPool(m),u=[];if(!pool.length||!rzMds(m).length)return u;for(let i=0;i<n;i++){const md=rzMd(m,w);if(md)u.push(rzUse(pool,md))}return u},
 WCV={relief:3,stain:1,wear:1.4},WST={wear:4,relief:1.5,stain:1},
-rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u:(sOn('tx','none')&&ch(.2)?[]:rzList('tx',WCV,ch(.3)?2:1));
+rzCv=()=>RZ.keep.tx?JSON.parse(JSON.stringify(WBS.tex)).u:(sOn('tx','none')&&ch(.2)?[]:rzList('tx',{...WCV,wear:0},ch(.3)?2:1));   /* 2.67.3: never Wear on the canvas: it knocks ink out of every layer, the Background too, and the Background must stay solid */
 const EO={pick,ri,rr,ch,jit:!!FT.jit,texOn:!!(FT.pr&&sOn('pr','lay')),gradeOn:!!FT.gr,tex:()=>rzList('pr',WST,1)};
 if(usedGen)mL=rzMainEls(mL,mT,EO);if(FT.frame)fL=rzFrameEls(fL,fT,EO);
 const cvU=rzCv();
@@ -251,7 +251,7 @@ if(FT.layout){const lsz=sOn('layout','size'),lsp=sOn('layout','space'),lrt=sOn('
  useT(WBS.tiles[WBS.cur]);store();upd()}
 // Layer opacity and blend: the first layer stays mostly solid; the ones above can turn see-through or blend
 if(FT.look){const bl=['multiply','darken','screen','lighten','overlay','soft-light'].filter(x=>sOn('look','b_'+x));
- WBS.layers.forEach((l,i)=>{if(l.rz=='free')return;
+ WBS.layers.forEach((l,i)=>{if(l.rz=='free'||(l.pl||[]).some(q=>q.bgd))return;   /* 2.67.3: never the layer that holds the Background */
   if(sOn('look','op')){if(ch(i?.7:.3))l.op=ri(i?45:75,i?92:96);else delete l.op}
   if(bl.length&&i>0){if(ch(.65))l.bl=pick(bl);else if(l.bl&&l.bl!='behind'&&l.bl!='cancel'&&l.bl!='replace')delete l.bl}});store();upd()}
 // Print effects, Impression: uneven pressure and ink flooding on the layers you already had as well as the new ones
@@ -294,6 +294,8 @@ if((FT.free||libFree)&&ch(.65)){
   reqs.forEach(([t,o])=>{if(keep.includes(t))fzReqs.push([t,o])});fzDone=true;WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0))}
  setDim();useT(WBS.tiles[WBS.cur]);store();upd()}
 rzPut(OWN,fzU);
+/* 2.67.3: the Background stays solid: 100% opacity, no blend, no Wear texture, on it or on the layer that holds it */
+WBS.layers.forEach(l=>{if((l.pl||[]).some(q=>q.bgd)){delete l.op;if(l.bl&&l.bl!='behind'&&l.bl!='cancel'&&l.bl!='replace')delete l.bl;(l.pl||[]).forEach(q=>{if(!q.bgd)return;delete q.op;delete q.bl;if(q.fx){const f=q.fx.filter(e=>!(e.k=='texture'&&e.md=='wear'));if(f.length)q.fx=f;else delete q.fx}})}});
 // 2.39.0 (owner Oct 24 2026): Effects. The roll's new elements may get a Noise, Blur, Print or Distort effect, and a Filter shape may go on top (it replaces the last roll's).
 // Not on a repeat tile: a blur, a displacement or a filter over the whole canvas does not wrap round its edges, so the seams would show (frames and gradients are left out of a tile for the same reason).
 // With Stamps off it reworks the effects of what is there. It draws from its own number stream, so the rest of a seeded roll is unchanged.
