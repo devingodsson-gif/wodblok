@@ -183,6 +183,8 @@ if(!g){const m=wsMem[p],e=m&&m.e?m.e:wsSide(),free=x=>!x.lk;
  const own=!ELP.includes(p)&&(p=='rand'||!L.dock.length)?wsG([]):null,nid=()=>own?own.id:'gn'+(++wsN);
  if(m&&m.with&&m.with.length)g=wsAll().find(x=>free(x)&&x.tabs.some(t=>m.with.includes(t)))||null;
  if(!g&&m&&m.fl){g={id:nid(),tabs:[],a:p,f:1,e:'r',x:m.fl.x,y:m.fl.y,w:m.fl.w,h:m.fl.h};L.float.push(g)}
+ // Export (2.76.1, owner Oct 29 2026): with no remembered place it pops out in the middle of the window
+ if(!g&&p=='xrec'){const w=Math.min(380,Math.max(260,innerWidth-40)),h=Math.round(Math.min(560,Math.max(260,innerHeight-120)));g={id:nid(),tabs:[],a:p,f:1,e:'r',x:Math.round((innerWidth-w)/2),y:Math.round(Math.max(56,(innerHeight-h)/2)),w,h};L.float.push(g)}
  // the Shape panel that opens by itself when a shape is added gets a group of its own (on the panels' side), so the panel you are working in stays in front
  if(!g&&bot){g=wsG([],{e});g.a=p;L.dock.push(g)}   /* a random id here as before 2.55.0 (the seeded series) */
  if(!g&&ELP.includes(p))g=wsAll().find(x=>free(x)&&wsIsP(x))||null;

@@ -5,6 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
+- **Oct 29: 2.76.2** (the five worst bugs of the 2.76 review: Image in exports, Image with effects vanishing, Randomize over your elements, Select all taking the Background, Book cover art on the back) on `fix/2.76.2-review-bugs`, stacked on 2.76.1; neither merged. Open from the review: the rest of its list (claude.ai project doc wodblok-review-2.76); your own text can be low-contrast after a roll.
+- **Oct 29: 2.76.0 merged (live). 2.76.1** (Export opens centred, floating) on `feat/2.76.1-export-centered`, not merged.
 - **Oct 29: 2.75.0 merged (live). 2.76.0** (canvas size anchor) on `feat/2.76.0-canvas-anchor`, pushed, not merged. The Randomize plan's end moves to 2.77.0.
 - **Oct 29: 2.74.2 merged (live). 2.75.0** on `feat/2.75.0-image-element` (pushed, not merged): Image element, Point crop with curves and feather, Pictures library (docs/plan.md). The Randomize plan's end moves to the next minor (2.76.0). Open: Point crop for pictures in shapes and Sheets; the build is over the 16 MB preview limit.
 - **Oct 29: 2.74.2** on `fix/2.74.2-stamp-editor-bugs` (pushed, not merged): stamp editor resize like the canvas, typed width/height to 2000 %, no pattern arrows in a stamp tab, turned shapes keep their effects, image Crop (see docs/plan.md). The build is 17.5 MB, over the 16 MB preview artifact limit: the preview can't be updated until it shrinks. Open: Crop for Sheet pictures and stamp pictures; motif-look-2-31's stamp-image test needs rewriting for the Looks.
