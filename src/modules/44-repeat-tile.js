@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {setDim,tileOn} from './04-canvas-and-stamp-outlines.js';
+import {setDim,tileOn,tileRk} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {buildTex} from './17-texture-panel-and-previews.js';
@@ -24,16 +24,19 @@ function init44(){
     store();buildTex();upd();if(WBX.wbCap)WBX.wbCap();if(WBX.wbApplyZ)requestAnimationFrame(WBX.wbApplyZ);
   };
   WBX.wbTileUi=()=>{
-    const on=tileOn(),n=frames(),g=on?grads():0,key=[on,!!WBS.tilePv,WBS.book.on,n,g].join();if(key===last)return;last=key;
+    const on=tileOn(),n=frames(),g=on?grads():0,key=[on,!!WBS.tilePv,WBS.book.on,n,g,tileRk()].join();if(key===last)return;last=key;
     if(!on&&WBS.tilePv){WBS.tilePv=false;WBS.tpvImg=''}
     document.querySelectorAll('#cfmt [data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==(WBS.book.on?'book':on?'tile':'free')));
-    $('tlobox').hidden=!on;$('tpvg').hidden=!on;$('tpv').disabled=!on;$('tpv').setAttribute('aria-pressed',String(on&&!!WBS.tilePv));
+    $('tlobox').hidden=!on;$('tlrkbox').hidden=!on;$('xrrq').hidden=!on;$('xrrp').disabled=$('xrrt').disabled=!on;$('tlrk').querySelectorAll('[data-k]').forEach(b=>{const o=b.dataset.k==tileRk();b.classList.toggle('on',o);b.setAttribute('aria-pressed',String(o))});$('tpvg').hidden=!on;$('tpv').disabled=!on;$('tpv').setAttribute('aria-pressed',String(on&&!!WBS.tilePv));
     
     const parts=[];if(on&&n)parts.push(n+(n>1?' frames':' frame'));if(g)parts.push(g+(g>1?' gradients':' gradient'));
     $('tpn').hidden=!parts.length;$('tpn').textContent=parts.length?'Hidden on a repeat tile: '+parts.join(', '):'';
-    $('artwrap').classList.toggle('tpv',on&&!!WBS.tilePv);
+    $('artwrap').classList.toggle('tpv',on&&!!WBS.tilePv);$('artwrap').classList.toggle('tpvk',tileRk()!='grid');
     $('tpx').hidden=!(on&&!!WBS.tilePv);
   };
+  // 2.76.6: Grid, Brick or Half drop: how the tile repeats (dim.rk); the wrap at the edges, the 3 x 3 view and the exported repeat unit all follow it
+  $('tlrk').onclick=e=>{const b=e.target.closest('[data-k]');if(!b||b.dataset.k==tileRk())return;if(b.dataset.k=='grid')delete WBS.dim.rk;else WBS.dim.rk=b.dataset.k;
+   WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}WBS.tpvImg='';store();buildTex();upd();if(WBX.wbCap)WBX.wbCap();if(WBS.tilePv)tpvMake()};
   // the 3 x 3 view cannot be edited: the pill and Esc both go back to editing
   $('tpx').onclick=()=>$('tpv').click();
   document.addEventListener('keydown',e=>{if(e.key!='Escape'||!WBS.tilePv||document.querySelector('.baX')||(e.target.matches&&e.target.matches('input,select,textarea')))return;e.preventDefault();$('tpv').click()});

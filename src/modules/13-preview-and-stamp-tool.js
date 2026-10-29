@@ -10,7 +10,7 @@ import {build,hx} from './10-layer-grids.js';
 import {Q,eR,eT,upd} from './11-pressure-flooding-block-edges.js';
 import {sceDropShape} from './64-stamp-canvas-edit.js';
 import {QS,clampN,delItems,selSet,selToggle,wrapA} from './12-selection-and-split.js';
-import {syncAsp} from './14-presets-and-layer-grid-ui.js';
+import {syncAsp,syncPhys} from './14-presets-and-layer-grid-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {libPick} from './21-motif-library-ui.js';
 import {fpL} from './24-free-place-layers.js';
@@ -40,7 +40,7 @@ const txAbs=(g,c)=>WBX.wbTxXf(g,M=>{M.ax+=c[0]-M.mx;M.ay+=c[1]-M.my;M.mx=c[0];M.
 const sAx=k=>e=>{const q=Q();if(!q)return;const v=e.target.value/100,f=v/(q[k]||1);QS().forEach(o=>o[k]=o===q?v:clampN((o[k]||1)*f,.05,20));store();upd()};
 const addSt=t=>{const L=WBS.layers[WBS.selL];if(L&&!L.st.includes(t.id))L.st.push(t.id)};
 const layName=()=>{const L=WBS.layers[WBS.selL];return L?L.name:'the pattern'};
-function sync(){const t=WBS.tiles[WBS.cur]||WBS.noTile,L=WBS.layers[WBS.selL],sv=(id,v)=>{if($(id).value!=v)$(id).value=v};syncAsp('c','c');syncAsp('s','s');{
+function sync(){const t=WBS.tiles[WBS.cur]||WBS.noTile,L=WBS.layers[WBS.selL],sv=(id,v)=>{if($(id).value!=v)$(id).value=v};syncAsp('c','c');syncPhys();syncAsp('s','s');{
 if(WBX.wbNums)WBX.wbNums()
 }document.querySelectorAll('#skind [data-k]').forEach(b=>b.classList.toggle('on',b.dataset.k==SK));$('sasprow').hidden=SK=='hex'||SK=='tri';$('shexrow').hidden=SK!='hex';$('shor').value=HO;
 if(WBX.wbTraySync)WBX.wbTraySync();$('neg').checked=!!(t&&t.neg);$('swrap').checked=!t||t.wr!==false;

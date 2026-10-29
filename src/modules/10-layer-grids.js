@@ -1,7 +1,7 @@
 import {tbSync} from './07-symmetry.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {bkPre,bkShow,bkTile} from './03-stamp-prints-and-drawing.js';
-import {shBleed,CH,CW,SH,SK,SW,cOut,col,hasOut,shp,tileOn,useT,okC} from './04-canvas-and-stamp-outlines.js';
+import {CH,col,cOut,CW,hasOut,okC,SH,shBleed,shp,SK,SW,tileOffs,tileOn,tileRk,useT} from './04-canvas-and-stamp-outlines.js';
 import {inkOf,luid,pal} from './06-motif-library-folders.js';
 import {clipSeed,inkRuns,items} from './09-stamp-items-and-print-runs.js';
 import {edgeDefs} from './11-pressure-flooding-block-edges.js';
@@ -42,7 +42,8 @@ defs+=`<filter id="bhk" filterUnits="userSpaceOnUse" ${RB()} color-interpolation
 clipSeed(_cn);
 renderGuides();
 {const pv=tileOn()&&WBS.tilePv&&WBS.tpvImg,a=$('art');a.setAttribute('viewBox',pv?`${-CW} ${-CH} ${3*CW} ${3*CH}`:`0 0 ${CW} ${CH}`);a.classList.toggle('tpvr',!!pv);
- let g=$('tpvi');if(!g&&pv){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='tpvi';a.appendChild(g)}if(g){const h=pv?[-1,0,1].flatMap(dx=>[-1,0,1].map(dy=>`<image href="${WBS.tpvImg}" x="${dx*CW}" y="${dy*CH}" width="${CW}" height="${CH}" preserveAspectRatio="none"/>`)).join(''):'';if(g.dataset.k!==h.length+'|'+(pv||'')){g.dataset.k=h.length+'|'+(pv||'');g.innerHTML=h}}
+ // 2.76.6: the 3 x 3 view's copies sit on the repeat's lattice (grid, brick or half drop), enough of them to fill the view
+ let g=$('tpvi');if(!g&&pv){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='tpvi';a.appendChild(g)}if(g){const h=pv?[[0,0],...tileOffs(2)].filter(([x,y])=>x>-2*CW+1e-6&&x<2*CW-1e-6&&y>-2*CH+1e-6&&y<2*CH-1e-6).map(([x,y])=>`<image href="${WBS.tpvImg}" x="${+x.toFixed(3)}" y="${+y.toFixed(3)}" width="${CW}" height="${CH}" preserveAspectRatio="none"/>`+(tileRk()!='grid'?`<rect class="tpe" x="${+x.toFixed(3)}" y="${+y.toFixed(3)}" width="${CW}" height="${CH}"/>`:'')).join(''):'';if(g.dataset.k!==h.length+'|'+(pv||'')){g.dataset.k=h.length+'|'+(pv||'');g.innerHTML=h}}
  if(WBX.wbTpvDrawn)WBX.wbTpvDrawn()}const ikc=typeof inkCatch=='function'&&!WBS.DRAFT?inkCatch():null;{const sk=WBS.tiles.map(t=>SURFC[t.id]?t.id+'#'+SURFC[t.id].k:'').join(';')+(WBS.edInk?'':'|plain');if(sk!==WBS.SURFK){WBS.SURFK=sk;$('surfd').innerHTML=WBS.tiles.map(t=>SURFC[t.id]?(WBS.edInk?SURFC[t.id].s:`<mask id="is${t.id}" maskUnits="userSpaceOnUse" x="-100000" y="-100000" width="200000" height="200000"><rect x="-100000" y="-100000" width="200000" height="200000" fill="#fff"/></mask>`):'').join('')}}bkShow(defs,ikc?ikc.defs:'',lg,L=>`${un}<g${ikc?(WBS.edTx?' mask="url(#cw)"':' data-tki="1"'):''}><g>${L}</g></g>`,sd);$('texg').style.display=WBS.edTx?'':'none';tbSync();
 {const ci=hasOut(),O=ci?cOut():null;$('cvdefs').innerHTML=ci?`<clipPath id="cvclip" clipPathUnits="userSpaceOnUse"><path d="${O.d}"/></clipPath>`:'';['dyn','texg'].forEach(id=>ci?$(id).setAttribute('clip-path','url(#cvclip)'):$(id).removeAttribute('clip-path'));$('art').classList.toggle('shp',ci);const sh=$('artsh');sh.style.display=ci?'block':'none';sh.setAttribute('viewBox',`0 0 ${CW} ${CH}`);sh.innerHTML=ci?`<defs><pattern id="ckp" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="scale(${ckK().toFixed(4)})"><rect width="16" height="16" fill="#fff"/><rect width="8" height="8" fill="#dcdcdc"/><rect x="8" y="8" width="8" height="8" fill="#dcdcdc"/></pattern></defs><path d="${O.d}" fill="url(#ckp)"/>`:'';ckWatch();$('art').classList.toggle('cvck',!ci)}
 useT(WBS.tiles[WBS.cur]);

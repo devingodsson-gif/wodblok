@@ -132,6 +132,8 @@ body.panning #boardP,body.panning #boardP *{cursor:grabbing!important;user-selec
 .rctr .lib.rws>div>button:first-child{grid-template-columns:minmax(0,1fr) auto;padding-right:56px}.rctr .lib.rws .rcact{position:absolute;right:24px;top:50%;transform:translateY(-50%);width:var(--h-sm);height:var(--h-sm)}.rctr .lib.rws .rcact svg{width:14px;height:14px}
 .xrp select{width:auto;flex:1}.xrall{margin-top:12px}.xrq{margin-top:8px;gap:6px;flex-wrap:wrap}.xrq button{display:inline-flex;align-items:center;gap:6px;height:var(--h-md);padding:0 8px;font-size:var(--fs-m)}.xrq button svg{width:14px;height:14px;flex:none}.xrq kbd{font-size:var(--fs-s);color:var(--mut)}.xrq:not(:has(button:not([hidden]))){display:none}
 #artwrap.tpv>*{pointer-events:none}
+/* 2.76.6: a brick or half-drop repeat marks each tile's edges in the picture itself (the lines below only suit a grid) */
+#artwrap.tpvk::after{display:none}#tpvi .tpe{fill:none;stroke:color-mix(in srgb,var(--acc) var(--tlo,92%),transparent);stroke-width:1px;vector-effect:non-scaling-stroke}
 /* 3 x 3 repeat preview: faint lines mark where each tile ends, so seams can be checked; the picture is not editable here */
 #artwrap.tpv::after{content:"";position:absolute;inset:28px;pointer-events:none;z-index:3;--tl:color-mix(in srgb,var(--acc) var(--tlo,92%),transparent);background:
  linear-gradient(90deg,transparent calc(33.333% - .5px),var(--tl) calc(33.333% - .5px),var(--tl) calc(33.333% + .5px),transparent calc(33.333% + .5px)),
@@ -432,7 +434,7 @@ body.calm *{transition:none!important;animation:none!important}
 .ctl label{margin:0;color:var(--fg);font-size:var(--fs-m);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ctl .num{position:relative}
 .ctl .num input{height:var(--h-sm);font-size:var(--fs-s);padding:2px 6px}
-.ctl .num input.u{padding-right:14px}.num input.u2{padding-right:20px}
+.ctl .num input.u{padding-right:14px}.num input.u2{padding-right:24px}
 .ctl .num input.u::-webkit-inner-spin-button,.ctl .num input.u2::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}.ctl .num input.u,.ctl .num input.u2{-moz-appearance:textfield;appearance:textfield}
 .ctl .num i{position:absolute;right:5px;top:0;bottom:0;display:flex;align-items:center;font-style:normal;line-height:1;color:var(--faint);font-size:var(--fs-s);pointer-events:none}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:var(--h-md);background:transparent;margin:0;--p:50%}
@@ -941,10 +943,15 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
    <div class="seg" id="cfmt" style="grid-template-columns:1fr 1fr 1fr"><button type="button" data-f="free">Free canvas</button><button type="button" data-f="tile">Repeat tile</button><button type="button" data-f="book">Book cover</button></div>
    <div class="hint" id="cfmth">Free, Repeat tile or Book cover.</div><div class="hint" id="tpn" hidden></div>
    <div id="tlobox" hidden><label for="tlo">Grid opacity</label><input type="range" id="tlo" min="0" max="100" step="1" value="92" data-u="%" data-def="92"></div>
+   <div id="tlrkbox" hidden><label>Repeat</label><div class="seg" id="tlrk" role="group" aria-label="Repeat" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-k="grid">Grid</button><button type="button" data-k="brick">Brick</button><button type="button" data-k="half">Half drop</button></div></div>
   </div></details>
   <details class="g" id="cfree" open><summary>Canvas size</summary><div class="gb">
    <div id="caspbox"><label>Aspect ratio</label><div class="asp"><select id="casp"></select><button class="alt" id="cswp" title="Swap width and height" aria-label="Swap width and height">&#8646;</button></div>
    <div class="aspc" id="cascw">Width <input type="number" id="caw" min="0.1" max="50" step="0.1"> Height <input type="number" id="cah" min="0.1" max="50" step="0.1"></div></div>
+   <label for="cun">Size</label><select id="cun" aria-label="Size unit"><option value="">Ratio only</option><option value="px">Pixels</option><option value="in">Inches</option><option value="mm">Millimetres</option></select>
+   <div id="cphb" hidden><div class="aspc">Width <input type="number" id="cpw" min="0.01" max="20000" step="0.01" aria-label="Width"> Height <input type="number" id="cph" min="0.01" max="20000" step="0.01" aria-label="Height"> <span id="cpu"></span></div>
+   <div class="ctl"><label for="cdpi">Resolution</label><select id="cdpi" aria-label="Resolution"><option value="72">72 DPI</option><option value="150">150 DPI</option><option value="300">300 DPI</option><option value="600">600 DPI</option></select></div>
+   <div class="xrd" id="cphi" aria-live="polite"></div></div>
    <label>Anchor</label><div class="shg" id="canc" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
   </div></details>
   <div id="bkgrp" hidden>
@@ -1278,6 +1285,7 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
     <div class="seg" id="pelay" role="group" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-l="tile">Tiling</button><button type="button" data-l="radial">Radial</button><button type="button" data-l="scatter">Scatter</button><button type="button" data-l="frame">Frame</button></div>
      <div id="petl"><label>Tile shape</label><select id="pets" aria-label="Tile shape"></select><label>Arrangement</label><select id="pear" aria-label="Arrangement"></select>
      <div class="ctl"><label>Size</label><input type="range" id="peps" min="1" max="60" step="0.5" value="12" data-u="%" data-def="12"></div>
+     <div class="ctl" id="pepur" hidden><label for="pepu">Piece size</label><div class="num"><input type="number" class="u u2" id="pepu" min="0.01" max="20000" step="0.01" aria-label="Piece size"><i id="pepuu">in</i></div></div>
      <div class="ctl"><label>Spacing</label><input type="range" id="pesp" min="0" max="100" value="0" data-u="%" data-def="0"></div></div>
      <div id="pefr">
     <div class="ctl"><label>Columns</label><input type="range" id="pecn" min="1" max="24" value="4" data-def="4"></div>
@@ -1378,13 +1386,15 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
   <div class="row"><button type="button" class="primary" id="xrnow">Export now</button></div>
   <div class="seg" id="xrf" role="group" aria-label="Format"><button type="button" class="on" data-f="png">PNG</button><button type="button" data-f="jpg">JPG</button><button type="button" data-f="svg">SVG</button><button type="button" data-f="tiff">TIFF</button></div>
   <div class="ctl"><label for="xrpx">Long side</label><div class="num"><input type="number" class="u u2" id="xrpx" min="256" max="8192" step="1" value="2048" aria-label="Long side in pixels"><i>px</i></div></div>
+  <label class="chk" id="xrpsr" hidden><input type="checkbox" id="xrps"><span>Print size</span></label>
   <div class="ctl" id="xrdpirow" hidden><label for="xrdpi">Print resolution</label><select id="xrdpi" aria-label="TIFF print resolution"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option></select></div>
   <div class="xrd" id="xrd" aria-live="polite"></div>
   <input type="text" id="xrsfx" maxlength="24" aria-label="Added to the file name" placeholder="File name ending">
   <div class="xrn"><input type="text" id="xrn" maxlength="40" aria-label="Recipe name" placeholder="Recipe name"><button type="button" id="xrsave">Save recipe</button></div>
  </div></details>
  <details class="g" open><summary>Quick</summary><div class="gb">
-  <div class="row xrq"><button id="png"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="image"></svg>PNG image<kbd>3× size</kbd></button><button id="sv"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="pen"></svg>SVG vector</button><button id="cpy"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="duplicate"></svg>Copy SVG code</button></div>
+  <div class="row xrq"><button id="png"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="image"></svg>PNG image<kbd>3× size</kbd></button><button id="sv"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="pen"></svg>SVG vector</button><button id="cpy"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="duplicate"></svg>Copy SVG code</button><button id="xrpdf"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="fileText"></svg>PDF</button></div>
+  <div class="row xrq" id="xrrq" hidden><button id="xrrp"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="pattern"></svg>Repeat unit PNG</button><button id="xrrt"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="pattern"></svg>Repeat unit TIFF</button></div>
   <div class="row xrq"><button id="bkpdf" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="fileText"></svg>Print cover PDF<kbd>300 DPI</kbd></button><button id="bkpng" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="spread"></svg>Print cover PNG<kbd>300 DPI</kbd></button></div>
  </div></details>
  <details class="g" open><summary>Print proof</summary><div class="gb">

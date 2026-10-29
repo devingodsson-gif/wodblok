@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,SH,SW,col,tileExt,tileOn} from './04-canvas-and-stamp-outlines.js';
+import {CH,col,CW,SH,SW,tileExt,tileOffs,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -17,7 +17,7 @@ function surfFor(t){const q=isOf(t);if(!q){delete SURFC[t.id];return''}const k=q
 const txoG=(t,mid)=>{const c=SURFC[t.id];return c&&c.o?`<g class="txo"${WBS.edInk?'':' display="none"'} mask="url(#${mid})"><use href="#txo${t.id}"/></g>`:''};
 // a whole layer: wear = one mask over the canvas, relief / stain = a filter on the layer
 // Repeat tile: a picture that covers the tile is repeated one tile over in every direction (used by masks, which must reach past the edges)
-const tileCopies=(v,id)=>{let o=`<g id="${id}">${v}</g>`;for(const dx of[-1,0,1])for(const dy of[-1,0,1])if(dx||dy)o+=`<use href="#${id}" x="${dx*CW}" y="${dy*CH}"/>`;return o};
+const tileCopies=(v,id)=>{let o=`<g id="${id}">${v}</g>`;for(const[x,y]of tileOffs())o+=`<use href="#${id}" x="${+x.toFixed(3)}" y="${+y.toFixed(3)}"/>`;return o};
 function layTexMask(L,li){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return'';const tl=tileOn(),v=txImgs(q,CW,CH,800,'host',txIsW,0,0,tl);if(!v)return'';
 return tl?`<mask id="lt${li}" maskUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}"><rect x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" fill="#fff"/>${tileCopies(v,'ltc'+li)}</mask>`:`<mask id="lt${li}" maskUnits="userSpaceOnUse" x="0" y="0" width="${CW}" height="${CH}"><rect width="${CW}" height="${CH}" fill="#fff"/>${v}</mask>`}
 function layTexOv(L){const q=txSpecs(L.tu,'wear');if(!q.length||!WBS.edInk)return['',''];const f=txFilt(q,0,0,CW,CH,800,tileOn()?tileExt():undefined);return f?[`<g filter="url(#${f})">`,'</g>']:['','']}

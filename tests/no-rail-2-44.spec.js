@@ -15,7 +15,7 @@ test('no rail on screen; the canvas area starts at the window edge', async ({ pa
 
 test('every panel the rail had is in a menu', async ({ page }) => {
   const { errors } = await openApp(page);
-  const where = { 'mnb-image': ['panel.canvas', 'panel.pgrid'], 'mnb-elements': ['panel.lyrs'], 'mnb-edit': ['panel.hist'], 'mnb-colour': ['panel.colors'], 'mnb-export': ['panel.xrec'], 'mnb-effects': ['panel.rand'], 'mnb-window': ['panels.closeAll'] };
+  const where = { 'mnb-image': ['panel.canvas', 'panel.pgrid'], 'mnb-elements': ['panel.lyrs'], 'mnb-edit': ['panel.hist'], 'mnb-colour': ['panel.colors'], 'mnb-export': ['file.export'], 'mnb-effects': ['panel.rand'], 'mnb-window': ['panels.closeAll'] };
   for (const [bar, ids] of Object.entries(where)) {
     await page.click('#' + bar);
     const menu = await page.locator('#' + bar).getAttribute('aria-controls');

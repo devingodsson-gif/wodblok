@@ -3,7 +3,7 @@ import {mapPts,mapShape} from './77-map-to-shape.js';
 import {cust,mk} from './06-motif-library-folders.js';
 import {mNm} from './21-motif-library-ui.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,geom,rowMenu,shOf,stNmId} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,geom,PHU,physLen,physOf,physToCv,rowMenu,shOf,stNmId} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
@@ -85,7 +85,7 @@ const patHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 const patCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 function patSrcName(s){if(s.k=='stamp')return stNmId(s.t);if(s.k=='motif')return mNm(s.m);return String((s.it.tx&&s.it.tx.text)||'Text').replace(/\n/g,' ').slice(0,24)}
 function patSync(){const host=$('pelist');if(!host)return;const a=patList(),p=patCur();if(WBS.patSel!=null&&!p&&a.length===0)WBS.patSel=null;
-const key=JSON.stringify([a.map(q=>[q.u,q.n]),WBS.patSel,WBS.patSrc,p&&[p.lay,p.ts,p.ar,p.ps,p.sp,p.cn,p.rn,p.sz,p.rt,p.ox,p.oy,p.in,p.ds,(p.src||[]).map(s=>[s.k,s.t,s.a,s.w,s.it&&s.it.tx&&s.it.tx.text])],WBS.tiles.map(t=>t.id).join()]);
+const key=JSON.stringify([a.map(q=>[q.u,q.n]),WBS.patSel,WBS.patSrc,p&&[p.pcm,p.iv,p.ov,JSON.stringify(WBS.dim),CW,CH,p.lay,p.ts,p.ar,p.ps,p.sp,p.cn,p.rn,p.sz,p.rt,p.ox,p.oy,p.in,p.ds,(p.src||[]).map(s=>[s.k,s.t,s.a,s.w,s.it&&s.it.tx&&s.it.tx.text])],WBS.tiles.map(t=>t.id).join()]);
 if(host.dataset.k===key)return;host.dataset.k=key;
 host.innerHTML=a.slice().reverse().map(q=>`<div class="mr${q.u==WBS.patSel?' on':''}" data-pe="${q.u}"><b>${patHx(q.n)}<i>${(q.src||[]).length} source${(q.src||[]).length==1?'':'s'}</i></b><button type="button" data-pd="${q.u}" aria-label="Delete this pattern">&#215;</button></div>`).join('');
 $('peed').hidden=!p;if(!p)return;
@@ -94,7 +94,7 @@ $('pelay').querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dat
 {const tile=p.lay=='tile';$('petl').hidden=!tile;$('pefr').hidden=tile;{const lb={radial:['Spokes','Rings'],scatter:['Across','Down'],frame:['Columns','Rows']}[p.lay]||['Columns','Rows'];$('pecn').closest('.ctl').firstElementChild.textContent=lb[0];$('pern').closest('.ctl').firstElementChild.textContent=lb[1]}if(tile){const sh=tlShape(p),ts=$('pets'),ar=$('pear');
  if(!ts.options.length)ts.innerHTML=TL_TS.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');const tv=p.ts&&TL_AR[p.ts]?p.ts:'auto';if(ts.value!==tv)ts.value=tv;
  const ah=TL_AR[sh].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');if(ar.dataset.sh!==sh){ar.dataset.sh=sh;ar.innerHTML=ah}const av=tlArr(p,sh);if(ar.value!==av)ar.value=av}}$('peds').querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d==p.ds));
-const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};sv('peps',+p.ps||12);sv('pesp',+p.sp||0);sv('pecn',p.cn);sv('pern',p.rn);sv('pesz',p.sz);sv('pert',p.rt);sv('peox',+p.ox||0);sv('peoy',+p.oy||0);sv('pein',p.in==null?4:+p.in);sv('peiv',+p.iv||0);$('peov').checked=!!p.ov;$('pepc').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('on',b.dataset.c==(p.pcm||'')));$('peinr').hidden=p.lay!='frame';
+const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};sv('peps',+p.ps||12);sv('pesp',+p.sp||0);sv('pecn',p.cn);sv('pern',p.rn);sv('pesz',p.sz);sv('pert',p.rt);sv('peox',+p.ox||0);sv('peoy',+p.oy||0);sv('pein',p.in==null?4:+p.in);sv('peiv',+p.iv||0);{const P=physOf(),r=$('pepur');r.hidden=!P;if(P){const S=Math.min(CW,CH)*Math.max(1,Math.min(100,+p.ps||12))/100,v=physLen(S),u=WBS.dim.u;$('pepuu').textContent=PHU[u];if(document.activeElement!=$('pepu'))$('pepu').value=String(+v.toFixed(u=='px'?0:u=='mm'?1:2))}}$('peov').checked=!!p.ov;$('pepc').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('on',b.dataset.c==(p.pcm||'')));$('peinr').hidden=p.lay!='frame';
 // the sources (2.3.0): one row each, a thumbnail of the stamp (or the kind's icon), its name, its weight when the pattern picks by weight, and remove
 $('pesrc').innerHTML=(p.src||[]).map((s,i)=>{const t=s.k=='stamp'?WBS.tiles.find(x=>x.id==s.t):null,G=t?geom(shOf(t)):null,th=s.k=='motif'?`<svg viewBox="-110 -110 220 220">${mk(s.m,'currentColor','transparent')}</svg>`:G?`<svg viewBox="0 0 ${G.SW} ${G.SH}"><use href="#s${t.id}"/></svg>`:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.text}</svg>`;
  return`<div class="psr2${s.k=='motif'&&WBS.patSrc===i?' on':''}" data-si="${i}"${s.k=='motif'?' data-look':''}><span class="pth">${th}</span><b>${patHx(patSrcName(s))}${patSrcOk(s)?'':' <i>missing</i>'}</b>${p.ds=='weighted'?`<input type="number" min="1" max="99" value="${+s.w>0?+s.w:1}" data-sw="${i}" aria-label="Weight">`:'<span></span>'}<button type="button" class="ib" data-sx="${i}" aria-label="Remove this source"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.close}</svg></button></div>`}).join('')}
@@ -113,6 +113,8 @@ $('pelist').onclick=e=>{const L=fpL();if(!L)return;WBS.patSrc=null;const d=e.tar
 const set=(f,v)=>{const p=patCur();if(!p)return;if(p[f]===v)return;p[f]=v;patCh()};
 $('pelay').onclick=e=>{const b=e.target.closest('[data-l]');if(b){set('lay',b.dataset.l);$('peinr').hidden=b.dataset.l!='frame'}};
 $('pepc').onclick=e=>{const b=e.target.closest('[data-c]'),p=patCur();if(!b||!p)return;const v=b.dataset.c;if((p.pcm||'')===v)return;if(v){p.pcm=v;const ts=(WBS.proj.ts||[]).map(id=>'@'+id);p.pcc=ts.length?ts:[WBS.proj.ink]}else{delete p.pcm;delete p.pcc}patCh()};   // the colours are the tray's, taken when the choice is made
+// 2.76.6: once the canvas has a physical size, a piece's size can be given in its unit (2 in, 50 mm); it sets Size (the % of the canvas's short side)
+$('pepu').addEventListener('change',()=>{const p=patCur(),v=+$('pepu').value,S=physToCv(v);if(!p||!(S>0))return;const ps=+Math.max(1,Math.min(100,S/Math.min(CW,CH)*100)).toFixed(2);if(ps>60){pmsg('That is larger than a piece can be on this canvas.');patSync();return}if(p.ps!==ps){p.ps=ps;patCh()}});
 $('peov').addEventListener('change',()=>{const p=patCur();if(!p)return;if($('peov').checked)p.ov=1;else delete p.ov;patCh()});
 $('peds').onclick=e=>{const b=e.target.closest('[data-d]');if(b)set('ds',b.dataset.d)};
 $('pets').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$('pets').value;if((p.ts||'auto')!==v){p.ts=v;delete p.ar;patCh()}});

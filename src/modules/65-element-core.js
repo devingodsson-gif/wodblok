@@ -1,6 +1,6 @@
 import {ICN} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,col,CW,okC,stNmId,tileOn} from './04-canvas-and-stamp-outlines.js';
+import {CH,col,CW,okC,stNmId,tileOffs,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {freeLayer} from './24-free-place-layers.js';
 import {txtLayer} from './26-text-boxes.js';
 
@@ -61,7 +61,7 @@ for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
  emit();if(k!==run){flush();run=k}buf+=s}
 flush();emit();return out}
 const body=render(its,0);return[defs,body,'','',null,'']}   // render first: a group's ink adds its filter to defs while it draws
-function elTile(id,h){let o=`<g id="tw${id}">${h}</g>`;const R=[-1,0,1];for(const dx of R)for(const dy of R)if(dx||dy)o+=`<use href="#tw${id}" x="${dx*CW}" y="${dy*CH}"/>`;return o}
+function elTile(id,h){let o=`<g id="tw${id}">${h}</g>`;for(const[x,y]of tileOffs())o+=`<use href="#tw${id}" x="${+x.toFixed(3)}" y="${+y.toFixed(3)}"/>`;return o}   // the neighbours on the repeat's lattice (2.76.6: brick and half drop too)
 // the opacity and blend attributes of one element ('' when it has neither); behind, cancel and replace stay layer-only
 // Replace's Match (0 to 100, default 25): how close to colour A a pixel beneath must be
 const fqRm=q=>{const v=+q.rm;return Number.isFinite(v)?Math.max(0,Math.min(100,v)):25};

@@ -1,7 +1,7 @@
 import {clipboard,kv,use} from '../platform/index.js';
 import {icAlign} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,SK,csk,geom,setDim,shOf,stvOn,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {CH,csk,CW,geom,PHU,physOf,setDim,shOf,SK,stvOn,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {say,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC} from './17-texture-panel-and-previews.js';
@@ -10,15 +10,26 @@ import {wmDraw,wmGet,wmReady} from './56-watermark.js';
 // ---- Canvas & stamp shape presets
 const ASP={c:[['2:3',2,3],['3:4',3,4],['4:5',4,5],['5:7',5,7],['1:1 square',1,1],['A4 / A-series',1,1.4142],['US Letter',8.5,11],['6×9 book',6,9],['9:16 tall',9,16],['3:2',3,2],['4:3',4,3],['16:9 wide',16,9]],
 s:[['1:1 square',1,1],['2:3',2,3],['3:2',3,2],['3:4',3,4],['4:3',4,3],['1:2',1,2],['2:1',2,1],['1:3',1,3],['3:1',3,1],['6:1 frame strip',6,1],['8:1 frame strip',8,1],['12:1 frame strip',12,1],['16:1 frame strip',16,1]]};
-const aspKey=([w,h])=>(+w).toFixed(4)+':'+(+h).toFixed(4);
+const aspKey=([w,h])=>(+w/+h).toFixed(4);   // 2.76.6: by the ratio, so 8 x 12 inches shows as 2:3
 function syncAsp(k,p){const cur=k=='s'?shOf(WBS.tiles[WBX.wbCur()]||undefined).s:WBS.dim[k],i=ASP[k].findIndex(a=>aspKey([a[1],a[2]])==aspKey(cur));
 if(!$(p+'asp').options.length)$(p+'asp').innerHTML=ASP[k].map((a,j)=>`<option value="${j}">${a[0]}</option>`).join('')+'<option value="x">Custom…</option>';
 const custom=i<0||$(p+'asp').dataset.custom=='1';$(p+'asp').value=custom?'x':i;
 const f=v=>String(+(+v).toFixed(3));if(document.activeElement!=$(p+'aw'))$(p+'aw').value=f(cur[0]);if(document.activeElement!=$(p+'ah'))$(p+'ah').value=f(cur[1])}
+// ---- Physical canvas size (2.76.6, docs/pattern-plan.md step 3): a unit, a width and height in it, and a resolution; the ratio (dim.c) follows them, and a ratio
+// chosen from the list keeps the width and sets the height. Ratio only drops the physical size. The read-out is the size in pixels at that resolution.
+let phSet=false;
+const phR=v=>+(+v).toFixed(WBS.dim.u=='px'?0:WBS.dim.u=='mm'?1:3);
+const phFmt=v=>String(+(+v).toFixed(3));
+function syncPhys(){const d=WBS.dim,P=physOf(),u=P?d.u:'';if($('cun').value!==u)$('cun').value=u;$('cphb').hidden=!P;$('cascw').hidden=!!P;if(!P)return;
+ if(document.activeElement!=$('cpw'))$('cpw').value=phFmt(P.w);if(document.activeElement!=$('cph'))$('cph').value=phFmt(P.h);$('cpu').textContent=PHU[u];
+ const dv=String(P.dpi);if(![...$('cdpi').options].some(o=>o.value==dv))$('cdpi').insertAdjacentHTML('beforeend',`<option value="${dv}">${dv} DPI</option>`);if($('cdpi').value!==dv)$('cdpi').value=dv;
+ $('cphi').textContent=P.pxW+' × '+P.pxH+' px'+(u!='in'?' · '+phFmt(+P.inW.toFixed(2))+' × '+phFmt(+P.inH.toFixed(2))+' in':'')}
+function physSet(o){Object.assign(WBS.dim,o);if(!physOf()){['u','pw','ph','dpi'].forEach(x=>delete WBS.dim[x]);try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd();return}
+ phSet=true;try{applyAsp('c',[+WBS.dim.pw,+WBS.dim.ph])}finally{phSet=false}}
 // Change one stamp's outline and stretch its motifs to match
 function reshape(t,ch){const sh=shOf(t),a=geom(sh);if(ch.k)sh.k=ch.k;if(ch.o)sh.o=ch.o;if(ch.s)sh.s=[+ch.s[0],+ch.s[1]];const b=geom(sh);useG(b);t.items.forEach(q=>{[q.x,q.y]=wrapP(q.x*b.SW/a.SW,q.y*b.SH/a.SH)});useT(WBS.tiles[WBS.cur])}
 function applyAsp(k,v,ch){if(v){const r=v[0]/v[1],lim=k=='s'?20:5;if(!(r>=1/lim&&r<=lim)){if(k=='s')pmsg('Stamps can be up to 20 times longer than they are wide.');return}}
-if(k=='c'){const W0=CW,H0=CH;if(v)WBS.dim.c=v;setDim();if(!stvOn()&&!WBS.book.on)canShift(W0,H0)}
+if(k=='c'){const W0=CW,H0=CH;if(v){WBS.dim.c=v;if(physOf()&&!phSet){const r=v[1]/v[0];WBS.dim.ph=phR(WBS.dim.pw*r)}}setDim();if(!stvOn()&&!WBS.book.on)canShift(W0,H0)}
 else{const t=WBS.tiles[WBS.cur],c={...(ch||{})};if(v)c.s=v;reshape(t,c);const sh=shOf(t);WBS.dim={...WBS.dim,k:sh.k,o:sh.o,s:[...sh.s]}}
 WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd()}
 // ---- Canvas size anchor (2.76.0, owner Oct 29 2026: "when we change the size of the canvas we need a section to adjust where the existing elements go ... expand from
@@ -32,7 +43,7 @@ function canMove(dx,dy){if(Math.abs(dx)<1e-6&&Math.abs(dy)<1e-6)return false;let
  WBS.layers.forEach(L=>(L.pl||[]).forEach(p=>{if(!p||p.bgd||p.k=='sheet'||p.k=='group'||p.x==null||p.y==null)return;if(p.k=='pattern'&&(p.af||!(+p.aw>0)))return;p.x=+(+p.x+dx).toFixed(2);p.y=+(+p.y+dy).toFixed(2);n++}));return n>0}
 function canPaint(){const g=$('canc');if(!g)return;g.querySelectorAll('button').forEach(b=>{const on=+b.dataset.x==CANCH[0]&&+b.dataset.y==CANCH[1];if(b.classList.contains('on')!==on)b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))})}
 const LY=()=>WBS.layers[WBS.selL];
-const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'wodblok-pattern';return n+'.'+ext};
+const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'Untitled-project';return n+'.'+ext};   // 2.76.6: an untitled project's files are called Untitled-project
 const ser=()=>{const k=WBS.edMk;if(!k){WBS.edMk=true;upd()}try{return ser0()}finally{if(!k){WBS.edMk=false;upd()}}};
 // Knockouts repeat the same shape as a mask once per placement (about 1,300 copies in a busy piece: 10 MB of the 13 MB).
 // The saved, copied and exported picture keeps one copy of each identical mask and points the rest at it; the stage is untouched.
@@ -50,7 +61,12 @@ function init14(){
 $(p+'asp').oninput=()=>{const v=$(p+'asp').value;if(v=='x'){$(p+'asp').dataset.custom='1';$(p+'aw').focus();return}
 $(p+'asp').dataset.custom='';const a=ASP[k][+v];applyAsp(k,[a[1],a[2]])};
 const cu=()=>{const w=+$(p+'aw').value,h=+$(p+'ah').value;if(w>0&&h>0)applyAsp(k,[w,h])};$(p+'aw').oninput=$(p+'ah').oninput=cu;
-$(p+'swp').onclick=()=>{const a=k=='s'?shOf(WBS.tiles[WBS.cur]).s:WBS.dim[k];applyAsp(k,[a[1],a[0]])}});
+$(p+'swp').onclick=()=>{if(k=='c'&&physOf()){physSet({pw:WBS.dim.ph,ph:WBS.dim.pw});return}const a=k=='s'?shOf(WBS.tiles[WBS.cur]).s:WBS.dim[k];applyAsp(k,[a[1],a[0]])}});
+$('cun').oninput=()=>{const u=$('cun').value,P=physOf();if(!u){physSet({u:''});return}
+ // a new unit keeps the size the canvas has (converted), or starts from 8 inches across at 300 DPI at the canvas's ratio
+ const dpi=P?P.dpi:300,c=WBS.dim.c||[CW,CH],iw=P?P.inW:8,ih=P?P.inH:8*c[1]/c[0],from=v=>u=='px'?Math.round(v*dpi):u=='mm'?+(v*25.4).toFixed(1):+v.toFixed(3);physSet({u,dpi,pw:from(iw),ph:from(ih)})};
+const phIn=()=>{const w=+$('cpw').value,h=+$('cph').value;if(w>0&&h>0&&h/w<=5&&w/h<=5)physSet({pw:w,ph:h})};$('cpw').onchange=$('cph').onchange=phIn;
+$('cdpi').onchange=()=>{if(physOf())physSet({dpi:+$('cdpi').value||300})};
 $('skind').onclick=e=>{const b=e.target.closest('[data-k]');if(b&&b.dataset.k!=SK)applyAsp('s',null,{k:b.dataset.k})};
 $('shor').oninput=()=>applyAsp('s',null,{o:$('shor').value});
 $('shz').oninput=()=>{shOf(WBS.tiles[WBS.cur]).z=+$('shz').value;store();upd()};
@@ -61,4 +77,4 @@ $('let').oninput=()=>{WBS.tiles[WBS.cur].et=+$('let').value;store();upd()};$('le
 $('cpy').onclick=async()=>{try{await clipboard.writeText(ser());say('SVG copied.')}catch(e){say('Copy was blocked here.')}};
 // 2.21.0: the quick PNG and SVG buttons are made by the Export recipes code (43), so a quick file and a recipe's file are made the same way
 }
-export {LY,canMove,expName,ser,syncAsp,init14};
+export {syncPhys,LY,canMove,expName,ser,syncAsp,init14};

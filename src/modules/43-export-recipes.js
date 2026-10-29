@@ -2,12 +2,13 @@ import {ICN} from './00-icons.js';
 import {kv,use} from '../platform/index.js';
 import {zipSync} from '../vendor/fflate.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,physOf,tileOn,tileRk} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
 import {wmGet,wmSet,wmReady,wmDraw} from './56-watermark.js';
 import {ltMake} from './87-library-tree.js';
+import {pdfJpeg} from './30-print-cover.js';
 // ===== Export recipes =====
 // A recipe is a saved set of export settings: format, long side in pixels, TIFF DPI, and file-name ending.
 // Click a recipe to export with it. "Export all" makes every recipe in one zip. With more than one colourway, "Colourways: All" makes each
@@ -55,14 +56,21 @@ const frames=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(
 // run fn once per colourway (each one showing in turn), then put back the one that was showing
 async function xrWays(all,fn){const o=WBS.proj;if(!all||o.cw.length<2)return fn(null);const keep=o.cwa;WBX.wbNoCap=1;
   try{for(let i=0;i<o.cw.length;i++){o.cwa=i;upd();await frames();await fn(o.cw[i])}}finally{const q=WBS.proj;q.cwa=Math.min(keep,q.cw.length-1);upd();await frames();WBX.wbNoCap=0}}
+// 2.76.6: one repeat unit (r.rep): a grid repeat is the tile itself; a brick repeat is two rows (the second moved half a tile across, cut at the sides); a half drop is two
+// columns (the second moved half a tile down, cut at the top and bottom). Laid side by side, the unit repeats with no seam. xrUnit is its size, xrPlaces where the tile is drawn in it.
+const xrUnit=(r,w,h)=>r.rep=='brick'?[w,2*h]:r.rep=='half'?[2*w,h]:[w,h];
+const xrPlaces=(r,w,h)=>r.rep=='brick'?[[0,0],[-w/2,h],[w/2,h]]:r.rep=='half'?[[0,0],[w,-h/2],[w,h/2]]:[[0,0]];
 // the picture itself, as a Blob
 function xrRender(r){return(r.fmt!='svg'&&wmGet()?wmReady():Promise.resolve()).then(()=>xrRender0(r))}
 function xrRender0(r){
   return new Promise((res,rej)=>{
     if(r.fmt=='svg')return res(new Blob([ser()],{type:'image/svg+xml'}));
-    const [w,h]=xrDims(xrPx(r.px));if(w*h>XR_AREA)return rej(new Error('That size is too large for this browser. Try a smaller long side.'));
+    const [w,h]=r.w>0&&r.h>0?[Math.round(r.w),Math.round(r.h)]:xrDims(xrPx(r.px)),U=xrUnit(r,w,h);if(U[0]*U[1]>XR_AREA)return rej(new Error('That size is too large for this browser. Try a smaller size.'));
     const img=new Image();
-    img.onload=()=>{try{const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d',{willReadFrequently:r.fmt=='tiff'});if(r.fmt=='jpg'||r.fmt=='tiff'){ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h)}ctx.drawImage(img,0,0,w,h);if(wmGet())wmDraw(ctx,w,h);if(r.fmt=='tiff'){const im=ctx.getImageData(0,0,w,h);res(xrTiff(im.data,w,h,r.dpi||300));return}c.toBlob(b=>b?res(b):rej(new Error('The picture could not be made at that size.')),r.fmt=='jpg'?'image/jpeg':'image/png',.92)}catch(e){rej(e)}};
+    img.onload=()=>{try{const[W,H]=U,c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d',{willReadFrequently:r.fmt=='tiff'});if(r.fmt=='jpg'||r.fmt=='tiff'||r.fmt=='pdf'){ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H)}
+      xrPlaces(r,w,h).forEach(([x,y])=>ctx.drawImage(img,x,y,w,h));if(wmGet())wmDraw(ctx,W,H);if(r.fmt=='tiff'){const im=ctx.getImageData(0,0,W,H);res(xrTiff(im.data,W,H,r.dpi||300));return}
+      if(r.fmt=='pdf'){c.toBlob(async b=>{if(!b)return rej(new Error('The picture could not be made at that size.'));try{res(new Blob([pdfJpeg(new Uint8Array(await b.arrayBuffer()),W,H,{W:r.inW||W/300,H:r.inH||H/300,b:0})],{type:'application/pdf'}))}catch(e){rej(e)}},'image/jpeg',.95);return}
+      c.toBlob(b=>b?res(b):rej(new Error('The picture could not be made at that size.')),r.fmt=='jpg'?'image/jpeg':'image/png',.92)}catch(e){rej(e)}};
     img.onerror=()=>rej(new Error('The picture could not be made.'));
     img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser());
   });
@@ -85,8 +93,11 @@ const xrCfg=()=>({p:'rc',word:'recipe',words:'recipes',ui:XR_UI,rows:true,export
 function init43(){
   XRT=ltMake(xrCfg());XRT.init();$('xrpane').innerHTML=XRT.paneHtml();
   const px=$('xrpx'),sfx=$('xrsfx'),nm=$('xrn'),wmEl=$('xrwm');wmEl.checked=wmGet();wmEl.addEventListener('change',()=>wmSet(wmEl.checked));let fmt='png',dpi=300,all=false,busy=false;const dpiEl=$('xrdpi'),dpiRow=$('xrdpirow');
-  const cur=()=>({fmt,px:xrPx(px.value),sfx:sfx.value.trim(),...(fmt=='tiff'?{dpi:+(dpiEl&&dpiEl.value)||300}:{})});
-  function dims(){const r=cur();$('xrd').textContent=fmt=='svg'?'Vector, any size':xrDims(r.px).join(' × ')+' px';px.disabled=fmt=='svg';wmEl.disabled=fmt=='svg';if(dpiRow)dpiRow.hidden=fmt!='tiff'}
+  // 2.76.6: Print size (offered when the canvas has a physical size) exports at that size and resolution instead of a long side
+  const psEl=$('xrps'),psOn=()=>!!physOf()&&psEl.checked&&fmt!='svg';
+  const cur=()=>{if(psOn()){const P=physOf();return{fmt,px:Math.max(P.pxW,P.pxH),w:P.pxW,h:P.pxH,sfx:sfx.value.trim(),...(fmt=='tiff'?{dpi:P.dpi}:{})}}return{fmt,px:xrPx(px.value),sfx:sfx.value.trim(),...(fmt=='tiff'?{dpi:+(dpiEl&&dpiEl.value)||300}:{})}};
+  function dims(){const P=physOf();$('xrpsr').hidden=!P||fmt=='svg';const r=cur(),ps=psOn();$('xrd').textContent=fmt=='svg'?'Vector, any size':(ps?[r.w,r.h]:xrDims(r.px)).join(' × ')+' px'+(ps&&fmt=='tiff'?' · '+P.dpi+' DPI':'');px.disabled=fmt=='svg'||ps;wmEl.disabled=fmt=='svg';if(dpiRow)dpiRow.hidden=fmt!='tiff'||ps;}
+  psEl.addEventListener('change',dims);
   function setFmt(f){fmt=f;$('xrf').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.f==f));dims()}
   $('xrf').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setFmt(b.dataset.f)});
   px.addEventListener('input',dims);px.addEventListener('change',()=>{px.value=xrPx(px.value);dims()});
@@ -122,11 +133,18 @@ function init43(){
   $('xrcw').addEventListener('click',e=>{const b=e.target.closest('button');if(b)scope(b.dataset.s)});
   WBX.wbXrScope=scope;WBX.wbXrUse=use1;WBX.wbXrExport=exportOne;
   const prevPaint=WBX.wbTrayPaint;WBX.wbTrayPaint=f=>{if(prevPaint)prevPaint(f);ways$()};
-  new MutationObserver(()=>{ways$();if(!document.querySelector('section.pn[data-p="xrec"]').hidden)paint(true)}).observe(document.querySelector('section.pn[data-p="xrec"]'),{attributes:true,attributeFilter:['hidden']});
+  new MutationObserver(()=>{ways$();if(!document.querySelector('section.pn[data-p="xrec"]').hidden){paint(true);dims()}}).observe(document.querySelector('section.pn[data-p="xrec"]'),{attributes:true,attributeFilter:['hidden']});
   
   $('xrnow').onclick=()=>exportOne(cur());
   $('png').onclick=()=>exportOne({fmt:'png',px:Math.max(CW,CH)*3,sfx:''});   // Quick: PNG at 3x the canvas, SVG as it is; the same render, watermark and save as a recipe
   $('sv').onclick=()=>exportOne({fmt:'svg',px:2048,sfx:''});
+  // 2.76.6: the repeat unit (repeat tile only) at the canvas's physical size and resolution, else at the long side above; a PDF of the artwork at its physical size
+  // (else 11 inches on the long side at 300 DPI)
+  const sizeNow=()=>{const P=physOf();if(P)return{w:P.pxW,h:P.pxH,dpi:P.dpi,inW:P.inW,inH:P.inH};const[w,h]=xrDims(xrPx(px.value));return{w,h,dpi:+(dpiEl&&dpiEl.value)||300}};
+  const repeatOne=f=>{if(!tileOn())return pmsg('The repeat unit is made from a repeat tile: Canvas > Format > Repeat tile.');exportOne({fmt:f,...sizeNow(),sfx:'repeat',rep:tileRk()})};
+  $('xrrp').onclick=()=>repeatOne('png');$('xrrt').onclick=()=>repeatOne('tiff');
+  $('xrpdf').onclick=()=>{const P=physOf();if(P)return exportOne({fmt:'pdf',w:P.pxW,h:P.pxH,inW:P.inW,inH:P.inH,sfx:''});const k=3300/Math.max(CW,CH),w=Math.round(CW*k),h=Math.round(CH*k);exportOne({fmt:'pdf',w,h,inW:w/300,inH:h/300,sfx:''})};
+  WBX.wbXrDims=dims;
   $('xrall').onclick=exportAll;
   $('xrsave').onclick=()=>{
     const d=xrDb();let name=nm.value.trim().slice(0,40);if(!name)name='Recipe '+(d.t.length+1);

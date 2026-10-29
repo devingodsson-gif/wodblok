@@ -45,6 +45,18 @@ const hEsc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 let STV=null;const stvOn=()=>!!STV;
 function stvSet(w,h){STV=w?[w,h]:null;setDim()}
 const tileOn=()=>!STV&&!!WBS.dim.rt&&!WBS.book.on;
+// 2.76.6: how the repeat tile repeats (dim.rk): 'grid' (side by side), 'brick' (every row moved half a tile across) or 'half' (half drop: every column moved half a tile down).
+// The tile's neighbours are i * a + j * b on that lattice; tileOffs(r) lists them for i, j from -r to r, without the tile itself.
+const tileRk=()=>WBS.dim.rk=='brick'||WBS.dim.rk=='half'?WBS.dim.rk:'grid';
+function tileOffs(r=1){const k=tileRk(),o=[];for(let i=-r;i<=r;i++)for(let j=-r;j<=r;j++){if(!i&&!j)continue;o.push(k=='brick'?[i*CW+j*CW/2,j*CH]:k=='half'?[i*CW,j*CH+i*CH/2]:[i*CW,j*CH])}return o}
+// 2.76.6: a canvas can have a physical size (dim.u: 'px', 'in' or 'mm'; dim.pw, dim.ph in that unit; dim.dpi), so it prints and exports at that size; its ratio is dim.c.
+// physOf() is null for a canvas that only has a ratio, else its size in pixels at its DPI and in inches.
+const PHU={px:'px',in:'in',mm:'mm'};
+function physOf(d=WBS.dim){if(!d||!PHU[d.u]||!(+d.pw>0)||!(+d.ph>0))return null;const dpi=Math.max(30,Math.min(1200,+d.dpi||300)),toIn=v=>d.u=='px'?v/dpi:d.u=='mm'?v/25.4:v;
+ const iw=toIn(+d.pw),ih=toIn(+d.ph);return{u:d.u,w:+d.pw,h:+d.ph,dpi,inW:iw,inH:ih,pxW:Math.max(1,Math.round(d.u=='px'?+d.pw:iw*dpi)),pxH:Math.max(1,Math.round(d.u=='px'?+d.ph:ih*dpi))}}
+// a length on the canvas (canvas units) in the canvas's own unit, and back; null without a physical size
+const physLen=v=>{const P=physOf();return P?v/CW*P.w:null};
+const physToCv=v=>{const P=physOf();return P?v/P.w*CW:null};
 const tileExt=()=>tileOn()?[Math.min(CW,48),Math.min(CH,48)]:[0,0];   // 2.66.2: the 3 x 3 view is a picture of the tile (44-repeat-tile.js), so the drawing is the same with it on
 const setDim=()=>{['cs','cr','n','co','g','cp'].forEach(x=>{if(x in WBS.dim)delete WBS.dim[x]});useG(geom(WBS.dim));try{useT(WBS.tiles[WBS.cur])}catch(e){}
 if(STV){CW=STV[0];CH=STV[1]}else if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims()};
@@ -166,4 +178,4 @@ CM=Object.fromEntries(C);
 PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return[WADA_NAMES[i]||'No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj=trayDefault();try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 }
-export {hEsc,stFreeNm,stNm,stNmId,stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
+export {hEsc,physLen,physOf,physToCv,PHU,tileOffs,tileRk,stFreeNm,stNm,stNmId,stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
