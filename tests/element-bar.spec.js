@@ -16,8 +16,8 @@ const canvasClick = async (page, fx, fy) => {
 test('the element bar has one button per kind, left of centre; the tray starts right of centre', async ({ page }) => {
   const { errors } = await openApp(page);
   const btn = page.locator('#elb .elbb');
-  await expect(btn).toHaveCount(6);   // 2.26.0: Select (V) comes first again; still no Image button
-  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Paint', 'Shape', 'Text', 'Stamp', 'Pattern', 'Sheet']);
+  await expect(btn).toHaveCount(7);   // 2.26.0: Select (V) comes first again; 2.75.0: the Image button is back (after Shape)
+  expect(await btn.evaluateAll(bs => bs.map(b => b.getAttribute('aria-label')))).toEqual(['Paint', 'Shape', 'Image', 'Text', 'Stamp', 'Pattern', 'Sheet']);
   await expect(page.locator('#elb [data-k="paint"]')).toBeHidden();   // the brush is put away for now
   for (const pn of ['stmp', 'layers']) await expect(page.locator(`.rail [data-pn="${pn}"]`)).toBeHidden();   // element panels have no rail button
   const vb = await page.locator('.viewbar').boundingBox(), el = await page.locator('#elb').boundingBox(), ty = await page.locator('#tyc').boundingBox();
@@ -34,7 +34,6 @@ test('a bar button opens its panel and Add there makes the element, just above t
   await noPattern(page);
   const kinds = async () => JSON.parse(await getState(page)).els.map(q => q.k);
   await expect(page.locator('#elb .elbb[aria-pressed="true"]')).toHaveCount(0);   // no tool in hand
-  await expect(page.locator('#elb [data-k="image"]')).toHaveCount(0);    // there is no Image button
   await page.click('#elb [data-k="pattern"]'); await settle(page);
   expect(await kinds()).toEqual([]);                      // the button makes nothing
   await expect(page.locator('#elb [data-k="pattern"]')).toHaveAttribute('aria-pressed', 'true');
@@ -71,7 +70,7 @@ test('the Stamp button arms the stamp at once (2.26.0) and opens the Stamp prope
   expect(errors).toEqual([]);
 });
 
-test('Import image with nothing picked makes a Rectangle motif filled with the picture; the Fill group shows it', async ({ page }, testInfo) => {
+test('Import image with nothing picked makes an Image of the picture (2.75.0; it made a Rectangle motif filled with it); the Image panel shows it', async ({ page }, testInfo) => {
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   const f = path.join(testInfo.outputDir, 'dot.png');
@@ -81,9 +80,10 @@ test('Import image with nothing picked makes a Rectangle motif filled with the p
   await settle(page);
   const els = JSON.parse(await getState(page)).els;
   expect(els).toHaveLength(1);
-  expect(els[0]).toMatchObject({ k: 'motif', fl: 'img' });
+  expect(els[0]).toMatchObject({ k: 'image' });
   expect(els[0].a).toBeTruthy();
-  await expect(page.locator('#mf_fk [data-f="img"]')).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('#lfars [data-a]')).toHaveCount(1);
+  await expect(page.locator('section.pn[data-p="image"]')).toBeVisible();
+  await page.keyboard.press('Escape'); await settle(page);
+  await expect(page.locator('#impane .pctr button[data-pc]')).toHaveCount(1);   // the Pictures library lists it
   expect(errors).toEqual([]);
 });

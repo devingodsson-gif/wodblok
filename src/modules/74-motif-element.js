@@ -103,4 +103,4 @@ function init74(){
  // picking a library shape while a Motif element is selected changes that element's shape
  WBX.wbMotifSwap=m=>{if(WBS.brush)return false;const L=fpL(),q=L&&(L.pl||[]).find(x=>String(x.u)===String(WBS.fpSel));if(!q||q.k!='motif')return false;q.m=m;mtLast=m;store();upd();if(WBX.wbCap)WBX.wbCap();return true};
 }
-export {FLT_I,FLT_S,FLT_U,init74,mtfLayer,mtDraw,mtPaper,mtPic};
+export {FLT_I,FLT_S,FLT_U,init74,mtfLayer,mtDraw,mtPaper,mtPic,mtTurned};

@@ -88,5 +88,7 @@
  "91-effect-popout.js",
  "92-pattern-tiling.js",
  "93-randomize-looks.js",
- "94-image-crop.js"
+ "94-image-crop.js",
+ "95-image-element.js",
+ "96-picture-library.js"
 ]

@@ -49,9 +49,10 @@ function mfSync(){if(!$('mf_f'))return;const T=mfT();MF_G.forEach(id=>mfVis(id,!
  if(sh){if(WBX.wbPaintWells)WBX.wbPaintWells();return}
  const so=+p.sw>0,oc=$('mf_oon');if(oc.checked!==so)oc.checked=so;mfVis('mf_owr',so);mfVis('mf_ocr',so);if(so)mfVal('mf_ow',Math.round(+p.sw));
  if(WBX.wbPaintWells)WBX.wbPaintWells()}
-// a picture: the picked motifs take it; with nothing picked it makes a Rectangle motif the shape of the picture, filled with it (Import image, Use a project)
+// a picture: the picked motifs take it; with nothing picked it makes an Image of it (2.75.0; before, a Rectangle motif the shape of the picture, filled with it) (Import image, Use a project)
 function mfImage(id){const A=WBS.ARTS[id];if(!A)return;const T=mfT();
  if(T){T.list.forEach(q=>{q.fl='img';q.a=id});mfCh();mfSync();return}
+ if(WBX.wbImageAdd){WBX.wbImageAdd(id);return}
  if(!fpL())return;const S=Math.min(CW,CH)*.5,r=A.h/A.w,q=abInsert({u:fpU(),k:'motif',m:basicKey('rect')||'b0',x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:+(r>1?S/r:S).toFixed(1),wy:+r.toFixed(4),r:0,f:1,fl:'img',a:id});
  if(q){mfCh();if(WBX.wbElSeen)WBX.wbElSeen(q.u);if(WBX.wbOpenPanel)WBX.wbOpenPanel('motifs')}}
 
