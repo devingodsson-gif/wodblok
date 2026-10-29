@@ -27,8 +27,9 @@ function imVis(p,A){const c=Array.isArray(p.ic)?p.ic.map(v=>Math.max(0,Math.min(
 function imPath(pc,A){if(!Array.isArray(pc)||pc.length<3)return'';const P=pc.map(q=>q.map((v,i)=>(+v||0)*(i%2?A.h:A.w)));let d=`M${imF(P[0][0])} ${imF(P[0][1])}`;
  for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];d+=`C${imF(a[4])} ${imF(a[5])} ${imF(b[2])} ${imF(b[3])} ${imF(b[0])} ${imF(b[1])}`}return d+'Z'}
 // one image in its own frame (middle at 0, 0, not turned): {defs, body}. id: a prefix for its definitions; seen: the pictures already defined
+// the picture is written as its data address (2.76.2): a print made once and every export are separate documents, which cannot load the page's blob address
 function imDraw(p,A,id,seen){const s=Math.max(1,+p.s||100),w=s*(+p.wx||1),h=s*(+p.wy||1),V=imVis(p,A),aid='ima_'+String(p.a).replace(/[^\w-]/g,'');let defs='';
- if(!seen||!seen.has(aid)){if(seen)seen.add(aid);defs+=`<image id="${aid}" href="${artBU(A)}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none"/>`}
+ if(!seen||!seen.has(aid)){if(seen)seen.add(aid);defs+=`<image id="${aid}" href="${A.src}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none"/>`}
  const d=imPath(p.pc,A),fe=Math.max(0,Math.min(100,+p.fe||0)),cut=V.c.some(v=>v>0),R=`x="${imF(V.x)}" y="${imF(V.y)}" width="${imF(V.w)}" height="${imF(V.h)}"`;let pic=`<use href="#${aid}"/>`;
  // feather: the kept part's edge (the points, else the rectangle) through a blur, as a mask; without it a clip
  if(fe>0){const sd=fe/100*.06*Math.min(V.w,V.h),m=sd*3;defs+=`<filter id="${id}fb" filterUnits="userSpaceOnUse" x="${imF(-m)}" y="${imF(-m)}" width="${imF(A.w+2*m)}" height="${imF(A.h+2*m)}"><feGaussianBlur stdDeviation="${imF(sd)}"/></filter>`+
