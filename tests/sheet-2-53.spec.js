@@ -119,7 +119,7 @@ test('Sheets are saved and opened as they are (format 28); a file from an older 
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wb-sheet-')), f = path.join(dir, 'sheets.wodblok'); fs.writeFileSync(f, Buffer.from(dl.base64, 'base64'));
   const { unzipSync, strFromU8, zipSync, strToU8 } = require('fflate');
   const files = unzipSync(new Uint8Array(fs.readFileSync(f))), proj = JSON.parse(strFromU8(files['project.json']));
-  expect(proj.v).toBe(29);
+  expect(proj.v).toBe(30);
   await H.openProjectFile(page, f);
   expect((await st(page)).els.map(q => ({ k: q.k, n: q.n, fl: q.fl, fx: (q.fx || []).map(e => e.k) }))).toEqual(before);
   // the same file marked as format 27 is refused
