@@ -2,7 +2,7 @@
 
 Owner, Oct 29 2026: "WODBLOK is primarily a pattern making tool. What are some improvements or additions we could make for the patterning to be more useful and prevalent", then "make a plan that encompasses everything you just mentioned, plus all the items that would improve the user experience from the test before" (the 2.76 review: Project doc `claude/wodblok-review-2.76.md`; bugs B1 to B4 were fixed in 2.76.2).
 
-Status: **plan only.** Nothing is built. The owner answered on Oct 29 2026 (below); three questions are still open. Items marked **(define)** have never been done in WODBLOK: by CLAUDE.md the owner defines them before they are built.
+Status: **plan only.** Nothing is built. The owner answered every question on Oct 29 2026 (below). Mockups are shelved for later.
 
 ## What patterns already do (2.76.2)
 - Tiling by a tile shape (From stamp, Square, Hexagon, Triangle, Diamond, Circle, Octagon) with 19 arrangements; Size, Spacing, Rotate, Shift (92-pattern-tiling.js).
@@ -73,14 +73,13 @@ Step 1, the Looks, is live (2.74.1). The rest, which the owner answered on Oct 2
 - Tests: pieces only inside the outline, follow the outline when it moves; density follows a two-tone picture. `npm run perf`. Suite: about 70%.
 
 ### Step 7 — 2.76.10: Editing pieces, and patterns of patterns
-- **(define) Edit one piece:** click a piece to remove it, swap its source, recolour it or move it; the rest stays generated, and the change is kept when Size or Spacing changes (a piece is known by its place).
+- **Edit one piece** (owner: "whatever you think is right", plus making it its own element): click a piece to delete it, swap it for another source, recolour it, or move and turn it; the rest stays generated, and the change is kept when Size or Spacing changes (a piece is known by its place). **Make into its own element:** the piece leaves the pattern and becomes an ordinary Stamp element (a Motif or Text for those sources) at the same place, size, turn and colour, one history step; its place in the pattern stays empty.
 - **A pattern as a source** of another pattern.
 - **An accent layer:** a second set of pieces between the main ones (what Randomize's accents do today), set by hand.
 - Tests: an edited piece survives a Size change and Undo; nesting draws; accents sit between pieces. Suite: about 70% (the file format if piece edits are stored).
 
-### Step 8 — 2.76.11: Patterns library and mockups
+### Step 8 — 2.76.11: Patterns library
 - **Patterns library:** saved patterns reused across projects, on the shared library tree (`ltMake`: folders, Move to, Export, Import), like stamps, trays and colourways.
-- **(define) Mockup preview:** the repeat shown on fabric, wallpaper, wrapping paper or a book, at real scale (needs the physical size from step 3).
 - Tests: save, reuse in a new project, export and import the library. Suite: about 40%.
 
 ### Step 9 — 2.76.12: For experienced users
@@ -99,8 +98,6 @@ Step 1, the Looks, is live (2.74.1). The rest, which the owner answered on Oct 2
 3. Once starter templates exist, the template picker opens at launch again ("yes"; step 5 turns Settings > General > Templates at launch on by default and rewrites the Never-break rule in CLAUDE.md).
 4. Starter stamps: drawn from the built-in shapes for now ("yeah sure draw them for now").
 5. Density from a picture: both bigger and smaller pieces and fewer pieces ("both, the more variety the better").
-
-## Still open (asked again in plainer words, Oct 29 2026)
-6. Editing one piece (step 7): when you click one piece of a pattern, which can you do: delete it, swap it for another stamp, recolour it, move or turn it? (Suggested: all four.)
-7. Mockups (step 8): a preview of the pattern on a real object (a tote bag, a wall, wrapping paper, a book). Which objects, and drawn by Claude or from your photos? (Suggested: three or four drawn ones; or drop mockups.)
-8. The project title: a new file is called "Untitled pattern" in the top bar, but a file is a whole project (patterns, stamps, text). Change it to "Untitled project", or keep it? (Suggested: "Untitled project".)
+6. Editing one piece: "whatever you think is right", so all four (delete, swap, recolour, move and turn), and also making a piece its own Stamp element.
+7. Mockups: "ignore mockups for now and shelve it for later". Out of this plan; kept under Suggestions in docs/PROJECT_STATUS.md.
+8. The project title: "Untitled project" ("Untitled Project is fine").
