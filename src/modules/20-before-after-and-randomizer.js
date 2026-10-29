@@ -14,6 +14,7 @@ import {txMerge} from './17-texture-panel-and-previews.js';
 import {coreStr,pmsg} from './18-projects-and-cover-overlay.js';
 import {wbHold} from './19-randomize-and-hold.js';
 import {fpU} from './24-free-place-layers.js';
+import {fpHid,fpWH} from './25-art-layers.js';
 import {SL,libColors,libMotifs} from './27-stamp-library.js';
 import {RZL,RZ_FRAME,RZ_NAMES,rzLay,rzLookPick,rzRoles} from './93-randomize-looks.js';
 import {rzEffectsEls,rzFrameEls,rzFx,rzLayoutEls,rzMainEls,rzPressEls} from './71-randomize-elements.js';
@@ -123,7 +124,17 @@ if(LOOK&&RZL[LOOK]){const own0=OWN?OWN.own:flatEls(WBS.layers),bgq=own0.find(p=>
  const cvU=!FT.tx?JSON.parse(JSON.stringify(WBS.tex)).u.filter(u=>u.md!='wear'):res.tex?paperTex(res.tex):[];
  const GL={warm:()=>({tp:ri(12,28),tn:ri(0,8),fd:ri(4,16)}),fade:()=>({fd:ri(14,32),ct:-ri(0,10),sat:-ri(5,20)}),punch:()=>({ct:ri(8,22),vib:ri(8,24),sh:-ri(0,10)}),none:()=>({})};
  WBX.wbTxBusy=(WBX.wbTxBusy||0)+1;WBX.wbRollHold=tok;
- const done=lt=>{if(tok!==WBX.wbRndTok)return;WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;WBS.selL=0;
+ // 2.76.2 (owner Oct 29 2026, review): your own elements stay where they are and the roll keeps clear of them. Whatever the roll places on the canvas (words,
+ // emblems, stamps, a ring) is left out where it would touch one of yours; its Background, Sheets, frames, Patterns that fill the canvas and paths (they draw nothing) stay.
+ // a stamp's box from its stamp's outline: the roll's stamps are not in the project yet
+ const stWH=p=>{const tt=res.tiles.find(t=>t.id==p.t)||WBS.tiles.find(t=>t.id==p.t);if(!tt)return null;const G=geom(shOf(tt)),k=p.s/Math.max(G.SW,G.SH);return[G.SW*k*(p.wx||1),G.SH*k*(p.wy||1)]};
+ const rzBox=p=>{const wh=p.k=='stamp'?stWH(p):fpWH(p);if(!wh)return null;const r=(+p.r||0)*Math.PI/180,co=Math.abs(Math.cos(r)),si=Math.abs(Math.sin(r)),ex=(wh[0]*co+wh[1]*si)/2,ey=(wh[0]*si+wh[1]*co)/2,x=+p.x||0,y=+p.y||0,
+  b=[Math.max(0,x-ex),Math.max(0,y-ey),Math.min(CW,x+ex),Math.min(CH,y+ey)];return b[2]>b[0]&&b[3]>b[1]?b:null};
+ const behind=q=>q.bgd||q.nm=='Path'||q.k=='sheet'||q.k=='group'||RZ_FRAME.includes(q.nm)||q.k=='pattern'&&!q.mp&&(q.af||!(+q.aw>0)||!(+q.ah>0));
+ const ownB=OWN?OWN.own.filter(p=>!behind(p)&&!fpHid(OWN.own,p)).map(rzBox).filter(Boolean):[],gap=Math.min(CW,CH)*.02;
+ const onPath=q=>q.mp&&(q.k=='pattern'||q.tx)?els.find(z=>z.u==q.mp)||q:q;   /* a Pattern or words mapped to a shape take that shape's box */
+ const clear=q=>{if(!ownB.length||behind(q))return true;const b=rzBox(onPath(q));return!b||!ownB.some(o=>b[0]<o[2]+gap&&b[2]>o[0]-gap&&b[1]<o[3]+gap&&b[3]>o[1]-gap)};
+ const done=lt=>{if(tok!==WBX.wbRndTok)return;if(ownB.length){lt=(lt||[]).filter(clear);els=els.filter(clear)}WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;WBS.selL=0;
   const c={pg:{...WBS.pgrid},tiles:res.tiles,els:(OWN?[]:own0.filter(p=>p.bgd)).concat(own0.some(p=>p.bgd)?[]:[{u:fpU(),k:'sheet',n:'Background',ink:paper,bgd:1}],els,lt,top?[top]:[]),proj:{...P0},dim:WBS.dim,pr:{e:0,q:0,t:'',a:0,sc:100,sd:1},tex:{u:cvU,v:87,...(!FT.tx&&WBS.tex.off?{off:1}:{})}};
   RZFZ=new Set();(WBX.wbApply||applyCore)(c);WBS.selL=0;rzPut(OWN,null);
   if(WBX.wbGrade){const g0=WBX.wbGrade.get();let gl={};if(FT.gr)gl=(GL[res.grade]||GL.none)();else Object.keys(g0).forEach(k=>{if(k!='cov'&&k!='masks')gl[k]=g0[k]});
