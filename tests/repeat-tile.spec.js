@@ -1,6 +1,6 @@
 // Repeat tile canvas (Phase 5): a rectangle whose edges meet, so copies placed side by side show no seam.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, rzSet} = require('./helpers/harness');
 
 const roll = async page => { if (!(await page.locator('section.pn[data-p="rand"]:not([hidden])').count())) await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 60000 }); await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)')); };
 // the Background is on by default (a solid paper colour), so the artwork is measured on paper
@@ -108,14 +108,13 @@ for (const seed of [1, 2, 3, 4, 6]) {
   });
 }
 
-// With Layout, Canvas size and Layer opacity and blend switched on as well, a roll also makes layers that follow another layer's grid,
-// layers tinted by a layer colour mask, blends, and a different ratio. Roll 7 used to lose its whole first layer outside the middle tile.
+// With every Randomize switch on, a roll still repeats seamlessly (a Look that tiles; no filter effect or vignette, which do not wrap). Roll 7 used to lose its whole first layer outside the middle tile.
 for (const seed of [7, 12, 21]) {
   test(`seamless with more of Randomize switched on: roll ${seed}`, async ({ page }) => {
     const { errors } = await openApp(page, { seed });
     await tile(page);
     await openPanel(page, 'rand');
-    for (const k of ['layout', 'size', 'look']) await page.evaluate(k => { const c = document.querySelector(`[data-ft="${k}"]`); if (c.type === 'range') { c.value = 100; c.dispatchEvent(new Event('input', { bubbles: true })); } else if (!c.checked) { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); } }, k);
+    await rzSet(page, { size: true });   // 2.76.3: every switch on (Layout and Layer opacity and blend are gone; a repeat tile keeps its own size)
     await roll(page);
     const p = await periodic(page);
     expect(p.half, 'the piece has something in it').toBeGreaterThan(1);

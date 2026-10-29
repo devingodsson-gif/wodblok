@@ -1,6 +1,6 @@
 // 2.37.0: Fit to canvas and Stretch to canvas in a Shape's Align group; a Randomize roll that changes the canvas size refits the Background (2.53.0: a Sheet, which always covers the canvas).
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState, addShape } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, addShape, rzSet } = require('./helpers/harness');
 
 const st = async page => JSON.parse(await getState(page));
 const shapeOf = d => (d.els || []).find(q => q.k === 'motif' && !q.bgd);
@@ -73,7 +73,7 @@ test('the Fit buttons show for a selected shape, hide when nothing is selected, 
 test('a Randomize roll that changes the canvas size: the Background Sheet still covers the canvas', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 7, background: true });
   await openPanel(page, 'rand');
-  await page.evaluate(() => { document.querySelectorAll('[data-ft]').forEach(c => { if (c.type === 'checkbox' && c.checked) { c.checked = false; c.dispatchEvent(new Event('change', { bubbles: true })); } }); const c = document.querySelector('[data-ft="size"]'); if (c.type === 'range') { c.value = 100; c.dispatchEvent(new Event('input', { bubbles: true })); } else { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); } });
+  await rzSet(page, { size: true }, true);   // 2.76.3: only Canvas size is on, so a roll reworks the ratio
   // 2.53.0: the Background is a Sheet, which is always the whole canvas, so nothing is refitted
   const look = () => page.evaluate(() => { const a = document.getElementById('art'), v = a.viewBox.baseVal, s = JSON.parse(__wbTest.state()); return { cw: v.width, ch: v.height, bg: s.els.filter(q => q.bgd && q.k === 'sheet').length, full: [...a.querySelectorAll('rect')].some(r => r.getAttribute('x') === '0' && r.getAttribute('y') === '0' && Math.abs(+r.getAttribute('width') - v.width) < .02 && Math.abs(+r.getAttribute('height') - v.height) < .02) }; });
   let changed = 0;

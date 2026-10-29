@@ -13,7 +13,8 @@ import {TL_AR} from './92-pattern-tiling.js';
 // settings; the random results should look appealing, like a real image"). A roll first picks a Look, an art direction that decides the whole picture at once: which
 // elements it is made of, where they sit, which colour has which role, which fonts, how strong the finish is. 2.74.1 (owner Oct 28 2026: "they should look more or less
 // like finished art work ready to use, with all the features wodblok has to offer; a wide variety of possible outputs"): each Look has several layouts, built from shared
-// parts (grounds, fields, focal points, type, frames, finishes), and Repeat is a Look too. The old roll (20-before-after-and-randomizer.js) is left for a roll with Stamps off.
+// parts (grounds, fields, focal points, type, frames, finishes), and Repeat is a Look too. 2.76.3: every roll is a Look (the old roll is gone); with none of the
+// parts switched on, a roll reworks what is there (20-before-after-and-randomizer.js).
 // A Look is {w: how often it comes up, dark: it may sit on a dark ground, build(E)}. E is the roll's environment (20): the seeded helpers, the switches, the colour roles
 // and a texture maker. build returns {tiles, els (bottom to top), texts, tex: the canvas texture ('' none, or a texture kind), grade: a grade name, top: a finish effect}.
 
@@ -132,14 +133,15 @@ const rzSh=(k,s)=>({k,o:'p',s:s||[1,1],z:100});
 
 // --- shared parts
 // the ground: flat (the Background shows), a quiet tonal gradient, a radial glow, or a halftone gradient. Returns the colours a word over it must read against.
-function rzGround(E,out,kind){const R=E.roles,k=kind||E.pick(['flat','flat','tonal','glow','halftone']);
+// 2.76.3: with Background off in the Randomize panel the ground is always flat (the paper shows)
+function rzGround(E,out,kind){const R=E.roles,k0=kind||E.pick(['flat','flat','tonal','glow','halftone']),k=E.FT.bg&&!E.tile?k0:'flat';
  if(R.dark)out.els.push(elSheet('Ground',{ink:R.paper}));
  if(k=='flat')return[R.paper];
  const far=R.tone(E.rr(.12,.22),R.dark?R.light:E.ch(.5)?R.deep:R.ink),near=R.tone(E.rr(0,.04),R.light);
  if(k=='glow'){out.els.push(elGrad(E,near,far,true));return[near,far]}
  const g=elGrad(E,near,far,false);if(k=='halftone')addFx(g,rzQfx('halftone',{sz:E.ri(14,24),tone:E.ri(40,55),ang:E.pick([15,45,75]),spr:E.ri(25,45)},E));out.els.push(g);return[near,far]}
 // a quiet field: small shapes in a tone of the paper over the whole canvas (a Tiling or a Scatter)
-function rzField(E,out,o){o=o||{};const R=E.roles,ms=o.ms||[E.ch(.6)?rzSmall(E):E.pick(rzThemes(E,o.look||'poster'))],ink=o.ink||R.tone(E.rr(.1,.18)),lay=o.lay||E.pick(['tile','tile','scatter']);
+function rzField(E,out,o){if(!E.FT.pat)return null;o=o||{};const R=E.roles,ms=o.ms||[E.ch(.6)?rzSmall(E):E.pick(rzThemes(E,o.look||'poster'))],ink=o.ink||R.tone(E.rr(.1,.18)),lay=o.lay||E.pick(['tile','tile','scatter']);
  const p=patOf(o.n||'Field',[],lay,E.ri(6,10),E.ri(8,14),E.ri(25,45),[],E.ri(1,9999));p.src=ms.map(m=>rzWt(m)>1500?rzSolo(E,out,m,ink):{k:'motif',m,w:1,ink});
  if(lay=='tile'){p.ts=E.pick(['square','hex','diamond']);p.ar=E.pick((TL_AR[p.ts]||[['grid']]).map(x=>x[0]));p.ps=+(o.ps||E.rr(2.5,5)).toFixed(1);p.sp=E.ri(140,320);p.ds='cycle'}else{p.cn=E.ri(5,8);p.rn=E.ri(7,11);p.sz=E.ri(20,40);p.ds='random'}
  if(E.ch(.3)&&E.FT.jit&&lay=='scatter')addFx(p,fxJ(0,E.ri(10,40),E.ri(5,25)));out.els.push(p);return p}
@@ -154,7 +156,9 @@ function rzCorners(E,m,mk,s,ink){return[[m,m,0],[CW-m,m,90],[CW-m,CH-m,180],[m,C
 // a ring of pieces round a circle (Map to shape: a pattern that follows a path): a wreath of leaves, a ring of dots or rays
 function rzRing(E,out,x,y,d,src,ink,o){o=o||{};const P=elPath('ellipse',x,y,d,d);out.els.push(P);const p=patOf(o.n||'Ring',[],'scatter',4,4,o.sz||60,[],1);p.src=[].concat(src).map(m=>rzWt(m)>1500&&!o.look?rzSolo(E,out,m,ink):{k:'motif',m,w:1,ink,...(o.look||{})});p.mp=P.u;p.mm='on';p.mc=o.mc||24;p.mo=0;p.rt=o.rt||0;p.ds='cycle';p.af=1;out.els.push(p);return p}
 // the focal point in a box w by h at x, y: an emblem (a stamp), a silhouette (one big motif), a wreath round a motif, or a disc behind a silhouette
-function rzFocal(E,out,look,x,y,w,h,ink,kind,o){o=o||{};const R=E.roles,mains=rzPool(E,look,3),d=Math.min(w,h),k=kind||E.pick(['emblem','silhouette','silhouette','wreath','disc']);
+// every element a focal point makes is marked as one (_p), so the Focal point switch can leave it out (2.76.3); the mark is taken off before the roll is applied
+function rzFocal(E,out,...a){const n=out.els.length,k=rzFocal0(E,out,...a);out.els.slice(n).forEach(q=>q._p='focal');return k}
+function rzFocal0(E,out,look,x,y,w,h,ink,kind,o){o=o||{};const R=E.roles,mains=rzPool(E,look,3),d=Math.min(w,h),k=kind||E.pick(['emblem','silhouette','silhouette','wreath','disc']);
  if(k=='emblem'){const t=rzTile(E,out.tiles.length+1,rzSh(E.pick(['circle','circle','hex','rect','diamond'])),E.pick(['emblem','center','center','rosette','star']),mains,[rzSmall(E)],ink,{c2:E.ch(.35)?R.blk([ink,...(o.bg||[R.paper])],1.4,[ink]):'',edge:E.ch(.35)});out.tiles.push(t);
   out.els.push(addFx(elStamp(t,x,y,d,0),o.fx!==false?rzInkFx(E,R):null,E.ch(.3)&&E.FT.pr?fxP(E.ri(1,4),0):null));return k}
  if(k=='disc'){const dc=o.disc||R.blk(o.bg||[R.paper],1.3,[ink]),dd=d*E.rr(.85,1);out.els.push(addFx(elBox('ellipse',x,y-d*.04,dd,dd,{ink:dc,nm:'Disc'}),E.ch(.4)?rzQfx('rough',{amt:E.ri(4,10),sz:E.ri(20,40)},E):null));
@@ -248,7 +252,7 @@ RZL.specimen={w:.9,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.07,.1),o
 
 // Modern: shapes and type in the manner of a modern print. Layouts: Shapes (a few big shapes set on a grid, overprinted), Tiles (a clean grid of shapes in two or three inks),
 // Bands (stripes of colour), Circles (rings and discs), with a bold title
-RZL.modern={dark:1,w:1,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.06,.08),out={tiles:[],els:[],texts:[]},lay=E.pick(['shapes','shapes','tiles','bands','circles','bigtype']);
+RZL.modern={dark:1,w:1,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.06,.08),out={tiles:[],els:[],texts:[]},lay=E.pick(['shapes','shapes',...(E.FT.pat?['tiles']:[]),'bands','circles','bigtype']);
  const gnd=rzGround(E,out,E.pick(['flat','flat','flat','tonal'])),inks0=[...R.acc,R.ink].filter(c=>R.lo(c,gnd)>=1.35),inks=inks0.length?inks0.slice(0,3):[R.ink],[ti,sub]=E.pick(RZW.modern),tf=rzFont(E,RZF.modern[0]),sf=rzFont(E,RZF.modern[1]);
  const typeTop=E.ch(.4),th=S*E.rr(.13,.19),tH=th+S*.1,gap=S*.06,ax=typeTop?tH+m+gap:m,ay=typeTop?CH-m:CH-tH-m-gap,aH=ay-ax,cy=ax+aH/2,ink=R.txt(gnd,R.ink),bl=R.dark?'screen':'multiply';
  // Shapes: a grid of cells over the picture's part of the canvas, most holding one basic shape (a disc, a square, a triangle turned, a ring), and one large
@@ -291,7 +295,7 @@ RZL.sun={w:.9,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],te
 
 // Quilt: rolled square blocks set as a quilt. Layouts: Blocks (two blocks turned, pinwheeled, mirrored), Sashing (blocks with strips between), Medallion (a centre block in a
 // border of small ones), with a binding round the edge and sometimes a label
-RZL.quilt={w:.8,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.04,.06),out={tiles:[],els:[],texts:[]},lay=E.pick(['blocks','blocks','sashing',...(CH>=CW*.9?['medallion']:[])]),mains=rzPool(E,'quilt',3);
+RZL.quilt={w:.8,need:'pat',build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.04,.06),out={tiles:[],els:[],texts:[]},lay=E.pick(['blocks','blocks','sashing',...(CH>=CW*.9?['medallion']:[])]),mains=rzPool(E,'quilt',3);
  const gnd=rzGround(E,out,'flat'),c1=R.txt(gnd,R.ink),c2=R.blk(gnd,1.8,[c1]),a=rzTile(E,1,rzSh('rect'),E.pick(['quad','mirror','center','star']),mains,[rzSmall(E)],c1,{edge:E.ch(.6),c2:E.ch(.4)?c2:''}),b=rzTile(E,2,rzSh('rect'),E.pick(['center','rosette','quad']),mains,[rzSmall(E)],c2,{edge:E.ch(.6)});out.tiles.push(a,b);
  // a patch of cloth: a block printed solid with its motifs carved out (Invert), so the quilt reads as coloured squares
  if(E.ch(.6)){a.neg=true;a.items.forEach(q=>delete q.ic)}if(E.ch(.4))b.neg=true;
@@ -308,7 +312,8 @@ RZL.quilt={w:.8,build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.04,.06),out
 // and the canvas texture give the printed feel.)
 // Repeat: a seamless all-over pattern, like wallpaper or cloth. Layouts: Wallpaper (one stamp in a half drop, brick, turned or mirrored set, with a small filler between),
 // Pair (two stamps alternating), Stripe (rows of motifs between bands), Toile (scattered motifs in one ink, turned this way and that)
-RZL.repeat={w:1.4,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},lay=E.pick(['wallpaper','wallpaper','pair','stripe','toile','damask']),mains=rzPool(E,'repeat',3);
+// On a repeat tile (E.tile) the bands of Stripe would meet at the tile's edges out of step, so Stripe is not used there
+RZL.repeat={w:1.4,need:'pat',tile:1,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},lay=E.pick(['wallpaper','wallpaper','pair',...(E.tile?[]:['stripe']),'toile','damask']),mains=rzPool(E,'repeat',3);
  const gnd=rzGround(E,out,E.pick(['flat','flat','flat','tonal'])),c1=R.txt(gnd,R.blk(gnd,2.4),2.4),c2=R.blk(gnd,1.6,[c1]),shk=E.pick(['rect','rect','circle','hex','diamond']);
  if(lay=='wallpaper'||lay=='pair'){const a=rzTile(E,1,rzSh(shk),E.pick(['center','center','rosette','quad','mirror','star','emblem']),mains,[rzSmall(E)],c1,{edge:E.ch(.35),c2:E.ch(.4)?c2:''});out.tiles.push(a);const src=[{k:'stamp',t:1,w:1}];
   if(lay=='pair'){const b=rzTile(E,2,rzSh(shk),E.pick(['center','rosette','grid']),mains,[rzSmall(E)],c2,{edge:a.et>0});out.tiles.push(b);src.push({k:'stamp',t:2,w:1})}
@@ -330,8 +335,10 @@ RZL.repeat={w:1.4,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[
 const RZ_NAMES={repeat:'Repeat',poster:'Poster',plate:'Book plate',badge:'Badge',specimen:'Specimen',modern:'Modern',sun:'Sunburst',quilt:'Quilt'},RZ_LOOKS=Object.keys(RZ_NAMES);
 // the names of the frame elements a Look makes: the Frame switch leaves them out
 const RZ_FRAME=['Frame','Rule','Binding','Border','Corner'];
-// which Look a roll makes: the one chosen in the Randomize panel, or any by its weight
-function rzLookPick(o){if(o.want&&o.want!='any'&&RZL[o.want])return o.want;return o.wpick(Object.keys(RZL).map(k=>[k,RZL[k].w]))}
+// which Look a roll makes: the one chosen in the Randomize panel, or any by its weight. 2.76.3: only a Look whose parts are switched on (Repeat and Quilt are
+// made of Patterns), and on a repeat tile only one that tiles (Repeat). '' when none fits: the roll then reworks what is there.
+function rzLookPick(o){const ok=k=>RZL[k]&&!(RZL[k].need&&!o.FT[RZL[k].need])&&(!o.tile||RZL[k].tile),ks=Object.keys(RZL).filter(ok);if(!ks.length)return'';
+ if(o.want&&o.want!='any'&&ok(o.want))return o.want;return o.wpick(ks.map(k=>[k,RZL[k].w]))}
 // lay out the texts a Look asked for (fonts load first), and put the letters on the elements
 async function rzLay(texts){const out=[];for(const q of texts){try{const R=await WBX.wbTxLay(q.tx);if(!R)continue;const n=Math.max(R.bw,R.bh);Object.assign(q,{G:R.G,Lt:R.Lt,bw:R.bw,bh:R.bh,n,s:+n.toFixed(2)});out.push(q)}catch(e){}}return out}
 export {RZL,RZ_LOOKS,RZ_NAMES,RZ_FRAME,rzLookPick,rzLay,rzRoles,rzLum,rzCon,rzQfx,rzGrade};

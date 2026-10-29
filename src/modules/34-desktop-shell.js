@@ -15,7 +15,6 @@ import {LY} from './14-presets-and-layer-grid-ui.js';
 import {txClean} from './16-texture-generators.js';
 import {buildTex,saveTex,texNorm} from './17-texture-panel-and-previews.js';
 import {coreStr,dirty,paintPst,pgFix,pmsg,thumb} from './18-projects-and-cover-overlay.js';
-import {libRz} from './21-motif-library-ui.js';
 import {randomize,wbBA} from './20-before-after-and-randomizer.js';
 import {clearAll} from './33-clear.js';
 import {stUnlocked} from './63-stamp-tool.js';
@@ -212,42 +211,17 @@ $('pnop').onclick=e=>{const b=e.target.closest('[data-pn]');if(b)wsToggle(b.data
 document.querySelectorAll('[data-opn]').forEach(b=>b.addEventListener('click',e=>wsToggle(b.dataset.opn,e.isTrusted)));
 
 
-// ===== Randomize panel: which main features a roll may change. Anything switched off stays exactly as it is. Settings are remembered.
-(()=>{const sec=document.querySelector('section.pn[data-p="rand"]'),fts=[...sec.querySelectorAll('[data-ft]')],subs=[...sec.querySelectorAll('[data-sub]')],KEY='wb38_rzft',SKEY='wb50_rzsub',by=k=>fts.find(c=>c.dataset.ft==k),sk=m=>subs.filter(c=>c.dataset.sub.startsWith(m+'.'));
-// a main switch is a slider (0 off, 100 fully on) or, for Colours, a tick box. Older saves held true/false: true is 100.
-const amtOf=c=>c.type=='range'?(+c.value||0)/100:(c.checked?1:0),isOn=c=>amtOf(c)>0,setAmt=(c,v)=>{if(c.type=='range')c.value=v?100:0;else c.checked=!!v};
-try{const z=JSON.parse(kv.get(KEY)||'null');if(z)fts.forEach(c=>{const v=z[c.dataset.ft];if(v===undefined)return;if(c.type=='range')c.value=typeof v=='number'?Math.max(0,Math.min(100,v)):(v?100:0);else c.checked=!!v})}catch(e){}
-try{const z=JSON.parse(kv.get(SKEY)||'null');if(z)subs.forEach(c=>{if(c.dataset.sub in z)c.checked=!!z[c.dataset.sub]})}catch(e){}
-// a switch counts as on only if something under it is ticked (Stamps also counts Lettering)
-const eff=c=>{const k=c.dataset.ft,ss=sk(k);if(!isOn(c))return false;if(!ss.length)return true;return ss.some(x=>x.checked)||(k=='stamps'&&isOn(by('text')))};
-const get=()=>{const o={};fts.forEach(c=>o[c.dataset.ft]=eff(c));return o};
-const sub=m=>{const ss=sk(m);return ss.length?new Set(ss.filter(c=>c.checked).map(c=>c.dataset.sub.slice(m.length+1))):null};
-const sync=()=>{const st=isOn(by('stamps')),t=by('text');t.disabled=!st;(t.closest('.ctl')||t.parentNode).style.opacity=st?'':'.45';
-sec.querySelectorAll('.rzx[data-rzx]').forEach(b=>{const m=b.dataset.rzx,ss=sk(m),n=ss.filter(c=>c.checked).length,all=n==ss.length;b.querySelector('.rzn').textContent=all?'All':n+'/'+ss.length;b.classList.toggle('part',!all);const box=sec.querySelector('[data-rzs="'+m+'"]');if(box)box.classList.toggle('off',!isOn(by(m)))});
-const any=fts.some(c=>eff(c)&&!c.disabled),b=$('rzdo');if(b)b.disabled=!any;
-const h=$('rzhint');if(h)h.textContent=any?'Only what is switched on changes. Everything else stays exactly as it is. Use the arrows to choose which kinds of change are allowed. The canvas stays the same size unless Canvas size is on, and the book cover is always kept.':'Nothing is switched on, so Randomize has nothing to change.'};
-const save=()=>{try{kv.set(KEY,JSON.stringify(Object.fromEntries(fts.map(c=>[c.dataset.ft,c.type=='range'?+c.value:c.checked]))));kv.set(SKEY,JSON.stringify(Object.fromEntries(subs.map(c=>[c.dataset.sub,c.checked]))))}catch(e){}sync()};
-sec.addEventListener('change',save);sec.addEventListener('input',save);
-sec.addEventListener('click',e=>{const x=e.target.closest('[data-rzx]');if(x){const m=x.dataset.rzx,box=sec.querySelector('[data-rzs="'+m+'"]'),open=box.hidden;box.hidden=!open;x.setAttribute('aria-expanded',open?'true':'false');return}
-const a=e.target.closest('[data-rzall],[data-rzno]');if(a){const m=a.dataset.rzall||a.dataset.rzno,on=!!a.dataset.rzall;sk(m).forEach(c=>c.checked=on);save()}});
-$('rzall').onclick=()=>{fts.forEach(c=>setAmt(c,true));subs.forEach(c=>c.checked=true);nums();save()};$('rznone').onclick=()=>{fts.forEach(c=>setAmt(c,false));nums();save()};
-const amt=k=>{const c=by(k);return c&&eff(c)?amtOf(c):0};
-// Shape folders: which library folders a roll may take shapes from. New folders start ticked; only the unticked ones are remembered.
-// Ticking a folder ticks the folders inside it. At least one folder that holds shapes always stays ticked.
-const FK='wb160_rzfold',fbox=sec.querySelector('[data-rzfbox]'),flist=sec.querySelector('[data-rzflist]'),fbtn=sec.querySelector('[data-rzfx]');
-let foff=new Set(),FS=[];try{const z=JSON.parse(kv.get(FK)||'[]');if(Array.isArray(z))foff=new Set(z.filter(v=>typeof v=='string'))}catch(e){}
-const fPick=()=>FS.filter(x=>x.c>0),fOn=x=>!foff.has(x.v),fHas=()=>FS.some(x=>x.ks.length&&fOn(x));
-const fLabel=()=>{try{FS=libRz()}catch(e){return}const p=fPick(),n=p.filter(fOn).length,all=n==p.length;fbtn.querySelector('.rzn').textContent=all?'All':n+'/'+p.length;fbtn.classList.toggle('part',!all)};
-const fSaveOff=()=>{try{kv.set(FK,JSON.stringify([...foff]))}catch(e){}};
-function fPaint(){try{FS=libRz()}catch(e){FS=[]}flist.textContent='';FS.forEach(x=>{const l=document.createElement('label'),c=document.createElement('input'),s=document.createElement('span');l.className='chk sub';l.style.marginLeft=(x.d*14)+'px';if(!x.c)l.style.opacity='.45';c.type='checkbox';c.dataset.fv=x.v;c.checked=x.c>0&&fOn(x);c.disabled=!x.c;s.textContent=x.n;l.append(c,s);flist.appendChild(l)});fLabel()}
-const fKids=i=>{const o=[];for(let j=i+1;j<FS.length&&FS[j].d>FS[i].d;j++)o.push(FS[j]);return o};
-flist.addEventListener('change',e=>{const c=e.target.closest('[data-fv]');if(!c)return;const i=FS.findIndex(x=>x.v==c.dataset.fv);if(i<0)return;const prev=new Set(foff);[FS[i],...fKids(i)].forEach(x=>{if(!x.c)return;if(c.checked)foff.delete(x.v);else foff.add(x.v)});if(!fHas())foff=prev;fSaveOff();fPaint()});
-fbox.addEventListener('click',e=>{if(e.target.closest('[data-rzfall]')){foff.clear();fSaveOff();fPaint()}else if(e.target.closest('[data-rzfno]')){try{FS=libRz()}catch(e2){return}const keep=FS.find(x=>x.ks.length);foff=new Set(fPick().filter(x=>x!==keep).map(x=>x.v));fSaveOff();fPaint()}});
-fbtn.onclick=()=>{const open=fbox.hidden;if(open)fPaint();fbox.hidden=!open;fbtn.setAttribute('aria-expanded',open?'true':'false')};
-// null while every folder is ticked (the roll then works exactly as before); otherwise the shapes of each ticked folder, with the Dots set kept apart as the accents
-const folders=()=>{fLabel();const p=fPick();if(p.every(fOn)||!fHas())return null;const on=p.filter(x=>fOn(x)&&x.ks.length),dots=on.find(x=>x.v=='b:Dots'),th=on.filter(x=>x!==dots).map(x=>x.ks);return th.length||dots?{themes:th,dots:dots?dots.ks:null}:null};
-sync();fLabel();WBX.wbRZ={get,sub,amt,folders,look:()=>{try{return kv.get('wb167_rzlook')||'any'}catch(e){return'any'}}};
-// 2.74.1: the Look a roll makes (Any, or one Look; the names are 93-randomize-looks.js's RZ_NAMES), kept in the settings
+// ===== Randomize panel (2.76.3, docs/pattern-plan.md step 0; owner Oct 28 2026: "a Look choice and a few switches"). The Look a roll makes (Any, or one Look; the names are
+// 93-randomize-looks.js's RZ_NAMES) and nine switches: the parts a roll makes (Background, Pattern, Focal point, Text, Frame) and what it changes (Colours, Effects,
+// Finish, Canvas size). With none of the parts on, a roll reworks what is there (20-before-after-and-randomizer.js). Both are remembered in the settings.
+(()=>{const sec=document.querySelector('section.pn[data-p="rand"]'),cs=[...sec.querySelectorAll('[data-rz]')],KEY='wb2763_rz';
+try{const z=JSON.parse(kv.get(KEY)||'null');if(z)cs.forEach(c=>{if(c.dataset.rz in z)c.checked=!!z[c.dataset.rz]})}catch(e){}
+const get=()=>Object.fromEntries(cs.map(c=>[c.dataset.rz,c.checked?1:0]));
+const sync=()=>{const b=$('rzdo');if(b)b.disabled=!cs.some(c=>c.checked)};
+const save=()=>{try{kv.set(KEY,JSON.stringify(get()))}catch(e){}sync()};
+sec.addEventListener('change',e=>{if(e.target.closest('[data-rz]'))save()});
+$('rzall').onclick=()=>{cs.forEach(c=>c.checked=true);save()};$('rznone').onclick=()=>{cs.forEach(c=>c.checked=false);save()};
+sync();WBX.wbRZ={get,look:()=>{try{return kv.get('wb167_rzlook')||'any'}catch(e){return'any'}}};
 {const ls=$('rzlook');if(ls){try{const v=kv.get('wb167_rzlook');if(v&&[...ls.options].some(o=>o.value==v))ls.value=v}catch(e){}ls.addEventListener('change',()=>{try{kv.set('wb167_rzlook',ls.value)}catch(e){}})}}
 $('rzdo').onclick=()=>randomize(false);
 })();

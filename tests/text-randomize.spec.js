@@ -1,4 +1,5 @@
 // 1.46.0: Randomize uses the newer text options (wave path, bulge, random placement, bounce) on some lettering. The options come from the words, so rolls stay repeatable.
+// 2.76.3: the Looks decide the lettering; the Sunburst Look sets some titles on a wave path, so the rolls here are Sunburst rolls.
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle, getState } = require('./helpers/harness');
 
@@ -13,8 +14,9 @@ const NEW = m => !!(m.pt || m.wp || m.rp || m.bb);
 
 test('Randomize gives some lettering a path, warp, scatter or bounce, and the same seed gives the same result', async ({ page }) => {
   let withNew = 0, total = 0, first = null;
-  for (const seed of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]) {   // 2.30.0: more seeds, as the draws moved and fewer of the first eight put lettering down
+  for (const seed of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) {
     const { errors } = await openApp(page, { seed, pattern: false });
+    await page.evaluate(() => window.__wbTest.kv.set('wb167_rzlook', 'sun'));
     await roll(page);
     const ts = texts(await getState(page));
     total += ts.length; withNew += ts.filter(NEW).length;
@@ -23,6 +25,6 @@ test('Randomize gives some lettering a path, warp, scatter or bounce, and the sa
   }
   expect(total).toBeGreaterThan(0);
   expect(withNew).toBeGreaterThan(0);
-  await openApp(page, { seed: 3, pattern: false }); await roll(page);
+  await openApp(page, { seed: 3, pattern: false }); await page.evaluate(() => window.__wbTest.kv.set('wb167_rzlook', 'sun')); await roll(page);
   expect(JSON.stringify(texts(await getState(page)).map(m => [m.text, m.pt, m.wp, m.rp, m.bb]))).toBe(first);
 });

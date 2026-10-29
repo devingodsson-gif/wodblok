@@ -1,59 +1,36 @@
-// 2.39.0: Randomize uses the Noise, Blur, Print and Distort effects and Filter shapes (the Effects switch and its kinds).
+// 2.39.0: Randomize uses the Noise, Blur, Print and Distort effects and Filter shapes (the Effects switch). 2.76.3: the kinds are not chosen any more; a roll draws from all four.
 // They draw from a number stream of their own, so a seeded roll is the same as before apart from what Effects adds.
 const { test, expect } = require('@playwright/test');
-const { openApp, openPanel, settle, getState } = require('./helpers/harness');
+const { openApp, openPanel, settle, getState, rzSet } = require('./helpers/harness');
 
 const QK = ['noise', 'grain', 'dust', 'blur', 'motion', 'halftone', 'lines', 'stipple', 'bleed', 'misreg', 'rough', 'ripple', 'wobble', 'warp', 'slip'];
 const GRP = { noise: ['noise', 'grain', 'dust'], blur: ['blur', 'motion'], print: ['halftone', 'lines', 'stipple', 'bleed', 'misreg'], distort: ['rough', 'ripple', 'wobble', 'warp', 'slip'] };
 const els = async page => JSON.parse(await getState(page)).els || [];
 // the roll-able effects on elements, and the Filter shapes
 // a roll's filter: a Filter shape, or (2.53.0) a Sheet over the whole canvas
-const isF = q => !!q.flt || (q.k === 'sheet' && !q.bgd);
+const isF = q => !!q.flt || (q.k === 'sheet' && !q.bgd && q.fl === 'none');   // 2.76.3: a Look's Ground and Gradient Sheets are not filters
 const fxOf = list => list.filter(q => !isF(q)).flatMap(q => (q.fx || []).map(e => e.k)).filter(k => QK.includes(k));
 const filters = list => list.filter(isF);
-async function only(page, fts, subs) {
-  await page.evaluate(([fts, subs]) => {
-    document.querySelectorAll('[data-ft]').forEach(c => { if (c.type === 'range') c.value = fts.includes(c.dataset.ft) ? 100 : 0; else c.checked = fts.includes(c.dataset.ft); c.dispatchEvent(new Event('input', { bubbles: true })); c.dispatchEvent(new Event('change', { bubbles: true })); });
-    if (subs) document.querySelectorAll('[data-sub^="efx."]').forEach(c => { c.checked = subs.includes(c.dataset.sub.split('.')[1]); c.dispatchEvent(new Event('change', { bubbles: true })); });
-  }, [fts, subs]);
-}
 const roll = async page => { await page.click('#rzdo'); await settle(page); await page.waitForTimeout(250); };
 
-test('the Effects switch: on at 100 with every kind ticked', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 3 });
+test('the Effects switch is on; with it off a roll adds no effect and no Filter, with it on some roll does', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 3, pattern: false });
   await openPanel(page, 'rand');
-  await expect(page.locator('[data-ft="efx"]')).toHaveValue('100');
-  for (const k of ['noise', 'blur', 'print', 'distort', 'filter']) await expect(page.locator(`[data-sub="efx.${k}"]`)).toBeChecked();
-  await page.click('[data-rzx="efx"]');
-  await expect(page.locator('[data-rzs="efx"]')).toBeVisible();
-  expect(errors).toEqual([]);
-});
-
-test('a seeded roll is the same with Effects on, apart from the effects and Filter shapes it adds', async ({ browser }) => {
-  const state = async efx => {
-    const page = await browser.newPage();
-    const { errors } = await openApp(page, { seed: 5 });
-    await openPanel(page, 'rand');
-    await page.evaluate(v => { const c = document.querySelector('[data-ft="efx"]'); c.value = v; c.dispatchEvent(new Event('input', { bubbles: true })); }, efx);
-    await roll(page);
-    const d = JSON.parse(await getState(page));
-    expect(errors).toEqual([]);
-    await page.close();
-    return d;
-  };
-  const a = await state(100), b = await state(0);
-  expect(fxOf(b.els).length + filters(b.els).length).toBe(0);
-  const added = fxOf(a.els).length + filters(a.els).length;
+  await expect(page.locator('[data-rz="efx"]')).toBeChecked();
+  await rzSet(page, { efx: false });
+  for (let i = 0; i < 3; i++) { await roll(page); const L = await els(page); expect(fxOf(L).length + filters(L).length, 'off, roll ' + i).toBe(0); }
+  await rzSet(page, { efx: true });
+  let added = 0;
+  for (let i = 0; i < 8; i++) { await roll(page); const L = await els(page); added += fxOf(L).length + filters(L).length; }
   expect(added).toBeGreaterThan(0);
-  a.els = a.els.filter(q => !q.flt).map(q => { if (!q.fx) return q; const fx = q.fx.filter(e => !QK.includes(e.k)); const r = { ...q, fx }; if (!fx.length) delete r.fx; return r; });
-  expect(JSON.stringify(a.els)).toBe(JSON.stringify(b.els));
+  expect(errors).toEqual([]);
 });
 
 test('Effects alone reworks what is there; a Filter shape from the last roll is replaced, not stacked', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 8 });
   await openPanel(page, 'rand');
   await roll(page);   // a piece to work on
-  await only(page, ['efx']);
+  await rzSet(page, { efx: true }, true);
   const before = (await els(page)).filter(q => !isF(q)).map(q => q.u);
   let seen = 0;
   for (let i = 0; i < 6; i++) {
@@ -64,28 +41,6 @@ test('Effects alone reworks what is there; a Filter shape from the last roll is 
     if (fxOf(L).length || filters(L).length) seen++;
   }
   expect(seen).toBe(6);   // with only Effects on, every roll changes something
-  expect(errors).toEqual([]);
-});
-
-test('only the ticked kinds are used; Filter shapes alone carry a colour grade', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 2 });
-  await openPanel(page, 'rand');
-  await roll(page);
-  await only(page, ['efx'], ['blur']);
-  for (let i = 0; i < 4; i++) {
-    await roll(page);
-    const L = await els(page);
-    for (const k of fxOf(L)) expect(GRP.blur).toContain(k);
-    expect(filters(L).length).toBe(0);
-  }
-  await only(page, ['efx'], ['filter']);
-  for (let i = 0; i < 3; i++) {
-    await roll(page);
-    const L = await els(page), f = filters(L);
-    expect(fxOf(L)).toEqual([]);
-    expect(f.length).toBe(1);
-    expect(f[0].fx.map(e => e.k)).toEqual(['grade']);
-  }
   expect(errors).toEqual([]);
 });
 

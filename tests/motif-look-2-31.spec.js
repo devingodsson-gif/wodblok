@@ -70,19 +70,18 @@ test('a click picks a motif by its outline: beside a Line, inside its box, it mi
 
 test('a motif in a stamp: an outline of its own colour and an image print with the stamp', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, pattern: false });
-  await page.click('#rzdo'); await H.settle(page, { max: 60000 });
-  const p = await H.stampInstance(page, 1); const c = await H.canvasToClient(page, p.cx, p.cy);
-  await page.mouse.dblclick(c.x, c.y); await H.settle(page);
-  const b = await page.locator('#art').boundingBox();
-  await page.mouse.click(b.x + b.width * 0.5, b.y + b.height * 0.62); await H.settle(page);
+  // 2.76.3: set up directly (a roll is a Look now and no longer leaves a known stamp): a new stamp opens in its tab; a shape is put in it and stays selected
+  await H.showPanel(page, 'stmp'); await page.click('#smknew'); await H.settle(page);
+  await H.addShape(page, 'rect'); await H.settle(page);
   await H.showPanel(page, 'motifs');
   await expect(page.locator('#mf_o')).toBeVisible();
   await page.check('#mf_oon'); await H.settle(page);
   await page.click('#mf_fk [data-f="img"]'); await H.settle(page);
   await page.setInputFiles('#lfafile', IMG); await H.settle(page, { max: 30000 });
-  const it = JSON.parse(await H.getState(page)).tiles.find(t => t.id === 1).items.find(q => q.fl === 'img');
+  const it = JSON.parse(await H.getState(page)).tiles.find(t => t.items.some(q => q.fl === 'img')).items.find(q => q.fl === 'img');
   expect(it).toBeTruthy();
   expect(it.sw).toBeGreaterThan(0);
+  await page.keyboard.press('Escape'); await H.settle(page);
   expect(await page.locator('#stpix image').count()).toBe(1);             // the picture is defined once for every print
   expect(errors).toEqual([]);
 });

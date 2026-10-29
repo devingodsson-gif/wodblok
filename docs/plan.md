@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.76.3 (Oct 29 2026, branch feat/2.76.3-randomize-finished, step 0 of docs/pattern-plan.md): Randomize finished
+- **One roller.** The old roller is removed: every roll builds a Look (93-randomize-looks.js), also with Stamps off, on a Book cover (built at front-cover size, then moved onto the front) and on a repeat tile (only Looks that tile: Repeat and Quilt, no Stripe). 71-randomize-elements.js keeps only the element and effect helpers.
+- **Simple panel.** A Look choice (Any or one of the eight) and switches for Background, Pattern, Focal point, Text, Frame, Colours, Effects, Finish and Canvas size (off by default), replacing the sliders and the Shape folders choice. A switch that is off leaves that part as it is; with Pattern, Focal point, Text and Frame all off a roll only reworks colours, effects and finish; with nothing on it says so and changes nothing.
+- **Tests.** New randomize-panel-2-76-3 (6) and randomize-coverage-2-76-3 (30 rolls: at least six Looks, none empty, nothing off the canvas beyond 5% of the short side, no page error). Rewritten for the Looks: randomize-effects-2-39, randomize-mode-2-21, randomize-solid-background-2-67-4, motif-look-2-31, palette, fit-canvas-2-37, repeat-tile, text-randomize. Removed: randomize-amounts, randomize-elements, randomize-folders, randomize-new (they tested the old sliders). Harness: `rzSet`.
+- Ran, Chromium: the specs above, `npm run check:platform`, `npm run check:style`, `npm run perf` (slider drag ratio 0.92, roll + settle 1242 ms). Not run: full suite, WebKit, CI, pixel goldens. Scenario snapshots (seeds 1 to 3) change with the rolls and are not regenerated: they need the owner's approval at the end of the plan. Full suite importance about 70% (drawing, every element kind, the document).
+
 ## 2.76.2 (Oct 29 2026, branch fix/2.76.2-review-bugs, on top of 2.76.1): the five worst bugs of the 2.76 review
 Owner: "Fix those 5 first bugs you presented" (review in the claude.ai project, wodblok-review-2.76).
 - **Image in exports.** The Image element drew its picture from the page's blob address, which a PNG export, an SVG export and a print made once cannot load: the picture was missing from PNG files and SVG files pointed at `blob:`. It now uses the picture's data address, as shapes with a picture fill always did (95-image-element.js).

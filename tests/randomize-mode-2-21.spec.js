@@ -18,9 +18,12 @@ test('a roll replaces the previous roll: the count does not grow roll after roll
   await noPattern(page);
   await addShape(page);
   const own = (await st(page)).els.find(q => q.k === 'motif' && !q.bgd).u;
-  const counts = [];
-  for (let i = 0; i < 4; i++) { await roll(page); const s = await st(page); counts.push(s.els.length); expect(s.els.some(q => q.u === own), 'roll ' + (i + 1)).toBe(true); }
-  expect(Math.max(...counts)).toBeLessThan(counts[0] * 3);   // before 2.21.0 each roll kept every earlier one on top
+  // 2.76.3: Looks differ a lot in size (a quilt has a few elements, a specimen sheet a dozen), so the test is that nothing of the previous roll stays
+  let prev = null;
+  for (let i = 0; i < 4; i++) { await roll(page); const s = await st(page), us = s.els.filter(q => q.u !== own && !q.bgd).map(q => q.u);
+    expect(s.els.some(q => q.u === own), 'roll ' + (i + 1)).toBe(true);
+    if (prev) expect(us.filter(u => prev.includes(u)), 'roll ' + (i + 1) + ' keeps nothing of the last').toEqual([]);
+    prev = us; }
   expect(errors).toEqual([]);
 });
 

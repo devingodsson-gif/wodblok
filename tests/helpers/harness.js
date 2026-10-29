@@ -226,6 +226,11 @@ async function noPattern(page) {
   while (await page.locator('#pelist [data-pd]').count()) { await page.evaluate(() => document.querySelector('#pelist [data-pd]').click()); await settle(page); }
 }
 
+// 2.76.3: the Randomize panel's switches (data-rz: bg, pat, focal, text, frame, col, efx, fin, size) set by name: { size: true, efx: false }; `only` switches every other one off
+async function rzSet(page, on, only) {
+  await page.evaluate(([on, only]) => { document.querySelectorAll('[data-rz]').forEach(c => { const want = c.dataset.rz in on ? !!on[c.dataset.rz] : only ? false : c.checked; if (c.checked !== want) { c.checked = want; c.dispatchEvent(new Event('change', { bubbles: true })); } }); }, [on, !!only]);
+}
+
 // 2.2.3: using the interface puts an armed stamp away, so a test that placed stamps after changing a setting arms the stamp again just before it clicks the canvas
 async function armStamp(page) {
   if (await page.locator('#lfpst [data-t].on').count()) return;
@@ -296,4 +301,4 @@ async function stampMenu(page, item, n = 0) {
   await t.click({ button: 'right' });
   await page.locator('.rowm').getByRole('menuitem', { name: item, exact: true }).click();
 }
-module.exports = { stampMenu, addKind, placeArmed, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+module.exports = { stampMenu, addKind, placeArmed, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, rzSet, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

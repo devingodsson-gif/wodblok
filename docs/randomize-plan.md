@@ -1,4 +1,4 @@
-# Randomize rewrite: plan (in progress; step 1 on `feat/2.74.1-randomize-looks`)
+# Randomize rewrite: plan (done in 2.76.3; the Looks in 2.74.1)
 
 Owner, Oct 27 2026: "rewrite Randomize so it touches every option we have right now, all the elements and everything, all the effects and settings. The random results should look appealing, like a real image."
 
