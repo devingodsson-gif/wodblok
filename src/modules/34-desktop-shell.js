@@ -262,10 +262,13 @@ try{new ResizeObserver(()=>applyZ()).observe($('boardP'))}catch(e){window.addEve
 new MutationObserver(()=>applyZ()).observe($('art'),{attributes:true,attributeFilter:['viewBox']});
 
 // ---- slider rows with editable number fields
-function addNum(row,r){const w=document.createElement('div');w.className='num';const n=document.createElement('input');n.type='number';n.min=r.min;n.max=r.max;n.step=r.step||1;
+// 2.74.2 (owner Oct 29 2026: "you should be able to type in any width/height"): a slider with data-omin and data-omax takes a typed value past its own ends, up to those;
+// its track grows to hold the value (and shrinks back to its own ends for a value inside them). rngSet sets such a slider from the panel's code too.
+function rngSet(r,v){v=+v;if(r.dataset.omax!=null){if(r.dataset.max0==null){r.dataset.max0=r.max;r.dataset.min0=r.min}v=Math.min(+r.dataset.omax,Math.max(+r.dataset.omin,v));r.max=Math.max(+r.dataset.max0,v);r.min=Math.min(+r.dataset.min0,v)}r.value=v;return v}
+function addNum(row,r){const w=document.createElement('div');w.className='num';const n=document.createElement('input');n.type='number';n.min=r.dataset.omin!=null?r.dataset.omin:r.min;n.max=r.dataset.omax!=null?r.dataset.omax:r.max;n.step=r.step||1;
 const lb=row.querySelector('label');n.setAttribute('aria-label',lb?lb.textContent:'Value');if(r.dataset.u){n.className='u';const i=document.createElement('i');i.textContent=r.dataset.u;w.appendChild(i)}
 w.prepend(n);row.appendChild(w);r._n=n;
-n.addEventListener('change',()=>{if(paintBack){n.value=+(+r.value).toFixed(2);return}let v=+n.value;if(n.value===''||isNaN(v))return paint(r);v=Math.min(+r.max,Math.max(+r.min,v));r.value=v;r.dispatchEvent(new Event('input',{bubbles:true}));paint(r)});
+n.addEventListener('change',()=>{if(paintBack){n.value=+(+r.value).toFixed(2);return}let v=+n.value;if(n.value===''||isNaN(v))return paint(r);if(r.dataset.omax!=null)rngSet(r,v);else{v=Math.min(+r.max,Math.max(+r.min,v));r.value=v}r.dispatchEvent(new Event('input',{bubbles:true}));paint(r)});
 n.addEventListener('keydown',e=>{if(e.key=='Enter')n.blur();else if(e.key=='Escape'){e.stopPropagation();paintBack=1;n.blur();paintBack=0;n.value=+(+r.value).toFixed(2)}})}
 // double-click any number box to select all of it; whatever you type then replaces it (Enter or click away to apply, Esc to cancel)
 let paintBack=0;document.addEventListener('dblclick',e=>{const t=e.target;if(t&&t.matches&&t.matches('input[type=number]')){t.focus();t.select()}});
@@ -278,7 +281,7 @@ function paint(r){const lo=+r.min,hi=+r.max,p=hi>lo?(r.value-lo)/(hi-lo)*100:0;r
 // outside panels), and only when their value or range changed since the last paint. A panel is repainted when it opens (wsRender calls nums), so a hidden one is never out of date when it shows.
 const NUMS_SEL='section.pn:not([hidden]) input[type=range],input[type=range]:not(section.pn input)';
 function nums(){document.querySelectorAll(NUMS_SEL).forEach(r=>{if(r._pk!==r.value+'|'+r.min+'|'+r.max)paint(r)})}
-WBX.wbNums=nums;WBX.wbEnhance=enhance;
+WBX.wbNums=nums;WBX.wbEnhance=enhance;WBX.wbRngSet=rngSet;
 document.addEventListener('input',e=>{if(e.target.type=='range')paint(e.target)});
 
 // ---- status line + dock subtitle

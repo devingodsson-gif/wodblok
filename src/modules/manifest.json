@@ -87,5 +87,6 @@
  "90-panel-modes.js",
  "91-effect-popout.js",
  "92-pattern-tiling.js",
- "93-randomize-looks.js"
+ "93-randomize-looks.js",
+ "94-image-crop.js"
 ]

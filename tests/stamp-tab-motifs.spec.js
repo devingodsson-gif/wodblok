@@ -56,18 +56,18 @@ test('the other things a stamp tab offers work in an empty project: Add text, th
 });
 
 // the corner handles (2.15.0): a plain corner stretches one side, Ctrl or Cmd scales both
-test('in a stamp tab a corner pulled sideways widens, pulled down makes taller; Ctrl scales both', async ({ page }) => {
+test('in a stamp tab a corner pulled sideways widens, pulled down makes taller; Shift scales both (2.74.2: as on the canvas)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
   await newStampTab(page);
   await addKind(page, 'motif'); await settle(page);
   const q = async () => JSON.parse(await getState(page)).tiles[0].items[0];
   const corner = async () => { const r = await page.locator('#stoh [data-hd="se"]').boundingBox(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; };
-  const pull = async (dx, dy, ctrl) => { const c = await corner(); if (ctrl) await page.keyboard.down('Control'); await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.move(c.x + dx, c.y + dy, { steps: 6 }); await page.mouse.up(); if (ctrl) await page.keyboard.up('Control'); await settle(page); };
+  const pull = async (dx, dy, ctrl) => { const c = await corner(); if (ctrl) await page.keyboard.down('Shift'); await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.move(c.x + dx, c.y + dy, { steps: 6 }); await page.mouse.up(); if (ctrl) await page.keyboard.up('Shift'); await settle(page); };
   const a = await q();
-  await pull(50, 2);
+  await pull(50, 0);
   const b = await q();
   expect(b.sx || 1).toBeGreaterThan((a.sx || 1) * 1.05); expect(b.sy || 1).toBe(a.sy || 1); expect(b.s).toBe(a.s);
-  await pull(2, 50);
+  await pull(0, 50);
   const c = await q();
   expect(c.sy || 1).toBeGreaterThan((b.sy || 1) * 1.05); expect(c.sx || 1).toBe(b.sx || 1);
   await pull(40, 40, true);

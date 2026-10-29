@@ -44,7 +44,7 @@ function sceDown(e){if(e.button!==0)return;let t0=stUnlocked();
  if(spk&&WBS.split&&SCE.ai!=null&&STP.items[SCE.ai]){const c=scePt(e),M=sceInv(SCE.ai);if(!c)return;const p=sceTo(M,c.x,c.y);e.preventDefault();e.stopPropagation();SCE.sp={k:spk.dataset.sp,M,ox:WBS.split.x-p.x,oy:WBS.split.y-p.y};return}
  const hd=e.target.closest&&e.target.closest('[data-hd]');
  if(hd){const t=sceRO();if(!t||WBS.msel.size!=1||WBS.sel<0||SCE.ai==null||!STP.items[SCE.ai])return;const q=t.items[WBS.sel];if(!q)return;e.preventDefault();e.stopPropagation();
-  SCE.h={k:hd.dataset.hd,q,t,cx:+q.x,cy:+q.y,s0:q.s,sx0:q.sx||1,sy0:q.sy||1,r0:+q.r||0,M:sceInv(SCE.ai)};WBS.WBDRG=1;$('texg').style.display='none';return}
+  SCE.h={k:hd.dataset.hd,q,t,cx:+q.x,cy:+q.y,s0:q.s,sx0:q.sx||1,sy0:q.sy||1,r0:+q.r||0,f0:+q.f||1,M:sceInv(SCE.ai)};WBS.WBDRG=1;$('texg').style.display='none';return}
  const c=scePt(e);if(!c)return;const h=stampAt(c.x,c.y,t0);if(!h)return;const t=sceOpen();if(!t)return;
  e.preventDefault();e.stopPropagation();SCE.ai=h.i;
  const M0=stMatrix(STP.items[h.i]),sn=sceSnap(M0,h.u,h.v,e);

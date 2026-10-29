@@ -89,13 +89,23 @@ const Q=()=>(WBS.tiles[WBS.cur]||WBS.noTile).items[WBS.sel];
 function init11(){
 EDC=new Map();
 WBX.hdResize=hdResize;
-// Pulling a corner or a side square: the opposite corner or side stays where it is; with Shift the motif grows from its middle. Works in the motif's own (turned) frame.
-function hdResize(h,p,e){const q=h.q,a=-h.r0*Math.PI/180,dx=p.x-h.cx,dy=p.y-h.cy,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),rx0=48*h.s0*h.sx0,ry0=48*h.s0*h.sy0,mid=e.shiftKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));let ns=h.s0,nx=h.sx0,ny=h.sy0,ox=0,oy=0,k0=h.k;
-// A corner stretches one side (2.15.0): the first clear pull sideways sets the width, up or down the height; Ctrl or Cmd keeps scaling both together.
-if(k0.length==2&&!(e.ctrlKey||e.metaKey)){{const mx=lx-(k0[1]=='e'?rx0:-rx0),my=ly-(k0[0]=='s'?ry0:-ry0);if(!h.ax&&Math.hypot(mx,my)>Math.max(2,Math.min(rx0,ry0)*.08))h.ax=Math.abs(mx)>=Math.abs(my)?'x':'y'}if(!h.ax)return;k0=h.ax=='x'?(k0[1]=='e'?'e':'w'):(k0[0]=='s'?'s':'n')}
-if(k0.length==2){const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Cx=cx*rx0,Cy=cy*ry0,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy);ns=cl(+(h.s0*k).toFixed(3),.02,4);k=ns/h.s0;if(!mid){ox=(k-1)*Cx;oy=(k-1)*Cy}}
-else if(k0=='e'||k0=='w'){const d=k0=='e'?1:-1,w=mid?Math.abs(lx)*2:d*lx+rx0;nx=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)ox=-d*rx0+d*48*h.s0*nx}
-else{const d=k0=='s'?1:-1,w=mid?Math.abs(ly)*2:d*ly+ry0;ny=cl(+(w/2/(48*h.s0)).toFixed(3),.2,3);if(!mid)oy=-d*ry0+d*48*h.s0*ny}
-q.s=ns;if(nx!=1||q.sx)q.sx=nx;if(ny!=1||q.sy)q.sy=ny;const r=-a;q.x=+(h.cx+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(2);q.y=+(h.cy+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(2)}
+// Pulling a corner or a side square of a shape in a stamp (2.74.2, owner Oct 29 2026: "the canvas and stamp editors should work exactly the same"): as a piece on the
+// canvas (fpResize, 28-canvas-select.js). The opposite corner or side stays where it is; with Alt (Option) the shape grows from its middle. A corner pulls width and height
+// at once (they follow the pointer; with Shift the proportions are kept); a side pulls only the width or the height. Pulled past the opposite side the shape turns over on
+// that axis: across, its flip turns; down, the flip turns and it makes a half turn. Worked out in the shape's own frame as it was when the pull began.
+// (Before 2.74.2 a corner locked to the first direction it was pulled in, Shift grew from the middle, and the width and height stopped at 20 and 300 %.)
+function hdResize(h,p,e){const q=h.q,a=-h.r0*Math.PI/180,dx=p.x-h.cx,dy=p.y-h.cy,lx=dx*Math.cos(a)-dy*Math.sin(a),ly=dx*Math.sin(a)+dy*Math.cos(a),w0=96*h.s0*h.sx0,h0=96*h.s0*h.sy0,mid=e.altKey,cl=(v,lo,hi)=>Math.min(hi,Math.max(lo,v)),k0=h.k,f0=h.f0||1;
+ let ns=h.s0,nx=h.sx0,ny=h.sy0,ox=0,oy=0,fx=1,fy=1;
+ if(k0.length==2&&e.shiftKey){// a corner with Shift: the size along the line from the fixed corner (or the middle) through the pulled one; past the fixed point it turns right round
+  const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Cx=cx*w0/2,Cy=cy*h0/2,Fx=mid?0:-Cx,Fy=mid?0:-Cy,vx=Cx-Fx,vy=Cy-Fy;let k=((lx-Fx)*vx+(ly-Fy)*vy)/(vx*vx+vy*vy);if(k<0){fx=-1;fy=-1;k=-k}
+  ns=cl(+(h.s0*k).toFixed(3),.02,40);k=ns/h.s0;if(!mid){ox=Fx+fx*k*vx/2;oy=Fy+fx*k*vy/2}}
+ else if(k0.length==2){// a corner: width and height follow the pointer
+  const cx=k0[1]=='e'?1:-1,cy=k0[0]=='s'?1:-1,Fx=mid?0:-cx*w0/2,Fy=mid?0:-cy*h0/2,sw=mid?2*lx*cx:(lx-Fx)*cx,sh=mid?2*ly*cy:(ly-Fy)*cy;
+  fx=sw<0?-1:1;fy=sh<0?-1:1;nx=cl(+(h.sx0*Math.max(w0*.02,Math.abs(sw))/w0).toFixed(3),.05,20);ny=cl(+(h.sy0*Math.max(h0*.02,Math.abs(sh))/h0).toFixed(3),.05,20);
+  if(!mid){ox=Fx+cx*fx*w0*nx/h.sx0/2;oy=Fy+cy*fy*h0*ny/h.sy0/2}}
+ else if(k0=='e'||k0=='w'){const d=k0=='e'?1:-1,sw=mid?2*d*lx:d*lx+w0/2;fx=sw<0?-1:1;nx=cl(+(h.sx0*Math.max(w0*.02,Math.abs(sw))/w0).toFixed(3),.05,20);if(!mid)ox=-d*w0/2+d*fx*(w0*nx/h.sx0)/2}
+ else{const d=k0=='s'?1:-1,sh=mid?2*d*ly:d*ly+h0/2;fy=sh<0?-1:1;ny=cl(+(h.sy0*Math.max(h0*.02,Math.abs(sh))/h0).toFixed(3),.05,20);if(!mid)oy=-d*h0/2+d*fy*(h0*ny/h.sy0)/2}
+ q.s=ns;if(nx!=1||q.sx)q.sx=nx;if(ny!=1||q.sy)q.sy=ny;q.f=f0*fx*fy;q.r=+((((fy<0?h.r0+180:h.r0)+540)%360)-180).toFixed(1);
+ const r=-a;q.x=+(h.cx+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(2);q.y=+(h.cy+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(2)}
 }
 export {Q,eNV,eR,eSeed,eT,edgeDef,edgeDefs,pressDefs,raf,upd,init11};

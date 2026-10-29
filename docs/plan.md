@@ -1,5 +1,12 @@
 # Development plan
 
+## 2.74.2 (Oct 29 2026, branch fix/2.74.2-stamp-editor-bugs, not live): the owner's bug list, and cropping
+- Stamp editor works like the canvas: a corner pulls width and height at once (it locked to the first direction), Alt grows from the middle (was Shift), Shift keeps the proportions (was Ctrl), past the opposite side the shape turns over; width and height go from 5 to 2000 % by handle or typed (they stopped at 20 to 300 %). Sliders with `data-omin`/`data-omax` take typed values past their ends (34-desktop-shell.js `rngSet`).
+- A Pattern's arrows (and the canvas's selection boxes) are not drawn while a stamp is open in its tab.
+- A shape's effects work over the box of the turned shape (a tall shape with Roughen turned towards flat was cut off).
+- Crop (new, 94-image-crop.js): Crop in the Fill group of a picture on the canvas (command `image.crop`): the whole picture faintly, the kept part as it is, eight squares; a pull inside moves the frame; Enter or a click outside applies, Esc cancels. Stored as `ic` [left, top, right, bottom] on the shape; the shape becomes the size of what is left, where it lay. Pictures in Sheets and in stamps are not croppable yet.
+- Tests: new editor-fixes-2-74-2 and image-crop-2-74-2; resize-handles, stamp-tab-motifs, selection-handles, stamp-canvas-edit updated (Shift for both sides, free corners); passing with stamp-canvas-edit, element-print-2-44-3, noise-blur-effects-2-35, motif-look-2-31 except its stamp-image test, which fails since 2.74.1 (it rolls Randomize and expects stamp 1). `npm run perf`: ratio 1.054. Not run: the full suite, WebKit. File format unchanged (29; `ic` is a new optional field).
+
 ## 2.74.1 (Oct 28 2026, branch feat/2.74.1-randomize-looks, not live): Randomize Looks, step 1 of docs/randomize-plan.md
 - 93-randomize-looks.js rewritten: shared parts and several layouts per Look (table in docs/randomize-plan.md); Repeat is a Look; the old roll stays for Stamps off, book covers and repeat tiles. Colour roles read the palette being rolled (they read the old tray before). A Look dropdown at the top of the Randomize panel (kv `wb167_rzlook`). Vignette mask rarer and lighter.
 - Checked by eye: 8 rolls per Look on contact sheets, portrait and 3:2. Markup at most about 400,000 characters per roll.
