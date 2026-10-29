@@ -1,6 +1,7 @@
 import {clipboard,kv,use} from '../platform/index.js';
+import {icAlign} from './00-icons.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,SK,csk,geom,setDim,shOf,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,SK,csk,geom,setDim,shOf,stvOn,tileOn,useG,useT,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {say,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC} from './17-texture-panel-and-previews.js';
@@ -17,9 +18,17 @@ const f=v=>String(+(+v).toFixed(3));if(document.activeElement!=$(p+'aw'))$(p+'aw
 // Change one stamp's outline and stretch its motifs to match
 function reshape(t,ch){const sh=shOf(t),a=geom(sh);if(ch.k)sh.k=ch.k;if(ch.o)sh.o=ch.o;if(ch.s)sh.s=[+ch.s[0],+ch.s[1]];const b=geom(sh);useG(b);t.items.forEach(q=>{[q.x,q.y]=wrapP(q.x*b.SW/a.SW,q.y*b.SH/a.SH)});useT(WBS.tiles[WBS.cur])}
 function applyAsp(k,v,ch){if(v){const r=v[0]/v[1],lim=k=='s'?20:5;if(!(r>=1/lim&&r<=lim)){if(k=='s')pmsg('Stamps can be up to 20 times longer than they are wide.');return}}
-if(k=='c'){if(v)WBS.dim.c=v;setDim()}
+if(k=='c'){const W0=CW,H0=CH;if(v)WBS.dim.c=v;setDim();if(!stvOn()&&!WBS.book.on)canShift(W0,H0)}
 else{const t=WBS.tiles[WBS.cur],c={...(ch||{})};if(v)c.s=v;reshape(t,c);const sh=shOf(t);WBS.dim={...WBS.dim,k:sh.k,o:sh.o,s:[...sh.s]}}
 WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();upd()}
+// ---- Canvas size anchor (2.76.0, owner Oct 29 2026: "when we change the size of the canvas we need a section to adjust where the existing elements go ... expand from
+// the sides, top/bottom, corners or middle"; it starts in the middle every time the Canvas panel opens). The anchor is the part of the canvas that stays where it is:
+// a new size grows or shrinks the canvas away from it, and every element moves by as much, so it keeps its place against the anchor. The Background and the patterns
+// that fill the canvas follow the new size by themselves; a pattern with an area of its own moves like any element. Elements only move (no scaling).
+let CANCH=[.5,.5];
+function canShift(W0,H0){const dx=(CW-W0)*CANCH[0],dy=(CH-H0)*CANCH[1];if(Math.abs(dx)<1e-6&&Math.abs(dy)<1e-6)return;
+ WBS.layers.forEach(L=>(L.pl||[]).forEach(p=>{if(!p||p.bgd||p.k=='sheet'||p.k=='group'||p.x==null||p.y==null)return;if(p.k=='pattern'&&(p.af||!(+p.aw>0)))return;p.x=+(+p.x+dx).toFixed(2);p.y=+(+p.y+dy).toFixed(2)}))}
+function canPaint(){const g=$('canc');if(!g)return;g.querySelectorAll('button').forEach(b=>{const on=+b.dataset.x==CANCH[0]&&+b.dataset.y==CANCH[1];if(b.classList.contains('on')!==on)b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))})}
 const LY=()=>WBS.layers[WBS.selL];
 const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'wodblok-pattern';return n+'.'+ext};
 const ser=()=>{const k=WBS.edMk;if(!k){WBS.edMk=true;upd()}try{return ser0()}finally{if(!k){WBS.edMk=false;upd()}}};
@@ -31,6 +40,10 @@ function svShare(s){const seen=new Map(),to=new Map();
 const ser0=()=>{const c=$('art').cloneNode(true);c.classList.remove('tpvr');{const tv=c.querySelector('#tpvi');if(tv)tv.remove()}WBX.wbVec(c);if(tileOn())c.setAttribute('viewBox',`0 0 ${CW} ${CH}`);   // a repeat tile is saved as the tile, also while the 3 x 3 view is on
 ['#guig','#fpgrid','#fpov','#gmov'].forEach(q=>{const g=c.querySelector(q);if(g)g.remove()});const gd=c.querySelector('#grdf');if(gd&&WBX.wbGrade)gd.innerHTML=WBX.wbGrade.defs(false);{const sd=c.querySelector('#surfd');if(sd&&!WBS.edInk)sd.innerHTML=WBS.tiles.map(t=>SURFC[t.id]?SURFC[t.id].s:'').join('');c.querySelectorAll('[data-tki]').forEach(g=>{g.setAttribute('mask','url(#cw)');g.removeAttribute('data-tki')});c.querySelectorAll('.txo[display]').forEach(g=>g.removeAttribute('display'));const tg=c.querySelector('#texg');if(tg)tg.style.display=''}return svShare(new XMLSerializer().serializeToString(c))};
 function init14(){
+{const g=$('canc'),N=[['Top left','Top','Top right'],['Left','Middle','Right'],['Bottom left','Bottom','Bottom right']];if(g){g.innerHTML=N.flatMap((row,r)=>row.map((t,c)=>`<button type="button" data-x="${c/2}" data-y="${r/2}" aria-label="Anchor: ${t}" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${icAlign(r,c)}</svg></button>`)).join('');
+ g.onclick=e=>{const b=e.target.closest('button[data-x]');if(!b)return;CANCH=[+b.dataset.x,+b.dataset.y];canPaint()};canPaint();
+ // back to the middle each time the Canvas panel opens
+ const sec=g.closest('section.pn');if(sec)new MutationObserver(()=>{if(!sec.hidden){CANCH=[.5,.5];canPaint()}}).observe(sec,{attributes:true,attributeFilter:['hidden']})}}
 [['c','c'],['s','s']].forEach(([k,p])=>{
 $(p+'asp').oninput=()=>{const v=$(p+'asp').value;if(v=='x'){$(p+'asp').dataset.custom='1';$(p+'aw').focus();return}
 $(p+'asp').dataset.custom='';const a=ASP[k][+v];applyAsp(k,[a[1],a[2]])};
