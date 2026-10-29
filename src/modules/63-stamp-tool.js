@@ -1,6 +1,6 @@
 import {ICN} from './00-icons.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,hEsc,rowMenu,SH,SHN,shp,stNm,stNmId,SW,useT} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,hEsc,rowMenu,SH,SHN,shp,stFreeNm,stNm,stNmId,SW,useT} from './04-canvas-and-stamp-outlines.js';
 import {pal,selOne,store} from './06-motif-library-folders.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -61,7 +61,7 @@ const stAddTo=id=>{const L=stSel();if(L&&!(L.st||[]).includes(id)){L.st=L.st||[]
 const stNo=id=>WBS.tiles.findIndex(t=>t.id==id)+1;
 function stCurrent(id){const k=WBS.tiles.findIndex(t=>t.id==id);if(k<0||WBS.cur===k)return;if(STP.un!=null&&STP.un!==id){STP.un=null;STP.unL=null}WBS.cur=k;selOne(-1);STP.ai=null;upd()}
 // a new stamp (an outline can be chosen) is added to the selected layer's arrangement, becomes the open stamp and starts locked
-function stNew(kind){const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:0,er:0,es:Math.floor(Math.random()*999),tu:[]};t.nm='Stamp '+t.id;WBS.tiles.push(t);stAddTo(t.id);WBS.cur=WBS.tiles.length-1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;
+function stNew(kind){const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:0,er:0,es:Math.floor(Math.random()*999),tu:[]};t.nm=stFreeNm();WBS.tiles.push(t);stAddTo(t.id);WBS.cur=WBS.tiles.length-1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;
  if(kind&&kind!='rect'){const b=document.querySelector('#skind [data-k="'+kind+'"]');if(b)b.click()}stLabel('New stamp');store();upd();pmsg('Added '+stNm(t)+'.');if(WBX.wbSteGo)WBX.wbSteGo(t.id)}   // (2.25.0) a new stamp opens in its tab, where it can be seen and filled
 // a copy edits separately from the original
 function stDup(){const k=WBS.cur,src=WBS.tiles[k];if(!src)return;const t=JSON.parse(JSON.stringify(src));t.id=WBS.nid++;t.nm=(stNm(src)+' copy').slice(0,40);WBS.tiles.splice(k+1,0,t);stAddTo(t.id);WBS.cur=k+1;selOne(-1);STP.un=null;STP.unL=null;STP.ai=null;stLabel('Duplicated stamp');store();upd();pmsg('Duplicated '+stNm(src)+'.')}

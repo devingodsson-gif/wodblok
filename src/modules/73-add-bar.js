@@ -64,7 +64,8 @@ const AD={
 };
 // which tool is armed, for the pressed look of the bar: '' is Select
 function abTool(){if(WBX.wbPaMode&&WBX.wbPaMode()!='off')return'paint';const k=WBX.plKind?WBX.plKind():'';return k||ABP}
-function abSync(){const b=$('elb');if(!b)return;if(ABP&&elSel())ABP='';const t=abTool();b.querySelectorAll('.elbb').forEach(x=>{const on=x.dataset.k==(t||'select');if(x.getAttribute('aria-pressed')!=String(on))x.setAttribute('aria-pressed',String(on))});abOpts(t)}
+function abSync(){const b=$('elb');if(!b)return;if(ABP&&elSel())ABP='';const t=abTool();b.querySelectorAll('.elbb').forEach(x=>{const on=x.dataset.k==(t||'select');if(x.getAttribute('aria-pressed')!=String(on))x.setAttribute('aria-pressed',String(on))});{const pb=b.querySelector('[data-k="pattern"]');if(pb){const off=stUnlocked()!=null;if(pb.disabled!=off)pb.disabled=off}}   // a stamp holds no Pattern (B12, 2.76.4)
+abOpts(t)}
 // The options strip (Photoshop's options bar): one line under the bar while the brush is on, with Brush / Eraser and its size. It drives the Paint panel's own controls.
 function abOpts(t){const o=$('elopt');if(!o)return;const on=t=='paint';if(o.hidden===on)o.hidden=!on;if(!on)return;const m=WBX.wbPaMode?WBX.wbPaMode():'off';
  o.querySelectorAll('[data-m]').forEach(x=>{const p=x.dataset.m==m;if(x.getAttribute('aria-pressed')!=String(p)){x.setAttribute('aria-pressed',String(p));x.classList.toggle('on',p)}});

@@ -1,5 +1,5 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {geom,shOf} from './04-canvas-and-stamp-outlines.js';
+import {geom,shOf,stFreeNm} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
@@ -21,7 +21,7 @@ function stcSel(){const L=fpL();return L?fpGrp().filter(q=>q.k=='text'):[]}
 function stcMake(){const L=fpL(),sel=stcSel();if(!L||!sel.length)return;
 const bs=sel.map(q=>{const wh=fpWH(q);if(!wh)return null;const h=Math.max(wh[0],wh[1])/2;return[q.x-h,q.y-h,q.x+h,q.y+h]}).filter(Boolean);if(!bs.length)return;
 const x0=Math.min(...bs.map(b=>b[0])),y0=Math.min(...bs.map(b=>b[1])),x1=Math.max(...bs.map(b=>b[2])),y1=Math.max(...bs.map(b=>b[3])),cx=(x0+x1)/2,cy=(y0+y1)/2,big=Math.max(x1-x0,y1-y0,1);
-const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:0,er:0,es:Math.floor(Math.random()*999),tu:[]};t.nm='Stamp '+t.id;const G=geom(shOf(t)),M=Math.max(G.SW,G.SH),kf=.9*M/big;
+const t={id:WBS.nid++,items:[],sh:{k:'rect',o:'p',s:[1,1],z:100},sym:{m:'off'},et:0,er:0,es:Math.floor(Math.random()*999),tu:[]};t.nm=stFreeNm();const G=geom(shOf(t)),M=Math.max(G.SW,G.SH),kf=.9*M/big;
 t.el=sel.map(q=>{const{x,y,s,...r}=q;return{...r,x:+(G.SW/2+(x-cx)*kf).toFixed(2),y:+(G.SH/2+(y-cy)*kf).toFixed(2),s:+(s*kf).toFixed(3)}});
 WBS.tiles.push(t);WBS.cur=WBS.tiles.length-1;
 const gone=new Set(sel.map(q=>q.u));L.pl=(L.pl||[]).filter(q=>!gone.has(q.u));

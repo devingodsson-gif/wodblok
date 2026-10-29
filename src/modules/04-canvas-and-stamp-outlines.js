@@ -37,6 +37,8 @@ const SHN={rect:'Rectangle',hex:'Hexagon',circle:'Circle',diamond:'Diamond',tri:
 // The stamp view (2.5.1): while a stamp is open in its tab the stage is a canvas of the stamp's own size, alone (no outline, tile, book or background)
 // A stamp's name (2.28.0): its own name when it has been given one (t.nm, renamed in the Stamps list), else "Stamp <id>". The id never changes, so the names do not
 // renumber when a stamp is deleted, and "Stamp 7" in the Elements list stays the same stamp. A new stamp is given its name when it is made.
+// the next free "Stamp N" (a running count of the stamps there are, not the internal id: B11, 2.76.4)
+const stFreeNm=(extra)=>{const u=new Set([...WBS.tiles,...(extra||[])].map(t=>/^Stamp (\d+)$/.test(t.nm||'')?+RegExp.$1:0));let n=1;while(u.has(n))n++;return 'Stamp '+n};
 const stNm=t=>t?(typeof t.nm=='string'&&t.nm.trim()?t.nm.trim().slice(0,40):'Stamp '+t.id):'Missing stamp';
 const stNmId=id=>stNm(WBS.tiles.find(t=>t.id==id));
 const hEsc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));   // a name a person typed, put into markup
@@ -164,4 +166,4 @@ CM=Object.fromEntries(C);
 PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return[WADA_NAMES[i]||'No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj=trayDefault();try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 }
-export {hEsc,stNm,stNmId,stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
+export {hEsc,stFreeNm,stNm,stNmId,stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};

@@ -36,7 +36,7 @@ function crStart(){const p=crSel();if(!p)return;if(CR.on)crEnd(true);const A=WBS
  const ox=p.k=='image'?0:Math.max(0,(A.w*(1-c0[0]-c0[2])*kx-w)/2)/(A.w*kx),oy=p.k=='image'?0:Math.max(0,(A.h*(1-c0[1]-c0[3])*ky-h)/2)/(A.h*ky),c=[c0[0]+ox,c0[1]+oy,c0[2]+ox,c0[3]+oy];
  CR.on={mode:'rect',p,A,c0,c,cs:c.slice(),kx,ky,d:null};upd();crPaint()}
 function crPtsStart(){const p=crSel();if(!p||p.k!='image')return;if(CR.on)crEnd(true);const A=WBS.ARTS[p.a],c0=crOf(p),[kx,ky]=crScale(p,A,c0),pts=Array.isArray(p.pc)&&p.pc.length>2?p.pc.map(q=>q.map(v=>+v||0)):[];
- CR.on={mode:'pts',p,A,c0,kx,ky,pts,p0:JSON.stringify(pts),closed:pts.length>2,sel:-1,d:null};upd();crPaint()}
+ CR.on={mode:'pts',p,A,c0,kx,ky,pts,p0:JSON.stringify(pts),closed:pts.length>2,sel:-1,d:null};upd();crPaint();if(pts.length<3)pmsg('Point crop: click the picture to add points (at least 3), Enter to apply, Esc to leave it.')}
 const crF2=v=>(+v).toFixed(2);
 // the point outline in the picture's frame (canvas units): its path, closed or not
 function crPathD(pts,closed){if(!pts.length)return'';const L=pts.map(q=>[...crLoc(q[0],q[1]),...crLoc(q[2],q[3]),...crLoc(q[4],q[5])]);let d=`M${crF2(L[0][0])} ${crF2(L[0][1])}`;
@@ -90,6 +90,7 @@ function crEnd(apply){const S=CR.on;if(!S)return;CR.on=null;
  if(apply&&S.mode=='rect'&&S.c.some((v,i)=>Math.abs(v-S.cs[i])>1e-4)){const{p,A,c,kx,ky}=S,cw=1-c[0]-c[2],ch=1-c[1]-c[3];CR.on=S;const[mx,my]=crLoc(c[0]+cw/2,c[1]+ch/2),[X,Y]=crToC(mx,my);CR.on=null;const s=Math.max(1,+p.s||100);
   p.x=+X.toFixed(2);p.y=+Y.toFixed(2);p.wx=+(cw*A.w*kx/s).toFixed(4);p.wy=+(ch*A.h*ky/s).toFixed(4);if(p.k!='image'){delete p.iz;delete p.im}
   if(c.every(v=>v<1e-4))delete p.ic;else p.ic=c.map(v=>+v.toFixed(4));store()}
+ if(apply&&S.mode=='pts'&&S.pts.length&&S.pts.length<3)pmsg('Point crop needs at least 3 points, so no crop was made.');
  if(apply&&S.mode=='pts'){const pts=S.pts.length>2?S.pts.map(q=>q.map(v=>+(+v).toFixed(4))):[];if(JSON.stringify(pts)!==S.p0){if(pts.length)S.p.pc=pts;else delete S.p.pc;store()}}
  upd();crPaint()}
 function init94(){
@@ -106,7 +107,7 @@ function init94(){
  art.addEventListener('pointermove',e=>{if(!CR.on||!CR.on.d)return;e.stopImmediatePropagation();const[X,Y]=fpPt(e),[lx,ly]=crFromC(X,Y);if(CR.on.mode=='pts')crPtsMove(lx,ly,e);else crMove(lx,ly)},true);
  art.addEventListener('pointerup',e=>{if(!CR.on||!CR.on.d)return;e.stopImmediatePropagation();CR.on.d=null},true);
  document.addEventListener('keydown',e=>{if(!CR.on||(e.target.matches&&e.target.matches('input,textarea,select')))return;const S=CR.on;
-  if(e.key=='Enter'){e.preventDefault();e.stopImmediatePropagation();if(S.mode=='pts'&&S.pts.length>2)S.closed=true;crEnd(true)}
+  if(e.key=='Enter'){e.preventDefault();e.stopImmediatePropagation();if(S.mode=='pts'&&S.pts.length<3){pmsg('Point crop needs at least 3 points: click the picture to add more.');return}if(S.mode=='pts')S.closed=true;crEnd(true)}
   else if(e.key=='Escape'){e.preventDefault();e.stopImmediatePropagation();crEnd(false)}
   else if(S.mode=='pts'&&(e.key=='Delete'||e.key=='Backspace')&&S.sel>=0){e.preventDefault();e.stopImmediatePropagation();S.pts.splice(S.sel,1);S.sel=-1;if(S.pts.length<3)S.closed=false;crPaint()}},true)}
 export {init94};

@@ -1,6 +1,6 @@
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CM,CW,PL,bk,col,geom,okC,setDim,shOf,stvSet,tileOn} from './04-canvas-and-stamp-outlines.js';
+import {bk,CH,CM,col,CW,geom,okC,PL,setDim,shOf,stFreeNm,stvSet,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {trayLoad} from './50-tray-core.js';
 import {flatEls,selOne,store} from './06-motif-library-folders.js';
 import {raf,upd} from './11-pressure-flooding-block-edges.js';
@@ -90,7 +90,7 @@ const isQ=e=>e&&!['texture','pressure','jitter','grade'].includes(e.k);
 // anything switched off stays out of the picture: filter effects (Effects; never on a repeat tile), pressure and textures (Finish), the parts (a focal point is marked by the Look)
 const keepFx=e=>!(isQ(e)&&(!FT.efx||tile))&&!((e.k=='pressure'||e.k=='texture')&&!FT.fin);
 // the roll's stamps take ids no stamp has had in this session: a print kept for an old stamp with the same id must never stand in for a new one
-{const base=Math.max(0,...WBS.tiles.map(t=>+t.id||0),WBS.nid||0),mp={};res.tiles.forEach((t,i)=>{mp[t.id]=base+1+i;t.id=base+1+i});res.els.forEach(q=>{if(q.k=='stamp'&&mp[q.t]!=null)q.t=mp[q.t];(q.src||[]).forEach(x=>{if(x.k=='stamp'&&mp[x.t]!=null)x.t=mp[x.t]})});WBS.nid=base+1+res.tiles.length}
+{const base=Math.max(0,...WBS.tiles.map(t=>+t.id||0),WBS.nid||0),mp={};res.tiles.forEach((t,i)=>{mp[t.id]=base+1+i;t.id=base+1+i;if(!(typeof t.nm=='string'&&t.nm.trim()))t.nm=stFreeNm(res.tiles.slice(0,i))});res.els.forEach(q=>{if(q.k=='stamp'&&mp[q.t]!=null)q.t=mp[q.t];(q.src||[]).forEach(x=>{if(x.k=='stamp'&&mp[x.t]!=null)x.t=mp[x.t]})});WBS.nid=base+1+res.tiles.length}
 const fr=q=>RZ_FRAME.includes(q.nm);
 let els=res.els.filter(q=>(FT.frame||!fr(q))&&(FT.focal||q._p!='focal')&&(FT.pat||q.k!='pattern'||q.mp||fr(q)));els.forEach(q=>{delete q._p;if(q.fx){q.fx=q.fx.filter(keepFx);if(!q.fx.length)delete q.fx}});
 const top=res.top&&FT.efx&&!tile?{u:fpU(),k:'sheet',n:'Filter',fl:'none',fx:[res.top]}:null,texts=FT.text?res.texts:[];
