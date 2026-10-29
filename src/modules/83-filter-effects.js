@@ -9,7 +9,7 @@ import {fxRegister} from './65-element-core.js';
 // filt(e, id, b) returns {defs, wrap(markup)} or null; the effect stack (69) chains them in list order with the Colour grade.
 // Settings are declared: P ranges [field, label, min, max, default, unit], S selects [field, label, [[value, name]...], default], C checks [field, label, default];
 // seed: true adds a Reroll button and an `sd` field. Sizes scale with the element, so an effect looks the same on a small and a large one.
-const FQK=['stamp','text','pattern','paint','motif','sheet'];
+const FQK=['stamp','text','pattern','paint','motif','image','sheet'];
 const q4=n=>+(+n).toFixed(4);
 const fqClamp=(v,a,b,d)=>{v=+v;return Number.isFinite(v)?Math.max(a,Math.min(b,v)):d};
 const fqFilter=(id,x,y,w,h,body)=>`<filter id="${id}" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="${q4(x)}" y="${q4(y)}" width="${q4(w)}" height="${q4(h)}" color-interpolation-filters="sRGB">${body}</filter>`;

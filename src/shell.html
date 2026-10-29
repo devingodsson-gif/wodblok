@@ -34,6 +34,7 @@ svg[stroke="currentColor"]:not([width]):not(.ic){stroke-width:1.7;stroke-linecap
 .ddl{border-radius:var(--r-l);padding:6px}.ddi{border-radius:var(--r-m);padding:6px 8px}.ddi.cur{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}.ddi.dis{opacity:.4;cursor:default}.rowm .ddi{white-space:nowrap;display:flex;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);font:inherit;cursor:pointer}.rowm .ddi:hover:not(:disabled),.rowm .ddi:focus-visible{background:var(--acc-soft)}.rowm .ddi:disabled{opacity:.4;cursor:default}.ddg{padding:8px 8px 4px;font-size:var(--fs-s);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .sw .dd2,.asp .dd2,.lyo .dd2,.gmc .dd2{flex:1;min-width:0}
 .ccb{flex:none;width:38px;height:var(--h-md);padding:4px;margin:0;border:1px solid var(--line2);border-radius:var(--r-m);background:var(--field)}.ccb::before{content:"";display:block;width:100%;height:100%;border-radius:var(--r-s);background:var(--c,#888);box-shadow:var(--edge)}.ccb:hover{border-color:var(--faint)}.gmc .ccb{width:var(--h-md);height:var(--h-md)}
+#fpov path.crp{fill:none;stroke:var(--acc);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}#fpov .fhd.on{fill:var(--acc)}
 #fpov rect.sel,#fpov rect.gh{fill:none;stroke:var(--acc);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}#fpov rect.gh{stroke-dasharray:4 3}#fpov rect.gh.ov{stroke:var(--warn)}
 :root{--hl:var(--acc)}
 #fpov .sgg{pointer-events:none}#fpov .sgl,#fpov .sgs{fill:none;stroke:var(--hl);stroke-width:1px;vector-effect:non-scaling-stroke;shape-rendering:crispEdges;pointer-events:none}
@@ -900,6 +901,7 @@ body.eyedrop{cursor:crosshair}
  <button type="button" id="rail-layers" data-pn="layers" aria-label="Pattern"></button>
  <button type="button" id="rail-stmp" data-pn="stmp" aria-label="Stamp"></button>
  <button type="button" id="rail-motifs" data-pn="motifs" aria-label="Shape"></button>
+ <button type="button" id="rail-image" data-pn="image" aria-label="Image"></button>
  <button type="button" id="rail-text" data-pn="text" aria-label="Text"></button>
  <button type="button" id="rail-mlist" data-pn="mlist" aria-label="Element"></button>
  <button type="button" id="rail-elpaint" data-pn="elpaint" aria-label="Paint"></button>
@@ -1147,6 +1149,14 @@ body.eyedrop{cursor:crosshair}
   </div></details>
  </section>
 
+ <section class="pn" data-p="image" hidden>
+  <details class="g" open id="imcrop" hidden><summary>Crop</summary><div class="gb">
+   <div class="row"><button type="button" class="alt" id="im_crop">Crop</button><button type="button" class="alt" id="im_pcrop">Point crop</button></div>
+   <div class="ctl"><label>Feather</label><input type="range" id="im_fe" min="0" max="100" value="0" data-u="%" data-def="0"></div>
+   <div class="row"><button type="button" class="alt" id="im_reset">Reset crop</button></div>
+  </div></details>
+  <details class="g" open><summary>Pictures</summary><div class="gb" id="impane"></div></details>
+ </section>
  <section class="pn" data-p="sheet" hidden></section>
  <section class="pn" data-p="mlist" hidden>
   <details class="g" open><summary>Element</summary><div class="gb">

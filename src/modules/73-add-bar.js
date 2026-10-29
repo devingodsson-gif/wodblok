@@ -48,6 +48,7 @@ const AB={
  paint(){const q=abInsert({u:fpU(),k:'paint',n:'Paint '+(abCount('paint')+1),x:0,y:0,st:[]});if(!q)return;WBS.paSel=q.u;if(WBX.wbPaArm)WBX.wbPaArm('brush');abDone();abOpen('elpaint')},
  stamp(){abPick('stamp');abArm('stamp')},
  motif(){abPick('motif');abArm('motif')},
+ image(){plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;upd();abOpen('image')},   /* 2.75.0: the Image panel, creating: its Pictures library and Import image */
  select(){abSelect()}};
 // what Add in an element panel makes (2.6.0; Motif and Stamp too from 2.7.0): just above the selected element
 const AD={
