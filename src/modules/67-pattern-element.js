@@ -45,24 +45,33 @@ if(p.lay=='half'){for(let i=-1;i<=cn;i++)for(let j=-1;j<=rn;j++){const y=(j+.5)*
 for(let j=-1;j<=rn;j++)for(let i=-1;i<=cn;i++)o.push([(i+.5)*cw,(j+.5)*ch]);return{pts:sh(o),cell}}
 // 2.31.0: a motif source carries its own look (stretch, colour, fill, picture, outline), which every placement of it takes
 const PAT_LOOK=['wx','wy','ink','fl','a','iz','im','sw','sk'];
+// 2.76.5: what makes the pieces look hand-printed. A piece's own ink (pcm: 'place' takes the colour by the place's class, as a Checkerboard's two colours; 'random' draws
+// one; the colours are pcc, tray colours), its own pressure (iv, 0 to 100: how much lighter the lightest piece prints) and overprinting (ov: pieces multiply where they overlap).
+// Each piece draws from its own seeded stream, so a piece keeps its look when the others change.
+function patVary(p,o,i,cls){const iv=+p.iv||0,cm=p.pcm,cc=Array.isArray(p.pcc)?p.pcc:[];if(!(iv>0||p.ov||(cm&&cc.length)))return o;
+ const r=patRnd((+p.sd||1)*7919+i*104729+3);
+ if(cm&&cc.length){const c=cm=='place'?cc[((cls|0)%cc.length+cc.length)%cc.length]:cc[Math.floor(r()*cc.length)];if(c)o.ink=c}else r();
+ if(iv>0)o.op=Math.max(5,Math.round(100-r()*Math.min(100,iv)*.9));
+ if(p.ov)o.bl='multiply';return o}
 const patLook=s=>{const o={};PAT_LOOK.forEach(k=>{if(s[k]!=null)o[k]=s[k]});return o};
 const patSrcOk=s=>s&&(s.k=='stamp'?WBS.tiles.some(t=>t.id==s.t):s.k=='motif'?typeof s.m=='string'&&!!s.m:s.k=='text'&&s.it);
 // the elements a pattern stands for
 function patItems(p){const ss=(p.src||[]).filter(patSrcOk);if(!ss.length)return[];if(p.lay=='tile'&&!mapShape(p))return patTiles(p,ss);const{pts,cell,rot}=patPts(p),r=patRnd(p.sd),sz=cell*patClamp(p.sz||80,5,300)/100,tot=ss.reduce((a,s)=>a+(+s.w>0?+s.w:1),0),out=[];
 pts.forEach((q,i)=>{let s;if(p.ds=='random')s=ss[Math.floor(r()*ss.length)];else if(p.ds=='weight'){let v=r()*tot;s=ss.find(z=>(v-=(+z.w>0?+z.w:1))<0)||ss[ss.length-1]}else s=ss[i%ss.length];
 const b={u:p.u+'.'+i,pu:p.u,...(p.fx&&p.fx.length?{fx:p.fx}:{}),x:+q[0].toFixed(1),y:+q[1].toFixed(1),s:+sz.toFixed(2),r:(+p.rt||0)+(rot?rot[i]||0:0),f:1};
-if(s.k=='stamp')out.push({...b,k:'stamp',t:s.t});else if(s.k=='motif')out.push({...b,k:'motif',m:s.m,s:+(sz/1.5).toFixed(2),...patLook(s)});else{const{u,x,y,s:_s,r:_r,f:_f,...it}=s.it;out.push({...it,...b,k:'text'})}});return out}
+if(s.k=='stamp')out.push(patVary(p,{...b,k:'stamp',t:s.t},i,i));else if(s.k=='motif')out.push(patVary(p,{...b,k:'motif',m:s.m,s:+(sz/1.5).toFixed(2),...patLook(s)},i,i));else{const{u,x,y,s:_s,r:_r,f:_f,...it}=s.it;out.push(patVary(p,{...it,...b,k:'text'},i,i))}});return out}
 // the pieces of a tiling: each place's own size, turn and flip; Cycle picks the source by the place's class (a Checkerboard's two colours, a Diagonal's stripes),
 // so sources alternate the way the arrangement says; a place marked gap (the small squares of Octagons and squares) is left empty with only one source
 function patTiles(p,ss){const T=patPts(p),r=patRnd(p.sd),tot=ss.reduce((a,s)=>a+(+s.w>0?+s.w:1),0),out=[],n=ss.length;
  T.pts.forEach((q,i)=>{if(T.gap[i]&&n<2)return;let s;if(p.ds=='random')s=ss[Math.floor(r()*n)];else if(p.ds=='weight'){let v=r()*tot;s=ss.find(z=>(v-=(+z.w>0?+z.w:1))<0)||ss[n-1]}else s=ss[((T.cls[i]%n)+n)%n];
   const sz=T.size[i],b={u:p.u+'.'+i,pu:p.u,...(p.fx&&p.fx.length?{fx:p.fx}:{}),x:+q[0].toFixed(2),y:+q[1].toFixed(2),s:+sz.toFixed(3),r:+(T.rot[i]||0).toFixed(2),f:T.flip[i]||1};
-  if(s.k=='stamp')out.push({...b,k:'stamp',t:s.t});else if(s.k=='motif'){// a shape fills the tile's own box (a hexagon tile is narrower than it is tall), times its own stretch
-   const L=patLook(s),bw=T.gap[i]?1:T.box.w,bh=T.gap[i]?1:T.box.h;out.push({...b,k:'motif',m:s.m,...L,wx:+((+L.wx||1)*bw).toFixed(4),wy:+((+L.wy||1)*bh).toFixed(4)})}else{const{u,x,y,s:_s,r:_r,f:_f,...it}=s.it;out.push({...it,...b,k:'text'})}});
+  if(s.k=='stamp')out.push(patVary(p,{...b,k:'stamp',t:s.t},i,T.cls[i]));else if(s.k=='motif'){// a shape fills the tile's own box (a hexagon tile is narrower than it is tall), times its own stretch
+   const L=patLook(s),bw=T.gap[i]?1:T.box.w,bh=T.gap[i]?1:T.box.h;out.push(patVary(p,{...b,k:'motif',m:s.m,...L,wx:+((+L.wx||1)*bw).toFixed(4),wy:+((+L.wy||1)*bh).toFixed(4)},i,T.cls[i]))}else{const{u,x,y,s:_s,r:_r,f:_f,...it}=s.it;out.push(patVary(p,{...it,...b,k:'text'},i,T.cls[i]))}});
  return out}
 // the layer as the kinds should draw it: each pattern replaced, in place, by the elements it stands for
 function patExpand(L){const pl=L.pl||[];if(!pl.some(q=>q.k=='pattern'))return L;const o=[];pl.forEach(q=>{if(q.k=='pattern'){if(q.af){const cx=+(CW/2).toFixed(1),cy=+(CH/2).toFixed(1);if(q.x!==cx)q.x=cx;if(q.y!==cy)q.y=cy}   /* an area that follows the canvas keeps its middle on the canvas's (its box is drawn there) */
- const A=patArea(q),cl=!q.af&&+q.aw>0?{clp:[A.x0,A.y0,A.w,A.h]}:null,w=q.op!=null||q.bl||q.v===false||q.g||cl?{wk:q.u,...(cl||{}),...(q.g?{g:q.g}:{}),...(q.op!=null?{op:q.op}:{}),...(q.bl?{bl:q.bl}:{}),...(q.v===false?{v:false}:{})}:null;o.push(...(w?patItems(q).map(i=>({...i,...w})):patItems(q)))}else o.push(q)});return{...L,pl:o}}
+ const A=patArea(q),cl=!q.af&&+q.aw>0?{clp:[A.x0,A.y0,A.w,A.h]}:null,w=q.op!=null||q.bl||q.v===false||q.g||cl?{wk:q.u,...(cl||{}),...(q.g?{g:q.g}:{}),...(q.op!=null?{op:q.op}:{}),...(q.bl?{bl:q.bl}:{}),...(q.v===false?{v:false}:{})}:null;const vr=(+q.iv>0)||q.ov;   // pieces with their own pressure or overprinting are wrapped one by one (the pattern's own opacity and blend ride on each); their clip is shared by id
+ o.push(...(w?patItems(q).map(i=>{if(!vr)return{...i,...w};const m={...i,...w,wk:i.u};if(cl)m.cwk=q.u;if(w.op!=null||i.op!=null)m.op=Math.round((i.op==null?100:i.op)*(w.op==null?100:w.op)/100);else delete m.op;if(i.bl||w.bl)m.bl=i.bl||w.bl;return m}):patItems(q)))}else o.push(q)});return{...L,pl:o}}
 
 // Empty patterns (2.4.0): each point is drawn as an arrow pointing the way a placed piece would face (its top), so the pattern can be seen and set up before anything is in it.
 // The arrows are editor overlay only: they are not part of the picture, nor of an export.
@@ -85,7 +94,7 @@ $('pelay').querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dat
 {const tile=p.lay=='tile';$('petl').hidden=!tile;$('pefr').hidden=tile;{const lb={radial:['Spokes','Rings'],scatter:['Across','Down'],frame:['Columns','Rows']}[p.lay]||['Columns','Rows'];$('pecn').closest('.ctl').firstElementChild.textContent=lb[0];$('pern').closest('.ctl').firstElementChild.textContent=lb[1]}if(tile){const sh=tlShape(p),ts=$('pets'),ar=$('pear');
  if(!ts.options.length)ts.innerHTML=TL_TS.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');const tv=p.ts&&TL_AR[p.ts]?p.ts:'auto';if(ts.value!==tv)ts.value=tv;
  const ah=TL_AR[sh].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');if(ar.dataset.sh!==sh){ar.dataset.sh=sh;ar.innerHTML=ah}const av=tlArr(p,sh);if(ar.value!==av)ar.value=av}}$('peds').querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d==p.ds));
-const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};sv('peps',+p.ps||12);sv('pesp',+p.sp||0);sv('pecn',p.cn);sv('pern',p.rn);sv('pesz',p.sz);sv('pert',p.rt);sv('peox',+p.ox||0);sv('peoy',+p.oy||0);sv('pein',p.in==null?4:+p.in);$('peinr').hidden=p.lay!='frame';
+const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};sv('peps',+p.ps||12);sv('pesp',+p.sp||0);sv('pecn',p.cn);sv('pern',p.rn);sv('pesz',p.sz);sv('pert',p.rt);sv('peox',+p.ox||0);sv('peoy',+p.oy||0);sv('pein',p.in==null?4:+p.in);sv('peiv',+p.iv||0);$('peov').checked=!!p.ov;$('pepc').querySelectorAll('[data-c]').forEach(b=>b.classList.toggle('on',b.dataset.c==(p.pcm||'')));$('peinr').hidden=p.lay!='frame';
 // the sources (2.3.0): one row each, a thumbnail of the stamp (or the kind's icon), its name, its weight when the pattern picks by weight, and remove
 $('pesrc').innerHTML=(p.src||[]).map((s,i)=>{const t=s.k=='stamp'?WBS.tiles.find(x=>x.id==s.t):null,G=t?geom(shOf(t)):null,th=s.k=='motif'?`<svg viewBox="-110 -110 220 220">${mk(s.m,'currentColor','transparent')}</svg>`:G?`<svg viewBox="0 0 ${G.SW} ${G.SH}"><use href="#s${t.id}"/></svg>`:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.text}</svg>`;
  return`<div class="psr2${s.k=='motif'&&WBS.patSrc===i?' on':''}" data-si="${i}"${s.k=='motif'?' data-look':''}><span class="pth">${th}</span><b>${patHx(patSrcName(s))}${patSrcOk(s)?'':' <i>missing</i>'}</b>${p.ds=='weighted'?`<input type="number" min="1" max="99" value="${+s.w>0?+s.w:1}" data-sw="${i}" aria-label="Weight">`:'<span></span>'}<button type="button" class="ib" data-sx="${i}" aria-label="Remove this source"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.close}</svg></button></div>`}).join('')}
@@ -103,10 +112,12 @@ $('penew').onclick=()=>{const L=fpL();if(!L)return;L.pl=L.pl||[];const n=patList
 $('pelist').onclick=e=>{const L=fpL();if(!L)return;WBS.patSrc=null;const d=e.target.closest('[data-pd]');if(d){const i=L.pl.findIndex(q=>q.u==d.dataset.pd);if(i>=0){L.pl.splice(i,1);if(WBS.patSel==d.dataset.pd)WBS.patSel=null;patCh()}return}const r=e.target.closest('[data-pe]');if(r){WBS.patSel=r.dataset.pe;patSync();}};
 const set=(f,v)=>{const p=patCur();if(!p)return;if(p[f]===v)return;p[f]=v;patCh()};
 $('pelay').onclick=e=>{const b=e.target.closest('[data-l]');if(b){set('lay',b.dataset.l);$('peinr').hidden=b.dataset.l!='frame'}};
+$('pepc').onclick=e=>{const b=e.target.closest('[data-c]'),p=patCur();if(!b||!p)return;const v=b.dataset.c;if((p.pcm||'')===v)return;if(v){p.pcm=v;const ts=(WBS.proj.ts||[]).map(id=>'@'+id);p.pcc=ts.length?ts:[WBS.proj.ink]}else{delete p.pcm;delete p.pcc}patCh()};   // the colours are the tray's, taken when the choice is made
+$('peov').addEventListener('change',()=>{const p=patCur();if(!p)return;if($('peov').checked)p.ov=1;else delete p.ov;patCh()});
 $('peds').onclick=e=>{const b=e.target.closest('[data-d]');if(b)set('ds',b.dataset.d)};
 $('pets').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$('pets').value;if((p.ts||'auto')!==v){p.ts=v;delete p.ar;patCh()}});
 $('pear').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$('pear').value;if(p.ar!==v){p.ar=v;patCh()}});
-[['peps','ps'],['pesp','sp'],['pecn','cn'],['pern','rn'],['pesz','sz'],['pert','rt'],['peox','ox'],['peoy','oy'],['pein','in']].forEach(([id,f])=>$(id).addEventListener('input',()=>{const p=patCur();if(!p)return;const v=+$(id).value;if(p[f]!==v){p[f]=v;patCh()}}));
+[['peps','ps'],['pesp','sp'],['pecn','cn'],['pern','rn'],['pesz','sz'],['pert','rt'],['peox','ox'],['peoy','oy'],['pein','in'],['peiv','iv']].forEach(([id,f])=>$(id).addEventListener('input',()=>{const p=patCur();if(!p)return;const v=+$(id).value;if(p[f]!==v){p[f]=v;patCh()}}));
 $('pesd').onclick=()=>{const p=patCur();if(p){p.sd=1+Math.floor(Math.random()*9998);patCh()}};
 // "Add element" (2.4.0): one list of everything a pattern can place: the stamps, the motifs of the library, and the text on the canvas
 $('peadd').onclick=e=>{e.stopPropagation();patAddMenu()};

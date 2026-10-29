@@ -6,7 +6,7 @@ import {fmtValidate} from './validate.js';
 // In memory, a project keeps its images as data URLs, as the app always has; the container only moves them out of the JSON.
 // Format 21 is the only one the app opens. A file made by an older app is refused with a message, never converted (owner, Oct 19 2026); a file made by a newer
 // app opens read-only and is never written back.
-const FMT_LATEST = 29;   // 29 (2.57.0): a Pattern tiles by a tile shape and an arrangement and has an area; 28 (2.53.0): the Sheet element
+const FMT_LATEST = 30;   // 30 (2.76.5): a Pattern's pieces take colours from the tray, vary in ink and overprint, and Jitter turns in steps; 29 (2.57.0): a Pattern tiles by a tile shape and an arrangement and has an area; 28 (2.53.0): the Sheet element
 const FMT_MIME = 'application/vnd.wodblok+zip', FMT_REF = 'wbasset:';
 const FMT_EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' };
 const FMT_TYPE = Object.fromEntries(Object.entries(FMT_EXT).map(([k, v]) => [v, k]));

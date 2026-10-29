@@ -35,12 +35,12 @@ const fxPad=(x,y,W,H)=>{const p=Math.max(W,H)*.15;return{x:x-p,y:y-p,W:W+2*p,H:H
 // pressure for one element: null when it has none of its own (the layer's setting then applies)
 function fxPress(q){const e=fxOn(q).filter(z=>z.k=='pressure');if(!e.length)return null;return{pst:Math.max(0,Math.min(10,+e[e.length-1].pst||0)),pfl:Math.max(0,Math.min(10,+e[e.length-1].pfl||0))}}
 
-// Jitter {pos: 0 to 100 (% of the element's size), rot: 0 to 180 degrees, sz: 0 to 100 (%), fh, fv: random flips, sd: seed}: a repeatable random nudge for one element; on a pattern every placement gets its own.
+// Jitter {pos: 0 to 100 (% of the element's size), rot: 0 to 180 degrees (or rs: 90 or 180, a turn in whole steps, the way a printer turns the block; rot is then not used), sz: 0 to 100 (%), fh, fv: random flips, sd: seed}: a repeatable random nudge for one element; on a pattern every placement gets its own.
 // The result is the change to the element's own place: dx, dy (canvas units), dr (degrees), sz (a scale factor), sx, sy (1 or -1). null = no jitter.
 const fxSeed=u=>{let h=7;for(const c of String(u))h=(h*31+c.charCodeAt(0))>>>0;return h%100000};
 function fxJit(q){const es=fxOn(q).filter(e=>e.k=='jitter');if(!es.length)return null;const J={dx:0,dy:0,dr:0,sz:1,sx:1,sy:1};
-es.forEach(e=>{const Q=rng(fxSeed(q.u)*15485863+(e.sd|0)*104729+101),a=Q(),b=Q(),c=Q(),d=Q(),h=Q(),v=Q(),P=Math.max(0,Math.min(100,+e.pos||0)),R=Math.max(0,Math.min(180,+e.rot||0)),Z=Math.max(0,Math.min(100,+e.sz||0)),s=+q.s||0;
-J.dx+=(a*2-1)*P/100*s*.5;J.dy+=(b*2-1)*P/100*s*.5;J.dr+=(c*2-1)*R;J.sz*=1+(d*2-1)*Z/100*.6;if(e.fh&&h<.5)J.sx=-J.sx;if(e.fv&&v<.5)J.sy=-J.sy});return J}
+es.forEach(e=>{const Q=rng(fxSeed(q.u)*15485863+(e.sd|0)*104729+101),a=Q(),b=Q(),c=Q(),d=Q(),h=Q(),v=Q(),P=Math.max(0,Math.min(100,+e.pos||0)),R=Math.max(0,Math.min(180,+e.rot||0)),Z=Math.max(0,Math.min(100,+e.sz||0)),RS=e.rs==90||e.rs==180?+e.rs:0,s=+q.s||0;
+J.dx+=(a*2-1)*P/100*s*.5;J.dy+=(b*2-1)*P/100*s*.5;J.dr+=RS>0?Math.floor(c*(360/RS))*RS:(c*2-1)*R;J.sz*=1+(d*2-1)*Z/100*.6;if(e.fh&&h<.5)J.sx=-J.sx;if(e.fv&&v<.5)J.sy=-J.sy});return J}
 
 // ---- the panels
 const KIND_PANEL={stamp:'stmp',text:'text',pattern:'layers',paint:'elpaint',motif:'motifs',image:'image',sheet:'sheet'};
@@ -77,6 +77,7 @@ function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hid
 <div class="fxs" data-e="jitter" hidden>
 <div class="ctl"><label>Position</label><input type="range" class="fxjp" min="0" max="100" value="20" data-u="%" data-def="20"></div>
 <div class="ctl"><label>Rotate</label><input type="range" class="fxjr2" min="0" max="180" value="15" data-u="&#176;" data-def="15"></div>
+<div class="ctl"><label>Turn</label><select class="fxjs" aria-label="Turn"><option value="0">Free</option><option value="90">90&#176; steps</option><option value="180">180&#176; steps</option></select></div>
 <div class="ctl"><label>Size</label><input type="range" class="fxjz" min="0" max="100" value="0" data-u="%" data-def="0"></div>
 <label class="chk"><input type="checkbox" class="fxjh"><span>Flip across</span></label>
 <label class="chk"><input type="checkbox" class="fxjv"><span>Flip down</span></label>
@@ -109,7 +110,7 @@ if(sel&&sel.k=='texture'){const L=txLib(sel.x)||{t:Object.keys(TXN)[0],a:40,sc:1
  {const tl=g._fxtl||(g._fxtl=gQ(g,'.fxtl')),row=gQ(g,'.fxtr');tlShow(tl,L.t,id=>{if(WBX.wbFxTexSet)WBX.wbFxTexSet(kind,'t',id);pmClose()});
   const th=txThumb(L.t),rk=L.t+(th?'+':'');if(row&&row.dataset.key!==rk){row.dataset.key=rk;const e=txSrc(L.t);row.querySelector('.rpth').innerHTML=th?`<img src="${th}" alt="" draggable="false">`:'';row.querySelector('.rpn').textContent=e?e.n:'Texture'}
   if(row&&!row.dataset.w){row.dataset.w=1;row.querySelector('.rpgo').onclick=ev=>{ev.stopPropagation();const b=ev.currentTarget;if(pmIsOpen(b)){pmClose();return}tl.hidden=false;pmPop(b,tl,'')}}}}
-if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=gQ(g,c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxjp',+sel.pos||0);set('.fxjr2',+sel.rot||0);set('.fxjz',+sel.sz||0);gQ(g,'.fxjh').checked=!!sel.fh;gQ(g,'.fxjv').checked=!!sel.fv}
+if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=gQ(g,c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxjp',+sel.pos||0);set('.fxjr2',+sel.rot||0);set('.fxjz',+sel.sz||0);{const t=gQ(g,'.fxjs'),v=String(sel.rs==90||sel.rs==180?sel.rs:0);if(t.value!==v)t.value=v;gQ(g,'.fxjr2').closest('.ctl').hidden=v!='0'}gQ(g,'.fxjh').checked=!!sel.fh;gQ(g,'.fxjv').checked=!!sel.fv}
 if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=gQ(g,'.fxg_'+k),v=+sel[k]||0;if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}});
 if(sel){const d=fxDef(sel.k),pane=d&&d.sync&&gQ(g,`.fxs[data-e="${sel.k}"]`);if(pane)d.sync(pane,sel)}
 if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=gQ(g,c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxpp',+sel.pst||0);set('.fxpf',+sel.pfl||0)}})}
@@ -163,6 +164,7 @@ gQ(g,'.fxrr').onclick=()=>{const e=cur();if(e){e.sd=txRid();fxCh()}};
 GRL.forEach(([k])=>gQ(g,'.fxg_'+k).addEventListener('input',()=>{const e=cur();if(!e||e.k!='grade')return;const v=+gQ(g,'.fxg_'+k).value;if(e[k]!==v){e[k]=v;fxCh()}}));
 [['.fxjp','pos'],['.fxjr2','rot'],['.fxjz','sz']].forEach(([c,f])=>gQ(g,c).addEventListener('input',()=>{const e=cur();if(!e||e.k!='jitter')return;const v=+gQ(g,c).value;if(e[f]!==v){e[f]=v;fxCh()}}));
 [['.fxjh','fh'],['.fxjv','fv']].forEach(([c,f])=>gQ(g,c).onchange=()=>{const e=cur();if(e&&e.k=='jitter'){e[f]=gQ(g,c).checked;fxCh()}});
+gQ(g,'.fxjs').addEventListener('change',()=>{const e=cur();if(!e||e.k!='jitter')return;const v=+gQ(g,'.fxjs').value;if(v)e.rs=v;else delete e.rs;gQ(g,'.fxjr2').closest('.ctl').hidden=!!v;fxCh()});
 gQ(g,'.fxjrr').onclick=()=>{const e=cur();if(e&&e.k=='jitter'){e.sd=txRid();fxCh()}};
 [['.fxpp','pst'],['.fxpf','pfl']].forEach(([c,f])=>gQ(g,c).addEventListener('input',()=>{const e=cur();if(!e||e.k!='pressure')return;const v=+gQ(g,c).value;if(e[f]!==v){e[f]=v;fxCh()}}))});
 WBX.wbFxSync=fxSync;WBX.wbFxTexSet=(kind,k,v)=>{const f=WBX.wbFxTexSets&&WBX.wbFxTexSets[kind];if(f)f(k,v)}}

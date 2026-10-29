@@ -73,9 +73,9 @@ test('a selected pattern shows its area; pulling a corner resizes the area, the 
   expect(errors).toEqual([]);
 });
 
-test('patterns are saved and opened at format 29; a file of format 28 is refused', async ({ page }) => {
+test('patterns are saved and opened at format 30 (with their Print fields); a file of format 29 is refused', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4 });
-  await setPat(page, { ts: 'tri', ar: 'alt', sp: 10 }); await H.settle(page);
+  await setPat(page, { ts: 'tri', ar: 'alt', sp: 10, pcm: 'place', pcc: ['#ff0000', '#0000ff'], iv: 40, ov: 1 }); await H.settle(page);
   await page.evaluate(() => { window.__wbDownloads.length = 0; });
   await page.click('#fileb'); await page.click('#psv');
   await page.waitForFunction(() => window.__wbDownloads.length > 0); await page.keyboard.press('Escape');
@@ -83,10 +83,10 @@ test('patterns are saved and opened at format 29; a file of format 28 is refused
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wb-pat-')), f = path.join(dir, 'p.wodblok'); fs.writeFileSync(f, Buffer.from(dl.base64, 'base64'));
   const { unzipSync, strFromU8, zipSync, strToU8 } = require('fflate');
   const files = unzipSync(new Uint8Array(fs.readFileSync(f))), proj = JSON.parse(strFromU8(files['project.json']));
-  expect(proj.v).toBe(29);
+  expect(proj.v).toBe(30);
   await H.openProjectFile(page, f);
-  expect(await pat(page)).toMatchObject({ lay: 'tile', ts: 'tri', ar: 'alt', sp: 10 });
-  files['project.json'] = strToU8(JSON.stringify({ ...proj, v: 28 }));
+  expect(await pat(page)).toMatchObject({ lay: 'tile', ts: 'tri', ar: 'alt', sp: 10, pcm: 'place', pcc: ['#ff0000', '#0000ff'], iv: 40, ov: 1 });
+  files['project.json'] = strToU8(JSON.stringify({ ...proj, v: 29 }));
   const old = path.join(dir, 'old.wodblok'); fs.writeFileSync(old, Buffer.from(zipSync(files)));
   await page.setInputFiles('#pfile', old); await H.settle(page);
   await expect(page.locator('#pmsg')).toContainText('older WODBLOK');

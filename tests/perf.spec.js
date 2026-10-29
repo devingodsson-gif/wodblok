@@ -56,7 +56,10 @@ async function measureOnce(browser, url, label, fixture = FIXTURE) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
   const page = await ctx.newPage();
   const { errors } = await openApp(page, { url });
-  await openProjectFile(page, fixture);
+  // the baseline build can be one format behind (it then opens the file as a copy from a newer app), so either message counts as open
+  await page.setInputFiles('#pfile', fixture);
+  await page.waitForFunction(() => /Opened|newer WODBLOK/.test((document.getElementById('pmsg') || {}).textContent || ''), null, { timeout: 30000 });
+  await settle(page);
   const r = await measureDrag(page);
   expect(errors, `${label} page errors`).toEqual([]);
   await ctx.close();
