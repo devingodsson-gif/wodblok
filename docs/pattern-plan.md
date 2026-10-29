@@ -13,7 +13,14 @@ Status: **plan only.** Nothing is built. The owner answers the questions at the 
 - Speed limit to respect (docs/randomize-plan.md): a Pattern with Pressure offset or Texture draws each piece on its own (up to 7 million characters in tests). Every per-piece feature below must stay inside the stamp's single print, or be measured with `npm run perf` (no regression over 10%).
 
 ## Releases
-One theme per release, each one minor (as the polish plan did). The Randomize plan's open steps (the simple panel, its tests, removing the old roller) end at 2.77.0, so this plan starts at 2.78.0; if the owner wants patterns first, the numbers move up by one and the Randomize plan follows.
+One theme per release, each one minor (as the polish plan did). Owner, Oct 29 2026: the Randomize plan's open steps go into this plan as one update, release 0 (2.77.0); the pattern releases follow from 2.78.0.
+
+### Release 0 — 2.77.0: Randomize finished (docs/randomize-plan.md steps 2 to 4, as one update)
+Step 1, the Looks, is live (2.74.1). The rest, which the owner answered on Oct 28 2026:
+- **The simple panel:** a Look choice (Any, or one of the eight Looks) and switches for Background, Pattern, Focal point, Text, Frame, Colours, Effects, Finish and Canvas size, replacing today's long list of sliders.
+- **Looks everywhere:** a roll with Stamps off, on a Book cover and on a repeat tile uses a Look too, so the **old roller is removed** (one roller, one code path).
+- **Tests:** the `randomize-*` specs, `text-randomize`, `repeat-tile`, `nothing-lost-2-24` and `motif-look-2-31` rewritten for the Looks; a coverage test (many seeds give a wide variety of Looks and layouts, nothing empty, nothing off the canvas, speed within the limit); the Randomize scenario snapshots regenerated in CI **with the owner's approval** (the rolls change).
+- `npm run perf` (a roll stays at most about 400,000 characters of `#dyn` markup). Suite: about 70% (Randomize touches drawing, every element kind and the document). Docs: docs/randomize-plan.md marked done.
 
 ### Release 1 — 2.78.0: Review fixes (the small bugs left from the 2.76 review)
 - B5: at 1024 px the menu bar runs over the project title, and the Randomize number boxes overlap their "All" menus.
@@ -87,11 +94,10 @@ One theme per release, each one minor (as the polish plan did). The Randomize pl
 - Tests: each menu item, search finds each action, history names, crop on a Sheet picture. Suite: about 40%.
 
 ## Questions for the owner
-1. Order: Randomize plan first (2.77.0), then this plan; or patterns first?
-2. Is the release order right? (Bugs, then hand-printed pieces, export, arrangements, first minute, shapes and density, piece editing, library and mockups, experienced users.)
-3. Once starter templates exist, should the template picker open at launch again (today off by default)?
-4. Starter stamps: may I draw a few simple ones from the built-in shapes, or will you supply the artwork?
-5. Density from a picture (release 6): bigger and smaller pieces, fewer pieces, or both?
-6. Editing one piece (release 7): what can a piece change (source, colour, place, turn, removal)?
-7. Mockups (release 8): which objects, and from your own photos or drawn ones?
-8. The project title: "Untitled project", or another wording?
+1. Is the release order right? (Randomize finished, bugs, then hand-printed pieces, export, arrangements, first minute, shapes and density, piece editing, library and mockups, experienced users.)
+2. Once starter templates exist, should the template picker open at launch again (today off by default)?
+3. Starter stamps: may I draw a few simple ones from the built-in shapes, or will you supply the artwork?
+4. Density from a picture (release 6): bigger and smaller pieces, fewer pieces, or both?
+5. Editing one piece (release 7): what can a piece change (source, colour, place, turn, removal)?
+6. Mockups (release 8): which objects, and from your own photos or drawn ones?
+7. The project title: "Untitled project", or another wording?
