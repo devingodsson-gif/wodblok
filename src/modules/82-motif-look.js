@@ -45,7 +45,7 @@ function mfSync(){if(!$('mf_f'))return;const T=mfT();MF_G.forEach(id=>mfVis(id,!
  // 2.60.4: a Sheet's gradient: the Colour well is its start, End its end; Linear by an angle, Radial by a centre and a size; Midpoint where the two meet
  mfVis('mf_gr',fk=='grad');{const k=$('mf_fck'),t=fk=='grad'?'Start':'Colour';if(k.textContent!==t)k.textContent=t}
  if(fk=='grad'){const rad=p.gk=='rad';$('mf_gk').querySelectorAll('[data-g]').forEach(b=>mfSet(b,b.dataset.g==(rad?'rad':'lin')));mfVis('mf_gar',!rad);mfVis('mf_grr',rad);mfVal('mf_ga',p.ga!=null?+p.ga:90);mfVal('mf_gx',p.gx!=null?+p.gx:50);mfVal('mf_gy',p.gy!=null?+p.gy:50);mfVal('mf_gs',p.gs!=null?+p.gs:70);mfVal('mf_gm',p.gm!=null?+p.gm:50)}
- if(fk=='img'){mfStrip(p.a);mfVal('mf_iz',Math.round(+p.iz||100));const im=$('mf_im'),fit=p.im&&(sh||p.im=='contain')?p.im:'cover';im.style.gridTemplateColumns=`repeat(${sh?4:2},1fr)`;im.querySelectorAll('[data-i]').forEach(b=>{const x=b.dataset.i=='stretch'||b.dataset.i=='tile';if(b.hidden!==(x&&!sh))b.hidden=x&&!sh;mfSet(b,b.dataset.i==fit)})}
+ if(WBX.wbCropSync)WBX.wbCropSync();if(fk=='img'){mfStrip(p.a);mfVal('mf_iz',Math.round(+p.iz||100));const im=$('mf_im'),fit=p.im&&(sh||p.im=='contain')?p.im:'cover';im.style.gridTemplateColumns=`repeat(${sh?4:2},1fr)`;im.querySelectorAll('[data-i]').forEach(b=>{const x=b.dataset.i=='stretch'||b.dataset.i=='tile';if(b.hidden!==(x&&!sh))b.hidden=x&&!sh;mfSet(b,b.dataset.i==fit)})}
  if(sh){if(WBX.wbPaintWells)WBX.wbPaintWells();return}
  const so=+p.sw>0,oc=$('mf_oon');if(oc.checked!==so)oc.checked=so;mfVis('mf_owr',so);mfVis('mf_ocr',so);if(so)mfVal('mf_ow',Math.round(+p.sw));
  if(WBX.wbPaintWells)WBX.wbPaintWells()}

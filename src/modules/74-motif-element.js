@@ -36,19 +36,23 @@ function mtDraw(m,o,id,seen,ip='mai_'){const w=Math.max(.01,o.w),h=Math.max(.01,
   body+=`<g filter="url(#${id}o)"><rect ${R} fill="#000" mask="url(#${mid})"/></g>`}
  const A=o.pic&&o.pic.A;
  if(A){const aid=ip+String(o.pic.a).replace(/[^\w-]/g,'');if(seen!==true&&(!seen||!seen.has(aid))){if(seen)seen.add(aid);defs+=`<image id="${aid}" href="${A.src}" x="0" y="0" width="${A.w}" height="${A.h}" preserveAspectRatio="none"/>`}
-  const k=(o.pic.im=='contain'?Math.min(w/A.w,h/A.h):Math.max(w/A.w,h/A.h))*Math.max(.05,Math.min(8,(+o.pic.iz||100)/100));
-  body+=`<g mask="url(#${mid})"><use href="#${aid}" transform="scale(${k.toFixed(5)}) translate(${mt2(-A.w/2)} ${mt2(-A.h/2)})"/></g>`}
+  // 2.74.2: a cropped picture (ic: the part cut off left, top, right, bottom; 94-image-crop.js) is laid in as if it were only what is left
+  const ic=Array.isArray(o.pic.ic)&&o.pic.ic.some(v=>+v>0)?o.pic.ic.map(v=>Math.max(0,Math.min(.98,+v||0))):null,cx=ic?A.w*ic[0]:0,cy=ic?A.h*ic[1]:0,cw=ic?A.w*(1-ic[0]-ic[2]):A.w,ch=ic?A.h*(1-ic[1]-ic[3]):A.h;
+  const k=(o.pic.im=='contain'?Math.min(w/cw,h/ch):Math.max(w/cw,h/ch))*Math.max(.05,Math.min(8,(+o.pic.iz||100)/100));
+  if(ic)defs+=`<clipPath id="${mid}ic"><rect x="${mt2(cx)}" y="${mt2(cy)}" width="${mt2(cw)}" height="${mt2(ch)}"/></clipPath>`;
+  body+=`<g mask="url(#${mid})"><use href="#${aid}" transform="scale(${k.toFixed(5)}) translate(${mt2(-cx-cw/2)} ${mt2(-cy-ch/2)})"${ic?` clip-path="url(#${mid}ic)"`:''}/></g>`}
  else if(o.fill)body+=`<rect ${R} fill="${o.fill}" mask="url(#${mid})"/>`;
  return{defs,body}}
 // the look of a motif (an element, a stamp's motif or a pattern's source) as mtDraw takes it; ink: its fill colour (a colour reference resolved by the caller)
-const mtPic=p=>p.fl=='img'&&p.a&&WBS.ARTS[p.a]?{A:WBS.ARTS[p.a],a:p.a,iz:p.iz,im:p.im}:null;
+const mtPic=p=>p.fl=='img'&&p.a&&WBS.ARTS[p.a]?{A:WBS.ARTS[p.a],a:p.a,iz:p.iz,im:p.im,ic:p.ic}:null;
 // the shape that is being edited or moved draws live: its print would be out of date at every step
 const mtLive=p=>{const d=WBS.fpDrag,m=WBS.fpMS;return p.u==WBS.fpSel||!!(m&&m.has&&m.has(p.u))||!!(d&&(d.p===p||d.g&&d.g.some(a=>a[0]===p)))};
 // the box a w by h shape takes up on the canvas when it is turned r degrees: its effects work inside that box (2.74.2: a tall shape turned towards flat ran out of
 // the unturned box and was cut off by an invisible edge)
 const mtTurned=(w,h,r)=>{const a=r*Math.PI/180,c=Math.abs(Math.cos(a)),s=Math.abs(Math.sin(a));return[w*c+h*s,w*s+h*c]};
 function mtfLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='motif'&&p.m);if(!pl.length)return['',''];if(WBX.wbMtWarm)pl.forEach(p=>WBX.wbMtWarm(p.m));const fr=new Map(),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),seen=new Set();let defs='',out='';
- pl.forEach(p=>{if(p.flt&&!p.bgd){const r=mtFilter(p,li,seen);defs+=r.defs;fr.set(String(p.u),r.piece);return}
+ pl.forEach(p=>{if(WBX.wbCropHide&&WBX.wbCropHide(p))return;   /* a picture being cropped is drawn by the crop's overlay */
+  if(p.flt&&!p.bgd){const r=mtFilter(p,li,seen);defs+=r.defs;fr.set(String(p.u),r.piece);return}
   const id=String(p.u).replace(/[^\w-]/g,''),s=Math.max(1,+p.s||100),J=fxJit(p),k=s*(J?J.sz:1),fx=(J?J.dx:0),fy=(J?J.dy:0),rr=(+p.r||0)+(J?J.dr:0),fl=(+p.f||1)*(J&&J.sx<0?-1:1),fv=J&&J.sy<0?-1:1,
   w=k*(+p.wx||1),h=k*(+p.wy||1),sw=+p.sw>0?+p.sw:0,[bw,bh]=mtTurned(w,h,rr),box={x:(+p.x||0)+fx-bw*.6-sw,y:(+p.y||0)+fy-bh*.6-sw,W:bw*1.2+2*sw,H:bh*1.2+2*sw,R:400},T=p.fx&&p.fx.length?fxTex(p,'mtx'+li+'_'+id,box):null,G=p.fx&&p.fx.length?fxGr(p,'mtg'+li+'_'+id,box):null,
   da={w,h,fill:p.fl=='none'?'':okC(p.ink)?col(p.ink):col(WBS.proj.ink),pic:mtPic(p),sw,sk:col(okC(p.sk)?p.sk:WBS.proj.ink)},D=mtDraw(p.m,da,'mt'+li+'_'+id,seen);
