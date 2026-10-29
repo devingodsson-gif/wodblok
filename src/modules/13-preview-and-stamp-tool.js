@@ -37,7 +37,7 @@ el.innerHTML=`<div class="ml">`+(h||`<div class="em">No shapes yet</div>`)+`</di
 if(sc)el.querySelector('.ml').scrollTop=sc;if(WBX.wbTxSync)WBX.wbTxSync()}
 const txC=()=>{const qs=QS();let x=0,y=0;qs.forEach(o=>{x+=o.x;y+=o.y});return[x/qs.length,y/qs.length]};
 const txAbs=(g,c)=>WBX.wbTxXf(g,M=>{M.ax+=c[0]-M.mx;M.ay+=c[1]-M.my;M.mx=c[0];M.my=c[1]});
-const sAx=k=>e=>{const q=Q();if(!q)return;const v=e.target.value/100,f=v/(q[k]||1);QS().forEach(o=>o[k]=o===q?v:clampN((o[k]||1)*f,.2,3));store();upd()};
+const sAx=k=>e=>{const q=Q();if(!q)return;const v=e.target.value/100,f=v/(q[k]||1);QS().forEach(o=>o[k]=o===q?v:clampN((o[k]||1)*f,.05,20));store();upd()};
 const addSt=t=>{const L=WBS.layers[WBS.selL];if(L&&!L.st.includes(t.id))L.st.push(t.id)};
 const layName=()=>{const L=WBS.layers[WBS.selL];return L?L.name:'the pattern'};
 function sync(){const t=WBS.tiles[WBS.cur]||WBS.noTile,L=WBS.layers[WBS.selL],sv=(id,v)=>{if($(id).value!=v)$(id).value=v};syncAsp('c','c');syncAsp('s','s');{

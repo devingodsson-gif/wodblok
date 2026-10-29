@@ -1,4 +1,5 @@
-// Canvas, with a stamp unlocked: four side squares pull the width or height; a corner or side grows away from the opposite one; Shift grows from the middle (1.37.0, moved from the Stamp editor to the Pattern canvas in step 11).
+// Canvas, with a stamp unlocked: four side squares pull the width or height; a corner or side grows away from the opposite one (1.37.0, moved from the Stamp editor to the Pattern canvas in step 11).
+// 2.74.2: the same as a piece on the canvas: a corner pulls width and height at once, Alt grows from the middle, Shift keeps the proportions, and a typed width or height can go past the slider.
 const { test, expect } = require('@playwright/test');
 const { openApp, settle, getState, unlockStamp, pickShape, stampInstance, clickStamp } = require('./helpers/harness');
 
@@ -8,13 +9,14 @@ const place = async page => {
   await unlockStamp(page); await pickShape(page);
   await clickStamp(page, await stampInstance(page));   // the placed shape is selected, with its handles
 };
-const pull = async (page, h, dx, dy, shift) => {
+const pull = async (page, h, dx, dy, key) => {
+  const shift = key === true ? 'Alt' : key;
   const b = await page.locator(`#stoh [data-hd="${h}"]`).boundingBox();
   const x = b.x + b.width / 2, y = b.y + b.height / 2;
   await page.mouse.move(x, y); await page.mouse.down();
-  if (shift) await page.keyboard.down('Shift');
+  if (shift) await page.keyboard.down(shift);
   await page.mouse.move(x + dx / 2, y + dy / 2, { steps: 3 }); await page.mouse.move(x + dx, y + dy, { steps: 3 });
-  await page.mouse.up(); if (shift) await page.keyboard.up('Shift'); await settle(page);
+  await page.mouse.up(); if (shift) await page.keyboard.up(shift); await settle(page);
 };
 
 test('eight squares: the side ones pull only the width or the height, and the far side stays put', async ({ page }) => {
@@ -36,19 +38,33 @@ test('eight squares: the side ones pull only the width or the height, and the fa
   expect(errors).toEqual([]);
 });
 
-test('a corner keeps the opposite corner where it is, and Shift grows from the middle', async ({ page }) => {
+test('a corner pulls width and height at once and keeps the opposite corner; Alt grows from the middle; Shift keeps the proportions', async ({ page }) => {
   const { errors } = await openApp(page); await place(page);
   const a = box(await item(page));
-  await pull(page, 'ne', 30, 0);   // a corner moved sideways only changes the width (2.15.0)
-  let q = await item(page); const b = box(q);
-  expect(b.w).toBeGreaterThan(a.w + 1); expect(b.l).toBeCloseTo(a.l, 0); expect(b.b).toBeCloseTo(a.b, 0);
-  await pull(page, 'se', 20, 0, true);
+  await pull(page, 'ne', 30, -20);   // both ways at once, as on the canvas (it locked to the first direction before 2.74.2)
+  const b = box(await item(page));
+  expect(b.w).toBeGreaterThan(a.w + 1); expect(b.h).toBeGreaterThan(a.h + 1); expect(b.l).toBeCloseTo(a.l, 0); expect(b.b).toBeCloseTo(a.b, 0);
+  await pull(page, 'se', 20, 0, 'Alt');
   const c = box(await item(page));
   expect(c.w).toBeGreaterThan(b.w + 1);
   expect((c.l + c.r) / 2).toBeCloseTo((b.l + b.r) / 2, 0); expect((c.t + c.b) / 2).toBeCloseTo((b.t + b.b) / 2, 0);
-  await pull(page, 'e', 25, 0, true);
+  await pull(page, 'e', 25, 0, 'Alt');
   const d = box(await item(page));
   expect(d.w).toBeGreaterThan(c.w + 1); expect((d.l + d.r) / 2).toBeCloseTo((c.l + c.r) / 2, 0);
+  await pull(page, 'se', 30, 5, 'Shift');
+  const e = box(await item(page));
+  expect(e.w).toBeGreaterThan(d.w + 1); expect(e.w / e.h).toBeCloseTo(d.w / d.h, 1);
+  expect(errors).toEqual([]);
+});
+
+test('a typed width or height goes past the slider, as far as 2000 %', async ({ page }) => {
+  const { errors } = await openApp(page); await place(page);
+  const typeIn = async (id, v) => { const n = page.locator(`#${id}`).locator('xpath=..').locator('input[type=number]'); await n.fill(String(v)); await n.press('Enter'); await settle(page); };
+  await typeIn('ssx', 1200);
+  expect((await item(page)).sx).toBeCloseTo(12, 2);
+  await typeIn('ssy', 5000);
+  expect((await item(page)).sy).toBeCloseTo(20, 2);   // 2000 % at most
+  expect(await page.locator('#ssx').inputValue()).toBe('1200');
   expect(errors).toEqual([]);
 });
 

@@ -44,10 +44,13 @@ function mtDraw(m,o,id,seen,ip='mai_'){const w=Math.max(.01,o.w),h=Math.max(.01,
 const mtPic=p=>p.fl=='img'&&p.a&&WBS.ARTS[p.a]?{A:WBS.ARTS[p.a],a:p.a,iz:p.iz,im:p.im}:null;
 // the shape that is being edited or moved draws live: its print would be out of date at every step
 const mtLive=p=>{const d=WBS.fpDrag,m=WBS.fpMS;return p.u==WBS.fpSel||!!(m&&m.has&&m.has(p.u))||!!(d&&(d.p===p||d.g&&d.g.some(a=>a[0]===p)))};
+// the box a w by h shape takes up on the canvas when it is turned r degrees: its effects work inside that box (2.74.2: a tall shape turned towards flat ran out of
+// the unturned box and was cut off by an invisible edge)
+const mtTurned=(w,h,r)=>{const a=r*Math.PI/180,c=Math.abs(Math.cos(a)),s=Math.abs(Math.sin(a));return[w*c+h*s,w*s+h*c]};
 function mtfLayer(L,li,pa){const pl=(L.pl||[]).filter(p=>p.k=='motif'&&p.m);if(!pl.length)return['',''];if(WBX.wbMtWarm)pl.forEach(p=>WBX.wbMtWarm(p.m));const fr=new Map(),ed=li==WBS.selL&&!$('boardP').classList.contains('off'),seen=new Set();let defs='',out='';
  pl.forEach(p=>{if(p.flt&&!p.bgd){const r=mtFilter(p,li,seen);defs+=r.defs;fr.set(String(p.u),r.piece);return}
   const id=String(p.u).replace(/[^\w-]/g,''),s=Math.max(1,+p.s||100),J=fxJit(p),k=s*(J?J.sz:1),fx=(J?J.dx:0),fy=(J?J.dy:0),rr=(+p.r||0)+(J?J.dr:0),fl=(+p.f||1)*(J&&J.sx<0?-1:1),fv=J&&J.sy<0?-1:1,
-  w=k*(+p.wx||1),h=k*(+p.wy||1),sw=+p.sw>0?+p.sw:0,box={x:(+p.x||0)-w*.6-sw,y:(+p.y||0)-h*.6-sw,W:w*1.2+2*sw,H:h*1.2+2*sw,R:400},T=p.fx&&p.fx.length?fxTex(p,'mtx'+li+'_'+id,box):null,G=p.fx&&p.fx.length?fxGr(p,'mtg'+li+'_'+id,box):null,
+  w=k*(+p.wx||1),h=k*(+p.wy||1),sw=+p.sw>0?+p.sw:0,[bw,bh]=mtTurned(w,h,rr),box={x:(+p.x||0)+fx-bw*.6-sw,y:(+p.y||0)+fy-bh*.6-sw,W:bw*1.2+2*sw,H:bh*1.2+2*sw,R:400},T=p.fx&&p.fx.length?fxTex(p,'mtx'+li+'_'+id,box):null,G=p.fx&&p.fx.length?fxGr(p,'mtg'+li+'_'+id,box):null,
   da={w,h,fill:p.fl=='none'?'':okC(p.ink)?col(p.ink):col(WBS.proj.ink),pic:mtPic(p),sw,sk:col(okC(p.sk)?p.sk:WBS.proj.ink)},D=mtDraw(p.m,da,'mt'+li+'_'+id,seen);
   defs+=D.defs;if(T)defs+=T.defs;if(G)defs+=G.defs;
   const body=`<g transform="translate(${mtF((+p.x||0)+fx)} ${mtF((+p.y||0)+fy)}) rotate(${mtF(rr)}) scale(${fl} ${fv})">${D.body}</g>`;
@@ -70,7 +73,7 @@ const FLT_U='@@UNDER@@',FLT_I='@@UID@@',FLT_S='@@FSPLIT@@';   // 2.40.1: FLT_S s
 function mtPaper(){for(const L of WBS.layers||[])for(const q of L.pl||[])if(q.bgd&&q.v!==false&&q.k=='sheet'&&!q.fl)return okC(q.ink)?col(q.ink):col(WBS.proj.bg);return'#ffffff'}
 function mtFilter(p,li,seen){if(WBS.DRAFT&&WBS.DRAFTCV)return{defs:'',piece:FLT_U};   // while something is dragged on the canvas the picture is drawn without the filter, and with it once the drag ends (a slider drag keeps it, so the filter is seen while it is set)
  const id=String(p.u).replace(/[^\w-]/g,''),s=Math.max(1,+p.s||100),w=s*(+p.wx||1),h=s*(+p.wy||1),op=p.op!=null?Math.max(0,Math.min(100,+p.op))/100:1,
- box={x:(+p.x||0)-w*.6,y:(+p.y||0)-h*.6,W:w*1.2,H:h*1.2,R:400},q={...p,__fm:{paper:mtPaper()}},T=fxTex(q,'flx'+li+'_'+id,box),G=fxGr(q,'flg'+li+'_'+id,box),
+ [bw,bh]=mtTurned(w,h,+p.r||0),box={x:(+p.x||0)-bw*.6,y:(+p.y||0)-bh*.6,W:bw*1.2,H:bh*1.2,R:400},q={...p,__fm:{paper:mtPaper()}},T=fxTex(q,'flx'+li+'_'+id,box),G=fxGr(q,'flg'+li+'_'+id,box),
  tf=`translate(${mtF(+p.x||0)} ${mtF(+p.y||0)}) rotate(${mtF(+p.r||0)}) scale(${+p.f||1} 1)`,
  Wi=mtDraw(p.m,{w,h,fill:'#fff'},'fli'+li+'_'+id,seen),R=`maskUnits="userSpaceOnUse" x="${mtF(-CW)}" y="${mtF(-CH)}" width="${mtF(3*CW)}" height="${mtF(3*CH)}"`;
  let defs=Wi.defs+(T?T.defs:'')+(G?G.defs:'');
@@ -84,7 +87,7 @@ const mtfSize=()=>{const b=WBS.brush;return b&&b.s?Math.max(20,Math.min(400,b.s*
 // the canvas motif's Width, Height and Colour while one is selected (the rest of Edit is for stamp shapes and hides).
 const mtSel=()=>{const q=elSel();return q&&q.k=='motif'&&stUnlocked()==null?q:null};
 function mtSync(){const e=$('sel');if(!e)return;const q=mtSel();if(e.classList.contains('mtel')!==!!q)e.classList.toggle('mtel',!!q);if(!q)return;
- const x=Math.round((+q.wx||1)*100),y=Math.round((+q.wy||1)*100);if($('ssx').value!=x)$('ssx').value=x;if($('ssy').value!=y)$('ssy').value=y}
+ const x=Math.round((+q.wx||1)*100),y=Math.round((+q.wy||1)*100);if($('ssx').value!=x)(WBX.wbRngSet||((r,v)=>r.value=v))($('ssx'),x);if($('ssy').value!=y)(WBX.wbRngSet||((r,v)=>r.value=v))($('ssy'),y)}
 function init74(){
  WBX.wbMotifSize=mtfSize;WBX.wbMtSel=mtSel;WBX.wbMtSync=mtSync;
  [['ssx','wx'],['ssy','wy']].forEach(([id,f])=>$(id).addEventListener('input',e=>{const q=mtSel();if(!q)return;e.stopImmediatePropagation();const v=+e.target.value/100;if(v==1)delete q[f];else q[f]=+v.toFixed(3);store();upd()},true));
