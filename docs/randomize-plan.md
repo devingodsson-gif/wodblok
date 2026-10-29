@@ -55,7 +55,7 @@ A table in this document (made in step 1) lists every element kind, layout, Tili
 - A roll builds new stamp art from shapes by default (it does not take saved stamps).
 - "Spend more time on the looks: they should look more or less like finished art work ready to use, with all the features WODBLOK has to offer; a wide variety of possible outputs."
 
-## Steps (each a patch; the next minor when the plan is done: 2.76.0, since 2.75.0 went to the Image element; renumbered Oct 28 2026, the plan was written against 2.67.0)
+## Steps (each a patch; the next minor when the plan is done: 2.77.0, since 2.75.0 and 2.76.0 went to the Image element and the canvas anchor; renumbered Oct 28 2026, the plan was written against 2.67.0)
 1. **2.74.1 The Looks**: the Look engine (93-randomize-looks.js) with shared parts (grounds, fields, focal points, words round a circle, borders, corners, rules, ribbons, a brush swash) and several layouts per Look; Repeat moved onto it (the old roll is kept for a roll with Stamps off, a book cover and a repeat tile); colour roles read through the palette being rolled; a Look choice at the top of the Randomize panel. **Done, see docs/plan.md.**
 2. **2.74.2 The panel**: the simplified switches (Background, Pattern, Focal point, Text, Frame, Colours, Effects, Finish, Canvas size) replacing today's sliders.
 3. **2.74.3 Tests**: the `randomize-*` specs, `text-randomize`, `repeat-tile` and `nothing-lost-2-24` rewritten for the Looks; the coverage test; the Randomize scenario snapshots regenerated in CI with the owner's approval.
