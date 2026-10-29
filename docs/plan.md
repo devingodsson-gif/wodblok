@@ -1,5 +1,14 @@
 # Development plan
 
+## 2.76.2 (Oct 29 2026, branch fix/2.76.2-review-bugs, on top of 2.76.1): the five worst bugs of the 2.76 review
+Owner: "Fix those 5 first bugs you presented" (review in the claude.ai project, wodblok-review-2.76).
+- **Image in exports.** The Image element drew its picture from the page's blob address, which a PNG export, an SVG export and a print made once cannot load: the picture was missing from PNG files and SVG files pointed at `blob:`. It now uses the picture's data address, as shapes with a picture fill always did (95-image-element.js).
+- **Image with a filter effect vanished when not selected** (same cause: its print made once could not load the picture). Fixed by the same change.
+- **Randomize keeps clear of your own elements.** With "Start from an empty canvas" off, a roll keeps your elements and now leaves out whatever of its own (words, emblems, stamps, rings, words round a circle) would touch one of them; its Background, Sheets, frames, paths and Patterns that fill the canvas stay behind them (20-before-after-and-randomizer.js). A roll whose focal point would sit on your element can come out sparse.
+- **Select all (Ctrl+A) leaves out the Background**, hidden and locked elements, so Select all then Delete keeps the canvas solid (28-canvas-select.js).
+- **Book cover keeps the art on the front.** Turning Book cover on or off, or changing its trim, pages or bleed, moves the elements with the middle of the front cover (one undo step); before, they kept their place and landed on the back. `canMove` in 14-presets-and-layer-grid-ui.js is shared with the canvas size anchor (30-print-cover.js).
+Tests: tests/review-fixes-2-76-2.spec.js (5 tests). Ran with it, Chromium: image-crop-2-74-2, image-element-2-75, randomize-mode-2-21, randomize-solid-background-2-67-3 and -4, add-arm-2-20, align, print-proof, canvas-anchor-2-76, export-centered-2-76-1: all 22 passed. `npm run perf` ratio 0.986. Full suite not run. Not fixed (seen while checking): your own text keeps its colour role, so on some rolls it is low in contrast against the new background.
+
 ## 2.76.1 (Oct 29 2026, branch feat/2.76.1-export-centered): Export opens in the middle
 Owner: the Export panel should pop out in the middle of the window by default when opened from the top bar. With no remembered place, `setPanel('xrec')` makes a floating group centred in the window (up to 380 x 560); a remembered place still wins. Test: tests/export-centered-2-76-1.spec.js (Chromium: it and export-dialog, colour-tray pass; full suite not run).
 
