@@ -1,6 +1,9 @@
 # Development plan
 
-## 2.76.0 (Oct 29 2026, branch feat/2.76.0-canvas-anchor, not live): the canvas size anchor (owner's request)
+## 2.76.1 (Oct 29 2026, branch feat/2.76.1-export-centered): Export opens in the middle
+Owner: the Export panel should pop out in the middle of the window by default when opened from the top bar. With no remembered place, `setPanel('xrec')` makes a floating group centred in the window (up to 380 x 560); a remembered place still wins. Test: tests/export-centered-2-76-1.spec.js (Chromium: it and export-dialog, colour-tray pass; full suite not run).
+
+## 2.76.0 (Oct 29 2026, branch feat/2.76.0-canvas-anchor, merged, live): the canvas size anchor (owner's request)
 - Canvas size has an Anchor: a 3 x 3 grid (the Align group's buttons and icons). A new aspect ratio, custom width and height, or Swap grows or shrinks the canvas away from the anchor, and every element moves by as much (no scaling, owner's choice); the Background and the patterns that fill the canvas follow the new size by themselves. The anchor is the middle each time the Canvas panel opens (owner's choice). The size change and the move are one undo step. Not in a stamp's tab, not for a book cover.
 - Tests: canvas-anchor-2-76 (new), sheet-2-53 and repeat-tile pass. Not run: the full suite (the scenario snapshots that change the canvas size may change), WebKit, perf (nothing on the drawing path).
 
