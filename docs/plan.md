@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.78.5 (Oct 30 2026, branch fix/2.78.5-narrow-window-and-element-tab, step 4 of the bug-test plan): narrow windows, the Element tab
+- **B3** (owner: 1,024 px is the narrowest window): when the top bar does not fit, its menus fold from the right (Help first, File never) into a last menu, "…", which lists them as submenus; at full width it is hidden (85-menu-bar.js). Below 1,024 px the right end of the bar (Undo, Redo, History, search, Randomize, the theme) stays in reach; at 800 px Randomize was cut off, at 640 px Undo and Redo too. Arrow keys along the bar skip the folded menus.
+- **B5** (owner: "hidden"): the Element panel's tab goes while no stamp is open, as its own close button would (34-desktop-shell.js, `WBX.wbMlTab`); it was a blank panel with a stamp selected but not open.
+- Tests: bug-test-2-79 (every top-bar button in reach at 1,024, 900 and 800 px, Help reached through "…", "…" hidden again at full width; the Element tab gone when the stamp closes); menu-bar-2-42 counts only the menus on show; the menu, dock, panel, tab, stamp-tab, launch and first-five specs (115 pass). check:style. Not run: full suite, WebKit, CI.
+
 ## 2.78.4 (Oct 30 2026, branch fix/2.78.4-pattern-piece-limit, step 3 of the bug-test plan): a pattern's piece limit
 - **B2** (owner: "whatever you think"): a pattern holds at most 3,000 pieces (67-pattern-element.js, `PAT_MAX`). Size, Spacing, Columns or Rows moved past it, and past what the pattern had, stop at the last step of the slider under the limit, so the slider shows the real value; a pattern already past it (an older file) can always go back down. Size 1% with no spacing made about 15,000 pieces (5.9 MB of drawing, over 4 seconds a change); Radial at 24 x 24, 7,200.
 - Tests: bug-test-2-79 (Size held above 1% and the slider shows it, drawing under 2.5 MB, a change under 6 s; Radial held to 3,000); the pattern, arrangement, print, piece-editing, repeat-tile and speed-guard specs (57 pass). `npm run perf` ratio 0.975. Not run: full suite, WebKit, CI.

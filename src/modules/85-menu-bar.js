@@ -55,7 +55,7 @@ function mnbClick(e){const b=e.target.closest('button');if(!b||b.disabled)return
 // ---- keyboard (section 13.2): arrows move, Enter picks, Esc closes and returns focus; left and right move along the bar
 const mnbItems=m=>[...m.querySelectorAll('button,label.mi')].filter(x=>!x.disabled&&!x.hidden&&x.offsetParent!==null);
 function mnbFocus(m,i){const its=mnbItems(m);if(!its.length)return;its[(i+its.length)%its.length].focus()}
-const mnbBars=()=>[...document.querySelectorAll('#mbar .mnbb')];
+const mnbBars=()=>[...document.querySelectorAll('#mbar .mnbb')].filter(b=>!b.closest('[hidden]'));   // 2.78.5: not the menus folded into "…"
 const mnbOpenBtn=()=>mnbBars().find(b=>b.getAttribute('aria-expanded')==='true')||null;
 const mnbPopOf=b=>$(b.getAttribute('aria-controls'));
 function mnbKey(e){const b=mnbOpenBtn(),a=document.activeElement;
@@ -78,6 +78,17 @@ function init85(){const bar=$('mbar');if(!bar||!WBX.wbMenuWire)return;
  MNB.forEach(([k,,es])=>{const m=$('mnbm-'+k);WBX.wbMenuWire('mnb-'+k,'mnbm-'+k,()=>{mnbSubClose();m.innerHTML=mnbHtml(es)});m.addEventListener('click',mnbClick);
   m.addEventListener('pointerover',e=>{const it=e.target.closest('button');if(!it||!m.contains(it))return;if(it.dataset.sub!=null){const M=mnbList(es)[+it.dataset.sub];if(M)mnbSubOpen(it,M[1],false)}else if(mnbSub)mnbSubClose()})});
  WBX.wbMenuSubClose=mnbSubClose;
+ // 2.78.5 (bug test B3, owner Oct 30 2026: 1,024 px is the narrowest window): when the top bar does not fit, its menus fold from the right (Help first, File never) into a
+ // last menu, "…", which lists them as submenus; at full width it is hidden. Below 1,024 px everything on the right of the bar still stays in reach
+ {const fold=new Set(),order=MNB.map(([k])=>k).reverse(),wrap=k=>{const b=$('mnb-'+k);return b&&b.parentElement};
+  bar.insertAdjacentHTML('beforeend','<div class="menu" id="mnbmore" hidden><button type="button" class="mnbb" id="mnb-more" role="menuitem" aria-haspopup="menu" aria-expanded="false" aria-controls="mnbm-more" aria-label="More menus" title="More menus">…</button><div class="pop mnbm" id="mnbm-more" data-mnb="more" role="menu" aria-label="More menus" hidden></div></div>');
+  const es=()=>MNB.filter(([k])=>fold.has(k)).map(([,t,e])=>[t,e]),m=$('mnbm-more');
+  WBX.wbMenuWire('mnb-more','mnbm-more',()=>{mnbSubClose();m.innerHTML=mnbHtml([es])});m.addEventListener('click',mnbClick);
+  m.addEventListener('pointerover',e=>{const it=e.target.closest('button');if(!it||!m.contains(it))return;if(it.dataset.sub!=null){const M=mnbList([es])[+it.dataset.sub];if(M)mnbSubOpen(it,M[1],false)}else if(mnbSub)mnbSubClose()});
+  const last=()=>{const b=[...document.querySelectorAll('header .tr button')].filter(x=>x.getBoundingClientRect().width>0).pop();return b?b.getBoundingClientRect().right:0};
+  const fit=()=>{fold.clear();order.forEach(k=>{const w=wrap(k);if(w&&w.hidden)w.hidden=false});$('mnbmore').hidden=true;
+   for(const k of order){if(last()<=innerWidth-2)break;const w=wrap(k);if(!w)continue;w.hidden=true;fold.add(k);$('mnbmore').hidden=false}};
+  WBX.wbMenuFit=fit;let ft=0;addEventListener('resize',()=>{cancelAnimationFrame(ft);ft=requestAnimationFrame(fit)});requestAnimationFrame(fit);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit)}
  // with one menu open, moving the pointer along the bar opens the menu under it (the menu still opens and closes with a click)
  // the click that follows (the pointer came to rest and was pressed) must not close it again at once
  let hov=null;

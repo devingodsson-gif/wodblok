@@ -10,7 +10,7 @@ const item = (page, menu, label) => page.locator(`#${menu} [data-cmd]`, { hasTex
 
 test('the bar lists the menus in order, and every item is a command with its state', async ({ page }) => {
   const { errors } = await openApp(page);
-  expect(await page.locator('#mbar .mnbb').allTextContents()).toEqual(NAMES);
+  expect(await page.locator('#mbar .menu:not([hidden]) > .mnbb').allTextContents()).toEqual(NAMES);   // 2.78.5: "…" (menus folded in a narrow window) is hidden at full width
   for (const b of BARS.slice(1)) {
     await open(page, b);
     const menu = await page.locator('#' + b).getAttribute('aria-controls');

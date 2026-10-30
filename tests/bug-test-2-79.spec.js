@@ -80,3 +80,38 @@ test('a pattern stops at its piece limit; the slider shows the real value; it st
   expect(r.cn * r.rn * (r.rn + 1) / 2, 'radial pieces').toBeLessThanOrEqual(3000);
   expect(errors).toEqual([]);
 });
+
+// B3 (2.78.5): below about 1,000 px the right end of the top bar was cut off (Randomize, then Undo and Redo); the menus fold into "…" instead
+test('a narrow window folds the menus into "…" and keeps every top-bar button in reach', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, background: true });
+  await expect(page.locator('#mnbmore')).toBeHidden();
+  for (const w of [1024, 900, 800]) {
+    await page.setViewportSize({ width: w, height: 700 }); await page.waitForTimeout(300);
+    const out = await page.evaluate(() => [...document.querySelectorAll('header button')].filter(b => { const r = b.getBoundingClientRect(); return r.width > 0 && r.right > innerWidth + 1; }).map(b => b.id || b.textContent.trim()));
+    expect(out, `${w} px: buttons past the edge`).toEqual([]);
+    await expect(page.locator('#rzdo')).toBeVisible();
+  }
+  await expect(page.locator('#mnbmore')).toBeVisible();
+  await page.click('#mnb-more');
+  const subs = await page.locator('#mnbm-more button').allTextContents();
+  expect(subs.join('|')).toMatch(/Help/);
+  await page.locator('#mnbm-more button', { hasText: 'Help' }).hover();
+  await expect(page.locator('.pop button', { hasText: 'Keyboard shortcuts' }).first()).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.setViewportSize({ width: 1440, height: 900 }); await page.waitForTimeout(300);
+  await expect(page.locator('#mnbmore')).toBeHidden();
+  await expect(page.locator('#mnb-help')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+// B5 (2.78.5, owner: "hidden"): the Element panel was a blank tab with a stamp selected but not open; its tab goes while no stamp is open
+test('the Element tab is there only while a stamp is open', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false });
+  await H.addStamp(page); await H.unlockStamp(page, 0); await H.settle(page);
+  await H.openPanel(page, 'mlist'); await H.settle(page);
+  await expect(page.locator('.wtab[data-t="mlist"]')).toHaveCount(1);
+  await H.showPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await H.settle(page);   // its edit button again closes the stamp
+  expect(await page.evaluate(() => window.__wbTest.unlockedStamp())).toBe(null);
+  await expect(page.locator('.wtab[data-t="mlist"]')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
