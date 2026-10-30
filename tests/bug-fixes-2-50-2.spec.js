@@ -6,7 +6,7 @@ test('after a roll that keeps your Pattern 1, no two elements share a name', asy
   test.setTimeout(180000);
   const { errors } = await openApp(page, { seed: 5 });   // starts with your own Pattern 1
   await openPanel(page, 'rand'); await page.click('#rzdo'); await settle(page, { max: 60000 });
-  const names = JSON.parse(await getState(page)).els.map(e => e.n).filter(Boolean);
+  const names = JSON.parse(await getState(page)).els.map(e => e.n).filter(n => typeof n === 'string' && n);   // a text's n is its laid-out size, not a name (two texts of one size matched, 2.78.0)
   expect(names).toContain('Pattern 1');
   expect(names.length, JSON.stringify(names)).toBe(new Set(names).size);
   expect(errors).toEqual([]);
