@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.78.4 (Oct 30 2026, branch fix/2.78.4-pattern-piece-limit, step 3 of the bug-test plan): a pattern's piece limit
+- **B2** (owner: "whatever you think"): a pattern holds at most 3,000 pieces (67-pattern-element.js, `PAT_MAX`). Size, Spacing, Columns or Rows moved past it, and past what the pattern had, stop at the last step of the slider under the limit, so the slider shows the real value; a pattern already past it (an older file) can always go back down. Size 1% with no spacing made about 15,000 pieces (5.9 MB of drawing, over 4 seconds a change); Radial at 24 x 24, 7,200.
+- Tests: bug-test-2-79 (Size held above 1% and the slider shows it, drawing under 2.5 MB, a change under 6 s; Radial held to 3,000); the pattern, arrangement, print, piece-editing, repeat-tile and speed-guard specs (57 pass). `npm run perf` ratio 0.975. Not run: full suite, WebKit, CI.
+
 ## 2.78.3 (Oct 30 2026, branch fix/2.78.3-group-and-empty-text, step 2 of the bug-test plan): Group at once, an emptied text goes
 - **B6:** Group, Ungroup and Ctrl+G / Ctrl+Shift+G ask the selection, not the Elements panel's buttons (they catch up only on the next redraw, so right after Select all Group read as off).
 - **B4:** a text whose Text field is left empty (the field loses focus while empty) is removed, as a text typed in place is in a stamp's tab; one Undo brings it back ("Deleted text"). While typing, an empty field keeps the last words.

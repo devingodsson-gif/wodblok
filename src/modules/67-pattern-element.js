@@ -222,7 +222,12 @@ $('peov').addEventListener('change',()=>{const p=patCur();if(!p)return;if($('peo
 $('peds').onclick=e=>{const b=e.target.closest('[data-d]');if(b)set('ds',b.dataset.d)};
 $('pets').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$('pets').value;if((p.ts||'auto')!==v){p.ts=v;delete p.ar;patCh()}});
 $('pear').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$('pear').value;if(p.ar!==v){p.ar=v;patCh()}});
-[['peps','ps'],['pesp','sp'],['pecn','cn'],['pern','rn'],['pesz','sz'],['pert','rt'],['peox','ox'],['peoy','oy'],['pein','in'],['peiv','iv'],['pemd','md'],['pemg','mg'],['pedv','dv'],['pedg','dg']].forEach(([id,f])=>$(id).addEventListener('input',()=>{if(WBS.uiLoad)return;const p=patCur();if(!p)return;const v=+$(id).value;if(p[f]!==v){p[f]=v;patCh()}}));
+// 2.78.4 (bug test B2): a pattern holds at most PAT_MAX pieces. Size at 1% with no spacing made about 15,000 (6 MB of drawing, seconds a change); a slider that would take it
+// past the limit, and past what it had, stops at the last step under it, so it shows the real value. A pattern already past it (an older file) can always go back down.
+const PAT_MAX=3000,patN=p=>{try{return(patPts(p).pts||[]).length}catch(e){return 0}};
+function patHold(p,f,old,el){const n=patN(p);if(n<=PAT_MAX)return;p[f]=old;if(patN(p)>=n){p[f]=+el.value;return}const st=+el.step||1,mn=+el.min||0,snap=x=>+(mn+Math.round((x-mn)/st)*st).toFixed(3),dir=Math.sign(+el.value-old);let v=snap(old);if(dir>0?v>old:v<old)v=+(v-dir*st).toFixed(3);   // on the slider's own steps
+ for(let i=0;i<400;i++){const w=+(v+dir*st).toFixed(3);if(dir>0?w>+el.value:w<+el.value)break;p[f]=w;if(patN(p)>PAT_MAX)break;v=w}p[f]=v;el.value=v;uiFire(el)}
+[['peps','ps'],['pesp','sp'],['pecn','cn'],['pern','rn'],['pesz','sz'],['pert','rt'],['peox','ox'],['peoy','oy'],['pein','in'],['peiv','iv'],['pemd','md'],['pemg','mg'],['pedv','dv'],['pedg','dg']].forEach(([id,f])=>$(id).addEventListener('input',()=>{if(WBS.uiLoad)return;const p=patCur();if(!p)return;const v=+$(id).value;if(p[f]!==v){const el=$(id),old=p[f]!=null?+p[f]:+(el.dataset.def||el.min||0);p[f]=v;if(['ps','sp','cn','rn'].includes(f))patHold(p,f,old,el);patCh()}}));
 $('pesd').onclick=()=>{const p=patCur();if(p){p.sd=1+Math.floor(Math.random()*9998);patCh()}};
 // "Add element" (2.4.0): one list of everything a pattern can place: the stamps, the motifs of the library, and the text on the canvas
 $('peadd').onclick=e=>{e.stopPropagation();patAddMenu()};

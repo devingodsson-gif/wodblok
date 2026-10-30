@@ -57,3 +57,26 @@ test('a text whose field is left empty goes; Undo brings it back', async ({ page
   expect(await texts()).toEqual(['Hello']);
   expect(errors).toEqual([]);
 });
+
+// B2 (2.78.4): Size at 1% with no spacing placed about 15,000 pieces (6 MB of drawing, seconds a change); a pattern holds at most 3,000 and its slider stops there
+test('a pattern stops at its piece limit; the slider shows the real value; it stays quick', async ({ page }) => {
+  test.setTimeout(240000);
+  const { errors } = await H.openApp(page, { seed: 4, background: true });
+  await H.openPanel(page, 'layers');
+  const set = (id, v) => page.evaluate(([id, v]) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, [id, v]);
+  const pat = async () => JSON.parse(await H.getState(page)).els.find(q => q.k === 'pattern');
+  await set('pesp', 0); await H.settle(page);
+  const t0 = Date.now(); await set('peps', 1); await H.settle(page, { max: 30000 }); const ms = Date.now() - t0;
+  const p = await pat(), shown = await page.inputValue('#peps');
+  expect(p.ps, 'held above 1%').toBeGreaterThan(1);
+  expect(+shown, 'the slider shows what the pattern has').toBe(p.ps);
+  const n = await page.evaluate(() => document.querySelectorAll('#dyn use, #dyn g[data-pc], #dyn [transform]').length);
+  expect(await page.evaluate(() => document.getElementById('dyn').innerHTML.length), 'drawing markup').toBeLessThan(2500000);
+  expect(ms, 'a change at the limit').toBeLessThan(6000);
+  // Radial at its largest counts is held too
+  await page.locator('section.pn[data-p="layers"] button', { hasText: /^Radial$/ }).first().click(); await H.settle(page);
+  await set('pecn', 24); await set('pern', 24); await H.settle(page, { max: 30000 });
+  const r = await pat();
+  expect(r.cn * r.rn * (r.rn + 1) / 2, 'radial pieces').toBeLessThanOrEqual(3000);
+  expect(errors).toEqual([]);
+});
