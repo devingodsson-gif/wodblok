@@ -24,8 +24,8 @@ test('a new Pattern tiles: Tiling layout, tile shape From stamp, its arrangement
   await expect(page.locator('#pelay [data-l="tile"]')).toHaveClass(/on/);
   await expect(page.locator('#petl')).toBeVisible();
   await expect(page.locator('#pefr')).toBeHidden();
-  expect(await page.locator('#pets option').allTextContents()).toEqual(['From stamp', 'Square', 'Hexagon', 'Triangle', 'Diamond', 'Circle', 'Octagon']);
-  expect(await page.locator('#pear option').allTextContents()).toEqual(['Grid', 'Checkerboard', 'Brick', 'Half drop', 'Diagonal', 'Basketweave', 'Turned', 'Pinwheel', 'Mirror']);   // a rectangle stamp tiles by Square
+  expect(await page.locator('#pets option').allTextContents()).toEqual(['From stamp', 'Square', 'Hexagon', 'Triangle', 'Diamond', 'Circle', 'Octagon', 'Wallpaper']);
+  expect(await page.locator('#pear option').allTextContents()).toEqual(['Grid', 'Checkerboard', 'Brick', 'Half drop', 'Diagonal', 'Basketweave', 'Turned', 'Pinwheel', 'Mirror', 'Stripes', 'Bands', 'Chevron', 'Herringbone']);   // a rectangle stamp tiles by Square
   await pick(page, '#pets', 'hex'); await H.settle(page);
   expect(await page.locator('#pear option').allTextContents()).toEqual(['Honeycomb', 'Honeycomb, turned', 'Three colours']);
   expect((await pat(page)).ts).toBe('hex');

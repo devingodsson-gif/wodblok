@@ -780,6 +780,7 @@ body.eyedrop{cursor:crosshair}
 /* 2.54.2: an element panel while editing: what the element is made from, with Replace (a list row, Part 9.10); Replace opens the library in a popover */
 .rprow{display:flex;align-items:center;gap:var(--sp-4);min-height:var(--h-row);margin-bottom:var(--sp-3)}.rprow[hidden]{display:none}
 section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel keeps the panel's side padding */
+.pewpv{display:flex;justify-content:center;margin-top:var(--sp-4);color:var(--mut)}.pewpv svg{width:128px;height:auto}   /* 2.76.7: a wallpaper group's picture */
 .rpth{flex:none;width:20px;height:20px;display:inline-flex}.rpth svg{width:20px;height:20px}
 .rpn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs-m)}
 .rpgo{flex:none}
@@ -1282,18 +1283,21 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
   <details class="g" open><summary>Pattern</summary><div class="gb">
    <div id="pelist" hidden></div><button class="alt" id="penew" hidden>New pattern</button>
    <div id="peed" hidden>
-    <div class="seg" id="pelay" role="group" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-l="tile">Tiling</button><button type="button" data-l="radial">Radial</button><button type="button" data-l="scatter">Scatter</button><button type="button" data-l="frame">Frame</button></div>
-     <div id="petl"><label>Tile shape</label><select id="pets" aria-label="Tile shape"></select><label>Arrangement</label><select id="pear" aria-label="Arrangement"></select>
+    <div class="seg" id="pelay" role="group" style="grid-template-columns:repeat(5,1fr)"><button type="button" data-l="tile">Tiling</button><button type="button" data-l="radial">Radial</button><button type="button" data-l="scatter">Scatter</button><button type="button" data-l="spiral">Spiral</button><button type="button" data-l="frame">Frame</button></div>
+     <div id="petl"><label>Tile shape</label><select id="pets" aria-label="Tile shape"></select><label>Arrangement</label><select id="pear" aria-label="Arrangement"></select><div class="pewpv" id="pewpv" hidden></div>
      <div class="ctl"><label>Size</label><input type="range" id="peps" min="1" max="60" step="0.5" value="12" data-u="%" data-def="12"></div>
      <div class="ctl" id="pepur" hidden><label for="pepu">Piece size</label><div class="num"><input type="number" class="u u2" id="pepu" min="0.01" max="20000" step="0.01" aria-label="Piece size"><i id="pepuu">in</i></div></div>
      <div class="ctl"><label>Spacing</label><input type="range" id="pesp" min="0" max="100" value="0" data-u="%" data-def="0"></div></div>
      <div id="pefr">
     <div class="ctl"><label>Columns</label><input type="range" id="pecn" min="1" max="24" value="4" data-def="4"></div>
     <div class="ctl"><label>Rows</label><input type="range" id="pern" min="1" max="24" value="4" data-def="4"></div>
-    <div class="ctl"><label>Size</label><input type="range" id="pesz" min="10" max="200" value="80" data-u="%" data-def="80"></div></div>
+    <div class="ctl"><label>Size</label><input type="range" id="pesz" min="10" max="200" value="80" data-u="%" data-def="80"></div>
+    <div class="ctl" id="pemdr" hidden><label>Min distance</label><input type="range" id="pemd" min="0" max="100" value="0" data-u="%" data-def="0"></div></div>
     <div class="ctl"><label>Rotate</label><input type="range" id="pert" min="-180" max="180" value="0" data-u="&#176;" data-def="0"></div>
     <div class="ctl"><label>Shift across</label><input type="range" id="peox" min="-100" max="100" value="0" data-u="%" data-def="0"></div>
     <div class="ctl"><label>Shift down</label><input type="range" id="peoy" min="-100" max="100" value="0" data-u="%" data-def="0"></div>
+    <label>Edges</label><div class="seg" id="peeg" role="group" aria-label="Edges" style="grid-template-columns:1fr 1fr"><button type="button" data-e="cut">Cut at the edge</button><button type="button" data-e="whole">Whole pieces</button></div>
+    <div class="ctl"><label>Margin</label><input type="range" id="pemg" min="0" max="40" value="0" data-u="%" data-def="0"></div>
     <div class="ctl" id="peinr"><label>Inset</label><input type="range" id="pein" min="0" max="40" value="4" data-u="%" data-def="4"></div>
     <div class="seg" id="peds" role="group" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-d="cycle">Cycle</button><button type="button" data-d="random">Random</button><button type="button" data-d="weight">Weighted</button></div>
     <div class="row"><button class="alt" id="pesd">Reroll</button></div>
