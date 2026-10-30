@@ -61,7 +61,7 @@ function tlBox(p,sh){const t=tlStamp(p),G=t?geom(shOf(t)):null,own=G&&TL_KIND[G.
 const tlMod=(a,n)=>((a%n)+n)%n;
 // the places, in the area's own units (0..W, 0..H): {pts:[[x,y]], rot, flip, cls, size: the long side of a piece in canvas units}
 function tlPts(p,W,H){const sh=tlShape(p),ar=tlArr(p,sh),B=tlBox(p,sh),S=Math.max(1,Math.min(CW,CH)*Math.max(1,Math.min(100,+p.ps||12))/100),g=1+Math.max(0,Math.min(200,+p.sp||0))/100,
- w=B.w*S,h=B.h*S,pts=[],rot=[],flip=[],cls=[],size=[],gap=[];
+ w=B.w*S,h=B.h*S,pts=[],rot=[],flip=[],cls=[],size=[],gap=[],keys=[],acc=[];
  // the lattice: a place for each (i, j), with its turn, flip and class; the step vectors grow with the spacing
  let a=[w*g,0],b=[0,h*g],fn=(i,j)=>({});
  if(sh=='square'){
@@ -94,11 +94,15 @@ function tlPts(p,W,H){const sh=tlShape(p),ar=tlArr(p,sh),B=tlBox(p,sh),S=Math.ma
  // enough places to cover the area from its middle, wherever the turn and shift put them
  const R=Math.hypot(W,H)/2+S*g*2+(sh=='wall'?Math.hypot(a[0]+b[0],a[1]+b[1]):0),da=Math.hypot(a[0],a[1]),db=Math.hypot(b[0],b[1]),cross=Math.abs(a[0]*b[1]-a[1]*b[0])||1,ni=Math.ceil(R*db/cross)+2,nj=Math.ceil(R*da/cross)+2;
  const rt=(+p.rt||0)*Math.PI/180,co=Math.cos(rt),si=Math.sin(rt),ox=W/2+(Math.max(-100,Math.min(100,+p.ox||0))/100)*w*g,oy=H/2+(Math.max(-100,Math.min(100,+p.oy||0))/100)*h*g,lim=Math.max(w,h)*g;
- let k=0;const put=(lx,ly,o,sz)=>{const x=ox+lx*co-ly*si,y=oy+lx*si+ly*co;if(x<-lim||x>W+lim||y<-lim||y>H+lim)return;pts.push([x,y]);rot.push((o.r||0)+(+p.rt||0));flip.push(o.f||1);cls.push(o.c==null?o.i:o.c);size.push(sz||S);gap.push(!!o.gap);k++};
+ // 2.76.10: every place has a key from its lattice position (i_j, a wallpaper copy i_j_k, the small octagon square i_j_g, an accent i_j_a), so an edit made to one
+// piece stays with its place when Size, Spacing or the area change; an accent (p.ac) sits at the middle between four places
+ let k=0;const put=(lx,ly,o,sz)=>{const x=ox+lx*co-ly*si,y=oy+lx*si+ly*co;if(x<-lim||x>W+lim||y<-lim||y>H+lim)return;pts.push([x,y]);rot.push((o.r||0)+(+p.rt||0));flip.push(o.f||1);cls.push(o.c==null?o.i:o.c);size.push(sz||S);gap.push(!!o.gap);keys.push(o.key);acc.push(!!o.acc);k++};
+ const AC=p.ac&&p.ac.on?Math.max(5,Math.min(100,+p.ac.z||40))/100:0;
  // a wallpaper cell's copies follow the lattice's own stretch across and down (a repeat tile stretches them apart)
  const WG=sh=='wall'?tlWall(ar):null,WX=WG?a[0]:0,WY=WG?(WG.hex?b[1]/(TL_S3/2):b[1]):0;
- for(let j=-nj;j<=nj;j++)for(let i=-ni;i<=ni;i++){const lx=i*a[0]+j*b[0],ly=i*a[1]+j*b[1];if(Math.hypot(lx,ly)>R)continue;if(WG){WG.ops.forEach((c,k)=>put(lx+c.x*WX,ly+c.y*WY,{i,r:c.r,f:c.f,c:k}));continue}put(lx,ly,{i,...fn(i,j)});
+ for(let j=-nj;j<=nj;j++)for(let i=-ni;i<=ni;i++){const lx=i*a[0]+j*b[0],ly=i*a[1]+j*b[1];if(Math.hypot(lx,ly)>R)continue;if(AC)put(lx+(a[0]+b[0])/2,ly+(a[1]+b[1])/2,{i,c:'a',key:i+'_'+j+'_a',acc:1},S*AC);
+  if(WG){WG.ops.forEach((c,k)=>put(lx+c.x*WX,ly+c.y*WY,{i,r:c.r,f:c.f,c:k,key:i+'_'+j+'_'+k}));continue}put(lx,ly,{i,...fn(i,j),key:i+'_'+j});
   // Octagons and squares: the small square between four octagons takes the second source (left empty with one source) (a regular octagon's side is its width / (1 + √2))
-  if(sh=='oct'&&ar=='octsq'){const s=w/(1+Math.SQRT2);put(lx+a[0]/2+b[0]/2,ly+a[1]/2+b[1]/2,{i,r:45,c:1,gap:1},s*Math.SQRT2)}}
- return{pts,rot,flip,cls,size,gap,shape:sh,arr:ar,box:{w:B.w,h:B.h}}}
+  if(sh=='oct'&&ar=='octsq'){const s=w/(1+Math.SQRT2);put(lx+a[0]/2+b[0]/2,ly+a[1]/2+b[1]/2,{i,r:45,c:1,gap:1,key:i+'_'+j+'_g'},s*Math.SQRT2)}}
+ return{pts,rot,flip,cls,size,gap,keys,acc,shape:sh,arr:ar,box:{w:B.w,h:B.h}}}
 export {TL_AR,TL_TS,tlArr,tlPts,tlShape,tlWallPreview};

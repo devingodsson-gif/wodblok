@@ -1286,6 +1286,8 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
    <div id="peed" hidden>
     <div class="seg" id="pelay" role="group" style="grid-template-columns:repeat(5,1fr)"><button type="button" data-l="tile">Tiling</button><button type="button" data-l="radial">Radial</button><button type="button" data-l="scatter">Scatter</button><button type="button" data-l="spiral">Spiral</button><button type="button" data-l="frame">Frame</button></div>
      <div id="petl"><label>Tile shape</label><select id="pets" aria-label="Tile shape"></select><label>Arrangement</label><select id="pear" aria-label="Arrangement"></select><div class="pewpv" id="pewpv" hidden></div>
+      <label class="chk"><input type="checkbox" id="peac"><span>Accent</span></label>
+      <div id="peacb" hidden><select id="peacs" aria-label="Accent source"></select><div class="ctl"><label>Accent size</label><input type="range" id="peacz" min="5" max="100" value="40" data-u="%" data-def="40"></div></div>
      <div class="ctl"><label>Size</label><input type="range" id="peps" min="1" max="60" step="0.5" value="12" data-u="%" data-def="12"></div>
      <div class="ctl" id="pepur" hidden><label for="pepu">Piece size</label><div class="num"><input type="number" class="u u2" id="pepu" min="0.01" max="20000" step="0.01" aria-label="Piece size"><i id="pepuu">in</i></div></div>
      <div class="ctl"><label>Spacing</label><input type="range" id="pesp" min="0" max="100" value="0" data-u="%" data-def="0"></div></div>
@@ -1315,6 +1317,14 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
      <div class="ctl"><label>Amount</label><input type="range" id="pedv" min="0" max="100" value="70" data-u="%" data-def="70"></div>
      <div class="ctl" id="pedgr"><label>Angle</label><input type="range" id="pedg" min="0" max="359" value="0" data-u="&#176;" data-def="0"></div>
      <label class="chk"><input type="checkbox" id="pedi"><span>Invert</span></label>
+    </div>
+    <div class="glb">Pieces</div>
+    <label class="chk"><input type="checkbox" id="pepe"><span>Edit pieces</span></label>
+    <div id="pepg" hidden>
+     <label for="pepsrc">Source</label><select id="pepsrc" aria-label="Source of this piece"></select>
+     <label for="pepcol">Colour</label><select id="pepcol" aria-label="Colour of this piece"></select>
+     <div class="ctl"><label>Turn</label><input type="range" id="pepdr" min="-180" max="180" value="0" data-u="&#176;" data-def="0"></div>
+     <div class="row"><button type="button" class="alt" id="pepdel">Delete</button><button type="button" class="alt" id="peprs">Reset</button><button type="button" class="alt" id="pepown">Make its own element</button></div>
     </div>
     <div class="glb">Sources</div>
     <div class="psl" id="pesrc"></div>

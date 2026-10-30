@@ -1,5 +1,12 @@
 # Development plan
 
+## 2.76.10 (Oct 30 2026, branch feat/2.76.10-piece-editing, step 7 of docs/pattern-plan.md, on top of 2.76.9 (live)): editing pieces, patterns of patterns, accents. Format 30 kept
+- **Edit pieces** (Pattern panel, Pieces): with it on, a click on the canvas picks one piece of the selected pattern (a box shows it) and a drag moves it; Source (another of the pattern's sources), Colour (a tray colour), Turn, Delete, Reset and **Make its own element** (the piece leaves the pattern as an ordinary stamp, shape or text at the same place, size, turn and colour, just above the pattern; its place stays empty; one history step). An edit is stored on the pattern by its place's key (`pe`: the tiling's lattice position, or the place's number in the free layouts), so it stays with its place when Size, Spacing or the area change.
+- **A Pattern as a source:** Add source lists the layer's other patterns (one level deep); each place prints that pattern, scaled to the piece and turned with it (at most 64 pieces a place and 4,000 in all).
+- **Accent** (Tiling): a second set of pieces at the middles between the main places, with its own source and size (`ac`).
+- New fields are optional, so the format stays 30 (owner, Oct 29 2026).
+- Tests: tests/piece-editing-2-76-10.spec.js (4: pick and delete a piece, the edit kept through a Size change, Undo; drag, turn, recolour, make its own element; a pattern printing a pattern; the accent). Ran: see PROJECT_STATUS. `npm run perf` ratio 0.965. check:style, check:platform. Not run: full suite, WebKit, CI.
+
 ## 2.76.9 (Oct 30 2026, branch feat/2.76.9-inside-and-density, step 6 of docs/pattern-plan.md, on top of 2.76.8 (live)): patterns inside shapes, and density. Format 30 kept
 - **Inside:** a Pattern's Inside setting names another element of the layer (a shape, Sheet, text or stamp; `pin`). Its pieces are masked by that element's own drawing made white (65-element-core.js), so they show only inside the outline or the letters and follow the element when it moves or changes; the element itself still draws (hide it to see only the pieces).
 - **Density** (Pattern panel, Density group): Off, Picture (a picture of the project, `da`), Linear (an angle, `dg`) or Radial (`dm`); Amount (`dv`), Size, Count or Both (`dk`; owner: "both, the more variety the better"), Invert (`di`). A picture is read once into a small grid of darkness; pieces are smaller (Size), fewer (Count, from the piece's own seeded draw) or both where it is light: a halftone made of stamps, or a fade.

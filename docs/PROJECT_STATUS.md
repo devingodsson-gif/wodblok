@@ -5,6 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
+- **Oct 30: 2.76.9 LIVE. 2.76.10 (step 7: editing pieces, patterns of patterns, accents)** on `feat/2.76.10-piece-editing`, not merged. Next: 2.76.11 (Patterns library).
 - **Oct 30: 2.76.9 (step 6, patterns inside shapes and density)** on `feat/2.76.9-inside-and-density`, not merged (waiting for the owner). Next: 2.76.10 (editing pieces, patterns of patterns, accent layer).
 - **Oct 30: 2.76.7 and 2.76.8 LIVE** (owner: "next step go then merge"; format 30 kept for optional new Pattern fields, owner Oct 29). Next: 2.76.9 (patterns inside shapes, density).
 - **Oct 29: 2.76.6 is LIVE** (main fast-forwarded to it with the owner's word: 2.76.3 to 2.76.6 and the regenerated snapshots; format 30 is now live). **2.76.7 (step 4, arrangements and edges)** on `feat/2.76.7-arrangements`, not merged. Open question: keep format 30 for optional new fields (recommended) or bump. The preview artifact link in CLAUDE.md is gone and the build (17.5 MB) is over the 16 MB artifact limit, so no preview was published. Next: 2.76.8.
