@@ -5,6 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
+- **Oct 30: 2.76.10 LIVE** (owner: "Merge"). Step 8 of the pattern plan, the Patterns library, is **shelved** (owner: "I don't want to save patterns let's shelve that for now"). Next: step 9, 2.76.11 (for experienced users), then 2.77.0 and the end-of-plan CI suite.
 - **Oct 30: 2.76.9 LIVE. 2.76.10 (step 7: editing pieces, patterns of patterns, accents)** on `feat/2.76.10-piece-editing`, not merged. Known: smart-guides-2-40 "Settings > Guides" fails since before the plan (2.76.2); scenarios "panel: pattern-grid" is flaky. Next: 2.76.11 (Patterns library).
 - **Oct 30: 2.76.9 (step 6, patterns inside shapes and density)** on `feat/2.76.9-inside-and-density`, not merged (waiting for the owner). Next: 2.76.10 (editing pieces, patterns of patterns, accent layer).
 - **Oct 30: 2.76.7 and 2.76.8 LIVE** (owner: "next step go then merge"; format 30 kept for optional new Pattern fields, owner Oct 29). Next: 2.76.9 (patterns inside shapes, density).
@@ -198,7 +199,8 @@ None at the moment. Add new ones here.
 - Open CI notes: top-bar-2-43 (Ctrl+S after a body click), saved-colours-list ("element is not stable") and the commands.spec 'documented shortcuts' test were flaky in CI; the baseline run on v2.44.0 listed no failing shards.
 - Still open from before: owner's Mac `npm run perf:draw`; printing text, picture and pattern elements with effects (2.44.3 prints only shapes); stale remote branch docs/2.44.0-live could not be deleted.
 
-## Suggestions (my recommendations, not decisions)
+## Suggestions
+- **Patterns library** (pattern plan step 8, shelved by the owner Oct 30 2026): saved patterns reused across projects on the shared library tree. (my recommendations, not decisions)
 - Mockups (shelved by the owner Oct 29 2026, "for later"): a pattern's repeat previewed on fabric, wallpaper, wrapping paper or a book at real scale, once the physical canvas size of docs/pattern-plan.md step 3 exists.
 - Library standard release: the owner wants every library to work the same way as the Shapes library (Oct 26 2026). Saved stamps (no folders), Saved trays (one level, no select mode, no drag), templates, workspaces and export recipes (flat lists) and colourways (no library) still differ; one release per library, starting with Saved stamps.
 - Drawing speed: plan in docs/speed-plan.md (Oct 25 2026). Owner said yes to the order below. 2.44.1 to 2.44.4 (now released as 2.45.0) are built on feat/2.44.1-perf-draw (not merged; 2.44.2: -8% work per slider/shape step, -21% undo/redo; 2.44.3 on top: another -50%, see docs/perf-baseline.md). 2.44.4 updates the canvas in place (another -10 to -22%). 2.44.3 prints shapes with effects once; text, picture and pattern elements with effects are still drawn live (a later step if wanted). Order: 2.44.1 measure, 2.44.2 stop refreshing unchanged panels, 2.44.3 print effect elements once (the big one), 2.44.4 update the canvas in place.

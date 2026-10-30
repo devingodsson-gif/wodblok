@@ -2,7 +2,7 @@
 
 Owner, Oct 29 2026: "WODBLOK is primarily a pattern making tool. What are some improvements or additions we could make for the patterning to be more useful and prevalent", then "make a plan that encompasses everything you just mentioned, plus all the items that would improve the user experience from the test before" (the 2.76 review: Project doc `claude/wodblok-review-2.76.md`; bugs B1 to B4 were fixed in 2.76.2).
 
-Status: **started Oct 29 2026 (steps 0 to 7 built, 2.76.3 to 2.76.10, up to 2.76.9 live; step 2 without misregistration per piece).** Testing (owner, Oct 29 2026): no CI and no full suite until the end of the plan; only quick, targeted local tests on the way. The owner answered every question on Oct 29 2026 (below). Mockups are shelved for later.
+Status: **started Oct 29 2026 (steps 0 to 7 built and live, 2.76.3 to 2.76.10; step 2 without misregistration per piece; step 8, the Patterns library, shelved Oct 30 2026; step 9 is 2.76.11, then 2.77.0).** Testing (owner, Oct 29 2026): no CI and no full suite until the end of the plan; only quick, targeted local tests on the way. The owner answered every question on Oct 29 2026 (below). Mockups are shelved for later.
 
 ## What patterns already do (2.76.2)
 - Tiling by a tile shape (From stamp, Square, Hexagon, Triangle, Diamond, Circle, Octagon) with 19 arrangements; Size, Spacing, Rotate, Shift (92-pattern-tiling.js).
@@ -13,7 +13,7 @@ Status: **started Oct 29 2026 (steps 0 to 7 built, 2.76.3 to 2.76.10, up to 2.76
 - Speed limit to respect (docs/randomize-plan.md): a Pattern with Pressure offset or Texture draws each piece on its own (up to 7 million characters in tests). Every per-piece feature below must stay inside the stamp's single print, or be measured with `npm run perf` (no regression over 10%).
 
 ## Releases
-One update (owner, Oct 29 2026: "roll it into one update"; his standing rule: a plan of several steps is one update). Each step raises the patch, 2.76.3 to 2.76.12, one theme each; the minor rises once, to **2.77.0**, when the whole plan is done. The Randomize plan's open steps are step 0.
+One update (owner, Oct 29 2026: "roll it into one update"; his standing rule: a plan of several steps is one update). Each step raises the patch, 2.76.3 to 2.76.12 (2.76.11 after step 8 was shelved), one theme each; the minor rises once, to **2.77.0**, when the whole plan is done. The Randomize plan's open steps are step 0.
 
 ### Step 0 — 2.76.3: Randomize finished (docs/randomize-plan.md steps 2 to 4, as one update)
 Step 1, the Looks, is live (2.74.1). The rest, which the owner answered on Oct 28 2026:
@@ -78,11 +78,10 @@ Step 1, the Looks, is live (2.74.1). The rest, which the owner answered on Oct 2
 - **An accent layer:** a second set of pieces between the main ones (what Randomize's accents do today), set by hand.
 - Tests: an edited piece survives a Size change and Undo; nesting draws; accents sit between pieces. Suite: about 70% (the file format if piece edits are stored).
 
-### Step 8 — 2.76.11: Patterns library
-- **Patterns library:** saved patterns reused across projects, on the shared library tree (`ltMake`: folders, Move to, Export, Import), like stamps, trays and colourways.
-- Tests: save, reuse in a new project, export and import the library. Suite: about 40%.
+### Step 8 — Patterns library: SHELVED (owner, Oct 30 2026: "I don't want to save patterns let's shelve that for now")
+- Saved patterns reused across projects, on the shared library tree. Kept under Suggestions in docs/PROJECT_STATUS.md; not built.
 
-### Step 9 — 2.76.12: For experienced users
+### Step 9 — 2.76.11: For experienced users (was 2.76.12; renumbered when step 8 was shelved)
 - **Edit and right-click menus:** Bring forward and Send backward, Lock, Hide, Rename, Select all, Deselect, Group in the right-click menu.
 - **Command search** covers every menu item and panel action (rotate, flip, canvas size, hide, lock, order, font, select).
 - **Navigation:** Ctrl+wheel zooms in clear steps; the middle button pans.
