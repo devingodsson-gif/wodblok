@@ -77,15 +77,19 @@ function tbStyUI(){tbLoad=true;try{if(TBW)paintWell(TBW,true)}finally{tbLoad=fal
 function tbStyle(k,v){const grp=fpGrp().filter(q=>q.tx);if(k=='ink'){tbSty.ink=v;grp.forEach(q=>{if(v)q.ink=v;else delete q.ink})}tbStyUI();if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();if(WBS.txArm)WBH.fpOverlay()}
 function tbStySet(a){const grp=fpGrp().filter(q=>q.tx);tbSty.tu=a.map(u=>({...u}));grp.forEach(q=>{q.tu=a.map((u,i)=>{const o=(q.tu||[])[i];return o&&o.x===u.x?o:{x:u.x,sd:grp.length>1?txRid():u.sd}})});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd();if(WBS.txArm)WBH.fpOverlay()}
 function tbStyVary(i){const grp=fpGrp().filter(q=>q.tx);if(tbSty.tu[i])tbSty.tu[i]={...tbSty.tu[i],sd:txRid()};grp.forEach(q=>{if(q.tu&&q.tu[i])q.tu[i]={...q.tu[i],sd:txRid()}});if(grp.length){store();if(WBX.wbCap)WBX.wbCap()}upd()}
+// what the controls were last loaded from: a text and its options (2.78.1: one function, so a live edit's own result does not count as a change from elsewhere)
+const tbKeyOf=p=>p?p.u+'|'+Math.round(p.s*10)+'|'+(p.tx.wd||0)+'|'+(p.tx.ht||0)+'|'+(p.tx.va||'t')+'|'+(p.tx.pd||0)+(p.tx.ft||'')+(p.tx.ov||'')+(p.tx.rp||0)+(p.tx.rr||0)+(p.tx.rs||0)+(p.tx.bb||0)+(p.tx.sc||'')+(p.tx.sd||0)+'|'+(p.tx.ind||0)+'|'+(p.tx.psp||0)+(p.tx.bal||'')+JSON.stringify(p.tx.sty||0)+(p.tx.wp||'')+(p.tx.wa||0)+(p.tx.pt||'')+(p.tx.pa||0)+(p.tx.pw||0):'-';
+// a live edit waiting to be laid out: the controls are not reloaded from the text meanwhile (they hold the newer values; reloading lost a second change made at once)
+let tbPend=0;
 function txbSync(L){if(WBS.txArm&&(tbSel()||WBS.fpB)){WBS.txArm=false;tbG=null;tbArmUI()}
 document.querySelectorAll('.txlay').forEach(e=>{const h=stTxMode();if(e.hidden!==h)e.hidden=h});if(!stTxMode()&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;const tx=tbSel()||WBS.txArm;sw.style.display=tx?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=tx?'none':''}if(!$('tx_t')||stTxMode())return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
-const key=p?p.u+'|'+Math.round(p.s*10)+'|'+(p.tx.wd||0)+'|'+(p.tx.ht||0)+'|'+(p.tx.va||'t')+'|'+(p.tx.pd||0)+(p.tx.ft||'')+(p.tx.ov||'')+(p.tx.rp||0)+(p.tx.rr||0)+(p.tx.rs||0)+(p.tx.bb||0)+(p.tx.sc||'')+(p.tx.sd||0)+'|'+(p.tx.ind||0)+'|'+(p.tx.psp||0)+(p.tx.bal||'')+JSON.stringify(p.tx.sty||0)+(p.tx.wp||'')+(p.tx.wa||0)+(p.tx.pt||'')+(p.tx.pa||0)+(p.tx.pw||0):'-';if(key===tbKey)return;tbKey=key;if(!p)return;
+const key=tbKeyOf(p);if(key===tbKey)return;if(p&&tbPend)return;tbKey=key;if(!p)return;
 tbSty={tu:(Array.isArray(p.tu)?p.tu:[]).map(u=>({...u})),ink:p.ink||''};tbStyUI();tbLoad=true;try{const o=p.tx,ra=p.s/Math.max(p.n||1,.01);txoWrite(o,{sz:Math.max(2,Math.min(60,+(o.sz*ra).toFixed(1))),wd:Math.max(0,Math.min(400,Math.round((o.wd||0)*ra))),ht:Math.max(0,Math.min(400,Math.round((o.ht||0)*ra)))},false)}finally{tbLoad=false}if(WBX.wbTxFxPaint)WBX.wbTxFxPaint()}
 // the Text tool in the Pattern editor: with no Text layer selected, typing makes one
 function tbEnsure(){return fpL()}
 function tbLive(){if(tbLoad||stTxMode())return;let p=tbSel(),L=fpL();if(!p)return;   // 2.12.0: typing no longer arms a click-to-place text; Add text makes it
-clearTimeout(tbT);tbT=setTimeout(async()=>{const o=tbRead();if(!o.text.trim())return;const R=await WBX.wbTxLay(o);if(!R||!L.pl.includes(p))return;
-p.tx=o;p.G=R.G;p.Lt=R.Lt;p.bw=R.bw;p.bh=R.bh;p.n=Math.max(R.bw,R.bh);p.s=+p.n.toFixed(2);tbKey=p.u+'|'+Math.round(p.s*10);store();upd();if(WBX.wbCap)WBX.wbCap()},160)}
+clearTimeout(tbT);const pn=++tbPend;tbT=setTimeout(async()=>{try{const o=tbRead();if(!o.text.trim())return;const R=await WBX.wbTxLay(o);if(!R||!L.pl.includes(p)||pn!==tbPend){if(pn===tbPend){tbPend=0;upd()}return}
+p.tx=o;p.G=R.G;p.Lt=R.Lt;p.bw=R.bw;p.bh=R.bh;p.n=Math.max(R.bw,R.bh);p.s=+p.n.toFixed(2);tbKey=tbKeyOf(p);store();upd();if(WBX.wbCap)WBX.wbCap()}finally{if(pn===tbPend)tbPend=0}},160)}
 async function tbAdd(){const L=fpL();if(!L)return;const o=tbRead();if(!o.text.trim())return;const R=await WBX.wbTxLay(o);if(!R){pmsg('No letters came out. Try another font.');return}
 L.pl=L.pl||[];const c=L.pl.filter(z=>z.tx).length,n=Math.max(R.bw,R.bh),q={u:fpU(),k:'text',tx:o,G:R.G,Lt:R.Lt,bw:R.bw,bh:R.bh,n,x:+(CW/2+((c%4)-1.5)*CW*.03).toFixed(1),y:+(CH/2+((c%4)-1.5)*CW*.03).toFixed(1),s:+n.toFixed(2),r:0,f:1};
 L.pl.push(q);WBS.fpSel=q.u;WBS.fpMS=new Set();WBS.fpB=null;WBS.fpGhost=null;tbKey='';store();upd();if(WBX.wbCap)WBX.wbCap()}

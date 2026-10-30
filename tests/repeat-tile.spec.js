@@ -149,3 +149,23 @@ test('the 3 x 3 view shows tile edges, a pressed button and an exit pill, and Es
   await expect(page.locator('#tpv')).toHaveAttribute('aria-pressed', 'false');
   expect(errors).toEqual([]);
 });
+
+// 2.78.1: the faint seam of a Pattern with a Texture effect (known since 2.24.0, last seen as roll 21) no longer shows: a Texture added by hand to a tiled Pattern
+// keeps the tile as seamless as without it (measured: right 1.40 against 1.46 before, the resampling of the edges)
+test('seamless with a Texture effect on the Pattern', async ({ page }) => {
+  test.setTimeout(300000);
+  const { errors } = await openApp(page, { seed: 5 });
+  await tile(page);
+  await page.evaluate(() => window.__wbTest.kv.set('wb167_rzlook', 'repeat')); await roll(page);
+  const u = JSON.parse(await getState(page)).els.find(q => q.k === 'pattern').u;
+  await openPanel(page, 'lyrs'); await page.locator(`#lybody .lyr[data-u="${u}"]`).first().click({ position: { x: 60, y: 10 } });
+  await openPanel(page, 'layers'); await settle(page);
+  await page.locator('.fxg[data-fxk="pattern"] .fxadd').scrollIntoViewIfNeeded(); await page.click('.fxg[data-fxk="pattern"] .fxadd');
+  await page.locator('.rowm .ddi', { hasText: 'Texture' }).first().click(); await settle(page, { max: 60000 });
+  expect((JSON.parse(await getState(page)).els.find(q => q.u === u).fx || []).map(e => e.k)).toContain('texture');
+  const p = await periodic(page);
+  expect(p.half, 'the piece has something in it').toBeGreaterThan(1);
+  expect(p.right, JSON.stringify(p)).toBeLessThan(0.4 * p.half + 0.4);
+  expect(p.down, JSON.stringify(p)).toBeLessThan(0.4 * p.half + 0.15);
+  expect(errors).toEqual([]);
+});
