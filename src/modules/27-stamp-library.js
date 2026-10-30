@@ -4,7 +4,7 @@ import {kv,use,collection} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {BK} from './03-stamp-prints-and-drawing.js';
 import {C,CC,CH,CM,col,CW,geom,okC,paintColors,saveCC,shOf,shp,stNm,useT} from './04-canvas-and-stamp-outlines.js';
-import {clean,cust,inkOf,selOne,store} from './06-motif-library-folders.js';
+import {clean,cust,inkOf,mk,selOne,store} from './06-motif-library-folders.js';
 import {hx} from './10-layer-grids.js';
 import {eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
 import {SURFC,inkCatch,txMerge,txPack} from './17-texture-panel-and-previews.js';
@@ -15,6 +15,7 @@ import {fpPick} from './24-free-place-layers.js';
 import {artEnc,artId,artOk,artRefd} from './25-art-layers.js';
 import {ltMake} from './87-library-tree.js';
 import {zipRead} from '../format/libzip.js';
+import {basicKey} from './76-basic-shapes.js';
 // ===== Stamp library: keep stamps between projects, and export a stamp as a PNG =====
 // A library record: {name, updated, w, h, img (transparent picture), tile (the stamp, as JSON), motifs (the custom motifs it uses), colors (its custom ink)}.
 // Stored privately with your Claude account when that is available, otherwise in this browser.
@@ -66,17 +67,27 @@ const SLF_KEY='wb251_stampfolders',SLF_UI='wb251_stampsui';
 let SLT=null,slRecs=[];
 const slFold=()=>{let d=null;try{d=JSON.parse(kv.get(SLF_KEY)||'null')}catch(e){}return(d&&Array.isArray(d.f)?d.f:[]).filter(x=>typeof x=='string'&&x&&x.length<=200&&!x.startsWith('s:'))};
 const slPathOk=p=>typeof p=='string'&&p.length<=200&&!p.startsWith('s:')?p:'';
+// 2.76.8 (owner Oct 29 2026, docs/pattern-plan.md step 5: "draw them for now"): a few built-in stamps drawn from the Basic shapes, in a Starting points set that
+// opens first. Each is [id, name, stamp outline, items: [basic shape, x, y (in the outline's box), size, turn]]; the shapes are found by name when one is added.
+const SL_START=[['dot','Dot','circle',[['ellipse',120,120,.78,0]]],['star','Star','rect',[['star',120,126,.82,0]]],['heart','Heart','rect',[['heart',120,128,.76,0]]],
+ ['diamonds','Four diamonds','rect',[['dia',68,68,.38,0],['dia',172,68,.38,0],['dia',68,172,.38,0],['dia',172,172,.38,0]]],
+ ['flower','Hex flower','hex',[['hex',103.92,120,.34,0],...[0,1,2,3,4,5].map(k=>['ellipse',+(103.92+Math.cos(k*Math.PI/3)*62).toFixed(2),+(120+Math.sin(k*Math.PI/3)*62).toFixed(2),.22,0])]],
+ ['triangles','Two triangles','rect',[['tri',120,80,.52,0],['tri',120,160,.52,180]]]];
+const SL_SID=id=>'bs:'+id,slStart=id=>{const x=typeof id=='string'&&id.startsWith('bs:')?SL_START.find(s=>s[0]==id.slice(3)):null;return x||null};
+function slStartTile(x){return{items:x[3].map(([b,X,Y,s,r])=>({m:basicKey(b)||'b0',x:X,y:Y,s,r,f:1})),sh:{k:x[2],o:'p',s:[1,1],z:100},sym:{m:'off'},et:0,er:0,es:1,tu:[]}}
+function slStartPic(x){const G=geom({k:x[2],o:'p',s:[1,1]}),mks=x[3].map(([b,X,Y,s,r])=>{const k=basicKey(b);return k?`<g transform="translate(${X} ${Y}) rotate(${r}) scale(${s})">${mk(k,'currentColor','transparent')}</g>`:''}).join('');
+ return`<svg viewBox="0 0 ${G.SW.toFixed(1)} ${G.SH.toFixed(1)}" aria-hidden="true">${mks}</svg>`}
 const slRec=id=>slRecs.find(x=>x.id===id);
 const slPatch=(id,o)=>SL.get(id).then(r=>{if(r){delete r.id;return SL.put(id,{...r,...o})}}).catch(()=>{});
 const slCfg=()=>({p:'sl',word:'stamp',words:'stamps',ui:SLF_UI,exportName:'wodblok-stamps',exportAs:'stamp files',pane:'#slpane',trId:'slgrid',qId:'slq',
  read(){const at={};slRecs.forEach(x=>{at[x.id]=x.g||''});return{f:slFold(),at,b:{},h:[],r:{}}},
  write(m){try{kv.set(SLF_KEY,JSON.stringify({f:m.f}))}catch(e){}slRecs.forEach(x=>{const g=slPathOk(m.at[x.id]);if(g!==(x.g||'')){x.g=g;slPatch(x.id,{g})}})},
- sets:()=>[],name:id=>{const x=slRec(id);return x?x.name||'Stamp':null},own:()=>true,used:()=>false,
- tile:id=>{const x=slRec(id);return x&&slOkImg(x.img)?`<img src="${hx(x.img)}" alt="" draggable="false">`:''},
+ open:['s:Starting points'],sets:()=>[{k:'s:Starting points',n:'Starting points',ids:SL_START.map(x=>SL_SID(x[0]))}],name:id=>{const b=slStart(id);if(b)return b[1];const x=slRec(id);return x?x.name||'Stamp':null},own:id=>!slStart(id),used:()=>false,
+ tile:id=>{const b=slStart(id);if(b)return slStartPic(b);const x=slRec(id);return x&&slOkImg(x.img)?`<img src="${hx(x.img)}" alt="" draggable="false">`:''},
  remove(list){list.forEach(id=>{slRecs=slRecs.filter(x=>x.id!==id);SL.del(id).catch(()=>{})});$('slcount').textContent=slRecs.length?String(slRecs.length):''},
  rename(id,v){const x=slRec(id);if(x)x.name=v;slPatch(id,{name:v})},
  async file(id){const r=await SL.get(id);return r?{name:r.name||'Stamp',data:new TextEncoder().encode(fmtStampPack(r)),ext:'.wodblok-stamp',fb:'Stamp'}:null},
- itemMenu:id=>[['Add to project',()=>slAct(id,'add')],['Save as PNG',()=>slAct(id,'png')],['Save as file',()=>slAct(id,'file')]]});
+ itemMenu:id=>slStart(id)?[['Add to project',()=>slAct(id,'add')]]:[['Add to project',()=>slAct(id,'add')],['Save as PNG',()=>slAct(id,'png')],['Save as file',()=>slAct(id,'file')]]});
 async function slPaint(){if(!$('slpane'))return;slSync();await SL.init();$('slwhere').textContent=SL.kind=='account'?'Saved to your Claude account':'Saved in this browser';
 try{const all=await SL.list();slRecs=all.map(p=>({id:p.id,name:p.name||'Stamp',img:p.img,g:slPathOk(p.g)}));$('slcount').textContent=all.length?String(all.length):'';SLT.show($('slpane'),'',slAct0);SLT.paintAll(true)}
 catch(e){slMsg('Could not load the library.')}}
@@ -85,7 +96,7 @@ async function artImport(f){if(!f||!/^image\//.test(f.type))return pmsg('That fi
 const url=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=()=>r(null);fr.readAsDataURL(f)}),img=url&&await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=url});
 if(!img)return pmsg('Could not read that image.');let nw=img.naturalWidth||img.width||1000,nh=img.naturalHeight||img.height||1000;const k=Math.min(1,2000/Math.max(nw,nh)),w=Math.max(1,Math.round(nw*k)),h=Math.max(1,Math.round(nh*k)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
 const id=artId();WBS.ARTS[id]={n:(f.name||'Art').replace(/\.[^.]+$/,'').replace(/["<>&|]/g,'').slice(0,40)||'Art',k:'img',src:artEnc(c),w,h};if(WBX.wbMotifImage)WBX.wbMotifImage(id);pmsg('Image added.');upd()}
-async function slAct(id,a){try{const rec=await SL.get(id);if(!rec)return slMsg('That stamp is gone.');
+async function slAct(id,a){try{const b=slStart(id),rec=b?{name:b[1],tile:JSON.stringify(slStartTile(b)),motifs:{},colors:[]}:await SL.get(id);if(!rec)return slMsg('That stamp is gone.');
 if(a=='add'){let t=null;try{t=JSON.parse(rec.tile)}catch(er){}if(!t||!Array.isArray(t.items))return slMsg('That library entry is damaged.');
 libMotifs({motifs:rec.motifs});libColors({colors:rec.colors});if(WBX.wbTexImgsLoad)WBX.wbTexImgsLoad(rec.tximgs);txMerge(t);if(t.ink){const h=okC(t.ink)&&t.ink[0]!='@'?col(t.ink):CM[t.ink]||null;const r=h?refAdopt(h):null;if(r)t.ink=r;else delete t.ink}t.id=WBS.nid++;t.nm=String(rec.name||'').trim().slice(0,40)||'Stamp '+t.id;shOf(t);WBS.tiles.push(t);{const Ls=WBS.layers[WBS.selL];if(Ls&&!(Ls.st||[]).includes(t.id)){Ls.st=Ls.st||[];Ls.st.push(t.id)}}WBS.cur=WBS.tiles.length-1;selOne(-1);WBS.symKey='';store();upd();if(WBX.wbCap)WBX.wbCap();slMsg('Added “'+rec.name+'” as a new stamp. Tick it under Stamps in the Layout to print it.')}
 else if(a=='png'){if(!slOkImg(rec.img))return slMsg('That entry has no picture.');const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Could not read the picture'));i.src=rec.img}),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);await slSavePng(await slBlob(c),rec.name||'Stamp')}

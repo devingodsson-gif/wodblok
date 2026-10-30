@@ -1,5 +1,14 @@
 # Development plan
 
+## 2.76.8 (Oct 29 2026, branch feat/2.76.8-first-minute, step 5 of docs/pattern-plan.md, on top of 2.76.7): the first minute
+- **Starter content:** the stamp library has a Starting points set (open first) of six stamps drawn from the Basic shapes (Dot, Star, Heart, Four diamonds, Hex flower, Two triangles; 27-stamp-library.js `SL_START`); a click adds one to the project. The four starter templates (one per format plus Framed border) existed, so the template picker opens at launch again: Settings > General > Templates at launch is on by default (CLAUDE.md's launch rule rewritten; tests still start with it off unless they ask).
+- **Shape places at once:** the Shape button arms the last shape, else a rectangle (it opened the library and armed nothing).
+- **A new Pattern starts ready:** its source is the selected stamp or shape (with the shape's look), else the project's only stamp, taken when its button is pressed; it goes just above the Background. **Make pattern** (right-click menu and Elements menu, command `element.makePattern`) makes one at once from the selected stamp or shape. The test harness adds the stamp source only when the Pattern has none, so specs and snapshots are unchanged.
+- **Fewer controls:** with no shape selected and no stamp open, the Shape panel shows the Library only (its Edit group belongs to the stamp tab); a shape's Width and Height sit under Size in the Element group.
+- **Wording:** "Untitled project" (title placeholder, saved name, crash recovery, print proof, file names `Untitled-project.*`); "No elements" in an empty stamp's Elements list. **New project** with unsaved work asks "Save changes first?" (Save, Don't save, Cancel) instead of a second click; the Projects dialog's New project closes that dialog first.
+- **Panels:** the canvas no longer jumps sideways when the left column opens (while fitted to the screen the left column is left out of the fit and the canvas moves back by half of it); a group shows at most four tabs, fewer when they do not fit, the open one always, the rest in a More tabs menu.
+- Tests: tests/first-minute-2-76-8.spec.js (6), new-project.spec rewritten for the dialog (4), nothing-lost-2-24 and templates updated. Ran: see PROJECT_STATUS. Not run: full suite, WebKit, CI.
+
 ## 2.76.7 (Oct 29 2026, branch feat/2.76.7-arrangements, step 4 of docs/pattern-plan.md, on top of 2.76.6 (live)): more arrangements and edges. Format 30 kept
 - **Scatter without overlaps:** Min distance (`md`, % of a cell): each piece is drawn up to 30 times from the seed and the first place far enough from the others is kept.
 - **Spiral** layout (a sunflower: Across x Down pieces at the golden angle, facing outward).

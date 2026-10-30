@@ -26,7 +26,7 @@ async function proofCanvas(paper){
   const text=(s,px,y,o={})=>{x.font=`${o.w||400} ${px}px ${o.f||sans}`;x.fillStyle=o.c||ink;x.textAlign=o.a||'left';x.fillText(s,o.x??m,y)};
   const clip=(s,px,maxw,o={})=>{x.font=`${o.w||400} ${px}px ${o.f||sans}`;while(s.length>3&&x.measureText(s).width>maxw)s=s.slice(0,-2);return s};
   // header
-  const name=($('pnm').value||'').trim()||'Untitled pattern',date=new Date().toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  const name=($('pnm').value||'').trim()||'Untitled project',date=new Date().toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
   text(clip(name,46,W-2*m,{w:600}),46,m+34,{w:600});
   text(`Print proof  ·  ${date}  ·  WODBLOK v${WB_VER}`,20,m+70,{c:mut});
   x.strokeStyle=line;x.lineWidth=2;x.beginPath();x.moveTo(m,m+92);x.lineTo(W-m,m+92);x.stroke();

@@ -97,7 +97,8 @@ async function addPattern(page) {
   if (!(await page.evaluate(() => JSON.parse(window.__wbTest.state()).tiles.length))) await addStamp(page);   // 2.15.0: a new project has no stamp; the old start's one is made here
   await page.click('#elb [data-k="pattern"]');
   await addKind(page, 'pattern');
-  await patSource(page);                                  // the old start's Pattern printed the stamp
+  // 2.76.8: a new Pattern takes the project's only stamp by itself; only add it when it is not there (the old start's Pattern printed the stamp)
+  if (!(await page.evaluate(() => JSON.parse(window.__wbTest.state()).els.some(q => q.k === 'pattern' && (q.src || []).length)))) await patSource(page);
   if ((await page.getAttribute('#rcls', 'aria-label')) === 'Close all panels') await page.locator('#rcls').dispatchEvent('click');
   await page.keyboard.press('Escape'); await settle(page);
   await page.evaluate(() => window.__wbTest.resetHistory());   // the set-up steps are not the test's history: the first step is the Start again

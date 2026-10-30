@@ -10,6 +10,7 @@ import {fxGr,fxJit,fxTex} from './69-effect-stack.js';
 import {abInsert} from './73-add-bar.js';
 import {stUnlocked} from './63-stamp-tool.js';
 import {mNm} from './21-motif-library-ui.js';
+import {basicKey} from './76-basic-shapes.js';
 
 // ===== The Motif element (2.3.0, owner Oct 20 2026: "add shapes freely to the canvas"): one library shape on the canvas on its own, not inside a stamp.
 // {u, k:'motif', m: motif key, x, y (its middle, canvas units), s (its size: the 100-unit motif box becomes s units), r (degrees), f (1 or -1, flipped), ink?,
@@ -90,15 +91,19 @@ const mtfSize=()=>{const b=WBS.brush;return b&&b.s?Math.max(20,Math.min(400,b.s*
 // 2.26.0 (review 12): a Motif on the canvas is edited in the Motif panel. Its Element group (size, turn, position, flip, order) sits at the top; the panel's Edit group, which works on the shapes of a stamp, switches to
 // the canvas motif's Width, Height and Colour while one is selected (the rest of Edit is for stamp shapes and hides).
 const mtSel=()=>{const q=elSel();return q&&q.k=='motif'&&stUnlocked()==null?q:null};
-function mtSync(){const e=$('sel');if(!e)return;const q=mtSel();if(e.classList.contains('mtel')!==!!q)e.classList.toggle('mtel',!!q);if(!q)return;
- const x=Math.round((+q.wx||1)*100),y=Math.round((+q.wy||1)*100);if($('ssx').value!=x)(WBX.wbRngSet||((r,v)=>r.value=v))($('ssx'),x);if($('ssy').value!=y)(WBX.wbRngSet||((r,v)=>r.value=v))($('ssy'),y)}
+// 2.76.8: with no shape selected and no stamp open, the Shape panel shows the library only (its Edit group is the stamp tab's); a shape's Width and Height sit
+// under Size in the Element group (lfpwh), the Edit group's own copies hidden
+function mtSync(){const e=$('sel');if(!e)return;const q=mtSel();if(e.classList.contains('mtel')!==!!q)e.classList.toggle('mtel',!!q);
+ {const g=e.closest('details.g'),off=!q&&stUnlocked()==null;if(g&&g.hidden!==off)g.hidden=off;const wh=$('lfpwh');if(wh&&wh.hidden!==!q)wh.hidden=!q}if(!q)return;
+ const x=Math.round((+q.wx||1)*100),y=Math.round((+q.wy||1)*100);if($('ssx').value!=x)(WBX.wbRngSet||((r,v)=>r.value=v))($('ssx'),x);if($('ssy').value!=y)(WBX.wbRngSet||((r,v)=>r.value=v))($('ssy'),y);
+ {const R=WBX.wbRngSet||((r,v)=>r.value=v);if($('lfpsw')&&$('lfpsw').value!=x)R($('lfpsw'),x);if($('lfpsh')&&$('lfpsh').value!=y)R($('lfpsh'),y)}}
 function init74(){
  WBX.wbMotifSize=mtfSize;WBX.wbMtSel=mtSel;WBX.wbMtSync=mtSync;
- [['ssx','wx'],['ssy','wy']].forEach(([id,f])=>$(id).addEventListener('input',e=>{const q=mtSel();if(!q)return;e.stopImmediatePropagation();const v=+e.target.value/100;if(v==1)delete q[f];else q[f]=+v.toFixed(3);store();upd()},true));
+ [['ssx','wx'],['ssy','wy'],['lfpsw','wx'],['lfpsh','wy']].forEach(([id,f])=>$(id).addEventListener('input',e=>{const q=mtSel();if(!q)return;e.stopImmediatePropagation();const v=+e.target.value/100;if(v==1)delete q[f];else q[f]=+v.toFixed(3);store();upd()},true));
  elExtend('motif',{dz:5,pn:'motifs',is:q=>q.k=='motif',name:q=>q.nm||mNm(q.m)||'Shape',draw:(L,li,pa)=>mtfLayer(L,li,pa)});
  // a click on the canvas with a shape armed and no stamp unlocked: a free Motif element there (64-stamp-canvas-edit.js asks first)
 // Add motif (2.7.0): a Motif in the middle of the canvas, the last one used or else the first of the library, selected; the library then changes its shape
- WBX.wbMotifAdd=()=>{const m=mtLast;if(!m){if(WBX.wbOpenPanel)WBX.wbOpenPanel('motifs');return}   /* 2.26.0: nothing chosen yet, so the library opens (it used to place the first shape, a battle axe) */WBS.brush=null;if(stUnlocked()!=null){if(WBX.wbStampAddMotif)WBX.wbStampAddMotif(m,.8);return}if(!fpL())return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.brush={m,s:.8,r:0};upd()};
+ WBX.wbMotifAdd=()=>{const m=mtLast||basicKey('rect');if(!m){if(WBX.wbOpenPanel)WBX.wbOpenPanel('motifs');return}   /* 2.76.8 (owner, Oct 22 and 29 2026): the Shape button arms the last shape at once, else a rectangle (2.26.0 opened the library and armed nothing) */WBS.brush=null;if(stUnlocked()!=null){if(WBX.wbStampAddMotif)WBX.wbStampAddMotif(m,.8);return}if(!fpL())return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.brush={m,s:.8,r:0};upd()};
  WBX.wbMotifAt=(x,y)=>{const b=WBS.brush;if(!b||b.txt||!b.m||!fpL())return false;mtfMake(b.m,x,y,mtfSize(),b.r||0);return true};
  // picking a library shape while a Motif element is selected changes that element's shape
  WBX.wbMotifSwap=m=>{if(WBS.brush)return false;const L=fpL(),q=L&&(L.pl||[]).find(x=>String(x.u)===String(WBS.fpSel));if(!q||q.k!='motif')return false;q.m=m;mtLast=m;store();upd();if(WBX.wbCap)WBX.wbCap();return true};

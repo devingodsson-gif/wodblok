@@ -8,6 +8,7 @@ import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpHit,fpPt,fpWH} from './25-art-layers.js';
 import {lyDupSel} from './32-layers-panel.js';
 import {stUnlocked} from './63-stamp-tool.js';
+import {patCanMake,patMakeFrom} from './67-pattern-element.js';
 
 // ===== Copy, paste and the right-click menu (2.22.0, owner Oct 22 2026). Cut, Copy and Paste work on the selected elements with Ctrl+X, C and V (inside the app: the clipboard is kept here, not the system's,
 // so a picture copied elsewhere still pastes as an image). A right click on the canvas selects the element under the pointer and opens a menu: Cut, Copy, Paste, Duplicate, Bring to front, Send to back, Delete.
@@ -29,15 +30,15 @@ function emPaste(){const L=fpL();if(!L||!EMCLIP||!EMCLIP.length)return false;L.p
 function emDel(){const L=fpL(),g=fpGrp();if(!L||!g.length)return false;g.forEach(q=>{const i=L.pl.indexOf(q);if(i>=0)L.pl.splice(i,1)});WBS.fpSel=-1;WBS.fpMS=new Set();emDone();return true}
 const emCut=()=>{if(!emCopy())return false;return emDel()};
 function emOrder(front){const L=fpL(),g=fpGrp();if(!L||!g.length)return false;g.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));if(front)L.pl.push(...g);else L.pl.unshift(...g);emDone();return true}
-const emCan={cut:()=>fpGrp().length>0,copy:()=>fpGrp().length>0,paste:()=>!!EMCLIP&&!!EMCLIP.length&&!!fpL(),dup:()=>fpGrp().length>0,front:()=>fpGrp().length>0,back:()=>fpGrp().length>0,del:()=>fpGrp().length>0};
-const emRows=[['cut','Cut','Ctrl+X','split'],['copy','Copy','Ctrl+C','duplicate'],['paste','Paste','Ctrl+V','importIc'],['dup','Duplicate','Ctrl+D','layers'],null,['front','Bring to front','','front'],['back','Send to back','','back'],null,['del','Delete','Del','trash']];
-const emRun={cut:emCut,copy:emCopy,paste:emPaste,dup:()=>lyDupSel(),front:()=>emOrder(true),back:()=>emOrder(false),del:emDel};
+const emCan={pat:()=>patCanMake(),cut:()=>fpGrp().length>0,copy:()=>fpGrp().length>0,paste:()=>!!EMCLIP&&!!EMCLIP.length&&!!fpL(),dup:()=>fpGrp().length>0,front:()=>fpGrp().length>0,back:()=>fpGrp().length>0,del:()=>fpGrp().length>0};
+const emRows=[['cut','Cut','Ctrl+X','split'],['copy','Copy','Ctrl+C','duplicate'],['paste','Paste','Ctrl+V','importIc'],['dup','Duplicate','Ctrl+D','layers'],['pat','Make pattern','','pattern'],null,['front','Bring to front','','front'],['back','Send to back','','back'],null,['del','Delete','Del','trash']];
+const emRun={pat:()=>patMakeFrom(),cut:emCut,copy:emCopy,paste:emPaste,dup:()=>lyDupSel(),front:()=>emOrder(true),back:()=>emOrder(false),del:emDel};
 const emIc=n=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN[n]||''}</svg>`;
 function emClose(){const m=$('ctxm');if(m)m.hidden=true}
 // in a stamp tab (2.25.0) the same menu works on the stamp's shapes
 const emTab=()=>stUnlocked()!=null&&!!WBX.wbStClip;
-const emCanT={cut:()=>WBX.wbStClip.sel(),copy:()=>WBX.wbStClip.sel(),paste:()=>WBX.wbStClip.has(),dup:()=>WBX.wbStClip.sel(),front:()=>WBX.wbStClip.sel(),back:()=>WBX.wbStClip.sel(),del:()=>WBX.wbStClip.sel()};
-const emRunT={cut:()=>WBX.wbStClip.cut(),copy:()=>WBX.wbStClip.copy(),paste:()=>WBX.wbStClip.paste(),dup:()=>{const c=cmdGet('stamp.duplicateMotif');if(c)c.run()},front:()=>WBX.wbSceOrder(true),back:()=>WBX.wbSceOrder(false),del:()=>WBX.wbSceDelSel()};
+const emCanT={pat:()=>false,cut:()=>WBX.wbStClip.sel(),copy:()=>WBX.wbStClip.sel(),paste:()=>WBX.wbStClip.has(),dup:()=>WBX.wbStClip.sel(),front:()=>WBX.wbStClip.sel(),back:()=>WBX.wbStClip.sel(),del:()=>WBX.wbStClip.sel()};
+const emRunT={pat:()=>{},cut:()=>WBX.wbStClip.cut(),copy:()=>WBX.wbStClip.copy(),paste:()=>WBX.wbStClip.paste(),dup:()=>{const c=cmdGet('stamp.duplicateMotif');if(c)c.run()},front:()=>WBX.wbSceOrder(true),back:()=>WBX.wbSceOrder(false),del:()=>WBX.wbSceDelSel()};
 function emOpen(e,over){let m=$('ctxm');if(!m){m=document.createElement('div');m.id='ctxm';m.className='pop';m.setAttribute('role','menu');document.body.appendChild(m);
   m.addEventListener('click',ev=>{const b=ev.target.closest('button[data-a]');if(!b||b.disabled)return;emClose();(emTab()?emRunT:emRun)[b.dataset.a]()})}
  m.innerHTML=emRows.map(r=>r?`<button type="button" role="menuitem" data-a="${r[0]}"${(emTab()?emCanT:emCan)[r[0]]()?'':' disabled'}>${emIc(r[3])}${r[1]}${r[2]?`<kbd>${r[2]}</kbd>`:''}</button>`:'<hr>').join('');
@@ -56,5 +57,6 @@ function init80(){
  // Ctrl or Cmd with X, C, V on the canvas (not in a field, not in a stamp's tab, which has its own copy and paste)
  document.addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey||e.shiftKey||stUnlocked()!=null)return;const t=e.target;if(t&&t.matches&&t.matches('input,textarea,select,[contenteditable]'))return;
   const k=e.key.toLowerCase();if(k=='c'){if(emCopy())e.preventDefault()}else if(k=='x'){if(emCut())e.preventDefault()}else if(k=='v'&&emCan.paste()){if(emPaste())e.preventDefault()}});
- [['edit.copy','Copy elements','Mod+C','copy'],['edit.cut','Cut elements','Mod+X','cut'],['edit.paste','Paste elements','Mod+V','paste']].forEach(([id,label,shortcut,a])=>cmdRegister({id,label,shortcut,enabled:()=>emCan[a](),run:()=>emRun[a]()}))}
+ [['edit.copy','Copy elements','Mod+C','copy'],['edit.cut','Cut elements','Mod+X','cut'],['edit.paste','Paste elements','Mod+V','paste']].forEach(([id,label,shortcut,a])=>cmdRegister({id,label,shortcut,enabled:()=>emCan[a](),run:()=>emRun[a]()}));
+ cmdRegister({id:'element.makePattern',label:'Make pattern',enabled:()=>patCanMake(),run:()=>patMakeFrom()})}   // 2.76.8: the selected stamp or shape as a Pattern's source
 export {init80};

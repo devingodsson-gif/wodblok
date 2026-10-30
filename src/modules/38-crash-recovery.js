@@ -17,7 +17,7 @@ async function rcRun(){
     const s=coreStr(),need=rcUnsaved(),key=need?s+'|'+$('pnm').value:'';
     if(key===rcLast)return;rcLast=key;
     if(!need)return await recovery.del('current');
-    await recovery.put('current',{t:Date.now(),id:WBS.cp.id||null,name:$('pnm').value.trim()||'Untitled pattern',data:JSON.stringify(snapshot())});
+    await recovery.put('current',{t:Date.now(),id:WBS.cp.id||null,name:$('pnm').value.trim()||'Untitled project',data:JSON.stringify(snapshot())});
   }catch(e){}
 }
 async function rcRestore(){

@@ -60,9 +60,14 @@ function init18(){WBS.pgrid={...PGD};
 WBS.guiKey='';
 WBS.cp={id:null,name:'',saved:''};
 $('pnm').value=WBS.cp.name||'';setInterval(paintPst,800);paintPst();
-$('pnw').onclick=()=>{confirm2($('pnw'),'Click again: can’t be undone',()=>{const t=JSON.parse(DEF_TILES);
-openData({tiles:t,layers:[mkEL('Layer 1',t.map(x=>x.id))],proj:{...PCOL},dim:{s:[1,1],c:[2,3]},tex:PDEF.tex},null,'');clearAll(true);WBS.guiKey='';renderGuides();WBS.cp.saved=coreStr();paintPst()});
-// first click with unsaved work: the button says so (the File menu stays open, see 34-desktop-shell) and the status bar explains
-if($('pnw').dataset.sure)pmsg('A new project can’t be undone. New project again to discard this one.')};
+// 2.76.8 (docs/pattern-plan.md step 5): New project with unsaved work asks Save changes first? (Save, Don't save, Cancel) instead of a second click.
+// A caller that asked already (the template picker's Blank) sets dataset.sure and goes straight through.
+const newNow=()=>{const t=JSON.parse(DEF_TILES);openData({tiles:t,layers:[mkEL('Layer 1',t.map(x=>x.id))],proj:{...PCOL},dim:{s:[1,1],c:[2,3]},tex:PDEF.tex},null,'');clearAll(true);WBS.guiKey='';renderGuides();WBS.cp.saved=coreStr();paintPst()};
+const nwHide=()=>{$('nwd').hidden=true};
+$('pnw').onclick=()=>{const b=$('pnw');if(b.dataset.sure||!dirty()){delete b.dataset.sure;return newNow()}try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}catch(e){}$('nwd').hidden=false;$('nwdok').focus()};
+$('nwdx').onclick=$('nwdcx').onclick=nwHide;
+$('nwdno').onclick=()=>{nwHide();newNow()};
+$('nwdok').onclick=async()=>{nwHide();if(WBX.wbSaveProject)try{await WBX.wbSaveProject()}catch(e){}if(!dirty())newNow();else pmsg('The project was not saved, so it is still open.')};
+$('nwd').addEventListener('keydown',e=>{if(e.key=='Escape'){e.preventDefault();e.stopPropagation();nwHide()}});
 }
 export {PGD,fileSnap,thumb,confirm2,coreStr,dirty,newId,openData,paintPst,pgFix,pmsg,renderGuides,snapshot,init18};

@@ -5,7 +5,7 @@ import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL,fpU} from './24-free-place-layers.js';
 import {fpSz} from './25-art-layers.js';
-import {patNew} from './67-pattern-element.js';
+import {patNew,patPut,patSrcNow} from './67-pattern-element.js';
 import {elKind,elSel} from './65-element-core.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {plDisarm} from './72-placing.js';
@@ -26,7 +26,7 @@ const abCount=k=>{const L=fpL();return L?(L.pl||[]).filter(q=>q.k==k).length:0};
 function abSheet(){plDisarm();const q=abInsert({u:fpU(),k:'sheet',n:'Sheet '+(1+((fpL()||{}).pl||[]).filter(x=>x.k=='sheet'&&!x.bgd).length),fl:'none'});if(!q)return;abDone();if(WBX.wbElSeen)WBX.wbElSeen(q.u);abOpen('sheet')}
 // Shape, Motif and Stamp (2.4.0), and Text and Pattern too (2.6.0), owner Oct 21 2026: the button makes nothing. It puts everything away, clears the selection and opens that kind's properties;
 // what is picked there is made (a Shape preset) or follows the pointer as a ghost and is placed as often as wanted (a Motif, a Stamp).
-let ABP='';   // which of 'motif', 'stamp', 'text', 'pattern' was last chosen on the bar and is waiting for a pick, '' for none
+let ABP='',PSRC=null;   // PSRC (2.76.8): the new Pattern's source, taken when its button is pressed (arming clears the selection)   // which of 'motif', 'stamp', 'text', 'pattern' was last chosen on the bar and is waiting for a pick, '' for none
 const abPick=k=>{plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;ABP=k;upd();abOpen(k=='motif'?'motifs':k=='text'?'text':k=='pattern'?'layers':'stmp')};
 // 2.20.0 (owner Oct 22 2026): every Add arms its kind, a ghost follows the pointer and each click on the canvas places one; Esc or V puts it away. Text, Motif and Stamp use their own ghosts; Pattern uses a box.
 function plArm(o){plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;WBS.plArm=o;upd();abOpen('layers');abSync()}
@@ -34,15 +34,15 @@ function plArm(o){plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;WBS.
 // follows the pointer and each click places one more (one history step each) until Esc, V, a right click or any other control puts it away.
 function plCopy(){const q=elSel();if(!q||q.k=='sheet'||q.bgd||q.k=='group'||elKind(q)=='group')return false;const c=JSON.parse(JSON.stringify(q));delete c.u;delete c.g;delete c.lk;
  plDisarm();WBS.plArm={k:'copy',q:c,su:String(q.u)};WBS.fpGhost=null;upd();pmsg('Click the canvas to place copies. Esc stops.');return true}
-function plMake(o,x,y){if(o.k=='copy'){const q=JSON.parse(JSON.stringify(o.q));q.u=fpU();q.x=x;q.y=y;const L=fpL();if(!L)return;(L.pl=L.pl||[]).push(q);abDone();return}if(o.k=='pattern'){const q=abInsert({u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),...patNew(),rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x,y,s:Math.min(CW,CH),r:0,f:1});if(!q)return;WBS.patSel=q.u;abDone()}}
+function plMake(o,x,y){if(o.k=='copy'){const q=JSON.parse(JSON.stringify(o.q));q.u=fpU();q.x=x;q.y=y;const L=fpL();if(!L)return;(L.pl=L.pl||[]).push(q);abDone();return}if(o.k=='pattern'){const L=fpL();if(!L)return;const src=PSRC||[];PSRC=null;patPut(L,{u:fpU(),k:'pattern',n:'Pattern '+(abCount('pattern')+1),...patNew(),rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src,x,y,s:Math.min(CW,CH),r:0,f:1});abDone()}}
 // 2.26.0: what a bar button does after it opened the panel. In a stamp's tab only Motif and Text have an Add, so the other buttons stay as they were (they only open the panel).
 function abArm(k){const un=stUnlocked()!=null;if(un&&k!='motif'&&k!='text')return;
  if(k=='stamp'){if(!WBS.tiles.length)return;AD.stamp();return}
- if(k=='pattern'){AD.pattern();return}
+ if(k=='pattern'){AD.pattern(true);return}
  if(k=='text'){AD.text();return}
  if(k=='motif'&&WBX.wbMotifAdd)WBX.wbMotifAdd()}
 const AB={
- pattern(){abPick('pattern');abArm('pattern')},
+ pattern(){PSRC=patSrcNow();abPick('pattern');abArm('pattern')},
  text(){abPick('text');abArm('text')},   /* 2.26.0 (owner Oct 22 2026): a bar button opens the panel and arms the tool at once, as Add in the panel does (AD below) */
  sheet(){abSheet()},
  paint(){const q=abInsert({u:fpU(),k:'paint',n:'Paint '+(abCount('paint')+1),x:0,y:0,st:[]});if(!q)return;WBS.paSel=q.u;if(WBX.wbPaArm)WBX.wbPaArm('brush');abDone();abOpen('elpaint')},
@@ -55,7 +55,7 @@ const AD={
  sheet(){abSheet()},
  stamp(){const t=WBS.tiles[WBS.cur];if(!t)return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpB=t.id;upd();abOpen('stmp')},
  motif(){if(WBX.wbMotifAdd)WBX.wbMotifAdd()},   // arms the last motif (74); in a stamp's tab it puts one in at once
- pattern(){plArm({k:'pattern',s:Math.min(CW,CH)})},
+ pattern(keep){if(!keep)PSRC=patSrcNow();plArm({k:'pattern',s:Math.min(CW,CH)})},
  text(){if(stUnlocked()!=null){abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTxStampAt||!WBX.wbStampMid)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}const[x,y]=WBX.wbStampMid()||[0,0];Promise.resolve(WBX.wbTxStampAt(x,y,true)).then(g=>setTimeout(()=>{if(!(g&&WBX.wbTxInStamp&&WBX.wbTxInStamp(g))){ta.focus();ta.select()}},0));return}   // (2.25.0) the typing starts on the stamp, in place
   abOpen('text');const ta=$('tx_t'),go=$('tx_go');if(!ta||!go)return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}if(!WBS.txArm)go.click();return;
   const L=fpL(),before=new Set(L?(L.pl||[]).map(q=>String(q.u)):[]),anchor=elSel();if(!WBX.wbTbAdd)return;

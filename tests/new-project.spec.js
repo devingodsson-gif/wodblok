@@ -1,6 +1,5 @@
-// File > New project with unsaved work asks for a second click. Before, the File menu closed after the first click and nothing
-// visible happened (UX review B3). Now the menu stays open showing "Click again: can’t be undone", and the status bar says why.
-// (Starting a new project resets History, so Undo cannot bring the old project back: the guard has to stay.)
+// File > New project with unsaved work asks first. 2.76.8 (docs/pattern-plan.md step 5): it asks "Save changes first?" in a dialog (Save, Don't save, Cancel);
+// before, a second click discarded the work (UX review B3 made that click visible). Starting a new project resets History, so the guard has to stay.
 const { test, expect } = require('@playwright/test');
 const path = require('path');
 const { ROOT, openApp, openPanel, settle, getState } = require('./helpers/harness');
@@ -13,34 +12,44 @@ async function roll(page) {
   await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)'));
 }
 
-test('first click with unsaved work keeps the menu open and says what the next click does; the second click starts the new project', async ({ page }) => {
+test('with unsaved work New project asks Save changes first?: Cancel keeps the work, Don\'t save starts the new project', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
   await roll(page);
   const before = await getState(page);
-  await page.click('#fileb');
-  await page.click('#pnw');
-  await expect(page.locator('#filem')).toBeVisible();
-  await expect(page.locator('#pnw')).toHaveText('Click again: can’t be undone');
-  await expect(page.locator('#pmsg')).toContainText('can’t be undone');
+  await page.click('#fileb'); await page.click('#pnw');
+  await expect(page.locator('#nwd')).toBeVisible();
+  await expect(page.locator('#filem')).toBeHidden();
   expect(await getState(page)).toBe(before);
-  await page.click('#pnw');
+  await page.click('#nwdcx'); await expect(page.locator('#nwd')).toBeHidden();
+  expect(await getState(page)).toBe(before);
+  await page.click('#fileb'); await page.click('#pnw'); await page.click('#nwdno');
   await settle(page, { max: 30000 });
   expect(JSON.parse(await getState(page)).tiles.length).toBe(0);   // 2.10.0: a new project has no stamp
-  await expect(page.locator('#filem')).toBeHidden();
-  await expect(page.locator('#pnw')).toHaveText('New project');
   expect(errors).toEqual([]);
 });
 
-test('the New project button in the Projects dialog shows the same cue', async ({ page }) => {
+test('Save in the dialog saves the project, then starts the new one', async ({ page }) => {
+  const { errors } = await openApp(page, { seed: 5 });
+  await roll(page);
+  await page.evaluate(() => { window.__wbDownloads.length = 0; });
+  await page.click('#fileb'); await page.click('#pnw'); await page.click('#nwdok');
+  await page.waitForFunction(() => window.__wbDownloads.length > 0, null, { timeout: 30000 });
+  await settle(page, { max: 30000 });
+  expect(await page.evaluate(() => window.__wbDownloads[0].filename)).toMatch(/\.wodblok$/);
+  expect(JSON.parse(await getState(page)).tiles.length).toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test('the New project button in the Projects dialog asks the same', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 5 });
   await roll(page);
   await installFolder(page, [{ name: 'x.wodblok', path: path.join(ROOT, 'tests', 'fixtures', 'project-1-diamond.wodblok') }]);
   await page.click('#fileb'); await page.click('#pls');
   await page.click('#pnw2');
-  await expect(page.locator('#pnw2')).toHaveText('Click again: can’t be undone');
-  await page.click('#pnw2');
+  await expect(page.locator('#nwd')).toBeVisible();
+  await page.click('#nwdno');
   await settle(page, { max: 30000 });
-  expect(JSON.parse(await getState(page)).tiles.length).toBe(0);   // 2.10.0: a new project has no stamp
+  expect(JSON.parse(await getState(page)).tiles.length).toBe(0);
   expect(errors).toEqual([]);
 });
 

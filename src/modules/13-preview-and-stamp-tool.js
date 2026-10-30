@@ -31,7 +31,7 @@ for(let i=t.items.length-1;i>=0;i--){const nm=gk(t.items[i]);if(done[nm])continu
 if(g.length==1&&!isT){h+=row(i);continue}
 const fr=isT?[...g]:[...g].reverse(),ns=g.filter(j=>WBS.msel.has(j)).length,open=!mlFold.has(nm),e=hx(nm),lb=hx(gnm(nm));
 h+=`<div class="mg${open?' open':''}"><div class="mr mh${ns==g.length?' on':ns?' part':''}" data-g="${e}"><span class="car" data-f="${e}" role="button" aria-label="${open?'Fold':'Unfold'} ${e}" aria-expanded="${open}">${CHEV}</span>${thumb(t.items[fr[0]])}<b>${lb}<i class="cnt">${ns&&ns<g.length?ns+'/':''}${g.length}</i></b><button type="button" class="lyb" data-gm="${e}" aria-haspopup="menu" aria-label="Actions for ${lb}">${MLMORE}</button></div>${open?`<div class="mk">${fr.map(j=>row(j,isT?0:g.indexOf(j)+1,1)).join('')}</div>`:''}</div>`}
-el.innerHTML=`<div class="ml">`+(h||`<div class="em">No shapes yet</div>`)+`</div>`;
+el.innerHTML=`<div class="ml">`+(h||`<div class="em">No elements</div>`)+`</div>`;
 // the Elements header counts what the tab lists (2.25.0): each motif, and a text once
 {const n=t.items.filter(q=>!q.tg).length+new Set(t.items.filter(q=>q.tg).map(q=>q.tg)).size,c=$('lycnt');if(c)c.textContent=`${n} element${n==1?'':'s'}`}
 if(sc)el.querySelector('.ml').scrollTop=sc;if(WBX.wbTxSync)WBX.wbTxSync()}

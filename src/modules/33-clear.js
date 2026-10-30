@@ -33,7 +33,7 @@ const zip=await fmtPack({name,...data},{thumbnail:await thumbPng(thumbUrl),snaps
 if(folder&&!linkOf(id,name)){try{if(await files.folderWritable(folder)){const f=await files.saveToFolder(folder,fname(name)+'.wodblok',blob);link={id:id||null,name,handle:f.handle};if(WBX.wbRecentAdd)WBX.wbRecentAdd(name,f.handle);pmsg('Saved “'+name+'” to '+folder.name+'.');if(!$('plist').hidden)renderPL();return true}}catch(e){/* the folder cannot be written: use the Save dialog below */}}
 const r=await d.save({filename:fname(name)+'.wodblok',data:blob,handle:linkOf(id,name)||h0});if(r&&r.handle){link={id:id||null,name,handle:r.handle};if(WBX.wbRecentAdd)WBX.wbRecentAdd(name,r.handle)}pmsg((r&&r.how=='saved'?'Saved “':'Downloaded “')+name+'”.');return true}catch(e){if(e&&e.code!='declined')pmsg('Could not save: '+e.message);else pmsg('');return false}}
 // Save project: write the .wodblok file (into the file this project came from or was last saved to, where the browser allows; else the Save dialog; else a download).
-async function saveProject(){const name=$('pnm').value.trim()||'Untitled pattern',id=WBS.cp.id||newId(),b=$('psv');b.disabled=true;pmsg('Saving…');
+async function saveProject(){const name=$('pnm').value.trim()||'Untitled project',id=WBS.cp.id||newId(),b=$('psv');b.disabled=true;pmsg('Saving…');
 try{if(await dl(name,await fileSnap(),await thumb(),id)){WBS.cp={id,name,saved:coreStr()};$('pnm').value=name}}finally{b.disabled=false;paintPst()}}
 // The projects folder: a folder on this computer that holds .wodblok files (Chrome and Edge). Its handle is remembered, so the next visit lists it again.
 let folder=null,plTok=0,plUrls=[];
@@ -53,7 +53,7 @@ catch(e){if(tok==plTok)g.innerHTML='<div class="hint">Could not read the folder:
 let plList=[];
 function init33(){
 $('clr').onclick=()=>clearAll(false);
-$('psv').onclick=saveProject;WBX.wbClearAll=()=>clearAll(false);WBX.wbOpenFile=(f,h)=>openFile(f,h);
+$('psv').onclick=saveProject;WBX.wbSaveProject=saveProject;WBX.wbClearAll=()=>clearAll(false);WBX.wbOpenFile=(f,h)=>openFile(f,h);
 // 2.21.0, the File menu: Save project as (a new file: the link to the file it came from is dropped first), Export opens the Export panel. Save project is the File menu's own item since 2.43.0 (the top bar button is gone)
 $('psa').onclick=()=>{link=null;saveProject()};$('xrm').onclick=()=>{if(WBX.wbOpenPanel)WBX.wbOpenPanel('xrec')};
 

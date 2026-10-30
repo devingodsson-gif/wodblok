@@ -132,6 +132,6 @@ function init54(){
  $('tpsn').addEventListener('keydown',e=>{e.stopPropagation();if(e.key=='Enter'){e.preventDefault();tpSave()}});
  $('tpsok').onclick=tpSave;
  // the picker opens when the app starts, so the first choice is what to start from (Settings > General can turn this off)
- let on=false;try{on=kv.get(TP_START)==='1'}catch(e){}
+ let on=true;try{const v=kv.get(TP_START);on=v==null?true:v==='1'}catch(e){}   // 2.76.8 (owner Oct 29 2026): on by default again now that starter templates exist
  if(on)requestAnimationFrame(()=>{if(!tpIsOpen())tpShow()})}
 export {init54};

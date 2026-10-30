@@ -64,6 +64,14 @@ function patVary(p,o,i,cls){const iv=+p.iv||0,cm=p.pcm,cc=Array.isArray(p.pcc)?p
  if(cm&&cc.length){const c=cm=='place'?cc[((cls|0)%cc.length+cc.length)%cc.length]:cc[Math.floor(r()*cc.length)];if(c)o.ink=c}else r();
  if(iv>0)o.op=Math.max(5,Math.round(100-r()*Math.min(100,iv)*.9));
  if(p.ov)o.bl='multiply';return o}
+// 2.76.8 (docs/pattern-plan.md step 5): a new Pattern starts ready. Its source is the selected stamp or shape (with the shape's look), else the project's only stamp;
+// it goes just above the Background (patPut) instead of over everything. Make pattern does the same at once for the selected stamp or shape.
+function patSrcNow(){const q=elSel();if(q&&(q.k=='stamp'||!q.k)&&q.t!=null&&WBS.tiles.some(t=>t.id==q.t))return[{k:'stamp',t:q.t,w:1}];if(q&&q.k=='motif'&&q.m)return[{k:'motif',m:q.m,w:1,...patLook(q)}];return WBS.tiles.length==1?[{k:'stamp',t:WBS.tiles[0].id,w:1}]:[]}
+function patPut(L,q){const a=(L.pl=L.pl||[]);let i=-1;a.forEach((x,k)=>{if(x.bgd)i=k});a.splice(i+1,0,q);WBS.fpSel=q.u;WBS.fpMS=new Set();WBS.fpAnc=q.u;WBS.patSel=q.u;return q}
+const patCanMake=()=>{const q=elSel();return!!q&&((q.k=='motif'&&!!q.m)||((q.k=='stamp'||!q.k)&&q.t!=null))};
+function patMakeFrom(){if(!patCanMake())return false;const L=fpL();if(!L)return false;const src=patSrcNow(),n=patList().length+1;
+ const q=patPut(L,{u:fpU(),k:'pattern',n:'Pattern '+n,...patNew(),rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src,x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:Math.min(CW,CH),r:0,f:1});
+ patCh();if(WBX.wbOpenPanel)WBX.wbOpenPanel('layers');pmsg('Made '+q.n+' from the selection.');return true}
 const patLook=s=>{const o={};PAT_LOOK.forEach(k=>{if(s[k]!=null)o[k]=s[k]});return o};
 const patSrcOk=s=>s&&(s.k=='stamp'?WBS.tiles.some(t=>t.id==s.t):s.k=='motif'?typeof s.m=='string'&&!!s.m:s.k=='text'&&s.it);
 // the elements a pattern stands for
@@ -140,4 +148,4 @@ document.addEventListener('keydown',e=>{if(e.key=='Escape'&&WBX.wbLibPick){WBX.w
 $('pesrc').onclick=e=>{const p=patCur(),x=e.target.closest('[data-sx]');if(p&&x){p.src.splice(+x.dataset.sx,1);WBS.patSrc=null;patCh();return}const r=e.target.closest('[data-look]');if(p&&r&&!e.target.closest('input')){const i=+r.dataset.si;WBS.patSrc=WBS.patSrc===i?null:i;patSync();if(WBX.wbMfSync)WBX.wbMfSync()}};
 $('pesrc').addEventListener('change',e=>{const p=patCur(),w=e.target.closest('[data-sw]');if(p&&w){p.src[+w.dataset.sw].w=Math.max(1,Math.min(99,Math.round(+w.value||1)));patCh()}});
 WBX.wbPatSync=patSync;WBX.wbPatArrows=patArrows;patSync()}
-export {init67,patCur,patExpand,patItems,patPts,patStart,patSync,patNew};
+export {init67,patCanMake,patCur,patExpand,patItems,patMakeFrom,patPts,patPut,patSrcNow,patStart,patSync,patNew};

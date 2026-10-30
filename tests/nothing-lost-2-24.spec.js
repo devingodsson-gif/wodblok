@@ -98,7 +98,7 @@ test('New project empties the clipboard: nothing from the old project pastes int
   const { errors } = await H.openApp(page, { seed: 4, pattern: false });
   await H.addShape(page); await H.settle(page);                        // selected after it is made
   await page.keyboard.press('Control+c');
-  await page.click('#fileb'); await page.click('#pnw'); await page.click('#pnw'); await H.settle(page);
+  await page.click('#fileb'); await page.click('#pnw'); await page.click('#nwdno'); await H.settle(page);   // 2.76.8: New project asks in a dialog
   const n0 = (await st(page)).els.length;
   await page.keyboard.press('Control+v'); await H.settle(page);
   expect((await st(page)).els.length).toBe(n0);
