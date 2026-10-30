@@ -1,8 +1,10 @@
 name: update-snapshots
 # Manual only (Actions > update-snapshots > Run workflow; owner, Oct 26 2026). Some state and SVG snapshots depend on the machine (text metrics, so Randomize picks
 # differently in the sandbox), and CI is the reference. This reruns the chosen spec files with --update-snapshots=changed and hands the changed
-# snapshot files back as a download (artifact `snapshots`). It never commits or pushes: an agent downloads them, looks at each diff, and commits them
-# once the owner has approved (CLAUDE.md: state and SVG snapshots need his approval). Runs one job, only when started by hand.
+# snapshot files back as a download (artifact `snapshots`) and, when any changed, commits only those files to a side branch
+# `snapshots/<branch>-<run>` (2.77.0, owner Oct 30 2026: the sandbox cannot download artifacts). It never writes to main or to the branch it ran on:
+# an agent fetches the side branch, looks at each diff, copies the files into the release only once the owner has approved
+# (CLAUDE.md: state and SVG snapshots need his approval), and deletes the side branch. Runs one job, only when started by hand.
 on:
   workflow_dispatch:
     inputs:
@@ -11,7 +13,7 @@ on:
         required: true
         default: 'tests/scenarios.spec.js'
 permissions:
-  contents: read
+  contents: write   # only to push the side branch above
 concurrency:
   group: update-snapshots-${{ github.ref }}
   cancel-in-progress: true
@@ -36,3 +38,15 @@ jobs:
           name: snapshots
           path: tests/__snapshots__
           retention-days: 3
+      - name: Push changed snapshots to a side branch
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if [ -z "$(git status --porcelain -- tests/__snapshots__)" ]; then echo "No snapshot changed."; exit 0; fi
+          B="snapshots/$(echo "$GITHUB_REF_NAME" | tr '/' '-')-$GITHUB_RUN_ID"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$B"
+          git add tests/__snapshots__
+          git commit -m "Snapshots regenerated in CI for $GITHUB_REF_NAME (run $GITHUB_RUN_ID), waiting for the owner's approval"
+          git push origin "$B"
+          echo "Pushed $B"
