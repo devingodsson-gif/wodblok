@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.77.0 (Oct 30 2026, branch fix/2.77.0-close-pattern-plan): the pattern plan is done
+- Closes docs/pattern-plan.md (2.76.3 to 2.76.11; step 8, the Patterns library, shelved by the owner; misregistration per piece left out of step 2).
+- **A button in a hidden row or group no longer counts as usable** (37-command-list.js): Duplicate (Ctrl+D and the Edit menu) showed as available with no stamp open. The commands test now counts a hidden row or group as hiding its buttons (it failed on 2.76.10 at Crop the picture).
+- tests/stamp-tab-motifs.spec.js: in a stamp's tab Add motif puts a rectangle in at once since 2.76.8; the spec still went through the library and placed a second one.
+- Tests: commands, command-search, experienced-2-76-11, stamp-tab-motifs and the menu specs (42, all pass). End-of-plan CI suite: see PROJECT_STATUS.
+
 ## 2.76.11 (Oct 30 2026, branch feat/2.76.11-experienced-users, step 9 of docs/pattern-plan.md, on top of 2.76.10 (live)): for experienced users
 - **Element commands** (32-layers-panel.js): Bring forward and Send backward (Ctrl+] and Ctrl+[), Bring to front and Send to back (with Shift), Lock and Unlock, Hide and Show, Rename, Rotate 90° either way, Flip across, Select all, Deselect. The **right-click menu** gains Bring forward, Send backward, Group, Lock, Hide, Rename and Select all; the **Edit menu** gains Select all, Deselect, Arrange, Transform, Lock, Unlock, Hide, Show and Rename.
 - **Command search** also finds a command by its own words (`kw`), after the label matches: canvas size, font, rotate, flip, hide, lock, order, select.

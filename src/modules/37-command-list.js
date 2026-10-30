@@ -5,7 +5,8 @@ import {$} from './01-launch-and-version.js';
 // apart. `shortcut` documents the key that already works today; the key handler in 34-desktop-shell looks the key up here and calls the command's run(), with the same conditions as before (Phases 1-3 are
 // bug-for-bug). A command is enabled when its button exists, is visible and is not disabled.
 const el = id => () => $(id);
-const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled; };
+// 2.77.0: a button in a hidden row or group is not usable either (Duplicate's row is hidden while no stamp is open)
+const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled && !b.parentElement.closest('.row[hidden],details[hidden]'); };
 // the element panels' openers are hidden even among the hidden openers (2.44.0: there is no rail; #pnop holds every opener), so their commands check that the button exists, not that it shows
 const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-image', 'rail-sheet']);
 const exists = id => () => { const b = $(id); return !!b && !b.disabled; };

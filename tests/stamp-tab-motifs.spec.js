@@ -10,11 +10,13 @@ async function newStampTab(page) {
   await page.click('#smkedit'); await settle(page);
   await showPanel(page, 'motifs');
 }
+// 2.76.8: in a stamp's tab Add motif puts the last shape (else a rectangle) in at once; it no longer opens the library first
+const addMotifHere = async page => { await page.click('.elk[data-k="motif"] [data-add]'); await settle(page); };
 
 test('in a stamp tab of an empty project, Add motif makes a motif that can be dragged', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
   await newStampTab(page);
-  await addKind(page, 'motif'); await settle(page);
+  await addMotifHere(page);
   expect(await items(page)).toHaveLength(1);
   await expect(page.locator('#stoh .steh')).toHaveCount(9);          // the box and its eight handles
   const [x0, y0] = [(await items(page))[0].x, (await items(page))[0].y];
@@ -59,7 +61,7 @@ test('the other things a stamp tab offers work in an empty project: Add text, th
 test('in a stamp tab a corner pulled sideways widens, pulled down makes taller; Shift scales both (2.74.2: as on the canvas)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
   await newStampTab(page);
-  await addKind(page, 'motif'); await settle(page);
+  await addMotifHere(page);
   const q = async () => JSON.parse(await getState(page)).tiles[0].items[0];
   const corner = async () => { const r = await page.locator('#stoh [data-hd="se"]').boundingBox(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; };
   const pull = async (dx, dy, ctrl) => { const c = await corner(); if (ctrl) await page.keyboard.down('Shift'); await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.move(c.x + dx, c.y + dy, { steps: 6 }); await page.mouse.up(); if (ctrl) await page.keyboard.up('Shift'); await settle(page); };
