@@ -1297,6 +1297,7 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
     <div class="ctl"><label>Rotate</label><input type="range" id="pert" min="-180" max="180" value="0" data-u="&#176;" data-def="0"></div>
     <div class="ctl"><label>Shift across</label><input type="range" id="peox" min="-100" max="100" value="0" data-u="%" data-def="0"></div>
     <div class="ctl"><label>Shift down</label><input type="range" id="peoy" min="-100" max="100" value="0" data-u="%" data-def="0"></div>
+    <label for="pepin">Inside</label><select id="pepin" aria-label="Inside"></select>
     <label>Edges</label><div class="seg" id="peeg" role="group" aria-label="Edges" style="grid-template-columns:1fr 1fr"><button type="button" data-e="cut">Cut at the edge</button><button type="button" data-e="whole">Whole pieces</button></div>
     <div class="ctl"><label>Margin</label><input type="range" id="pemg" min="0" max="40" value="0" data-u="%" data-def="0"></div>
     <div class="ctl" id="peinr"><label>Inset</label><input type="range" id="pein" min="0" max="40" value="4" data-u="%" data-def="4"></div>
@@ -1306,6 +1307,15 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
     <div class="seg" id="pepc" role="group" aria-label="Colour of each piece" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-c="">Own</button><button type="button" data-c="place">By place</button><button type="button" data-c="random">Random</button></div>
     <div class="ctl"><label>Ink variation</label><input type="range" id="peiv" min="0" max="100" value="0" data-u="%" data-def="0"></div>
     <label class="chk"><input type="checkbox" id="peov"><span>Overprint</span></label>
+    <div class="glb">Density</div>
+    <div class="seg" id="pedm" role="group" aria-label="Density" style="grid-template-columns:repeat(4,1fr)"><button type="button" data-d="">Off</button><button type="button" data-d="img">Picture</button><button type="button" data-d="lin">Linear</button><button type="button" data-d="rad">Radial</button></div>
+    <div id="pedb" hidden>
+     <select id="peda" aria-label="Picture"></select>
+     <div class="seg" id="pedk" role="group" aria-label="Density changes" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-k="size">Size</button><button type="button" data-k="count">Count</button><button type="button" data-k="both">Both</button></div>
+     <div class="ctl"><label>Amount</label><input type="range" id="pedv" min="0" max="100" value="70" data-u="%" data-def="70"></div>
+     <div class="ctl" id="pedgr"><label>Angle</label><input type="range" id="pedg" min="0" max="359" value="0" data-u="&#176;" data-def="0"></div>
+     <label class="chk"><input type="checkbox" id="pedi"><span>Invert</span></label>
+    </div>
     <div class="glb">Sources</div>
     <div class="psl" id="pesrc"></div>
     <div class="row"><button type="button" class="alt" id="peadd" aria-haspopup="menu" data-more>Add source</button></div>

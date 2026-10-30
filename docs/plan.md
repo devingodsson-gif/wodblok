@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.76.9 (Oct 30 2026, branch feat/2.76.9-inside-and-density, step 6 of docs/pattern-plan.md, on top of 2.76.8 (live)): patterns inside shapes, and density. Format 30 kept
+- **Inside:** a Pattern's Inside setting names another element of the layer (a shape, Sheet, text or stamp; `pin`). Its pieces are masked by that element's own drawing made white (65-element-core.js), so they show only inside the outline or the letters and follow the element when it moves or changes; the element itself still draws (hide it to see only the pieces).
+- **Density** (Pattern panel, Density group): Off, Picture (a picture of the project, `da`), Linear (an angle, `dg`) or Radial (`dm`); Amount (`dv`), Size, Count or Both (`dk`; owner: "both, the more variety the better"), Invert (`di`). A picture is read once into a small grid of darkness; pieces are smaller (Size), fewer (Count, from the piece's own seeded draw) or both where it is light: a halftone made of stamps, or a fade.
+- New fields are optional; a file without them opens as before, so the format stays 30 (owner, Oct 29 2026).
+- Tests: tests/inside-and-density-2-76-9.spec.js (4: inside a hidden ellipse only and following it, pixel counts; picture density by size and by count on the sample picture's dark and light quarters; a linear fade and Invert; the panel). Ran: see PROJECT_STATUS. `npm run perf` ratio 0.952. check:style, check:platform. Not run: full suite, WebKit, CI.
+
 ## 2.76.8 (Oct 29 2026, branch feat/2.76.8-first-minute, step 5 of docs/pattern-plan.md, on top of 2.76.7): the first minute
 - **Starter content:** the stamp library has a Starting points set (open first) of six stamps drawn from the Basic shapes (Dot, Star, Heart, Four diamonds, Hex flower, Two triangles; 27-stamp-library.js `SL_START`); a click adds one to the project. The four starter templates (one per format plus Framed border) existed, so the template picker opens at launch again: Settings > General > Templates at launch is on by default (CLAUDE.md's launch rule rewritten; tests still start with it off unless they ask).
 - **Shape places at once:** the Shape button arms the last shape, else a rectangle (it opened the library and armed nothing).

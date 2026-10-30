@@ -2,7 +2,7 @@
 
 Owner, Oct 29 2026: "WODBLOK is primarily a pattern making tool. What are some improvements or additions we could make for the patterning to be more useful and prevalent", then "make a plan that encompasses everything you just mentioned, plus all the items that would improve the user experience from the test before" (the 2.76 review: Project doc `claude/wodblok-review-2.76.md`; bugs B1 to B4 were fixed in 2.76.2).
 
-Status: **started Oct 29 2026 (steps 0 to 5 built, 2.76.3 to 2.76.8; step 2 without misregistration per piece).** Testing (owner, Oct 29 2026): no CI and no full suite until the end of the plan; only quick, targeted local tests on the way. The owner answered every question on Oct 29 2026 (below). Mockups are shelved for later.
+Status: **started Oct 29 2026 (steps 0 to 6 built, 2.76.3 to 2.76.9, up to 2.76.8 live; step 2 without misregistration per piece).** Testing (owner, Oct 29 2026): no CI and no full suite until the end of the plan; only quick, targeted local tests on the way. The owner answered every question on Oct 29 2026 (below). Mockups are shelved for later.
 
 ## What patterns already do (2.76.2)
 - Tiling by a tile shape (From stamp, Square, Hexagon, Triangle, Diamond, Circle, Octagon) with 19 arrangements; Size, Spacing, Rotate, Shift (92-pattern-tiling.js).
