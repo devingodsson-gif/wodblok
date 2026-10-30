@@ -76,7 +76,8 @@ const end=msg=>{store();upd();if(WBX.wbRollHold===tok)WBX.wbRollHold=0;
 const LOOK=RZ_PARTS.some(k=>FT[k])?rzLookPick({FT,wpick,tile,want:WBX.wbRZ&&WBX.wbRZ.look?WBX.wbRZ.look():'any'}):'';
 // --- no part to make (or none that fits a repeat tile): the roll reworks what is there
 if(!LOOK){const u=FT.fin?(tile?[]:paperTex()):null,c=JSON.parse(coreStr());c.proj=P0;if(u)c.tex={u,v:87};
- if(FT.efx&&!tile)rzEffectsEls([{pl:c.els}],{seed:tok+':'+JSON.stringify(c.els),groups:['noise','blur','print','distort'],filter:true,rework:true,isNew:()=>true,prev:new Set(RZMADE?RZMADE.els:[]),only:!(FT.col||FT.fin||FT.size)});
+ // 2.78.0: the list the rework hands back is the one applied (it makes a new list when it takes the last roll's Filter away, and a new Filter went into that one only)
+ if(FT.efx&&!tile){const LL=[{pl:c.els}];rzEffectsEls(LL,{seed:tok+':'+JSON.stringify(c.els),groups:['noise','blur','print','distort'],filter:true,rework:true,isNew:()=>true,prev:new Set(RZMADE?RZMADE.els:[]),only:!(FT.col||FT.fin||FT.size)});c.els=LL[0].pl}
  WBS.cur=0;selOne(-1);WBS.selL=0;(WBX.wbApply||applyCore)(c);WBS.selL=0;grade(pick(['warm','fade','punch','none','none']));end('Randomized.');return}
 // --- a Look
 const OWN=fresh?null:rzTake(),own0=OWN?OWN.own:flatEls(WBS.layers),bgq=own0.find(p=>p.bgd),paper=bgq&&okC(bgq.ink)?bgq.ink:P0.bg;

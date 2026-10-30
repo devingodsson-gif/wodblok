@@ -74,7 +74,7 @@ test('a stamp coloured piece by piece prints without a block edge (each colour w
   expect(errors).toEqual([]);
 });
 
-test('on a repeat tile the pattern Looks only tile: no Inside, no density, no jitter, no random colours', async ({ page }) => {
+test('on a repeat tile the pattern Looks only tile: no Inside, no density, no jitter, no colour per piece', async ({ page }) => {
   test.setTimeout(180000);
   const { errors } = await openApp(page, { seed: 12, pattern: false });
   await openPanel(page, 'canvas'); await page.click('#cfmt [data-f="tile"]'); await settle(page);
@@ -86,7 +86,7 @@ test('on a repeat tile the pattern Looks only tile: no Inside, no density, no ji
       expect(pats.length, k).toBeGreaterThan(0);
       for (const p of pats) {
         expect(p.lay, k).toBe('tile');
-        expect([p.pin, p.dm, p.pcm === 'random' ? 'random' : undefined].filter(Boolean), k + ' ' + p.n).toEqual([]);
+        expect([p.pin, p.dm, p.pcm].filter(Boolean), k + ' ' + p.n).toEqual([]);   // no colour per piece either: by place it would not meet across the edges
         if (k !== 'repeat') expect((p.fx || []).filter(e => e.k === 'jitter'), k + ' ' + p.n).toEqual([]);   // Repeat's Damask sprig keeps its turn-only jitter (before 2.78)
       }
     }

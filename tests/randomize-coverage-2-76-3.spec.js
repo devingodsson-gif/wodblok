@@ -12,8 +12,8 @@ test('thirty rolls: at least six different Looks, none empty, nothing off the ca
     const m = /Randomized: ([^.]+)\./.exec(await page.locator('#pmsg').textContent()); if (m) looks.add(m[1]);
     const s = JSON.parse(await getState(page)), v = await page.evaluate(() => { const b = document.getElementById('art').viewBox.baseVal; return [b.width, b.height]; });
     const real = s.els.filter(q => !q.bgd);
-    // a Repeat is one or two Patterns (each holds many pieces), so it has few elements; every other Look has at least three
-    expect(real.length, 'roll ' + i + ' is not empty').toBeGreaterThanOrEqual(m && m[1] === 'Repeat' ? 1 : 3);
+    // a Repeat is one or two Patterns (each holds many pieces), so it has few elements, as have Quilt and the pattern Looks of 2.78.0; every other Look has at least three
+    expect(real.length, 'roll ' + i + ' (' + (m && m[1]) + ': ' + real.map(q => q.k + (q.nm ? ':' + q.nm : '')).join(',') + ') is not empty').toBeGreaterThanOrEqual(m && ['Repeat', 'Quilt', 'Textile', 'Tilework', 'Halftone', 'Confetti', 'Pattern type', 'Mandala'].includes(m[1]) ? 1 : 3);
     real.forEach(q => kinds.add(q.k));
     // a placed element's middle lies on the canvas (a Sheet, and a Pattern that fills it, have no place of their own)
     // (a corner ornament or a half sun may sit on the edge, so the middle may lie up to 5% of the short side outside)

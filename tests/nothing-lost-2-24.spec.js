@@ -6,6 +6,7 @@ const st = async page => JSON.parse(await H.getState(page));
 test('after Randomize, stamps placed on their own are in the Elements list and can be clicked', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 3, pattern: false });   // 2.66.2: seed 23's roll no longer places stamps on their own (rolls changed with the tiling patterns); seed 3's places four
   // 2.74.0: a roll places stamps on their own only some of the time, and which roll does changes whenever the roll's draws change (2.71.0 took the print settings out): roll until one does
+  await page.evaluate(() => window.__wbTest.kv.set('wb167_rzlook', 'mandala'));   // 2.78.0: most Looks are patterns now; Mandala puts a stamp emblem in its middle half the time
   let s, free = [];
   for (let i = 0; i < 8 && !free.length; i++) { await page.click('#rzdo'); await H.settle(page, { max: 60000 }); s = await st(page); free = s.els.filter(e => e.k === 'stamp'); }
   expect(free.length, 'a roll places stamps on their own').toBeGreaterThan(0);

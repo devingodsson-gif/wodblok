@@ -188,7 +188,9 @@ function rzInks(E,gnd,n){const R=E.roles,a=[...new Set([R.txt(gnd,R.ink),...R.ac
 const rzOneEdge=(out,p)=>{if(p.pcm)(p.src||[]).forEach(x=>{if(x&&x.k=='stamp'){const t=out.tiles.find(z=>z.id==x.t);if(t&&t.et>0)t.et=0}})};
 function rzPat(E,out,o){o=o||{};const seam=E.tile,inks=(o.inks||[]).filter(Boolean),lay=E.pick(o.lays||(seam?['tile','tile','wall']:['tile','tile','tile','wall','wall','scatter','spiral']));
  const p=patOf(o.n||'Pattern',[],lay=='wall'?'tile':lay,4,4,100,[],E.ri(1,9999));p.src=o.src.slice();p.ds=o.ds||'cycle';p.af=1;
- if(lay=='tile'||lay=='wall'){if(lay=='wall'){p.ts='wall';p.ar=o.ar&&RZ_WALL.includes(o.ar)?o.ar:E.pick(RZ_WALL)}else{const ts=o.ts||E.pick(['square','square','square','hex','hex','diamond','circle','tri','oct']);p.ts=ts;p.ar=o.ar||E.pick((TL_AR[ts]||[['grid']]).map(x=>x[0]))}
+ if(lay=='tile'||lay=='wall'){if(lay=='wall'){p.ts='wall';p.ar=o.ar&&RZ_WALL.includes(o.ar)?o.ar:E.pick(RZ_WALL)}else{const ts=o.ts||E.pick(['square','square','square','hex','hex','diamond','circle','tri','oct']);p.ts=ts;p.ar=o.ar||E.pick((TL_AR[ts]||[['grid']]).map(x=>x[0]));
+   // on a repeat tile an arrangement whose places alternate (stripes, checks, three colours) does not always meet across the edges: the shape's first arrangement instead
+   if(seam&&(RZ_CLS.includes(p.ar)||p.ar=='brick'||p.ar=='half'))p.ar=(TL_AR[ts]||[['grid']]).map(x=>x[0]).find(a=>!RZ_CLS.includes(a)&&a!='brick'&&a!='half')||'grid'}
   p.ps=+(o.ps||E.rr(7,20)).toFixed(1);p.sp=o.sp!=null?o.sp:E.ri(0,lay=='wall'?20:60);
   // at most about o.max pieces (450) over its area: a roll stays light to draw (each piece is markup of its own); past that the pieces grow. Chevrons, herringbone
   // and basketweave put two or more pieces in each step, and a tiling also places the pieces just past its edges (about 1.6 times)
@@ -196,7 +198,9 @@ function rzPat(E,out,o){o=o||{};const seam=E.tile,inks=(o.inks||[]).filter(Boole
  else if(lay=='scatter'){p.cn=E.ri(5,9);p.rn=E.ri(6,11);p.sz=E.ri(35,70);p.md=E.ri(60,100);p.ds='random'}
  else{p.cn=E.ri(9,14);p.rn=E.ri(9,14);p.sz=E.ri(45,85)}
  // colour per piece: by place where the arrangement has classes (most of the time), else at random from the seed
- if(inks.length>1&&E.ch(o.pc==null?.6:o.pc)){p.pcm=RZ_CLS.includes(p.ar)&&E.ch(.8)?'place':'random';p.pcc=E.shuf(inks).slice(0,E.ri(2,Math.min(4,inks.length)))}
+ // not on a repeat tile: a stripe's or a check's colour follows its row or column, and a tile does not always hold an even number of them, so the colours would not
+ // meet across its edges
+ if(!seam&&inks.length>1&&E.ch(o.pc==null?.6:o.pc)){p.pcm=RZ_CLS.includes(p.ar)&&E.ch(.8)?'place':'random';p.pcc=E.shuf(inks).slice(0,E.ri(2,Math.min(4,inks.length)))}
  if(!o.quiet&&E.ch(.35))p.iv=E.ri(12,40);
  if(!o.quiet&&E.ch(.18)&&(lay=='scatter'||+p.sp<10))p.ov=1;
  if(!seam&&E.FT.jit&&E.ch(o.quiet?.12:lay=='scatter'?.6:.25)){const j=fxJ(lay=='scatter'?0:E.ri(0,12),E.ri(10,40),E.ri(0,15));if(E.ch(.5))j.rs=E.pick([90,180]);addFx(p,j)}
@@ -369,7 +373,7 @@ RZL.quilt={w:.8,need:'pat',build(E){const R=E.roles,S=Math.min(CW,CH),m=S*E.rr(.
  if(lay=='medallion'){const nc=E.pick([5,7]),cell=Math.min(iw/nc,ih/Math.round(ih/(iw/nc))),nr=Math.max(3,Math.floor(ih/cell));const p=rzGrid('Quilt',[{k:'stamp',t:2,w:1}],CW/2,CH/2,nc,nr,cell,E.rr(.86,.96),{ar:'turn'});p.src=[{k:'stamp',t:2,w:1}];out.els.push(p);
   const cd=Math.min(nc-2,nr-2)*cell*.94;out.els.push(elBox('rect',CW/2,CH/2,cd*1.04,cd*1.04,{ink:R.paper,nm:'Centre'}));out.els.push(addFx(elStamp(a,CW/2,CH/2,cd*.92,0),E.ch(.5)?fxP(E.ri(1,3),0):null))}
  else{const nc=E.ri(3,6),cell=Math.min(iw/nc,ih/Math.max(3,Math.round(ih/(iw/nc)))),nr=Math.max(3,Math.floor(ih/cell)),sash=lay=='sashing',p=rzGrid('Quilt',[{k:'stamp',t:1,w:1},{k:'stamp',t:2,w:1}],CW/2,CH/2,nc,nr,cell,sash?E.rr(.8,.88):1,{ar:E.pick(['turn','pinwheel','mirror','basket','checker','grid'])});
-  if(E.ch(.5)){p.pcm=RZ_CLS.includes(p.ar)&&E.ch(.6)?'place':'random';p.pcc=rzInks(E,gnd,4);rzOneEdge(out,p)}if(!E.tile&&E.ch(.4))p.iv=E.ri(10,25);
+  if(!E.tile&&E.ch(.5)){p.pcm=RZ_CLS.includes(p.ar)&&E.ch(.6)?'place':'random';p.pcc=rzInks(E,gnd,4);rzOneEdge(out,p)}if(!E.tile&&E.ch(.4))p.iv=E.ri(10,25);
   if(sash){out.els.push(elBox('rect',CW/2,CH/2,nc*cell,nr*cell,{ink:R.blk(gnd,1.25,[c1,c2]),nm:'Sashing'}))}out.els.push(p)}
  out.els.push(elFrame(m*.9,m*.9,R.blk(gnd,2,[]),'Binding'));if(E.ch(.4))out.els.push(elFrame(m*1.6,Math.max(1,S*.003),c1,'Rule',{}));
  if(E.ch(.3)){const [ti,sub]=E.pick(RZW.quilt),lw=S*.36,lh=S*.12,lx=CW-m*2-lw/2,ly=CH-m*2-lh/2;out.els.push(elBox('rect',lx,ly,lw,lh,{ink:R.light,nm:'Label'}));out.texts.push(elText(E,ti,rzFont(E,RZF.quilt[0]),lx,ly-lh*.12,lw*.84,lh*.5,R.txt([R.light],R.ink)));out.texts.push(elText(E,sub,rzFont(E,RZF.quilt[1]),lx,ly+lh*.28,lw*.7,lh*.16,R.txt([R.light],R.acc[0]),{ls:10}))}
@@ -387,7 +391,7 @@ RZL.repeat={w:1.4,need:'pat',tile:1,build(E){const R=E.roles,S=Math.min(CW,CH),o
   const ts={rect:'square',circle:'circle',hex:'hex',diamond:'diamond'}[shk],ar=E.pick((TL_AR[ts]||[['grid']]).map(x=>x[0]).filter(x=>lay=='pair'||!['checker','diag','three','harl','rows'].includes(x))),p=patOf('Pattern',[],'tile',4,4,100,[],1);
   Object.assign(p,{src,ts,ar,ps:+E.rr(14,26).toFixed(1),sp:E.ri(0,lay=='pair'?8:45),ds:'cycle',af:1});
   // 2.78.0: each piece its own ink, by place or at random, and its own pressure, now and then
-  if(E.ch(.35)){const ik=rzInks(E,gnd,4);if(ik.length>1){p.pcm=RZ_CLS.includes(ar)?'place':E.tile?'':'random';if(p.pcm){p.pcc=ik;rzOneEdge(out,p)}else delete p.pcm}}if(!E.tile&&E.ch(.3))p.iv=E.ri(10,30);out.els.push(p);
+  if(!E.tile&&E.ch(.35)){const ik=rzInks(E,gnd,4);if(ik.length>1){p.pcm=RZ_CLS.includes(ar)?'place':'random';if(p.pcm){p.pcc=ik;rzOneEdge(out,p)}else delete p.pcm}}if(!E.tile&&E.ch(.3))p.iv=E.ri(10,30);out.els.push(p);
   // a small filler between the pieces of a square lattice: the same step, half a step over and down; its piece is half a step, the shape a third of that
   if(ts=='square'&&['grid','turn','mirror','pinwheel','basket'].includes(ar)&&+p.sp>=15&&E.ch(.65)){const f=patOf('Filler',[],'tile',4,4,100,[],1),z=+E.rr(.22,.34).toFixed(2);
    Object.assign(f,{src:[{k:'motif',m:rzSmall(E),w:1,ink:c2,wx:z,wy:z}],ts,ar:'grid',ps:+(p.ps*(1+p.sp/100)/2).toFixed(3),sp:100,ox:50,oy:50,ds:'cycle',af:1});out.els.push(f)}}
@@ -413,8 +417,8 @@ RZL.repeat={w:1.4,need:'pat',tile:1,build(E){const R=E.roles,S=Math.min(CW,CH),o
 // ===== 2.78.0: Looks made of patterns first (owner Oct 30 2026). Each is mostly Pattern elements, using the tools of the 2.76 pattern plan.
 // Textile: a length of printed cloth. Layouts: Stripes, Bands, Gingham (a checkerboard of two inks overprinted), Chevron, Herringbone, Basketweave, in colour by place,
 // sometimes with a sprig of small motifs over it, and on the canvas (not a repeat tile) now and then a woven label
-RZL.textile={w:1,need:'pat',tile:1,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},ar=E.pick(['stripes','bands','checker','checker','chevron','herring','basket']);
- const gnd=rzGround(E,out,'flat'),inks=rzInks(E,gnd,4),rk=basicKey('rect'),sq=!!rk&&E.ch(.65),pool=rzPool(E,'textile',3);
+RZL.textile={w:1,need:'pat',tile:1,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},ar=E.pick(E.tile?['basket','grid','turn','mirror']:['stripes','bands','checker','checker','chevron','herring','basket']);
+ const gnd=rzGround(E,out,'flat'),inks=rzInks(E,gnd,4),rk=basicKey('rect'),sq=!!rk&&!E.tile&&E.ch(.65),pool=rzPool(E,'textile',3);
  const src=[sq?{k:'motif',m:rk,w:1,ink:inks[0]}:rzSrc(E,out,pool[0],inks[0])],two=inks.length>1?inks:[inks[0],R.tone(.35)];
  const p=rzPat(E,out,{n:'Cloth',src,inks:two,lays:['tile'],ts:'square',ar,ps:E.rr(sq?4.5:7,sq?8:13),sp:sq?0:E.ri(5,30),pc:1,quiet:true});if(p.pcm)p.pcm='place';   // stripes and checks by place: random squares read as noise
  if(sq&&ar=='checker'&&!E.tile){p.ov=1;p.iv=E.ri(8,22)}   // gingham: the checks overprint as woven threads do
