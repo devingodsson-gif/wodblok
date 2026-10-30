@@ -86,3 +86,6 @@ Speed: a motif is drawn in full at every place it is put (about 10,000 character
 2. Words: what may a roll write? Made-up titles that fit the Look, the project's name, a word list you can edit in Settings, or a mix?
 3. Is the list of Looks right? Any to add or drop?
 4. Should a roll still build new stamp artwork from the shapes (as now), or also use your saved stamps and shapes by default?
+
+## 2.78.0 (Oct 30 2026): patterns first
+The owner asked for more Looks, more variation and patterns in the vast majority of rolls. Six Looks made of patterns (Textile, Tilework, Halftone, Mandala, Pattern type, Confetti), one pattern maker for every Look (`rzPat`, `rzInside`) that uses the 2.76 pattern tools, and patterns added to most layouts of the older Looks. See docs/plan.md 2.78.0.

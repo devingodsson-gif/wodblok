@@ -117,7 +117,9 @@ const rzTitle=lt=>{if(!OWN||!lt||!lt.length)return lt;const mine=OWN.own.filter(
 const rzLum=h=>{const c=String(h||'').slice(1,7),v=[0,2,4].map(i=>{const x=parseInt(c.slice(i,i+2),16)/255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]};
 const rzReadable=()=>{if(!OWN||!lookInk)return;const pa=rzLum(col(WBS.proj.bg)),cr=h=>{const a=rzLum(h);return(Math.max(a,pa)+.05)/(Math.min(a,pa)+.05)};OWN.own.forEach(q=>{if(!q.tx||q===myT||q.v===false)return;const ink=col(okC(q.ink)?q.ink:WBS.proj.ink);if(cr(ink)<3)q.ink=lookInk})};
 const done=lt=>{if(tok!==WBX.wbRndTok)return;lt=rzTitle(lt||[]);if(ownB.length){lt=(lt||[]).filter(clear);els=els.filter(clear)}WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;WBS.selL=0;
- const c={pg:{...WBS.pgrid},tiles:res.tiles,els:(OWN?[]:own0.filter(p=>p.bgd)).concat(own0.some(p=>p.bgd)?[]:[{u:fpU(),k:'sheet',n:'Background',ink:paper,bgd:1}],els,lt,top?[top]:[]),proj:{...P0},dim:WBS.dim,pr:{e:0,q:0,t:'',a:0,sc:100,sd:1},tex:{u:cvU,v:87,...(!FT.fin&&WBS.tex.off?{off:1}:{})}};
+ // 2.78.0: a Pattern inside the Look's words (_post) goes over them; it is left out when its words are not there (Text off, your own title in their place)
+ const post=els.filter(q=>q._post),has=new Set([...els,...(lt||[])].map(q=>String(q.u)));els=els.filter(q=>!q._post);const pst=post.filter(q=>has.has(String(q.pin)));pst.forEach(q=>delete q._post);
+ const c={pg:{...WBS.pgrid},tiles:res.tiles,els:(OWN?[]:own0.filter(p=>p.bgd)).concat(own0.some(p=>p.bgd)?[]:[{u:fpU(),k:'sheet',n:'Background',ink:paper,bgd:1}],els,lt,pst,top?[top]:[]),proj:{...P0},dim:WBS.dim,pr:{e:0,q:0,t:'',a:0,sc:100,sd:1},tex:{u:cvU,v:87,...(!FT.fin&&WBS.tex.off?{off:1}:{})}};
  (WBX.wbApply||applyCore)(c);WBS.selL=0;rzPut(OWN,null);rzReadable();grade(res.grade);end('Randomized: '+(RZ_NAMES[LOOK]||LOOK)+'.')};
 return rzLay(texts).then(done,()=>done([])).catch(e=>{rzPut(OWN,null);store();upd();throw e}).finally(()=>{if(WBX.wbRollHold===tok)WBX.wbRollHold=0;WBX.wbTxBusy=Math.max(0,(WBX.wbTxBusy||1)-1)})}
 function init20(){
