@@ -68,7 +68,7 @@ Right after Select all, Group still reads as unavailable until the screen redraw
 | 4 | 2.78.5 | **B3** and **B5**: the top bar folds what does not fit into a "more" menu (Part 9 style; **owner to say the narrowest width to support**, suggestion 1,024 px); the Element panel's tab is offered only while a stamp is open, or it shows the stamp's shapes read-only (**owner to choose**) | the top bar at 1,024 and 800 px reaches every button; no blank Element panel | about 30%: panels |
 | 5 | 2.79.0 | close the plan: the CI suite, the owner's word to go live | | |
 
-Questions for the owner (in docs/PROJECT_STATUS.md too):
-1. B2: hold hand-made patterns to a piece limit automatically, or raise the sliders' lowest values?
-2. B3: the narrowest window to support (suggestion: 1,024 px), and a "more" menu for what does not fit?
-3. B5: hide the Element tab until a stamp is open, or show the stamp's shapes read-only?
+Owner's answers (Oct 30 2026):
+1. B2: "whatever you think": every pattern is held to a piece limit; a slider stops where the next step would pass it, so it always shows the real value.
+2. B3: "that's fine": 1,024 px is the narrowest window supported; what does not fit in the top bar folds into a "more" menu.
+3. B5: "hidden": the Element tab is offered only while a stamp is open for editing.
