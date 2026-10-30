@@ -23,9 +23,12 @@ const recents=()=>{try{const a=JSON.parse(kv.get(RK)||'[]');return Array.isArray
 const remember=id=>{try{kv.set(RK,JSON.stringify([id,...recents().filter(x=>x!==id)].slice(0,5)))}catch(e){}};
 // a command whose button sits in a part of the page that is not showing now (the other view's tools) is out of view; menu items and file inputs count as in view
 const inView=c=>{const e=c.elId&&$(c.elId);if(!e)return true;if(e.matches('input')||e.closest('.pop,.menu,#pnop'))return true;return e.getClientRects().length>0};
+// 2.76.11: a command's own words (kw) find it too, ranked after the label matches
+// a command's own words match only as whole words or the start of one, never letter by letter across them
+function kwHit(t,q){const w=t.toLowerCase().split(/[^a-z0-9]+/);return q.toLowerCase().split(/\s+/).filter(Boolean).every(x=>w.some(y=>y.startsWith(x)))}
 function search(q){
   const rec=recents(),all=cmdList().map((c,i)=>({c,i,on:cmdIsEnabled(c.id),v:inView(c),r:rec.indexOf(c.id)}));
-  if(q.trim()){const hits=all.map(r=>({...r,s:score(r.c.label,q)})).filter(r=>r.s>=0);return hits.sort((a,b)=>(b.on-a.on)||(a.s-b.s)||(a.i-b.i))}
+  if(q.trim()){const hits=all.map(r=>{let s=score(r.c.label,q);if(s<0&&r.c.kw&&kwHit(r.c.label+' '+r.c.kw,q))s=100;return{...r,s}}).filter(r=>r.s>=0);return hits.sort((a,b)=>(b.on-a.on)||(a.s-b.s)||(a.i-b.i))}
   return all.sort((a,b)=>(b.on-a.on)||((b.r>=0)-(a.r>=0))||(a.r>=0&&b.r>=0?a.r-b.r:0)||(b.v-a.v)||(a.i-b.i));
 }
 // On a Mac the page says Cmd where it says Ctrl: button titles (now and when they are rewritten later) and the fixed panel text. Status messages

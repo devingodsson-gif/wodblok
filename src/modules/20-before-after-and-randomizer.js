@@ -105,12 +105,20 @@ const stWH=p=>{const tt=res.tiles.find(t=>t.id==p.t)||WBS.tiles.find(t=>t.id==p.
 const rzBox=p=>{const wh=p.k=='stamp'?stWH(p):fpWH(p);if(!wh)return null;const r=(+p.r||0)*Math.PI/180,co=Math.abs(Math.cos(r)),si=Math.abs(Math.sin(r)),ex=(wh[0]*co+wh[1]*si)/2,ey=(wh[0]*si+wh[1]*co)/2,x=+p.x||0,y=+p.y||0,
  b=[Math.max(0,x-ex),Math.max(0,y-ey),Math.min(CW,x+ex),Math.min(CH,y+ey)];return b[2]>b[0]&&b[3]>b[1]?b:null};
 const behind=q=>q.bgd||q.nm=='Path'||q.k=='sheet'||q.k=='group'||fr(q)||q.k=='pattern'&&!q.mp&&(q.af||!(+q.aw>0)||!(+q.ah>0));
-const ownB=OWN?OWN.own.filter(p=>!behind(p)&&!fpHid(OWN.own,p)).map(rzBox).filter(Boolean):[],gap=Math.min(CW,CH)*.02;
+let ownB=OWN?OWN.own.filter(p=>!behind(p)&&!fpHid(OWN.own,p)).map(rzBox).filter(Boolean):[];const gap=Math.min(CW,CH)*.02;
 const onPath=q=>q.mp&&(q.k=='pattern'||q.tx)?els.find(z=>z.u==q.mp)||q:q;   /* a Pattern or words mapped to a shape take that shape's box */
 const clear=q=>{if(!ownB.length||behind(q))return true;const b=rzBox(onPath(q));return!b||!ownB.some(o=>b[0]<o[2]+gap&&b[2]>o[0]-gap&&b[1]<o[3]+gap&&b[3]>o[1]-gap)};
-const done=lt=>{if(tok!==WBX.wbRndTok)return;if(ownB.length){lt=(lt||[]).filter(clear);els=els.filter(clear)}WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;WBS.selL=0;
+// 2.76.11 (2.76 review): your title takes the Look's title place. Your largest visible text moves to where the Look puts its title, at its size and in its colour,
+// and the Look's own title is left out; then the roll keeps clear of it as of everything else of yours. After the roll, any other text of yours that would be hard to
+// read on the new paper (contrast under 3:1) takes the Look's text colour.
+let myT=null,lookInk=null;
+const rzTitle=lt=>{if(!OWN||!lt||!lt.length)return lt;const mine=OWN.own.filter(q=>q.tx&&q.v!==false&&!q.lk&&!fpHid(OWN.own,q)).sort((a,b)=>(+b.s||0)-(+a.s||0)),tt=lt.slice().sort((a,b)=>(+b.s||0)-(+a.s||0))[0];if(!tt)return lt;lookInk=tt.ink||null;
+ if(!mine.length)return lt;myT=mine[0];myT.x=tt.x;myT.y=tt.y;myT.s=+(+tt.s).toFixed(2);myT.r=+tt.r||0;if(tt.ink)myT.ink=tt.ink;ownB=OWN.own.filter(p=>!behind(p)&&!fpHid(OWN.own,p)).map(rzBox).filter(Boolean);return lt.filter(q=>q!==tt)};
+const rzLum=h=>{const c=String(h||'').slice(1,7),v=[0,2,4].map(i=>{const x=parseInt(c.slice(i,i+2),16)/255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]};
+const rzReadable=()=>{if(!OWN||!lookInk)return;const pa=rzLum(col(WBS.proj.bg)),cr=h=>{const a=rzLum(h);return(Math.max(a,pa)+.05)/(Math.min(a,pa)+.05)};OWN.own.forEach(q=>{if(!q.tx||q===myT||q.v===false)return;const ink=col(okC(q.ink)?q.ink:WBS.proj.ink);if(cr(ink)<3)q.ink=lookInk})};
+const done=lt=>{if(tok!==WBX.wbRndTok)return;lt=rzTitle(lt||[]);if(ownB.length){lt=(lt||[]).filter(clear);els=els.filter(clear)}WBS.cur=0;selOne(-1);if(typeof WBS.brush!='undefined')WBS.brush=null;WBS.selL=0;
  const c={pg:{...WBS.pgrid},tiles:res.tiles,els:(OWN?[]:own0.filter(p=>p.bgd)).concat(own0.some(p=>p.bgd)?[]:[{u:fpU(),k:'sheet',n:'Background',ink:paper,bgd:1}],els,lt,top?[top]:[]),proj:{...P0},dim:WBS.dim,pr:{e:0,q:0,t:'',a:0,sc:100,sd:1},tex:{u:cvU,v:87,...(!FT.fin&&WBS.tex.off?{off:1}:{})}};
- (WBX.wbApply||applyCore)(c);WBS.selL=0;rzPut(OWN,null);grade(res.grade);end('Randomized: '+(RZ_NAMES[LOOK]||LOOK)+'.')};
+ (WBX.wbApply||applyCore)(c);WBS.selL=0;rzPut(OWN,null);rzReadable();grade(res.grade);end('Randomized: '+(RZ_NAMES[LOOK]||LOOK)+'.')};
 return rzLay(texts).then(done,()=>done([])).catch(e=>{rzPut(OWN,null);store();upd();throw e}).finally(()=>{if(WBX.wbRollHold===tok)WBX.wbRollHold=0;WBX.wbTxBusy=Math.max(0,(WBX.wbTxBusy||1)-1)})}
 function init20(){
 wbBA=(()=>{const st=()=>document.querySelector('.stage'),bd=()=>[...st().querySelectorAll(':scope>.board')].filter(b=>!b.hidden&&!b.classList.contains('off')),key=()=>bd().map(b=>b.id).join();

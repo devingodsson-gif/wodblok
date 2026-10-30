@@ -17,13 +17,13 @@ const mnbFx=()=>{const out=[],grp={};fxAll().forEach(d=>{const id='effect.'+d.k;
 const mnbAdds=()=>[...document.querySelectorAll('#elb .elbb[data-k]')].filter(b=>b.dataset.k!='select'&&!b.hidden).map(b=>'element.add.'+b.dataset.k);
 const MNB=[
  ['export','Export',['file.export','-','export.png','export.svg','export.pdf','export.copySvg','-','export.repeatPng','export.repeatTiff','-','colourway.exportAll','library.exportShapes','-','export.proofPdf','export.proofPng','-','export.allRecipes']],   // 2.76.6: one Export entry (Open Export and Export with the recipe settings went; Window still opens the panel)
- ['edit','Edit',['edit.undo','edit.redo','panel.hist','-','edit.cut','edit.copy','edit.paste','stamp.duplicateMotif','stamp.deleteMotif','-','element.group','element.ungroup','-',['Align',['align.0','align.1','align.2','align.3','align.4','align.5','align.6','align.7','align.8','-','align.ch','align.cv','-','align.dh','align.dv']],'shape.fitToCanvas','shape.stretchToCanvas']],
- ['image','Image',['panel.canvas','panel.pgrid']],
+ ['edit','Edit',['edit.undo','edit.redo','panel.hist','-','edit.cut','edit.copy','edit.paste','stamp.duplicateMotif','stamp.deleteMotif','-','edit.selectAll','edit.deselect','-','element.group','element.ungroup','-',['Arrange',['element.front','element.forward','element.backward','element.back']],['Transform',['element.rotateCw','element.rotateCcw','element.flip']],'element.lock','element.unlock','element.hide','element.show','element.rename','-',['Align',['align.0','align.1','align.2','align.3','align.4','align.5','align.6','align.7','align.8','-','align.ch','align.cv','-','align.dh','align.dv']],'shape.fitToCanvas','shape.stretchToCanvas']],
+ ['image','Image',['panel.canvas','panel.pgrid','-','view.tileRepeat','-','image.crop','image.pointcrop','-','element.rotateCw','element.rotateCcw','element.flip']],   // 2.76.11: more than Open Canvas and Open Grid
  ['elements','Elements',['panel.lyrs','-',mnbAdds,'element.makePattern','-','stamp.new','stamp.duplicate','stamp.delete','stamp.saveToLibrary','library.importStamp','-','library.importImage','library.importSheet','library.newFolder','-','stamp.split','stamp.knockout']],
  ['effects','Effects',[mnbFx,'-','randomize.roll','panel.rand']],
  ['colour','Colour',['panel.colors','tray.add','tray.save','-','colourway.new','colourway.exportAll']],
  ['view','View',['view.zoomIn','view.zoomOut','view.fit','view.actualSize','view.hand','-','view.grid','view.smartGuides','-','view.before','view.split','view.tileRepeat','-','view.theme']],
- ['window','Window',['panel.canvas','panel.colors','panel.lyrs','panel.layers','panel.stmp','panel.motifs','panel.text','panel.pgrid','panel.hist','panel.rand','panel.xrec','-','panels.closeAll']],
+ ['window','Window',['panel.canvas','panel.colors','panel.lyrs','panel.layers','panel.stmp','panel.motifs','panel.text','panel.image','panel.sheet','panel.pgrid','panel.hist','panel.rand','panel.xrec','-','panels.closeAll']],   // 2.76.11: Image and Sheet too
  ['help','Help',['help.shortcuts','app.commandSearch','feedback.open','-','help.about']]];
 // commands that open a dialog or a file picker: their menu item ends with … (section 13.2)
 const MNB_DOTS=new Set(['file.export','library.importStamp','library.importImage','library.importSheet','app.commandSearch','feedback.open','help.shortcuts','help.about']);

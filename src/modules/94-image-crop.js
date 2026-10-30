@@ -35,7 +35,8 @@ const crFromC=(X,Y)=>{const p=CR.on.p,a=-(+p.r||0)*Math.PI/180,f=+p.f||1,dx=X-p.
 function crStart(){const p=crSel();if(!p)return;if(CR.on)crEnd(true);const A=WBS.ARTS[p.a],c0=crOf(p),[kx,ky]=crScale(p,A,c0),[w,h]=crBox(p);
  const ox=p.k=='image'?0:Math.max(0,(A.w*(1-c0[0]-c0[2])*kx-w)/2)/(A.w*kx),oy=p.k=='image'?0:Math.max(0,(A.h*(1-c0[1]-c0[3])*ky-h)/2)/(A.h*ky),c=[c0[0]+ox,c0[1]+oy,c0[2]+ox,c0[3]+oy];
  CR.on={mode:'rect',p,A,c0,c,cs:c.slice(),kx,ky,d:null};upd();crPaint()}
-function crPtsStart(){const p=crSel();if(!p||p.k!='image')return;if(CR.on)crEnd(true);const A=WBS.ARTS[p.a],c0=crOf(p),[kx,ky]=crScale(p,A,c0),pts=Array.isArray(p.pc)&&p.pc.length>2?p.pc.map(q=>q.map(v=>+v||0)):[];
+function crPtsStart(){const p=crSel();if(!p)return;   // 2.76.11: a shape's picture too (it was an Image only)
+if(CR.on)crEnd(true);const A=WBS.ARTS[p.a],c0=crOf(p),[kx,ky]=crScale(p,A,c0),pts=Array.isArray(p.pc)&&p.pc.length>2?p.pc.map(q=>q.map(v=>+v||0)):[];
  CR.on={mode:'pts',p,A,c0,kx,ky,pts,p0:JSON.stringify(pts),closed:pts.length>2,sel:-1,d:null};upd();crPaint();if(pts.length<3)pmsg('Point crop: click the picture to add points (at least 3), Enter to apply, Esc to leave it.')}
 const crF2=v=>(+v).toFixed(2);
 // the point outline in the picture's frame (canvas units): its path, closed or not
@@ -96,8 +97,8 @@ function crEnd(apply){const S=CR.on;if(!S)return;CR.on=null;
 function init94(){
  WBX.wbCropOv=crOv;WBX.wbCropHide=p=>!!(CR.on&&CR.on.p===p);WBX.wbCropOn=()=>!!CR.on;WBX.wbCropSync=()=>{const b=$('mf_cropr');if(b){const p=crSel(),v=!!p&&p.k=='motif';if(b.hidden===v)b.hidden=!v}};
  cmdRegister({id:'image.crop',label:'Crop the picture',elId:'mf_crop',enabled:()=>!!crSel(),run:()=>crStart()});
- cmdRegister({id:'image.pointcrop',label:'Point crop the image',elId:'im_pcrop',enabled:()=>{const p=crSel();return!!p&&p.k=='image'},run:()=>crPtsStart()});
- $('mf_crop').addEventListener('click',crStart);$('im_crop').addEventListener('click',crStart);$('im_pcrop').addEventListener('click',crPtsStart);
+ cmdRegister({id:'image.pointcrop',label:'Point crop the picture',kw:'crop points outline cut',elId:'im_pcrop',enabled:()=>!!crSel(),run:()=>crPtsStart()});
+ $('mf_crop').addEventListener('click',crStart);$('im_crop').addEventListener('click',crStart);$('im_pcrop').addEventListener('click',crPtsStart);$('mf_pcrop').addEventListener('click',crPtsStart);
  const art=$('art');
  art.addEventListener('pointerdown',e=>{if(!CR.on||e.button!==0)return;e.preventDefault();e.stopImmediatePropagation();const[X,Y]=fpPt(e),[lx,ly]=crFromC(X,Y);
   if(CR.on.mode=='pts'){crPtsDown(lx,ly,e);if(CR.on&&CR.on.d)try{art.setPointerCapture(e.pointerId)}catch(x){}return}

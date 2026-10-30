@@ -7,7 +7,7 @@ import {$} from './01-launch-and-version.js';
 const el = id => () => $(id);
 const usable = id => () => { const b = $(id); return !!b && !b.hidden && !b.disabled; };
 // the element panels' openers are hidden even among the hidden openers (2.44.0: there is no rail; #pnop holds every opener), so their commands check that the button exists, not that it shows
-const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text']);
+const ELBTN = new Set(['rail-layers', 'rail-stmp', 'rail-motifs', 'rail-text', 'rail-image', 'rail-sheet']);
 const exists = id => () => { const b = $(id); return !!b && !b.disabled; };
 const click = id => () => $(id).click();
 const COMMANDS = [
@@ -63,6 +63,8 @@ const COMMANDS = [
   ['panel.lyrs', 'Open Elements', 'rail-lyrs'],
   ['panel.layers', 'Open Pattern', 'rail-layers'],
   ['panel.stmp', 'Open Stamp', 'rail-stmp'],
+  ['panel.image', 'Open Image', 'rail-image'],
+  ['panel.sheet', 'Open Sheet', 'rail-sheet'],
   ['stamp.new', 'New stamp', 'smknew'],
   ['stamp.duplicate', 'Duplicate stamp', 'smkdup'],
   ['stamp.delete', 'Delete stamp', 'smkdel'],
@@ -79,9 +81,14 @@ const COMMANDS = [
   ['randomize.roll', 'Randomize now', 'rzdo'],
   ['app.commandSearch', 'Search commands', 'cmdkb', 'Mod+K'],
 ];
+// 2.76.11: words command search also finds a command by (a label match ranks first)
+const KWS = {'panel.canvas': 'canvas size format aspect ratio width height dpi resolution repeat tile book cover', 'panel.text': 'font type typeface lettering words',
+  'panel.motifs': 'shape shapes library', 'panel.colors': 'colour color tray palette ink paper', 'panel.layers': 'pattern repeat tiling', 'panel.lyrs': 'elements layers list',
+  'panel.pgrid': 'grid snap', 'panel.hist': 'history undo steps', 'panel.rand': 'random roll looks', 'view.theme': 'dark light theme', 'file.export': 'save image png jpg tiff svg pdf',
+  'view.grid': 'grid', 'view.fit': 'zoom fit', 'view.actualSize': 'zoom 100', 'stamp.new': 'stamp make', 'file.save': 'save', 'export.pdf': 'print pdf'};
 function init37() {
   for (const [id, label, elId, shortcut, kind] of COMMANDS) {
-    cmdRegister({id, label, shortcut: shortcut || undefined, elId,
+    cmdRegister({id, label, shortcut: shortcut || undefined, elId, kw: KWS[id] || '',
       // file inputs are opened by clicking them (that is what their visible label does); they are hidden on purpose
       enabled: kind === 'input' ? el(elId) : ELBTN.has(elId) ? exists(elId) : usable(elId),
       run: click(elId)});

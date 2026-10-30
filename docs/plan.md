@@ -1,5 +1,15 @@
 # Development plan
 
+## 2.76.11 (Oct 30 2026, branch feat/2.76.11-experienced-users, step 9 of docs/pattern-plan.md, on top of 2.76.10 (live)): for experienced users
+- **Element commands** (32-layers-panel.js): Bring forward and Send backward (Ctrl+] and Ctrl+[), Bring to front and Send to back (with Shift), Lock and Unlock, Hide and Show, Rename, Rotate 90° either way, Flip across, Select all, Deselect. The **right-click menu** gains Bring forward, Send backward, Group, Lock, Hide, Rename and Select all; the **Edit menu** gains Select all, Deselect, Arrange, Transform, Lock, Unlock, Hide, Show and Rename.
+- **Command search** also finds a command by its own words (`kw`), after the label matches: canvas size, font, rotate, flip, hide, lock, order, select.
+- **Navigation:** Ctrl/Cmd+wheel goes up or down one clear zoom level (5% to 800%, Photoshop's ladder); a trackpad's small steps add up to one. Middle-button drag already panned; the browser's own middle-click autoscroll is now kept from taking it.
+- **Menus:** Window opens Image and Sheet too; Image has Repeat 3 x 3, Crop, Point crop and the turns.
+- **History names the step:** the element by its own name ("Moved Rectangle", "Rotated Rectangle", "Added Pattern 2"), an effect by its name ("Blur on Rectangle", "Removed Blur from Star"), Locked, Renamed (from and to), Flipped, Edited a piece of.
+- **Point crop on a shape's picture** (Shape panel, Fill, next to Crop; 74-motif-element.js draws it); a stamp's own pictures draw a point crop the same way, but picking one inside a stamp to crop is not built yet, and a Sheet's picture has no crop yet.
+- **Randomize and your elements:** your largest visible text takes the Look's title place, at its size and in its colour, and the Look's own title is left out; your other texts that would be hard to read on the new paper (under 3:1) take the Look's text colour.
+- Tests: tests/experienced-2-76-11.spec.js (7). Ran: see PROJECT_STATUS. `npm run perf` ratio 1.02. check:style, check:platform. Not run: full suite, WebKit, CI.
+
 ## 2.76.10 (Oct 30 2026, branch feat/2.76.10-piece-editing, step 7 of docs/pattern-plan.md, on top of 2.76.9 (live)): editing pieces, patterns of patterns, accents. Format 30 kept
 - **Edit pieces** (Pattern panel, Pieces): with it on, a click on the canvas picks one piece of the selected pattern (a box shows it) and a drag moves it; Source (another of the pattern's sources), Colour (a tray colour), Turn, Delete, Reset and **Make its own element** (the piece leaves the pattern as an ordinary stamp, shape or text at the same place, size, turn and colour, just above the pattern; its place stays empty; one history step). An edit is stored on the pattern by its place's key (`pe`: the tiling's lattice position, or the place's number in the free layouts), so it stays with its place when Size, Spacing or the area change.
 - **A Pattern as a source:** Add source lists the layer's other patterns (one level deep); each place prints that pattern, scaled to the piece and turned with it (at most 64 pieces a place and 4,000 in all).

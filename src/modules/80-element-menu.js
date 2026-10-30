@@ -1,5 +1,5 @@
 import {ICN} from './00-icons.js';
-import {cmdGet,cmdRegister} from '../commands/registry.js';
+import {cmdGet,cmdIsEnabled,cmdRegister,cmdRun} from '../commands/registry.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
@@ -30,15 +30,16 @@ function emPaste(){const L=fpL();if(!L||!EMCLIP||!EMCLIP.length)return false;L.p
 function emDel(){const L=fpL(),g=fpGrp();if(!L||!g.length)return false;g.forEach(q=>{const i=L.pl.indexOf(q);if(i>=0)L.pl.splice(i,1)});WBS.fpSel=-1;WBS.fpMS=new Set();emDone();return true}
 const emCut=()=>{if(!emCopy())return false;return emDel()};
 function emOrder(front){const L=fpL(),g=fpGrp();if(!L||!g.length)return false;g.forEach(q=>L.pl.splice(L.pl.indexOf(q),1));if(front)L.pl.push(...g);else L.pl.unshift(...g);emDone();return true}
-const emCan={pat:()=>patCanMake(),cut:()=>fpGrp().length>0,copy:()=>fpGrp().length>0,paste:()=>!!EMCLIP&&!!EMCLIP.length&&!!fpL(),dup:()=>fpGrp().length>0,front:()=>fpGrp().length>0,back:()=>fpGrp().length>0,del:()=>fpGrp().length>0};
-const emRows=[['cut','Cut','Ctrl+X','split'],['copy','Copy','Ctrl+C','duplicate'],['paste','Paste','Ctrl+V','importIc'],['dup','Duplicate','Ctrl+D','layers'],['pat','Make pattern','','pattern'],null,['front','Bring to front','','front'],['back','Send to back','','back'],null,['del','Delete','Del','trash']];
-const emRun={pat:()=>patMakeFrom(),cut:emCut,copy:emCopy,paste:emPaste,dup:()=>lyDupSel(),front:()=>emOrder(true),back:()=>emOrder(false),del:emDel};
+const EMC={fwd:'element.forward',bwd:'element.backward',grp:'element.group',lock:'element.lock',hide:'element.hide',ren:'element.rename',all:'edit.selectAll'};   // 2.76.11: rows that run a command
+const emCan={...Object.fromEntries(Object.entries(EMC).map(([a,id])=>[a,()=>cmdIsEnabled(id)])),pat:()=>patCanMake(),cut:()=>fpGrp().length>0,copy:()=>fpGrp().length>0,paste:()=>!!EMCLIP&&!!EMCLIP.length&&!!fpL(),dup:()=>fpGrp().length>0,front:()=>fpGrp().length>0,back:()=>fpGrp().length>0,del:()=>fpGrp().length>0};
+const emRows=[['cut','Cut','Ctrl+X','split'],['copy','Copy','Ctrl+C','duplicate'],['paste','Paste','Ctrl+V','importIc'],['dup','Duplicate','Ctrl+D','layers'],['pat','Make pattern','','pattern'],null,['front','Bring to front','Ctrl+Shift+]','front'],['fwd','Bring forward','Ctrl+]','front'],['bwd','Send backward','Ctrl+[','back'],['back','Send to back','Ctrl+Shift+[','back'],null,['grp','Group','Ctrl+G','group'],['lock','Lock','','lock'],['hide','Hide','','eyeOff'],['ren','Rename','','pencil'],null,['all','Select all','Ctrl+A','marquee'],null,['del','Delete','Del','trash']];
+const emRun={...Object.fromEntries(Object.entries(EMC).map(([a,id])=>[a,()=>cmdRun(id)])),pat:()=>patMakeFrom(),cut:emCut,copy:emCopy,paste:emPaste,dup:()=>lyDupSel(),front:()=>emOrder(true),back:()=>emOrder(false),del:emDel};
 const emIc=n=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN[n]||''}</svg>`;
 function emClose(){const m=$('ctxm');if(m)m.hidden=true}
 // in a stamp tab (2.25.0) the same menu works on the stamp's shapes
 const emTab=()=>stUnlocked()!=null&&!!WBX.wbStClip;
-const emCanT={pat:()=>false,cut:()=>WBX.wbStClip.sel(),copy:()=>WBX.wbStClip.sel(),paste:()=>WBX.wbStClip.has(),dup:()=>WBX.wbStClip.sel(),front:()=>WBX.wbStClip.sel(),back:()=>WBX.wbStClip.sel(),del:()=>WBX.wbStClip.sel()};
-const emRunT={pat:()=>{},cut:()=>WBX.wbStClip.cut(),copy:()=>WBX.wbStClip.copy(),paste:()=>WBX.wbStClip.paste(),dup:()=>{const c=cmdGet('stamp.duplicateMotif');if(c)c.run()},front:()=>WBX.wbSceOrder(true),back:()=>WBX.wbSceOrder(false),del:()=>WBX.wbSceDelSel()};
+const emCanT={...Object.fromEntries(Object.keys(EMC).map(a=>[a,()=>false])),pat:()=>false,cut:()=>WBX.wbStClip.sel(),copy:()=>WBX.wbStClip.sel(),paste:()=>WBX.wbStClip.has(),dup:()=>WBX.wbStClip.sel(),front:()=>WBX.wbStClip.sel(),back:()=>WBX.wbStClip.sel(),del:()=>WBX.wbStClip.sel()};
+const emRunT={...Object.fromEntries(Object.keys(EMC).map(a=>[a,()=>{}])),pat:()=>{},cut:()=>WBX.wbStClip.cut(),copy:()=>WBX.wbStClip.copy(),paste:()=>WBX.wbStClip.paste(),dup:()=>{const c=cmdGet('stamp.duplicateMotif');if(c)c.run()},front:()=>WBX.wbSceOrder(true),back:()=>WBX.wbSceOrder(false),del:()=>WBX.wbSceDelSel()};
 function emOpen(e,over){let m=$('ctxm');if(!m){m=document.createElement('div');m.id='ctxm';m.className='pop';m.setAttribute('role','menu');document.body.appendChild(m);
   m.addEventListener('click',ev=>{const b=ev.target.closest('button[data-a]');if(!b||b.disabled)return;emClose();(emTab()?emRunT:emRun)[b.dataset.a]()})}
  m.innerHTML=emRows.map(r=>r?`<button type="button" role="menuitem" data-a="${r[0]}"${(emTab()?emCanT:emCan)[r[0]]()?'':' disabled'}>${emIc(r[3])}${r[1]}${r[2]?`<kbd>${r[2]}</kbd>`:''}</button>`:'<hr>').join('');

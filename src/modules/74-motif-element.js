@@ -11,6 +11,7 @@ import {abInsert} from './73-add-bar.js';
 import {stUnlocked} from './63-stamp-tool.js';
 import {mNm} from './21-motif-library-ui.js';
 import {basicKey} from './76-basic-shapes.js';
+import {imPath} from './95-image-element.js';
 
 // ===== The Motif element (2.3.0, owner Oct 20 2026: "add shapes freely to the canvas"): one library shape on the canvas on its own, not inside a stamp.
 // {u, k:'motif', m: motif key, x, y (its middle, canvas units), s (its size: the 100-unit motif box becomes s units), r (degrees), f (1 or -1, flipped), ink?,
@@ -41,11 +42,13 @@ function mtDraw(m,o,id,seen,ip='mai_'){const w=Math.max(.01,o.w),h=Math.max(.01,
   const ic=Array.isArray(o.pic.ic)&&o.pic.ic.some(v=>+v>0)?o.pic.ic.map(v=>Math.max(0,Math.min(.98,+v||0))):null,cx=ic?A.w*ic[0]:0,cy=ic?A.h*ic[1]:0,cw=ic?A.w*(1-ic[0]-ic[2]):A.w,ch=ic?A.h*(1-ic[1]-ic[3]):A.h;
   const k=(o.pic.im=='contain'?Math.min(w/cw,h/ch):Math.max(w/cw,h/ch))*Math.max(.05,Math.min(8,(+o.pic.iz||100)/100));
   if(ic)defs+=`<clipPath id="${mid}ic"><rect x="${mt2(cx)}" y="${mt2(cy)}" width="${mt2(cw)}" height="${mt2(ch)}"/></clipPath>`;
-  body+=`<g mask="url(#${mid})"><use href="#${aid}" transform="scale(${k.toFixed(5)}) translate(${mt2(-cx-cw/2)} ${mt2(-cy-ch/2)})"${ic?` clip-path="url(#${mid}ic)"`:''}/></g>`}
+  // 2.76.11: a point crop (pc, 94-image-crop.js) keeps what is inside its outline, in the picture's own pixels, as on an Image
+  const pd=imPath(o.pic.pc,A);if(pd)defs+=`<clipPath id="${mid}pc"><path d="${pd}"/></clipPath>`;
+  body+=`<g mask="url(#${mid})"><g transform="scale(${k.toFixed(5)}) translate(${mt2(-cx-cw/2)} ${mt2(-cy-ch/2)})"${pd?` clip-path="url(#${mid}pc)"`:''}><use href="#${aid}"${ic?` clip-path="url(#${mid}ic)"`:''}/></g></g>`}
  else if(o.fill)body+=`<rect ${R} fill="${o.fill}" mask="url(#${mid})"/>`;
  return{defs,body}}
 // the look of a motif (an element, a stamp's motif or a pattern's source) as mtDraw takes it; ink: its fill colour (a colour reference resolved by the caller)
-const mtPic=p=>p.fl=='img'&&p.a&&WBS.ARTS[p.a]?{A:WBS.ARTS[p.a],a:p.a,iz:p.iz,im:p.im,ic:p.ic}:null;
+const mtPic=p=>p.fl=='img'&&p.a&&WBS.ARTS[p.a]?{A:WBS.ARTS[p.a],a:p.a,iz:p.iz,im:p.im,ic:p.ic,pc:p.pc}:null;
 // the shape that is being edited or moved draws live: its print would be out of date at every step
 const mtLive=p=>{const d=WBS.fpDrag,m=WBS.fpMS;return p.u==WBS.fpSel||!!(m&&m.has&&m.has(p.u))||!!(d&&(d.p===p||d.g&&d.g.some(a=>a[0]===p)))};
 // the box a w by h shape takes up on the canvas when it is turned r degrees: its effects work inside that box (2.74.2: a tall shape turned towards flat ran out of

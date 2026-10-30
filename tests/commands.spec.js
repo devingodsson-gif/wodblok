@@ -39,7 +39,7 @@ test('a disabled button means a disabled command', async ({ page }) => {
     if (/^edit\.(copy|cut|paste)$/.test(id)) continue;
     if (!(await page.evaluate(id => window.__wbTest.commands.get(id).elId, id))) continue;   // a command with no button of its own (the menu bar's Add, effect and Help commands, 2.42.0) has its own enabled check
     const el = await page.evaluate(id => { const c = window.__wbTest.commands.get(id); const b = document.getElementById(c.elId); return { hidden: b.hidden, disabled: !!b.disabled, input: b.tagName === 'INPUT' }; }, id);
-    const elementPanel = /^panel\.(layers|stmp|motifs|text|elpaint|mlist)$/.test(id);   // opened from the element bar: the rail button is hidden but the command works
+    const elementPanel = /^panel\.(layers|stmp|motifs|text|elpaint|mlist|image|sheet)$/.test(id);   // opened from the element bar: the rail button is hidden but the command works
     expect(enabled, id).toBe(el.input ? true : elementPanel ? !el.disabled : !el.hidden && !el.disabled);
   }
   expect(errors).toEqual([]);

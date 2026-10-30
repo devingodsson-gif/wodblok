@@ -16,6 +16,8 @@ function init41(){
     e.preventDefault();e.stopPropagation();board.setPointerCapture(e.pointerId);
     pan={x:e.clientX,y:e.clientY,l:board.scrollLeft,t:board.scrollTop,id:e.pointerId};document.body.classList.add('panning');
   },true);
+  // 2.76.11: the browser's own middle-click autoscroll would take the drag; the board keeps it
+  document.addEventListener('mousedown',e=>{if(e.button==1&&board.contains(e.target))e.preventDefault()},true);
   board.addEventListener('pointermove',e=>{if(!pan||e.pointerId!=pan.id)return;board.scrollLeft=pan.l-(e.clientX-pan.x);board.scrollTop=pan.t-(e.clientY-pan.y)});
   const stop=e=>{if(pan&&e.pointerId==pan.id){pan=null;document.body.classList.remove('panning')}};
   board.addEventListener('pointerup',stop);board.addEventListener('pointercancel',stop);

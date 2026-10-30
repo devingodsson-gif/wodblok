@@ -70,7 +70,27 @@ function lyDrop(u,tu,above){const a=lyP(),i=a.findIndex(q=>String(q.u)===String(
  const[s,e]=lyBlk(a,i),m=a.splice(s,e-s+1),root=m[m.length-1],t2=a.findIndex(q=>String(q.u)===String(tu)),[ts,te]=lyBlk(a,t2);let at,g=T.g||null;
  if(above)at=te+1;else if(lyIsG(T)&&!lyFold.has(String(T.u))){at=t2;g=T.u}else at=ts;
  if(g)root.g=g;else delete root.g;a.splice(at,0,...m);lyDone()}
-function init32(){
+// 2.76.11 (2.76 review, "for experienced users"): the element actions as commands, so the Edit menu, the right-click menu, the shortcuts and command search all
+// reach them: order one step or all the way, lock, hide, rename, select all, deselect, turn a quarter and flip. Each is one history step, named.
+const lyLbl=t=>{WBX.wbLabelNext={t,at:performance.now()}};
+const lyNm=q=>{const d=elDef(elKind(q)),n=d&&d.name?d.name(q):'';return String(n||'element').replace(/\s+/g,' ').trim().slice(0,24)};
+const lyAct=(t,f)=>()=>{const s=lySel();if(!s.length)return false;lyLbl(t+' '+(s.length==1?lyNm(s[0]):s.length+' elements'));f(s);lyDone();return true};
+const lyOrdAll=front=>()=>{const s=lySel();if(!s.length)return false;const a=lyP();lyLbl(front?'Bring to front':'Send to back');s.forEach(q=>a.splice(a.indexOf(q),1));const bg=a.filter(q=>q.bgd).length;if(front)a.push(...s);else a.splice(bg,0,...s);lyDone();return true};
+function lyCmds(){const any=()=>lySel().length>0,one=()=>lySel().length==1,KW=(id,label,kw,run,enabled,shortcut)=>cmdRegister({id,label,kw,run,enabled:enabled||any,...(shortcut?{shortcut}:{})});
+ KW('element.forward','Bring forward','order up raise',()=>{const s=lySel();if(!s.length)return false;lyLbl('Bring forward');lyMove(s[s.length-1].u,1);return true},null,'Mod+]');
+ KW('element.backward','Send backward','order down lower',()=>{const s=lySel();if(!s.length)return false;lyLbl('Send backward');lyMove(s[s.length-1].u,-1);return true},null,'Mod+[');
+ KW('element.front','Bring to front','order top',lyOrdAll(true),null,'Mod+Shift+]');KW('element.back','Send to back','order bottom',lyOrdAll(false),null,'Mod+Shift+[');
+ KW('element.lock','Lock','freeze',lyAct('Lock',s=>s.forEach(q=>{q.lk=1})),()=>lySel().some(q=>!q.lk));
+ KW('element.unlock','Unlock','',lyAct('Unlock',s=>s.forEach(q=>{delete q.lk})),()=>lySel().some(q=>q.lk));
+ KW('element.hide','Hide','visibility eye',lyAct('Hide',s=>s.forEach(q=>{q.v=false})),()=>lySel().some(q=>q.v!==false));
+ KW('element.show','Show','visibility eye',lyAct('Show',s=>s.forEach(q=>{delete q.v})),()=>lySel().some(q=>q.v===false));
+ KW('element.rename','Rename','name',()=>{const s=lySel();if(s.length!=1)return false;if(WBX.wbOpenPanel)WBX.wbOpenPanel('lyrs');lyRen=s[0].u;upd();return true},one);
+ KW('element.rotateCw','Rotate 90° clockwise','turn rotate quarter',lyAct('Rotated',s=>s.forEach(q=>{q.r=((((+q.r||0)+90)%360)+540)%360-180})));
+ KW('element.rotateCcw','Rotate 90° anticlockwise','turn rotate quarter counterclockwise',lyAct('Rotated',s=>s.forEach(q=>{q.r=((((+q.r||0)-90)%360)+540)%360-180})));
+ KW('element.flip','Flip across','mirror flip horizontal',lyAct('Flipped',s=>s.forEach(q=>{q.f=-(q.f||1)})));
+ KW('edit.selectAll','Select all','select everything',()=>{const a=lyP().filter(q=>!q.bgd&&!q.lk&&q.v!==false&&q.k!='group');if(!a.length)return false;lySetSel(a.map(q=>q.u));upd();return true},()=>lyP().some(q=>!q.bgd&&!q.lk));
+ KW('edit.deselect','Deselect','select none clear selection',()=>{lySetSel([]);upd();return true})}
+function init32(){lyCmds();
  window.lyInkOn=1;
  // Behind and Cancel make no sense on one element; Replace (2.73.0) works against the elements below it
  ['behind','cancel'].forEach(v=>{const o=$('ly_bl').querySelector(`option[value="${v}"]`);if(o)o.remove()});

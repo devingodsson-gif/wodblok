@@ -5,6 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
+- **Oct 30: 2.76.11 (step 9, for experienced users)** on `feat/2.76.11-experienced-users`, not merged. Not built from it: cropping a picture inside a stamp, and a Sheet's picture. Next: 2.77.0 closes the plan (the end-of-plan CI suite, with the owner's word).
 - **Oct 30: 2.76.10 LIVE** (owner: "Merge"). Step 8 of the pattern plan, the Patterns library, is **shelved** (owner: "I don't want to save patterns let's shelve that for now"). Next: step 9, 2.76.11 (for experienced users), then 2.77.0 and the end-of-plan CI suite.
 - **Oct 30: 2.76.9 LIVE. 2.76.10 (step 7: editing pieces, patterns of patterns, accents)** on `feat/2.76.10-piece-editing`, not merged. Known: smart-guides-2-40 "Settings > Guides" fails since before the plan (2.76.2); scenarios "panel: pattern-grid" is flaky. Next: 2.76.11 (Patterns library).
 - **Oct 30: 2.76.9 (step 6, patterns inside shapes and density)** on `feat/2.76.9-inside-and-density`, not merged (waiting for the owner). Next: 2.76.10 (editing pieces, patterns of patterns, accent layer).

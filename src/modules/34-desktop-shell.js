@@ -1,6 +1,6 @@
 import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
-import {cmdGet} from '../commands/registry.js';
+import {cmdGet,cmdIsEnabled,cmdRun} from '../commands/registry.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {DRT,NODRAFT,drOff} from './02-draft-mode-speedups.js';
 import {CH,CW,SH,SHN,SW,bk,closeDD,placeFloat,rowMenu,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
@@ -19,6 +19,7 @@ import {randomize,wbBA} from './20-before-after-and-randomizer.js';
 import {clearAll} from './33-clear.js';
 import {stUnlocked} from './63-stamp-tool.js';
 import {lyDupSel} from './32-layers-panel.js';
+import {elDef,elKind,fxDef} from './65-element-core.js';
 
 function init34(){// ===== Desktop shell: panels, views, zoom, number fields, menus, undo/redo, shortcuts =====
 (()=>{
@@ -244,7 +245,11 @@ function zoomAt(ns,cx,cy){const b=$('boardP'),a=$('art'),r0=a.getBoundingClientR
 const zoomMid=f=>{const r=$('boardP').getBoundingClientRect();zoomAt((z||fitS)*f,r.left+r.width/2,r.top+r.height/2)};
 WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbZoomTo=s=>{const r=$('boardP').getBoundingClientRect();zoomAt(s,r.left+r.width/2,r.top+r.height/2)};WBX.wbZoomNow=()=>z||fitS;WBX.wbZoomIn=()=>!!z&&z>fitS*1.001;
 $('zi').onclick=()=>zoomMid(1.25);$('zo').onclick=()=>zoomMid(1/1.25);$('zl').onclick=()=>{z=0;applyZ()};
-$('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomAt((z||fitS)*(e.deltaY<0?1.1:1/1.1),e.clientX,e.clientY)},{passive:false});
+// 2.76.11 (2.76 review: "Ctrl+wheel zooms in small steps"): Ctrl/Cmd+wheel goes up or down one clear zoom level at a time (Photoshop's ladder); a trackpad's small
+// deltas add up to one step, a mouse notch is one step
+const ZLAD=[.05,.1,.125,.167,.25,.333,.5,.667,1,1.5,2,3,4,6,8];let zAcc=0,zAt=0;
+$('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();const d=e.deltaY*(e.deltaMode==1?33:e.deltaMode==2?400:1),now=performance.now();if(now-zAt>400)zAcc=0;zAt=now;zAcc+=d;if(Math.abs(zAcc)<40)return;
+ const up=zAcc<0;zAcc=0;const s=z||fitS,n=up?ZLAD.find(v=>v>s*1.001):[...ZLAD].reverse().find(v=>v<s*.999);if(n)zoomAt(n,e.clientX,e.clientY)},{passive:false});
 try{new ResizeObserver(()=>applyZ()).observe($('boardP'))}catch(e){window.addEventListener('resize',applyZ)}
 new MutationObserver(()=>applyZ()).observe($('art'),{attributes:true,attributeFilter:['viewBox']});
 
@@ -309,13 +314,20 @@ const HK={tiles:'Stamp change',els:'Element change',layers:'Layer change',proj:'
 let hLU='';
 const hKN={text:'text',motif:'shape',stamp:'stamp',pattern:'pattern',paint:'paint',group:'group'};
 function hEls(c){const m=new Map();(Array.isArray(c.els)?c.els:[]).forEach(p=>m.set(String(p.u),p));return m}
-function hElWords(A,B){const a=hEls(A),b=hEls(B);if(!a.size&&!b.size)return'';const add=[...b.keys()].filter(u=>!a.has(u)),rem=[...a.keys()].filter(u=>!b.has(u)),kn=p=>hKN[p.k]||'element';
+// 2.76.11 (2.76 review: history "mostly Changed element"): a step names the element by its own name ("Moved Diamond", "Added Pattern 2"), an effect by its name
+// ("Halftone on photo", "Removed Blur from Star"), and locking, renaming and a pattern's piece edits too
+function hNm(p){try{const d=elDef(elKind(p)),n=d&&d.name?d.name(p):'';if(n)return String(n).replace(/\s+/g,' ').trim().slice(0,24)}catch(e){}return hKN[p.k]||'element'}
+function hFxWord(p,q){const A=p.fx||[],B=q.fx||[],ia=new Map(A.map(e=>[e.u,e])),ib=new Map(B.map(e=>[e.u,e])),nm=e=>{const d=fxDef(e.k);return d&&d.label||'Effect'},on=hNm(q);
+ const add=B.filter(e=>!ia.has(e.u)),rem=A.filter(e=>!ib.has(e.u)),chg=B.filter(e=>ia.has(e.u)&&JSON.stringify(ia.get(e.u))!==JSON.stringify(e));
+ if(add.length==1&&!rem.length)return nm(add[0])+' on '+on;if(rem.length==1&&!add.length)return'Removed '+nm(rem[0])+' from '+on;if(!add.length&&!rem.length&&chg.length==1)return(chg[0].on===false&&ia.get(chg[0].u).on!==false?'Turned off ':'')+nm(chg[0])+' on '+on;
+ if(!add.length&&!rem.length&&!chg.length&&A.length==B.length)return'Reordered effects on '+on;return'Effects on '+on}
+function hElWords(A,B){const a=hEls(A),b=hEls(B);if(!a.size&&!b.size)return'';const add=[...b.keys()].filter(u=>!a.has(u)),rem=[...a.keys()].filter(u=>!b.has(u)),kn=hNm;
 if(add.length||rem.length){if(add.length&&rem.length)return'';const ks=(add.length?add.map(u=>b.get(u)):rem.map(u=>a.get(u))),n=ks.length,w=add.length?'Added ':'Removed ';return w+(n==1?kn(ks[0]):n+' elements')}
 const chg=[...b.keys()].filter(u=>JSON.stringify(a.get(u))!==JSON.stringify(b.get(u)));if(!chg.length)return'';
 const keys=u=>{const p=a.get(u),q=b.get(u);return[...new Set([...Object.keys(p),...Object.keys(q)])].filter(k=>JSON.stringify(p[k])!==JSON.stringify(q[k]))};
 const only=(ks,ok)=>ks.every(k=>ok.includes(k)),all=chg.map(keys);let w='Changed';
-if(all.every(ks=>only(ks,['x','y'])))w='Moved';else if(all.every(ks=>only(ks,['r'])))w='Rotated';else if(all.every(ks=>only(ks,['s','wx','wy','bw','bh','n','x','y','G','Lt'])&&!ks.includes('tx')))w='Resized';else if(all.every(ks=>only(ks,['tx','G','Lt','bw','bh','n','tu'])))w='Edited';else if(all.every(ks=>only(ks,['ink','col','fill','op','a'])))w='Recoloured';else if(all.every(ks=>only(ks,['v'])))w=b.get(chg[0]).v===false?'Hid':'Showed';else if(all.every(ks=>only(ks,['name'])))w='Renamed';
-if(chg.length==1){const p=b.get(chg[0]);hLU=String(chg[0]);return w+' '+(w=='Edited'&&p.k=='text'?'text':kn(p))}return w+' '+chg.length+' elements'}
+if(all.every(ks=>only(ks,['x','y'])))w='Moved';else if(all.every(ks=>only(ks,['r'])))w='Rotated';else if(all.every(ks=>only(ks,['s','wx','wy','bw','bh','n','x','y','G','Lt'])&&!ks.includes('tx')))w='Resized';else if(all.every(ks=>only(ks,['tx','G','Lt','bw','bh','n','tu'])))w='Edited';else if(all.every(ks=>only(ks,['ink','col','fill','op','a'])))w='Recoloured';else if(all.every(ks=>only(ks,['v'])))w=b.get(chg[0]).v===false?'Hid':'Showed';else if(all.every(ks=>only(ks,['name','nm'])))w='Renamed';else if(all.every(ks=>only(ks,['lk'])))w=b.get(chg[0]).lk?'Locked':'Unlocked';else if(all.every(ks=>only(ks,['f'])))w='Flipped';else if(all.every(ks=>only(ks,['pe'])))w='Edited a piece of';
+if(chg.length==1){const p=b.get(chg[0]);hLU=String(chg[0]);if(all[0].length==1&&all[0][0]=='fx')return hFxWord(a.get(chg[0]),p);if(w=='Renamed')return'Renamed '+hNm(a.get(chg[0]))+' to '+hNm(p);return w+' '+(w=='Edited'&&p.k=='text'?'text':kn(p))}return w+' '+chg.length+' elements'}
 function hLabel(a,b){hLU='';try{const A=JSON.parse(a),B=JSON.parse(b),ch=Object.keys(HK).filter(k=>JSON.stringify(A[k])!==JSON.stringify(B[k]));if(!ch.length)return 'Change';if(ch.length==1&&ch[0]=='els'){const w=hElWords(A,B);if(w)return w}if(ch.length>2)return 'Several changes';if(ch[0]=='tiles'){const n=t=>t.reduce((q,x)=>q+(x.items||[]).length,0),x=n(A.tiles),y=n(B.tiles);if(A.tiles.length!=B.tiles.length)return B.tiles.length>A.tiles.length?'Added stamp':'Removed stamp';if(y>x)return 'Added shape'+(y-x>1?'s':'');if(y<x)return 'Removed shape'+(x-y>1?'s':'');return 'Moved or edited shape'}return ch.map(k=>HK[k]).join(' + ')}catch(e){return 'Change'}}
 // wbRollHold: a Randomize roll is still setting its lettering, so the half-made piece is not a history step
 // Shape editor: opens by itself when a shape is placed, unless Auto-open (top of the panel) is switched off; the choice is remembered
@@ -391,6 +403,7 @@ else if(m&&k=='y'){e.preventDefault();redo()}
 else if(m&&k=='s'){e.preventDefault();cmdGet('file.save').run()}
 else if(m&&k=='d'&&!typing&&q&&stUnlocked()!=null){e.preventDefault();cmdGet('stamp.duplicateMotif').run()}
 else if(m&&k=='d'&&!typing&&lyDupSel())e.preventDefault();
+else if(m&&!typing&&!e.altKey&&(e.code=='BracketRight'||e.code=='BracketLeft')){const id=e.code=='BracketRight'?(e.shiftKey?'element.front':'element.forward'):(e.shiftKey?'element.back':'element.backward');if(cmdIsEnabled(id)){e.preventDefault();cmdRun(id)}}   // 2.76.11: Photoshop's order keys
 else if(!typing&&WBS.split&&e.key=='Enter'){e.preventDefault();doSplit()}
 else if(!typing&&WBS.split&&e.key=='Escape'){WBS.split=null;WBH.draw()}
 else if(!typing&&WBS.brush&&!WBS.brush.txt&&(e.key=='['||e.key==']')){e.preventDefault();WBS.brush.r=((WBS.brush.r+(e.key==']'?15:-15)+540)%360)-180}
