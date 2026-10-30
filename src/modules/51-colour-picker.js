@@ -104,6 +104,8 @@ function init51(){EL=pkBuild();const e=EL,sv=e.querySelector('.cpksv'),hb=e.quer
   else if(k=='Enter'){ev.preventDefault();if(SVX>=0)svPick(SVR[SVX])}else if(k=='Escape'){ev.preventDefault();ev.stopPropagation();svClose();SVB.focus()}});
  document.addEventListener('click',()=>{if(SVB)SVB.setAttribute('aria-expanded',String(!!SVL&&!SVL.hidden))});
  // close on a press outside (not on the thing that opened it: that one toggles)
+ // 2.77.0: Escape closes the picker even before it has taken focus (it moves in on the next frame, so a quick Escape went to the page)
+ document.addEventListener('keydown',ev=>{if(PK&&!DROP&&ev.key=='Escape'&&!e.contains(ev.target)&&!(SVL&&!SVL.hidden)&&!ev.target.closest('.cpkkeep')){ev.stopPropagation();closePicker(true)}},true);
  document.addEventListener('pointerdown',ev=>{if(PK&&!DROP&&!e.contains(ev.target)&&!(PK.anchor&&PK.anchor.contains(ev.target))&&!ev.target.closest('.cpkkeep'))closePicker()},true);
  addEventListener('resize',()=>{if(PK&&PK.anchor&&PK.anchor.isConnected)place()});
  WBX.wbPicker={open:openPicker,close:closePicker,isOpen:()=>!!PK,anchor:()=>PK&&PK.anchor};

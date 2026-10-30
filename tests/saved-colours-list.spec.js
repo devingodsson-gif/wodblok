@@ -11,6 +11,7 @@ test('add colours, name them, make a folder, search, move, delete; the picker dr
   await page.click('#scadd');
   await expect(page.locator('.cpk')).toBeVisible();
   await page.keyboard.press('Escape');
+  await expect(page.locator('.cpk')).toBeHidden();   // 2.77.0: the picker is gone before the next click (it caught a click while closing, 1 run in 4)
   await expect(page.locator('#scl .scr')).toHaveCount(1);
   await expect(page.locator('#scn')).toHaveText('1');
   // rename it from its menu
