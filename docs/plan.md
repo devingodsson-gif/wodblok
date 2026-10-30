@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.77.1 (Oct 30 2026, branch fix/2.77.1-smart-guides, hotfix on 2.77.0 (live)): smart guides
+- **Snap to canvas off now stops canvas snapping** (84-smart-guides.js): an element that covers the whole canvas (a full Pattern or Sheet) is no longer a snap target, because its edges and middle are the canvas's own; with Snap to canvas off a full Pattern still pulled a shape to the canvas middle under Snap to elements. smart-guides-2-40 "Settings > Guides" failed on this since 2.76.2.
+- Tests: every guides and snap spec (5, all pass). `npm run perf` ratio 0.999. Not run: the full suite, WebKit, CI.
+
 ## 2.77.0 (Oct 30 2026, branch fix/2.77.0-close-pattern-plan): the pattern plan is done
 - Closes docs/pattern-plan.md (2.76.3 to 2.76.11; step 8, the Patterns library, shelved by the owner; misregistration per piece left out of step 2).
 - **A button in a hidden row or group no longer counts as usable** (37-command-list.js): Duplicate (Ctrl+D and the Edit menu) showed as available with no stamp open. The commands test now counts a hidden row or group as hiding its buttons (it failed on 2.76.10 at Crop the picture).

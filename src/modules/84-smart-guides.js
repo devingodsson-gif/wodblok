@@ -24,8 +24,9 @@ function sgBox(q){const wh=fpWH(q);if(!wh)return null;const a=(+q.r||0)*Math.PI/
  return Number.isFinite(x+y+ex+ey)?{l:x-ex,r:x+ex,t:y-ey,b:y+ey}:null}
 // What the moving elements can snap to: the other elements' boxes (not the Background, a Filter shape, a hidden one or a Pattern, which has no box)
 // as lines across (X) and down (Y), each tagged with its box (-1 for the canvas), and the moving selection's box relative to its anchor (ax, ay).
+// 2.77.1: an element that covers the whole canvas (a full Pattern or Sheet) is not a target: its lines are the canvas's, which Snap to canvas decides
 function sgPrep(L,mv,ax,ay,o){const ids=new Set(mv.map(q=>String(q.u))),pl=L.pl||[],T=[],X=[],Y=[];
- if(o.el)pl.forEach(q=>{if(ids.has(String(q.u))||q.bgd||q.flt||q.k=='group'||fpHid(pl,q))return;const b=sgBox(q);if(b&&b.r>b.l&&b.b>b.t)T.push(b)});
+ if(o.el)pl.forEach(q=>{if(ids.has(String(q.u))||q.bgd||q.flt||q.k=='group'||fpHid(pl,q))return;const b=sgBox(q);if(b&&b.r>b.l&&b.b>b.t&&!(b.l<=.5&&b.t<=.5&&b.r>=CW-.5&&b.b>=CH-.5))T.push(b)});
  T.forEach((b,i)=>{X.push([b.l,i],[(b.l+b.r)/2,i],[b.r,i]);Y.push([b.t,i],[(b.t+b.b)/2,i],[b.b,i])});
  if(o.cv){X.push([0,-1],[CW/2,-1],[CW,-1]);Y.push([0,-1],[CH/2,-1],[CH,-1])}
  let B=null;mv.forEach(q=>{const b=sgBox(q);if(b)B=B?{l:Math.min(B.l,b.l),r:Math.max(B.r,b.r),t:Math.min(B.t,b.t),b:Math.max(B.b,b.b)}:b});
