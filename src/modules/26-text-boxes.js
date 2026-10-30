@@ -119,6 +119,9 @@ if(!made.length){pmsg('There were no letters to split.');return}
 WBS.fpMS=new Set(made.map(q=>String(q.u)));WBS.fpSel=made[made.length-1].u;WBS.fpB=null;WBS.txArm=false;tbArmUI();tbKey='';store();upd();if(WBX.wbCap)WBX.wbCap();pmsg(`Split into ${total} letter${total>1?'s':''}. They are selected.`)});
 $('tx_go').addEventListener('click',()=>{if(stTxMode())return;if(WBS.txArm){tbArm(false);return}if(!tbRead().text.trim()){$('tx_t').focus();return}if(!tbEnsure())return;tbArm(true)});
 $('tx_t').addEventListener('keydown',e=>{if(!stTxMode())e.stopPropagation()});   // Enter is a new line, as in the Text tool
+// 2.78.3 (bug test B4): a text whose field is left empty goes, as a text typed in place does in a stamp's tab (2.25.0); one Undo brings it back. While typing an empty
+// field keeps the last words (a replacement is on its way); leaving the field empty is what removes it
+$('tx_t').addEventListener('change',()=>{if(stTxMode()||$('tx_t').value.trim())return;const p=tbSel(),L=fpL();if(!p||!L)return;clearTimeout(tbT);tbPend=0;L.pl=(L.pl||[]).filter(q=>q!==p);WBS.fpSel=-1;WBS.fpMS=new Set();tbKey='';store();upd();WBX.wbLabelNext={t:'Deleted '+(p.nm||'text'),at:performance.now()};if(WBX.wbCap)WBX.wbCap()});
 $('tx_new').addEventListener('click',()=>{if(stTxMode())return;WBS.fpSel=-1;WBS.fpMS=new Set();tbKey='';WBS.txArm=false;tbG=null;tbArmUI();$('tx_t').value='';upd();$('tx_t').focus()});
 $('tx_file').addEventListener('change',async()=>{if(stTxMode())return;const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl||!WBX.wbTxAddFont)return;try{const id=await WBX.wbTxAddFont(fl);$('tx_f').value=id;tbLive();pmsg(`Loaded “${fl.name.replace(/\.[a-z0-9]+$/i,'')}”.`)}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}});
 WBX.wbTbHas=()=>!!tbSel();WBX.wbTbMode=()=>{tbKey='';const L=fpL();if(L)txbSync(L);else{$('tx_ed').hidden=true;$('tx_sprow').hidden=true}tbArmUI()};if(WBX.wbTxMode)WBX.wbTxMode('pattern')}

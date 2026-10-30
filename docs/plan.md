@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.78.3 (Oct 30 2026, branch fix/2.78.3-group-and-empty-text, step 2 of the bug-test plan): Group at once, an emptied text goes
+- **B6:** Group, Ungroup and Ctrl+G / Ctrl+Shift+G ask the selection, not the Elements panel's buttons (they catch up only on the next redraw, so right after Select all Group read as off).
+- **B4:** a text whose Text field is left empty (the field loses focus while empty) is removed, as a text typed in place is in a stamp's tab; one Undo brings it back ("Deleted text"). While typing, an empty field keeps the last words.
+- Tests: bug-test-2-79 (Group right after Select all; an emptied text goes and comes back with Undo); every spec that mentions groups, commands, command-search, experienced-2-76-11 and the text specs (182 pass). Not run: full suite, WebKit, CI.
+
 ## 2.78.2 (Oct 30 2026, branch fix/2.78.2-selection-keeps-values, step 1 of the bug-test plan, docs/bug-test-2.78.md): selecting keeps the element's values
 - **B1:** a panel showing an element's values fired each slider's input event, and the slider's own handler wrote its rounded value back (a pattern's Size and Spacing, a shape's stroke width and scale, the effect sliders, Map to shape): selecting a rolled pattern or an outlined shape changed it and added two History steps. One helper, `uiFire` (01-launch-and-version.js), fires the event while `WBS.uiLoad` is held; the handlers in 67, 82, 77 and 69 leave the element alone meanwhile.
 - Tests: tests/bug-test-2-79.spec.js (selecting every element of eight Looks changes neither the document nor History); the pattern, shape, effect, map-to-shape and arrangement specs (59 pass). check:style, check:platform. Not run: full suite, WebKit, CI, `npm run perf` (no drawing change).

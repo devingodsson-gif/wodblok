@@ -115,9 +115,10 @@ function init32(){lyCmds();
  host.addEventListener('dragend',()=>{lyDrag=null;lyClr()});
  $('lygrp').onclick=e=>{e.stopPropagation();lyGroup()};
  $('lyung').onclick=e=>{e.stopPropagation();lyUngroup()};
- cmdRegister({id:'element.group',label:'Group the selected elements',shortcut:'Mod+G',elId:'lygrp',enabled:()=>!$('lygrp').disabled,run:()=>lyGroup()});
- cmdRegister({id:'element.ungroup',label:'Ungroup',shortcut:'Mod+Shift+G',elId:'lyung',enabled:()=>!$('lyung').disabled,run:()=>lyUngroup()});
- document.addEventListener('keydown',e=>{const t=e.target;if(t.matches&&t.matches('input,select,textarea'))return;if((e.ctrlKey||e.metaKey)&&!e.altKey&&e.key.toLowerCase()=='g'){e.preventDefault();if(e.shiftKey){if(!$('lyung').disabled)lyUngroup()}else if(!$('lygrp').disabled)lyGroup()}});   // Photoshop's: Ctrl+G groups, Ctrl+Shift+G ungroups (2.27.0; it was Shift+G)
+ // 2.78.3 (bug test B6): Group and Ungroup ask the selection itself, not their buttons, which catch up only on the next redraw (right after Select all Group read as off)
+ cmdRegister({id:'element.group',label:'Group the selected elements',shortcut:'Mod+G',elId:'lygrp',enabled:()=>lySel().length>=2,run:()=>lyGroup()});
+ cmdRegister({id:'element.ungroup',label:'Ungroup',shortcut:'Mod+Shift+G',elId:'lyung',enabled:()=>lySel().some(lyIsG),run:()=>lyUngroup()});
+ document.addEventListener('keydown',e=>{const t=e.target;if(t.matches&&t.matches('input,select,textarea'))return;if((e.ctrlKey||e.metaKey)&&!e.altKey&&e.key.toLowerCase()=='g'){e.preventDefault();if(e.shiftKey){if(lySel().some(lyIsG))lyUngroup()}else if(lySel().length>=2)lyGroup()}});   // Photoshop's: Ctrl+G groups, Ctrl+Shift+G ungroups (2.27.0; it was Shift+G)
  $('ly_bl').onchange=()=>{const v=$('ly_bl').value;lySel().forEach(q=>{if(v)q.bl=v;else delete q.bl});lyDone()};
  $('ly_op').addEventListener('input',()=>{if(lySync||WBS.fpSyncing)return;const v=+$('ly_op').value,s=lySel();if(!s.length)return;let ch=false;s.forEach(q=>{const o=q.op==null?100:q.op;if(o!==v){ch=true;if(v<100)q.op=v;else delete q.op}});if(ch){store();upd()}});
 }
