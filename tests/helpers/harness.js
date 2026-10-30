@@ -281,7 +281,8 @@ async function addKind(page, k) {
   await page.click(`.elk[data-k="${k}"] [data-add]`);
   await settle(page);
   // 2.26.0: Add motif with nothing chosen yet opens the library instead of placing the first shape; this picks one there
-  if (k === 'motif' && !page.__wbMotifPicked) { await pickShape(page); page.__wbMotifPicked = true; }   // later Adds use the shape picked here
+  // 2.76.8: in a stamp's tab Add motif has already put a rectangle in, so nothing is picked there
+  if (k === 'motif' && !page.__wbMotifPicked && (await page.evaluate(() => window.__wbTest.unlockedStamp())) == null) { await pickShape(page); page.__wbMotifPicked = true; }   // later Adds use the shape picked here
   await placeArmed(page, k);
 }
 async function placeArmed(page, k) {

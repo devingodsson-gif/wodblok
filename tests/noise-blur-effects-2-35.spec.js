@@ -125,7 +125,7 @@ test('text and a pattern take the new effects too', async ({ page }) => {
   const n0 = await page.evaluate(() => document.querySelectorAll('#art filter feGaussianBlur').length);
   await addFx(page, 'pattern', 'Blur', 'Gaussian Blur');
   d = await st(page);
-  expect((d.els.filter(q => q.k === 'pattern').pop().fx || []).map(e => e.k)).toEqual(['blur']);
+  expect((d.els.find(q => q.k === 'pattern').fx || []).map(e => e.k)).toEqual(['blur']);   // 2.76.8: the newest Pattern is the first, just above the Background
   expect(await page.evaluate(() => document.querySelectorAll('#art filter feGaussianBlur').length)).toBeGreaterThan(n0);
   expect(errors).toEqual([]);
 });

@@ -19,6 +19,7 @@ test('no tool starts as a floating window (the Shape editor docks along the bott
     expect(tools.length).toBeGreaterThan(6);
     for (const p of tools) {
       if (p === 'mlist' && mode === 'pattern') continue;   // empty until a stamp is unlocked
+      if (p === 'xrec') continue;   // 2.76.1: Export opens floating in the middle of the window until it has a place of its own
       await openPanel(page, p);
       await expect(page.locator(`.dk-l .wg:has(section.pn[data-p="${p}"]:not([hidden]))`), `${mode}: ${p}`).toHaveCount(1);
     }

@@ -247,9 +247,10 @@ WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbZoomTo=s=>{const r=$('boardP').get
 $('zi').onclick=()=>zoomMid(1.25);$('zo').onclick=()=>zoomMid(1/1.25);$('zl').onclick=()=>{z=0;applyZ()};
 // 2.76.11 (2.76 review: "Ctrl+wheel zooms in small steps"): Ctrl/Cmd+wheel goes up or down one clear zoom level at a time (Photoshop's ladder); a trackpad's small
 // deltas add up to one step, a mouse notch is one step
+// 2.77.0: a step goes to the next level at least 5% away, so a fit near a level (95% next to 100%) still moves visibly
 const ZLAD=[.05,.1,.125,.167,.25,.333,.5,.667,1,1.5,2,3,4,6,8];let zAcc=0,zAt=0;
 $('boardP').addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();const d=e.deltaY*(e.deltaMode==1?33:e.deltaMode==2?400:1),now=performance.now();if(now-zAt>400)zAcc=0;zAt=now;zAcc+=d;if(Math.abs(zAcc)<40)return;
- const up=zAcc<0;zAcc=0;const s=z||fitS,n=up?ZLAD.find(v=>v>s*1.001):[...ZLAD].reverse().find(v=>v<s*.999);if(n)zoomAt(n,e.clientX,e.clientY)},{passive:false});
+ const up=zAcc<0;zAcc=0;const s=z||fitS,n=up?ZLAD.find(v=>v>s*1.05):[...ZLAD].reverse().find(v=>v<s/1.05);if(n)zoomAt(n,e.clientX,e.clientY)},{passive:false});
 try{new ResizeObserver(()=>applyZ()).observe($('boardP'))}catch(e){window.addEventListener('resize',applyZ)}
 new MutationObserver(()=>applyZ()).observe($('art'),{attributes:true,attributeFilter:['viewBox']});
 

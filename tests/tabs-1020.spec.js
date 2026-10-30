@@ -2,16 +2,16 @@
 const { test, expect } = require('@playwright/test');
 const { openApp, openPanel, settle } = require('./helpers/harness');
 
-test('with many tabs open the newest tab is fully visible and the strip shows it can scroll back', async ({ page }) => {
+test('with many tabs open the newest tab is fully visible; the strip folds the rest into More tabs instead of scrolling (2.76.8)', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   for (const p of ['lyrs', 'rand', 'hist', 'colors', 'canvas']) await openPanel(page, p);
   await settle(page);
   const r = await page.evaluate(() => {
     const t = document.querySelector('.wh .wt'), a = t.querySelector('.wtab.on'), tr = t.getBoundingClientRect(), ar = a.getBoundingClientRect();
-    return { over: t.scrollWidth > t.clientWidth, inView: ar.left >= tr.left - 1 && ar.right <= tr.right + 1, left: t.parentElement.classList.contains('ovl') };
+    return { over: t.scrollWidth > t.clientWidth + 1, inView: ar.left >= tr.left - 1 && ar.right <= tr.right + 1, more: !!t.closest('.wh').querySelector('[data-act="tmore"]:not([hidden])') };
   });
-  expect(r.over).toBe(true);
+  expect(r.over).toBe(false);
   expect(r.inView).toBe(true);
-  expect(r.left).toBe(true);
+  expect(r.more).toBe(true);
   expect(errors).toEqual([]);
 });

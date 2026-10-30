@@ -5,9 +5,9 @@ let sid = 1;   // 2.30.0: the stamp the roll put under the pointer
 const items = async page => JSON.parse(await H.getState(page)).tiles.find(t => t.id === sid).items;
 
 async function addTextInTab(page) {
-  const o = await H.openApp(page, { seed: 4, pattern: false });
-  await page.click('#rzdo'); await H.settle(page, { max: 60000 });
-  const p = await H.stampInstance(page, 1); const c = await H.canvasToClient(page, p.cx, p.cy);
+  // 2.77.0: a roll makes a Look since 2.76.3 (often with no stamps), so the test's own Pattern and its first stamp are used instead
+  const o = await H.openApp(page, { seed: 4 });
+  const p = await H.stampInstance(page, JSON.parse(await H.getState(page)).tiles[0].id); const c = await H.canvasToClient(page, p.cx, p.cy);
   await page.mouse.dblclick(c.x, c.y); await H.settle(page);
   sid = await page.evaluate(() => window.__wbTest.unlockedStamp());
   const n0 = (await items(page)).length;

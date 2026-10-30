@@ -146,7 +146,7 @@ test('a stamp saved to the stamp library carries the picture of an imported text
   await p1.evaluate(j => window.__wbTest.apply(j), JSON.stringify(s)); await settle(p1);
   await openPanel(p1, 'stmp'); await settle(p1);
   await p1.fill('#slname', 'Textured'); await p1.click('#slsave');
-  await expect(p1.locator('#slgrid button[data-sl]')).toHaveCount(1);
+  await expect(p1.locator('#slgrid button[data-sl]:not([data-sl^="bs:"])')).toHaveCount(1);
   await p1.evaluate(() => { window.__wbDownloads.length = 0; });
   await stampMenu(p1, 'Save as file');
   await p1.waitForFunction(() => window.__wbDownloads.length > 0);
@@ -158,8 +158,8 @@ test('a stamp saved to the stamp library carries the picture of an imported text
   const b = await openApp(p2, { seed: 4, pattern: false });
   await openPanel(p2, 'stmp');
   await p2.setInputFiles('#slimpf', file); await settle(p2);
-  await expect(p2.locator('#slgrid button[data-sl]')).toHaveCount(1);
-  await p2.locator('#slgrid button[data-sl]').first().click(); await settle(p2);
+  await expect(p2.locator('#slgrid button[data-sl]:not([data-sl^="bs:"])')).toHaveCount(1);
+  await p2.locator('#slgrid button[data-sl]:not([data-sl^="bs:"])').first().click(); await settle(p2);
   const d2 = JSON.parse(await getState(p2)), t2 = d2.texLib.find(x => x.t === L.t);
   expect(t2).toBeTruthy();
   expect(d2.tiles.some(t => (t.tu || []).some(u => u.x === t2.id))).toBe(true);

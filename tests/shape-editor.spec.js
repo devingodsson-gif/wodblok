@@ -23,6 +23,7 @@ test('the Edit group sits in the Shape panel, is live when a shape is placed and
 
 test('Auto-open switches off and on', async ({ page }) => {
   const { errors } = await openApp(page);
+  await unlockStamp(page);   // 2.76.8: with no stamp open the Shape panel shows the Library only; the Edit group belongs to the stamp tab
   await openPanel(page, 'motifs');
   await expect(page.locator('#seauto')).toHaveAttribute('aria-pressed', 'true');
   await page.click('#seauto');

@@ -27,6 +27,6 @@ test('Randomize and Clear leave one short message', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 3 });
   await openPanel(page, 'rand');
   await page.click('#rzdo'); await settle(page, { max: 60000 });
-  await expect(page.locator('#pmsg')).toHaveText('Randomized.');
+  await expect(page.locator('#pmsg')).toHaveText(/^Randomized: [^.]+\.$/);   // 2.76.3: the message names the Look
   expect(errors).toEqual([]);
 });

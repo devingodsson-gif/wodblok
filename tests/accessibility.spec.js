@@ -17,8 +17,8 @@ for (const theme of ['dark', 'light']) {
 
 test('a slider thumb and a number field show a clear focus ring from the keyboard', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 1 });
-  await openPanel(page, 'rand');
-  await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="rand"] input[type=range]')].find(i => i.getBoundingClientRect().height > 0); e.setAttribute('data-a11y', '1'); });
+  await openPanel(page, 'layers');   // 2.77.0: the Randomize panel shows no slider since 2.76.3; the Pattern panel has them
+  await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="layers"] input[type=range]')].find(i => i.getBoundingClientRect().height > 0); e.setAttribute('data-a11y', '1'); });
   const thumb = async () => {
     const bb = await page.locator('[data-a11y]').boundingBox();
     return page.screenshot({ clip: { x: bb.x + bb.width / 2 - 24, y: bb.y - 8, width: 48, height: bb.height + 16 } });
@@ -48,8 +48,8 @@ test('a slider thumb and a number field show a clear focus ring from the keyboar
 
 test('slider rows are at least 24 px tall', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 1 });
-  await openPanel(page, 'rand');
-  await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="rand"] input[type=range]')].find(i => i.getBoundingClientRect().height > 0); e.setAttribute('data-a11y', '1'); });
+  await openPanel(page, 'layers');   // 2.77.0: the Randomize panel shows no slider since 2.76.3; the Pattern panel has them
+  await page.evaluate(() => { const e = [...document.querySelectorAll('section.pn[data-p="layers"] input[type=range]')].find(i => i.getBoundingClientRect().height > 0); e.setAttribute('data-a11y', '1'); });
   const h = await page.evaluate(() => document.querySelector('[data-a11y]').getBoundingClientRect().height);
   expect(h).toBeGreaterThanOrEqual(24);
   expect(errors).toEqual([]);

@@ -77,7 +77,7 @@ test('a pattern\'s effects apply to every placement', async ({ page }) => {
   await settle(page);
   await expect(page.locator('.fxg[data-fxk="pattern"]')).toBeVisible();
   await addEffect(page, 'pattern', 'Pressure offset');
-  const p = (await st(page)).els.filter(q => q.k === 'pattern').pop();
+  const p = (await st(page)).els.find(q => q.k === 'pattern');   // 2.76.8: a new Pattern goes just above the Background, so the newest is the first
   expect(p.fx).toHaveLength(1);
   // the add menu offers only what works on a pattern
   await page.locator('.fxg[data-fxk="pattern"] .fxadd').scrollIntoViewIfNeeded();
