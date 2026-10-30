@@ -84,7 +84,7 @@ const COMMANDS = [
 // 2.76.11: words command search also finds a command by (a label match ranks first)
 const KWS = {'panel.canvas': 'canvas size format aspect ratio width height dpi resolution repeat tile book cover', 'panel.text': 'font type typeface lettering words',
   'panel.motifs': 'shape shapes library', 'panel.colors': 'colour color tray palette ink paper', 'panel.layers': 'pattern repeat tiling', 'panel.lyrs': 'elements layers list',
-  'panel.pgrid': 'grid snap', 'panel.hist': 'history undo steps', 'panel.rand': 'random roll looks', 'view.theme': 'dark light theme', 'file.export': 'save image png jpg tiff svg pdf',
+  'panel.pgrid': 'grid snap', 'panel.hist': 'history steps', 'panel.rand': 'random roll looks', 'view.theme': 'dark light theme', 'file.export': 'save image png jpg tiff svg pdf',
   'view.grid': 'grid', 'view.fit': 'zoom fit', 'view.actualSize': 'zoom 100', 'stamp.new': 'stamp make', 'file.save': 'save', 'export.pdf': 'print pdf'};
 function init37() {
   for (const [id, label, elId, shortcut, kind] of COMMANDS) {
