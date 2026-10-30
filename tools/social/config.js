@@ -22,9 +22,10 @@ module.exports = {
 
   // How each design is made. Each image is one Randomize roll on a square canvas.
   roll: {
-    // Randomize switches, 0 (off) to 100 (always). Keys: stamps text layout frame shape size free gr masks tx pr look.
+    // Randomize switches (the Randomize panel, 2.76.3): above 0 is on. Keys: bg (Background) pat (Pattern) focal (Focal point) text frame efx (Effects) fin (Finish).
     // Left out or 0 means off. Colours are set by the `colours` line below, not here.
-    features: { stamps: 100, layout: 100 },
+    features: { bg: 100, pat: 100 },
+    look: 'repeat',                  // the Look: any, repeat, poster, plate, badge, specimen, modern, sun, quilt
     // Plain colour sets (hex), paper first, then ink, then accents. Every design uses exactly one set. Add your own; 2 to 4 colours each.
     colours: 'app',                  // 'app' = the app's own Randomize colours (includes the Wada sets); 'plain' = one of the plain palettes below
     palettes: [   // used only when colours is 'plain'

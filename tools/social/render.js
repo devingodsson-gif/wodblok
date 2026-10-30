@@ -53,11 +53,13 @@ async function setAspectSquare(page) {
   await settle(page, { max: 60000 });
 }
 
-async function rollWithFeatures(page, features, appColours) {
+// 2.76.3: the panel is a Look and switches; each switch is set on or off, colours by roll.colours, the canvas size never (the canvas stays square)
+async function rollWithFeatures(page, features, appColours, look) {
   await openPanel(page, 'rand');
-  await page.click('#rznone');                                   // everything off, colours included
-  for (const [k, v] of Object.entries(features)) if (v > 0) await page.locator(`[data-ft="${k}"]`).fill(String(v));
-  if (appColours) await page.locator('[data-ft="col"]').check();     // the app's own colour roll
+  await page.evaluate(([f, col, look]) => {
+    document.querySelectorAll('[data-rz]').forEach(b => { const k = b.dataset.rz, on = k === 'col' ? col : k === 'size' ? false : (f[k] || 0) > 0; if (b.checked !== on) { b.checked = on; b.dispatchEvent(new Event('change', { bubbles: true })); } });
+    const s = document.getElementById('rzlook'); if (s && s.value !== look) { s.value = look; s.dispatchEvent(new Event('change', { bubbles: true })); }
+  }, [features, !!appColours, look || 'any']);
   await page.click('#rzdo');
   await settle(page, { max: 90000 });
 }
@@ -96,7 +98,7 @@ async function renderOne(browser, cfg, seed, size) {
   try {
     const { errors } = await openApp(page, { seed, url: 'file://' + APP });
     await setAspectSquare(page);
-    await rollWithFeatures(page, cfg.roll.features, cfg.roll.colours === 'app');
+    await rollWithFeatures(page, cfg.roll.features, cfg.roll.colours === 'app', cfg.roll.look);
     const roll = JSON.parse(await page.evaluate(() => window.__wbTest.state()));
     const why = checkRoll(cfg, roll);
     if (why) return { ok: false, seed, why };

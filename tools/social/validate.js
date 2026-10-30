@@ -1,7 +1,8 @@
 // Checks tools/social/config.js. No dependencies, so the hourly schedule check can use it without installing anything.
 const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const EVERY = ['day', 'week', 'fortnight'];
-const FEATURES = ['stamps', 'text', 'layout', 'frame', 'shape', 'size', 'free', 'gr', 'masks', 'tx', 'pr', 'look'];
+const FEATURES = ['bg', 'pat', 'focal', 'text', 'frame', 'efx', 'fin'];   // the Randomize panel's switches (2.76.3); colours are roll.colours, the canvas stays square
+const LOOKS = ['any', 'repeat', 'poster', 'plate', 'badge', 'specimen', 'modern', 'sun', 'quilt'];
 const LAYOUTS = { auto: '', grid: 'square', brick: 'brick', halfdrop: 'drop', hex: 'honey' };   // name in this file -> the layer's grid setting in the app
 const HEX = /^#[0-9a-f]{6}$/i;
 
@@ -40,6 +41,7 @@ function validate(cfg, { needEmail = false } = {}) {
     if (v > 0) on++;
   }
   if (!on) fail('roll.features switches nothing on, so there would be nothing to roll');
+  if (r.look != null && !LOOKS.includes(r.look)) fail(`roll.look must be one of ${LOOKS.join(' ')} (got ${JSON.stringify(r.look)})`);
   if (!['app', 'plain'].includes(r.colours)) fail(`roll.colours must be "app" or "plain" (got ${JSON.stringify(r.colours)})`);
   if (!Array.isArray(r.palettes) || !r.palettes.length) fail('roll.palettes needs at least one palette');
   r.palettes.forEach((p, i) => {
