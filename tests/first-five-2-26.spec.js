@@ -43,7 +43,7 @@ test('the Text bar button arms text at once; V takes the tool away (2.54.0: ther
   expect(errors).toEqual([]);
 });
 
-test('Add motif with nothing chosen opens the library and places nothing; a pick arms it; the next Add motif uses that pick', async ({ page }) => {
+test('Add motif with nothing chosen arms a rectangle (2.76.8); a pick arms that; the next Add motif uses that pick', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4 });
   await H.noPattern(page);
   await page.click('#elb [data-k="motif"]'); await H.settle(page);
@@ -51,17 +51,17 @@ test('Add motif with nothing chosen opens the library and places nothing; a pick
   await expect(page.locator('#lib')).toBeVisible();
   const b = await page.locator('#art').boundingBox();
   await page.mouse.click(b.x + b.width * 0.5, b.y + b.height * 0.5); await H.settle(page);
-  expect((await els(page, 'motif')).length, 'no shape was chosen, so none is placed').toBe(0);
-  await H.pickShape(page);
+  expect((await els(page, 'motif')).length, 'nothing was chosen, so a rectangle is placed (2.26.0 placed nothing)').toBe(1);
+  await page.click('#elb [data-k="motif"]'); await H.pickShape(page);
   await page.mouse.click(b.x + b.width * 0.3, b.y + b.height * 0.3); await H.settle(page);
-  const m = (await els(page, 'motif'))[0];
+  const m = (await els(page, 'motif'))[1];
   expect(m, 'the picked shape is placed').toBeTruthy();
   await page.keyboard.press('v'); await H.settle(page);
   await page.click('#elb [data-k="motif"]'); await H.settle(page);
   await page.mouse.click(b.x + b.width * 0.7, b.y + b.height * 0.7); await H.settle(page);
   const all = await els(page, 'motif');
-  expect(all.length).toBe(2);
-  expect(all[1].m, 'the same shape').toBe(m.m);
+  expect(all.length).toBe(3);
+  expect(all[2].m, 'the same shape').toBe(m.m);
   expect(errors).toEqual([]);
 });
 
@@ -79,10 +79,11 @@ test('selecting a motif on the canvas opens the Motif panel (not Shape); its Ele
   await expect(page.locator('section.pn[data-p="mlist"]')).toBeHidden();
   await expect(page.locator('section.pn[data-p="motifs"] #lfree')).toBeVisible();   // the Element group
   await expect(page.locator('#sel')).toHaveClass(/mtel/);
-  await expect(page.locator('#ssx')).toBeVisible(); await expect(page.locator('#ssz')).toBeHidden();
+  // 2.76.8: Width and Height sit under Size in the Element group; the Edit group's own copies are hidden
+  await expect(page.locator('#lfpsw')).toBeVisible(); await expect(page.locator('#ssx')).toBeHidden(); await expect(page.locator('#ssz')).toBeHidden();
   const q0 = (await els(page, 'motif'))[0];
-  await page.locator('#ssx').fill('150'); await H.settle(page);
-  await page.locator('#ssy').fill('60'); await H.settle(page);
+  await page.locator('#lfpsw').fill('150'); await H.settle(page);
+  await page.locator('#lfpsh').fill('60'); await H.settle(page);
   const q1 = (await els(page, 'motif'))[0];
   expect(q1.wx, 'Width').toBeCloseTo(1.5, 2); expect(q1.wy, 'Height').toBeCloseTo(0.6, 2);
   expect(q1.x).toBe(q0.x);
@@ -101,18 +102,21 @@ test('the template picker has starting points: a stamped pattern and a framed bo
   expect(errors).toEqual([]);
 });
 
-test('a panel with more tabs than fit gets arrows at the ends that have more behind them', async ({ page }) => {
+test('a panel with more tabs than fit folds the rest into More tabs (2.76.8; it had arrows), the open tab always showing', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 700 });
   const { errors } = await H.openApp(page, { seed: 4, workspaces: true });
   for (const pn of ['hist', 'xrec', 'rand', 'canvas', 'colors', 'pgrid']) { const b = page.locator(`.rail [data-pn="${pn}"]:not([hidden])`); if (await b.count()) { await b.dispatchEvent('click'); await H.settle(page); } }
-  // 2.55.0: the tools open on the left, so the group that collects them is the one holding the last one opened
   const grp = page.locator('.wg:has(section.pn[data-p="pgrid"])'), wh = grp.locator('.wh').first(), wt = grp.locator('.wt').first();
-  await expect(wh).toHaveClass(/ovl/);                                  // the open tab is the last one, in view; the earlier ones are behind the left edge
-  await expect(wh.locator('.wta.l')).toBeVisible();
-  const x0 = await wt.evaluate(t => t.scrollLeft);
-  await wh.locator('.wta.l').click();
-  await expect.poll(() => wt.evaluate(t => t.scrollLeft)).toBeLessThan(x0);
-  await expect(wh.locator('.wta.r')).toBeVisible();                     // and now there is more behind the right edge
+  await expect(wh.locator('.wtab.on')).toBeVisible();
+  expect(await wt.evaluate(t => t.scrollWidth <= t.clientWidth + 1)).toBe(true);   // nothing behind an edge
+  await expect(wh.locator('.wta.l')).toBeHidden();
+  const more = wh.locator('[data-act="tmore"]');
+  await expect(more).toBeVisible();
+  const hidden = await wh.locator('.wtab[hidden]').count();
+  await more.click();
+  await expect(page.locator('.rowm .ddi')).toHaveCount(hidden);
+  await page.locator('.rowm .ddi').first().click(); await H.settle(page);
+  await expect(wh.locator('.wtab.on')).toBeVisible();
   expect(errors).toEqual([]);
 });
 

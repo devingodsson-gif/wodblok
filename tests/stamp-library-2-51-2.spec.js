@@ -15,7 +15,7 @@ async function makeFolder(page, name) {
   await page.click('[data-slnew]'); await page.fill(`${T} .fform input`, name); await page.click(`${T} [data-fok]`);
   await expect(page.locator(`${T} .lfr[data-k="${name}"]`)).toHaveCount(1);
 }
-const tiles = page => page.locator(`${T} button[data-sl]`);
+const tiles = page => page.locator(`${T} button[data-sl]:not([data-sl^="bs:"])`);   // 2.76.8: the Starting points stamps are not counted
 
 test('stamps sit in Yours; folders, select mode, Move to and Take out keep each stamp\'s folder', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });

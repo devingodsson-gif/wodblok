@@ -7,7 +7,7 @@ test('Find a stamp filters the saved stamps by name and clears back', async ({ p
   for (const n of ['Lion in a ring', 'Red fish']) {
     await page.fill('#slname', n); await page.click('#slsave'); await settle(page);
   }
-  const cards = () => page.locator('#slgrid button[data-sl]').count();
+  const cards = () => page.locator('#slgrid button[data-sl]:not([data-sl^="bs:"])').count();
   expect(await cards()).toBe(2);
   await page.fill('#slq', 'lion'); await settle(page);
   expect(await cards()).toBe(1);

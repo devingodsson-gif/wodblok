@@ -15,8 +15,9 @@ test('New pattern is empty: each point of its grid shows as an arrow until a sou
   await settle(page);
   const p = (await pats(page))[0];
   expect(p).toMatchObject({ k: 'pattern', lay: 'tile', ts: 'auto', ds: 'cycle', cn: 5, rn: 7 });   // 2.57.0: a new pattern tiles (cn, rn stay for Radial and the others)
-  expect(p.src).toHaveLength(0);
+  expect(p.src.map(x => x.k)).toEqual(['stamp']);   // 2.76.8: a new Pattern takes the project's only stamp
   await expect(page.locator('#peed')).toBeVisible();
+  await page.click('#pesrc [data-sx="0"]'); await settle(page);   // without its source it is empty
   await expect(page.locator('#pelist .mr')).toHaveCount(1);
   expect(await drawn(page, p.u)).toBe(0);
   const arrows = await page.locator('#fpov [data-pa]').count();
@@ -43,6 +44,7 @@ test('arrows turn with Rotate and lie along the edges of a Frame', async ({ page
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await page.click('#elb [data-k="pattern"]'); await addKind(page, 'pattern'); await settle(page);
+  await openPanel(page, 'layers'); await page.click('#pesrc [data-sx="0"]'); await settle(page);   // 2.76.8: drop the only stamp it took, to see its arrows
   const rots = () => page.$$eval('#fpov [data-pa]', a => a.map(x => Math.round(+/rotate\((-?[\d.]+)\)/.exec(x.getAttribute('transform'))[1])));
   expect(new Set(await rots())).toEqual(new Set([0]));
   await page.locator('#pert').fill('30'); await settle(page);
@@ -57,8 +59,7 @@ test('Radial takes columns and rows; a pattern with no source draws nothing', as
   const { errors } = await openApp(page, { seed: 4 });
   await noPattern(page);
   await openPanel(page, 'layers');
-  await page.click('#elb [data-k="pattern"]'); await addKind(page, 'pattern');
-  await patSource(page);
+  await page.click('#elb [data-k="pattern"]'); await addKind(page, 'pattern'); await settle(page);   // 2.76.8: it takes the only stamp as its source
   const u = (await pats(page))[0].u;
   expect(await drawn(page, u)).toBeGreaterThan(0);
   await page.click('#pelay [data-l="radial"]');   // 2.57.0: columns and rows belong to the free layouts
