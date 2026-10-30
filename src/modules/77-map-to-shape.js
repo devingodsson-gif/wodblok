@@ -1,4 +1,4 @@
-import {$,WBS,WBX} from './01-launch-and-version.js';
+import {$,WBS,WBX,uiFire} from './01-launch-and-version.js';
 import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -58,8 +58,8 @@ function mapSync(){Object.values(GR).forEach(G=>{const g=$(G.g);if(!g)return;con
   if(sel.dataset.k!=key){sel.dataset.k=key;sel.innerHTML='<option value="">Free</option>'+sh.map((q,i)=>`<option value="${String(q.u).replace(/"/g,'')}">${mapName(q,i)}</option>`).join('')}
   const v=S?String(S.u):'';if(sel.value!==v)sel.value=v;
   const mm=S?p.mm:'';$(G.m).hidden=!S;$(G.m).querySelectorAll('[data-m]').forEach(b=>{const on=b.dataset.m==mm;if(b.getAttribute('aria-pressed')!=String(on)){b.setAttribute('aria-pressed',String(on));b.classList.toggle('on',on)}});
-  const so=$(G.or);if(so.hidden!==!(S&&mm=='on'))so.hidden=!(S&&mm=='on');if(S&&mm=='on'){const o=$(G.o);if(+o.value!==(+p.mo||0)){o.value=+p.mo||0;o.dispatchEvent(new Event('input',{bubbles:true}))}}
-  if(G.c){const cr=$(G.cr);if(cr.hidden!==!(S&&mm=='on'))cr.hidden=!(S&&mm=='on');if(S&&mm=='on'){const c=$(G.c);if(+c.value!==(+p.mc||24)){c.value=+p.mc||24;c.dispatchEvent(new Event('input',{bubbles:true}))}}}
+  const so=$(G.or);if(so.hidden!==!(S&&mm=='on'))so.hidden=!(S&&mm=='on');if(S&&mm=='on'){const o=$(G.o);if(+o.value!==(+p.mo||0)){o.value=+p.mo||0;uiFire(o)}}
+  if(G.c){const cr=$(G.cr);if(cr.hidden!==!(S&&mm=='on'))cr.hidden=!(S&&mm=='on');if(S&&mm=='on'){const c=$(G.c);if(+c.value!==(+p.mc||24)){c.value=+p.mc||24;uiFire(c)}}}
  });
  // a Text inside a Shape follows it: lay out again when the Shape or the text changed
  const L=fpL();if(!L)return;(L.pl||[]).forEach(p=>{if(p.mm!='in'||!p.tx)return;const S=mapShape(p);if(!S)return;const k=fitKey(p,S);if(DONE.get(String(p.u))!==k){DONE.set(String(p.u),k);mapFit(p,S,k)}})}
@@ -69,8 +69,8 @@ function init77(){
   const set=(f)=>{const p=G.cur();if(!p)return;f(p);mapCh();mapSync()};
   sel.onchange=()=>set(p=>{if(!sel.value){delete p.mp;delete p.mm;DONE.delete(String(p.u))}else{p.mp=sel.value;if(!p.mm)p.mm='on'}});
   $(G.m).onclick=e=>{const b=e.target.closest('[data-m]');if(b)set(p=>{p.mm=b.dataset.m;DONE.delete(String(p.u))})};
-  $(G.o).addEventListener('input',()=>{const p=G.cur();if(!p)return;const v=+$(G.o).value;if((+p.mo||0)===v)return;p.mo=v;store();upd()});
-  if(G.c)$(G.c).addEventListener('input',()=>{const p=G.cur();if(!p)return;const v=+$(G.c).value;if((+p.mc||24)===v)return;p.mc=v;store();upd()});
+  $(G.o).addEventListener('input',()=>{if(WBS.uiLoad)return;const p=G.cur();if(!p)return;const v=+$(G.o).value;if((+p.mo||0)===v)return;p.mo=v;store();upd()});
+  if(G.c)$(G.c).addEventListener('input',()=>{if(WBS.uiLoad)return;const p=G.cur();if(!p)return;const v=+$(G.c).value;if((+p.mc||24)===v)return;p.mc=v;store();upd()});
   [G.o,G.c].forEach(id=>{if(id)$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()})})});
  WBX.wbMapSync=mapSync}
 export {init77,mapAt,mapBox,mapPts,mapShape,mapText,mapSync};

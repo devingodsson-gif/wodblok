@@ -1,5 +1,5 @@
 import {ICN} from './00-icons.js';
-import {$,WBS,WBX} from './01-launch-and-version.js';
+import {$,WBS,WBX,uiFire} from './01-launch-and-version.js';
 import {rng,tileOn} from './04-canvas-and-stamp-outlines.js';
 import {rowMenu} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
@@ -104,16 +104,16 @@ const host=gQ(g,'.fxl'),host2=gQ(g,'.fxl2');if(host.dataset.k!==key){host.datase
 const row=e=>{const d=fxDef(e.k),on=e.on!==false,op=sel&&e.u==sel.u;return`<div class="fxr${op?' on':''}${on?'':' off'}" data-fu="${e.u}" draggable="true"><button type="button" class="ib" data-fon aria-pressed="${on}" aria-label="${on?'Hide':'Show'} this effect">${on?FXI.eye:FXI.off}</button><span class="fxc${op?' open':''}">${FXI.car}</span><b>${fxHx(d?d.label:e.k)}</b><button type="button" class="ib" data-fmore aria-haspopup="menu" aria-label="More">${FXI.more}</button></div>`};
 const si=sel?list.indexOf(sel):list.length-1;host.innerHTML=list.slice(0,si+1).map(row).join('');host2.innerHTML=list.slice(si+1).map(row).join('');}
 fxPaneOf(g).querySelectorAll('.fxs').forEach(s=>{const on=!!sel&&s.dataset.e==sel.k;if(s.hidden===on)s.hidden=!on});
-if(sel&&sel.k=='texture'){const L=txLib(sel.x)||{t:Object.keys(TXN)[0],a:40,sc:100,az:225},sm=gQ(g,'.fxsm'),set=(c,v)=>{const el=gQ(g,c);if(+el.value!==+v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxsa',+L.a);set('.fxsc',+L.sc);set('.fxsr',+L.rot||0);set('.fxsz',+L.az);gQ(g,'.fxsfh').checked=!!L.fh;gQ(g,'.fxsfv').checked=!!L.fv;if(sm.value!==(sel.md||'wear'))sm.value=sel.md||'wear';
+if(sel&&sel.k=='texture'){const L=txLib(sel.x)||{t:Object.keys(TXN)[0],a:40,sc:100,az:225},sm=gQ(g,'.fxsm'),set=(c,v)=>{const el=gQ(g,c);if(+el.value!==+v){el.value=v;uiFire(el)}};set('.fxsa',+L.a);set('.fxsc',+L.sc);set('.fxsr',+L.rot||0);set('.fxsz',+L.az);gQ(g,'.fxsfh').checked=!!L.fh;gQ(g,'.fxsfv').checked=!!L.fv;if(sm.value!==(sel.md||'wear'))sm.value=sel.md||'wear';
  // 2.50.0: the texture is picked from the texture library; 2.55.0 (creating and editing, docs/panel-modes-plan.md): an effect is always being edited, so its texture
  // shows as a row (thumbnail, name, Replace) and the library opens from Replace in a popover; the library keeps its place on the group while it is moved
  {const tl=g._fxtl||(g._fxtl=gQ(g,'.fxtl')),row=gQ(g,'.fxtr');tlShow(tl,L.t,id=>{if(WBX.wbFxTexSet)WBX.wbFxTexSet(kind,'t',id);pmClose()});
   const th=txThumb(L.t),rk=L.t+(th?'+':'');if(row&&row.dataset.key!==rk){row.dataset.key=rk;const e=txSrc(L.t);row.querySelector('.rpth').innerHTML=th?`<img src="${th}" alt="" draggable="false">`:'';row.querySelector('.rpn').textContent=e?e.n:'Texture'}
   if(row&&!row.dataset.w){row.dataset.w=1;row.querySelector('.rpgo').onclick=ev=>{ev.stopPropagation();const b=ev.currentTarget;if(pmIsOpen(b)){pmClose();return}tl.hidden=false;pmPop(b,tl,'')}}}}
-if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=gQ(g,c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxjp',+sel.pos||0);set('.fxjr2',+sel.rot||0);set('.fxjz',+sel.sz||0);{const t=gQ(g,'.fxjs'),v=String(sel.rs==90||sel.rs==180?sel.rs:0);if(t.value!==v)t.value=v;gQ(g,'.fxjr2').closest('.ctl').hidden=v!='0'}gQ(g,'.fxjh').checked=!!sel.fh;gQ(g,'.fxjv').checked=!!sel.fv}
-if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=gQ(g,'.fxg_'+k),v=+sel[k]||0;if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}});
+if(sel&&sel.k=='jitter'){const set=(c,v)=>{const el=gQ(g,c);if(+el.value!==v){el.value=v;uiFire(el)}};set('.fxjp',+sel.pos||0);set('.fxjr2',+sel.rot||0);set('.fxjz',+sel.sz||0);{const t=gQ(g,'.fxjs'),v=String(sel.rs==90||sel.rs==180?sel.rs:0);if(t.value!==v)t.value=v;gQ(g,'.fxjr2').closest('.ctl').hidden=v!='0'}gQ(g,'.fxjh').checked=!!sel.fh;gQ(g,'.fxjv').checked=!!sel.fv}
+if(sel&&sel.k=='grade')GRL.forEach(([k])=>{const el=gQ(g,'.fxg_'+k),v=+sel[k]||0;if(+el.value!==v){el.value=v;uiFire(el)}});
 if(sel){const d=fxDef(sel.k),pane=d&&d.sync&&gQ(g,`.fxs[data-e="${sel.k}"]`);if(pane)d.sync(pane,sel)}
-if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=gQ(g,c);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};set('.fxpp',+sel.pst||0);set('.fxpf',+sel.pfl||0)}})}
+if(sel&&sel.k=='pressure'){const set=(c,v)=>{const el=gQ(g,c);if(+el.value!==v){el.value=v;uiFire(el)}};set('.fxpp',+sel.pst||0);set('.fxpf',+sel.pfl||0)}})}
 function init69(){
 document.addEventListener('click',e=>{const sm=e.target.closest&&e.target.closest('.fxg.fxnone>summary');if(sm)e.preventDefault()},true);
 // the Elements list opens an effect: select its element, show its panel, open that effect's settings
@@ -132,7 +132,7 @@ gQ(g,'.fxadd').onclick=e=>{e.stopPropagation();e.preventDefault();const t=tg();i
  const items=[],grp={};fxFor(kind).forEach(d=>{const it=[d.label,add(d)];if(d.grp){if(!grp[d.grp]){grp[d.grp]=[d.grp,null,false,[]];items.push(grp[d.grp])}grp[d.grp][3].push(it)}else items.push(it)});
  rowMenu(e.currentTarget,items)};
 // the declared settings of the filter effects: one listener for every field (data-q) and Reroll (data-qrr)
-const pn=gQ(g,'.fxpane');pn.addEventListener('input',ev=>{const el=ev.target.closest('[data-q]');if(!el)return;const ef=cur(),s=el.closest('.fxs');if(!ef||!s||ef.k!==s.dataset.e)return;const v=fqVal(el);if(ef[el.dataset.q]!==v){ef[el.dataset.q]=v;fxCh()}});
+const pn=gQ(g,'.fxpane');pn.addEventListener('input',ev=>{if(WBS.uiLoad)return;const el=ev.target.closest('[data-q]');if(!el)return;const ef=cur(),s=el.closest('.fxs');if(!ef||!s||ef.k!==s.dataset.e)return;const v=fqVal(el);if(ef[el.dataset.q]!==v){ef[el.dataset.q]=v;fxCh()}});
 pn.addEventListener('change',ev=>{const el=ev.target.closest('[data-q]');if(!el||el.type=='range')return;const ef=cur(),s=el.closest('.fxs');if(!ef||!s||ef.k!==s.dataset.e)return;const v=fqVal(el);if(ef[el.dataset.q]!==v){ef[el.dataset.q]=v;fxCh()}});
 // a colour field of an effect is a tray colour well. Its declaration [field, label, default entry, default colour] says what empty means:
 // a default entry ('Same ink', Misregistration) allows '' = the element's ink; null (Threshold's Dark and Light) has none, and an empty field shows the default colour
@@ -161,12 +161,12 @@ const txSet=(k,v)=>{const e=cur();if(!e||e.k!='texture')return;const L=txOwn(e);
 [['.fxsfh','fh'],['.fxsfv','fv']].forEach(([c,k])=>gQ(g,c).onchange=()=>txSet(k,gQ(g,c).checked?1:0));
 gQ(g,'.fxsm').onchange=()=>{const e=cur();if(e){e.md=gQ(g,'.fxsm').value;fxCh()}};
 gQ(g,'.fxrr').onclick=()=>{const e=cur();if(e){e.sd=txRid();fxCh()}};
-GRL.forEach(([k])=>gQ(g,'.fxg_'+k).addEventListener('input',()=>{const e=cur();if(!e||e.k!='grade')return;const v=+gQ(g,'.fxg_'+k).value;if(e[k]!==v){e[k]=v;fxCh()}}));
-[['.fxjp','pos'],['.fxjr2','rot'],['.fxjz','sz']].forEach(([c,f])=>gQ(g,c).addEventListener('input',()=>{const e=cur();if(!e||e.k!='jitter')return;const v=+gQ(g,c).value;if(e[f]!==v){e[f]=v;fxCh()}}));
+GRL.forEach(([k])=>gQ(g,'.fxg_'+k).addEventListener('input',()=>{if(WBS.uiLoad)return;const e=cur();if(!e||e.k!='grade')return;const v=+gQ(g,'.fxg_'+k).value;if(e[k]!==v){e[k]=v;fxCh()}}));
+[['.fxjp','pos'],['.fxjr2','rot'],['.fxjz','sz']].forEach(([c,f])=>gQ(g,c).addEventListener('input',()=>{if(WBS.uiLoad)return;const e=cur();if(!e||e.k!='jitter')return;const v=+gQ(g,c).value;if(e[f]!==v){e[f]=v;fxCh()}}));
 [['.fxjh','fh'],['.fxjv','fv']].forEach(([c,f])=>gQ(g,c).onchange=()=>{const e=cur();if(e&&e.k=='jitter'){e[f]=gQ(g,c).checked;fxCh()}});
 gQ(g,'.fxjs').addEventListener('change',()=>{const e=cur();if(!e||e.k!='jitter')return;const v=+gQ(g,'.fxjs').value;if(v)e.rs=v;else delete e.rs;gQ(g,'.fxjr2').closest('.ctl').hidden=!!v;fxCh()});
 gQ(g,'.fxjrr').onclick=()=>{const e=cur();if(e&&e.k=='jitter'){e.sd=txRid();fxCh()}};
-[['.fxpp','pst'],['.fxpf','pfl']].forEach(([c,f])=>gQ(g,c).addEventListener('input',()=>{const e=cur();if(!e||e.k!='pressure')return;const v=+gQ(g,c).value;if(e[f]!==v){e[f]=v;fxCh()}}))});
+[['.fxpp','pst'],['.fxpf','pfl']].forEach(([c,f])=>gQ(g,c).addEventListener('input',()=>{if(WBS.uiLoad)return;const e=cur();if(!e||e.k!='pressure')return;const v=+gQ(g,c).value;if(e[f]!==v){e[f]=v;fxCh()}}))});
 WBX.wbFxSync=fxSync;WBX.wbFxTexSet=(kind,k,v)=>{const f=WBX.wbFxTexSets&&WBX.wbFxTexSets[kind];if(f)f(k,v)}}
 // a text's Jitter is rolled per letter: letter i of text p gets its own seed, and the size it moves by is the font size
 const fxJitL=(p,i,fs)=>fxJit({u:p.u+'#'+i,s:fs,fx:p.fx});

@@ -1,4 +1,4 @@
-import {$,WBS,WBX} from './01-launch-and-version.js';
+import {$,WBS,WBX,uiFire} from './01-launch-and-version.js';
 import {CH,CW,SH,SW} from './04-canvas-and-stamp-outlines.js';
 import {mk,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
@@ -30,7 +30,7 @@ const mfOw=T=>Math.max(1,Math.round(T.k=='items'?Math.min(SW,SH)/80:Math.min(CW,
 const mfCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 const mfSet=(el,on)=>{if(el.getAttribute('aria-pressed')!=String(on)){el.setAttribute('aria-pressed',String(on));el.classList.toggle('on',on)}};
 const mfVis=(id,v)=>{const e=$(id);if(e&&e.hidden===v)e.hidden=!v};
-const mfVal=(id,v)=>{const e=$(id);if(e&&+e.value!==v){e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}))}};
+const mfVal=(id,v)=>{const e=$(id);if(e&&+e.value!==v){e.value=v;uiFire(e)}};
 // the groups go where the thing they set is edited: under a Pattern's sources, else under the Motif panel's Edit group
 function mfPlace(T){const at=T&&T.k=='src'?$('pesrc').closest('details.g'):T&&T.k=='sheet'?document.querySelector('section.pn[data-p="sheet"] .elk'):document.querySelector('section.pn[data-p="motifs"] #sel').closest('details.g');if(!at)return;
  let prev=at;MF_G.forEach(id=>{const g=$(id);if(!g)return;if(prev.nextElementSibling!==g)prev.insertAdjacentElement('afterend',g);prev=g})}
@@ -72,10 +72,10 @@ function init82(){if(!$('mf_f'))return;
  const each=f=>{const T=mfT();if(!T)return null;T.list.forEach(q=>f(q,T));return T};
  $('mf_fk').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const f=b.dataset.f;each(q=>{if(f=='none')q.fl='none';else if(f=='grad')q.fl='grad';else if(f=='img'){q.fl='img';if(!WBS.ARTS[q.a]){const k=Object.keys(WBS.ARTS);if(k.length)q.a=k[0];else delete q.a}}else delete q.fl});mfCh();mfSync()};
  $('mf_im').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;const i=b.dataset.i;each((q,T)=>{if(i=='contain'||(T.k=='sheet'&&(i=='stretch'||i=='tile')))q.im=i;else delete q.im});mfCh();mfSync()};
- const sl=(id,f,k)=>{$(id).addEventListener('input',()=>{const v=+$(id).value;each(q=>{const n=k?+(v/100).toFixed(3):v;if(k&&n==1)delete q[f];else q[f]=n});store();upd()});$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()})};
+ const sl=(id,f,k)=>{$(id).addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$(id).value;each(q=>{const n=k?+(v/100).toFixed(3):v;if(k&&n==1)delete q[f];else q[f]=n});store();upd()});$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()})};
  sl('mf_iz','iz');
  // the gradient's sliders: a value at its default is left out
- [['mf_ga','ga',90],['mf_gx','gx',50],['mf_gy','gy',50],['mf_gs','gs',70],['mf_gm','gm',50]].forEach(([id,f,d])=>{$(id).addEventListener('input',()=>{const v=+$(id).value;each(q=>{if(v==d)delete q[f];else q[f]=v});store();upd()});$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()})});
+ [['mf_ga','ga',90],['mf_gx','gx',50],['mf_gy','gy',50],['mf_gs','gs',70],['mf_gm','gm',50]].forEach(([id,f,d])=>{$(id).addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$(id).value;each(q=>{if(v==d)delete q[f];else q[f]=v});store();upd()});$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()})});
  $('mf_gk').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;each(q=>{if(b.dataset.g=='rad')q.gk='rad';else delete q.gk});mfCh();mfSync()};sl('mf_ow','sw');sl('mf_sx','wx',1);sl('mf_sy','wy',1);
  $('mf_flt').onchange=()=>{const T=mfT();if(!T||T.k!='el')return;const on=$('mf_flt').checked;T.list.forEach(q=>{if(q.bgd)return;if(on)q.flt=1;else delete q.flt});mfCh();mfSync()};
  $('mf_oon').onchange=()=>{const on=$('mf_oon').checked;each((q,T)=>{if(on){if(!(+q.sw>0))q.sw=mfOw(T)}else delete q.sw});mfCh();mfSync()};

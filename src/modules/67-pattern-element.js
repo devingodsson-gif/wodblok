@@ -2,7 +2,7 @@ import {ICN} from './00-icons.js';
 import {mapPts,mapShape} from './77-map-to-shape.js';
 import {cust,mk} from './06-motif-library-folders.js';
 import {mNm} from './21-motif-library-ui.js';
-import {$,WBS,WBX} from './01-launch-and-version.js';
+import {$,WBS,WBX,uiFire} from './01-launch-and-version.js';
 import {CH,CW,geom,okC,PHU,physLen,physOf,physToCv,rowMenu,shOf,stNmId} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {refLabel} from './50-tray-core.js';
@@ -152,7 +152,7 @@ $('pelay').querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dat
 {const tile=p.lay=='tile';$('petl').hidden=!tile;$('pefr').hidden=tile;{const lb={radial:['Spokes','Rings'],scatter:['Across','Down'],spiral:['Across','Down'],frame:['Columns','Rows']}[p.lay]||['Columns','Rows'];$('pecn').closest('.ctl').firstElementChild.textContent=lb[0];$('pern').closest('.ctl').firstElementChild.textContent=lb[1]}if(tile){const sh=tlShape(p),ts=$('pets'),ar=$('pear');
  if(!ts.options.length)ts.innerHTML=TL_TS.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');const tv=p.ts&&TL_AR[p.ts]?p.ts:'auto';if(ts.value!==tv)ts.value=tv;
  const ah=TL_AR[sh].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');if(ar.dataset.sh!==sh){ar.dataset.sh=sh;ar.innerHTML=ah}const av=tlArr(p,sh);if(ar.value!==av)ar.value=av;{const pv=$('pewpv'),k=sh=='wall'?av:'';pv.hidden=!k;if(pv.dataset.k!==k){pv.dataset.k=k;pv.innerHTML=k?tlWallPreview(k):''}}}}$('peds').querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d==p.ds));
-const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}};sv('peps',+p.ps||12);sv('pesp',+p.sp||0);sv('pecn',p.cn);sv('pern',p.rn);sv('pesz',p.sz);sv('pert',p.rt);sv('peox',+p.ox||0);sv('peoy',+p.oy||0);sv('pein',p.in==null?4:+p.in);sv('peiv',+p.iv||0);sv('pemd',+p.md||0);
+const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;uiFire(el)}};sv('peps',+p.ps||12);sv('pesp',+p.sp||0);sv('pecn',p.cn);sv('pern',p.rn);sv('pesz',p.sz);sv('pert',p.rt);sv('peox',+p.ox||0);sv('peoy',+p.oy||0);sv('pein',p.in==null?4:+p.in);sv('peiv',+p.iv||0);sv('pemd',+p.md||0);
  // Accent (2.76.10, Tiling): a second set of pieces at the middles between the main ones, its own source and size
  {const ac=p.ac&&p.ac.on;$('peac').checked=!!ac;$('peacb').hidden=!ac;const so=(p.src||[]).map((x,i)=>[String(i),patSrcName(x)]),h=so.map(([v,t])=>`<option value="${v}">${patHx(t)}</option>`).join(''),as=$('peacs');if(as.dataset.h!==h){as.dataset.h=h;as.innerHTML=h}
   if(ac){const v=String(p.ac.s!=null&&p.src&&p.src[p.ac.s]?p.ac.s:Math.max(0,(p.src||[]).length-1));if(as.value!==v)as.value=v;sv('peacz',+p.ac.z||40)}}
@@ -222,7 +222,7 @@ $('peov').addEventListener('change',()=>{const p=patCur();if(!p)return;if($('peo
 $('peds').onclick=e=>{const b=e.target.closest('[data-d]');if(b)set('ds',b.dataset.d)};
 $('pets').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$('pets').value;if((p.ts||'auto')!==v){p.ts=v;delete p.ar;patCh()}});
 $('pear').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$('pear').value;if(p.ar!==v){p.ar=v;patCh()}});
-[['peps','ps'],['pesp','sp'],['pecn','cn'],['pern','rn'],['pesz','sz'],['pert','rt'],['peox','ox'],['peoy','oy'],['pein','in'],['peiv','iv'],['pemd','md'],['pemg','mg'],['pedv','dv'],['pedg','dg']].forEach(([id,f])=>$(id).addEventListener('input',()=>{const p=patCur();if(!p)return;const v=+$(id).value;if(p[f]!==v){p[f]=v;patCh()}}));
+[['peps','ps'],['pesp','sp'],['pecn','cn'],['pern','rn'],['pesz','sz'],['pert','rt'],['peox','ox'],['peoy','oy'],['pein','in'],['peiv','iv'],['pemd','md'],['pemg','mg'],['pedv','dv'],['pedg','dg']].forEach(([id,f])=>$(id).addEventListener('input',()=>{if(WBS.uiLoad)return;const p=patCur();if(!p)return;const v=+$(id).value;if(p[f]!==v){p[f]=v;patCh()}}));
 $('pesd').onclick=()=>{const p=patCur();if(p){p.sd=1+Math.floor(Math.random()*9998);patCh()}};
 // "Add element" (2.4.0): one list of everything a pattern can place: the stamps, the motifs of the library, and the text on the canvas
 $('peadd').onclick=e=>{e.stopPropagation();patAddMenu()};
