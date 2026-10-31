@@ -8,7 +8,7 @@ Owner: "I want to optimize the mobile version of the app. When I scroll up and d
 
 ## Step 1: 2.80.1, sliders and the colour tray (built Oct 31 2026; docs/plan.md)
 1. A slider on a phone moves only once the finger has gone sideways (about 8 px); a finger that goes up or down first scrolls the panels and leaves the value alone. A tap on its track does not jump the value; a drag changes it from where it is. The number box beside it still takes a typed value.
-2. The colour tray shows on a phone, under the element bar, scrolling sideways when it does not fit.
+2. The colour tray shows on a phone, right of the element bar as on a desktop (2.81.1, owner), scrolling sideways when it does not fit.
 
 ## Step 2: 2.80.2, the canvas with fingers (built Oct 31 2026; docs/plan.md)
 1. Two fingers on the canvas pinch to zoom and drag to pan; one finger edits.

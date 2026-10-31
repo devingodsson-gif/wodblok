@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.81.1 (Oct 31 2026, hotfix, branch fix/2.81.1-touch-long-press): a held finger places the shape on a phone; the tray beside the element bar
+- Owner, on his phone: "When I try to place a shape on the canvas it deselects and nothing is created." A finger held on the canvas makes the phone send a long press (`contextmenu`), which the editor takes for a right click and so put away what was on the cursor (13-preview-and-stamp-tool.js). In `wbtouch` the canvas now ignores a long press (97-touch.js), and its callout and text selection are off (shell.html). A right click on a desktop still puts it away. The test browser sends no long press for a held touch, which is why 2.80.2's tests missed it.
+- Owner: "The color tray and element bar are not on the right place, they should be element bar on left color tray on right just like on desktop version": on a phone they share one row again, as on a desktop (the tray scrolls sideways when long; 2.80.1 had put it on a row of its own).
+- Tests: tests/mobile-touch-2-80.spec.js (a held finger with the long press sent still places; it fails without the fix; a desktop right click still puts the shape away). Not run: full suite, WebKit, CI.
+
 ## 2.81.0 (Oct 31 2026): the mobile touch plan is done, LIVE
 - Closes docs/mobile-touch-plan.md: 2.80.1 (a phone's sliders by a sideways drag only; the colour tray on a phone), 2.80.2 (the canvas with fingers), 2.80.3 (the selection bar). Phone only (`wbtouch`: the narrow layout on a touch screen, touch input); desktop unchanged. CI suite with the owner's word (results under 2.80.3); live with the owner's word ("Go live", Oct 31 2026). Later, if wanted: the bottom-sheet panel layout.
 

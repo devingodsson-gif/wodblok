@@ -52,11 +52,12 @@ test.describe('on a phone', () => {
     expect(errors).toEqual([]);
   });
 
-  test('the colour tray shows under the element bar', async ({ page }) => {
+  test('the colour tray shows right of the element bar, as on a desktop', async ({ page }) => {
     const { errors } = await H.openApp(page, { seed: 4, background: true });
     await expect(page.locator('#tyd')).toBeVisible();
     const tray = await page.locator('#tyd').boundingBox(), bar = await page.locator('#elb').boundingBox();
-    expect(tray.y, 'under the element bar').toBeGreaterThanOrEqual(bar.y + bar.height - 1);
+    expect(Math.abs((tray.y + tray.height / 2) - (bar.y + bar.height / 2)), 'one row').toBeLessThan(6);
+    expect(tray.x, 'right of the element bar').toBeGreaterThanOrEqual(bar.x + bar.width);
     expect(tray.x + tray.width).toBeLessThanOrEqual(391);
     expect(errors).toEqual([]);
   });
@@ -104,6 +105,21 @@ test.describe('on a phone, the canvas', () => {
     expect(Math.abs((q2.y - q.y) - (d1[1] - d0[1]))).toBeLessThan(20);
     expect(q2.wx || 1, 'moved, not stretched').toBe(1);
     expect((await shapes(page)).length, 'nothing else placed').toBe(1);
+    expect(errors).toEqual([]);
+  });
+
+  test('a finger held still on the canvas (the phone sends a long press) still places the shape where it lifts', async ({ page }) => {
+    const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false });
+    await page.click('#elb [data-k="motif"]'); await H.settle(page);
+    const b = await page.locator('#art').boundingBox(), A = [b.x + b.width * .4, b.y + b.height * .4], B = [b.x + b.width * .55, b.y + b.height * .5];
+    const c = await page.context().newCDPSession(page);
+    await c.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: A[0], y: A[1], id: 1 }] });
+    await page.waitForTimeout(600);
+    // what a phone sends for a press held this long
+    await page.evaluate(([x, y]) => document.elementFromPoint(x, y).dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 2 })), A);
+    for (const [x, y] of path([A], [B]).map(f => f[0])) { await c.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y, id: 1 }] }); await page.waitForTimeout(16); }
+    await c.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await page.waitForTimeout(150); await H.settle(page);
+    expect((await shapes(page)).length, 'placed').toBe(1);
     expect(errors).toEqual([]);
   });
 
@@ -208,5 +224,9 @@ test('desktop: no touch class, sliders take a click as before, the tray sits bes
   expect(Math.abs(tray.y - bar.y), 'one row').toBeLessThan(20);
   await H.addShape(page); await page.evaluate(() => window.__wbTest.commands.run('edit.selectAll')); await H.settle(page);
   await expect(page.locator('#tsb'), 'no selection bar on a desktop').toBeHidden();
+  // a right click still puts away what is on the cursor on a desktop
+  await page.keyboard.press('Escape'); await page.click('#elb [data-k="motif"]'); await H.settle(page);
+  { const b = await page.locator('#art').boundingBox(); await page.mouse.click(b.x + b.width * .3, b.y + b.height * .3, { button: 'right' }); await H.settle(page); }
+  { const n = (await shapes(page)).length, b = await page.locator('#art').boundingBox(); await page.mouse.click(b.x + b.width * .7, b.y + b.height * .7); await H.settle(page); expect((await shapes(page)).length, 'put away by the right click: a click places nothing').toBe(n); }
   expect(errors).toEqual([]);
 });

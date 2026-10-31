@@ -127,6 +127,9 @@ function touchCanvas() {
     t.dispatchEvent(pe('pointerdown', at)); t.dispatchEvent(pe('pointerup', at));   // the touch's own click follows
   };
   addEventListener('pointerup', up, true); addEventListener('pointercancel', up, true);
+  // 2.81.1 (owner Oct 31 2026: "it deselects and nothing is created"): a finger held on the canvas makes the phone send a long press (contextmenu), which the
+  // editor takes for a right click and puts away what is on the cursor. On a phone the canvas has no long press: the selection bar does that menu's work
+  addEventListener('contextmenu', e => { if (wbTouch() && e.target && e.target.closest && board.contains(e.target)) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
   return () => P.size > 0;   // a finger is on the canvas
 }
 
