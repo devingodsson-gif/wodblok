@@ -35,6 +35,8 @@ const emCan={...Object.fromEntries(Object.entries(EMC).map(([a,id])=>[a,()=>cmdI
 const emRows=[['cut','Cut','Ctrl+X','split'],['copy','Copy','Ctrl+C','duplicate'],['paste','Paste','Ctrl+V','importIc'],['dup','Duplicate','Ctrl+D','layers'],['pat','Make pattern','','pattern'],null,['front','Bring to front','Ctrl+Shift+]','front'],['fwd','Bring forward','Ctrl+]','front'],['bwd','Send backward','Ctrl+[','back'],['back','Send to back','Ctrl+Shift+[','back'],null,['grp','Group','Ctrl+G','group'],['lock','Lock','','lock'],['hide','Hide','','eyeOff'],['ren','Rename','','pencil'],null,['all','Select all','Ctrl+A','marquee'],null,['del','Delete','Del','trash']];
 const emRun={...Object.fromEntries(Object.entries(EMC).map(([a,id])=>[a,()=>cmdRun(id)])),pat:()=>patMakeFrom(),cut:emCut,copy:emCopy,paste:emPaste,dup:()=>lyDupSel(),front:()=>emOrder(true),back:()=>emOrder(false),del:emDel};
 const emIc=n=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN[n]||''}</svg>`;
+// 2.80.3: one row's action, for the phone's selection bar (97-touch.js); false when it cannot run now
+WBX.wbEmAct=a=>{const T=emTab();if(!(T?emCanT:emCan)[a]())return false;(T?emRunT:emRun)[a]();return true};
 function emClose(){const m=$('ctxm');if(m)m.hidden=true}
 // in a stamp tab (2.25.0) the same menu works on the stamp's shapes
 const emTab=()=>stUnlocked()!=null&&!!WBX.wbStClip;

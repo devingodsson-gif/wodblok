@@ -709,7 +709,8 @@ html,body{height:auto}body{overflow:visible}#app{height:auto;min-height:100vh}.d
 .rowm .cwsw{display:inline-block;width:20px;height:12px;border-radius:var(--r-s);margin-right:8px;vertical-align:-1px;box-shadow:var(--edge)}
 @media (max-width:1180px){.tye{display:none}}
 @media (max-width:860px){.viewbar{grid-template-columns:minmax(0,1fr);row-gap:6px}.vbl{justify-content:flex-start}.vbr{overflow-x:auto;scrollbar-width:none}.vbr::-webkit-scrollbar{display:none}}   /* 2.80.1: the colour tray on a phone, under the element bar */
-.wbtouch input[type=range]{pointer-events:none}.wbtouch :has(>input[type=range]){touch-action:pan-y}.wbtouch #boardP{touch-action:none}   /* 2.80.1: a phone's sliders move by a sideways drag only (97-touch.js) */
+.wbtouch input[type=range]{pointer-events:none}.wbtouch :has(>input[type=range]){touch-action:pan-y}.wbtouch #boardP{touch-action:none}
+.tsb{position:fixed;z-index:44;display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-l);padding:2px;box-shadow:var(--shadow)}.tsb[hidden]{display:none}.tsb .ib{width:var(--h-touch);height:var(--h-touch)}   /* 2.80.3: the phone's selection bar (97-touch.js); the element bar's look, touch-sized buttons */   /* 2.80.1: a phone's sliders move by a sideways drag only (97-touch.js) */
 /* picker */
 .cpk{position:fixed;z-index:9100;width:252px;padding:12px;background:var(--raise);border:1px solid var(--line2);border-radius:var(--r-l);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;touch-action:none}
 .cpk[hidden]{display:none}

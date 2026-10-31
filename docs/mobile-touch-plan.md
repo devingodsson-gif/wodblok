@@ -17,7 +17,7 @@ Owner: "I want to optimize the mobile version of the app. When I scroll up and d
 4. Resize and turn handles take a touch from about 22 px around them (they look the same).
 5. Moving an element keeps the offset from where it was touched (it does not jump under the finger): the editor's drag already does this; the held touch keeps it.
 
-## Step 3: 2.80.3, the selection toolbar
+## Step 3: 2.80.3, the selection toolbar (built Oct 31 2026; docs/plan.md)
 A small bar over the selection on a phone: Rotate 90°, Flip, Duplicate, Delete.
 
 ## 2.81.0

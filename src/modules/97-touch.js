@@ -1,10 +1,14 @@
 import {WBS,WBX} from './01-launch-and-version.js';
 import {drOff} from './02-draft-mode-speedups.js';
+import {ICN} from './00-icons.js';
+import {stUnlocked} from './63-stamp-tool.js';
+import {cmdRun} from '../commands/registry.js';
 // ===== Touch on a phone (2.80.1, owner Oct 31 2026, docs/mobile-touch-plan.md) =====
 // Everything here works only in the narrow layout on a touch screen (the `wbtouch` class on <html>); a desktop window and a mouse keep their own behaviour.
 const NARROW = '(max-width:860px)';
 const isTouchPhone = () => { try { return matchMedia(NARROW).matches && (navigator.maxTouchPoints > 0 || matchMedia('(pointer:coarse)').matches); } catch (e) { return false; } };
-function touchMark() { const on = isTouchPhone(), h = document.documentElement; if (h.classList.contains('wbtouch') !== on) h.classList.toggle('wbtouch', on); }
+let tsbKick = () => {};
+function touchMark() { const on = isTouchPhone(), h = document.documentElement; if (h.classList.contains('wbtouch') !== on) h.classList.toggle('wbtouch', on); if (on) tsbKick(); }
 const wbTouch = () => document.documentElement.classList.contains('wbtouch');
 
 // Sliders: in `wbtouch` a slider takes no touch of its own (CSS); a finger that goes sideways first drags its value from where it was, a finger that goes up or down
@@ -46,17 +50,17 @@ function touchSliders() {
 // copy on the finger, the finger shows where it goes and it is placed where the finger lifts.
 const HOLD_MS = 90, HOLD_GO = 6, HD_NEAR = 22;
 const UI = 'button,input,select,textarea,a,label,[contenteditable],.viewbar,#tbar,.stt,.sltb';
-const HANDLES = '#art [data-fh],#art .steh[data-hd],#art .steh[data-sp]';
+const HANDLES = '#art [data-fh],#stoh .steh[data-hd],#stoh .steh[data-sp]';
 const pe = (type, src, o = {}) => new PointerEvent(type, { bubbles: true, cancelable: true, composed: true, pointerId: src.pointerId, pointerType: 'touch', isPrimary: true, clientX: src.clientX, clientY: src.clientY, screenX: src.screenX, screenY: src.screenY, button: 0, buttons: type === 'pointerup' ? 0 : 1, width: src.width, height: src.height, pressure: type === 'pointerup' ? 0 : .5, ...o });
 function nearHandle(x, y, t) {
   if (t && t.closest && t.closest('[data-fh],.steh[data-hd],.steh[data-sp]')) return null;
-  for (const b of document.querySelectorAll('#fpov rect.sel,#art polygon.stes')) { const r = b.getBoundingClientRect(); if (x > r.left && x < r.right && y > r.top && y < r.bottom) return null; }   // on the selection itself a finger moves it
+  for (const b of document.querySelectorAll('#fpov rect.sel,#stoh polygon.stes')) { const r = b.getBoundingClientRect(); if (x > r.left && x < r.right && y > r.top && y < r.bottom) return null; }   // on the selection itself a finger moves it
   let best = null, bd = HD_NEAR;
   document.querySelectorAll(HANDLES).forEach(h => { const r = h.getBoundingClientRect(); if (!r.width && !r.height) return; const d = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2)); if (d < bd) { bd = d; best = h; } });
   return best;
 }
 function touchCanvas() {
-  const board = document.getElementById('boardP'); if (!board) return;
+  const board = document.getElementById('boardP'); if (!board) return () => false;
   const P = new Map();   // the touches on the board: id -> {x, y}
   let one = null, two = null, swallow = new Set();
   const armed = () => { const k = WBX.plKind ? WBX.plKind() : ''; return !!k && k !== 'paint'; };
@@ -123,10 +127,48 @@ function touchCanvas() {
     t.dispatchEvent(pe('pointerdown', at)); t.dispatchEvent(pe('pointerup', at));   // the touch's own click follows
   };
   addEventListener('pointerup', up, true); addEventListener('pointercancel', up, true);
+  return () => P.size > 0;   // a finger is on the canvas
+}
+
+// The selection bar (2.80.3, owner Oct 31 2026: "yes"): on a phone a small bar over the selection with Rotate 90°, Flip, Duplicate and Delete, so they need no
+// trip down to the panel. It shows while something is selected and no finger is on the canvas, above the selection (below it when there is no room).
+const TSB = [['rot', 'Rotate 90°', 'rotateCw'], ['flip', 'Flip', 'flip'], ['dup', 'Duplicate', 'duplicate'], ['del', 'Delete', 'trash']];
+function tsbRun(a) {
+  const tab = stUnlocked() != null;
+  if (a == 'dup' || a == 'del') { if (WBX.wbEmAct) WBX.wbEmAct(a); return; }
+  if (!tab) { cmdRun(a == 'rot' ? 'element.rotateCw' : 'element.flip'); return; }
+  if (a == 'flip') { const b = document.getElementById('sfl'); if (b) b.click(); return; }
+  const r = document.getElementById('srt'); if (!r) return;
+  r.value = ((+r.value + 90 + 180) % 360 + 360) % 360 - 180; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true }));
+}
+function selRect() {
+  const bs = [...document.querySelectorAll(stUnlocked() != null ? '#stoh polygon.stes' : '#fpov rect.sel')].map(b => b.getBoundingClientRect()).filter(r => r.width || r.height);
+  if (!bs.length) return null;
+  return { l: Math.min(...bs.map(r => r.left)), t: Math.min(...bs.map(r => r.top)), r: Math.max(...bs.map(r => r.right)), b: Math.max(...bs.map(r => r.bottom)) };
+}
+function touchSelBar(busy) {
+  const bar = document.createElement('div'); bar.className = 'tsb'; bar.id = 'tsb'; bar.setAttribute('role', 'toolbar'); bar.setAttribute('aria-label', 'Selection'); bar.hidden = true;
+  bar.innerHTML = TSB.map(([a, n, ic]) => `<button type="button" class="ib" data-a="${a}" aria-label="${n}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN[ic] || ''}</svg></button>`).join('');
+  document.body.appendChild(bar);
+  bar.addEventListener('click', e => { const b = e.target.closest('[data-a]'); if (b) tsbRun(b.dataset.a); });
+  const board = document.getElementById('boardP');
+  const place = () => {
+    const R = wbTouch() && !busy() && board && !board.classList.contains('off') ? selRect() : null, B = board && board.getBoundingClientRect();
+    const on = !!R && R.b > B.top && R.t < B.bottom;
+    if (bar.hidden === on) bar.hidden = !on;
+    if (on) {
+      const w = bar.offsetWidth, h = bar.offsetHeight, gap = 10, vw = document.documentElement.clientWidth;
+      let y = R.t - gap - h; if (y < Math.max(B.top, 0) + 4) y = R.b + gap;
+      const x = Math.round(Math.max(8, Math.min(vw - w - 8, (R.l + R.r) / 2 - w / 2))), yy = Math.round(y);
+      if (bar._x !== x || bar._y !== yy) { bar._x = x; bar._y = yy; bar.style.left = x + 'px'; bar.style.top = yy + 'px'; }
+    }
+    if (wbTouch()) requestAnimationFrame(place); else loop = false;   // it follows the selection frame by frame on a phone only
+  };
+  let loop = false; tsbKick = () => { if (!loop && wbTouch()) { loop = true; requestAnimationFrame(place); } }; tsbKick();
 }
 
 function init97() {
   touchMark(); addEventListener('resize', touchMark);
-  touchSliders(); touchCanvas();
+  touchSliders(); touchSelBar(touchCanvas());
 }
 export {init97,wbTouch};

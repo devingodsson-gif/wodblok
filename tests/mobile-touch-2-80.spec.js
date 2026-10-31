@@ -163,11 +163,50 @@ test.describe('on a phone, the canvas', () => {
   });
 });
 
+test.describe('on a phone, the selection bar', () => {
+  test.use(PHONE);
+  test('shows over the selection with Rotate 90°, Flip, Duplicate and Delete; hides with nothing selected', async ({ page }) => {
+    const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false });
+    await H.addShape(page); await page.keyboard.press('Escape'); await H.settle(page);
+    await page.evaluate(() => scrollTo(0, 0));
+    await expect(page.locator('#tsb')).toBeHidden();
+    let q = (await shapes(page))[0];
+    { const [x, y] = await scr(page, q.x, q.y); await touch(page, [[[x, y]]]); await H.settle(page); }
+    await expect(page.locator('#tsb')).toBeVisible();
+    const bar = await page.locator('#tsb').boundingBox(), sel = await page.locator('#fpov rect.sel').boundingBox();
+    expect(bar.y + bar.height, 'above the selection').toBeLessThanOrEqual(sel.y + 1);
+    const tap = async a => { const b = await page.locator(`#tsb [data-a="${a}"]`).boundingBox(); await touch(page, [[[b.x + b.width / 2, b.y + b.height / 2]]]); await H.settle(page); };
+    await tap('rot'); expect(((await shapes(page))[0].r + 360) % 360, 'turned a quarter').toBe(90);
+    await tap('flip'); expect((await shapes(page))[0].f, 'flipped').toBe(-1);
+    await tap('dup'); expect((await shapes(page)).length, 'duplicated').toBe(2);
+    await tap('del'); expect((await shapes(page)).length, 'deleted').toBe(1);
+    await page.evaluate(() => window.__wbTest.commands.run('edit.deselect')); await H.settle(page);
+    await expect(page.locator('#tsb')).toBeHidden();
+    expect(errors).toEqual([]);
+  });
+
+  test('in a stamp\'s tab it turns the selected shape', async ({ page }) => {
+    const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false });
+    await H.addStamp(page); await H.unlockStamp(page, 0); await H.settle(page);
+    await page.click('#elb [data-k="motif"]'); await H.settle(page); await page.keyboard.press('Escape'); await H.settle(page);
+    await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(100);
+    const b = await page.locator('#art').boundingBox(); await touch(page, [[[b.x + b.width / 2, b.y + b.height / 2]]]); await H.settle(page);
+    await expect(page.locator('#tsb')).toBeVisible();
+    const it = async () => (await page.evaluate(() => JSON.parse(window.__wbTest.state()).tiles[0].items)).slice(-1)[0];
+    const r0 = (await it()).r || 0, t = await page.locator('#tsb [data-a="rot"]').boundingBox();
+    await touch(page, [[[t.x + t.width / 2, t.y + t.height / 2]]]); await H.settle(page);
+    expect((((await it()).r || 0) - r0 + 360) % 360).toBe(90);
+    expect(errors).toEqual([]);
+  });
+});
+
 test('desktop: no touch class, sliders take a click as before, the tray sits beside the element bar', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, background: true });
   expect(await page.evaluate(() => document.documentElement.classList.contains('wbtouch'))).toBe(false);
   expect(await page.evaluate(() => getComputedStyle(document.querySelector('input[type=range]')).pointerEvents)).not.toBe('none');
   const tray = await page.locator('#tyd').boundingBox(), bar = await page.locator('#elb').boundingBox();
   expect(Math.abs(tray.y - bar.y), 'one row').toBeLessThan(20);
+  await H.addShape(page); await page.evaluate(() => window.__wbTest.commands.run('edit.selectAll')); await H.settle(page);
+  await expect(page.locator('#tsb'), 'no selection bar on a desktop').toBeHidden();
   expect(errors).toEqual([]);
 });
