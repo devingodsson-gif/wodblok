@@ -39,7 +39,7 @@ Each panel was checked for anything past the screen's edge and for small tap tar
 | 1 | 2.81.2 | **M1:** on a phone a one-finger swipe that starts on the empty canvas scrolls the page; a tap there still deselects. The selection rectangle stays a desktop tool. **M2:** after a placement on a phone the new element is selected and placing stops (owner to choose, below). | about 30% |
 | 2 | 2.81.3 | **M3:** the canvas stays at the top of the screen (sticky) while the panels scroll under it. **M4:** a phone shows one tool panel at a time under the Elements list; opening another replaces it, as a tab. | about 30% |
 | 3 | 2.81.4 | **M5:** icon buttons at touch size on a phone (`--h-touch`, 36 px). **M6:** the top bar folds what does not fit into its "…" menu, as a narrow desktop window does (2.78.5). | about 20% |
-| 4 | 2.82.0 | The CI suite, then live on the owner's word. | |
+| 4 | 2.82.0 | Live on the owner's word (Oct 31 2026, without the CI suite). | |
 
 Owner's answers (Oct 31 2026): "Yes to all your questions do whatever you think is best": placing stops after one on a phone; the canvas pinned at the top now, the bottom sheet as its own update later; one tool panel at a time on a phone.
 

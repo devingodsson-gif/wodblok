@@ -1,5 +1,8 @@
 # Development plan
 
+## 2.82.0 (Oct 31 2026): the mobile review's fix plan is done, LIVE
+- Closes docs/mobile-review-2.81.md: 2.81.2 (a swipe from the empty canvas scrolls; placing stops after one), 2.81.3 (the canvas pinned; one tool group), 2.81.4 (touch-sized buttons; the top bar fits). Phone only (`wbtouch`). Live with the owner's word ("Just merge, go live", Oct 31 2026) without the CI suite: the related specs only (about 63, all passed).
+
 ## 2.81.4 (Oct 31 2026, branch fix/2.81.4-phone-buttons-and-top-bar, step 3 of docs/mobile-review-2.81.md): touch-sized buttons; the top bar fits
 - Phone only: everything here, and 2.81.3's pinned canvas and single tool group, now hang on the `wbtouch` class (a narrow touch screen) instead of the narrow width alone, so a narrow desktop window keeps its own top bar and panels (bug-test-2-79's narrow-window test).
 - **M6:** the top bar keeps File, "…", the project name (it shrinks, 84 px at least), Undo, Redo and Randomize (its icon); History, command search, Randomize settings and the theme switch leave the bar (each is in a menu: Edit or Window, Help, Effects or Window, View).
