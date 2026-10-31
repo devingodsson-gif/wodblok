@@ -1,5 +1,8 @@
 # Development plan
 
+## 2.84.1 (Oct 31 2026, hotfix, branch fix/2.84.1-sections-saved-at-once): a section's open state is kept at once
+- The CI suite on live 2.84.0 (owner's word, run 41241266223): WebKit and seven of eight Chromium shards passed; shard 7 failed on small-updates-2-79-1's section memory: on CI the section was opened and the page reloaded before the `toggle` event (a task later) saved it. The open state is now kept by a MutationObserver on `open`, which runs before the next task (34-desktop-shell.js). The picture comparison job does not run on a hand-started suite, so the icon size changes of 2.84.0 were not compared there.
+
 ## 2.84.0 (Oct 31 2026, LIVE with the owner's word, without the CI suite): the whole app checked against the UI standard
 - Owner: "Do a style check over the whole app, make sure everything is confirmed to our style guidelines document make any adjustments you need."
 - Checked: `npm run check:style`, then a scan of the page CSS and the styles modules write against Part 9 (layers, motion, gaps, font sizes in the shorthand, icon sizes, disabled opacity, the swatch edge, literal colours, wording), and the icons drawn in every panel measured in the running app.
