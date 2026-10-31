@@ -63,8 +63,10 @@ test('installs, opens offline, finds a new version without reloading, and applie
 
   // with unsaved work the dot asks to save first and changes nothing
   await page.locator('.rail [data-pn="rand"]').dispatchEvent('click');
+  const blank = await page.evaluate(() => window.__wbTest.state());
   await page.click('#rzdo');
-  await page.waitForFunction(() => !document.querySelector('.fzov,.fzbar:not(.out)') && window.__wbTest.state().length > 1500);
+  // 2.79.3: this page is not seeded, so a roll can be small (a pattern Look); wait for the roll itself, not a size (failed about one run in three, on 2.79.0 too)
+  await page.waitForFunction(b => !document.querySelector('.fzov,.fzbar:not(.out)') && window.__wbTest.state() !== b, blank);
   await page.click('#pupd');
   await expect(page.locator('#pmsg')).toContainText('Save your work first');
   expect(await page.evaluate(() => window.__stay)).toBe('same page');
