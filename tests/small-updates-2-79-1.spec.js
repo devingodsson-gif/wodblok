@@ -65,7 +65,7 @@ test('6. a panel\'s sections start folded but the first; what is opened is remem
   const name = (await d.locator(':scope > summary').textContent()).trim();
   await d.locator(':scope > summary').click();
   await expect(d).toHaveAttribute('open', '');
-  await page.reload(); await page.waitForFunction(() => !!window.__wbTest && document.fonts.status === 'loaded'); await H.settle(page);
+  await page.reload();   // at once: the state is kept the moment the section opens (2.84.1) await page.waitForFunction(() => !!window.__wbTest && document.fonts.status === 'loaded'); await H.settle(page);
   await H.openPanel(page, 'canvas');
   const same = page.locator('section.pn[data-p="canvas"] > details.g').filter({ has: page.locator(':scope > summary', { hasText: name }) }).first();
   await expect(same, 'remembered: ' + name).toHaveAttribute('open', '');
