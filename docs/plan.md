@@ -5,6 +5,7 @@
 - **Stamp tab:** opening a stamp's tab brings the Stamp panel into its own group (`gstmp`) in the inner column right of the left dock (the left dock itself when that is empty); back on the Canvas it returns to where it was, or closes if it was not open, unless it was moved meanwhile (34 `WBX.wbStampDock`, called from 75-stamp-edit-mode.js). The group is dropped from a saved layout, since no stamp's tab is open at launch.
 - **The Element panel is gone** (owner, Oct 31 2026: "I agree"): no opener, no tab; its section stays as the hidden home of the Element group, Align and a stamp's shape list.
 - The drop guard (a click just after dropping a panel is ignored) uses `performance.now()`: with the tests' fixed clock every click on a panel after a drag was ignored.
+- CI run 41205252189 (Oct 31): WebKit and six shards passed; the seeded rolls (scenarios, randomize-effects) moved because the Stamp panel's group drew a random id while a test's start opened and closed a stamp. The group no longer draws one (the series is the same as 2.79.0's again, checked draw by draw). The section test found its section by place, which differed after a reload on CI; it finds it by name.
 - Tests: tests/small-updates-2-79-3.spec.js (2); bug-test-2-79 B5 now checks there is no Element panel. Related specs: see PROJECT_STATUS. Not run: full suite, WebKit, CI.
 
 ## 2.79.2 (Oct 31 2026, branch fix/2.79.2-wheel-and-tooltips, step 2 of docs/small-updates-plan.md): the wheel and quick tooltips

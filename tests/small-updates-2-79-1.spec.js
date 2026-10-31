@@ -62,10 +62,13 @@ test('6. a panel\'s sections start folded but the first; what is opened is remem
   expect(a[0], 'the top section').toBe(true);
   expect(a.slice(1).every(o => !o), 'the rest folded').toBe(true);
   const d = page.locator('section.pn[data-p="canvas"] > details.g:not([hidden])').nth(1);
+  const name = (await d.locator(':scope > summary').textContent()).trim();
   await d.locator(':scope > summary').click();
+  await expect(d).toHaveAttribute('open', '');
   await page.reload(); await page.waitForFunction(() => !!window.__wbTest && document.fonts.status === 'loaded'); await H.settle(page);
   await H.openPanel(page, 'canvas');
-  expect((await open())[1], 'remembered').toBe(true);
+  const same = page.locator('section.pn[data-p="canvas"] > details.g').filter({ has: page.locator(':scope > summary', { hasText: name }) }).first();
+  await expect(same, 'remembered: ' + name).toHaveAttribute('open', '');
   expect(errors).toEqual([]);
 });
 

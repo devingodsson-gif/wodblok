@@ -236,9 +236,9 @@ let wsStM=null;
 WBX.wbStampDock=on=>{if(!wsReady||wsNarrow())return;const L=wsL(),G='gstmp',mine=()=>L.dock.find(g=>g.id==G&&g.tabs.length==1&&g.tabs[0]=='stmp');
  if(on){const g0=wsFind('stmp');if(g0&&g0.id==G)return;wsStM=g0?{id:g0.id,i:g0.tabs.indexOf('stmp'),a:g0.a==='stmp',e:g0.e,fl:L.float.includes(g0)}:{none:1};
   if(g0){g0.tabs.splice(g0.tabs.indexOf('stmp'),1);if(g0.a=='stmp')g0.a=g0.tabs[0];if(!g0.tabs.length)wsDetach(g0)}
-  const g=wsG(['stmp'],{id:G});wsDockIns(L,g,L.dock.some(x=>x.e=='l')?'li':'l',1e9)}
+  const g={id:G,tabs:['stmp'],a:'stmp',f:1,e:'l'};wsDockIns(L,g,L.dock.some(x=>x.e=='l')?'li':'l',1e9)}   // no wsG: its random id would move the seeded series
  else{const g=mine(),m=wsStM;wsStM=null;if(!g||!m)return;wsDetach(g);
-  if(!m.none){let h=wsGroup(m.id);if(h){h.tabs.splice(Math.min(m.i,h.tabs.length),0,'stmp');if(m.a)h.a='stmp'}else{h=wsG(['stmp']);if(m.fl)L.float.push(Object.assign(h,{x:null}));else wsDockIns(L,h,m.e||'l',1e9)}}}
+  if(!m.none){let h=wsGroup(m.id);if(h){h.tabs.splice(Math.min(m.i,h.tabs.length),0,'stmp');if(m.a)h.a='stmp'}else{h={id:'gn'+(++wsN),tabs:['stmp'],a:'stmp',f:1,e:'l'};if(m.fl)L.float.push(Object.assign(h,{x:null}));else wsDockIns(L,h,m.e||'l',1e9)}}}
  wsSave();wsRender()};
 WBX.wbApart=pn=>{const a=wsFind('lyrs'),b=wsFind(pn);return!(a&&b&&a===b)};   // false when the panel is a tab beside the Elements list: showing it would hide the list
 // The panels the app opens with (2.9.0: the Workspaces tool is gone; this is the one built-in layout, opened at launch). Read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
