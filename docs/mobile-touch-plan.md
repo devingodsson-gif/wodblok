@@ -20,5 +20,5 @@ Owner: "I want to optimize the mobile version of the app. When I scroll up and d
 ## Step 3: 2.80.3, the selection toolbar (built Oct 31 2026; docs/plan.md)
 A small bar over the selection on a phone: Rotate 90°, Flip, Duplicate, Delete.
 
-## 2.81.0
+## 2.81.0 (LIVE Oct 31 2026)
 The CI suite, then live on the owner's word. Later, if wanted: the bottom-sheet panel layout.

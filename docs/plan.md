@@ -1,5 +1,8 @@
 # Development plan
 
+## 2.81.0 (Oct 31 2026): the mobile touch plan is done, LIVE
+- Closes docs/mobile-touch-plan.md: 2.80.1 (a phone's sliders by a sideways drag only; the colour tray on a phone), 2.80.2 (the canvas with fingers), 2.80.3 (the selection bar). Phone only (`wbtouch`: the narrow layout on a touch screen, touch input); desktop unchanged. CI suite with the owner's word (results under 2.80.3); live with the owner's word ("Go live", Oct 31 2026). Later, if wanted: the bottom-sheet panel layout.
+
 ## 2.80.3 (Oct 31 2026, branch feat/2.80.3-touch-selection-bar, step 3 of docs/mobile-touch-plan.md): the phone's selection bar
 - **Phone only:** a small bar over the selection (`#tsb`, the element bar's look with touch-sized buttons, `--h-touch`): Rotate 90°, Flip, Duplicate, Delete. On the canvas they run `element.rotateCw`, `element.flip` and the element menu's Duplicate and Delete (80-element-menu.js `WBX.wbEmAct`); in a stamp's tab the shape editor's Rotate (+90°) and Flip and the same menu's rows. It shows while something is selected and no finger is on the canvas, above the selection (below when there is no room), and follows it frame by frame, on a phone only (97-touch.js). It is never shown on a desktop.
 - Fixed in 2.80.2's code on the way: a stamp's tab draws its selection and handles in `#stoh` (in `#stolsvg`), not in `#art`; the handle reach and the move-on-the-selection rule now find them there.
