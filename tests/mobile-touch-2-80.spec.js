@@ -65,6 +65,16 @@ test.describe('on a phone', () => {
     expect(errors).toEqual([]);
   });
 
+  test('2.81.4: the top bar fits the screen and its icon buttons are touch-sized; the rest are in its menus', async ({ page }) => {
+    const { errors } = await H.openApp(page, { seed: 4, background: true });
+    const top = await page.evaluate(() => { const t = document.querySelector('.top'); return { sw: t.scrollWidth, cw: t.clientWidth, small: [...t.querySelectorAll('button')].filter(b => { const r = b.getBoundingClientRect(); return r.width && (r.height < 36 || r.width < 36) && !b.matches('.mnbb'); }).map(b => b.id) }; });
+    expect(top.sw, 'nothing past the edge').toBeLessThanOrEqual(top.cw);
+    expect(top.small, 'touch-sized icon buttons').toEqual([]);
+    for (const id of ['hstb', 'cmdkb', 'rzopt', 'thm']) await expect(page.locator('#' + id)).toBeHidden();
+    await expect(page.locator('#rzdo')).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+
   test('the colour tray shows right of the element bar, as on a desktop', async ({ page }) => {
     const { errors } = await H.openApp(page, { seed: 4, background: true });
     await expect(page.locator('#tyd')).toBeVisible();

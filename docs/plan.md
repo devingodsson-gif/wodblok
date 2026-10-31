@@ -1,7 +1,13 @@
 # Development plan
 
+## 2.81.4 (Oct 31 2026, branch fix/2.81.4-phone-buttons-and-top-bar, step 3 of docs/mobile-review-2.81.md): touch-sized buttons; the top bar fits
+- Phone only: everything here, and 2.81.3's pinned canvas and single tool group, now hang on the `wbtouch` class (a narrow touch screen) instead of the narrow width alone, so a narrow desktop window keeps its own top bar and panels (bug-test-2-79's narrow-window test).
+- **M6:** the top bar keeps File, "…", the project name (it shrinks, 84 px at least), Undo, Redo and Randomize (its icon); History, command search, Randomize settings and the theme switch leave the bar (each is in a menu: Edit or Window, Help, Effects or Window, View).
+- **M5:** icon buttons at touch size (`--h-touch`, 36 px): the top bar's, the panel headers', the Element group's and the shape editor's rows, and the Elements list's eye and row buttons.
+- Tests: tests/mobile-touch-2-80.spec.js (one more: the top bar fits at 390 px with touch-sized icon buttons). The narrow-screen specs pass. Not run: full suite, WebKit, CI.
+
 ## 2.81.3 (Oct 31 2026, branch fix/2.81.3-phone-pinned-canvas, step 2 of docs/mobile-review-2.81.md): the canvas stays on screen; one tool group
-- Phone only (the narrow layout, `max-width:860px` / `wsNarrow()`).
+- Phone only (the narrow layout on a touch screen; `wbtouch` since 2.81.4).
 - **M3:** the top bar and the stage stay at the top of the screen (sticky) while the panels scroll under them; the canvas is 38% of the screen's height there, and the page's scroll padding keeps a control scrolled to clear of it (shell.html).
 - **M4:** opening a tool panel moves it into one group under the Elements list, as a tab, instead of a new group under the last (34-desktop-shell.js `setPanel`).
 - Tests: tests/mobile-touch-2-80.spec.js (one more: four panels opened make one group of tabs; scrolled to the end, the canvas is still on screen). The narrow-screen specs (top-bar-scroll, format, settings-menu, site-account) pass. Not run: full suite, WebKit, CI.
