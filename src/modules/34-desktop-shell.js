@@ -29,17 +29,17 @@ let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[pa
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={xrec:'Export',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',image:'Image',sheet:'Sheet',mlist:'Element',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
+const PNAME={xrec:'Export',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',image:'Image',sheet:'Sheet',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
-const EL_ONLY=['layers','stmp','motifs','image','sheet','text','elpaint','mlist'];
+const EL_ONLY=['layers','stmp','motifs','image','sheet','text','elpaint'];
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
 const ELP=EL_ONLY,wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
-const MODEP={pattern:['lyrs','layers','stmp','motifs','image','sheet','mlist','elpaint','text','pgrid','canvas','colors','rand','hist','xrec']};
+const MODEP={pattern:['lyrs','layers','stmp','motifs','image','sheet','elpaint','text','pgrid','canvas','colors','rand','hist','xrec']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85,lk:1}),wsG(['layers']),wsG(['canvas','colors'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)
 let WS={pattern:wsDef()};
-try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;if(g.lk===undefined&&g.tabs.includes('lyrs'))g.lk=1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(ok),float:L.float.filter(ok)}})}catch(e){}
+try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>{const L=sv[m];if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return;const seen=new Set(),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP[m].includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=String(g.id||wsG([]).id);g.f=+g.f||1;if(g.lk===undefined&&g.tabs.includes('lyrs'))g.lk=1;return g.tabs.length>0};WS[m]={dock:L.dock.filter(g=>ok(g)&&g.id!='gstmp'),float:L.float.filter(ok)}})}catch(e){}   // gstmp: the Stamp panel of a stamp's tab (2.79.3); no tab is open at launch
 
 // 2.55.0 (owner Oct 26 2026): "every panel opens on the left by default (the Elements list on the right), and panels remember where they were opened".
 // Each panel's last place is kept across sessions: its dock edge and the panels it shared a group with, or its floating box. A panel with no place yet opens on
@@ -55,28 +55,32 @@ const wsGroup=id=>wsAll().find(g=>g.id==id)||null;
 const wsDetach=g=>{const L=wsL();['dock','float'].forEach(k=>{const i=L[k].indexOf(g);if(i>=0)L[k].splice(i,1)})};
 const wsSec=p=>document.querySelector(`section.pn[data-p="${p}"]`);
 const wsStash=document.createElement('div'),wsFl=document.createElement('div'),wsInd=document.createElement('div'),wsTint=document.createElement('div');
-const wsDk={},wsBox={},wsZn={};
+const wsDk={},wsBox={},wsZn={},WS_E=['l','li','ri','r','t','b'],wsVt=k=>k!='t'&&k!='b',wsOut=k=>k=='li'?'l':k=='ri'?'r':k;
 {const R=document.querySelector('aside.dock');R.classList.add('dk','dk-r');R.dataset.e='r';wsDk.r=R;wsBox.r=R.querySelector('.dock-b');
-['l','t','b'].forEach(k=>{const a=document.createElement('aside');a.className='dock dk dk-'+k;a.dataset.e=k;a.hidden=true;const b=document.createElement('div');b.className='dock-b';a.appendChild(b);$('app').appendChild(a);wsDk[k]=a;wsBox[k]=b});
-['l','r','t','b'].forEach(k=>{const b=wsBox[k];b.classList.add('wsd');if(k=='t'||k=='b')b.classList.add('hz');const h=document.createElement('div');h.className='wed';h.title='Resize';wsDk[k].appendChild(h);
+// 2.79.3 (owner Oct 31 2026: "panels ... attached to each other ... docked next to the other one"): beside the left and the right dock stands an inner column of its own,
+// 'li' and 'ri', a dock like the others (its groups, splitters and width); it shows only while its outer dock does
+['l','li','ri','t','b'].forEach(k=>{const a=document.createElement('aside');a.className='dock dk dk-'+k;a.dataset.e=k;a.hidden=true;const b=document.createElement('div');b.className='dock-b';a.appendChild(b);$('app').appendChild(a);wsDk[k]=a;wsBox[k]=b});
+WS_E.forEach(k=>{const b=wsBox[k];b.classList.add('wsd');if(k=='t'||k=='b')b.classList.add('hz');const h=document.createElement('div');h.className='wed';h.title='Resize';wsDk[k].appendChild(h);
 const z=document.createElement('div');z.className='wzn';z.dataset.e=k;z.hidden=true;document.body.appendChild(z);wsZn[k]=z})}
 wsBox.r.id='wsdock';
 // size of each dock (width for left/right, height for top/bottom), kept per mode for this session only
-const wsSz=k=>{const L=wsL();return(L.sz&&L.sz[k])||{l:316,r:316,t:260,b:260}[k]};
-const wsClampSz=(k,v)=>{const hz=k=='t'||k=='b',o=hz?(k=='t'?'b':'t'):(k=='l'?'r':'l'),oth=wsDk[o]&&!wsDk[o].hidden?wsSz(o):0,mn=hz?110:200,mx=hz?innerHeight-46-26-330-oth:innerWidth-44-420-oth;return Math.round(Math.max(mn,Math.min(v,Math.max(mn,mx))))};
+const wsSz=k=>{const L=wsL();return(L.sz&&L.sz[k])||{l:316,li:300,ri:300,r:316,t:260,b:260}[k]};
+const wsClampSz=(k,v)=>{const hz=k=='t'||k=='b',os=hz?[k=='t'?'b':'t']:WS_E.filter(o=>o!=k&&wsVt(o)),oth=os.reduce((n,o)=>n+(wsDk[o]&&!wsDk[o].hidden?wsSz(o):0),0),mn=hz?110:200,mx=hz?innerHeight-46-26-330-oth:innerWidth-44-420-oth;return Math.round(Math.max(mn,Math.min(v,Math.max(mn,mx))))};
 const wsSetSz=(k,v)=>{const L=wsL();v=wsClampSz(k,v);(L.sz=L.sz||{})[k]=v;if(k=='t'||k=='b')wsDk[k].style.height=v+'px';else wsDk[k].style.width=v+'px'};
 // put a group into one edge's stack at position i (i past the end means last)
 const wsDockIns=(L,g,k,i)=>{g.e=k;g.f=1;L.dock.forEach(x=>{if((x.e||'r')==k)x.f=1});const el=L.dock.filter(x=>x!==g&&(x.e||'r')==k);if(i>=el.length){const last=el[el.length-1];if(last)L.dock.splice(L.dock.indexOf(last)+1,0,g);else L.dock.push(g)}else L.dock.splice(L.dock.indexOf(el[i]),0,g)};
 // the strip of window that docks can use: the full width (2.44.0: no rail), below the top bar, above the status bar
 function wsWR(){const rl={right:0},tp=document.querySelector('.top').getBoundingClientRect(),sb=document.querySelector('.status').getBoundingClientRect();
-return{ox0:rl.right,ox1:innerWidth,y0:tp.bottom,y1:sb.top,x0:wsDk.l.hidden?rl.right:wsDk.l.getBoundingClientRect().right,x1:wsDk.r.hidden?innerWidth:wsDk.r.getBoundingClientRect().left}}
+return{ox0:rl.right,ox1:innerWidth,y0:tp.bottom,y1:sb.top,x0:!wsDk.li.hidden?wsDk.li.getBoundingClientRect().right:wsDk.l.hidden?rl.right:wsDk.l.getBoundingClientRect().right,x1:!wsDk.ri.hidden?wsDk.ri.getBoundingClientRect().left:wsDk.r.hidden?innerWidth:wsDk.r.getBoundingClientRect().left}}
 // which empty window edge the pointer is close to (null if none)
 function wsEdgeAt(e){const W=wsWR(),T=56,x=Math.max(W.ox0,Math.min(W.ox1,e.clientX)),y=Math.max(W.y0,Math.min(W.y1,e.clientY));let best=null,bd=T;
 const c=(k,d,ok)=>{if(ok&&wsDk[k].hidden&&d>=0&&d<bd){bd=d;best=k}};
-c('l',x-W.ox0,true);c('r',W.ox1-x,true);c('t',y-W.y0,x>=W.x0&&x<=W.x1);c('b',W.y1-y,x>=W.x0&&x<=W.x1);return best}
+c('l',x-W.ox0,true);c('r',W.ox1-x,true);c('t',y-W.y0,x>=W.x0&&x<=W.x1);c('b',W.y1-y,x>=W.x0&&x<=W.x1);
+if(!wsDk.l.hidden){const d=x-wsDk.l.getBoundingClientRect().right;c('li',Math.abs(d),d>-24)}if(!wsDk.r.hidden){const d=wsDk.r.getBoundingClientRect().left-x;c('ri',Math.abs(d),d>-24)}return best}   // the inner edge of a dock (2.79.3)
 // drop zones: a faint strip on every empty edge while dragging; the chosen one opens up to the size the dock would have
-function wsZones(hot){const W=wsWR();['l','r','t','b'].forEach(k=>{const z=wsZn[k],emp=wsDk[k].hidden;z.hidden=!emp;if(!emp)return;const th=hot==k?wsClampSz(k,wsSz(k)):26,s=z.style;
-if(k=='l'||k=='r'){s.left=(k=='l'?W.ox0:W.ox1-th)+'px';s.top=W.y0+'px';s.width=th+'px';s.height=(W.y1-W.y0)+'px'}
+function wsZones(hot){const W=wsWR();WS_E.forEach(k=>{const z=wsZn[k],emp=wsDk[k].hidden&&(wsOut(k)==k||!wsDk[wsOut(k)].hidden);z.hidden=!emp;if(!emp)return;const th=hot==k?wsClampSz(k,wsSz(k)):26,s=z.style;
+if(k=='li'||k=='ri'){const r=wsDk[wsOut(k)].getBoundingClientRect();s.left=(k=='li'?r.right:r.left-th)+'px';s.top=W.y0+'px';s.width=th+'px';s.height=(W.y1-W.y0)+'px'}
+else if(k=='l'||k=='r'){s.left=(k=='l'?W.ox0:W.ox1-th)+'px';s.top=W.y0+'px';s.width=th+'px';s.height=(W.y1-W.y0)+'px'}
 else{s.left=W.x0+'px';s.top=(k=='t'?W.y0:W.y1-th)+'px';s.width=(W.x1-W.x0)+'px';s.height=th+'px'}
 z.classList.toggle('hot',hot==k)})}
 wsStash.hidden=true;wsFl.id='wsfl';wsInd.id='wsind';wsInd.hidden=true;wsTint.id='wstint';wsTint.hidden=true;document.body.append(wsStash,wsFl,wsTint,wsInd);
@@ -103,10 +107,11 @@ el.innerHTML=`<div class="wh"><button type="button" class="wb wta l" data-act="t
 `<button type="button" class="wb" data-act="lock" aria-pressed="${g.lk?'true':'false'}" aria-label="${g.lk?'Unlock panel':'Lock panel'}">${g.lk?IC.lk:IC.ul}</button><button type="button" class="wb" data-act="col" title="${g.col?'Expand':'Collapse'}">${g.col?IC.exp:IC.col}</button>${g.lk?'':`<button type="button" class="wb" data-act="${fl?'dock':'float'}" title="${fl?'Dock to the side':'Pop out'}">${fl?IC.dock:IC.pop}</button><button type="button" class="wb" data-act="close" title="Close" aria-label="Close">${IC.x}</button>`}</div><div class="wbd"></div>${fl?'<div class="wrs" title="Resize"></div>':''}`;
 const bd=el.querySelector('.wbd');g.tabs.forEach(p=>{const sc=wsSec(p);if(sc){sc.classList.toggle('mc',!!sc.querySelector(':scope>details.g'));sc.hidden=p!=g.a;bd.appendChild(sc)}});return el}
 function wsRender(){wsReady=true;const L=wsL(),nar=wsNarrow(),dl=nar?[...L.dock,...L.float]:L.dock;
+['li','ri'].forEach(k=>{const o=wsOut(k);if(!L.dock.some(g=>g.e==o))L.dock.forEach(g=>{if(g.e==k)g.e=o})});   // an inner column whose outer dock emptied becomes the outer dock
 document.querySelectorAll('section.pn').forEach(sc=>wsStash.appendChild(sc));wsFl.innerHTML='';
-['l','r','t','b'].forEach(k=>{const box=wsBox[k],dk=wsDk[k],gs=dl.filter(g=>(nar?'r':(g.e||'r'))==k);box.innerHTML='';
+WS_E.forEach(k=>{const box=wsBox[k],dk=wsDk[k],gs=dl.filter(g=>(nar?'r':(g.e||'r'))==k);box.innerHTML='';
 gs.forEach((g,i)=>{if(i){const sp=document.createElement('div');sp.className='wsp';sp.dataset.i=i;box.appendChild(sp)}box.appendChild(wsEl(g,false))});
-dk.hidden=!gs.length;if(nar){dk.style.width='';dk.style.height=''}else if(gs.length){const ac=gs.every(g=>g.col);if(k=='l'||k=='r')dk.style.width=(ac?Math.min(200,wsClampSz(k,wsSz(k))):wsClampSz(k,wsSz(k)))+'px';else dk.style.height=(ac?34:wsClampSz(k,wsSz(k)))+'px'}});
+dk.hidden=!gs.length;if(nar){dk.style.width='';dk.style.height=''}else if(gs.length){const ac=gs.every(g=>g.col);if(wsVt(k))dk.style.width=(ac?Math.min(200,wsClampSz(k,wsSz(k))):wsClampSz(k,wsSz(k)))+'px';else dk.style.height=(ac?34:wsClampSz(k,wsSz(k)))+'px'}});
 if(!nar)L.float.forEach(g=>wsFl.appendChild(wsEl(g,true)));
 // the openers of the element panels are hidden (their commands check that the button exists, not that it shows); a top bar button that opens a panel is pressed while that panel shows
 document.querySelectorAll('#pnop [data-pn]').forEach(b=>{const p=b.dataset.pn;b.hidden=!MODEP.pattern.includes(p)||EL_ONLY.includes(p)});
@@ -118,11 +123,11 @@ function wsTabFit(){document.querySelectorAll('.wh .wt').forEach(t=>{wsTabFold(t
 document.addEventListener('scroll',e=>{if(e.target.classList&&e.target.classList.contains('wt'))wsTabEdge(e.target)},true);
 addEventListener('resize',()=>{if(wsReady)wsTabFit()});
 // tabs and buttons
-document.addEventListener('click',e=>{const w=e.target.closest('.wg');if(!w||Date.now()-wsJust<250)return;const g=wsGroup(w.dataset.g);if(!g)return;
+document.addEventListener('click',e=>{const w=e.target.closest('.wg');if(!w||performance.now()-wsJust<250)return;const g=wsGroup(w.dataset.g);if(!g)return;
 const b=e.target.closest('.wb');if(b){const a=b.dataset.act,r=w.getBoundingClientRect();
 if(a=='tmore'){rowMenu(b,[...w.querySelectorAll('.wt .wtab[hidden]')].map(t=>t.dataset.t).map(p=>[PNAME[p],()=>{g.a=p;g.col=false;panel=p;wsSave();wsRender()}]));return}
 if(a=='tl'||a=='tr'){const t=w.querySelector('.wt');if(t)t.scrollBy({left:(a=='tl'?-1:1)*Math.max(80,Math.round(t.clientWidth*.7)),behavior:'smooth'});return}   /* 2.26.0: more tabs than fit */
-if(a=='lock')g.lk=g.lk?0:1;else if(g.lk&&a!='col'){return}else if(a=='col')g.col=!g.col;else if(a=='close'){wsDetach(g)}else if(a=='tclose'){const p=b.dataset.tx,i=g.tabs.indexOf(p);if(i<0)return;g.tabs.splice(i,1);if(g.a==p)g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g)}   /* 2.60.1 (artist test): each tab of a group closes on its own */else if(a=='float'){wsDetach(g);const ek=g.e||'r',hz=ek=='t'||ek=='b',fw=Math.round(hz?Math.min(340,r.width):Math.min(320,r.width)),fh=Math.round(hz?Math.max(300,Math.min(420,innerHeight-120)):Math.min(Math.max(r.height,260),560));Object.assign(g,{x:Math.round(ek=='l'?r.right+14:ek=='r'?r.left-fw-14:r.left),y:Math.max(Math.round(document.querySelector('.stage').getBoundingClientRect().top+56),Math.round(ek=='t'?r.bottom+14:ek=='b'?r.top-fh-14:r.top)),w:fw,h:fh,col:false});wsL().float.push(g)}
+if(a=='lock')g.lk=g.lk?0:1;else if(g.lk&&a!='col'){return}else if(a=='col')g.col=!g.col;else if(a=='close'){wsDetach(g)}else if(a=='tclose'){const p=b.dataset.tx,i=g.tabs.indexOf(p);if(i<0)return;g.tabs.splice(i,1);if(g.a==p)g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g)}   /* 2.60.1 (artist test): each tab of a group closes on its own */else if(a=='float'){wsDetach(g);const ek=g.e||'r',hz=ek=='t'||ek=='b',fw=Math.round(hz?Math.min(340,r.width):Math.min(320,r.width)),fh=Math.round(hz?Math.max(300,Math.min(420,innerHeight-120)):Math.min(Math.max(r.height,260),560));Object.assign(g,{x:Math.round(ek=='l'||ek=='li'?r.right+14:ek=='r'||ek=='ri'?r.left-fw-14:r.left),y:Math.max(Math.round(document.querySelector('.stage').getBoundingClientRect().top+56),Math.round(ek=='t'?r.bottom+14:ek=='b'?r.top-fh-14:r.top)),w:fw,h:fh,col:false});wsL().float.push(g)}
 else if(a=='dock'){wsDetach(g);g.col=false;g.f=1;wsDockIns(wsL(),g,g.e||'r',1e9)}wsSave();wsRender();return}
 const t=e.target.closest('.wtab');if(t){g.a=t.dataset.t;g.col=false;panel=g.a;wsSave();wsRender()}});
 // 2.79.1 (owner Oct 31 2026): a panel's sections start folded but for its first one (and the selected element's own group); which ones are open is remembered for each
@@ -143,9 +148,8 @@ const t=e.target.closest('.wtab');if(t){g.a=t.dataset.t;g.col=false;panel=g.a;ws
   const t=x.getAttribute('title');if(t){x.dataset.wbtip=t;x.removeAttribute('title')}mo.observe(x,{attributes:true,attributeFilter:['title']});if(quick)show();else tm=setTimeout(show,300)},true);
  document.addEventListener('pointerout',e=>{if(el&&!(e.relatedTarget&&el.contains(e.relatedTarget))&&el.contains(e.target))hide()},true);
  ['pointerdown','keydown','wheel','scroll'].forEach(k=>addEventListener(k,()=>{if(el){hide();seen=0}},{capture:true,passive:true}))}
-// 2.78.5 (bug test B5, owner Oct 30 2026: "hidden"): the Element panel lists the shapes of the stamp open in its tab; with none open it was a blank panel, so its tab goes
-// (as its own close button would) and the Element panel opens again from a stamp's tab
-WBX.wbMlTab=()=>{if(stUnlocked()!=null)return;const L=wsL();let ch=false;[...L.dock,...L.float].forEach(g=>{const i=g.tabs.indexOf('mlist');if(i<0)return;g.tabs.splice(i,1);if(g.a=='mlist')g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g);ch=true});if(ch){wsSave();wsRender()}};
+// 2.79.3 (owner Oct 31 2026): the Element panel is gone (2.78.5 offered its tab only while a stamp was open); its section stays as the hidden home of the Element
+// group, Align and a stamp's shape list until they move into an element's panel or the Elements list
 // floating windows come to the front when touched
 document.addEventListener('pointerdown',e=>{const w=e.target.closest('.wg.fl');if(w){w.style.zIndex=++wsZ;const g=wsGroup(w.dataset.g),F=wsL().float,i=F.indexOf(g);if(i>=0&&i<F.length-1){F.splice(i,1);F.push(g);wsSave()}}},true);
 // dragging: tabs, title bars, splitters, resize corner
@@ -159,8 +163,9 @@ function wsTarget(e){wsInd.hidden=true;wsTint.hidden=true;document.querySelector
 const x=document.elementFromPoint(e.clientX,e.clientY);if(!x)return{k:'float'};const tb=x.closest('.wg .wh'),own=wd.whole?wd.el:null;
 if(tb){const w=tb.closest('.wg');if(w!==own&&!(w===wd.el&&!wd.whole)){w.classList.add('wdrop');return{k:'merge',g:wsGroup(w.dataset.g)}}}
 if(wsNarrow())return{k:'float'};
+{const z=wsEdgeAt(e);if(z=='li'||z=='ri'){wsZones(z);return{k:'dock',e:z,i:1e9}}}   // the inner edge of a dock: a column beside it (2.79.3)
 const dk=x.closest('.dk');
-if(dk&&!dk.hidden){const ed=dk.dataset.e,box=wsBox[ed],vert=ed=='l'||ed=='r',gs=[...box.querySelectorAll(':scope>.wg')].filter(w=>w!==own),br=box.getBoundingClientRect(),cur=vert?e.clientY:e.clientX;
+if(dk&&!dk.hidden){const ed=dk.dataset.e,box=wsBox[ed],vert=wsVt(ed),gs=[...box.querySelectorAll(':scope>.wg')].filter(w=>w!==own),br=box.getBoundingClientRect(),cur=vert?e.clientY:e.clientX;
 let i=gs.length;for(let k=0;k<gs.length;k++){const r=gs[k].getBoundingClientRect();if(cur<(vert?r.top+r.height/2:r.left+r.width/2)){i=k;break}}
 const same=!!wd.whole&&!wd.fl&&(wd.g.e||'r')==ed,mr=same?wd.el.getBoundingClientRect():null,inMine=!!mr&&e.clientX>=mr.left&&e.clientX<=mr.right&&e.clientY>=mr.top&&e.clientY<=mr.bottom,p=same?wsL().dock.filter(x=>(x.e||'r')==ed).indexOf(wd.g):-1;
 const hk=gs.find(w=>{const r=w.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom});
@@ -176,7 +181,7 @@ return{k:'dock',e:ed,i}}
 const z=wsEdgeAt(e);if(z){wsZones(z);return{k:'dock',e:z,i:1e9}}
 return{k:'float'}}
 document.addEventListener('pointermove',e=>{if(!wd||wd.cancel)return;
-if(wd.k=='edge'){const k=wd.e,d=k=='r'?wd.sx-e.clientX:k=='l'?e.clientX-wd.sx:k=='b'?wd.sy-e.clientY:e.clientY-wd.sy;wsSetSz(k,wd.s0+d);return}
+if(wd.k=='edge'){const k=wd.e,d=k=='r'||k=='ri'?wd.sx-e.clientX:k=='l'||k=='li'?e.clientX-wd.sx:k=='b'?wd.sy-e.clientY:e.clientY-wd.sy;wsSetSz(k,wd.s0+d);return}
 if(wd.k=='split'){const dy=(wd.hz?e.clientX:e.clientY)-wd.sy,mn=wd.hz?160:80,ha=Math.max(mn,wd.ha+dy),hb=Math.max(mn,wd.hb-(ha-wd.ha)),tot=wd.ga.f+wd.gb.f;wd.ga.f=tot*ha/(ha+hb);wd.gb.f=tot-wd.ga.f;wd.a.style.flexGrow=wd.ga.f;wd.b.style.flexGrow=wd.gb.f;return}
 if(wd.k=='size'){wd.g.w=Math.max(200,Math.round(wd.r.width+e.clientX-wd.sx));wd.g.h=Math.max(120,Math.round(wd.r.height+e.clientY-wd.sy));wd.w.style.width=wd.g.w+'px';wd.w.style.height=wd.g.h+'px';return}
 if(!wd.on){if(Math.hypot(e.clientX-wd.sx,e.clientY-wd.sy)<6)return;wd.on=true;wd.whole=!wd.p||wd.g.tabs.length==1;document.body.classList.add('wsdrag');
@@ -186,7 +191,7 @@ if(wd.live){wd.el.style.left=(e.clientX-wd.ox)+'px';wd.el.style.top=Math.max(0,e
 wd.t=wsTarget(e)});
 document.addEventListener('pointerup',e=>{if(!wd)return;const d=wd;wd=null;
 if(d.k=='split'){d.sp.classList.remove('on');wsSave();return}if(d.k=='size'){wsSave();return}if(d.k=='edge'){d.h.classList.remove('on');document.body.classList.remove('wsedge');wsSave();return}
-if(!d.on)return;wsJust=Date.now();document.body.classList.remove('wsdrag');if(d.gh)d.gh.remove();wsInd.hidden=true;wsTint.hidden=true;document.querySelectorAll('.dk.dropz').forEach(x=>x.classList.remove('dropz'));document.querySelectorAll('.wg.wdrop').forEach(x=>x.classList.remove('wdrop'));
+if(!d.on)return;wsJust=performance.now();document.body.classList.remove('wsdrag');if(d.gh)d.gh.remove();wsInd.hidden=true;wsTint.hidden=true;document.querySelectorAll('.dk.dropz').forEach(x=>x.classList.remove('dropz'));document.querySelectorAll('.wg.wdrop').forEach(x=>x.classList.remove('wdrop'));
 if(d.cancel){wsRender();return}
 const t=d.t||{k:'float'},L=wsL();
 if(t.k=='noop'||(t.k=='merge'&&t.g===d.g)){wsRender();return}
@@ -224,6 +229,17 @@ if(!g){const m=wsMem[p],e=m&&m.e?m.e:wsSide(),free=x=>!x.lk;
 g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
+// 2.79.3 (owner Oct 31 2026: "the stamp panel should always be out when the stamp tab mode is opened ... on the right side of the left panel"): opening a stamp's tab
+// brings the Stamp panel into a group of its own in the inner column right of the left dock (the left dock itself when it is empty); closing the tabs puts it back
+// where it was, or closes it if it was not open, unless it was moved meanwhile
+let wsStM=null;
+WBX.wbStampDock=on=>{if(!wsReady||wsNarrow())return;const L=wsL(),G='gstmp',mine=()=>L.dock.find(g=>g.id==G&&g.tabs.length==1&&g.tabs[0]=='stmp');
+ if(on){const g0=wsFind('stmp');if(g0&&g0.id==G)return;wsStM=g0?{id:g0.id,i:g0.tabs.indexOf('stmp'),a:g0.a==='stmp',e:g0.e,fl:L.float.includes(g0)}:{none:1};
+  if(g0){g0.tabs.splice(g0.tabs.indexOf('stmp'),1);if(g0.a=='stmp')g0.a=g0.tabs[0];if(!g0.tabs.length)wsDetach(g0)}
+  const g=wsG(['stmp'],{id:G});wsDockIns(L,g,L.dock.some(x=>x.e=='l')?'li':'l',1e9)}
+ else{const g=mine(),m=wsStM;wsStM=null;if(!g||!m)return;wsDetach(g);
+  if(!m.none){let h=wsGroup(m.id);if(h){h.tabs.splice(Math.min(m.i,h.tabs.length),0,'stmp');if(m.a)h.a='stmp'}else{h=wsG(['stmp']);if(m.fl)L.float.push(Object.assign(h,{x:null}));else wsDockIns(L,h,m.e||'l',1e9)}}}
+ wsSave();wsRender()};
 WBX.wbApart=pn=>{const a=wsFind('lyrs'),b=wsFind(pn);return!(a&&b&&a===b)};   // false when the panel is a tab beside the Elements list: showing it would hide the list
 // The panels the app opens with (2.9.0: the Workspaces tool is gone; this is the one built-in layout, opened at launch). Read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
 const wsLaunch=()=>({pattern:{dock:[wsG(['canvas','colors'],{e:'l'}),wsG(['lyrs','layers'],{e:'r',lk:1})],float:[]}});
@@ -259,7 +275,7 @@ $('rzdo').onclick=()=>randomize(false);
 // ---- zoom
 // 2.76.8 (2.76 review): the canvas no longer jumps sideways when the left column opens. While it is fitted to the screen, the left column's width is left out of
 // the fit and the canvas is moved back by half of it, so its middle stays where it was; a zoomed canvas keeps its own scroll
-const dkL=()=>{const d=document.querySelector('.dock.dk-l');return d?Math.round(d.getBoundingClientRect().width):0};
+const dkL=()=>[...document.querySelectorAll('.dock.dk-l,.dock.dk-li')].reduce((n,d)=>n+Math.round(d.getBoundingClientRect().width),0);
 function fitZ(){const b=$('boardP');if(b.classList.contains('off'))return;const w=b.clientWidth-64-dkL(),h=b.clientHeight-64;fitS=Math.max(.05,Math.min(w/CW,h/CH))}
 function applyZ(){fitZ();const s=z||fitS;{const sh=z?'':(dkL()?`translateX(${-dkL()/2}px)`:'');if($('artwrap').style.transform!==sh)$('artwrap').style.transform=sh}$('art').style.width=Math.round(CW*s)+'px';$('art').style.height=Math.round(CH*s)+'px';$('artsh').style.width=$('art').style.width;$('artsh').style.height=$('art').style.height;$('zl').textContent=Math.round(s*100)+'%';$('zl').title=z?'Fit to screen':'Fitted to screen';if(window.bkZ)bkZ();if(WBX.wbZoomed)WBX.wbZoomed()}
 function zoomAt(ns,cx,cy){const b=$('boardP'),a=$('art'),r0=a.getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);z=Math.min(8,Math.max(.1,ns));applyZ();const r1=a.getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}

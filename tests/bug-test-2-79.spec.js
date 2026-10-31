@@ -104,14 +104,11 @@ test('a narrow window folds the menus into "…" and keeps every top-bar button 
   expect(errors).toEqual([]);
 });
 
-// B5 (2.78.5, owner: "hidden"): the Element panel was a blank tab with a stamp selected but not open; its tab goes while no stamp is open
-test('the Element tab is there only while a stamp is open', async ({ page }) => {
+// B5 (2.78.5, owner: "hidden"); 2.79.3 (owner Oct 31 2026: "I agree"): the Element panel is gone, its parts live in the element panels and the Elements list
+test('there is no Element panel, on the canvas or in a stamp\'s tab', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false });
+  await expect(page.locator('.rail [data-pn="mlist"]')).toHaveCount(0);
   await H.addStamp(page); await H.unlockStamp(page, 0); await H.settle(page);
-  await page.evaluate(() => document.querySelector('.rail [data-pn="mlist"]').click()); await H.settle(page);   // 2.79.1: with nothing selected the panel is empty (Align hides), so only its tab is checked
-  await expect(page.locator('.wtab[data-t="mlist"]')).toHaveCount(1);
-  await H.showPanel(page, 'stmp'); await page.locator('#stmpl .smklk').first().click(); await H.settle(page);   // its edit button again closes the stamp
-  expect(await page.evaluate(() => window.__wbTest.unlockedStamp())).toBe(null);
   await expect(page.locator('.wtab[data-t="mlist"]')).toHaveCount(0);
   expect(errors).toEqual([]);
 });

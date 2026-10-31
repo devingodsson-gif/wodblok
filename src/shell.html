@@ -84,7 +84,7 @@ button,.ddi,.wtab,.lyr{transition:background-color var(--t-fast),border-color va
 .baH{position:absolute;z-index:43;width:20px;margin-left:-8px;cursor:ew-resize;touch-action:none}.baH::before{content:"";position:absolute;left:9px;top:0;bottom:0;width:2px;background:var(--acc);box-shadow:0 0 0 1px rgba(0,0,0,.25)}.baH i{position:absolute;left:1px;top:50%;width:18px;height:var(--h-md);margin-top:-12px;border-radius:var(--r-m);background:var(--acc);box-shadow:0 1px 4px rgba(0,0,0,.4)}
 #bacmp button[aria-pressed=true]{background:var(--raise);color:var(--acc-ink);font-weight:600;box-shadow:0 0 0 1px var(--acc)}.hr button.rfb,.hsh button.rfb{width:auto;height:var(--h-xs);padding:0 8px;font-size:var(--fs-s);border:1px solid var(--line2);background:var(--field);color:var(--fg)}.hr button.rfb:hover,.hsh button.rfb:hover{border-color:var(--acc);color:var(--acc-ink);background:var(--field)}.hsh button.rfb{visibility:visible}.hsh button.rfb[hidden]{display:none}.hr.sn{grid-template-columns:minmax(0,1fr) auto auto auto}.hr .rfb{margin-left:0}
 /* ---------- app grid ---------- */
-#app{height:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:46px auto minmax(0,1fr) auto 26px;grid-template-areas:"top top top" "dl dt dr" "dl stage dr" "dl db dr" "status status status"}
+#app{height:100%;display:grid;grid-template-columns:auto auto minmax(0,1fr) auto auto;grid-template-rows:46px auto minmax(0,1fr) auto 26px;grid-template-areas:"top top top top top" "dl dli dt dri dr" "dl dli stage dri dr" "dl dli db dri dr" "status status status status status"}
 .top{grid-area:top;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;padding:0 8px 0 0;border-bottom:1px solid var(--line);background:var(--panel)}
 /* 2.43.0, a clean top bar: the mark and the menus left, the project's name in the middle, the few tools right (Photoshop, Figma) */
 .top>.tl,.top>.tr{display:flex;align-items:center;gap:8px;min-width:0;height:100%}.top>.tr{justify-content:flex-end}
@@ -199,10 +199,12 @@ body.wsdrag,body.wsdrag *{cursor:grabbing!important;user-select:none!important}
 /* v71 four-edge docks: left, right, top, bottom. Side docks stack panels vertically; top and bottom docks lay panels out side by side. */
 .dk-r{grid-area:dr;border-left:1px solid var(--line);width:316px}
 .dk-l{grid-area:dl;border-right:1px solid var(--line);width:316px}
+.dk-li{grid-area:dli;border-right:1px solid var(--line);width:300px}
+.dk-ri{grid-area:dri;border-left:1px solid var(--line);width:300px}
 .dk-t{grid-area:dt;border-bottom:1px solid var(--line);height:260px}
 .dk-b{grid-area:db;border-top:1px solid var(--line);height:260px}
 .dk>.wsd{display:flex;flex:1;min-height:0;min-width:0;overflow:hidden}
-.dk-l>.wsd,.dk-r>.wsd{flex-direction:column}
+.dk-l>.wsd,.dk-r>.wsd,.dk-li>.wsd,.dk-ri>.wsd{flex-direction:column}
 .dk-t>.wsd,.dk-b>.wsd{flex-direction:row;overflow-x:auto;overflow-y:hidden}
 .dk-t .wsd .wg,.dk-b .wsd .wg{flex:1 1 300px;min-width:260px;min-height:0}
 .dk-t .wsd .wg.col,.dk-b .wsd .wg.col{flex:none!important;min-width:0;align-self:flex-start}
@@ -216,7 +218,8 @@ body.wsdrag,body.wsdrag *{cursor:grabbing!important;user-select:none!important}
 .wed{position:absolute;z-index:6;background:transparent;transition:background var(--t-fast)}
 .wed:hover,.wed.on{background:var(--acc)}
 .dk-r>.wed{left:0;top:0;bottom:0;width:5px;cursor:col-resize}
-.dk-l>.wed{right:0;top:0;bottom:0;width:5px;cursor:col-resize}
+.dk-l>.wed,.dk-li>.wed{right:0;top:0;bottom:0;width:5px;cursor:col-resize}
+.dk-ri>.wed{left:0;top:0;bottom:0;width:5px;cursor:col-resize}
 .dk-t>.wed{left:0;right:0;bottom:0;height:5px;cursor:row-resize}
 .dk-b>.wed{left:0;right:0;top:0;height:5px;cursor:row-resize}
 .wzn{position:fixed;z-index:68;pointer-events:none;border:2px dashed color-mix(in srgb,var(--acc) 55%,transparent);background:color-mix(in srgb,var(--acc) 6%,transparent);border-radius:var(--r-m);opacity:0;transition:opacity var(--t-fast),left var(--t-fast),top var(--t-fast),width var(--t-fast),height var(--t-fast),background var(--t-fast)}
@@ -224,7 +227,7 @@ body.wsdrag .wzn{opacity:1}
 .wzn.hot{background:var(--acc-soft);border-style:solid;border-color:var(--acc)}
 body.wsedge,body.wsedge *{user-select:none!important}
 .dock.dropz{box-shadow:inset 0 0 0 2px var(--acc);background:var(--acc-soft)}
-@media (max-width:860px){.wsd .wg{flex:none!important;min-height:0}.wsp,.wb[data-act=float]{display:none}.dk-l,.dk-t,.dk-b,.wzn,.wed{display:none!important}.dk-r{grid-area:dock;width:auto!important}}
+@media (max-width:860px){.wsd .wg{flex:none!important;min-height:0}.wsp,.wb[data-act=float]{display:none}.dk-l,.dk-li,.dk-ri,.dk-t,.dk-b,.wzn,.wed{display:none!important}.dk-r{grid-area:dock;width:auto!important}}
 
 
 /* ---------- v67 Randomize hold: the old picture stays up until the new one is fully made ---------- */
@@ -910,7 +913,6 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
  <button type="button" id="rail-motifs" data-pn="motifs" aria-label="Shape"></button>
  <button type="button" id="rail-image" data-pn="image" aria-label="Image"></button>
  <button type="button" id="rail-text" data-pn="text" aria-label="Text"></button>
- <button type="button" id="rail-mlist" data-pn="mlist" aria-label="Element"></button>
  <button type="button" id="rail-elpaint" data-pn="elpaint" aria-label="Paint"></button>
  <button type="button" id="rail-sheet" data-pn="sheet" aria-label="Sheet"></button>
 </div>

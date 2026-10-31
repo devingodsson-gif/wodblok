@@ -458,7 +458,7 @@ A row of two to four mutually exclusive options. Container `--r-m`, `--panel` fi
 - **Group label** (a sub-heading inside a group): section 11.2.
 - **Panel bar** (the compact bar under a header with a setting, e.g. Auto-open): padding 7 / 10, `--fs-s`, `--mut`, bottom border `--line`.
 - Panels MUST work at narrow widths: no fixed widths that overflow; labels truncate; the slider grid keeps its columns.
-- A panel works docked left, right, top or bottom, tabbed and floating. Test all three before shipping.
+- A panel works docked left, right, top or bottom, tabbed and floating. Test all three before shipping. Since 2.79.3 the left and the right dock each have an inner column beside them (edges `li` and `ri`): a panel dropped on a dock's inner edge stands there, the same dock in every way; a column whose outer dock empties becomes that dock. While a stamp's tab is open the Stamp panel stands in the left one (owner, Oct 31 2026).
 
 #### 11.2 Headings (the complete list)
 

@@ -16,7 +16,7 @@ Owner: "please make a simple plan with as few releases as possible. make these u
 2. Alt + wheel resizes and Shift + wheel rotates what is on the cursor or a selected element under the pointer (canvas and stamp tab); then the view does not move.
 3. Every icon and button shows a short name (and its shortcut) about 0.3 s after hovering.
 
-## Step 3: 2.79.3, side-by-side panels
+## Step 3: 2.79.3, side-by-side panels (built Oct 31 2026; docs/plan.md). Also: the Element panel removed (owner, Oct 31 2026)
 1. A panel dropped on the inner edge of a dock sits beside it as a second column.
 2. A stamp tab brings the Stamp panel out in a column to the right of the left panel while a stamp is open.
 

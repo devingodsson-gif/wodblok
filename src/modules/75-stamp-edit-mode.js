@@ -59,7 +59,7 @@ function steSync(){const un=stUnlocked(),ml=$('mlist'),body=$('lybody'),list=$('
  // a stamp that opened some other way (a double click, or the stamp list) gets its tab too
  if(un!=null&&!STE.tabs.includes(un))STE.tabs.push(un);
  steTabs(un);
- const on=un!=null;document.body.classList.toggle('stedit',on);
+ const on=un!=null,was=document.body.classList.contains('stedit');document.body.classList.toggle('stedit',on);if(on!==was&&WBX.wbStampDock)WBX.wbStampDock(on);   // the Stamp panel comes out beside the left panel (2.79.3)
  if(on&&ml.parentNode!==body){if(!steHome)steHome=ml.parentNode;body.insertBefore(ml,list);list.hidden=true}
  else if(!on&&steHome&&ml.parentNode!==steHome){steHome.appendChild(ml);list.hidden=false}}
 function init75(){const a=$('art');if(!a)return;
