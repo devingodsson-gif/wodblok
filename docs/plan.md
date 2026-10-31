@@ -1,6 +1,6 @@
 # Development plan
 
-## 2.84.0 (Oct 31 2026, branch fix/2.84.0-style-conformance): the whole app checked against the UI standard
+## 2.84.0 (Oct 31 2026, LIVE with the owner's word, without the CI suite): the whole app checked against the UI standard
 - Owner: "Do a style check over the whole app, make sure everything is confirmed to our style guidelines document make any adjustments you need."
 - Checked: `npm run check:style`, then a scan of the page CSS and the styles modules write against Part 9 (layers, motion, gaps, font sizes in the shorthand, icon sizes, disabled opacity, the swatch edge, literal colours, wording), and the icons drawn in every panel measured in the running app.
 - **Fixed (appearance only):**
