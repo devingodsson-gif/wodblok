@@ -20,5 +20,5 @@ Owner: "please make a simple plan with as few releases as possible. make these u
 1. A panel dropped on the inner edge of a dock sits beside it as a second column.
 2. A stamp tab brings the Stamp panel out in a column to the right of the left panel while a stamp is open.
 
-## 2.80.0
+## 2.80.0 (LIVE Oct 31 2026)
 The CI suite, then live on the owner's word.

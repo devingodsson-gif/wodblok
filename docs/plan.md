@@ -1,5 +1,8 @@
 # Development plan
 
+## 2.80.0 (Oct 31 2026): the small updates plan is done, LIVE
+- Closes docs/small-updates-plan.md: 2.79.1 (panels and selection), 2.79.2 (the wheel and quick tooltips), 2.79.3 (side-by-side panels, the Stamp panel beside the left panel in a stamp's tab, the Element panel removed). CI suite with the owner's word (results under 2.79.3); live with the owner's word ("Go live", Oct 31 2026).
+
 ## 2.79.3 (Oct 31 2026, branch feat/2.79.3-side-by-side-panels, step 3 of docs/small-updates-plan.md): panels side by side
 - **Inner columns:** beside the left and the right dock stands an inner column (edges `li`, `ri`; grid areas `dli`, `dri`), a dock like the others with its own groups, splitters and width. A panel dropped on a dock's inner edge goes there (the drop zone shows at that edge); one whose outer dock empties becomes that dock; a panel closed there opens there again (its remembered place). Floating and narrow windows take it into account; the canvas centring (`dkL`) still counts the left dock only (counting the column too shrank a fitted canvas twice) (34-desktop-shell.js, shell.html).
 - **Stamp tab:** opening a stamp's tab brings the Stamp panel into its own group (`gstmp`) in the inner column right of the left dock (the left dock itself when that is empty); back on the Canvas it returns to where it was, or closes if it was not open, unless it was moved meanwhile (34 `WBX.wbStampDock`, called from 75-stamp-edit-mode.js). The group is dropped from a saved layout, since no stamp's tab is open at launch.
