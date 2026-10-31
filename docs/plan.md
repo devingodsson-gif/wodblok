@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.79.0 (Oct 30 2026, branch fix/2.79.0-close-bug-test): the bug-test plan is done
+- Closes the fix plan of docs/bug-test-2.78.md: 2.78.2 (B1), 2.78.3 (B6, B4), 2.78.4 (B2), 2.78.5 (B3, B5).
+- CI suite: see PROJECT_STATUS.
+
 ## 2.78.5 (Oct 30 2026, branch fix/2.78.5-narrow-window-and-element-tab, step 4 of the bug-test plan): narrow windows, the Element tab
 - **B3** (owner: 1,024 px is the narrowest window): when the top bar does not fit, its menus fold from the right (Help first, File never) into a last menu, "…", which lists them as submenus; at full width it is hidden (85-menu-bar.js). Below 1,024 px the right end of the bar (Undo, Redo, History, search, Randomize, the theme) stays in reach; at 800 px Randomize was cut off, at 640 px Undo and Redo too. Arrow keys along the bar skip the folded menus.
 - **B5** (owner: "hidden"): the Element panel's tab goes while no stamp is open, as its own close button would (34-desktop-shell.js, `WBX.wbMlTab`); it was a blank panel with a stamp selected but not open.
