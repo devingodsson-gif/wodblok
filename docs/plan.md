@@ -1,5 +1,13 @@
 # Development plan
 
+## 2.80.2 (Oct 31 2026, branch feat/2.80.2-touch-canvas, step 2 of docs/mobile-touch-plan.md): the canvas with fingers
+- **Phone only** (97-touch.js, `wbtouch`, touch pointers only; the board takes every touch itself there: `touch-action:none`). A mouse and desktop windows are unchanged.
+- **A first finger is held 90 ms** before the editor sees it, so a second finger can still make a gesture of it; a finger that moves 6 px or stays is passed on as it was, to what is exactly under it (the browser's touch adjustment otherwise gave a small shape's handles every touch on it). Moving keeps where the element was held (the editor's own drag; as with the mouse, smart guides may snap it).
+- **Two fingers:** pinch and drag zoom and move the view; started on a selected element (the sliders of `WBX.wbWheelXf`, 2.79.2) they size and turn it through Size and Rotate, one History step when a finger lifts.
+- **Placing:** with a shape, stamp, text or copy on the finger, the finger shows where it goes (the editor's hover) and it is placed where the finger lifts, on the canvas and in a stamp's tab.
+- **Handles:** outside the selection, a handle takes a touch from 22 px round it.
+- Tests: tests/mobile-touch-2-80.spec.js (four more: placing on the canvas and in a stamp's tab, moving, pinch zoom and pinch size and turn, a handle from beside it). Related specs and `npm run perf`: see PROJECT_STATUS. Not run: full suite, WebKit, CI.
+
 ## 2.80.1 (Oct 31 2026, branch fix/2.80.1-touch-sliders-and-tray, step 1 of docs/mobile-touch-plan.md): a phone's sliders and the colour tray
 - **Phone only:** a new module, 97-touch.js, marks a narrow window on a touch screen with the `wbtouch` class on `<html>`; nothing in it runs elsewhere. Desktop windows (1,024 px and up) and the mouse are unchanged.
 - **Sliders:** in `wbtouch` a slider takes no touch of its own (`pointer-events:none`, its row `touch-action:pan-y`). A finger that goes sideways first (8 px) drags its value from where it was; one that goes up or down first scrolls; a tap changes nothing. The drag is drawn as a draft and is one History step when the finger lifts. The double tap that resets a slider (34) no longer counts a touch that moved, and times taps with `performance.now()`.
