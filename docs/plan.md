@@ -1,5 +1,26 @@
 # Development plan
 
+## 2.84.0 (Oct 31 2026, branch fix/2.84.0-style-conformance): the whole app checked against the UI standard
+- Owner: "Do a style check over the whole app, make sure everything is confirmed to our style guidelines document make any adjustments you need."
+- Checked: `npm run check:style`, then a scan of the page CSS and the styles modules write against Part 9 (layers, motion, gaps, font sizes in the shorthand, icon sizes, disabled opacity, the swatch edge, literal colours, wording), and the icons drawn in every panel measured in the running app.
+- **Fixed (appearance only):**
+  - **Phone Randomize:** the button showed its icon by setting the font size to 0; its label is now a span that a phone hides (the one `check:style` failure).
+  - **Pop-ups:** menus and popovers enter at `--t-fast` (were .13 s); a slider's reset flash fades at `--t-slow` (was .5 s).
+  - **Panel drag layers:** the drop zones, tint, ghost and line now sit in the 70 to 80 band (were 68 to 71, below modals).
+  - **Gaps:** the status bar's gap is 16 (was 18); a library tile's gap is 4 (was 3).
+  - **Font sizes in the shorthand:** the eyedropper's label and a colourway card's number are 11 px (were 10.5 and 9); the page's first, overridden body font is 12 px.
+  - **Icons:** every icon draws at 13, 15 or 18 px.
+    - 14 to 15: panel headers, the tab arrows, list and recipe rows, quick export.
+    - 16 to 15: the element bar, libraries, the tray's add button and the picker's tools.
+    - 17 to 15: icon buttons in panels.
+    - 18: the top bar's icon buttons and Randomize (were 17).
+    - 13: a stamp tab's close and the shape list's caret (were 12 and 11).
+  - **Disabled:** controls fade to .4 everywhere (were .45, .35 and .22 in five places).
+  - **Swatch edge:** one value, `rgba(0,0,0,.2)` (five were .18).
+- **`check:style` now also checks:** font sizes in the shorthand, layer bands, the spacing scale for gaps, motion durations and icon sizes (docs/developing-wodblok.md Part 9 section 16).
+- Wording: no Title Case labels, American spellings, "OK" or exclamation marks found in the interface.
+- Tests: the style-related specs; pixel goldens will change where icons moved by a pixel or two (expected). Not run: full suite, WebKit, CI.
+
 ## 2.83.0 (Oct 31 2026, LIVE with the owner's word): a flag picture for every pattern type
 - Owner: "Wallpaper pattern type shows pattern preview rendered with flags, I want this for all the pattern types. They should all render flags."
 - Under Arrangement, every tile shape (Square, Hexagon, Triangle, Diamond, Circle, Octagon; From stamp shows its shape's) now shows the small flag picture the wallpaper groups had: a flag at each place as `tlPts` lays it, with its turn and flip, whole flags only, in a window of three pieces round the middle. In the arrangements about colours (Checkerboard, Diagonal, Stripes, Bands, Three colours, Alternating rows, Harlequin, Ogee) a piece's class shows as a fainter or stronger flag (92-pattern-tiling.js `tlFlagPreview`, 67-pattern-element.js). The wallpaper groups keep their 2 x 2 cells.
