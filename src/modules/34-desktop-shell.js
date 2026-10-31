@@ -226,6 +226,9 @@ if(!g){const m=wsMem[p],e=m&&m.e?m.e:wsSide(),free=x=>!x.lk;
  if(!g&&!ELP.includes(p))g=L.dock.find(x=>free(x)&&(x.e||'r')==e&&!wsIsP(x))||null;
  if(!g){g={id:ELP.includes(p)?'gprops':nid(),tabs:[],a:p,f:1,e};L.dock.push(g)}
  g.tabs.push(p)}
+// 2.81.3 (owner Oct 31 2026): on a phone (the narrow layout) the tool panels share one group under the Elements list, one at a time, as tabs; opening a panel
+// moves it into that group instead of piling up another
+if(wsNarrow()&&!g.lk){const T=[...L.dock,...L.float].find(x=>!x.lk&&x!==g);if(T){const i=g.tabs.indexOf(p);if(i>=0)g.tabs.splice(i,1);if(g.a==p)g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g);if(!T.tabs.includes(p))T.tabs.push(p);g=T}}
 g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;

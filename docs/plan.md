@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.81.3 (Oct 31 2026, branch fix/2.81.3-phone-pinned-canvas, step 2 of docs/mobile-review-2.81.md): the canvas stays on screen; one tool group
+- Phone only (the narrow layout, `max-width:860px` / `wsNarrow()`).
+- **M3:** the top bar and the stage stay at the top of the screen (sticky) while the panels scroll under them; the canvas is 38% of the screen's height there, and the page's scroll padding keeps a control scrolled to clear of it (shell.html).
+- **M4:** opening a tool panel moves it into one group under the Elements list, as a tab, instead of a new group under the last (34-desktop-shell.js `setPanel`).
+- Tests: tests/mobile-touch-2-80.spec.js (one more: four panels opened make one group of tabs; scrolled to the end, the canvas is still on screen). The narrow-screen specs (top-bar-scroll, format, settings-menu, site-account) pass. Not run: full suite, WebKit, CI.
+
 ## 2.81.2 (Oct 31 2026, branch fix/2.81.2-touch-scroll-and-place-once, step 1 of docs/mobile-review-2.81.md): a swipe on the canvas scrolls; placing stops after one
 - Owner: "yes to all ... do whatever you think is best". Phone only (97-touch.js).
 - **M1:** a finger that moves from the empty canvas (no element a click would pick, no handle: `WBX.wbTouchHit` in 25, `WBX.wbSceAt` in 64 for a stamp's tab) scrolls the canvas when zoomed in and then the page; a tap there still deselects. The selection rectangle stays a desktop tool.

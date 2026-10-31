@@ -52,6 +52,19 @@ test.describe('on a phone', () => {
     expect(errors).toEqual([]);
   });
 
+  test('2.81.3: the canvas stays on screen while the panels scroll; tool panels open as tabs of one group', async ({ page }) => {
+    const { errors } = await H.openApp(page, { seed: 4, background: true, workspaces: 'launch' });
+    for (const p of ['rand', 'layers', 'motifs', 'xrec']) { await page.evaluate(p => document.querySelector(`.rail [data-pn="${p}"]`).click(), p); await H.settle(page); }
+    const groups = await page.evaluate(() => [...document.querySelectorAll('.wg')].map(g => [...g.querySelectorAll('.wtab')].map(t => t.dataset.t)));
+    expect(groups, 'the Elements list, then one group of tools').toEqual([['lyrs'], ['rand', 'layers', 'motifs', 'xrec']]);
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight)); await page.waitForTimeout(200);
+    expect(await page.evaluate(() => scrollY), 'the page scrolled').toBeGreaterThan(100);
+    const art = await page.locator('#art').boundingBox();
+    expect(art.y, 'the canvas is still on screen').toBeGreaterThanOrEqual(40);
+    expect(art.y + art.height).toBeLessThan(844 * .6);
+    expect(errors).toEqual([]);
+  });
+
   test('the colour tray shows right of the element bar, as on a desktop', async ({ page }) => {
     const { errors } = await H.openApp(page, { seed: 4, background: true });
     await expect(page.locator('#tyd')).toBeVisible();
