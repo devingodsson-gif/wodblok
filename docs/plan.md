@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.80.1 (Oct 31 2026, branch fix/2.80.1-touch-sliders-and-tray, step 1 of docs/mobile-touch-plan.md): a phone's sliders and the colour tray
+- **Phone only:** a new module, 97-touch.js, marks a narrow window on a touch screen with the `wbtouch` class on `<html>`; nothing in it runs elsewhere. Desktop windows (1,024 px and up) and the mouse are unchanged.
+- **Sliders:** in `wbtouch` a slider takes no touch of its own (`pointer-events:none`, its row `touch-action:pan-y`). A finger that goes sideways first (8 px) drags its value from where it was; one that goes up or down first scrolls; a tap changes nothing. The drag is drawn as a draft and is one History step when the finger lifts. The double tap that resets a slider (34) no longer counts a touch that moved, and times taps with `performance.now()`.
+- **Colour tray:** shown on a phone, on its own row under the element bar, scrolling sideways when it does not fit (it was hidden below 860 px).
+- Tests: tests/mobile-touch-2-80.spec.js (touch sent as real touch events through CDP on a 390 × 844 touch screen; a desktop check). Related specs: see PROJECT_STATUS. Not run: full suite, WebKit, CI.
+
 ## 2.80.0 (Oct 31 2026): the small updates plan is done, LIVE
 - Closes docs/small-updates-plan.md: 2.79.1 (panels and selection), 2.79.2 (the wheel and quick tooltips), 2.79.3 (side-by-side panels, the Stamp panel beside the left panel in a stamp's tab, the Element panel removed). CI suite with the owner's word (results under 2.79.3); live with the owner's word ("Go live", Oct 31 2026).
 

@@ -455,7 +455,8 @@ function resetRange(r){let d=r.dataset.def!=null?r.dataset.def:r.getAttribute('v
 r.value=d;r.dispatchEvent(new Event('input',{bubbles:true}));paint(r);const row=r.closest('.ctl');if(row){row.classList.remove('rst');void row.offsetWidth;row.classList.add('rst')}return true}
 const rowRange=t=>{if(t.closest&&t.closest('.num'))return null; /* the number box has its own double-click: select all */ const row=t.closest&&t.closest('.ctl');return row&&row.querySelector('input[type=range]')};
 document.addEventListener('dblclick',e=>{const r=rowRange(e.target);if(r&&resetRange(r)){e.preventDefault();if(document.activeElement&&document.activeElement.type=='number')document.activeElement.blur();const sel=getSelection&&getSelection();if(sel)sel.removeAllRanges()}});
-let lastTap={r:null,t:0};document.addEventListener('pointerup',e=>{if(e.pointerType!='touch')return;const r=rowRange(e.target);if(!r)return;const now=Date.now();if(lastTap.r===r&&now-lastTap.t<320){resetRange(r);lastTap={r:null,t:0}}else lastTap={r,t:now}});
+let lastTap={r:null,t:0},tapAt=null;document.addEventListener('pointerdown',e=>{if(e.pointerType=='touch')tapAt=[e.clientX,e.clientY]},true);   // 2.80.1: a touch that moved (a drag or a scroll) is no tap
+document.addEventListener('pointerup',e=>{if(e.pointerType!='touch')return;if(tapAt&&Math.hypot(e.clientX-tapAt[0],e.clientY-tapAt[1])>8){lastTap={r:null,t:0};return}const r=rowRange(e.target);if(!r)return;const now=performance.now();if(lastTap.r===r&&now-lastTap.t<320){resetRange(r);lastTap={r:null,t:0}}else lastTap={r,t:now}});
 const rs=document.createElement('style');rs.textContent='.ctl.rst{animation:rstf .5s ease-out}@keyframes rstf{0%{background:var(--acc-soft)}100%{background:transparent}}.ctl{border-radius:var(--r-m)}.ctl label{cursor:default}';document.head.appendChild(rs);
 // (2.29.0) slider rows carry no hover sentence; double-click still resets a slider
 $('gti').onclick=()=>{WBS.edInk=!WBS.edInk;tbSync();upd()};
