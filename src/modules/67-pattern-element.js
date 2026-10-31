@@ -11,7 +11,7 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {fpL,fpU} from './24-free-place-layers.js';
 import {fpSz} from './25-art-layers.js';
 import {elDef,elExtend,elKind,elSel} from './65-element-core.js';
-import {TL_AR,TL_TS,tlArr,tlPts,tlShape,tlWallPreview} from './92-pattern-tiling.js';
+import {TL_AR,TL_TS,tlArr,tlFlagPreview,tlPts,tlShape} from './92-pattern-tiling.js';
 
 // ===== The Pattern element (element update, step 5, 2.1.5): a list of points plus sources placed at them.
 // {u, k:'pattern', n:name, lay:'grid'|'brick'|'half'|'radial'|'scatter'|'frame', cn:columns, rn:rows, sz:size in % of a cell, rt:turn in degrees, ox, oy: shift in % of a cell, in: the frame's inset in % of the short side,
@@ -151,7 +151,7 @@ $('pelay').querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dat
 // 2.57.0: Tiling shows its tile shape, arrangement, size and spacing; the free layouts their columns, rows and size
 {const tile=p.lay=='tile';$('petl').hidden=!tile;$('pefr').hidden=tile;{const lb={radial:['Spokes','Rings'],scatter:['Across','Down'],spiral:['Across','Down'],frame:['Columns','Rows']}[p.lay]||['Columns','Rows'];$('pecn').closest('.ctl').firstElementChild.textContent=lb[0];$('pern').closest('.ctl').firstElementChild.textContent=lb[1]}if(tile){const sh=tlShape(p),ts=$('pets'),ar=$('pear');
  if(!ts.options.length)ts.innerHTML=TL_TS.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');const tv=p.ts&&TL_AR[p.ts]?p.ts:'auto';if(ts.value!==tv)ts.value=tv;
- const ah=TL_AR[sh].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');if(ar.dataset.sh!==sh){ar.dataset.sh=sh;ar.innerHTML=ah}const av=tlArr(p,sh);if(ar.value!==av)ar.value=av;{const pv=$('pewpv'),k=sh=='wall'?av:'';pv.hidden=!k;if(pv.dataset.k!==k){pv.dataset.k=k;pv.innerHTML=k?tlWallPreview(k):''}}}}$('peds').querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d==p.ds));
+ const ah=TL_AR[sh].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');if(ar.dataset.sh!==sh){ar.dataset.sh=sh;ar.innerHTML=ah}const av=tlArr(p,sh);if(ar.value!==av)ar.value=av;{const pv=$('pewpv'),k=sh+'|'+av;pv.hidden=false;if(pv.dataset.k!==k){pv.dataset.k=k;pv.innerHTML=tlFlagPreview(sh,av)}}}}$('peds').querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d==p.ds));
 const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;uiFire(el)}};sv('peps',+p.ps||12);sv('pesp',+p.sp||0);sv('pecn',p.cn);sv('pern',p.rn);sv('pesz',p.sz);sv('pert',p.rt);sv('peox',+p.ox||0);sv('peoy',+p.oy||0);sv('pein',p.in==null?4:+p.in);sv('peiv',+p.iv||0);sv('pemd',+p.md||0);
  // Accent (2.76.10, Tiling): a second set of pieces at the middles between the main ones, its own source and size
  {const ac=p.ac&&p.ac.on;$('peac').checked=!!ac;$('peacb').hidden=!ac;const so=(p.src||[]).map((x,i)=>[String(i),patSrcName(x)]),h=so.map(([v,t])=>`<option value="${v}">${patHx(t)}</option>`).join(''),as=$('peacs');if(as.dataset.h!==h){as.dataset.h=h;as.innerHTML=h}

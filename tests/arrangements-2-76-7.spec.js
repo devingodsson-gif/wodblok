@@ -57,6 +57,25 @@ test('the 17 wallpaper groups: each places its copies and shows its picture', as
   expect(errors).toEqual([]);
 });
 
+// 2.83.0 (owner Oct 31 2026: "They should all render flags"): every tile shape's arrangements show the flag picture, each its own
+test('every tile shape and arrangement shows a flag picture, and the pictures differ', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4 });
+  await shapes(page, { lay: 'tile', ts: 'square', ar: 'grid', ps: 10, sp: 0 });
+  const seen = new Set();
+  for (const ts of ['square', 'hex', 'tri', 'diamond', 'circle', 'oct']) {
+    await setPat(page, { ts }); await H.settle(page);
+    for (const ar of await page.locator('#pear option').evaluateAll(a => a.map(o => o.value))) {
+      await setPat(page, { ts, ar }); await H.settle(page);
+      await expect(page.locator('#pewpv'), ts + ' ' + ar).toBeVisible();
+      const svg = await page.locator('#pewpv').innerHTML();
+      expect((svg.match(/<path /g) || []).length, ts + ' ' + ar + ': flags').toBeGreaterThan(3);
+      seen.add(svg);
+    }
+  }
+  expect(seen.size, 'each picture its own').toBeGreaterThanOrEqual(20);
+  expect(errors).toEqual([]);
+});
+
 test('Whole pieces keeps no piece across the edge, and the margin keeps them inside it', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4 });
   await shapes(page, { lay: 'tile', ts: 'square', ar: 'grid', ps: 13, sp: 10 });

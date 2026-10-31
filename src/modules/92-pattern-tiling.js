@@ -47,6 +47,15 @@ function tlWall(g){if(TL_WC[g])return TL_WC[g];const[hex,gens]=TL_WG[g]||TL_WG.p
 function tlWallPreview(g){const W=tlWall(g),B=W.hex?TL_H3:[[1,0],[0,1]],L=34,o=[],F='M-5 6V-7h8l-2 3 2 3h-8';let mk='';
  for(let i=0;i<2;i++)for(let j=0;j<2;j++)W.ops.forEach(c=>{const x=(i*B[0][0]+j*B[1][0]+c.x)*L,y=(i*B[0][1]+j*B[1][1]+c.y)*L;mk+=`<path d="${F}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${c.r}) scale(${c.f} 1) scale(1.15)"/>`});
  const w=(2*B[0][0]+2*B[1][0])*L,h=(2*B[0][1]+2*B[1][1])*L;return`<svg viewBox="-8 -8 ${(w+16).toFixed(1)} ${(h+16).toFixed(1)}" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">${mk}</g></svg>`}
+// 2.83.0 (owner Oct 31 2026: "I want this for all the pattern types. They should all render flags"): the same small picture for every tile shape and arrangement,
+// laid by tlPts itself (a flag at each place, with its turn and flip, fainter or stronger by its class) in a window of three pieces round the middle; a wallpaper
+// group keeps its 2 x 2 cells
+const TL_CLS=new Set(['checker','diag','stripes','bands','three','rows','harl','ogee']);   // the arrangements that are about colours: their classes show
+function tlFlagPreview(sh,ar){if(sh=='wall')return tlWallPreview(ar);
+ const q={lay:'tile',ts:sh,ar,ps:20,sp:0,rt:0,ox:0,oy:0,src:[]},S=Math.min(CW,CH)*.2,W=S*3,T=tlPts(q,W,W),F='M-5 6V-7h8l-2 3 2 3h-8',m=S*.2,OP=[1,.4,.7],u=v=>(v/S*34).toFixed(1);let mk='';
+ T.pts.forEach(([x,y],i)=>{if(x<m||x>W-m||y<m||y>W-m)return;const k=(T.size[i]||S)/S,c=TL_CLS.has(ar)?T.cls[i]:0;   // whole flags only; a piece's class (a colour in Checkerboard, Stripes...) as its strength
+  mk+=`<path d="${F}" stroke-opacity="${OP[(typeof c=='number'?((c%3)+3)%3:0)]}" transform="translate(${u(x)} ${u(y)}) rotate(${(+T.rot[i]||0).toFixed(1)}) scale(${(T.flip[i]||1)*1.15*k} ${1.15*k})"/>`});
+ const w=+u(W);return`<svg viewBox="-8 -8 ${(w+16).toFixed(1)} ${(w+16).toFixed(1)}" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">${mk}</g></svg>`}
 // the stamp outline kinds and the tile shape each one tiles by
 const TL_KIND={rect:'square',hex:'hex',tri:'tri',diamond:'diamond',circle:'circle',oct:'oct'};
 function tlStamp(p){const s=(p.src||[]).find(x=>x.k=='stamp'&&WBS.tiles.some(t=>t.id==x.t));return s?WBS.tiles.find(t=>t.id==s.t):null}
@@ -105,4 +114,4 @@ function tlPts(p,W,H){const sh=tlShape(p),ar=tlArr(p,sh),B=tlBox(p,sh),S=Math.ma
   // Octagons and squares: the small square between four octagons takes the second source (left empty with one source) (a regular octagon's side is its width / (1 + √2))
   if(sh=='oct'&&ar=='octsq'){const s=w/(1+Math.SQRT2);put(lx+a[0]/2+b[0]/2,ly+a[1]/2+b[1]/2,{i,r:45,c:1,gap:1,key:i+'_'+j+'_g'},s*Math.SQRT2)}}
  return{pts,rot,flip,cls,size,gap,keys,acc,shape:sh,arr:ar,box:{w:B.w,h:B.h}}}
-export {TL_AR,TL_TS,tlArr,tlPts,tlShape,tlWallPreview};
+export {TL_AR,TL_TS,tlArr,tlFlagPreview,tlPts,tlShape,tlWallPreview};
