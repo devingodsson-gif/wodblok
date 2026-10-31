@@ -44,7 +44,7 @@ function sceDown(e){if(e.button!==0)return;let t0=stUnlocked();
  if(spk&&WBS.split&&SCE.ai!=null&&STP.items[SCE.ai]){const c=scePt(e),M=sceInv(SCE.ai);if(!c)return;const p=sceTo(M,c.x,c.y);e.preventDefault();e.stopPropagation();SCE.sp={k:spk.dataset.sp,M,ox:WBS.split.x-p.x,oy:WBS.split.y-p.y};return}
  const hd=e.target.closest&&e.target.closest('[data-hd]');
  if(hd){const t=sceRO();if(!t||WBS.msel.size!=1||WBS.sel<0||SCE.ai==null||!STP.items[SCE.ai])return;const q=t.items[WBS.sel];if(!q)return;e.preventDefault();e.stopPropagation();
-  SCE.h={k:hd.dataset.hd,q,t,cx:+q.x,cy:+q.y,s0:q.s,sx0:q.sx||1,sy0:q.sy||1,r0:+q.r||0,f0:+q.f||1,M:sceInv(SCE.ai)};WBS.WBDRG=1;$('texg').style.display='none';return}
+  SCE.h={k:hd.dataset.hd,q,t,cx:+q.x,cy:+q.y,s0:q.s,sx0:q.sx||1,sy0:q.sy||1,r0:+q.r||0,f0:+q.f||1,M:sceInv(SCE.ai),...sceHdOff(q,hd.dataset.hd)};WBS.WBDRG=1;$('texg').style.display='none';return}
  const c=scePt(e);if(!c)return;const h=stampAt(c.x,c.y,t0);if(!h)return;const t=sceOpen();if(!t)return;
  e.preventDefault();e.stopPropagation();SCE.ai=h.i;
  const M0=stMatrix(STP.items[h.i]),sn=sceSnap(M0,h.u,h.v,e);
@@ -58,10 +58,18 @@ function sceDown(e){if(e.button!==0)return;let t0=stUnlocked();
  WBS.sel=i;const q=t.items[i],cp=hit.o?sceWith(t,()=>hit.o.p(mod(q.x,SW),mod(q.y,SH))):null;
  SCE.d={t,q,o:hit.o,M:sceInv(h.i),dx:(cp?cp[0]:q.x+hit.ax)-h.u,dy:(cp?cp[1]:q.y+hit.ay)-h.v,x0:e.clientX,y0:e.clientY,moved:false,st:[...WBS.msel].filter(j=>j!=i).map(j=>t.items[j]).filter(Boolean).map(w=>[w,w.x,w.y]),px:q.x,py:q.y};
  sceSel()}
+// 2.79.1 (owner Oct 31 2026): a split piece's selection box fits the piece: the motif's square (±48) cut by each of its lines (q.cl: [angle, offset, side], the side kept
+// is the one its normal points to), as [x0, x1, y0, y1] in the motif's own units
+function sceClip(q){let P=[[-48,-48],[48,-48],[48,48],[-48,48]];(q.cl||[]).forEach(([a,d,sd])=>{const r=a*Math.PI/180,n=[-Math.sin(r)*sd,Math.cos(r)*sd],k=d*sd,v=p=>p[0]*n[0]+p[1]*n[1]-k,o=[];
+  P.forEach((p,i)=>{const w=P[(i+1)%P.length],a1=v(p),b1=v(w);if(a1>=0)o.push(p);if((a1>=0)!==(b1>=0)){const t=a1/(a1-b1);o.push([p[0]+(w[0]-p[0])*t,p[1]+(w[1]-p[1])*t])}});P=o});
+ if(P.length<3)return[-48,48,-48,48];const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);return[Math.min(...xs),Math.max(...xs),Math.min(...ys),Math.max(...ys)]}
+// a handle of a fitted box sits inside the full one; the resize is measured from the full box, so the pointer is taken as far over as the handle is in (2.79.1)
+function sceHdOff(q,k){const S={nw:[-1,-1],ne:[1,-1],sw:[-1,1],se:[1,1],n:[0,-1],s:[0,1],e:[1,0],w:[-1,0]}[k];if(!S||!q.cl||!q.cl.length)return{ox:0,oy:0};const K=sceClip(q),f0=+q.f||1,kx=q.s*(q.sx||1),ky=q.s*(q.sy||1),
+ du=S[0]*48*kx-((K[0]+K[1])/2*kx*f0+S[0]*(K[1]-K[0])/2*kx),dv=S[1]*48*ky-((K[2]+K[3])/2*ky+S[1]*(K[3]-K[2])/2*ky),r=(+q.r||0)*Math.PI/180;return{ox:du*Math.cos(r)-dv*Math.sin(r),oy:du*Math.sin(r)+dv*Math.cos(r)}}
 function sceMove(e){if(SCE.sp){const c=scePt(e);if(!c||!WBS.split)return;const p=sceTo(SCE.sp.M,c.x,c.y);if(SCE.sp.k=='m'){WBS.split.x=p.x+SCE.sp.ox;WBS.split.y=p.y+SCE.sp.oy}else{let a=Math.atan2(p.y-WBS.split.y,p.x-WBS.split.x)*180/Math.PI;if(e.shiftKey)a=Math.round(a/15)*15;WBS.split.a=a}sceDraw();return}
  if(SCE.m){const m=SCE.m,dx=e.clientX-m.x0,dy=e.clientY-m.y0;if(!m.on&&dx*dx+dy*dy<25)return;m.on=true;let b=$('mqb');if(!b){b=document.createElement('div');b.id='mqb';document.body.appendChild(b)}Object.assign(b.style,{display:'block',left:Math.min(m.x0,e.clientX)+'px',top:Math.min(m.y0,e.clientY)+'px',width:Math.abs(dx)+'px',height:Math.abs(dy)+'px'});return}
  if(!SCE.h&&!SCE.d)return;const c=scePt(e);if(!c)return;
- if(SCE.h){const h=SCE.h,p=sceTo(h.M,c.x,c.y);sceWith(h.t,()=>{if(h.k=='rot'){let a=Math.atan2(p.y-h.cy,p.x-h.cx)*180/Math.PI+90;if(e.shiftKey)a=Math.round(a/15)*15;h.q.r=+(((a+540)%360)-180).toFixed(1)}else WBX.hdResize(h,p,e)});upd();return}
+ if(SCE.h){const h=SCE.h,p=sceTo(h.M,c.x,c.y);sceWith(h.t,()=>{if(h.k=='rot'){let a=Math.atan2(p.y-h.cy,p.x-h.cx)*180/Math.PI+90;if(e.shiftKey)a=Math.round(a/15)*15;h.q.r=+(((a+540)%360)-180).toFixed(1)}else WBX.hdResize(h,{x:p.x+(h.ox||0),y:p.y+(h.oy||0)},e)});upd();return}
  const d=SCE.d;if(!d.moved){const dx=e.clientX-d.x0,dy=e.clientY-d.y0;if(dx*dx+dy*dy<9)return;d.moved=true;WBS.WBDRG=1;$('texg').style.display='none'}
  const p=sceTo(d.M,c.x,c.y),sn=sceSnap(d.M,p.x+d.dx,p.y+d.dy,e),np=d.o?d.o.i(sn.x,sn.y):[sn.x,sn.y];d.q.x=+np[0].toFixed(2);d.q.y=+np[1].toFixed(2);const ax=d.q.x-d.px,ay=d.q.y-d.py;d.st.forEach(([w,ox,oy])=>{w.x=+(ox+ax).toFixed(2);w.y=+(oy+ay).toFixed(2)});upd()}
 function sceUp(e){if(SCE.sp){SCE.sp=null;return}
@@ -88,9 +96,10 @@ function sceDraw(){const g=$('stoh');if(!g)return;const gh0=sceGhost(),t=sceRO()
  const gh=sceSymG(t,ai)+gh0;if(!WBS.msel.size){g.innerHTML=gh;return}
  const a=$('art'),m0=a&&a.getScreenCTM(),sc=(m0&&m0.a)||1,hs=4.5/sc,off=20/sc,M=stMatrix(STP.items[ai]),f=v=>v.toFixed(2);let h='';
  const P=(x,y)=>{const q=M.transformPoint({x,y});return[q.x,q.y]};
- const box=q=>{const rx=48*q.s*(q.sx||1),ry=48*q.s*(q.sy||1),r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return{rx,ry,L:(u,v)=>P(+q.x+u*c-v*s,+q.y+u*s+v*c)}};
- for(const i of WBS.msel){const q=t.items[i];if(!q)continue;const b=box(q);h+=`<polygon class="stes" points="${[b.L(-b.rx,-b.ry),b.L(b.rx,-b.ry),b.L(b.rx,b.ry),b.L(-b.rx,b.ry)].map(p=>f(p[0])+','+f(p[1])).join(' ')}"/>`}
- const q=WBS.msel.size==1?t.items[WBS.sel]:null;
+ const box=q=>{const K=sceClip(q),f0=+q.f||1,kx=q.s*(q.sx||1),ky=q.s*(q.sy||1),ox=(K[0]+K[1])/2*kx*f0,oy=(K[2]+K[3])/2*ky,rx=(K[1]-K[0])/2*kx,ry=(K[3]-K[2])/2*ky,r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return{rx,ry,L:(u,v)=>{u+=ox;v+=oy;return P(+q.x+u*c-v*s,+q.y+u*s+v*c)}}};
+ const spl=!!(WBS.split&&WBS.split.i===WBS.sel);   // while splitting only the split line and its handles show
+ for(const i of WBS.msel){if(spl)break;const q=t.items[i];if(!q)continue;const b=box(q);h+=`<polygon class="stes" points="${[b.L(-b.rx,-b.ry),b.L(b.rx,-b.ry),b.L(b.rx,b.ry),b.L(-b.rx,b.ry)].map(p=>f(p[0])+','+f(p[1])).join(' ')}"/>`}
+ const q=WBS.msel.size==1&&!spl?t.items[WBS.sel]:null;
  if(q){const b=box(q),hd=[['nw',-1,-1],['ne',1,-1],['sw',-1,1],['se',1,1],['n',0,-1],['s',0,1],['e',1,0],['w',-1,0]],cur={nw:'nwse-resize',se:'nwse-resize',ne:'nesw-resize',sw:'nesw-resize',n:'ns-resize',s:'ns-resize',e:'ew-resize',w:'ew-resize'};
   for(const[k,sx,sy]of hd){const p=b.L(sx*b.rx,sy*b.ry);h+=`<rect class="steh" data-hd="${k}" x="${f(p[0]-hs)}" y="${f(p[1]-hs)}" width="${f(hs*2)}" height="${f(hs*2)}" cursor="${cur[k]}"/>`}
   const T=b.L(0,-b.ry),C=b.L(0,0),dx=T[0]-C[0],dy=T[1]-C[1],n=Math.hypot(dx,dy)||1,R=[T[0]+dx/n*off,T[1]+dy/n*off];

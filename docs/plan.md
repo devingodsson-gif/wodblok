@@ -1,5 +1,15 @@
 # Development plan
 
+## 2.79.1 (Oct 31 2026, branch fix/2.79.1-panels-and-selection, step 1 of docs/small-updates-plan.md): panels and selection
+- **Template picker:** the dialog has a fixed height (as Settings), so the card size slider changes the cards, not the window.
+- **Placing:** with a shape, a stamp or copies on the cursor and nothing selected, the Element group comes into that kind's panel and its Size and Rotate set what will be placed (25-art-layers.js `fpArm`, 78-element-lists.js); in a stamp's tab the shape editor's Size and Rotate do the same for a library shape on the cursor (09, 13). They showed only after something had been selected.
+- **Align** is hidden with nothing selected (59-align.js).
+- **Rotate 90°** beside Flip in the Element group (`rotateCw` icon in 00-icons.js): a quarter turn clockwise of the selection, or of what is on the cursor.
+- **Split** (a stamp's tab): while splitting only the split line and its handles show; a split piece's selection box fits the piece (the shape's square cut by its lines), and after a split both pieces are selected. A handle of a fitted box resizes as the full one did (64-stamp-canvas-edit.js).
+- **Panel sections** start folded but the first shown and the element's own group; which are open is remembered for each panel in this browser (34-desktop-shell.js, `wb279_secs`). The test harness opens every section at the start; a spec about the folding passes `sections: 'default'`.
+- **Stamp tab:** another stamp's row in the Stamp panel opens that stamp's tab.
+- Tests: tests/small-updates-2-79-1.spec.js (6). Related specs: see PROJECT_STATUS. Not run: full suite, WebKit, CI.
+
 ## 2.79.0 (Oct 30 2026, branch fix/2.79.0-close-bug-test): the bug-test plan is done
 - Closes the fix plan of docs/bug-test-2.78.md: 2.78.2 (B1), 2.78.3 (B6, B4), 2.78.4 (B2), 2.78.5 (B3, B5).
 - **CI suite** (run 41147706053, owner's word): WebKit and seven of eight Chromium shards pass; shard 6 failed only on five Randomize scenario state snapshots, where the test project's starting Pattern now keeps Size 20.1 instead of being rounded to 20 when its panel opened (B1 working). Regenerated in CI with the owner's approval (update-snapshots 41158121109: the state files change only `ps 20 → 20.1`, the SVG files only their checksum); the recheck (41158444511) changed nothing.

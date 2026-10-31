@@ -65,6 +65,8 @@ popout:'<path d="M13.5 4h6.5v6.5M20 4l-8.5 8.5"/><path d="M17.5 13.5v5a1.5 1.5 0
 front:'<path d="M5 4.5h14M12 20V8.5M7.5 13L12 8.5l4.5 4.5"/>',
 back:'<path d="M5 19.5h14M12 4v11.5M7.5 11l4.5 4.5 4.5-4.5"/>',
 flip:'<path d="M12 3.5v17M9 7L4 17h5zM15 7l5 10h-5z"/>',
+// 2.79.1: a quarter turn clockwise (the Element group's Rotate 90°)
+rotateCw:'<path d="M18.5 12a6.5 6.5 0 11-1.9-4.6"/><path d="M17.5 3.5v4h-4"/>',
 group:'<path d="M4 8V5.5A1.5 1.5 0 015.5 4H8M16 4h2.5A1.5 1.5 0 0120 5.5V8M20 16v2.5a1.5 1.5 0 01-1.5 1.5H16M8 20H5.5A1.5 1.5 0 014 18.5V16"/><rect x="8" y="8" width="8" height="8" rx="1"/>',
 ungroup:'<rect x="4" y="4" width="7" height="7" '+R+'/><rect x="13" y="13" width="7" height="7" '+R+'/>',
 knockout:'<rect x="4" y="4" width="16" height="16" '+R+'/><circle cx="12" cy="12" r="4"/>',

@@ -9,7 +9,8 @@ const ELK={text:{pn:'text',add:'Add text'},pattern:{pn:'layers',add:'Add pattern
 // One Element group (Size, Rotate, Position, Flip, Duplicate, Order, Delete) for every kind (2.19.0): it sits at the top of the panel of the kind that is selected (a Motif's, a Text's, a placed Stamp's).
 // A Pattern keeps its own grid controls. One set of controls, so one set of ids: the group moves, it is not copied.
 const ELG_PN={motif:'motifs',image:'image',text:'text',stamp:'stmp'};
-function elgPlace(){const g=document.querySelector('details.g:has(>.gb>#lfree)');if(!g)return;const q=elSel(),pn=q&&ELG_PN[elKind(q)];if(!pn)return;
+// 2.79.1 (owner Oct 31 2026): with nothing selected, the panel of what is on the cursor (a shape, a stamp, copies) gets the group, so Size and Rotate show before the first is placed
+function elgPlace(){const g=document.querySelector('details.g:has(>.gb>#lfree)');if(!g)return;const q=elSel(),b=WBS.brush,c=WBS.plArm,k=q?elKind(q):b&&!b.txt&&b.m?'motif':WBS.fpB?'stamp':c&&c.k=='copy'&&c.q?elKind(c.q):null,pn=k&&ELG_PN[k];if(!pn)return;
  const sec=document.querySelector(`section.pn[data-p="${pn}"]`);if(!sec||g.parentElement===sec)return;const at=sec.querySelector('.elk[data-k]');if(at)at.insertAdjacentElement('afterend',g);else sec.insertAdjacentElement('afterbegin',g);
  const al=document.getElementById('lalsec');if(al)g.insertAdjacentElement('afterend',al)}   // Align sits right under the element's own group (2.22.0)
 function elkSync(){const un=stUnlocked()!=null;elgPlace();if(WBX.wbSlSync)WBX.wbSlSync();

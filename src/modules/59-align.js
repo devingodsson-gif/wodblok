@@ -39,7 +39,8 @@ function alCanvas(keep){const ps=alShapes();if(!ps.length)return;
   const f=+p.f||1;p.r=0;p.s=+w.toFixed(2);p.wy=+(h/w).toFixed(4);delete p.wx;
   p.x=+(CW/2-f*(o.x+o.w/2)*w/100).toFixed(2);p.y=+(CH/2-(o.y+o.h/2)*h/100).toFixed(2)});
  alDone()}
-function alSync(){const n=alItems().length,g=$('lalsec');if(!g)return;g.querySelectorAll('#lalg button,#lalr button').forEach(b=>{b.disabled=b.dataset.k=='d'?n<3:!n});
+function alSync(){const n=alItems().length,g=$('lalsec');if(!g)return;if(g.hidden!==!n)g.hidden=!n;   // 2.79.1 (owner Oct 31 2026): no Align with nothing selected
+ g.querySelectorAll('#lalg button,#lalr button').forEach(b=>{b.disabled=b.dataset.k=='d'?n<3:!n});
  const fr=$('lalfit');if(fr){const sh=alShapes().length>0;if(fr.hidden===sh)fr.hidden=!sh;fr.querySelectorAll('button').forEach(b=>{if(b.disabled===sh)b.disabled=!sh})}}
 const alIc=b=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${b}</svg>`;
 function init59(){

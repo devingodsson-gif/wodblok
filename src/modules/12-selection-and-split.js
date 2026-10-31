@@ -13,7 +13,7 @@ function doSplit(){const t=WBS.tiles[WBS.cur],q=t.items[WBS.split.i];if(!q){WBS.
 const Sx=q.s*q.f*(q.sx||1),Sy=q.s*(q.sy||1),r=-q.r*Math.PI/180,rot=(x,y)=>[x*Math.cos(r)-y*Math.sin(r),x*Math.sin(r)+y*Math.cos(r)];
 const[px,py]=rot(WBS.split.x-q.x,WBS.split.y-q.y),L0=[px/Sx,py/Sy],a=WBS.split.a*Math.PI/180,[dx,dy]=rot(Math.cos(a),Math.sin(a)),U=[dx/Sx,dy/Sy],th=Math.atan2(U[1],U[0]),n=[-Math.sin(th),Math.cos(th)],d=L0[0]*n[0]+L0[1]*n[1];
 const A=+(th*180/Math.PI).toFixed(3),D=+d.toFixed(3),q2=JSON.parse(JSON.stringify(q));q.cl=[...(q.cl||[]),[A,D,1]];q2.cl=[...(q2.cl||[]),[A,D,-1]];
-t.items.splice(WBS.split.i+1,0,q2);selOne(WBS.split.i+1);WBS.split=null;store();upd();pmsg('Split into two pieces.')}
+t.items.splice(WBS.split.i+1,0,q2);selOne(WBS.split.i+1);WBS.msel=new Set([WBS.split.i,WBS.split.i+1]);WBS.split=null;   /* 2.79.1: both pieces stay selected, each in its own box */store();upd();pmsg('Split into two pieces.')}
 function init12(){
 // ---- Split: place a line over the selected motif, then cut it into two pieces (each keeps its own half).
 WBS.split=null;

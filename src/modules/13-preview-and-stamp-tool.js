@@ -1,6 +1,6 @@
 import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
-import {$,WBS,WBX} from './01-launch-and-version.js';
+import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {DD,HO,N,SK,col,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
 import {DOTK} from './05-motif-data.js';
 import {cust,inkOf,it,mk,selOne,store} from './06-motif-library-folders.js';
@@ -14,7 +14,7 @@ import {syncAsp,syncPhys} from './14-presets-and-layer-grid-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {libPick} from './21-motif-library-ui.js';
 import {fpL} from './24-free-place-layers.js';
-import {stUnlocked} from './63-stamp-tool.js';
+import {stTxMode,stUnlocked} from './63-stamp-tool.js';
 const mName=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
 let mlFold;
 const CHEV='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3l3 3-3 3"/></svg>';
@@ -60,9 +60,11 @@ const gm=C('[data-gm]');if(gm){selSet(ofName(gm.dataset.gm),false);upd();if(WBX.
 const rm=C('[data-rm]');if(rm){const i=+rm.dataset.rm;if(!WBS.msel.has(i))selOne(i);WBS.sel=i;upd();if(WBX.wbCtxAt)WBX.wbCtxAt(rm);return}
 const g=C('[data-g]');if(g){selSet(ofName(g.dataset.g),add);upd();return}
 const r=C('[data-r]');if(!r)return;const i=+r.dataset.r;WBS.brush=null;if(rng){const ord=[...ML.querySelectorAll('[data-r]')].map(x=>+x.dataset.r),a=WBS.mAnc!=null&&ord.includes(WBS.mAnc)?ord.indexOf(WBS.mAnc):(WBS.sel>=0&&ord.includes(WBS.sel)?ord.indexOf(WBS.sel):-1),b=ord.indexOf(i);if(a>=0&&b>=0){selSet(ord.slice(Math.min(a,b),Math.max(a,b)+1),false);WBS.sel=i}else{selToggle(i);WBS.mAnc=i}}else if(e.ctrlKey||e.metaKey){selToggle(i);WBS.mAnc=i}else{selOne(i);WBS.mAnc=i}upd()};
-$('ssz').oninput=e=>{const q=Q();if(!q)return;const v=e.target.value/100,f=v/q.s;{const g=WBX.wbTxGrp&&WBX.wbTxGrp();if(g&&WBS.msel.size>1){const c=txC();txAbs(g,c);QS().forEach(o=>{o.s=o===q?v:o.s*f;[o.x,o.y]=wrapP(c[0]+(o.x-c[0])*f,c[1]+(o.y-c[1])*f)});WBX.wbTxXf(g,M=>{M.sz=+(M.sz*f).toFixed(3);M.ax=c[0]+(M.ax-c[0])*f;M.ay=c[1]+(M.ay-c[1])*f});store();upd();return}}QS().forEach(o=>o.s=o===q?v:clampN(o.s*f,.08,2.6));store();upd()};
+// 2.79.1: with no shape selected, Size and Rotate set the shape on the cursor (a stamp's tab)
+const seBrush=()=>{const b=WBS.brush;return stTxMode()&&b&&!b.txt&&b.m?b:null};
+$('ssz').oninput=e=>{const q=Q();if(!q){const b=seBrush();if(b){b.s=+Math.max(.05,e.target.value/100).toFixed(3);WBH.draw()}return}const v=e.target.value/100,f=v/q.s;{const g=WBX.wbTxGrp&&WBX.wbTxGrp();if(g&&WBS.msel.size>1){const c=txC();txAbs(g,c);QS().forEach(o=>{o.s=o===q?v:o.s*f;[o.x,o.y]=wrapP(c[0]+(o.x-c[0])*f,c[1]+(o.y-c[1])*f)});WBX.wbTxXf(g,M=>{M.sz=+(M.sz*f).toFixed(3);M.ax=c[0]+(M.ax-c[0])*f;M.ay=c[1]+(M.ay-c[1])*f});store();upd();return}}QS().forEach(o=>o.s=o===q?v:clampN(o.s*f,.08,2.6));store();upd()};
 $('sth').oninput=e=>{if(!Q())return;const v=+e.target.value;QS().forEach(o=>{if(v)o.w=v;else delete o.w});store();upd()};
-$('srt').oninput=e=>{const q=Q();if(!q)return;const v=+e.target.value,d=v-q.r;{const g=WBX.wbTxGrp&&WBX.wbTxGrp();if(g&&WBS.msel.size>1){const c=txC(),a=d*Math.PI/180,cs=Math.cos(a),sn=Math.sin(a),R=(x,y)=>[c[0]+(x-c[0])*cs-(y-c[1])*sn,c[1]+(x-c[0])*sn+(y-c[1])*cs];txAbs(g,c);QS().forEach(o=>{o.r=o===q?v:wrapA(o.r+d);[o.x,o.y]=wrapP(...R(o.x,o.y))});WBX.wbTxXf(g,M=>{M.rot=wrapA((M.rot||0)+d);[M.ax,M.ay]=R(M.ax,M.ay)});store();upd();return}}QS().forEach(o=>o.r=o===q?v:wrapA(o.r+d));store();upd()};$('ssx').oninput=sAx('sx');$('ssy').oninput=sAx('sy');$('ssr').onclick=()=>{if(Q()){QS().forEach(o=>{delete o.sx;delete o.sy});store();upd()}};
+$('srt').oninput=e=>{const q=Q();if(!q){const b=seBrush();if(b){b.r=+e.target.value;WBH.draw()}return}const v=+e.target.value,d=v-q.r;{const g=WBX.wbTxGrp&&WBX.wbTxGrp();if(g&&WBS.msel.size>1){const c=txC(),a=d*Math.PI/180,cs=Math.cos(a),sn=Math.sin(a),R=(x,y)=>[c[0]+(x-c[0])*cs-(y-c[1])*sn,c[1]+(x-c[0])*sn+(y-c[1])*cs];txAbs(g,c);QS().forEach(o=>{o.r=o===q?v:wrapA(o.r+d);[o.x,o.y]=wrapP(...R(o.x,o.y))});WBX.wbTxXf(g,M=>{M.rot=wrapA((M.rot||0)+d);[M.ax,M.ay]=R(M.ax,M.ay)});store();upd();return}}QS().forEach(o=>o.r=o===q?v:wrapA(o.r+d));store();upd()};$('ssx').oninput=sAx('sx');$('ssy').oninput=sAx('sy');$('ssr').onclick=()=>{if(Q()){QS().forEach(o=>{delete o.sx;delete o.sy});store();upd()}};
 $('sko').onclick=()=>{const q=Q();if(!q)return;const on=!q.k;QS().forEach(o=>{if(on)o.k=1;else delete o.k});store();upd()};
 $('sfl').onclick=()=>{if(Q()){QS().forEach(o=>o.f*=-1);store();upd()}};
 $('scp').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).items,src=QS(),p=src.indexOf(Q()),ids=[];src.forEach(o=>{const q=JSON.parse(JSON.stringify(o));[q.x,q.y]=wrapP(q.x+20,q.y+20);a.push(q);ids.push(a.length-1)});WBS.msel=new Set(ids);WBS.sel=ids[p];store();upd()};

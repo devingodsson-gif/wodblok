@@ -91,7 +91,7 @@ function init63(){
  try{new ResizeObserver(stOlFit).observe($('art'))}catch(e){}
  const list=$('stmpl');if(list){
   list.addEventListener('dblclick',e=>{const n=e.target.closest('.smkn');const r=n&&n.closest('.smkr');if(!r||n.querySelector('input'))return;stRename(+r.dataset.t)});
-  list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r||e.target.closest('.smkn input'))return;const id=+r.dataset.t;if(e.target.closest('[data-lk]')){if(WBX.wbSteEdit)WBX.wbSteEdit(id);else stLock(id)}else stCurrent(id)});
+  list.addEventListener('click',e=>{const r=e.target.closest('.smkr');if(!r||e.target.closest('.smkn input'))return;const id=+r.dataset.t;if(e.target.closest('[data-lk]')){if(WBX.wbSteEdit)WBX.wbSteEdit(id);else stLock(id)}else if(stUnlocked()!=null&&stUnlocked()!==id&&WBX.wbSteEdit)WBX.wbSteEdit(id);else stCurrent(id)});   // 2.79.1 (owner Oct 31 2026): in a stamp's tab, another stamp's row opens that stamp's tab
  stBar();
   if(typeof IntersectionObserver=='function')new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting))stPanel(true)}).observe(list)}
 }
