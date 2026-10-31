@@ -8,14 +8,15 @@ function init41(){
   $('nv100').onclick=()=>WBX.wbZoomTo(1);
   // 2.79.2 (owner Oct 31 2026): the wheel moves the view (up and down; with Shift across; Ctrl or Cmd zooms, 34-desktop-shell.js); with Alt it sizes and with Shift it turns
   // what is on the cursor, or the selected element under the pointer (25-art-layers.js picks the sliders). A notch is 5% of the size or 5°; one History step when it stops
-  {let acc=0,at=0,tm=0;
+  {let acc=0,at=0,tm=0,pend=null;const done=()=>{clearTimeout(tm);const el=pend;pend=null;if(el)el.dispatchEvent(new Event('change',{bubbles:true}))};
    board.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey||e.altKey===e.shiftKey)return;const t=WBX.wbWheelXf&&WBX.wbWheelXf(e);
     if(!t){if(e.shiftKey&&!e.deltaX&&e.deltaY){e.preventDefault();board.scrollLeft+=e.deltaY*(e.deltaMode==1?33:e.deltaMode==2?400:1)}return}   // Shift: across, where the system does not turn the wheel sideways itself
    e.preventDefault();e.stopPropagation();
     const d=(e.deltaY||e.deltaX)*(e.deltaMode==1?33:e.deltaMode==2?400:1),now=performance.now();if(now-at>400)acc=0;at=now;acc+=d;if(Math.abs(acc)<40)return;
     const n=-Math.sign(acc)*Math.max(1,Math.round(Math.abs(acc)/100));acc=0;const el=$(e.shiftKey?t.r:t.s),v=+el.value;let w;
     if(e.shiftKey)w=((v+5*n+180)%360+360)%360-180;else{w=Math.round(v*Math.pow(1.05,n));if(w===v)w=v+Math.sign(n);w=Math.min(+el.max,Math.max(+el.min,w))}
-    if(w===v)return;el.value=w;el.dispatchEvent(new Event('input',{bubbles:true}));clearTimeout(tm);tm=setTimeout(()=>el.dispatchEvent(new Event('change',{bubbles:true})),400)},{capture:true,passive:false})}
+    if(w===v)return;el.value=w;el.dispatchEvent(new Event('input',{bubbles:true}));pend=el;clearTimeout(tm);tm=setTimeout(done,700)},{capture:true,passive:false});
+   addEventListener('keyup',e=>{if(e.key=='Alt'||e.key=='Shift')done()},true)}   // letting go of Alt or Shift ends the change at once
   // ---- hand tool
   const setHand=on=>{hand=on;document.body.classList.toggle('handtool',hand||space);$('nvhand').setAttribute('aria-pressed',String(hand))};
   $('nvhand').onclick=()=>setHand(!hand);
