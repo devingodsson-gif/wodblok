@@ -275,7 +275,7 @@ $('rzdo').onclick=()=>randomize(false);
 // ---- zoom
 // 2.76.8 (2.76 review): the canvas no longer jumps sideways when the left column opens. While it is fitted to the screen, the left column's width is left out of
 // the fit and the canvas is moved back by half of it, so its middle stays where it was; a zoomed canvas keeps its own scroll
-const dkL=()=>[...document.querySelectorAll('.dock.dk-l,.dock.dk-li')].reduce((n,d)=>n+Math.round(d.getBoundingClientRect().width),0);
+const dkL=()=>{const d=document.querySelector('.dock.dk-l');return d?Math.round(d.getBoundingClientRect().width):0};   // the left dock only: an inner column (2.79.3) takes its own room
 function fitZ(){const b=$('boardP');if(b.classList.contains('off'))return;const w=b.clientWidth-64-dkL(),h=b.clientHeight-64;fitS=Math.max(.05,Math.min(w/CW,h/CH))}
 function applyZ(){fitZ();const s=z||fitS;{const sh=z?'':(dkL()?`translateX(${-dkL()/2}px)`:'');if($('artwrap').style.transform!==sh)$('artwrap').style.transform=sh}$('art').style.width=Math.round(CW*s)+'px';$('art').style.height=Math.round(CH*s)+'px';$('artsh').style.width=$('art').style.width;$('artsh').style.height=$('art').style.height;$('zl').textContent=Math.round(s*100)+'%';$('zl').title=z?'Fit to screen':'Fitted to screen';if(window.bkZ)bkZ();if(WBX.wbZoomed)WBX.wbZoomed()}
 function zoomAt(ns,cx,cy){const b=$('boardP'),a=$('art'),r0=a.getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);z=Math.min(8,Math.max(.1,ns));applyZ();const r1=a.getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
