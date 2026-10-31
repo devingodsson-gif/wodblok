@@ -1,6 +1,6 @@
 # Development plan
 
-## 2.83.0 (Oct 31 2026, branch feat/2.83.0-flag-previews): a flag picture for every pattern type
+## 2.83.0 (Oct 31 2026, LIVE with the owner's word): a flag picture for every pattern type
 - Owner: "Wallpaper pattern type shows pattern preview rendered with flags, I want this for all the pattern types. They should all render flags."
 - Under Arrangement, every tile shape (Square, Hexagon, Triangle, Diamond, Circle, Octagon; From stamp shows its shape's) now shows the small flag picture the wallpaper groups had: a flag at each place as `tlPts` lays it, with its turn and flip, whole flags only, in a window of three pieces round the middle. In the arrangements about colours (Checkerboard, Diagonal, Stripes, Bands, Three colours, Alternating rows, Harlequin, Ogee) a piece's class shows as a fainter or stronger flag (92-pattern-tiling.js `tlFlagPreview`, 67-pattern-element.js). The wallpaper groups keep their 2 x 2 cells.
 - Tests: arrangements-2-76-7 (one more: every tile shape's arrangements show a picture of flags, and they differ). Not run: full suite, WebKit, CI.
