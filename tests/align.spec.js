@@ -4,7 +4,7 @@ const { openApp, openPanel, showPanel, settle, getState, armStamp } = require('.
 
 // 2.1.2: Align lives in the Elements panel; the arrangement control in Pattern
 // the layer starts with a Pattern; 'x' takes it away so clicks on the canvas place stamps freely
-const pick = async (page, v) => { await showPanel(page, 'layers'); if (v === 'x') while (await page.locator('#pelist [data-pd]').count()) { await page.evaluate(() => document.querySelector('#pelist [data-pd]').click()); await settle(page); } if (v === 'x') { await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page); } await showPanel(page, 'mlist'); };
+const pick = async (page, v) => { await showPanel(page, 'layers'); if (v === 'x') while (await page.locator('#pelist [data-pd]').count()) { await page.evaluate(() => document.querySelector('#pelist [data-pd]').click()); await settle(page); } if (v === 'x') { await page.locator('#lfpst [data-t] >> nth=0').dispatchEvent('click'); await settle(page); } await showPanel(page, 'stmp'); };   // 2.79.1: Align shows with a selection, under the selected element's own group
 const pl = async page => JSON.parse(await getState(page)).els;
 const dims = async page => (await page.locator('#art').evaluate(e => (e.getAttribute('viewBox') || '0 0 1000 1000'))).split(/[ ,]+/).map(Number);
 async function place(page, fx, fy) {

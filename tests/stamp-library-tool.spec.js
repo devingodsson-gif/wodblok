@@ -42,7 +42,8 @@ test('New stamp asks for an outline, becomes the open stamp and opens in its tab
   expect(errors).toEqual([]);
 });
 
-test('clicking a stamp in the list makes it the open stamp and locks the one that was unlocked', async ({ page }) => {
+// 2.79.1 (owner Oct 31 2026): in a stamp's tab another stamp's row opens that stamp's tab
+test('clicking a stamp in the list makes it the open stamp; in a stamp\'s tab it opens that stamp\'s tab', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
   await openPanel(page, 'stmp');
   await newStamp(page, 'Rectangle');
@@ -53,7 +54,8 @@ test('clicking a stamp in the list makes it the open stamp and locks the one tha
   await settle(page);
   await expect(rows(page).nth(1)).toHaveClass(/cur/);
   await expect(rows(page).nth(0)).not.toHaveClass(/cur/);
-  expect(await page.evaluate(() => __wbTest.unlockedStamp())).toBe(null);
+  const ids = JSON.parse(await page.evaluate(() => __wbTest.state())).tiles.map(t => t.id);
+  expect(await page.evaluate(() => __wbTest.unlockedStamp())).toBe(ids[1]);
   expect(errors).toEqual([]);
 });
 

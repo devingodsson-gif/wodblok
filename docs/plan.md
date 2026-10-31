@@ -8,7 +8,9 @@
 - **Split** (a stamp's tab): while splitting only the split line and its handles show; a split piece's selection box fits the piece (the shape's square cut by its lines), and after a split both pieces are selected. A handle of a fitted box resizes as the full one did (64-stamp-canvas-edit.js).
 - **Panel sections** start folded but the first shown and the element's own group; which are open is remembered for each panel in this browser (34-desktop-shell.js, `wb279_secs`). The test harness opens every section at the start; a spec about the folding passes `sections: 'default'`.
 - **Stamp tab:** another stamp's row in the Stamp panel opens that stamp's tab.
-- Tests: tests/small-updates-2-79-1.spec.js (6). Related specs: see PROJECT_STATUS. Not run: full suite, WebKit, CI.
+- **Row menus** (a folder's or a row's ⋯): a panel that only got shorter under an open menu (placing ended with the same click, so the Element group left) moves the menu with its button instead of closing it; the shared menu close (`closeDD`) leaves row menus to their own closing (04-canvas-and-stamp-outlines.js). Found by shape-folders.spec.
+- Tests: tests/small-updates-2-79-1.spec.js (6). Updated for the intended changes: stamp-library-tool (a stamp's row in a stamp's tab opens its tab), stamp-canvas-edit (the Edit group is live for a shape on the cursor), align (opens the Stamp panel: Align shows with a selection, under the element's own group), bug-test-2-79 B5 (checks the Element tab only: with nothing selected the panel is now empty). Related specs run: 280 (7 failures, all fixed and re-run). Not run: full suite, WebKit, CI.
+- Known: the Element panel (`mlist`) is empty with nothing selected now that Align hides; its parts live in the element panels and the Elements list. Owner to decide (see PROJECT_STATUS open questions).
 
 ## 2.79.0 (Oct 30 2026, branch fix/2.79.0-close-bug-test): the bug-test plan is done
 - Closes the fix plan of docs/bug-test-2.78.md: 2.78.2 (B1), 2.78.3 (B6, B4), 2.78.4 (B2), 2.78.5 (B3, B5).

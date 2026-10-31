@@ -164,7 +164,7 @@ test('the Edit group of the Shape panel acts on the shape placed in the unlocked
   const { errors } = await openApp(page, { seed: 4 });
   await unlock(page);
   await pick(page);
-  await expect(page.locator('#sel')).toHaveClass(/none/);
+  await expect(page.locator('#sel')).not.toHaveClass(/none/);   // 2.79.1: live for the shape on the cursor too
   await click(page, await inst(page));
   await expect(page.locator('#sel')).not.toHaveClass(/none/, { timeout: 10000 });
   await page.evaluate(() => { const r = document.getElementById('ssz'); r.value = 50; r.dispatchEvent(new Event('input', { bubbles: true })); });

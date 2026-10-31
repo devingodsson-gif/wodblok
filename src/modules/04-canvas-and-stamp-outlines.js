@@ -134,6 +134,7 @@ function rowMenu(btn,items){const was=ROWM&&ROWM.btn===btn;closeRowMenu();if(was
  m.innerHTML=items.map(([t,,off,sub],i)=>`<button type="button" class="ddi${sub?' hassub':''}" role="menuitem" data-i="${i}"${off?' disabled':''}${sub?' aria-haspopup="menu" aria-expanded="false"':''}><span>${t}</span>${sub?'<span class="rmcar" aria-hidden="true">&#8250;</span>':''}</button>`).join('');
  document.body.appendChild(m);{m.style.width='max-content';const nw=Math.ceil(m.getBoundingClientRect().width);m.style.width='';m.dataset.w=String(Math.max(150,nw))}   // 2.60.1 (artist test: long items wrapped over each other): the menu is as wide as its longest item
  placeFloat(m,btn,true);m.btn=btn;ROWM=m;btn.setAttribute('aria-expanded','true');
+ m.sc=new Map();for(let a=btn.parentElement;a;a=a.parentElement)m.sc.set(a,[a.scrollTop,a.scrollLeft,a.scrollHeight]);   // 2.79.1: how its panels stood when it opened
  const openSub=(b,focus)=>{const it=items[+b.dataset.i];if(!it||!it[3])return;if(ROWS&&ROWS.src===b){if(focus){const f=ROWS.querySelector('button');if(f)f.focus()}return}closeRowSub();
   const f=document.createElement('div');f.className='ddl rowm rowsub fx';f.setAttribute('role','menu');f.src=b;
   f.innerHTML=it[3].map(([t,,off],i)=>`<button type="button" class="ddi" role="menuitem" data-j="${i}"${off?' disabled':''}><span>${t}</span></button>`).join('');
@@ -149,7 +150,11 @@ function rowMenu(btn,items){const was=ROWM&&ROWM.btn===btn;closeRowMenu();if(was
   else if(e.key=='ArrowRight'||e.key=='Enter'){const b=document.activeElement;if(b&&b.dataset&&b.dataset.i!=null&&items[+b.dataset.i][3]){e.preventDefault();openSub(b,true)}}};
  const f=m.querySelector('button:not(:disabled)');if(f)f.focus()}
 document.addEventListener('pointerdown',e=>{if(ROWM&&!e.target.closest('.rowm,[data-more]'))closeRowMenu()},true);
-addEventListener('scroll',e=>{if(ROWM&&!(e.target.closest&&e.target.closest('.rowm')))closeRowMenu()},true);
+// a scroll closes the menu; a panel that only got shorter under it (the click changed what the panel shows, 2.79.1) moves the menu with its button instead
+addEventListener('scroll',e=>{if(!ROWM||(e.target.closest&&e.target.closest('.rowm')))return;const t=e.target,v=ROWM.sc&&ROWM.sc.get(t);
+ if(v&&v[0]===t.scrollTop&&v[1]===t.scrollLeft)return;
+ if(v&&v[2]!==t.scrollHeight&&ROWM.btn&&ROWM.btn.isConnected){v[0]=t.scrollTop;v[1]=t.scrollLeft;v[2]=t.scrollHeight;closeRowSub();placeFloat(ROWM,ROWM.btn,true);return}
+ closeRowMenu()},true);
 function placeFloat(el,a,right,cap){if(el.parentNode!==document.body)document.body.appendChild(el);el.classList.add('fx');el.style.maxHeight='';el.style.width='';
 const r=a.getBoundingClientRect(),vw=document.documentElement.clientWidth,vh=window.innerHeight,g=4,pad=8;
 if(el.classList.contains('ddl'))el.style.width=Math.min(vw-2*pad,Math.max(r.width,+el.dataset.w||180))+'px';
@@ -158,7 +163,7 @@ let top;if(h<=below||below>=above){top=r.bottom+g;el.style.maxHeight=Math.max(12
 else{const mh=Math.min(h,above);el.style.maxHeight=mh+'px';top=r.top-g-mh}
 const w=el.offsetWidth;let left=right?r.right-w:r.left;left=Math.max(pad,Math.min(left,vw-w-pad));
 el.style.left=left+'px';el.style.top=top+'px'}
-const DD={},DDset={},esc=x=>String(x).replace(/&/g,'&amp;'),closeDD=()=>document.querySelectorAll('.ddl').forEach(l=>l.hidden=true);
+const DD={},DDset={},esc=x=>String(x).replace(/&/g,'&amp;'),closeDD=()=>document.querySelectorAll('.ddl:not(.rowm)').forEach(l=>l.hidden=true);   // a row's menu keeps its own closing (closeRowMenu, 2.79.1)
 function paintColors(){if(window.lyInkOn)lyInkFill();if(WBX.wbTrayPaint)WBX.wbTrayPaint(true)}
 const N=[],M=[];
 function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
