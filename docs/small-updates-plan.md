@@ -2,7 +2,7 @@
 
 Owner: "please make a simple plan with as few releases as possible. make these updates very minimal and clean." Answers (Oct 31 2026): Alt + wheel resizes and Shift + wheel rotates what is on the cursor, and the same for a selected element under the pointer; tooltips after about 0.3 s.
 
-## Step 1: 2.79.1, panels and selection
+## Step 1: 2.79.1, panels and selection (built Oct 31 2026; docs/plan.md)
 1. Template picker: the size slider resizes only the cards; the window keeps its size.
 2. While a shape, stamp, text or picture is on the cursor, the Element section shows Size and Rotate from the start (canvas and stamp tab).
 3. Align is hidden when nothing is selected.
@@ -11,7 +11,7 @@ Owner: "please make a simple plan with as few releases as possible. make these u
 6. Panel sections start folded except the top one; which ones were opened is remembered per panel.
 7. Stamp tab: clicking another stamp in the Stamp panel opens that stamp's tab.
 
-## Step 2: 2.79.2, the wheel and tooltips
+## Step 2: 2.79.2, the wheel and tooltips (built Oct 31 2026; docs/plan.md)
 1. Wheel scrolls up and down, Shift + wheel left and right, Ctrl/Cmd + wheel zooms (and pinch); Space or the middle button and drag pans.
 2. Alt + wheel resizes and Shift + wheel rotates what is on the cursor or a selected element under the pointer (canvas and stamp tab); then the view does not move.
 3. Every icon and button shows a short name (and its shortcut) about 0.3 s after hovering.

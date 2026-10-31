@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.79.2 (Oct 31 2026, branch fix/2.79.2-wheel-and-tooltips, step 2 of docs/small-updates-plan.md): the wheel and quick tooltips
+- **Wheel:** Alt + wheel sizes (5% a notch) and Shift + wheel turns (5° a notch) what is on the cursor, or the selection while the pointer is over a selected element; on the canvas through the Element group's Size and Rotate, in a stamp's tab through the shape editor's; one History step when the wheel stops (41-view-keys.js, 25-art-layers.js `WBX.wbWheelXf`). Otherwise the wheel moves the view as before: up and down, Shift across (done by the app where the system does not turn the wheel sideways), Ctrl/Cmd zooms; Space or the middle button drags.
+- **Tooltips:** an icon-only control's name (its title, or the aria-label of a button with no words) shows in a small tip (`.wbtip`, Transient band) 0.3 s after the pointer rests on it, at once when moving on from another tip; the native title is lifted while it shows and is back before any press (34-desktop-shell.js). The icon name watcher (00-icons.js) and the older hover-title code leave a lifted title alone. Mouse and pen only.
+- Tests: tests/small-updates-2-79-2.spec.js (4). Related specs: see PROJECT_STATUS. Not run: full suite, WebKit, CI.
+
 ## 2.79.1 (Oct 31 2026, branch fix/2.79.1-panels-and-selection, step 1 of docs/small-updates-plan.md): panels and selection
 - **Template picker:** the dialog has a fixed height (as Settings), so the card size slider changes the cards, not the window.
 - **Placing:** with a shape, a stamp or copies on the cursor and nothing selected, the Element group comes into that kind's panel and its Size and Rotate set what will be placed (25-art-layers.js `fpArm`, 78-element-lists.js); in a stamp's tab the shape editor's Size and Rotate do the same for a library shape on the cursor (09, 13). They showed only after something had been selected.

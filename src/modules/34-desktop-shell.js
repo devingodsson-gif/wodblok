@@ -130,6 +130,19 @@ const t=e.target.closest('.wtab');if(t){g.a=t.dataset.t;g.col=false;panel=g.a;ws
 {const K='wb279_secs',key=d=>{const s=d.querySelector(':scope>summary');return(d.id||'')+'|'+(s?s.textContent.trim():'')};let M={};try{M=JSON.parse(kv.get(K)||'{}')||{}}catch(e){M={}}
  document.querySelectorAll('section.pn[data-p]').forEach(sec=>{const p=sec.dataset.p;const top=[...sec.querySelectorAll(':scope>details.g')].find(d=>!d.hidden);[...sec.querySelectorAll(':scope>details.g')].forEach(d=>{const m=M[p]&&M[p][key(d)];d.open=m!=null?!!m:(d===top||!!d.querySelector('#lfree'))})});
  document.addEventListener('toggle',e=>{const d=e.target;if(!d||!d.matches||!d.matches('details.g'))return;const sec=d.closest('section.pn[data-p]');if(!sec)return;const p=sec.dataset.p;(M[p]=M[p]||{})[key(d)]=d.open?1:0;try{kv.set(K,JSON.stringify(M))}catch(x){}},true)}
+// 2.79.2 (owner Oct 31 2026: "a minimal tooltip which appears very quickly"): an icon-only control's name (its title, or the aria-label of a button that shows no text)
+// shows in a small tip 0.3 s after the pointer rests on it, at once when moving on from another tip; the title is lifted while the tip shows so the slow native one does not
+// also appear, and is back before any press (so code reading it sees it). Mouse and pen only; a press, a key, the wheel or a scroll hides it
+{let tip=null,el=null,tm=0,seen=0;const mo=new MutationObserver(()=>{if(!el)return;const t=el.getAttribute('title');if(t==null)return;el.dataset.wbtip=t;el.removeAttribute('title');if(tip&&!tip.hidden)tip.textContent=t});   // the app renames a control while it is pointed at (Undo's title)
+ const hide=()=>{clearTimeout(tm);mo.disconnect();if(el&&el.dataset.wbtip!=null){el.setAttribute('title',el.dataset.wbtip);delete el.dataset.wbtip}el=null;if(tip&&!tip.hidden){tip.hidden=true;seen=performance.now()}};
+ const name=x=>{const t=x.dataset.wbtip!=null?x.dataset.wbtip:x.getAttribute('title');if(t)return t;if(x.matches('button,[role=button]')){const tp=x.querySelector('.tip');if(!x.textContent.replace(tp?tp.textContent:'','').trim())return x.getAttribute('aria-label')||''}return''};
+ const show=()=>{if(!el||!el.isConnected)return hide();const t=name(el);if(!t)return;if(!tip){tip=document.createElement('div');tip.className='wbtip';tip.setAttribute('role','tooltip');document.body.appendChild(tip)}
+  tip.textContent=t;tip.hidden=false;const r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight,vw=document.documentElement.clientWidth,vh=innerHeight;let y=r.bottom+4;if(y+h>vh-4)y=r.top-4-h;
+  tip.style.left=Math.round(Math.max(4,Math.min(vw-w-4,r.left+r.width/2-w/2)))+'px';tip.style.top=Math.round(Math.max(4,y))+'px'};
+ document.addEventListener('pointerover',e=>{if(e.pointerType=='touch')return;const x=e.target.closest&&e.target.closest('[title],[data-wbtip],button[aria-label],[role=button][aria-label]');if(x===el)return;const quick=(tip&&!tip.hidden)||performance.now()-seen<400;hide();if(!x||!name(x))return;el=x;
+  const t=x.getAttribute('title');if(t){x.dataset.wbtip=t;x.removeAttribute('title')}mo.observe(x,{attributes:true,attributeFilter:['title']});if(quick)show();else tm=setTimeout(show,300)},true);
+ document.addEventListener('pointerout',e=>{if(el&&!(e.relatedTarget&&el.contains(e.relatedTarget))&&el.contains(e.target))hide()},true);
+ ['pointerdown','keydown','wheel','scroll'].forEach(k=>addEventListener(k,()=>{if(el){hide();seen=0}},{capture:true,passive:true}))}
 // 2.78.5 (bug test B5, owner Oct 30 2026: "hidden"): the Element panel lists the shapes of the stamp open in its tab; with none open it was a blank panel, so its tab goes
 // (as its own close button would) and the Element panel opens again from a stamp's tab
 WBX.wbMlTab=()=>{if(stUnlocked()!=null)return;const L=wsL();let ch=false;[...L.dock,...L.float].forEach(g=>{const i=g.tabs.indexOf('mlist');if(i<0)return;g.tabs.splice(i,1);if(g.a=='mlist')g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g);ch=true});if(ch){wsSave();wsRender()}};
@@ -402,7 +415,7 @@ setInterval(()=>{if(!sec.hidden)paint()},30000)})();
 
 
 // ---- names on hover (Part 9, owner Oct 22 2026): an icon-only button shows its aria-label; a button that shows its own words shows nothing extra
-document.addEventListener('pointerover',e=>{const b=e.target.closest&&e.target.closest('button[aria-label],[role=button][aria-label]');if(!b||b.title)return;
+document.addEventListener('pointerover',e=>{const b=e.target.closest&&e.target.closest('button[aria-label],[role=button][aria-label]');if(!b||b.title||b.dataset.wbtip!=null)return;   // 2.79.2: its title is lifted while the quick tip shows
 const tip=b.querySelector('.tip');const words=b.textContent.replace(tip?tip.textContent:'','').trim();if(!words)b.title=b.getAttribute('aria-label')},true);
 
 // ---- keyboard shortcuts

@@ -114,9 +114,10 @@ function ic(n){return IC_OPEN+(ICN[n]!=null?ICN[n]:n)+'</svg>'}
 function icFill(root){(root||document).querySelectorAll('svg[data-ic]').forEach(s=>{const d=ICN[s.dataset.ic];if(d!=null&&!s.firstChild)s.innerHTML=d})}
 // Every icon-only button shows its name on hover and has the same accessible name (Part 9, section 8; 2.29.0). The accessible name leads: a button with only one of
 // the two gets the other, and a title that says something else is set to the name. A title may add a shortcut in brackets ("Undo (Ctrl+Z)"); that is kept.
-// One watcher keeps every button on the page in line as lists and menus are redrawn, so no panel has to remember it.
+// One watcher keeps every button on the page in line as lists and menus are redrawn, so no panel has to remember it. A button whose title is lifted while its quick tip
+// shows (data-wbtip, 34-desktop-shell.js, 2.79.2) is left alone until the title is back.
 const icBare=t=>String(t||'').replace(/ \([^)]*\)$/,'');
-function icNm(b){if(!b||b.tagName!=='BUTTON'||!b.querySelector('svg')||b.textContent.trim())return;const t=b.getAttribute('title'),a=b.getAttribute('aria-label');
+function icNm(b){if(!b||b.tagName!=='BUTTON'||b.dataset.wbtip!=null||!b.querySelector('svg')||b.textContent.trim())return;const t=b.getAttribute('title'),a=b.getAttribute('aria-label');
  if(a){if(!t||(t!==a&&icBare(t)!==a))b.setAttribute('title',a)}else if(t)b.setAttribute('aria-label',icBare(t))}   // a name that itself ends in brackets is left alone, so this never sets the same title again
 function icNames(root){(root||document).querySelectorAll('button').forEach(icNm)}
 function icNamesWatch(){icNames();if(typeof MutationObserver!='function')return;

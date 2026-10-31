@@ -8,6 +8,7 @@ import {ser} from './14-presets-and-layer-grid-ui.js';
 import {fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnapS,fpTog,fpU} from './24-free-place-layers.js';
 import {fx1,tbG,tbSty,txbSync,txtGl} from './26-text-boxes.js';
 import {fxGr,fxJit,fxPad,fxTex} from './69-effect-stack.js';
+import {stTxMode} from './63-stamp-tool.js';
 
 // ===== Art layers: imported images and saved WODBLOK projects, placed by hand like Free place stamps =====
 // ARTS[id] = {n name, k 'img'|'proj', src data URL, w, h, and for projects pid (source project) + ver (when it was last saved)}.
@@ -65,6 +66,10 @@ function init25(){WBX.wbFpBox=(q,c)=>fpBox(q,c);   /* 2.76.10: the box of one pa
 WBS.fpLast=null;
 {const ch=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()},cur2=()=>{const L=fpL();return L&&(L.pl||[]).find(q=>q.u==WBS.fpSel)};
 $('lfpst').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;const id=+b.dataset.t;if(e.shiftKey||e.ctrlKey||e.metaKey){fpPick(String(id),e,[...$('lfpst').querySelectorAll('[data-t]')].map(x=>x.dataset.t),false);return}WBS.fpPool=new Set();WBS.fpPA=String(id);WBS.fpB=WBS.fpB==id&&!fpPoolOk()?null:id;if(WBS.fpB){WBS.fpSel=-1;WBS.fpMS=new Set()}upd()};
+// 2.79.2 (owner Oct 31 2026): which Size and Rotate sliders the wheel moves (Alt and Shift, 41-view-keys.js): those of what is on the cursor, or of the selection when
+// the pointer is over a selected element; on the canvas the Element group's, in a stamp's tab the shape editor's. Nothing to move: null, and the wheel scrolls as usual
+WBX.wbWheelXf=e=>{if(stTxMode()){if($('sel').classList.contains('none'))return null;if(WBS.msel&&WBS.msel.size){const on=[...document.querySelectorAll('#art polygon.stes')].some(g=>{const r=g.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom});return on?{s:'ssz',r:'srt'}:null}return WBS.brush&&!WBS.brush.txt&&WBS.brush.m?{s:'ssz',r:'srt'}:null}
+ if($('lfpsel').hidden)return null;const p=cur2();if(!p)return fpArm()?{s:'lfps',r:'lfpr'}:null;const L=fpL(),[x,y]=fpPt(e),h=L&&fpHit(L,x,y);return h&&fpGrp().includes(h)?{s:'lfps',r:'lfpr'}:null};
 $('lfps').addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p){const A=fpArm();if(A){A.setS(+($('lfps').value/100*Math.min(CW,CH)).toFixed(2));WBH.fpOverlay()}return}const v=+$('lfps').value/100*Math.min(CW,CH);if(Math.abs(v-p.s)<.01)return;const k=v/p.s,S0=Math.min(CW,CH);fpGrp().forEach(q=>{if(q!==p)q.s=+Math.max(S0*.02,Math.min(S0*3,q.s*k)).toFixed(2)});p.s=+v.toFixed(2);WBS.fpLast=p.s;store();upd()});
 $('lfpr').addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p){const A=fpArm();if(A){A.setR(Math.round(+$('lfpr').value));WBH.fpOverlay()}return}const v=+$('lfpr').value;if(v==p.r)return;const d=v-(+p.r||0);fpGrp().forEach(q=>{if(q!==p){let r=Math.round((+q.r||0)+d);r=((r+180)%360+360)%360-180;q.r=r}});p.r=v;store();upd()});
 ['lfpx','lfpy'].forEach((id,ax)=>$(id).addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p)return;const k=ax?'y':'x',W=ax?CH:CW,v=+$(id).value/100*W,d=v-p[k];if(Math.abs(d)<.01)return;fpGrp().forEach(q=>{q[k]=+(q[k]+d).toFixed(1)});store();upd()}));
