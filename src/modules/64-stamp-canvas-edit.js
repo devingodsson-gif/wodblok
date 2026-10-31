@@ -123,7 +123,7 @@ function sceKey(e){if(WBS.brush&&e.key!=='Delete')return;const tg=e.target;if(tg
  else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='s'||e.key=='S')){e.preventDefault();$('ssp').click()}
  else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='k'||e.key=='K')){e.preventDefault();$('sko').click()}}
 function init64(){
- STP.after=sceDraw;WBX.wbSceDraw=sceDraw;WBX.wbSceDelSel=sceDelSel;WBX.wbSceOrder=sceOrder;WBX.wbSceHitSel=sceHitSel;
+ STP.after=sceDraw;WBX.wbSceDraw=sceDraw;WBX.wbSceDelSel=sceDelSel;WBX.wbSceOrder=sceOrder;WBX.wbSceHitSel=sceHitSel;WBX.wbSceAt=e=>{const id=stUnlocked();if(id==null)return false;const c=scePt(e);if(!c)return false;const h=stampAt(c.x,c.y,id);if(!h)return false;const t=sceRO();return!!(t&&sceItemAt(t,h.u,h.v))};   /* 2.81.2: is a shape of the open stamp under the pointer (97-touch.js), nothing changed */
  const w=$('artwrap');if(w)w.addEventListener('pointerdown',sceDown,true);
  document.addEventListener('pointermove',sceMove);document.addEventListener('pointerup',sceUp);document.addEventListener('pointercancel',sceUp);
  document.addEventListener('keydown',sceKey);

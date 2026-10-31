@@ -41,7 +41,9 @@ Each panel was checked for anything past the screen's edge and for small tap tar
 | 3 | 2.81.4 | **M5:** icon buttons at touch size on a phone (`--h-touch`, 36 px). **M6:** the top bar folds what does not fit into its "…" menu, as a narrow desktop window does (2.78.5). | about 20% |
 | 4 | 2.82.0 | The CI suite, then live on the owner's word. | |
 
-Questions for the owner:
+Owner's answers (Oct 31 2026): "Yes to all your questions do whatever you think is best": placing stops after one on a phone; the canvas pinned at the top now, the bottom sheet as its own update later; one tool panel at a time on a phone.
+
+Questions for the owner (answered above):
 1. M2: on a phone, should placing stop after one (recommended: tap the button again for another), or should the armed element-bar button put it away when tapped?
 2. M3: keep the canvas pinned at the top now (recommended, small), or go straight to the bottom-sheet layout?
 3. M4: one tool panel at a time on a phone (recommended)?

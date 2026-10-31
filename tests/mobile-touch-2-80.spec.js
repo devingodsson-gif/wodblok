@@ -123,6 +123,29 @@ test.describe('on a phone, the canvas', () => {
     expect(errors).toEqual([]);
   });
 
+  test('2.81.2: a swipe that starts on the empty canvas scrolls the page and keeps the selection; placing stops after one', async ({ page }) => {
+    const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false });
+    await page.click('#elb [data-k="motif"]'); await H.settle(page);
+    const b = await page.locator('#art').boundingBox();
+    await touch(page, [[[b.x + b.width / 2, b.y + b.height / 3]]]); await H.settle(page);
+    expect(await page.evaluate(() => !!document.querySelector('#elb [aria-pressed="true"]')), 'placing stopped after one').toBe(false);
+    const q = (await shapes(page))[0], [x, y] = await scr(page, q.x, q.y);
+    await touch(page, [[[x, y]]]); await H.settle(page);
+    expect((await shapes(page)).length, 'a tap on it selects it, no copy').toBe(1);
+    await expect(page.locator('#fpov rect.sel')).toHaveCount(1);
+    const bd = await page.locator('#boardP').boundingBox();
+    await touch(page, path([[bd.x + 24, bd.y + bd.height - 30]], [[bd.x + 24, bd.y + 40]]));
+    await H.settle(page);
+    expect(await page.evaluate(() => scrollY), 'the page scrolled').toBeGreaterThan(50);
+    await expect(page.locator('#fpov rect.sel'), 'still selected').toHaveCount(1);
+    // a tap on the empty canvas still deselects
+    await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(100);
+    const bd2 = await page.locator('#boardP').boundingBox();
+    await touch(page, [[[bd2.x + 24, bd2.y + bd2.height - 30]]]); await H.settle(page);
+    await expect(page.locator('#fpov rect.sel'), 'a tap on the empty canvas deselects').toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+
   test('two fingers on the empty canvas zoom and leave the document alone; on a selected element they size and turn it in one History step', async ({ page }) => {
     const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false });
     await H.addShape(page); await page.keyboard.press('Escape'); await page.evaluate(() => window.__wbTest.commands.run('edit.deselect')); await H.settle(page);

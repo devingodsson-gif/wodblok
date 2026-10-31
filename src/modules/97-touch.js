@@ -67,6 +67,10 @@ function touchCanvas() {
   const pass = (o, ev) => { if (o.passed) return; const t = nearHandle(ev.clientX, ev.clientY, o.t) || o.t; o.passed = true; clearTimeout(o.tm); t.dispatchEvent(pe('pointerdown', o.down)); };
   const stop = e => { e.stopImmediatePropagation(); if (e.cancelable) e.preventDefault(); };
   const sliders = (x, y) => { if (armed() || !WBX.wbWheelXf) return null; const t = WBX.wbWheelXf({ clientX: x, clientY: y }); return t ? { s: document.getElementById(t.s), r: document.getElementById(t.r) } : null; };
+  const scrollBy = (o, e) => {
+    const dx = e.clientX - o.scroll.x, dy = e.clientY - o.scroll.y; o.scroll.x = e.clientX; o.scroll.y = e.clientY;
+    const t0 = board.scrollTop; board.scrollLeft -= dx; board.scrollTop -= dy; const rest = -dy - (board.scrollTop - t0); if (rest) window.scrollBy(0, rest);
+  };
   const geo = () => { const [a, b] = [...P.values()]; return { d: Math.max(1, Math.hypot(b.x - a.x, b.y - a.y)), a: Math.atan2(b.y - a.y, b.x - a.x), x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; };
   addEventListener('pointerdown', e => {
     if (e.pointerType !== 'touch' || !e.isTrusted || !wbTouch()) return;
@@ -74,7 +78,7 @@ function touchCanvas() {
     P.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (P.size === 1) {
       stop(e); const o = one = { id: e.pointerId, t: board.contains(document.elementFromPoint(e.clientX, e.clientY)) ? document.elementFromPoint(e.clientX, e.clientY) : t, down: e, x: e.clientX, y: e.clientY, armed: armed(), passed: false };
-      if (!o.armed) o.tm = setTimeout(() => { if (one === o && !two && !o.passed) pass(o, o.down); }, HOLD_MS);
+      if (!o.armed) o.tm = setTimeout(() => { if (one === o && !two && !o.passed && !o.scroll) pass(o, o.down); }, HOLD_MS);
       return;
     }
     stop(e);
@@ -106,7 +110,12 @@ function touchCanvas() {
     }
     const o = one; if (!o || o.id !== e.pointerId || o.passed) return;
     if (o.armed) return;   // the shape on the finger follows it (the editor's own hover)
-    if (Math.hypot(e.clientX - o.x, e.clientY - o.y) >= HOLD_GO) pass(o, o.down); else stop(e);
+    if (o.scroll) { stop(e); scrollBy(o, e); return; }
+    if (Math.hypot(e.clientX - o.x, e.clientY - o.y) < HOLD_GO) { stop(e); return; }
+    // 2.81.2 (owner: "it deselects the shape"): a finger that moves from the empty canvas scrolls (the canvas when zoomed in, then the page), as a phone's
+    // page would; on a desktop the same drag draws a selection box, which starts by dropping the selection
+    if (!nearHandle(o.x, o.y, o.t) && !(o.t.closest && o.t.closest('[data-fh],.steh')) && !(WBX.wbTouchHit && WBX.wbTouchHit(o.down))) { clearTimeout(o.tm); o.scroll = { x: o.x, y: o.y }; stop(e); scrollBy(o, e); return; }
+    pass(o, o.down);
   }, { capture: true, passive: false });
   const up = e => {
     if (e.pointerType !== 'touch' || !e.isTrusted || !P.has(e.pointerId)) return;
@@ -121,10 +130,12 @@ function touchCanvas() {
     const o = one; if (!o || o.id !== e.pointerId) return; one = null; clearTimeout(o.tm);
     if (o.passed) return;   // the editor has had the press: its lift goes on to it
     stop(e);
-    if (e.type === 'pointercancel') return;
+    if (e.type === 'pointercancel' || o.scroll) return;
     const t = o.armed ? (document.elementFromPoint(e.clientX, e.clientY) || o.t) : (nearHandle(o.x, o.y, o.t) || o.t);
     const at = o.armed ? e : o.down;   // placed where the finger lifts; a tap where it touched
-    t.dispatchEvent(pe('pointerdown', at)); t.dispatchEvent(pe('pointerup', at));   // the touch's own click follows
+    t.dispatchEvent(pe('pointerdown', at)); t.dispatchEvent(pe('pointerup', at));
+    // 2.81.2: on a phone placing stops after one (no Esc or right click there to stop it); the Place copies tool keeps going, as it is meant to
+    if (o.armed && WBX.plKind && WBX.plKind() !== 'copy' && WBX.plKind() !== 'text' && WBX.plDisarm) WBX.plDisarm();   // the touch's own click follows
   };
   addEventListener('pointerup', up, true); addEventListener('pointercancel', up, true);
   // 2.81.1 (owner Oct 31 2026: "it deselects and nothing is created"): a finger held on the canvas makes the phone send a long press (contextmenu), which the
