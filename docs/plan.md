@@ -1,5 +1,13 @@
 # Development plan
 
+## 2.84.2 (Nov 1 2026, patch 1 of docs/patch-todo-2.85.md): five bugs from the tester's list
+- **T1, text caret:** the typing field laid over a text on the canvas is now set in the text's real font, size (read from the drawn letters, so a Fill-the-box text is right too), line height, letter and word spacing, case and alignment; the block of lines sits in the middle of the box as the engine centres it. Texts shaped on a curve, path or warp keep the old straight fit (a straight field cannot follow them). Stamp-tab text is unchanged. Not covered: per-letter styles (size, spacing) inside one text.
+- **T2, Effects:** an Effects group with no effects has no fold arrow, so a fold saved closed (or closed before the last effect was removed) left only a title and no Add effect. An empty group is now always open (`fxSync`).
+- **T3, Shape button:** the first click opens the Shapes panel and makes or arms nothing (2.76.8 armed a rectangle, and put one into a stamp's tab). Once a shape has been used, the button arms that shape again; a shape put into a stamp's tab counts as used (`wbMotifUsed`).
+- **T4, Add pattern:** adds the pattern at once, in the middle, selected; nothing is armed and no canvas click is needed (bar button and panel Add).
+- **T5, Save dialog type:** `src/platform/web.js` reads the Save as type from the file name (PNG, JPEG, WebP, SVG, PDF, TIFF, ZIP, .wodblok, JSON) when the caller gives none, with a description, so the dialog no longer offers a bare "file".
+- Tests: text-caret-2-84-2, effects-add-always-reachable-2-84-2, add-pattern-at-once-2-84-2, save-type-2-84-2 (new); first-minute-2-76-8 (the Shape button, rewritten), add-arm-2-20 (pattern no longer armed), stamp-tab-2-25 and stamp-tab-motifs (a rectangle is put in by `stampTabRect` in the harness); harness `addKind` for motif.
+
 ## 2.84.1 (Oct 31 2026, hotfix, LIVE with the owner's word): a section's open state is kept at once
 - The CI suite on live 2.84.0 (owner's word, run 41241266223): WebKit and seven of eight Chromium shards passed; shard 7 failed on small-updates-2-79-1's section memory: on CI the section was opened and the page reloaded before the `toggle` event (a task later) saved it. The open state is now kept by a MutationObserver on `open`, which runs before the next task (34-desktop-shell.js). The picture comparison job does not run on a hand-started suite, so the icon size changes of 2.84.0 were not compared there.
 
