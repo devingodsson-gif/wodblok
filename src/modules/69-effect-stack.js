@@ -99,6 +99,8 @@ const gQ=(g,s)=>g.querySelector(s)||fxPaneOf(g).querySelector(s);
 function fxSync(){if(!WBS.layers||!WBS.proj)return;document.querySelectorAll('.fxg').forEach(g=>{const kind=g.dataset.fxk,t=fxTarget(kind);if(g.hidden!==!t)g.hidden=!t;if(!t)return;const list=fxOf(t),sel=list.find(e=>e.u==SEL[kind])||null;
 // 2.55.0 (owner Oct 26 2026): with no effects the group is only its title and +, with no fold arrow
 if(g.classList.contains('fxnone')!==!list.length){g.classList.toggle('fxnone',!list.length);if(list.length)g.open=true}
+// 2.84.2: an empty Effects group has no arrow to open it with, so it is never left folded (a folded state saved while it had effects, or folded before its last effect went, hid Add effect with nothing to open it)
+if(!list.length&&!g.open)g.open=true
 const key=JSON.stringify([t.u||'x',list.map(e=>[e.u,e.k,e.on,e.x,e.md]),sel&&sel.u]);
 const host=gQ(g,'.fxl'),host2=gQ(g,'.fxl2');if(host.dataset.k!==key){host.dataset.k=key;
 const row=e=>{const d=fxDef(e.k),on=e.on!==false,op=sel&&e.u==sel.u;return`<div class="fxr${op?' on':''}${on?'':' off'}" data-fu="${e.u}" draggable="true"><button type="button" class="ib" data-fon aria-pressed="${on}" aria-label="${on?'Hide':'Show'} this effect">${on?FXI.eye:FXI.off}</button><span class="fxc${op?' open':''}">${FXI.car}</span><b>${fxHx(d?d.label:e.k)}</b><button type="button" class="ib" data-fmore aria-haspopup="menu" aria-label="More">${FXI.more}</button></div>`};
