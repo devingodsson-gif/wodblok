@@ -267,6 +267,13 @@ async function stampTabRect(page) {
   await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 3 }); await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await settle(page);
   await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur()); await page.keyboard.press('v'); await settle(page);
 }
+// 2.84.2: arms a Rectangle on the pointer (the Shape button's first click only opens the Shapes panel now); the same in a stamp's tab, where a click then puts it in
+async function armRect(page) {
+  await showPanel(page, 'motifs');
+  const set = page.locator('#lib .lfr[data-f="b:Basic shapes"]');
+  if (!(await page.locator(`#lib button[data-m][aria-label="${BASIC.rect}"]`).count())) { await set.click(); await settle(page); }
+  await page.locator(`#lib button[data-m][aria-label="${BASIC.rect}"]`).click(); await settle(page);
+}
 // 2.4.0: a new Pattern is empty; this puts a source in it (a stamp by default, or 'motif' / 'text').
 // 2.28.0: Add source is a menu: the project's stamps, then its texts, then "Shape from the library…", which opens the library; the motif clicked there is added.
 async function patSource(page, kind = 'stamp', n = 0) {
@@ -324,4 +331,4 @@ async function stampMenu(page, item, n = 0) {
   await t.click({ button: 'right' });
   await page.locator('.rowm').getByRole('menuitem', { name: item, exact: true }).click();
 }
-module.exports = { stampTabRect, stampMenu, addKind, placeArmed, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, rzSet, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+module.exports = { armRect, stampTabRect, stampMenu, addKind, placeArmed, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, rzSet, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

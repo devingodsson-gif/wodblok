@@ -18,7 +18,7 @@ test('1. the template picker keeps its size while the card size slider changes t
 
 test('2. a shape on the cursor shows Size and Rotate before the first is placed, on the canvas and in a stamp tab', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false });
-  await page.click('#elb [data-k="motif"]'); await H.settle(page);
+  await H.armRect(page);
   expect(await vis(page, 'lfps'), 'Size').toBe(true);
   expect(await vis(page, 'lfpr'), 'Rotate').toBe(true);
   await set(page, 'lfps', 40); await set(page, 'lfpr', 30); await H.settle(page);
@@ -88,7 +88,7 @@ test('7. in a stamp\'s tab another stamp\'s row opens that stamp\'s tab', async 
 test('5. splitting shows only the split line; after it both pieces are selected, each in a box that fits it', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false });
   await H.addStamp(page); await H.unlockStamp(page, 0); await H.settle(page);
-  await page.click('#elb [data-k="motif"]'); await H.settle(page); await page.keyboard.press('Escape'); await H.settle(page);
+  await H.stampTabRect(page);
   const n = await page.evaluate(() => JSON.parse(window.__wbTest.state()).tiles[0].items.length);
   expect(n, 'a shape in the stamp').toBeGreaterThan(0);
   { const b = await page.locator('#art').boundingBox(); await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await H.settle(page); }   // the shape in the stamp's middle
