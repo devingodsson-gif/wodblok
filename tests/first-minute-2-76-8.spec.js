@@ -29,14 +29,33 @@ test('the stamp library has Starting points: six stamps drawn from the Basic sha
   expect(errors).toEqual([]);
 });
 
-test('the Shape button arms a rectangle at once: one click on the canvas places it', async ({ page }) => {
+// 2.84.2 (owner, Nov 1 2026): the first click on the Shape button only opens the Shapes panel. It made no rectangle in 2.76.8 (it armed one; in a stamp's tab it put one in). After a shape has been used the button arms that shape again.
+test('the first Shape click only opens the Shapes panel; afterwards the button arms the last shape used', async ({ page }) => {
   const { errors } = await H.openApp(page, { pattern: false, background: true });
   await page.click('#elb [data-k="motif"]'); await H.settle(page);
+  await expect(page.locator('section.pn[data-p="motifs"]:not([hidden])')).toBeVisible();
   const b = await page.locator('#art').boundingBox();
   await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await H.settle(page);
-  const m = (await st(page)).els.filter(q => q.k === 'motif');
-  expect(m.length).toBe(1);
-  expect(await page.evaluate(k => document.querySelector(`#lib button[data-m="${k}"]`) ? document.querySelector(`#lib button[data-m="${k}"]`).getAttribute('aria-label') || document.querySelector(`#lib button[data-m="${k}"]`).title : '', m[0].m)).toMatch(/Rectangle|^$/);
+  expect((await st(page)).els.filter(q => q.k === 'motif').length, 'nothing armed, nothing placed').toBe(0);
+  const m1 = await H.addShape(page, 'ellipse');
+  expect(m1).toBeTruthy();
+  await page.click('#elb [data-k="motif"]'); await H.settle(page);
+  await page.mouse.click(b.x + b.width * 0.25, b.y + b.height * 0.25); await H.settle(page);
+  const ms = (await st(page)).els.filter(q => q.k === 'motif');
+  expect(ms.length).toBe(2);
+  expect(ms[1].m).toBe(ms[0].m);
+  expect(errors).toEqual([]);
+});
+
+test('in a stamp\'s tab the first Shape click puts nothing in the stamp', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.showPanel(page, 'stmp'); await page.click('#smknew'); await H.settle(page); await page.click('#smkedit'); await H.settle(page);
+  await H.showPanel(page, 'motifs');
+  expect(await page.evaluate(() => window.__wbTest.unlockedStamp()), 'a stamp tab is open').not.toBeNull();
+  const before = await page.evaluate(() => JSON.stringify(JSON.parse(window.__wbTest.state()).tiles.map(t => t.items.length)));
+  await page.click('#elb [data-k="motif"]'); await H.settle(page);
+  const after = await page.evaluate(() => JSON.stringify(JSON.parse(window.__wbTest.state()).tiles.map(t => t.items.length)));
+  expect(after).toBe(before);
   expect(errors).toEqual([]);
 });
 

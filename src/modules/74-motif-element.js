@@ -10,7 +10,6 @@ import {fxGr,fxJit,fxTex} from './69-effect-stack.js';
 import {abInsert} from './73-add-bar.js';
 import {stUnlocked} from './63-stamp-tool.js';
 import {mNm} from './21-motif-library-ui.js';
-import {basicKey} from './76-basic-shapes.js';
 import {imPath} from './95-image-element.js';
 
 // ===== The Motif element (2.3.0, owner Oct 20 2026: "add shapes freely to the canvas"): one library shape on the canvas on its own, not inside a stamp.
@@ -106,7 +105,8 @@ function init74(){
  elExtend('motif',{dz:5,pn:'motifs',is:q=>q.k=='motif',name:q=>q.nm||mNm(q.m)||'Shape',draw:(L,li,pa)=>mtfLayer(L,li,pa)});
  // a click on the canvas with a shape armed and no stamp unlocked: a free Motif element there (64-stamp-canvas-edit.js asks first)
 // Add motif (2.7.0): a Motif in the middle of the canvas, the last one used or else the first of the library, selected; the library then changes its shape
- WBX.wbMotifAdd=()=>{const m=mtLast||basicKey('rect');if(!m){if(WBX.wbOpenPanel)WBX.wbOpenPanel('motifs');return}   /* 2.76.8 (owner, Oct 22 and 29 2026): the Shape button arms the last shape at once, else a rectangle (2.26.0 opened the library and armed nothing) */WBS.brush=null;if(stUnlocked()!=null){if(WBX.wbStampAddMotif)WBX.wbStampAddMotif(m,.8);return}if(!fpL())return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.brush={m,s:.8,r:0};upd()};
+ WBX.wbMotifAdd=()=>{const m=mtLast;if(!m){if(WBX.wbOpenPanel)WBX.wbOpenPanel('motifs');return}   /* the Shape button arms the last shape used at once; the first time (none used yet) it only opens the Shapes panel and makes or arms nothing (owner, Nov 1 2026: 2.76.8 armed a rectangle, and put one into a stamp's tab, which he did not want) */WBS.brush=null;if(stUnlocked()!=null){if(WBX.wbStampAddMotif)WBX.wbStampAddMotif(m,.8);return}if(!fpL())return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.brush={m,s:.8,r:0};upd()};
+ WBX.wbMotifUsed=m=>{mtLast=m};   // a shape put into a stamp's tab is the last one used too, so the Shape button repeats it there
  WBX.wbMotifAt=(x,y)=>{const b=WBS.brush;if(!b||b.txt||!b.m||!fpL())return false;mtfMake(b.m,x,y,mtfSize(),b.r||0);return true};
  // picking a library shape while a Motif element is selected changes that element's shape
  WBX.wbMotifSwap=m=>{if(WBS.brush)return false;const L=fpL(),q=L&&(L.pl||[]).find(x=>String(x.u)===String(WBS.fpSel));if(!q||q.k!='motif')return false;q.m=m;mtLast=m;store();upd();if(WBX.wbCap)WBX.wbCap();return true};
