@@ -2,7 +2,7 @@
 
 The owner's rough list from a testing session, formatted. The owner's words are kept in quotes; the grouping into patches is a proposal (nothing here is built or approved yet). Each patch is a small release (one theme, a few items), numbered as patches of the 2.85.0 update, as the earlier plans were (docs/pattern-plan.md, docs/mobile-review-2.81.md).
 
-Status: **proposed, not started.** Mark each item when it ships. Items marked **?** need the owner's answer before building.
+Status: **proposed, not started.** Mark each item when it ships. The owner answered the four open questions on Nov 1 2026 (below).
 
 ## Patch 1, 2.84.2: things that are wrong now (bugs)
 - [ ] **T1. Text caret is in the wrong place.** "When typing text the flashing position indicator line is not accurate in where it is."
@@ -18,15 +18,15 @@ Status: **proposed, not started.** Mark each item when it ships. Items marked **
 ## Patch 3, 2.84.4: the stamp tab
 - [ ] **T8. The alignment grid works in a stamp's tab.** "Alignment grid needs to work on stamp tab."
 - [ ] **T9. Add a Sheet to a stamp.** "Should be able to add sheet to stamp."
-- [ ] **T10. A stamp gets a background fill colour option.** "Stamps should have background fill color option." **?** A fill of the whole stamp square, or a Sheet inside the stamp (T9)? They may be the same item.
+- [ ] **T10. A stamp gets a background fill colour option.** "Stamps should have background fill color option." Owner: "it should actually just be a sheet", so this is T9: a Sheet in the stamp with a colour fill. One item, built once.
 - [ ] **T11. Drag elements in a stamp's element list to reorder by depth.**
 - [ ] **T12. Click any symmetry copy to select the element.** "When a shape is being repeated by a symmetry selection. You must click the original stamp to select it, I'd like to be able to click on any, the original or the copies."
 - [ ] **T13. Symmetry wrap toggle.** "Have symmetry in stamp mode have a toggle switch to wrap at the edges of the symmetry zones or be cut off."
 - [ ] **T14. Accent stamp can be any stamp.** "Accent stamp should be any possible option, not only stamps already in use." The Accent picker lists the whole Stamps library, not just stamps already used in the pattern.
 
 ## Patch 4, 2.84.5: panels and inputs
-- [ ] **T15. Only one element panel open at a time.** **?** Since 2.79.3 panels can sit side by side and a stamp's tab keeps the Stamp panel beside the left panel. Does "one at a time" mean opening an element panel closes the other element panels, while the Elements list, Colours and other non-element panels stay? Phone panels already pile up (docs/mobile-review-2.81.md, M4).
-- [ ] **T16. Font size bar.** "Font size bar." **?** Only the two words were written. Is it a slider beside the size number in the Text panel, or something on the canvas? Please say.
+- [ ] **T15. Only one element panel open at a time.** Owner: yes, opening an element panel closes the other element panels (the Elements list, Colours and other non-element panels stay), but in a stamp's tab the Stamp panel stays locked open. Phone panels already pile up (docs/mobile-review-2.81.md, M4); this helps there too.
+- [ ] **T16. Font size bar.** "Font size bar." Owner: a slider in the Text panel that resizes the font without touching the box dimensions.
 - [ ] **T17. Gradients with more than two colours.** "Triple and quadruple gradient. Keep being able to add colors." Gradient stops can be added without a limit of two (the owner suggests at least three and four, and "keep being able to add").
 - [ ] **T18. Paste a copied picture into the shape importer.** "Ability to paste copied images into shape importer." Ctrl/Cmd+V with a picture on the clipboard, as well as choosing a file.
 
@@ -35,8 +35,8 @@ Status: **proposed, not started.** Mark each item when it ships. Items marked **
 - Each patch: a branch `fix/<version>-<name>`, one commit per behaviour change with its test, quick specs and `check:style`/`check:platform`; the full suite only on the owner's word.
 - The 2.85.0 minor is raised once, when the four patches are done.
 
-## Questions for the owner
-1. T10: fill the stamp square, or the same as adding a Sheet (T9)?
-2. T15: what should "one element panel at a time" close, and what stays?
-3. T16: where is the font size bar?
-4. Order: bugs first (as above), or the stamp tab first?
+## Owner's answers (Nov 1 2026)
+1. Stamp background fill: just a Sheet (T9 and T10 are one item).
+2. One element panel at a time: yes; the Stamp panel stays locked open in a stamp's tab.
+3. Font size bar: a slider in the Text panel; the box dimensions stay as they are.
+4. Order: "doesn't matter" (the order above stands).
