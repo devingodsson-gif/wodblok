@@ -38,7 +38,7 @@ function plMake(o,x,y){if(o.k=='copy'){const q=JSON.parse(JSON.stringify(o.q));q
 // 2.26.0: what a bar button does after it opened the panel. In a stamp's tab only Motif and Text have an Add, so the other buttons stay as they were (they only open the panel).
 function abArm(k){const un=stUnlocked()!=null;if(un&&k!='motif'&&k!='text')return;
  if(k=='stamp'){if(!WBS.tiles.length)return;AD.stamp();return}
- if(k=='pattern'){AD.pattern(true);return}
+ if(k=='pattern')return;   // (2.84.2) the bar button only opens the Pattern panel; its Add adds the pattern
  if(k=='text'){AD.text();return}
  if(k=='motif'&&WBX.wbMotifAdd)WBX.wbMotifAdd()}
 const AB={
