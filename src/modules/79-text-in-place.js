@@ -1,5 +1,6 @@
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CW} from './04-canvas-and-stamp-outlines.js';
+import {CW,CH} from './04-canvas-and-stamp-outlines.js';
+import {teF,teE} from './60-text-engine.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL} from './24-free-place-layers.js';
@@ -27,9 +28,19 @@ function tisStart(g){if(!WBX.wbTxStampSel||!WBX.wbTxStampSel(g))return false;TIS
 function tisStop(){if(!TIS)return;const g=TIS;TIS=null;const e=$('txin');const v=e?e.value:'';if(e)e.hidden=true;if(WBX.wbTxStampEnd)WBX.wbTxStampEnd(g,!v.trim())}
 function tinPlace(){if(TIS){tisPlace();return}const e=$('txin');if(!e||e.hidden)return;const q=tinCur();if(!q){tinStop();return}
  const art=$('art'),m=art.getScreenCTM(),wh=fpWH(q);if(!m||!wh)return;const pt=art.createSVGPoint();pt.x=q.x-wh[0]/2;pt.y=q.y-wh[1]/2;const a=pt.matrixTransform(m);pt.x=q.x+wh[0]/2;pt.y=q.y+wh[1]/2;const b=pt.matrixTransform(m);
- const lines=Math.max(1,String(q.tx&&q.tx.text||'').split('\n').length),h=Math.max(8,b.y-a.y),s=e.style;
- s.left=a.x.toFixed(1)+'px';s.top=a.y.toFixed(1)+'px';s.width=Math.max(24,b.x-a.x).toFixed(1)+'px';s.height=h.toFixed(1)+'px';s.fontSize=Math.max(8,Math.min(120,h/lines*.8)).toFixed(1)+'px';s.lineHeight=(h/lines).toFixed(1)+'px';
- s.textAlign=(q.tx&&q.tx.al)||'left';s.transform=q.r?`rotate(${+q.r}deg)`:''}
+ const lines=Math.max(1,String(q.tx&&q.tx.text||'').split('\n').length),h=Math.max(8,b.y-a.y),w=Math.max(24,b.x-a.x),s=e.style,tx=q.tx||{};
+ s.left=a.x.toFixed(1)+'px';s.top=a.y.toFixed(1)+'px';s.width=w.toFixed(1)+'px';s.height=h.toFixed(1)+'px';s.transform=q.r?`rotate(${+q.r}deg)`:'';s.boxSizing='border-box';s.paddingTop='0px';s.fontWeight='';
+ // (2.84.2) the caret is the field's own, so the field is set in the text's real font, size, line height and spacing: then a letter typed lands where the caret is. A text shaped on a curve, a path or a warp cannot be followed by a straight field and keeps the old fit.
+ const f=teF[tx.f],shaped=Math.abs(+tx.cv||0)>=.5||!!tx.pt||!!(tx.wp&&tx.wa);
+ if(!f||shaped){s.fontFamily='inherit';s.fontSize=Math.max(8,Math.min(120,h/lines*.8)).toFixed(1)+'px';s.lineHeight=(h/lines).toFixed(1)+'px';s.letterSpacing='';s.wordSpacing='';s.textTransform='';s.whiteSpace='pre-wrap';s.textAlign=tx.al=='c'?'center':tx.al=='r'?'right':'left';return}
+ const sc=Math.hypot(m.a,m.b),ra=q.s/Math.max(q.n||1,.01),box=+tx.wd>0,Ss=(q.Lt||[]).map(l=>l[4]),mode=Ss.length?Ss.sort((x,y)=>Ss.filter(v=>v===y).length-Ss.filter(v=>v===x).length)[0]:0,
+  em=Math.max(1,(mode?mode*teE:(+tx.sz||30)/100*Math.min(CW,CH))*ra*sc),pad=box?Math.max(0,(+tx.pd||0))*Math.min(CW,CH)/100*ra*sc:0;   // the size actually drawn (a fitted text is not its Size field), read from the letters' own scale
+ s.paddingLeft=s.paddingRight=pad.toFixed(1)+'px';
+ s.fontFamily=`"${f.fam}", Georgia, serif`;s.fontWeight=String(f.w||'').replace(/[^0-9a-z ]/gi,'');s.fontSize=em.toFixed(2)+'px';s.lineHeight=((+tx.lh||115)/100*em).toFixed(2)+'px';s.letterSpacing=((+tx.ls||0)/100*em).toFixed(2)+'px';s.wordSpacing=((+tx.ws||0)/100*em).toFixed(2)+'px';
+ s.textTransform=tx.tc=='u'?'uppercase':tx.tc=='l'?'lowercase':tx.tc=='t'?'capitalize':'none';s.whiteSpace=box?'pre-wrap':'pre';s.textAlign=tx.al=='c'?'center':tx.al=='r'?'right':tx.al=='j'?'justify':'left';
+ // the block of lines sits in the middle of the box, as the engine centres it; a text wider than its field is widened round its middle (or its edge) so the caret does not run off
+ s.height='0px';const ch=e.scrollHeight,cw=e.scrollWidth;s.height=h.toFixed(1)+'px';s.paddingTop=Math.max(0,(h-ch)/2).toFixed(1)+'px';
+ if(!box&&cw>w){const d=cw-w;s.width=cw.toFixed(1)+'px';s.left=(a.x-(tx.al=='r'?d:tx.al=='l'?0:d/2)).toFixed(1)+'px'}}
 function tinStart(){const q=elSel();if(!q||elKind(q)!='text'||WBS.txArm)return false;TIN=String(q.u);const e=tinEl(),t=$('tx_t');e.value=t?t.value:String((q.tx&&q.tx.text)||'');e.hidden=false;tinPlace();e.focus();e.select();return true}
 function tinStop(){if(TIS){tisStop();return}if(!TIN)return;const u=TIN;TIN=null;const e=$('txin');if(e){const v=e.value;e.hidden=true;if(!v.trim()){const L=fpL(),i=L?(L.pl||[]).findIndex(q=>String(q.u)===u):-1;if(i>=0){L.pl.splice(i,1);WBS.fpSel=-1;WBS.fpMS=new Set();store();upd();if(WBX.wbCap)WBX.wbCap()}}}}
 // a text just placed by a click: it is selected, the tool is put away (one text at a time, you are typing now) and the typing starts
