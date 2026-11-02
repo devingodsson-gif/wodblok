@@ -56,7 +56,7 @@ test.describe('on a phone', () => {
     const { errors } = await H.openApp(page, { seed: 4, background: true, workspaces: 'launch' });
     for (const p of ['rand', 'layers', 'motifs', 'xrec']) { await page.evaluate(p => document.querySelector(`.rail [data-pn="${p}"]`).click(), p); await H.settle(page); }
     const groups = await page.evaluate(() => [...document.querySelectorAll('.wg')].map(g => [...g.querySelectorAll('.wtab')].map(t => t.dataset.t)));
-    expect(groups, 'the Elements list, then one group of tools').toEqual([['lyrs'], ['rand', 'layers', 'motifs', 'xrec']]);
+    expect(groups, 'the Elements list, then one group of tools').toEqual([['lyrs'], ['rand', 'motifs', 'xrec']]);   // 2.84.5: one element panel at a time (Shape closed Pattern)
     await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight)); await page.waitForTimeout(200);
     expect(await page.evaluate(() => scrollY), 'the page scrolled').toBeGreaterThan(100);
     const art = await page.locator('#art').boundingBox();
