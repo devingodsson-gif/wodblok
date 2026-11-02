@@ -25,10 +25,10 @@ Status: **proposed, not started.** Mark each item when it ships. The owner answe
 - [x] **T14. Accent stamp can be any stamp.** "Accent stamp should be any possible option, not only stamps already in use." The Accent picker lists the whole Stamps library, not just stamps already used in the pattern.
 
 ## Patch 4, 2.84.5: panels and inputs
-- [ ] **T15. Only one element panel open at a time.** Owner: yes, opening an element panel closes the other element panels (the Elements list, Colours and other non-element panels stay), but in a stamp's tab the Stamp panel stays locked open. Phone panels already pile up (docs/mobile-review-2.81.md, M4); this helps there too.
-- [ ] **T16. Font size bar.** "Font size bar." Owner: a slider in the Text panel that resizes the font without touching the box dimensions.
-- [ ] **T17. Gradients with more than two colours.** "Triple and quadruple gradient. Keep being able to add colors." Gradient stops can be added without a limit of two (the owner suggests at least three and four, and "keep being able to add").
-- [ ] **T18. Paste a copied picture into the shape importer.** "Ability to paste copied images into shape importer." Ctrl/Cmd+V with a picture on the clipboard, as well as choosing a file.
+- [x] **T15. Only one element panel open at a time.** Owner: yes, opening an element panel closes the other element panels (the Elements list, Colours and other non-element panels stay), but in a stamp's tab the Stamp panel stays locked open. Phone panels already pile up (docs/mobile-review-2.81.md, M4); this helps there too.
+- [x] **T16. Font size bar.** "Font size bar." Owner: a slider in the Text panel that resizes the font without touching the box dimensions.
+- [x] **T17. Gradients with more than two colours.** "Triple and quadruple gradient. Keep being able to add colors." Gradient stops can be added without a limit of two (the owner suggests at least three and four, and "keep being able to add").
+- [x] **T18. Paste a copied picture into the shape importer.** "Ability to paste copied images into shape importer." Ctrl/Cmd+V with a picture on the clipboard, as well as choosing a file.
 
 ## Order and testing
 - Patches 1 and 2 first (bugs and quick wins). Patch 3 is the largest and touches the stamp tab's drawing and selection, so it gets the broader regression and `npm run perf`. Patch 4 touches panels and the colour/gradient code.
