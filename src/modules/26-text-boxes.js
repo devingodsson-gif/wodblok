@@ -10,6 +10,7 @@ import {fpGrp,fpL,fpU} from './24-free-place-layers.js';
 import {fpWH} from './25-art-layers.js';
 import {txoFlag,txoFlagOn,txoHl,txoSetHl,txoShapeBind,txoLetterCol,txoRead,txoSetLetterCol,txoWrite,txoBind,txoSelBind,txoSeed,TXO_IDS} from './61-text-panel.js';
 import {stTxMode} from './63-stamp-tool.js';
+import {teE} from './60-text-engine.js';
 import {fxGr,fxJit,fxJitL,fxPad,fxTexUses} from './69-effect-stack.js';
 // ===== Text boxes. Any layer may hold them, in L.pl = [{u, tx:{text,f,sz,ls,lh,al,cv,rot}, G:{key:path}, Lt:[[key,x,y,rot,scale]], bw,bh,n, x,y,s,r,f}].
 // The letters are stored as outlines (centred on the box), so the project needs no fonts to show them. s = the box's long side on the canvas.
@@ -65,7 +66,7 @@ const tbSel=()=>{const L=fpL();return L?(L.pl||[]).find(q=>q.u==WBS.fpSel&&q.tx)
 // dragging the corners and the sides"; "as simple as possible"): a text on the canvas is a box and its letters always fill it (Fill the box). A new text's box is
 // TB_W x TB_H % of the canvas's short side; padding and overflow are gone; the size the letters take is worked out.
 const TB_W=60,TB_H=20;
-const tbBox=o=>{if(!(o.wd>0))o.wd=TB_W;if(!(o.ht>0))o.ht=TB_H;o.ft='f';delete o.pd;delete o.ov;return o};
+const tbBox=o=>{if(!(o.wd>0))o.wd=TB_W;if(!(o.ht>0))o.ht=TB_H;if(o.ft!=='z')o.ft='f';delete o.pd;delete o.ov;return o};
 const tbRead=()=>tbBox(txoRead());
 // A placed text after its box width or height was pulled with a handle: the letters keep their size and the lines break again. keepTop keeps the top edge where it is while the height follows the lines.
 async function tbRelay(p,keepTop,drag){const tok=++tbRelTok,R=await WBX.wbTxLay(p.tx);if(tok!==tbRelTok||!R)return;const L=fpL();if(!L||!(L.pl||[]).includes(p))return;const ra=p.s/Math.max(p.n||1,.01),dh=(R.bh-p.bh)*ra/2,r=(+p.r||0)*Math.PI/180;p.G=R.G;p.Lt=R.Lt;p.bw=R.bw;p.bh=R.bh;p.n=Math.max(R.bw,R.bh);p.s=+(ra*p.n).toFixed(2);if(keepTop){p.x=+(p.x-dh*Math.sin(r)).toFixed(1);p.y=+(p.y+dh*Math.cos(r)).toFixed(1);if(drag){drag.x0-=dh*Math.sin(r);drag.y0+=dh*Math.cos(r)}}tbKey='';upd()}
@@ -84,7 +85,7 @@ let tbPend=0;
 function txbSync(L){if(WBS.txArm&&(tbSel()||WBS.fpB)){WBS.txArm=false;tbG=null;tbArmUI()}
 document.querySelectorAll('.txlay').forEach(e=>{const h=stTxMode();if(e.hidden!==h)e.hidden=h});if(!stTxMode()&&$('tx_sprow'))$('tx_sprow').hidden=!tbSel();{const sw=$('lfps').closest('.ctl')||$('lfps'),lb=sw.previousElementSibling;const tx=tbSel()||WBS.txArm;sw.style.display=tx?'none':'';if(lb&&lb.tagName=='LABEL')lb.style.display=tx?'none':''}if(!$('tx_t')||stTxMode())return;const p=tbSel();$('tx_ed').hidden=!p;if(p)$('tx_edn').textContent=String(p.tx.text).replace(/\n/g,' ').slice(0,30);
 const key=tbKeyOf(p);if(key===tbKey)return;if(p&&tbPend)return;tbKey=key;if(!p)return;
-tbSty={tu:(Array.isArray(p.tu)?p.tu:[]).map(u=>({...u})),ink:p.ink||''};tbStyUI();tbLoad=true;try{const o=p.tx,ra=p.s/Math.max(p.n||1,.01);txoWrite(o,{sz:Math.max(2,Math.min(60,+(o.sz*ra).toFixed(1))),wd:Math.max(0,Math.min(400,Math.round((o.wd||0)*ra))),ht:Math.max(0,Math.min(400,Math.round((o.ht||0)*ra)))},false)}finally{tbLoad=false}if(WBX.wbTxFxPaint)WBX.wbTxFxPaint()}
+tbSty={tu:(Array.isArray(p.tu)?p.tu:[]).map(u=>({...u})),ink:p.ink||''};tbStyUI();tbLoad=true;try{const o=p.tx,ra=p.s/Math.max(p.n||1,.01);txoWrite(o,{sz:Math.max(2,Math.min(60,+(o.sz*ra).toFixed(1))),wd:Math.max(0,Math.min(400,Math.round((o.wd||0)*ra))),ht:Math.max(0,Math.min(400,Math.round((o.ht||0)*ra)))},false);tbFszShow(p)}finally{tbLoad=false}if(WBX.wbTxFxPaint)WBX.wbTxFxPaint()}
 // the Text tool in the Pattern editor: with no Text layer selected, typing makes one
 function tbEnsure(){return fpL()}
 function tbLive(){if(tbLoad||stTxMode())return;let p=tbSel(),L=fpL();if(!p)return;   // 2.12.0: typing no longer arms a click-to-place text; Add text makes it
@@ -93,7 +94,12 @@ p.tx=o;p.G=R.G;p.Lt=R.Lt;p.bw=R.bw;p.bh=R.bh;p.n=Math.max(R.bw,R.bh);p.s=+p.n.to
 async function tbAdd(){const L=fpL();if(!L)return;const o=tbRead();if(!o.text.trim())return;const R=await WBX.wbTxLay(o);if(!R){pmsg('No letters came out. Try another font.');return}
 L.pl=L.pl||[];const c=L.pl.filter(z=>z.tx).length,n=Math.max(R.bw,R.bh),q={u:fpU(),k:'text',tx:o,G:R.G,Lt:R.Lt,bw:R.bw,bh:R.bh,n,x:+(CW/2+((c%4)-1.5)*CW*.03).toFixed(1),y:+(CH/2+((c%4)-1.5)*CW*.03).toFixed(1),s:+n.toFixed(2),r:0,f:1};
 L.pl.push(q);WBS.fpSel=q.u;WBS.fpMS=new Set();WBS.fpB=null;WBS.fpGhost=null;tbKey='';store();upd();if(WBX.wbCap)WBX.wbCap()}
+// 2.84.5 (owner, Nov 1 2026: "a slider in the text panel to resize the font without touching the box dimensions"): Size shows the size the letters are drawn at (a text that
+// fills its box is not its Size field) and setting it turns Fit to box off, so the letters take that size inside the same box
+function tbFszShow(p){const z=$('tx_fsz');if(!z||!p||!p.tx)return;const ra=p.s/Math.max(p.n||1,.01),Ss=(p.Lt||[]).map(l=>+l[4]).filter(v=>v>0),m=Ss.length?Ss.sort((a,b)=>Ss.filter(v=>v===b).length-Ss.filter(v=>v===a).length)[0]:0,
+ v=(m?m*teE*100/Math.min(CW,CH):+p.tx.sz||30)*ra;z.value=Math.max(+z.min,Math.min(+z.max,Math.round(v*2)/2))}
 function init26(){WBX.wbTxHit=txHit;txoShapeBind();
+ {const z=$('tx_fsz');if(z)z.addEventListener('input',()=>{if(tbLoad)return;const s=$('tx_sz'),f=$('tx_ft');if(f)f.value='z';if(s)s.value=z.value;tbLive()})}
 WBX.wbTbAdd=tbAdd;
 TXM=new Map();WBS.txArm=false;
 {['tx_t',...TXO_IDS].forEach(id=>$(id).addEventListener('input',tbLive));
