@@ -5,6 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
+- **Nov 1: 2.84.3 (patch 2: T6 T7, the view moves by the middle button and the wheel at any zoom)** on `fix/2.84.3-view-navigation`, not merged until the owner says so. Next: 2.84.4 (the stamp tab).
+- **Nov 1: 2.84.2 LIVE** (owner: "Go live").
 - **Nov 1: 2.84.2 (patch 1 of docs/patch-todo-2.85.md: T1 to T5)** on `fix/2.84.2-bugs`, not merged until the owner says so. Patches 2 to 4 (2.84.3 canvas navigation, 2.84.4 stamp tab, 2.84.5 panels and inputs) are not started. Owner's answers are in the to-do.
 - **Oct 31: 2.84.1 LIVE** (hotfix, owner: "Go live"): a panel section's open state is kept the moment it changes (found by the CI suite on 2.84.0). Picture comparison was not run (it runs on a pull request only).
 - **Oct 31: 2.84.0 LIVE** (owner: "Go live", without the CI suite): whole-app style check against Part 9 (icon sizes, motion, layers, gaps, disabled opacity, swatch edge; `check:style` extended). Pixel goldens will move where icons changed size: the next CI suite should show them; regenerate those after looking at each diff.

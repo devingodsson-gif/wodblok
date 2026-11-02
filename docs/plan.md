@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.84.3 (Nov 1 2026, patch 2 of docs/patch-todo-2.85.md): moving around the canvas
+- **T6, T7:** the middle mouse button (and Space or the Hand tool) drags the view, and the wheel moves it (up and down; Shift across), also while the canvas is fitted to the screen. The board scrolls as far as it can; the rest moves a view offset on the artwork (`34-desktop-shell.js`, `voSet`), like Photoshop's pasteboard. A quarter of the canvas always stays on screen; a new zoom level or Fit puts the offset back to the middle. Placing and selecting still land under the pointer (the offset is a CSS translate, so the canvas's own coordinates follow it).
+- The plain wheel is now handled by the app (it scrolls the board, then moves the offset) instead of the browser's own scroll.
+- Tests: view-pan-2-84-3 (new: middle drag, wheel and Shift+wheel, Fit, the canvas stays on screen, placing after a move); small-updates-2-79-2 arms the shape through the library; first-five-2-26 follows 2.84.2 (its two old expectations had not been run with 2.84.2). `npm run perf`: ratio 1.029.
+
 ## 2.84.2 (Nov 1 2026, patch 1 of docs/patch-todo-2.85.md): five bugs from the tester's list
 - **T1, text caret:** the typing field laid over a text on the canvas is now set in the text's real font, size (read from the drawn letters, so a Fill-the-box text is right too), line height, letter and word spacing, case and alignment; the block of lines sits in the middle of the box as the engine centres it. Texts shaped on a curve, path or warp keep the old straight fit (a straight field cannot follow them). Stamp-tab text is unchanged. Not covered: per-letter styles (size, spacing) inside one text.
 - **T2, Effects:** an Effects group with no effects has no fold arrow, so a fold saved closed (or closed before the last effect was removed) left only a title and no Add effect. An empty group is now always open (`fxSync`).
