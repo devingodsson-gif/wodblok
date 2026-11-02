@@ -25,7 +25,7 @@ const thumb=q=>`<svg viewBox="-50 -50 100 100" style="background:${q.k?pb:pa}">$
 const tags=q=>`${q.cl&&q.cl.length?' <i>piece</i>':''}${q.k?'<i>knockout</i>':''}`;
 const gk=q=>q.tg?'txt:'+q.tg:mName(q.m),gnm=k=>{if(k.startsWith('txt:')){const M=(t.tgm||{})[k.slice(4)];const s=M?M.text.replace(/\n/g,' '):'Text';return '“'+(s.length>24?s.slice(0,23)+'…':s)+'”'}return k};
 const by={};t.items.forEach((q,i)=>{const nm=gk(q);(by[nm]=by[nm]||[]).push(i)});
-const row=(i,n,kid)=>{const q=t.items[i],nm=mName(q.m);return`<div class="mr${kid?' kid':''}${WBS.msel.has(i)?' on':''}" data-r="${i}">${thumb(q)}<b>${hx(nm)}${n?` <i>${n}</i>`:''}${tags(q)}</b><button type="button" class="lyb" data-rm="${i}" aria-haspopup="menu" aria-label="Actions for ${hx(nm)}">${MLMORE}</button></div>`};
+const row=(i,n,kid)=>{const q=t.items[i],nm=mName(q.m);return`<div class="mr${kid?' kid':''}${WBS.msel.has(i)?' on':''}" data-r="${i}"${q.tg?'':' draggable="true"'}>${thumb(q)}<b>${hx(nm)}${n?` <i>${n}</i>`:''}${tags(q)}</b><button type="button" class="lyb" data-rm="${i}" aria-haspopup="menu" aria-label="Actions for ${hx(nm)}">${MLMORE}</button></div>`};
 let h='';const done={};
 for(let i=t.items.length-1;i>=0;i--){const nm=gk(t.items[i]);if(done[nm])continue;done[nm]=1;const g=by[nm],isT=nm.startsWith('txt:');
 if(g.length==1&&!isT){h+=row(i);continue}
@@ -52,6 +52,14 @@ WBS.brush=null;
 document.addEventListener('contextmenu',e=>{const was=WBX.plDisarm?WBX.plDisarm():false;if(!was&&WBX.wbCtxMenu&&WBX.wbCtxMenu(e))return;
 if(typeof WBS.fpB!='undefined'&&(was||WBS.fpSel!==-1)&&fpL()){e.preventDefault();WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}e.preventDefault()},true);
 mlFold=new Set();try{mlFold=new Set(JSON.parse(kv.get('wb18_mlfold')||'[]'))}catch(e){}
+// 2.84.4 (owner, Nov 1 2026): a stamp's shapes are dragged in its Elements list to change their depth, as the elements are in the canvas's list. A row dropped on the
+// top half of another goes in front of it (higher in the list), on the bottom half behind it. A text's letters move with their text, so they are not dragged one by one.
+function mlMove(i,j,above){const t=WBS.tiles[WBS.cur];if(!t||i===j||!t.items[i]||!t.items[j])return;const q=t.items[i],tg=t.items[j];t.items.splice(i,1);t.items.splice(t.items.indexOf(tg)+(above?1:0),0,q);selOne(t.items.indexOf(q));store();upd();if(WBX.wbCap)WBX.wbCap()}
+{let mlDrag=null;const ML=$('mlist'),clr=()=>ML.querySelectorAll('.mr').forEach(x=>x.classList.remove('dragover-t','dragover-b'));
+ ML.addEventListener('dragstart',e=>{const r=e.target.closest&&e.target.closest('.mr[data-r][draggable]');if(!r)return;mlDrag=+r.dataset.r;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain','shape')}catch(x){}});
+ ML.addEventListener('dragover',e=>{if(mlDrag==null)return;const r=e.target.closest&&e.target.closest('.mr[data-r]');if(!r)return;e.preventDefault();clr();const b=r.getBoundingClientRect();r.classList.add(e.clientY<b.top+b.height/2?'dragover-t':'dragover-b')});
+ ML.addEventListener('drop',e=>{if(mlDrag==null)return;e.preventDefault();const r=e.target.closest&&e.target.closest('.mr[data-r]');clr();const i=mlDrag;mlDrag=null;if(!r)return;const b=r.getBoundingClientRect();mlMove(i,+r.dataset.r,e.clientY<b.top+b.height/2)});
+ ML.addEventListener('dragend',()=>{mlDrag=null;clr()})}
 $('mlist').onmousedown=e=>{if(e.shiftKey&&e.target.closest('.mr'))e.preventDefault()};
 $('mlist').onclick=e=>{const ML=$('mlist'),C=q=>{const x=e.target.closest(q);return x&&ML.contains(x)?x:null},t=WBS.tiles[WBS.cur],add=e.shiftKey||e.ctrlKey||e.metaKey,rng=e.shiftKey,ofName=nm=>t.items.map((q,i)=>(q.tg?'txt:'+q.tg:mName(q.m))==nm?i:-1).filter(i=>i>=0);
 const f=C('[data-f]');if(f){const nm=f.dataset.f;mlFold.has(nm)?mlFold.delete(nm):mlFold.add(nm);try{kv.set('wb18_mlfold',JSON.stringify([...mlFold]))}catch(er){}renderML();return}

@@ -133,3 +133,29 @@ test('a pattern\'s Accent can be any stamp of the project, not only one of its s
   expect(ac2.src).toBeUndefined(); expect(ac2.s).toBe(0);
   expect(errors).toEqual([]);
 });
+
+// T11
+test('in a stamp\'s Elements list a shape row is dragged to change its depth', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  const sid = await newStampTab(page);
+  await H.stampTabRect(page);
+  // a second, different shape (so the two are not folded into one group)
+  await H.showPanel(page, 'motifs');
+  await page.locator('#lib button[data-m]:not([data-m="' + (await items(page, sid))[0].m + '"])').first().click(); await H.settle(page);
+  const b = await page.locator('#art').boundingBox();
+  await page.mouse.move(b.x + b.width * .3, b.y + b.height * .3, { steps: 3 }); await page.mouse.click(b.x + b.width * .3, b.y + b.height * .3); await H.settle(page);
+  await page.evaluate(() => document.activeElement && document.activeElement.blur()); await page.keyboard.press('v'); await H.settle(page);
+  const it0 = (await items(page, sid)).map(q => q.m);
+  expect(it0.length).toBe(2); expect(it0[0]).not.toBe(it0[1]);
+  await H.showPanel(page, 'lyrs');
+  const rowOf = i => page.locator(`#mlist .mr[data-r="${i}"]`);
+  await expect(rowOf(0)).toHaveAttribute('draggable', 'true');
+  // the list puts the front first: row 1 (the second shape) is on top. Dragging the rectangle (row 0) onto its top half puts it in front.
+  await rowOf(0).dragTo(rowOf(1), { targetPosition: { x: 20, y: 3 } }); await H.settle(page);
+  expect((await items(page, sid)).map(q => q.m)).toEqual([it0[1], it0[0]]);
+  // and back behind it, onto the bottom half
+  const h = (await rowOf(0).boundingBox()).height;
+  await rowOf(1).dragTo(rowOf(0), { targetPosition: { x: 20, y: h - 3 } }); await H.settle(page);
+  expect((await items(page, sid)).map(q => q.m)).toEqual(it0);
+  expect(errors).toEqual([]);
+});
