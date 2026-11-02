@@ -14,7 +14,7 @@ import {STP,stMatrix,stUnlocked,stampAt,stLock} from './63-stamp-tool.js';
 // so the shape lands where it was pointed at whatever the layer's rotation, turn, flip or size variation. The stamp's items are one list, so every instance and every layer that uses the stamp shows the edit. Clicks that do not land on an instance of the unlocked stamp
 // are left to the layer, as before. Text typed in the Text panel is put into the stamp the same way (as letters tagged tg); a click on a
 // letter of such a text selects the whole text (Alt-click one letter), which puts the text into the Text panel to be edited live.
-const SCE={d:null,h:null,m:null,sp:null,ai:null,g:null};
+const SCE={d:null,h:null,m:null,sp:null,ai:null,g:null,cs:null};   // cs (2.84.4): the symmetry copy a shape was picked on, {q, c}; its box and handles show there
 // the unlocked stamp, if it is also the open stamp (the selection indexes belong to the open stamp)
 const sceRO=()=>{const id=stUnlocked();if(id==null)return null;const t=WBS.tiles[WBS.cur];return t&&t.id===id?t:null};
 function sceOpen(){const id=stUnlocked();if(id==null)return null;const k=WBS.tiles.findIndex(t=>t.id===id);if(k<0)return null;if(WBS.cur!==k){WBS.cur=k;selOne(-1)}return WBS.tiles[k]}
@@ -32,6 +32,9 @@ function sceItemAt(t,u,v){return sceWith(t,()=>{const ops=symOps(t),offs=OFFS.sl
   for(let c=0;c<ops.length;c++)for(const[ax,ay]of offs){const[x,y]=ops[c].i(u-ax,v-ay);if(sceBox(b,x,y))return{i,c:c+1,ax,ay,o:ops[c]}}}
  return null})}
 const sceFree=()=>{WBS.fpSel=-1;WBS.fpMS=new Set()};
+// 2.84.4 (owner, Nov 2 2026): a shape picked on one of its symmetry copies keeps its box and handles on that copy. This is that copy's mapping (and back), with the
+// shift the stamp's wrap gives the original, while the one selected shape is still the one picked
+function sceCop(t){const cs=SCE.cs;if(!cs||WBS.msel.size!=1||t.items[WBS.sel]!==cs.q)return null;return sceWith(t,()=>{const o=symOps(t)[cs.c-1];if(!o)return null;const w=t.wr===false?[+cs.q.x,+cs.q.y]:wrapP(+cs.q.x,+cs.q.y);return{q:cs.q,o,dx:w[0]-cs.q.x,dy:w[1]-cs.q.y}})}
 const sceSel=()=>{if(WBH.draw)WBH.draw();sceDraw()};
 // the Grid tool snaps in canvas units (Alt skips it); a point is snapped there and then moved back into the stamp
 function sceSnap(M,x,y,e){const L=fpL();if(!L)return{x,y};const q=sceTo(M,x,y),n=fpSnap(L,q.x,q.y,e);return sceTo(M.inverse(),n[0],n[1])}
@@ -44,7 +47,7 @@ function sceDown(e){if(e.button!==0)return;let t0=stUnlocked();
  if(spk&&WBS.split&&SCE.ai!=null&&STP.items[SCE.ai]){const c=scePt(e),M=sceInv(SCE.ai);if(!c)return;const p=sceTo(M,c.x,c.y);e.preventDefault();e.stopPropagation();SCE.sp={k:spk.dataset.sp,M,ox:WBS.split.x-p.x,oy:WBS.split.y-p.y};return}
  const hd=e.target.closest&&e.target.closest('[data-hd]');
  if(hd){const t=sceRO();if(!t||WBS.msel.size!=1||WBS.sel<0||SCE.ai==null||!STP.items[SCE.ai])return;const q=t.items[WBS.sel];if(!q)return;e.preventDefault();e.stopPropagation();
-  SCE.h={k:hd.dataset.hd,q,t,cx:+q.x,cy:+q.y,s0:q.s,sx0:q.sx||1,sy0:q.sy||1,r0:+q.r||0,f0:+q.f||1,M:sceInv(SCE.ai),...sceHdOff(q,hd.dataset.hd)};WBS.WBDRG=1;$('texg').style.display='none';return}
+  SCE.h={cop:sceCop(t),k:hd.dataset.hd,q,t,cx:+q.x,cy:+q.y,s0:q.s,sx0:q.sx||1,sy0:q.sy||1,r0:+q.r||0,f0:+q.f||1,M:sceInv(SCE.ai),...sceHdOff(q,hd.dataset.hd)};WBS.WBDRG=1;$('texg').style.display='none';return}
  const c=scePt(e);if(!c)return;const h=stampAt(c.x,c.y,t0);if(!h)return;const t=sceOpen();if(!t)return;
  e.preventDefault();e.stopPropagation();SCE.ai=h.i;
  const M0=stMatrix(STP.items[h.i]),sn=sceSnap(M0,h.u,h.v,e);
@@ -55,7 +58,7 @@ function sceDown(e){if(e.button!==0)return;let t0=stUnlocked();
  if(!hit){if(!add)selOne(-1);SCE.m={x0:e.clientX,y0:e.clientY,add,on:false,ai:h.i,t};sceSel();return}
  const i=hit.i;sceFree();
  if(add){selToggle(i);if(!WBS.msel.has(i)){sceSel();return}}else if(!WBS.msel.has(i)){const g=t.items[i].tg;if(g&&!e.altKey)selSet(t.items.map((x,j)=>x.tg===g?j:-1).filter(j=>j>=0),false);else selOne(i)}
- WBS.sel=i;const q=t.items[i],cp=hit.o?sceWith(t,()=>hit.o.p(mod(q.x,SW),mod(q.y,SH))):null;
+ WBS.sel=i;const q=t.items[i];SCE.cs=hit.c?{q,c:hit.c}:null;const cp=hit.o?sceWith(t,()=>hit.o.p(mod(q.x,SW),mod(q.y,SH))):null;
  SCE.d={t,q,o:hit.o,M:sceInv(h.i),dx:(cp?cp[0]:q.x+hit.ax)-h.u,dy:(cp?cp[1]:q.y+hit.ay)-h.v,x0:e.clientX,y0:e.clientY,moved:false,st:[...WBS.msel].filter(j=>j!=i).map(j=>t.items[j]).filter(Boolean).map(w=>[w,w.x,w.y]),px:q.x,py:q.y};
  sceSel()}
 // 2.79.1 (owner Oct 31 2026): a split piece's selection box fits the piece: the motif's square (±48) cut by each of its lines (q.cl: [angle, offset, side], the side kept
@@ -69,7 +72,7 @@ function sceHdOff(q,k){const S={nw:[-1,-1],ne:[1,-1],sw:[-1,1],se:[1,1],n:[0,-1]
 function sceMove(e){if(SCE.sp){const c=scePt(e);if(!c||!WBS.split)return;const p=sceTo(SCE.sp.M,c.x,c.y);if(SCE.sp.k=='m'){WBS.split.x=p.x+SCE.sp.ox;WBS.split.y=p.y+SCE.sp.oy}else{let a=Math.atan2(p.y-WBS.split.y,p.x-WBS.split.x)*180/Math.PI;if(e.shiftKey)a=Math.round(a/15)*15;WBS.split.a=a}sceDraw();return}
  if(SCE.m){const m=SCE.m,dx=e.clientX-m.x0,dy=e.clientY-m.y0;if(!m.on&&dx*dx+dy*dy<25)return;m.on=true;let b=$('mqb');if(!b){b=document.createElement('div');b.id='mqb';document.body.appendChild(b)}Object.assign(b.style,{display:'block',left:Math.min(m.x0,e.clientX)+'px',top:Math.min(m.y0,e.clientY)+'px',width:Math.abs(dx)+'px',height:Math.abs(dy)+'px'});return}
  if(!SCE.h&&!SCE.d)return;const c=scePt(e);if(!c)return;
- if(SCE.h){const h=SCE.h,p=sceTo(h.M,c.x,c.y);sceWith(h.t,()=>{if(h.k=='rot'){let a=Math.atan2(p.y-h.cy,p.x-h.cx)*180/Math.PI+90;if(e.shiftKey)a=Math.round(a/15)*15;h.q.r=+(((a+540)%360)-180).toFixed(1)}else WBX.hdResize(h,{x:p.x+(h.ox||0),y:p.y+(h.oy||0)},e)});upd();return}
+ if(SCE.h){const h=SCE.h;let p=sceTo(h.M,c.x,c.y);if(h.cop){const z=h.cop.o.i(p.x,p.y);p={x:z[0]-h.cop.dx,y:z[1]-h.cop.dy}}sceWith(h.t,()=>{if(h.k=='rot'){let a=Math.atan2(p.y-h.cy,p.x-h.cx)*180/Math.PI+90;if(e.shiftKey)a=Math.round(a/15)*15;h.q.r=+(((a+540)%360)-180).toFixed(1)}else WBX.hdResize(h,{x:p.x+(h.ox||0),y:p.y+(h.oy||0)},e)});upd();return}
  const d=SCE.d;if(!d.moved){const dx=e.clientX-d.x0,dy=e.clientY-d.y0;if(dx*dx+dy*dy<9)return;d.moved=true;WBS.WBDRG=1;$('texg').style.display='none'}
  const p=sceTo(d.M,c.x,c.y),sn=sceSnap(d.M,p.x+d.dx,p.y+d.dy,e),np=d.o?d.o.i(sn.x,sn.y):[sn.x,sn.y];d.q.x=+np[0].toFixed(2);d.q.y=+np[1].toFixed(2);const ax=d.q.x-d.px,ay=d.q.y-d.py;d.st.forEach(([w,ox,oy])=>{w.x=+(ox+ax).toFixed(2);w.y=+(oy+ay).toFixed(2)});upd()}
 function sceUp(e){if(SCE.sp){SCE.sp=null;return}
@@ -95,8 +98,8 @@ function sceDraw(){const g=$('stoh');if(!g)return;const gh0=sceGhost(),t=sceRO()
  let ai=SCE.ai;if(ai==null||!STP.items[ai]||STP.items[ai][0]!==t.id)ai=SCE.ai=STP.items.findIndex(x=>x[0]===t.id);if(ai<0){g.innerHTML=gh0;return}
  const gh=sceSymG(t,ai)+gh0;if(!WBS.msel.size){g.innerHTML=gh;return}
  const a=$('art'),m0=a&&a.getScreenCTM(),sc=(m0&&m0.a)||1,hs=4.5/sc,off=20/sc,M=stMatrix(STP.items[ai]),f=v=>v.toFixed(2);let h='';
- const P=(x,y)=>{const q=M.transformPoint({x,y});return[q.x,q.y]};
- const box=q=>{const K=sceClip(q),f0=+q.f||1,kx=q.s*(q.sx||1),ky=q.s*(q.sy||1),ox=(K[0]+K[1])/2*kx*f0,oy=(K[2]+K[3])/2*ky,rx=(K[1]-K[0])/2*kx,ry=(K[3]-K[2])/2*ky,r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return{rx,ry,L:(u,v)=>{u+=ox;v+=oy;return P(+q.x+u*c-v*s,+q.y+u*s+v*c)}}};
+ const P=(x,y)=>{const q=M.transformPoint({x,y});return[q.x,q.y]},cop=sceCop(t),Pq=(q,x,y)=>{if(cop&&q===cop.q){const z=cop.o.p(x+cop.dx,y+cop.dy);return P(z[0],z[1])}return P(x,y)};
+ const box=q=>{const K=sceClip(q),f0=+q.f||1,kx=q.s*(q.sx||1),ky=q.s*(q.sy||1),ox=(K[0]+K[1])/2*kx*f0,oy=(K[2]+K[3])/2*ky,rx=(K[1]-K[0])/2*kx,ry=(K[3]-K[2])/2*ky,r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return{rx,ry,L:(u,v)=>{u+=ox;v+=oy;return Pq(q,+q.x+u*c-v*s,+q.y+u*s+v*c)}}};
  const spl=!!(WBS.split&&WBS.split.i===WBS.sel);   // while splitting only the split line and its handles show
  for(const i of WBS.msel){if(spl)break;const q=t.items[i];if(!q)continue;const b=box(q);h+=`<polygon class="stes" points="${[b.L(-b.rx,-b.ry),b.L(b.rx,-b.ry),b.L(b.rx,b.ry),b.L(-b.rx,b.ry)].map(p=>f(p[0])+','+f(p[1])).join(' ')}"/>`}
  const q=WBS.msel.size==1&&!spl?t.items[WBS.sel]:null;

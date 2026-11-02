@@ -37,3 +37,29 @@ test('on the canvas the grid still divides the canvas', async ({ page }) => {
   expect(await page.evaluate(() => document.querySelector('#fpgrid path').getAttribute('d'))).toContain(`V${vb}`);
   expect(errors).toEqual([]);
 });
+
+// T12
+test('a shape picked on its symmetry copy shows its box and handles on that copy, and the copy\'s handles size it', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  const sid = await newStampTab(page);
+  await H.armRect(page);
+  const b = await page.locator('#art').boundingBox();
+  await page.mouse.move(b.x + b.width * .25, b.y + b.height * .3, { steps: 3 }); await page.mouse.click(b.x + b.width * .25, b.y + b.height * .3); await H.settle(page);
+  await page.evaluate(() => document.activeElement && document.activeElement.blur()); await page.keyboard.press('v'); await H.settle(page);
+  await H.showPanel(page, 'stmp'); await page.locator('#sym [data-y="lr"]').click(); await H.settle(page);
+  await page.mouse.click(b.x + b.width * .5, b.y + b.height * .9); await H.settle(page);   // nothing selected
+  const boxX = () => page.evaluate(() => { const r = document.querySelector('#stoh polygon.stes').getBoundingClientRect(); return r.x + r.width / 2; });
+  await page.mouse.click(b.x + b.width * .75, b.y + b.height * .3); await H.settle(page);
+  await expect(page.locator('#stoh .steh')).toHaveCount(9);
+  expect(await boxX(page), 'the box is on the copy (right half)').toBeGreaterThan(b.x + b.width / 2);
+  const s0 = (await items(page, sid))[0].s;
+  const se = await page.locator('#stoh .steh[data-hd="se"]').boundingBox(), hx = se.x + se.width / 2, hy = se.y + se.height / 2;
+  const pb = await page.evaluate(() => { const r = document.querySelector('#stoh polygon.stes').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; });
+  const ox = Math.sign(hx - pb[0]) * 40, oy = Math.sign(hy - pb[1]) * 40;   // outward from the copy's middle (on a mirrored copy the original's se corner is on its left)
+  await page.mouse.move(hx, hy); await page.mouse.down(); await page.mouse.move(hx + ox, hy + oy, { steps: 6 }); await page.mouse.up(); await H.settle(page);
+  { const q = (await items(page, sid))[0]; expect(q.s * (q.sx || 1), 'the copy\'s corner sizes the shape').toBeGreaterThan(s0 * 1.05); }
+  await page.mouse.click(b.x + b.width * .5, b.y + b.height * .9); await H.settle(page);
+  await page.mouse.click(b.x + b.width * .25, b.y + b.height * .3); await H.settle(page);
+  expect(await boxX(page), 'picked on the original, the box is on the original').toBeLessThan(b.x + b.width / 2);
+  expect(errors).toEqual([]);
+});
