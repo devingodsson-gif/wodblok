@@ -10,7 +10,7 @@ const scr = (page, x, y) => page.evaluate(([x, y]) => { const a = document.getEl
 
 test('Alt + wheel sizes and Shift + wheel turns the shape on the cursor, then the selected one under the pointer, one History step each', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false });
-  await page.click('#elb [data-k="motif"]'); await H.settle(page);
+  await H.armRect(page);   // 2.84.2: the Shape button's first click only opens the panel
   const b = await page.locator('#art').boundingBox();
   await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
   const s0 = await val(page, 'lfps'), r0 = await val(page, 'lfpr');

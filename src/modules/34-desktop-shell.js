@@ -281,11 +281,17 @@ $('rzdo').onclick=()=>randomize(false);
 // the fit and the canvas is moved back by half of it, so its middle stays where it was; a zoomed canvas keeps its own scroll
 const dkL=()=>{const d=document.querySelector('.dock.dk-l');return d?Math.round(d.getBoundingClientRect().width):0};   // the left dock only: an inner column (2.79.3) takes its own room
 function fitZ(){const b=$('boardP');if(b.classList.contains('off'))return;const w=b.clientWidth-64-dkL(),h=b.clientHeight-64;fitS=Math.max(.05,Math.min(w/CW,h/CH))}
-function applyZ(){fitZ();const s=z||fitS;{const sh=z?'':(dkL()?`translateX(${-dkL()/2}px)`:'');if($('artwrap').style.transform!==sh)$('artwrap').style.transform=sh}$('art').style.width=Math.round(CW*s)+'px';$('art').style.height=Math.round(CH*s)+'px';$('artsh').style.width=$('art').style.width;$('artsh').style.height=$('art').style.height;$('zl').textContent=Math.round(s*100)+'%';$('zl').title=z?'Fit to screen':'Fitted to screen';if(window.bkZ)bkZ();if(WBX.wbZoomed)WBX.wbZoomed()}
+// 2.84.3 (owner, Nov 1 2026: "middle click should drag the view and I should be able to scroll if I'm not zoomed in"): past where the board can scroll (always, while the
+// canvas is fitted) the view moves by an offset on the artwork, like Photoshop's pasteboard. A quarter of the canvas stays on screen; a new zoom level or Fit puts it back.
+let vo={x:0,y:0},voS=0;
+function voT(){const sh=[];if(!z&&dkL())sh.push(`translateX(${-dkL()/2}px)`);if(vo.x||vo.y)sh.push(`translate(${vo.x.toFixed(1)}px, ${vo.y.toFixed(1)}px)`);const t=sh.join(' ');if($('artwrap').style.transform!==t)$('artwrap').style.transform=t}
+function voSet(x,y){const b=$('boardP'),s=z||fitS,aw=CW*s,ah=CH*s,mx=Math.max(0,(b.clientWidth+aw)/2-Math.min(aw,b.clientWidth)*.25),my=Math.max(0,(b.clientHeight+ah)/2-Math.min(ah,b.clientHeight)*.25);
+ vo={x:Math.max(-mx,Math.min(mx,x)),y:Math.max(-my,Math.min(my,y))};voT();if(WBX.wbTxInPlace)WBX.wbTxInPlace()}
+function applyZ(){fitZ();const s=z||fitS;if(s!==voS){voS=s;vo={x:0,y:0}}voT();$('art').style.width=Math.round(CW*s)+'px';$('art').style.height=Math.round(CH*s)+'px';$('artsh').style.width=$('art').style.width;$('artsh').style.height=$('art').style.height;$('zl').textContent=Math.round(s*100)+'%';$('zl').title=z?'Fit to screen':'Fitted to screen';if(window.bkZ)bkZ();if(WBX.wbZoomed)WBX.wbZoomed()}
 function zoomAt(ns,cx,cy){const b=$('boardP'),a=$('art'),r0=a.getBoundingClientRect(),fx=(cx-r0.left)/(r0.width||1),fy=(cy-r0.top)/(r0.height||1);z=Math.min(8,Math.max(.1,ns));applyZ();const r1=a.getBoundingClientRect();b.scrollLeft+=r1.left+fx*r1.width-cx;b.scrollTop+=r1.top+fy*r1.height-cy}
 const zoomMid=f=>{const r=$('boardP').getBoundingClientRect();zoomAt((z||fitS)*f,r.left+r.width/2,r.top+r.height/2)};
-WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbZoomTo=s=>{const r=$('boardP').getBoundingClientRect();zoomAt(s,r.left+r.width/2,r.top+r.height/2)};WBX.wbZoomNow=()=>z||fitS;WBX.wbZoomIn=()=>!!z&&z>fitS*1.001;
-$('zi').onclick=()=>zoomMid(1.25);$('zo').onclick=()=>zoomMid(1/1.25);$('zl').onclick=()=>{z=0;applyZ()};
+WBX.wbApplyZ=applyZ;WBX.wbZoomAt=zoomAt;WBX.wbViewGet=()=>({...vo});WBX.wbViewOff=voSet;WBX.wbZoomTo=s=>{const r=$('boardP').getBoundingClientRect();zoomAt(s,r.left+r.width/2,r.top+r.height/2)};WBX.wbZoomNow=()=>z||fitS;WBX.wbZoomIn=()=>!!z&&z>fitS*1.001;
+$('zi').onclick=()=>zoomMid(1.25);$('zo').onclick=()=>zoomMid(1/1.25);$('zl').onclick=()=>{z=0;vo={x:0,y:0};applyZ()};
 // 2.76.11 (2.76 review: "Ctrl+wheel zooms in small steps"): Ctrl/Cmd+wheel goes up or down one clear zoom level at a time (Photoshop's ladder); a trackpad's small
 // deltas add up to one step, a mouse notch is one step
 // 2.77.0: a step goes to the next level at least 5% away, so a fit near a level (95% next to 100%) still moves visibly
