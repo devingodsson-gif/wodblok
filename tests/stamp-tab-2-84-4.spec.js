@@ -30,6 +30,23 @@ test('in a stamp\'s tab the alignment grid divides the stamp, and a dragged shap
   expect(errors).toEqual([]);
 });
 
+test('Snap all to grid in a stamp\'s tab snaps the stamp\'s shapes and leaves the canvas\'s elements alone', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: true });
+  const els0 = JSON.stringify(JSON.parse(await H.getState(page)).els);
+  const sid = await newStampTab(page);
+  await H.stampTabRect(page);
+  await page.evaluate(sid => { const d = JSON.parse(window.__wbTest.state()), t = d.tiles.find(x => x.id === sid); Object.assign(t.items[0], { x: 101.3, y: 77.7 }); return window.__wbTest.apply(JSON.stringify(d)); }, sid); await H.settle(page);
+  await H.openPanel(page, 'pgrid'); await H.settle(page);
+  await page.click('#pgq'); await H.settle(page);
+  const q = (await items(page, sid))[0], vb = await page.evaluate(() => document.getElementById('art').viewBox.baseVal.width);
+  const c = vb / 8;   // the grid's default 8 cells across
+  const onGrid = v => Math.abs(v / (c / 2) - Math.round(v / (c / 2))) < 0.01;
+  expect(onGrid(q.x) && onGrid(q.y), `${q.x}, ${q.y} on a grid of ${c}`).toBe(true);
+  expect(await page.textContent('#pmsg')).toMatch(/Snapped 1 shape to the grid/);
+  expect(JSON.stringify(JSON.parse(await H.getState(page)).els), 'the canvas\'s elements did not move').toBe(els0);
+  expect(errors).toEqual([]);
+});
+
 test('on the canvas the grid still divides the canvas', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, pattern: false });
   await gridOn(page); await H.settle(page);

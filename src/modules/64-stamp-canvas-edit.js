@@ -5,7 +5,7 @@ import {DOTK} from './05-motif-data.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {symG,symOf,symOps} from './07-symmetry.js';
 import {delItems,selSet,selToggle} from './12-selection-and-split.js';
-import {fpL,fpSnap} from './24-free-place-layers.js';
+import {fpL,fpSnap,fpSnapS,pgSs} from './24-free-place-layers.js';
 import {STP,stMatrix,stUnlocked,stampAt,stLock} from './63-stamp-tool.js';
 // ===== Editing the unlocked stamp on the canvas (layer update, step 5) =====
 // With a stamp unlocked, the Pattern canvas edits that stamp through the instance printed under the pointer: a click with a shape picked in the
@@ -32,6 +32,13 @@ function sceItemAt(t,u,v){return sceWith(t,()=>{const ops=symOps(t),offs=OFFS.sl
   for(let c=0;c<ops.length;c++)for(const[ax,ay]of offs){const[x,y]=ops[c].i(u-ax,v-ay);if(sceBox(b,x,y))return{i,c:c+1,ax,ay,o:ops[c]}}}
  return null})}
 const sceFree=()=>{WBS.fpSel=-1;WBS.fpMS=new Set()};
+// 2.84.4 (owner, Nov 1 2026: "alignment grid needs to work on stamp tab"): Snap all to grid in a stamp's tab snaps the stamp's own shapes (it moved the canvas's elements,
+// which the tab does not show); the size too while Snap size to whole cells is on. Returns how many moved, or null when no stamp is open.
+function sceSnapAll(){const t=sceRO();if(!t)return null;const ai=STP.items.findIndex(x=>x[0]===t.id),L=fpL();if(ai<0||!L)return null;const M=stMatrix(STP.items[ai]),Mi=M.inverse();let n=0;
+ t.items.forEach(q=>{const a=sceTo(M,+q.x,+q.y),b=fpSnap(L,a.x,a.y,null,true),c=sceTo(Mi,b[0],b[1]),nx=+c.x.toFixed(2),ny=+c.y.toFixed(2);let ns=q.s;
+  if(pgSs()){const k=Math.hypot(M.a,M.b)||1,w=100*q.s*k,ws=fpSnapS(L,w,null,true);ns=+(ws/(100*k)).toFixed(4)}
+  if(Math.abs(nx-q.x)>.01||Math.abs(ny-q.y)>.01||ns!==q.s){n++;q.x=nx;q.y=ny;q.s=ns}});
+ store();upd();if(WBX.wbCap)WBX.wbCap();return n}
 // 2.84.4 (owner, Nov 2 2026): a shape picked on one of its symmetry copies keeps its box and handles on that copy. This is that copy's mapping (and back), with the
 // shift the stamp's wrap gives the original, while the one selected shape is still the one picked
 function sceCop(t){const cs=SCE.cs;if(!cs||WBS.msel.size!=1||t.items[WBS.sel]!==cs.q)return null;return sceWith(t,()=>{const o=symOps(t)[cs.c-1];if(!o)return null;const w=t.wr===false?[+cs.q.x,+cs.q.y]:wrapP(+cs.q.x,+cs.q.y);return{q:cs.q,o,dx:w[0]-cs.q.x,dy:w[1]-cs.q.y}})}
@@ -126,7 +133,7 @@ function sceKey(e){if(WBS.brush&&e.key!=='Delete')return;const tg=e.target;if(tg
  else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='s'||e.key=='S')){e.preventDefault();$('ssp').click()}
  else if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key=='k'||e.key=='K')){e.preventDefault();$('sko').click()}}
 function init64(){
- STP.after=sceDraw;WBX.wbSceDraw=sceDraw;WBX.wbSceDelSel=sceDelSel;WBX.wbSceOrder=sceOrder;WBX.wbSceHitSel=sceHitSel;WBX.wbSceAt=e=>{const id=stUnlocked();if(id==null)return false;const c=scePt(e);if(!c)return false;const h=stampAt(c.x,c.y,id);if(!h)return false;const t=sceRO();return!!(t&&sceItemAt(t,h.u,h.v))};   /* 2.81.2: is a shape of the open stamp under the pointer (97-touch.js), nothing changed */
+ STP.after=sceDraw;WBX.wbSceDraw=sceDraw;WBX.wbSceSnapAll=sceSnapAll;WBX.wbSceDelSel=sceDelSel;WBX.wbSceOrder=sceOrder;WBX.wbSceHitSel=sceHitSel;WBX.wbSceAt=e=>{const id=stUnlocked();if(id==null)return false;const c=scePt(e);if(!c)return false;const h=stampAt(c.x,c.y,id);if(!h)return false;const t=sceRO();return!!(t&&sceItemAt(t,h.u,h.v))};   /* 2.81.2: is a shape of the open stamp under the pointer (97-touch.js), nothing changed */
  const w=$('artwrap');if(w)w.addEventListener('pointerdown',sceDown,true);
  document.addEventListener('pointermove',sceMove);document.addEventListener('pointerup',sceUp);document.addEventListener('pointercancel',sceUp);
  document.addEventListener('keydown',sceKey);

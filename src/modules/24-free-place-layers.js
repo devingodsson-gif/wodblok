@@ -6,7 +6,7 @@ import {gModel,gNear} from './08-grid-shapes.js';
 import {bhStrip,flipVOk} from './10-layer-grids.js';
 import {eNV,eT,pressDefs,upd} from './11-pressure-flooding-block-edges.js';
 import {fxGr,fxJit,fxPad,fxPress,fxTex} from './69-effect-stack.js';
-import {stOlAdd,stUnlocked} from './63-stamp-tool.js';
+import {stOlAdd} from './63-stamp-tool.js';
 
 function tGrp(){const g=WBS.tiles.map((t,i)=>i).filter(i=>WBS.tM.has(WBS.tiles[i].id));return g.length>1&&WBS.tiles[WBS.cur]&&WBS.tM.has((WBS.tiles[WBS.cur]||WBS.noTile).id)?g:[WBS.cur]}
 function fpGrp(){const L=fpL();if(!L)return[];const pl=L.pl||[];if(WBS.fpMS.size>1&&WBS.fpMS.has(String(WBS.fpSel))){const g=pl.filter(q=>WBS.fpMS.has(String(q.u)));if(g.length>1)return g}const p=pl.find(q=>q.u==WBS.fpSel);return p?[p]:[]}
@@ -17,19 +17,17 @@ function fpPick(k,e,order,art){const same=!WBS.fpB||(typeof WBS.fpB=='string')==
 // snapping: one switch for the whole pattern, in the Grid tool (WBS.pgrid.snap, .ss for snapping sizes); the same grid is used by every Free place, Pictures and Text layer
 const pgSnap=()=>!!WBS.pgrid.snap,pgSs=()=>!!WBS.pgrid.ss;
 const fpFG=L=>({snap:pgSnap(),ss:pgSs(),show:WBS.pgrid.show,n:WBS.pgrid.n,m:WBS.pgrid.m});
-// 2.84.4 (owner, Nov 1 2026: "alignment grid needs to work on stamp tab"): in a stamp's tab the grid divides the stamp (the canvas shows the stamp there), not the canvas
-const pgWH=()=>{if(stUnlocked()!=null){const a=$('art'),v=a&&a.viewBox&&a.viewBox.baseVal;if(v&&v.width>0)return[v.width,v.height]}return[CW,CH]};
-const fpCell=L=>pgWH()[0]/Math.max(2,fpFG(L).n);
-function fpSnap(L,x,y,e,force){const g=fpFG(L),[W,H]=pgWH();if(!force&&(!g.snap||(e&&e.altKey)))return[x,y];if(WBS.pgrid.sh&&WBS.pgrid.sh!='rect'){const M=gModel(WBS.pgrid.sh,W,H,Math.max(2,WBS.pgrid.n),false),b=gNear((g.m!='l'?M.cents:[]).concat(g.m!='c'?M.verts:[]),x,y,W,H,false);if(b)return[b[0],b[1]]}
+const fpCell=L=>CW/Math.max(2,fpFG(L).n);
+function fpSnap(L,x,y,e,force){const g=fpFG(L);if(!force&&(!g.snap||(e&&e.altKey)))return[x,y];if(WBS.pgrid.sh&&WBS.pgrid.sh!='rect'){const M=gModel(WBS.pgrid.sh,CW,CH,Math.max(2,WBS.pgrid.n),false),b=gNear((g.m!='l'?M.cents:[]).concat(g.m!='c'?M.verts:[]),x,y,CW,CH,false);if(b)return[b[0],b[1]]}
  const c=fpCell(L),cand=[];if(g.m!='l')cand.push([(Math.floor(x/c)+.5)*c,(Math.floor(y/c)+.5)*c]);if(g.m!='c')cand.push([Math.round(x/c)*c,Math.round(y/c)*c]);let b=cand[0],bd=1e18;cand.forEach(q=>{const d=(q[0]-x)**2+(q[1]-y)**2;if(d<bd){bd=d;b=q}});return b}
 function fpSnapS(L,sz,e,force){const g=fpFG(L);if(!force&&(!g.snap||!g.ss||(e&&e.altKey)))return sz;const c=fpCell(L);return Math.max(c,Math.round(sz/c)*c)}
-function fpGridDraw(){const g=$('fpgrid');if(!g)return;const[W,H]=pgWH();const on=WBS.pgrid.show&&!$('boardP').classList.contains('off');if(!on){if(g.dataset.k){g.innerHTML='';g.dataset.k=''}return}
-const c=W/Math.max(2,WBS.pgrid.n),k=W+'x'+H+'x'+WBS.pgrid.n+WBS.pgrid.m+WBS.pgrid.op+(WBS.pgrid.sh||'rect');if(g.dataset.k==k)return;g.dataset.k=k;
-if(WBS.pgrid.sh&&WBS.pgrid.sh!='rect'){const M=gModel(WBS.pgrid.sh,W,H,Math.max(2,WBS.pgrid.n),false),a=c*.09,mk=[],rv=['rrect','circle','oval','arch'].includes(WBS.pgrid.sh)?M.verts:[],pm=WBS.pgrid.m=='c'?M.cents:WBS.pgrid.m=='b'?M.cents.concat(rv):rv;pm.forEach(q=>{if(q[0]>=0&&q[0]<=W&&q[1]>=0&&q[1]<=H)mk.push(`M${(q[0]-a).toFixed(2)} ${q[1].toFixed(2)}h${(2*a).toFixed(2)}M${q[0].toFixed(2)} ${(q[1]-a).toFixed(2)}v${(2*a).toFixed(2)}`)});
- const all=M.items.join('')+mk.join(''),w=Math.max(W,H)/900,o=WBS.pgrid.op/100;g.innerHTML=`<clipPath id="pgclip"><rect width="${W}" height="${H}"/></clipPath><g clip-path="url(#pgclip)"><path d="${all}" fill="none" stroke="#fff" stroke-opacity="${(.6*o).toFixed(2)}" stroke-width="${(w*2.6).toFixed(2)}"/><path d="${all}" fill="none" stroke="#2f6bff" stroke-opacity="${(.9*o).toFixed(2)}" stroke-width="${w.toFixed(2)}"/></g>`;return}
-let d='',m='';for(let x=0;x<=W+.01;x+=c)d+=`M${x.toFixed(2)} 0V${H}`;for(let y=0;y<=H+.01;y+=c)d+=`M0 ${y.toFixed(2)}H${W}`;
-if(WBS.pgrid.m!='l'){const a=c*.09;for(let y=c/2;y<H;y+=c)for(let x=c/2;x<W;x+=c)m+=`M${(x-a).toFixed(2)} ${y.toFixed(2)}h${(2*a).toFixed(2)}M${x.toFixed(2)} ${(y-a).toFixed(2)}v${(2*a).toFixed(2)}`}
-const w=Math.max(W,H)/900,all=d+m,o=WBS.pgrid.op/100;g.innerHTML=`<path d="${all}" fill="none" stroke="#fff" stroke-opacity="${(.6*o).toFixed(2)}" stroke-width="${(w*2.6).toFixed(2)}"/><path d="${all}" fill="none" stroke="#2f6bff" stroke-opacity="${(.9*o).toFixed(2)}" stroke-width="${w.toFixed(2)}"/>`}
+function fpGridDraw(){const g=$('fpgrid');if(!g)return;const on=WBS.pgrid.show&&!$('boardP').classList.contains('off');if(!on){if(g.dataset.k){g.innerHTML='';g.dataset.k=''}return}
+const c=CW/Math.max(2,WBS.pgrid.n),k=CW+'x'+CH+'x'+WBS.pgrid.n+WBS.pgrid.m+WBS.pgrid.op+(WBS.pgrid.sh||'rect');if(g.dataset.k==k)return;g.dataset.k=k;
+if(WBS.pgrid.sh&&WBS.pgrid.sh!='rect'){const M=gModel(WBS.pgrid.sh,CW,CH,Math.max(2,WBS.pgrid.n),false),a=c*.09,mk=[],rv=['rrect','circle','oval','arch'].includes(WBS.pgrid.sh)?M.verts:[],pm=WBS.pgrid.m=='c'?M.cents:WBS.pgrid.m=='b'?M.cents.concat(rv):rv;pm.forEach(q=>{if(q[0]>=0&&q[0]<=CW&&q[1]>=0&&q[1]<=CH)mk.push(`M${(q[0]-a).toFixed(2)} ${q[1].toFixed(2)}h${(2*a).toFixed(2)}M${q[0].toFixed(2)} ${(q[1]-a).toFixed(2)}v${(2*a).toFixed(2)}`)});
+ const all=M.items.join('')+mk.join(''),w=Math.max(CW,CH)/900,o=WBS.pgrid.op/100;g.innerHTML=`<clipPath id="pgclip"><rect width="${CW}" height="${CH}"/></clipPath><g clip-path="url(#pgclip)"><path d="${all}" fill="none" stroke="#fff" stroke-opacity="${(.6*o).toFixed(2)}" stroke-width="${(w*2.6).toFixed(2)}"/><path d="${all}" fill="none" stroke="#2f6bff" stroke-opacity="${(.9*o).toFixed(2)}" stroke-width="${w.toFixed(2)}"/></g>`;return}
+let d='',m='';for(let x=0;x<=CW+.01;x+=c)d+=`M${x.toFixed(2)} 0V${CH}`;for(let y=0;y<=CH+.01;y+=c)d+=`M0 ${y.toFixed(2)}H${CW}`;
+if(WBS.pgrid.m!='l'){const a=c*.09;for(let y=c/2;y<CH;y+=c)for(let x=c/2;x<CW;x+=c)m+=`M${(x-a).toFixed(2)} ${y.toFixed(2)}h${(2*a).toFixed(2)}M${x.toFixed(2)} ${(y-a).toFixed(2)}v${(2*a).toFixed(2)}`}
+const w=Math.max(CW,CH)/900,all=d+m,o=WBS.pgrid.op/100;g.innerHTML=`<path d="${all}" fill="none" stroke="#fff" stroke-opacity="${(.6*o).toFixed(2)}" stroke-width="${(w*2.6).toFixed(2)}"/><path d="${all}" fill="none" stroke="#2f6bff" stroke-opacity="${(.9*o).toFixed(2)}" stroke-width="${w.toFixed(2)}"/>`}
 // every layer can hold items (layer update, step 2)
 const fpL=()=>WBS.layers[WBS.selL]||null;
 const fpU=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
