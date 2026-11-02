@@ -59,7 +59,11 @@ function init80(){
  addEventListener('blur',close);addEventListener('resize',close);
  // Ctrl or Cmd with X, C, V on the canvas (not in a field, not in a stamp's tab, which has its own copy and paste)
  document.addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey||e.shiftKey||stUnlocked()!=null)return;const t=e.target;if(t&&t.matches&&t.matches('input,textarea,select,[contenteditable]'))return;
-  const k=e.key.toLowerCase();if(k=='c'){if(emCopy())e.preventDefault()}else if(k=='x'){if(emCut())e.preventDefault()}else if(k=='v'&&emCan.paste()){if(emPaste())e.preventDefault()}});
+  const k=e.key.toLowerCase();if(k=='c'){if(emCopy())e.preventDefault()}else if(k=='x'){if(emCut())e.preventDefault()}});
+ // 2.84.5 (owner, Nov 1 2026: "ability to paste copied images into shape importer"): Paste goes by what is on the clipboard. Ctrl+V used to paste copied elements at the key
+ // press, which stopped the browser's paste, so a picture copied after them never reached the importer. Now a picture goes to the importer (35) and anything else pastes the elements.
+ document.addEventListener('paste',e=>{if(stUnlocked()!=null||e.defaultPrevented)return;const t=e.target;if(t&&t.matches&&t.matches('input,textarea,select,[contenteditable]'))return;
+  if([...(e.clipboardData&&e.clipboardData.items||[])].some(i=>/^image\//.test(i.type)))return;if(emCan.paste()&&emPaste())e.preventDefault()});
  [['edit.copy','Copy elements','Mod+C','copy'],['edit.cut','Cut elements','Mod+X','cut'],['edit.paste','Paste elements','Mod+V','paste']].forEach(([id,label,shortcut,a])=>cmdRegister({id,label,shortcut,enabled:()=>emCan[a](),run:()=>emRun[a]()}));
  cmdRegister({id:'element.makePattern',label:'Make pattern',enabled:()=>patCanMake(),run:()=>patMakeFrom()})}   // 2.76.8: the selected stamp or shape as a Pattern's source
 export {init80};

@@ -90,7 +90,8 @@ test('the panels stay as they are when a tab is picked: no tool opens or closes'
   const c = await open();
   await page.locator('#stmpl .smklk').first().click(); await settle(page);
   // 2.79.3 (owner Oct 31 2026): in a stamp's tab the Stamp panel stands beside the left panel (the group it left shows its next tab); nothing else opens or closes
-  expect(await page.evaluate(() => document.querySelector('.dk .wtab[data-t="stmp"]').closest('.dk').dataset.e)).toBe('li');
+  // 2.84.5: with one element panel at a time the Stamp panel is the only one on the left here, so it stays in the left dock itself (beside a left panel it stands in 'li')
+  expect(await page.evaluate(() => document.querySelector('.dk .wtab[data-t="stmp"]').closest('.dk').dataset.e)).toMatch(/^li?$/);
   expect((await open()).split(',')).toContain('stmp');
   await page.click('#stetabs [data-sv="c"]'); await settle(page);
   expect(await open(), 'back as it was').toBe(c);

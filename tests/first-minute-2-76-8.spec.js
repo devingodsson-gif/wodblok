@@ -95,9 +95,10 @@ test('the canvas stays put when the left column opens, and a fifth tab folds int
   const { errors } = await H.openApp(page, { pattern: false, background: true, workspaces: 'launch' });
   const mid = () => page.evaluate(() => { const r = document.getElementById('art').getBoundingClientRect(); return r.left + r.width / 2 });
   const m0 = await mid();
-  await H.openPanel(page, 'motifs'); await H.settle(page);
+  await H.openPanel(page, 'colors'); await H.settle(page);
   expect(Math.abs(await mid() - m0)).toBeLessThan(2);
-  for (const p of ['text', 'layers', 'stmp', 'image']) { await H.openPanel(page, p); await H.settle(page); }
+  // 2.84.5: element panels no longer stack (one at a time), so five tool panels make the five tabs
+  for (const p of ['canvas', 'pgrid', 'hist', 'rand']) { await H.openPanel(page, p); await H.settle(page); }
   const g = page.locator('.dock.dk-l .wg').first();
   const shown = await g.locator('.wtab:visible').count();
   expect(shown).toBeGreaterThanOrEqual(1); expect(shown).toBeLessThanOrEqual(4);   // at most four, fewer when they do not fit

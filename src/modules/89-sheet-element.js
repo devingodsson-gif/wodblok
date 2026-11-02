@@ -40,7 +40,9 @@ function shFill(q,id,seen){const R=`x="0" y="0" width="${shF(CW)}" height="${shF
  // 2.67.0: an end can be None (a colour with no opacity): the gradient fades from the other end's colour to nothing
  if(q.fl=='grad'){const N=c=>/^#[0-9a-f]{6}00$/i.test(String(c||'')),n1=N(q.ink),n2=N(q.ink2);let c1=okC(q.ink)&&!n1?col(q.ink):col(WBS.proj.bg),c2=okC(q.ink2)&&!n2?col(q.ink2):col(WBS.proj.ink);if(n1)c1=c2;if(n2)c2=c1;
   const m=Math.max(5,Math.min(95,q.gm!=null?+q.gm:50))/100,o1=n1?0:1,o2=n2?0:1,sc=(c,o)=>`stop-color="${c}"${o<1?` stop-opacity="${o}"`:''}`;
-  const st=`<stop offset="0" ${sc(c1,o1)}/>${Math.abs(m-.5)>.001?`<stop offset="${m.toFixed(3)}" ${sc(shMix(c1,c2),(o1+o2)/2)}/>`:''}<stop offset="1" ${sc(c2,o2)}/>`;let g;
+  // 2.84.5 (owner, Nov 1 2026: "triple and quadruple gradient, keep being able to add colors"): more colours between Start and End (q.gst: [colour, position %]); with any, Midpoint is not used
+  const X=(Array.isArray(q.gst)?q.gst:[]).filter(s=>s&&okC(s[0])).map(s=>[col(s[0]),Math.max(0,Math.min(100,+s[1]))/100]).sort((a,b)=>a[1]-b[1]);
+  const st=X.length?`<stop offset="0" ${sc(c1,o1)}/>${X.map(([c,o])=>`<stop offset="${o.toFixed(3)}" stop-color="${c}"/>`).join('')}<stop offset="1" ${sc(c2,o2)}/>`:`<stop offset="0" ${sc(c1,o1)}/>${Math.abs(m-.5)>.001?`<stop offset="${m.toFixed(3)}" ${sc(shMix(c1,c2),(o1+o2)/2)}/>`:''}<stop offset="1" ${sc(c2,o2)}/>`;let g;
   return{defs:shGrad(q,id+'g',st),body:`<rect ${R} fill="url(#${id}g)"/>`}}
  return{defs:'',body:`<rect ${R} fill="${okC(q.ink)?col(q.ink):col(WBS.proj.bg)}"/>`}}
 // the Sheet that is being edited draws live (its print would be out of date at every step)

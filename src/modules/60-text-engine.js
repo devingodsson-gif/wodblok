@@ -111,7 +111,7 @@ if((limP||hbP)&&(Math.abs(cvv)>=.005||o.pt||(o.wp&&o.wa))&&out.length){let x0=1e
  if((limP&&x1-x0>limP*k+.5*k)||(hbP&&y1-y0>hbP*k+.5*k))over=true}
 out.over=over;out.tw=Math.max(0,...L.map((l,j)=>l.W*fj[j]))*k;return out}
 // The layout, with the fit modes: Shrink to fit and Fill the box look for the size that fits (about 12 tries); Fit the width scales one run of lines to the box width.
-function teLayout(o){const bx=o.wd>0||o.ht>0,ft=bx?(o.ft||''):'';if(!ft)return teCore({...o,ft:''});if(ft=='l')return teCore(o);
+function teLayout(o){const bx=o.wd>0||o.ht>0,ft=bx?(o.ft||''):'';if(!ft||ft=='z')return teCore({...o,ft:''});/* 'z' (2.84.5): a box text set at its own Size (the Text panel's Size slider), not fitted */if(ft=='l')return teCore(o);
 if(ft=='w'){if(!(o.wd>0))return teCore({...o,ft:''});const r0=teCore({...o,ft:'',sz:100,nw:1});if(!r0.length)return r0;const U=Math.min(SW,SH)/100,inner=Math.max(1,o.wd*U-2*(o.pd||0)*U);return teCore({...o,ft:'',sz:Math.max(1,100*inner/Math.max(1,r0.tw)),nw:1})}
 const c0={...o,ft:''};if(ft=='s'){const r=teCore(c0);if(!r.over)return r}let lo=1,hi=ft=='s'?o.sz:400;for(let i=0;i<12;i++){const mid=(lo+hi)/2;if(teCore({...c0,sz:mid}).over)hi=mid;else lo=mid}return teCore({...c0,sz:lo})}
 // --- text options and defaults

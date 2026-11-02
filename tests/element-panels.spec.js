@@ -27,7 +27,9 @@ test('picking an element in the Elements list opens its kind\'s panel; the tabs 
   await page.click('#elb [data-k="motif"]'); await addKind(page, 'motif'); await settle(page);
   await page.click('#elb [data-k="pattern"]'); await addKind(page, 'pattern'); await settle(page);
   expect(await shown(page)).toContain('layers');
-  expect(await tabs(page)).toEqual(expect.arrayContaining(['Shape', 'Pattern']));
+  // 2.84.5 (owner, Nov 1 2026): one element panel at a time, so opening Pattern closed Shape
+  expect(await tabs(page)).toEqual(expect.arrayContaining(['Pattern']));
+  expect(await tabs(page)).not.toContain('Shape');
   expect(await tabs(page)).not.toContain('Properties');
   await showPanel(page, 'lyrs');
   const u = JSON.parse(await getState(page)).els.find(q => q.k === 'motif').u;
