@@ -5,7 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 2: 2.84.5 (patch 4: panels and inputs, T15 to T18)** on `feat/2.84.5-panels-and-inputs`, built on `feat/2.84.4-stamp-tab` (2.84.4 not merged yet), not merged. With it the to-do is done: 2.85.0 closes it (the end-of-plan CI suite with the owner's word).
+- **Nov 2: 2.84.5 (patch 4: panels and inputs, T15 to T18)** on `feat/2.84.5-panels-and-inputs`, built on `feat/2.84.4-stamp-tab` (2.84.4 not merged yet), not merged. With it the to-do is done: 2.85.0 closes it. CI suite (owner's word, Nov 2) green on this branch after the File menu tests were updated (run 41536168118, one shard re-run for a timing failure in small-updates-2-79-2). Not run: picture comparison (pull request only).
 - **Nov 2: 2.84.4 (patch 3: the stamp tab, T8 to T14)** on `feat/2.84.4-stamp-tab`, not merged until the owner says so. Next: 2.84.5 (patch 4: panels and inputs), then 2.85.0 closes the to-do. Open: the stamp Sheet is a colour fill only (no gradient, picture or effects); say if those are wanted.
 - **Nov 2: 2.84.3 LIVE** (owner: "merge").
 - **Nov 1: 2.84.3 (patch 2: T6 T7, the view moves by the middle button and the wheel at any zoom)** on `fix/2.84.3-view-navigation`, not merged until the owner says so. Next: 2.84.4 (the stamp tab).
