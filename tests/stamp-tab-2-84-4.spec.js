@@ -88,3 +88,31 @@ test('symmetry: Wrap at the zone edges on carries a shape past its zone into the
   expect((await page.evaluate(sid => JSON.parse(window.__wbTest.state()).tiles.find(x => x.id === sid).sym, sid)).zc).toBeUndefined();
   expect(errors).toEqual([]);
 });
+
+// T14
+test('a pattern\'s Accent can be any stamp of the project, not only one of its sources', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.addStamp(page); await page.keyboard.press('Escape'); await H.settle(page);
+  const sid = JSON.parse(await H.getState(page)).tiles[0].id;
+  // a pattern of squares only (its one source is a shape), then the accent on
+  await page.click('#elb [data-k="pattern"]'); await H.addKind(page, 'pattern'); await H.settle(page);
+  await H.openPanel(page, 'layers'); await H.settle(page);
+  await H.patSource(page, 'motif', 0); await H.settle(page);
+  await page.click('#pesrc [data-sx="0"]'); await H.settle(page);
+  await page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()), p = s.els.find(q => q.k === 'pattern'); Object.assign(p, { lay: 'tile', ts: 'square', ar: 'grid', ps: 10, sp: 40 }); window.__wbTest.apply(JSON.stringify(s)); }); await H.settle(page);
+  expect(JSON.parse(await H.getState(page)).els.find(q => q.k === 'pattern').src.map(x => x.k)).toEqual(['motif']);
+  await page.locator('#peac').check(); await H.settle(page);
+  const opts = await page.evaluate(() => [...document.querySelectorAll('#peacs option')].map(o => o.value));
+  expect(opts, 'the project\'s stamp is offered').toContain('t' + sid);
+  const dyn0 = await page.evaluate(() => document.getElementById('dyn').innerHTML.length);
+  await page.evaluate(v => { const s = document.getElementById('peacs'); s.value = v; s.dispatchEvent(new Event('change', { bubbles: true })); }, 't' + sid); await H.settle(page);
+  const ac = JSON.parse(await H.getState(page)).els.find(q => q.k === 'pattern').ac;
+  expect(ac.src).toEqual({ k: 'stamp', t: sid, w: 1 });
+  expect(await page.evaluate(() => document.getElementById('peacs').value)).toBe('t' + sid);
+  expect(await page.evaluate(() => document.getElementById('dyn').innerHTML.length), 'the accent now prints the stamp').not.toBe(dyn0);
+  // back to the pattern's own source
+  await page.evaluate(() => { const s = document.getElementById('peacs'); s.value = 's0'; s.dispatchEvent(new Event('change', { bubbles: true })); }); await H.settle(page);
+  const ac2 = JSON.parse(await H.getState(page)).els.find(q => q.k === 'pattern').ac;
+  expect(ac2.src).toBeUndefined(); expect(ac2.s).toBe(0);
+  expect(errors).toEqual([]);
+});
