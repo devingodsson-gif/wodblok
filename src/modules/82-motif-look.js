@@ -1,5 +1,6 @@
+import {ic} from './00-icons.js';
 import {$,WBS,WBX,uiFire} from './01-launch-and-version.js';
-import {CH,CW,SH,SW} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,SH,SW,col} from './04-canvas-and-stamp-outlines.js';
 import {mk,store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {hx} from './10-layer-grids.js';
@@ -44,6 +45,7 @@ function mfSync(){if(!$('mf_f'))return;const T=mfT();MF_G.forEach(id=>mfVis(id,!
  const fk=p.fl=='none'?'none':p.fl=='img'?'img':sh&&p.fl=='grad'?'grad':'solid';{const g=$('mf_fk').querySelector('[data-f=grad]');if(g.hidden===sh)g.hidden=!sh;$('mf_fk').style.gridTemplateColumns=`repeat(${sh?4:3},1fr)`}$('mf_fk').querySelectorAll('[data-f]').forEach(b=>mfSet(b,b.dataset.f==fk));mfVis('mf_img',fk=='img');mfVis('mf_fcr',sh&&(fk=='solid'||fk=='grad'));
  // 2.60.4: a Sheet's gradient: the Colour well is its start, End its end; Linear by an angle, Radial by a centre and a size; Midpoint where the two meet
  mfVis('mf_gr',fk=='grad');{const k=$('mf_fck'),t=fk=='grad'?'Start':'Colour';if(k.textContent!==t)k.textContent=t}
+ if(fk=='grad'&&WBX.wbMfGst)WBX.wbMfGst(p);
  if(fk=='grad'){const rad=p.gk=='rad';$('mf_gk').querySelectorAll('[data-g]').forEach(b=>mfSet(b,b.dataset.g==(rad?'rad':'lin')));mfVis('mf_gar',!rad);mfVis('mf_grr',rad);mfVal('mf_ga',p.ga!=null?+p.ga:90);mfVal('mf_gx',p.gx!=null?+p.gx:50);mfVal('mf_gy',p.gy!=null?+p.gy:50);mfVal('mf_gs',p.gs!=null?+p.gs:70);mfVal('mf_gm',p.gm!=null?+p.gm:50)}
  if(WBX.wbCropSync)WBX.wbCropSync();if(fk=='img'){mfStrip(p.a);mfVal('mf_iz',Math.round(+p.iz||100));const im=$('mf_im'),fit=p.im&&(sh||p.im=='contain')?p.im:'cover';im.style.gridTemplateColumns=`repeat(${sh?4:2},1fr)`;im.querySelectorAll('[data-i]').forEach(b=>{const x=b.dataset.i=='stretch'||b.dataset.i=='tile';if(b.hidden!==(x&&!sh))b.hidden=x&&!sh;mfSet(b,b.dataset.i==fit)})}
  if(sh){if(WBX.wbPaintWells)WBX.wbPaintWells();return}
@@ -83,6 +85,18 @@ function init82(){if(!$('mf_f'))return;
   WBX.wbMkWell($('mf_ow2'),{label:'Outline colour',what:'Outline',defRef:()=>{const T=mfT();if(T&&T.k=='items'){const t=WBS.tiles[WBS.cur];return T.list[0].ic||(t&&t.ink)||pj().ink}return pj().ink},get:()=>{const q=first();return q&&q.sk||''},set:v=>{each(q=>{if(v)q.sk=v;else delete q.sk})}});
   WBX.wbMkWell($('mf_cw'),{label:'Shape colour',what:'Shape',defRef:()=>pj().ink,get:()=>{const q=first();return q&&q.ink||''},set:v=>{each(q=>{if(v)q.ink=v;else delete q.ink})}});
   WBX.wbMkWell($('mf_g2w'),{label:'Gradient end',what:'Sheet',none:true,defRef:()=>pj().ink,get:()=>{const q=first();return q&&q.ink2||''},set:v=>{each(q=>{if(v)q.ink2=v;else delete q.ink2})}});
+  // 2.84.5: a gradient's other colours, between Start and End: a row each (its colour, Position, remove), rebuilt when their number changes; Add colour puts one in the widest gap
+  {const host=$('mf_gst'),hx2=c=>{const v=String(c||'');return /^#[0-9a-f]{6}/i.test(v)?v.slice(0,7):'#808080'},mix=(a,b)=>{const p=h=>[1,3,5].map(i=>parseInt(hx2(h).slice(i,i+2),16));const x=p(a),y=p(b);return'#'+x.map((v,i)=>Math.round((v+y[i])/2).toString(16).padStart(2,'0')).join('')},
+    gl=()=>{const q=first();return q&&Array.isArray(q.gst)?q.gst:[]};
+   WBX.wbMfGst=p=>{const L=Array.isArray(p.gst)?p.gst:[],k=String(L.length);{const r=$('mf_gm').closest('.ctl');if(r&&r.hidden!==!!L.length)r.hidden=!!L.length}
+    if(host.dataset.k!==k){host.dataset.k=k;host.innerHTML=L.map((s,i)=>`<div class="cwrow"><span class="cwk">Mid ${i+1}</span><div class="cwell" id="mf_gsw${i}"></div><button type="button" class="ib" data-gdel="${i}" title="Remove colour" aria-label="Remove colour">${ic('trash')}</button></div><div class="ctl"><label for="mf_gsp${i}">Position</label><input type="range" id="mf_gsp${i}" data-gp="${i}" min="1" max="99" value="50" data-u="%" data-def="50"></div>`).join('');
+     L.forEach((s,i)=>WBX.wbMkWell($('mf_gsw'+i),{label:'Gradient middle colour '+(i+1),what:'Sheet',defRef:()=>pj().ink,get:()=>{const g=gl()[i];return g?g[0]:''},set:v=>{if(!v)return;each(q=>{if(Array.isArray(q.gst)&&q.gst[i])q.gst[i][0]=v})}}));if(WBX.wbEnhance)WBX.wbEnhance()}
+    L.forEach((s,i)=>mfVal('mf_gsp'+i,Math.round(+s[1])));if(WBX.wbPaintWells)WBX.wbPaintWells()};
+   host.addEventListener('input',e=>{const r=e.target.closest&&e.target.closest('[data-gp]');if(!r||WBS.uiLoad)return;const i=+r.dataset.gp,v=+r.value;each(q=>{if(Array.isArray(q.gst)&&q.gst[i])q.gst[i][1]=v});store();upd()});
+   host.addEventListener('change',e=>{if(e.target.closest&&e.target.closest('[data-gp]')&&WBX.wbCap)WBX.wbCap()});
+   host.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-gdel]');if(!b)return;const i=+b.dataset.gdel;each(q=>{if(!Array.isArray(q.gst))return;q.gst.splice(i,1);if(!q.gst.length)delete q.gst});mfCh();mfSync()});
+   $('mf_gadd').onclick=()=>{each(q=>{const a=q.ink||pj().bg,b=q.ink2||pj().ink,g=Array.isArray(q.gst)?q.gst:(q.gst=[]),P=[0,...g.map(s=>+s[1]).sort((x,y)=>x-y),100];let w=0,at=50;for(let j=1;j<P.length;j++)if(P[j]-P[j-1]>w){w=P[j]-P[j-1];at=(P[j]+P[j-1])/2}
+    g.push([mix(col(a),col(b)),Math.round(at)]);g.sort((x,y)=>x[1]-y[1])});mfCh();mfSync()}}
   WBX.wbMkWell($('mf_fcw'),{label:'Sheet colour',what:'Sheet',none:true,defRef:()=>pj().bg,get:()=>{const q=first();return q&&q.ink||''},set:v=>{each(q=>{if(v)q.ink=v;else delete q.ink})}})}
  WBX.wbMfSync=mfSync;WBX.wbMotifImage=mfImage;WBX.wbMtHit=mtHit;WBX.wbMtWarm=mtShape}
 export {init82,mfSync,mtHit};

@@ -54,3 +54,40 @@ test('in a stamp\'s tab the Stamp panel stays open beside another element panel'
   expect(s, 'the Text panel was closed').not.toContain('"text"');
   expect(errors).toEqual([]);
 });
+
+// T17
+test('a gradient takes more colours: Add colour puts a third and a fourth between Start and End, each with a Position; removing them goes back to two', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false, background: true });
+  const sheet = async () => (await st(page)).els.find(x => x.k === 'sheet');
+  const u = (await sheet()).u;
+  await H.showPanel(page, 'lyrs');
+  await page.locator(`#lyl2 .lyr[data-u="${u}"] .lyn`).click(); await H.settle(page);
+  await page.click('#mf_fk [data-f="grad"]'); await H.settle(page);
+  const stops = () => page.evaluate(() => [...document.querySelectorAll('#art linearGradient:not([id^="shu"]) stop')].map(s => [+s.getAttribute('offset'), s.getAttribute('stop-color')]));
+  expect((await stops()).length).toBeLessThanOrEqual(3);
+  await page.click('#mf_gadd'); await H.settle(page);
+  expect((await sheet()).gst).toHaveLength(1);
+  expect((await sheet()).gst[0][1]).toBe(50);
+  await expect(page.locator('#mf_gst .cwrow')).toHaveCount(1);
+  await expect(page.locator('#mf_gm')).toBeHidden();   // Midpoint is for two colours only
+  await page.click('#mf_gadd'); await H.settle(page);
+  const g = (await sheet()).gst;
+  expect(g).toHaveLength(2);
+  expect(g.map(s => s[1])).toEqual([...g.map(s => s[1])].sort((a, b) => a - b));
+  const s4 = await stops();
+  expect(s4).toHaveLength(4);
+  expect(s4.map(s => s[0])).toEqual([0, g[0][1] / 100, g[1][1] / 100, 1]);
+  // a stop's Position moves it
+  await page.evaluate(() => { const e = document.getElementById('mf_gsp0'); e.value = 10; e.dispatchEvent(new Event('input', { bubbles: true })); }); await H.settle(page);
+  expect((await sheet()).gst[0][1]).toBe(10);
+  expect((await stops())[1][0]).toBeCloseTo(0.1, 3);
+  // its colour is the picker's like every well: set through the document here, the stop follows
+  await page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()), q = s.els.find(x => x.k === 'sheet'); q.gst[1][0] = '#00ff00'; window.__wbTest.apply(JSON.stringify(s)); }); await H.settle(page);
+  expect((await stops()).map(s => s[1])).toContain('#00ff00');
+  // remove both
+  await page.click('#mf_gst [data-gdel="1"]'); await H.settle(page);
+  await page.click('#mf_gst [data-gdel="0"]'); await H.settle(page);
+  expect((await sheet()).gst).toBeUndefined();
+  await expect(page.locator('#mf_gm')).toBeVisible();
+  expect(errors).toEqual([]);
+});
