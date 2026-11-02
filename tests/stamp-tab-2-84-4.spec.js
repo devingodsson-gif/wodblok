@@ -159,3 +159,34 @@ test('in a stamp\'s Elements list a shape row is dragged to change its depth', a
   expect((await items(page, sid)).map(q => q.m)).toEqual(it0);
   expect(errors).toEqual([]);
 });
+
+// T9, T10
+test('in a stamp\'s tab the Sheet button adds a Sheet to the stamp: it fills the stamp behind its shapes, in the paper colour, recoloured by its Colour well', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  const sid = await newStampTab(page);
+  await H.stampTabRect(page);
+  const pixel = async (fx, fy) => { const b = await page.locator('#art').boundingBox(), buf = await page.screenshot({ clip: { x: b.x + b.width * fx - 2, y: b.y + b.height * fy - 2, width: 4, height: 4 } });
+    return page.evaluate(async s => { const im = await createImageBitmap(await (await fetch('data:image/png;base64,' + s)).blob()), c = new OffscreenCanvas(im.width, im.height), g = c.getContext('2d'); g.drawImage(im, 0, 0); const d = g.getImageData(1, 1, 1, 1).data; return [d[0], d[1], d[2]]; }, buf.toString('base64')); };
+  const near = (a, b) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]) < 30;
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  await page.click('#elb [data-k="sheet"]'); await H.settle(page);
+  const its = await items(page, sid), d = JSON.parse(await H.getState(page));
+  expect(its.length).toBe(2);
+  expect(its[0]).toMatchObject({ sh: 1 });
+  expect(its[0].ic).toBe(d.proj.bg);
+  expect(d.els.filter(q => q.k === 'sheet' && !q.bgd).length, 'no canvas Sheet was made').toBe(0);
+  await expect(page.locator('#mlist .mr[data-r="0"] b')).toHaveText(/Sheet/);
+  await page.keyboard.press('Escape'); await page.mouse.click(5, 5); await H.settle(page);
+  // the shape (middle) stays ink, a corner of the stamp is now the sheet's colour
+  const pap = /^#/.test(d.proj.bg) ? hex(d.proj.bg) : null;
+  if (pap) expect(near(await pixel(0.08, 0.08), pap), 'the corner is the paper colour').toBe(true);
+  await page.evaluate(sid => { const s = JSON.parse(window.__wbTest.state()), t = s.tiles.find(x => x.id === sid); t.items[0].ic = '#ff0000'; return window.__wbTest.apply(JSON.stringify(s)); }, sid); await H.settle(page);
+  expect(near(await pixel(0.08, 0.08), [255, 0, 0]), 'the sheet takes its colour').toBe(true);
+  expect(near(await pixel(0.5, 0.5), [255, 0, 0]), 'the shape in front of it is not covered').toBe(false);
+  // picked in the list, it shows only its Colour and the actions; no box on the canvas
+  await H.showPanel(page, 'lyrs');
+  await page.locator('#mlist .mr[data-r="0"]').click(); await H.settle(page);
+  await expect(page.locator('#sel')).toHaveClass(/shsel/);
+  await expect(page.locator('#stoh .steh')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});

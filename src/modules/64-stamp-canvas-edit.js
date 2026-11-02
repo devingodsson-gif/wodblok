@@ -7,6 +7,7 @@ import {symG,symOf,symOps} from './07-symmetry.js';
 import {delItems,selSet,selToggle} from './12-selection-and-split.js';
 import {fpL,fpSnap,fpSnapS,pgSs} from './24-free-place-layers.js';
 import {STP,stMatrix,stUnlocked,stampAt,stLock} from './63-stamp-tool.js';
+import {basicKey} from './76-basic-shapes.js';
 // ===== Editing the unlocked stamp on the canvas (layer update, step 5) =====
 // With a stamp unlocked, the Pattern canvas edits that stamp through the instance printed under the pointer: a click with a shape picked in the
 // Shapes panel puts the shape in the stamp, a click on a shape inside an instance selects it, dragging moves it, the square handles resize it and
@@ -26,7 +27,7 @@ const sceInv=i=>stMatrix(STP.items[i]).inverse();
 // back into the shape's own frame first. Returns {i, c, ax, ay, o}: the shape, which copy (0 is the shape itself), the wrap offset, the symmetry operation.
 function sceBox(q,x,y){const r=-(+q.r||0)*Math.PI/180,dx=x-q.x,dy=y-q.y,lx=dx*Math.cos(r)-dy*Math.sin(r),ly=dx*Math.sin(r)+dy*Math.cos(r);return Math.abs(lx)<=48*q.s*(q.sx||1)+3&&Math.abs(ly)<=48*q.s*(q.sy||1)+3}
 function sceItemAt(t,u,v){return sceWith(t,()=>{const ops=symOps(t),offs=OFFS.slice();
- for(let i=t.items.length-1;i>=0;i--){const q=t.items[i],w=wrapP(q.x,q.y),b={...q,x:w[0],y:w[1]};
+ for(let i=t.items.length-1;i>=0;i--){const q=t.items[i];if(q.sh)continue;const w=wrapP(q.x,q.y),b={...q,x:w[0],y:w[1]};   // a Sheet (2.84.4) is picked in the list, as a canvas Sheet is
   for(const[ax,ay]of offs)if(sceBox(q,u-ax,v-ay))return{i,c:0,ax,ay,o:null};
   if(q.tg&&!(t.sym&&t.sym.tx))continue;
   for(let c=0;c<ops.length;c++)for(const[ax,ay]of offs){const[x,y]=ops[c].i(u-ax,v-ay);if(sceBox(b,x,y))return{i,c:c+1,ax,ay,o:ops[c]}}}
@@ -84,7 +85,7 @@ function sceMove(e){if(SCE.sp){const c=scePt(e);if(!c||!WBS.split)return;const p
  const p=sceTo(d.M,c.x,c.y),sn=sceSnap(d.M,p.x+d.dx,p.y+d.dy,e),np=d.o?d.o.i(sn.x,sn.y):[sn.x,sn.y];d.q.x=+np[0].toFixed(2);d.q.y=+np[1].toFixed(2);const ax=d.q.x-d.px,ay=d.q.y-d.py;d.st.forEach(([w,ox,oy])=>{w.x=+(ox+ax).toFixed(2);w.y=+(oy+ay).toFixed(2)});upd()}
 function sceUp(e){if(SCE.sp){SCE.sp=null;return}
  if(SCE.m){const m=SCE.m;SCE.m=null;const b=$('mqb');if(b)b.style.display='none';if(m.on&&e.type=='pointerup'){const x0=Math.min(m.x0,e.clientX),x1=Math.max(m.x0,e.clientX),y0=Math.min(m.y0,e.clientY),y1=Math.max(m.y0,e.clientY),M=STP.items[m.ai]?stMatrix(STP.items[m.ai]):null,a=$('art'),sm=a&&a.getScreenCTM();
-  if(M&&sm){const hit=[];m.t.items.forEach((q,i)=>{const rx=48*q.s*(q.sx||1),ry=48*q.s*(q.sy||1),r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);
+  if(M&&sm){const hit=[];m.t.items.forEach((q,i)=>{if(q.sh)return;const rx=48*q.s*(q.sx||1),ry=48*q.s*(q.sy||1),r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);
     if([[-rx,-ry],[rx,-ry],[rx,ry],[-rx,ry]].every(([u,v])=>{const p=M.transformPoint({x:+q.x+u*c-v*s,y:+q.y+u*s+v*c}),P=a.createSVGPoint();P.x=p.x;P.y=p.y;const k=P.matrixTransform(sm);return k.x>=x0-1&&k.x<=x1+1&&k.y>=y0-1&&k.y<=y1+1}))hit.push(i)});
    hit.forEach(i=>{if(!WBS.msel.has(i))selToggle(i)});upd()}}return}
  if(SCE.h){SCE.h=null;WBS.WBDRG=0;$('texg').style.display='';store();upd();return}
@@ -108,8 +109,8 @@ function sceDraw(){const g=$('stoh');if(!g)return;const gh0=sceGhost(),t=sceRO()
  const P=(x,y)=>{const q=M.transformPoint({x,y});return[q.x,q.y]},cop=sceCop(t),Pq=(q,x,y)=>{if(cop&&q===cop.q){const z=cop.o.p(x+cop.dx,y+cop.dy);return P(z[0],z[1])}return P(x,y)};
  const box=q=>{const K=sceClip(q),f0=+q.f||1,kx=q.s*(q.sx||1),ky=q.s*(q.sy||1),ox=(K[0]+K[1])/2*kx*f0,oy=(K[2]+K[3])/2*ky,rx=(K[1]-K[0])/2*kx,ry=(K[3]-K[2])/2*ky,r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return{rx,ry,L:(u,v)=>{u+=ox;v+=oy;return Pq(q,+q.x+u*c-v*s,+q.y+u*s+v*c)}}};
  const spl=!!(WBS.split&&WBS.split.i===WBS.sel);   // while splitting only the split line and its handles show
- for(const i of WBS.msel){if(spl)break;const q=t.items[i];if(!q)continue;const b=box(q);h+=`<polygon class="stes" points="${[b.L(-b.rx,-b.ry),b.L(b.rx,-b.ry),b.L(b.rx,b.ry),b.L(-b.rx,b.ry)].map(p=>f(p[0])+','+f(p[1])).join(' ')}"/>`}
- const q=WBS.msel.size==1&&!spl?t.items[WBS.sel]:null;
+ for(const i of WBS.msel){if(spl)break;const q=t.items[i];if(!q||q.sh)continue;const b=box(q);h+=`<polygon class="stes" points="${[b.L(-b.rx,-b.ry),b.L(b.rx,-b.ry),b.L(b.rx,b.ry),b.L(-b.rx,b.ry)].map(p=>f(p[0])+','+f(p[1])).join(' ')}"/>`}
+ const q=WBS.msel.size==1&&!spl&&t.items[WBS.sel]&&!t.items[WBS.sel].sh?t.items[WBS.sel]:null;
  if(q){const b=box(q),hd=[['nw',-1,-1],['ne',1,-1],['sw',-1,1],['se',1,1],['n',0,-1],['s',0,1],['e',1,0],['w',-1,0]],cur={nw:'nwse-resize',se:'nwse-resize',ne:'nesw-resize',sw:'nesw-resize',n:'ns-resize',s:'ns-resize',e:'ew-resize',w:'ew-resize'};
   for(const[k,sx,sy]of hd){const p=b.L(sx*b.rx,sy*b.ry);h+=`<rect class="steh" data-hd="${k}" x="${f(p[0]-hs)}" y="${f(p[1]-hs)}" width="${f(hs*2)}" height="${f(hs*2)}" cursor="${cur[k]}"/>`}
   const T=b.L(0,-b.ry),C=b.L(0,0),dx=T[0]-C[0],dy=T[1]-C[1],n=Math.hypot(dx,dy)||1,R=[T[0]+dx/n*off,T[1]+dy/n*off];
@@ -119,7 +120,7 @@ function sceDraw(){const g=$('stoh');if(!g)return;const gh0=sceGhost(),t=sceRO()
  g.innerHTML=h+gh}
 // (2.25.0) the stamp tab answers the canvas keys: arrows nudge the selected shapes (Shift: ten times as far)
 const SCE_AR={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
-function sceNudge(t,d,big){const k=Math.min(SW,SH)/200*(big?10:1);sceWith(t,()=>{[...WBS.msel].forEach(i=>{const q=t.items[i];if(!q)return;const w=wrapP(+q.x+d[0]*k,+q.y+d[1]*k);q.x=+w[0].toFixed(2);q.y=+w[1].toFixed(2)})});store();upd()}
+function sceNudge(t,d,big){const k=Math.min(SW,SH)/200*(big?10:1);sceWith(t,()=>{[...WBS.msel].forEach(i=>{const q=t.items[i];if(!q||q.sh)return;const w=wrapP(+q.x+d[0]*k,+q.y+d[1]*k);q.x=+w[0].toFixed(2);q.y=+w[1].toFixed(2)})});store();upd()}
 // the selected shapes of the open stamp go (Cut and Delete use it)
 function sceDelSel(){const t=sceRO();if(!t||!WBS.msel.size)return false;delItems([...WBS.msel]);selOne(-1);store();upd();if(WBX.wbCap)WBX.wbCap();return true}
 // to the front or the back of the stamp's list (the list order is the drawing order)
@@ -141,7 +142,8 @@ function init64(){
  try{new ResizeObserver(sceDraw).observe($('art'))}catch(e){}}
 // Add motif / Add text in a stamp's tab (2.12.0): a shape in the middle of the open stamp, selected
 WBX.wbStampMid=()=>{const t=sceOpen();return t?sceWith(t,()=>[+(SW/2).toFixed(2),+(SH/2).toFixed(2)]):null};
-WBX.wbStampAddMotif=(m,s)=>{const t=sceOpen();if(!t||!m)return false;if(WBX.wbMotifUsed)WBX.wbMotifUsed(m);const[x,y]=WBX.wbStampMid();t.items.push(it(m,x,y,s||.8,0));selOne(t.items.length-1);sceFree();store();upd();if(WBX.wbCap)WBX.wbCap();return true};
+WBX.wbStampAddSheet=()=>{const t=sceOpen();if(!t)return false;const q=sceWith(t,()=>it(basicKey('rect'),SW/2,SH/2,1,0));q.sh=1;q.ic=WBS.proj.bg;t.items.unshift(q);selOne(0);sceFree();store();upd();if(WBX.wbCap)WBX.wbCap();return true};   // 2.84.4: a Sheet in the stamp, at the back, in the paper colour
+ WBX.wbStampAddMotif=(m,s)=>{const t=sceOpen();if(!t||!m)return false;if(WBX.wbMotifUsed)WBX.wbMotifUsed(m);const[x,y]=WBX.wbStampMid();t.items.push(it(m,x,y,s||.8,0));selOne(t.items.length-1);sceFree();store();upd();if(WBX.wbCap)WBX.wbCap();return true};
 // a shape dragged from the Shapes panel and let go over an instance of the unlocked stamp is put in the stamp at that point
 function sceDropShape(k,e){const t0=stUnlocked();if(t0==null)return false;const c=scePt(e);if(!c)return false;const h=stampAt(c.x,c.y,t0);if(!h)return false;const t=sceOpen();if(!t)return false;
  const M=stMatrix(STP.items[h.i]),sn=sceSnap(M,h.u,h.v,e),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0,r=+(((( flip?th:-th)+540)%360)-180).toFixed(1),[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));

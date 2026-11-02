@@ -44,7 +44,7 @@ function abArm(k){const un=stUnlocked()!=null;if(un&&k!='motif'&&k!='text')retur
 const AB={
  pattern(){PSRC=patSrcNow();abPick('pattern');abArm('pattern')},
  text(){abPick('text');abArm('text')},   /* 2.26.0 (owner Oct 22 2026): a bar button opens the panel and arms the tool at once, as Add in the panel does (AD below) */
- sheet(){abSheet()},
+ sheet(){if(stUnlocked()!=null&&WBX.wbStampAddSheet){WBX.wbStampAddSheet();abOpen('motifs');return}abSheet()},   // 2.84.4: in a stamp's tab, a Sheet in the stamp
  paint(){const q=abInsert({u:fpU(),k:'paint',n:'Paint '+(abCount('paint')+1),x:0,y:0,st:[]});if(!q)return;WBS.paSel=q.u;if(WBX.wbPaArm)WBX.wbPaArm('brush');abDone();abOpen('elpaint')},
  stamp(){abPick('stamp');abArm('stamp')},
  motif(){abPick('motif');abArm('motif')},
@@ -52,7 +52,7 @@ const AB={
  select(){abSelect()}};
 // what Add in an element panel makes (2.6.0; Motif and Stamp too from 2.7.0): just above the selected element
 const AD={
- sheet(){abSheet()},
+ sheet(){if(stUnlocked()!=null&&WBX.wbStampAddSheet){WBX.wbStampAddSheet();abOpen('motifs');return}abSheet()},   // 2.84.4: in a stamp's tab, a Sheet in the stamp
  stamp(){const t=WBS.tiles[WBS.cur];if(!t)return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpB=t.id;upd();abOpen('stmp')},
  motif(){if(WBX.wbMotifAdd)WBX.wbMotifAdd()},   // arms the last motif (74); in a stamp's tab it puts one in at once
  pattern(keep){if(!keep)PSRC=patSrcNow();plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;plMake({k:'pattern'},CW/2,CH/2);abOpen('layers')},   /* 2.84.2 (owner, Nov 1 2026): Add pattern just adds it, in the middle; it no longer waits for a click on the canvas */

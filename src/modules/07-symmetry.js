@@ -34,7 +34,8 @@ function symZone(t){if(!(t.sym&&t.sym.zc))return null;const{m,n}=symOf(t),[C,D]=
  if(m=='rx')return box(0,0,SW/n,SH);if(m=='ry')return box(0,0,SW,SH/n);if(m=='grid'||m=='brick'||m=='drop')return box(0,0,SW/n,SH/n);return null}
 const symInPoly=(P,x,y)=>{let r=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const[a,b]=P[i],[c,d]=P[j];if((b>y)!==(d>y)&&x<(c-a)*(y-b)/(d-b)+a)r=!r}return r};
 const ptsOf=P=>P.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
-function expand(t){const ops=symOps(t),out=[],Z=ops.length?symZone(t):null;t.items.forEach((q,i)=>{const[x0,y0]=wP(t,q.x,q.y);
+function expand(t){const ops=symOps(t),out=[],Z=ops.length?symZone(t):null;t.items.forEach((q,i)=>{if(q.sh){out.push([q,i,0,null]);return}   // a stamp's Sheet (2.84.4) covers it already: no copies, no zone
+const[x0,y0]=wP(t,q.x,q.y);
  // the zone the piece's middle is in (the work area, or one of its copies), and each copy's zone is that one under the copy's mapping
  let Zi=null;if(Z){const all=[Z].concat(ops.map(o=>Z.map(p=>o.p(p[0],p[1]))));Zi=all.find(P=>symInPoly(P,x0,y0))||Z}
  out.push([q,i,0,Zi?ptsOf(Zi):null]);if(q.tg&&!(t.sym&&t.sym.tx))return;
