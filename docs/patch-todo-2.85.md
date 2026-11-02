@@ -2,7 +2,7 @@
 
 The owner's rough list from a testing session, formatted. The owner's words are kept in quotes; the grouping into patches is a proposal (nothing here is built or approved yet). Each patch is a small release (one theme, a few items), numbered as patches of the 2.85.0 update, as the earlier plans were (docs/pattern-plan.md, docs/mobile-review-2.81.md).
 
-Status: **proposed, not started.** Mark each item when it ships. The owner answered the four open questions on Nov 1 2026 (below).
+Status: **done, live in 2.85.0 (Nov 2 2026).** Mark each item when it ships. The owner answered the four open questions on Nov 1 2026 (below).
 
 ## Patch 1, 2.84.2: things that are wrong now (bugs)
 - [x] **T1. Text caret is in the wrong place.** "When typing text the flashing position indicator line is not accurate in where it is."
