@@ -29,3 +29,28 @@ test('the Text panel\'s Size slider sizes the letters and leaves the box as it i
   expect(t1.tx.ft, 'the text keeps its own size (not fitted to the box)').toBe('z');
   expect(errors).toEqual([]);
 });
+
+// T15
+test('opening an element panel closes the other element panels; the Elements list stays', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false, workspaces: 'launch' });
+  await H.openPanel(page, 'motifs'); await H.settle(page);
+  await H.openPanel(page, 'colors'); await H.settle(page);
+  await H.openPanel(page, 'text'); await H.settle(page);
+  const s = await page.evaluate(() => JSON.stringify([...document.querySelectorAll('.wg')].map(g => [...g.querySelectorAll('[data-tx],[data-p]')].map(t => t.dataset.tx || t.dataset.p))));
+  expect(s).toContain('"text"');
+  expect(s, 'the Shape panel was closed').not.toContain('"motifs"');
+  expect(s, 'the Elements list stays').toContain('"lyrs"');
+  expect(s, 'Colours stays').toContain('"colors"');
+  expect(errors).toEqual([]);
+});
+
+test('in a stamp\'s tab the Stamp panel stays open beside another element panel', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.showPanel(page, 'stmp'); await page.click('#smknew'); await H.settle(page); await page.click('#smkedit'); await H.settle(page);
+  await H.openPanel(page, 'text'); await H.settle(page);
+  await H.openPanel(page, 'motifs'); await H.settle(page);
+  const s = await page.evaluate(() => JSON.stringify([...document.querySelectorAll('.wg')].map(g => [...g.querySelectorAll('[data-tx],[data-p]')].map(t => t.dataset.tx || t.dataset.p))));
+  expect(s).toContain('"stmp"'); expect(s).toContain('"motifs"');
+  expect(s, 'the Text panel was closed').not.toContain('"text"');
+  expect(errors).toEqual([]);
+});
