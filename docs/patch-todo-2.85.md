@@ -16,13 +16,13 @@ Status: **proposed, not started.** Mark each item when it ships. The owner answe
 - [x] **T7. Scroll the view when not zoomed in.** "I should be able to scroll if I'm not zoomed in."
 
 ## Patch 3, 2.84.4: the stamp tab
-- [ ] **T8. The alignment grid works in a stamp's tab.** "Alignment grid needs to work on stamp tab."
-- [ ] **T9. Add a Sheet to a stamp.** "Should be able to add sheet to stamp."
-- [ ] **T10. A stamp gets a background fill colour option.** "Stamps should have background fill color option." Owner: "it should actually just be a sheet", so this is T9: a Sheet in the stamp with a colour fill. One item, built once.
-- [ ] **T11. Drag elements in a stamp's element list to reorder by depth.**
-- [ ] **T12. Click any symmetry copy to select the element.** "When a shape is being repeated by a symmetry selection. You must click the original stamp to select it, I'd like to be able to click on any, the original or the copies."
-- [ ] **T13. Symmetry wrap toggle.** "Have symmetry in stamp mode have a toggle switch to wrap at the edges of the symmetry zones or be cut off."
-- [ ] **T14. Accent stamp can be any stamp.** "Accent stamp should be any possible option, not only stamps already in use." The Accent picker lists the whole Stamps library, not just stamps already used in the pattern.
+- [x] **T8. The alignment grid works in a stamp's tab.** "Alignment grid needs to work on stamp tab."
+- [x] **T9. Add a Sheet to a stamp.** "Should be able to add sheet to stamp."
+- [x] **T10. A stamp gets a background fill colour option.** "Stamps should have background fill color option." Owner: "it should actually just be a sheet", so this is T9: a Sheet in the stamp with a colour fill. One item, built once.
+- [x] **T11. Drag elements in a stamp's element list to reorder by depth.**
+- [x] **T12. Click any symmetry copy to select the element.** "When a shape is being repeated by a symmetry selection. You must click the original stamp to select it, I'd like to be able to click on any, the original or the copies."
+- [x] **T13. Symmetry wrap toggle.** "Have symmetry in stamp mode have a toggle switch to wrap at the edges of the symmetry zones or be cut off."
+- [x] **T14. Accent stamp can be any stamp.** "Accent stamp should be any possible option, not only stamps already in use." The Accent picker lists the whole Stamps library, not just stamps already used in the pattern.
 
 ## Patch 4, 2.84.5: panels and inputs
 - [ ] **T15. Only one element panel open at a time.** Owner: yes, opening an element panel closes the other element panels (the Elements list, Colours and other non-element panels stay), but in a stamp's tab the Stamp panel stays locked open. Phone panels already pile up (docs/mobile-review-2.81.md, M4); this helps there too.

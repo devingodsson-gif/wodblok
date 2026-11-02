@@ -20,14 +20,14 @@ let mlFold;
 const CHEV='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3l3 3-3 3"/></svg>';
 const MLMORE=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.more}</svg>`;
 let _mlK='';function renderML(){const el=$('mlist'),eg=$('elstg');if(eg)eg.hidden=stUnlocked()==null;if(stUnlocked()==null){if(_mlK){el.innerHTML='';_mlK=''}return}   // a locked stamp does not change, so its shapes are not listed
-const t=WBS.tiles[WBS.cur],pa=col(WBS.proj.bg),pb=inkOf(t),sc=el.querySelector('.ml')?el.querySelector('.ml').scrollTop:0;{const k=JSON.stringify([WBS.cur,pa,pb,[...WBS.msel],[...mlFold],t.items.map(q=>[q.m,q.k,q.cl,q.tg,cust[q.m]?[cust[q.m].n,cust[q.m].svg.length]:0]),t.tgm||0]);if(k===_mlK&&el.firstChild){if(WBX.wbTxSync)WBX.wbTxSync();return}_mlK=k}
-const thumb=q=>`<svg viewBox="-50 -50 100 100" style="background:${q.k?pb:pa}">${clipWrap(q,q.k?mk(q.m,pa,pb):mk(q.m,pb,pa))}</svg>`;
+const t=WBS.tiles[WBS.cur],pa=col(WBS.proj.bg),pb=inkOf(t),sc=el.querySelector('.ml')?el.querySelector('.ml').scrollTop:0;{const k=JSON.stringify([WBS.cur,pa,pb,[...WBS.msel],[...mlFold],t.items.map(q=>[q.m,q.k,q.cl,q.tg,q.sh?String(q.ic):0,cust[q.m]?[cust[q.m].n,cust[q.m].svg.length]:0]),t.tgm||0]);if(k===_mlK&&el.firstChild){if(WBX.wbTxSync)WBX.wbTxSync();return}_mlK=k}
+const thumb=q=>q.sh?`<svg viewBox="-50 -50 100 100"><rect x="-50" y="-50" width="100" height="100" fill="${hx(col(q.ic||pb))}"/></svg>`:`<svg viewBox="-50 -50 100 100" style="background:${q.k?pb:pa}">${clipWrap(q,q.k?mk(q.m,pa,pb):mk(q.m,pb,pa))}</svg>`;
 const tags=q=>`${q.cl&&q.cl.length?' <i>piece</i>':''}${q.k?'<i>knockout</i>':''}`;
-const gk=q=>q.tg?'txt:'+q.tg:mName(q.m),gnm=k=>{if(k.startsWith('txt:')){const M=(t.tgm||{})[k.slice(4)];const s=M?M.text.replace(/\n/g,' '):'Text';return '“'+(s.length>24?s.slice(0,23)+'…':s)+'”'}return k};
-const by={};t.items.forEach((q,i)=>{const nm=gk(q);(by[nm]=by[nm]||[]).push(i)});
-const row=(i,n,kid)=>{const q=t.items[i],nm=mName(q.m);return`<div class="mr${kid?' kid':''}${WBS.msel.has(i)?' on':''}" data-r="${i}">${thumb(q)}<b>${hx(nm)}${n?` <i>${n}</i>`:''}${tags(q)}</b><button type="button" class="lyb" data-rm="${i}" aria-haspopup="menu" aria-label="Actions for ${hx(nm)}">${MLMORE}</button></div>`};
+const gk=(q,i)=>q.sh?'sheet:'+i:q.tg?'txt:'+q.tg:mName(q.m),gnm=k=>{if(k.startsWith('txt:')){const M=(t.tgm||{})[k.slice(4)];const s=M?M.text.replace(/\n/g,' '):'Text';return '“'+(s.length>24?s.slice(0,23)+'…':s)+'”'}return k};
+const by={};t.items.forEach((q,i)=>{const nm=gk(q,i);(by[nm]=by[nm]||[]).push(i)});
+const row=(i,n,kid)=>{const q=t.items[i],nm=q.sh?'Sheet':mName(q.m);return`<div class="mr${kid?' kid':''}${WBS.msel.has(i)?' on':''}" data-r="${i}"${q.tg?'':' draggable="true"'}>${thumb(q)}<b>${hx(nm)}${n?` <i>${n}</i>`:''}${tags(q)}</b><button type="button" class="lyb" data-rm="${i}" aria-haspopup="menu" aria-label="Actions for ${hx(nm)}">${MLMORE}</button></div>`};
 let h='';const done={};
-for(let i=t.items.length-1;i>=0;i--){const nm=gk(t.items[i]);if(done[nm])continue;done[nm]=1;const g=by[nm],isT=nm.startsWith('txt:');
+for(let i=t.items.length-1;i>=0;i--){const nm=gk(t.items[i],i);if(done[nm])continue;done[nm]=1;const g=by[nm],isT=nm.startsWith('txt:');
 if(g.length==1&&!isT){h+=row(i);continue}
 const fr=isT?[...g]:[...g].reverse(),ns=g.filter(j=>WBS.msel.has(j)).length,open=!mlFold.has(nm),e=hx(nm),lb=hx(gnm(nm));
 h+=`<div class="mg${open?' open':''}"><div class="mr mh${ns==g.length?' on':ns?' part':''}" data-g="${e}"><span class="car" data-f="${e}" role="button" aria-label="${open?'Fold':'Unfold'} ${e}" aria-expanded="${open}">${CHEV}</span>${thumb(t.items[fr[0]])}<b>${lb}<i class="cnt">${ns&&ns<g.length?ns+'/':''}${g.length}</i></b><button type="button" class="lyb" data-gm="${e}" aria-haspopup="menu" aria-label="Actions for ${lb}">${MLMORE}</button></div>${open?`<div class="mk">${fr.map(j=>row(j,isT?0:g.indexOf(j)+1,1)).join('')}</div>`:''}</div>`}
@@ -52,6 +52,14 @@ WBS.brush=null;
 document.addEventListener('contextmenu',e=>{const was=WBX.plDisarm?WBX.plDisarm():false;if(!was&&WBX.wbCtxMenu&&WBX.wbCtxMenu(e))return;
 if(typeof WBS.fpB!='undefined'&&(was||WBS.fpSel!==-1)&&fpL()){e.preventDefault();WBS.fpB=null;WBS.txArm=false;WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpPool=new Set();WBS.fpGhost=null;upd();return}e.preventDefault()},true);
 mlFold=new Set();try{mlFold=new Set(JSON.parse(kv.get('wb18_mlfold')||'[]'))}catch(e){}
+// 2.84.4 (owner, Nov 1 2026): a stamp's shapes are dragged in its Elements list to change their depth, as the elements are in the canvas's list. A row dropped on the
+// top half of another goes in front of it (higher in the list), on the bottom half behind it. A text's letters move with their text, so they are not dragged one by one.
+function mlMove(i,j,above){const t=WBS.tiles[WBS.cur];if(!t||i===j||!t.items[i]||!t.items[j])return;const q=t.items[i],tg=t.items[j];t.items.splice(i,1);t.items.splice(t.items.indexOf(tg)+(above?1:0),0,q);selOne(t.items.indexOf(q));store();upd();if(WBX.wbCap)WBX.wbCap()}
+{let mlDrag=null;const ML=$('mlist'),clr=()=>ML.querySelectorAll('.mr').forEach(x=>x.classList.remove('dragover-t','dragover-b'));
+ ML.addEventListener('dragstart',e=>{const r=e.target.closest&&e.target.closest('.mr[data-r][draggable]');if(!r)return;mlDrag=+r.dataset.r;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain','shape')}catch(x){}});
+ ML.addEventListener('dragover',e=>{if(mlDrag==null)return;const r=e.target.closest&&e.target.closest('.mr[data-r]');if(!r)return;e.preventDefault();clr();const b=r.getBoundingClientRect();r.classList.add(e.clientY<b.top+b.height/2?'dragover-t':'dragover-b')});
+ ML.addEventListener('drop',e=>{if(mlDrag==null)return;e.preventDefault();const r=e.target.closest&&e.target.closest('.mr[data-r]');clr();const i=mlDrag;mlDrag=null;if(!r)return;const b=r.getBoundingClientRect();mlMove(i,+r.dataset.r,e.clientY<b.top+b.height/2)});
+ ML.addEventListener('dragend',()=>{mlDrag=null;clr()})}
 $('mlist').onmousedown=e=>{if(e.shiftKey&&e.target.closest('.mr'))e.preventDefault()};
 $('mlist').onclick=e=>{const ML=$('mlist'),C=q=>{const x=e.target.closest(q);return x&&ML.contains(x)?x:null},t=WBS.tiles[WBS.cur],add=e.shiftKey||e.ctrlKey||e.metaKey,rng=e.shiftKey,ofName=nm=>t.items.map((q,i)=>(q.tg?'txt:'+q.tg:mName(q.m))==nm?i:-1).filter(i=>i>=0);
 const f=C('[data-f]');if(f){const nm=f.dataset.f;mlFold.has(nm)?mlFold.delete(nm):mlFold.add(nm);try{kv.set('wb18_mlfold',JSON.stringify([...mlFold]))}catch(er){}renderML();return}
@@ -84,6 +92,7 @@ document.addEventListener('paste',e=>{if(!stEdit()||!mclip||typingIn(e.target))r
 $('sfr').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...rest,...mv);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
 $('ssb').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...mv,...rest);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
 $('sym').onclick=e=>{const b=e.target.closest('[data-y]');if(!b)return;const t=WBS.tiles[WBS.cur],d=SYM.find(x=>x[0]==b.dataset.y);t.sym={m:d[0],n:d[2]?(t.sym&&t.sym.m==d[0]?t.sym.n:d[4]):0,...(t.sym&&t.sym.tx?{tx:1}:{})};store();upd()};
+$('symz').onchange=()=>{const t=WBS.tiles[WBS.cur];t.sym={...(t.sym||{m:'off'})};if($('symz').checked)delete t.sym.zc;else t.sym.zc=1;WBS.symKey='';store();upd();if(WBX.wbCap)WBX.wbCap()};   // 2.84.4: off cuts each piece at its symmetry zone
 $('symtx').onchange=()=>{const t=WBS.tiles[WBS.cur];t.sym={...(t.sym||{m:'off'})};if($('symtx').checked)t.sym.tx=1;else delete t.sym.tx;WBS.symKey='';store();upd();if(WBX.wbCap)WBX.wbCap()};
 $('sn').oninput=e=>{const t=WBS.tiles[WBS.cur];if(t.sym){t.sym.n=+e.target.value;store();upd()}};
 $('sbk').onclick=()=>{const t=WBS.tiles[WBS.cur];if(symOf(t).m=='off')return;t.items=expand(t).map(e=>({...e[0]}));t.sym={m:'off',n:0};selOne(-1);store();upd()};

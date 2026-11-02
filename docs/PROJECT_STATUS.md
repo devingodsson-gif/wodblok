@@ -5,6 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
+- **Nov 2: 2.84.4 (patch 3: the stamp tab, T8 to T14)** on `feat/2.84.4-stamp-tab`, not merged until the owner says so. Next: 2.84.5 (patch 4: panels and inputs), then 2.85.0 closes the to-do. Open: the stamp Sheet is a colour fill only (no gradient, picture or effects); say if those are wanted.
+- **Nov 2: 2.84.3 LIVE** (owner: "merge").
 - **Nov 1: 2.84.3 (patch 2: T6 T7, the view moves by the middle button and the wheel at any zoom)** on `fix/2.84.3-view-navigation`, not merged until the owner says so. Next: 2.84.4 (the stamp tab).
 - **Nov 1: 2.84.2 LIVE** (owner: "Go live").
 - **Nov 1: 2.84.2 (patch 1 of docs/patch-todo-2.85.md: T1 to T5)** on `fix/2.84.2-bugs`, not merged until the owner says so. Patches 2 to 4 (2.84.3 canvas navigation, 2.84.4 stamp tab, 2.84.5 panels and inputs) are not started. Owner's answers are in the to-do.

@@ -24,8 +24,22 @@ else if(m=='drop'){for(let a=0;a<n;a++)for(let b=0;b<n;b++)if(a||b)o.push(sh(SW*
 else if(m=='grid')for(let a=0;a<n;a++)for(let b=0;b<n;b++)if(a||b)o.push(sh(SW*a/n,SH*b/n));
 return o}
 const wP=(t,x,y)=>t.wr===false?[x,y]:wrapP(x,y);
-function expand(t){const ops=symOps(t),out=[];t.items.forEach((q,i)=>{out.push([q,i,0]);if(q.tg&&!(t.sym&&t.sym.tx))return;const[x0,y0]=wP(t,q.x,q.y);
-ops.forEach((o,c)=>{const[x,y]=o.p(x0,y0);const w=wP(t,x,y);out.push([{...q,x:w[0],y:w[1],r:nr(o.r(q.r)),f:o.f(q.f),...(q.cl?{cl:q.cl.map(a=>a.slice())}:{})},i,c+1])})});return out}
+// 2.84.4 (owner, Nov 1 2026): with Wrap at the zone edges off (t.sym.zc), every piece is cut at the edge of its symmetry zone: the half, quarter, wedge or cell it sits in
+// (the zones are the "work here" area turned, mirrored or moved by each copy's mapping). A zone is a polygon in the stamp's units; a wedge's arc is drawn in 5° steps.
+function symZone(t){if(!(t.sym&&t.sym.zc))return null;const{m,n}=symOf(t),[C,D]=symC(),R=Math.max(SW,SH)*2,box=(x,y,w,h)=>[[x,y],[x+w,y],[x+w,y+h],[x,y+h]],
+ wedge=(a0,a1)=>{const P=[[C,D]],k=Math.max(2,Math.ceil((a1-a0)/5));for(let j=0;j<=k;j++){const a=(a0+(a1-a0)*j/k)*RAD;P.push([C+R*Math.cos(a),D+R*Math.sin(a)])}return P};
+ if(m=='lr'||m=='glide')return box(C,-SH,SW,3*SH);if(m=='ud')return box(-SW,-SH,3*SW,SH+D);if(m=='quad')return box(C,-SH,SW,SH+D);
+ if(m=='diag')return wedge(45,225);if(m=='diag2')return wedge(135,315);if(m=='dd')return wedge(45,135);
+ if(m=='star'||m=='hex'||m=='kal'){const k=m=='star'?4:m=='hex'?6:n;return wedge(-90,-90+180/k)}if(m=='rot')return wedge(-90,-90+360/n);
+ if(m=='rx')return box(0,0,SW/n,SH);if(m=='ry')return box(0,0,SW,SH/n);if(m=='grid'||m=='brick'||m=='drop')return box(0,0,SW/n,SH/n);return null}
+const symInPoly=(P,x,y)=>{let r=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const[a,b]=P[i],[c,d]=P[j];if((b>y)!==(d>y)&&x<(c-a)*(y-b)/(d-b)+a)r=!r}return r};
+const ptsOf=P=>P.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+function expand(t){const ops=symOps(t),out=[],Z=ops.length?symZone(t):null;t.items.forEach((q,i)=>{if(q.sh){out.push([q,i,0,null]);return}   // a stamp's Sheet (2.84.4) covers it already: no copies, no zone
+const[x0,y0]=wP(t,q.x,q.y);
+ // the zone the piece's middle is in (the work area, or one of its copies), and each copy's zone is that one under the copy's mapping
+ let Zi=null;if(Z){const all=[Z].concat(ops.map(o=>Z.map(p=>o.p(p[0],p[1]))));Zi=all.find(P=>symInPoly(P,x0,y0))||Z}
+ out.push([q,i,0,Zi?ptsOf(Zi):null]);if(q.tg&&!(t.sym&&t.sym.tx))return;
+ops.forEach((o,c)=>{const[x,y]=o.p(x0,y0);const w=wP(t,x,y);out.push([{...q,x:w[0],y:w[1],r:nr(o.r(q.r)),f:o.f(q.f),...(q.cl?{cl:q.cl.map(a=>a.slice())}:{})},i,c+1,Zi?ptsOf(Zi.map(p=>o.p(p[0],p[1]))):null])})});return out}
 // Guide lines (and a shaded "work here" area) for a symmetry mode
 function symG(m,n,w,clip){const[C,D]=symC(),R=Math.max(SW,SH)+40,A=a=>[C+R*Math.cos(a*RAD),D+R*Math.sin(a*RAD)],f=v=>v.toFixed(1);
 const L=(x1,y1,x2,y2)=>`<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}"/>`,full=a=>{const[x1,y1]=A(a),[x2,y2]=A(a+180);return L(x1,y1,x2,y2)},ray=a=>{const[x,y]=A(a);return L(C,D,x,y)};
@@ -46,11 +60,11 @@ if(!g)return'';
 return`<g pointer-events="none"${clip?' clip-path="url(#ec)"':''}><g fill="#c8694a" fill-opacity=".12">${sh}</g><g fill="none" stroke="#c8694a" stroke-width="${w}" stroke-dasharray="${w*4} ${w*3}" stroke-linecap="round">${g}</g>${m=='lr'||m=='ud'||m=='glide'||m=='brick'||m=='drop'||m[0]=='r'&&m!='rot'||m=='grid'?'':`<circle cx="${C}" cy="${D}" r="${w*2.2}" fill="#c8694a"/>`}</g>`} // (view only; exports always keep both textures)
 function tbSync(){try{const p=true,a=WBS.edInk,b=WBS.edTx,gi=$('gti'),gx=$('gtx');if(!gi||!gx)return;gi.classList.toggle('on',a);gi.setAttribute('aria-pressed',String(a));gx.classList.toggle('on',b);gx.setAttribute('aria-pressed',String(b));
 if(p){gi.title=WBS.tiles.some(isOf)?'Show the stamp texture in the pattern (view only)':'No stamp has a stamp texture set (see Stamp texture in the stamp panel)';gx.title=WBS.tex.t?'Show the canvas texture in the pattern (view only)':'This project has no canvas texture set'}}catch(e){}}
-function renderSym(t){const{m,n,d}=symOf(t),k=(t.wr===false?'w0':'')+m+n+col(WBS.proj.bg)+SW+'x'+SH+SK+HO+(t.items.some(q=>q.tg)?(t.sym&&t.sym.tx?'T':'t'):'');if(k==WBS.symKey)return;WBS.symKey=k;
+function renderSym(t){const{m,n,d}=symOf(t),k=(t.wr===false?'w0':'')+(t.sym&&t.sym.zc?'z':'')+m+n+col(WBS.proj.bg)+SW+'x'+SH+SK+HO+(t.items.some(q=>q.tg)?(t.sym&&t.sym.tx?'T':'t'):'');if(k==WBS.symKey)return;WBS.symKey=k;
 $('sym').innerHTML=SYM.filter(x=>SK=='rect'||!REP.includes(x[0])).map(x=>{const nn=x[0]==m?n:x[4]||0;return`<button type="button" data-y="${x[0]}" class="${x[0]==m?'on':''}"><svg viewBox="-12 -12 ${SW+24} ${SH+24}"><path d="${shp(0)}" fill="none" stroke="currentColor" stroke-width="7" opacity=".35"/>${symG(x[0],nn,9,0)}</svg>${x[1]}</button>`}).join('');
 $('symn').hidden=!d[2];if(d[2]){$('sn').min=d[2];$('sn').max=d[3];$('sn').value=n;$('snl').textContent=d[5]}
 if(WBX.wbSceDraw)WBX.wbSceDraw();
-$('symh').textContent='';$('sbkr').hidden=m=='off';{const hasT=t.items.some(q=>q.tg);$('symtxr').hidden=m=='off'||!hasT;$('symtx').checked=!!(t.sym&&t.sym.tx)}}
+$('symh').textContent='';$('sbkr').hidden=m=='off';{const hasT=t.items.some(q=>q.tg);$('symtxr').hidden=m=='off'||!hasT;$('symtx').checked=!!(t.sym&&t.sym.tx)}{const zr=$('symzr');if(zr){zr.hidden=m=='off';$('symz').checked=!(t.sym&&t.sym.zc)}}}
 function init07(){
 WBS.symKey='';
 }

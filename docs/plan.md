@@ -1,5 +1,15 @@
 # Development plan
 
+## 2.84.4 (Nov 2 2026, patch 3 of docs/patch-todo-2.85.md): the stamp tab
+- **T8, grid:** the grid already divided the stamp in its tab (the tab sets the canvas size to the stamp) and dragging snapped to it; what did not work was **Snap all to grid**, which moved the canvas's elements (not shown in the tab). In a stamp's tab it now snaps the stamp's shapes, and their size while Snap size to whole cells is on (`sceSnapAll`, 64).
+- **T9, T10, a Sheet in a stamp** (owner: "it should actually just be a sheet"): the element bar's Sheet button in a stamp's tab adds a Sheet item to the stamp (`sh:1` on a stamp item): it covers the whole stamp in one colour at its depth, at the back to start, in the paper colour; its Colour is the Shape panel's Colour well (the rest of that group is hidden for a Sheet); it is listed as "Sheet" and reordered like the shapes; it has no symmetry copies, no box and is picked in the list, not on the canvas. Only a colour fill: no gradient, picture or effects (a canvas Sheet keeps those).
+- **T11, reorder:** a stamp's shape rows in the Elements list are dragged to change their depth (front on top; a drop on a row's top half goes in front of it). A text's letters move with their text and are not dragged one by one.
+- **T12, symmetry copies** (owner's answer, Nov 2: the box should follow the copy clicked): a shape picked on one of its symmetry copies shows its box and handles on that copy; the copy's handles size and turn the shape.
+- **T13, Wrap at the zone edges:** a new switch in Symmetry (on by default, as before). Off, every piece is cut at the edge of its symmetry zone (the half, quarter, wedge or repeat cell it sits in); a shape running past its cell no longer carries into the next one. Stored as `sym.zc`.
+- **T14, accent:** a Pattern's Accent can be any stamp of the project (`ac.src`), not only one of the pattern's sources.
+- New optional fields (`sh` on a stamp item, `sym.zc`, `ac.src`) keep file format 30 (owner, Oct 29: optional new fields stay 30).
+- Tests: stamp-tab-2-84-4 (new, 8 tests); related specs (41 files: stamp, symmetry, pattern, grid, element, first-run, split, commands; 157 passed, 1 skipped). `npm run perf`: ratio 0.988.
+
 ## 2.84.3 (Nov 1 2026, patch 2 of docs/patch-todo-2.85.md): moving around the canvas
 - **T6, T7:** the middle mouse button (and Space or the Hand tool) drags the view, and the wheel moves it (up and down; Shift across), also while the canvas is fitted to the screen. The board scrolls as far as it can; the rest moves a view offset on the artwork (`34-desktop-shell.js`, `voSet`), like Photoshop's pasteboard. A quarter of the canvas always stays on screen; a new zoom level or Fit puts the offset back to the middle. Placing and selecting still land under the pointer (the offset is a CSS translate, so the canvas's own coordinates follow it).
 - The plain wheel is now handled by the app (it scrolls the board, then moves the offset) instead of the browser's own scroll.

@@ -119,7 +119,7 @@ out.push(patEd(patMk(p,s,b,i,i,null,null,+(sz/1.5).toFixed(2)),E,key))});return 
 // place (2.76.10) takes the accent's source (p.ac.s, else the last one)
 function patTiles(p,ss){const T=patPts(p),r=patRnd(p.sd),tot=ss.reduce((a,s)=>a+(+s.w>0?+s.w:1),0),out=[],n=ss.length,nc=new Map();nc.n=0;
  const I=patIn(p);T.pts.forEach((q,i)=>{if(T.gap[i]&&n<2)return;if(!patWhole(p,I,q[0],q[1],T.size[i],T.rot[i]))return;let s;
-  if(T.acc&&T.acc[i]){const a=(p.src||[])[p.ac&&p.ac.s];s=patSrcOk(a)?a:ss[n-1]}else if(p.ds=='random')s=ss[Math.floor(r()*n)];else if(p.ds=='weight'){let v=r()*tot;s=ss.find(z=>(v-=(+z.w>0?+z.w:1))<0)||ss[n-1]}else s=ss[((T.cls[i]%n)+n)%n];
+  if(T.acc&&T.acc[i]){const a=p.ac&&p.ac.src&&patSrcOk(p.ac.src)?p.ac.src:(p.src||[])[p.ac&&p.ac.s];s=patSrcOk(a)?a:ss[n-1]}else if(p.ds=='random')s=ss[Math.floor(r()*n)];else if(p.ds=='weight'){let v=r()*tot;s=ss.find(z=>(v-=(+z.w>0?+z.w:1))<0)||ss[n-1]}else s=ss[((T.cls[i]%n)+n)%n];
   const key=T.keys&&T.keys[i]!=null?T.keys[i]:String(i),E=p.pe&&p.pe[key];if(E&&E.d)return;s=patSrcAt(p,s,E);
   const sz=T.size[i],b={u:p.u+'.'+i,pu:p.u,...(p.fx&&p.fx.length?{fx:p.fx}:{}),x:+q[0].toFixed(2),y:+q[1].toFixed(2),s:+sz.toFixed(3),r:+(T.rot[i]||0).toFixed(2),f:T.flip[i]||1};
   if(s.k=='pattern'){const b2=patEd({...b},E,key);out.push(...patNest(p,s,b2,nc).map(o=>{o.pk=key;return o}));return}
@@ -154,8 +154,8 @@ $('pelay').querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dat
  const ah=TL_AR[sh].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');if(ar.dataset.sh!==sh){ar.dataset.sh=sh;ar.innerHTML=ah}const av=tlArr(p,sh);if(ar.value!==av)ar.value=av;{const pv=$('pewpv'),k=sh+'|'+av;pv.hidden=false;if(pv.dataset.k!==k){pv.dataset.k=k;pv.innerHTML=tlFlagPreview(sh,av)}}}}$('peds').querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d==p.ds));
 const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;uiFire(el)}};sv('peps',+p.ps||12);sv('pesp',+p.sp||0);sv('pecn',p.cn);sv('pern',p.rn);sv('pesz',p.sz);sv('pert',p.rt);sv('peox',+p.ox||0);sv('peoy',+p.oy||0);sv('pein',p.in==null?4:+p.in);sv('peiv',+p.iv||0);sv('pemd',+p.md||0);
  // Accent (2.76.10, Tiling): a second set of pieces at the middles between the main ones, its own source and size
- {const ac=p.ac&&p.ac.on;$('peac').checked=!!ac;$('peacb').hidden=!ac;const so=(p.src||[]).map((x,i)=>[String(i),patSrcName(x)]),h=so.map(([v,t])=>`<option value="${v}">${patHx(t)}</option>`).join(''),as=$('peacs');if(as.dataset.h!==h){as.dataset.h=h;as.innerHTML=h}
-  if(ac){const v=String(p.ac.s!=null&&p.src&&p.src[p.ac.s]?p.ac.s:Math.max(0,(p.src||[]).length-1));if(as.value!==v)as.value=v;sv('peacz',+p.ac.z||40)}}
+ {const ac=p.ac&&p.ac.on;$('peac').checked=!!ac;$('peacb').hidden=!ac;const so=(p.src||[]).map((x,i)=>['s'+i,patSrcName(x)]).concat(WBS.tiles.filter(t=>!(p.src||[]).some(x=>x.k=='stamp'&&x.t==t.id)).map(t=>['t'+t.id,stNmId(t.id)])),   /* 2.84.4 (owner, Nov 1 2026): the accent can be any stamp of the project, not only the pattern's own sources */h=so.map(([v,t])=>`<option value="${v}">${patHx(t)}</option>`).join(''),as=$('peacs');if(as.dataset.h!==h){as.dataset.h=h;as.innerHTML=h}
+  if(ac){const v=p.ac.src&&p.ac.src.k=='stamp'&&patSrcOk(p.ac.src)?'t'+p.ac.src.t:'s'+(p.ac.s!=null&&p.src&&p.src[p.ac.s]?p.ac.s:Math.max(0,(p.src||[]).length-1));if(as.value!==v)as.value=v;sv('peacz',+p.ac.z||40)}}
  // Edit pieces (2.76.10): the piece picked on the canvas, its source, colour and turn
  {const on=WBS.patPE===p.u;$('pepe').checked=on;const k=on?WBS.patPc:null,E=k!=null&&p.pe?p.pe[k]||{}:{};$('pepg').hidden=k==null;
   if(k!=null){const so=[['','Own'],...(p.src||[]).map((x,i)=>[String(i),patSrcName(x)])],h=so.map(([v,t])=>`<option value="${v}">${patHx(t)}</option>`).join(''),ps=$('pepsrc');if(ps.dataset.h!==h){ps.dataset.h=h;ps.innerHTML=h}const sv2=E.s!=null?String(E.s):'';if(ps.value!==sv2)ps.value=sv2;
@@ -207,7 +207,7 @@ $('pepown').onclick=()=>{const p=patCur(),L=fpL(),k=WBS.patPc;if(!p||!L||k==null
  const{pu,pk,wk,clp,cwk,pin,u,...rest}=JSON.parse(JSON.stringify(o)),q={...rest,u:fpU()};if(q.k=='text'){q.n=+q.s||q.n}
  const a=L.pl;a.splice(a.indexOf(p)+1,0,q);p.pe=p.pe||{};p.pe[k]={d:1};WBS.patPc=null;WBS.patPE=null;WBS.fpSel=q.u;WBS.fpMS=new Set();WBS.fpAnc=q.u;patCh();pmsg('The piece is now its own element.')};
 $('peac').addEventListener('change',()=>{const p=patCur();if(!p)return;if($('peac').checked)p.ac={on:1,s:Math.max(0,(p.src||[]).length-1),z:40};else delete p.ac;patCh()});
-$('peacs').addEventListener('change',()=>{const p=patCur();if(!p||!p.ac)return;p.ac.s=+$('peacs').value;patCh()});
+$('peacs').addEventListener('change',()=>{const p=patCur();if(!p||!p.ac)return;const v=$('peacs').value;if(v[0]=='t'){const t=WBS.tiles.find(x=>String(x.id)===v.slice(1));if(!t)return;p.ac.src={k:'stamp',t:t.id,w:1};delete p.ac.s}else{p.ac.s=+v.slice(1);delete p.ac.src}patCh()});
 $('peacz').addEventListener('input',()=>{const p=patCur();if(!p||!p.ac)return;const v=+$('peacz').value;if(p.ac.z!==v){p.ac.z=v;patCh()}});
 $('pepin').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$('pepin').value;if(v)p.pin=v;else delete p.pin;patCh()});
 $('pedm').onclick=e=>{const b=e.target.closest('[data-d]'),p=patCur();if(!b||!p)return;const v=b.dataset.d;if((p.dm||'')===v)return;if(v){p.dm=v;if(v=='img'&&!p.da){const a=Object.keys(WBS.ARTS||{})[0];if(a)p.da=a}}else delete p.dm;patCh()};
