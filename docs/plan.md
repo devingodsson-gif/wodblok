@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.85.0 (Nov 2 2026, LIVE with the owner's word): the patch to-do is done
+- Closes docs/patch-todo-2.85.md: 2.84.2 (bugs), 2.84.3 (moving the view), 2.84.4 (the stamp tab) and 2.84.5 (panels and inputs), all live. Version and docs only.
+- Open from the to-do: the stamp Sheet is a colour fill only (no gradient, picture or effects); picture comparison was not run on 2.84.4 and 2.84.5 (pull request only).
+
 ## 2.84.5 (Nov 2 2026, patch 4 of docs/patch-todo-2.85.md): panels and inputs
 - **T15, one element panel at a time** (owner's answer: the Stamp panel stays in a stamp's tab): opening an element panel closes the other element panels in unlocked groups; the Elements list, Colours and the tool panels stay; in a stamp's tab the Stamp panel stays. A closed panel's section is hidden as it closes. A text put into a stamp no longer opens the Shape panel by itself (it would have closed the Text panel).
 - **T16, font size:** the Text panel's Character group has a Size slider again (the old one was hidden since the box fits the text). It shows the size the letters are drawn at and sets it; the box keeps its size and the text then keeps its own size (`tx.ft` 'z', laid out like no fit; a box text was always 'f', Fill the box).
