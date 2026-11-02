@@ -13,8 +13,8 @@ async function enter(page) {
   const p = await H.stampInstance(page, JSON.parse(await H.getState(page)).tiles[0].id); const c = await H.canvasToClient(page, p.cx, p.cy);
   await page.mouse.dblclick(c.x, c.y); await H.settle(page);
   sid = await inTab(page); expect(sid, 'a stamp is open in its tab').toBeGreaterThan(0);
-  // the test's stamp starts empty: Add motif puts a rectangle in its middle (2.76.8); the click below selects it
-  await H.showPanel(page, 'motifs'); await page.click('.elk[data-k="motif"] [data-add]'); await H.settle(page);
+  // the test's stamp starts empty: a rectangle is put in its middle (2.84.2: the Shape button only opens the panel now); the click below selects it
+  await H.stampTabRect(page);
   const b = await page.locator('#art').boundingBox(), pt = { x: b.x + b.width * 0.5, y: b.y + b.height * 0.5 };   // 2.77.0: the shape in the middle of the stamp
   await page.mouse.click(pt.x, pt.y); await H.settle(page);
   return { ...o, pt };

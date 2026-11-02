@@ -3,7 +3,7 @@ const { openApp, settle, getState, noPattern, pickShape } = require('./helpers/h
 // 2.20.0: every Add arms its kind; a ghost follows the pointer; each click on the canvas places one at the pointer; Esc or V puts the tool away.
 const els = async (page, k) => JSON.parse(await getState(page)).els.filter(q => q.k === k);
 
-for (const k of ['pattern', 'motif', 'stamp']) {
+for (const k of ['motif', 'stamp']) {   // 2.84.2: Add pattern no longer arms; it adds at once (tests/add-pattern-at-once-2-84-2.spec.js)
   test(`Add ${k}: makes nothing until the canvas is clicked, places where clicked, stays armed, V puts it away`, async ({ page }) => {
     const { errors } = await openApp(page, { seed: 4 });
     await noPattern(page);

@@ -38,7 +38,7 @@ function plMake(o,x,y){if(o.k=='copy'){const q=JSON.parse(JSON.stringify(o.q));q
 // 2.26.0: what a bar button does after it opened the panel. In a stamp's tab only Motif and Text have an Add, so the other buttons stay as they were (they only open the panel).
 function abArm(k){const un=stUnlocked()!=null;if(un&&k!='motif'&&k!='text')return;
  if(k=='stamp'){if(!WBS.tiles.length)return;AD.stamp();return}
- if(k=='pattern'){AD.pattern(true);return}
+ if(k=='pattern')return;   // (2.84.2) the bar button only opens the Pattern panel; its Add adds the pattern
  if(k=='text'){AD.text();return}
  if(k=='motif'&&WBX.wbMotifAdd)WBX.wbMotifAdd()}
 const AB={
@@ -55,7 +55,7 @@ const AD={
  sheet(){abSheet()},
  stamp(){const t=WBS.tiles[WBS.cur];if(!t)return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpB=t.id;upd();abOpen('stmp')},
  motif(){if(WBX.wbMotifAdd)WBX.wbMotifAdd()},   // arms the last motif (74); in a stamp's tab it puts one in at once
- pattern(keep){if(!keep)PSRC=patSrcNow();plArm({k:'pattern',s:Math.min(CW,CH)})},
+ pattern(keep){if(!keep)PSRC=patSrcNow();plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();WBS.fpAnc=null;plMake({k:'pattern'},CW/2,CH/2);abOpen('layers')},   /* 2.84.2 (owner, Nov 1 2026): Add pattern just adds it, in the middle; it no longer waits for a click on the canvas */
  text(){if(stUnlocked()!=null){abOpen('text');const ta=$('tx_t');if(!ta||!WBX.wbTxStampAt||!WBX.wbStampMid)return;if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}const[x,y]=WBX.wbStampMid()||[0,0];Promise.resolve(WBX.wbTxStampAt(x,y,true)).then(g=>setTimeout(()=>{if(!(g&&WBX.wbTxInStamp&&WBX.wbTxInStamp(g))){ta.focus();ta.select()}},0));return}   // (2.25.0) the typing starts on the stamp, in place
   abOpen('text');const ta=$('tx_t'),go=$('tx_go');if(!ta||!go)return;plDisarm();WBS.fpSel=-1;WBS.fpMS=new Set();if(!ta.value.trim()){ta.value='Text';ta.dispatchEvent(new Event('input',{bubbles:true}))}if(!WBS.txArm)go.click();return;
   const L=fpL(),before=new Set(L?(L.pl||[]).map(q=>String(q.u)):[]),anchor=elSel();if(!WBX.wbTbAdd)return;

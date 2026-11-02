@@ -136,4 +136,4 @@ Lt.forEach(l=>{l[1]=+(l[1]-mx).toFixed(2);l[2]=+(l[2]-my).toFixed(2)});
 // with a box width or height, the box (not the letters) is what the piece measures, so Align and Vertical sit inside it
 return{G,Lt,bw:+(boxW?q.wd*U:x1-x0).toFixed(2),bh:+(boxH?q.ht*U:y1-y0).toFixed(2),over}}
 
-export {TE_FONTS0,TE_GROUPS,teVar,teRnd,teFonts,teF,teUF,teCss,teGlyph,teLayout,teD,teFitSz,teReady,teAddUF,teLoadFonts,teLayBox,teSetNotify};
+export {teE,TE_FONTS0,TE_GROUPS,teVar,teRnd,teFonts,teF,teUF,teCss,teGlyph,teLayout,teD,teFitSz,teReady,teAddUF,teLoadFonts,teLayBox,teSetNotify};

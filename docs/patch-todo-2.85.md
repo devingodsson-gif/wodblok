@@ -5,11 +5,11 @@ The owner's rough list from a testing session, formatted. The owner's words are 
 Status: **proposed, not started.** Mark each item when it ships. The owner answered the four open questions on Nov 1 2026 (below).
 
 ## Patch 1, 2.84.2: things that are wrong now (bugs)
-- [ ] **T1. Text caret is in the wrong place.** "When typing text the flashing position indicator line is not accurate in where it is."
-- [ ] **T2. Effects section has no way to add an effect.** "Effects section on element panels has no arrow or way to add effects." Every element panel's Effects section needs the open/close arrow and the Add effect button.
-- [ ] **T3. The Shape button makes a rectangle.** "When you first click the shape icon it creates a rectangle, don't do that just open the menu." The button only opens the Shape panel; nothing is created by it (docs/element-refinement-plan.md).
-- [ ] **T4. Add pattern needs no click on the canvas.** "Clicking add pattern should just add it, no click on the canvas."
-- [ ] **T5. Save as PNG defaults to the wrong file type.** "Files need to save as their stated format or .png, by default when you press save as PNG the default file format selected is 'file'." The file type in the save dialog must follow the chosen format (PNG saves as .png, and so on).
+- [x] **T1. Text caret is in the wrong place.** "When typing text the flashing position indicator line is not accurate in where it is."
+- [x] **T2. Effects section has no way to add an effect.** "Effects section on element panels has no arrow or way to add effects." Every element panel's Effects section needs the open/close arrow and the Add effect button.
+- [x] **T3. The Shape button makes a rectangle.** "When you first click the shape icon it creates a rectangle, don't do that just open the menu." The button only opens the Shape panel; nothing is created by it (docs/element-refinement-plan.md).
+- [x] **T4. Add pattern needs no click on the canvas.** "Clicking add pattern should just add it, no click on the canvas."
+- [x] **T5. Save as PNG defaults to the wrong file type.** "Files need to save as their stated format or .png, by default when you press save as PNG the default file format selected is 'file'." The file type in the save dialog must follow the chosen format (PNG saves as .png, and so on).
 
 ## Patch 2, 2.84.3: moving around the canvas
 - [ ] **T6. Middle mouse button drags the view.** "Middle click should drag the view."

@@ -257,6 +257,23 @@ async function addShape(page, g = 'rect') {
   const u = await page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()); const q = s.els[s.els.length - 1]; return q && q.u; });
   return u;
 }
+// 2.84.2: in a stamp's tab the Shape button no longer puts a rectangle in (its first click only opens the Shapes panel); this picks the Rectangle and puts one in the middle, then puts the tool away
+async function stampTabRect(page) {
+  await showPanel(page, 'motifs');
+  const set = page.locator('#lib .lfr[data-f="b:Basic shapes"]');
+  if (!(await page.locator(`#lib button[data-m][aria-label="${BASIC.rect}"]`).count())) { await set.click(); await settle(page); }
+  await page.locator(`#lib button[data-m][aria-label="${BASIC.rect}"]`).click(); await settle(page);
+  const b = await page.locator('#art').boundingBox();
+  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 3 }); await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await settle(page);
+  await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur()); await page.keyboard.press('v'); await settle(page);
+}
+// 2.84.2: arms a Rectangle on the pointer (the Shape button's first click only opens the Shapes panel now); the same in a stamp's tab, where a click then puts it in
+async function armRect(page) {
+  await showPanel(page, 'motifs');
+  const set = page.locator('#lib .lfr[data-f="b:Basic shapes"]');
+  if (!(await page.locator(`#lib button[data-m][aria-label="${BASIC.rect}"]`).count())) { await set.click(); await settle(page); }
+  await page.locator(`#lib button[data-m][aria-label="${BASIC.rect}"]`).click(); await settle(page);
+}
 // 2.4.0: a new Pattern is empty; this puts a source in it (a stamp by default, or 'motif' / 'text').
 // 2.28.0: Add source is a menu: the project's stamps, then its texts, then "Shape from the library…", which opens the library; the motif clicked there is added.
 async function patSource(page, kind = 'stamp', n = 0) {
@@ -284,8 +301,16 @@ async function addKind(page, k) {
   await page.click(`.elk[data-k="${k}"] [data-add]`);
   await settle(page);
   // 2.26.0: Add motif with nothing chosen yet opens the library instead of placing the first shape; this picks one there
-  // 2.76.8: in a stamp's tab Add motif has already put a rectangle in, so nothing is picked there
-  if (k === 'motif' && !page.__wbMotifPicked && (await page.evaluate(() => window.__wbTest.unlockedStamp())) == null) { await pickShape(page); page.__wbMotifPicked = true; }   // later Adds use the shape picked here
+  // 2.84.2: the first Add motif only opens the Shapes panel (it no longer arms or puts in a rectangle, in a stamp's tab either)
+  if (k === 'motif' && !page.__wbMotifPicked) {
+    await pickShape(page); page.__wbMotifPicked = true;
+    if ((await page.evaluate(() => window.__wbTest.unlockedStamp())) != null) {   // in a stamp's tab the pick is a ghost on the pointer: one click puts it in, V puts it away
+      const b = await page.locator('#art').boundingBox();
+      await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 3 }); await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); await settle(page);
+      await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur()); await page.keyboard.press('v'); await settle(page);
+      return;
+    }
+  }   // later Adds use the shape picked here
   await placeArmed(page, k);
 }
 async function placeArmed(page, k) {
@@ -306,4 +331,4 @@ async function stampMenu(page, item, n = 0) {
   await t.click({ button: 'right' });
   await page.locator('.rowm').getByRole('menuitem', { name: item, exact: true }).click();
 }
-module.exports = { stampMenu, addKind, placeArmed, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, rzSet, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };
+module.exports = { armRect, stampTabRect, stampMenu, addKind, placeArmed, closeAllPanels, addStampText, addPattern, fitView, patSource, addShape, armStamp, noPattern, rzSet, addStamp, ROOT, TARGET, APP_URL, openApp, settle, getState, stateText, svgSummary, openProjectFile, openPanel, checkpoint, showPanel, unlockStamp, pickShape, canvasToClient, stampInstance, clickStamp };

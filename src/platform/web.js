@@ -26,7 +26,13 @@ const blobs = {
 };
 const canSave = () => typeof /** @type {any} */ (window).showSaveFilePicker === 'function';
 const canOpen = () => typeof /** @type {any} */ (window).showOpenFilePicker === 'function';
-const picker = (name, type) => (type ? [{ accept: { [type]: ['.' + name.split('.').pop()] } }] : undefined);
+// The Save dialog's "Save as type" list. Without a type the browser labels the one choice "file", so the type is read from the file name when the caller gave none (2.84.2).
+const KINDS = { png: ['image/png', 'PNG image'], jpg: ['image/jpeg', 'JPEG image'], jpeg: ['image/jpeg', 'JPEG image'], webp: ['image/webp', 'WebP image'], svg: ['image/svg+xml', 'SVG image'], pdf: ['application/pdf', 'PDF document'], tif: ['image/tiff', 'TIFF image'], tiff: ['image/tiff', 'TIFF image'], zip: ['application/zip', 'ZIP archive'], wodblok: ['application/vnd.wodblok+zip', 'WODBLOK project'], json: ['application/json', 'JSON file'] };
+const picker = (name, type) => {
+  const ext = (name.includes('.') ? name.split('.').pop() : '').toLowerCase(), k = KINDS[ext];
+  if (type) return [{ ...(k && k[0] === type ? { description: k[1] } : {}), accept: { [type]: ['.' + ext] } }];
+  return k ? [{ description: k[1], accept: { [k[0]]: ['.' + ext] } }] : undefined;
+};
 // Write a file: into the file the person already chose (opts.handle), else through the Save dialog where the browser has one,
 // else as a download. Returns how it went and the file handle (when there is one) so the next write can go to the same file.
 const write = async (name, data, opts = {}) => {

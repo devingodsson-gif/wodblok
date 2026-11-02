@@ -50,7 +50,7 @@ function sceDown(e){if(e.button!==0)return;let t0=stUnlocked();
  const M0=stMatrix(STP.items[h.i]),sn=sceSnap(M0,h.u,h.v,e);
  if((WBS.txArm||(WBS.brush&&WBS.brush.txt))&&WBX.wbTxStampAt){const[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));WBX.wbTxStampAt(+x.toFixed(1),+y.toFixed(1));return}
  if(WBS.brush&&!WBS.brush.txt){const M=stMatrix(STP.items[h.i]),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0;let r=WBS.brush.r+(flip?th:-th);r=+(((r+540)%360)-180).toFixed(1);
-  const[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));t.items.push(it(WBS.brush.m,+x.toFixed(2),+y.toFixed(2),WBS.brush.s,r));selOne(t.items.length-1);sceFree();store();upd();return}
+  const[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));t.items.push(it(WBS.brush.m,+x.toFixed(2),+y.toFixed(2),WBS.brush.s,r));if(WBX.wbMotifUsed)WBX.wbMotifUsed(WBS.brush.m);selOne(t.items.length-1);sceFree();store();upd();return}
  const hit=sceItemAt(t,h.u,h.v),add=e.shiftKey||e.ctrlKey||e.metaKey;
  if(!hit){if(!add)selOne(-1);SCE.m={x0:e.clientX,y0:e.clientY,add,on:false,ai:h.i,t};sceSel();return}
  const i=hit.i;sceFree();
@@ -131,7 +131,7 @@ function init64(){
  try{new ResizeObserver(sceDraw).observe($('art'))}catch(e){}}
 // Add motif / Add text in a stamp's tab (2.12.0): a shape in the middle of the open stamp, selected
 WBX.wbStampMid=()=>{const t=sceOpen();return t?sceWith(t,()=>[+(SW/2).toFixed(2),+(SH/2).toFixed(2)]):null};
-WBX.wbStampAddMotif=(m,s)=>{const t=sceOpen();if(!t||!m)return false;const[x,y]=WBX.wbStampMid();t.items.push(it(m,x,y,s||.8,0));selOne(t.items.length-1);sceFree();store();upd();if(WBX.wbCap)WBX.wbCap();return true};
+WBX.wbStampAddMotif=(m,s)=>{const t=sceOpen();if(!t||!m)return false;if(WBX.wbMotifUsed)WBX.wbMotifUsed(m);const[x,y]=WBX.wbStampMid();t.items.push(it(m,x,y,s||.8,0));selOne(t.items.length-1);sceFree();store();upd();if(WBX.wbCap)WBX.wbCap();return true};
 // a shape dragged from the Shapes panel and let go over an instance of the unlocked stamp is put in the stamp at that point
 function sceDropShape(k,e){const t0=stUnlocked();if(t0==null)return false;const c=scePt(e);if(!c)return false;const h=stampAt(c.x,c.y,t0);if(!h)return false;const t=sceOpen();if(!t)return false;
  const M=stMatrix(STP.items[h.i]),sn=sceSnap(M,h.u,h.v,e),th=Math.atan2(M.b,M.a)*180/Math.PI,flip=M.a*M.d-M.b*M.c<0,r=+(((( flip?th:-th)+540)%360)-180).toFixed(1),[x,y]=sceWith(t,()=>wrapP(sn.x,sn.y));

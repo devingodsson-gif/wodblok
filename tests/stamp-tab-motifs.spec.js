@@ -1,7 +1,7 @@
 // 2.15.0: a stamp's tab works on its own, with no Pattern anywhere in the project: Add motif makes a motif you can move, a library motif is a ghost on the pointer
 // and a click puts it in the stamp.
 const { test, expect } = require('@playwright/test');
-const { openApp, showPanel, settle, getState, addKind } = require('./helpers/harness');
+const { openApp, showPanel, settle, getState, addKind, stampTabRect } = require('./helpers/harness');
 
 const items = async page => JSON.parse(await getState(page)).tiles[0].items.map(q => ({ m: q.m, x: q.x, y: q.y }));
 async function newStampTab(page) {
@@ -10,8 +10,8 @@ async function newStampTab(page) {
   await page.click('#smkedit'); await settle(page);
   await showPanel(page, 'motifs');
 }
-// 2.76.8: in a stamp's tab Add motif puts the last shape (else a rectangle) in at once; it no longer opens the library first
-const addMotifHere = async page => { await page.click('.elk[data-k="motif"] [data-add]'); await settle(page); };
+// 2.84.2: in a stamp's tab the Shape button repeats the last shape used (the first time it only opens the Shapes panel); stampTabRect picks a Rectangle and puts one in
+const addMotifHere = async page => { await stampTabRect(page); };   // 2.84.2: the Shape button only opens the panel in a stamp's tab
 
 test('in a stamp tab of an empty project, Add motif makes a motif that can be dragged', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4, pattern: false });
