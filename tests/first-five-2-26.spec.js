@@ -4,7 +4,7 @@ const H = require('./helpers/harness');
 const st = async page => JSON.parse(await H.getState(page));
 const els = async (page, k) => (await st(page)).els.filter(q => q.k === k);
 
-for (const k of ['pattern', 'stamp']) {
+for (const k of ['stamp']) {   // 2.84.2: the Pattern bar button only opens the panel and its Add adds at once (add-pattern-at-once-2-84-2)
   test(`the ${k} bar button arms its tool at once: one click on the bar, one click on the canvas, one ${k}`, async ({ page }) => {
     const { errors } = await H.openApp(page, { seed: 4 });
     await H.noPattern(page);
@@ -43,7 +43,7 @@ test('the Text bar button arms text at once; V takes the tool away (2.54.0: ther
   expect(errors).toEqual([]);
 });
 
-test('Add motif with nothing chosen arms a rectangle (2.76.8); a pick arms that; the next Add motif uses that pick', async ({ page }) => {
+test('Add motif with nothing chosen only opens the library (2.84.2); a pick arms that; the next Add motif uses that pick', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4 });
   await H.noPattern(page);
   await page.click('#elb [data-k="motif"]'); await H.settle(page);
@@ -51,17 +51,17 @@ test('Add motif with nothing chosen arms a rectangle (2.76.8); a pick arms that;
   await expect(page.locator('#lib')).toBeVisible();
   const b = await page.locator('#art').boundingBox();
   await page.mouse.click(b.x + b.width * 0.5, b.y + b.height * 0.5); await H.settle(page);
-  expect((await els(page, 'motif')).length, 'nothing was chosen, so a rectangle is placed (2.26.0 placed nothing)').toBe(1);
+  expect((await els(page, 'motif')).length, 'nothing was chosen, so nothing is placed (2.84.2, as in 2.26.0)').toBe(0);
   await page.click('#elb [data-k="motif"]'); await H.pickShape(page);
   await page.mouse.click(b.x + b.width * 0.3, b.y + b.height * 0.3); await H.settle(page);
-  const m = (await els(page, 'motif'))[1];
+  const m = (await els(page, 'motif'))[0];
   expect(m, 'the picked shape is placed').toBeTruthy();
   await page.keyboard.press('v'); await H.settle(page);
   await page.click('#elb [data-k="motif"]'); await H.settle(page);
   await page.mouse.click(b.x + b.width * 0.7, b.y + b.height * 0.7); await H.settle(page);
   const all = await els(page, 'motif');
-  expect(all.length).toBe(3);
-  expect(all[2].m, 'the same shape').toBe(m.m);
+  expect(all.length).toBe(2);
+  expect(all[1].m, 'the same shape').toBe(m.m);
   expect(errors).toEqual([]);
 });
 

@@ -12,8 +12,8 @@ Status: **proposed, not started.** Mark each item when it ships. The owner answe
 - [x] **T5. Save as PNG defaults to the wrong file type.** "Files need to save as their stated format or .png, by default when you press save as PNG the default file format selected is 'file'." The file type in the save dialog must follow the chosen format (PNG saves as .png, and so on).
 
 ## Patch 2, 2.84.3: moving around the canvas
-- [ ] **T6. Middle mouse button drags the view.** "Middle click should drag the view."
-- [ ] **T7. Scroll the view when not zoomed in.** "I should be able to scroll if I'm not zoomed in."
+- [x] **T6. Middle mouse button drags the view.** "Middle click should drag the view."
+- [x] **T7. Scroll the view when not zoomed in.** "I should be able to scroll if I'm not zoomed in."
 
 ## Patch 3, 2.84.4: the stamp tab
 - [ ] **T8. The alignment grid works in a stamp's tab.** "Alignment grid needs to work on stamp tab."
