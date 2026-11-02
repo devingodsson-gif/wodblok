@@ -84,6 +84,7 @@ document.addEventListener('paste',e=>{if(!stEdit()||!mclip||typingIn(e.target))r
 $('sfr').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...rest,...mv);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
 $('ssb').onclick=()=>{if(!Q())return;const a=(WBS.tiles[WBS.cur]||WBS.noTile).items,pq=Q(),mv=QS(),rest=a.filter(o=>!mv.includes(o));a.length=0;a.push(...mv,...rest);WBS.msel=new Set(mv.map(o=>a.indexOf(o)));WBS.sel=a.indexOf(pq);store();upd()};
 $('sym').onclick=e=>{const b=e.target.closest('[data-y]');if(!b)return;const t=WBS.tiles[WBS.cur],d=SYM.find(x=>x[0]==b.dataset.y);t.sym={m:d[0],n:d[2]?(t.sym&&t.sym.m==d[0]?t.sym.n:d[4]):0,...(t.sym&&t.sym.tx?{tx:1}:{})};store();upd()};
+$('symz').onchange=()=>{const t=WBS.tiles[WBS.cur];t.sym={...(t.sym||{m:'off'})};if($('symz').checked)delete t.sym.zc;else t.sym.zc=1;WBS.symKey='';store();upd();if(WBX.wbCap)WBX.wbCap()};   // 2.84.4: off cuts each piece at its symmetry zone
 $('symtx').onchange=()=>{const t=WBS.tiles[WBS.cur];t.sym={...(t.sym||{m:'off'})};if($('symtx').checked)t.sym.tx=1;else delete t.sym.tx;WBS.symKey='';store();upd();if(WBX.wbCap)WBX.wbCap()};
 $('sn').oninput=e=>{const t=WBS.tiles[WBS.cur];if(t.sym){t.sym.n=+e.target.value;store();upd()}};
 $('sbk').onclick=()=>{const t=WBS.tiles[WBS.cur];if(symOf(t).m=='off')return;t.items=expand(t).map(e=>({...e[0]}));t.sym={m:'off',n:0};selOne(-1);store();upd()};

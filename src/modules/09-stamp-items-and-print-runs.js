@@ -37,7 +37,7 @@ function inkRuns(t){const a=t.items;if(t.neg||!a.some(q=>q.ic||(!q.k&&(q.fl=='im
  const runs=[];seq.forEach(x=>{const l=runs[runs.length-1];if(l&&l.c===x.c&&!x.c.startsWith('#img'))l.ks.push(x);else runs.push({c:x.c,ks:[x]})});
  runs.forEach(r=>{const set=new Set(r.ks.map(x=>x.k)),end=Math.max(...r.ks.map(x=>x.i));r.img=r.c.startsWith('#img');if(r.img)r.c='';r.sel=k=>set.has(k)||(typeof k=='number'&&!!a[k].k&&k>end)});return runs}
 // cl: {c: ink, d: cut} colours; pic: paint the pictures of the selected motifs (a picture run); sel(k): only these parts (see inkRuns)
-function items(t,cl,ed,e,sel){let o='';expand(t).forEach(([q,i,c])=>{const lk=lookOf(q),pb=!sel||sel(i),po=lk&&+q.sw>0&&(!sel||sel('o'+i));if(cl.pic?!(lk&&q.fl=='img'&&pb):!(pb||po))return;
+function items(t,cl,ed,e,sel){let o='';expand(t).forEach(([q,i,c,z])=>{const o0=o.length;const lk=lookOf(q),pb=!sel||sel(i),po=lk&&+q.sw>0&&(!sel||sel('o'+i));if(cl.pic?!(lk&&q.fl=='img'&&pb):!(pb||po))return;
 const SX=q.sx||1,SY=q.sy||1,r=70*q.s*Math.max(SX,SY)+(+q.sw||0),own=ed&&q.ic&&!t.neg&&!q.k?col(q.ic):cl.c,m0=lk?null:q.k?mk(q.m,cl.d,cl.c):mk(q.m,own,cl.d);
 for(const[dx,dy]of(t.wr===false?[[0,0]]:OFFS)){const x=q.x+dx,y=q.y+dy;if(x+r<-e||x-r>SW+e||y+r<-e||y-r>SH+e)continue;
 if(lk){const w=100*q.s*SX,h=100*q.s*SY,id='kl'+(clipN++),pic=pb&&q.fl=='img'?(cl.pic||ed?mtPic(q):null):null,
@@ -45,7 +45,8 @@ if(lk){const w=100*q.s*SX,h=100*q.s*SY,id='kl'+(clipN++),pic=pb&&q.fl=='img'?(cl
  let m=D.defs+D.body;if(q.cl&&q.cl.length){const kx=(w/100).toFixed(4),ky=(h/100).toFixed(4);m=`<g transform="scale(${kx} ${ky})">${clipWrap(q,`<g transform="scale(${(100/w).toFixed(5)} ${(100/h).toFixed(5)})">${m}</g>`)}</g>`}
  o+=`<g${ed?` data-i="${i}" data-c="${c}"`:''} transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${q.r}) scale(${q.f||1} 1)">${m}${ed?`<g opacity="0" transform="scale(${(w/100).toFixed(4)} ${(h/100).toFixed(4)})">${mk(q.m,'#000','#000')}</g>`:''}</g>`;continue}
 const m=clipWrap(q,q.k?(thick(q,cl.c,cl.d)||m0):solid(q,own,ed));
-o+=`<g${ed?` data-i="${i}" data-c="${c}"`:''} transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${q.r}) scale(${+(q.s*q.f*SX).toFixed(4)} ${+(q.s*SY).toFixed(4)})">${m}</g>`}});return o}
+o+=`<g${ed?` data-i="${i}" data-c="${c}"`:''} transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${q.r}) scale(${+(q.s*q.f*SX).toFixed(4)} ${+(q.s*SY).toFixed(4)})">${m}</g>`}
+ if(z&&o.length>o0){const id='kz'+(clipN++);o=o.slice(0,o0)+`<clipPath id="${id}"><polygon points="${z}"/></clipPath><g clip-path="url(#${id})">${o.slice(o0)}</g>`}});return o}   // 2.84.4: a piece cut at its symmetry zone (07-symmetry.js)
 function draw(){if(texNorm())buildTex();useT(WBS.tiles[WBS.cur]);if(!WBS.layers.length)WBS.layers=[mkL('Layer 1',WBS.tiles.map(t=>t.id),'check',180)];if(WBS.selL<0||WBS.selL>=WBS.layers.length)WBS.selL=WBS.layers.length-1;trayGuard();WBS.tiles.forEach(t=>{if(t.ink&&!okC(t.ink))delete t.ink});sync();const t=WBS.tiles[WBS.cur]||WBS.noTile,cl=cols(t);selFix();const q=t.items[WBS.sel];
 if(WBS.split&&(WBS.split.i!=WBS.sel||!stTxMode()||!q))WBS.split=null;$('spbar').hidden=!WBS.split;
 renderSym(t);

@@ -63,3 +63,28 @@ test('a shape picked on its symmetry copy shows its box and handles on that copy
   expect(await boxX(page), 'picked on the original, the box is on the original').toBeLessThan(b.x + b.width / 2);
   expect(errors).toEqual([]);
 });
+
+// T13
+test('symmetry: Wrap at the zone edges on carries a shape past its zone into the next one; off cuts it at the zone edge', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  const sid = await newStampTab(page);
+  await H.stampTabRect(page);
+  // Repeat ↔ in two: a 80-wide shape at x 100 runs 20 past its half (the zone edge at 120)
+  await page.evaluate(sid => { const d = JSON.parse(window.__wbTest.state()), t = d.tiles.find(x => x.id === sid); Object.assign(t.items[0], { x: 100, y: 120, s: 0.8, sx: 1, sy: 1, r: 0 }); t.sym = { m: 'rx', n: 2 }; return window.__wbTest.apply(JSON.stringify(d)); }, sid);
+  await H.settle(page);
+  await page.mouse.click(10, 10); await page.keyboard.press('Escape'); await H.settle(page);   // nothing selected, so no box over the spot
+  await H.showPanel(page, 'stmp');
+  await expect(page.locator('#symzr')).toBeVisible();
+  await expect(page.locator('#symz')).toBeChecked();
+  const px = async () => { const b = await page.locator('#art').boundingBox(), buf = await page.screenshot({ clip: { x: b.x + b.width * 130 / 240 - 2, y: b.y + b.height * 120 / 240 - 2, width: 4, height: 4 } });
+    return page.evaluate(async s => { const im = await createImageBitmap(await (await fetch('data:image/png;base64,' + s)).blob()), c = new OffscreenCanvas(im.width, im.height), g = c.getContext('2d'); g.drawImage(im, 0, 0); const d = g.getImageData(1, 1, 1, 1).data; return [d[0], d[1], d[2]]; }, buf.toString('base64')); };
+  const ink = await px(page);
+  await page.locator('#symzr').click(); await H.settle(page);
+  expect((await page.evaluate(sid => JSON.parse(window.__wbTest.state()).tiles.find(x => x.id === sid).sym, sid)).zc).toBe(1);
+  const cut = await px(page);
+  const diff = Math.abs(ink[0] - cut[0]) + Math.abs(ink[1] - cut[1]) + Math.abs(ink[2] - cut[2]);
+  expect(diff, `past the zone edge: ${ink} with wrap, ${cut} cut off`).toBeGreaterThan(60);
+  await page.locator('#symzr').click(); await H.settle(page);
+  expect((await page.evaluate(sid => JSON.parse(window.__wbTest.state()).tiles.find(x => x.id === sid).sym, sid)).zc).toBeUndefined();
+  expect(errors).toEqual([]);
+});
