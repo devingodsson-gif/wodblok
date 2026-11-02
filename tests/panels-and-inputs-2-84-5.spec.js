@@ -91,3 +91,29 @@ test('a gradient takes more colours: Add colour puts a third and a fourth betwee
   await expect(page.locator('#mf_gm')).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+// T18
+const pngBytes = () => Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAJklEQVR4nGNkYPj/n4EIwESMIpoqZEESYGRiYGBgYmBgYGBgYGAAAEReAQb0P+VDAAAAAElFTkSuQmCC', 'base64').toString('base64');
+const pasteEvt = (page, withImage) => page.evaluate(([withImage, b64]) => {
+  const dt = new DataTransfer();
+  if (withImage) { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); dt.items.add(new File([u], 'copied.png', { type: 'image/png' })); }
+  document.body.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+}, [withImage, pngBytes()]);
+
+test('a picture pasted with Ctrl+V opens the shape importer, even after elements were copied; with no picture, Paste puts the copied elements back', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, pattern: false });
+  await H.addShape(page); await H.settle(page);
+  const n0 = (await st(page)).els.length;
+  await page.evaluate(() => document.activeElement && document.activeElement.blur());
+  await page.keyboard.press('Control+C'); await H.settle(page);
+  // a picture on the clipboard: the importer, not the copied shape
+  await pasteEvt(page, true); await H.settle(page);
+  await expect(page.locator('#idlg')).toBeVisible();
+  expect((await st(page)).els.length, 'the copied shape was not pasted').toBe(n0);
+  await page.click('#icl'); await H.settle(page);
+  // no picture: the copied elements
+  await pasteEvt(page, false); await H.settle(page);
+  expect((await st(page)).els.length).toBe(n0 + 1);
+  await expect(page.locator('#idlg')).toBeHidden();
+  expect(errors).toEqual([]);
+});

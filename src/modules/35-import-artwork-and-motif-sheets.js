@@ -29,6 +29,10 @@ document.addEventListener('dragover',e=>{if([...(e.dataTransfer&&e.dataTransfer.
 document.addEventListener('dragleave',e=>{if(!e.relatedTarget)document.body.classList.remove('dropping')});
 document.addEventListener('drop',e=>{document.body.classList.remove('dropping');const f=[...(e.dataTransfer&&e.dataTransfer.files||[])].find(f=>/^image\//.test(f.type));if(f){e.preventDefault();loadFile(f,null,'one',stUnlocked()!=null)}});
 document.addEventListener('paste',e=>{if(e.target.matches&&e.target.matches('input,textarea'))return;const it=[...(e.clipboardData&&e.clipboardData.items||[])].find(i=>/^image\//.test(i.type));if(it){e.preventDefault();loadFile(it.getAsFile(),'Pasted image','one')}});
+// 2.84.5: File > Paste image as shape reads a picture from the clipboard into the importer (Ctrl+V does the same through the paste event above)
+{const b=$('pimpaste');if(b)b.onclick=async()=>{let items=null;try{items=await clipboard.read()}catch(e){pm('Could not read the clipboard. Allow clipboard access and try again.');return}
+ for(const c of items||[]){const ty=(c.types||[]).find(x=>/^image\//.test(x));if(ty){const bl=await c.getType(ty);loadFile(new File([bl],'Pasted image',{type:ty}),'Pasted image','one');return}}
+ pm('There is no picture on the clipboard.')}}
 // auto: with a stamp unlocked a dropped picture becomes a shape at once (traced with the usual settings, placed on the stamp); if no ink is found the window stays open
 function loadFile(f,nm,m,auto){if(f.type&&!/^image\//.test(f.type))return say2('That file is not an image. Use a PNG, JPG or WebP.');
 const url=URL.createObjectURL(f),img=new Image();img.onload=()=>{URL.revokeObjectURL(url);openImg(img,(nm||f.name||'').replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' '),m);if(auto&&last&&!$('iadd').disabled)addOne()};
