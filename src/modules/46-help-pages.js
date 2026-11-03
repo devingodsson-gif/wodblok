@@ -28,7 +28,7 @@ const HELP_PAGES=[
  ['patterns','Patterns',[
   ['p','A Pattern repeats its sources (stamps or shapes) over the canvas or over an area of it.'],
   ['h','Arrangements'],
-  ['ul',['Tiling, Radial, Scatter, Spiral and Frame, each with its own settings: size, spacing, columns and rows, rotation and shifts.','Edges decides what happens at the border: cut at the edge or whole pieces only.','Cycle, Random or Weighted picks which source goes where; Reroll draws again.']],
+  ['ul',['Tiling, Radial, Scatter, Spiral and Frame, each with its own settings: size, spacing, columns and rows, rotation and shifts.','Edges decides what happens at the border: cut at the edge or whole pieces only.','The dice beside Tile shape picks a random tile shape and arrangement together.','Cycle, Random or Weighted picks which source goes where; Reroll draws again.']],
   ['h','Pieces and colour'],
   ['ul',['The Sources group at the top of the Pattern panel lists what the pattern prints. Add source adds one of the project\u2019s stamps, texts or other patterns, or a shape from the library.','Accent places a different source at chosen places.','Colour of each piece can follow the source or the place; ink variation and overprint make it look printed.','Edit pieces lets you pick one piece to recolour, turn, delete or make an element of its own.']],
   ['h','Repeats'],
@@ -50,6 +50,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.89.0','Nov 3 2026',['A dice beside the Pattern panel\u2019s Tile shape picks a random tile shape and arrangement in one click.']],
  ['2.88.1','Nov 3 2026',['A book cover\u2019s units, rulers, separations, CMYK and print files use the cover\u2019s real size.']],
  ['2.88.0','Nov 3 2026',['Real units, rulers and guides, Alt-drag, Help, colour output and print files, panel layouts, blend modes and working undo: the pro basics update is complete.']],
  ['2.87.12','Nov 3 2026',['Default layout in the Layout panel puts the built-in layout back; your saved one is kept for Reset layout.']],

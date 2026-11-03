@@ -222,6 +222,11 @@ $('peov').addEventListener('change',()=>{const p=patCur();if(!p)return;if($('peo
 $('peds').onclick=e=>{const b=e.target.closest('[data-d]');if(b)set('ds',b.dataset.d)};
 $('pets').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$('pets').value;if((p.ts||'auto')!==v){p.ts=v;delete p.ar;patCh()}});
 $('pear').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$('pear').value;if(p.ar!==v){p.ar=v;patCh()}});
+// 2.89.0 (owner Nov 3 2026: "a randomize icon next to the pattern type/arrangement that just picks random pattern type and arrangement. One icon for both"): a tile
+// shape (not From stamp, which follows the stamp) and one of its arrangements, never the pair showing now; one History step
+function patRandTiling(){const p=patCur();if(!p||p.lay!='tile')return;const cur=(p.ts||'auto')+'|'+tlArr(p),all=[];TL_TS.forEach(([ts])=>{if(ts=='auto'||!TL_AR[ts])return;TL_AR[ts].forEach(([ar])=>{if(ts+'|'+ar!==cur)all.push([ts,ar])})});
+ if(!all.length)return;const[ts,ar]=all[Math.floor(Math.random()*all.length)];p.ts=ts;p.ar=ar;WBX.wbLabelNext={t:'Random tiling',at:performance.now()};patCh()}
+$('petrn').onclick=patRandTiling;
 // 2.78.4 (bug test B2): a pattern holds at most PAT_MAX pieces. Size at 1% with no spacing made about 15,000 (6 MB of drawing, seconds a change); a slider that would take it
 // past the limit, and past what it had, stops at the last step under it, so it shows the real value. A pattern already past it (an older file) can always go back down.
 const PAT_MAX=3000,patN=p=>{try{return(patPts(p).pts||[]).length}catch(e){return 0}};
