@@ -22,15 +22,16 @@ const MNB=[
  ['elements','Elements',['panel.lyrs','-',mnbAdds,'element.makePattern','-','stamp.new','stamp.duplicate','stamp.delete','stamp.saveToLibrary','library.importStamp','-','library.importImage','library.importSheet','library.newFolder','-','stamp.split','stamp.knockout']],
  ['effects','Effects',[mnbFx,'-','randomize.roll','panel.rand']],
  ['colour','Colour',['panel.colors','tray.add','tray.save','-','colourway.new','colourway.exportAll']],
- ['view','View',['view.zoomIn','view.zoomOut','view.fit','view.actualSize','view.hand','-','view.grid','view.smartGuides','-','view.before','view.split','view.tileRepeat','-','view.theme']],
+ ['view','View',['view.zoomIn','view.zoomOut','view.fit','view.actualSize','view.hand','-','view.grid','view.smartGuides','-','view.rulers','view.guides','view.lockGuides','view.clearGuides','view.newGuide','-','view.before','view.split','view.tileRepeat','-','view.theme']],
  ['window','Window',['panel.canvas','panel.colors','panel.lyrs','panel.layers','panel.stmp','panel.motifs','panel.text','panel.image','panel.sheet','panel.pgrid','panel.hist','panel.rand','panel.xrec','-','panels.closeAll']],   // 2.76.11: Image and Sheet too
  ['help','Help',['help.shortcuts','app.commandSearch','feedback.open','-','help.about']]];
 // commands that open a dialog or a file picker: their menu item ends with … (section 13.2)
-const MNB_DOTS=new Set(['file.export','library.importStamp','library.importImage','library.importSheet','app.commandSearch','feedback.open','help.shortcuts','help.about']);
+const MNB_DOTS=new Set(['view.newGuide','file.export','library.importStamp','library.importImage','library.importSheet','app.commandSearch','feedback.open','help.shortcuts','help.about']);
 const mnbMac=()=>/Mac|iPhone|iPad/.test(navigator.platform||'');
 const mnbEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // an on/off command is ticked while its button is pressed or its switch is on
-function mnbOn(c){const b=c&&c.elId?$(c.elId):null;if(!b)return null;if(b.type=='checkbox')return b.checked;const p=b.getAttribute('aria-pressed');return p==null?null:p==='true'}
+function mnbOn(c){if(c&&typeof c.on=='function')return !!c.on();   /* 2.87.2: a command with no button says itself whether it is on (Rulers, Guides) */
+ const b=c&&c.elId?$(c.elId):null;if(!b)return null;if(b.type=='checkbox')return b.checked;const p=b.getAttribute('aria-pressed');return p==null?null:p==='true'}
 const mnbList=es=>es.flatMap(e=>typeof e=='function'?e():[e]);
 // one menu's items. Unknown commands (an account command while signed out) are left out, and so are dividers left at an edge or doubled
 function mnbHtml(es){const rows=[];mnbList(es).forEach((e,i)=>{

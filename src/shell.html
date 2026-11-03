@@ -414,7 +414,19 @@ select,input[type=text],input[type=number],input.unf{background:var(--field);bor
 select:hover,input[type=text]:hover,input[type=number]:hover,input.unf:hover{border-color:var(--line2)}
 select:focus,input[type=text]:focus,input[type=number]:focus,input.unf:focus{border-color:var(--acc);outline:none}
 select{appearance:none;-webkit-appearance:none;padding-right:26px;background-image:linear-gradient(45deg,transparent 50%,var(--mut) 50%),linear-gradient(135deg,var(--mut) 50%,transparent 50%);background-position:calc(100% - 13px) 13px,calc(100% - 9px) 13px;background-size:4px 4px;background-repeat:no-repeat}
-input[type=number]{-moz-appearance:textfield;text-align:right;font-variant-numeric:tabular-nums;padding:4px 6px}input.unf{text-align:right;font-variant-numeric:tabular-nums;padding:4px 6px;color:var(--fg);font-size:var(--fs-m)}input.unf.bad{border-color:var(--warn)}.unr .unu{min-width:2em}
+input[type=number]{-moz-appearance:textfield;text-align:right;font-variant-numeric:tabular-nums;padding:4px 6px}input.unf{text-align:right;font-variant-numeric:tabular-nums;padding:4px 6px;color:var(--fg);font-size:var(--fs-m)}input.unf.bad{border-color:var(--warn)}
+/* 2.87.2: rulers and guides over the board (99-rulers.js); a stage overlay (z 40), the rulers --h-xs thick */
+#rul{position:absolute;z-index:40;pointer-events:none;overflow:hidden}#rul[hidden]{display:none}
+#rux,#ruy,#ruc{position:absolute;display:none;background:var(--panel);color:var(--mut);border:0 solid var(--line2);font-size:var(--fs-s);pointer-events:auto}
+#rul.rulon #rux,#rul.rulon #ruy,#rul.rulon #ruc{display:block}
+#rux{left:var(--h-xs);top:0;right:0;height:var(--h-xs);border-bottom-width:1px;cursor:ns-resize}#ruy{left:0;top:var(--h-xs);bottom:0;width:var(--h-xs);border-right-width:1px;cursor:ew-resize}
+#ruc{left:0;top:0;width:var(--h-xs);height:var(--h-xs);border-right-width:1px;border-bottom-width:1px;pointer-events:none}
+#rug{position:absolute;inset:0}.rgd{position:absolute;left:0;top:0;pointer-events:auto;touch-action:none}
+.rgd::after{content:"";position:absolute;background:var(--hl)}
+.rgd.rgv{width:7px;height:100%;margin-left:-3px;cursor:ew-resize}.rgd.rgv::after{left:3px;top:0;bottom:0;width:1px}
+.rgd.rgh{height:7px;width:100%;margin-top:-3px;cursor:ns-resize}.rgd.rgh::after{top:3px;left:0;right:0;height:1px}
+#rul.rulk .rgd{pointer-events:none}
+#rngd .dlg{width:min(380px,calc(100vw - 32px))}#rngd .dlg-b{padding:var(--sp-5)}.unr .unu{min-width:2em}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .board.off{position:absolute;left:-20000px;top:0;width:40px;height:40px;overflow:hidden;pointer-events:none;flex:none}
 .tpd{width:min(820px,100%);height:min(560px,100%)}.tpd .dlg-b{flex:1;min-height:0;overflow-y:auto}.tpd .seg{margin-bottom:6px}.tpnav{position:static}   /* 2.79.1: a fixed height (as Settings), so the card size slider changes the cards and not the window */
@@ -938,6 +950,7 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
   </div>
  </div>
  <div class="board" id="boardP"><div id="artwrap"><svg id="artsh" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"></svg><svg id="art" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><defs id="grdf"></defs><defs id="cvdefs"></defs><defs id="surfd"></defs><defs id="txd"></defs><defs id="stdefs"></defs><defs id="stpix"></defs><g id="dyn"></g><g id="texg"></g><g id="guig" pointer-events="none"></g><g id="fpgrid" pointer-events="none"></g><g id="fpov" pointer-events="none"></g><g id="gmov"></g></svg><svg id="stolsvg" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><g id="stol" class="stol" pointer-events="none"></g><g id="stoh" class="stoh"></g></svg></div></div>
+ <div id="rul" hidden><div id="rug"></div><canvas id="rux" aria-hidden="true"></canvas><canvas id="ruy" aria-hidden="true"></canvas><div id="ruc"></div></div>
  <div class="spbar" id="spbar" hidden><span>Drag the line to place it. Drag the round end to turn it (Shift snaps to 15&#176;).</span><button class="alt" id="spno">Cancel</button><button class="pri" id="spok">Split</button></div>
 
 </main>
@@ -1505,6 +1518,11 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
 <div class="modal" id="nwd" hidden><div class="dlg tpsd" role="dialog" aria-modal="true" aria-labelledby="nwdt">
  <div class="dlg-h"><h2 id="nwdt">Save changes first?</h2><button class="ib" id="nwdx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-f ifoot"><button type="button" class="alt" id="nwdcx">Cancel</button><button type="button" class="alt" id="nwdno">Don’t save</button><button type="button" class="primary" id="nwdok">Save</button></div>
+</div></div>
+<div class="modal" id="rngd" hidden><div class="dlg tpsd" role="dialog" aria-modal="true" aria-labelledby="rngt">
+ <div class="dlg-h"><h2 id="rngt">New guide</h2><button class="ib" id="rngx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
+ <div class="dlg-b"><div class="seg" role="group" aria-label="Direction" style="--n:2"><button type="button" id="rngh" aria-pressed="true" class="on">Horizontal</button><button type="button" id="rngv" aria-pressed="false">Vertical</button></div><div class="aspc unr">Position <input type="text" class="unf" id="rngp" inputmode="decimal" autocomplete="off" aria-label="Position"> <span class="unu" id="rngu"></span></div></div>
+ <div class="dlg-f ifoot"><button type="button" class="alt" id="rngcx">Cancel</button><button type="button" class="primary" id="rngok">Add</button></div>
 </div></div>
 <div class="modal" id="tpsd" hidden><div class="dlg tpsd" role="dialog" aria-modal="true" aria-labelledby="tpst">
  <div class="dlg-h"><h2 id="tpst">Save as template</h2><button class="ib" id="tpsx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
