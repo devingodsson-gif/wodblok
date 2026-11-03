@@ -41,7 +41,7 @@ function ruTicks(cv,horiz,M,b,u){const dpr=window.devicePixelRatio||1,len=horiz?
 function ruDraw(){ruSt.raf=0;const R=$('rul'),bd=$('boardP');if(!R||!bd)return;const stp=ruStamp(),off=bd.classList.contains('off');
  const g=ruGd(),show=!stp&&!off&&(ruSt.on||(ruSt.sh&&(g.x.length||g.y.length)));R.hidden=!show;if(!show){ruSt.key='';$('rug').textContent='';return}
  const b=bd.getBoundingClientRect(),st=R.offsetParent?R.offsetParent.getBoundingClientRect():{left:0,top:0},M=ruMap();if(!M)return;
- const bw=bd.clientWidth,bh=bd.clientHeight,u=unGet(),key=[b.left,b.top,bw,bh,M.kx,M.ky,M.ax,M.ay,u,ruSt.on,ruSt.sh,ruSt.lk,JSON.stringify(g),ruSt.drag?ruSt.drag.ax+ruSt.drag.i+':'+ruSt.drag.v:'',document.documentElement.className,document.documentElement.dataset.theme||'',document.body.className].join('|');
+ const bw=bd.clientWidth,bh=bd.clientHeight,u=unGet(),key=[b.left,b.top,bw,bh,M.kx,M.ky,M.ax,M.ay,u,unTo(1,u),ruSt.on,ruSt.sh,ruSt.lk,JSON.stringify(g),ruSt.drag?ruSt.drag.ax+ruSt.drag.i+':'+ruSt.drag.v:'',document.documentElement.className,document.documentElement.dataset.theme||'',document.body.className].join('|');
  if(key===ruSt.key)return;ruSt.key=key;
  Object.assign(R.style,{left:(b.left-st.left)+'px',top:(b.top-st.top)+'px',width:bw+'px',height:bh+'px'});
  R.classList.toggle('rulon',ruSt.on);R.classList.toggle('rulk',ruSt.lk);
