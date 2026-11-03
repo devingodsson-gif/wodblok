@@ -1,5 +1,5 @@
 import {kv,use} from '../platform/index.js';
-import {cmdRegister} from '../commands/registry.js';
+import {cmdGet,cmdIsEnabled,cmdRegister,cmdRun} from '../commands/registry.js';
 import {zlibSync} from '../vendor/fflate.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {tileOn,tileRk} from './04-canvas-and-stamp-outlines.js';
@@ -144,5 +144,16 @@ function init36(){
   const t=e.target.closest('.pvc');if(t){const k={prfk:'crop',prfg2:'reg',prfs:'spots',prfi:'inkCh'}[t.id];if(k){prOpt[k]=!prOpt[k];prPaint()}}});
  $('prfok').onclick=()=>{prHide();prExport({...prOpt})};$('prfcx').onclick=prHide;$('prfx').onclick=prHide;$('prfd').addEventListener('click',e=>{if(e.target===$('prfd'))prHide()});
  $('prfd').addEventListener('keydown',e=>{if(e.key=='Escape'){e.preventDefault();e.stopPropagation();prHide()}});
- cmdRegister({id:'export.printFile',label:'Print file',run:prOpen})}
+ cmdRegister({id:'export.printFile',label:'Print file',run:prOpen});
+ // 2.87.9 (step 9): the Export panel's Print and colour group runs the same commands; its line says the bleed and the spot inks, its tick is Proof colours
+ [['xpfile','export.printFile'],['xpsep','export.separations'],['xpcmt','export.cmykTiff'],['xpcmp','export.cmykPdf']].forEach(([id,c])=>{const b=$(id);if(b)b.onclick=()=>cmdRun(c)});
+ {const t=$('xpprf');if(t)t.addEventListener('change',()=>{const c=cmdGet('view.proof');if(c&&!!c.on()!==t.checked)cmdRun('view.proof')})}
+ const d1=WBH.draw;WBH.draw=function(){const r=d1.apply(this,arguments);prPanelSync();return r};prPanelSync();
+ {const sec=document.querySelector('section.pn[data-p="xrec"]');if(sec)new MutationObserver(()=>{prPk='';prPanelSync()}).observe(sec,{attributes:true,attributeFilter:['hidden']})}
+ WBX.wbExportSync=()=>{prPk='';prPanelSync()}}
+let prPk='';
+function prPanelSync(){const i=$('xpinfo'),sec=document.querySelector('section.pn[data-p="xrec"]');if(!i||!sec||sec.hidden)return;   /* only while the Export panel shows: nothing on the drawing path otherwise */
+ const bl=prBleedIn(),n=coSpots().filter(id=>coInks().includes(id)).length,c=cmdGet('view.proof'),pr=!!(c&&c.on()),sep=cmdIsEnabled('export.separations'),k=[bl,n,unGet(),pr,sep].join('|');if(k===prPk)return;prPk=k;
+ const parts=[];if(bl>0)parts.push('Bleed '+unFmt(unFrom(bl,'in'))+' '+unGet());if(n)parts.push(n+' spot ink'+(n>1?'s':''));i.textContent=parts.join(' · ');i.hidden=!parts.length;
+ const t=$('xpprf');if(t&&t.checked!==pr)t.checked=pr;const s=$('xpsep');if(s)s.disabled=!sep}
 export {init36};

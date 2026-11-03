@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.87.9 (Nov 3 2026, step 9 of docs/pro-basics-plan.md): the Export panel rearranged
+- **Quick export** at the top (Export now, format and size, then the one-click exports), **Print and colour** in the middle (Print file…, Separations…, CMYK TIFF and PDF, the bleed and spot inks, Proof colours, print proof), **Recipes** at the bottom (with Save recipe).
+- dock-default skips all the undocked panels (Export, Help since 2.87.4, Layout since 2.87.7): it failed on main since 2.87.4 because Help opens floating, as intended.
+- Tests: tests/export-panel-2-87-9.spec.js (new, 2). Run: it and every spec touching the Export panel (24 files, 108 passed after the dock-default fix), check:style. Not run: perf (nothing on the drawing path; the panel's line is only worked out while the panel shows), the full suite (end of the plan).
+
 ## 2.87.8 (Nov 3 2026, step 8 of docs/pro-basics-plan.md): the Pattern panel's sources
 - A **Sources** group at the top of the Pattern panel, with **Add source** as the standard full-width Add button and the source rows under it (they were at the bottom of the Pattern group).
 - Help (Patterns, What's new) updated.

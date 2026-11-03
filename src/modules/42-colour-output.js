@@ -125,7 +125,7 @@ async function coProofDraw(){if(!PRF.on||PRF.busy)return;const g=coProofG(true);
   if(PRF.on&&g.isConnected){g.innerHTML=`<image href="${c.toDataURL('image/png')}" x="0" y="0" width="${CW}" height="${CH}" preserveAspectRatio="none"/>`;PRF.key=coProofKey()}}
  catch(e){}finally{PRF.busy=false}if(PRF.on&&coProofKey()!==PRF.key)coProofSoon()}
 const coProofSoon=()=>{clearTimeout(PRF.t);PRF.t=setTimeout(coProofDraw,350)};
-function coProof(on){PRF.on=on;PRF.key='';if(!on)coProofG(false);if(on)coProofDraw();pmsg(on?'Proof colours on.':'Proof colours off.')}
+function coProof(on){PRF.on=on;PRF.key='';if(WBX.wbExportSync)setTimeout(WBX.wbExportSync,0);if(!on)coProofG(false);if(on)coProofDraw();pmsg(on?'Proof colours on.':'Proof colours off.')}
 function init42(){
  $('sepb').addEventListener('click',e=>{const s=e.target.closest('.seg [data-v]');if(s){const id=s.closest('.seg').id,v=s.dataset.v;if(id=='sepf')coOpt.fmt=v;else if(id=='sepr')coOpt.dpi=+v;else if(id=='sept')coOpt.tint=v;else if(id=='sepl')coOpt.lpi=+v;coDlgPaint();return}
   if(e.target.closest('#sepm')){coOpt.marks=!coOpt.marks;coDlgPaint()}});

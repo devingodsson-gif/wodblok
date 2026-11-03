@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **steps 1 to 3 live (2.87.3); steps 1 to 7 live (2.87.7); step 8 done (2.87.8, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 to 3 live (2.87.3); steps 1 to 7 live (2.87.7); steps 8 and 9 done (2.87.8, 2.87.9, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -108,6 +108,7 @@ Numbering: each step is a patch release on the version that is live when work st
   - The print proof joins this section.
 - **Bottom: Export recipes.** The saved recipes and Export all, moved down from the top.
 - Tests: the groups are in that order; Quick export works from the top with one click; the print options produce the files from steps 5 and 6.
+- **Done in 2.87.9:** the Watermark and Colourways rows stay at the very top (they apply to every export). **Quick export** (was Custom export): Export now first (2.76.4), the format and size, the file name ending, then the one-click exports (PNG, SVG, Copy SVG, PDF, repeat unit, book cover) that were the Quick group. **Print and colour** (`#xpcg`): Print file…, Separations…, CMYK TIFF, CMYK PDF, a line with the bleed and the spot inks, Proof colours, and the print proof (Letter or A4, PDF or PNG). Crop and registration marks are in the Print file dialog. **Recipes**: the recipe list, Export all recipes, and Save recipe, moved down.
 
 ## Step 10: blend modes, with a live preview (owner, Nov 3: "add around 20 of the top blend modes too, and when you hover over them it previews on the canvas")
 - **About 20 modes, grouped as in Photoshop**, with a thin line between the groups:
