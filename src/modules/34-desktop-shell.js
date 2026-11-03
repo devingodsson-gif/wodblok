@@ -35,7 +35,7 @@ const EL_ONLY=['layers','stmp','motifs','image','sheet','text','elpaint'];
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
 const ELP=EL_ONLY,wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
 // undocked panels (2.87.4, owner Nov 3 2026): with no remembered place they open floating in the middle of the window, and dock like any panel
-const WS_UNDOCK=['xrec','help','layout'],WS_USZ={layout:[260,112]};   // 2.87.7: Layout is small
+const WS_UNDOCK=['xrec','help','layout'],WS_USZ={layout:[260,148]};   // 2.87.7: Layout is small
 const MODEP={pattern:['lyrs','layers','stmp','motifs','image','sheet','elpaint','text','pgrid','canvas','colors','rand','hist','xrec','help','layout']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
@@ -257,7 +257,7 @@ function layClean(L){if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))retu
 function laySaved(m){let v=null;try{v=JSON.parse(kv.get(LAY_K[m])||'null')}catch(e){}return v?layClean(v):null}
 const layDefault=m=>laySaved(m)||(m=='stamp'?layStampDef():layCanvasDef());
 // take the Layout panel's group out of the layout shown (to carry it over or leave it out of a save)
-function layPull(L){let G=null;['dock','float'].forEach(k=>{L[k].forEach(g=>{const i=g.tabs.indexOf('layout');if(i<0)return;if(g.tabs.length==1){G=g;return}g.tabs.splice(i,1);if(g.a=='layout')g.a=g.tabs[0];G={id:layId(),tabs:['layout'],a:'layout',f:1,e:g.e,x:g.x,y:g.y,w:260,h:112}});L[k]=L[k].filter(g=>g!==G)});return G}
+function layPull(L){let G=null;['dock','float'].forEach(k=>{L[k].forEach(g=>{const i=g.tabs.indexOf('layout');if(i<0)return;if(g.tabs.length==1){G=g;return}g.tabs.splice(i,1);if(g.a=='layout')g.a=g.tabs[0];G={id:layId(),tabs:['layout'],a:'layout',f:1,e:g.e,x:g.x,y:g.y,w:260,h:148}});L[k]=L[k].filter(g=>g!==G)});return G}
 function layPut(L,G){if(!G)return;if(L.float.includes(G)||L.dock.includes(G))return;(G.x!=null||!L.dock.length?L.float:L.dock).push(G)}
 function laySwitch(m){if(m===layMode||!wsReady||wsNarrow()){layMode=m;return}const cur=WS.pattern,G=layPull(cur);layLive[layMode]=cur;layMode=m;
  const nx=layLive[m]||layDefault(m);delete layLive[m];layPut(nx,G);WS.pattern=nx;wsSave();wsRender()}
@@ -265,10 +265,12 @@ WBX.wbStampDock=on=>laySwitch(on?'stamp':'pattern');
 const layName=()=>layMode=='stamp'?'Stamp tab':'Canvas';
 function laySave(){const c=JSON.parse(JSON.stringify(WS.pattern));layPull(c);try{kv.set(LAY_K[layMode],JSON.stringify(c))}catch(e){}pmsg('Saved the '+layName()+' layout.')}
 function layReset(){const cur=WS.pattern,G=layPull(cur),nx=layDefault(layMode);layPut(nx,G);WS.pattern=nx;wsSave();wsRender();pmsg('Reset the '+layName()+' layout.')}
-WBX.wbLayout={mode:()=>layMode,name:layName,save:laySave,reset:layReset};
-{const n=$('layn'),sv=$('lays'),rs=$('layr'),sync=()=>{if(n&&n.textContent!==layName())n.textContent=layName()};if(sv)sv.onclick=laySave;if(rs)rs.onclick=layReset;
+// 2.87.12 (owner, Nov 3 2026): Default layout puts the mode's built-in layout back; a saved layout is kept, so Reset layout still brings it back
+function layDefaultNow(){const cur=WS.pattern,G=layPull(cur),nx=layMode=='stamp'?layStampDef():layCanvasDef();layPut(nx,G);WS.pattern=nx;wsSave();wsRender();pmsg('Put back the default '+layName()+' layout.')}
+WBX.wbLayout={mode:()=>layMode,name:layName,save:laySave,reset:layReset,def:layDefaultNow};
+{const n=$('layn'),sv=$('lays'),rs=$('layr'),sync=()=>{if(n&&n.textContent!==layName())n.textContent=layName()};if(sv)sv.onclick=laySave;if(rs)rs.onclick=layReset;if($('layd'))$('layd').onclick=layDefaultNow;
  const s0=laySwitch;WBX.wbStampDock=on=>{s0(on?'stamp':'pattern');sync()};sync();
- cmdRegister({id:'layout.save',label:'Save layout',run:laySave});cmdRegister({id:'layout.reset',label:'Reset layout',run:layReset})}
+ cmdRegister({id:'layout.save',label:'Save layout',run:laySave});cmdRegister({id:'layout.reset',label:'Reset layout',run:layReset});cmdRegister({id:'layout.default',label:'Default layout',run:layDefaultNow})}
 WBX.wbApart=pn=>{const a=wsFind('lyrs'),b=wsFind(pn);return!(a&&b&&a===b)};   // false when the panel is a tab beside the Elements list: showing it would hide the list
 // The panels the app opens with (2.9.0: the Workspaces tool is gone; this is the one built-in layout, opened at launch). Read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
 const wsLaunch=()=>({pattern:{dock:[wsG(['canvas','colors'],{e:'l'}),wsG(['lyrs','layers'],{e:'r',lk:1})],float:[]}});

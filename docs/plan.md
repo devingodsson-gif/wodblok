@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.87.12 (Nov 3 2026, owner: "Can we have a reset layout button"): Default layout
+- The Layout panel gains **Default layout** (also Window > Default layout): it puts the mode's built-in layout back (the Canvas: Elements alone on the right; a stamp's tab: Stamp left, Shape beside Elements, Elements far right). A saved layout is kept, so Reset layout still brings it back.
+- Tests: layouts-2-87-7 (a third test). Run: it, menu-bar-2-42, commands, help-2-87-4, small-updates-2-79-3 (16 passed), check:style.
+
 ## 2.87.11 (Nov 3 2026, step 11 of docs/pro-basics-plan.md): undo and redo
 - Owner: "undo/redo dont work". Fifteen kinds of change checked by the keys and by the buttons; the buttons always worked. The keys did nothing while a text or number field had the focus, and the unit fields keep it after Enter. Now a field keeps Ctrl+Z only while it holds typing not yet applied; otherwise Ctrl+Z, Ctrl+Shift+Z and Ctrl+Y undo and redo the document and the field shows the value that comes back.
 - rulers-2-87-2 waits for Lock guides to come off before dragging (it failed once in a busy run).

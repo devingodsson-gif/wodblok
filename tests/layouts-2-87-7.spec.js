@@ -46,3 +46,20 @@ test('the Layout panel saves and resets each mode\'s layout; saved layouts come 
   expect(await where(page, 'motifs')).toBeNull(); expect(await where(page, 'stmp')).toBe('l'); expect(await where(page, 'pgrid')).toBeNull();
   expect(errors).toEqual([]);
 });
+
+// 2.87.12 (owner, Nov 3 2026): Default layout puts the built-in layout back and keeps the saved one for Reset layout
+test('Default layout puts the built-in layout back; Reset layout still brings back the saved one', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4, workspaces: 'launch' });
+  await page.locator('#layb').click(); await H.settle(page);
+  await run(page, 'panel.pgrid'); await H.settle(page); const grid = await where(page, 'pgrid');
+  await page.locator('#lays').click();
+  await page.locator('#layd').click(); await H.settle(page);
+  expect(await where(page, 'pgrid')).toBeNull(); expect(await where(page, 'lyrs')).toBe('r'); expect(await where(page, 'layout')).toBe('float');
+  await page.locator('#layr').click(); await H.settle(page);
+  expect(await where(page, 'pgrid')).toBe(grid);
+  // in a stamp's tab: Stamp left, Shape beside Elements again
+  await openStampTab(page); await page.locator('section.pn[data-p="motifs"]').evaluate(s => s.closest('.wg').querySelector('[aria-label^="Close"]').click()); await H.settle(page);
+  await page.locator('#layd').click(); await H.settle(page);
+  expect(await where(page, 'stmp')).toBe('l'); expect(await where(page, 'motifs')).toBe('ri'); expect(await where(page, 'lyrs')).toBe('r');
+  expect(errors).toEqual([]);
+});

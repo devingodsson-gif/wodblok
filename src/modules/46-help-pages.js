@@ -6,7 +6,7 @@ const HELP_PAGES=[
  ['start','Getting started',[
   ['p','WODBLOK makes stamped patterns: you draw stamps from shapes, print them on the canvas, repeat them as patterns, colour them from a small tray of inks and finish them with print effects.'],
   ['h','The window'],
-  ['ul',['The menu bar is at the top left. Undo, redo, History, search, Randomize and light or dark are at the top right.','The element bar above the canvas adds a Shape, Image, Text, Stamp, Pattern or Sheet. Beside it is the colour tray.','The Elements list is docked on the right. Every other panel opens from the menus and can be docked, tabbed or left floating.','The Canvas and a stamp\u2019s tab each keep their own panel layout. The Layout button in the top bar opens Save layout and Reset layout for the one you are in; the Canvas\u2019s saved layout is also what the app opens with.']],
+  ['ul',['The menu bar is at the top left. Undo, redo, History, search, Randomize and light or dark are at the top right.','The element bar above the canvas adds a Shape, Image, Text, Stamp, Pattern or Sheet. Beside it is the colour tray.','The Elements list is docked on the right. Every other panel opens from the menus and can be docked, tabbed or left floating.','The Canvas and a stamp\u2019s tab each keep their own panel layout. The Layout button in the top bar opens Save layout, Reset layout (back to your saved one) and Default layout (back to the built-in one) for the one you are in; the Canvas\u2019s saved layout is also what the app opens with.']],
   ['h','A first pattern'],
   ['ul',['Elements > New stamp opens the stamp in its own tab. Add shapes to it from the Shape panel.','Go back to the Canvas tab and add a Pattern from the element bar. It repeats your stamps over the canvas.','Pick inks in the colour tray, then add print effects from the Effects menu.','Export > Export… opens the Export panel.']],
   ['h','Saving'],
@@ -50,6 +50,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.87.12','Nov 3 2026',['Default layout in the Layout panel puts the built-in layout back; your saved one is kept for Reset layout.']],
  ['2.87.11','Nov 3 2026',['Undo and redo work right after typing in a field (such as X or W) and pressing Enter, without leaving the field first.']],
  ['2.87.10','Nov 3 2026',['Seventeen blend modes in Photoshop\u2019s groups, previewed on the canvas as you point at them or arrow through the list.']],
  ['2.87.9','Nov 3 2026',['The Export panel: Quick export at the top, Print and colour in the middle, recipes at the bottom.']],

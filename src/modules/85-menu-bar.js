@@ -23,7 +23,7 @@ const MNB=[
  ['effects','Effects',[mnbFx,'-','randomize.roll','panel.rand']],
  ['colour','Colour',['panel.colors','tray.add','tray.save','-','colourway.new','colourway.exportAll']],
  ['view','View',['view.zoomIn','view.zoomOut','view.fit','view.actualSize','view.hand','-','view.grid','view.smartGuides','-','view.rulers','view.guides','view.lockGuides','view.clearGuides','view.newGuide','-','view.proof','-','view.before','view.split','view.tileRepeat','-','view.theme']],
- ['window','Window',['panel.canvas','panel.colors','panel.lyrs','panel.layers','panel.stmp','panel.motifs','panel.text','panel.image','panel.sheet','panel.pgrid','panel.hist','panel.rand','panel.xrec','-','panel.layout','layout.save','layout.reset','panels.closeAll']],   // 2.76.11: Image and Sheet too
+ ['window','Window',['panel.canvas','panel.colors','panel.lyrs','panel.layers','panel.stmp','panel.motifs','panel.text','panel.image','panel.sheet','panel.pgrid','panel.hist','panel.rand','panel.xrec','-','panel.layout','layout.save','layout.reset','layout.default','panels.closeAll']],   // 2.76.11: Image and Sheet too
  ['help','Help',['help.start','help.manual','help.shortcuts','help.whatsNew','-','app.commandSearch','feedback.open','-','help.about']]];   // 2.87.4: Help pages open in the Help panel (47-help.js)
 // commands that open a dialog or a file picker: their menu item ends with … (section 13.2)
 const MNB_DOTS=new Set(['view.newGuide','export.separations','export.printFile','file.export','library.importStamp','library.importImage','library.importSheet','app.commandSearch','feedback.open']);

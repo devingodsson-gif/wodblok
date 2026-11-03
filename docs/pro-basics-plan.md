@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **steps 1 to 3 live (2.87.3); steps 1 to 7 live (2.87.7); steps 1 to 10 live (2.87.10); step 11 done (2.87.11, not live). Next: 2.88.0 closes the plan (version and docs), then the end-of-plan suite with the owner's word.** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 to 3 live (2.87.3); steps 1 to 7 live (2.87.7); steps 1 to 10 live (2.87.10); step 11 done (2.87.11, not live). Next: 2.88.0 closes the plan (version and docs), then the end-of-plan suite with the owner's word.** 2.87.11 is live; 2.87.12 adds Default layout to step 7's Layout panel (owner). Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement

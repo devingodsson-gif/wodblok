@@ -434,7 +434,7 @@ input[type=number]{-moz-appearance:textfield;text-align:right;font-variant-numer
 .hlpc{font-size:var(--fs-m);line-height:1.4;color:var(--fg)}.hlpc h4{margin:var(--sp-5) 0 var(--sp-2);font-size:var(--fs-m);font-weight:600}.hlpc p{margin:0 0 var(--sp-4)}.hlpc ul{margin:0 0 var(--sp-4);padding-left:var(--sp-6)}.hlpc li{margin:0 0 var(--sp-2)}
 .hlpd{font-weight:400;color:var(--mut);font-size:var(--fs-s)}.hlpn{color:var(--mut);font-size:var(--fs-m)}
 /* 2.87.5: the Separations dialog (42-colour-output.js): settings rows; an ink row has its swatch (a --h-xs square) */
-.layrw{padding:0 var(--sp-5) var(--sp-5);gap:var(--sp-4)}.layrw button{flex:1;min-width:0}
+.layrw{padding:0 var(--sp-5) var(--sp-2);gap:var(--sp-4)}.layrw:last-child{padding-bottom:var(--sp-5)}.layrw button{flex:1;min-width:0}
 /* 2.87.10: a thin line between groups of a dropdown (an optgroup with no label), like a menu divider; the item being previewed */
 .ddl .ddsep{height:0;border-top:1px solid var(--line);margin:var(--sp-2) 0}.ddl .ddi.hi{background:var(--acc-soft)}
 #sepd .dlg,#prfd .dlg{width:min(420px,calc(100vw - 32px))}#prfd .dlg-b{padding:var(--sp-4) var(--sp-5);gap:0}#sepd .dlg-b{padding:var(--sp-4) var(--sp-5);gap:0;max-height:min(70vh,560px);overflow-y:auto}
@@ -1446,6 +1446,7 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
 <section class="pn" data-p="layout" hidden>
  <div class="glb" id="layn">Canvas</div>
  <div class="row layrw"><button type="button" class="alt" id="lays">Save layout</button><button type="button" class="alt" id="layr">Reset layout</button></div>
+ <div class="row layrw"><button type="button" class="alt" id="layd">Default layout</button></div>
 </section>
 <section class="pn" data-p="help" hidden>
  <div class="hlpt"><button type="button" class="ib" id="hlpbk" aria-label="Back" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="chevL"></svg></button><input type="text" id="hlpq" aria-label="Search help" placeholder="Search help" autocomplete="off"></div>
