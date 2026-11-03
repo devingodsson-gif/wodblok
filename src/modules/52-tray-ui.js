@@ -121,8 +121,8 @@ function usesText(id){const u=trayUses(id),n={};u.forEach(x=>{n[x.k]=(n[x.k]||0)
  const pl=(k,a,b)=>{if(n[k])out.push(n[k]+' '+(n[k]>1?b:a))};pl('stamp','stamp','stamps');pl('shape','shape','shapes');pl('layer','layer','layers');pl('replace','replace','replaces');pl('text','text','texts');pl('element','element','elements');pl('effect','effect','effects');pl('outline','outline','outlines');return out.join(' · ')}
 let listK='';
 function paintList(force){const box=$('tyl');if(!box||!box.isConnected||(!force&&!shown(box)))return;const o=tyP(),w=cwNow(o);
- const k=JSON.stringify([o.ts,o.ts.map(id=>[w.c[id],w.m[id]]),o.bg,o.ink,WBS.tiles.map(t=>t.ink),WBS.layers.map(L=>[L.ink,L.rp,(L.pl||[]).map(q=>q&&[q.ink,q.sk,q.rp,q.ra,fxCols(q).map(f=>f.col)])]),WBS.trayEdit]);if(!force&&k===listK)return;listK=k;
- box.innerHTML=o.ts.map((id,i)=>{const c=w.c[id],nm=w.m[id],u=usesText(id);return`<div class="tyr${WBS.trayEdit===id?' on':''}" data-s="${id}" role="listitem" tabindex="0"><span class="tyn">${i+1}</span><i style="background:${swBg(c)}"></i><span class="tyt"><b>${tyEsc(nm||c.slice(0,7).toUpperCase())}</b><small>${tyEsc([nm?c.slice(0,7).toUpperCase():'',hexAlpha(c)<1?Math.round(hexAlpha(c)*100)+'%':'',u].filter(Boolean).join(' · '))}</small></span><button type="button" class="ib" data-more aria-haspopup="menu" aria-expanded="false" aria-label="Actions for colour ${i+1}">${TY_MORE}</button></div>`}).join('');
+ const k=JSON.stringify([o.ts,o.ts.map(id=>[w.c[id],w.m[id]]),o.bg,o.ink,o.spot,WBS.tiles.map(t=>t.ink),WBS.layers.map(L=>[L.ink,L.rp,(L.pl||[]).map(q=>q&&[q.ink,q.sk,q.rp,q.ra,fxCols(q).map(f=>f.col)])]),WBS.trayEdit]);if(!force&&k===listK)return;listK=k;
+ box.innerHTML=o.ts.map((id,i)=>{const c=w.c[id],nm=w.m[id],u=usesText(id);return`<div class="tyr${WBS.trayEdit===id?' on':''}" data-s="${id}" role="listitem" tabindex="0"><span class="tyn">${i+1}</span><i style="background:${swBg(c)}"></i><span class="tyt"><b>${tyEsc(nm||c.slice(0,7).toUpperCase())}</b><small>${tyEsc([nm?c.slice(0,7).toUpperCase():'',hexAlpha(c)<1?Math.round(hexAlpha(c)*100)+'%':'',WBX.wbSpot&&WBX.wbSpot.is(id)?'Spot':'',u].filter(Boolean).join(' · '))}</small></span><button type="button" class="ib" data-more aria-haspopup="menu" aria-expanded="false" aria-label="Actions for colour ${i+1}">${TY_MORE}</button></div>`}).join('');
  $('tycnt').textContent=o.ts.length+' of '+TRAY_MAX;$('tyaddl').disabled=o.ts.length>=TRAY_MAX}
 function listEvents(){const box=$('tyl');
  box.addEventListener('click',e=>{const r=e.target.closest('.tyr');if(!r)return;const id=r.dataset.s,o=tyP(),i=o.ts.indexOf(id);
@@ -131,6 +131,7 @@ function listEvents(){const box=$('tyl');
    ['Move up',()=>{trayMove(id,i-1);trayDone('Moved tray colour')},i==0],
    ['Move down',()=>{trayMove(id,i+1);trayDone('Moved tray colour')},i==o.ts.length-1],
    ['Duplicate',()=>{const nid=trayAdd(slotHex(id),slotName(id),i+1);if(nid){tyP().cw.forEach(w=>{w.c[nid]=w.c[id];if(w.m[id])w.m[nid]=w.m[id]});trayDone('Duplicated tray colour')}},o.ts.length>=TRAY_MAX],
+   [WBX.wbSpot&&WBX.wbSpot.is(id)?'Unmark spot ink':'Mark as spot ink',()=>{if(WBX.wbSpot)WBX.wbSpot.set(id,!WBX.wbSpot.is(id))},!WBX.wbSpot||id===refSlot(o.bg)],   // 2.87.5: a spot ink prints on its own named plate (42-colour-output.js)
    ['Remove',()=>removeSlot(id),o.ts.length<=1]]);return}
   if(WBX.wbPicker.isOpen()&&WBX.wbPicker.anchor()===r){closePicker();return}editSlot(id,r)});
  box.addEventListener('keydown',e=>{const r=e.target.closest('.tyr');if(r&&e.target===r&&(e.key=='Enter'||e.key==' ')){e.preventDefault();editSlot(r.dataset.s,r)}});
