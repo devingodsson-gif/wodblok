@@ -16,7 +16,7 @@ const HELP_PAGES=[
   ['h','Kinds'],
   ['ul',['Shape: one shape from the shape library.','Image: a picture you bring in.','Text: words in a box, in any of the bundled or your own fonts.','Stamp: one print of a stamp.','Pattern: a repeat of stamps or shapes over the canvas or an area.','Sheet: a fill of colour, a gradient or a picture.']],
   ['h','Working with them'],
-  ['ul',['Click to select; Shift, Ctrl or Cmd adds to the selection; drag on empty canvas to select with a box.','Drag to move. Hold Alt as you start a drag to leave the element and drag a copy.','The handles size and turn the selection. Alt sizes from the middle; Shift keeps the proportions.','The Element group shows X, Y, W and H in the units chosen in Settings > General > Units. Type a value, a unit such as 2in or 50mm, or a sum such as +10.','Group, lock, hide, rename and arrange elements from the Elements list or the Edit menu.']],
+  ['ul',['Click to select; Shift, Ctrl or Cmd adds to the selection; drag on empty canvas to select with a box.','Drag to move. Hold Alt as you start a drag to leave the element and drag a copy.','The handles size and turn the selection. Alt sizes from the middle; Shift keeps the proportions.','The Element group shows X, Y, W and H in the units chosen in Settings > General > Units. Type a value, a unit such as 2in or 50mm, or a sum such as +10.','Group, lock, hide, rename and arrange elements from the Elements list or the Edit menu.','The Elements list\u2019s Blend has the Photoshop blend modes, in their groups. Point at a mode, or move through the list with the arrow keys, to see it on the canvas; click or press Enter to keep it, Esc to go back.']],
   ['h','Lining things up'],
   ['ul',['Smart guides snap a dragged element to the canvas and to the other elements.','View > Rulers shows rulers on the Canvas tab. Drag a guide out of a ruler, and drag it back to remove it. Elements snap to guides.','View > Show grid and the Grid panel set a grid to snap to.']]]],
  ['stamps','Stamps',[
@@ -50,6 +50,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.87.10','Nov 3 2026',['Seventeen blend modes in Photoshop\u2019s groups, previewed on the canvas as you point at them or arrow through the list.']],
  ['2.87.9','Nov 3 2026',['The Export panel: Quick export at the top, Print and colour in the middle, recipes at the bottom.']],
  ['2.87.8','Nov 3 2026',['The Pattern panel\u2019s sources are a group of their own at the top, with a full-width Add source.']],
  ['2.87.7','Nov 3 2026',['A stamp\u2019s tab opens with Stamp on the left and Shape beside Elements on the right. The Canvas and a stamp\u2019s tab keep their own layouts; the Layout button saves and resets them.']],
