@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **steps 1 to 3 live (2.87.3); steps 4 and 5 done (2.87.4, 2.87.5, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 to 3 live (2.87.3); steps 4 to 6 done (2.87.4 to 2.87.6, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -72,6 +72,14 @@ Numbering: each step is a patch release on the version that is live when work st
   - A layered TIFF or PSD with one layer per element, so a print shop or Photoshop user can adjust it.
   - It is also written without a new library if that proves feasible; otherwise the owner is asked first.
 - Tests: a PDF has its trim and bleed boxes and marks; a layered file opens with one layer per element.
+- **Done in 2.87.6** (`36-print-files.js`):
+  - Canvas > Canvas size > **Bleed**, typed in the units (`dim.bl` in inches, optional; format 30; hidden for the book cover, which has its own). The app draws only inside the canvas, so the bleed is made at export: a grid repeat tile carries on into it as it repeats, any other canvas is mirrored outwards at its edges (the background and anything at the edge run on without a seam). Say if the engine should draw the bleed for real instead; that is a larger rendering change.
+  - **Export > Print file…** (one dialog): PDF, TIFF or PSD; RGB or CMYK (PDF and TIFF); 150 / 300 / 600 DPI; the bleed shown; Crop marks; Registration marks; Spot inks as plates (PDF, when the design has spot inks); Ink channels (PSD).
+  - The PDF: MediaBox, BleedBox and TrimBox; the picture (Flate) over the bleed box; each spot ink a Separation image printed over it (overprint on); the marks as lines in the Registration colour (`/All`). Checked with qpdf and pdfinfo.
+  - The TIFF: the sheet with bleed and marks, RGB or CMYK (the marks on every plate).
+  - The PSD: one layer per visible element, bottom to top, each drawn alone without the canvas texture and cropped to what it covers, with its name (also in Unicode); the merged picture; with Ink channels, one spot channel per tray ink (textile and screen printing). Opened with Pillow: 7 layers for a 7-element design.
+  - The marks and options were not added to the Export panel's own exports: step 9 rearranges that panel and can carry them.
+- **Not yet:** a layered TIFF (the PSD covers layers and spot channels); a PSD at CMYK; the bleed drawn by the engine (see above).
 
 ## Step 7: panel layouts for the Canvas and a stamp's tab (owner, Nov 3)
 - A stamp's tab opens with the Stamp panel on the left, the Elements list docked on the far right, and the Shape panel just to the left of the Elements list (the inner right column).

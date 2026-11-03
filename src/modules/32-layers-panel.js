@@ -124,4 +124,4 @@ function init32(){lyCmds();
 }
 // Ctrl/Cmd+D on the canvas: duplicate the selected element (the last one when several are selected)
 function lyDupSel(){const s=lySel();if(!s.length)return false;lyDup(s[s.length-1].u);return true}
-export {lyInkFill,renderLayers,init32,lyDupSel};
+export {lyNm,lyInkFill,renderLayers,init32,lyDupSel};

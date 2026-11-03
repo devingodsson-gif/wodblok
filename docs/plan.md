@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.87.6 (Nov 3 2026, step 6 of docs/pro-basics-plan.md): print files
+- **Bleed** on any canvas (Canvas > Canvas size, in the units; `dim.bl`, optional, format 30), made at export by mirroring the edges (or by the repeat, for a grid repeat tile).
+- **Export > Print file…:** a print PDF (trim, bleed and media boxes; crop and registration marks; RGB or CMYK; spot inks as Separation plates), a print TIFF (RGB or CMYK, bleed and marks), or a layered PSD (one layer per element; optional ink channels). Written by WODBLOK's own code.
+- Tests: tests/print-files-2-87-6.spec.js (new, 3). Run: it, colour-output-2-87-5, help-2-87-4, units-2-87-1, canvas-anchor-2-76, format, export-size, fit-canvas-2-37, recovery, menu-bar-2-42, commands, export-recipes (43 passed); qpdf --check and pdfinfo on a real print PDF, Pillow on the TIFF and PSD; check:style, check:platform, `npm run perf` (ratio 0.93). Not run: the full suite (end of the plan).
+
 ## 2.87.5 (Nov 3 2026, step 5 of docs/pro-basics-plan.md): colour output
 - **Export > Separations…:** one greyscale plate per tray ink used (the paper is not an ink), PNG or TIFF, 150 / 300 / 600 DPI, tints solid, as tones or as halftone dots, registration and corner marks with the ink's name; one zip.
 - **Spot inks:** a tray colour's … menu marks it (`proj.spot`, optional, format 30); its plate is named as a spot.
