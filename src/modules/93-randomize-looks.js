@@ -487,30 +487,33 @@ RZL.confetti={dark:1,w:.9,need:'pat',build(E){const R=E.roles,S=Math.min(CW,CH),
   out.texts.push(elText(E,sub,rzFont(E,RZF.confetti[1]),CW/2,CH/2+lh*.24,lw*.6,lh*.12,R.txt([lc],R.acc[0]||R.ink),{ls:12}))}
  out.tex=E.ch(.4)?rzPaper(E):'';out.grade=E.pick(['punch','none']);return out}};
 
-// 2.86.0 (owner, Nov 2 2026: "another randomize look, it's just called Random and it's basically totally random, much like the old school randomize before the looks ... just go wild"):
-// no plan and no layout. Every part is drawn at random: the ground, a gradient, one to three patterns in any layout with shapes or themed pictures, a scatter of loose
-// shapes (any size, turn, blend, opacity and effect), sometimes a themed picture, a ring, a border or a frame, and words in any font. The panel's switches still apply.
-const RZ_BASIC=['rect','rrect','ellipse','tri','dia','pent','hex','star','arrow','heart'];
-// the blends that keep a piece seen on its ground: on a light ground the darkening ones, on a dark ground the lightening ones (a light blend on a light ground hid everything)
-const rzBlends=g=>rzLum(g)>.35?['multiply','darken','overlay','soft-light']:['screen','lighten','overlay','soft-light'];
-// an effect from the filter list with its settings thrown somewhere between its default and anywhere in its range
-function rzWildFx(E){const ks=Object.keys(FQ),k=E.pick(ks),e=rzQfx(k,{},E);if(!e)return null;(FQ[k].P||[]).forEach(([f,,lo,hi,v])=>{if(E.ch(.7)){const w=E.rr(lo,hi);e[f]=Math.round(v+(w-v)*E.rr(.3,1))}});return e}
-RZL.random={dark:1,w:0,build(E){   /* w 0: only when chosen in the panel, so Any rolls (and every seeded roll) stay as they were */const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},looks=Object.keys(RZT);
- const gnd=rzGround(E,out,E.pick(['flat','tonal','glow','halftone'])),inks=rzInks(E,gnd,5),ink=()=>E.pick(inks),theme=()=>E.pick(rzThemes(E,E.pick(looks))),shape=()=>basicKey(E.pick(RZ_BASIC));
- const BL=rzBlends(rzHex(Array.isArray(gnd)?gnd[0]:gnd)),wild=(q,p)=>{if(!q)return q;if(E.ch(p||.35))addFx(q,rzWildFx(E));if(E.ch(.2))q.bl=E.pick(BL);if(E.ch(.2))q.op=E.ri(55,95);return q};
- if(E.ch(.3))out.els.push(wild(elGrad(E,ink(),E.ch(.5)?ink():R.paper,E.ch(.4)),.2));
- if(E.FT.pat)for(let i=0,n=E.ri(1,3);i<n;i++){const ks=[...Array(E.ri(1,3))].map(()=>E.ch(.45)?theme():shape()).filter(Boolean),pi=E.shuf(inks).slice(0,E.ri(1,3));if(!ks.length)continue;
-  const p=rzPat(E,out,{n:'Random '+(i+1),src:ks.map(k=>rzSrc(E,out,k,pi[0])),inks:pi,lays:['tile','wall','scatter','spiral'],pc:E.ch(.5)?1:0});
-  if(E.FT.jit&&E.ch(.35)&&!(p.fx||[]).some(e=>e.k=='jitter'))addFx(p,fxJ(E.ri(0,40),E.ri(0,90),E.ri(0,40)));out.els.push(wild(p,.3))}
- for(let i=0,n=E.ri(2,10);i<n;i++){const k=E.pick(RZ_BASIC),w=S*E.rr(.04,.55),h=E.ch(.6)?w:S*E.rr(.04,.55),q=elBox(k,E.rr(0,CW),E.rr(0,CH),w,h,{ink:ink(),nm:'Random shape'});if(!q)continue;q.r=E.ri(-180,180);
-  if(E.ch(.2)){q.fl='none';q.sw=rzF(Math.max(1,S*E.rr(.003,.02)));q.sk=ink()}out.els.push(wild(q))}
- if(E.ch(.45)){const d=S*E.rr(.3,.75);rzFocal(E,out,E.pick(['poster','plate','badge']),E.rr(CW*.25,CW*.75),E.rr(CH*.25,CH*.75),d,d,ink(),null,{bg:gnd})}
- for(let i=0,n=E.ri(0,4);i<n;i++){const m=theme();if(m)out.els.push(wild(elMotif(m,E.rr(0,CW),E.rr(0,CH),S*E.rr(.1,.5),{ink:ink(),r:E.ri(-180,180)})))}
- if(E.FT.pat&&E.ch(.25)){const d=S*E.rr(.3,.8);rzRing(E,out,E.rr(CW*.3,CW*.7),E.rr(CH*.3,CH*.7),d,[E.ch(.5)?theme():shape()].filter(Boolean),ink())}
- if(E.FT.pat&&E.ch(.2))out.els.push(rzBorder(E,out,S*E.rr(.03,.08),[shape()].filter(Boolean),ink()));else if(E.ch(.25))out.els.push(elFrame(S*E.rr(.03,.09),Math.max(1,S*E.rr(.002,.008)),ink(),'Frame'));
- const WK=Object.keys(RZW),FS=[...new Set(Object.values(RZF).flat(2))];
- for(let i=0,n=E.wpick([[0,.25],[1,.45],[2,.25],[3,.05]]);i<n;i++){const [ti,sub]=E.pick(RZW[E.pick(WK)]),t=E.ch(.65)?ti:sub,w=S*E.rr(.35,.95),h=w*E.rr(.12,.4),q=elText(E,E.ch(.15)?t.toUpperCase():t,rzFont(E,FS),E.rr(w/2,CW-w/2),E.rr(h,CH-h),w,h,ink(),{ls:E.pick([0,0,4,10,30])});if(E.ch(.3))q.r=E.ri(-35,35);out.texts.push(q)}
- out.tex=E.ch(.5)?rzPaper(E):'';out.grade=E.pick(['punch','fade','warm','none','none']);return out}};
+// 2.86.0 (owner, Nov 2 2026): a Look called Random. 2.87.0 (owner, Nov 2 2026: "the random output should be more pattern heavy and make sure it only uses the color
+// tray. Look at the gallery on the website. The output should be more like that"): a printed repeat of stamp blocks over the whole sheet, in the tray's own colours.
+// Each roll: a main pattern of one or two stamps (a shape with a block edge most of the time, motifs inside, any arrangement of its shape), often a second pattern of
+// small motifs under or over it, sometimes a border or a ruled frame, now and then a word; worn and printed (Wear, roughened or misregistered ink, a paper texture).
+// Colours: only the tray's colours, as tray links: the paper is the ground, the inks are the other tray colours. No gradient, no mixed tone, no grade, and none of the
+// effects that bring colours of their own (Threshold's black and white).
+RZL.random={dark:1,w:0,need:'pat',build(E){   /* w 0: only when chosen in the panel, so Any rolls (and every seeded roll) stay as they were */
+ const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},paper=R.paper,seen=new Set(),T=R.all.filter(c=>{const h=rzHex(c);if(seen.has(h))return false;seen.add(h);return true});
+ rzGround(E,out,'flat');
+ let inks=T.filter(c=>rzHex(c)!==rzHex(paper)).sort((a,b)=>rzCon(b,paper)-rzCon(a,paper));if(!inks.length)inks=[R.ink];
+ const strong=inks.filter(c=>rzCon(c,paper)>=1.8),c1=E.pick(strong.length?strong:[inks[0]]),others=inks.filter(c=>c!==c1),c2=others.length?E.pick(others):'',RF={acc:[c2||c1]};
+ const look=()=>E.pick(Object.keys(RZT)),mains=rzPool(E,look(),3),fx=q=>addFx(q,rzInkFx(E,RF,['none','rough','rough','misreg','bleed','stipple','halftone']),E.FT.fin?rzWear(E):null);
+ // the main pattern: stamp blocks
+ const shk=E.pick(['rect','rect','rect','hex','diamond','circle']),ts={rect:'square',circle:'circle',hex:'hex',diamond:'diamond'}[shk],nT=E.ch(.45)?2:1,src=[];
+ for(let i=0;i<nT;i++){const t=rzTile(E,out.tiles.length+1,rzSh(shk),E.pick(['center','center','rosette','quad','mirror','star','emblem','grid']),i?E.shuf(mains):mains,[rzSmall(E)],i&&c2?c2:c1,{edge:E.ch(.7),c2:c2&&E.ch(.35)?c2:''});out.tiles.push(t);src.push({k:'stamp',t:t.id,w:1})}
+ const ar=E.pick((TL_AR[ts]||[['grid']]).map(x=>x[0]).filter(x=>!E.tile||!(RZ_CLS.includes(x)||x=='brick'||x=='half'))),main=patOf('Pattern',[],'tile',4,4,100,[],1);
+ Object.assign(main,{src,ts,ar:ar||'grid',ps:+E.rr(12,30).toFixed(1),sp:E.ri(0,55),ds:'cycle',af:1});
+ if(!E.tile&&inks.length>1&&E.ch(.35)){main.pcm=RZ_CLS.includes(main.ar)?'place':'random';main.pcc=E.shuf(inks).slice(0,E.ri(2,Math.min(3,inks.length)));rzOneEdge(out,main)}
+ if(!E.tile&&E.ch(.4))main.iv=E.ri(10,35);fx(main);
+ // a second pattern of small motifs, quieter, under the stamps (or over them now and then)
+ let second=null;if(E.ch(.65)){const ink2=c2||E.pick(inks),ms=E.ch(.5)?[rzSmall(E)]:rzPool(E,look(),E.ri(1,2));second=rzPat(E,out,{n:'Pattern 2',src:ms.map(m=>rzSrc(E,out,m,ink2)),inks:E.shuf(inks).slice(0,2),lays:E.tile?['tile','wall']:['tile','tile','wall','scatter'],ps:E.rr(3.5,9),quiet:E.ch(.5)});fx(second)}
+ if(second&&E.ch(.7))out.els.push(second,main);else out.els.push(main,...(second?[second]:[]));
+ // the edge: a border of small motifs, or ruled lines
+ if(!E.tile){const m=S*E.rr(.035,.07);if(E.ch(.25))out.els.push(fx(rzBorder(E,out,m,[E.ch(.5)?rzSmall(E):E.pick(mains)],E.pick(inks))));else if(E.ch(.25)){const lc=E.pick(inks);out.els.push(elFrame(m,Math.max(1,S*E.rr(.003,.007)),lc,'Frame'));if(E.ch(.5))out.els.push(elFrame(m*1.3,Math.max(1,S*.0025),lc,'Frame'))}}
+ // a word now and then, in the ink that reads best on the paper
+ if(!E.tile&&E.ch(.12)){const [ti]=E.pick(RZW[E.pick(Object.keys(RZW))]),w=S*E.rr(.5,.85),h=w*E.rr(.12,.2),FS=[...new Set(Object.values(RZF).flat(2))],top=E.ch(.6);out.texts.push(elText(E,ti,rzFont(E,FS),CW/2,top?S*.11:CH-S*.11,w,h,inks[0],{ls:E.pick([0,10,30])}))}
+ out.tex=E.ch(.8)?rzPaper(E):'';out.grade='none';return out}};
 
 const RZ_NAMES={repeat:'Repeat',textile:'Textile',tilework:'Tilework',halftone:'Halftone',mandala:'Mandala',letters:'Pattern type',confetti:'Confetti',poster:'Poster',plate:'Book plate',badge:'Badge',specimen:'Specimen',modern:'Modern',sun:'Sunburst',quilt:'Quilt',random:'Random'},RZ_LOOKS=Object.keys(RZ_NAMES);
 // the names of the frame elements a Look makes: the Frame switch leaves them out
