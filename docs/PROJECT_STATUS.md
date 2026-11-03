@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 3: 2.87.4 (pro basics step 4: Help)** on `feat/2.87.4-help`, not merged. Next: step 5 (colour output); the plan goes by step number now (owner).
+- **Nov 3: 2.87.5 (pro basics step 5: colour output)** on `feat/2.87.5-colour-output`, built on 2.87.4, not merged. Separations, spot inks, CMYK TIFF and PDF, Proof colours. Next: step 6 (print files), which also carries spot inks into PDF and the textile layered TIFF. Saving: only the optional `proj.spot`.
+- **Nov 3: 2.87.4 (pro basics step 4: Help)** on `feat/2.87.4-help`, not merged.
 - **Nov 3: 2.87.3 LIVE** (owner: "Merge then work on step 4").
 - **Nov 3: 2.87.3 (pro basics step 3: Alt-drag duplicates)** on `feat/2.87.3-alt-drag`, merged.
 - **Nov 3: 2.87.2 LIVE** (owner: "Both"): 2.87.1 (units) and 2.87.2 (rulers and guides) merged.

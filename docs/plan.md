@@ -1,5 +1,12 @@
 # Development plan
 
+## 2.87.5 (Nov 3 2026, step 5 of docs/pro-basics-plan.md): colour output
+- **Export > Separations…:** one greyscale plate per tray ink used (the paper is not an ink), PNG or TIFF, 150 / 300 / 600 DPI, tints solid, as tones or as halftone dots, registration and corner marks with the ink's name; one zip.
+- **Spot inks:** a tray colour's … menu marks it (`proj.spot`, optional, format 30); its plate is named as a spot.
+- **CMYK:** Export CMYK TIFF (4 channels) and Export CMYK PDF (DeviceCMYK) at the print size, a standard conversion; View > Proof colours.
+- The vendored fflate now also exports `zlibSync` (same library and version; tools/vendor-fflate.js), for the PDF's compressed picture.
+- Tests: tests/colour-output-2-87-5.spec.js (new, 3). Run: it, colour-tray, misreg-tray-2-41, saved-colourways-2-51-7, saved-trays-2-51-3, export-recipes, export-dialog, export-size, repeat-tile, menu-bar-2-42, commands (50 passed), check:style, check:platform, `npm run perf` (ratio 1.01). Not run: the full suite (end of the plan).
+
 ## 2.87.4 (Nov 3 2026, step 4 of docs/pro-basics-plan.md): Help
 - A **Help** panel, an undocked panel: it opens floating in the middle the first time, like Export, and docks like any panel. Help menu: Getting started, Manual, Keyboard shortcuts, What's new, Search commands, Send feedback, About Wodblok; each opens its page.
 - The manual: Getting started, Elements, Stamps, Patterns, Effects, Colours, Randomize, Export and print, written in the app's own words and bundled (no network). Search finds pages by their words. Shortcuts and About are drawn from the app.

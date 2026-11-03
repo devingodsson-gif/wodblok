@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **steps 1 to 3 live (2.87.3); step 4 done (2.87.4, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 to 3 live (2.87.3); steps 4 and 5 done (2.87.4, 2.87.5, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -54,6 +54,12 @@ Numbering: each step is a patch release on the version that is live when work st
 - **CMYK.** A CMYK export for print shops (TIFF and PDF), using a standard conversion, with a soft-proof view (View > Proof colours) that shows how the colours will print.
 - **Colour profiles** (ICC: embedding and choosing one) are left for later unless the owner wants them now: proper profile conversion needs a library, which needs the owner's approval.
 - Tests: one separation per ink with the right pixels; a spot ink keeps its name; a CMYK export opens with the right channel count.
+- **Done in 2.87.5** (`42-colour-output.js`):
+  - Export > Separations…: the inks used (ticked, with the count), PNG or TIFF (greyscale), 150 / 300 / 600 DPI, Tints Solid / Tones / Halftone (35 to 65 lines per inch at 22.5°), registration marks. Each plate is drawn by the app with that ink black and every other tray colour and the paper white (a colourway made for the moment), so overprint, knock-out, opacity and print effects come out right. One zip, plates named `NN-ink-name`.
+  - Spot inks: the tray colour's … menu, Mark as spot ink (`proj.spot`, optional; format 30); the row says Spot; its plate is named `spot-…`.
+  - Export CMYK TIFF and Export CMYK PDF at the canvas's print size (its DPI, else 300), a standard conversion with full black generation; View > Proof colours lays a picture of the canvas as process inks print it under the selection (not exported).
+  - Help (Export and print, Colours, What's new) updated.
+- **Not yet:** spot inks in a PDF (Separation colour spaces) and the textile layered TIFF with spot channels go with step 6's print PDF writer and layered TIFF; ICC profiles later (owner). Fixed colours and pictures are on no plate (a picture would need its own separation).
 
 ## Step 6: print files
 - **Bleed and marks on any canvas:**
