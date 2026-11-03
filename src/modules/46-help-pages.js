@@ -40,16 +40,17 @@ const HELP_PAGES=[
   ['p','The Canvas panel’s Texture sets the paper’s texture under everything.']]],
  ['colours','Colours',[
   ['p','The colour tray beside the element bar holds the project’s inks. Elements take their colour from a place in the tray, so changing a tray colour changes everything that uses it.'],
-  ['ul',['Click a tray place to pick its colour; the Colours panel finds, saves and folders colours.','Save tray keeps a set of tray colours to use again.','A colourway is another set of colours for the same tray. Colour > New colourway adds one; Export all colourways exports one file for each.']]]],
+  ['ul',['Click a tray place to pick its colour; the Colours panel finds, saves and folders colours.','Save tray keeps a set of tray colours to use again.','A tray colour\u2019s \u2026 menu can mark it as a spot ink; its separation plate is then named as a spot.','A colourway is another set of colours for the same tray. Colour > New colourway adds one; Export all colourways exports one file for each.']]]],
  ['randomize','Randomize',[
   ['p','Randomize builds a new design in one click, using your tray colours and your stamps where it can.'],
   ['ul',['Randomize in the top bar rolls a new design.','The gear beside it opens the Randomize panel: pick a Look (Any, Repeat, Textile, Tilework, Halftone, Random and more) and what may change: background, pattern, focal point, text, frame, colours, effects, finish and canvas size.','Every roll is one History step, so Undo takes it back.']]]],
  ['export','Export and print',[
   ['p','Export > Export… opens the Export panel. Quick export saves at once; a custom export picks the format and size.'],
-  ['ul',['Formats: PNG, JPG, SVG, TIFF and PDF. Set the long side in pixels or a print size and resolution.','Recipes keep export settings to use again; Export all recipes exports each in one zip.','Export repeat unit saves one seamless tile of a repeat (PNG or TIFF).','Print proof makes a proof sheet on Letter or A4.','Colourways can be exported all at once.']],
+  ['ul',['Formats: PNG, JPG, SVG, TIFF and PDF. Set the long side in pixels or a print size and resolution.','Recipes keep export settings to use again; Export all recipes exports each in one zip.','Export repeat unit saves one seamless tile of a repeat (PNG or TIFF).','Print proof makes a proof sheet on Letter or A4.','Export > Separations\u2026 makes one greyscale plate for each tray ink in the design, for screen, block and relief printing and riso: PNG or TIFF, at 150, 300 or 600 DPI, with tints as solid, tones or halftone dots, and registration marks with the ink\u2019s name. The paper is not an ink, and fixed colours are on no plate.','Export CMYK TIFF and Export CMYK PDF make a CMYK file for a print shop at the canvas\u2019s print size, by a standard conversion. View > Proof colours shows how those colours print.','Colourways can be exported all at once.']],
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.87.5','Nov 3 2026',['Export > Separations\u2026: one plate per ink, with halftone tints and registration marks. Spot inks. CMYK TIFF and PDF, and View > Proof colours.']],
  ['2.87.4','Nov 3 2026',['Help is a panel of its own, with a manual, search, keyboard shortcuts and this list.']],
  ['2.87.3','Nov 3 2026',['Hold Alt as you start a drag to leave the element and drag a copy, on the canvas and in a stamp’s tab.']],
  ['2.87.2','Nov 3 2026',['Rulers and guides on the Canvas tab (View > Rulers, Ctrl+R). Drag guides out of the rulers; elements snap to them.']],

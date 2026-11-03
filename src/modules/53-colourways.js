@@ -61,4 +61,4 @@ function init53(){const g=$('cwg');
  $('cwg').closest('details').addEventListener('toggle',()=>{if(isOpen())cwPaint()});
  let lastK='';WBX.wbCwDirty=()=>{stale=true;if(isOpen())soon()};
  const prev=WBX.wbTrayPaint;WBX.wbTrayPaint=f=>{if(prev)prev(f);if(isOpen()){const o=WBS.proj,k=JSON.stringify([o.cw.map(w=>[w.n,o.ts.map(id=>w.c[id])]),o.cwa]);if(k!==lastK||f){lastK=k;cwPaint()}}}}
-export {init53};
+export {init53,vrRecolor};

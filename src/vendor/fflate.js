@@ -2666,4 +2666,4 @@ function unzipSync(data, opts) {
     return files;
 }
 
-export {zipSync,unzipSync,strToU8,strFromU8};
+export {zipSync,unzipSync,zlibSync,strToU8,strFromU8};
