@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **steps 1 to 3 live (2.87.3); steps 4 to 6 live (2.87.6); step 7 done (2.87.7, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 to 3 live (2.87.3); steps 1 to 7 live (2.87.7); step 8 done (2.87.8, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -99,6 +99,7 @@ Numbering: each step is a patch release on the version that is live when work st
 - **A Sources group near the top** of the Pattern panel, right under the panel's own controls, so a new pattern's empty sources are the first thing seen.
 - **Add source** becomes the standard Add button: full width at the top of the group, opening the usual Add menu. The menu lists the project's stamps, then its texts and patterns, then Shape from the library…, as the Add effect menu does.
 - Tests: a new pattern shows Sources near the top with Add source; each menu entry adds that source.
+- **Done in 2.87.8:** a **Sources** group (`#pesg`) first among the Pattern panel's groups, under the panel's own Add pattern and the Element group; **Add source** is the standard full-width Add button (`.row.fxar`, as Add effect) at its top, then the source rows. The menu was already in the asked order (stamps, texts, other patterns, Shape from the library…). The group shows only while a pattern is being edited.
 
 ## Step 9: the Export panel, rearranged (owner, Nov 3; done last, after steps 5 and 6)
 - **Top: Quick export.** The format, size and Export now. One click for the common case.
