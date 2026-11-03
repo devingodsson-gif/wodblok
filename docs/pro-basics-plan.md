@@ -36,7 +36,7 @@ Numbering: each step is a patch release on the version that is live when work st
   - What's new, filled from the releases.
   - Send feedback, for signed-in users, as now.
   - About.
-- **Where it lives:** a Help panel or window with search, styled to the UI standard, kept out of the tool panels so the no-tooltips rule stands.
+- **Where it lives:** a **Help undocked panel**, with search, styled to the UI standard. It opens floating in the middle the first time, like Export, and can be docked. It is kept out of the tool panels so the no-tooltips rule stands.
 - **Content:** plain writing kept in the repo and bundled into the app, so it works offline with no network.
 - Tests: every menu item opens its page; search finds a topic; the page fits a phone.
 
