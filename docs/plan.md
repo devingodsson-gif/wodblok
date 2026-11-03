@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.88.1 (Nov 3 2026, hotfix; bug 1 of docs/full-review-2.88.md, owner: "Go ahead and fix the book cover")
+- On a book cover, the unit fields, rulers, guides, Separations, CMYK TIFF and PDF, and Print file measured the canvas as the 300 mm default, not the cover. `physNow()` (04) gives the size the canvas prints at: the whole cover sheet (both covers, the spine and the bleed) at 300 DPI on a book cover, else `physOf()`. The Print file PDF of a cover has its bleed box the whole sheet and its trim box the cover's bleed inside it, with the crop marks there. The book cover's own Print cover export is unchanged.
+- Tests: tests/book-cover-size-2-88-1.spec.js (new, 2). Run: it, print-files-2-87-6, colour-output-2-87-5, units-2-87-1, rulers-2-87-2, export-panel-2-87-9 and the cover, print proof and export specs (30 passed), check:style, check:platform, `npm run perf`. Not run: the full suite (a hotfix on print output: about 50%, see the report).
+
 ## 2.88.0 (Nov 3 2026): the pro basics plan is done
 - Closes docs/pro-basics-plan.md: real units (2.87.1), rulers and guides (2.87.2), Alt-drag (2.87.3), Help (2.87.4), colour output (2.87.5), print files (2.87.6), panel layouts (2.87.7, with Default layout in 2.87.12), Pattern sources (2.87.8), the Export panel (2.87.9), blend modes (2.87.10) and undo and redo (2.87.11), all live. Version and docs only.
 - Open: the end-of-plan CI suite (owner's word); five Photoshop blend modes left out (see step 10); bleed made at export, not by the engine (step 6); five scenario state snapshots fail in this container on the base build too.
