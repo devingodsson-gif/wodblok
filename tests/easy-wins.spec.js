@@ -13,16 +13,7 @@ test('the Colours tool holds the tray, paper and ink, and the saved trays (1.10)
   expect(errors).toEqual([]);
 });
 
-test.skip('every starting Look has a picture, made from its own settings', async ({ page }) => {
-  const { errors } = await openApp(page);
-  await openPanel(page, 'pres');
-  const n = await page.locator('#psl .psr').count();
-  expect(n).toBeGreaterThanOrEqual(6);
-  expect(await page.locator('#psl .psr .th svg').count()).toBe(n);
-  const sigs = await page.evaluate(() => [...document.querySelectorAll('#psl .psr .th svg')].map(s => s.innerHTML.replace(/lkf\d+/g, 'x')));
-  expect(new Set(sigs).size, 'the looks do not all look the same').toBeGreaterThan(3);
-  expect(errors).toEqual([]);
-});
+// (2.88.0) 'every starting Look has a picture' was skipped: the Looks panel it opened ('pres') is gone. Randomize's Looks are covered by the randomize specs.
 
 test('the four view toggles live in Settings (General) and the Display tab is gone', async ({ page }) => {
   const { errors } = await openApp(page);

@@ -116,21 +116,8 @@ test('Delete takes two taps, removes the stamp from every layer and free item th
   expect(errors).toEqual([]);
 });
 
-test.fixme('a stamp is saved to the library from the Stamps panel and a loaded one joins the layer', async ({ page }) => {
-  const { errors } = await openApp(page, { seed: 4 });
-  await shapeIn(page, 1);
-  await page.click('#smksave');
-  await settle(page);
-  // fixme: the Stamp library has no rail button or command since 2.10.0 (the panel and code are kept for when stamps are saved again)
-  await expect(page.locator('section.pn[data-p="slib"]:not([hidden])')).toBeVisible();
-  await expect(page.locator('#slgrid button[data-sl]')).toHaveCount(1, { timeout: 15000 });
-  await page.locator('#slgrid button[data-sl]').first().click();
-  await settle(page);
-  const s = await state(page);
-  expect(s.tiles.length).toBe(2);
-  expect(s.tiles[1].items.length).toBe(s.tiles[0].items.length);
-  expect(errors).toEqual([]);
-});
+// (2.88.0) 'a stamp is saved to the library … and a loaded one joins the layer' was a fixme for the old Stamp library panel (no opener since 2.10.0). Saving
+// and using stamps from the library are covered by stamp-library-2-51-2, stamp-library-search-2-34 and project-files.
 
 test('Zoom to stamp brings one printed copy of the open stamp to the middle of the screen and fills it', async ({ page }) => {
   const { errors } = await openApp(page, { seed: 4 });
