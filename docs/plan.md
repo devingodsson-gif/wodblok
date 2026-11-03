@@ -1,5 +1,12 @@
 # Development plan
 
+## 2.87.0 (Nov 2 2026): Random is more like the website's gallery, in the tray's colours only
+- Owner: "The random output should be more pattern heavy and make sure it only uses the color tray. Look at the gallery on the website. The output should be more like that."
+- The gallery (site/img/gallery) is all printed repeats: stamp blocks in a lattice over the whole sheet, two or three colours, heavy wear and grain, sometimes a second layer or a border, almost no words and no loose shapes. Random now makes that: a main pattern of one or two stamps (a shape with a block edge most of the time, motifs inside, any arrangement of its shape), often a second pattern of small motifs under or over it, sometimes a border of motifs or ruled frame lines, a word now and then (12%); Wear on the printed layers when Finish is on, roughened, misregistered, bled or halftoned ink, and a paper texture.
+- Colours: only the tray's own colours, as tray links (the paper is the ground; the inks are the other tray colours, the one that reads best first). No gradient, no mixed tone, no grade, no effect with colours of its own. It needs Pattern on in the Randomize panel.
+- Still weight 0: it rolls only when chosen.
+- Tests: random-look-2-86 now also checks that every colour a roll set is a tray link and that each roll is made of patterns; the Randomize specs (28) pass. `npm run perf`: ratio 1.027.
+
 ## 2.86.0 (Nov 2 2026): a Randomize Look called Random
 - Owner: "Add another randomize look, it's just called Random and it's basically totally random. Much like the old school randomize before the looks were implemented. Just go wild."
 - `RZL.random` (93-randomize-looks.js): no plan or layout. A roll draws a ground, sometimes a gradient Sheet, one to three Patterns in any layout (tile, wallpaper, scatter, spiral) of basic shapes or themed pictures, two to ten loose shapes (any size, turn, outline, blend, opacity), sometimes a focal picture, loose themed pictures, a ring, a border or a frame, and zero to three lines of words in any font. Any piece may carry a filter effect with its settings thrown anywhere in their range (`rzWildFx`). Blends keep a piece visible: darkening ones on a light ground, lightening ones on a dark ground. The panel's switches apply as for every Look.
