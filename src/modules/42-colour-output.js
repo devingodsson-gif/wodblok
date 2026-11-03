@@ -34,8 +34,8 @@ function coSize(dpi){const P=physOf();let inW,inH;if(P){inW=P.inW;inH=P.inH}else
  return{W:Math.max(1,Math.round(inW*dpi)),H:Math.max(1,Math.round(inH*dpi)),inW,inH}}
 const CO_AREA=64e6;
 // the design (an SVG string) drawn on white at W x H
-function coRaster(svg,W,H){return new Promise((res,rej)=>{if(W*H>CO_AREA)return rej(new Error('That size is too large for this browser. Try a lower resolution.'));
- const img=new Image();img.onload=()=>{try{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.fillStyle='#fff';x.fillRect(0,0,W,H);x.drawImage(img,0,0,W,H);res(x.getImageData(0,0,W,H))}catch(e){rej(e)}};
+function coRaster(svg,W,H,clear){return new Promise((res,rej)=>{if(W*H>CO_AREA)return rej(new Error('That size is too large for this browser. Try a lower resolution.'));
+ const img=new Image();img.onload=()=>{try{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});if(!clear){x.fillStyle='#fff';x.fillRect(0,0,W,H)}x.drawImage(img,0,0,W,H);res(x.getImageData(0,0,W,H))}catch(e){rej(e)}};
  img.onerror=()=>rej(new Error('The picture could not be made.'));img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)})}
 // draw the design with one colourway made for the moment (each tray colour set by fn(slot id, its colour)); the one showing is put back after
 async function coWith(fn,each,run){const o=WBS.proj,keep=o.cwa,base=cwNow(o),tmp={id:'_co',n:'_co',c:{},m:{}};WBX.wbNoCap=1;o.cw.push(tmp);o.cwa=o.cw.length-1;
@@ -57,8 +57,8 @@ function coSheet(g,W,H,dpi,marks,label){const m=marks?Math.round(dpi*.5):0,SW=W+
   x.beginPath();[[m,m,-1,-1],[SW-m,m,1,-1],[m,SH-m,-1,1],[SW-m,SH-m,1,1]].forEach(([cx,cy,sx,sy])=>{x.moveTo(cx+sx*m*.15,cy);x.lineTo(cx+sx*m*.75,cy);x.moveTo(cx,cy+sy*m*.15);x.lineTo(cx,cy+sy*m*.75)});x.stroke();
   x.font=`500 ${Math.max(8,Math.round(dpi*8/72))}px "Hanken Grotesk",system-ui,sans-serif`;x.textBaseline='middle';x.fillText(label,m,SH-m/2)}
  return c}
-// ---- TIFF (little-endian, one strip, uncompressed): grey (1 channel, 0 = black) or CMYK (4 channels)
-function coTiff(px,w,h,spp,dpi){const cmyk=spp==4,tags=[[256,4,1,w],[257,4,1,h],[258,3,spp,0],[259,3,1,1],[262,3,1,cmyk?5:1],[273,4,1,0],[277,3,1,spp],[278,4,1,h],[279,4,1,px.length],[282,5,1,0],[283,5,1,0],[284,3,1,1],[296,3,1,2],...(cmyk?[[332,3,1,1]]:[])];
+// ---- TIFF (little-endian, one strip, uncompressed): grey (1 channel, 0 = black), RGB (3) or CMYK (4 channels)
+function coTiff(px,w,h,spp,dpi){const cmyk=spp==4,tags=[[256,4,1,w],[257,4,1,h],[258,3,spp,0],[259,3,1,1],[262,3,1,cmyk?5:spp==3?2:1],[273,4,1,0],[277,3,1,spp],[278,4,1,h],[279,4,1,px.length],[282,5,1,0],[283,5,1,0],[284,3,1,1],[296,3,1,2],...(cmyk?[[332,3,1,1]]:[])];
  const ifd=8,isz=2+tags.length*12+4,bits=ifd+isz,rx=bits+8,ry=rx+8,pix=ry+8,out=new Uint8Array(pix+px.length),v=new DataView(out.buffer);
  const set=(k,val)=>{tags.find(t=>t[0]===k)[3]=val};set(258,spp==1?8:bits);set(273,pix);set(282,rx);set(283,ry);
  out[0]=0x49;out[1]=0x49;v.setUint16(2,42,true);v.setUint32(4,ifd,true);v.setUint16(ifd,tags.length,true);
@@ -137,4 +137,4 @@ function init42(){
  cmdRegister({id:'export.cmykTiff',label:'Export CMYK TIFF',run:()=>coCmykOut('tiff')});
  cmdRegister({id:'export.cmykPdf',label:'Export CMYK PDF',run:()=>coCmykOut('pdf')});
  cmdRegister({id:'view.proof',label:'Proof colours',on:()=>PRF.on,run:()=>coProof(!PRF.on)})}
-export {init42};
+export {init42,coCmyk,coIdle,coInkName,coInks,coIsSpot,coPlate,coRaster,coSize,coSpots,coTiff,coWith};

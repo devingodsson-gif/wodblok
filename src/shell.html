@@ -434,7 +434,7 @@ input[type=number]{-moz-appearance:textfield;text-align:right;font-variant-numer
 .hlpc{font-size:var(--fs-m);line-height:1.4;color:var(--fg)}.hlpc h4{margin:var(--sp-5) 0 var(--sp-2);font-size:var(--fs-m);font-weight:600}.hlpc p{margin:0 0 var(--sp-4)}.hlpc ul{margin:0 0 var(--sp-4);padding-left:var(--sp-6)}.hlpc li{margin:0 0 var(--sp-2)}
 .hlpd{font-weight:400;color:var(--mut);font-size:var(--fs-s)}.hlpn{color:var(--mut);font-size:var(--fs-m)}
 /* 2.87.5: the Separations dialog (42-colour-output.js): settings rows; an ink row has its swatch (a --h-xs square) */
-#sepd .dlg{width:min(420px,calc(100vw - 32px))}#sepd .dlg-b{padding:var(--sp-4) var(--sp-5);gap:0;max-height:min(70vh,560px);overflow-y:auto}
+#sepd .dlg,#prfd .dlg{width:min(420px,calc(100vw - 32px))}#prfd .dlg-b{padding:var(--sp-4) var(--sp-5);gap:0}#sepd .dlg-b{padding:var(--sp-4) var(--sp-5);gap:0;max-height:min(70vh,560px);overflow-y:auto}
 .sepi i{flex:none;width:var(--h-xs);height:var(--h-xs);border-radius:var(--r-s);border:1px solid var(--line2)}.sepi label b{margin-left:var(--sp-3)}
 #rngd .dlg{width:min(380px,calc(100vw - 32px))}#rngd .dlg-b{padding:var(--sp-5)}.unr .unu{min-width:2em}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
@@ -986,6 +986,7 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
    <div id="cphb" hidden><div class="aspc">Width <input type="number" id="cpw" min="0.01" max="20000" step="0.01" aria-label="Width"> Height <input type="number" id="cph" min="0.01" max="20000" step="0.01" aria-label="Height"> <span id="cpu"></span></div>
    <div class="ctl"><label for="cdpi">Resolution</label><select id="cdpi" aria-label="Resolution"><option value="72">72 DPI</option><option value="150">150 DPI</option><option value="300">300 DPI</option><option value="600">600 DPI</option></select></div>
    <div class="xrd" id="cphi" aria-live="polite"></div></div>
+   <div class="aspc unr" id="cblr">Bleed <input type="text" class="unf" id="cbl" inputmode="decimal" autocomplete="off" aria-label="Bleed"> <span class="unu"></span></div>
    <label>Anchor</label><div class="shg" id="canc" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
   </div></details>
   <div id="bkgrp" hidden>
@@ -1533,6 +1534,11 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
 <div class="modal" id="nwd" hidden><div class="dlg tpsd" role="dialog" aria-modal="true" aria-labelledby="nwdt">
  <div class="dlg-h"><h2 id="nwdt">Save changes first?</h2><button class="ib" id="nwdx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
  <div class="dlg-f ifoot"><button type="button" class="alt" id="nwdcx">Cancel</button><button type="button" class="alt" id="nwdno">Don’t save</button><button type="button" class="primary" id="nwdok">Save</button></div>
+</div></div>
+<div class="modal" id="prfd" hidden><div class="dlg tpsd" role="dialog" aria-modal="true" aria-labelledby="prft">
+ <div class="dlg-h"><h2 id="prft">Print file</h2><button class="ib" id="prfx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
+ <div class="dlg-b" id="prfb"></div>
+ <div class="dlg-f ifoot"><button type="button" class="alt" id="prfcx">Cancel</button><button type="button" class="primary" id="prfok">Export</button></div>
 </div></div>
 <div class="modal" id="sepd" hidden><div class="dlg tpsd" role="dialog" aria-modal="true" aria-labelledby="sept0">
  <div class="dlg-h"><h2 id="sept0">Separations</h2><button class="ib" id="sepx" aria-label="Close"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="close"></svg></button></div>
