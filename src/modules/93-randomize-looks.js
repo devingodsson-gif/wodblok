@@ -487,7 +487,32 @@ RZL.confetti={dark:1,w:.9,need:'pat',build(E){const R=E.roles,S=Math.min(CW,CH),
   out.texts.push(elText(E,sub,rzFont(E,RZF.confetti[1]),CW/2,CH/2+lh*.24,lw*.6,lh*.12,R.txt([lc],R.acc[0]||R.ink),{ls:12}))}
  out.tex=E.ch(.4)?rzPaper(E):'';out.grade=E.pick(['punch','none']);return out}};
 
-const RZ_NAMES={repeat:'Repeat',textile:'Textile',tilework:'Tilework',halftone:'Halftone',mandala:'Mandala',letters:'Pattern type',confetti:'Confetti',poster:'Poster',plate:'Book plate',badge:'Badge',specimen:'Specimen',modern:'Modern',sun:'Sunburst',quilt:'Quilt'},RZ_LOOKS=Object.keys(RZ_NAMES);
+// 2.86.0 (owner, Nov 2 2026: "another randomize look, it's just called Random and it's basically totally random, much like the old school randomize before the looks ... just go wild"):
+// no plan and no layout. Every part is drawn at random: the ground, a gradient, one to three patterns in any layout with shapes or themed pictures, a scatter of loose
+// shapes (any size, turn, blend, opacity and effect), sometimes a themed picture, a ring, a border or a frame, and words in any font. The panel's switches still apply.
+const RZ_BASIC=['rect','rrect','ellipse','tri','dia','pent','hex','star','arrow','heart'];
+// the blends that keep a piece seen on its ground: on a light ground the darkening ones, on a dark ground the lightening ones (a light blend on a light ground hid everything)
+const rzBlends=g=>rzLum(g)>.35?['multiply','darken','overlay','soft-light']:['screen','lighten','overlay','soft-light'];
+// an effect from the filter list with its settings thrown somewhere between its default and anywhere in its range
+function rzWildFx(E){const ks=Object.keys(FQ),k=E.pick(ks),e=rzQfx(k,{},E);if(!e)return null;(FQ[k].P||[]).forEach(([f,,lo,hi,v])=>{if(E.ch(.7)){const w=E.rr(lo,hi);e[f]=Math.round(v+(w-v)*E.rr(.3,1))}});return e}
+RZL.random={dark:1,w:.8,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},looks=Object.keys(RZT);
+ const gnd=rzGround(E,out,E.pick(['flat','tonal','glow','halftone'])),inks=rzInks(E,gnd,5),ink=()=>E.pick(inks),theme=()=>E.pick(rzThemes(E,E.pick(looks))),shape=()=>basicKey(E.pick(RZ_BASIC));
+ const BL=rzBlends(rzHex(gnd)),wild=(q,p)=>{if(!q)return q;if(E.ch(p||.35))addFx(q,rzWildFx(E));if(E.ch(.2))q.bl=E.pick(BL);if(E.ch(.2))q.op=E.ri(55,95);return q};
+ if(E.ch(.3))out.els.push(wild(elGrad(E,ink(),E.ch(.5)?ink():R.paper,E.ch(.4)),.2));
+ if(E.FT.pat)for(let i=0,n=E.ri(1,3);i<n;i++){const ks=[...Array(E.ri(1,3))].map(()=>E.ch(.45)?theme():shape()).filter(Boolean),pi=E.shuf(inks).slice(0,E.ri(1,3));if(!ks.length)continue;
+  const p=rzPat(E,out,{n:'Random '+(i+1),src:ks.map(k=>rzSrc(E,out,k,pi[0])),inks:pi,lays:['tile','wall','scatter','spiral'],pc:E.ch(.5)?1:0});
+  if(E.FT.jit&&E.ch(.35)&&!(p.fx||[]).some(e=>e.k=='jitter'))addFx(p,fxJ(E.ri(0,40),E.ri(0,90),E.ri(0,40)));out.els.push(wild(p,.3))}
+ for(let i=0,n=E.ri(2,10);i<n;i++){const k=E.pick(RZ_BASIC),w=S*E.rr(.04,.55),h=E.ch(.6)?w:S*E.rr(.04,.55),q=elBox(k,E.rr(0,CW),E.rr(0,CH),w,h,{ink:ink(),nm:'Random shape'});if(!q)continue;q.r=E.ri(-180,180);
+  if(E.ch(.2)){q.fl='none';q.sw=rzF(Math.max(1,S*E.rr(.003,.02)));q.sk=ink()}out.els.push(wild(q))}
+ if(E.ch(.45)){const d=S*E.rr(.3,.75);rzFocal(E,out,E.pick(['poster','plate','badge']),E.rr(CW*.25,CW*.75),E.rr(CH*.25,CH*.75),d,d,ink(),null,{bg:gnd})}
+ for(let i=0,n=E.ri(0,4);i<n;i++){const m=theme();if(m)out.els.push(wild(elMotif(m,E.rr(0,CW),E.rr(0,CH),S*E.rr(.1,.5),{ink:ink(),r:E.ri(-180,180)})))}
+ if(E.FT.pat&&E.ch(.25)){const d=S*E.rr(.3,.8);rzRing(E,out,E.rr(CW*.3,CW*.7),E.rr(CH*.3,CH*.7),d,[E.ch(.5)?theme():shape()].filter(Boolean),ink())}
+ if(E.FT.pat&&E.ch(.2))out.els.push(rzBorder(E,out,S*E.rr(.03,.08),[shape()].filter(Boolean),ink()));else if(E.ch(.25))out.els.push(elFrame(S*E.rr(.03,.09),Math.max(1,S*E.rr(.002,.008)),ink(),'Frame'));
+ const WK=Object.keys(RZW),FS=[...new Set(Object.values(RZF).flat(2))];
+ for(let i=0,n=E.wpick([[0,.25],[1,.45],[2,.25],[3,.05]]);i<n;i++){const [ti,sub]=E.pick(RZW[E.pick(WK)]),t=E.ch(.65)?ti:sub,w=S*E.rr(.35,.95),h=w*E.rr(.12,.4),q=elText(E,E.ch(.15)?t.toUpperCase():t,rzFont(E,FS),E.rr(w/2,CW-w/2),E.rr(h,CH-h),w,h,ink(),{ls:E.pick([0,0,4,10,30])});if(E.ch(.3))q.r=E.ri(-35,35);out.texts.push(q)}
+ out.tex=E.ch(.5)?rzPaper(E):'';out.grade=E.pick(['punch','fade','warm','none','none']);return out}};
+
+const RZ_NAMES={repeat:'Repeat',textile:'Textile',tilework:'Tilework',halftone:'Halftone',mandala:'Mandala',letters:'Pattern type',confetti:'Confetti',poster:'Poster',plate:'Book plate',badge:'Badge',specimen:'Specimen',modern:'Modern',sun:'Sunburst',quilt:'Quilt',random:'Random'},RZ_LOOKS=Object.keys(RZ_NAMES);
 // the names of the frame elements a Look makes: the Frame switch leaves them out
 const RZ_FRAME=['Frame','Rule','Binding','Border','Corner'];
 // which Look a roll makes: the one chosen in the Randomize panel, or any by its weight. 2.76.3: only a Look whose parts are switched on (Repeat and Quilt are
