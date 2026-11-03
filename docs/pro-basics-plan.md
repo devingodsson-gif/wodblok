@@ -87,9 +87,28 @@ Numbering: each step is a patch release on the version that is live when work st
 - **Bottom: Export recipes.** The saved recipes and Export all, moved down from the top.
 - Tests: the groups are in that order; Quick export works from the top with one click; the print options produce the files from steps 5 and 6.
 
+## Step 10: blend modes, with a live preview (owner, Nov 3: "add around 20 of the top blend modes too, and when you hover over them it previews on the canvas")
+- **About 20 modes, grouped as in Photoshop**, with a thin line between the groups:
+  - Normal.
+  - Darken, Multiply, Colour burn, Linear burn.
+  - Lighten, Screen, Colour dodge, Linear dodge (Add).
+  - Overlay, Soft light, Hard light, Vivid light, Linear light.
+  - Difference, Exclusion, Subtract, Divide.
+  - Hue, Saturation, Colour, Luminosity.
+  - WODBLOK's own Replace stays at the end.
+- **How they are drawn:**
+  - 13 of the new ones are the browser's own blend modes, so they are fast.
+  - Linear burn, Linear dodge, Vivid light, Linear light, Subtract and Divide are drawn with a filter. They are checked with `npm run perf`, and any that is too slow is left out and said.
+- **Live preview:**
+  - Moving the pointer over a mode in the Blend list shows it on the selected elements right away.
+  - Moving down the list with the arrow keys does the same, so it is not hover-only.
+  - Leaving the list or pressing Esc puts the old mode back.
+  - Clicking (or Enter) keeps the new mode, as one History step. Nothing is saved or added to History while previewing.
+- Tests: each mode is applied and drawn; hovering or arrowing previews it with no History step; leaving restores; clicking keeps it.
+
 ## Order and testing
 - Order:
-  - Steps 1 to 3 first (small, everyday tools), with 7 and 8 alongside (panel work).
+  - Steps 1 to 3 first (small, everyday tools), with 7, 8 and 10 alongside.
   - Then 4 (Help), then 5 and 6 (the largest).
   - Step 9 last, so the Export panel is arranged once the new print options exist.
 - Each step: its own branch, one commit per behaviour change with its test, the related specs, `check:style` and `check:platform`. Run `npm run perf` where drawing or dragging changes (steps 2, 3 and 6).
