@@ -5,7 +5,7 @@
 - The Element group's Position across and down sliders are now **X, Y, W and H** fields in those units (the box's top-left corner and size). W and H show for elements that have a box. A canvas with a size (Canvas > Format) uses it; one with only a ratio counts as 300 mm on its long side at 300 DPI.
 - Typed values take units ("2in", "50mm"), sums and a leading + or - from the current value; Enter or leaving the field applies (one History step), Esc puts the shown value back, bad input is marked and changes nothing.
 - Not yet: Size and Rotate stay sliders; the Canvas's pattern pieces and spacing keep %.
-- Tests: tests/units-2-87-1.spec.js (new, 3), tests/layout-settings.spec.js (the Position across / down test moved there). Run: those two specs, check:style, check:platform. Not run: the full suite (kept for the end of the plan, owner Nov 3).
+- Tests: tests/units-2-87-1.spec.js (new, 3), tests/layout-settings.spec.js removed (its one test, Position across / down, is now in the units spec). Run: those two specs, check:style, check:platform. Not run: the full suite (kept for the end of the plan, owner Nov 3).
 
 ## 2.87.0 (Nov 2 2026): Random is more like the website's gallery, in the tray's colours only
 - Owner: "The random output should be more pattern heavy and make sure it only uses the color tray. Look at the gallery on the website. The output should be more like that."
