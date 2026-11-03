@@ -29,12 +29,14 @@ let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[pa
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={xrec:'Export',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',image:'Image',sheet:'Sheet',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
+const PNAME={xrec:'Export',help:'Help',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',image:'Image',sheet:'Sheet',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
 const EL_ONLY=['layers','stmp','motifs','image','sheet','text','elpaint'];
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
 const ELP=EL_ONLY,wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
-const MODEP={pattern:['lyrs','layers','stmp','motifs','image','sheet','elpaint','text','pgrid','canvas','colors','rand','hist','xrec']};
+// undocked panels (2.87.4, owner Nov 3 2026): with no remembered place they open floating in the middle of the window, and dock like any panel
+const WS_UNDOCK=['xrec','help'];
+const MODEP={pattern:['lyrs','layers','stmp','motifs','image','sheet','elpaint','text','pgrid','canvas','colors','rand','hist','xrec','help']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85,lk:1}),wsG(['layers']),wsG(['canvas','colors'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)
@@ -219,7 +221,7 @@ if(!g){const m=wsMem[p],e=m&&m.e?m.e:wsSide(),free=x=>!x.lk;
  if(m&&m.with&&m.with.length)g=wsAll().find(x=>free(x)&&x.tabs.some(t=>m.with.includes(t)))||null;
  if(!g&&m&&m.fl){g={id:nid(),tabs:[],a:p,f:1,e:'r',x:m.fl.x,y:m.fl.y,w:m.fl.w,h:m.fl.h};L.float.push(g)}
  // Export (2.76.1, owner Oct 29 2026): with no remembered place it pops out in the middle of the window
- if(!g&&p=='xrec'){const w=Math.min(380,Math.max(260,innerWidth-40)),h=Math.round(Math.min(560,Math.max(260,innerHeight-120)));g={id:nid(),tabs:[],a:p,f:1,e:'r',x:Math.round((innerWidth-w)/2),y:Math.round(Math.max(56,(innerHeight-h)/2)),w,h};L.float.push(g)}
+ if(!g&&WS_UNDOCK.includes(p)){const w=Math.min(380,Math.max(260,innerWidth-40)),h=Math.round(Math.min(560,Math.max(260,innerHeight-120)));g={id:nid(),tabs:[],a:p,f:1,e:'r',x:Math.round((innerWidth-w)/2),y:Math.round(Math.max(56,(innerHeight-h)/2)),w,h};L.float.push(g)}
  // the Shape panel that opens by itself when a shape is added gets a group of its own (on the panels' side), so the panel you are working in stays in front
  if(!g&&bot){g=wsG([],{e});g.a=p;L.dock.push(g)}   /* a random id here as before 2.55.0 (the seeded series) */
  if(!g&&ELP.includes(p))g=wsAll().find(x=>free(x)&&wsIsP(x))||null;

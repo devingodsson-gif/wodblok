@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **steps 1 and 2 live (2.87.2); step 3 done (2.87.3, not live).** Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 to 3 live (2.87.3); step 4 done (2.87.4, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -43,6 +43,7 @@ Numbering: each step is a patch release on the version that is live when work st
 - **Where it lives:** a **Help undocked panel**, with search, styled to the UI standard. It opens floating in the middle the first time, like Export, and can be docked. It is kept out of the tool panels so the no-tooltips rule stands.
 - **Content:** plain writing kept in the repo and bundled into the app, so it works offline with no network.
 - Tests: every menu item opens its page; search finds a topic; the page fits a phone.
+- **Done in 2.87.4:** the Help panel (`help`, 46-help-pages.js for the writing, 47-help.js for the panel) and the Help menu: Getting started, Manual, Keyboard shortcuts, What's new, Search commands, Send feedback (signed in), About Wodblok. Home lists the pages; search matches every word typed and shows the line it is in; Keyboard shortcuts come from the command registry and About from the app's version, so neither goes stale. What's new is a short list kept in 46-help-pages.js: each release a user would notice adds a line at the top. Export and Help are the **undocked panels** (`WS_UNDOCK` in 34-desktop-shell.js). Settings keeps its own Shortcuts and About pages.
 
 ## Step 5: colour output
 - **Ink separations.**
@@ -117,9 +118,7 @@ Numbering: each step is a patch release on the version that is live when work st
 
 ## Order and testing
 - Order:
-  - Steps 1 to 3 first (small, everyday tools), with 7, 8 and 10 alongside. Step 11 (undo and redo) after those, unless the owner moves it up.
-  - Then 4 (Help), then 5 and 6 (the largest).
-  - Step 9 last, so the Export panel is arranged once the new print options exist.
+  - By step number, 1 to 11 (owner, Nov 3 2026: "Do it in numerical order"). Step 9 (the Export panel) still comes after 5 and 6, so it is arranged once the new print options exist.
 - Each step: its own branch, one commit per behaviour change with its test, the related specs, `check:style` and `check:platform`. Run `npm run perf` where drawing or dragging changes (steps 2, 3 and 6).
 - Run the CI suite at the end with the owner's word. Saving, opening files and the file format are touched in steps 2 (guides saved) and 5 (spot inks); this is said before going live.
 

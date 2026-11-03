@@ -80,6 +80,7 @@ import {init94} from './modules/94-image-crop.js';
 import {init95} from './modules/95-image-element.js';
 import {init96} from './modules/96-picture-library.js';
 import {init97} from './modules/97-touch.js';
+import {init47} from './modules/47-help.js';
 import {init99} from './modules/99-rulers.js';
 import {init58} from './modules/58-account.js';
 import {init59} from './modules/59-align.js';
@@ -168,7 +169,7 @@ init94();
 init62();
 init63();
 init64();
-init99();   // rulers and guides (2.87.2): its commands before the menu bar
+init47();init99();   // rulers and guides (2.87.2): its commands before the menu bar
 // the menu bar last: its menus list commands from every module, the account's included
 init85();
 // a launch with no template picker is an untouched new project: no unsaved dot, nothing to confirm before opening another (2.22.1; the picker's own finish used to set this)

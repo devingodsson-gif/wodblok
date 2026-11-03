@@ -24,9 +24,9 @@ const MNB=[
  ['colour','Colour',['panel.colors','tray.add','tray.save','-','colourway.new','colourway.exportAll']],
  ['view','View',['view.zoomIn','view.zoomOut','view.fit','view.actualSize','view.hand','-','view.grid','view.smartGuides','-','view.rulers','view.guides','view.lockGuides','view.clearGuides','view.newGuide','-','view.before','view.split','view.tileRepeat','-','view.theme']],
  ['window','Window',['panel.canvas','panel.colors','panel.lyrs','panel.layers','panel.stmp','panel.motifs','panel.text','panel.image','panel.sheet','panel.pgrid','panel.hist','panel.rand','panel.xrec','-','panels.closeAll']],   // 2.76.11: Image and Sheet too
- ['help','Help',['help.shortcuts','app.commandSearch','feedback.open','-','help.about']]];
+ ['help','Help',['help.start','help.manual','help.shortcuts','help.whatsNew','-','app.commandSearch','feedback.open','-','help.about']]];   // 2.87.4: Help pages open in the Help panel (47-help.js)
 // commands that open a dialog or a file picker: their menu item ends with … (section 13.2)
-const MNB_DOTS=new Set(['view.newGuide','file.export','library.importStamp','library.importImage','library.importSheet','app.commandSearch','feedback.open','help.shortcuts','help.about']);
+const MNB_DOTS=new Set(['view.newGuide','file.export','library.importStamp','library.importImage','library.importSheet','app.commandSearch','feedback.open']);
 const mnbMac=()=>/Mac|iPhone|iPad/.test(navigator.platform||'');
 const mnbEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // an on/off command is ticked while its button is pressed or its switch is on

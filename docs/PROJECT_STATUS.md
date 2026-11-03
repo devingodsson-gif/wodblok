@@ -5,7 +5,9 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 3: 2.87.3 (pro basics step 3: Alt-drag duplicates)** on `feat/2.87.3-alt-drag`, not merged. Next: step 7 (layouts), 8 (Pattern sources) or 10 (blend modes), the owner picks; then 11 (undo and redo).
+- **Nov 3: 2.87.4 (pro basics step 4: Help)** on `feat/2.87.4-help`, not merged. Next: step 5 (colour output); the plan goes by step number now (owner).
+- **Nov 3: 2.87.3 LIVE** (owner: "Merge then work on step 4").
+- **Nov 3: 2.87.3 (pro basics step 3: Alt-drag duplicates)** on `feat/2.87.3-alt-drag`, merged.
 - **Nov 3: 2.87.2 LIVE** (owner: "Both"): 2.87.1 (units) and 2.87.2 (rulers and guides) merged.
 - **Nov 3: 2.87.2 (pro basics step 2: rulers and guides)** on `feat/2.87.2-rulers`, built on 2.87.1, merged. View > Rulers (Ctrl+R), Guides (Ctrl+'; Ctrl+; is Smart guides), Lock, Clear, New guide…; guides saved in `proj.gd`. Next: step 3 (Alt-drag). Saving touches the file only by the optional `proj.gd`.
 - **Nov 3: 2.87.1 (pro basics step 1: real units)** on `feat/2.87.1-real-units`, not merged. Units setting (mm default) and X, Y, W, H fields in the Element group. Next: step 2 (rulers), then 3. Not yet: Size and Rotate stay sliders; pattern pieces and spacing keep %. Full suite at the end of the plan with the owner's word.

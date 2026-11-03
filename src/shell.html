@@ -426,6 +426,13 @@ input[type=number]{-moz-appearance:textfield;text-align:right;font-variant-numer
 .rgd.rgv{width:7px;height:100%;margin-left:-3px;cursor:ew-resize}.rgd.rgv::after{left:3px;top:0;bottom:0;width:1px}
 .rgd.rgh{height:7px;width:100%;margin-top:-3px;cursor:ns-resize}.rgd.rgh::after{top:3px;left:0;right:0;height:1px}
 #rul.rulk .rgd{pointer-events:none}
+/* 2.87.4: the Help panel (47-help.js): a search row, page rows like list rows, and the page's writing (--fs-m, line height 1.4) */
+.hlpt{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-4) var(--sp-5)}.hlpb{padding:0 var(--sp-5) var(--sp-5)}.hlpt input{flex:1;min-width:0}
+.hlpr{display:flex;align-items:center;gap:var(--sp-4);width:100%;min-height:var(--h-row);padding:0 var(--sp-2);border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--fg);font-size:var(--fs-m);text-align:left;border-radius:0}
+.hlpr:hover{background:var(--raise)}.hlpr .hlprt{flex:none;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hlpr .hlprs{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mut);font-size:var(--fs-s)}.hlpr .ic{margin-left:auto;flex:none;width:13px;height:13px;color:var(--faint)}
+.hlph{margin:var(--sp-2) 0 var(--sp-4);font-size:var(--fs-l);font-weight:600}
+.hlpc{font-size:var(--fs-m);line-height:1.4;color:var(--fg)}.hlpc h4{margin:var(--sp-5) 0 var(--sp-2);font-size:var(--fs-m);font-weight:600}.hlpc p{margin:0 0 var(--sp-4)}.hlpc ul{margin:0 0 var(--sp-4);padding-left:var(--sp-6)}.hlpc li{margin:0 0 var(--sp-2)}
+.hlpd{font-weight:400;color:var(--mut);font-size:var(--fs-s)}.hlpn{color:var(--mut);font-size:var(--fs-m)}
 #rngd .dlg{width:min(380px,calc(100vw - 32px))}#rngd .dlg-b{padding:var(--sp-5)}.unr .unu{min-width:2em}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .board.off{position:absolute;left:-20000px;top:0;width:40px;height:40px;overflow:hidden;pointer-events:none;flex:none}
@@ -926,6 +933,7 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
  <button type="button" id="rail-hist" data-pn="hist" aria-label="History"></button>
  <button type="button" id="rail-rand" data-pn="rand" aria-label="Randomize"></button>
  <button type="button" id="rail-xrec" data-pn="xrec" aria-label="Export"></button>
+ <button type="button" id="rail-help" data-pn="help" aria-label="Help"></button>
  <button type="button" id="rail-layers" data-pn="layers" aria-label="Pattern"></button>
  <button type="button" id="rail-stmp" data-pn="stmp" aria-label="Stamp"></button>
  <button type="button" id="rail-motifs" data-pn="motifs" aria-label="Shape"></button>
@@ -1426,6 +1434,10 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
  <div class="hsl" id="bal"></div>
  <div class="hsh"><span>History</span><span class="hsc" id="hsc"></span></div>
  <div class="hsl" id="hhl"></div></div></section>
+<section class="pn" data-p="help" hidden>
+ <div class="hlpt"><button type="button" class="ib" id="hlpbk" aria-label="Back" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="chevL"></svg></button><input type="text" id="hlpq" aria-label="Search help" placeholder="Search help" autocomplete="off"></div>
+ <div class="hlpb" id="hlpb"></div>
+</section>
 <section class="pn" data-p="xrec" hidden>
  <div class="xrw"><label for="xrwm">Watermark</label><input type="checkbox" id="xrwm"></div>
  <div class="xrw" id="xrcwr" hidden><span>Colourways</span><div class="seg" id="xrcw" role="group" aria-label="Colourways to export"><button type="button" class="on" data-s="one">Showing</button><button type="button" data-s="all" id="xrcwall">All</button></div></div>
