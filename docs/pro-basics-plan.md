@@ -9,18 +9,17 @@ Numbering: each step is a patch release on the version that is live when work st
 - One **Units** setting (Settings > General): px, in, mm, cm. It applies everywhere.
 - The element panels show **X, Y, W, H** and Rotate in those units, in fields you can type into. They replace Position across, Position down, Size, Width and Height in %, which show the same values in real units now.
 - A real size comes from the canvas's physical size and resolution (Canvas > Format, which already has inches, millimetres and DPI).
-- Stamp items, pattern pieces and spacing show real units where it makes sense: a piece's size, spacing and margins.
+- Pattern pieces and spacing on the Canvas show real units where it makes sense: a piece's size, spacing and margins. A stamp's own shapes, in its tab, keep %.
 - Typed values take units ("2in", "50mm") and simple arithmetic ("+10").
 - Tests: a value typed in each unit lands at the right place; changing Units changes the display, not the document.
 
 ## Step 2: rulers and guides
-- **Rulers** on the top and left of the stage in **every tab**, in the chosen units, following zoom and pan. View > Rulers (Ctrl+R) turns them on and off for all tabs.
-  - On the Canvas they measure the canvas from its top-left corner.
-  - In a stamp's tab they measure the stamp at its printed size (owner, Nov 3: "a ruler to the top and left side of the canvas tabs too").
+- **Rulers** on the top and left of the **Canvas** tab, in the chosen units, measuring the canvas from its top-left corner and following zoom and pan. View > Rulers (Ctrl+R) turns them on and off.
+- **No rulers in a stamp's tab** (owner, Nov 3: "lets maybe not measure the stamp size, remove it from the stamp tab"): the stamp is not measured, and its shapes keep their sizes in % as now.
 - **Guides** are dragged out of a ruler, moved by dragging, and removed by dragging back onto the ruler. View > Guides shows or hides them (Ctrl+;), View > Lock guides locks them, View > Clear guides removes them.
 - Elements **snap** to guides (with the smart guides, under the same switch; Alt skips snapping).
 - **New guide…** places one at a typed position.
-- Guides are saved with the project, and a stamp's tab keeps its own guides.
+- Guides are saved with the project. They belong to the Canvas only, since a stamp's tab has no rulers.
 - Tests: rulers follow zoom and pan; guides drag, snap, lock, save and reopen.
 
 ## Step 3: Alt-drag to duplicate
