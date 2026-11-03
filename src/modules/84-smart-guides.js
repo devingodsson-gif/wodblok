@@ -29,6 +29,7 @@ function sgPrep(L,mv,ax,ay,o){const ids=new Set(mv.map(q=>String(q.u))),pl=L.pl|
  if(o.el)pl.forEach(q=>{if(ids.has(String(q.u))||q.bgd||q.flt||q.k=='group'||fpHid(pl,q))return;const b=sgBox(q);if(b&&b.r>b.l&&b.b>b.t&&!(b.l<=.5&&b.t<=.5&&b.r>=CW-.5&&b.b>=CH-.5))T.push(b)});
  T.forEach((b,i)=>{X.push([b.l,i],[(b.l+b.r)/2,i],[b.r,i]);Y.push([b.t,i],[(b.t+b.b)/2,i],[b.b,i])});
  if(o.cv){X.push([0,-1],[CW/2,-1],[CW,-1]);Y.push([0,-1],[CH/2,-1],[CH,-1])}
+ {const G=WBX.wbGuideLines&&WBX.wbGuideLines();if(G){G.x.forEach(v=>X.push([v,-2]));G.y.forEach(v=>Y.push([v,-2]))}}   // 2.87.2: the guides (99-rulers.js), tagged -2; drawn across the canvas like its own lines
  let B=null;mv.forEach(q=>{const b=sgBox(q);if(b)B=B?{l:Math.min(B.l,b.l),r:Math.max(B.r,b.r),t:Math.min(B.t,b.t),b:Math.max(B.b,b.b)}:b});
  return{T,X,Y,o,off:B?{l:B.l-ax,r:B.r-ax,t:B.t-ay,b:B.b-ay}:null}}
 // the nearest match within the snap distance: [shift, line] or null
@@ -49,7 +50,7 @@ const f2=v=>v.toFixed(2);
 function sgDraw(S,B,u,gx,gy,edges){const eps=Math.max(.06,u*.5),T=S.T;let h='';
  const axis=(ms,lines,lo,hi,full,vert)=>{const seen=new Set();ms.forEach(m=>lines.forEach(([v,i])=>{if(Math.abs(v-m)>eps)return;const k=v.toFixed(2);if(seen.has(k+'|'+i))return;seen.add(k+'|'+i)}));
   const by=new Map();seen.forEach(z=>{const[k,i]=z.split('|');if(!by.has(k))by.set(k,[]);by.get(k).push(+i)});
-  by.forEach((is,k)=>{let a=B[lo],b=B[hi];if(is.includes(-1)){a=0;b=full}else is.forEach(i=>{a=Math.min(a,T[i][lo]);b=Math.max(b,T[i][hi])});
+  by.forEach((is,k)=>{let a=B[lo],b=B[hi];if(is.includes(-1)||is.includes(-2)){a=0;b=full}else is.forEach(i=>{a=Math.min(a,T[i][lo]);b=Math.max(b,T[i][hi])});
    h+=vert?`<line class="sgl" x1="${k}" y1="${f2(a)}" x2="${k}" y2="${f2(b)}"/>`:`<line class="sgl" x1="${f2(a)}" y1="${k}" x2="${f2(b)}" y2="${k}"/>`})};
  axis(edges?[B.l,B.r]:[B.l,(B.l+B.r)/2,B.r],S.X,'t','b',CH,true);axis(edges?[B.t,B.b]:[B.t,(B.t+B.b)/2,B.b],S.Y,'l','r',CW,false);
  // a gap mark sits three quarters of the way down (or across) the part the two boxes share, clear of a line through their middles
@@ -57,7 +58,7 @@ function sgDraw(S,B,u,gx,gy,edges){const eps=Math.max(.06,u*.5),T=S.T;let h='';
  if(gx)gx.g.forEach(([a,b,p,q])=>{const y=mid(p,q,'t','b');h+=`<path class="sgs" d="M${f2(a)} ${f2(y)}H${f2(b)}M${f2(a)} ${f2(y-tk)}V${f2(y+tk)}M${f2(b)} ${f2(y-tk)}V${f2(y+tk)}"/>`});
  if(gy)gy.g.forEach(([a,b,p,q])=>{const x=mid(p,q,'l','r');h+=`<path class="sgs" d="M${f2(x)} ${f2(a)}V${f2(b)}M${f2(x-tk)} ${f2(a)}H${f2(x+tk)}M${f2(x-tk)} ${f2(b)}H${f2(x+tk)}"/>`});
  return h?`<g class="sgg">${h}</g>`:''}
-const sgLive=(L,e,o)=>o.on&&(o.cv||o.el)&&!(e&&e.altKey)&&!fpFG(L).snap;
+const sgLive=(L,e,o)=>o.on&&(o.cv||o.el||!!(WBX.wbGuideLines&&WBX.wbGuideLines()))&&!(e&&e.altKey)&&!fpFG(L).snap;
 // A move: D is the drag (WBS.fpDrag: p, g, s0); (nx, ny) where its anchor would go. Returns where it goes; the guides are left in WBS.sgG for the overlay.
 // 2.60.0 (artist test): Shift held while moving turns the guides off too (Alt still does; Shift is not used for a move otherwise)
 function sgMove(D,L,nx,ny,e){WBS.sgG='';if(!D.sgO)D.sgO=sgOpts();const o=D.sgO;if(!sgLive(L,e,o)||(e&&e.shiftKey))return[nx,ny];

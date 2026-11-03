@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **step 1 done (2.87.1, not live).** Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 and 2 done (2.87.1, 2.87.2, not live).** Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -23,6 +23,7 @@ Numbering: each step is a patch release on the version that is live when work st
 - **New guide…** places one at a typed position.
 - Guides are saved with the project. They belong to the Canvas only, since a stamp's tab has no rulers.
 - Tests: rulers follow zoom and pan; guides drag, snap, lock, save and reopen.
+- **Done in 2.87.2:** all of the above. Guides are kept in the project as `proj.gd` (`{x, y}` in canvas units; optional, so the format stays 30) and every add, move, removal or clear is one History step. The Guides shortcut is **Mod+'** (Mod+; was already Smart guides). Shift while dragging a guide steps it to the ruler's small ticks. Rulers start off; Guides start shown.
 
 ## Step 3: Alt-drag to duplicate
 - Holding Alt while dragging an element (or a selection, or a stamp's shape in its tab) leaves the original and drags a copy.
@@ -115,7 +116,7 @@ Numbering: each step is a patch release on the version that is live when work st
 
 ## Order and testing
 - Order:
-  - Step 1, then 11 (undo and redo), then 2 and 3 (small, everyday tools), with 7, 8 and 10 alongside.
+  - Steps 1 to 3 first (small, everyday tools), with 7, 8 and 10 alongside. Step 11 (undo and redo) after those, unless the owner moves it up.
   - Then 4 (Help), then 5 and 6 (the largest).
   - Step 9 last, so the Export panel is arranged once the new print options exist.
 - Each step: its own branch, one commit per behaviour change with its test, the related specs, `check:style` and `check:platform`. Run `npm run perf` where drawing or dragging changes (steps 2, 3 and 6).

@@ -92,5 +92,6 @@
  "95-image-element.js",
  "96-picture-library.js",
  "97-touch.js",
- "98-units.js"
+ "98-units.js",
+ "99-rulers.js"
 ]
