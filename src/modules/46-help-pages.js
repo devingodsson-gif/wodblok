@@ -6,7 +6,7 @@ const HELP_PAGES=[
  ['start','Getting started',[
   ['p','WODBLOK makes stamped patterns: you draw stamps from shapes, print them on the canvas, repeat them as patterns, colour them from a small tray of inks and finish them with print effects.'],
   ['h','The window'],
-  ['ul',['The menu bar is at the top left. Undo, redo, History, search, Randomize and light or dark are at the top right.','The element bar above the canvas adds a Shape, Image, Text, Stamp, Pattern or Sheet. Beside it is the colour tray.','The Elements list is docked on the right. Every other panel opens from the menus and can be docked, tabbed or left floating.']],
+  ['ul',['The menu bar is at the top left. Undo, redo, History, search, Randomize and light or dark are at the top right.','The element bar above the canvas adds a Shape, Image, Text, Stamp, Pattern or Sheet. Beside it is the colour tray.','The Elements list is docked on the right. Every other panel opens from the menus and can be docked, tabbed or left floating.','The Canvas and a stamp\u2019s tab each keep their own panel layout. The Layout button in the top bar opens Save layout and Reset layout for the one you are in; the Canvas\u2019s saved layout is also what the app opens with.']],
   ['h','A first pattern'],
   ['ul',['Elements > New stamp opens the stamp in its own tab. Add shapes to it from the Shape panel.','Go back to the Canvas tab and add a Pattern from the element bar. It repeats your stamps over the canvas.','Pick inks in the colour tray, then add print effects from the Effects menu.','Export > Export… opens the Export panel.']],
   ['h','Saving'],
@@ -50,6 +50,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.87.7','Nov 3 2026',['A stamp\u2019s tab opens with Stamp on the left and Shape beside Elements on the right. The Canvas and a stamp\u2019s tab keep their own layouts; the Layout button saves and resets them.']],
  ['2.87.6','Nov 3 2026',['Bleed on any canvas, and Export > Print file\u2026: a print PDF with trim and bleed boxes, marks and spot plates, a print TIFF, or a layered PSD.']],
  ['2.87.5','Nov 3 2026',['Export > Separations\u2026: one plate per ink, with halftone tints and registration marks. Spot inks. CMYK TIFF and PDF, and View > Proof colours.']],
  ['2.87.4','Nov 3 2026',['Help is a panel of its own, with a manual, search, keyboard shortcuts and this list.']],

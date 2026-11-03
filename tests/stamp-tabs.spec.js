@@ -16,7 +16,8 @@ test('Edit on a stamp row opens its tab; the strip is there only while a stamp i
   await expect(page.locator('#stmpl .smklk').first()).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#stmpl .smklk').first()).toHaveAttribute('aria-label', 'Edit Stamp 1');
   const wIn = await artW(page);
-  expect(wIn).toBeGreaterThan(w0 * 1.2);                       // the stage is zoomed to the stamp
+  expect(wIn).toBeGreaterThan(w0 * .8);                        // the stage is zoomed to the stamp (2.87.7: between Stamp on the left and Shape and Elements on the right, so a narrower stage)
+  expect(parseInt(await page.locator('#zl').textContent())).toBeGreaterThan(100);
   await page.click('#stetabs [data-sv="c"]'); await settle(page);
   expect(await tabs(page)).toEqual(['Canvas*', 'Stamp 1']);
   await expect(page.locator('#stmpl .smklk').first()).toHaveAttribute('aria-pressed', 'false');

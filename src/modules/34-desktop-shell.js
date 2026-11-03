@@ -1,6 +1,6 @@
 import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
-import {cmdGet,cmdIsEnabled,cmdRun} from '../commands/registry.js';
+import {cmdGet,cmdIsEnabled,cmdRegister,cmdRun} from '../commands/registry.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {DRT,NODRAFT,drOff} from './02-draft-mode-speedups.js';
 import {CH,CW,SH,SHN,SW,bk,closeDD,placeFloat,rowMenu,setDim,shOf,wrapP} from './04-canvas-and-stamp-outlines.js';
@@ -29,14 +29,14 @@ let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[pa
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={xrec:'Export',help:'Help',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',image:'Image',sheet:'Sheet',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
+const PNAME={xrec:'Export',help:'Help',layout:'Layout',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',image:'Image',sheet:'Sheet',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
 const EL_ONLY=['layers','stmp','motifs','image','sheet','text','elpaint'];
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
 const ELP=EL_ONLY,wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
 // undocked panels (2.87.4, owner Nov 3 2026): with no remembered place they open floating in the middle of the window, and dock like any panel
-const WS_UNDOCK=['xrec','help'];
-const MODEP={pattern:['lyrs','layers','stmp','motifs','image','sheet','elpaint','text','pgrid','canvas','colors','rand','hist','xrec','help']};
+const WS_UNDOCK=['xrec','help','layout'],WS_USZ={layout:[260,112]};   // 2.87.7: Layout is small
+const MODEP={pattern:['lyrs','layers','stmp','motifs','image','sheet','elpaint','text','pgrid','canvas','colors','rand','hist','xrec','help','layout']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85,lk:1}),wsG(['layers']),wsG(['canvas','colors'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)
@@ -46,10 +46,11 @@ try{const sv=JSON.parse(kv.get('wb30_ws')||'null');if(sv)['pattern'].forEach(m=>
 // 2.55.0 (owner Oct 26 2026): "every panel opens on the left by default (the Elements list on the right), and panels remember where they were opened".
 // Each panel's last place is kept across sessions: its dock edge and the panels it shared a group with, or its floating box. A panel with no place yet opens on
 // the side set in Settings > General > Open panels on (wb255_pside, default left).
-let wsMem={},wsN=0;try{const m=JSON.parse(kv.get('wb255_pmem')||'null');if(m&&typeof m=='object')wsMem=m}catch(e){}
+let wsMem={},wsN=0,layMode='pattern';   // layMode: 2.87.7, the mode whose layout shows (see laySwitch)
+try{const m=JSON.parse(kv.get('wb255_pmem')||'null');if(m&&typeof m=='object')wsMem=m}catch(e){}
 const wsSide=()=>{let v='';try{v=kv.get('wb255_pside')||''}catch(e){}return v=='r'?'r':'l'};
 const wsRemember=()=>{const L=WS.pattern;L.float.forEach(g=>g.tabs.forEach(p=>{wsMem[p]={fl:{x:g.x,y:g.y,w:g.w,h:g.h},with:g.tabs.filter(t=>t!=p)}}));L.dock.forEach(g=>g.tabs.forEach(p=>{wsMem[p]={e:g.e||'r',with:g.tabs.filter(t=>t!=p)}}));try{kv.set('wb255_pmem',JSON.stringify(wsMem))}catch(e){}};
-const wsSave=()=>{wsRemember();try{kv.set('wb30_ws',JSON.stringify(WS))}catch(e){}};
+const wsSave=()=>{if(layMode!='pattern')return;wsRemember();try{kv.set('wb30_ws',JSON.stringify(WS))}catch(e){}};   /* 2.87.7: a stamp's tab's layout is its own: it does not move where Canvas panels open */
 const wsL=()=>WS.pattern;
 const wsAll=()=>[...wsL().dock,...wsL().float];
 const wsFind=p=>wsAll().find(g=>g.tabs.includes(p))||null;
@@ -221,7 +222,7 @@ if(!g){const m=wsMem[p],e=m&&m.e?m.e:wsSide(),free=x=>!x.lk;
  if(m&&m.with&&m.with.length)g=wsAll().find(x=>free(x)&&x.tabs.some(t=>m.with.includes(t)))||null;
  if(!g&&m&&m.fl){g={id:nid(),tabs:[],a:p,f:1,e:'r',x:m.fl.x,y:m.fl.y,w:m.fl.w,h:m.fl.h};L.float.push(g)}
  // Export (2.76.1, owner Oct 29 2026): with no remembered place it pops out in the middle of the window
- if(!g&&WS_UNDOCK.includes(p)){const w=Math.min(380,Math.max(260,innerWidth-40)),h=Math.round(Math.min(560,Math.max(260,innerHeight-120)));g={id:nid(),tabs:[],a:p,f:1,e:'r',x:Math.round((innerWidth-w)/2),y:Math.round(Math.max(56,(innerHeight-h)/2)),w,h};L.float.push(g)}
+ if(!g&&WS_UNDOCK.includes(p)){const z=WS_USZ[p]||[380,560],w=Math.min(z[0],Math.max(Math.min(260,z[0]),innerWidth-40)),h=Math.round(Math.min(z[1],Math.max(Math.min(260,z[1]),innerHeight-120)));g={id:nid(),tabs:[],a:p,f:1,e:'r',x:Math.round((innerWidth-w)/2),y:Math.round(Math.max(56,(innerHeight-h)/2)),w,h};L.float.push(g)}
  // the Shape panel that opens by itself when a shape is added gets a group of its own (on the panels' side), so the panel you are working in stays in front
  if(!g&&bot){g=wsG([],{e});g.a=p;L.dock.push(g)}   /* a random id here as before 2.55.0 (the seeded series) */
  if(!g&&ELP.includes(p))g=wsAll().find(x=>free(x)&&wsIsP(x))||null;
@@ -241,14 +242,33 @@ WBX.wbOpenPanel=setPanel;
 // 2.79.3 (owner Oct 31 2026: "the stamp panel should always be out when the stamp tab mode is opened ... on the right side of the left panel"): opening a stamp's tab
 // brings the Stamp panel into a group of its own in the inner column right of the left dock (the left dock itself when it is empty); closing the tabs puts it back
 // where it was, or closes it if it was not open, unless it was moved meanwhile
-let wsStM=null;
-WBX.wbStampDock=on=>{if(!wsReady||wsNarrow())return;const L=wsL(),G='gstmp',mine=()=>L.dock.find(g=>g.id==G&&g.tabs.length==1&&g.tabs[0]=='stmp');
- if(on){const g0=wsFind('stmp');if(g0&&g0.id==G)return;wsStM=g0?{id:g0.id,i:g0.tabs.indexOf('stmp'),a:g0.a==='stmp',e:g0.e,fl:L.float.includes(g0)}:{none:1};
-  if(g0){g0.tabs.splice(g0.tabs.indexOf('stmp'),1);if(g0.a=='stmp')g0.a=g0.tabs[0];if(!g0.tabs.length)wsDetach(g0)}
-  const g={id:G,tabs:['stmp'],a:'stmp',f:1,e:'l'};wsDockIns(L,g,L.dock.some(x=>x.e=='l')?'li':'l',1e9)}   // no wsG: its random id would move the seeded series
- else{const g=mine(),m=wsStM;wsStM=null;if(!g||!m)return;wsDetach(g);
-  if(!m.none){let h=wsGroup(m.id);if(h){h.tabs.splice(Math.min(m.i,h.tabs.length),0,'stmp');if(m.a)h.a='stmp'}else{h={id:'gn'+(++wsN),tabs:['stmp'],a:'stmp',f:1,e:'l'};if(m.fl)L.float.push(Object.assign(h,{x:null}));else wsDockIns(L,h,m.e||'l',1e9)}}}
- wsSave();wsRender()};
+// 2.87.7 (docs/pro-basics-plan.md step 7; owner Nov 3 2026): the Canvas and a stamp's tab each have their own layout. A stamp's tab opens with the Stamp panel on the
+// left, the Shape panel in the inner right column and the Elements list on the far right, locked. Switching shows each mode's own layout as you left it; Save layout
+// (the Layout panel) keeps the panels as they are as that mode's default (settings, not the project) and Reset layout puts the default back. The Canvas's saved
+// default is also what the app opens with. The Layout panel itself goes along with you and is never part of a layout. Group ids here count up (no Math.random:
+// the seeded series stays as it was).
+const LAY_K={pattern:'wb2877_lay_c',stamp:'wb2877_lay_s'};
+let layN=0;const layLive={},layId=()=>'gl'+(++layN);
+const layStampDef=()=>({dock:[{id:layId(),tabs:['stmp'],a:'stmp',f:1,e:'l'},{id:layId(),tabs:['motifs'],a:'motifs',f:1,e:'ri'},{id:layId(),tabs:['lyrs'],a:'lyrs',f:1,e:'r',lk:1}],float:[]});
+const layCanvasDef=()=>({dock:[{id:layId(),tabs:['lyrs'],a:'lyrs',f:1,e:'r',lk:1}],float:[]});
+// a layout from outside (settings): known panels only, each once, never the Layout panel, fresh ids
+function layClean(L){if(!L||!Array.isArray(L.dock)||!Array.isArray(L.float))return null;const seen=new Set(['layout']),ok=g=>{if(!g||!Array.isArray(g.tabs))return false;g.tabs=g.tabs.filter(p=>MODEP.pattern.includes(p)&&!seen.has(p)&&seen.add(p));if(!g.tabs.includes(g.a))g.a=g.tabs[0];g.id=layId();g.f=+g.f||1;g.e=WS_E.includes(g.e)?g.e:'r';g.col=false;return g.tabs.length>0};
+ const c=JSON.parse(JSON.stringify(L));return{dock:c.dock.filter(ok),float:c.float.filter(ok)}}
+function laySaved(m){let v=null;try{v=JSON.parse(kv.get(LAY_K[m])||'null')}catch(e){}return v?layClean(v):null}
+const layDefault=m=>laySaved(m)||(m=='stamp'?layStampDef():layCanvasDef());
+// take the Layout panel's group out of the layout shown (to carry it over or leave it out of a save)
+function layPull(L){let G=null;['dock','float'].forEach(k=>{L[k].forEach(g=>{const i=g.tabs.indexOf('layout');if(i<0)return;if(g.tabs.length==1){G=g;return}g.tabs.splice(i,1);if(g.a=='layout')g.a=g.tabs[0];G={id:layId(),tabs:['layout'],a:'layout',f:1,e:g.e,x:g.x,y:g.y,w:260,h:112}});L[k]=L[k].filter(g=>g!==G)});return G}
+function layPut(L,G){if(!G)return;if(L.float.includes(G)||L.dock.includes(G))return;(G.x!=null||!L.dock.length?L.float:L.dock).push(G)}
+function laySwitch(m){if(m===layMode||!wsReady||wsNarrow()){layMode=m;return}const cur=WS.pattern,G=layPull(cur);layLive[layMode]=cur;layMode=m;
+ const nx=layLive[m]||layDefault(m);delete layLive[m];layPut(nx,G);WS.pattern=nx;wsSave();wsRender()}
+WBX.wbStampDock=on=>laySwitch(on?'stamp':'pattern');
+const layName=()=>layMode=='stamp'?'Stamp tab':'Canvas';
+function laySave(){const c=JSON.parse(JSON.stringify(WS.pattern));layPull(c);try{kv.set(LAY_K[layMode],JSON.stringify(c))}catch(e){}pmsg('Saved the '+layName()+' layout.')}
+function layReset(){const cur=WS.pattern,G=layPull(cur),nx=layDefault(layMode);layPut(nx,G);WS.pattern=nx;wsSave();wsRender();pmsg('Reset the '+layName()+' layout.')}
+WBX.wbLayout={mode:()=>layMode,name:layName,save:laySave,reset:layReset};
+{const n=$('layn'),sv=$('lays'),rs=$('layr'),sync=()=>{if(n&&n.textContent!==layName())n.textContent=layName()};if(sv)sv.onclick=laySave;if(rs)rs.onclick=layReset;
+ const s0=laySwitch;WBX.wbStampDock=on=>{s0(on?'stamp':'pattern');sync()};sync();
+ cmdRegister({id:'layout.save',label:'Save layout',run:laySave});cmdRegister({id:'layout.reset',label:'Reset layout',run:layReset})}
 WBX.wbApart=pn=>{const a=wsFind('lyrs'),b=wsFind(pn);return!(a&&b&&a===b)};   // false when the panel is a tab beside the Elements list: showing it would hide the list
 // The panels the app opens with (2.9.0: the Workspaces tool is gone; this is the one built-in layout, opened at launch). Read the arrangement of the tools, or put one in place (unknown tools are dropped, every tool stays in one place only)
 const wsLaunch=()=>({pattern:{dock:[wsG(['canvas','colors'],{e:'l'}),wsG(['lyrs','layers'],{e:'r',lk:1})],float:[]}});
@@ -284,7 +304,7 @@ $('rzdo').onclick=()=>randomize(false);
 // ---- zoom
 // 2.76.8 (2.76 review): the canvas no longer jumps sideways when the left column opens. While it is fitted to the screen, the left column's width is left out of
 // the fit and the canvas is moved back by half of it, so its middle stays where it was; a zoomed canvas keeps its own scroll
-const dkL=()=>{const d=document.querySelector('.dock.dk-l');return d?Math.round(d.getBoundingClientRect().width):0};   // the left dock only: an inner column (2.79.3) takes its own room
+const dkL=()=>{if(document.body.classList.contains('stedit'))return 0;const d=document.querySelector('.dock.dk-l');return d?Math.round(d.getBoundingClientRect().width):0};   /* 2.87.7: not in a stamp's tab, where the Stamp panel is always on the left: the stamp fits the stage between the columns */   // the left dock only: an inner column (2.79.3) takes its own room
 function fitZ(){const b=$('boardP');if(b.classList.contains('off'))return;const w=b.clientWidth-64-dkL(),h=b.clientHeight-64;fitS=Math.max(.05,Math.min(w/CW,h/CH))}
 // 2.84.3 (owner, Nov 1 2026: "middle click should drag the view and I should be able to scroll if I'm not zoomed in"): past where the board can scroll (always, while the
 // canvas is fitted) the view moves by an offset on the artwork, like Photoshop's pasteboard. A quarter of the canvas stays on screen; a new zoom level or Fit puts it back.
@@ -546,7 +566,7 @@ if(typeof nums=='function'){const _n=nums;nums=function(){_n();WBX.wbDDsync()}}
 })();
 
 enhance();
-WS.pattern={dock:[],float:[]};setView();{let st='';try{st=kv.get('wb96_launch')||''}catch(e){}if(st==='on')WBX.wbWsSet(wsLaunch());else if(st!=='none')WBX.wbWsSet({pattern:{dock:[wsG(['lyrs'],{e:'r',lk:1})],float:[]}})}   /* 2.55.0 (owner Oct 26 2026): the app starts with the Elements list on the right, locked ('none' is the tests' empty start) */info();nums();requestAnimationFrame(()=>{applyZ();nums()});
+WS.pattern={dock:[],float:[]};setView();{let st='';try{st=kv.get('wb96_launch')||''}catch(e){}if(st==='on')WBX.wbWsSet(wsLaunch());else if(st!=='none'){const sv=laySaved('pattern');if(sv){WS.pattern=sv;wsSave();wsRender();info();nums()}else WBX.wbWsSet({pattern:{dock:[wsG(['lyrs'],{e:'r',lk:1})],float:[]}})}}   /* 2.55.0 (owner Oct 26 2026): the app starts with the Elements list on the right, locked ('none' is the tests' empty start) */info();nums();requestAnimationFrame(()=>{applyZ();nums()});
 
 {const sp=document.getElementById('splash'),t0=performance.now();if(sp){const go=()=>{const w=Math.max(0,520-(performance.now()-t0));setTimeout(()=>{sp.classList.add('out');setTimeout(()=>sp.remove(),320)},w)};const f=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1400))]):Promise.resolve();requestAnimationFrame(()=>requestAnimationFrame(()=>f.then(go)))}}
 {const b=$('gdt');let on=true;try{on=kv.get('wb93_dots')!=='0'}catch(e){}const ap=()=>{document.body.classList.toggle('plain',!on);b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))};ap();b.onclick=()=>{on=!on;try{kv.set('wb93_dots',on?'1':'0')}catch(e){}ap()}}

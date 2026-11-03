@@ -434,6 +434,7 @@ input[type=number]{-moz-appearance:textfield;text-align:right;font-variant-numer
 .hlpc{font-size:var(--fs-m);line-height:1.4;color:var(--fg)}.hlpc h4{margin:var(--sp-5) 0 var(--sp-2);font-size:var(--fs-m);font-weight:600}.hlpc p{margin:0 0 var(--sp-4)}.hlpc ul{margin:0 0 var(--sp-4);padding-left:var(--sp-6)}.hlpc li{margin:0 0 var(--sp-2)}
 .hlpd{font-weight:400;color:var(--mut);font-size:var(--fs-s)}.hlpn{color:var(--mut);font-size:var(--fs-m)}
 /* 2.87.5: the Separations dialog (42-colour-output.js): settings rows; an ink row has its swatch (a --h-xs square) */
+.layrw{padding:0 var(--sp-5) var(--sp-5);gap:var(--sp-4)}.layrw button{flex:1;min-width:0}
 #sepd .dlg,#prfd .dlg{width:min(420px,calc(100vw - 32px))}#prfd .dlg-b{padding:var(--sp-4) var(--sp-5);gap:0}#sepd .dlg-b{padding:var(--sp-4) var(--sp-5);gap:0;max-height:min(70vh,560px);overflow-y:auto}
 .sepi i{flex:none;width:var(--h-xs);height:var(--h-xs);border-radius:var(--r-s);border:1px solid var(--line2)}.sepi label b{margin-left:var(--sp-3)}
 #rngd .dlg{width:min(380px,calc(100vw - 32px))}#rngd .dlg-b{padding:var(--sp-5)}.unr .unu{min-width:2em}
@@ -914,7 +915,7 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
  <div class="tb">
   <button class="ib" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="undo"></svg></button>
   <button class="ib" id="redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="redo"></svg></button>
-  <button class="ib" id="hstb" type="button" data-opn="hist" title="History" aria-label="History" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="history"></svg></button>
+  <button class="ib" id="hstb" type="button" data-opn="hist" title="History" aria-label="History" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="history"></svg></button><button class="ib" id="layb" type="button" data-opn="layout" title="Layout" aria-label="Layout" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="panels"></svg></button>
   <button class="ib" id="cmdkb" aria-label="Search commands" title="Search commands (Ctrl+K)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="search"></svg></button>
  </div>
  
@@ -937,6 +938,7 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
  <button type="button" id="rail-rand" data-pn="rand" aria-label="Randomize"></button>
  <button type="button" id="rail-xrec" data-pn="xrec" aria-label="Export"></button>
  <button type="button" id="rail-help" data-pn="help" aria-label="Help"></button>
+ <button type="button" id="rail-layout" data-pn="layout" aria-label="Layout"></button>
  <button type="button" id="rail-layers" data-pn="layers" aria-label="Pattern"></button>
  <button type="button" id="rail-stmp" data-pn="stmp" aria-label="Stamp"></button>
  <button type="button" id="rail-motifs" data-pn="motifs" aria-label="Shape"></button>
@@ -960,7 +962,7 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
   <div class="tyd" id="tyd" role="toolbar" aria-label="Colour tray"><div class="tyc" id="tyc" role="list"></div><button type="button" class="tycw" id="tycw" aria-haspopup="menu" aria-expanded="false" hidden><i></i><span></span><svg class="chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l5 5 5-5"/></svg></button></div>
   </div>
  </div>
- <div class="board" id="boardP"><div id="artwrap"><svg id="artsh" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"></svg><svg id="art" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><defs id="grdf"></defs><defs id="cvdefs"></defs><defs id="surfd"></defs><defs id="txd"></defs><defs id="stdefs"></defs><defs id="stpix"></defs><g id="dyn"></g><g id="texg"></g><g id="prfg" pointer-events="none"></g><g id="guig" pointer-events="none"></g><g id="fpgrid" pointer-events="none"></g><g id="fpov" pointer-events="none"></g><g id="gmov"></g></svg><svg id="stolsvg" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><g id="stol" class="stol" pointer-events="none"></g><g id="stoh" class="stoh"></g></svg></div></div>
+ <div class="board" id="boardP"><div id="artwrap"><svg id="artsh" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"></svg><svg id="art" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><defs id="grdf"></defs><defs id="cvdefs"></defs><defs id="surfd"></defs><defs id="txd"></defs><defs id="stdefs"></defs><defs id="stpix"></defs><g id="dyn"></g><g id="texg"></g><g id="guig" pointer-events="none"></g><g id="fpgrid" pointer-events="none"></g><g id="fpov" pointer-events="none"></g><g id="gmov"></g></svg><svg id="stolsvg" aria-hidden="true" viewBox="0 0 533 800" xmlns="http://www.w3.org/2000/svg"><g id="stol" class="stol" pointer-events="none"></g><g id="stoh" class="stoh"></g></svg></div></div>
  <div id="rul" hidden><div id="rug"></div><canvas id="rux" aria-hidden="true"></canvas><canvas id="ruy" aria-hidden="true"></canvas><div id="ruc"></div></div>
  <div class="spbar" id="spbar" hidden><span>Drag the line to place it. Drag the round end to turn it (Shift snaps to 15&#176;).</span><button class="alt" id="spno">Cancel</button><button class="pri" id="spok">Split</button></div>
 
@@ -1438,6 +1440,10 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
  <div class="hsl" id="bal"></div>
  <div class="hsh"><span>History</span><span class="hsc" id="hsc"></span></div>
  <div class="hsl" id="hhl"></div></div></section>
+<section class="pn" data-p="layout" hidden>
+ <div class="glb" id="layn">Canvas</div>
+ <div class="row layrw"><button type="button" class="alt" id="lays">Save layout</button><button type="button" class="alt" id="layr">Reset layout</button></div>
+</section>
 <section class="pn" data-p="help" hidden>
  <div class="hlpt"><button type="button" class="ib" id="hlpbk" aria-label="Back" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="chevL"></svg></button><input type="text" id="hlpq" aria-label="Search help" placeholder="Search help" autocomplete="off"></div>
  <div class="hlpb" id="hlpb"></div>
