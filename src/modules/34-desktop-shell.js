@@ -470,9 +470,14 @@ document.addEventListener('pointerover',e=>{const b=e.target.closest&&e.target.c
 const tip=b.querySelector('.tip');const words=b.textContent.replace(tip?tip.textContent:'','').trim();if(!words)b.title=b.getAttribute('aria-label')},true);
 
 // ---- keyboard shortcuts
+// 2.87.11 (docs/pro-basics-plan.md step 11; owner: "undo/redo dont work"): a text or number field keeps Ctrl+Z for its own typing only while there is typing in it
+// not yet applied. Once its value is applied (Enter, or the change when it is left) the keys undo and redo the document again, also with the field still focused (the
+// unit fields keep the focus after Enter); the field lets go of the focus so it shows the value that comes back.
+{const ed=t=>t&&t.matches&&t.matches('input[type=text],input[type=number],input:not([type])'),mark=v=>e=>{if(ed(e.target))e.target._wbEd=v};
+ document.addEventListener('input',mark(true),true);document.addEventListener('change',mark(false),true);document.addEventListener('focusin',mark(false),true);
+ document.addEventListener('keydown',e=>{if(e.key=='Enter'&&ed(e.target)){const t=e.target;setTimeout(()=>{t._wbEd=false},0)}},true)}
 document.addEventListener('keydown',e=>{const t=e.target,typing=t.matches&&t.matches('input,select,textarea'),m=e.metaKey||e.ctrlKey,k=e.key.toLowerCase(),q=WBS.tiles[WBS.cur]&&(WBS.tiles[WBS.cur]||WBS.noTile).items[WBS.sel];
-if(m&&k=='z'){if(typing&&(t.type=='text'||t.type=='number'))return;e.preventDefault();e.shiftKey?redo():undo()}
-else if(m&&k=='y'){e.preventDefault();redo()}
+if(m&&(k=='z'||k=='y')){if(typing&&(t.type=='text'||t.type=='number')){if(t._wbEd)return;t.blur()}e.preventDefault();k=='y'||e.shiftKey?redo():undo()}
 else if(m&&k=='s'){e.preventDefault();cmdGet('file.save').run()}
 else if(m&&k=='d'&&!typing&&q&&stUnlocked()!=null){e.preventDefault();cmdGet('stamp.duplicateMotif').run()}
 else if(m&&k=='d'&&!typing&&lyDupSel())e.preventDefault();

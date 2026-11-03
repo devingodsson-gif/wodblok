@@ -61,6 +61,7 @@ test('New guide takes a position in units; Lock guides stops dragging; Guides hi
   await pull(page, [x, b.y + 400], [x + 80, b.y + 400]);
   expect((await gd(page)).x[0] * k).toBeCloseTo(50, 1);
   await page.evaluate(() => window.__wbTest.commands.run('view.lockGuides'));
+  await expect(page.locator('#rul')).not.toHaveClass(/rulk/);   // unlocked: the guide takes the pointer again (drawn on the next frame)
   await pull(page, [x, b.y + 400], [x + 80, b.y + 400]);
   expect((await gd(page)).x[0] * k).toBeGreaterThan(52);
   expect((await labels(page)).slice(-1)[0]).toBe('Moved guide');
