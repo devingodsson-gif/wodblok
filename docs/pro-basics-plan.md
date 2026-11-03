@@ -6,7 +6,7 @@ Status: **plan, not started.** Steps 7 to 9 were added Nov 3 from the owner's se
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
-- One **Units** setting (Settings > General): px, in, mm, cm. It applies everywhere.
+- One **Units** setting (Settings > General): px, in, **mm (the default)**, cm. It applies everywhere.
 - The element panels show **X, Y, W, H** and Rotate in those units, in fields you can type into. They replace Position across, Position down, Size, Width and Height in %, which show the same values in real units now.
 - A real size comes from the canvas's physical size and resolution (Canvas > Format, which already has inches, millimetres and DPI).
 - Pattern pieces and spacing on the Canvas show real units where it makes sense: a piece's size, spacing and margins. A stamp's own shapes, in its tab, keep %.
@@ -66,8 +66,8 @@ Numbering: each step is a patch release on the version that is live when work st
 - A stamp's tab opens with the Stamp panel on the left, the Elements list docked on the far right, and the Shape panel just to the left of the Elements list (the inner right column).
 - **Two default layouts**, one for the Canvas and one for a stamp's tab. Each is saved and restored on its own.
 - **In the top bar:**
-  - **Save layout** keeps the panels as they are now as that mode's default.
-  - **Reset layout** puts them back.
+  - One button opens a small **Layout** undocked panel (floating by default, dockable).
+  - It holds **Save layout**, which keeps the panels as they are now as that mode's default, and **Reset layout**, which puts them back.
   - Both act on the mode you are in (the Canvas, or a stamp's tab).
 - Each default is kept in the settings, not in the project. Switching between the Canvas and a stamp's tab shows each one's own layout.
 - This is a default per mode, not named workspaces, which were removed in 2.9.0. Nothing else from workspaces comes back.
@@ -114,9 +114,11 @@ Numbering: each step is a patch release on the version that is live when work st
 - Each step: its own branch, one commit per behaviour change with its test, the related specs, `check:style` and `check:platform`. Run `npm run perf` where drawing or dragging changes (steps 2, 3 and 6).
 - Run the CI suite at the end with the owner's word. Saving, opening files and the file format are touched in steps 2 (guides saved) and 5 (spot inks); this is said before going live.
 
-## Questions for the owner
-1. Units: which should be the default? Inches (US print) or mm?
-2. Help: a panel docked like the others, or a separate window?
-3. Colour output: which printing first? Screen print, block or relief, riso, or print-on-demand?
-4. CMYK and profiles: is a standard conversion enough now, with ICC profiles later (that needs a library)?
-5. Layouts: should Save layout and Reset layout be two icon buttons in the top bar (beside History and the gear), or one button opening a small menu?
+## Owner's answers (Nov 3 2026)
+1. **Units:** the default is **mm**.
+2. **Help:** an **undocked panel**: it opens floating in the middle of the window the first time, as Export does, and can be docked like any panel. "Undocked panel" is the name for panels that open this way.
+3. **Printing first:** "whatever you think is best; we need textile printing and screen printing at least".
+   - Screen printing: one separation per ink (black on white, at the print resolution), with registration marks, a halftone option for tints, and the ink's name on each plate.
+   - Textile printing: the repeat unit exported with its inks as spot channels (a layered TIFF), the colour count of the repeat shown, and a CMYK or RGB file for digital textile printing.
+4. **CMYK:** a standard conversion now; ICC profiles later.
+5. **Layouts:** a small **Layout** undocked panel (floating by default, dockable), opened from one top-bar button. It holds Save layout and Reset layout for the mode you are in.
