@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 2: 2.87.0 (Random like the website's gallery, tray colours only)** on `feat/2.87.0-random-patterns`, not merged.
+- **Nov 3: 2.87.1 (pro basics step 1: real units)** on `feat/2.87.1-real-units`, not merged. Units setting (mm default) and X, Y, W, H fields in the Element group. Next: step 11 (undo and redo, owner: "undo/redo dont work"), then 2 and 3. Not yet: Size and Rotate stay sliders; pattern pieces and spacing keep %. Full suite at the end of the plan with the owner's word.
+- **2.87.0 is LIVE** (on `main`).
 - **Nov 2: 2.86.0 LIVE (Randomize Look "Random")** (owner: "Merge"). It rolls only when chosen (weight 0); open question: include it in Any?
 - **Nov 2: 2.85.0 LIVE** (owner: "Go live"): 2.84.4 and 2.84.5 merged, then 2.85.0 closes docs/patch-todo-2.85.md (version and docs only). Open: the stamp Sheet is a colour fill only; picture comparison not run.
 - **Nov 2: 2.84.5 (patch 4: panels and inputs, T15 to T18)** on `feat/2.84.5-panels-and-inputs`, built on `feat/2.84.4-stamp-tab` (2.84.4 not merged yet), not merged. With it the to-do is done: 2.85.0 closes it. CI suite (owner's word, Nov 2) green on this branch after the File menu tests were updated (run 41536168118, one shard re-run for a timing failure in small-updates-2-79-2). Not run: picture comparison (pull request only).

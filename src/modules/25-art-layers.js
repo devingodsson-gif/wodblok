@@ -9,6 +9,7 @@ import {fpGridDraw,fpGrp,fpL,fpPick,fpPoolOk,fpRange,fpSnapS,fpTog,fpU} from './
 import {fx1,tbG,tbSty,txbSync,txtGl} from './26-text-boxes.js';
 import {fxGr,fxJit,fxPad,fxTex} from './69-effect-stack.js';
 import {stTxMode} from './63-stamp-tool.js';
+import {unFmt,unGet,unParse} from './98-units.js';
 
 // ===== Art layers: imported images and saved WODBLOK projects, placed by hand like Free place stamps =====
 // ARTS[id] = {n name, k 'img'|'proj', src data URL, w, h, and for projects pid (source project) + ver (when it was last saved)}.
@@ -61,7 +62,20 @@ function fpSync(){const L=fpL();if(!L||!$('lfree'))return;txbSync(L);const[pa]=p
 if($('lfpst').dataset.k!=ky){WBS.fpTh={};$('lfpst').innerHTML=WBS.tiles.map((t,i)=>{useT(t);const sv=`<svg viewBox="0 0 ${SW} ${SH}"><path d="${shp(0)}" fill="${pa}"/><use href="#s${t.id}"/></svg>`;WBS.fpTh[t.id]=sv;return`<button type="button" data-t="${t.id}" title="${stNm(t)}" aria-label="${stNm(t)}">${sv}</button>`}).join('');useT(WBS.tiles[WBS.cur]);$('lfpst').dataset.k=ky}
 document.querySelectorAll('#lfpst [data-t]').forEach(b=>b.classList.toggle('on',+b.dataset.t==WBS.fpB||(fpPoolOk()&&WBS.fpPool.has(b.dataset.t))));
 const n=(L.pl||[]).length,p=(L.pl||[]).find(q=>q.u==WBS.fpSel);if(WBX.alSync)WBX.alSync();const A=p?null:fpArm();$('lfpsel').hidden=!(p||A);['lfpdu','lfpcp','lfpup','lfpdn','lfpdl'].forEach(id=>{if($(id))$(id).hidden=!p});if($('lfpcp'))$('lfpcp').setAttribute('aria-pressed',String(!!(WBS.plArm&&WBS.plArm.k=='copy')));
-if(p||A){const S0=Math.min(CW,CH),sv=(id,v)=>{const el=$(id);if(+el.value!=v){el.value=v;WBS.fpSyncing=1;try{el.dispatchEvent(new Event('input',{bubbles:true}))}finally{WBS.fpSyncing=0}}};sv('lfps',Math.round((p?p.s:A.s())/S0*100));sv('lfpr',Math.round(p?(+p.r||0):A.r()));$('lfpxy').hidden=!p;if(p){sv('lfpx',+(p.x/CW*100).toFixed(1));sv('lfpy',+(p.y/CH*100).toFixed(1))}}if(WBX.wbElSync)WBX.wbElSync()}
+if(p||A){const S0=Math.min(CW,CH),sv=(id,v)=>{const el=$(id);if(+el.value!=v){el.value=v;WBS.fpSyncing=1;try{el.dispatchEvent(new Event('input',{bubbles:true}))}finally{WBS.fpSyncing=0}}};sv('lfps',Math.round((p?p.s:A.s())/S0*100));sv('lfpr',Math.round(p?(+p.r||0):A.r()));$('lfpxy').hidden=!p;if(p)unSync(p)}if(WBX.wbElSync)WBX.wbElSync()}
+// 2.87.1 (docs/pro-basics-plan.md step 1): the Element group shows where the selected element is and how big, in real units (98-units.js): X and Y of its box's
+// top-left corner from the canvas's, W and H of its box. A typed value is set on Enter or when the field is left; Esc puts the shown value back.
+function unBox(p){const wh=fpWH(p);return{wh,x:wh?p.x-wh[0]/2:p.x,y:wh?p.y-wh[1]/2:p.y}}
+function unSync(p){const b=unBox(p),u=unGet();$('lfuwh').hidden=!b.wh;
+ [['lfux',b.x],['lfuy',b.y],...(b.wh?[['lfuw',b.wh[0]],['lfuh',b.wh[1]]]:[])].forEach(([id,v])=>{const e=$(id);if(document.activeElement===e)return;const t=unFmt(v,u);if(e.value!==t)e.value=t;e.classList.remove('bad')});
+ document.querySelectorAll('#lfpxy .unu').forEach(s=>{if(s.textContent!==u)s.textContent=u})}
+// a new width or height: a shape or a picture stretches on that side; an area pattern's area changes on that side (a whole-canvas pattern becomes an area of that size);
+// anything else scales evenly. The box's top-left corner stays where it was.
+function unResize(p,ax,nv){const b=unBox(p);if(!b.wh)return false;const k=nv/b.wh[ax];if(!(k>0)||Math.abs(k-1)<1e-6)return false;
+ if(p.k=='motif'||p.k=='image'){const f=ax?'wy':'wx';p[f]=+((+p[f]||1)*k).toFixed(4)}
+ else if(p.k=='pattern'){if(p.af||!(+p.aw>0)||!(+p.ah>0)){p.af=0;p.aw=b.wh[0];p.ah=b.wh[1]}const f=ax?'ah':'aw';p[f]=+(p[f]*k).toFixed(1)}
+ else p.s=+(p.s*k).toFixed(2);
+ const w2=fpWH(p);if(w2){p.x=+(b.x+w2[0]/2).toFixed(1);p.y=+(b.y+w2[1]/2).toFixed(1)}return true}
 function init25(){WBX.wbFpBox=(q,c)=>fpBox(q,c);   /* 2.76.10: the box of one pattern piece (67-pattern-element.js) */WBH.fpOverlay=fpOverlay;WBH.fpSync=fpSync;
 WBS.fpLast=null;
 {const ch=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()},cur2=()=>{const L=fpL();return L&&(L.pl||[]).find(q=>q.u==WBS.fpSel)};
@@ -74,8 +88,16 @@ WBX.wbWheelXf=e=>{if(stTxMode()){if($('sel').classList.contains('none'))return n
  if($('lfpsel').hidden)return null;const p=cur2();if(!p)return fpArm()?{s:'lfps',r:'lfpr'}:null;const L=fpL(),[x,y]=fpPt(e),h=L&&fpHit(L,x,y);return h&&fpGrp().includes(h)?{s:'lfps',r:'lfpr'}:null};
 $('lfps').addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p){const A=fpArm();if(A){A.setS(+($('lfps').value/100*Math.min(CW,CH)).toFixed(2));WBH.fpOverlay()}return}const v=+$('lfps').value/100*Math.min(CW,CH);if(Math.abs(v-p.s)<.01)return;const k=v/p.s,S0=Math.min(CW,CH);fpGrp().forEach(q=>{if(q!==p)q.s=+Math.max(S0*.02,Math.min(S0*3,q.s*k)).toFixed(2)});p.s=+v.toFixed(2);WBS.fpLast=p.s;store();upd()});
 $('lfpr').addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p){const A=fpArm();if(A){A.setR(Math.round(+$('lfpr').value));WBH.fpOverlay()}return}const v=+$('lfpr').value;if(v==p.r)return;const d=v-(+p.r||0);fpGrp().forEach(q=>{if(q!==p){let r=Math.round((+q.r||0)+d);r=((r+180)%360+360)%360-180;q.r=r}});p.r=v;store();upd()});
-['lfpx','lfpy'].forEach((id,ax)=>$(id).addEventListener('input',()=>{if(WBS.fpSyncing)return;const p=cur2();if(!p)return;const k=ax?'y':'x',W=ax?CH:CW,v=+$(id).value/100*W,d=v-p[k];if(Math.abs(d)<.01)return;fpGrp().forEach(q=>{q[k]=+(q[k]+d).toFixed(1)});store();upd()}));
-['lfps','lfpr','lfpx','lfpy'].forEach(id=>$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()}));
+['lfps','lfpr'].forEach(id=>$(id).addEventListener('change',()=>{if(WBX.wbCap)WBX.wbCap()}));
+{const go=id=>{const p=cur2(),e=$(id);if(!p||!e)return;const b=unBox(p),cur=id=='lfux'?b.x:id=='lfuy'?b.y:b.wh?b.wh[id=='lfuw'?0:1]:null,v=unParse(e.value,cur);
+  if(v==null){e.classList.add('bad');return}e.classList.remove('bad');let ch=false;
+  if(id=='lfux'||id=='lfuy'){const k=id=='lfux'?'x':'y',d=v-cur;if(Math.abs(d)>.005){fpGrp().forEach(q=>{q[k]=+(q[k]+d).toFixed(2)});ch=true}}
+  else ch=unResize(p,id=='lfuw'?0:1,Math.max(.5,v));
+  if(ch){store();upd();if(WBX.wbCap)WBX.wbCap()}
+  {const b2=unBox(p),nv=id=='lfux'?b2.x:id=='lfuy'?b2.y:b2.wh?b2.wh[id=='lfuw'?0:1]:null;if(nv!=null)e.value=unFmt(nv)}   // the field shows what was set at once, so leaving it does not apply "+10" again
+  unSync(p)};
+ ['lfux','lfuy','lfuw','lfuh'].forEach(id=>{const e=$(id);if(!e)return;e.addEventListener('change',()=>go(id));
+  e.addEventListener('keydown',ev=>{if(ev.key=='Enter'){ev.preventDefault();go(id);e.select()}else if(ev.key=='Escape'){ev.preventDefault();ev.stopPropagation();const p=cur2();if(p){const b=unBox(p),ov=id=='lfux'?b.x:id=='lfuy'?b.y:b.wh?b.wh[id=='lfuw'?0:1]:null;if(ov!=null)e.value=unFmt(ov)}e.classList.remove('bad');e.blur()}})})}
 $('lfpfl').onclick=()=>{const p=cur2();if(p){fpGrp().forEach(q=>{q.f=(q.f||1)*-1});ch()}else if(WBS.fpB){fpFlip*=-1;WBH.fpOverlay()}};
 // 2.79.1 (owner Oct 31 2026): Rotate 90°, a quarter turn clockwise of the selection (as Image > Rotate), or of what is on the cursor
 $('lfpr90').onclick=()=>{if(cur2()){cmdRun('element.rotateCw');return}const A=fpArm();if(A){A.setR(((Math.round(A.r())+90+180)%360+360)%360-180);upd()}};
