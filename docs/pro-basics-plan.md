@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **plan, not started.** Steps 7 to 9 were added Nov 3 from the owner's second list; more may follow.
+Status: **step 1 done (2.87.1, not live).** Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -12,6 +12,8 @@ Numbering: each step is a patch release on the version that is live when work st
 - Pattern pieces and spacing on the Canvas show real units where it makes sense: a piece's size, spacing and margins. A stamp's own shapes, in its tab, keep %.
 - Typed values take units ("2in", "50mm") and simple arithmetic ("+10").
 - Tests: a value typed in each unit lands at the right place; changing Units changes the display, not the document.
+- **Done in 2.87.1:** the Units setting, and X, Y, W and H in the Element group (they replace Position across and down). W and H show for elements with a box (shapes, images, patterns, text). Typed values take px, in, mm, cm or ", sums with + - * / and brackets, and a leading + or - moves from the current value; bad input is marked and changes nothing; Esc puts the shown value back.
+- **Not yet (later, with the owner's word):** Size and Rotate stay as sliders (Rotate is in degrees already); pattern pieces, spacing and margins on the Canvas still show %.
 
 ## Step 2: rulers and guides
 - **Rulers** on the top and left of the **Canvas** tab, in the chosen units, measuring the canvas from its top-left corner and following zoom and pan. View > Rulers (Ctrl+R) turns them on and off.
@@ -106,9 +108,14 @@ Numbering: each step is a patch release on the version that is live when work st
   - Clicking (or Enter) keeps the new mode, as one History step. Nothing is saved or added to History while previewing.
 - Tests: each mode is applied and drawn; hovering or arrowing previews it with no History step; leaving restores; clicking keeps it.
 
+## Step 11: undo and redo that work (owner, Nov 3: "undo/redo dont work")
+- First find which cases fail: Ctrl+Z / Ctrl+Shift+Z and the top-bar buttons, on the Canvas and in a stamp's tab, after drawing, dragging, typing in a field, sliders, text, panels and Randomize. A quick check earlier found Ctrl+Z works after Delete, so the fault is in some of these, not all.
+- Every change that alters the document is one History step; undo puts back exactly what was there, selection included; redo replays it. Nothing that only changes the view (zoom, pan, panels) is a step.
+- Tests: one per case found broken, each doing the change, undo and redo, and comparing the document.
+
 ## Order and testing
 - Order:
-  - Steps 1 to 3 first (small, everyday tools), with 7, 8 and 10 alongside.
+  - Step 1, then 11 (undo and redo), then 2 and 3 (small, everyday tools), with 7, 8 and 10 alongside.
   - Then 4 (Help), then 5 and 6 (the largest).
   - Step 9 last, so the Export panel is arranged once the new print options exist.
 - Each step: its own branch, one commit per behaviour change with its test, the related specs, `check:style` and `check:platform`. Run `npm run perf` where drawing or dragging changes (steps 2, 3 and 6).
