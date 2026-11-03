@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.87.3 (Nov 3 2026, step 3 of docs/pro-basics-plan.md): Alt-drag duplicates
+- Alt held as a drag starts leaves the element, or the whole selection, where it is and drags a copy, on the canvas and in a stamp's tab. One History step, "Duplicated"; Undo takes the copy away, and so does Esc during the drag.
+- The smart guides and grid snap the copy as in a move (Alt does not skip snapping here). In a stamp's tab, Alt on a letter of a text still moves that one letter.
+- Tests: tests/alt-drag-2-87-3.spec.js (new, 3). Run: it and every spec that uses Alt (resize-handles, resize-handles-pattern, small-updates-2-79-2, smart-guides-2-40, stamp-canvas-edit, text-adjust, transform-2-56; all pass), check:style, check:platform, `npm run perf` (ratio 1.06, within 10%). Not run: the full suite (end of the plan).
+
 ## 2.87.2 (Nov 3 2026, step 2 of docs/pro-basics-plan.md): rulers and guides
 - View > **Rulers** (Ctrl+R): rulers on the top and left of the Canvas tab in the chosen units, from the canvas's top-left, following zoom and pan. None in a stamp's tab.
 - **Guides:** drag one out of a ruler, drag it to move it, drag it back onto a ruler to remove it. View > Guides (Ctrl+'), Lock guides, Clear guides, New guide… (direction and a typed position). Elements snap to them with the smart guides (Alt skips). Kept in the project (`proj.gd`, optional; format 30); each change is one History step.

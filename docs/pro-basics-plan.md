@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **steps 1 and 2 done (2.87.1, 2.87.2, not live).** Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 and 2 live (2.87.2); step 3 done (2.87.3, not live).** Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -30,6 +30,7 @@ Numbering: each step is a patch release on the version that is live when work st
 - One History step ("Duplicated").
 - Shift still constrains to the axis, and the smart guides work as in a move.
 - Tests: Alt-drag on the canvas and in a stamp's tab; Undo removes only the copy.
+- **Done in 2.87.3:** the copy is made on the first move (an Alt-click alone changes nothing), goes just above its original and is selected; Esc during the drag takes it away. Alt held during the drag no longer skips snapping, since it is the duplicate key; Shift still turns the smart guides off (there is no axis lock on a move today, so none was added). In a stamp's tab, Alt on a letter of a text still picks and moves that one letter (1.40.0) instead of copying it.
 
 ## Step 4: Help
 - **The Help menu:**
