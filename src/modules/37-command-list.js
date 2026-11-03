@@ -42,6 +42,7 @@ const COMMANDS = [
   ['view.hand', 'Hand tool', 'nvhand', 'H'],
   ['panel.xrec', 'Open Export', 'rail-xrec'],
   ['panel.layout', 'Open Layout', 'rail-layout'],
+  ['pattern.randomTiling', 'Random tile shape and arrangement', 'petrn'],
   ['view.tileRepeat', 'Repeat tile: show 3 × 3', 'tpv'],
   ['export.now', 'Export with the recipe settings', 'xrnow'],
   ['export.pdf', 'Export PDF', 'xrpdf'],
