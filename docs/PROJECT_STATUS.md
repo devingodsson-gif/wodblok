@@ -6,6 +6,7 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
 - **Nov 3: 2.88.1 (hotfix: the book cover's real size)** on `fix/2.88.1-book-cover-size`, not merged. Bug 1 of the full review (docs/full-review-2.88.md, PR #207).
+- **Nov 3: full review of 2.88.0** (docs/full-review-2.88.md; owner asked for a full trial run, style, bugs and a comparison with pattern tools). Suite green on 2.88.0 with the test fixes (run 41704836293: 824 Chromium and WebKit, no failures). Found: the book cover's real size is ignored by units and print exports (bug 1, high); a few style drifts; the missing pattern features by priority. Open questions there for the owner.
 - **Nov 3: 2.88.0, the pro basics plan is done** (version and docs only). Next: the end-of-plan CI suite with the owner's word. Open decisions: bleed by the engine or at export (step 6), Alt on a stamp-text letter (step 3), slider focus and the arrow keys (step 11).
 - **Nov 3: 2.87.12 LIVE** (owner: "Yes"): Default layout in the Layout panel.
 - **Nov 3: 2.87.11 LIVE** (owner: "merge everything"): every step of the pro basics plan is live.
