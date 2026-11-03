@@ -50,6 +50,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.87.11','Nov 3 2026',['Undo and redo work right after typing in a field (such as X or W) and pressing Enter, without leaving the field first.']],
  ['2.87.10','Nov 3 2026',['Seventeen blend modes in Photoshop\u2019s groups, previewed on the canvas as you point at them or arrow through the list.']],
  ['2.87.9','Nov 3 2026',['The Export panel: Quick export at the top, Print and colour in the middle, recipes at the bottom.']],
  ['2.87.8','Nov 3 2026',['The Pattern panel\u2019s sources are a group of their own at the top, with a full-width Add source.']],

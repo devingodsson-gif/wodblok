@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.87.11 (Nov 3 2026, step 11 of docs/pro-basics-plan.md): undo and redo
+- Owner: "undo/redo dont work". Fifteen kinds of change checked by the keys and by the buttons; the buttons always worked. The keys did nothing while a text or number field had the focus, and the unit fields keep it after Enter. Now a field keeps Ctrl+Z only while it holds typing not yet applied; otherwise Ctrl+Z, Ctrl+Shift+Z and Ctrl+Y undo and redo the document and the field shows the value that comes back.
+- rulers-2-87-2 waits for Lock guides to come off before dragging (it failed once in a busy run).
+- Tests: tests/undo-redo-2-87-11.spec.js (new, 3: by keys and by buttons over add, drag, typed field, slider, Randomize, Blend, a guide and a stamp's tab; a field with typing keeps its own undo). Run: it and the 39 spec files using undo, redo or History (all pass but the 5 scenario state snapshots, which fail the same way on the base build here), check:style. Not run: perf (nothing on the drawing path), the full suite (end of the plan).
+
 ## 2.87.10 (Nov 3 2026, step 10 of docs/pro-basics-plan.md): blend modes with a live preview
 - **17 blend modes** in Photoshop's groups with thin lines between them: Normal; Darken, Multiply, Colour burn; Lighten, Screen, Colour dodge, Linear dodge (Add); Overlay, Soft light, Hard light; Difference, Exclusion; Hue, Saturation, Colour, Luminosity; Replace last.
 - **Live preview:** pointing at a mode, or arrowing through the open list, shows it on the selected elements with no History step; leaving the list or Esc puts the old mode back; a click or Enter keeps it (one step).

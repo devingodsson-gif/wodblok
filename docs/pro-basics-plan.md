@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **steps 1 to 3 live (2.87.3); steps 1 to 7 live (2.87.7); steps 8 to 10 done (2.87.8 to 2.87.10, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 to 3 live (2.87.3); steps 1 to 7 live (2.87.7); steps 1 to 10 live (2.87.10); step 11 done (2.87.11, not live). Next: 2.88.0 closes the plan (version and docs), then the end-of-plan suite with the owner's word.** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -135,6 +135,8 @@ Numbering: each step is a patch release on the version that is live when work st
 - First find which cases fail: Ctrl+Z / Ctrl+Shift+Z and the top-bar buttons, on the Canvas and in a stamp's tab, after drawing, dragging, typing in a field, sliders, text, panels and Randomize. A quick check earlier found Ctrl+Z works after Delete, so the fault is in some of these, not all.
 - Every change that alters the document is one History step; undo puts back exactly what was there, selection included; redo replays it. Nothing that only changes the view (zoom, pan, panels) is a step.
 - Tests: one per case found broken, each doing the change, undo and redo, and comparing the document.
+- **Done in 2.87.11.** Checked, by Ctrl+Z / Ctrl+Shift+Z and by the top bar's buttons: adding, dragging, a typed field, a slider, a nudge, Delete, Randomize, Blend, a new stamp, a shape in a stamp's tab, a text, typing in a text, a pattern, the canvas ratio, a guide. All worked by the buttons. **The fault:** by the keys, nothing was undone while a text or number field had the focus, and the unit fields (2.87.1) keep the focus after Enter, so after typing a value Ctrl+Z seemed dead until you clicked elsewhere. Now a field keeps Ctrl+Z only while it holds typing not yet applied; once applied (Enter, or leaving it) the keys undo and redo the document, and the field lets go of the focus so it shows the value that comes back. Ctrl+Y redoes too.
+- **Seen, not changed:** after a slider is clicked it keeps the focus, so the arrow keys move the slider and Delete does nothing until the canvas is clicked (that is how a focused slider behaves; say if the keys should go back to the canvas).
 
 ## Order and testing
 - Order:
