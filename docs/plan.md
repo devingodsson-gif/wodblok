@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.87.2 (Nov 3 2026, step 2 of docs/pro-basics-plan.md): rulers and guides
+- View > **Rulers** (Ctrl+R): rulers on the top and left of the Canvas tab in the chosen units, from the canvas's top-left, following zoom and pan. None in a stamp's tab.
+- **Guides:** drag one out of a ruler, drag it to move it, drag it back onto a ruler to remove it. View > Guides (Ctrl+'), Lock guides, Clear guides, New guide… (direction and a typed position). Elements snap to them with the smart guides (Alt skips). Kept in the project (`proj.gd`, optional; format 30); each change is one History step.
+- Tests: tests/rulers-2-87-2.spec.js (new, 3). Run: it, commands, menu-bar-2-42, smart-guides-2-40, units-2-87-1 (16 passed), check:style, check:platform, `npm run perf` (ratio 0.93, no regression). Not run: the full suite (end of the plan).
+
 ## 2.87.1 (Nov 3 2026, step 1 of docs/pro-basics-plan.md): real units
 - Settings > General > **Units**: px, in, mm (the default), cm.
 - The Element group's Position across and down sliders are now **X, Y, W and H** fields in those units (the box's top-left corner and size). W and H show for elements that have a box. A canvas with a size (Canvas > Format) uses it; one with only a ratio counts as 300 mm on its long side at 300 DPI.
