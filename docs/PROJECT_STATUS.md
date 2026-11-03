@@ -5,6 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
+- **Nov 3: 2.90.0 (every arrangement has its own settings)** on `feat/2.90.0-arrangement-settings`, not merged: Half drop's Drop, Brick's Offset and one or two settings for every other arrangement and the wallpaper groups (owner). Replaces step 1 of the repeats update; still to come from it: a mirror repeat for the canvas tile, Make seamless for pictures, a real-size preview.
 - **Nov 3: 2.89.0 (a dice for the tiling)** on `feat/2.89.0-pattern-dice`, not merged: one icon beside Tile shape picks a random tile shape and arrangement (owner).
 - **Nov 3: 2.88.1 LIVE** (hotfix: the book cover's real size); the full review (#207) merged too. Bug 1 of the full review (docs/full-review-2.88.md, PR #207).
 - **Nov 3: full review of 2.88.0** (docs/full-review-2.88.md; owner asked for a full trial run, style, bugs and a comparison with pattern tools). Suite green on 2.88.0 with the test fixes (run 41704836293: 824 Chromium and WebKit, no failures). Found: the book cover's real size is ignored by units and print exports (bug 1, high); a few style drifts; the missing pattern features by priority. Open questions there for the owner.
