@@ -16,7 +16,7 @@ function fpLive(q){const a=document.querySelector(`#art [data-fp="${q.u}"]`);if(
  return false}
 let fpRaf=0;function fpRedraw(){if(fpRaf)return;fpRaf=requestAnimationFrame(()=>{fpRaf=0;if(WBS.fpDrag)upd()})}
 // Esc during a drag puts everything back as it was: no store, no history step (2.27.0)
-const fpCancel=()=>{sgClear();const d=WBS.fpDrag,x=WBS.fpXf;if(d){if(d.g)d.g.forEach(([q,qx,qy])=>{q.x=qx;q.y=qy});else{d.p.x=d.s0[0];d.p.y=d.s0[1]}WBS.fpDrag=null}
+const fpCancel=()=>{sgClear();const d=WBS.fpDrag,x=WBS.fpXf;if(d&&d.made){fpDupUndo(d);WBS.fpDrag=null}if(d&&WBS.fpDrag){if(d.g)d.g.forEach(([q,qx,qy])=>{q.x=qx;q.y=qy});else{d.p.x=d.s0[0];d.p.y=d.s0[1]}WBS.fpDrag=null}
 if(x){const o=JSON.parse(x.orig);Object.keys(x.p).forEach(k=>{if(!(k in o))delete x.p[k]});Object.assign(x.p,o);WBS.fpXf=null;if(x.p.tx&&typeof tbRelay=='function')tbRelay(x.p)}upd()};
 // Rubber band: every element the box touches is selected; Shift/Ctrl/Cmd adds to the selection (2.27.0)
 function fpMqPick(L){const m=WBS.fpMq,a=Math.min(m.x0,m.x1),b=Math.max(m.x0,m.x1),c=Math.min(m.y0,m.y1),d=Math.max(m.y0,m.y1),pl=L.pl||[],hit=new Set(m.base);
@@ -25,7 +25,15 @@ const arr=[...hit];WBS.fpMS=new Set(arr);WBS.fpSel=arr.length?arr[arr.length-1]:
 // 2.60.0 (artist test: a click that moved a little drew a box and picked two elements): the box starts only after the pointer has moved this far, in screen pixels
 const FP_MQ_PX=10;
 const fpMqEnd=()=>{if(!WBS.fpMq)return;const on=WBS.fpMq.on;WBS.fpMq=null;if(on)upd();else WBH.fpOverlay()};
-const fpEnd=()=>{sgClear();if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved;WBS.fpDrag=null;if(mv){store();upd();if(WBX.wbCap)WBX.wbCap()}};
+const fpEnd=()=>{sgClear();if(!WBS.fpDrag)return;const mv=WBS.fpDrag.moved,dup=WBS.fpDrag.made;WBS.fpDrag=null;if(mv){store();upd();if(dup)WBX.wbLabelNext={t:'Duplicated',at:performance.now()};if(WBX.wbCap)WBX.wbCap()}};
+// 2.87.3 (docs/pro-basics-plan.md step 3): Alt held as a drag begins leaves the element (or the whole selection) where it is and drags a copy. The copies are made on the
+// first move, so an Alt-click alone changes nothing; each goes just above its original in the Elements list and is selected. Alt held during that drag does not skip
+// snapping (it is the duplicate key), so the smart guides and the grid work as in a move; Shift still turns the smart guides off. Esc takes the copies away again.
+function fpDupMake(L,D){const pl=L.pl||[],src=D.g?D.g.map(z=>z[0]):[D.p],cp=new Map();
+ src.forEach(q=>{const i=pl.indexOf(q);if(i<0)return;const n=JSON.parse(JSON.stringify(q));n.u=fpU();delete n.lk;pl.splice(i+1,0,n);cp.set(q,n)});
+ if(!cp.has(D.p))return;D.made=[...cp.values()];D.orig={sel:WBS.fpSel,ms:new Set(WBS.fpMS),anc:WBS.fpAnc};D.p=cp.get(D.p);if(D.g)D.g=D.g.map(([q,qx,qy])=>[cp.get(q)||q,qx,qy]);
+ WBS.fpSel=D.p.u;WBS.fpAnc=String(D.p.u);WBS.fpMS=D.g?new Set(D.made.map(n=>String(n.u))):new Set();upd()}
+function fpDupUndo(D){const L=fpL();if(L&&L.pl)L.pl=L.pl.filter(q=>!D.made.includes(q));WBS.fpSel=D.orig.sel;WBS.fpMS=D.orig.ms;WBS.fpAnc=D.orig.anc}
 function init28(){
  try{let raf=0;new ResizeObserver(()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(WBH.fpOverlay)WBH.fpOverlay()})}).observe($("art"))}catch(e){}   // the box keeps its pixel size when the view is zoomed (2.15.0)
 // 2.60.0 (artist test): a click on the empty space round the canvas ends the selection, as a click on the canvas's own empty space does
@@ -41,10 +49,10 @@ if(WBS.fpB&&(WBS.tiles.some(t=>t.id==WBS.fpB))){e.preventDefault();L.pl=L.pl||[]
 const p=fpHit(L,x,y);if(!p){const add=e.shiftKey||e.ctrlKey||e.metaKey,base=add?new Set(fpGrp().map(q=>String(q.u))):new Set();if(!add&&(WBS.fpSel!==-1||WBS.fpMS.size)){WBS.fpSel=-1;WBS.fpMS=new Set();upd()}
 if((L.pl||[]).length){WBS.fpMq={x0:x,y0:y,x1:x,y1:y,cx:e.clientX,cy:e.clientY,on:false,add,base,id:e.pointerId};try{$('art').setPointerCapture(e.pointerId)}catch(er){}}return}
 if(e.shiftKey||e.ctrlKey||e.metaKey){e.preventDefault();fpTog(p.u);return}
-e.preventDefault();fpPatOwn(p);const g0=fpGrp(),inG=g0.length>1&&g0.includes(p);if(!inG)WBS.fpMS=new Set();WBS.fpSel=p.u;WBS.fpAnc=String(p.u);const g=inG?g0.map(q=>[q,q.x,q.y]):null;WBS.fpDrag={p,g,s0:[p.x,p.y],dx:x-p.x,dy:y-p.y,moved:false,id:e.pointerId};try{$('art').setPointerCapture(e.pointerId)}catch(er){}upd()});
+e.preventDefault();fpPatOwn(p);const g0=fpGrp(),inG=g0.length>1&&g0.includes(p);if(!inG)WBS.fpMS=new Set();WBS.fpSel=p.u;WBS.fpAnc=String(p.u);const g=inG?g0.map(q=>[q,q.x,q.y]):null;WBS.fpDrag={p,g,s0:[p.x,p.y],dx:x-p.x,dy:y-p.y,moved:false,id:e.pointerId,dup:e.altKey&&!p.bgd&&p.k!='sheet'};try{$('art').setPointerCapture(e.pointerId)}catch(er){}upd()});
 // a drag keeps the element's centre on the sheet (2.24.0), so it can always be clicked and dragged back
 const fpOn=(v,m)=>Math.min(m,Math.max(0,v));
-$('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBX.wbPatPieceMove&&WBS.patPD){const[px,py]=fpPt(e);WBX.wbPatPieceMove(px,py);return}if(WBS.fpMq){const m=WBS.fpMq,[x,y]=fpPt(e);m.x1=x;m.y1=y;if(!m.on&&Math.hypot(e.clientX-m.cx,e.clientY-m.cy)<FP_MQ_PX)return;m.on=true;fpMqPick(L);return}if(WBS.fpDrag){const[x0,y0]=fpPt(e),p=WBS.fpDrag.p;let[nx,ny]=fpSnap(L,fpOn(x0-WBS.fpDrag.dx,CW),fpOn(y0-WBS.fpDrag.dy,CH),e);[nx,ny]=sgMove(WBS.fpDrag,L,nx,ny,e);nx=fpOn(nx,CW);ny=fpOn(ny,CH);WBS.fpDrag.moved=true;if(WBS.fpDrag.g){const ddx=+nx.toFixed(1)-WBS.fpDrag.s0[0],ddy=+ny.toFixed(1)-WBS.fpDrag.s0[1];let oh='',live=true;WBS.fpDrag.g.forEach(([q,qx,qy])=>{q.x=+(qx+ddx).toFixed(1);q.y=+(qy+ddy).toFixed(1);if(!fpLive(q))live=false;oh+=fpBox(q,'sel')});$('fpov').innerHTML=oh+WBS.sgG;if(!live)fpRedraw();return}
+$('art').addEventListener('pointermove',e=>{const L=fpL();if(!L)return;if(WBX.wbPatPieceMove&&WBS.patPD){const[px,py]=fpPt(e);WBX.wbPatPieceMove(px,py);return}if(WBS.fpMq){const m=WBS.fpMq,[x,y]=fpPt(e);m.x1=x;m.y1=y;if(!m.on&&Math.hypot(e.clientX-m.cx,e.clientY-m.cy)<FP_MQ_PX)return;m.on=true;fpMqPick(L);return}if(WBS.fpDrag){if(WBS.fpDrag.dup&&!WBS.fpDrag.made)fpDupMake(L,WBS.fpDrag);const ev=WBS.fpDrag.dup?{altKey:false,shiftKey:e.shiftKey,ctrlKey:e.ctrlKey,metaKey:e.metaKey}:e,[x0,y0]=fpPt(e),p=WBS.fpDrag.p;let[nx,ny]=fpSnap(L,fpOn(x0-WBS.fpDrag.dx,CW),fpOn(y0-WBS.fpDrag.dy,CH),ev);[nx,ny]=sgMove(WBS.fpDrag,L,nx,ny,ev);nx=fpOn(nx,CW);ny=fpOn(ny,CH);WBS.fpDrag.moved=true;if(WBS.fpDrag.g){const ddx=+nx.toFixed(1)-WBS.fpDrag.s0[0],ddy=+ny.toFixed(1)-WBS.fpDrag.s0[1];let oh='',live=true;WBS.fpDrag.g.forEach(([q,qx,qy])=>{q.x=+(qx+ddx).toFixed(1);q.y=+(qy+ddy).toFixed(1);if(!fpLive(q))live=false;oh+=fpBox(q,'sel')});$('fpov').innerHTML=oh+WBS.sgG;if(!live)fpRedraw();return}
 p.x=+nx.toFixed(1);p.y=+ny.toFixed(1);
 if(!fpLive(p))fpRedraw();$('fpov').innerHTML=fpBox(p,'sel')+fpHandles(p)+WBS.sgG;return}
 if(WBS.fpB||WBS.txArm||WBS.plArm){WBS.fpAlt=e.altKey;WBS.fpGhost=fpSnap(L,...fpPt(e),e);WBH.fpOverlay()}});

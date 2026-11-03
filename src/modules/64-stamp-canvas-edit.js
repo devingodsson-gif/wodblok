@@ -67,7 +67,7 @@ function sceDown(e){if(e.button!==0)return;let t0=stUnlocked();
  const i=hit.i;sceFree();
  if(add){selToggle(i);if(!WBS.msel.has(i)){sceSel();return}}else if(!WBS.msel.has(i)){const g=t.items[i].tg;if(g&&!e.altKey)selSet(t.items.map((x,j)=>x.tg===g?j:-1).filter(j=>j>=0),false);else selOne(i)}
  WBS.sel=i;const q=t.items[i];SCE.cs=hit.c?{q,c:hit.c}:null;const cp=hit.o?sceWith(t,()=>hit.o.p(mod(q.x,SW),mod(q.y,SH))):null;
- SCE.d={t,q,o:hit.o,M:sceInv(h.i),dx:(cp?cp[0]:q.x+hit.ax)-h.u,dy:(cp?cp[1]:q.y+hit.ay)-h.v,x0:e.clientX,y0:e.clientY,moved:false,st:[...WBS.msel].filter(j=>j!=i).map(j=>t.items[j]).filter(Boolean).map(w=>[w,w.x,w.y]),px:q.x,py:q.y};
+ SCE.d={t,q,o:hit.o,M:sceInv(h.i),dx:(cp?cp[0]:q.x+hit.ax)-h.u,dy:(cp?cp[1]:q.y+hit.ay)-h.v,x0:e.clientX,y0:e.clientY,moved:false,dup:e.altKey&&!q.tg,st:[...WBS.msel].filter(j=>j!=i).map(j=>t.items[j]).filter(Boolean).map(w=>[w,w.x,w.y]),px:q.x,py:q.y};
  sceSel()}
 // 2.79.1 (owner Oct 31 2026): a split piece's selection box fits the piece: the motif's square (±48) cut by each of its lines (q.cl: [angle, offset, side], the side kept
 // is the one its normal points to), as [x0, x1, y0, y1] in the motif's own units
@@ -81,8 +81,13 @@ function sceMove(e){if(SCE.sp){const c=scePt(e);if(!c||!WBS.split)return;const p
  if(SCE.m){const m=SCE.m,dx=e.clientX-m.x0,dy=e.clientY-m.y0;if(!m.on&&dx*dx+dy*dy<25)return;m.on=true;let b=$('mqb');if(!b){b=document.createElement('div');b.id='mqb';document.body.appendChild(b)}Object.assign(b.style,{display:'block',left:Math.min(m.x0,e.clientX)+'px',top:Math.min(m.y0,e.clientY)+'px',width:Math.abs(dx)+'px',height:Math.abs(dy)+'px'});return}
  if(!SCE.h&&!SCE.d)return;const c=scePt(e);if(!c)return;
  if(SCE.h){const h=SCE.h;let p=sceTo(h.M,c.x,c.y);if(h.cop){const z=h.cop.o.i(p.x,p.y);p={x:z[0]-h.cop.dx,y:z[1]-h.cop.dy}}sceWith(h.t,()=>{if(h.k=='rot'){let a=Math.atan2(p.y-h.cy,p.x-h.cx)*180/Math.PI+90;if(e.shiftKey)a=Math.round(a/15)*15;h.q.r=+(((a+540)%360)-180).toFixed(1)}else WBX.hdResize(h,{x:p.x+(h.ox||0),y:p.y+(h.oy||0)},e)});upd();return}
- const d=SCE.d;if(!d.moved){const dx=e.clientX-d.x0,dy=e.clientY-d.y0;if(dx*dx+dy*dy<9)return;d.moved=true;WBS.WBDRG=1;$('texg').style.display='none'}
- const p=sceTo(d.M,c.x,c.y),sn=sceSnap(d.M,p.x+d.dx,p.y+d.dy,e),np=d.o?d.o.i(sn.x,sn.y):[sn.x,sn.y];d.q.x=+np[0].toFixed(2);d.q.y=+np[1].toFixed(2);const ax=d.q.x-d.px,ay=d.q.y-d.py;d.st.forEach(([w,ox,oy])=>{w.x=+(ox+ax).toFixed(2);w.y=+(oy+ay).toFixed(2)});upd()}
+ const d=SCE.d;if(!d.moved){const dx=e.clientX-d.x0,dy=e.clientY-d.y0;if(dx*dx+dy*dy<9)return;d.moved=true;WBS.WBDRG=1;$('texg').style.display='none';if(d.dup)sceDup(d)}
+ const p=sceTo(d.M,c.x,c.y),sn=sceSnap(d.M,p.x+d.dx,p.y+d.dy,d.dup?{altKey:false,shiftKey:e.shiftKey}:e),np=d.o?d.o.i(sn.x,sn.y):[sn.x,sn.y];d.q.x=+np[0].toFixed(2);d.q.y=+np[1].toFixed(2);const ax=d.q.x-d.px,ay=d.q.y-d.py;d.st.forEach(([w,ox,oy])=>{w.x=+(ox+ax).toFixed(2);w.y=+(oy+ay).toFixed(2)});upd()}
+// 2.87.3 (docs/pro-basics-plan.md step 3): Alt held as a shape's drag begins drags copies of the selected shapes (added on top, as Duplicate does) and leaves
+// the originals. A letter of a text (tg) is the exception: Alt there still picks the one letter and moves it (1.40.0). Alt does not skip snapping during that
+// drag, since it is the duplicate key.
+function sceDup(d){const a=d.t.items,cp=new Map(),src=[d.q,...d.st.map(z=>z[0])];src.forEach(q=>{const n=JSON.parse(JSON.stringify(q));a.push(n);cp.set(q,n)});
+ d.q=cp.get(d.q);d.st=d.st.map(([w,ox,oy])=>[cp.get(w),ox,oy]);d.made=true;const ids=[...cp.values()].map(n=>a.indexOf(n));WBS.msel=new Set(ids);WBS.sel=a.indexOf(d.q)}
 function sceUp(e){if(SCE.sp){SCE.sp=null;return}
  if(SCE.m){const m=SCE.m;SCE.m=null;const b=$('mqb');if(b)b.style.display='none';if(m.on&&e.type=='pointerup'){const x0=Math.min(m.x0,e.clientX),x1=Math.max(m.x0,e.clientX),y0=Math.min(m.y0,e.clientY),y1=Math.max(m.y0,e.clientY),M=STP.items[m.ai]?stMatrix(STP.items[m.ai]):null,a=$('art'),sm=a&&a.getScreenCTM();
   if(M&&sm){const hit=[];m.t.items.forEach((q,i)=>{if(q.sh)return;const rx=48*q.s*(q.sx||1),ry=48*q.s*(q.sy||1),r=(+q.r||0)*Math.PI/180,c=Math.cos(r),s=Math.sin(r);
@@ -90,7 +95,7 @@ function sceUp(e){if(SCE.sp){SCE.sp=null;return}
    hit.forEach(i=>{if(!WBS.msel.has(i))selToggle(i)});upd()}}return}
  if(SCE.h){SCE.h=null;WBS.WBDRG=0;$('texg').style.display='';store();upd();return}
  const d=SCE.d;if(!d)return;SCE.d=null;WBS.WBDRG=0;$('texg').style.display='';if(!d.moved)return;
- sceWith(d.t,()=>{[d.q.x,d.q.y]=wrapP(d.q.x,d.q.y);d.st.forEach(([w])=>{[w.x,w.y]=wrapP(w.x,w.y)})});store();upd()}
+ sceWith(d.t,()=>{[d.q.x,d.q.y]=wrapP(d.q.x,d.q.y);d.st.forEach(([w])=>{[w.x,w.y]=wrapP(w.x,w.y)})});if(d.made)WBX.wbLabelNext={t:'Duplicated',at:performance.now()};store();upd()}
 // the selection box (and, for one shape, the handles) drawn on the instance that was last used, in canvas units; handle sizes are fixed on screen
 // The ghost of the shape picked in the Shapes panel, on the pointer: over a stamp it sits where a click would put it (same snap, same size and turn, drawn through the
 // instance's matrix); anywhere else on the canvas it follows the pointer, fainter, at the size of the first stamp.
