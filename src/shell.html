@@ -814,6 +814,8 @@ body.eyedrop{cursor:crosshair}
 /* 2.54.2: an element panel while editing: what the element is made from, with Replace (a list row, Part 9.10); Replace opens the library in a popover */
 .rprow{display:flex;align-items:center;gap:var(--sp-4);min-height:var(--h-row);margin-bottom:var(--sp-3)}.rprow[hidden]{display:none}
 section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel keeps the panel's side padding */
+/* 2.90.1: the Mockup panel's view, with the print area's corners over it (the crop's squares) */
+.mkvw{position:relative;margin:var(--sp-4) var(--sp-5) 0;line-height:0}#mkc{display:block;width:100%;height:auto;border-radius:var(--r-m);background:var(--field)}#mkov{position:absolute;inset:0;width:100%;height:100%;touch-action:none}#mkov .crln{fill:none;stroke:var(--hl);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}#mkov .crhd{fill:var(--fg);stroke:var(--panel);stroke-width:1px;vector-effect:non-scaling-stroke;cursor:move}
 .pewpv{display:flex;justify-content:center;margin-top:var(--sp-4);color:var(--mut)}.pewpv svg{width:128px;height:auto}   /* 2.76.7: a wallpaper group's picture */
 .rpth{flex:none;width:20px;height:20px;display:inline-flex}.rpth svg{width:20px;height:20px}
 .rpn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs-m)}
@@ -941,6 +943,7 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
  <button type="button" id="rail-xrec" data-pn="xrec" aria-label="Export"></button>
  <button type="button" id="rail-help" data-pn="help" aria-label="Help"></button>
  <button type="button" id="rail-layout" data-pn="layout" aria-label="Layout"></button>
+ <button type="button" id="rail-mock" data-pn="mock" aria-label="Mockup"></button>
  <button type="button" id="rail-layers" data-pn="layers" aria-label="Pattern"></button>
  <button type="button" id="rail-stmp" data-pn="stmp" aria-label="Stamp"></button>
  <button type="button" id="rail-motifs" data-pn="motifs" aria-label="Shape"></button>
@@ -1447,6 +1450,17 @@ section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel
  <div class="glb" id="layn">Canvas</div>
  <div class="row layrw"><button type="button" class="alt" id="lays">Save layout</button><button type="button" class="alt" id="layr">Reset layout</button></div>
  <div class="row layrw"><button type="button" class="alt" id="layd">Default layout</button></div>
+</section>
+<section class="pn" data-p="mock" hidden>
+ <div class="mkvw" id="mkvw" hidden><canvas id="mkc"></canvas><svg id="mkov" hidden></svg></div>
+ <details class="g" open id="mkg" hidden><summary>Mockup</summary><div class="gb">
+  <label>Fill</label><div class="seg" id="mkfl" role="group" aria-label="Fill" style="grid-template-columns:1fr 1fr"><button type="button" data-f="rep">Repeat</button><button type="button" data-f="one">Once</button></div>
+  <div class="ctl"><label>Scale</label><input type="range" id="mksc" min="5" max="200" value="25" data-u="%" data-def="25"></div>
+  <div class="ctl"><label>Shading</label><input type="range" id="mksh" min="0" max="100" value="100" data-u="%" data-def="100"></div>
+  <label class="chk"><input type="checkbox" id="mkcn"><span>Edit corners</span></label>
+  <div class="row"><button type="button" class="primary" id="mkx">Export mockup</button></div>
+ </div></details>
+ <details class="g" open><summary>Mockups</summary><div class="gb" id="mkpane"></div></details>
 </section>
 <section class="pn" data-p="help" hidden>
  <div class="hlpt"><button type="button" class="ib" id="hlpbk" aria-label="Back" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-ic="chevL"></svg></button><input type="text" id="hlpq" aria-label="Search help" placeholder="Search help" autocomplete="off"></div>
