@@ -79,6 +79,7 @@ import {init91} from './modules/91-effect-popout.js';
 import {init94} from './modules/94-image-crop.js';
 import {init95} from './modules/95-image-element.js';
 import {init96} from './modules/96-picture-library.js';
+import {init23} from './modules/23-mockups.js';
 import {init97} from './modules/97-touch.js';
 import {init47} from './modules/47-help.js';
 import {init42} from './modules/42-colour-output.js';
@@ -166,6 +167,7 @@ init90();
 init91();
 init95();
 init96();
+init23();   // mockups (2.90.1): the library tree, after the other libraries
 init97();
 init94();
 init62();
