@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 3: 2.87.9 (pro basics step 9: the Export panel)** on `feat/2.87.9-export-panel`, built on 2.87.8, not merged. Next: step 10 (blend modes).
+- **Nov 3: 2.87.10 (pro basics step 10: blend modes)** on `feat/2.87.10-blend-modes`, built on 2.87.9, not merged. Next: step 11 (undo and redo), the last step; then 2.88.0 and the end-of-plan suite with the owner's word.
+- **Nov 3: 2.87.9 (pro basics step 9: the Export panel)** on `feat/2.87.9-export-panel`, built on 2.87.8, not merged.
 - **Nov 3: 2.87.8 (pro basics step 8: Pattern sources)** on `feat/2.87.8-pattern-sources`, not merged.
 - **Nov 3: 2.87.7 LIVE** (owner: "Merge everything"), with the gap review (#191). Not merged: #55 and #45, older pull requests that are not this plan's.
 - **Nov 3: 2.87.7 (pro basics step 7: layouts)**, merged.

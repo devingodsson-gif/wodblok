@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.87.10 (Nov 3 2026, step 10 of docs/pro-basics-plan.md): blend modes with a live preview
+- **17 blend modes** in Photoshop's groups with thin lines between them: Normal; Darken, Multiply, Colour burn; Lighten, Screen, Colour dodge, Linear dodge (Add); Overlay, Soft light, Hard light; Difference, Exclusion; Hue, Saturation, Colour, Luminosity; Replace last.
+- **Live preview:** pointing at a mode, or arrowing through the open list, shows it on the selected elements with no History step; leaving the list or Esc puts the old mode back; a click or Enter keeps it (one step).
+- Left out: Linear burn, Vivid light, Linear light, Subtract, Divide (a browser cannot blend with what is under an element except through its own modes; see the plan).
+- Tests: tests/blend-modes-2-87-10.spec.js (new, 3). Run: it and the 41 spec files using dropdowns or blend (all pass but the 5 scenario state snapshots, which fail the same way on the base build in this container), check:style, `npm run perf` (0.99). Not run: the full suite (end of the plan).
+
 ## 2.87.9 (Nov 3 2026, step 9 of docs/pro-basics-plan.md): the Export panel rearranged
 - **Quick export** at the top (Export now, format and size, then the one-click exports), **Print and colour** in the middle (Print file…, Separations…, CMYK TIFF and PDF, the bleed and spot inks, Proof colours, print proof), **Recipes** at the bottom (with Save recipe).
 - dock-default skips all the undocked panels (Export, Help since 2.87.4, Layout since 2.87.7): it failed on main since 2.87.4 because Help opens floating, as intended.
