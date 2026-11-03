@@ -11,7 +11,7 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {fpL,fpU} from './24-free-place-layers.js';
 import {fpSz} from './25-art-layers.js';
 import {elDef,elExtend,elKind,elSel} from './65-element-core.js';
-import {TL_AR,TL_TS,tlArr,tlFlagPreview,tlPts,tlShape} from './92-pattern-tiling.js';
+import {TL_AR,TL_TS,tlArr,tlFlagPreview,tlOpDefs,tlOpt,tlPts,tlShape} from './92-pattern-tiling.js';
 
 // ===== The Pattern element (element update, step 5, 2.1.5): a list of points plus sources placed at them.
 // {u, k:'pattern', n:name, lay:'grid'|'brick'|'half'|'radial'|'scatter'|'frame', cn:columns, rn:rows, sz:size in % of a cell, rt:turn in degrees, ox, oy: shift in % of a cell, in: the frame's inset in % of the short side,
@@ -143,7 +143,7 @@ const patHx=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 const patCh=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
 function patSrcName(s){if(s.k=='pattern'){const r=patRef(s.p);return String(r&&r.n||'Pattern').slice(0,24)}if(s.k=='stamp')return stNmId(s.t);if(s.k=='motif')return mNm(s.m);return String((s.it.tx&&s.it.tx.text)||'Text').replace(/\n/g,' ').slice(0,24)}
 function patSync(){const host=$('pelist');if(!host)return;const a=patList(),p=patCur();if(WBS.patSel!=null&&!p&&a.length===0)WBS.patSel=null;
-const key=JSON.stringify([a.map(q=>[q.u,q.n]),WBS.patSel,WBS.patSrc,p&&[WBS.patPE,WBS.patPc,JSON.stringify(p.pe||null),JSON.stringify(p.ac||null),(WBS.proj.ts||[]).join(),p.pin,p.dm,p.da,p.dk,p.dv,p.dg,p.di,Object.keys(WBS.ARTS||{}).join(),(fpL()&&fpL().pl||[]).map(q=>q.u+(q.n||q.nm||'')).join(),p.md,p.mg,p.ed,p.pcm,p.iv,p.ov,JSON.stringify(WBS.dim),CW,CH,p.lay,p.ts,p.ar,p.ps,p.sp,p.cn,p.rn,p.sz,p.rt,p.ox,p.oy,p.in,p.ds,(p.src||[]).map(s=>[s.k,s.t,s.a,s.w,s.it&&s.it.tx&&s.it.tx.text])],WBS.tiles.map(t=>t.id).join()]);
+const key=JSON.stringify([a.map(q=>[q.u,q.n]),WBS.patSel,WBS.patSrc,p&&[WBS.patPE,WBS.patPc,JSON.stringify(p.pe||null),JSON.stringify(p.ac||null),(WBS.proj.ts||[]).join(),p.pin,p.dm,p.da,p.dk,p.dv,p.dg,p.di,Object.keys(WBS.ARTS||{}).join(),(fpL()&&fpL().pl||[]).map(q=>q.u+(q.n||q.nm||'')).join(),p.md,p.mg,p.ed,p.pcm,p.iv,p.ov,JSON.stringify(WBS.dim),CW,CH,p.lay,p.ts,p.ar,JSON.stringify(p.ao||null),p.ps,p.sp,p.cn,p.rn,p.sz,p.rt,p.ox,p.oy,p.in,p.ds,(p.src||[]).map(s=>[s.k,s.t,s.a,s.w,s.it&&s.it.tx&&s.it.tx.text])],WBS.tiles.map(t=>t.id).join()]);
 if(host.dataset.k===key)return;host.dataset.k=key;
 host.innerHTML=a.slice().reverse().map(q=>`<div class="mr${q.u==WBS.patSel?' on':''}" data-pe="${q.u}"><b>${patHx(q.n)}<i>${(q.src||[]).length} source${(q.src||[]).length==1?'':'s'}</i></b><button type="button" data-pd="${q.u}" aria-label="Delete this pattern">&#215;</button></div>`).join('');
 $('peed').hidden=!p;if($('pesg'))$('pesg').hidden=!p;if(!p)return;   /* 2.87.8: Sources is its own group at the top, with the standard Add button */
@@ -151,7 +151,7 @@ $('pelay').querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dat
 // 2.57.0: Tiling shows its tile shape, arrangement, size and spacing; the free layouts their columns, rows and size
 {const tile=p.lay=='tile';$('petl').hidden=!tile;$('pefr').hidden=tile;{const lb={radial:['Spokes','Rings'],scatter:['Across','Down'],spiral:['Across','Down'],frame:['Columns','Rows']}[p.lay]||['Columns','Rows'];$('pecn').closest('.ctl').firstElementChild.textContent=lb[0];$('pern').closest('.ctl').firstElementChild.textContent=lb[1]}if(tile){const sh=tlShape(p),ts=$('pets'),ar=$('pear');
  if(!ts.options.length)ts.innerHTML=TL_TS.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');const tv=p.ts&&TL_AR[p.ts]?p.ts:'auto';if(ts.value!==tv)ts.value=tv;
- const ah=TL_AR[sh].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');if(ar.dataset.sh!==sh){ar.dataset.sh=sh;ar.innerHTML=ah}const av=tlArr(p,sh);if(ar.value!==av)ar.value=av;{const pv=$('pewpv'),k=sh+'|'+av;pv.hidden=false;if(pv.dataset.k!==k){pv.dataset.k=k;pv.innerHTML=tlFlagPreview(sh,av)}}}}$('peds').querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d==p.ds));
+ const ah=TL_AR[sh].map(([v,t])=>`<option value="${v}">${t}</option>`).join('');if(ar.dataset.sh!==sh){ar.dataset.sh=sh;ar.innerHTML=ah}const av=tlArr(p,sh);if(ar.value!==av)ar.value=av;{const ao=p.ao&&p.ao[av],pv=$('pewpv'),k=sh+'|'+av+'|'+JSON.stringify(ao||null);pv.hidden=false;if(pv.dataset.k!==k){pv.dataset.k=k;pv.innerHTML=tlFlagPreview(sh,av,ao)}}patAoSync(p,sh,av)}}$('peds').querySelectorAll('[data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d==p.ds));
 const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;uiFire(el)}};sv('peps',+p.ps||12);sv('pesp',+p.sp||0);sv('pecn',p.cn);sv('pern',p.rn);sv('pesz',p.sz);sv('pert',p.rt);sv('peox',+p.ox||0);sv('peoy',+p.oy||0);sv('pein',p.in==null?4:+p.in);sv('peiv',+p.iv||0);sv('pemd',+p.md||0);
  // Accent (2.76.10, Tiling): a second set of pieces at the middles between the main ones, its own source and size
  {const ac=p.ac&&p.ac.on;$('peac').checked=!!ac;$('peacb').hidden=!ac;const so=(p.src||[]).map((x,i)=>['s'+i,patSrcName(x)]).concat(WBS.tiles.filter(t=>!(p.src||[]).some(x=>x.k=='stamp'&&x.t==t.id)).map(t=>['t'+t.id,stNmId(t.id)])),   /* 2.84.4 (owner, Nov 1 2026): the accent can be any stamp of the project, not only the pattern's own sources */h=so.map(([v,t])=>`<option value="${v}">${patHx(t)}</option>`).join(''),as=$('peacs');if(as.dataset.h!==h){as.dataset.h=h;as.innerHTML=h}
@@ -170,6 +170,15 @@ const sv=(id,v)=>{const el=$(id);if(+el.value!==v){el.value=v;uiFire(el)}};sv('p
 // the sources (2.3.0): one row each, a thumbnail of the stamp (or the kind's icon), its name, its weight when the pattern picks by weight, and remove
 $('pesrc').innerHTML=(p.src||[]).map((s,i)=>{const t=s.k=='stamp'?WBS.tiles.find(x=>x.id==s.t):null,G=t?geom(shOf(t)):null,th=s.k=='motif'?`<svg viewBox="-110 -110 220 220">${mk(s.m,'currentColor','transparent')}</svg>`:G?`<svg viewBox="0 0 ${G.SW} ${G.SH}"><use href="#s${t.id}"/></svg>`:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${s.k=='pattern'?ICN.pattern:ICN.text}</svg>`;
  return`<div class="psr2${s.k=='motif'&&WBS.patSrc===i?' on':''}" data-si="${i}"${s.k=='motif'?' data-look':''}><span class="pth">${th}</span><b>${patHx(patSrcName(s))}${patSrcOk(s)?'':' <i>missing</i>'}</b>${p.ds=='weighted'?`<input type="number" min="1" max="99" value="${+s.w>0?+s.w:1}" data-sw="${i}" aria-label="Weight">`:'<span></span>'}<button type="button" class="ib" data-sx="${i}" aria-label="Remove this source"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${ICN.close}</svg></button></div>`}).join('')}
+// 2.90.0: the arrangement's own settings (92-pattern-tiling.js TL_OP): slider rows and segmented controls, built when the arrangement changes and set from the
+// pattern after that (a rebuild while a slider is dragged would drop the drag)
+function patAoSync(p,sh,ar){const host=$('peao');if(!host)return;const D=tlOpDefs(sh,ar),O=tlOpt(p,sh,ar),k=sh+'|'+ar;
+ if(host.dataset.k!==k){host.dataset.k=k;host.dataset.ar=ar;host.innerHTML=D.map(e=>Array.isArray(e[2])
+  ?`<label>${e[1]}</label><div class="seg" role="group" aria-label="${e[1]}" data-aos="${e[0]}" style="grid-template-columns:repeat(${e[2].length},1fr)">${e[2].map(([v,t])=>`<button type="button" data-v="${v}">${t}</button>`).join('')}</div>`
+  :`<div class="ctl"><label>${e[1]}</label><input type="range" id="peao_${e[0]}" data-ao="${e[0]}" min="${e[2]}" max="${e[3]}" value="${e[4]}" data-def="${e[4]}"${e[5]?` data-u="${e[5]}"`:''}></div>`).join('');
+  host.hidden=!D.length;if(WBX.wbEnhance)WBX.wbEnhance()}
+ D.forEach(e=>{if(Array.isArray(e[2]))host.querySelectorAll(`[data-aos="${e[0]}"] [data-v]`).forEach(b=>b.classList.toggle('on',b.dataset.v===O[e[0]]));
+  else{const el=host.querySelector(`[data-ao="${e[0]}"]`);if(el&&+el.value!==O[e[0]]){el.value=O[e[0]];uiFire(el)}}})}
 // Add source (2.28.0): a menu with the project's stamps and texts, and "Motif from the library…", which opens the Motifs panel's folder tree: the next motif clicked
 // there becomes a source of this pattern and the Pattern panel comes back (Esc lets go). It replaces one dropdown of every motif in the library (464 of them).
 function patAddSrc(p,src){const q=patList().find(x=>x.u===p.u);if(!q)return;q.src=q.src||[];q.src.push(src);WBS.patSel=q.u;patCh()}
@@ -227,12 +236,20 @@ $('pear').addEventListener('change',()=>{const p=patCur();if(!p)return;const v=$
 function patRandTiling(){const p=patCur();if(!p||p.lay!='tile')return;const cur=(p.ts||'auto')+'|'+tlArr(p),all=[];TL_TS.forEach(([ts])=>{if(ts=='auto'||!TL_AR[ts])return;TL_AR[ts].forEach(([ar])=>{if(ts+'|'+ar!==cur)all.push([ts,ar])})});
  if(!all.length)return;const[ts,ar]=all[Math.floor(Math.random()*all.length)];p.ts=ts;p.ar=ar;WBX.wbLabelNext={t:'Random tiling',at:performance.now()};patCh()}
 $('petrn').onclick=patRandTiling;
+$('peao').addEventListener('input',e=>{const r=e.target.closest('[data-ao]');if(!r||WBS.uiLoad)return;patAoSet(r.dataset.ao,+r.value)});
+$('peao').addEventListener('click',e=>{const b=e.target.closest('[data-v]'),g=b&&b.closest('[data-aos]');if(g)patAoSet(g.dataset.aos,b.dataset.v)});
 // 2.78.4 (bug test B2): a pattern holds at most PAT_MAX pieces. Size at 1% with no spacing made about 15,000 (6 MB of drawing, seconds a change); a slider that would take it
 // past the limit, and past what it had, stops at the last step under it, so it shows the real value. A pattern already past it (an older file) can always go back down.
 const PAT_MAX=3000,patN=p=>{try{return(patPts(p).pts||[]).length}catch(e){return 0}};
 function patHold(p,f,old,el){const n=patN(p);if(n<=PAT_MAX)return;p[f]=old;if(patN(p)>=n){p[f]=+el.value;return}const st=+el.step||1,mn=+el.min||0,snap=x=>+(mn+Math.round((x-mn)/st)*st).toFixed(3),dir=Math.sign(+el.value-old);let v=snap(old);if(dir>0?v>old:v<old)v=+(v-dir*st).toFixed(3);   // on the slider's own steps
  for(let i=0;i<400;i++){const w=+(v+dir*st).toFixed(3);if(dir>0?w>+el.value:w<+el.value)break;p[f]=w;if(patN(p)>PAT_MAX)break;v=w}p[f]=v;el.value=v;uiFire(el)}
 [['peps','ps'],['pesp','sp'],['pecn','cn'],['pern','rn'],['pesz','sz'],['pert','rt'],['peox','ox'],['peoy','oy'],['pein','in'],['peiv','iv'],['pemd','md'],['pemg','mg'],['pedv','dv'],['pedg','dg']].forEach(([id,f])=>$(id).addEventListener('input',()=>{if(WBS.uiLoad)return;const p=patCur();if(!p)return;const v=+$(id).value;if(p[f]!==v){const el=$(id),old=p[f]!=null?+p[f]:+(el.dataset.def||el.min||0);p[f]=v;if(['ps','sp','cn','rn'].includes(f))patHold(p,f,old,el);patCh()}}));
+// one setting of the arrangement showing: kept in p.ao[ar] only when off its default; one History step a change. A value that would take the pattern past
+// PAT_MAX pieces (Overlap, Row spacing) goes back to the one it had.
+function patAoSet(key,v){const p=patCur(),host=$('peao');if(!p||!host)return;const ar=host.dataset.ar,sh=tlShape(p),e=tlOpDefs(sh,ar).find(x=>x[0]==key);if(!e)return;
+ const def=Array.isArray(e[2])?e[3]:e[4],old=tlOpt(p,sh,ar)[key];if(old===v)return;const n0=patN(p),put=x=>{p.ao=p.ao||{};const o={...(p.ao[ar]||{})};if(x===def)delete o[key];else o[key]=x;
+  if(Object.keys(o).length)p.ao[ar]=o;else delete p.ao[ar];if(!Object.keys(p.ao).length)delete p.ao};
+ put(v);if(patN(p)>PAT_MAX&&patN(p)>n0){put(old);patAoSync(p,sh,ar);return}patCh()}
 $('pesd').onclick=()=>{const p=patCur();if(p){p.sd=1+Math.floor(Math.random()*9998);patCh()}};
 // "Add element" (2.4.0): one list of everything a pattern can place: the stamps, the motifs of the library, and the text on the canvas
 $('peadd').onclick=e=>{e.stopPropagation();patAddMenu()};

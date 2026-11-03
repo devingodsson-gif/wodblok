@@ -34,25 +34,45 @@ const TL_WG={p1:[0,[]],p2:[0,[TL_R(180)]],pm:[0,[TL_MX()]],pg:[0,[TL_MX(0,.5)]],
  pgg:[0,[TL_R(180),TL_MX(.5,.5)]],cmm:[0,[TL_MX(),TL_MY(),TL_T(.5,.5)]],p4:[0,[TL_R(90)]],p4m:[0,[TL_R(90),TL_MX()]],p4g:[0,[TL_R(90),TL_MX(.5,.5)]],
  p3:[1,[TL_R(120)]],p3m1:[1,[TL_R(120),TL_MY()]],p31m:[1,[TL_R(120),TL_MX()]],p6:[1,[TL_R(60)]],p6m:[1,[TL_R(60),TL_MX()]]};
 const TL_WC={};
-// the copies of one cell: [{x, y (in cells, Cartesian), r, f}]; the lattice basis is the square or TL_H3
-function tlWall(g){if(TL_WC[g])return TL_WC[g];const[hex,gens]=TL_WG[g]||TL_WG.p1,B=hex?TL_H3:[[1,0],[0,1]],det=B[0][0]*B[1][1]-B[1][0]*B[0][1],
+// the copies of one cell: [{x, y (in cells, Cartesian), r, f}]; the lattice basis is the square or TL_H3. k (2.90.0, the group's Spread): how far the piece p0 sits from the
+// cell's corner, the centre of its turns and mirrors (1 = as before)
+function tlWall(g,k=1){const ck=g+'|'+k;if(TL_WC[ck])return TL_WC[ck];const[hex,gens]=TL_WG[g]||TL_WG.p1,B=hex?TL_H3:[[1,0],[0,1]],det=B[0][0]*B[1][1]-B[1][0]*B[0][1],
  red=t=>{let u=(t[0]*B[1][1]-t[1]*B[1][0])/det,v=(-t[0]*B[0][1]+t[1]*B[0][0])/det;u-=Math.floor(u+1e-9);v-=Math.floor(v+1e-9);return[u*B[0][0]+v*B[1][0],u*B[0][1]+v*B[1][1]]},
  cmp=(A,C)=>({m:[A.m[0]*C.m[0]+A.m[1]*C.m[2],A.m[0]*C.m[1]+A.m[1]*C.m[3],A.m[2]*C.m[0]+A.m[3]*C.m[2],A.m[2]*C.m[1]+A.m[3]*C.m[3]],t:red([A.m[0]*C.t[0]+A.m[1]*C.t[1]+A.t[0],A.m[2]*C.t[0]+A.m[3]*C.t[1]+A.t[1]])}),
  key=o=>o.m.map(v=>Math.round(v*1e6)).join()+'|'+o.t.map(v=>Math.round(v*1e6)).join(),ops=[tlM(1,0,0,1)],seen=new Set([key(ops[0])]);
  for(let i=0;i<ops.length&&ops.length<48;i++)for(const G of gens){const n=cmp(G,ops[i]);const k=key(n);if(!seen.has(k)){seen.add(k);ops.push(n)}}
- const p0=hex?[.31,.13]:[.21,.14],out=ops.map(o=>{const[x,y]=red([o.m[0]*p0[0]+o.m[1]*p0[1]+o.t[0],o.m[2]*p0[0]+o.m[3]*p0[1]+o.t[1]]),d=o.m[0]*o.m[3]-o.m[1]*o.m[2],
+ const p0=(hex?[.31,.13]:[.21,.14]).map(v=>v*k),out=ops.map(o=>{const[x,y]=red([o.m[0]*p0[0]+o.m[1]*p0[1]+o.t[0],o.m[2]*p0[0]+o.m[3]*p0[1]+o.t[1]]),d=o.m[0]*o.m[3]-o.m[1]*o.m[2],
   r=d>0?Math.atan2(o.m[2],o.m[0]):Math.atan2(-o.m[2],-o.m[0]);return{x,y,r:+(r*180/Math.PI).toFixed(3),f:d>0?1:-1}});
- return TL_WC[g]={hex,ops:out}}
+ return TL_WC[ck]={hex,ops:out}}
 // a small picture of a group: an asymmetric mark (a flag) at each copy, over 2 x 2 cells, in the current colour
-function tlWallPreview(g){const W=tlWall(g),B=W.hex?TL_H3:[[1,0],[0,1]],L=34,o=[],F='M-5 6V-7h8l-2 3 2 3h-8';let mk='';
+function tlWallPreview(g,k=1){const W=tlWall(g,k),B=W.hex?TL_H3:[[1,0],[0,1]],L=34,o=[],F='M-5 6V-7h8l-2 3 2 3h-8';let mk='';
  for(let i=0;i<2;i++)for(let j=0;j<2;j++)W.ops.forEach(c=>{const x=(i*B[0][0]+j*B[1][0]+c.x)*L,y=(i*B[0][1]+j*B[1][1]+c.y)*L;mk+=`<path d="${F}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${c.r}) scale(${c.f} 1) scale(1.15)"/>`});
  const w=(2*B[0][0]+2*B[1][0])*L,h=(2*B[0][1]+2*B[1][1])*L;return`<svg viewBox="-8 -8 ${(w+16).toFixed(1)} ${(h+16).toFixed(1)}" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">${mk}</g></svg>`}
+// ---- 2.90.0 (owner Nov 3 2026: "every arrangement type should have their own settings, just one or two (or more), so the half drop arrangement will have a setting
+// for the distance"; settings may be shared): each arrangement's own settings, kept per arrangement in p.ao[ar] (only values off their default; the defaults lay
+// the arrangement exactly as before). A slider is [key, label, min, max, default, unit]; a segmented control [key, label, [[value, label]], default].
+const TL_OP={grid:[['sk','Skew',-50,50,0,'%']],checker:[['bk','Block',1,4,1]],brick:[['of','Offset',0,100,50,'%']],half:[['dr','Drop',0,100,50,'%']],
+ diag:[['sw','Stripe width',1,4,1],['dir','Direction',[['dn','Down'],['up','Up']],'dn']],basket:[['st','Strands',2,4,2]],turn:[['an','Angle',0,180,90,'°']],
+ pinwheel:[['dir','Direction',[['cw','Clockwise'],['ccw','Anticlockwise']],'cw']],mirror:[['mm','Mirror',[['both','Both ways'],['across','Across'],['down','Down']],'both']],
+ stripes:[['sw','Stripe width',1,6,1],['dir','Direction',[['rows','Rows'],['cols','Columns']],'rows']],bands:[['bw','Band width',2,8,2],['gp','Gap',0,4,0]],
+ chevron:[['an','Angle',15,75,45,'°'],['arm','Arm width',1,4,1]],herring:[['an','Angle',15,75,45,'°'],['dr','Drop',0,100,50,'%']],
+ honey:[['at','Alternate turn',0,180,0,'°']],honeyt:[['at','Alternate turn',0,180,0,'°']],three:[['nc','Colours',[['3','3'],['4','4'],['7','7']],'3']],
+ alt:[['sd','Second piece',[['turn','Turned'],['mirror','Mirrored']],'turn']],rows:[['rw','Rows per colour',1,4,1]],
+ harl:[['bk','Block',1,3,1]],dgrid:[['at','Alternate turn',0,180,0,'°']],ogee:[['mm','Mirror',[['down','Down'],['across','Across']],'down']],
+ packed:[['rs','Row spacing',50,150,100,'%']],square:[['z2','Second size',20,100,100,'%']],scale:[['ov','Overlap',0,75,50,'%']],
+ octsq:[['sq','Square size',20,150,100,'%']],octs:[['of','Row offset',0,100,0,'%']]},TL_OPW=[['spr','Spread',20,100,50,'%']];
+const tlOpDefs=(sh,ar)=>TL_OP[ar]||(sh=='wall'?TL_OPW:[]);
+// the settings of an arrangement, defaults filled in and values kept in range
+function tlOpt(p,sh,ar){const s=(p&&p.ao&&p.ao[ar])||{},o={};tlOpDefs(sh,ar).forEach(e=>{let v=s[e[0]];if(Array.isArray(e[2])){if(!e[2].some(x=>x[0]===v))v=e[3]}
+ else{v=v==null||!isFinite(+v)?e[4]:Math.max(e[2],Math.min(e[3],+v))}o[e[0]]=v});return o}
+// a fraction as p/q with q at most 8 (a repeat tile needs a shift that comes back to a whole piece after q rows or columns)
+function tlFr(x){let best=[Math.round(x),1],be=Math.abs(x-best[0]);for(let q=2;q<=8;q++){const p=Math.round(x*q),e=Math.abs(x-p/q);if(e<be-1e-9){best=[p,q];be=e}}return best}
 // 2.83.0 (owner Oct 31 2026: "I want this for all the pattern types. They should all render flags"): the same small picture for every tile shape and arrangement,
 // laid by tlPts itself (a flag at each place, with its turn and flip, fainter or stronger by its class) in a window of three pieces round the middle; a wallpaper
 // group keeps its 2 x 2 cells
 const TL_CLS=new Set(['checker','diag','stripes','bands','three','rows','harl','ogee']);   // the arrangements that are about colours: their classes show
-function tlFlagPreview(sh,ar){if(sh=='wall')return tlWallPreview(ar);
- const q={lay:'tile',ts:sh,ar,ps:20,sp:0,rt:0,ox:0,oy:0,src:[]},S=Math.min(CW,CH)*.2,W=S*3,T=tlPts(q,W,W),F='M-5 6V-7h8l-2 3 2 3h-8',m=S*.2,OP=[1,.4,.7],u=v=>(v/S*34).toFixed(1);let mk='';
+function tlFlagPreview(sh,ar,ao){if(sh=='wall')return tlWallPreview(ar,tlOpt({ao:{[ar]:ao||{}}},sh,ar).spr/50);
+ const q={lay:'tile',ts:sh,ar,ps:20,sp:0,rt:0,ox:0,oy:0,src:[],ao:{[ar]:ao||{}}},S=Math.min(CW,CH)*.2,W=S*3,T=tlPts(q,W,W),F='M-5 6V-7h8l-2 3 2 3h-8',m=S*.2,OP=[1,.4,.7],u=v=>(v/S*34).toFixed(1);let mk='';
  T.pts.forEach(([x,y],i)=>{if(x<m||x>W-m||y<m||y>W-m)return;const k=(T.size[i]||S)/S,c=TL_CLS.has(ar)?T.cls[i]:0;   // whole flags only; a piece's class (a colour in Checkerboard, Stripes...) as its strength
   mk+=`<path d="${F}" stroke-opacity="${OP[(typeof c=='number'?((c%3)+3)%3:0)]}" transform="translate(${u(x)} ${u(y)}) rotate(${(+T.rot[i]||0).toFixed(1)}) scale(${(T.flip[i]||1)*1.15*k} ${1.15*k})"/>`});
  const w=+u(W);return`<svg viewBox="-8 -8 ${(w+16).toFixed(1)} ${(w+16).toFixed(1)}" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">${mk}</g></svg>`}
@@ -73,32 +93,41 @@ function tlPts(p,W,H){const sh=tlShape(p),ar=tlArr(p,sh),B=tlBox(p,sh),S=Math.ma
  w=B.w*S,h=B.h*S,pts=[],rot=[],flip=[],cls=[],size=[],gap=[],keys=[],acc=[];
  // the lattice: a place for each (i, j), with its turn, flip and class; the step vectors grow with the spacing
  let a=[w*g,0],b=[0,h*g],fn=(i,j)=>({});
+ // 2.90.0: the arrangement's own settings (O); on a repeat tile a shift is taken to the nearest p/q, so the rows or columns come back to a whole piece
+ const O=tlOpt(p,sh,ar),fit=tileOn()&&Math.abs(W-CW)<.01&&Math.abs(H-CH)<.01,fv=x=>{if(!fit)return x;const f=tlFr(x);return f[0]/f[1]},fq=x=>tlFr(x)[1],bl=(i,j,k)=>tlMod(Math.floor(i/k)+Math.floor(j/k),2);
  if(sh=='square'){
-  if(ar=='brick')b=[w*g/2,h*g];
-  if(ar=='half'){a=[w*g,h*g/2];b=[0,h*g]}
+  if(ar=='grid')b=[w*g*fv(O.sk/100),h*g];
+  if(ar=='brick')b=[w*g*fv(O.of/100),h*g];
+  if(ar=='half'){a=[w*g,h*g*fv(O.dr/100)];b=[0,h*g]}
   if(ar=='chevron')a=[w*g*.75,0];
-  if(ar=='herring'){a=[w*g*.75,h*g/2];b=[0,h*g]}
-  fn={grid:(i,j)=>({}),checker:(i,j)=>({c:tlMod(i+j,2)}),brick:(i,j)=>({}),half:(i,j)=>({}),diag:(i,j)=>({c:i+j}),
-   basket:(i,j)=>({r:tlMod(Math.floor(i/2)+Math.floor(j/2),2)*90}),turn:(i,j)=>({r:tlMod(i+j,2)*90}),
-   pinwheel:(i,j)=>({r:[[0,270],[90,180]][tlMod(i,2)][tlMod(j,2)]}),mirror:(i,j)=>({f:(tlMod(i,2)?-1:1)*(tlMod(j,2)?-1:1),r:tlMod(j,2)?180:0}),
-   stripes:(i,j)=>({c:j}),bands:(i,j)=>({c:Math.floor(j/2)}),chevron:(i,j)=>({r:tlMod(i,2)?-45:45,c:i}),herring:(i,j)=>({r:tlMod(i,2)?-45:45,c:i})}[ar]||fn}
+  if(ar=='herring'){a=[w*g*.75,h*g*fv(O.dr/100)];b=[0,h*g]}
+  fn={grid:(i,j)=>({}),checker:(i,j)=>({c:bl(i,j,O.bk)}),brick:(i,j)=>({}),half:(i,j)=>({}),diag:(i,j)=>({c:Math.floor((O.dir=='up'?i-j:i+j)/O.sw)}),
+   basket:(i,j)=>({r:bl(i,j,O.st)*90}),turn:(i,j)=>({r:tlMod(i+j,2)*O.an}),
+   pinwheel:(i,j)=>({r:(O.dir=='ccw'?[[0,90],[270,180]]:[[0,270],[90,180]])[tlMod(i,2)][tlMod(j,2)]}),
+   mirror:(i,j)=>{const x=tlMod(i,2),y=tlMod(j,2);return O.mm=='across'?{f:x?-1:1}:O.mm=='down'?{f:y?-1:1,r:y?180:0}:{f:(x?-1:1)*(y?-1:1),r:y?180:0}},
+   stripes:(i,j)=>({c:Math.floor((O.dir=='cols'?i:j)/O.sw)}),bands:(i,j)=>{const P=O.bw+O.gp;return tlMod(j,P)>=O.bw?{skip:1}:{c:Math.floor(j/P)}},
+   chevron:(i,j)=>{const k=Math.floor(i/O.arm);return{r:tlMod(k,2)?-O.an:O.an,c:k}},herring:(i,j)=>({r:tlMod(i,2)?-O.an:O.an,c:i})}[ar]||fn}
  else if(sh=='hex'){
   // a stamp's own hexagon keeps its orientation; Honeycomb, turned turns the pieces a quarter (a pointy hexagon lies flat)
   const tw=ar=='honeyt'?h:w,th=ar=='honeyt'?w:h,turn=ar=='honeyt'?90:0,pt=(B.o!='f')!==(ar=='honeyt');
   if(pt){a=[tw*g,0];b=[tw*g/2,th*.75*g]}else{a=[tw*.75*g,th*g/2];b=[0,th*g]}
-  fn=(i,j)=>({r:turn,c:ar=='three'?tlMod(i-j,3):undefined})}
- else if(sh=='tri'){a=[w*g/2,0];b=[0,h*g];fn=(i,j)=>({r:tlMod(i+j,2)*180,c:ar=='rows'?j:undefined})}
- else if(sh=='diamond'){a=[w*g/2,h*g/2];b=[-w*g/2,h*g/2];fn=(i,j)=>(ar=='ogee'?{c:tlMod(i+j,2),f:tlMod(i+j,2)?-1:1,r:tlMod(i+j,2)?180:0}:{c:ar=='harl'?tlMod(i+j,2):undefined})}
- else if(sh=='circle'){if(ar=='packed'){a=[w*g,0];b=[w*g/2,h*TL_S3/2*g]}if(ar=='scale'){a=[w*g,0];b=[w*g/2,h*g/2]}}
- else if(sh=='wall'){const W=tlWall(ar),L=S*g*Math.max(1.4,Math.sqrt(W.ops.length)*(W.hex?1.25:1.1));a=[L,0];b=W.hex?[L/2,L*TL_S3/2]:[0,L]}
- else if(sh=='oct'){a=[w*g,0];b=[0,h*g];if(ar=='octsq')fn=()=>({c:0})}
+  const nc=+O.nc||3;fn=(i,j)=>({r:turn+(O.at&&tlMod(pt?j:i,2)?O.at:0),c:ar=='three'?(nc==4?tlMod(i,2)+2*tlMod(j,2):nc==7?tlMod(i+3*j,7):tlMod(i-j,3)):undefined})}
+ else if(sh=='tri'){a=[w*g/2,0];b=[0,h*g];fn=(i,j)=>{const od=tlMod(i+j,2);return{r:od*180,f:ar=='alt'&&O.sd=='mirror'&&od?-1:1,c:ar=='rows'?Math.floor(j/O.rw):undefined}}}
+ else if(sh=='diamond'){a=[w*g/2,h*g/2];b=[-w*g/2,h*g/2];fn=(i,j)=>{const od=tlMod(i+j,2);return ar=='ogee'?{c:od,f:od?-1:1,r:od&&O.mm!='across'?180:0}:ar=='harl'?{c:bl(i,j,O.bk)}:{r:od*O.at}}}
+ else if(sh=='circle'){if(ar=='packed'){a=[w*g,0];b=[w*g/2,h*TL_S3/2*g*(O.rs/100)]}if(ar=='scale'){a=[w*g,0];b=[w*g/2,h*g*(1-O.ov/100)]}if(ar=='square'&&O.z2<100)fn=(i,j)=>tlMod(i+j,2)?{z:O.z2/100}:{}}
+ else if(sh=='wall'){const W=tlWall(ar,O.spr/50),L=S*g*Math.max(1.4,Math.sqrt(W.ops.length)*(W.hex?1.25:1.1));a=[L,0];b=W.hex?[L/2,L*TL_S3/2]:[0,L]}
+ else if(sh=='oct'){a=[w*g,0];b=[ar=='octs'?w*g*fv(O.of/100):0,h*g];if(ar=='octsq')fn=()=>({c:0})}
  // on a repeat tile the arrangement must repeat with the tile: its rectangle of repeat (Px x Py: how far across and down it is the same again, sources
  // included) is stretched, by at most half a step, so a whole number of them fits the tile; the pieces keep their size
- if(tileOn()&&Math.abs(W-CW)<.01&&Math.abs(H-CH)<.01){const n=Math.max(1,(p.src||[]).length),lcm=(x,y)=>{let m=x;while(m%y)m+=x;return m},hexP=sh=='hex'&&Math.abs(a[1])<1e-9;
-  const P={square:{grid:[a[0]*n,b[1]],checker:[a[0]*2,b[1]*2],brick:[a[0]*n,b[1]*2],half:[a[0]*lcm(2,n),b[1]],diag:[a[0]*n,b[1]*n],basket:[a[0]*lcm(4,n),b[1]*4],turn:[a[0]*lcm(2,n),b[1]*2],pinwheel:[a[0]*lcm(2,n),b[1]*2],mirror:[a[0]*lcm(2,n),b[1]*2],stripes:[a[0],b[1]*n],bands:[a[0],b[1]*2*n],chevron:[a[0]*lcm(2,n),b[1]],herring:[a[0]*lcm(2,n),b[1]]}[ar],
-   hex:hexP?[a[0]*(ar=='three'?3:n),b[1]*2]:[a[0]*2*(ar=='three'?1:n),b[1]*(ar=='three'?3:1)],
-   tri:[a[0]*2*lcm(2,n)/2,b[1]*2*(ar=='rows'?lcm(2,n)/2:1)],diamond:[a[0]*2*(ar=='harl'||ar=='ogee'?1:n),a[1]*2],
-   circle:[a[0]*n,ar=='packed'||ar=='scale'?b[1]*2:b[1]],oct:[a[0]*(ar=='octsq'?1:n),b[1]],wall:[a[0],b[1]*(Math.abs(b[0])>1e-9?2:1)]}[sh]||[a[0],b[1]];
+ // (2.90.0: the settings change how far that is: a shift of p/q comes back after q rows or columns, a Block of k after 2k, and so on)
+ if(fit){const n=Math.max(1,(p.src||[]).length),lcm=(x,y)=>{let m=x;while(m%y)m+=x;return m},hexP=sh=='hex'&&Math.abs(a[1])<1e-9,nc=+O.nc||3,
+  h3=ar=='three'?(hexP?[nc==4?2:nc==7?7:3,nc==4?4:nc==7?14:2]:[nc==4?2:nc==7?7:1,nc==4?2:nc==7?7:3]):(hexP?[n,2]:[n,1]);
+  const P={square:{grid:[a[0]*n,b[1]*fq(O.sk/100)],checker:[a[0]*2*O.bk,b[1]*2*O.bk],brick:[a[0]*n,b[1]*fq(O.of/100)],half:[a[0]*lcm(fq(O.dr/100),n),b[1]],diag:[a[0]*n*O.sw,b[1]*n*O.sw],
+   basket:[a[0]*lcm(2*O.st,n),b[1]*2*O.st],turn:[a[0]*lcm(2,n),b[1]*2],pinwheel:[a[0]*lcm(2,n),b[1]*2],mirror:[a[0]*lcm(2,n),b[1]*2],stripes:O.dir=='cols'?[a[0]*n*O.sw,b[1]]:[a[0],b[1]*n*O.sw],
+   bands:[a[0],b[1]*(O.bw+O.gp)*n],chevron:[a[0]*lcm(2*O.arm,n*O.arm),b[1]],herring:[a[0]*lcm(lcm(2,n),fq(O.dr/100)),b[1]]}[ar],
+   hex:hexP?[a[0]*h3[0],b[1]*h3[1]]:[a[0]*2*h3[0],b[1]*h3[1]],
+   tri:[a[0]*2*lcm(2,n)/2,b[1]*(ar=='rows'?lcm(2,n*O.rw):2)],diamond:[a[0]*2*(ar=='harl'?O.bk:ar=='ogee'?1:n),a[1]*2*(ar=='harl'?O.bk:1)],
+   circle:ar=='square'&&O.z2<100?[a[0]*lcm(2,n),b[1]*2]:[a[0]*n,ar=='packed'||ar=='scale'?b[1]*2:b[1]],oct:[a[0]*(ar=='octsq'?1:n),b[1]*(ar=='octs'?fq(O.of/100):1)],wall:[a[0],b[1]*(Math.abs(b[0])>1e-9?2:1)]}[sh]||[a[0],b[1]];
   const kx=P[0]>0?W/Math.max(1,Math.round(W/P[0]))/P[0]:1,ky=P[1]>0?H/Math.max(1,Math.round(H/P[1]))/P[1]:1;a=[a[0]*kx,a[1]*ky];b=[b[0]*kx,b[1]*ky]}
  // enough places to cover the area from its middle, wherever the turn and shift put them
  const R=Math.hypot(W,H)/2+S*g*2+(sh=='wall'?Math.hypot(a[0]+b[0],a[1]+b[1]):0),da=Math.hypot(a[0],a[1]),db=Math.hypot(b[0],b[1]),cross=Math.abs(a[0]*b[1]-a[1]*b[0])||1,ni=Math.ceil(R*db/cross)+2,nj=Math.ceil(R*da/cross)+2;
@@ -108,10 +137,10 @@ function tlPts(p,W,H){const sh=tlShape(p),ar=tlArr(p,sh),B=tlBox(p,sh),S=Math.ma
  let k=0;const put=(lx,ly,o,sz)=>{const x=ox+lx*co-ly*si,y=oy+lx*si+ly*co;if(x<-lim||x>W+lim||y<-lim||y>H+lim)return;pts.push([x,y]);rot.push((o.r||0)+(+p.rt||0));flip.push(o.f||1);cls.push(o.c==null?o.i:o.c);size.push(sz||S);gap.push(!!o.gap);keys.push(o.key);acc.push(!!o.acc);k++};
  const AC=p.ac&&p.ac.on?Math.max(5,Math.min(100,+p.ac.z||40))/100:0;
  // a wallpaper cell's copies follow the lattice's own stretch across and down (a repeat tile stretches them apart)
- const WG=sh=='wall'?tlWall(ar):null,WX=WG?a[0]:0,WY=WG?(WG.hex?b[1]/(TL_S3/2):b[1]):0;
+ const WG=sh=='wall'?tlWall(ar,O.spr/50):null,WX=WG?a[0]:0,WY=WG?(WG.hex?b[1]/(TL_S3/2):b[1]):0;
  for(let j=-nj;j<=nj;j++)for(let i=-ni;i<=ni;i++){const lx=i*a[0]+j*b[0],ly=i*a[1]+j*b[1];if(Math.hypot(lx,ly)>R)continue;if(AC)put(lx+(a[0]+b[0])/2,ly+(a[1]+b[1])/2,{i,c:'a',key:i+'_'+j+'_a',acc:1},S*AC);
-  if(WG){WG.ops.forEach((c,k)=>put(lx+c.x*WX,ly+c.y*WY,{i,r:c.r,f:c.f,c:k,key:i+'_'+j+'_'+k}));continue}put(lx,ly,{i,...fn(i,j),key:i+'_'+j});
+  if(WG){WG.ops.forEach((c,k)=>put(lx+c.x*WX,ly+c.y*WY,{i,r:c.r,f:c.f,c:k,key:i+'_'+j+'_'+k}));continue}{const o=fn(i,j);if(!o.skip)put(lx,ly,{i,...o,key:i+'_'+j},o.z?S*o.z:0)}
   // Octagons and squares: the small square between four octagons takes the second source (left empty with one source) (a regular octagon's side is its width / (1 + √2))
-  if(sh=='oct'&&ar=='octsq'){const s=w/(1+Math.SQRT2);put(lx+a[0]/2+b[0]/2,ly+a[1]/2+b[1]/2,{i,r:45,c:1,gap:1,key:i+'_'+j+'_g'},s*Math.SQRT2)}}
+  if(sh=='oct'&&ar=='octsq'){const s=w/(1+Math.SQRT2);put(lx+a[0]/2+b[0]/2,ly+a[1]/2+b[1]/2,{i,r:45,c:1,gap:1,key:i+'_'+j+'_g'},s*Math.SQRT2*(O.sq/100))}}
  return{pts,rot,flip,cls,size,gap,keys,acc,shape:sh,arr:ar,box:{w:B.w,h:B.h}}}
-export {TL_AR,TL_TS,tlArr,tlFlagPreview,tlPts,tlShape,tlWallPreview};
+export {TL_AR,TL_TS,tlArr,tlFlagPreview,tlOpDefs,tlOpt,tlPts,tlShape,tlWallPreview};
