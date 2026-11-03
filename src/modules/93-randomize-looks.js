@@ -495,9 +495,9 @@ const RZ_BASIC=['rect','rrect','ellipse','tri','dia','pent','hex','star','arrow'
 const rzBlends=g=>rzLum(g)>.35?['multiply','darken','overlay','soft-light']:['screen','lighten','overlay','soft-light'];
 // an effect from the filter list with its settings thrown somewhere between its default and anywhere in its range
 function rzWildFx(E){const ks=Object.keys(FQ),k=E.pick(ks),e=rzQfx(k,{},E);if(!e)return null;(FQ[k].P||[]).forEach(([f,,lo,hi,v])=>{if(E.ch(.7)){const w=E.rr(lo,hi);e[f]=Math.round(v+(w-v)*E.rr(.3,1))}});return e}
-RZL.random={dark:1,w:.8,build(E){const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},looks=Object.keys(RZT);
+RZL.random={dark:1,w:0,build(E){   /* w 0: only when chosen in the panel, so Any rolls (and every seeded roll) stay as they were */const R=E.roles,S=Math.min(CW,CH),out={tiles:[],els:[],texts:[]},looks=Object.keys(RZT);
  const gnd=rzGround(E,out,E.pick(['flat','tonal','glow','halftone'])),inks=rzInks(E,gnd,5),ink=()=>E.pick(inks),theme=()=>E.pick(rzThemes(E,E.pick(looks))),shape=()=>basicKey(E.pick(RZ_BASIC));
- const BL=rzBlends(rzHex(gnd)),wild=(q,p)=>{if(!q)return q;if(E.ch(p||.35))addFx(q,rzWildFx(E));if(E.ch(.2))q.bl=E.pick(BL);if(E.ch(.2))q.op=E.ri(55,95);return q};
+ const BL=rzBlends(rzHex(Array.isArray(gnd)?gnd[0]:gnd)),wild=(q,p)=>{if(!q)return q;if(E.ch(p||.35))addFx(q,rzWildFx(E));if(E.ch(.2))q.bl=E.pick(BL);if(E.ch(.2))q.op=E.ri(55,95);return q};
  if(E.ch(.3))out.els.push(wild(elGrad(E,ink(),E.ch(.5)?ink():R.paper,E.ch(.4)),.2));
  if(E.FT.pat)for(let i=0,n=E.ri(1,3);i<n;i++){const ks=[...Array(E.ri(1,3))].map(()=>E.ch(.45)?theme():shape()).filter(Boolean),pi=E.shuf(inks).slice(0,E.ri(1,3));if(!ks.length)continue;
   const p=rzPat(E,out,{n:'Random '+(i+1),src:ks.map(k=>rzSrc(E,out,k,pi[0])),inks:pi,lays:['tile','wall','scatter','spiral'],pc:E.ch(.5)?1:0});

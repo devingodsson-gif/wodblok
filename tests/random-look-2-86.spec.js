@@ -11,8 +11,9 @@ test('Random is in the Look list; its rolls are each different, mixed and never 
   await page.evaluate(() => window.__wbTest.kv.set('wb167_rzlook', 'random'));
   const seen = new Set(), sigs = [];
   for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => { document.getElementById('pmsg').textContent = ''; });
     await roll(page);
-    expect(await page.textContent('#pmsg')).toMatch(/Randomized: Random/);
+    await expect(page.locator('#pmsg'), 'roll ' + i).toHaveText(/Randomized: Random/, { timeout: 30000 }); await settle(page);
     const d = await st(page), real = d.els.filter(q => !q.bgd);
     expect(real.length, 'roll ' + i + ' is not empty').toBeGreaterThanOrEqual(2);
     real.forEach(q => seen.add(q.k));
