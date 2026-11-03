@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.87.4 (Nov 3 2026, step 4 of docs/pro-basics-plan.md): Help
+- A **Help** panel, an undocked panel: it opens floating in the middle the first time, like Export, and docks like any panel. Help menu: Getting started, Manual, Keyboard shortcuts, What's new, Search commands, Send feedback, About Wodblok; each opens its page.
+- The manual: Getting started, Elements, Stamps, Patterns, Effects, Colours, Randomize, Export and print, written in the app's own words and bundled (no network). Search finds pages by their words. Shortcuts and About are drawn from the app.
+- Tests: tests/help-2-87-4.spec.js (new, 3); menu-bar-2-42 (Help > Keyboard shortcuts now opens the Help page, not Settings). Run: those, commands, settings, settings-menu, shortcuts, panels-2-55, panels-1019, panel-style (one settings test failed once under parallel workers and passed 9 of 9 on its own), check:style, check:platform. Not run: perf (nothing on the drawing path), the full suite (end of the plan).
+
 ## 2.87.3 (Nov 3 2026, step 3 of docs/pro-basics-plan.md): Alt-drag duplicates
 - Alt held as a drag starts leaves the element, or the whole selection, where it is and drags a copy, on the canvas and in a stamp's tab. One History step, "Duplicated"; Undo takes the copy away, and so does Esc during the drag.
 - The smart guides and grid snap the copy as in a move (Alt does not skip snapping here). In a stamp's tab, Alt on a letter of a text still moves that one letter.
