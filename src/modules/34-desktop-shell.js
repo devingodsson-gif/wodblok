@@ -521,13 +521,24 @@ let key='',hi=-1;
 const st={sel,w,b,l,sync(force){const k=sel.selectedIndex+'|'+sel.options.length+'|'+(sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].textContent:'')+'|'+sel.disabled+'|'+(sel.hidden?1:0);if(!force&&k===key)return;key=k;
  const o=sel.options[sel.selectedIndex];t.textContent=o?o.textContent:'';t.style.cssText=o&&o.dataset.font?ffOf(o.dataset.font,o.dataset.w):'';b.disabled=sel.disabled;w.hidden=sel.hidden;if(!l.hidden)fill()},
  fill};
-function fill(){const items=optList(sel),cv=sel.value;l.innerHTML=items.map((o,i)=>o.g!=null?`<div class="ddg">${esc(o.g)}</div>`:`<div class="ddi${o.v===cv?' cur':''}${o.d?' dis':''}" role="option" data-i="${i}" data-v="${esc(o.v).replace(/"/g,'&quot;')}"${o.f?` style="${ffOf(o.f,o.w)}"`:''}>${esc(o.t)}</div>`).join('')}
+function fill(){const items=optList(sel),cv=sel.value;l.innerHTML=items.map((o,i)=>o.g!=null?(o.g===''?'<div class="ddsep" role="separator"></div>':`<div class="ddg">${esc(o.g)}</div>`):`<div class="ddi${o.v===cv?' cur':''}${o.d?' dis':''}" role="option" data-i="${i}" data-v="${esc(o.v).replace(/"/g,'&quot;')}"${o.f?` style="${ffOf(o.f,o.w)}"`:''}>${esc(o.t)}</div>`).join('')}
 function pick(v){desc.set.call(sel,v);key='';st.sync(true);close();sel.dispatchEvent(new Event('input',{bubbles:true}));sel.dispatchEvent(new Event('change',{bubbles:true}))}
-function close(){l.hidden=true;b.setAttribute('aria-expanded','false')}
+function close(){l.hidden=true;b.setAttribute('aria-expanded','false');if(st.pvEnd)st.pvEnd()}   /* a preview ends before a pick's change event */
 function open(){closeDD();if(typeof closeMenus=='function')closeMenus();fill();l.hidden=false;b.setAttribute('aria-expanded','true');placeFloat(l,b,false,320);const c=l.querySelector('.cur');if(c){l.scrollTop=c.offsetTop-(l.clientHeight-c.offsetHeight)/2;hi=+c.dataset.i}}
 b.onclick=e=>{e.stopPropagation();l.hidden?open():close()};
 l.onclick=e=>{const i=e.target.closest('.ddi');if(!i||i.classList.contains('dis'))return;e.stopPropagation();pick(i.dataset.v)};
+// 2.87.10 (step 10): a select with data-preview shows each item as it is pointed at or arrowed to (a 'ddpreview' event with its value), and puts the old one
+// back (detail null) when the list closes without a pick; Enter or a click picks. Nothing on the item is hover-only: the arrow keys do the same
+const pv=sel.dataset.preview!=null;let pvOn=false;
+const prev=v=>{pvOn=v!=null;sel.dispatchEvent(new CustomEvent('ddpreview',{detail:v}))};if(pv)st.pvEnd=()=>{l.querySelectorAll('.ddi.hi').forEach(x=>x.classList.remove('hi'));if(pvOn)prev(null)};
+const hiTo=el=>{l.querySelectorAll('.ddi.hi').forEach(x=>x.classList.remove('hi'));if(!el)return;el.classList.add('hi');hi=+el.dataset.i;el.scrollIntoView({block:'nearest'});prev(el.dataset.v)};
+if(pv){l.addEventListener('pointerover',e=>{const i=e.target.closest('.ddi');if(i&&!i.classList.contains('dis')&&!i.classList.contains('hi'))hiTo(i)});
+ l.addEventListener('pointerleave',()=>{l.querySelectorAll('.ddi.hi').forEach(x=>x.classList.remove('hi'));if(pvOn)prev(null)});
+ new MutationObserver(()=>{if(l.hidden&&pvOn)prev(null)}).observe(l,{attributes:true,attributeFilter:['hidden']})}
 b.addEventListener('keydown',e=>{const k=e.key;
+ if(pv&&(k=='ArrowDown'||k=='ArrowUp')){e.preventDefault();e.stopPropagation();   /* the arrows are the list's here, not a nudge of the selection */
+ if(l.hidden){open();return}const its=[...l.querySelectorAll('.ddi:not(.dis)')],cur=l.querySelector('.ddi.hi')||l.querySelector('.ddi.cur');let j=its.indexOf(cur);j=Math.max(0,Math.min(its.length-1,j+(k=='ArrowDown'?1:-1)));hiTo(its[j]);return}
+ if(pv&&k=='Enter'&&!l.hidden){e.preventDefault();e.stopPropagation();const h=l.querySelector('.ddi.hi');if(h)pick(h.dataset.v);else close();return}
  if(k=='ArrowDown'||k=='ArrowUp'){e.preventDefault();const op=[...sel.options],n=op.length;let i=sel.selectedIndex;do{i+=k=='ArrowDown'?1:-1}while(i>=0&&i<n&&op[i].disabled);if(i>=0&&i<n){desc.set.call(sel,op[i].value);key='';st.sync(true);if(!l.hidden)fill();sel.dispatchEvent(new Event('input',{bubbles:true}));sel.dispatchEvent(new Event('change',{bubbles:true}))}}
  else if(k=='Escape'&&!l.hidden){e.stopPropagation();close()}});
 // programmatic changes: value setter + option changes + disabled/hidden

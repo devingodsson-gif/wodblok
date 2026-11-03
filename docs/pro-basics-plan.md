@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **steps 1 to 3 live (2.87.3); steps 1 to 7 live (2.87.7); steps 8 and 9 done (2.87.8, 2.87.9, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 to 3 live (2.87.3); steps 1 to 7 live (2.87.7); steps 8 to 10 done (2.87.8 to 2.87.10, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -128,6 +128,8 @@ Numbering: each step is a patch release on the version that is live when work st
   - Leaving the list or pressing Esc puts the old mode back.
   - Clicking (or Enter) keeps the new mode, as one History step. Nothing is saved or added to History while previewing.
 - Tests: each mode is applied and drawn; hovering or arrowing previews it with no History step; leaving restores; clicking keeps it.
+- **Done in 2.87.10:** the Blend list (Elements panel) has Normal | Darken, Multiply, Colour burn | Lighten, Screen, Colour dodge, Linear dodge (Add) | Overlay, Soft light, Hard light | Difference, Exclusion | Hue, Saturation, Colour, Luminosity | Replace, with a thin line between groups (an optgroup with no label in any dropdown draws one). All are the browser's own blend modes (Linear dodge is `plus-lighter`), so they cost nothing extra (`npm run perf` 0.99). The dropdown's `data-preview` previews on pointing and with the arrow keys (they no longer nudge the selection while the list is open), Esc or leaving restores, a click or Enter is one History step.
+- **Left out, and why:** Linear burn, Vivid light, Linear light, Subtract and Divide. A browser can only blend an element with what is under it through its own modes; an SVG filter cannot see what is under the element, so these cannot be drawn on the canvas the way the others are. They would need the whole canvas redrawn in a picture for each change (slow) or a new drawing engine.
 
 ## Step 11: undo and redo that work (owner, Nov 3: "undo/redo dont work")
 - First find which cases fail: Ctrl+Z / Ctrl+Shift+Z and the top-bar buttons, on the Canvas and in a stamp's tab, after drawing, dragging, typing in a field, sliders, text, panels and Randomize. A quick check earlier found Ctrl+Z works after Delete, so the fault is in some of these, not all.

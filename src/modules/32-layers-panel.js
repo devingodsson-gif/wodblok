@@ -46,7 +46,7 @@ function renderLayers(){const host=$('lyl2');if(!host)return;const a=lyP(),S=new
    (fxOpen?fxs.map(e=>{const fd=fxDef(e.k),on=e.on!==false;return`<div class="lyfx${on?'':' off'}" data-u="${q.u}" data-lfx="${e.u}" style="margin-left:${12*d+24}px"><button type="button" class="eye" data-fxeye title="${on?'Hide':'Show'}">${on?EYE:NOEYE}</button><span class="lyn">${hx(fd?fd.label:e.k)}</span></div>`}).join(''):'')}).join('');
   const inp=host.querySelector('input');if(inp){inp.focus();inp.select();const lyDone=ok=>{if(lyRen==null)return;const q=lyBy(lyP(),lyRen);if(ok&&q&&inp.value.trim())q.nm=inp.value.trim().slice(0,30);lyRen=null;store();upd()};inp.onkeydown=e=>{if(e.key=='Enter')lyDone(1);else if(e.key=='Escape')lyDone(0)};inp.onblur=()=>lyDone(1);inp.onclick=e=>e.stopPropagation()}}
  const n=a.filter(q=>!lyIsG(q)).length;if(!document.body.classList.contains('stedit'))$('lycnt').textContent=`${n} element${n==1?'':'s'}`;
- const s=lySel(),one=s[0]||null;$('ly_bl').value=one&&one.bl||'';{const rp=s.some(q=>q.bl=='replace');$('ly_rarow').hidden=$('ly_rprow').hidden=$('ly_rmrow').hidden=!rp;const q1=s.find(q=>q.bl=='replace'),rv=q1&&q1.rm!=null?+q1.rm:25;if(+$('ly_rm').value!=rv){lySync=true;try{$('ly_rm').value=rv;$('ly_rm').dispatchEvent(new Event('input',{bubbles:true}))}finally{lySync=false}}}$('ly_bl').disabled=!s.length;$('ly_op').disabled=!s.length;const ov=one?(one.op==null?100:one.op):100;if(+$('ly_op').value!=ov){lySync=true;try{$('ly_op').value=ov;$('ly_op').dispatchEvent(new Event('input',{bubbles:true}))}finally{lySync=false}}
+ const s=lySel(),one=s[0]||null;if(!lyBlPv)$('ly_bl').value=one&&one.bl||'';{const rp=s.some(q=>q.bl=='replace');$('ly_rarow').hidden=$('ly_rprow').hidden=$('ly_rmrow').hidden=!rp;const q1=s.find(q=>q.bl=='replace'),rv=q1&&q1.rm!=null?+q1.rm:25;if(+$('ly_rm').value!=rv){lySync=true;try{$('ly_rm').value=rv;$('ly_rm').dispatchEvent(new Event('input',{bubbles:true}))}finally{lySync=false}}}$('ly_bl').disabled=!s.length;$('ly_op').disabled=!s.length;const ov=one?(one.op==null?100:one.op):100;if(+$('ly_op').value!=ov){lySync=true;try{$('ly_op').value=ov;$('ly_op').dispatchEvent(new Event('input',{bubbles:true}))}finally{lySync=false}}
  $('lygrp').disabled=s.length<2;$('lyung').disabled=!s.some(lyIsG)}
 // ---- changing the list
 const lyDone=()=>{store();upd();if(WBX.wbCap)WBX.wbCap()};
@@ -73,6 +73,7 @@ function lyDrop(u,tu,above){const a=lyP(),i=a.findIndex(q=>String(q.u)===String(
 // 2.76.11 (2.76 review, "for experienced users"): the element actions as commands, so the Edit menu, the right-click menu, the shortcuts and command search all
 // reach them: order one step or all the way, lock, hide, rename, select all, deselect, turn a quarter and flip. Each is one history step, named.
 const lyLbl=t=>{WBX.wbLabelNext={t,at:performance.now()}};
+let lyBlPv=null;   // 2.87.10: the selected elements' modes while the Blend list previews another (the list keeps showing the real one)
 const lyNm=q=>{const d=elDef(elKind(q)),n=d&&d.name?d.name(q):'';return String(n||'element').replace(/\s+/g,' ').trim().slice(0,24)};
 const lyAct=(t,f)=>()=>{const s=lySel();if(!s.length)return false;lyLbl(t+' '+(s.length==1?lyNm(s[0]):s.length+' elements'));f(s);lyDone();return true};
 const lyOrdAll=front=>()=>{const s=lySel();if(!s.length)return false;const a=lyP();lyLbl(front?'Bring to front':'Send to back');s.forEach(q=>a.splice(a.indexOf(q),1));const bg=a.filter(q=>q.bgd).length;if(front)a.push(...s);else a.splice(bg,0,...s);lyDone();return true};
@@ -119,6 +120,11 @@ function init32(){lyCmds();
  cmdRegister({id:'element.group',label:'Group the selected elements',shortcut:'Mod+G',elId:'lygrp',enabled:()=>lySel().length>=2,run:()=>lyGroup()});
  cmdRegister({id:'element.ungroup',label:'Ungroup',shortcut:'Mod+Shift+G',elId:'lyung',enabled:()=>lySel().some(lyIsG),run:()=>lyUngroup()});
  document.addEventListener('keydown',e=>{const t=e.target;if(t.matches&&t.matches('input,select,textarea'))return;if((e.ctrlKey||e.metaKey)&&!e.altKey&&e.key.toLowerCase()=='g'){e.preventDefault();if(e.shiftKey){if(lySel().some(lyIsG))lyUngroup()}else if(lySel().length>=2)lyGroup()}});   // Photoshop's: Ctrl+G groups, Ctrl+Shift+G ungroups (2.27.0; it was Shift+G)
+ /* 2.87.10 (step 10): the Blend list previews the mode pointed at or arrowed to on the selected elements, drawn only (no store, no History step); leaving the list
+    puts the old modes back, and a pick is then one step */
+ $('ly_bl').addEventListener('ddpreview',e=>{const v=e.detail;
+  if(v==null){if(!lyBlPv)return;lyBlPv.forEach(([q,b])=>{if(b)q.bl=b;else delete q.bl});lyBlPv=null;WBX.wbNoCap=0;upd();return}
+  if(!lyBlPv){lyBlPv=lySel().map(q=>[q,q.bl]);WBX.wbNoCap=1}lyBlPv.forEach(([q])=>{if(v)q.bl=v;else delete q.bl});upd()});
  $('ly_bl').onchange=()=>{const v=$('ly_bl').value;lySel().forEach(q=>{if(v)q.bl=v;else delete q.bl});lyDone()};
  $('ly_op').addEventListener('input',()=>{if(lySync||WBS.fpSyncing)return;const v=+$('ly_op').value,s=lySel();if(!s.length)return;let ch=false;s.forEach(q=>{const o=q.op==null?100:q.op;if(o!==v){ch=true;if(v<100)q.op=v;else delete q.op}});if(ch){store();upd()}});
 }
