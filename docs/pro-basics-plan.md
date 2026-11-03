@@ -14,7 +14,9 @@ Numbering: each step is a patch release on the version that is live when work st
 - Tests: a value typed in each unit lands at the right place; changing Units changes the display, not the document.
 
 ## Step 2: rulers and guides
-- **Rulers** on the top and left of the canvas, in the chosen units, following zoom and pan. View > Rulers (Ctrl+R) turns them on and off.
+- **Rulers** on the top and left of the stage in **every tab**, in the chosen units, following zoom and pan. View > Rulers (Ctrl+R) turns them on and off for all tabs.
+  - On the Canvas they measure the canvas from its top-left corner.
+  - In a stamp's tab they measure the stamp at its printed size (owner, Nov 3: "a ruler to the top and left side of the canvas tabs too").
 - **Guides** are dragged out of a ruler, moved by dragging, and removed by dragging back onto the ruler. View > Guides shows or hides them (Ctrl+;), View > Lock guides locks them, View > Clear guides removes them.
 - Elements **snap** to guides (with the smart guides, under the same switch; Alt skips snapping).
 - **New guide…** places one at a typed position.
