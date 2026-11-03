@@ -5,7 +5,9 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 3: 2.87.7 (pro basics step 7: layouts)** on `feat/2.87.7-layouts`, not merged. Per-mode layouts, the Layout panel and top-bar button. Next: step 8 (Pattern panel sources).
+- **Nov 3: 2.87.8 (pro basics step 8: Pattern sources)** on `feat/2.87.8-pattern-sources`, not merged. Next: step 9 (the Export panel rearranged).
+- **Nov 3: 2.87.7 LIVE** (owner: "Merge everything"), with the gap review (#191). Not merged: #55 and #45, older pull requests that are not this plan's.
+- **Nov 3: 2.87.7 (pro basics step 7: layouts)**, merged.
 - **Nov 3: 2.87.6 LIVE** (owner: "Both"): 2.87.4, 2.87.5 and 2.87.6 merged.
 - **Nov 3: 2.87.6 (pro basics step 6: print files)** on `feat/2.87.6-print-files`, built on 2.87.5, not merged. Bleed, Export > Print file… (PDF, TIFF, layered PSD). Next: step 7 (panel layouts). Open: the bleed is mirrored at export, not drawn by the engine (owner may want the engine route). Saving: only the optional `dim.bl`.
 - **Nov 3: 2.87.5 (pro basics step 5: colour output)** on `feat/2.87.5-colour-output`, built on 2.87.4, not merged. Separations, spot inks, CMYK TIFF and PDF, Proof colours. Next: step 6 (print files), which also carries spot inks into PDF and the textile layered TIFF. Saving: only the optional `proj.spot`.

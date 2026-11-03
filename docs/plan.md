@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.87.8 (Nov 3 2026, step 8 of docs/pro-basics-plan.md): the Pattern panel's sources
+- A **Sources** group at the top of the Pattern panel, with **Add source** as the standard full-width Add button and the source rows under it (they were at the bottom of the Pattern group).
+- Help (Patterns, What's new) updated.
+- Tests: tests/pattern-sources-2-87-8.spec.js (new, 2). Run: it, bug-fixes-2-16, element-pattern, motif-look-2-31, piece-editing-2-76-10, stamp-tab-2-84-4, add-pattern-at-once-2-84-2, panel-style, element-panels, first-minute-2-76-8 (44 passed), check:style. Not run: perf (nothing on the drawing path), the full suite (end of the plan).
+
 ## 2.87.7 (Nov 3 2026, step 7 of docs/pro-basics-plan.md): panel layouts per mode
 - A stamp's tab opens with **Stamp on the left, Shape in the inner right column and Elements on the far right**. The Canvas and a stamp's tab keep their own layouts.
 - A **Layout** button in the top bar opens a small undocked panel with **Save layout** and **Reset layout** for the mode you are in (settings, not the project). The Canvas's saved layout is what the app opens with.
