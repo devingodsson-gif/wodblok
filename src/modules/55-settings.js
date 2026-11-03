@@ -71,6 +71,7 @@ const stTgl=(id,on,label)=>`<div class="stgr"><span>${label}</span><button type=
 const stSegH=(id,label,opts,cur)=>`<div class="stgr"><span>${label}</span><div class="seg" id="${id}" role="group" aria-label="${label}" style="--n:${opts.length}">${opts.map(([v,t])=>`<button type="button" data-v="${v}" class="${String(v)===String(cur)?'on':''}" aria-pressed="${String(v)===String(cur)}">${t}</button>`).join('')}</div></div>`;
 // The four view-only toggles (formerly the Display menu). Each one drives the existing hidden button, so the state, keys and commands stay shared.
 // the keys that work but are not commands, listed with the commands that have one
+const ST_LIC=[['Hanken Grotesk','SIL OFL 1.1'],['IM Fell English','SIL OFL 1.1'],['fflate','MIT']];   // also shown in Help > About (47-help.js)
 const stKeys=()=>cmdList().filter(c=>c.shortcut).concat([['Redo (also)','Mod+Y'],['Copy','Mod+C'],['Paste','Mod+V'],['Hand (hold)','Space'],['Turn the picked shape','[ ]'],['Split: apply','Enter'],['Split: cancel','Escape'],['Zoom in','Mod+='],['Zoom out','Mod+-'],['Zoom to fit','Mod+0']].map(([label,shortcut])=>({label,shortcut})));
 const stVIEW=[['stgti','gti','Stamp texture'],['stgtx','gtx','Canvas texture'],['stgtm','gtm','Grade masks'],['stgdt','gdt','Stage dots']];
 const stViewOn=id=>$(id)?.getAttribute('aria-pressed')==='true';
@@ -101,8 +102,7 @@ function stPageHtml(p){
  if(p=='keys'){const m=/Mac|iPhone|iPad/.test(navigator.platform||'');
   const rows=stKeys().filter(c=>!stKeyQ||(c.label+' '+c.shortcut).toLowerCase().includes(stKeyQ.toLowerCase()));
   return`<input type="text" id="stgkq" aria-label="Search shortcuts" placeholder="Search" value="${stEsc(stKeyQ)}"><div class="stgk" id="stgkl">${rows.map(c=>`<div class="stgkr"><span>${stEsc(c.label)}</span><kbd>${stEsc(cmdFormatShortcut(c.shortcut,m))}</kbd></div>`).join('')||'<div class="stgkr"><span>No match</span></div>'}</div>`}
- const lic=[['Hanken Grotesk','SIL OFL 1.1'],['IM Fell English','SIL OFL 1.1'],['fflate','MIT']];
- return`<div class="stgr"><span>Version</span><b>v${stEsc(WB_VER)}</b></div><div class="glb">Licences</div>${lic.map(([n,l])=>`<div class="stgr"><span>${n}</span><b>${l}</b></div>`).join('')}`}
+ return`<div class="stgr"><span>Version</span><b>v${stEsc(WB_VER)}</b></div><div class="glb">Licences</div>${ST_LIC.map(([n,l])=>`<div class="stgr"><span>${n}</span><b>${l}</b></div>`).join('')}`}
 function stPaint(){const nav=$('stgnav');nav.innerHTML=stPAGES.map(([k,t])=>`<button type="button" role="tab" data-p="${k}" aria-selected="${k===stPage}" class="${k===stPage?'on':''}">${t}</button>`).join('');
  $('stgbody').innerHTML=stPageHtml(stPage);$('stgbody').setAttribute('aria-labelledby','stgnav');stWire();if(stPage=='files')stStoragePaint()}
 async function stStoragePaint(){const u=$('stguse'),k=$('stgkp');if(!u||!k)return;
@@ -154,4 +154,4 @@ function init55(){WBX.wbStgOpen=p=>{stShow();stSetPage(p)};WBX.wbStgSync=()=>{if
  // Escape closes the dialog (before the app's own Escape handling), unless the colour picker has it first
  document.addEventListener('keydown',e=>{if(e.key!='Escape'||!stIsOpen())return;if(document.querySelector('.cpk:not([hidden])'))return;if(e.target.matches&&e.target.matches('#stgkq')&&e.target.value){e.target.value='';e.target.dispatchEvent(new Event('input'));e.stopImmediatePropagation();e.preventDefault();return}
   e.stopImmediatePropagation();e.preventDefault();stHide()},true)}
-export {init55,accentVars,accentApply,accentFromAccount,stAccentGet};
+export {ST_LIC,stKeys,init55,accentVars,accentApply,accentFromAccount,stAccentGet};

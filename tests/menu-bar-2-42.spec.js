@@ -40,10 +40,10 @@ test('an item runs its command; on/off commands are ticked', async ({ page }) =>
   await expect(item(page, 'mnbm-view', 'Show grid')).toHaveAttribute('aria-checked', 'true');
   await expect(item(page, 'mnbm-view', 'Show grid').locator('.ic')).toHaveCount(1);
   await page.keyboard.press('Escape');
-  // Help > Keyboard shortcuts opens Settings on its Shortcuts page
+  // Help > Keyboard shortcuts opens the Help panel on its Keyboard shortcuts page (2.87.4; Settings keeps its Shortcuts page too)
   await open(page, 'mnb-help');
   await item(page, 'mnbm-help', 'Keyboard shortcuts').click();
-  await expect(page.locator('#stgnav .on')).toHaveText('Shortcuts');
+  await expect(page.locator('#hlpb .hlph')).toHaveText('Keyboard shortcuts');
   expect(errors).toEqual([]);
 });
 
