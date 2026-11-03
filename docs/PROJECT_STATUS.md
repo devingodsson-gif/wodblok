@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 3: 2.87.12 (Default layout)** on `feat/2.87.12-default-layout`, not merged: the Layout panel's third button puts the built-in layout back (owner).
+- **Nov 3: 2.88.0, the pro basics plan is done** (version and docs only). Next: the end-of-plan CI suite with the owner's word. Open decisions: bleed by the engine or at export (step 6), Alt on a stamp-text letter (step 3), slider focus and the arrow keys (step 11).
+- **Nov 3: 2.87.12 LIVE** (owner: "Yes"): Default layout in the Layout panel.
 - **Nov 3: 2.87.11 LIVE** (owner: "merge everything"): every step of the pro basics plan is live.
 - **Nov 3: 2.87.11 (pro basics step 11: undo and redo)**, merged. The last step. Next: 2.88.0 closes the plan (version and docs), then the end-of-plan CI suite with the owner's word.
 - **Nov 3: 2.87.10 LIVE** (owner: "Merge now"): 2.87.8, 2.87.9 and 2.87.10 merged.

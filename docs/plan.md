@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.88.0 (Nov 3 2026): the pro basics plan is done
+- Closes docs/pro-basics-plan.md: real units (2.87.1), rulers and guides (2.87.2), Alt-drag (2.87.3), Help (2.87.4), colour output (2.87.5), print files (2.87.6), panel layouts (2.87.7, with Default layout in 2.87.12), Pattern sources (2.87.8), the Export panel (2.87.9), blend modes (2.87.10) and undo and redo (2.87.11), all live. Version and docs only.
+- Open: the end-of-plan CI suite (owner's word); five Photoshop blend modes left out (see step 10); bleed made at export, not by the engine (step 6); five scenario state snapshots fail in this container on the base build too.
+
 ## 2.87.12 (Nov 3 2026, owner: "Can we have a reset layout button"): Default layout
 - The Layout panel gains **Default layout** (also Window > Default layout): it puts the mode's built-in layout back (the Canvas: Elements alone on the right; a stamp's tab: Stamp left, Shape beside Elements, Elements far right). A saved layout is kept, so Reset layout still brings it back.
 - Tests: layouts-2-87-7 (a third test). Run: it, menu-bar-2-42, commands, help-2-87-4, small-updates-2-79-3 (16 passed), check:style.
