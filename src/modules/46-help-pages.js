@@ -30,7 +30,7 @@ const HELP_PAGES=[
   ['h','Arrangements'],
   ['ul',['Tiling, Radial, Scatter, Spiral and Frame, each with its own settings: size, spacing, columns and rows, rotation and shifts.','Edges decides what happens at the border: cut at the edge or whole pieces only.','Cycle, Random or Weighted picks which source goes where; Reroll draws again.']],
   ['h','Pieces and colour'],
-  ['ul',['Add source puts another stamp or shape into the pattern.','Accent places a different source at chosen places.','Colour of each piece can follow the source or the place; ink variation and overprint make it look printed.','Edit pieces lets you pick one piece to recolour, turn, delete or make an element of its own.']],
+  ['ul',['The Sources group at the top of the Pattern panel lists what the pattern prints. Add source adds one of the project\u2019s stamps, texts or other patterns, or a shape from the library.','Accent places a different source at chosen places.','Colour of each piece can follow the source or the place; ink variation and overprint make it look printed.','Edit pieces lets you pick one piece to recolour, turn, delete or make an element of its own.']],
   ['h','Repeats'],
   ['p','Canvas > Format > Repeat tile makes the canvas one tile of a seamless repeat (grid, brick or half drop). View > Repeat tile shows it 3 × 3.']]],
  ['effects','Effects',[
@@ -50,6 +50,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.87.8','Nov 3 2026',['The Pattern panel\u2019s sources are a group of their own at the top, with a full-width Add source.']],
  ['2.87.7','Nov 3 2026',['A stamp\u2019s tab opens with Stamp on the left and Shape beside Elements on the right. The Canvas and a stamp\u2019s tab keep their own layouts; the Layout button saves and resets them.']],
  ['2.87.6','Nov 3 2026',['Bleed on any canvas, and Export > Print file\u2026: a print PDF with trim and bleed boxes, marks and spot plates, a print TIFF, or a layered PSD.']],
  ['2.87.5','Nov 3 2026',['Export > Separations\u2026: one plate per ink, with halftone tints and registration marks. Spot inks. CMYK TIFF and PDF, and View > Proof colours.']],

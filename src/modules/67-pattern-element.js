@@ -146,7 +146,7 @@ function patSync(){const host=$('pelist');if(!host)return;const a=patList(),p=pa
 const key=JSON.stringify([a.map(q=>[q.u,q.n]),WBS.patSel,WBS.patSrc,p&&[WBS.patPE,WBS.patPc,JSON.stringify(p.pe||null),JSON.stringify(p.ac||null),(WBS.proj.ts||[]).join(),p.pin,p.dm,p.da,p.dk,p.dv,p.dg,p.di,Object.keys(WBS.ARTS||{}).join(),(fpL()&&fpL().pl||[]).map(q=>q.u+(q.n||q.nm||'')).join(),p.md,p.mg,p.ed,p.pcm,p.iv,p.ov,JSON.stringify(WBS.dim),CW,CH,p.lay,p.ts,p.ar,p.ps,p.sp,p.cn,p.rn,p.sz,p.rt,p.ox,p.oy,p.in,p.ds,(p.src||[]).map(s=>[s.k,s.t,s.a,s.w,s.it&&s.it.tx&&s.it.tx.text])],WBS.tiles.map(t=>t.id).join()]);
 if(host.dataset.k===key)return;host.dataset.k=key;
 host.innerHTML=a.slice().reverse().map(q=>`<div class="mr${q.u==WBS.patSel?' on':''}" data-pe="${q.u}"><b>${patHx(q.n)}<i>${(q.src||[]).length} source${(q.src||[]).length==1?'':'s'}</i></b><button type="button" data-pd="${q.u}" aria-label="Delete this pattern">&#215;</button></div>`).join('');
-$('peed').hidden=!p;if(!p)return;
+$('peed').hidden=!p;if($('pesg'))$('pesg').hidden=!p;if(!p)return;   /* 2.87.8: Sources is its own group at the top, with the standard Add button */
 $('pelay').querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l==p.lay));
 // 2.57.0: Tiling shows its tile shape, arrangement, size and spacing; the free layouts their columns, rows and size
 {const tile=p.lay=='tile';$('petl').hidden=!tile;$('pefr').hidden=tile;{const lb={radial:['Spokes','Rings'],scatter:['Across','Down'],spiral:['Across','Down'],frame:['Columns','Rows']}[p.lay]||['Columns','Rows'];$('pecn').closest('.ctl').firstElementChild.textContent=lb[0];$('pern').closest('.ctl').firstElementChild.textContent=lb[1]}if(tile){const sh=tlShape(p),ts=$('pets'),ar=$('pear');
