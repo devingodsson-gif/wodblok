@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.86.0 (Nov 2 2026): a Randomize Look called Random
+- Owner: "Add another randomize look, it's just called Random and it's basically totally random. Much like the old school randomize before the looks were implemented. Just go wild."
+- `RZL.random` (93-randomize-looks.js): no plan or layout. A roll draws a ground, sometimes a gradient Sheet, one to three Patterns in any layout (tile, wallpaper, scatter, spiral) of basic shapes or themed pictures, two to ten loose shapes (any size, turn, outline, blend, opacity), sometimes a focal picture, loose themed pictures, a ring, a border or a frame, and zero to three lines of words in any font. Any piece may carry a filter effect with its settings thrown anywhere in their range (`rzWildFx`). Blends keep a piece visible: darkening ones on a light ground, lightening ones on a dark ground. The panel's switches apply as for every Look.
+- Random has weight 0: it rolls only when chosen in the Look list, so Any and every seeded roll (and the scenario snapshots) stay as they were. Say if it should come up in Any too.
+- Tests: random-look-2-86 (new: six rolls each different, never empty, a mix of kinds); the Randomize specs (29) pass; 20 rolls by hand with no page error. `npm run perf`: ratio 1.025.
+
 ## 2.85.0 (Nov 2 2026, LIVE with the owner's word): the patch to-do is done
 - Closes docs/patch-todo-2.85.md: 2.84.2 (bugs), 2.84.3 (moving the view), 2.84.4 (the stamp tab) and 2.84.5 (panels and inputs), all live. Version and docs only.
 - Open from the to-do: the stamp Sheet is a colour fill only (no gradient, picture or effects); picture comparison was not run on 2.84.4 and 2.84.5 (pull request only).
