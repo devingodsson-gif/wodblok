@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **steps 1 to 3 live (2.87.3); steps 4 to 6 done (2.87.4 to 2.87.6, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
+Status: **steps 1 to 3 live (2.87.3); steps 4 to 6 live (2.87.6); step 7 done (2.87.7, not live).** Order: by step number (owner, Nov 3 2026: "Do it in numerical order"). Steps 7 to 10 were added Nov 3 from the owner's second list, step 11 (undo and redo) on Nov 3 as well.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -91,6 +91,8 @@ Numbering: each step is a patch release on the version that is live when work st
 - Each default is kept in the settings, not in the project. Switching between the Canvas and a stamp's tab shows each one's own layout.
 - This is a default per mode, not named workspaces, which were removed in 2.9.0. Nothing else from workspaces comes back.
 - Tests: a stamp's tab opens in that arrangement; a saved layout comes back after a reload and after Reset; the Canvas and a stamp's tab keep their own layouts.
+- **Done in 2.87.7** (34-desktop-shell.js, `laySwitch`): each mode's layout as you left it; the stamp default Stamp `l`, Shape `ri`, Elements `r` (locked); Save layout and Reset layout in a small **Layout** undocked panel (top bar button `#layb`, also Window > Open Layout, Save layout, Reset layout); defaults in settings (`wb2877_lay_c`, `wb2877_lay_s`); the Canvas's saved default is what the app opens with (otherwise Elements alone, as before). Reset goes to the saved default, or the built-in one when none was saved. The Layout panel moves with you and is never saved in a layout. A stamp's layout does not change where Canvas panels open next, and in a stamp's tab the stamp is fitted to the stage between the columns (the Canvas's left-column compensation is not used there).
+- Also fixed: the Proof colours group (2.87.5) was an empty `<g>` in every drawing, which moved the launch SVG summary; it is now made only while the proof is on.
 
 ## Step 8: the Pattern panel's sources (owner, Nov 3)
 - The Add source button is hard to see; a first-time user would not find it.

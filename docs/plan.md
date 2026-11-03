@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.87.7 (Nov 3 2026, step 7 of docs/pro-basics-plan.md): panel layouts per mode
+- A stamp's tab opens with **Stamp on the left, Shape in the inner right column and Elements on the far right**. The Canvas and a stamp's tab keep their own layouts.
+- A **Layout** button in the top bar opens a small undocked panel with **Save layout** and **Reset layout** for the mode you are in (settings, not the project). The Canvas's saved layout is what the app opens with.
+- Fix: the empty Proof colours group (2.87.5) no longer sits in every drawing (the launch SVG summary is as before).
+- Tests: tests/layouts-2-87-7.spec.js (new, 2); small-updates-2-79-3 (the Stamp panel's place in a stamp's tab is now the owner's new layout) and stamp-tabs (the stamp's stage is narrower between the columns) updated for the intended change. Run: 29 panel, stamp tab, first-run, menu and launch spec files (138 tests), check:style, check:platform. Not run: perf (nothing on the drawing path), the full suite (end of the plan).
+
 ## 2.87.6 (Nov 3 2026, step 6 of docs/pro-basics-plan.md): print files
 - **Bleed** on any canvas (Canvas > Canvas size, in the units; `dim.bl`, optional, format 30), made at export by mirroring the edges (or by the repeat, for a grid repeat tile).
 - **Export > Print file…:** a print PDF (trim, bleed and media boxes; crop and registration marks; RGB or CMYK; spot inks as Separation plates), a print TIFF (RGB or CMYK, bleed and marks), or a layered PSD (one layer per element; optional ink channels). Written by WODBLOK's own code.
