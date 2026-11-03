@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.89.0 (Nov 3 2026): a dice for the tiling
+- Owner: "Can we add a randomize icon next to the pattern type/arrangement that just picks random pattern type and arrangement? One icon for both."
+- The Pattern panel's Tile shape row has a dice button (`#petrn`, the `dice` icon, the `.asp` row like the aspect ratio's swap button). It picks a tile shape (not From stamp, which follows the stamp) and one of its arrangements, never the pair showing; one History step, "Random tiling". Also the command Random tile shape and arrangement. Shown with the Tiling layout only.
+- Tests: tests/pattern-dice-2-89.spec.js (new). Run: it, element-pattern, pattern-sources-2-87-8, commands, arrangements-2-76-7, patterns-2-57 (all pass), check:style.
+
 ## 2.88.1 (Nov 3 2026, hotfix; bug 1 of docs/full-review-2.88.md, owner: "Go ahead and fix the book cover")
 - On a book cover, the unit fields, rulers, guides, Separations, CMYK TIFF and PDF, and Print file measured the canvas as the 300 mm default, not the cover. `physNow()` (04) gives the size the canvas prints at: the whole cover sheet (both covers, the spine and the bleed) at 300 DPI on a book cover, else `physOf()`. The Print file PDF of a cover has its bleed box the whole sheet and its trim box the cover's bleed inside it, with the crop marks there. The book cover's own Print cover export is unchanged.
 - Tests: tests/book-cover-size-2-88-1.spec.js (new, 2). Run: it, print-files-2-87-6, colour-output-2-87-5, units-2-87-1, rulers-2-87-2, export-panel-2-87-9 and the cover, print proof and export specs (30 passed), check:style, check:platform, `npm run perf`. Not run: the full suite (a hotfix on print output: about 50%, see the report).
