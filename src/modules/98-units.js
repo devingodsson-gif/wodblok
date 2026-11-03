@@ -1,5 +1,5 @@
 import {kv} from '../platform/index.js';
-import {CH,CW,physOf} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,physNow} from './04-canvas-and-stamp-outlines.js';
 
 // ===== Units (2.87.1, docs/pro-basics-plan.md step 1; owner Nov 3 2026: mm by default). One setting, Settings > General > Units (px, in, mm, cm), for every length the
 // panels show in real units. A length on the canvas (canvas units) is turned into the unit through the canvas's physical size (Canvas > Format: its size and DPI). A canvas
@@ -8,7 +8,7 @@ const UN_K='wb2871_units',UNITS=['px','in','mm','cm'],UN_DP={px:0,in:3,mm:1,cm:2
 const unGet=()=>{let v='';try{v=kv.get(UN_K)||''}catch(e){}return UNITS.includes(v)?v:'mm'};
 const unSet=u=>{if(UNITS.includes(u))try{kv.set(UN_K,u)}catch(e){}};
 // millimetres per canvas unit, and the DPI px are counted at
-function unBase(){const P=physOf();if(P)return{mm:P.inW*25.4/CW,dpi:P.dpi};return{mm:300/Math.max(CW,CH),dpi:300}}
+function unBase(){const P=physNow();if(P)return{mm:P.inW*25.4/CW,dpi:P.dpi};return{mm:300/Math.max(CW,CH),dpi:300}}
 const unPer=u=>{const b=unBase();return u=='mm'?b.mm:u=='cm'?b.mm/10:u=='in'?b.mm/25.4:b.mm/25.4*b.dpi};
 // canvas units to the chosen unit (a number), and back
 const unTo=(v,u=unGet())=>v*unPer(u);

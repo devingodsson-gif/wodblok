@@ -17,7 +17,7 @@ Not checked: Safari on a Mac, a real tablet with a pen, screen readers, very lar
 ## Bugs
 | # | Bug | Where | Severity |
 |---|---|---|---|
-| 1 | **The book cover's real size is ignored by the new units and print exports.** A 12.70 × 9.25 in cover gives a print PDF of 11.81 × 8.60 in (the 300 mm default), and X, Y, W, H, the rulers, guides, Separations and CMYK measure it the same wrong way. (Bleed is turned off on a book cover, which has its own.) The book cover's own Print cover PDF and PNG are right. | `physOf()` has no size for a book cover, so units (98) and colour and print output (36, 42) fall back to 300 mm | **High** for anyone printing a cover |
+| 1 | **The book cover's real size is ignored by the new units and print exports.** A 12.70 × 9.25 in cover gives a print PDF of 11.81 × 8.60 in (the 300 mm default), and X, Y, W, H, the rulers, guides, Separations and CMYK measure it the same wrong way. (Bleed is turned off on a book cover, which has its own.) The book cover's own Print cover PDF and PNG are right. | `physOf()` has no size for a book cover, so units (98) and colour and print output (36, 42) fall back to 300 mm | **High** for anyone printing a cover. Fixed in 2.88.1 |
 | 2 | The "Exit 3 × 3 preview" button sits over the top ruler when both are on. | Stage overlay order | Low |
 | 3 | After a slider is clicked it keeps the focus: the arrow keys move the slider instead of the selection, and Delete does nothing, until the canvas is clicked. | Browser focus on range inputs | Low (it may be what people expect; owner's call) |
 | 4 | Five scenario state snapshots fail in the local container and pass in CI (letter positions with local fonts). | Test environment, not the app | None for users |

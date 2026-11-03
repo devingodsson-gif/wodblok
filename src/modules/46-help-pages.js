@@ -50,6 +50,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.88.1','Nov 3 2026',['A book cover\u2019s units, rulers, separations, CMYK and print files use the cover\u2019s real size.']],
  ['2.88.0','Nov 3 2026',['Real units, rulers and guides, Alt-drag, Help, colour output and print files, panel layouts, blend modes and working undo: the pro basics update is complete.']],
  ['2.87.12','Nov 3 2026',['Default layout in the Layout panel puts the built-in layout back; your saved one is kept for Reset layout.']],
  ['2.87.11','Nov 3 2026',['Undo and redo work right after typing in a field (such as X or W) and pressing Enter, without leaving the field first.']],
