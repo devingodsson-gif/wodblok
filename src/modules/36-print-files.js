@@ -2,7 +2,7 @@ import {kv,use} from '../platform/index.js';
 import {cmdGet,cmdIsEnabled,cmdRegister,cmdRun} from '../commands/registry.js';
 import {zlibSync} from '../vendor/fflate.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
-import {tileOn,tileRk} from './04-canvas-and-stamp-outlines.js';
+import {physNow,tileOn,tileRk} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
@@ -38,6 +38,8 @@ function prMarks(W,H,b,s,dpi,crop,reg){const L=[],C=[],t0=s,t1=s+b,ox=s+b+W,oy=s
 function prDrawMarks(x,M){x.strokeStyle='#000';x.lineWidth=M.lw;x.beginPath();M.L.forEach(([a,b,c,d])=>{x.moveTo(a,b);x.lineTo(c,d)});M.C.forEach(([a,b,r])=>{x.moveTo(a+r,b);x.arc(a,b,r,0,2*Math.PI)});x.stroke()}
 // ---- the sheet: the design with its bleed, on a margin for the marks when there are any; spot plates (coverage, 255 = full ink) laid out the same way
 async function prSheet(o){const{W,H,inW,inH}=coSize(o.dpi),b=Math.round(prBleedIn()*o.dpi),s=o.crop||o.reg?Math.round(PR_SLUG*o.dpi):0,SW=W+2*b+2*s,SH=H+2*b+2*s;
+ // a book cover's canvas already holds its bleed: the picture is the bleed box as it is, and the trim (and the crop marks) sit that far inside it
+ const P=physNow(),cb=P&&P.cover?Math.round(P.cover.b*o.dpi):0;
  const spots=o.spots?coSpots().filter(id=>coInks().includes(id)):[];let base=null;const plates=[];
  if(spots.length){await coWith((k,id,c)=>spots.includes(id)?withAlpha('#ffffff',hexAlpha(c)):c,[0],async()=>{base=await coRaster(ser(),W,H)});
   await coWith((ink,id,c)=>withAlpha(id===ink?'#000000':'#ffffff',hexAlpha(c)),spots,async ink=>{const im=await coRaster(ser(),W,H),g=coPlate(im,'tone',o.dpi),pc=document.createElement('canvas');pc.width=W;pc.height=H;
@@ -45,6 +47,7 @@ async function prSheet(o){const{W,H,inW,inH}=coSize(o.dpi),b=Math.round(prBleedI
    const e=prBleed(pc,b).getContext('2d').getImageData(0,0,W+2*b,H+2*b).data,cov=new Uint8Array((W+2*b)*(H+2*b));for(let i=0,p=0;i<cov.length;i++,p+=4)cov[i]=255-e[p];plates.push({id:ink,cov})})}
  else{await coIdle();base=await coRaster(ser(),W,H)}
  const sheet=document.createElement('canvas');sheet.width=SW;sheet.height=SH;const x=sheet.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,SW,SH);x.drawImage(prBleed(prCanvas(base),b),s,s);
+ if(cb)return{sheet,W:W-2*cb,H:H-2*cb,b:cb,s,SW,SH,inW,inH,plates,M:prMarks(W-2*cb,H-2*cb,cb,s,o.dpi,o.crop,o.reg)};
  return{sheet,W,H,b,s,SW,SH,inW,inH,plates,M:prMarks(W,H,b,s,o.dpi,o.crop,o.reg)}}
 // ---- PDF: one page; the picture over the bleed box (DeviceRGB or DeviceCMYK, Flate), each spot plate as a Separation image printed over it, the marks as lines
 function prPdf(S,o){const enc=new TextEncoder(),k=72/o.dpi,P=v=>(v*k).toFixed(3),pw=P(S.SW),ph=P(S.SH),parts=[],off=[];let len=0,n=0;
@@ -116,7 +119,7 @@ function prPaint(){const b=$('prfb');if(!b)return;const o=prOpt,bl=prBleedIn(),s
   +`<div class="stgr" id="prfbr"><span>Bleed</span><b>${bl>0?unFmt(unFrom(bl,'in'))+' '+unGet():'None'}</b></div>`+prTgl('prfk','Crop marks',o.crop)+prTgl('prfg2','Registration marks',o.reg)+(spot?prTgl('prfs','Spot inks as plates',o.spots):'')+prTgl('prfi','Ink channels',o.inkCh);
  const psd=o.fmt=='psd';['prfcr','prfbr','prfkr','prfg2r'].forEach(id=>{const e=$(id);if(e)e.hidden=psd});{const e=$('prfsr');if(e)e.hidden=o.fmt!='pdf'}$('prfir').hidden=!psd}
 const prFrom={el:null};
-function prOpen(){const d=$('prfd');if(!d)return;prFrom.el=document.activeElement;try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}catch(e){}const P=(WBS.dim&&+WBS.dim.dpi)||0;if([150,300,600].includes(P))prOpt.dpi=P;prPaint();d.hidden=false;$('prfok').focus()}
+function prOpen(){const d=$('prfd');if(!d)return;prFrom.el=document.activeElement;try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}catch(e){}const P=(physNow()||{}).dpi||0;if([150,300,600].includes(P))prOpt.dpi=P;prPaint();d.hidden=false;$('prfok').focus()}
 function prHide(){$('prfd').hidden=true;const f=prFrom.el;prFrom.el=null;if(f&&f.focus&&document.contains(f))try{f.focus()}catch(e){}}
 async function prExport(o){if(prBusy.on)return;const d=await use('downloads');if(!d)return pmsg('Saving is not available here.');prBusy.on=true;
  const ext=o.fmt,name=expName('png').replace(/\.png$/,'')+(o.fmt=='psd'?'-layers':'-print'+(o.cm=='cmyk'?'-cmyk':''))+'.'+ext;

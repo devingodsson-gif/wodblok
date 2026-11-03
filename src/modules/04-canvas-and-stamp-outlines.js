@@ -54,6 +54,10 @@ function tileOffs(r=1){const k=tileRk(),o=[];for(let i=-r;i<=r;i++)for(let j=-r;
 const PHU={px:'px',in:'in',mm:'mm'};
 function physOf(d=WBS.dim){if(!d||!PHU[d.u]||!(+d.pw>0)||!(+d.ph>0))return null;const dpi=Math.max(30,Math.min(1200,+d.dpi||300)),toIn=v=>d.u=='px'?v/dpi:d.u=='mm'?v/25.4:v;
  const iw=toIn(+d.pw),ih=toIn(+d.ph);return{u:d.u,w:+d.pw,h:+d.ph,dpi,inW:iw,inH:ih,pxW:Math.max(1,Math.round(d.u=='px'?+d.pw:iw*dpi)),pxH:Math.max(1,Math.round(d.u=='px'?+d.ph:ih*dpi))}}
+// 2.88.1 (bug 1 of docs/full-review-2.88.md): the size the canvas prints at. A book cover is the whole sheet (bk(): both covers, the spine and the bleed, in
+// inches, at 300 DPI as its Print cover export), which physOf() knows nothing of; anything else is physOf(). Used by the units, colour output and print files.
+// In a stamp's tab the canvas is the stamp, so the cover's size does not apply there.
+function physNow(){if(WBS.book&&WBS.book.on&&!stvOn()){const g=bk();return{u:'in',w:g.W,h:g.H,dpi:300,inW:g.W,inH:g.H,pxW:Math.max(1,Math.round(g.W*300)),pxH:Math.max(1,Math.round(g.H*300)),cover:g}}return physOf()}
 // a length on the canvas (canvas units) in the canvas's own unit, and back; null without a physical size
 const physLen=v=>{const P=physOf();return P?v/CW*P.w:null};
 const physToCv=v=>{const P=physOf();return P?v/P.w*CW:null};
@@ -183,4 +187,4 @@ CM=Object.fromEntries(C);
 PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return[WADA_NAMES[i]||'No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj=trayDefault();try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 }
-export {hEsc,physLen,physOf,physToCv,PHU,tileOffs,tileRk,stFreeNm,stNm,stNmId,stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
+export {hEsc,physLen,physNow,physOf,physToCv,PHU,tileOffs,tileRk,stFreeNm,stNm,stNmId,stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};

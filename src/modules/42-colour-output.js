@@ -3,7 +3,7 @@ import {cmdRegister} from '../commands/registry.js';
 import {zipSync,zlibSync} from '../vendor/fflate.js';
 import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {BK} from './03-stamp-prints-and-drawing.js';
-import {CH,CW,physOf} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,physNow} from './04-canvas-and-stamp-outlines.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
 import {coreStr,pmsg} from './18-projects-and-cover-overlay.js';
@@ -30,7 +30,7 @@ const coIsSpot=id=>coSpots().includes(id);
 const coInkName=(id,i)=>slotName(id)||slotHex(id).slice(0,7).toUpperCase()||'Ink '+(i+1);
 function coSpotSet(id,on){const o=WBS.proj;if(!o)return;const s=new Set(coSpots());if(on)s.add(id);else s.delete(id);if(s.size)o.spot=[...s];else delete o.spot;trayDone(on?'Marked spot ink':'Unmarked spot ink')}
 // ---- the print size: the canvas's own (Canvas > Format), else 300 mm on its long side (as the units do)
-function coSize(dpi){const P=physOf();let inW,inH;if(P){inW=P.inW;inH=P.inH}else{const L=300/25.4;inW=CW>=CH?L:L*CW/CH;inH=CH>=CW?L:L*CH/CW}
+function coSize(dpi){const P=physNow();let inW,inH;if(P){inW=P.inW;inH=P.inH}else{const L=300/25.4;inW=CW>=CH?L:L*CW/CH;inH=CH>=CW?L:L*CH/CW}
  return{W:Math.max(1,Math.round(inW*dpi)),H:Math.max(1,Math.round(inH*dpi)),inW,inH}}
 const CO_AREA=64e6;
 // the design (an SVG string) drawn on white at W x H
@@ -98,7 +98,7 @@ async function coSeparate(o){if(coBusy)return;const d=await use('downloads');if(
   await d.save({filename:zn,data:new Blob([zipSync(files,{level:0})],{type:'application/zip'}),handle:h0});pmsg('Exported '+inks.length+' plate'+(inks.length>1?'s':'')+' in one zip.')}
  catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not export.')}finally{coBusy=false}}
 // CMYK: the design as it is, at the print size and resolution, converted
-async function coCmykOut(fmt){if(coBusy)return;coBusy=true;try{const P=physOf(),dpi=P?P.dpi:300,{W,H,inW,inH}=coSize(dpi);pmsg('Exporting CMYK…');await coIdle();
+async function coCmykOut(fmt){if(coBusy)return;coBusy=true;try{const P=physNow(),dpi=P?P.dpi:300,{W,H,inW,inH}=coSize(dpi);pmsg('Exporting CMYK…');await coIdle();
  const im=await coRaster(ser(),W,H),c=coCmyk(im.data),name=coBase()+'-cmyk.'+fmt;
  if(await coSave(name,fmt=='tiff'?coTiff(c,W,H,4,dpi):coPdf(c,W,H,inW,inH)))pmsg('Exported '+name+'.')}
  catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not export.')}finally{coBusy=false}}
@@ -112,7 +112,7 @@ function coDlgPaint(){const b=$('sepb');if(!b)return;const inks=coInks(),all=WBS
   +coSeg('sepl','Lines per inch',CO_LPI,coOpt.lpi)+`<div class="stgr"><span>Registration marks</span><button type="button" class="pvc" id="sepm" aria-pressed="${coOpt.marks}" aria-label="Registration marks">${coOpt.marks?'On':'Off'}</button></div>`;
  $('seplr').hidden=coOpt.tint!='dots';$('sepok').disabled=!inks.some(id=>!coOpt.off.has(id))}
 const coFrom={el:null};
-function coDlgOpen(){const d=$('sepd');if(!d)return;coFrom.el=document.activeElement;try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}catch(e){}const P=physOf();if(P&&CO_DPI.some(x=>x[0]==P.dpi))coOpt.dpi=P.dpi;coDlgPaint();d.hidden=false;$('sepok').focus()}
+function coDlgOpen(){const d=$('sepd');if(!d)return;coFrom.el=document.activeElement;try{if(typeof WBX.wbCloseMenus=='function')WBX.wbCloseMenus()}catch(e){}const P=physNow();if(P&&CO_DPI.some(x=>x[0]==P.dpi))coOpt.dpi=P.dpi;coDlgPaint();d.hidden=false;$('sepok').focus()}
 function coDlgHide(){$('sepd').hidden=true;const f=coFrom.el;coFrom.el=null;if(f&&f.focus&&document.contains(f))try{f.focus()}catch(e){}}
 // ---- View > Proof colours: a picture of the canvas as it prints, laid over the artwork under the selection and guides; redrawn when the document changes
 const PRF={on:false,key:'',t:0,busy:false};
