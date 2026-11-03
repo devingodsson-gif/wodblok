@@ -41,6 +41,7 @@ const COMMANDS = [
   ['view.actualSize', 'Zoom to 100%', 'nv100', '1'],
   ['view.hand', 'Hand tool', 'nvhand', 'H'],
   ['panel.xrec', 'Open Export', 'rail-xrec'],
+  ['panel.layout', 'Open Layout', 'rail-layout'],
   ['view.tileRepeat', 'Repeat tile: show 3 × 3', 'tpv'],
   ['export.now', 'Export with the recipe settings', 'xrnow'],
   ['export.pdf', 'Export PDF', 'xrpdf'],

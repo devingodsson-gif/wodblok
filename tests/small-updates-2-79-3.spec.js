@@ -31,18 +31,21 @@ test('a tab dropped on the inner edge of the left dock stands beside it as a sec
   expect(errors).toEqual([]);
 });
 
-test('opening a stamp\'s tab brings the Stamp panel out beside the left panel; back on the Canvas it goes back', async ({ page }) => {
+// 2.87.7 (owner, Nov 3 2026): a stamp's tab has its own layout: the Stamp panel on the left, Shape in the inner right column, Elements on the far right (this was the Stamp
+// panel beside the left panel since 2.79.3); back on the Canvas its own layout comes back
+test('opening a stamp\'s tab shows its own layout, the Stamp panel on the left; back on the Canvas it goes back', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4, background: true, pattern: false, workspaces: true });
   await H.addStamp(page); await H.settle(page);
   const before = await dockOf(page, 'stmp');
   await H.unlockStamp(page, 0); await H.settle(page);
-  expect(await dockOf(page, 'stmp'), 'beside the left panel').toBe('li');
+  expect(await dockOf(page, 'stmp'), 'on the left').toBe('l');
+  expect(await dockOf(page, 'motifs'), 'Shape beside Elements').toBe('ri');
+  expect(await dockOf(page, 'lyrs'), 'Elements on the far right').toBe('r');
   await expect(page.locator('section.pn[data-p="stmp"]')).toBeVisible();
-  const L = await rect(page, '.dk-l'), I = await rect(page, '.dk-li');
-  expect(Math.abs(I.l - L.r)).toBeLessThan(2);
-  // another stamp's tab keeps it there
+  const R = await rect(page, '.dk-r'), I = await rect(page, '.dk-ri');
+  expect(Math.abs(I.r - R.l)).toBeLessThan(2);
   await page.locator('#stetabs [data-sv="c"]').click(); await H.settle(page);
   expect(await dockOf(page, 'stmp'), 'back where it was').toBe(before);
-  await expect(page.locator('.dk-li')).toBeHidden();
+  await expect(page.locator('.dk-ri')).toBeHidden();
   expect(errors).toEqual([]);
 });

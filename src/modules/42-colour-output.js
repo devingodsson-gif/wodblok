@@ -117,13 +117,15 @@ function coDlgHide(){$('sepd').hidden=true;const f=coFrom.el;coFrom.el=null;if(f
 // ---- View > Proof colours: a picture of the canvas as it prints, laid over the artwork under the selection and guides; redrawn when the document changes
 const PRF={on:false,key:'',t:0,busy:false};
 function coProofKey(){return coreStr()+'|'+CW+'|'+CH+'|'+(WBS.proj?WBS.proj.cwa:0)}
-async function coProofDraw(){if(!PRF.on||PRF.busy)return;const g=$('prfg');if(!g)return;if(document.body.classList.contains('stedit')){g.innerHTML='';PRF.key='';return}
+// the proof's group is made only while the proof is on (just under the guides), so the canvas is unchanged otherwise
+function coProofG(on){let g=$('prfg');if(on&&!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='prfg';g.setAttribute('pointer-events','none');const at=$('guig');at.parentNode.insertBefore(g,at)}if(!on&&g){g.remove();g=null}return g}
+async function coProofDraw(){if(!PRF.on||PRF.busy)return;const g=coProofG(true);if(!g)return;if(document.body.classList.contains('stedit')){g.innerHTML='';PRF.key='';return}
  const k=coProofKey();if(k===PRF.key)return;PRF.busy=true;try{await coIdle();const a=$('art').getBoundingClientRect(),s=Math.min(2,window.devicePixelRatio||1),L=Math.min(1600,Math.max(200,Math.round(Math.max(a.width,a.height)*s))),f=L/Math.max(CW,CH),W=Math.round(CW*f),H=Math.round(CH*f);
   const im=await coRaster(ser(),W,H);coProofPx(im.data);const c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').putImageData(im,0,0);
-  if(PRF.on){g.innerHTML=`<image href="${c.toDataURL('image/png')}" x="0" y="0" width="${CW}" height="${CH}" preserveAspectRatio="none"/>`;PRF.key=coProofKey()}}
+  if(PRF.on&&g.isConnected){g.innerHTML=`<image href="${c.toDataURL('image/png')}" x="0" y="0" width="${CW}" height="${CH}" preserveAspectRatio="none"/>`;PRF.key=coProofKey()}}
  catch(e){}finally{PRF.busy=false}if(PRF.on&&coProofKey()!==PRF.key)coProofSoon()}
 const coProofSoon=()=>{clearTimeout(PRF.t);PRF.t=setTimeout(coProofDraw,350)};
-function coProof(on){PRF.on=on;PRF.key='';const g=$('prfg');if(g&&!on)g.innerHTML='';if(on)coProofDraw();pmsg(on?'Proof colours on.':'Proof colours off.')}
+function coProof(on){PRF.on=on;PRF.key='';if(!on)coProofG(false);if(on)coProofDraw();pmsg(on?'Proof colours on.':'Proof colours off.')}
 function init42(){
  $('sepb').addEventListener('click',e=>{const s=e.target.closest('.seg [data-v]');if(s){const id=s.closest('.seg').id,v=s.dataset.v;if(id=='sepf')coOpt.fmt=v;else if(id=='sepr')coOpt.dpi=+v;else if(id=='sept')coOpt.tint=v;else if(id=='sepl')coOpt.lpi=+v;coDlgPaint();return}
   if(e.target.closest('#sepm')){coOpt.marks=!coOpt.marks;coDlgPaint()}});
