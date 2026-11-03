@@ -2,7 +2,7 @@
 
 Owner, Nov 3 2026, from docs/pro-gap-review-2.86.md: "so lets do- real units of measurement. rulers. alt-drag. update help, colour output and print files. for now make a simple, clean plan for this but im gonna give you some more features in a minute."
 
-Status: **plan, not started.** More features are coming from the owner; they are added as further steps before the plan closes.
+Status: **plan, not started.** Steps 7 to 9 were added Nov 3 from the owner's second list; more may follow.
 Numbering: each step is a patch release on the version that is live when work starts (after 2.87.0, if it is merged first: 2.87.1, 2.87.2 and so on). The minor version is raised once, when the plan is done.
 
 ## Step 1: real units of measurement
@@ -61,8 +61,36 @@ Numbering: each step is a patch release on the version that is live when work st
   - It is also written without a new library if that proves feasible; otherwise the owner is asked first.
 - Tests: a PDF has its trim and bleed boxes and marks; a layered file opens with one layer per element.
 
+## Step 7: panel layouts for the Canvas and a stamp's tab (owner, Nov 3)
+- A stamp's tab opens with the Stamp panel on the left, the Elements list docked on the far right, and the Shape panel just to the left of the Elements list (the inner right column).
+- **Two default layouts**, one for the Canvas and one for a stamp's tab. Each is saved and restored on its own.
+- **In the top bar:**
+  - **Save layout** keeps the panels as they are now as that mode's default.
+  - **Reset layout** puts them back.
+  - Both act on the mode you are in (the Canvas, or a stamp's tab).
+- Each default is kept in the settings, not in the project. Switching between the Canvas and a stamp's tab shows each one's own layout.
+- This is a default per mode, not named workspaces, which were removed in 2.9.0. Nothing else from workspaces comes back.
+- Tests: a stamp's tab opens in that arrangement; a saved layout comes back after a reload and after Reset; the Canvas and a stamp's tab keep their own layouts.
+
+## Step 8: the Pattern panel's sources (owner, Nov 3)
+- The Add source button is hard to see; a first-time user would not find it.
+- **A Sources group near the top** of the Pattern panel, right under the panel's own controls, so a new pattern's empty sources are the first thing seen.
+- **Add source** becomes the standard Add button: full width at the top of the group, opening the usual Add menu. The menu lists the project's stamps, then its texts and patterns, then Shape from the library…, as the Add effect menu does.
+- Tests: a new pattern shows Sources near the top with Add source; each menu entry adds that source.
+
+## Step 9: the Export panel, rearranged (owner, Nov 3; done last, after steps 5 and 6)
+- **Top: Quick export.** The format, size and Export now. One click for the common case.
+- **Middle: Print and colour output.**
+  - The new options from steps 5 and 6: separations, spot inks, CMYK, bleed, crop and registration marks, and the print PDF.
+  - The print proof joins this section.
+- **Bottom: Export recipes.** The saved recipes and Export all, moved down from the top.
+- Tests: the groups are in that order; Quick export works from the top with one click; the print options produce the files from steps 5 and 6.
+
 ## Order and testing
-- Order: steps 1 to 3 first (small, everyday tools), then 4, then 5 and 6 (the largest).
+- Order:
+  - Steps 1 to 3 first (small, everyday tools), with 7 and 8 alongside (panel work).
+  - Then 4 (Help), then 5 and 6 (the largest).
+  - Step 9 last, so the Export panel is arranged once the new print options exist.
 - Each step: its own branch, one commit per behaviour change with its test, the related specs, `check:style` and `check:platform`. Run `npm run perf` where drawing or dragging changes (steps 2, 3 and 6).
 - Run the CI suite at the end with the owner's word. Saving, opening files and the file format are touched in steps 2 (guides saved) and 5 (spot inks); this is said before going live.
 
@@ -71,3 +99,4 @@ Numbering: each step is a patch release on the version that is live when work st
 2. Help: a panel docked like the others, or a separate window?
 3. Colour output: which printing first? Screen print, block or relief, riso, or print-on-demand?
 4. CMYK and profiles: is a standard conversion enough now, with ICC profiles later (that needs a library)?
+5. Layouts: should Save layout and Reset layout be two icon buttons in the top bar (beside History and the gear), or one button opening a small menu?
