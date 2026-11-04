@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.92.1 (Nov 4 2026, hotfix): mockups print to the products' edges
+- Owner: "some of the area on the edges is still not showing the graphic, the mask needs to be sharper". Two causes: the masks of 2.90.2 were drawn a few pixels inside each product, at half size and blurred; and the folds' warp near an edge took design from outside the print area, where there was none.
+- The masks are made again at the photo's full size: a trimap 10 px either side of the old edge, each pixel in it decided by colour against the product's and the background's colour nearby (warmth for the T-shirt, tote, fabric, notebook and the cushion's top, which stand neutral against a warm wall even in shadow; light for the cushion's shaded lower left), a firm edge with a pixel or two of softness; the wallpaper's wall is everything but the floor, the sideboard, the pot and each leaf. With a mask the design is now laid 6% past the print area on every side (`mkDraw`), so the mask and the warp always find design. About 120 KB of masks (was 40).
+- Tests: tests/mockups-2-90.spec.js. Checked by eye: full-size exports of all six, the edges at 2×.
+
 ## 2.92.0 (Nov 4 2026): the repeats update is done (docs/repeats-plan.md)
 - Version and docs only. Live: 2.90.0 (every arrangement's own settings, including any drop or offset), 2.91.1 (mirror repeat), 2.91.2 (Make seamless), 2.91.3 (View > Real size).
 - Tests: none new; the release changes no code.

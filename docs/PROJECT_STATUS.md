@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.92.0 (the repeats update is done)**, version and docs only. Next from the review (docs/full-review-2.88.md): selling (full-surface export, print-on-demand presets), then colour for printers (colour reduction, colourway generation).
+- **Nov 4: 2.92.1 (hotfix: mockups print to the products' edges)** on `fix/2.92.1-mockup-edges`, not merged.
+- **Nov 4: 2.92.0 LIVE (the repeats update is done)**, version and docs only. Next from the review (docs/full-review-2.88.md): selling (full-surface export, print-on-demand presets), then colour for printers (colour reduction, colourway generation).
 - **Nov 4: 2.91.3 LIVE (repeats step 3: View > Real size)**.
 - **Nov 4: 2.91.2 LIVE (repeats step 2: Make seamless for pictures)**.
 - **Nov 4: 2.91.1 LIVE (repeats step 1: a mirror repeat)**. Plan: docs/repeats-plan.md.
