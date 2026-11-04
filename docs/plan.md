@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.94.0 (Nov 4 2026): the better Find product is done (docs/own-mockups-plan.md)
+- Version and docs only. Live: 2.93.1 (the product's own colours, Show mask), 2.93.2 (click to add or remove).
+- Tests: none new; the release changes no code.
+
 ## 2.93.2 (Nov 4 2026): a better Find product, step 2: click to add or remove (docs/own-mockups-plan.md)
 - With Show mask on (the view gets the class `mkpk`, a crosshair), a click on the Mockup view runs `mkWand`: from the clicked pixel, what is joined to it, on the same side of the mask (product or not) and like it (light, colour and texture within Tolerance's distance) changes side. The fill stops at outlines (a change of light over 14 across a pixel) and, when adding, at the product's box. The mask, at its own size, is kept with the photo. Checked on the cushion photo: three clicks bring back most of its shaded strip without reaching the wall (a first try, with a wider match and no stops, spilled onto the wall).
 - Tests: tests/mockups-2-90.spec.js (a seventh test: a click adds a wooden stool to the product, a second takes it out; no change without Show mask).

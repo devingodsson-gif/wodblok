@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.94.0','Nov 4 2026',['A better Find product: it leaves out things of another colour, Show mask shows what it found, and a click adds or removes a part.']],
  ['2.93.2','Nov 4 2026',['With Show mask on, a click on the Mockup view adds a part to the product or takes it out, as the Magic Wand does.']],
  ['2.93.1','Nov 4 2026',['Find product leaves out things of another colour touching the product, such as a stool or a curtain rod. Show mask tints what is not product.']],
  ['2.93.0','Nov 4 2026',['Your own mockups are as good as the built-in ones: the product is found for you, the design follows the folds, and Real size works.']],

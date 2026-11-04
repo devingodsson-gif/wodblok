@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.93.2 (a better Find product, step 2: click to add or remove)** on `feat/2.93.2-mask-click`, not merged. Next: 2.94.0 closes the update.
+- **Nov 4: 2.94.0 (the better Find product is done)**, version and docs only. Next from the review: selling (full-surface export, print-on-demand presets), then colour for printers.
+- **Nov 4: 2.93.2 LIVE (a better Find product, step 2: click to add or remove)**.
 - **Nov 4: 2.93.1 LIVE (a better Find product, step 1: the product's colours, Show mask)**.
 - **Nov 4: 2.93.0 LIVE (your own mockups update is done)**, version and docs only. Next from the review: selling (full-surface export, print-on-demand presets), then colour for printers.
 - **Nov 4: 2.92.3 LIVE (your own mockups step 2: Folds and Real width)**.
