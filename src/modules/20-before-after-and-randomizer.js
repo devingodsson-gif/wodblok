@@ -1,3 +1,4 @@
+import {ICN} from './00-icons.js';
 import {kv} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {bk,CH,CM,col,CW,geom,okC,PL,setDim,shOf,stFreeNm,stvSet,tileOn} from './04-canvas-and-stamp-outlines.js';
@@ -54,6 +55,13 @@ function rzFront(res,bx){const k=bx.S0/bx.S1,f1=v=>+(+v).toFixed(1),mv=q=>{if(q.
     else{if(q.lay=='scatter'){q.cn=Math.max(1,Math.min(40,Math.round(q.cn*CW/bx.w)));q.rn=Math.max(1,Math.min(40,Math.round(q.rn*CH/bx.h)))}Object.assign(q,{x:f1(CW/2),y:f1(CH/2),s:Math.min(CW,CH)})}return}}
   if(q.tx){if(q.tx.wd)q.tx.wd=Math.max(4,Math.round(q.tx.wd*k));if(q.tx.ht)q.tx.ht=Math.max(3,Math.round(q.tx.ht*k))}
   mv(q)})}
+// 2.98.0 (owner Nov 4 2026: "when the randomize dice icon spins it changes the icon to a dice with 1-6 sides like it's actually rolling"): while the button's dice spins
+// (.45 s, rspin) its face changes every 60 ms, never to the face it shows, and it lands on a face from one to six, which it keeps until the next roll. With reduced
+// motion it only shows the face it lands on.
+let rzTT=0;
+function rzTumble(b){if(!b)return;const sv=b.querySelector('svg');if(!sv)return;b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin');clearInterval(rzTT);
+ let cur=+(sv.dataset.face||5);const face=()=>{let n;do n=1+Math.floor(Math.random()*6);while(n===cur);cur=n;sv.dataset.face=n;sv.innerHTML=ICN['die'+n]};
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches){face();return}let k=0;rzTT=setInterval(()=>{face();if(++k>=7)clearInterval(rzTT)},60)}
 function randomizeCore(fresh){const R=Math.random,pick=a=>a[Math.floor(R()*a.length)],rr=(a,b)=>a+R()*(b-a),ri=(a,b)=>Math.floor(rr(a,b+1)),ch=p=>R()<p,wpick=o=>{let t=R()*o.reduce((x,y)=>x+y[1],0);for(const x of o){if((t-=x[1])<=0)return x[0]}return o[0][0]};
 const FT={...RZ_DEF,...(WBX.wbRZ?WBX.wbRZ.get():{})};
 if(!Object.keys(RZ_DEF).some(k=>FT[k])){pmsg('Nothing is switched on in Randomize, so nothing changed.');return}
@@ -72,7 +80,7 @@ const grade=name=>{if(!WBX.wbGrade)return;const g0=WBX.wbGrade.get();let gl={};i
  const masks=FT.fin?(!tile&&ch(.2)?[{t:'rad',name:'Vignette',sp:'c',cx:.5,cy:.5,rx:+rr(.62,.78).toFixed(3),ry:+rr(.62,.78).toFixed(3),fe:ri(70,90),inv:true,a:{ex:-ri(6,14)}}]:[]):(g0.masks||[]);WBX.wbGrade.set({...gl,cov:g0.cov,masks})};
 const end=msg=>{store();upd();if(WBX.wbRollHold===tok)WBX.wbRollHold=0;
  if(fresh){if(WBX.wbResetHist)WBX.wbResetHist()}else if(WBX.wbCap){WBX.wbLabelNext={t:'Randomize '+(WBX.wbRollN=(WBX.wbRollN||0)+1),at:performance.now()};WBX.wbCap()}
- {const b=$('rzdo');if(b){b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin')}}pmsg(fresh?'Started a new project with a fresh random piece.':msg)};
+ rzTumble($('rzdo'));pmsg(fresh?'Started a new project with a fresh random piece.':msg)};
 const LOOK=RZ_PARTS.some(k=>FT[k])?rzLookPick({FT,wpick,tile,want:WBX.wbRZ&&WBX.wbRZ.look?WBX.wbRZ.look():'any'}):'';
 // --- no part to make (or none that fits a repeat tile): the roll reworks what is there
 if(!LOOK){const u=FT.fin?(tile?[]:paperTex()):null,c=JSON.parse(coreStr());c.proj=P0;if(u)c.tex={u,v:87};
