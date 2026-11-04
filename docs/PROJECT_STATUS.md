@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.98.3 (asset split, step 3: fonts)** on `feat/2.98.3-asset-fonts`, not merged. Hosted page 7.0 MB (from 18.5). Next: step 4, shapes and templates.
+- **Nov 4: 2.98.4 (asset split, step 4: shapes and templates as data files, the owner's "cached file at start")** on `feat/2.98.4-asset-data`, not merged. Hosted page 2.2 MB (from 18.5). Start-up now waits for the two files in the hosted app. Next: 2.99.0 closes the plan; then phase 2 (AI Select subject: model and licence are the owner's choice).
+- **Nov 4: 2.98.3 LIVE (asset split, step 3: fonts)**.
 - **Nov 4: 2.98.2 LIVE (asset split, step 2: textures)**.
 - **Nov 4: 2.98.1 LIVE (asset split, step 1: the asset system, mockups first; docs/asset-split-plan.md)**. Open: the AI model for phase 2 (licence and size) is the owner's choice.
 - **Nov 4: 2.98.0 LIVE (the Randomize dice rolls)**.
