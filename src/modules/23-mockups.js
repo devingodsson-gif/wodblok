@@ -5,6 +5,7 @@ import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,physOf,tileOn,tileRk} from './04-canvas-and-stamp-outlines.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
+import {unGet} from './98-units.js';
 import {ltMake} from './87-library-tree.js';
 
 // ===== Mockups (2.90.1, docs/mockups-plan.md; owner Nov 3 2026: "Let's do mockups": a live Mockup panel, people's own photos with four corners, built-in products later).
@@ -28,7 +29,7 @@ function mkLoad(){let raw=null;try{raw=kv.get(MK_KEY)}catch(e){}
  if(mkC===null||raw!==mkCr){let d=null;try{d=JSON.parse(raw||'null')}catch(e){}if(!d||typeof d!='object')d={};
   d.f=(Array.isArray(d.f)?d.f:[]).filter(x=>typeof x=='string'&&x&&x.length<=200);
   d.t=(Array.isArray(d.t)?d.t:[]).filter(x=>x&&/^m[\w-]{1,30}$/.test(x.id)&&x.w>0&&x.h>0&&typeof x.th=='string'&&/^data:image\/(?:webp|png|jpeg);base64,/.test(x.th))
-   .map(x=>({id:x.id,n:mkName(x.n),f:typeof x.f=='string'?x.f:'',w:+x.w,h:+x.h,th:x.th,q:mkQok(x.q)?x.q.slice():mkQ0.slice(),...(x.am?{am:1,tol:Number.isFinite(+x.tol)?Math.max(0,Math.min(100,+x.tol)):50}:{})}));
+   .map(x=>({id:x.id,n:mkName(x.n),f:typeof x.f=='string'?x.f:'',w:+x.w,h:+x.h,th:x.th,q:mkQok(x.q)?x.q.slice():mkQ0.slice(),...(x.am?{am:1,tol:Number.isFinite(+x.tol)?Math.max(0,Math.min(100,+x.tol)):50}:{}),...(+x.warp>0?{warp:Math.min(1,+x.warp)}:{}),...(+x.cm>0?{cm:Math.min(10000,+x.cm)}:{})}));
   d.h=(Array.isArray(d.h)?d.h:[]).filter(x=>typeof x=='string'&&x.length<=60);d.r=d.r&&typeof d.r=='object'&&!Array.isArray(d.r)?d.r:{};d.b={};mkC=d;mkCr=raw}
  return{f:[...mkC.f],t:mkC.t.map(x=>({...x,q:x.q.slice()})),h:[...mkC.h],r:{...mkC.r},b:{}}}
 const mkStore=d=>{try{kv.set(MK_KEY,JSON.stringify(d));mkC=null;return true}catch(e){pmsg('Could not keep the mockups in this browser.');return false}};
@@ -179,9 +180,15 @@ async function mkView(){const c=$('mkc'),wrap=$('mkvw');if(!c||!mkOpen())return;
 function mkCorners(){const ov=$('mkov');if(!ov)return;const m=mkCur(),on=!!(m&&!m.b&&$('mkcn').checked);ov.toggleAttribute('hidden',!on);if(!on){ov.innerHTML='';return}
  const H=1000*m.h/m.w;ov.setAttribute('viewBox',`0 0 1000 ${H.toFixed(2)}`);const P=m.q.map((v,i)=>v*(i%2?H:1000)),s=14;
  ov.innerHTML=`<path class="crln" d="M${P[0]} ${P[1]}L${P[2]} ${P[3]}L${P[4]} ${P[5]}L${P[6]} ${P[7]}Z"/>`+[0,1,2,3].map(i=>`<rect class="crhd" data-mkq="${i}" x="${(P[i*2]-s/2).toFixed(1)}" y="${(P[i*2+1]-s/2).toFixed(1)}" width="${s}" height="${s}"/>`).join('')}
+// 2.92.3 (docs/own-mockups-plan.md step 2): your mockup's Folds (warp, 0 to 1: how much the design follows the photo's folds, as the products') and Real width
+// (cm: the print area's width, typed in Settings > General > Units; px counts as mm) for Real size
+const MK_UPC={mm:.1,cm:1,in:2.54,px:.1},mkUnit=()=>{const u=unGet();return u=='px'?'mm':u};
+function mkOwnSet(o){const m=mkCur();if(!m||m.b)return;const d=mkLoad(),t=d.t.find(z=>z.id===m.id);if(!t)return;Object.entries(o).forEach(([k,v])=>{if(v)t[k]=v;else delete t[k]});mkStore(d);mkSync();mkView()}
 // the controls follow the mockup in use and the settings
 function mkSync(){const u=mkUi(),fill=mkFill(u);$('mkfl').querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==fill));
  const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;$('mkamr').hidden=!m||!!m.b;$('mkam').checked=!!(m&&m.am);$('mktolr').hidden=!m||!!m.b||!m.am;
+ {const own=!!(m&&!m.b);$('mkfor').hidden=!own;$('mkcmr').hidden=!own;if(own){const fo=$('mkfo'),fv=Math.round((m.warp||0)*100);if(+fo.value!==fv&&document.activeElement!==fo){fo.value=fv;fo.dispatchEvent(new Event('input',{bubbles:true}))}
+  const u=mkUnit(),cf=$('mkcm');$('mkcmu').textContent=u;if(document.activeElement!==cf)cf.value=m.cm?String(+(m.cm/MK_UPC[u]).toFixed(u=='in'?2:u=='cm'?1:0)):''}}
  {const tl=$('mktol'),tv=m&&m.am?m.tol:50;if(+tl.value!==tv&&document.activeElement!==tl){tl.value=tv;tl.dispatchEvent(new Event('input',{bubbles:true}))}}   /* a product's print area is its own */
  const sc=$('mksc'),v=fill=='rep'?u.sr:u.so;sc.dataset.def=fill=='rep'?'25':'100';sc.disabled=real&&u.rs;if(sc._n)sc._n.disabled=sc.disabled;if(+sc.value!==v){sc.value=v;sc.dispatchEvent(new Event('input',{bubbles:true}))}
  const sh=$('mksh');if(+sh.value!==u.sh){sh.value=u.sh;sh.dispatchEvent(new Event('input',{bubbles:true}))}$('mkx').disabled=!m}
@@ -201,6 +208,8 @@ function init23(){if(!$('mkpane'))return;MKT=ltMake(mkCfg());MKT.init();$('mkpan
  $('mksc').addEventListener('input',()=>{if(WBS.uiLoad)return;const u=mkUi(),v=+$('mksc').value;if(mkFill(u)=='rep'){if(u.sr===v)return;mkUiSet({sr:v})}else{if(u.so===v)return;mkUiSet({so:v})}mkView()});
  $('mksh').addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$('mksh').value;if(mkUi().sh===v)return;mkUiSet({sh:v});mkView()});
  $('mkcn').addEventListener('change',mkCorners);
+ $('mkfo').addEventListener('input',()=>{if(WBS.uiLoad)return;const m=mkCur(),v=+$('mkfo').value/100;if(!m||m.b||(m.warp||0)===v)return;mkOwnSet({warp:v})});
+ $('mkcm').addEventListener('change',()=>{const t=String($('mkcm').value).trim(),v=+t;if(t===''){mkOwnSet({cm:0});return}if(!(v>0)){mkSync();return}mkOwnSet({cm:+Math.min(10000,v*MK_UPC[mkUnit()]).toFixed(2)})});
  // Find product and Tolerance (2.92.2): the mask is made again a moment after the slider stops
  const mkRefind=async(on,tol)=>{const m=mkCur();if(!m||m.b)return;const ok=await mkFindSet(m.id,on,tol);if(on&&!ok)pmsg('No product found: it may touch every edge of the photo. Set its corners instead.');mkSync();mkView();mkCorners()};
  $('mkam').addEventListener('change',()=>mkRefind($('mkam').checked,+$('mktol').value));
