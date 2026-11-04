@@ -1,4 +1,14 @@
+import {cmdRegister} from '../commands/registry.js';
+import {kv} from '../platform/index.js';
 import {$,WBX} from './01-launch-and-version.js';
+import {CW,physNow} from './04-canvas-and-stamp-outlines.js';
+import {pmsg} from './18-projects-and-cover-overlay.js';
+// 2.91.3 (docs/repeats-plan.md step 3): View > Real size zooms the canvas to the size it prints at, on this screen: its real width (Canvas > Format, or a book cover's sheet)
+// times the screen's pixels per inch. Screens differ, so the number is a setting (Settings > General > Screen resolution, 96 by default: what a browser takes an inch to
+// be); hold a ruler to the screen and set it until an inch measures an inch.
+const RS_PPI='wb2913_ppi',rsPpi=()=>{try{const n=+kv.get(RS_PPI);return Number.isFinite(n)&&n>=60&&n<=300?n:96}catch(e){return 96}};
+function rsShow(){const P=physNow();if(!P){pmsg('Give the canvas a real size first: Canvas > Format.');return}const s=P.inW*rsPpi()/CW;
+ if(s>8||s<.1){pmsg('At real size the canvas is too large to show here.');return}WBX.wbZoomTo(s);pmsg('Real size.')}
 // ===== Zoom keys and hand tool =====
 // Hand tool: hold Space, press the middle mouse button, or switch the Hand button on (or press H), then drag the picture to move it.
 // Zoom keys: + and - zoom, 1 shows the piece at 100%, 0 fits it to the screen. (The Navigator panel was removed in 2.9.0.)
@@ -6,6 +16,7 @@ function init41(){
   const board=$('boardP');
   let hand=false,space=false,pan=null;
   $('nv100').onclick=()=>WBX.wbZoomTo(1);
+  cmdRegister({id:'view.realSize',label:'Real size',run:rsShow});WBX.wbRsPpi=rsPpi;
   // 2.79.2 (owner Oct 31 2026): the wheel moves the view (up and down; with Shift across; Ctrl or Cmd zooms, 34-desktop-shell.js); with Alt it sizes and with Shift it turns
   // what is on the cursor, or the selected element under the pointer (25-art-layers.js picks the sliders). A notch is 5% of the size or 5°; one History step when it stops
   {let acc=0,at=0,tm=0,pend=null;const done=()=>{clearTimeout(tm);const el=pend;pend=null;if(el)el.dispatchEvent(new Event('change',{bubbles:true}))};
