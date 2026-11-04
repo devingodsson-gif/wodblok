@@ -17,7 +17,7 @@ for (const view of ['pattern', 'unlocked stamp']) {
   test(`${view}: every tool panel opens with text of at least 11 px`, async ({ page }) => {
     const { errors } = await openApp(page, { seed: 4 });
     if (view !== 'pattern') { await unlockStamp(page); await pickShape(page); await clickStamp(page, await stampInstance(page)); }   // one shape on the stamp, so the Shape list has a row
-    const tools = await page.evaluate(() => [...document.querySelectorAll('.rail [data-pn]')].filter(b => !b.hidden).filter(b => !(b.dataset.pn === 'mlist' && __wbTest.unlockedStamp() == null)).map(b => b.dataset.pn));   // the Shape list is empty in Pattern until a stamp is unlocked
+    const tools = await page.evaluate(() => [...document.querySelectorAll('.rail [data-pn]')].filter(b => !b.hidden).filter(b => !(b.dataset.pn === 'mlist' && __wbTest.unlockedStamp() == null)).filter(b => !(b.dataset.pn === 'mock' && __wbTest.unlockedStamp() != null)).map(b => b.dataset.pn));   // the Shape list is empty in Pattern until a stamp is unlocked; Mockup opens its own tab and leaves the stamp (2.96.0), so it is checked in Pattern only
     const bad = [];
     for (const t of tools) { await showPanel(page, t); await settle(page); bad.push(...(await small(page)).map(x => t + ': ' + x)); await page.locator(`.rail [data-pn="${t}"]`).dispatchEvent('click').catch(() => {}); }
     expect(bad, bad.join('\n')).toEqual([]);

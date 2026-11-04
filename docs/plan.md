@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.99.0 (Nov 4 2026): the asset split plan is done (docs/asset-split-plan.md)
+- Live: 2.98.1 (the asset system, mockups), 2.98.2 (textures), 2.98.3 (fonts), 2.98.4 (shapes and templates as data files), 2.98.5 (the asset cache kept small). The hosted page is about 2.2 MB (18.5 MB before); the single file is unchanged.
+- Also: tests/text-size.spec.js "unlocked stamp" no longer opens Mockup inside a stamp (it opens its own tab and leaves the stamp since 2.96.0, so the test waited for ever; it failed on 2.98.0 too). Mockup's text is still checked in the Pattern half.
+- Tests: text-size (2 passed). No app code changed.
+
 ## 2.98.5 (Nov 4 2026): asset split: the asset cache kept small (docs/asset-split-plan.md)
 - Owner: "merge, run suite". The suite on 2.98.4 (run 41889099948) failed 3 tests of about 820: tests/web-app.spec.js (the browser's caches now include `wodblok-assets-1`), which showed the asset cache was never trimmed; small-updates-2-79-2 (Alt + wheel, one History step: passes locally, flaky); text-size "unlocked stamp" (waits for the Mockup panel in an unlocked stamp; fails on 2.98.0 too, so it predates this plan; not fixed here).
 - tools/build.js writes this build's asset list into sw.js: install also stores the start-up data files (shapes, templates), so applying a version with no network still opens; activate deletes the asset files this version does not use.
