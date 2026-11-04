@@ -1,4 +1,4 @@
-// 2.90.1 (owner Nov 3 2026, docs/mockups-plan.md step 1): Window > Mockup is a live panel. Add mockup brings in a photo; the design is drawn onto its print area
+// 2.90.1 and 2.90.2 (owner Nov 3 and 4 2026, docs/mockups-plan.md steps 1 and 2): Window > Mockup is a live panel. Add mockup brings in a photo; the design is drawn onto its print area
 // (four corners, Edit corners), Repeat or Once at a Scale, with the photo's light by Shading; Export mockup saves a PNG at the photo's size. Nothing goes in the project.
 const { test, expect } = require('@playwright/test');
 const H = require('./helpers/harness');
@@ -17,11 +17,14 @@ test('Add mockup, the design on its print area, Repeat and Once, Shading, corner
   const doc0 = await H.getState(page);
   await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
   await page.waitForSelector('section.pn[data-p="mock"]:not([hidden])');
-  await expect(page.locator('#mkvw')).toBeHidden(); await expect(page.locator('#mkg')).toBeHidden();
+  // 2.90.2: the first product shows until a mockup is chosen; a product's print area is its own (no Edit corners)
+  await expect(page.locator('#mkvw')).toBeVisible(); await waitView(page, 0);
+  await expect(page.locator('#mkcn')).toBeHidden();
+  const k0 = await viewKey(page);
   await page.setInputFiles('#mkpane .mkfile', { name: 'Room.png', mimeType: 'image/png', buffer: Buffer.from(await photo(page), 'base64') });
-  await expect(page.locator('#mkvw')).toBeVisible(); await expect(page.locator('#mkpane [data-mk]')).toHaveCount(1);
-  await expect(page.locator('#mkpane [data-mk] b')).toHaveText('Room');
-  await waitView(page, 0);
+  await expect(page.locator('#mkpane [data-mk^="m"]')).toHaveCount(1);
+  await expect(page.locator('#mkpane [data-mk^="m"] b')).toHaveText('Room');
+  await waitView(page, k0);
   // outside the print area the photo shows as it is; inside, the design (not the white panel)
   const out = await px(page, .05, .05); expect(Math.abs(out[0] - 0x8a)).toBeLessThan(6);
   const k1 = await viewKey(page);
@@ -65,5 +68,32 @@ test('the view follows the design: a change on the canvas draws the mockup again
   // a new design (Randomize): the view is made again a moment later
   await page.evaluate(() => window.__wbTest.commands.run('randomize.roll')); await H.settle(page);
   await waitView(page, k);
+  expect(errors).toEqual([]);
+});
+
+test('the Products: six built-in products, the design only on the product, Real size with a canvas of real size', async ({ page }) => {
+  test.setTimeout(120000);
+  const { errors } = await H.openApp(page, { seed: 11 });
+  await page.evaluate(() => window.__wbTest.commands.run('randomize.roll')); await H.settle(page);
+  await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
+  const ids = await page.locator('#mkpane [data-mk^="p-"]').evaluateAll(b => b.map(x => x.dataset.mk));
+  expect(ids).toEqual(['p-tshirt', 'p-tote', 'p-cushion', 'p-fabric', 'p-wallpaper', 'p-notebook']);
+  await page.locator('#mkfl [data-f="rep"]').click();
+  // the cushion: the wall above it and beside it stays as the photo; its middle takes the design
+  await page.locator('#mkpane [data-mk="p-cushion"]').click(); await waitView(page, 0);
+  const photoPx = await page.evaluate(async () => { const i = new Image(); i.src = document.querySelector('#mkpane [data-mk="p-cushion"] img').src; await i.decode(); const c = document.createElement('canvas'); c.width = i.naturalWidth; c.height = i.naturalHeight; const x = c.getContext('2d'); x.drawImage(i, 0, 0);
+    return [[.5, .02], [.02, .5], [.5, .5]].map(([fx, fy]) => [...x.getImageData(Math.round(c.width * fx), Math.round(c.height * fy), 1, 1).data].slice(0, 3)); });
+  const near = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+  expect(near(await px(page, .5, .02), photoPx[0])).toBeLessThan(12);
+  expect(near(await px(page, .02, .5), photoPx[1])).toBeLessThan(12);
+  expect(near(await px(page, .5, .5), photoPx[2])).toBeGreaterThan(12);
+  // Real size shows only when the canvas has a real size; it sets the scale (the slider is off) and changes the view
+  await expect(page.locator('#mkrsr')).toBeHidden();
+  await page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()); s.dim = { ...(s.dim || {}), u: 'mm', pw: 100, ph: 150, dpi: 300 }; window.__wbTest.apply(JSON.stringify(s)); }); await H.settle(page);
+  await page.locator('#mkpane [data-mk="p-tote"]').click(); await page.waitForTimeout(600);
+  await expect(page.locator('#mkrsr')).toBeVisible();
+  const k = await viewKey(page);
+  await page.locator('#mkrs').check(); await waitView(page, k);
+  await expect(page.locator('#mksc')).toBeDisabled();
   expect(errors).toEqual([]);
 });
