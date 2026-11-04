@@ -28,4 +28,5 @@ The built app is one file of about 18.5 MB, and every visitor downloads all of i
 - **Phase 3: pixel-perfect masks** from that selection (edge refinement).
 
 ## Outcome
-- 2.98.1 (Nov 4 2026): built. The single file is unchanged in size (18,463,080 bytes); the hosted page is 17,833,934 bytes plus 12 files in assets/mockups (472,320 bytes), none fetched at start.
+- 2.98.1 (Nov 4 2026): live. The single file is unchanged in size (18,463,080 bytes); the hosted page is 17,833,934 bytes plus 12 files in assets/mockups (472,320 bytes), none fetched at start.
+- 2.98.2 (Nov 4 2026): built. The 30 texture pictures are files in assets/textures/ (4,358,810 bytes); the hosted page is 12,023,567 bytes. None is fetched at start; adding a Texture effect fetches the first set the library shows (7 files), the other sets wait until they are shown. The library's Export reads a built-in's bytes through assetBytes. Test set-up shared in tests/helpers/web-build.js.
