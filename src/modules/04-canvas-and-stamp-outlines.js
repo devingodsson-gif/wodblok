@@ -47,8 +47,12 @@ function stvSet(w,h){STV=w?[w,h]:null;setDim()}
 const tileOn=()=>!STV&&!!WBS.dim.rt&&!WBS.book.on;
 // 2.76.6: how the repeat tile repeats (dim.rk): 'grid' (side by side), 'brick' (every row moved half a tile across) or 'half' (half drop: every column moved half a tile down).
 // The tile's neighbours are i * a + j * b on that lattice; tileOffs(r) lists them for i, j from -r to r, without the tile itself.
-const tileRk=()=>WBS.dim.rk=='brick'||WBS.dim.rk=='half'?WBS.dim.rk:'grid';
-function tileOffs(r=1){const k=tileRk(),o=[];for(let i=-r;i<=r;i++)for(let j=-r;j<=r;j++){if(!i&&!j)continue;o.push(k=='brick'?[i*CW+j*CW/2,j*CH]:k=='half'?[i*CW,j*CH+i*CH/2]:[i*CW,j*CH])}return o}
+// 2.91.1: 'mirror' (every other column flipped across, every other row flipped down): the edges meet their own reflection, so nothing wraps (tileOffs is empty) and
+// what runs off an edge is cut there; tileCells lists the copies with their flips for the 3 x 3 view.
+const tileRk=()=>WBS.dim.rk=='brick'||WBS.dim.rk=='half'||WBS.dim.rk=='mirror'?WBS.dim.rk:'grid';
+function tileOffs(r=1){if(tileRk()=='mirror')return[];const k=tileRk(),o=[];for(let i=-r;i<=r;i++)for(let j=-r;j<=r;j++){if(!i&&!j)continue;o.push(k=='brick'?[i*CW+j*CW/2,j*CH]:k=='half'?[i*CW,j*CH+i*CH/2]:[i*CW,j*CH])}return o}
+// [x, y, flip across, flip down] for the tile and its neighbours out to r (the 3 x 3 view): a mirror repeat flips odd columns and rows, the others only move
+function tileCells(r=1){if(tileRk()!='mirror')return[[0,0,0,0],...tileOffs(r).map(([x,y])=>[x,y,0,0])];const o=[];for(let i=-r;i<=r;i++)for(let j=-r;j<=r;j++)o.push([i*CW,j*CH,i&1,j&1]);return o}
 // 2.76.6: a canvas can have a physical size (dim.u: 'px', 'in' or 'mm'; dim.pw, dim.ph in that unit; dim.dpi), so it prints and exports at that size; its ratio is dim.c.
 // physOf() is null for a canvas that only has a ratio, else its size in pixels at its DPI and in inches.
 const PHU={px:'px',in:'in',mm:'mm'};
@@ -187,4 +191,4 @@ CM=Object.fromEntries(C);
 PL=WADA_COMBOS.map((cb,i)=>{const cs=cb.map(j=>WADA_COLORS[j]).sort((a,b)=>hsl(a[1])[2]-hsl(b[1])[2]);const mid=cs.slice(1,-1).reverse();return[WADA_NAMES[i]||'No. '+(i+1),cs[0][0],cs[cs.length-1][0],mid[0]?mid[0][0]:'',mid[1]?mid[1][0]:'']});WBS.proj=trayDefault();try{JSON.parse(kv.get('wb7_colors')||'[]').forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}})}catch(e){}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 }
-export {hEsc,physLen,physNow,physOf,physToCv,PHU,tileOffs,tileRk,stFreeNm,stNm,stNmId,stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};
+export {hEsc,physLen,physNow,physOf,physToCv,PHU,tileCells,tileOffs,tileRk,stFreeNm,stNm,stNmId,stvOn,stvSet,shBleed,C,CASP,CC,okC,CH,CM,CSN,CW,DD,DDset,HO,M,N,OFFS,ORN,PAPER,PCOL,PL,SH,SHN,SK,SW,TRIMS,bk,cOut,closeDD,closeRowMenu,col,csk,geom,hasOut,inShape,init04,offPoly,ornPts,paintColors,placeFloat,polyArea,rng,rowMenu,saveCC,setDim,shOf,shp,tileExt,tileOn,tk,useG,useT,wrapP};

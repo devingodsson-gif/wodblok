@@ -78,7 +78,8 @@ function mkTri(x,F,s,d){const[[u0,v0],[u1,v1],[u2,v2]]=s,[[X0,Y0],[X1,Y1],[X2,Y2
 // the design laid flat at fw x fh: Repeat on the repeat tile's lattice (grid, brick, half drop), one copy Scale% of the width; Once in the middle, Scale% of the area
 function mkFlat(D,fw,fh,fill,sc){const F=document.createElement('canvas');F.width=Math.max(1,Math.round(fw));F.height=Math.max(1,Math.round(fh));const x=F.getContext('2d'),ar=CH/CW;
  if(fill=='rep'){const tw=Math.max(2,fw*sc/100),th=tw*ar,k=tileOn()?tileRk():'grid',nx=Math.ceil(fw/tw)+2,ny=Math.ceil(fh/th)+2;
-  for(let j=-1;j<ny;j++)for(let i=-1;i<nx;i++){const X=i*tw+(k=='brick'&&j%2?tw/2:0),Y=j*th+(k=='half'&&i%2?th/2:0);x.drawImage(D,X,Y,tw+.5,th+.5)}}
+  for(let j=-1;j<ny;j++)for(let i=-1;i<nx;i++){const X=i*tw+(k=='brick'&&j%2?tw/2:0),Y=j*th+(k=='half'&&i%2?th/2:0),fx=k=='mirror'&&i&1,fy=k=='mirror'&&j&1;   // 2.91.1: a mirror repeat flips odd columns and rows
+   if(!fx&&!fy){x.drawImage(D,X,Y,tw+.5,th+.5);continue}x.save();x.translate(X+(fx?tw:0),Y+(fy?th:0));x.scale(fx?-1:1,fy?-1:1);x.drawImage(D,0,0,tw+.5,th+.5);x.restore()}}
  else{const k=Math.min(fw/CW,fh/CH)*sc/100,w=CW*k,h=CH*k;x.drawImage(D,(fw-w)/2,(fh-h)/2,w,h)}
  return F}
 // the photo's light: its greyscale, made white at the print area's brightest (the 95th of a hundred), opaque, at W x H
