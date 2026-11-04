@@ -1,5 +1,5 @@
 import {ICN} from './00-icons.js';
-import {collection,kv,use} from '../platform/index.js';
+import {assetData,collection,kv,use} from '../platform/index.js';
 import {fmtOpen,fmtPack,fmtPeek} from '../format/container.js';
 import {TPL_BUILTIN} from '../data/templates.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
@@ -23,6 +23,8 @@ const TP_BLANK={canvas:'<svg viewBox="0 0 60 80" aria-hidden="true"><rect x="14"
 const TPS={kind:'canvas',arm:null,list:[]};   // the kind shown, the card waiting for a second click, your templates as last read
 let tpStore=null;                                              // the records collection (null: this browser keeps none)
 const tpB64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
+// the built-in templates (in the hosted app a file, preloaded by src/main.js before start-up, 2.98.4)
+const tpB=()=>assetData(TPL_BUILTIN);
 const tpBytes=s=>{const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u};
 const tpKind=d=>d&&d.cover&&d.cover.book&&d.cover.book.on?'book':d&&d.dim&&d.dim.rt?'tile':'canvas';
 const tpNow=()=>WBS.book&&WBS.book.on?'book':WBS.dim&&WBS.dim.rt?'tile':'canvas';
@@ -39,9 +41,9 @@ const tpD=()=>$('tpdlg'),tpIsOpen=()=>!tpD().hidden;
 // The folders, the set's name and whether it is hidden are kept in settings (TP_FKEY); a template's folder is its `f` in the list.
 const TP_FKEY='wb251_tplfolders',TP_UI='wb251_templatesui',TP_SET='Starting points';
 let TPT=null;
-const tpIsBuilt=id=>id.startsWith('blank:')||TPL_BUILTIN.some(t=>t.id===id);
-const tpBuiltIn=()=>[{id:'blank:'+TPS.kind,n:'Blank',type:TPS.kind,blank:1},...TPL_BUILTIN.filter(t=>t.type===TPS.kind)];
-const tpItem=id=>{if(id.startsWith('blank:'))return id==='blank:'+TPS.kind?tpBuiltIn()[0]:null;const b=TPL_BUILTIN.find(t=>t.id===id);if(b)return b.type===TPS.kind?b:null;const t=TPS.list.find(x=>x.id===id);return t&&t.type===TPS.kind?t:null};
+const tpIsBuilt=id=>id.startsWith('blank:')||tpB().some(t=>t.id===id);
+const tpBuiltIn=()=>[{id:'blank:'+TPS.kind,n:'Blank',type:TPS.kind,blank:1},...tpB().filter(t=>t.type===TPS.kind)];
+const tpItem=id=>{if(id.startsWith('blank:'))return id==='blank:'+TPS.kind?tpBuiltIn()[0]:null;const b=tpB().find(t=>t.id===id);if(b)return b.type===TPS.kind?b:null;const t=TPS.list.find(x=>x.id===id);return t&&t.type===TPS.kind?t:null};
 function tpFold(){let d=null;try{d=JSON.parse(kv.get(TP_FKEY)||'null')}catch(e){}d=d&&typeof d=='object'?d:{};
  const r=d.r&&typeof d.r[TP_SET]=='string'&&/^[^\\"<>&|/]{1,30}$/.test(d.r[TP_SET])&&!/^s:/i.test(d.r[TP_SET])?{[TP_SET]:d.r[TP_SET]}:{},b={};
  if(d.b&&typeof d.b=='object')Object.keys(d.b).forEach(k=>{if(tpIsBuilt(k)&&typeof d.b[k]=='string'&&d.b[k]&&d.b[k].length<=200)b[k]=d.b[k]});
@@ -56,7 +58,7 @@ const tpCfg=()=>({p:'tp',word:'template',words:'templates',ui:TP_UI,cards:true,z
  remove(list){tpOpenStore().then(st=>{if(st)list.forEach(id=>st.doc(id).delete().catch(()=>{}))});tpIndexSet(tpIndex().filter(x=>!list.includes(x.id)));TPS.list=tpIndex()},
  rename(id,v){const a=tpIndex(),t=a.find(x=>x.id===id);if(!t)return;t.n=v;tpIndexSet(a);TPS.list=tpIndex();
   tpOpenStore().then(st=>st&&st.doc(id).get().then(r=>{const d=r&&r.exists?r.data():null;if(d)return st.doc(id).set({...d,n:v})})).catch(()=>{})},
- async file(id){const b=TPL_BUILTIN.find(t=>t.id===id);if(b)return{name:b.n,data:tpBytes(b.b),ext:'.wodblok',fb:'Template'};if(id.startsWith('blank:'))return null;
+ async file(id){const b=tpB().find(t=>t.id===id);if(b)return{name:b.n,data:tpBytes(b.b),ext:'.wodblok',fb:'Template'};if(id.startsWith('blank:'))return null;
   const st=await tpOpenStore(),r=st&&await st.doc(id).get(),v=r&&r.exists?r.data():null;return v&&typeof v.b=='string'?{name:v.n||'Template',data:tpBytes(v.b),ext:'.wodblok',fb:'Template'}:null},
  itemMenu(id){const t=TPS.list.find(x=>x.id===id);return t?[['Download',()=>tpDownload(t)]]:[]}});
 function tpPaint(){if(!tpIsOpen()||!TPT)return;const k=TPS.kind;
@@ -77,7 +79,7 @@ async function tpBlankStart(kind){const b=$('pnw');b.dataset.sure='1';b.click();
 async function tpStart(id){
  if(id.startsWith('blank:')){await tpBlankStart(id.slice(6));return}
  let bytes=null,name='';
- const bi=TPL_BUILTIN.find(t=>t.id===id);
+ const bi=tpB().find(t=>t.id===id);
  if(bi){bytes=tpBytes(bi.b);name=bi.n}
  else{const st=await tpOpenStore();if(!st)return pmsg('This browser does not keep templates.');const r=await st.doc(id).get();const v=r&&r.exists?r.data():null;if(!v||typeof v.b!='string')return pmsg('That template could not be read.');bytes=tpBytes(v.b);name=v.n||''}
  const r=await fmtOpen(bytes);openData(r.project,null,'');await tpFinish(name)}
