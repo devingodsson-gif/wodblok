@@ -52,6 +52,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.91.0','Nov 4 2026',['Mockups are complete: Window > Mockup shows your design live on six products or your own photos, and Export mockup saves it.']],
  ['2.90.2','Nov 4 2026',['Mockup has six products: a T-shirt, a tote bag, a cushion, fabric, wallpaper and a notebook. The design follows their folds; Real size shows the repeat at the size it prints.']],
  ['2.90.1','Nov 3 2026',['Window > Mockup shows your design on a product photo, live. Add your own photos and set the corners of the print area; Export mockup saves a PNG.']],
  ['2.90.0','Nov 3 2026',['Every arrangement has settings of its own: Half drop\u2019s Drop, Brick\u2019s Offset, Chevron\u2019s Angle, Stripes\u2019 width and direction, and more.']],

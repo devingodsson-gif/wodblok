@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.91.0 (Nov 4 2026): the mockups update is done (docs/mockups-plan.md)
+- Version and docs only. Live: 2.90.1 (the Mockup panel and your own photos) and 2.90.2 (six built-in products). Still to come when the owner sends their photos: gift wrap and phone case (each is a photo, its mask and a line in mockups/products.json).
+- Tests: none new; the release changes no code.
+
 ## 2.90.2 (Nov 4 2026): mockups step 2, the built-in products (docs/mockups-plan.md)
 - The owner's photos (made in ChatGPT from the prompts of Nov 3; he sent six of the eight: no gift wrap or phone case yet): T-shirt, Tote bag, Cushion, Fabric, Wallpaper, Notebook, in the Products set of the Mockups library. `mockups/`: `<id>.webp` (the photo, WebP 80, 26 to 145 KB), `<id>-mask.png` (alpha: where the design prints, half size, feathered) and `products.json` ([id, name, {cm, warp, q, w, h}]); the build puts them in `src/data/mockups.js` (`tools/mockups/folders.js`, as the textures). About 0.55 MB more in the build.
 - The masks were made once from the photos (not at run time): the product is neutral against a warm grey background, by colour; the cushion by the fine texture of its linen (its shaded side is as warm as the wall); the wallpaper's wall by light, grey and above the floor; the tote without its handles; the fabric below the rod.
