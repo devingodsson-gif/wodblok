@@ -293,3 +293,21 @@ test('the Mockup tab: opens with the panel, the Canvas tab and back, × closes i
   await expect(page.locator('section.pn[data-p="mock"]')).toBeHidden();
   expect(errors).toEqual([]);
 });
+
+// 2.97.0 (owner Nov 4 2026): Opacity makes the design see-through over the mockup's photo; 0% shows the photo as it is
+test('Opacity fades the design over the photo, and is kept', async ({ page }) => {
+  test.setTimeout(120000);
+  const { errors } = await H.openApp(page, { seed: 11 });
+  await page.evaluate(() => window.__wbTest.commands.run('randomize.roll')); await H.settle(page);
+  await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
+  await page.locator('#mkpane [data-mk="p-notebook"]').click(); await page.locator('#mkfl [data-f="rep"]').click(); await waitView(page, 0); await page.waitForTimeout(500);
+  const photoPx = await page.evaluate(async () => { const i = new Image(); i.src = document.querySelector('#mkpane [data-mk="p-notebook"] img').src; await i.decode(); const c = document.createElement('canvas'); c.width = i.naturalWidth; c.height = i.naturalHeight; const x = c.getContext('2d'); x.drawImage(i, 0, 0); return [...x.getImageData(Math.round(c.width * .5), Math.round(c.height * .5), 1, 1).data].slice(0, 3); });
+  const near = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+  const full = await px(page, .5, .5); expect(near(full, photoPx)).toBeGreaterThan(20);
+  const set = async v => { const k = await viewKey(page), n = page.locator('#mkop').locator('xpath=..').locator('.num input'); await n.fill(String(v)); await n.press('Enter'); await waitView(page, k); };
+  await set(0); expect(near(await px(page, .5, .5), photoPx)).toBeLessThan(8);
+  await set(50); const half = await px(page, .5, .5);
+  half.forEach((v, i) => expect(Math.abs(v - (full[i] + photoPx[i]) / 2)).toBeLessThan(12));
+  expect(await page.evaluate(() => { const v = window.__wbTest.kv.get('wb2901_mockui'); return v && JSON.parse(v).op; })).toBe(50);
+  expect(errors).toEqual([]);
+});
