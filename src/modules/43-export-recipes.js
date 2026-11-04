@@ -58,8 +58,8 @@ async function xrWays(all,fn){const o=WBS.proj;if(!all||o.cw.length<2)return fn(
   try{for(let i=0;i<o.cw.length;i++){o.cwa=i;upd();await frames();await fn(o.cw[i])}}finally{const q=WBS.proj;q.cwa=Math.min(keep,q.cw.length-1);upd();await frames();WBX.wbNoCap=0}}
 // 2.76.6: one repeat unit (r.rep): a grid repeat is the tile itself; a brick repeat is two rows (the second moved half a tile across, cut at the sides); a half drop is two
 // columns (the second moved half a tile down, cut at the top and bottom). Laid side by side, the unit repeats with no seam. xrUnit is its size, xrPlaces where the tile is drawn in it.
-const xrUnit=(r,w,h)=>r.rep=='brick'?[w,2*h]:r.rep=='half'?[2*w,h]:[w,h];
-const xrPlaces=(r,w,h)=>r.rep=='brick'?[[0,0],[-w/2,h],[w/2,h]]:r.rep=='half'?[[0,0],[w,-h/2],[w,h/2]]:[[0,0]];
+const xrUnit=(r,w,h)=>r.rep=='brick'?[w,2*h]:r.rep=='half'?[2*w,h]:r.rep=='mirror'?[2*w,2*h]:[w,h];   // 2.91.1: a mirror repeat's unit is 2 x 2 tiles
+const xrPlaces=(r,w,h)=>r.rep=='brick'?[[0,0],[-w/2,h],[w/2,h]]:r.rep=='half'?[[0,0],[w,-h/2],[w,h/2]]:r.rep=='mirror'?[[0,0],[w,0,1],[0,h,0,1],[w,h,1,1]]:[[0,0]];   // [x, y, flip across, flip down]
 // the picture itself, as a Blob
 function xrRender(r){return(r.fmt!='svg'&&wmGet()?wmReady():Promise.resolve()).then(()=>xrRender0(r))}
 function xrRender0(r){
@@ -68,7 +68,7 @@ function xrRender0(r){
     const [w,h]=r.w>0&&r.h>0?[Math.round(r.w),Math.round(r.h)]:xrDims(xrPx(r.px)),U=xrUnit(r,w,h);if(U[0]*U[1]>XR_AREA)return rej(new Error('That size is too large for this browser. Try a smaller size.'));
     const img=new Image();
     img.onload=()=>{try{const[W,H]=U,c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d',{willReadFrequently:r.fmt=='tiff'});if(r.fmt=='jpg'||r.fmt=='tiff'||r.fmt=='pdf'){ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H)}
-      xrPlaces(r,w,h).forEach(([x,y])=>ctx.drawImage(img,x,y,w,h));if(wmGet())wmDraw(ctx,W,H);if(r.fmt=='tiff'){const im=ctx.getImageData(0,0,W,H);res(xrTiff(im.data,W,H,r.dpi||300));return}
+      xrPlaces(r,w,h).forEach(([x,y,fx,fy])=>{if(!fx&&!fy)return ctx.drawImage(img,x,y,w,h);ctx.save();ctx.translate(x+(fx?w:0),y+(fy?h:0));ctx.scale(fx?-1:1,fy?-1:1);ctx.drawImage(img,0,0,w,h);ctx.restore()});if(wmGet())wmDraw(ctx,W,H);if(r.fmt=='tiff'){const im=ctx.getImageData(0,0,W,H);res(xrTiff(im.data,W,H,r.dpi||300));return}
       if(r.fmt=='pdf'){c.toBlob(async b=>{if(!b)return rej(new Error('The picture could not be made at that size.'));try{res(new Blob([pdfJpeg(new Uint8Array(await b.arrayBuffer()),W,H,{W:r.inW||W/300,H:r.inH||H/300,b:0})],{type:'application/pdf'}))}catch(e){rej(e)}},'image/jpeg',.95);return}
       c.toBlob(b=>b?res(b):rej(new Error('The picture could not be made at that size.')),r.fmt=='jpg'?'image/jpeg':'image/png',.92)}catch(e){rej(e)}};
     img.onerror=()=>rej(new Error('The picture could not be made.'));

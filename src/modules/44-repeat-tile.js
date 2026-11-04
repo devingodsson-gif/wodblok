@@ -34,7 +34,7 @@ function init44(){
     $('artwrap').classList.toggle('tpv',on&&!!WBS.tilePv);$('artwrap').classList.toggle('tpvk',tileRk()!='grid');
     $('tpx').hidden=!(on&&!!WBS.tilePv);
   };
-  // 2.76.6: Grid, Brick or Half drop: how the tile repeats (dim.rk); the wrap at the edges, the 3 x 3 view and the exported repeat unit all follow it
+  // 2.76.6: Grid, Brick or Half drop: how the tile repeats (dim.rk); the wrap at the edges, the 3 x 3 view and the exported repeat unit all follow it. 2.91.1: and Mirror
   $('tlrk').onclick=e=>{const b=e.target.closest('[data-k]');if(!b||b.dataset.k==tileRk())return;if(b.dataset.k=='grid')delete WBS.dim.rk;else WBS.dim.rk=b.dataset.k;
    WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}WBS.tpvImg='';store();buildTex();upd();if(WBX.wbCap)WBX.wbCap();if(WBS.tilePv)tpvMake()};
   // the 3 x 3 view cannot be edited: the pill and Esc both go back to editing
