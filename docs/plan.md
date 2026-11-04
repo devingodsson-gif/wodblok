@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.102.1 (Nov 4 2026): hotfix: the app would not open after the first visit
+- Found: Cloudflare Pages had been building `npm run build` (the single file), so the asset split (2.98), the AI (2.100.1) and the service worker were not live. The owner set the build to `npm ci && npm run build:web`, output `dist/web`; the app then opened once and failed every load after ("nothing loads"). Cause: Cloudflare answers /index.html with a 308 to /, the service worker kept that redirected reply and answered page loads with it, and browsers refuse a redirected reply for a page (ERR_FAILED).
+- src/web/sw.js: the page is kept as ./ only; any reply that came by a redirect is kept as a plain copy; a kept page that came by a redirect is never served (the network is asked); a new worker that finds the broken one's redirected page takes over at once instead of waiting (the page is not reloaded). A browser stuck on the broken worker does not look for a new one until about a day has passed: unregistering the worker (not clearing site data) recovers it at once.
+- Tests: tests/web-app.spec.js (its server now redirects /index.html as Cloudflare does: the test fails on 2.102.0's worker with ERR_FAILED and passes on this one), the asset split spec 4, the AI spec (8 passed). By hand: the live web build (wodblok.pages.dev) loaded and then failed on reload (2.102.0); a local copy of 2.102.0 then this fix showed a stuck browser does not fetch the new worker by itself.
+
 ## 2.102.0 (Nov 4 2026): Copy prompt asks for the photo only
 - Owner: the copied prompt failed in ChatGPT ("The image-generation step hasn't returned an accessible image file, so I can't perform Step 2 against the exact source photo"): an AI chat cannot hand the picture its image tool made to its Python tool in the same reply. He agreed to make Copy prompt the photo only; the mask is made in WODBLOK (Find product, Find with AI in the web app) or brought in with Import mask. The image prompt itself is unchanged.
 - Tests: tests/mockups-2-90.spec.js (the Copy prompt test: no mask or Python step), help. Run: those (4 passed), check:platform, check:style.
