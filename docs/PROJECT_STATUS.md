@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.94.1 (Import mask for your own mockups)** on `feat/2.94.1-import-mask`, not merged. Set aside: making Find product take drop shadows as background and leave lenses and twine out (the owner chose Import mask instead).
+- **Nov 4: 2.95.0 (Copy prompt in the Mockup panel)** on `feat/2.95.0-mockup-prompt`, not merged.
+- **Nov 4: 2.94.1 LIVE (Import mask for your own mockups)**. Set aside: making Find product take drop shadows as background and leave lenses and twine out (the owner chose Import mask instead).
 - **Nov 4: 2.94.0 LIVE (the better Find product is done)**, version and docs only. Next from the review: selling (full-surface export, print-on-demand presets), then colour for printers.
 - **Nov 4: 2.93.2 LIVE (a better Find product, step 2: click to add or remove)**.
 - **Nov 4: 2.93.1 LIVE (a better Find product, step 1: the product's colours, Show mask)**.
