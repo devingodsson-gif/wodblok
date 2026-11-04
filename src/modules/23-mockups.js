@@ -41,7 +41,7 @@ const mkCur=()=>mkGet(mkUi().cur)||(MK_B[0]?mkGet(MK_B[0].id):null);
 // the panel's settings: the mockup in use, Fill, Scale (one value for Repeat and one for Once), Shading
 function mkUi(){let u=null;try{u=JSON.parse(kv.get(MK_UI)||'null')}catch(e){}u=u&&typeof u=='object'?u:{};
  const n=(v,lo,hi,d)=>{v=+v;return isFinite(v)&&u!=null?Math.max(lo,Math.min(hi,v)):d};
- return{cur:typeof u.cur=='string'?u.cur:'',rs:!!u.rs,fill:u.fill=='one'||u.fill=='rep'?u.fill:'',sr:u.sr==null?25:n(u.sr,5,200,25),so:u.so==null?100:n(u.so,10,200,100),sh:u.sh==null?100:n(u.sh,0,100,100),op:u.op==null?100:n(u.op,0,100,100)}}   // 2.97.0: op, the design's Opacity over the photo
+ return{cur:typeof u.cur=='string'?u.cur:'',rs:!!u.rs,fill:u.fill=='one'||u.fill=='rep'?u.fill:'',sr:u.sr==null?25:n(u.sr,5,200,25),so:u.so==null?100:n(u.so,10,200,100),sh:u.sh==null?100:n(u.sh,0,100,100),op:u.op==null?100:n(u.op,0,100,100),ox:u.ox==null?0:n(u.ox,-100,100,0),oy:u.oy==null?0:n(u.oy,-100,100,0),rt:u.rt==null?0:n(u.rt,-180,180,0)}}   // 2.97.0: op, the design's Opacity over the photo
 const mkUiSet=o=>{try{kv.set(MK_UI,JSON.stringify({...mkUi(),...o}))}catch(e){}};
 const mkFill=u=>u.fill||(tileOn()?'rep':'one');
 // ---- photos (IndexedDB; this session only where the browser has none)
@@ -159,11 +159,15 @@ function mkTri(x,F,s,d){const[[u0,v0],[u1,v1],[u2,v2]]=s,[[X0,Y0],[X1,Y1],[X2,Y2
  x.save();x.beginPath();x.moveTo(p[0][0],p[0][1]);x.lineTo(p[1][0],p[1][1]);x.lineTo(p[2][0],p[2][1]);x.closePath();x.clip();
  x.setTransform(a,b,c,e,X0-a*u0-c*v0,Y0-b*u0-e*v0);x.drawImage(F,0,0);x.restore()}
 // the design laid flat at fw x fh: Repeat on the repeat tile's lattice (grid, brick, half drop), one copy Scale% of the width; Once in the middle, Scale% of the area
-function mkFlat(D,fw,fh,fill,sc){const F=document.createElement('canvas');F.width=Math.max(1,Math.round(fw));F.height=Math.max(1,Math.round(fh));const x=F.getContext('2d'),ar=CH/CW;
- if(fill=='rep'){const tw=Math.max(2,fw*sc/100),th=tw*ar,k=tileOn()?tileRk():'grid',nx=Math.ceil(fw/tw)+2,ny=Math.ceil(fh/th)+2;
-  for(let j=-1;j<ny;j++)for(let i=-1;i<nx;i++){const X=i*tw+(k=='brick'&&j%2?tw/2:0),Y=j*th+(k=='half'&&i%2?th/2:0),fx=k=='mirror'&&i&1,fy=k=='mirror'&&j&1;   // 2.91.1: a mirror repeat flips odd columns and rows
+// 2.100.0 (owner Nov 4 2026: "two sliders ... one for horizontal across and one for vertical ... Also let's add one for rotate"): the design is moved by dx, dy
+// pixels and turned by rt degrees about the print area's middle, before it is laid on the product, so the move and turn follow its perspective, shading and mask;
+// a turned or moved repeat still covers the whole print area
+function mkFlat(D,fw,fh,fill,sc,o){const F=document.createElement('canvas');F.width=Math.max(1,Math.round(fw));F.height=Math.max(1,Math.round(fh));const x=F.getContext('2d'),ar=CH/CW;
+ const dx=o?o.dx:0,dy=o?o.dy:0,rt=o?o.rt:0;x.translate(fw/2+dx,fh/2+dy);if(rt)x.rotate(rt*Math.PI/180);
+ if(fill=='rep'){const tw=Math.max(2,fw*sc/100),th=tw*ar,k=tileOn()?tileRk():'grid',R=Math.hypot(fw,fh)/2+Math.hypot(dx,dy),i0=Math.floor((fw/2-R)/tw)-1,i1=Math.ceil((fw/2+R)/tw)+1,j0=Math.floor((fh/2-R)/th)-1,j1=Math.ceil((fh/2+R)/th)+1;
+  for(let j=j0;j<j1;j++)for(let i=i0;i<i1;i++){const X=i*tw-fw/2+(k=='brick'&&j%2?tw/2:0),Y=j*th-fh/2+(k=='half'&&i%2?th/2:0),fx=k=='mirror'&&i&1,fy=k=='mirror'&&j&1;   // 2.91.1: a mirror repeat flips odd columns and rows
    if(!fx&&!fy){x.drawImage(D,X,Y,tw+.5,th+.5);continue}x.save();x.translate(X+(fx?tw:0),Y+(fy?th:0));x.scale(fx?-1:1,fy?-1:1);x.drawImage(D,0,0,tw+.5,th+.5);x.restore()}}
- else{const k=Math.min(fw/CW,fh/CH)*sc/100,w=CW*k,h=CH*k;x.drawImage(D,(fw-w)/2,(fh-h)/2,w,h)}
+ else{const k=Math.min(fw/CW,fh/CH)*sc/100,w=CW*k,h=CH*k;x.drawImage(D,-w/2,-h/2,w,h)}
  return F}
 // the photo's light: its greyscale, made white at the print area's brightest (the 95th of a hundred), opaque, at W x H
 function mkLight(ph,W,H,P){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(ph,0,0,W,H);const im=x.getImageData(0,0,W,H),d=im.data,n=W*H,L=new Float32Array(n);
@@ -177,7 +181,7 @@ function mkDraw(out,ph,m,D,u,mask){const W=out.width,H=out.height,x=out.getConte
  const P=m.q.map((v,i)=>v*(i%2?H:W)),T0=mkHom(P),fill=mkFill(u),
   // 2.92.1: with a mask the design is laid a little past the print area (e of it on every side), so the mask's edge, and the folds' warp near it, always find design
   e=mask?.06:0,Q=e?[...T0(-e,-e),...T0(1+e,-e),...T0(1+e,1+e),...T0(-e,1+e)]:P,len=(a,b)=>Math.hypot(Q[b*2]-Q[a*2],Q[b*2+1]-Q[a*2+1]),fw=Math.max(4,Math.min(4096,(len(0,1)+len(3,2))/2)),fh=Math.max(4,Math.min(4096,(len(0,3)+len(1,2))/2));
- const F=mkFlat(D,fw,fh,fill,mkScale(m,u)/(1+2*e)),G=document.createElement('canvas');G.width=W;G.height=H;const g=G.getContext('2d'),T=mkHom(Q),N=MK_N;
+ const F=mkFlat(D,fw,fh,fill,mkScale(m,u)/(1+2*e),{dx:(u.ox||0)/100*fw/(1+2*e),dy:(u.oy||0)/100*fh/(1+2*e),rt:u.rt||0}),G=document.createElement('canvas');G.width=W;G.height=H;const g=G.getContext('2d'),T=mkHom(Q),N=MK_N;
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const u0=i/N,u1=(i+1)/N,v0=j/N,v1=(j+1)/N,S=(a,b)=>[a*F.width,b*F.height];
   mkTri(g,F,[S(u0,v0),S(u1,v0),S(u1,v1)],[T(u0,v0),T(u1,v0),T(u1,v1)]);mkTri(g,F,[S(u0,v0),S(u1,v1),S(u0,v1)],[T(u0,v0),T(u1,v1),T(u0,v1)])}
  if(m.warp>0)mkWarp(G,ph,m.warp);
@@ -239,7 +243,7 @@ function mkSync(){const u=mkUi(),fill=mkFill(u);$('mkfl').querySelectorAll('[dat
  {const tl=$('mktol'),tv=m&&m.am?m.tol:50;if(+tl.value!==tv&&document.activeElement!==tl){tl.value=tv;tl.dispatchEvent(new Event('input',{bubbles:true}))}}   /* a product's print area is its own */
  const sc=$('mksc'),v=fill=='rep'?u.sr:u.so;sc.dataset.def=fill=='rep'?'25':'100';sc.disabled=real&&u.rs;if(sc._n)sc._n.disabled=sc.disabled;if(+sc.value!==v){sc.value=v;sc.dispatchEvent(new Event('input',{bubbles:true}))}
  const sh=$('mksh');if(+sh.value!==u.sh){sh.value=u.sh;sh.dispatchEvent(new Event('input',{bubbles:true}))}
- {const op=$('mkop');if(+op.value!==u.op){op.value=u.op;op.dispatchEvent(new Event('input',{bubbles:true}))}}$('mkx').disabled=!m}
+ {const op=$('mkop');if(+op.value!==u.op){op.value=u.op;op.dispatchEvent(new Event('input',{bubbles:true}))}}[['mkox','ox'],['mkoy','oy'],['mkrt','rt']].forEach(([id,k])=>{const e=$(id);if(+e.value!==u[k]){e.value=u[k];e.dispatchEvent(new Event('input',{bubbles:true}))}});$('mkx').disabled=!m}
 let mkKey='';
 function mkPaint(force){const pane=$('mkpane');if(!pane||!MKT)return;const u=mkUi(),cur=(mkCur()||{}).id,k=mkLoad().t.map(x=>x.id+':'+x.n+':'+x.f).join('|')+'#'+cur;if(force||k!==mkKey){mkKey=k;MKT.show(pane,cur,mkPick)}mkSync();mkView()}
 function mkPick(id){if(!mkGet(id))return;mkUiSet({cur:id});mkPaint(true)}
@@ -257,7 +261,8 @@ function init23(){if(!$('mkpane'))return;MKT=ltMake(mkCfg());MKT.init();$('mkpan
  $('mkfl').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;mkUiSet({fill:b.dataset.f});mkSync();mkView()};
  $('mksc').addEventListener('input',()=>{if(WBS.uiLoad)return;const u=mkUi(),v=+$('mksc').value;if(mkFill(u)=='rep'){if(u.sr===v)return;mkUiSet({sr:v})}else{if(u.so===v)return;mkUiSet({so:v})}mkView()});
  $('mksh').addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$('mksh').value;if(mkUi().sh===v)return;mkUiSet({sh:v});mkView()});
- $('mkop').addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$('mkop').value;if(mkUi().op===v)return;mkUiSet({op:v});mkView()});   // 2.97.0
+ $('mkop').addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$('mkop').value;if(mkUi().op===v)return;mkUiSet({op:v});mkView()});
+ [['mkox','ox'],['mkoy','oy'],['mkrt','rt']].forEach(([id,k])=>$(id).addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$(id).value;if(mkUi()[k]===v)return;mkUiSet({[k]:v});mkView()}));   // 2.100.0   // 2.97.0
  $('mkcn').addEventListener('change',mkCorners);
  $('mkmi').onclick=()=>{const f=$('mkmf');f.value='';f.click()};$('mkmf').onchange=()=>{const f=$('mkmf').files&&$('mkmf').files[0];$('mkmf').value='';if(f)mkImportMask(f)};
  $('mkmv').addEventListener('change',()=>{mkSync();mkView()});

@@ -311,3 +311,35 @@ test('Opacity fades the design over the photo, and is kept', async ({ page }) =>
   expect(await page.evaluate(() => { const v = window.__wbTest.kv.get('wb2901_mockui'); return v && JSON.parse(v).op; })).toBe(50);
   expect(errors).toEqual([]);
 });
+
+// 2.100.0 (owner Nov 4 2026: "two sliders ... one for horizontal across and one for vertical across so I can fine tune and position where the image is. Also let's add
+// one for rotate"): Shift across and Shift down move the design over the print area (in print-area widths and heights), Rotate turns it; a moved and turned repeat
+// still covers the whole print area; the values are kept
+test('Shift across, Shift down and Rotate move and turn the design on the mockup; a turned repeat still covers the print area', async ({ page }) => {
+  test.setTimeout(150000);
+  const { errors } = await H.openApp(page, { seed: 4, background: true });
+  await H.addShape(page); await H.settle(page);
+  await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
+  await page.waitForSelector('section.pn[data-p="mock"]:not([hidden])'); await waitView(page, 0);
+  const k0 = await viewKey(page);
+  await page.setInputFiles('#mkpane .mkfile', { name: 'Room.png', mimeType: 'image/png', buffer: Buffer.from(await photo(page), 'base64') });
+  await expect(page.locator('#mkpane [data-mk^="m"]')).toHaveCount(1); await waitView(page, k0);
+  const set = async (id, v) => { const k = await viewKey(page), n = page.locator('#' + id).locator('xpath=..').locator('.num input'); await n.fill(String(v)); await n.press('Enter'); await waitView(page, k); };
+  // the print area (the white panel: x 150 to 450, y 100 to 300 of 600 x 400): where the design differs from the panel, and how much of it is still bare panel
+  const look = () => page.evaluate(() => { const c = document.getElementById('mkc'), W = c.width, H = c.height, d = c.getContext('2d').getImageData(0, 0, W, H).data; let sx = 0, sy = 0, n = 0, bare = 0, all = 0;
+    for (let y = Math.round(H * .27); y < H * .73; y += 2) for (let x = Math.round(W * .27); x < W * .73; x += 2) { const i = (y * W + x) * 4, wht = d[i] > 250 && d[i + 1] > 250 && d[i + 2] > 250; all++; if (wht) bare++; else { sx += x / W; sy += y / H; n++; } }
+    return { cx: n ? sx / n : null, cy: n ? sy / n : null, bare: bare / all }; });
+  // Once, small: the design sits in the middle of the print area
+  await page.locator('#mkfl [data-f="one"]').click(); await page.waitForTimeout(300); await set('mksh', 0); await set('mksc', 40);
+  const a = await look(); expect(Math.abs(a.cx - .5)).toBeLessThan(.03); expect(Math.abs(a.cy - .5)).toBeLessThan(.03);
+  expect(a.bare).toBeGreaterThan(.2);   // (so the bare count below can see a gap)
+  await set('mkox', 30); const b = await look(); expect(Math.abs(b.cx - a.cx - .15)).toBeLessThan(.03); expect(Math.abs(b.cy - a.cy)).toBeLessThan(.02);   // 30% of a print area half the view wide
+  await set('mkoy', -30); const c = await look(); expect(Math.abs(c.cy - a.cy + .15)).toBeLessThan(.03);
+  const k1 = await viewKey(page); await set('mkrt', 45); expect(await viewKey(page)).not.toBe(k1);
+  // Repeat, moved and turned: no bare panel left anywhere in the print area
+  await page.locator('#mkfl [data-f="rep"]').click(); await page.waitForTimeout(300); await set('mksc', 30);
+  await set('mkox', 37); await set('mkoy', -23); await set('mkrt', 33);
+  expect((await look()).bare).toBeLessThan(.01);
+  expect(await page.evaluate(() => { const v = JSON.parse(window.__wbTest.kv.get('wb2901_mockui')); return [v.ox, v.oy, v.rt]; })).toEqual([37, -23, 33]);
+  expect(errors).toEqual([]);
+});
