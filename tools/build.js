@@ -21,7 +21,7 @@ const strip = (name, t) => {
 const parts = [];
 // 2.98.1 (docs/asset-split-plan.md): where the app's own files go. The single file keeps them inside it; the hosted app (--web) writes them next to the page, in
 // assets/ (made afresh each build), and fetches each only when it is needed (src/platform/assets.js).
-const { assetWriter } = require('./assets');
+const { assetWriter, dataFile } = require('./assets');
 const ASSETS = WEB ? (() => { const d = path.dirname(out); fs.rmSync(path.join(d, 'assets'), { recursive: true, force: true }); return assetWriter('split', d); })() : assetWriter('inline');
 // Vendored libraries keep their own scope: their short top-level names must not meet the app's. Each file becomes
 // `const {exported names} = (() => { ...library...; return {names}; })();`
@@ -34,7 +34,7 @@ for (const sub of ['data', 'platform', 'format', 'commands']) {                 
   const d = path.join(ROOT, 'src', sub);
   for (const f of fs.readdirSync(d).filter(f => f.endsWith('.js')).sort()) {
     const t = fs.readFileSync(path.join(d, f), 'utf8');
-    parts.push(strip(sub + '/' + f, sub + '/' + f === 'data/templates.js' ? require('./templates/folders').withFolders(t) : sub + '/' + f === 'data/textures.js' ? require('./textures/folders').withTextures(t, ASSETS) : sub + '/' + f === 'data/mockups.js' ? require('./mockups/folders').withMockups(t, ASSETS) : t));   // the templates/ and textures/ folders join the built-in lists
+    parts.push(strip(sub + '/' + f, sub + '/' + f === 'data/templates.js' ? dataFile(ASSETS, 'templates', 'TPL_BUILTIN', require('./templates/folders').withFolders(t)) : sub + '/' + f === 'data/shapes.js' ? dataFile(ASSETS, 'shapes', 'SHAPES', t) : sub + '/' + f === 'data/textures.js' ? require('./textures/folders').withTextures(t, ASSETS) : sub + '/' + f === 'data/mockups.js' ? require('./mockups/folders').withMockups(t, ASSETS) : t));   // the templates/ and textures/ folders join the built-in lists
   }
 }
 parts.push(...manifest.map(f => strip(f, fs.readFileSync(path.join(dir, f), 'utf8'))));

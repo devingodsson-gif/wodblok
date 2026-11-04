@@ -89,9 +89,14 @@ import {init58} from './modules/58-account.js';
 import {init59} from './modules/59-align.js';
 import {acAccount} from './platform/account.js';
 import {init55} from './modules/55-settings.js';
-import {kv} from './platform/index.js';
+import {assetPreload,kv} from './platform/index.js';
+import {SHAPES} from './data/shapes.js';
+import {TPL_BUILTIN} from './data/templates.js';
 import {cmdConflicts,cmdFormatShortcut,cmdGet,cmdIsEnabled,cmdList,cmdRun} from './commands/registry.js';
 
+// 2.98.4 (docs/asset-split-plan.md): data every part of the app reads from its first moment (the built-in shapes and templates) is inside the single file, and
+// a file of the app's own in the hosted app. When it is inside, start-up runs at once, as it always did; else it runs once the files are here.
+function wbStart(){
 icFill();     // the page's icons first (2.14.0), so nothing below ever sees an empty one
 icNamesWatch();   // every icon-only button: a hover name and the same accessible name (2.29.0)
 init01();
@@ -180,3 +185,6 @@ init85();
 if(!WBS.cp.id&&WBS.cp.saved===''){WBS.cp.saved=coreStr()}
 if(WBX.wbEnhance)WBX.wbEnhance();   // value boxes on the slider rows that panels wrote themselves
 window.__wbTest = { stampIdOf: i => { const it = STP.items[i]; return it ? it[0] : null; }, histLabels: () => WBX.wbHistLabels(), markClean: () => { WBS.cp.saved = coreStr(); WBX.wbPaintPst && WBX.wbPaintPst(); }, apply: s => WBX.wbApply(JSON.parse(s)), resetHistory: () => WBX.wbResetHist && WBX.wbResetHist(), stampAt, stampToCanvas, unlockedStamp: stUnlocked, state: () => coreStr(), kv, account: acAccount, recoveryTick: rcTick, printsBusy: () => (!BK.off && !!(BK.busy || BK.q.size)) || !!(WBX.wbTexBusy && WBX.wbTexBusy()), commands: { list: cmdList, get: cmdGet, run: cmdRun, isEnabled: cmdIsEnabled, formatShortcut: cmdFormatShortcut, conflicts: cmdConflicts } };
+}
+function wbStartFailed(){const v=document.getElementById('splver');if(v)v.textContent='Could not load Wodblok. Check the connection, then reload.'}
+{const wait=assetPreload([SHAPES,TPL_BUILTIN]);if(wait)wait.then(wbStart,wbStartFailed);else wbStart()}

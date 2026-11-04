@@ -5,6 +5,9 @@
 //   assetUrl(ref)      an address to give an <img>, an Image, a CSS url() or a FontFace (the browser loads it when it needs it); '' for anything else
 //   assetBytes(ref)    a promise of the file's bytes (Uint8Array), for code that reads a file (an export, opentype.js, a zip)
 //   assetText(ref)     a promise of the file as text (JSON data)
+//   assetPreload(list) data the app needs from its first moment (2.98.4: shapes, templates), each the data itself or its file's reference: null when there is
+//                      nothing to fetch (the single file: start-up stays synchronous), else a promise that resolves once every file is here and parsed
+//   assetData(v)       that data, read synchronously after the preload (v itself when it was never a reference)
 // Rules: no work on import; callers keep their own try/catch (a missing file rejects, with the reference in the message).
 const AS_OWN = /^assets\/[a-z0-9-]+\/[a-z0-9-]+\.[0-9a-f]{10}\.[a-z0-9]+$/, AS_DATA = /^data:[\w.+\/-]+;base64,/;
 const isAsset = ref => typeof ref === 'string' && (AS_DATA.test(ref) || AS_OWN.test(ref));
@@ -21,4 +24,16 @@ function assetBytes(ref) {
   return asGot.get(ref);
 }
 const assetText = async ref => new TextDecoder().decode(await assetBytes(ref));
-export {assetBytes,assetText,assetUrl,isAsset};
+const asData = new Map();   // reference -> its parsed JSON, once preloaded
+const asIsRef = v => typeof v === 'string' && AS_OWN.test(v);
+function assetPreload(list) {
+  const refs = list.filter(v => asIsRef(v) && !asData.has(v));
+  if (!refs.length) return null;
+  return Promise.all(refs.map(r => assetText(r).then(t => { asData.set(r, JSON.parse(t)); })));
+}
+function assetData(v) {
+  if (!asIsRef(v)) return v;
+  if (!asData.has(v)) throw new Error('Not loaded yet: ' + v);
+  return asData.get(v);
+}
+export {assetBytes,assetData,assetPreload,assetText,assetUrl,isAsset};

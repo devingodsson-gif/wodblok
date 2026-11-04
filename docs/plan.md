@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.98.4 (Nov 4 2026): asset split, step 4: shapes and templates (docs/asset-split-plan.md)
+- Owner chose "cached file at start". tools/assets.js `dataFile` turns `const SHAPES=[...]` and `const TPL_BUILTIN=[...]` into references for `npm run build:web` (assets/data/shapes.<hash>.json, templates.<hash>.json); src/platform/assets.js `assetPreload` and `assetData`; src/main.js runs start-up as `wbStart`, at once when the data is inside (the single file, unchanged) and after the preload otherwise, with a message on the loading screen if a file cannot be fetched. 05-motif-data.js and 54-templates.js read their data through assetData.
+- Hosted page 2,165,572 bytes (from 7,004,384; 18,463,080 before the plan).
+- Tests: tests/asset-split-2-98-4.spec.js (new: both files, the same templates and shape sets as the single file, a shape adds; a failed fetch shows the message). Run: the four asset specs, templates, launch, dock-default, small-updates-2-79-1, randomize-mode (28 passed), check:platform, check:style, the start-up error check. Not run: perf (no drawing change), the full suite.
+
 ## 2.98.3 (Nov 4 2026): asset split, step 3: fonts (docs/asset-split-plan.md)
 - tools/fonts.js goes through tools/assets.js: the lettering fonts are 174 files in assets/fonts/ for `npm run build:web`; the interface font and the wordmark font (IM Fell English, used by the splash and the watermark) stay inside the page. The single file's font CSS is unchanged, byte for byte.
 - The Text tool (60-text-engine.js): `teRef` finds a font's file from its @font-face rule; `teLoad`, which every layout already waits for, also fetches a file font's bytes (`teFetch`, through assetBytes) for opentype.js; a font whose bytes have not arrived is not cached as unreadable. Editing a text whose font changed also readies its old font (22-text-tool.js). `isAsset` exported from src/platform.
