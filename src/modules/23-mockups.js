@@ -81,19 +81,29 @@ function mkDist(d,W,H){const n=W*H,Y=new Float32Array(n),Cb=new Float32Array(n),
  for(let yy=0;yy<H;yy++)for(let xx=0;xx<W;xx++){if(yy>=bw&&yy<H-bw&&xx>=bw&&xx<W-bw)continue;const i=yy*W+xx,a=Math.floor((Math.atan2(yy-H/2,xx-W/2)+Math.PI)/(2*Math.PI)*32)%32;seg[a][0].push(Y[i]);seg[a][1].push(Cb[i]);seg[a][2].push(Cr[i]);seg[a][3].push(E[i])}
  const med=v=>{v.sort((p,q)=>p-q);return v[v.length>>1]},bg=seg.filter(s=>s[0].length).map(s=>[med(s[0]),med(s[1]),med(s[2]),med(s[3])]);
  const B=[];bg.forEach(c=>{if(!B.some(o=>.35*(o[0]-c[0])**2+(o[1]-c[1])**2+(o[2]-c[2])**2+9*(o[3]-c[3])**2<1))B.push(c)});   // near-equal border pieces once
- const out=new Float32Array(n);for(let i=0;i<n;i++){let m=1e9;const y=Y[i],cb=Cb[i],cr=Cr[i],e=E[i];for(let j=0;j<B.length;j++){const c=B[j],dy=y-c[0],db=cb-c[1],dr=cr-c[2],de=e-c[3],v=.35*dy*dy+db*db+dr*dr+9*de*de;if(v<m)m=v}out[i]=m}return out}
+ const out=new Float32Array(n);for(let i=0;i<n;i++){let m=1e9;const y=Y[i],cb=Cb[i],cr=Cr[i],e=E[i];for(let j=0;j<B.length;j++){const c=B[j],dy=y-c[0],db=cb-c[1],dr=cr-c[2],de=e-c[3],v=.35*dy*dy+db*db+dr*dr+9*de*de;if(v<m)m=v}out[i]=m}return{v:out,Cb,Cr}}
+const MK_OFF=10;   // how far (in Cb, Cr) a colour may be from the product's own colours and still be product
 const mkFD=new WeakMap();   // per photo: its size at work and each pixel's distance to the background (the slow part, made once)
 function mkFind(img,w,h,tol){const k=Math.min(1,1000/Math.max(w,h)),W=Math.max(8,Math.round(w*k)),H=Math.max(8,Math.round(h*k)),c=document.createElement('canvas');c.width=W;c.height=H;
- const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,W,H);const n=W*H;let D2=mkFD.get(img);if(!D2||D2.n!==n){D2={n,v:mkDist(x.getImageData(0,0,W,H).data,W,H)};mkFD.set(img,D2)}const dist=D2.v;
+ const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,W,H);const n=W*H;let D2=mkFD.get(img);if(!D2||D2.n!==n){D2={n,...mkDist(x.getImageData(0,0,W,H).data,W,H)};mkFD.set(img,D2)}const dist=D2.v,Cb=D2.Cb,Cr=D2.Cr;
  const thr=2+Math.max(0,Math.min(100,tol))*.16,t2=thr*thr,like=new Uint8Array(n);for(let i=0;i<n;i++)if(dist[i]<=t2)like[i]=1;
  // the background: like the border and joined to it
  const back=new Uint8Array(n),Q=new Int32Array(n);let qh=0,qt=0;const push=i=>{if(like[i]&&!back[i]){back[i]=1;Q[qt++]=i}};
  for(let xx=0;xx<W;xx++){push(xx);push((H-1)*W+xx)}for(let yy=0;yy<H;yy++){push(yy*W);push(yy*W+W-1)}
  while(qh<qt){const i=Q[qh++],xx=i%W;if(xx>0)push(i-1);if(xx<W-1)push(i+1);if(i>=W)push(i-W);if(i<n-W)push(i+W)}
- // the product: the largest part of the rest
- const lab=new Int32Array(n);let best=0,bestN=0,id=0;for(let s0=0;s0<n;s0++){if(back[s0]||lab[s0])continue;id++;let cnt=0;qh=qt=0;lab[s0]=id;Q[qt++]=s0;
-  while(qh<qt){const i=Q[qh++],xx=i%W;cnt++;const go=j=>{if(!back[j]&&!lab[j]){lab[j]=id;Q[qt++]=j}};if(xx>0)go(i-1);if(xx<W-1)go(i+1);if(i>=W)go(i-W);if(i<n-W)go(i+W)}if(cnt>bestN){bestN=cnt;best=id}}
+ // 2.93.1 (owner Nov 4 2026: a stool touching a curtain took the design): the product's own colours, learnt from the middle of the photo (where a product photo puts it):
+ // six colours (Cb, Cr) of what is not background there. Whatever is not background but of another colour (further than MK_OFF from every one of them: wood, leaves,
+ // a pot, a rod) is not product; a shadow or a fold on the product keeps its colour, so it stays in.
+ const keep=new Uint8Array(n),inMid=i=>{const xx=i%W,yy=(i/W)|0;return xx>=W/4&&xx<3*W/4&&yy>=H/4&&yy<3*H/4},sm=[];for(let i=0,st=Math.max(1,Math.floor(n/4/6000));i<n;i+=st)if(!back[i]&&inMid(i))sm.push([Cb[i],Cr[i]]);
+ if(sm.length>=50){let C=[0,1,2,3,4,5].map(j=>sm[Math.floor((j+.5)*sm.length/6)].slice());for(let it=0;it<10;it++){const acc=C.map(()=>[0,0,0]);for(const p of sm){let bj=0,bd=1e9;C.forEach((c,j)=>{const d=(p[0]-c[0])**2+(p[1]-c[1])**2;if(d<bd){bd=d;bj=j}});acc[bj][0]+=p[0];acc[bj][1]+=p[1];acc[bj][2]++}C=C.map((c,j)=>acc[j][2]?[acc[j][0]/acc[j][2],acc[j][1]/acc[j][2]]:c)}
+  const o2=MK_OFF*MK_OFF;for(let i=0;i<n;i++){if(back[i])continue;let m=1e9;for(const c of C){const d=(Cb[i]-c[0])**2+(Cr[i]-c[1])**2;if(d<m)m=d}if(m<=o2)keep[i]=1}}
+ else for(let i=0;i<n;i++)keep[i]=back[i]?0:1;
+ // the product: the part of what is kept that covers most of the middle (the largest when none does), its holes filled
+ const lab=new Int32Array(n);let best=0,bestM=-1,bestN=0,id=0;for(let s0=0;s0<n;s0++){if(!keep[s0]||lab[s0])continue;id++;let cnt=0,mid=0;qh=qt=0;lab[s0]=id;Q[qt++]=s0;
+  while(qh<qt){const i=Q[qh++],xx=i%W;cnt++;if(inMid(i))mid++;const go=j=>{if(keep[j]&&!lab[j]){lab[j]=id;Q[qt++]=j}};if(xx>0)go(i-1);if(xx<W-1)go(i+1);if(i>=W)go(i-W);if(i<n-W)go(i+W)}if(mid>bestM||(mid==bestM&&cnt>bestN)){bestM=mid;bestN=cnt;best=id}}
  if(!best||bestN<n*.01||bestN>n*.97)return null;
+ {const out=new Uint8Array(n);qh=qt=0;const go=j=>{if(lab[j]!==best&&!out[j]){out[j]=1;Q[qt++]=j}};for(let xx=0;xx<W;xx++){go(xx);go((H-1)*W+xx)}for(let yy=0;yy<H;yy++){go(yy*W);go(yy*W+W-1)}
+  while(qh<qt){const i=Q[qh++],xx=i%W;if(xx>0)go(i-1);if(xx<W-1)go(i+1);if(i>=W)go(i-W);if(i<n-W)go(i+W)}for(let i=0;i<n;i++)if(!out[i]&&lab[i]!==best){lab[i]=best;bestN++}}
  const im=x.createImageData(W,H),o=im.data;let x0=W,y0=H,x1=0,y1=0;for(let i=0;i<n;i++){const p=i*4;o[p]=o[p+1]=o[p+2]=255;if(lab[i]===best){o[p+3]=255;const xx=i%W,yy=(i/W)|0;if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy}}
  let edge=0;for(let i=0;i<n;i++)if(lab[i]===best){const xx=i%W;if(xx==0||xx==W-1||i<W||i>=n-W||lab[i-1]!==best||lab[i+1]!==best||lab[i-W]!==best||lab[i+W]!==best)edge++}
  x.putImageData(im,0,0);const q=[x0/W,y0/H,(x1+1)/W,y0/H,(x1+1)/W,(y1+1)/H,x0/W,(y1+1)/H].map(v=>+v.toFixed(4));return{c,q,ragged:edge/Math.sqrt(bestN)}}
@@ -175,7 +185,11 @@ async function mkView(){const c=$('mkc'),wrap=$('mkvw');if(!c||!mkOpen())return;
  const tok=++mkTok,ph=await mkPhoto(m.id),mask=await mkMask(m);if(tok!==mkTok)return;if(!ph){wrap.hidden=true;return}
  const cw=Math.max(80,wrap.clientWidth||260),dpr=window.devicePixelRatio||1,W=Math.round(cw*dpr),H=Math.round(W*m.h/m.w);
  const dk=[CW,CH,Math.round(W*1.2/256)].join();if(!mkDes||mkDesK!==dk){mkDes=await mkDesign(Math.min(2048,Math.max(512,W*1.2)));mkDesK=dk;if(tok!==mkTok)return}
- if(c.width!==W||c.height!==H){c.width=W;c.height=H}c.style.aspectRatio=m.w+' / '+m.h;mkDraw(c,ph,m,mkDes,u,mask);mkCorners()}
+ if(c.width!==W||c.height!==H){c.width=W;c.height=H}c.style.aspectRatio=m.w+' / '+m.h;mkDraw(c,ph,m,mkDes,u,mask);
+ // 2.93.1: Show mask tints what is not product (the view only; Export mockup never shows it)
+ if(mask&&!m.b&&m.am&&$('mkmv').checked){const t=document.createElement('canvas');t.width=W;t.height=H;const tx=t.getContext('2d');tx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()||'#b98a4b';tx.globalAlpha=.55;tx.fillRect(0,0,W,H);
+  tx.globalAlpha=1;tx.globalCompositeOperation='destination-out';tx.drawImage(mask,0,0,W,H);c.getContext('2d').drawImage(t,0,0)}
+ mkCorners()}
 // the four squares and the outline of the print area, in the view's own units (0..1000 across)
 function mkCorners(){const ov=$('mkov');if(!ov)return;const m=mkCur(),on=!!(m&&!m.b&&$('mkcn').checked);ov.toggleAttribute('hidden',!on);if(!on){ov.innerHTML='';return}
  const H=1000*m.h/m.w;ov.setAttribute('viewBox',`0 0 1000 ${H.toFixed(2)}`);const P=m.q.map((v,i)=>v*(i%2?H:1000)),s=14;
@@ -186,7 +200,7 @@ const MK_UPC={mm:.1,cm:1,in:2.54,px:.1},mkUnit=()=>{const u=unGet();return u=='p
 function mkOwnSet(o){const m=mkCur();if(!m||m.b)return;const d=mkLoad(),t=d.t.find(z=>z.id===m.id);if(!t)return;Object.entries(o).forEach(([k,v])=>{if(v)t[k]=v;else delete t[k]});mkStore(d);mkSync();mkView()}
 // the controls follow the mockup in use and the settings
 function mkSync(){const u=mkUi(),fill=mkFill(u);$('mkfl').querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==fill));
- const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;$('mkamr').hidden=!m||!!m.b;$('mkam').checked=!!(m&&m.am);$('mktolr').hidden=!m||!!m.b||!m.am;
+ const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;$('mkamr').hidden=!m||!!m.b;$('mkam').checked=!!(m&&m.am);$('mktolr').hidden=!m||!!m.b||!m.am;$('mkmvr').hidden=!m||!!m.b||!m.am;
  {const own=!!(m&&!m.b);$('mkfor').hidden=!own;$('mkcmr').hidden=!own;if(own){const fo=$('mkfo'),fv=Math.round((m.warp||0)*100);if(+fo.value!==fv&&document.activeElement!==fo){fo.value=fv;fo.dispatchEvent(new Event('input',{bubbles:true}))}
   const u=mkUnit(),cf=$('mkcm');$('mkcmu').textContent=u;if(document.activeElement!==cf)cf.value=m.cm?String(+(m.cm/MK_UPC[u]).toFixed(u=='in'?2:u=='cm'?1:0)):''}}
  {const tl=$('mktol'),tv=m&&m.am?m.tol:50;if(+tl.value!==tv&&document.activeElement!==tl){tl.value=tv;tl.dispatchEvent(new Event('input',{bubbles:true}))}}   /* a product's print area is its own */
@@ -208,6 +222,7 @@ function init23(){if(!$('mkpane'))return;MKT=ltMake(mkCfg());MKT.init();$('mkpan
  $('mksc').addEventListener('input',()=>{if(WBS.uiLoad)return;const u=mkUi(),v=+$('mksc').value;if(mkFill(u)=='rep'){if(u.sr===v)return;mkUiSet({sr:v})}else{if(u.so===v)return;mkUiSet({so:v})}mkView()});
  $('mksh').addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$('mksh').value;if(mkUi().sh===v)return;mkUiSet({sh:v});mkView()});
  $('mkcn').addEventListener('change',mkCorners);
+ $('mkmv').addEventListener('change',()=>mkView());
  $('mkfo').addEventListener('input',()=>{if(WBS.uiLoad)return;const m=mkCur(),v=+$('mkfo').value/100;if(!m||m.b||(m.warp||0)===v)return;mkOwnSet({warp:v})});
  $('mkcm').addEventListener('change',()=>{const t=String($('mkcm').value).trim(),v=+t;if(t===''){mkOwnSet({cm:0});return}if(!(v>0)){mkSync();return}mkOwnSet({cm:+Math.min(10000,v*MK_UPC[mkUnit()]).toFixed(2)})});
  // Find product and Tolerance (2.92.2): the mask is made again a moment after the slider stops
