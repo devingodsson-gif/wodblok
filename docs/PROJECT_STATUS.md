@@ -5,7 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.101.0 (the AI selection plan is done)** on `fix/2.101.0-close-ai-select`, not merged. Next (owner): AI in the Image panel. Open: cross-origin isolation for faster AI (Suggestions).
+- **Nov 4: 2.101.0 LIVE (the AI selection plan is done)**. AI in the Image panel is shelved (owner, Nov 4 2026: "shelve the ai image panel for now"). Open: cross-origin isolation for faster AI (Suggestions).
 - **Nov 4: 2.100.1 LIVE (AI selection for mockup masks: Find with Colour | AI; docs/ai-select-plan.md)**. The model and runtime (ai/, about 100 MB, Apache 2.0 and MIT) are in the repo.
 - **Nov 4: 2.100.0 LIVE (Shift across, Shift down and Rotate in the Mockup panel)**.
 - **Nov 4: 2.99.0 LIVE (the asset split plan is done; text-size test fixed)**. Next: phase 2, AI Select subject (open question for the owner: which model, after a licence and size check).
