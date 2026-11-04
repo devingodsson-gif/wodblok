@@ -72,7 +72,9 @@ if (WEB) {
   // the rest of the web app, next to index.html. The service worker's cache name changes with every build, so a new build is a new version.
   const wd = path.dirname(out), sd = path.join(ROOT, 'src', 'web');
   for (const f of fs.readdirSync(sd)) {
-    if (f === 'sw.js') fs.writeFileSync(path.join(wd, f), fs.readFileSync(path.join(sd, f), 'utf8').replace('@@CACHE@@', 'wodblok-' + VER + '-' + BUILT));
+    // 2.98.5: the service worker also gets this build's asset files: all of them (it deletes any other it kept) and the data start-up waits for (it stores those as it installs)
+    if (f === 'sw.js') fs.writeFileSync(path.join(wd, f), fs.readFileSync(path.join(sd, f), 'utf8').replace('@@CACHE@@', 'wodblok-' + VER + '-' + BUILT)
+      .replace("'@@ASSETS_ALL@@'", () => JSON.stringify(ASSETS.written.map(w => w.file))).replace("'@@ASSETS_START@@'", () => JSON.stringify(ASSETS.written.filter(w => w.kind === 'data').map(w => w.file))));
     else fs.copyFileSync(path.join(sd, f), path.join(wd, f));
   }
   console.log('web app files in', path.relative(ROOT, wd), '+', ASSETS.written.length, 'asset files,', ASSETS.written.reduce((s, w) => s + w.bytes, 0), 'bytes');
