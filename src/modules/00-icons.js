@@ -79,6 +79,13 @@ layers:'<path d="M12 4l8.5 4.5L12 13 3.5 8.5z"/><path d="M3.5 12.2L12 16.7l8.5-4
 grid:'<rect x="4" y="4" width="16" height="16" '+R+'/><path d="M4 9.33h16M4 14.67h16M9.33 4v16M14.67 4v16"/>',
 history:'<path d="M4.5 12a7.5 7.5 0 102.2-5.3"/><path d="M4.5 4.5v4h4"/><path d="M12 8v4l2.8 1.8"/>',
 dice:'<rect x="4" y="4" width="16" height="16" rx="2.5"/><circle cx="8.6" cy="8.6" r="1.1"/><circle cx="15.4" cy="8.6" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="8.6" cy="15.4" r="1.1"/><circle cx="15.4" cy="15.4" r="1.1"/>',
+// 2.98.0: the six faces of a die, for the Randomize button's roll (20-before-after-and-randomizer.js)
+die1:'<rect x="4" y="4" width="16" height="16" rx="2.5"/><circle cx="12" cy="12" r="1.1"/>',
+die2:'<rect x="4" y="4" width="16" height="16" rx="2.5"/><circle cx="8.6" cy="8.6" r="1.1"/><circle cx="15.4" cy="15.4" r="1.1"/>',
+die3:'<rect x="4" y="4" width="16" height="16" rx="2.5"/><circle cx="8.6" cy="8.6" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="15.4" cy="15.4" r="1.1"/>',
+die4:'<rect x="4" y="4" width="16" height="16" rx="2.5"/><circle cx="8.6" cy="8.6" r="1.1"/><circle cx="15.4" cy="8.6" r="1.1"/><circle cx="8.6" cy="15.4" r="1.1"/><circle cx="15.4" cy="15.4" r="1.1"/>',
+die5:'<rect x="4" y="4" width="16" height="16" rx="2.5"/><circle cx="8.6" cy="8.6" r="1.1"/><circle cx="15.4" cy="8.6" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="8.6" cy="15.4" r="1.1"/><circle cx="15.4" cy="15.4" r="1.1"/>',
+die6:'<rect x="4" y="4" width="16" height="16" rx="2.5"/><circle cx="8.6" cy="8.6" r="1.1"/><circle cx="15.4" cy="8.6" r="1.1"/><circle cx="8.6" cy="12" r="1.1"/><circle cx="15.4" cy="12" r="1.1"/><circle cx="8.6" cy="15.4" r="1.1"/><circle cx="15.4" cy="15.4" r="1.1"/>',
 books:'<rect x="4" y="5" width="4.5" height="14.5" rx="1"/><rect x="10" y="5" width="4.5" height="14.5" rx="1"/><path d="M16.2 6.3l2.9-.8 2.4 13.3-2.9.8z"/>',
 pattern:'<rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/>',
 stamp:'<circle cx="12" cy="6.5" r="2.5"/><path d="M10.6 9l-.6 3.5h4L13.4 9"/><path d="M5 12.5h14a1 1 0 011 1v3H4v-3a1 1 0 011-1z"/><path d="M5.5 19.5h13"/>',
