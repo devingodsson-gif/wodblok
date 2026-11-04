@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.101.0','Nov 4 2026',['AI selection is in: in the web app, Find with AI in the Mockup panel finds your product for you.']],
  ['2.100.1','Nov 4 2026',['Find with AI in the Mockup panel (the web app): the AI finds the product in your own photo, and a click takes a part out or adds it.']],
  ['2.100.0','Nov 4 2026',['Shift across, Shift down and Rotate in the Mockup panel: move and turn the design on the product.']],
  ['2.99.0','Nov 4 2026',['The web app is about a tenth of the download it was: pictures, fonts and textures load when they are first used.']],

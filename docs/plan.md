@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.101.0 (Nov 4 2026): the AI selection plan is done (docs/ai-select-plan.md)
+- Live: 2.100.1 (Find with: Colour | AI for mockup masks, in the hosted app). Next, at the owner's word: the same AI tools in the Image panel.
+- Version and docs only (and a Help line); no app code changed. Tests: help.
+
 ## 2.100.1 (Nov 4 2026): AI selection for mockup masks (docs/ai-select-plan.md step 1)
 - Owner: "let's add it right now just for the mockup masks, but later link it into image panel"; he chose "Find with: Colour | AI" and keeping the model in the repo. In the hosted app, own mockups have Find with: Colour | AI under Find product; AI finds the product with SAM 2.1 Hiera Tiny (fp16), and with Show mask on a click adds or takes out a part, read by the AI (rules in the plan). The first use fetches the model (74 MB, with progress in the status bar); the photo is read once a session. The single file has no AI.
 - New: ai/ (the model, Transformers.js 4.3.2, the ONNX Runtime engine, their licences), tools/ai/folders.js, src/data/ai.js, src/platform/ai.js; tools/assets.js writes a file over 24 MiB in pieces and src/platform/assets.js joins them; Settings and Help > About list the three licences. Rule: src/platform/ai.js loads only from the app's own files (CLAUDE.md, the guide).
