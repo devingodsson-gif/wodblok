@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.98.1 (Nov 4 2026): asset split, step 1: the asset system, mockups first (docs/asset-split-plan.md)
+- Owner: "suggest how to split it up" (for AI selection and pixel-perfect masks later), then "let's start on phase 1 … build it modular, easy and clean to expand". tools/assets.js decides where each built-in file goes (inside the page for `npm run build`, `assets/<kind>/<name>.<hash>.<ext>` for `npm run build:web`); src/platform/assets.js is the only reader (`assetUrl`, `assetBytes`, `assetText`), fetching only the app's own files. The six mockup photos and masks are the first content moved; their thumbnails load lazily, so nothing is fetched at start. `/assets/*` cached for ever; the service worker keeps fetched files offline (`wodblok-assets-1`). Rule change: a second exception to "no runtime network" (CLAUDE.md, the guide). No file format change.
+- Sizes: single file unchanged (18,463,080 bytes); hosted page 17,833,934 bytes plus 12 asset files (472,320 bytes).
+- Tests: tests/asset-split-2-98-1.spec.js (new: builds the web app into a temporary folder and serves it; files in assets/, none fetched at start, photo and mask fetched by the Mockup tab, thumbnails and view drawn). Run: it and tests/mockups-2-90.spec.js (12 passed), check:platform, check:style, the start-up error check. Not run: perf (no drawing change), the full suite.
+
 ## 2.98.0 (Nov 4 2026): the Randomize dice rolls
 - Owner: "when the randomize dice icon spins it changes the icon to a dice with 1-6 sides like it's actually rolling". Six die faces in 00-icons.js (`die1` to `die6`, the dice's own outline and pips). After a roll, while the button's dice spins (.45 s, `rspin`), `rzTumble` (20-before-after-and-randomizer.js) changes its face every 60 ms, seven times, never to the face showing, and leaves it on the last (a face from one to six, kept until the next roll). With reduced motion only the last face shows.
 - Tests: tests/rolling-dice-2-98.spec.js (new). Run: it and the Randomize, top bar and icon specs (27 passed), check:style, check:platform.

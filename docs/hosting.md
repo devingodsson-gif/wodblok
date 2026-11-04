@@ -25,4 +25,7 @@ GitHub Pages is not an option: Pages sites are public (private ones need GitHub 
   save-to-file picker, so Download saves a copy and Open is the file picker.
 - **Storage:** the app asks the browser to keep its data and shows "Stored N MB" in the status bar. Safari clears a site's data after 7 days without
   a visit unless the app is added to the Dock or Home Screen, so treat browser storage as a cache and files as the truth.
+- **The app's own files (2.98.1, docs/asset-split-plan.md):** `npm run build:web` puts built-in content (mockup photos first; textures, fonts, shapes and templates
+  next) in `assets/` beside index.html, each name carrying its content's hash. The app fetches a file only when it is used; `/assets/*` is cached for ever
+  (_headers), and the service worker keeps every file it has fetched in its own cache for offline use. The single file (`npm run build`) keeps them inside.
 - **Opening files:** the installed app in Chrome and Edge on a computer can be chosen as the opener for `.wodblok` files.
