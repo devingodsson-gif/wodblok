@@ -15,7 +15,7 @@ import {fpHit} from './25-art-layers.js';
 // (steScene, 10-layer-grids.js asks); nothing of the scene is stored. Owner, Oct 21 2026: "edit the stamps in their own view, a tabs bar with the canvas as a tab and any open
 // stamp windows as a tab", then "I don't want to see the rest of the canvas, I just want to see the stamp rendered on its own".
 let steHome=null;   // where the list of the stamp's contents lives when it is not shown in the Elements panel
-const STE={tabs:[],views:{},key:''};   // tabs: the open stamp ids in the order opened; views: zoom and scroll left by each tab ('c' is the Canvas)
+const STE={tabs:[],views:{},key:'',mk:false,mkOn:false};   // 2.96.0: mk: the Mockup tab is open; mkOn: it is the one shown   // tabs: the open stamp ids in the order opened; views: zoom and scroll left by each tab ('c' is the Canvas)
 const stePt=e=>{const a=$('art'),m=a&&a.getScreenCTM();if(!m)return null;const p=a.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(m.inverse());return{x:q.x,y:q.y}};
 const steView=()=>{const b=$('boardP');return{z:WBX.wbZoomNow?WBX.wbZoomNow():1,fit:!(WBX.wbZoomIn&&WBX.wbZoomIn()),sl:b.scrollLeft,st:b.scrollTop}};
 function steBack(v){const b=$('boardP');if(!v||!b)return;if(v.fit){if(WBX.wbZoomIn&&WBX.wbZoomIn())$('zl').click()}else if(WBX.wbZoomTo)WBX.wbZoomTo(v.z);b.scrollLeft=v.sl;b.scrollTop=v.st}
@@ -33,7 +33,7 @@ function steStage(id){STID=id;const t=id==null?null:WBS.tiles.find(x=>x.id==id);
 // were centred on it (16 units off on a hexagon or a triangle opened as a rectangle). The build calls this first.
 function steFit(){if(STID==null)return;const t=WBS.tiles.find(x=>x.id==STID);if(!t)return;const G=geom(shOf(t));if(Math.abs(CW-G.SW)<1e-6&&Math.abs(CH-G.SH)<1e-6)return;stvSet(G.SW,G.SH);if(WBX.wbApplyZ)WBX.wbApplyZ()}
 // show a tab: a stamp id, or null for the Canvas
-function steGo(id){const cur=stUnlocked();if((cur==null?null:cur)===(id==null?null:id))return;
+function steGo(id){if(STE.mkOn&&id!=null)mkTabShow(false);const cur=stUnlocked();if((cur==null?null:cur)===(id==null?null:id))return;
  STE.views[cur==null?'c':cur]=steView();
  if(id==null){steStage(null);stLock(cur)}else{if(!STE.tabs.includes(id))STE.tabs.push(id);steStage(id);stLock(id)}
  const v=STE.views[id==null?'c':id];if(v)steBack(v);else if(id!=null&&WBX.wbZoomIn&&WBX.wbZoomIn())$('zl').click();
@@ -50,10 +50,15 @@ const stIcX='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColo
 const stIcL='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevL+'</svg>',stIcR='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevR+'</svg>';
 function steEdge(bar){const o=bar.scrollWidth>bar.clientWidth+1,l=o&&bar.scrollLeft>1,r=o&&bar.scrollLeft+bar.clientWidth<bar.scrollWidth-1;if(bar.classList.contains('ovl')!==l)bar.classList.toggle('ovl',l);if(bar.classList.contains('ovr')!==r)bar.classList.toggle('ovr',r)}
 function steTabs(un){const bar=$('stetabs');if(!bar)return;STE.tabs=STE.tabs.filter(id=>WBS.tiles.some(t=>t.id==id));
- const key=[un,STE.tabs.map(id=>id+':'+stNmId(id)).join()].join('|');if(key===STE.key){steEdge(bar);return}STE.key=key;
- const on=STE.tabs.length>0;if(bar.classList.contains('on')!==on)bar.classList.toggle('on',on);
- bar.innerHTML=on?`<button type="button" class="wb wta l" data-sc="-1" aria-label="Earlier tabs">${stIcL}</button><button type="button" class="wtab${un==null?' on':''}" role="tab" aria-selected="${un==null}" data-sv="c">Canvas</button>`+STE.tabs.map(id=>{const k=hEsc(stNmId(id)),a=un===id;return`<span class="wtg${a?' on':''}"><button type="button" class="wtab${a?' on':''}" role="tab" aria-selected="${a}" data-sv="${id}">${k}</button><button type="button" class="ib" data-sx="${id}" aria-label="Close ${k}">${stIcX}</button></span>`}).join('')+`<button type="button" class="wb wta r" data-sc="1" aria-label="Later tabs">${stIcR}</button>`:'';
+ const key=[un,STE.tabs.map(id=>id+':'+stNmId(id)).join(),STE.mk,STE.mkOn].join('|');if(key===STE.key){steEdge(bar);return}STE.key=key;
+ const on=STE.tabs.length>0||STE.mk,mo=STE.mk&&STE.mkOn;if(bar.classList.contains('on')!==on)bar.classList.toggle('on',on);
+ bar.innerHTML=on?`<button type="button" class="wb wta l" data-sc="-1" aria-label="Earlier tabs">${stIcL}</button><button type="button" class="wtab${un==null&&!mo?' on':''}" role="tab" aria-selected="${un==null&&!mo}" data-sv="c">Canvas</button>`+STE.tabs.map(id=>{const k=hEsc(stNmId(id)),a=un===id&&!mo;return`<span class="wtg${a?' on':''}"><button type="button" class="wtab${a?' on':''}" role="tab" aria-selected="${a}" data-sv="${id}">${k}</button><button type="button" class="ib" data-sx="${id}" aria-label="Close ${k}">${stIcX}</button></span>`}).join('')+(STE.mk?`<span class="wtg${mo?' on':''}"><button type="button" class="wtab${mo?' on':''}" role="tab" aria-selected="${mo}" data-sv="m">Mockup</button><button type="button" class="ib" data-mx aria-label="Close Mockup">${stIcX}</button></span>`:'')+`<button type="button" class="wb wta r" data-sc="1" aria-label="Later tabs">${stIcR}</button>`:'';
  if(on){const a=bar.querySelector('.wtab.on');if(a&&a.scrollIntoView)a.scrollIntoView({inline:'nearest',block:'nearest'});steEdge(bar)}}
+// ---- the Mockup tab (2.96.0; owner Nov 4 2026: "the mockup shows in its own tab", replacing the panel's small view). It is open while the Mockup panel is (23-mockups.js
+// opens it with the panel); shown, the stage is the mockup (#mkstage over it): Edit corners, Show mask and its clicks work there. Its × closes the Mockup panel too.
+// A stamp's tab or the Canvas tab hides it again; nothing in the document changes.
+function mkTabShow(on){on=!!on&&STE.mk;if(on&&stUnlocked()!=null)steGo(null);STE.mkOn=on;const s=$('mkstage');if(s&&s.hidden===on)s.hidden=!on;document.body.classList.toggle('mkview',on);steTabs(stUnlocked());if(on&&WBX.wbMockShown)WBX.wbMockShown()}
+function mkTab(open,show=true){STE.mk=!!open;if(!open)STE.mkOn=false;mkTabShow(!!open&&show)}
 function steSync(){const un=stUnlocked(),ml=$('mlist'),body=$('lybody'),list=$('lyl2');if(!ml||!body||!list)return;
  if(STID!=null&&un!==STID){steStage(null);STE.views.c&&steBack(STE.views.c);upd();return}   // the stamp went away (deleted, another layer): back on the Canvas
  // a stamp that opened some other way (a double click, or the stamp list) gets its tab too
@@ -64,12 +69,12 @@ function steSync(){const un=stUnlocked(),ml=$('mlist'),body=$('lybody'),list=$('
  else if(!on&&steHome&&ml.parentNode!==steHome){steHome.appendChild(ml);list.hidden=false}}
 function init75(){const a=$('art');if(!a)return;
  const st=document.querySelector('.stage');if(st&&!$('stetabs'))st.insertAdjacentHTML('afterbegin','<div class="stt" id="stetabs" role="tablist" aria-label="Views"></div>');
- $('stetabs').onclick=e=>{const sc=e.target.closest('[data-sc]');if(sc){const b=$('stetabs');b.scrollBy({left:+sc.dataset.sc*Math.max(80,Math.round(b.clientWidth*.7)),behavior:'smooth'});return}const x=e.target.closest('[data-sx]');if(x){steClose(+x.dataset.sx);return}const t=e.target.closest('[data-sv]');if(!t)return;steGo(t.dataset.sv=='c'?null:+t.dataset.sv)};
+ $('stetabs').onclick=e=>{const sc=e.target.closest('[data-sc]');if(sc){const b=$('stetabs');b.scrollBy({left:+sc.dataset.sc*Math.max(80,Math.round(b.clientWidth*.7)),behavior:'smooth'});return}if(e.target.closest('[data-mx]')){mkTab(false);if(WBX.wbClosePanel)WBX.wbClosePanel('mock');return}const x=e.target.closest('[data-sx]');if(x){steClose(+x.dataset.sx);return}const t=e.target.closest('[data-sv]');if(!t)return;if(t.dataset.sv=='m'){mkTabShow(true);return}if(STE.mkOn)mkTabShow(false);steGo(t.dataset.sv=='c'?null:+t.dataset.sv)};
  $('stetabs').addEventListener('scroll',()=>steEdge($('stetabs')));addEventListener('resize',()=>steEdge($('stetabs')));
  const ed=$('smkedit');if(ed)ed.onclick=()=>{const t=WBS.tiles[WBS.cur];if(t)steGo(t.id)};
  ($('boardP')||a).addEventListener('dblclick',e=>{if(WBS.brush||WBS.txArm||WBS.fpB!=null)return;const c=stePt(e);if(!c)return;
   // 2.50.2: a text or shape drawn over every pattern takes the double click (it starts typing), not the pattern's stamp under it
   if(stUnlocked()==null){const L=fpL(),q=L&&fpHit(L,c.x,c.y),pl=L&&L.pl||[];if(q&&q.k!='stamp'&&pl.indexOf(q)>Math.max(-1,...pl.map((p,i)=>p.k=='pattern'?i:-1)))return}
   const h=stampAt(c.x,c.y,null);if(!h)return;e.preventDefault();const it=STP.items[h.i],id=it?it[0]:null;if(id==null)return;if(stUnlocked()===id){if(WBX.wbTxGrp&&WBX.wbTxGrp())return;steClose(id)}else steGo(id)});
- WBX.wbSteSync=steSync;WBX.wbSteReset=steReset;WBX.wbSteGo=steGo;WBX.wbSteEdit=steEdit;WBX.wbSteScene=steScene;WBX.wbSteFit=steFit}
+ WBX.wbMockTab=mkTab;WBX.wbMockTabShow=mkTabShow;WBX.wbMockTabOn=()=>STE.mkOn;WBX.wbSteSync=steSync;WBX.wbSteReset=steReset;WBX.wbSteGo=steGo;WBX.wbSteEdit=steEdit;WBX.wbSteScene=steScene;WBX.wbSteFit=steFit}
 export {init75,steDone,steOpen};

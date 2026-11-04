@@ -270,3 +270,26 @@ test('Copy prompt copies a message for the product typed in Product, or [product
   expect(b).toContain('"baby-onesie.png"'); expect(b).toContain('"baby-onesie-mask.png"'); expect(b).not.toContain('{P}');
   expect(errors).toEqual([]);
 });
+
+// 2.96.0 (owner Nov 4 2026): the mockup shows in its own tab, beside the Canvas, in place of the panel's small view; the tab's × closes the Mockup panel too
+test('the Mockup tab: opens with the panel, the Canvas tab and back, × closes it and the panel', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4 });
+  await expect(page.locator('#stetabs')).not.toHaveClass(/\bon\b/); await expect(page.locator('#mkstage')).toBeHidden();
+  await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
+  await expect(page.locator('#stetabs')).toHaveClass(/\bon\b/);
+  await expect(page.locator('#stetabs .wtab')).toHaveText(['Canvas', 'Mockup']);
+  await expect(page.locator('#stetabs [data-sv="m"]')).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#mkstage')).toBeVisible(); await waitView(page, 0);
+  // the view is on the stage, as large as it holds it, not in the panel
+  expect(await page.locator('section.pn[data-p="mock"] #mkc').count()).toBe(0);
+  const w = (await page.locator('#mkc').boundingBox()).width; expect(w).toBeGreaterThan(400);
+  // the Canvas tab: the canvas again, the Mockup tab stays
+  await page.locator('#stetabs [data-sv="c"]').click();
+  await expect(page.locator('#mkstage')).toBeHidden(); await expect(page.locator('#stetabs [data-sv="m"]')).toHaveAttribute('aria-selected', 'false');
+  await page.locator('#stetabs [data-sv="m"]').click(); await expect(page.locator('#mkstage')).toBeVisible();
+  // × closes the tab and the panel
+  await page.locator('#stetabs [data-mx]').click();
+  await expect(page.locator('#mkstage')).toBeHidden(); await expect(page.locator('#stetabs')).not.toHaveClass(/\bon\b/);
+  await expect(page.locator('section.pn[data-p="mock"]')).toBeHidden();
+  expect(errors).toEqual([]);
+});

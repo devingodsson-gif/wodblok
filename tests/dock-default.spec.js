@@ -19,7 +19,7 @@ test('no tool starts as a floating window (the Shape editor docks along the bott
     expect(tools.length).toBeGreaterThan(6);
     for (const p of tools) {
       if (p === 'mlist' && mode === 'pattern') continue;   // empty until a stamp is unlocked
-      if (['xrec', 'help', 'layout', 'mock'].includes(p)) continue;   // the undocked panels (Export 2.76.1, Help 2.87.4, Layout 2.87.7, Mockup 2.90.1) open floating in the middle until they have a place of their own
+      if (['xrec', 'help', 'layout'].includes(p)) continue;   // the undocked panels (Export 2.76.1, Help 2.87.4, Layout 2.87.7; Mockup docks again since 2.96.0) open floating in the middle until they have a place of their own
       await openPanel(page, p);
       await expect(page.locator(`.dk-l .wg:has(section.pn[data-p="${p}"]:not([hidden]))`), `${mode}: ${p}`).toHaveCount(1);
     }

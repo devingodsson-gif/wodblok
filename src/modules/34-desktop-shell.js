@@ -35,7 +35,7 @@ const EL_ONLY=['layers','stmp','motifs','image','sheet','text','elpaint'];
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
 const ELP=EL_ONLY,wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
 // undocked panels (2.87.4, owner Nov 3 2026): with no remembered place they open floating in the middle of the window, and dock like any panel
-const WS_UNDOCK=['xrec','help','layout','mock'],WS_USZ={layout:[260,148],mock:[320,640]};   // 2.90.1: Mockup opens floating too   // 2.87.7: Layout is small
+const WS_UNDOCK=['xrec','help','layout'],WS_USZ={layout:[260,148]};   // 2.96.0: Mockup docks like the other panels again (its view is the Mockup tab)   // 2.87.7: Layout is small
 const MODEP={pattern:['lyrs','layers','stmp','motifs','image','sheet','elpaint','text','pgrid','canvas','colors','rand','hist','xrec','help','layout','mock']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
@@ -239,6 +239,8 @@ if(ELP.includes(p)){const keep=new Set([p]);if(stUnlocked()!=null)keep.add('stmp
 g.a=p;g.col=false;panel=p;try{kv.set('wb24_panel',p)}catch(e){}
 wsSave();wsRender();const el=document.querySelector(`.wg[data-g="${g.id}"]`);if(el&&el.classList.contains('fl'))el.style.zIndex=++wsZ;info();nums()}
 WBX.wbOpenPanel=setPanel;
+// 2.96.0: close a panel (the Mockup tab's × closes the Mockup panel) and whether a panel is open in the workspace (shown or behind another tab)
+WBX.wbClosePanel=p=>{const g=wsFind(p);if(!g)return;const i=g.tabs.indexOf(p);g.tabs.splice(i,1);if(g.a==p)g.a=g.tabs[Math.max(0,i-1)];if(!g.tabs.length)wsDetach(g);wsSave();wsRender()};WBX.wbPanelIn=p=>!!wsFind(p);
 // 2.79.3 (owner Oct 31 2026: "the stamp panel should always be out when the stamp tab mode is opened ... on the right side of the left panel"): opening a stamp's tab
 // brings the Stamp panel into a group of its own in the inner column right of the left dock (the left dock itself when it is empty); closing the tabs puts it back
 // where it was, or closes it if it was not open, unless it was moved meanwhile
