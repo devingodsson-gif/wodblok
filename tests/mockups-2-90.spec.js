@@ -155,3 +155,34 @@ test('your own mockup: Folds and Real width, then Real size', async ({ page }) =
   expect((await rec()).cm).toBeUndefined(); await expect(page.locator('#mkrsr')).toBeHidden();
   expect(errors).toEqual([]);
 });
+
+// 2.93.1 (owner Nov 4 2026: a stool touching a curtain took the design): Find product learns the product's own colours from the middle of the photo, so something of
+// another colour touching it (wood, leaves) is left out; Show mask tints what is not product, in the view only
+test('Find product leaves out a wooden stool touching a white curtain; Show mask tints what is not product', async ({ page }) => {
+  test.setTimeout(150000);
+  const { errors } = await H.openApp(page, { seed: 11 });
+  await page.evaluate(() => window.__wbTest.commands.run('randomize.roll')); await H.settle(page);
+  await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
+  await page.locator('#mkfl [data-f="rep"]').click(); await page.waitForTimeout(400);
+  // a made-up photo, 600 x 600: a warm grey wall, a light wooden floor, a white curtain in the middle with soft folds, a wooden stool touching its right edge
+  const b64 = await page.evaluate(() => { const c = document.createElement('canvas'); c.width = 600; c.height = 600; const x = c.getContext('2d');
+    x.fillStyle = '#c9c0b6'; x.fillRect(0, 0, 600, 600); x.fillStyle = '#c8a27a'; x.fillRect(0, 540, 600, 60);
+    for (let i = 120; i < 470; i++) { const v = 238 - 14 * Math.abs(Math.sin(i / 18)); x.fillStyle = `rgb(${v},${v},${v + 1})`; x.fillRect(i, 60, 1, 470); }
+    x.fillStyle = '#a8794a'; x.fillRect(455, 400, 110, 22); x.fillRect(465, 420, 14, 120); x.fillRect(545, 420, 14, 120);
+    return c.toDataURL('image/png').split(',')[1]; });
+  await page.setInputFiles('#mkpane .mkfile', { name: 'Curtain.png', mimeType: 'image/png', buffer: Buffer.from(b64, 'base64') });
+  await page.waitForFunction(() => { const v = window.__wbTest.kv.get('wb2901_mockups'); const t = v && JSON.parse(v).t; return t && t[0] && t[0].tol != null; }, null, { timeout: 30000 });
+  await page.waitForTimeout(1000);
+  const near = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+  // the stool's seat stays wood; the curtain takes the design
+  expect(near(await px(page, 510 / 600, 410 / 600), [0xa8, 0x79, 0x4a])).toBeLessThan(16);
+  expect(near(await px(page, 300 / 600, 300 / 600), [238, 238, 239])).toBeGreaterThan(16);
+  // Show mask: the wall is tinted, the curtain is not
+  const wall0 = await px(page, 40 / 600, 40 / 600);
+  await expect(page.locator('#mkmvr')).toBeVisible();
+  await page.locator('#mkmv').check(); await page.waitForTimeout(600);
+  expect(near(await px(page, 40 / 600, 40 / 600), wall0)).toBeGreaterThan(10);
+  await page.locator('#mkmv').uncheck(); await page.waitForTimeout(600);
+  expect(near(await px(page, 40 / 600, 40 / 600), wall0)).toBeLessThan(4);
+  expect(errors).toEqual([]);
+});

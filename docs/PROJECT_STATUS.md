@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.93.0 (your own mockups update is done)**, version and docs only. Next from the review: selling (full-surface export, print-on-demand presets), then colour for printers.
+- **Nov 4: 2.93.1 (a better Find product, step 1: the product's colours, Show mask)** on `feat/2.93.1-find-product-colours`, not merged. Next: click to add or remove (2.93.2), then 2.94.0.
+- **Nov 4: 2.93.0 LIVE (your own mockups update is done)**, version and docs only. Next from the review: selling (full-surface export, print-on-demand presets), then colour for printers.
 - **Nov 4: 2.92.3 LIVE (your own mockups step 2: Folds and Real width)**.
 - **Nov 4: 2.92.2 LIVE (your own mockups step 1: Find product)**. Plan: docs/own-mockups-plan.md.
 - **Nov 4: 2.92.1 LIVE (hotfix: mockups print to the products' edges)**.
