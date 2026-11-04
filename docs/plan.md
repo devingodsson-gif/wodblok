@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.91.3 (Nov 4 2026): repeats step 3, a real-size preview (docs/repeats-plan.md)
+- View > Real size (`view.realSize`, 41-view-keys.js) zooms the canvas so its real width (Canvas > Format; a book cover's sheet, `physNow()`) is that many inches on the screen: width × the screen's pixels per inch / the canvas's width. Settings > General > Screen resolution (`wb2913_ppi`, 60 to 300 ppi, 96 by default) sets the pixels per inch. A canvas with no real size, or one too large for the zoom range (up to 800%), says so instead. The plan's fabric or wallpaper width beside it was not built.
+- Tests: tests/real-size-2-91-3.spec.js (new). Run: it, settings, menu bar, view keys, commands, help, check:style.
+
 ## 2.91.2 (Nov 4 2026): repeats step 2, Make seamless for pictures (docs/repeats-plan.md)
 - The Image panel has a Seamless group (shown with an Image selected): Blend (5 to 50%, 25) and Make seamless (also the command `image.makeSeamless`). Near each edge the picture fades, by a smooth step over Blend of its width (then height), into itself moved half across (then half down), so a pixel at one edge is the neighbour of the one at the opposite edge; the middle is untouched. It works where the picture is smooth in its middle (a photo, a texture); a hard line through the middle shows at the edges. The result is a new picture ("… seamless", in the same Pictures folder) swapped into the Image as one History step ("Make seamless"); the old picture stays in Pictures. No offset view (the plan's idea): an Image stretched to a repeat tile is checked in the 3 × 3 view.
 - Tests: tests/make-seamless-2-91-2.spec.js (new). Run: it, image-element-2-75, review-fixes-2-76-4, commands, help, check:style.

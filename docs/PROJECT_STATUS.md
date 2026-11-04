@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.91.2 (repeats step 2: Make seamless for pictures)** on `feat/2.91.2-make-seamless`, not merged. Next: a real-size preview (2.91.3), then 2.92.0.
+- **Nov 4: 2.91.3 (repeats step 3: View > Real size)** on `feat/2.91.3-real-size`, not merged. Next: 2.92.0 closes the repeats update.
+- **Nov 4: 2.91.2 LIVE (repeats step 2: Make seamless for pictures)**.
 - **Nov 4: 2.91.1 LIVE (repeats step 1: a mirror repeat)**. Plan: docs/repeats-plan.md.
 - **Nov 4: 2.91.0 LIVE (the mockups update is done)**. Gift wrap and phone case wait for their photos.
 - **Nov 4: 2.90.2 LIVE (mockups step 2: six built-in products)**.
