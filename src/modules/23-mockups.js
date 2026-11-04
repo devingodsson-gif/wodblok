@@ -81,7 +81,7 @@ function mkDist(d,W,H){const n=W*H,Y=new Float32Array(n),Cb=new Float32Array(n),
  for(let yy=0;yy<H;yy++)for(let xx=0;xx<W;xx++){if(yy>=bw&&yy<H-bw&&xx>=bw&&xx<W-bw)continue;const i=yy*W+xx,a=Math.floor((Math.atan2(yy-H/2,xx-W/2)+Math.PI)/(2*Math.PI)*32)%32;seg[a][0].push(Y[i]);seg[a][1].push(Cb[i]);seg[a][2].push(Cr[i]);seg[a][3].push(E[i])}
  const med=v=>{v.sort((p,q)=>p-q);return v[v.length>>1]},bg=seg.filter(s=>s[0].length).map(s=>[med(s[0]),med(s[1]),med(s[2]),med(s[3])]);
  const B=[];bg.forEach(c=>{if(!B.some(o=>.35*(o[0]-c[0])**2+(o[1]-c[1])**2+(o[2]-c[2])**2+9*(o[3]-c[3])**2<1))B.push(c)});   // near-equal border pieces once
- const out=new Float32Array(n);for(let i=0;i<n;i++){let m=1e9;const y=Y[i],cb=Cb[i],cr=Cr[i],e=E[i];for(let j=0;j<B.length;j++){const c=B[j],dy=y-c[0],db=cb-c[1],dr=cr-c[2],de=e-c[3],v=.35*dy*dy+db*db+dr*dr+9*de*de;if(v<m)m=v}out[i]=m}return{v:out,Cb,Cr}}
+ const out=new Float32Array(n);for(let i=0;i<n;i++){let m=1e9;const y=Y[i],cb=Cb[i],cr=Cr[i],e=E[i];for(let j=0;j<B.length;j++){const c=B[j],dy=y-c[0],db=cb-c[1],dr=cr-c[2],de=e-c[3],v=.35*dy*dy+db*db+dr*dr+9*de*de;if(v<m)m=v}out[i]=m}return{v:out,Y,Cb,Cr,E}}
 const MK_OFF=10;   // how far (in Cb, Cr) a colour may be from the product's own colours and still be product
 const mkFD=new WeakMap();   // per photo: its size at work and each pixel's distance to the background (the slow part, made once)
 function mkFind(img,w,h,tol){const k=Math.min(1,1000/Math.max(w,h)),W=Math.max(8,Math.round(w*k)),H=Math.max(8,Math.round(h*k)),c=document.createElement('canvas');c.width=W;c.height=H;
@@ -112,6 +112,22 @@ function mkFind(img,w,h,tol){const k=Math.min(1,1000/Math.max(w,h)),W=Math.max(8
 function mkFindBest(img,w,h){const all=[20,35,50,65].map(tol=>({tol,r:mkFind(img,w,h,tol)})).filter(o=>o.r);if(!all.length)return null;const mid=all.find(o=>o.tol==50),best=all.reduce((a,b)=>b.r.ragged<a.r.ragged?b:a);
  return mid&&mid.r.ragged<=best.r.ragged*1.4?mid:best}
 // your mockup's mask made again (Find product on, at its Tolerance): kept with the photo, its corners set to the product's box
+// ---- click to add or remove (2.93.2, docs/own-mockups-plan.md): with Show mask on, a click on the view takes the part under it out of the product (a click on product)
+// or puts it in (a click on what is not): what is joined to the click and like it (light, colour and texture, within Tolerance's distance; as the Magic Wand), at the
+// mask's own size. The mask is kept with the photo; Find product off and on again (or a Tolerance change) makes it afresh.
+async function mkWand(fx,fy){const m=mkCur();if(!m||m.b||!m.am)return;const ph=await mkPhoto(m.id),mask=await mkMask(m);if(!ph||!mask)return;
+ const W=mask.naturalWidth,H=mask.naturalHeight,n=W*H,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});
+ const tmp=document.createElement('canvas');tmp.width=W;tmp.height=H;tmp.getContext('2d').drawImage(ph,0,0,W,H);let F=mkFD.get(ph);if(!F||F.n!==n){F={n,...mkDist(tmp.getContext('2d',{willReadFrequently:true}).getImageData(0,0,W,H).data,W,H)};mkFD.set(ph,F)}
+ x.drawImage(mask,0,0);const im=x.getImageData(0,0,W,H),a=im.data,s0=Math.min(n-1,Math.max(0,Math.round(fy*H-.5)*W+Math.round(fx*W-.5))),inP=a[s0*4+3]>127,add=!inP;
+ const thr=2+(m.tol==null?50:m.tol)*.16,t2=thr*thr,{Y,Cb,Cr,E}=F,y0=Y[s0],b0=Cb[s0],r0=Cr[s0],e0=E[s0],seen=new Uint8Array(n),Q=new Int32Array(n);let qh=0,qt=0,cnt=0;
+ // it stops at an outline in the photo (a strong change of light across a pixel) and, when adding, at the edge of the product's box: a shaded side the colour of the wall
+ // is not let out onto the wall
+ const G=new Float32Array(n);for(let yy=1;yy<H-1;yy++)for(let xx=1;xx<W-1;xx++){const i=yy*W+xx;G[i]=Math.hypot(Y[i+1]-Y[i-1],Y[i+W]-Y[i-W])}
+ const q=m.q,bx0=Math.min(q[0],q[6])*W,bx1=Math.max(q[2],q[4])*W,by0=Math.min(q[1],q[3])*H,by1=Math.max(q[5],q[7])*H,inBox=i=>{const xx=i%W,yy=(i/W)|0;return xx>=bx0&&xx<=bx1&&yy>=by0&&yy<=by1};
+ const ok=i=>{if(seen[i])return false;seen[i]=1;if((a[i*4+3]>127)!==inP||G[i]>14||(add&&!inBox(i)))return false;const dy=Y[i]-y0,db=Cb[i]-b0,dr=Cr[i]-r0,de=E[i]-e0;return .35*dy*dy+db*db+dr*dr+9*de*de<=t2};
+ seen[s0]=1;Q[qt++]=s0;while(qh<qt){const i=Q[qh++],xx=i%W;a[i*4+3]=add?255:0;a[i*4]=a[i*4+1]=a[i*4+2]=255;cnt++;const go=j=>{if(ok(j))Q[qt++]=j};if(xx>0)go(i-1);if(xx<W-1)go(i+1);if(i>=W)go(i-W);if(i<n-W)go(i+W)}
+ x.putImageData(im,0,0);await mkPhotoPut(m.id+'~mask',c.toDataURL('image/png'));[...mkMk.keys()].forEach(k=>{if(k.startsWith(m.id+'|'))mkMk.delete(k)});
+ pmsg(add?'Added to the product.':'Taken out of the product.');mkView()}
 async function mkFindSet(id,on,tol){const d=mkLoad(),t=d.t.find(z=>z.id===id);if(!t)return false;if(!on){delete t.am;delete t.tol;mkStore(d);return true}
  const ph=await mkPhoto(id);if(!ph)return false;let r;if(tol==null){const b=mkFindBest(ph,t.w,t.h);r=b&&b.r;tol=b?b.tol:50}else r=mkFind(ph,t.w,t.h,tol);if(!r){if(t.am){delete t.am;delete t.tol;mkStore(d)}return false}
  await mkPhotoPut(id+'~mask',r.c.toDataURL('image/png'));t.am=1;t.tol=tol;t.q=r.q;mkStore(d);[...mkMk.keys()].forEach(k=>{if(k.startsWith(id+'|'))mkMk.delete(k)});return true}
@@ -200,7 +216,7 @@ const MK_UPC={mm:.1,cm:1,in:2.54,px:.1},mkUnit=()=>{const u=unGet();return u=='p
 function mkOwnSet(o){const m=mkCur();if(!m||m.b)return;const d=mkLoad(),t=d.t.find(z=>z.id===m.id);if(!t)return;Object.entries(o).forEach(([k,v])=>{if(v)t[k]=v;else delete t[k]});mkStore(d);mkSync();mkView()}
 // the controls follow the mockup in use and the settings
 function mkSync(){const u=mkUi(),fill=mkFill(u);$('mkfl').querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==fill));
- const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;$('mkamr').hidden=!m||!!m.b;$('mkam').checked=!!(m&&m.am);$('mktolr').hidden=!m||!!m.b||!m.am;$('mkmvr').hidden=!m||!!m.b||!m.am;
+ const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;$('mkamr').hidden=!m||!!m.b;$('mkam').checked=!!(m&&m.am);$('mktolr').hidden=!m||!!m.b||!m.am;$('mkmvr').hidden=!m||!!m.b||!m.am;$('mkvw').classList.toggle('mkpk',!!(m&&!m.b&&m.am&&$('mkmv').checked));   /* a click on the view adds or removes */
  {const own=!!(m&&!m.b);$('mkfor').hidden=!own;$('mkcmr').hidden=!own;if(own){const fo=$('mkfo'),fv=Math.round((m.warp||0)*100);if(+fo.value!==fv&&document.activeElement!==fo){fo.value=fv;fo.dispatchEvent(new Event('input',{bubbles:true}))}
   const u=mkUnit(),cf=$('mkcm');$('mkcmu').textContent=u;if(document.activeElement!==cf)cf.value=m.cm?String(+(m.cm/MK_UPC[u]).toFixed(u=='in'?2:u=='cm'?1:0)):''}}
  {const tl=$('mktol'),tv=m&&m.am?m.tol:50;if(+tl.value!==tv&&document.activeElement!==tl){tl.value=tv;tl.dispatchEvent(new Event('input',{bubbles:true}))}}   /* a product's print area is its own */
@@ -222,7 +238,8 @@ function init23(){if(!$('mkpane'))return;MKT=ltMake(mkCfg());MKT.init();$('mkpan
  $('mksc').addEventListener('input',()=>{if(WBS.uiLoad)return;const u=mkUi(),v=+$('mksc').value;if(mkFill(u)=='rep'){if(u.sr===v)return;mkUiSet({sr:v})}else{if(u.so===v)return;mkUiSet({so:v})}mkView()});
  $('mksh').addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$('mksh').value;if(mkUi().sh===v)return;mkUiSet({sh:v});mkView()});
  $('mkcn').addEventListener('change',mkCorners);
- $('mkmv').addEventListener('change',()=>mkView());
+ $('mkmv').addEventListener('change',()=>{mkSync();mkView()});
+ $('mkc').addEventListener('pointerdown',e=>{if(!$('mkvw').classList.contains('mkpk')||e.button>0)return;const r=$('mkc').getBoundingClientRect();e.preventDefault();mkWand((e.clientX-r.left)/Math.max(1,r.width),(e.clientY-r.top)/Math.max(1,r.height))});
  $('mkfo').addEventListener('input',()=>{if(WBS.uiLoad)return;const m=mkCur(),v=+$('mkfo').value/100;if(!m||m.b||(m.warp||0)===v)return;mkOwnSet({warp:v})});
  $('mkcm').addEventListener('change',()=>{const t=String($('mkcm').value).trim(),v=+t;if(t===''){mkOwnSet({cm:0});return}if(!(v>0)){mkSync();return}mkOwnSet({cm:+Math.min(10000,v*MK_UPC[mkUnit()]).toFixed(2)})});
  // Find product and Tolerance (2.92.2): the mask is made again a moment after the slider stops
