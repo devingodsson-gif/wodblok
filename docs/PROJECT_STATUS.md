@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.98.4 (asset split, step 4: shapes and templates as data files, the owner's "cached file at start")** on `feat/2.98.4-asset-data`, not merged. Hosted page 2.2 MB (from 18.5). Start-up now waits for the two files in the hosted app. Next: 2.99.0 closes the plan; then phase 2 (AI Select subject: model and licence are the owner's choice).
+- **Nov 4: 2.98.5 (asset cache: kept small, start-up data stored on install)** on `fix/2.98.5-asset-cache`, not merged. Full suite on 2.98.4 (run 41889099948): 3 of about 820 failed: web-app.spec (fixed here), small-updates-2-79-2 Alt + wheel (passes locally: flaky), text-size "unlocked stamp" (waits for the Mockup panel in an unlocked stamp; fails on 2.98.0 too, so it predates the asset split; not fixed). Next: 2.99.0 closes the plan; then phase 2 (AI Select subject: model and licence are the owner's choice).
+- **Nov 4: 2.98.4 LIVE (asset split, step 4: shapes and templates as data files, the owner's "cached file at start")**. Hosted page 2.2 MB (from 18.5).
 - **Nov 4: 2.98.3 LIVE (asset split, step 3: fonts)**.
 - **Nov 4: 2.98.2 LIVE (asset split, step 2: textures)**.
 - **Nov 4: 2.98.1 LIVE (asset split, step 1: the asset system, mockups first; docs/asset-split-plan.md)**. Open: the AI model for phase 2 (licence and size) is the owner's choice.

@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.98.5 (Nov 4 2026): asset split: the asset cache kept small (docs/asset-split-plan.md)
+- Owner: "merge, run suite". The suite on 2.98.4 (run 41889099948) failed 3 tests of about 820: tests/web-app.spec.js (the browser's caches now include `wodblok-assets-1`), which showed the asset cache was never trimmed; small-updates-2-79-2 (Alt + wheel, one History step: passes locally, flaky); text-size "unlocked stamp" (waits for the Mockup panel in an unlocked stamp; fails on 2.98.0 too, so it predates this plan; not fixed here).
+- tools/build.js writes this build's asset list into sw.js: install also stores the start-up data files (shapes, templates), so applying a version with no network still opens; activate deletes the asset files this version does not use.
+- Tests: tests/web-app.spec.js (the asset cache holds the start-up data; an unused file is deleted when the new version takes over; what stays is the new version's). Run: it and two asset specs (7 passed). Not run: the full suite again.
+
 ## 2.98.4 (Nov 4 2026): asset split, step 4: shapes and templates (docs/asset-split-plan.md)
 - Owner chose "cached file at start". tools/assets.js `dataFile` turns `const SHAPES=[...]` and `const TPL_BUILTIN=[...]` into references for `npm run build:web` (assets/data/shapes.<hash>.json, templates.<hash>.json); src/platform/assets.js `assetPreload` and `assetData`; src/main.js runs start-up as `wbStart`, at once when the data is inside (the single file, unchanged) and after the preload otherwise, with a message on the loading screen if a file cannot be fetched. 05-motif-data.js and 54-templates.js read their data through assetData.
 - Hosted page 2,165,572 bytes (from 7,004,384; 18,463,080 before the plan).
