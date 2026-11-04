@@ -16,7 +16,7 @@ Owner, Nov 3 2026: "Let's do mockups". His answers: all four product groups (fab
 ## Steps
 1. **2.90.1: the Mockup panel and your own photos.** Window > Mockup (`panel.mock`), Export > Export mockup (`export.mockup`); Add mockup, the library, the live view, Fill (Repeat / Once), Scale, Shading, Edit corners, Export mockup. Test: tests/mockups-2-90-1.spec.js.
 2. **2.90.2: the built-in products. Done Nov 4 2026 with six (T-shirt, tote bag, cushion, fabric, wallpaper, notebook); gift wrap and phone case when their photos come.** The owner's eight photos (fabric, cushion, wallpaper, T-shirt, tote bag, gift wrap, notebook, phone case), compressed to about 200 KB each, each with its print area: a traced outline (not only four corners) and, for the curved ones (fabric, cushion, T-shirt), a gentle warp that follows the folds. A built-in set, Products, in the library. Real-size Scale where the product's size is known and the canvas has one (Canvas > Format).
-3. **2.91.0: closes the update** (Help, What's new, docs).
+3. **2.91.0: closes the update** (Help, What's new, docs). Done Nov 4 2026.
 
 ## Open questions
 - The owner's photos become public when committed while the repo is public (told him Nov 3 2026).
