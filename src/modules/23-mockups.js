@@ -29,7 +29,7 @@ function mkLoad(){let raw=null;try{raw=kv.get(MK_KEY)}catch(e){}
  if(mkC===null||raw!==mkCr){let d=null;try{d=JSON.parse(raw||'null')}catch(e){}if(!d||typeof d!='object')d={};
   d.f=(Array.isArray(d.f)?d.f:[]).filter(x=>typeof x=='string'&&x&&x.length<=200);
   d.t=(Array.isArray(d.t)?d.t:[]).filter(x=>x&&/^m[\w-]{1,30}$/.test(x.id)&&x.w>0&&x.h>0&&typeof x.th=='string'&&/^data:image\/(?:webp|png|jpeg);base64,/.test(x.th))
-   .map(x=>({id:x.id,n:mkName(x.n),f:typeof x.f=='string'?x.f:'',w:+x.w,h:+x.h,th:x.th,q:mkQok(x.q)?x.q.slice():mkQ0.slice(),...(x.am?{am:1,tol:Number.isFinite(+x.tol)?Math.max(0,Math.min(100,+x.tol)):50}:{}),...(+x.warp>0?{warp:Math.min(1,+x.warp)}:{}),...(+x.cm>0?{cm:Math.min(10000,+x.cm)}:{})}));
+   .map(x=>({id:x.id,n:mkName(x.n),f:typeof x.f=='string'?x.f:'',w:+x.w,h:+x.h,th:x.th,q:mkQok(x.q)?x.q.slice():mkQ0.slice(),...(x.am?{am:1,tol:Number.isFinite(+x.tol)?Math.max(0,Math.min(100,+x.tol)):50,...(x.mi?{mi:1}:{})}:{}),...(+x.warp>0?{warp:Math.min(1,+x.warp)}:{}),...(+x.cm>0?{cm:Math.min(10000,+x.cm)}:{})}));
   d.h=(Array.isArray(d.h)?d.h:[]).filter(x=>typeof x=='string'&&x.length<=60);d.r=d.r&&typeof d.r=='object'&&!Array.isArray(d.r)?d.r:{};d.b={};mkC=d;mkCr=raw}
  return{f:[...mkC.f],t:mkC.t.map(x=>({...x,q:x.q.slice()})),h:[...mkC.h],r:{...mkC.r},b:{}}}
 const mkStore=d=>{try{kv.set(MK_KEY,JSON.stringify(d));mkC=null;return true}catch(e){pmsg('Could not keep the mockups in this browser.');return false}};
@@ -63,7 +63,7 @@ await mkFindSet(id,true,null);   // 2.92.2: the product is found at once, at the
  return id}
 // a product's mask, loaded once
 const mkMk=new Map();
-async function mkMask(m){if(!m||!(m.mask||m.am))return null;const k=m.id+'|'+(m.tol||0);if(mkMk.has(k))return mkMk.get(k);const src=m.mask||await mkPhotoGet(m.id+'~mask');const i=src?await mkImg(src):null;if(i)mkMk.set(k,i);return i}
+async function mkMask(m){if(!m||!(m.mask||m.am))return null;const k=m.id+'|'+(m.tol||0)+(m.mi?'i':'');if(mkMk.has(k))return mkMk.get(k);const src=m.mask||await mkPhotoGet(m.id+'~mask');const i=src?await mkImg(src):null;if(i)mkMk.set(k,i);return i}
 // ---- Find product (2.92.2, docs/own-mockups-plan.md step 1; owner Nov 4 2026: "I want to give it a photo and it generates the mask with a tolerance slider to help").
 // The background's colours are read from the photo's border (a ring 3% wide, in 32 pieces, each piece's median); every pixel's distance to the nearest of them is
 // measured with colour counting more than light (a white product on a pale wall differs mostly in colour) and texture too (a linen cushion's shaded side is the wall's
@@ -128,7 +128,19 @@ async function mkWand(fx,fy){const m=mkCur();if(!m||m.b||!m.am)return;const ph=a
  seen[s0]=1;Q[qt++]=s0;while(qh<qt){const i=Q[qh++],xx=i%W;a[i*4+3]=add?255:0;a[i*4]=a[i*4+1]=a[i*4+2]=255;cnt++;const go=j=>{if(ok(j))Q[qt++]=j};if(xx>0)go(i-1);if(xx<W-1)go(i+1);if(i>=W)go(i-W);if(i<n-W)go(i+W)}
  x.putImageData(im,0,0);await mkPhotoPut(m.id+'~mask',c.toDataURL('image/png'));[...mkMk.keys()].forEach(k=>{if(k.startsWith(m.id+'|'))mkMk.delete(k)});
  pmsg(add?'Added to the product.':'Taken out of the product.');mkView()}
-async function mkFindSet(id,on,tol){const d=mkLoad(),t=d.t.find(z=>z.id===id);if(!t)return false;if(!on){delete t.am;delete t.tol;mkStore(d);return true}
+// ---- Import mask (2.94.1; owner Nov 4 2026: "Can we just make it so people can also import a mask?"): a picture the photo's shape, white (or opaque, in a PNG with
+// transparency) where the design prints, black (or clear) elsewhere, from Photoshop's Select Subject or any other tool. It takes the place of the found mask (mi: an
+// imported one, so Tolerance is hidden); the corners are set to its box; Show mask and clicks work on it; Find product off and on finds the product again.
+async function mkImportMask(f){const m=mkCur();if(!m||m.b)return;if(!f||!/^image\//.test(f.type)&&!/\.(png|jpe?g|webp)$/i.test(f.name||'')){pmsg('That file is not a picture.');return}
+ const url=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=()=>r(null);fr.readAsDataURL(f)}),img=url&&await mkImg(url);if(!img){pmsg('Could not read that picture.');return}
+ const iw=img.naturalWidth||1,ih=img.naturalHeight||1;if(Math.abs(iw/ih-m.w/m.h)>.03*(m.w/m.h)){pmsg('The mask must be the same shape as the photo.');return}
+ const k=Math.min(1,1600/Math.max(m.w,m.h)),W=Math.max(8,Math.round(m.w*k)),H=Math.max(8,Math.round(m.h*k)),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,W,H);
+ const im=x.getImageData(0,0,W,H),d=im.data,n=W*H;let clear=false;for(let i=3;i<d.length;i+=4)if(d[i]<250){clear=true;break}
+ let x0=W,y0=H,x1=-1,y1=-1;for(let i=0;i<n;i++){const p=i*4,a=clear?d[p+3]:Math.round(.299*d[p]+.587*d[p+1]+.114*d[p+2]);d[p]=d[p+1]=d[p+2]=255;d[p+3]=a;if(a>127){const xx=i%W,yy=(i/W)|0;if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy}}
+ if(x1<0){pmsg('That mask is empty: nothing in it is white.');return}x.putImageData(im,0,0);await mkPhotoPut(m.id+'~mask',c.toDataURL('image/png'));
+ const dd=mkLoad(),t=dd.t.find(z=>z.id===m.id);if(!t)return;t.am=1;t.mi=1;if(t.tol==null)t.tol=50;t.q=[x0/W,y0/H,(x1+1)/W,y0/H,(x1+1)/W,(y1+1)/H,x0/W,(y1+1)/H].map(v=>+v.toFixed(4));mkStore(dd);
+ [...mkMk.keys()].forEach(kk=>{if(kk.startsWith(m.id+'|'))mkMk.delete(kk)});pmsg('Imported the mask.');mkSync();mkView();mkCorners()}
+async function mkFindSet(id,on,tol){const d=mkLoad(),t=d.t.find(z=>z.id===id);if(!t)return false;delete t.mi;if(!on){delete t.am;delete t.tol;mkStore(d);return true}
  const ph=await mkPhoto(id);if(!ph)return false;let r;if(tol==null){const b=mkFindBest(ph,t.w,t.h);r=b&&b.r;tol=b?b.tol:50}else r=mkFind(ph,t.w,t.h,tol);if(!r){if(t.am){delete t.am;delete t.tol;mkStore(d)}return false}
  await mkPhotoPut(id+'~mask',r.c.toDataURL('image/png'));t.am=1;t.tol=tol;t.q=r.q;mkStore(d);[...mkMk.keys()].forEach(k=>{if(k.startsWith(id+'|'))mkMk.delete(k)});return true}
 // Scale as a % of the print area's width: Real size works it out from the canvas's real width and the product's (Repeat only)
@@ -216,7 +228,7 @@ const MK_UPC={mm:.1,cm:1,in:2.54,px:.1},mkUnit=()=>{const u=unGet();return u=='p
 function mkOwnSet(o){const m=mkCur();if(!m||m.b)return;const d=mkLoad(),t=d.t.find(z=>z.id===m.id);if(!t)return;Object.entries(o).forEach(([k,v])=>{if(v)t[k]=v;else delete t[k]});mkStore(d);mkSync();mkView()}
 // the controls follow the mockup in use and the settings
 function mkSync(){const u=mkUi(),fill=mkFill(u);$('mkfl').querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==fill));
- const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;$('mkamr').hidden=!m||!!m.b;$('mkam').checked=!!(m&&m.am);$('mktolr').hidden=!m||!!m.b||!m.am;$('mkmvr').hidden=!m||!!m.b||!m.am;$('mkvw').classList.toggle('mkpk',!!(m&&!m.b&&m.am&&$('mkmv').checked));   /* a click on the view adds or removes */
+ const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;$('mkamr').hidden=!m||!!m.b;$('mkam').checked=!!(m&&m.am);$('mktolr').hidden=!m||!!m.b||!m.am||!!m.mi;$('mkmir').hidden=!m||!!m.b;$('mkmvr').hidden=!m||!!m.b||!m.am;$('mkvw').classList.toggle('mkpk',!!(m&&!m.b&&m.am&&$('mkmv').checked));   /* a click on the view adds or removes */
  {const own=!!(m&&!m.b);$('mkfor').hidden=!own;$('mkcmr').hidden=!own;if(own){const fo=$('mkfo'),fv=Math.round((m.warp||0)*100);if(+fo.value!==fv&&document.activeElement!==fo){fo.value=fv;fo.dispatchEvent(new Event('input',{bubbles:true}))}
   const u=mkUnit(),cf=$('mkcm');$('mkcmu').textContent=u;if(document.activeElement!==cf)cf.value=m.cm?String(+(m.cm/MK_UPC[u]).toFixed(u=='in'?2:u=='cm'?1:0)):''}}
  {const tl=$('mktol'),tv=m&&m.am?m.tol:50;if(+tl.value!==tv&&document.activeElement!==tl){tl.value=tv;tl.dispatchEvent(new Event('input',{bubbles:true}))}}   /* a product's print area is its own */
@@ -238,6 +250,7 @@ function init23(){if(!$('mkpane'))return;MKT=ltMake(mkCfg());MKT.init();$('mkpan
  $('mksc').addEventListener('input',()=>{if(WBS.uiLoad)return;const u=mkUi(),v=+$('mksc').value;if(mkFill(u)=='rep'){if(u.sr===v)return;mkUiSet({sr:v})}else{if(u.so===v)return;mkUiSet({so:v})}mkView()});
  $('mksh').addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$('mksh').value;if(mkUi().sh===v)return;mkUiSet({sh:v});mkView()});
  $('mkcn').addEventListener('change',mkCorners);
+ $('mkmi').onclick=()=>{const f=$('mkmf');f.value='';f.click()};$('mkmf').onchange=()=>{const f=$('mkmf').files&&$('mkmf').files[0];$('mkmf').value='';if(f)mkImportMask(f)};
  $('mkmv').addEventListener('change',()=>{mkSync();mkView()});
  $('mkc').addEventListener('pointerdown',e=>{if(!$('mkvw').classList.contains('mkpk')||e.button>0)return;const r=$('mkc').getBoundingClientRect();e.preventDefault();mkWand((e.clientX-r.left)/Math.max(1,r.width),(e.clientY-r.top)/Math.max(1,r.height))});
  $('mkfo').addEventListener('input',()=>{if(WBS.uiLoad)return;const m=mkCur(),v=+$('mkfo').value/100;if(!m||m.b||(m.warp||0)===v)return;mkOwnSet({warp:v})});

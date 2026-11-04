@@ -223,3 +223,35 @@ test('with Show mask on, a click adds a part to the product and a second click t
   expect(near(await px(page, ...seat), wood)).toBeLessThan(16);
   expect(errors).toEqual([]);
 });
+
+// 2.94.1 (owner Nov 4 2026): Import mask: a black and white picture the photo's shape (white: where the design prints) takes the place of the found mask
+test('Import mask: the design prints only where the mask is white; a mask of another shape is refused; Find product off and on finds the product again', async ({ page }) => {
+  test.setTimeout(150000);
+  const { errors } = await H.openApp(page, { seed: 11 });
+  await page.evaluate(() => window.__wbTest.commands.run('randomize.roll')); await H.settle(page);
+  await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
+  await page.locator('#mkfl [data-f="rep"]').click(); await page.waitForTimeout(400);
+  await expect(page.locator('#mkmir')).toBeHidden();   // a product's mask is its own
+  await page.setInputFiles('#mkpane .mkfile', { name: 'Room.png', mimeType: 'image/png', buffer: Buffer.from(await photo(page), 'base64') });
+  await page.waitForFunction(() => { const v = window.__wbTest.kv.get('wb2901_mockups'); const t = v && JSON.parse(v).t; return t && t[0] && t[0].tol != null; }, null, { timeout: 30000 });
+  await expect(page.locator('#mkmir')).toBeVisible();
+  const mask = (w, h, x0, y0, x1, y1) => page.evaluate(([w, h, x0, y0, x1, y1]) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.fillStyle = '#000'; x.fillRect(0, 0, w, h); x.fillStyle = '#fff'; x.fillRect(x0, y0, x1 - x0, y1 - y0); return c.toDataURL('image/png').split(',')[1]; }, [w, h, x0, y0, x1, y1]);
+  // a square mask for a 3:2 photo is refused
+  await page.locator('#mkmf').setInputFiles({ name: 'm.png', mimeType: 'image/png', buffer: Buffer.from(await mask(300, 300, 0, 0, 300, 300), 'base64') });
+  await expect(page.locator('#pmsg')).toHaveText(/same shape/);
+  // the mask: only the left half of the white panel (150..300 across, 100..300 down, on a 600 x 400 photo)
+  const k = await viewKey(page);
+  await page.locator('#mkmf').setInputFiles({ name: 'm.png', mimeType: 'image/png', buffer: Buffer.from(await mask(600, 400, 150, 100, 300, 300), 'base64') });
+  await expect(page.locator('#pmsg')).toHaveText('Imported the mask.'); await waitView(page, k);
+  const t = await page.evaluate(() => JSON.parse(window.__wbTest.kv.get('wb2901_mockups')).t[0]);
+  expect(t.mi).toBe(1); expect(t.q[0]).toBeCloseTo(.25, 2); expect(t.q[2]).toBeCloseTo(.5, 2);
+  await expect(page.locator('#mktolr')).toBeHidden();
+  const near = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+  expect(near(await px(page, .62, .5), [255, 255, 255])).toBeLessThan(10);   // the right half of the panel: the photo
+  expect(near(await px(page, .37, .5), [255, 255, 255])).toBeGreaterThan(10);   // the left half: the design
+  // Find product off and on: the found mask again, Tolerance back
+  await page.locator('#mkam').uncheck(); await page.waitForTimeout(500); await page.locator('#mkam').check();
+  await page.waitForFunction(() => !JSON.parse(window.__wbTest.kv.get('wb2901_mockups')).t[0].mi, null, { timeout: 15000 });
+  await expect(page.locator('#mktolr')).toBeVisible();
+  expect(errors).toEqual([]);
+});

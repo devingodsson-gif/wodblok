@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.94.1 (Nov 4 2026): Import mask for your own mockups
+- Owner sent three photos where Find product did badly (a phone case, a kimono on a mannequin, a gift with twine: the drop shadows taken as product, the lenses and twine covered, rough edges), and asked: "Can we just make it so people can also import a mask?" (the shadow and hole fixes proposed first were set aside).
+- The Mockup group has Import mask for your own mockups (`mkImportMask`, 23-mockups.js): a picture the photo's shape (within 3%; another shape is refused), white where the design prints, or a PNG whose transparency is the mask. It is kept as the mask (at up to 1600 px), marked imported (`mi`: Tolerance hidden), and the corners become its box; Show mask and clicks work on it; Find product off and on finds the product again.
+- Tests: tests/mockups-2-90.spec.js (an eighth test: a mask of half the panel, a square mask refused, Find product off and on). Run: it (8 passed), help, check:style.
+
 ## 2.94.0 (Nov 4 2026): the better Find product is done (docs/own-mockups-plan.md)
 - Version and docs only. Live: 2.93.1 (the product's own colours, Show mask), 2.93.2 (click to add or remove).
 - Tests: none new; the release changes no code.
