@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.100.0 (Nov 4 2026): Shift across, Shift down and Rotate in the Mockup panel
+- Owner: "I want two sliders on the mock up panel one for horizontal across and one for vertical across so I can fine tune and position where the image is. Also let's add one for rotate". Under Scale: Shift across and Shift down (-100 to 100%, in widths and heights of the print area) and Rotate (-180 to 180 degrees), named and ranged as the same sliders elsewhere. The design is moved and turned in its flat drawing (mkFlat, 23-mockups.js), before it is laid on the product, so the move and turn follow the perspective, Shading, Folds and the mask; a moved or turned repeat is drawn over enough tiles to cover the whole print area. Kept with the other Mockup settings (not in the project), the same for every mockup.
+- Tests: tests/mockups-2-90.spec.js (a twelfth test: Once moves by the expected share, Rotate turns, a moved and turned repeat leaves no bare print area, values kept). Run: the mockups spec (12 passed), perf (ratio 0.93), check:style, check:platform.
+
 ## 2.99.0 (Nov 4 2026): the asset split plan is done (docs/asset-split-plan.md)
 - Live: 2.98.1 (the asset system, mockups), 2.98.2 (textures), 2.98.3 (fonts), 2.98.4 (shapes and templates as data files), 2.98.5 (the asset cache kept small). The hosted page is about 2.2 MB (18.5 MB before); the single file is unchanged.
 - Also: tests/text-size.spec.js "unlocked stamp" no longer opens Mockup inside a stamp (it opens its own tab and leaves the stamp since 2.96.0, so the test waited for ever; it failed on 2.98.0 too). Mockup's text is still checked in the Pattern half.
