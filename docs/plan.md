@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.92.3 (Nov 4 2026): your own mockups step 2, Folds and Real width (docs/own-mockups-plan.md)
+- The Mockup group shows, for your own mockups, Folds (0 to 100%: the record's `warp`, 0 to 1, the same displacement by the photo's light as the products') and Real width (the print area's width in Settings > General > Units, px counted as mm; kept as `cm`), so Real size works for them as for the products. Clearing Real width takes it away. No change to the products.
+- Tests: tests/mockups-2-90.spec.js (a fifth test: Folds, Real width, Real size, clearing it). Run: it, help, check:style.
+
 ## 2.92.2 (Nov 4 2026): your own mockups step 1, Find product (docs/own-mockups-plan.md)
 - Owner: "I want to give it a photo and it generates the mask with a tolerance slider to help". Add mockup now finds the product (`mkFind`, 23-mockups.js) and keeps its mask with the photo (IndexedDB, `<id>~mask`; the record gets `am` and `tol`); the corners become the product's box. The method: the photo at up to 1000 px; each pixel's distance to the nearest of the border's colours (a 3% ring in 32 pieces, medians of light, colour and texture: Y weighted .35, Cb, Cr, and the fine detail left by a small blur × 9; made once per photo, `mkDist`); within Tolerance's distance (2 + tol × .16) and joined to the border is background, the largest rest is the product with its holes. A new photo uses Tolerance 50 unless its outline is 40% more ragged than the smoothest of 20, 35 and 65 (`mkFindBest`; the fabric photo takes 20). About a second for a new photo, a quarter of a second for a Tolerance change.
 - Measured against the built-in masks (by eye and overlap): T-shirt, notebook and fabric 96 to 99%, tote 93%, cushion 94% (its shaded left edge and the bench top are close calls; Tolerance helps). A wall that fills the photo cannot be told from what stands in front of it: Find product off and the corners.
