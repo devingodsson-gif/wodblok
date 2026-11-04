@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.92.0 (Nov 4 2026): the repeats update is done (docs/repeats-plan.md)
+- Version and docs only. Live: 2.90.0 (every arrangement's own settings, including any drop or offset), 2.91.1 (mirror repeat), 2.91.2 (Make seamless), 2.91.3 (View > Real size).
+- Tests: none new; the release changes no code.
+
 ## 2.91.3 (Nov 4 2026): repeats step 3, a real-size preview (docs/repeats-plan.md)
 - View > Real size (`view.realSize`, 41-view-keys.js) zooms the canvas so its real width (Canvas > Format; a book cover's sheet, `physNow()`) is that many inches on the screen: width × the screen's pixels per inch / the canvas's width. Settings > General > Screen resolution (`wb2913_ppi`, 60 to 300 ppi, 96 by default) sets the pixels per inch. A canvas with no real size, or one too large for the zoom range (up to 800%), says so instead. The plan's fabric or wallpaper width beside it was not built.
 - Tests: tests/real-size-2-91-3.spec.js (new). Run: it, settings, menu bar, view keys, commands, help, check:style.

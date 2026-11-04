@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.92.0','Nov 4 2026',['The repeats update is complete: settings for every arrangement, a mirror repeat, Make seamless and View > Real size.']],
  ['2.91.3','Nov 4 2026',['View > Real size shows the canvas at the size it prints; Settings > General > Screen resolution matches it to your screen.']],
  ['2.91.2','Nov 4 2026',['The Image panel has Make seamless: the picture becomes one whose edges meet, so it repeats with no seam.']],
  ['2.91.1','Nov 4 2026',['Canvas > Format > Repeat has Mirror: every other tile is flipped across and down, so the edges always meet.']],
