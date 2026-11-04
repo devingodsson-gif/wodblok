@@ -2,6 +2,7 @@
 // (four corners, Edit corners), Repeat or Once at a Scale, with the photo's light by Shading; Export mockup saves a PNG at the photo's size. Nothing goes in the project.
 const { test, expect } = require('@playwright/test');
 const H = require('./helpers/harness');
+const path = require('path');
 // a photo: a grey room and a white panel in the middle (the print area), 600 x 400
 const photo = page => page.evaluate(() => { const c = document.createElement('canvas'); c.width = 600; c.height = 400; const x = c.getContext('2d'); x.fillStyle = '#8a8580'; x.fillRect(0, 0, 600, 400);
   x.fillStyle = '#ffffff'; x.fillRect(150, 100, 300, 200); return c.toDataURL('image/png').split(',')[1]; });
@@ -95,5 +96,34 @@ test('the Products: six built-in products, the design only on the product, Real 
   const k = await viewKey(page);
   await page.locator('#mkrs').check(); await waitView(page, k);
   await expect(page.locator('#mksc')).toBeDisabled();
+  expect(errors).toEqual([]);
+});
+
+// 2.92.2 (owner Nov 4 2026, docs/own-mockups-plan.md step 1): a photo you add has its product found at once (Find product, a mask kept with it, its corners the
+// product's box); Tolerance makes the mask again; Find product off goes back to corners only.
+test('your own mockup: Find product makes its mask, Tolerance and Find product change it', async ({ page }) => {
+  test.setTimeout(150000);
+  const { errors } = await H.openApp(page, { seed: 11 });
+  await page.evaluate(() => window.__wbTest.commands.run('randomize.roll')); await H.settle(page);
+  await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
+  await page.locator('#mkfl [data-f="rep"]').click(); await page.waitForTimeout(500);
+  await expect(page.locator('#mkamr')).toBeHidden();   // a product: its mask is its own
+  const k0 = await viewKey(page);
+  await page.setInputFiles('#mkpane .mkfile', path.join(__dirname, '..', 'mockups', 'tshirt.webp'));
+  await expect(page.locator('#mkpane [data-mk^="m"]')).toHaveCount(1); await waitView(page, k0);
+  await expect(page.locator('#mkam')).toBeChecked(); await expect(page.locator('#mktolr')).toBeVisible();
+  // the corners are the shirt's box; just inside its top left corner is the wall beside the collar and the shoulder: the photo, not the design
+  const st = () => page.evaluate(() => { const v = window.__wbTest.kv.get('wb2901_mockups'); return JSON.parse(v).t[0]; });
+  const t = await st(); expect(t.am).toBe(1); expect(t.q[0]).toBeLessThan(.06); expect(t.q[2]).toBeGreaterThan(.94);
+  const photo = await page.evaluate(async () => { const i = new Image(); i.src = document.querySelector('#mkpane [data-mk^="m"] img').src; await i.decode(); const c = document.createElement('canvas'); c.width = i.naturalWidth; c.height = i.naturalHeight; const x = c.getContext('2d'); x.drawImage(i, 0, 0); return [...x.getImageData(Math.round(c.width * .3), Math.round(c.height * .06), 1, 1).data].slice(0, 3); });
+  const near = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+  expect(near(await px(page, .3, .06), photo)).toBeLessThan(14);
+  // Tolerance remakes the mask
+  const k1 = await viewKey(page), tol = page.locator('#mktol').locator('xpath=..').locator('.num input'); await tol.fill('90'); await tol.press('Enter');
+  await page.waitForFunction(() => JSON.parse(window.__wbTest.kv.get('wb2901_mockups')).t[0].tol === 90, null, { timeout: 15000 });
+  // Find product off: corners only, so the design covers the wall there too
+  await page.locator('#mkam').uncheck(); await page.waitForTimeout(1200); expect((await st()).am).toBeUndefined();
+  await expect(page.locator('#mktolr')).toBeHidden();
+  expect(near(await px(page, .3, .06), photo)).toBeGreaterThan(14);
   expect(errors).toEqual([]);
 });

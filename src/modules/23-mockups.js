@@ -28,7 +28,7 @@ function mkLoad(){let raw=null;try{raw=kv.get(MK_KEY)}catch(e){}
  if(mkC===null||raw!==mkCr){let d=null;try{d=JSON.parse(raw||'null')}catch(e){}if(!d||typeof d!='object')d={};
   d.f=(Array.isArray(d.f)?d.f:[]).filter(x=>typeof x=='string'&&x&&x.length<=200);
   d.t=(Array.isArray(d.t)?d.t:[]).filter(x=>x&&/^m[\w-]{1,30}$/.test(x.id)&&x.w>0&&x.h>0&&typeof x.th=='string'&&/^data:image\/(?:webp|png|jpeg);base64,/.test(x.th))
-   .map(x=>({id:x.id,n:mkName(x.n),f:typeof x.f=='string'?x.f:'',w:+x.w,h:+x.h,th:x.th,q:mkQok(x.q)?x.q.slice():mkQ0.slice()}));
+   .map(x=>({id:x.id,n:mkName(x.n),f:typeof x.f=='string'?x.f:'',w:+x.w,h:+x.h,th:x.th,q:mkQok(x.q)?x.q.slice():mkQ0.slice(),...(x.am?{am:1,tol:Number.isFinite(+x.tol)?Math.max(0,Math.min(100,+x.tol)):50}:{})}));
   d.h=(Array.isArray(d.h)?d.h:[]).filter(x=>typeof x=='string'&&x.length<=60);d.r=d.r&&typeof d.r=='object'&&!Array.isArray(d.r)?d.r:{};d.b={};mkC=d;mkCr=raw}
  return{f:[...mkC.f],t:mkC.t.map(x=>({...x,q:x.q.slice()})),h:[...mkC.h],r:{...mkC.r},b:{}}}
 const mkStore=d=>{try{kv.set(MK_KEY,JSON.stringify(d));mkC=null;return true}catch(e){pmsg('Could not keep the mockups in this browser.');return false}};
@@ -47,7 +47,7 @@ const mkMem=new Map();
 async function mkCol0(){if(mkCol===null)mkCol=(await collection('mockups'))||false;return mkCol||null}
 async function mkPhotoPut(id,src){mkMem.set(id,src);const c=await mkCol0();if(c)try{await c.doc(id).set(src)}catch(e){}}
 async function mkPhotoGet(id){if(mkMem.has(id))return mkMem.get(id);const c=await mkCol0();if(!c)return null;try{const s=await c.doc(id).get();if(s.exists){const v=s.data();if(typeof v=='string'){mkMem.set(id,v);return v}}}catch(e){}return null}
-async function mkPhotoDel(id){mkMem.delete(id);mkPh.delete(id);const c=await mkCol0();if(c)try{await c.doc(id).delete()}catch(e){}}
+async function mkPhotoDel(id){mkMem.delete(id);mkMem.delete(id+'~mask');mkPh.delete(id);const c=await mkCol0();if(c)try{await c.doc(id).delete();await c.doc(id+'~mask').delete()}catch(e){}}
 const mkImg=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src});
 async function mkPhoto(id){if(mkPh.has(id))return mkPh.get(id);const b=MK_B.find(x=>x.id===id),s=b?b.src:await mkPhotoGet(id);const i=s?await mkImg(s):null;if(i)mkPh.set(id,i);return i}
 // a picture you chose becomes a mockup in the open folder: at most MK_MAX pixels on its long side, its print area a rectangle in the middle until its corners are set
@@ -57,10 +57,53 @@ async function mkAdd(f){if(!f||!/^image\//.test(f.type)&&!/\.(png|jpe?g|webp)$/i
  const enc=(cv,q)=>{const s=cv.toDataURL('image/webp',q);return s.startsWith('data:image/webp')?s:cv.toDataURL('image/jpeg',q)};
  const t=document.createElement('canvas'),tk=MK_TH/Math.max(w,h);t.width=Math.max(1,Math.round(w*tk));t.height=Math.max(1,Math.round(h*tk));t.getContext('2d').drawImage(c,0,0,t.width,t.height);
  const id='m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),src=enc(c,.86),d=mkLoad();await mkPhotoPut(id,src);
- d.t.push({id,n:mkName(f.name),f:MKT?MKT.here():'',w,h,th:enc(t,.8),q:mkQ0.slice()});mkStore(d);return id}
+ d.t.push({id,n:mkName(f.name),f:MKT?MKT.here():'',w,h,th:enc(t,.8),q:mkQ0.slice()});mkStore(d);
+await mkFindSet(id,true,null);   // 2.92.2: the product is found at once, at the Tolerance that gives the smoothest outline; where it is not (it touches every edge), the corners stay in the middle
+ return id}
 // a product's mask, loaded once
 const mkMk=new Map();
-async function mkMask(m){if(!m||!m.mask)return null;if(mkMk.has(m.id))return mkMk.get(m.id);const i=await mkImg(m.mask);if(i)mkMk.set(m.id,i);return i}
+async function mkMask(m){if(!m||!(m.mask||m.am))return null;const k=m.id+'|'+(m.tol||0);if(mkMk.has(k))return mkMk.get(k);const src=m.mask||await mkPhotoGet(m.id+'~mask');const i=src?await mkImg(src):null;if(i)mkMk.set(k,i);return i}
+// ---- Find product (2.92.2, docs/own-mockups-plan.md step 1; owner Nov 4 2026: "I want to give it a photo and it generates the mask with a tolerance slider to help").
+// The background's colours are read from the photo's border (a ring 3% wide, in 32 pieces, each piece's median); every pixel's distance to the nearest of them is
+// measured with colour counting more than light (a white product on a pale wall differs mostly in colour) and texture too (a linen cushion's shaded side is the wall's
+// colour but not its smoothness: the fine detail left when the picture is blurred a little); what is within the Tolerance's distance and reaches the
+// border is background, the rest product: its largest part, holes and all (a product's own shaded or pale parts stay in). Tolerance 0 to 100: the higher, the more
+// counts as background (as Photoshop's Magic Wand on the background). Worked at up to 1200 pixels on the long side; the mask is that size and drawn at any size.
+// Returns {c: the mask (white, alpha = product), q: the product's box as four corners} or null when nothing is found (a product that touches every edge, as a wall).
+// each pixel's distance (squared) to the nearest background colour: light, colour and texture
+function mkDist(d,W,H){const n=W*H,Y=new Float32Array(n),Cb=new Float32Array(n),Cr=new Float32Array(n);
+ for(let i=0,p=0;i<n;i++,p+=4){const r=d[p],g=d[p+1],b=d[p+2];Y[i]=.299*r+.587*g+.114*b;Cb[i]=-.1687*r-.3313*g+.5*b;Cr[i]=.5*r-.4187*g-.0813*b}
+ const box=(a,r)=>{const t=new Float32Array(n),o=new Float32Array(n),k=2*r+1;for(let yy=0;yy<H;yy++){let s=0;const b=yy*W;for(let xx=-r;xx<=r;xx++)s+=a[b+Math.min(W-1,Math.max(0,xx))];for(let xx=0;xx<W;xx++){t[b+xx]=s/k;s+=a[b+Math.min(W-1,xx+r+1)]-a[b+Math.max(0,xx-r)]}}
+  for(let xx=0;xx<W;xx++){let s=0;for(let yy=-r;yy<=r;yy++)s+=t[Math.min(H-1,Math.max(0,yy))*W+xx];for(let yy=0;yy<H;yy++){o[yy*W+xx]=s/k;s+=t[Math.min(H-1,yy+r+1)*W+xx]-t[Math.max(0,yy-r)*W+xx]}}return o};
+ const E=(()=>{const b=box(Y,1),h=new Float32Array(n);for(let i=0;i<n;i++){const v=Y[i]-b[i];h[i]=v*v}const e=box(h,4);for(let i=0;i<n;i++)e[i]=Math.sqrt(e[i]);return e})();   // the texture
+ const bw=Math.max(2,Math.round(Math.min(W,H)*.03)),seg=Array.from({length:32},()=>[[],[],[],[]]);
+ for(let yy=0;yy<H;yy++)for(let xx=0;xx<W;xx++){if(yy>=bw&&yy<H-bw&&xx>=bw&&xx<W-bw)continue;const i=yy*W+xx,a=Math.floor((Math.atan2(yy-H/2,xx-W/2)+Math.PI)/(2*Math.PI)*32)%32;seg[a][0].push(Y[i]);seg[a][1].push(Cb[i]);seg[a][2].push(Cr[i]);seg[a][3].push(E[i])}
+ const med=v=>{v.sort((p,q)=>p-q);return v[v.length>>1]},bg=seg.filter(s=>s[0].length).map(s=>[med(s[0]),med(s[1]),med(s[2]),med(s[3])]);
+ const B=[];bg.forEach(c=>{if(!B.some(o=>.35*(o[0]-c[0])**2+(o[1]-c[1])**2+(o[2]-c[2])**2+9*(o[3]-c[3])**2<1))B.push(c)});   // near-equal border pieces once
+ const out=new Float32Array(n);for(let i=0;i<n;i++){let m=1e9;const y=Y[i],cb=Cb[i],cr=Cr[i],e=E[i];for(let j=0;j<B.length;j++){const c=B[j],dy=y-c[0],db=cb-c[1],dr=cr-c[2],de=e-c[3],v=.35*dy*dy+db*db+dr*dr+9*de*de;if(v<m)m=v}out[i]=m}return out}
+const mkFD=new WeakMap();   // per photo: its size at work and each pixel's distance to the background (the slow part, made once)
+function mkFind(img,w,h,tol){const k=Math.min(1,1000/Math.max(w,h)),W=Math.max(8,Math.round(w*k)),H=Math.max(8,Math.round(h*k)),c=document.createElement('canvas');c.width=W;c.height=H;
+ const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,W,H);const n=W*H;let D2=mkFD.get(img);if(!D2||D2.n!==n){D2={n,v:mkDist(x.getImageData(0,0,W,H).data,W,H)};mkFD.set(img,D2)}const dist=D2.v;
+ const thr=2+Math.max(0,Math.min(100,tol))*.16,t2=thr*thr,like=new Uint8Array(n);for(let i=0;i<n;i++)if(dist[i]<=t2)like[i]=1;
+ // the background: like the border and joined to it
+ const back=new Uint8Array(n),Q=new Int32Array(n);let qh=0,qt=0;const push=i=>{if(like[i]&&!back[i]){back[i]=1;Q[qt++]=i}};
+ for(let xx=0;xx<W;xx++){push(xx);push((H-1)*W+xx)}for(let yy=0;yy<H;yy++){push(yy*W);push(yy*W+W-1)}
+ while(qh<qt){const i=Q[qh++],xx=i%W;if(xx>0)push(i-1);if(xx<W-1)push(i+1);if(i>=W)push(i-W);if(i<n-W)push(i+W)}
+ // the product: the largest part of the rest
+ const lab=new Int32Array(n);let best=0,bestN=0,id=0;for(let s0=0;s0<n;s0++){if(back[s0]||lab[s0])continue;id++;let cnt=0;qh=qt=0;lab[s0]=id;Q[qt++]=s0;
+  while(qh<qt){const i=Q[qh++],xx=i%W;cnt++;const go=j=>{if(!back[j]&&!lab[j]){lab[j]=id;Q[qt++]=j}};if(xx>0)go(i-1);if(xx<W-1)go(i+1);if(i>=W)go(i-W);if(i<n-W)go(i+W)}if(cnt>bestN){bestN=cnt;best=id}}
+ if(!best||bestN<n*.01||bestN>n*.97)return null;
+ const im=x.createImageData(W,H),o=im.data;let x0=W,y0=H,x1=0,y1=0;for(let i=0;i<n;i++){const p=i*4;o[p]=o[p+1]=o[p+2]=255;if(lab[i]===best){o[p+3]=255;const xx=i%W,yy=(i/W)|0;if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy}}
+ let edge=0;for(let i=0;i<n;i++)if(lab[i]===best){const xx=i%W;if(xx==0||xx==W-1||i<W||i>=n-W||lab[i-1]!==best||lab[i+1]!==best||lab[i-W]!==best||lab[i+W]!==best)edge++}
+ x.putImageData(im,0,0);const q=[x0/W,y0/H,(x1+1)/W,y0/H,(x1+1)/W,(y1+1)/H,x0/W,(y1+1)/H].map(v=>+v.toFixed(4));return{c,q,ragged:edge/Math.sqrt(bestN)}}
+// a new photo: Find product at Tolerance 50, unless its outline is much more ragged (by 40%) than the smoothest of 20, 35 and 65 (a product broken up by its own shadows
+// has a long, ragged edge; a lower Tolerance keeps it whole): then that one
+function mkFindBest(img,w,h){const all=[20,35,50,65].map(tol=>({tol,r:mkFind(img,w,h,tol)})).filter(o=>o.r);if(!all.length)return null;const mid=all.find(o=>o.tol==50),best=all.reduce((a,b)=>b.r.ragged<a.r.ragged?b:a);
+ return mid&&mid.r.ragged<=best.r.ragged*1.4?mid:best}
+// your mockup's mask made again (Find product on, at its Tolerance): kept with the photo, its corners set to the product's box
+async function mkFindSet(id,on,tol){const d=mkLoad(),t=d.t.find(z=>z.id===id);if(!t)return false;if(!on){delete t.am;delete t.tol;mkStore(d);return true}
+ const ph=await mkPhoto(id);if(!ph)return false;let r;if(tol==null){const b=mkFindBest(ph,t.w,t.h);r=b&&b.r;tol=b?b.tol:50}else r=mkFind(ph,t.w,t.h,tol);if(!r){if(t.am){delete t.am;delete t.tol;mkStore(d)}return false}
+ await mkPhotoPut(id+'~mask',r.c.toDataURL('image/png'));t.am=1;t.tol=tol;t.q=r.q;mkStore(d);[...mkMk.keys()].forEach(k=>{if(k.startsWith(id+'|'))mkMk.delete(k)});return true}
 // Scale as a % of the print area's width: Real size works it out from the canvas's real width and the product's (Repeat only)
 const mkRealOk=(m,u)=>!!(m&&m.cm>0&&physOf()&&mkFill(u)=='rep');
 const mkScale=(m,u)=>{const f=mkFill(u);if(f=='rep'&&u.rs&&mkRealOk(m,u)){const P=physOf();return Math.max(.5,Math.min(400,P.inW*2.54/m.cm*100))}return f=='rep'?u.sr:u.so};
@@ -138,7 +181,8 @@ function mkCorners(){const ov=$('mkov');if(!ov)return;const m=mkCur(),on=!!(m&&!
  ov.innerHTML=`<path class="crln" d="M${P[0]} ${P[1]}L${P[2]} ${P[3]}L${P[4]} ${P[5]}L${P[6]} ${P[7]}Z"/>`+[0,1,2,3].map(i=>`<rect class="crhd" data-mkq="${i}" x="${(P[i*2]-s/2).toFixed(1)}" y="${(P[i*2+1]-s/2).toFixed(1)}" width="${s}" height="${s}"/>`).join('')}
 // the controls follow the mockup in use and the settings
 function mkSync(){const u=mkUi(),fill=mkFill(u);$('mkfl').querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==fill));
- const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;   /* a product's print area is its own */
+ const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;$('mkamr').hidden=!m||!!m.b;$('mkam').checked=!!(m&&m.am);$('mktolr').hidden=!m||!!m.b||!m.am;
+ {const tl=$('mktol'),tv=m&&m.am?m.tol:50;if(+tl.value!==tv&&document.activeElement!==tl){tl.value=tv;tl.dispatchEvent(new Event('input',{bubbles:true}))}}   /* a product's print area is its own */
  const sc=$('mksc'),v=fill=='rep'?u.sr:u.so;sc.dataset.def=fill=='rep'?'25':'100';sc.disabled=real&&u.rs;if(sc._n)sc._n.disabled=sc.disabled;if(+sc.value!==v){sc.value=v;sc.dispatchEvent(new Event('input',{bubbles:true}))}
  const sh=$('mksh');if(+sh.value!==u.sh){sh.value=u.sh;sh.dispatchEvent(new Event('input',{bubbles:true}))}$('mkx').disabled=!m}
 let mkKey='';
@@ -157,6 +201,10 @@ function init23(){if(!$('mkpane'))return;MKT=ltMake(mkCfg());MKT.init();$('mkpan
  $('mksc').addEventListener('input',()=>{if(WBS.uiLoad)return;const u=mkUi(),v=+$('mksc').value;if(mkFill(u)=='rep'){if(u.sr===v)return;mkUiSet({sr:v})}else{if(u.so===v)return;mkUiSet({so:v})}mkView()});
  $('mksh').addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$('mksh').value;if(mkUi().sh===v)return;mkUiSet({sh:v});mkView()});
  $('mkcn').addEventListener('change',mkCorners);
+ // Find product and Tolerance (2.92.2): the mask is made again a moment after the slider stops
+ const mkRefind=async(on,tol)=>{const m=mkCur();if(!m||m.b)return;const ok=await mkFindSet(m.id,on,tol);if(on&&!ok)pmsg('No product found: it may touch every edge of the photo. Set its corners instead.');mkSync();mkView();mkCorners()};
+ $('mkam').addEventListener('change',()=>mkRefind($('mkam').checked,+$('mktol').value));
+ {let tt=0;$('mktol').addEventListener('input',()=>{if(WBS.uiLoad)return;const m=mkCur();if(!m||m.b||!m.am||m.tol===+$('mktol').value)return;clearTimeout(tt);tt=setTimeout(()=>mkRefind(true,+$('mktol').value),150)})}
  $('mkrs').addEventListener('change',()=>{mkUiSet({rs:$('mkrs').checked});mkSync();mkView()});
  $('mkx').onclick=mkExport;
  // a corner square follows the pointer; the corners are kept when it is let go
