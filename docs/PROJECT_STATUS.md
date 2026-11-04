@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.91.0 (the mockups update is done)** on `feat/2.91.0-mockups-done`, not merged; version and docs only. Gift wrap and phone case wait for their photos.
+- **Nov 4: 2.91.1 (repeats step 1: a mirror repeat)** on `feat/2.91.1-mirror-repeat`, not merged. Plan: docs/repeats-plan.md (next: Make seamless for pictures, a real-size preview, then 2.92.0).
+- **Nov 4: 2.91.0 LIVE (the mockups update is done)**. Gift wrap and phone case wait for their photos.
 - **Nov 4: 2.90.2 LIVE (mockups step 2: six built-in products)**.
 - **Nov 3: 2.90.1 LIVE (mockups step 1: the Mockup panel and your own photos)**. Plan: docs/mockups-plan.md.
 - **Nov 3: 2.90.0 LIVE (every arrangement has its own settings)**, merged: Half drop's Drop, Brick's Offset and one or two settings for every other arrangement and the wallpaper groups (owner). Replaces step 1 of the repeats update; still to come from it: a mirror repeat for the canvas tile, Make seamless for pictures, a real-size preview.

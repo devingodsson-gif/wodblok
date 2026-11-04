@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.91.1 (Nov 4 2026): repeats step 1, a mirror repeat for the canvas tile (docs/repeats-plan.md)
+- Owner: "Do it" (the rest of the repeats update). Canvas > Format > Repeat has a fourth choice, Mirror (`dim.rk = 'mirror'`, optional; the file format stays 30, and an older app reads it as Grid). Every other column of tiles is flipped across and every other row flipped down, so the edges meet their own reflection: `tileOffs` is empty (no wrap copies; what runs off an edge is cut there), `tileCells` gives the 3 × 3 view its flipped copies, the repeat unit is 2 × 2 tiles (`xrUnit`, `xrPlaces` with flips), the print file's bleed was already mirrored, and the mockups lay it the same way.
+- Tests: tests/mirror-repeat-2-91-1.spec.js (new). Run: it, repeat-tile, print-and-sell-2-76-6, mockups-2-90, arrangement-settings-2-90, help specs, check:style, `npm run perf`.
+
 ## 2.91.0 (Nov 4 2026): the mockups update is done (docs/mockups-plan.md)
 - Version and docs only. Live: 2.90.1 (the Mockup panel and your own photos) and 2.90.2 (six built-in products). Still to come when the owner sends their photos: gift wrap and phone case (each is a photo, its mask and a line in mockups/products.json).
 - Tests: none new; the release changes no code.

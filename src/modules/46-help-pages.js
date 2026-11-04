@@ -32,7 +32,7 @@ const HELP_PAGES=[
   ['h','Pieces and colour'],
   ['ul',['The Sources group at the top of the Pattern panel lists what the pattern prints. Add source adds one of the project\u2019s stamps, texts or other patterns, or a shape from the library.','Accent places a different source at chosen places.','Colour of each piece can follow the source or the place; ink variation and overprint make it look printed.','Edit pieces lets you pick one piece to recolour, turn, delete or make an element of its own.']],
   ['h','Repeats'],
-  ['p','Canvas > Format > Repeat tile makes the canvas one tile of a seamless repeat (grid, brick or half drop). View > Repeat tile shows it 3 × 3.']]],
+  ['p','Canvas > Format > Repeat tile makes the canvas one tile of a seamless repeat (grid, brick, half drop or mirror: every other tile flipped, so its edges always meet). View > Repeat tile shows it 3 × 3.']]],
  ['effects','Effects',[
   ['p','Effects make a print look printed. Add them from the Effects menu or the element’s Effects group; each has its own settings and can be switched off or removed.'],
   ['h','The effects'],
@@ -52,6 +52,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.91.1','Nov 4 2026',['Canvas > Format > Repeat has Mirror: every other tile is flipped across and down, so the edges always meet.']],
  ['2.91.0','Nov 4 2026',['Mockups are complete: Window > Mockup shows your design live on six products or your own photos, and Export mockup saves it.']],
  ['2.90.2','Nov 4 2026',['Mockup has six products: a T-shirt, a tote bag, a cushion, fabric, wallpaper and a notebook. The design follows their folds; Real size shows the repeat at the size it prints.']],
  ['2.90.1','Nov 3 2026',['Window > Mockup shows your design on a product photo, live. Add your own photos and set the corners of the print area; Export mockup saves a PNG.']],
