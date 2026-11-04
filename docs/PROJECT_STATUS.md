@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.100.0 (Shift across, Shift down and Rotate in the Mockup panel)** on `feat/2.100.0-mockup-position`, not merged. In progress next: AI selection for mockup masks (SAM 2.1 tiny; the owner chose "Find with: Colour | AI" and keeping the model in the repo; trial results in the report of Nov 4).
+- **Nov 4: 2.100.1 (AI selection for mockup masks: Find with Colour | AI; docs/ai-select-plan.md)** on `feat/2.100.1-ai-select`, not merged. The model and runtime (ai/, about 100 MB, Apache 2.0 and MIT) are now in the repo. Next: 2.101.0 closes the plan; later the Image panel.
+- **Nov 4: 2.100.0 LIVE (Shift across, Shift down and Rotate in the Mockup panel)**.
 - **Nov 4: 2.99.0 LIVE (the asset split plan is done; text-size test fixed)**. Next: phase 2, AI Select subject (open question for the owner: which model, after a licence and size check).
 - **Nov 4: 2.98.5 LIVE (asset cache: kept small, start-up data stored on install)**. Full suite on 2.98.4 (run 41889099948): 3 of about 820 failed: web-app.spec (fixed here), small-updates-2-79-2 Alt + wheel (passes locally: flaky), text-size "unlocked stamp" (waits for the Mockup panel in an unlocked stamp; fails on 2.98.0 too, so it predates the asset split; fixed in 2.99.0). Next: 2.99.0 closes the plan; then phase 2 (AI Select subject: model and licence are the owner's choice).
 - **Nov 4: 2.98.4 LIVE (asset split, step 4: shapes and templates as data files, the owner's "cached file at start")**. Hosted page 2.2 MB (from 18.5).
@@ -270,6 +271,7 @@ None at the moment. Add new ones here.
 - Still open from before: owner's Mac `npm run perf:draw`; printing text, picture and pattern elements with effects (2.44.3 prints only shapes); stale remote branch docs/2.44.0-live could not be deleted.
 
 ## Suggestions
+- (Nov 4 2026, AI selection) Cross-origin isolation (COOP and COEP headers on wodblok.com) would let the AI use several processor threads, reading a photo several times faster; it must be checked against sign-in (Clerk) first. Not done; the owner's decision.
 - **Patterns library** (pattern plan step 8, shelved by the owner Oct 30 2026): saved patterns reused across projects on the shared library tree. (my recommendations, not decisions)
 - Mockups (shelved by the owner Oct 29 2026, "for later"): a pattern's repeat previewed on fabric, wallpaper, wrapping paper or a book at real scale, once the physical canvas size of docs/pattern-plan.md step 3 exists.
 - Library standard release: the owner wants every library to work the same way as the Shapes library (Oct 26 2026). Saved stamps (no folders), Saved trays (one level, no select mode, no drag), templates, workspaces and export recipes (flat lists) and colourways (no library) still differ; one release per library, starting with Saved stamps.

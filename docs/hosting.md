@@ -28,4 +28,7 @@ GitHub Pages is not an option: Pages sites are public (private ones need GitHub 
 - **The app's own files (2.98.1, docs/asset-split-plan.md):** `npm run build:web` puts built-in content (mockup photos, textures, lettering fonts; the shapes and templates as two data files
   the app waits for at start) in `assets/` beside index.html, each name carrying its content's hash. The app fetches a file only when it is used; `/assets/*` is cached for ever
   (_headers), and the service worker keeps every file it has fetched in its own cache for offline use. The single file (`npm run build`) keeps them inside.
+- **AI selection (2.100.1, docs/ai-select-plan.md):** `assets/ai/` holds the model and its runtime (about 100 MB; any file over 24 MiB in pieces, `.1`, `.2`,
+  so none is over Cloudflare's 25 MiB). Fetched only when someone first uses Find with AI, then kept. It runs on one processor thread unless the page is
+  cross-origin isolated (COOP and COEP headers), which wodblok.com is not today: turning that on is faster but must not break sign-in; it is the owner's decision.
 - **Opening files:** the installed app in Chrome and Edge on a computer can be chosen as the opener for `.wodblok` files.
