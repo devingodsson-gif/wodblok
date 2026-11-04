@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.98.3 (Nov 4 2026): asset split, step 3: fonts (docs/asset-split-plan.md)
+- tools/fonts.js goes through tools/assets.js: the lettering fonts are 174 files in assets/fonts/ for `npm run build:web`; the interface font and the wordmark font (IM Fell English, used by the splash and the watermark) stay inside the page. The single file's font CSS is unchanged, byte for byte.
+- The Text tool (60-text-engine.js): `teRef` finds a font's file from its @font-face rule; `teLoad`, which every layout already waits for, also fetches a file font's bytes (`teFetch`, through assetBytes) for opentype.js; a font whose bytes have not arrived is not cached as unreadable. Editing a text whose font changed also readies its old font (22-text-tool.js). `isAsset` exported from src/platform.
+- Hosted page 7,004,384 bytes (from 12,023,567). At start only the Text tool's default font (Cinzel, 18 KB) is fetched.
+- Tests: tests/asset-split-2-98-3.spec.js (new: none but Cinzel at start; text in Cinzel and in Lora fetches its font and gives exactly the single file's letters). Run: the three asset specs and six text specs (12 passed), check:platform, check:style, the start-up error check. Not run: perf (no drawing change), the full suite.
+
 ## 2.98.2 (Nov 4 2026): asset split, step 2: textures (docs/asset-split-plan.md)
 - The built-in texture pictures go through tools/assets.js (tools/textures/folders.js): inside the page for `npm run build`, 30 files in assets/textures/ for `npm run build:web`. The app keeps each one's reference (`ref`) beside its address; the texture library's Export reads a built-in's bytes through assetBytes. Textures were already read the first time they are drawn, so nothing else changed. Hosted page 12,023,567 bytes (from 17,833,934); single file unchanged.
 - Tests: tests/asset-split-2-98-2.spec.js (new: none at start, a Texture effect fetches only what it shows, each file once); tests/helpers/web-build.js (new: builds and serves the hosted app, shared with the 2.98.1 spec). Run: both asset specs, the four texture specs and randomize-effects (16 passed), check:platform, check:style, the start-up error check. Not run: perf (the single file's drawing is unchanged), the full suite.

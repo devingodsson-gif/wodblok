@@ -1,11 +1,16 @@
 // The bundled fonts (SIL Open Font Licence; the licence texts are in src/fonts/licences/), as @font-face rules with the font data
 // inside the CSS, so the page needs no network for them. Latin subsets. The interface font (Hanken Grotesk, the only one) is a variable font; the thirty-four
 // lettering fonts (Text tool) are only fetched by the browser from this data when a letter is first set in them.
+// 2.98.3 (docs/asset-split-plan.md): where each lettering font goes is tools/assets.js's choice: inside the CSS, or a file in assets/fonts/ for the hosted app
+// (the browser fetches it when text is first set in it; the Text tool fetches its bytes through src/platform/assets.js). The interface font and the wordmark font
+// (IM Fell English: the splash and the watermark) always stay inside, so the first paint never waits for them.
 const fs = require('fs'), path = require('path');
-const dir = path.join(__dirname, '..', 'src', 'fonts');
-const face = (family, file, weight) => {
+const { assetWriter } = require('./assets');
+const dir = path.join(__dirname, '..', 'src', 'fonts'), INSIDE = ['fell'];   // lettering fonts the interface itself uses
+const face = (writer, family, file, weight) => {
   const fmt = file.endsWith('.woff') ? 'woff' : 'woff2';           // the lettering fonts are .woff: the Text tool reads their outlines with opentype.js, which cannot read .woff2
-  return `@font-face{font-family:"${family}";font-style:normal;font-weight:${weight};font-display:swap;src:url(data:font/${fmt};base64,${fs.readFileSync(path.join(dir, file)).toString('base64')}) format("${fmt}")}`;
+  const ref = writer.ref('fonts', path.basename(file).replace(/\.woff2?$/, ''), fs.readFileSync(path.join(dir, file)), fmt);
+  return `@font-face{font-family:"${family}";font-style:normal;font-weight:${weight};font-display:swap;src:url(${ref}) format("${fmt}")}`;
 };
 const TEXT = [['Cinzel', 'cinzel', 700], ['Cinzel Decorative', 'cinzeld', 700], ['IM Fell English', 'fell', 400], ['IM Fell English SC', 'fellsc', 400],
   ['Cormorant Garamond', 'garamond', 700], ['UnifrakturMaguntia', 'frak', 400], ['Pirata One', 'pirata', 400], ['Uncial Antiqua', 'uncial', 400],
@@ -13,8 +18,8 @@ const TEXT = [['Cinzel', 'cinzel', 700], ['Cinzel Decorative', 'cinzeld', 700], 
   ['Abril Fatface', 'abril', 400], ['Bebas Neue', 'bebas', 400], ['Playfair Display', 'playfair', 700], ['Bodoni Moda', 'bodoni', 700], ['DM Serif Display', 'dmserif', 400], ['Oswald', 'oswald', 700], ['Anton', 'anton', 400], ['League Gothic', 'leaguegothic', 400], ['Montserrat', 'montserrat', 800], ['Lobster', 'lobster', 400], ['Pacifico', 'pacifico', 400], ['Dancing Script', 'dancing', 700], ['Caveat', 'caveat', 700], ['Permanent Marker', 'marker', 400], ['Special Elite', 'elite', 400], ['Bungee', 'bungee', 400], ['Ultra', 'ultra', 400], ['Vast Shadow', 'vastshadow', 400], ['Limelight', 'limelight', 400], ['Almendra', 'almendra', 700], ['Metamorphous', 'metamorph', 400], ['Grenze Gotisch', 'grenze', 700]];
 // 2.66.0 (docs/text-plan.md release 4): about ninety lettering fonts; the families made by tools/fonts-make.py also have bold, italic and bold italic, each its own family ("Lora:b", "Lora:i", "Lora:bi") so the Text tool can read each one's outlines
 const TEXT2 = [["Lora", "lora", "biB"], ["Merriweather", "merriweather", "biB"], ["Libre Baskerville", "baskerville", "biB"], ["Crimson Pro", "crimson", "biB"], ["EB Garamond", "ebgaramond", "biB"], ["Spectral", "spectral", "biB"], ["Alegreya", "alegreya", "biB"], ["PT Serif", "ptserif", "biB"], ["Inter", "inter", "biB"], ["Work Sans", "worksans", "biB"], ["Raleway", "raleway", "biB"], ["Lato", "lato", "biB"], ["Nunito", "nunito", "biB"], ["Poppins", "poppins", "biB"], ["IBM Plex Sans", "plexsans", "biB"], ["Fira Sans", "firasans", "biB"], ["Karla", "karla", "biB"], ["Rubik", "rubik", "biB"], ["DM Sans", "dmsans", "biB"], ["Josefin Sans", "josefin", "biB"], ["Roboto Slab", "robotoslab", "b"], ["Arvo", "arvo", "biB"], ["Zilla Slab", "zillaslab", "biB"], ["Bitter", "bitter", "biB"], ["Righteous", "righteous", ""], ["Fredoka", "fredoka", "b"], ["Staatliches", "staatliches", ""], ["Archivo Black", "archivoblack", ""], ["Shrikhand", "shrikhand", ""], ["Monoton", "monoton", ""], ["Titan One", "titanone", ""], ["Luckiest Guy", "luckiestguy", ""], ["Passion One", "passionone", "b"], ["Chango", "chango", ""], ["Bowlby One SC", "bowlby", ""], ["Yeseva One", "yeseva", ""], ["Great Vibes", "greatvibes", ""], ["Satisfy", "satisfy", ""], ["Sacramento", "sacramento", ""], ["Parisienne", "parisienne", ""], ["Kaushan Script", "kaushan", ""], ["Yellowtail", "yellowtail", ""], ["Allura", "allura", ""], ["New Rocker", "newrocker", ""], ["UnifrakturCook", "frakcook", ""], ["Jacquard 24", "jacquard", ""], ["Indie Flower", "indieflower", ""], ["Shadows Into Light", "shadows", ""], ["Patrick Hand", "patrickhand", ""], ["Gloria Hallelujah", "gloria", ""], ["Architects Daughter", "architects", ""], ["Amatic SC", "amatic", "b"], ["Space Mono", "spacemono", "biB"], ["IBM Plex Mono", "plexmono", "biB"], ["Courier Prime", "courier", "biB"], ["JetBrains Mono", "jetbrains", "biB"]];
-module.exports = () => [
-  face('Hanken Grotesk', 'hanken-grotesk-latin.woff2', '400 600'),
-  ...TEXT.map(([fam, id, w]) => face(fam, 'text/' + id + '.woff', w)),
-  ...TEXT2.flatMap(([fam, id, v]) => [face(fam, 'text/' + id + '.woff', 400), ...[['b', 'b'], ['i', 'i'], ['B', 'bi']].filter(([k]) => v.includes(k)).map(([, s]) => face(fam + ':' + s, 'text/' + id + '-' + s + '.woff', 400))]),
+module.exports = (writer = assetWriter('inline')) => [
+  face(assetWriter('inline'), 'Hanken Grotesk', 'hanken-grotesk-latin.woff2', '400 600'),
+  ...TEXT.map(([fam, id, w]) => face(INSIDE.includes(id) ? assetWriter('inline') : writer, fam, 'text/' + id + '.woff', w)),
+  ...TEXT2.flatMap(([fam, id, v]) => [face(writer, fam, 'text/' + id + '.woff', 400), ...[['b', 'b'], ['i', 'i'], ['B', 'bi']].filter(([k]) => v.includes(k)).map(([, s]) => face(writer, fam + ':' + s, 'text/' + id + '-' + s + '.woff', 400))]),
 ].join('\n');

@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.98.3','Nov 4 2026',['The web app loads each lettering font the first time text is set in it.']],
  ['2.98.2','Nov 4 2026',['The web app loads textures only when they are used or shown.']],
  ['2.98.1','Nov 4 2026',['The web app loads mockup photos only when the Mockup tab shows them, so it starts with less to download.']],
  ['2.98.0','Nov 4 2026',['The Randomize dice rolls: it tumbles through its faces as it spins and lands on one.']],

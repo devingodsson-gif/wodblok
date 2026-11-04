@@ -1,4 +1,4 @@
-import {kv} from '../platform/index.js';
+import {assetBytes,isAsset,kv} from '../platform/index.js';
 import {opentype} from '../vendor/opentype.js';
 import {CH,CW,SH,SK,SW} from './04-canvas-and-stamp-outlines.js';
 // ===== Text engine (no panels, no document): fonts, letter outlines traced from the browser's own rendering, and the teLayout of lines,
@@ -20,7 +20,7 @@ const TE_GROUPS=['Serif','Sans','Slab','Display','Script','Blackletter','Handwri
 const teF={};teFonts.forEach(([id,fam,q,w,d,g,v])=>{teF[id]={id,fam,w,d,lbl:fam,g:g||'Display',v:{}};[['b','b'],['i','i'],['B','bi']].forEach(([k,sf])=>{if(v&&v.includes(k)){teF[id].v[sf]=id+'-'+sf;teF[id+'-'+sf]={id:id+'-'+sf,fam:fam+':'+sf,w:400,d,lbl:fam,g:'',sub:1}}})});
 // the font a letter is set in: its bold, italic or bold italic when the text's font has them (else the font itself, drawn bold or slanted by the Text layer)
 const teVar=(f,fl)=>{if(!fl||!f.v)return f;const b=fl.includes('b'),i=fl.includes('i'),k=b&&i?(f.v.bi?'bi':f.v.b?'b':f.v.i?'i':''):b?(f.v.b?'b':''):i?(f.v.i?'i':''):'';return k?teF[f.v[k]]:f};
-// the lettering fonts are bundled with the page (@font-face rules in the shell), so nothing is fetched
+// the lettering fonts are bundled with the page (@font-face rules in the shell); in the hosted app each is a file of the app's own (2.98.3), fetched when first used
 
 // your own fonts (kept in this browser when they fit)
 const teUF=[];const teAddUF=async(name,buf,save)=>{const id='u-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30);if(teF[id])return id;
@@ -43,8 +43,13 @@ function teDens(l,step){const o=[];for(let i=0;i<l.length;i++){const a=l[i],b=l[
 const teFok=f=>[...document.fonts].some(x=>x.family.replace(/["']/g,'')==f.fam&&x.status=='loaded');
 // --- real outlines: the letter's shape is read from the font file itself (opentype.js). Letters the file cannot give (a font it cannot read, a missing letter) are traced instead, below.
 const teOT=new Map();
-function teBytes(f){if(f.buf)return f.buf;for(const ss of document.styleSheets){let rs;try{rs=ss.cssRules}catch(e){continue}for(const r of rs){if(r.type!==5||r.style.getPropertyValue('font-family').replace(/["']/g,'')!==f.fam)continue;const m=/base64,([^")]+)/.exec(r.style.getPropertyValue('src'));if(m){const s=atob(m[1]),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u.buffer}}}return null}
-function teParsed(f){if(teOT.has(f.id))return teOT.get(f.id);let o=null;try{const b=teBytes(f);if(b)o=opentype.parse(b)}catch(e){o=null}teOT.set(f.id,o);return o}
+// a bundled font's file, as its @font-face rule names it: a data: address (the single file) or the app's own file (the hosted app); '' when there is none
+function teRef(f){if(f.ref!==undefined)return f.ref;f.ref='';for(const ss of document.styleSheets){let rs;try{rs=ss.cssRules}catch(e){continue}for(const r of rs){if(r.type!==5||r.style.getPropertyValue('font-family').replace(/["']/g,'')!==f.fam)continue;const m=/url\(\s*["']?([^"')]+)["']?\s*\)/.exec(r.style.getPropertyValue('src'));if(m&&isAsset(m[1])){f.ref=m[1];return f.ref}}}return f.ref}
+// the font's bytes, once they are here (a data: address is decoded at once; a file is fetched by teFetch, which teLoad waits for before any text is set)
+function teBytes(f){if(f.buf)return f.buf;const ref=teRef(f),m=/^data:[^,]*;base64,(.+)$/.exec(ref);if(!m)return null;const s=atob(m[1]),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);f.buf=u.buffer;return f.buf}
+async function teFetch(f){if(f.buf||f.u)return;const ref=teRef(f);if(!ref||ref.startsWith('data:'))return;try{const b=await assetBytes(ref);f.buf=b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength);teOT.delete(f.id)}catch(e){}}
+// a font whose file has not arrived yet is not remembered as unreadable: it is read once its bytes are here
+function teParsed(f){if(teOT.has(f.id))return teOT.get(f.id);let o=null;const b=teBytes(f);if(!b&&teRef(f)&&!teRef(f).startsWith('data:'))return null;try{if(b)o=opentype.parse(b)}catch(e){o=null}teOT.set(f.id,o);return o}
 // a cubic curve (fonts with PostScript outlines) as four quadratic pieces, the only curve the stored letters use
 function teCubic(x0,y0,x1,y1,x2,y2,x3,y3,out){const L=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t],P=[[x0,y0],[x1,y1],[x2,y2],[x3,y3]],bl=(t,u,v)=>{const a=L(P[0],P[1],t),b=L(P[1],P[2],t),c=L(P[2],P[3],t),d=L(a,b,u),e=L(b,c,u);return L(d,e,v)};
 for(let i=0;i<4;i++){const t0=i/4,t1=(i+1)/4,p0=bl(t0,t0,t0),c1=bl(t0,t0,t1),c2=bl(t0,t1,t1),p3=bl(t1,t1,t1);out.push([(3*c1[0]+3*c2[0]-p0[0]-p3[0])/4,(3*c1[1]+3*c2[1]-p0[1]-p3[1])/4,p3[0],p3[1]])}}
@@ -121,7 +126,7 @@ function teFitSz(o){const ps=teLayout({...o,sz:100});if(!ps.length)return o.sz;c
 const k=SK=='tri'?.55:SK=='rect'?.86:.74;return Math.max(5,Math.min(o.maxSz||40,Math.floor(100*Math.min(k*SW/(x1-x0),k*SH/(y1-y0)))))}
 // load a font before using it (the browser draws a fallback otherwise)
 // a font and its bold and italic (2.66.0) are loaded before letters are set in them
-const teLoad=async(f,t)=>{try{await Promise.all([f,...Object.values(f.v||{}).map(k=>teF[k]).filter(Boolean)].map(x=>document.fonts.load(teCss(x),t||'Aa')));await document.fonts.ready}catch(e){}};
+const teLoad=async(f,t)=>{try{const all=[f,...Object.values(f.v||{}).map(k=>teF[k]).filter(Boolean)];await Promise.all([...all.map(x=>document.fonts.load(teCss(x),t||'Aa')),...all.map(teFetch)]);await document.fonts.ready}catch(e){}};
 async function teReady(st){await teLoad(teF[st.f]||teF.cinzel,st.text)}
 
 async function teLayBox(o){const f=teF[o.f]||teF.cinzel;await teLoad(f,o.text);
