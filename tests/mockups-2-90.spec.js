@@ -127,3 +127,31 @@ test('your own mockup: Find product makes its mask, Tolerance and Find product c
   expect(near(await px(page, .3, .06), photo)).toBeGreaterThan(14);
   expect(errors).toEqual([]);
 });
+
+// 2.92.3 (docs/own-mockups-plan.md step 2): your own mockup has Folds (the design follows the photo's folds) and Real width (in Settings > General > Units), so Real size works for it
+test('your own mockup: Folds and Real width, then Real size', async ({ page }) => {
+  test.setTimeout(150000);
+  const { errors } = await H.openApp(page, { seed: 11 });
+  await page.evaluate(() => { window.__wbTest.kv.set('wb2871_units', 'cm'); window.__wbTest.commands.run('randomize.roll'); }); await H.settle(page);
+  await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
+  await page.locator('#mkfl [data-f="rep"]').click(); await page.waitForTimeout(400);
+  await expect(page.locator('#mkfor')).toBeHidden(); await expect(page.locator('#mkcmr')).toBeHidden();   // a product has its own
+  await page.setInputFiles('#mkpane .mkfile', path.join(__dirname, '..', 'mockups', 'fabric.webp'));
+  await page.waitForFunction(() => { const v = window.__wbTest.kv.get('wb2901_mockups'); return v && JSON.parse(v).t.length && JSON.parse(v).t[0].tol != null; }, null, { timeout: 30000 });
+  await page.waitForTimeout(800);
+  await expect(page.locator('#mkfor')).toBeVisible(); await expect(page.locator('#mkcmu')).toHaveText('cm');
+  const rec = () => page.evaluate(() => JSON.parse(window.__wbTest.kv.get('wb2901_mockups')).t[0]);
+  const k = await viewKey(page), fo = page.locator('#mkfo').locator('xpath=..').locator('.num input'); await fo.fill('80'); await fo.press('Enter'); await waitView(page, k);
+  expect((await rec()).warp).toBeCloseTo(.8, 5);
+  await page.locator('#mkcm').fill('110'); await page.locator('#mkcm').press('Enter'); await page.locator('#mkcm').blur(); await page.waitForTimeout(300);
+  expect((await rec()).cm).toBe(110);
+  // Real size shows once the canvas has a real size
+  await expect(page.locator('#mkrsr')).toBeHidden();
+  await page.evaluate(() => { const s = JSON.parse(window.__wbTest.state()); s.dim = { ...(s.dim || {}), u: 'mm', pw: 200, ph: 300, dpi: 300 }; window.__wbTest.apply(JSON.stringify(s)); }); await H.settle(page);
+  await expect(page.locator('#mkrsr')).toBeVisible({ timeout: 5000 });
+  const k2 = await viewKey(page); await page.locator('#mkrs').check(); await waitView(page, k2);
+  // clearing Real width takes it away
+  await page.locator('#mkcm').fill(''); await page.locator('#mkcm').press('Enter'); await page.locator('#mkcm').blur(); await page.waitForTimeout(300);
+  expect((await rec()).cm).toBeUndefined(); await expect(page.locator('#mkrsr')).toBeHidden();
+  expect(errors).toEqual([]);
+});
