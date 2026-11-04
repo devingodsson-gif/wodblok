@@ -34,7 +34,7 @@ for (const sub of ['data', 'platform', 'format', 'commands']) {                 
   const d = path.join(ROOT, 'src', sub);
   for (const f of fs.readdirSync(d).filter(f => f.endsWith('.js')).sort()) {
     const t = fs.readFileSync(path.join(d, f), 'utf8');
-    parts.push(strip(sub + '/' + f, sub + '/' + f === 'data/templates.js' ? dataFile(ASSETS, 'templates', 'TPL_BUILTIN', require('./templates/folders').withFolders(t)) : sub + '/' + f === 'data/shapes.js' ? dataFile(ASSETS, 'shapes', 'SHAPES', t) : sub + '/' + f === 'data/textures.js' ? require('./textures/folders').withTextures(t, ASSETS) : sub + '/' + f === 'data/mockups.js' ? require('./mockups/folders').withMockups(t, ASSETS) : t));   // the templates/ and textures/ folders join the built-in lists
+    parts.push(strip(sub + '/' + f, sub + '/' + f === 'data/templates.js' ? dataFile(ASSETS, 'templates', 'TPL_BUILTIN', require('./templates/folders').withFolders(t)) : sub + '/' + f === 'data/shapes.js' ? dataFile(ASSETS, 'shapes', 'SHAPES', t) : sub + '/' + f === 'data/ai.js' ? require('./ai/folders').withAi(t, ASSETS) : sub + '/' + f === 'data/textures.js' ? require('./textures/folders').withTextures(t, ASSETS) : sub + '/' + f === 'data/mockups.js' ? require('./mockups/folders').withMockups(t, ASSETS) : t));   // the templates/ and textures/ folders join the built-in lists
   }
 }
 parts.push(...manifest.map(f => strip(f, fs.readFileSync(path.join(dir, f), 'utf8'))));

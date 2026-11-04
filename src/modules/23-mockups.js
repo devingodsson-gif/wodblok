@@ -1,6 +1,7 @@
 import {cmdRegister} from '../commands/registry.js';
 import {MKIMG} from '../data/mockups.js';
-import {assetBytes,assetUrl,clipboard,collection,kv,use} from '../platform/index.js';
+import {AI_FILES} from '../data/ai.js';
+import {aiLoad,aiOk,aiPhoto,assetBytes,assetUrl,clipboard,collection,kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,physOf,tileOn,tileRk} from './04-canvas-and-stamp-outlines.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
@@ -29,7 +30,7 @@ function mkLoad(){let raw=null;try{raw=kv.get(MK_KEY)}catch(e){}
  if(mkC===null||raw!==mkCr){let d=null;try{d=JSON.parse(raw||'null')}catch(e){}if(!d||typeof d!='object')d={};
   d.f=(Array.isArray(d.f)?d.f:[]).filter(x=>typeof x=='string'&&x&&x.length<=200);
   d.t=(Array.isArray(d.t)?d.t:[]).filter(x=>x&&/^m[\w-]{1,30}$/.test(x.id)&&x.w>0&&x.h>0&&typeof x.th=='string'&&/^data:image\/(?:webp|png|jpeg);base64,/.test(x.th))
-   .map(x=>({id:x.id,n:mkName(x.n),f:typeof x.f=='string'?x.f:'',w:+x.w,h:+x.h,th:x.th,q:mkQok(x.q)?x.q.slice():mkQ0.slice(),...(x.am?{am:1,tol:Number.isFinite(+x.tol)?Math.max(0,Math.min(100,+x.tol)):50,...(x.mi?{mi:1}:{})}:{}),...(+x.warp>0?{warp:Math.min(1,+x.warp)}:{}),...(+x.cm>0?{cm:Math.min(10000,+x.cm)}:{})}));
+   .map(x=>({id:x.id,n:mkName(x.n),f:typeof x.f=='string'?x.f:'',w:+x.w,h:+x.h,th:x.th,q:mkQok(x.q)?x.q.slice():mkQ0.slice(),...(x.am?{am:1,tol:Number.isFinite(+x.tol)?Math.max(0,Math.min(100,+x.tol)):50,...(x.mi?{mi:1}:{}),...(x.ai?{ai:1}:{})}:{}),...(+x.warp>0?{warp:Math.min(1,+x.warp)}:{}),...(+x.cm>0?{cm:Math.min(10000,+x.cm)}:{})}));
   d.h=(Array.isArray(d.h)?d.h:[]).filter(x=>typeof x=='string'&&x.length<=60);d.r=d.r&&typeof d.r=='object'&&!Array.isArray(d.r)?d.r:{};d.b={};mkC=d;mkCr=raw}
  return{f:[...mkC.f],t:mkC.t.map(x=>({...x,q:x.q.slice()})),h:[...mkC.h],r:{...mkC.r},b:{}}}
 const mkStore=d=>{try{kv.set(MK_KEY,JSON.stringify(d));mkC=null;return true}catch(e){pmsg('Could not keep the mockups in this browser.');return false}};
@@ -129,6 +130,66 @@ async function mkWand(fx,fy){const m=mkCur();if(!m||m.b||!m.am)return;const ph=a
  seen[s0]=1;Q[qt++]=s0;while(qh<qt){const i=Q[qh++],xx=i%W;a[i*4+3]=add?255:0;a[i*4]=a[i*4+1]=a[i*4+2]=255;cnt++;const go=j=>{if(ok(j))Q[qt++]=j};if(xx>0)go(i-1);if(xx<W-1)go(i+1);if(i>=W)go(i-W);if(i<n-W)go(i+W)}
  x.putImageData(im,0,0);await mkPhotoPut(m.id+'~mask',c.toDataURL('image/png'));[...mkMk.keys()].forEach(k=>{if(k.startsWith(m.id+'|'))mkMk.delete(k)});
  pmsg(add?'Added to the product.':'Taken out of the product.');mkView()}
+// ---- AI (2.100.1, docs/ai-select-plan.md; owner Nov 4 2026: "Find with: Colour | AI"): in the hosted app, Find with AI finds the product with SAM 2.1 (src/platform/ai.js)
+// instead of by colour, and with Show mask on a click takes the part under it out of the product (a click on product) or adds it (elsewhere), read by the AI too.
+// The photo is analysed once a session (seconds; the first use also fetches the model, 74 MB, kept by the browser); the mask is kept with the photo as the other ones.
+const MK_AIW=1200,mkAiS=new Map();   // the long side the AI works at (the mask's size); mockup id -> promise of its analysed photo
+const mkAiOk=()=>aiOk(AI_FILES);
+let mkAiBusy=false;
+function mkAiPhoto(m){if(!mkAiS.has(m.id))mkAiS.set(m.id,(async()=>{
+  await aiLoad(AI_FILES,p=>pmsg('Getting the AI model: '+Math.round(p*100)+'%…'));
+  const ph=await mkPhoto(m.id);if(!ph)throw new Error('no photo');const k=Math.min(1,MK_AIW/Math.max(m.w,m.h)),c=document.createElement('canvas');c.width=Math.max(8,Math.round(m.w*k));c.height=Math.max(8,Math.round(m.h*k));
+  const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(ph,0,0,c.width,c.height);pmsg('Looking at the photo…');
+  const S=await aiPhoto(AI_FILES,c);return{...S,rgb:x.getImageData(0,0,c.width,c.height).data}})().catch(e=>{mkAiS.delete(m.id);throw e}));return mkAiS.get(m.id)}
+// the product (the AI's Select subject, tried on ten product photos, Nov 4 2026): the backdrop's colour is the median of the photo's outer band; each point of a 5 x 5
+// grid of the middle that is clearly not that colour is a click; a click's mask is kept when the model is sure of it, it has few backdrop-coloured pixels in it and
+// it is neither tiny nor most of the photo; the kept ones are joined (two curtain panels are one product). None kept: a box just inside the edges.
+async function mkAiSubject(S){const{W,H,rgb}=S,bw=Math.max(2,Math.round(Math.min(W,H)*.03)),band=[];
+  for(let y=0;y<H;y+=3)for(let x=0;x<W;x+=3)if(x<bw||y<bw||x>=W-bw||y>=H-bw)band.push(y*W+x);
+  const med=[0,1,2].map(c=>{const v=band.map(i=>rgb[i*4+c]).sort((p,q)=>p-q);return v[v.length>>1]}),far=(i,t)=>Math.hypot(rgb[i*4]-med[0],rgb[i*4+1]-med[1],rgb[i*4+2]-med[2])>t;
+  const col=(x,y)=>{let r=0,g=0,b=0,n=0;for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const i=(Math.min(H-1,Math.max(0,y+dy))*W+Math.min(W-1,Math.max(0,x+dx)))*4;r+=rgb[i];g+=rgb[i+1];b+=rgb[i+2];n++}return Math.hypot(r/n-med[0],g/n-med[1],b/n-med[2])};
+  const good=[];for(const fy of[.15,.325,.5,.675,.85])for(const fx of[.15,.325,.5,.675,.85]){const x=Math.round(W*fx),y=Math.round(H*fy);if(col(x,y)<=30)continue;
+   const r=await S.masks({points:[[x,y,1]]}),b=r.scores.reduce((p,v,i)=>v>r.scores[p]?i:p,0),L=r.masks[b];let on=0,bg=0;for(let i=0;i<W*H;i+=7)if(L[i]>0){on++;if(!far(i,22))bg++}
+   const a=on*7/(W*H);if(r.scores[b]>.8&&on&&bg/on<.35&&a>.005&&a<.9)good.push(L)}
+  if(good.length){const L=good[0].slice();for(const g of good.slice(1))for(let i=0;i<L.length;i++)if(g[i]>L[i])L[i]=g[i];return L}
+  const r=await S.masks({box:[W*.03,H*.03,W*.97,H*.97]});return r.masks[r.scores.reduce((p,v,i)=>v>r.scores[p]?i:p,0)]}
+// a mask from logits (>0 is product; the edge a soft pixel or two, as the model reads it), kept with the photo; when found afresh (box) the corners go to its box,
+// as Import mask does (a click keeps them, as the colour clicks do)
+async function mkAiKeep(id,L,W,H,box){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),im=x.createImageData(W,H),d=im.data;let x0=W,y0=H,x1=-1,y1=-1;
+  for(let i=0;i<W*H;i++){const a=Math.round(255/(1+Math.exp(-L[i])));d[i*4]=d[i*4+1]=d[i*4+2]=255;d[i*4+3]=a;if(a>127){const xx=i%W,yy=(i/W)|0;if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy}}
+  if(x1<0)return false;x.putImageData(im,0,0);await mkPhotoPut(id+'~mask',c.toDataURL('image/png'));
+  const dd=mkLoad(),t=dd.t.find(z=>z.id===id);if(!t)return false;t.am=1;t.ai=1;delete t.mi;if(t.tol==null)t.tol=50;if(box)t.q=[x0/W,y0/H,(x1+1)/W,y0/H,(x1+1)/W,(y1+1)/H,x0/W,(y1+1)/H].map(v=>+v.toFixed(4));mkStore(dd);
+  [...mkMk.keys()].forEach(k=>{if(k.startsWith(id+'|'))mkMk.delete(k)});return true}
+async function mkAiFind(){const m=mkCur();if(!m||m.b||mkAiBusy||!mkAiOk())return;mkAiBusy=true;
+  try{const S=await mkAiPhoto(m);pmsg('Finding the product…');const ok=await mkAiKeep(m.id,await mkAiSubject(S),S.W,S.H,true);pmsg(ok?'Found the product.':'No product found. Click it with Show mask on.')}
+  catch(e){pmsg('Could not run the AI. Check the connection, then try again.')}finally{mkAiBusy=false}mkSync();mkView();mkCorners()}
+// a closing of a 0/1 map (grown by r, then shrunk by r): gaps and holes narrower than about 2r are filled, the outline kept
+function mkClose(M,W,H,r){const box=(S,keepAll)=>{const t=new Uint16Array(W*H),o=new Uint8Array(W*H),k=(2*r+1)*(2*r+1);
+  for(let y=0;y<H;y++){let s=0;const b=y*W;for(let x=-r;x<=r;x++)s+=S[b+Math.min(W-1,Math.max(0,x))];for(let x=0;x<W;x++){t[b+x]=s;s+=S[b+Math.min(W-1,x+r+1)]-S[b+Math.max(0,x-r)]}}
+  for(let x=0;x<W;x++){let s=0;for(let y=-r;y<=r;y++)s+=t[Math.min(H-1,Math.max(0,y))*W+x];for(let y=0;y<H;y++){o[y*W+x]=keepAll?(s>=k?1:0):(s>0?1:0);s+=t[Math.min(H-1,y+r+1)*W+x]-t[Math.max(0,y-r)*W+x]}}return o};
+  return box(box(M,false),true)}
+// a click with Show mask on. Elsewhere: the AI's surest reading of the part under it is added. On product: the AI is asked for the product without the clicked part
+// (the click a "no" point, two points of the product far from it "yes"; a thin string, which the model will not take as a part on its own, comes out this way) and
+// only the piece this leaves out around the click is taken out, so nothing elsewhere goes with it
+async function mkAiClick(fx,fy){const m=mkCur();if(!m||m.b||!m.ai||mkAiBusy)return;mkAiBusy=true;
+  try{const S=await mkAiPhoto(m),mask=await mkMask(m),{W,H}=S,n=W*H,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});if(mask)x.drawImage(mask,0,0,W,H);
+   const A=x.getImageData(0,0,W,H).data,px=Math.min(W-1,Math.max(0,Math.round(fx*W-.5))),py=Math.min(H-1,Math.max(0,Math.round(fy*H-.5))),s0=py*W+px,inP=A[s0*4+3]>127,L=new Float32Array(n);
+   for(let i=0;i<n;i++)L[i]=Math.log((A[i*4+3]+.5)/(255.5-A[i*4+3]));
+   if(!inP){const r=await S.masks({points:[[px,py,1]]}),P=r.masks[r.scores.reduce((p,v,i)=>v>r.scores[p]?i:p,0)];for(let i=0;i<n;i++)if(P[i]>L[i])L[i]=P[i]}
+   else{const yes=[];for(let gy=1;gy<12;gy++)for(let gx=1;gx<12;gx++){const X=Math.round(gx/12*W),Y=Math.round(gy/12*H);if(A[(Y*W+X)*4+3]>200)yes.push([X,Y,Math.hypot(X-px,Y-py)])}
+    yes.sort((p,q)=>q[2]-p[2]);const far=yes.filter(p=>p[2]>Math.min(W,H)*.12),pts=[far[0],far[Math.floor(far.length/2)]].filter(Boolean).map(p=>[p[0],p[1],1]);
+    const r=await S.masks({points:[...pts,[px,py,0]]}),P=r.masks[r.scores.reduce((p,v,i)=>v>r.scores[p]?i:p,0)];
+    // the piece left out: product now, not in the answer, joined to the click (or to the nearest such pixel)
+    const out=i=>A[i*4+3]>127&&P[i]<=0;let st=out(s0)?s0:-1;if(st<0){let best=1e9;const R=Math.round(Math.min(W,H)*.03);for(let dy=-R;dy<=R;dy++)for(let dx=-R;dx<=R;dx++){const X=px+dx,Y=py+dy;if(X<0||Y<0||X>=W||Y>=H)continue;const i=Y*W+X,dd=dx*dx+dy*dy;if(dd<best&&out(i)){best=dd;st=i}}}
+    let seen=new Uint8Array(n);
+    if(st<0){// the product is one piece here (a shirt): the smallest part the AI is sure of under the click is taken out instead
+     const r1=await S.masks({points:[[px,py,1]]}),ar=r1.masks.map(M=>{let k=0;for(let i=0;i<n;i+=5)if(M[i]>0)k++;return k}),ok=r1.scores.map((v,i)=>i).filter(i=>r1.scores[i]>.7&&ar[i]>0);
+     if(!ok.length){pmsg('Nothing to take out there.');return}const b1=ok.reduce((p,i)=>ar[i]<ar[p]?i:p,ok[0]),M1=r1.masks[b1];for(let i=0;i<n;i++)if(M1[i]>0)seen[i]=1}
+    else{const Q=new Int32Array(n);let qh=0,qt=0;seen[st]=1;Q[qt++]=st;while(qh<qt){const i=Q[qh++],X=i%W;const go=j=>{if(!seen[j]&&out(j)){seen[j]=1;Q[qt++]=j}};if(X>0)go(i-1);if(X<W-1)go(i+1);if(i>=W)go(i-W);if(i<n-W)go(i+W)}}
+    // the piece closed (gaps and specks the model was unsure of, up to 1% of the photo, joined in) and taken out of the product wholly
+    const cl=mkClose(seen,W,H,Math.max(2,Math.round(Math.min(W,H)*.01)));for(let i=0;i<n;i++)if(cl[i]&&A[i*4+3]>0)L[i]=Math.min(L[i],-6)}
+   await mkAiKeep(m.id,L,W,H);pmsg(inP?'Taken out of the product.':'Added to the product.')}
+  catch(e){pmsg('Could not run the AI. Check the connection, then try again.')}finally{mkAiBusy=false}mkSync();mkView()}
 // ---- Import mask (2.94.1; owner Nov 4 2026: "Can we just make it so people can also import a mask?"): a picture the photo's shape, white (or opaque, in a PNG with
 // transparency) where the design prints, black (or clear) elsewhere, from Photoshop's Select Subject or any other tool. It takes the place of the found mask (mi: an
 // imported one, so Tolerance is hidden); the corners are set to its box; Show mask and clicks work on it; Find product off and on finds the product again.
@@ -139,9 +200,9 @@ async function mkImportMask(f){const m=mkCur();if(!m||m.b)return;if(!f||!/^image
  const im=x.getImageData(0,0,W,H),d=im.data,n=W*H;let clear=false;for(let i=3;i<d.length;i+=4)if(d[i]<250){clear=true;break}
  let x0=W,y0=H,x1=-1,y1=-1;for(let i=0;i<n;i++){const p=i*4,a=clear?d[p+3]:Math.round(.299*d[p]+.587*d[p+1]+.114*d[p+2]);d[p]=d[p+1]=d[p+2]=255;d[p+3]=a;if(a>127){const xx=i%W,yy=(i/W)|0;if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy}}
  if(x1<0){pmsg('That mask is empty: nothing in it is white.');return}x.putImageData(im,0,0);await mkPhotoPut(m.id+'~mask',c.toDataURL('image/png'));
- const dd=mkLoad(),t=dd.t.find(z=>z.id===m.id);if(!t)return;t.am=1;t.mi=1;if(t.tol==null)t.tol=50;t.q=[x0/W,y0/H,(x1+1)/W,y0/H,(x1+1)/W,(y1+1)/H,x0/W,(y1+1)/H].map(v=>+v.toFixed(4));mkStore(dd);
+ const dd=mkLoad(),t=dd.t.find(z=>z.id===m.id);if(!t)return;t.am=1;t.mi=1;delete t.ai;if(t.tol==null)t.tol=50;t.q=[x0/W,y0/H,(x1+1)/W,y0/H,(x1+1)/W,(y1+1)/H,x0/W,(y1+1)/H].map(v=>+v.toFixed(4));mkStore(dd);
  [...mkMk.keys()].forEach(kk=>{if(kk.startsWith(m.id+'|'))mkMk.delete(kk)});pmsg('Imported the mask.');mkSync();mkView();mkCorners()}
-async function mkFindSet(id,on,tol){const d=mkLoad(),t=d.t.find(z=>z.id===id);if(!t)return false;delete t.mi;if(!on){delete t.am;delete t.tol;mkStore(d);return true}
+async function mkFindSet(id,on,tol){const d=mkLoad(),t=d.t.find(z=>z.id===id);if(!t)return false;delete t.mi;delete t.ai;if(!on){delete t.am;delete t.tol;mkStore(d);return true}
  const ph=await mkPhoto(id);if(!ph)return false;let r;if(tol==null){const b=mkFindBest(ph,t.w,t.h);r=b&&b.r;tol=b?b.tol:50}else r=mkFind(ph,t.w,t.h,tol);if(!r){if(t.am){delete t.am;delete t.tol;mkStore(d)}return false}
  await mkPhotoPut(id+'~mask',r.c.toDataURL('image/png'));t.am=1;t.tol=tol;t.q=r.q;mkStore(d);[...mkMk.keys()].forEach(k=>{if(k.startsWith(id+'|'))mkMk.delete(k)});return true}
 // Scale as a % of the print area's width: Real size works it out from the canvas's real width and the product's (Repeat only)
@@ -237,7 +298,7 @@ const MK_UPC={mm:.1,cm:1,in:2.54,px:.1},mkUnit=()=>{const u=unGet();return u=='p
 function mkOwnSet(o){const m=mkCur();if(!m||m.b)return;const d=mkLoad(),t=d.t.find(z=>z.id===m.id);if(!t)return;Object.entries(o).forEach(([k,v])=>{if(v)t[k]=v;else delete t[k]});mkStore(d);mkSync();mkView()}
 // the controls follow the mockup in use and the settings
 function mkSync(){const u=mkUi(),fill=mkFill(u);$('mkfl').querySelectorAll('[data-f]').forEach(b=>b.classList.toggle('on',b.dataset.f==fill));
- const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;$('mkamr').hidden=!m||!!m.b;$('mkam').checked=!!(m&&m.am);$('mktolr').hidden=!m||!!m.b||!m.am||!!m.mi;$('mkmir').hidden=!m||!!m.b;$('mkmvr').hidden=!m||!!m.b||!m.am;$('mkvw').classList.toggle('mkpk',!!(m&&!m.b&&m.am&&$('mkmv').checked));   /* a click on the view adds or removes */
+ const m=mkCur(),real=mkRealOk(m,u);$('mkrsr').hidden=!real;$('mkrs').checked=real&&u.rs;$('mkcn').closest('label').hidden=!m||!!m.b;$('mkamr').hidden=!m||!!m.b;$('mkam').checked=!!(m&&m.am);$('mktolr').hidden=!m||!!m.b||!m.am||!!m.mi||!!m.ai;$('mkfwr').hidden=!m||!!m.b||!m.am||!!m.mi||!mkAiOk();$('mkfw').querySelectorAll('[data-w]').forEach(b=>b.classList.toggle('on',b.dataset.w==(m&&m.ai?'ai':'col')));$('mkmir').hidden=!m||!!m.b;$('mkmvr').hidden=!m||!!m.b||!m.am;$('mkvw').classList.toggle('mkpk',!!(m&&!m.b&&m.am&&$('mkmv').checked));   /* a click on the view adds or removes */
  {const own=!!(m&&!m.b);$('mkfor').hidden=!own;$('mkcmr').hidden=!own;if(own){const fo=$('mkfo'),fv=Math.round((m.warp||0)*100);if(+fo.value!==fv&&document.activeElement!==fo){fo.value=fv;fo.dispatchEvent(new Event('input',{bubbles:true}))}
   const u=mkUnit(),cf=$('mkcm');$('mkcmu').textContent=u;if(document.activeElement!==cf)cf.value=m.cm?String(+(m.cm/MK_UPC[u]).toFixed(u=='in'?2:u=='cm'?1:0)):''}}
  {const tl=$('mktol'),tv=m&&m.am?m.tol:50;if(+tl.value!==tv&&document.activeElement!==tl){tl.value=tv;tl.dispatchEvent(new Event('input',{bubbles:true}))}}   /* a product's print area is its own */
@@ -266,12 +327,13 @@ function init23(){if(!$('mkpane'))return;MKT=ltMake(mkCfg());MKT.init();$('mkpan
  $('mkcn').addEventListener('change',mkCorners);
  $('mkmi').onclick=()=>{const f=$('mkmf');f.value='';f.click()};$('mkmf').onchange=()=>{const f=$('mkmf').files&&$('mkmf').files[0];$('mkmf').value='';if(f)mkImportMask(f)};
  $('mkmv').addEventListener('change',()=>{mkSync();mkView()});
- $('mkc').addEventListener('pointerdown',e=>{if(!$('mkvw').classList.contains('mkpk')||e.button>0)return;const r=$('mkc').getBoundingClientRect();e.preventDefault();mkWand((e.clientX-r.left)/Math.max(1,r.width),(e.clientY-r.top)/Math.max(1,r.height))});
+ $('mkc').addEventListener('pointerdown',e=>{if(!$('mkvw').classList.contains('mkpk')||e.button>0)return;const r=$('mkc').getBoundingClientRect();e.preventDefault();const m=mkCur(),fx=(e.clientX-r.left)/Math.max(1,r.width),fy=(e.clientY-r.top)/Math.max(1,r.height);if(m&&m.ai)mkAiClick(fx,fy);else mkWand(fx,fy)});
  $('mkfo').addEventListener('input',()=>{if(WBS.uiLoad)return;const m=mkCur(),v=+$('mkfo').value/100;if(!m||m.b||(m.warp||0)===v)return;mkOwnSet({warp:v})});
  $('mkcm').addEventListener('change',()=>{const t=String($('mkcm').value).trim(),v=+t;if(t===''){mkOwnSet({cm:0});return}if(!(v>0)){mkSync();return}mkOwnSet({cm:+Math.min(10000,v*MK_UPC[mkUnit()]).toFixed(2)})});
  // Find product and Tolerance (2.92.2): the mask is made again a moment after the slider stops
- const mkRefind=async(on,tol)=>{const m=mkCur();if(!m||m.b)return;const ok=await mkFindSet(m.id,on,tol);if(on&&!ok)pmsg('No product found: it may touch every edge of the photo. Set its corners instead.');mkSync();mkView();mkCorners()};
+ const mkRefind=async(on,tol,colour)=>{const m=mkCur();if(!m||m.b)return;if(on&&!colour&&m.ai&&mkAiOk())return mkAiFind();const ok=await mkFindSet(m.id,on,tol);if(on&&!ok)pmsg('No product found: it may touch every edge of the photo. Set its corners instead.');mkSync();mkView();mkCorners()};
  $('mkam').addEventListener('change',()=>mkRefind($('mkam').checked,+$('mktol').value));
+ $('mkfw').addEventListener('click',e=>{const b=e.target.closest('[data-w]');const m=mkCur();if(!b||!m||m.b||b.classList.contains('on'))return;if(b.dataset.w=='ai')mkAiFind();else mkRefind(true,+$('mktol').value,true)});   // 2.100.1
  {let tt=0;$('mktol').addEventListener('input',()=>{if(WBS.uiLoad)return;const m=mkCur();if(!m||m.b||!m.am||m.tol===+$('mktol').value)return;clearTimeout(tt);tt=setTimeout(()=>mkRefind(true,+$('mktol').value),150)})}
  $('mkrs').addEventListener('change',()=>{mkUiSet({rs:$('mkrs').checked});mkSync();mkView()});
  $('mkx').onclick=mkExport;

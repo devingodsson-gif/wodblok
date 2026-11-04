@@ -3,23 +3,31 @@
 // "assets/<kind>/<name>.<hash>.<ext>", a file fetched only when it is needed and then kept by the browser (and the service worker, for offline use).
 // This is the only place that turns a reference into something the app can use, and it only ever reaches the app's own host: anything else is refused.
 //   assetUrl(ref)      an address to give an <img>, an Image, a CSS url() or a FontFace (the browser loads it when it needs it); '' for anything else
-//   assetBytes(ref)    a promise of the file's bytes (Uint8Array), for code that reads a file (an export, opentype.js, a zip)
+//   assetBytes(ref, onBytes)  a promise of the file's bytes (Uint8Array), for code that reads a file (an export, opentype.js, a zip); a reference ending ~N is a
+//                      file in N pieces (2.100.1: the host's 25 MiB limit), fetched and joined; onBytes(n), if given, hears each piece's size as it arrives
 //   assetText(ref)     a promise of the file as text (JSON data)
 //   assetPreload(list) data the app needs from its first moment (2.98.4: shapes, templates), each the data itself or its file's reference: null when there is
 //                      nothing to fetch (the single file: start-up stays synchronous), else a promise that resolves once every file is here and parsed
 //   assetData(v)       that data, read synchronously after the preload (v itself when it was never a reference)
 // Rules: no work on import; callers keep their own try/catch (a missing file rejects, with the reference in the message).
-const AS_OWN = /^assets\/[a-z0-9-]+\/[a-z0-9-]+\.[0-9a-f]{10}\.[a-z0-9]+$/, AS_DATA = /^data:[\w.+\/-]+;base64,/;
+const AS_OWN = /^assets\/[a-z0-9-]+\/[a-z0-9-]+\.[0-9a-f]{10}\.[a-z0-9]+(~[1-9][0-9]?)?$/, AS_DATA = /^data:[\w.+\/-]+;base64,/;
 const isAsset = ref => typeof ref === 'string' && (AS_DATA.test(ref) || AS_OWN.test(ref));
-const assetUrl = ref => (isAsset(ref) ? ref : '');
+const assetUrl = ref => (isAsset(ref) && !ref.includes('~') ? ref : '');   // a file in pieces has no single address
 const asGot = new Map();   // reference -> promise of its bytes, so a file is fetched once
-function assetBytes(ref) {
+async function asFetch(url) {
+  const r = await fetch(url, { credentials: 'same-origin' });
+  if (!r.ok) throw new Error('Could not load ' + url + ' (' + r.status + ').');
+  return new Uint8Array(await r.arrayBuffer());
+}
+function assetBytes(ref, onBytes) {
   if (!isAsset(ref)) return Promise.reject(new Error('Not one of the app\'s own files.'));
   if (!asGot.has(ref)) asGot.set(ref, (async () => {
     if (AS_DATA.test(ref)) { const b = atob(ref.slice(ref.indexOf(',') + 1)), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
-    const r = await fetch(ref, { credentials: 'same-origin' });
-    if (!r.ok) throw new Error('Could not load ' + ref + ' (' + r.status + ').');
-    return new Uint8Array(await r.arrayBuffer());
+    const k = ref.indexOf('~'), tell = u => { if (onBytes) try { onBytes(u.length); } catch (e) {} return u; };
+    if (k < 0) return tell(await asFetch(ref));
+    const base = ref.slice(0, k), parts = await Promise.all(Array.from({ length: +ref.slice(k + 1) }, (_, i) => asFetch(base + '.' + (i + 1)).then(tell)));
+    const out = new Uint8Array(parts.reduce((s, p) => s + p.length, 0)); let at = 0; for (const p of parts) { out.set(p, at); at += p.length; }
+    return out;
   })().catch(e => { asGot.delete(ref); throw e; }));
   return asGot.get(ref);
 }
