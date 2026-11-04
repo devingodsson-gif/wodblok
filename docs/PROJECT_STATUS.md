@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.98.0 (the Randomize dice rolls)** on `feat/2.98.0-rolling-dice`, not merged.
+- **Nov 4: 2.98.1 (asset split, step 1: the asset system, mockups first; docs/asset-split-plan.md)** on `feat/2.98.1-asset-packs`, not merged. Next: step 2, textures. Open: the AI model for phase 2 (licence and size) is the owner's choice.
+- **Nov 4: 2.98.0 LIVE (the Randomize dice rolls)**.
 - **Nov 4: 2.97.0 LIVE (Opacity in the Mockup panel)**.
 - **Nov 4: 2.96.0 LIVE (the Mockup tab)**.
 - **Nov 4: 2.95.0 LIVE (Copy prompt in the Mockup panel; library cards wrap on a phone)**.

@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.98.1','Nov 4 2026',['The web app loads mockup photos only when the Mockup tab shows them, so it starts with less to download.']],
  ['2.98.0','Nov 4 2026',['The Randomize dice rolls: it tumbles through its faces as it spins and lands on one.']],
  ['2.97.0','Nov 4 2026',['Opacity in the Mockup panel makes the design see-through over the product photo.']],
  ['2.96.0','Nov 4 2026',['The mockup has its own tab beside the Canvas tab, as large as the window holds it; the Mockup panel docks like the others.']],

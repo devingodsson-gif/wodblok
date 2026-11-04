@@ -19,6 +19,10 @@ const strip = (name, t) => {
   return r;
 };
 const parts = [];
+// 2.98.1 (docs/asset-split-plan.md): where the app's own files go. The single file keeps them inside it; the hosted app (--web) writes them next to the page, in
+// assets/ (made afresh each build), and fetches each only when it is needed (src/platform/assets.js).
+const { assetWriter } = require('./assets');
+const ASSETS = WEB ? (() => { const d = path.dirname(out); fs.rmSync(path.join(d, 'assets'), { recursive: true, force: true }); return assetWriter('split', d); })() : assetWriter('inline');
 // Vendored libraries keep their own scope: their short top-level names must not meet the app's. Each file becomes
 // `const {exported names} = (() => { ...library...; return {names}; })();`
 for (const f of fs.readdirSync(path.join(ROOT, 'src', 'vendor')).filter(f => f.endsWith('.js')).sort()) {
@@ -30,7 +34,7 @@ for (const sub of ['data', 'platform', 'format', 'commands']) {                 
   const d = path.join(ROOT, 'src', sub);
   for (const f of fs.readdirSync(d).filter(f => f.endsWith('.js')).sort()) {
     const t = fs.readFileSync(path.join(d, f), 'utf8');
-    parts.push(strip(sub + '/' + f, sub + '/' + f === 'data/templates.js' ? require('./templates/folders').withFolders(t) : sub + '/' + f === 'data/textures.js' ? require('./textures/folders').withTextures(t) : sub + '/' + f === 'data/mockups.js' ? require('./mockups/folders').withMockups(t) : t));   // the templates/ and textures/ folders join the built-in lists
+    parts.push(strip(sub + '/' + f, sub + '/' + f === 'data/templates.js' ? require('./templates/folders').withFolders(t) : sub + '/' + f === 'data/textures.js' ? require('./textures/folders').withTextures(t) : sub + '/' + f === 'data/mockups.js' ? require('./mockups/folders').withMockups(t, ASSETS) : t));   // the templates/ and textures/ folders join the built-in lists
   }
 }
 parts.push(...manifest.map(f => strip(f, fs.readFileSync(path.join(dir, f), 'utf8'))));
@@ -71,7 +75,7 @@ if (WEB) {
     if (f === 'sw.js') fs.writeFileSync(path.join(wd, f), fs.readFileSync(path.join(sd, f), 'utf8').replace('@@CACHE@@', 'wodblok-' + VER + '-' + BUILT));
     else fs.copyFileSync(path.join(sd, f), path.join(wd, f));
   }
-  console.log('web app files in', path.relative(ROOT, wd));
+  console.log('web app files in', path.relative(ROOT, wd), '+', ASSETS.written.length, 'asset files,', ASSETS.written.reduce((s, w) => s + w.bytes, 0), 'bytes');
 } else if (!args.length) {
   // Hosting (Cloudflare Pages etc.) serves index.html from the output folder, so a default build also leaves an identical
   // copy next to the single file. wodblok.html stays the file tests and GitHub Releases use.

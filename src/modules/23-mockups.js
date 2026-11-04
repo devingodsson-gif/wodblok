@@ -1,6 +1,6 @@
 import {cmdRegister} from '../commands/registry.js';
 import {MKIMG} from '../data/mockups.js';
-import {clipboard,collection,kv,use} from '../platform/index.js';
+import {assetBytes,assetUrl,clipboard,collection,kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW,physOf,tileOn,tileRk} from './04-canvas-and-stamp-outlines.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
@@ -33,7 +33,8 @@ function mkLoad(){let raw=null;try{raw=kv.get(MK_KEY)}catch(e){}
   d.h=(Array.isArray(d.h)?d.h:[]).filter(x=>typeof x=='string'&&x.length<=60);d.r=d.r&&typeof d.r=='object'&&!Array.isArray(d.r)?d.r:{};d.b={};mkC=d;mkCr=raw}
  return{f:[...mkC.f],t:mkC.t.map(x=>({...x,q:x.q.slice()})),h:[...mkC.h],r:{...mkC.r},b:{}}}
 const mkStore=d=>{try{kv.set(MK_KEY,JSON.stringify(d));mkC=null;return true}catch(e){pmsg('Could not keep the mockups in this browser.');return false}};
-const MK_B=MKIMG.map(e=>({id:'p-'+e.id,n:e.n,w:e.w,h:e.h,q:e.q.slice(),th:e.src,src:e.src,mask:e.mask,cm:e.cm,warp:e.warp,b:1}));
+// 2.98.1: a product's photo and mask are references to the app's own files (inside the page, or next to it in the hosted app: src/platform/assets.js)
+const MK_B=MKIMG.map(e=>({id:'p-'+e.id,n:e.n,w:e.w,h:e.h,q:e.q.slice(),th:assetUrl(e.src),src:assetUrl(e.src),mask:assetUrl(e.mask),ref:e.src,cm:e.cm,warp:e.warp,b:1}));
 const mkGet=id=>{if(typeof id!='string')return null;if(id.startsWith('p-')){const b=MK_B.find(x=>x.id===id);return b?{...b,q:b.q.slice()}:null}return mkLoad().t.find(x=>x.id===id)||null};
 // the mockup showing: the one chosen, else the first product
 const mkCur=()=>mkGet(mkUi().cur)||(MK_B[0]?mkGet(MK_B[0].id):null);
@@ -205,10 +206,10 @@ const mkCfg=()=>({p:'mk',pane:'#mkpane',word:'mockup',words:'mockups',ui:MK_TREE
  read(){const d=mkLoad(),at={};d.t.forEach(x=>{at[x.id]=x.f});return{f:d.f,at,b:{},h:d.h,r:d.r}},
  write(m){const d=mkLoad();d.f=m.f;d.t.forEach(x=>{if(x.id in m.at)x.f=m.at[x.id]});d.h=m.h;d.r=m.r;mkStore(d)},
  sets:()=>MK_B.length?[{k:'s:Products',n:'Products',ids:MK_B.map(x=>x.id)}]:[],name:id=>{const m=mkGet(id);return m?m.n:null},own:id=>!String(id).startsWith('p-'),used:()=>false,
- tile:id=>{const m=mkGet(id);return m?`<img src="${m.th}" alt="" draggable="false"><b>${mkEsc(m.n)}</b>`:''},
+ tile:id=>{const m=mkGet(id);return m?`<img src="${m.th}" alt="" draggable="false" loading="lazy"><b>${mkEsc(m.n)}</b>`:''},
  remove(list){const d=mkLoad();d.t=d.t.filter(x=>!list.includes(x.id));mkStore(d);list.forEach(mkPhotoDel);if(list.includes(mkUi().cur))mkUiSet({cur:''});mkPaint(true)},
  rename(id,v){const d=mkLoad(),x=d.t.find(y=>y.id===id);if(x){x.n=mkName(v);mkStore(d)}},
- file(id){const m=mkGet(id),s=m&&m.b?m.src:mkMem.get(id);if(!m||!s)return null;try{const i=s.indexOf(','),bin=atob(s.slice(i+1)),a=new Uint8Array(bin.length);for(let j=0;j<bin.length;j++)a[j]=bin.charCodeAt(j);return{name:m.n,data:a,ext:'.'+(s.slice(11,s.indexOf(';'))||'png').replace('jpeg','jpg'),fb:'Mockup'}}catch(e){return null}},
+ file(id){const m=mkGet(id);if(!m)return null;if(m.b)return assetBytes(m.ref).then(a=>({name:m.n,data:a,ext:'.webp',fb:'Mockup'})).catch(()=>null);const s=mkMem.get(id);if(!s)return null;try{const i=s.indexOf(','),bin=atob(s.slice(i+1)),a=new Uint8Array(bin.length);for(let j=0;j<bin.length;j++)a[j]=bin.charCodeAt(j);return{name:m.n,data:a,ext:'.'+(s.slice(11,s.indexOf(';'))||'png').replace('jpeg','jpg'),fb:'Mockup'}}catch(e){return null}},
  wire(pane){const add=pane.querySelector('[data-mkadd]');if(!add||add.dataset.w)return;add.dataset.w='1';pane.querySelector('[data-mkpc]').onclick=()=>mkCopyPrompt(pane.querySelector('.mkpp').value);const file=pane.querySelector('.mkfile');add.onclick=()=>{file.value='';file.click()};
   file.onchange=async()=>{const fl=[...(file.files||[])];file.value='';let last=null;for(const f of fl){const id=await mkAdd(f);if(id)last=id}if(!last)return;mkUiSet({cur:last});MKT.paintAll(true);mkPaint(true);
    pmsg(fl.length>1?'Added '+fl.length+' mockups.':'Added the mockup “'+mkGet(last).n+'”.')}}});
