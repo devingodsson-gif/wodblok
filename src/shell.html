@@ -815,7 +815,7 @@ body.eyedrop{cursor:crosshair}
 .rprow{display:flex;align-items:center;gap:var(--sp-4);min-height:var(--h-row);margin-bottom:var(--sp-3)}.rprow[hidden]{display:none}
 section.pn>.rprow{padding:0 12px}   /* B7, 2.76.4: a row set straight in a panel keeps the panel's side padding */
 /* 2.90.1: the Mockup panel's view, with the print area's corners over it (the crop's squares) */
-.mkvw{position:relative;margin:var(--sp-4) var(--sp-5) 0;line-height:0}#mkc{display:block;width:100%;height:auto;border-radius:var(--r-m);background:var(--field)}#mkov{position:absolute;inset:0;width:100%;height:100%;touch-action:none}#mkov .crln{fill:none;stroke:var(--hl);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}#mkov .crhd{fill:var(--fg);stroke:var(--panel);stroke-width:1px;vector-effect:non-scaling-stroke;cursor:move}
+.mkvw{position:relative;margin:var(--sp-4) var(--sp-5) 0;line-height:0}#mkc{display:block;width:100%;height:auto;border-radius:var(--r-m);background:var(--field)}#mkvw.mkpk #mkc{cursor:crosshair}#mkov{position:absolute;inset:0;width:100%;height:100%;touch-action:none}#mkov .crln{fill:none;stroke:var(--hl);stroke-width:1px;vector-effect:non-scaling-stroke;pointer-events:none}#mkov .crhd{fill:var(--fg);stroke:var(--panel);stroke-width:1px;vector-effect:non-scaling-stroke;cursor:move}
 .pewpv{display:flex;justify-content:center;margin-top:var(--sp-4);color:var(--mut)}.pewpv svg{width:128px;height:auto}   /* 2.76.7: a wallpaper group's picture */
 .rpth{flex:none;width:20px;height:20px;display:inline-flex}.rpth svg{width:20px;height:20px}
 .rpn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs-m)}
