@@ -24,7 +24,10 @@ test.beforeAll(async () => {
   const a = build('a', '2026-10-09T10:00:00Z'), b = build('b', '2026-10-09T11:00:00Z');
   root = a;
   server = http.createServer((q, r) => {
-    const u = q.url.split('?')[0], f = path.join(root, u === '/' ? 'index.html' : u);
+    const u = q.url.split('?')[0];
+    // 2.102.1: as Cloudflare Pages does, /index.html is a redirect to / (a worker that kept that redirected reply could not open the app again)
+    if (u === '/index.html') { r.writeHead(308, { location: '/', 'cache-control': 'no-store' }); return r.end(); }
+    const f = path.join(root, u === '/' ? 'index.html' : u);
     if (!f.startsWith(root) || !fs.existsSync(f)) { r.writeHead(404); return r.end(); }
     r.writeHead(200, { 'content-type': TYPES[path.extname(f)] || 'application/octet-stream', 'cache-control': 'no-store' }); r.end(fs.readFileSync(f));
   });

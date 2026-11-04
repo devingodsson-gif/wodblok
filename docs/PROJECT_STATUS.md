@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.102.0 (Copy prompt asks for the photo only)** on `fix/2.102.0-copy-prompt-photo`, not merged.
+- **Nov 4: 2.102.1 (hotfix: the service worker kept a redirected page, so the app would not open after the first visit)** on `fix/2.102.1-sw-redirect`, not merged. Found Nov 4: Cloudflare had been building `npm run build` (the single file), not `npm run build:web` as docs/hosting.md said, so the asset split, the AI and the service worker were never live; the owner switched it to `npm ci && npm run build:web`, output `dist/web`, and the first live service worker failed every load after the first. A browser left with the broken worker does not check for a new one itself (about a day): unregister it (Application > Service workers) to recover at once; do not clear site data (projects and libraries are in browser storage).
+- **Nov 4: 2.102.0 LIVE (Copy prompt asks for the photo only)**.
 - **Nov 4: 2.101.0 LIVE (the AI selection plan is done)**. AI in the Image panel is shelved (owner, Nov 4 2026: "shelve the ai image panel for now"). Open: cross-origin isolation for faster AI (Suggestions).
 - **Nov 4: 2.100.1 LIVE (AI selection for mockup masks: Find with Colour | AI; docs/ai-select-plan.md)**. The model and runtime (ai/, about 100 MB, Apache 2.0 and MIT) are in the repo.
 - **Nov 4: 2.100.0 LIVE (Shift across, Shift down and Rotate in the Mockup panel)**.
