@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 4: 2.100.1 (AI selection for mockup masks: Find with Colour | AI; docs/ai-select-plan.md)** on `feat/2.100.1-ai-select`, not merged. The model and runtime (ai/, about 100 MB, Apache 2.0 and MIT) are now in the repo. Next: 2.101.0 closes the plan; later the Image panel.
+- **Nov 4: 2.101.0 (the AI selection plan is done)** on `fix/2.101.0-close-ai-select`, not merged. Next (owner): AI in the Image panel. Open: cross-origin isolation for faster AI (Suggestions).
+- **Nov 4: 2.100.1 LIVE (AI selection for mockup masks: Find with Colour | AI; docs/ai-select-plan.md)**. The model and runtime (ai/, about 100 MB, Apache 2.0 and MIT) are in the repo.
 - **Nov 4: 2.100.0 LIVE (Shift across, Shift down and Rotate in the Mockup panel)**.
 - **Nov 4: 2.99.0 LIVE (the asset split plan is done; text-size test fixed)**. Next: phase 2, AI Select subject (open question for the owner: which model, after a licence and size check).
 - **Nov 4: 2.98.5 LIVE (asset cache: kept small, start-up data stored on install)**. Full suite on 2.98.4 (run 41889099948): 3 of about 820 failed: web-app.spec (fixed here), small-updates-2-79-2 Alt + wheel (passes locally: flaky), text-size "unlocked stamp" (waits for the Mockup panel in an unlocked stamp; fails on 2.98.0 too, so it predates the asset split; fixed in 2.99.0). Next: 2.99.0 closes the plan; then phase 2 (AI Select subject: model and licence are the owner's choice).
