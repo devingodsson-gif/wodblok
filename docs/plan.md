@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.97.0 (Nov 4 2026): Opacity in the Mockup panel
+- Owner: "an opacity slider on the mockup panel so we can make the image transparent over the mockup image". The Mockup group has Opacity (0 to 100%, 100) under Shading: the design (warped, shaded and cut) is drawn over the photo at that opacity (`mkDraw`), in the Mockup tab and in Export mockup. Kept with the panel's settings (`op` in `wb2901_mockui`), for every mockup.
+- Tests: tests/mockups-2-90.spec.js (an eleventh test: 0% shows the photo, 50% halfway, the value kept; 11 passed), help, check:style, check:platform.
+
 ## 2.96.0 (Nov 4 2026): the Mockup tab
 - Owner: "can we make it so the mockup shows in its own tab?", then "I want it to replace the small view" and yes to Edit corners, Show mask and the mask clicks working there. The tab strip of the stamps (75-stamp-edit-mode.js) has a Mockup tab after the stamp tabs while the Mockup panel is open (`STE.mk`; `mkTab`, `mkTabShow`; the strip shows with it even with no stamp open). Opening the panel opens the tab and shows it; at start (a saved layout with the panel) the tab is there but the Canvas is shown. Shown, `#mkstage` covers the stage below the strip with the mockup as large as it holds (the view, `#mkvw` with its canvas and corner layer, moved out of the panel; `mkView` sizes it to the stage). The Canvas tab or a stamp's hides it; opening a stamp's tab hides it too. Its × closes the tab and the Mockup panel (`WBX.wbClosePanel`, 34); the panel closed for good takes the tab away (`WBX.wbPanelIn`). The Mockup panel docks like the others again (no longer undocked).
 - Tests: tests/mockups-2-90.spec.js (a tenth test: the tab with the panel, Canvas and back, × closes both; the other nine now drive the view on the tab); dock-default checks Mockup again. Run: those, layouts, the stamp tab specs (44 passed with help, commands, layouts), check:style.

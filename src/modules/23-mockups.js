@@ -40,7 +40,7 @@ const mkCur=()=>mkGet(mkUi().cur)||(MK_B[0]?mkGet(MK_B[0].id):null);
 // the panel's settings: the mockup in use, Fill, Scale (one value for Repeat and one for Once), Shading
 function mkUi(){let u=null;try{u=JSON.parse(kv.get(MK_UI)||'null')}catch(e){}u=u&&typeof u=='object'?u:{};
  const n=(v,lo,hi,d)=>{v=+v;return isFinite(v)&&u!=null?Math.max(lo,Math.min(hi,v)):d};
- return{cur:typeof u.cur=='string'?u.cur:'',rs:!!u.rs,fill:u.fill=='one'||u.fill=='rep'?u.fill:'',sr:u.sr==null?25:n(u.sr,5,200,25),so:u.so==null?100:n(u.so,10,200,100),sh:u.sh==null?100:n(u.sh,0,100,100)}}
+ return{cur:typeof u.cur=='string'?u.cur:'',rs:!!u.rs,fill:u.fill=='one'||u.fill=='rep'?u.fill:'',sr:u.sr==null?25:n(u.sr,5,200,25),so:u.so==null?100:n(u.so,10,200,100),sh:u.sh==null?100:n(u.sh,0,100,100),op:u.op==null?100:n(u.op,0,100,100)}}   // 2.97.0: op, the design's Opacity over the photo
 const mkUiSet=o=>{try{kv.set(MK_UI,JSON.stringify({...mkUi(),...o}))}catch(e){}};
 const mkFill=u=>u.fill||(tileOn()?'rep':'one');
 // ---- photos (IndexedDB; this session only where the browser has none)
@@ -183,7 +183,7 @@ function mkDraw(out,ph,m,D,u,mask){const W=out.width,H=out.height,x=out.getConte
  // the light only where the design prints (a clear part of the design shows the photo as it is)
  if(u.sh>0){const L=mkLight(ph,W,H,P),l=L.getContext('2d');l.globalCompositeOperation='destination-in';l.drawImage(G,0,0);g.globalCompositeOperation='multiply';g.globalAlpha=u.sh/100;g.drawImage(L,0,0);g.globalAlpha=1}
  g.globalCompositeOperation='destination-in';if(mask)g.drawImage(mask,0,0,W,H);else{g.beginPath();g.moveTo(P[0],P[1]);for(let i=1;i<4;i++)g.lineTo(P[i*2],P[i*2+1]);g.closePath();g.fill()}
- x.drawImage(G,0,0)}
+ x.globalAlpha=(u.op==null?100:u.op)/100;x.drawImage(G,0,0);x.globalAlpha=1}
 // the folds: the design is moved by the photo's light, blurred (lighter: across and down one way, darker: the other), up to warp x 2% of the width
 function mkWarp(G,ph,warp){const W=G.width,H=G.height,b=document.createElement('canvas'),k=Math.max(8,Math.round(W/28));b.width=k;b.height=Math.max(8,Math.round(k*H/W));
  const bx=b.getContext('2d');bx.drawImage(ph,0,0,b.width,b.height);const B=document.createElement('canvas');B.width=W;B.height=H;const Bx=B.getContext('2d',{willReadFrequently:true});Bx.imageSmoothingQuality='high';Bx.drawImage(b,0,0,W,H);
@@ -237,7 +237,8 @@ function mkSync(){const u=mkUi(),fill=mkFill(u);$('mkfl').querySelectorAll('[dat
   const u=mkUnit(),cf=$('mkcm');$('mkcmu').textContent=u;if(document.activeElement!==cf)cf.value=m.cm?String(+(m.cm/MK_UPC[u]).toFixed(u=='in'?2:u=='cm'?1:0)):''}}
  {const tl=$('mktol'),tv=m&&m.am?m.tol:50;if(+tl.value!==tv&&document.activeElement!==tl){tl.value=tv;tl.dispatchEvent(new Event('input',{bubbles:true}))}}   /* a product's print area is its own */
  const sc=$('mksc'),v=fill=='rep'?u.sr:u.so;sc.dataset.def=fill=='rep'?'25':'100';sc.disabled=real&&u.rs;if(sc._n)sc._n.disabled=sc.disabled;if(+sc.value!==v){sc.value=v;sc.dispatchEvent(new Event('input',{bubbles:true}))}
- const sh=$('mksh');if(+sh.value!==u.sh){sh.value=u.sh;sh.dispatchEvent(new Event('input',{bubbles:true}))}$('mkx').disabled=!m}
+ const sh=$('mksh');if(+sh.value!==u.sh){sh.value=u.sh;sh.dispatchEvent(new Event('input',{bubbles:true}))}
+ {const op=$('mkop');if(+op.value!==u.op){op.value=u.op;op.dispatchEvent(new Event('input',{bubbles:true}))}}$('mkx').disabled=!m}
 let mkKey='';
 function mkPaint(force){const pane=$('mkpane');if(!pane||!MKT)return;const u=mkUi(),cur=(mkCur()||{}).id,k=mkLoad().t.map(x=>x.id+':'+x.n+':'+x.f).join('|')+'#'+cur;if(force||k!==mkKey){mkKey=k;MKT.show(pane,cur,mkPick)}mkSync();mkView()}
 function mkPick(id){if(!mkGet(id))return;mkUiSet({cur:id});mkPaint(true)}
@@ -255,6 +256,7 @@ function init23(){if(!$('mkpane'))return;MKT=ltMake(mkCfg());MKT.init();$('mkpan
  $('mkfl').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;mkUiSet({fill:b.dataset.f});mkSync();mkView()};
  $('mksc').addEventListener('input',()=>{if(WBS.uiLoad)return;const u=mkUi(),v=+$('mksc').value;if(mkFill(u)=='rep'){if(u.sr===v)return;mkUiSet({sr:v})}else{if(u.so===v)return;mkUiSet({so:v})}mkView()});
  $('mksh').addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$('mksh').value;if(mkUi().sh===v)return;mkUiSet({sh:v});mkView()});
+ $('mkop').addEventListener('input',()=>{if(WBS.uiLoad)return;const v=+$('mkop').value;if(mkUi().op===v)return;mkUiSet({op:v});mkView()});   // 2.97.0
  $('mkcn').addEventListener('change',mkCorners);
  $('mkmi').onclick=()=>{const f=$('mkmf');f.value='';f.click()};$('mkmf').onchange=()=>{const f=$('mkmf').files&&$('mkmf').files[0];$('mkmf').value='';if(f)mkImportMask(f)};
  $('mkmv').addEventListener('change',()=>{mkSync();mkView()});
