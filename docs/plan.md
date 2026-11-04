@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.102.0 (Nov 4 2026): Copy prompt asks for the photo only
+- Owner: the copied prompt failed in ChatGPT ("The image-generation step hasn't returned an accessible image file, so I can't perform Step 2 against the exact source photo"): an AI chat cannot hand the picture its image tool made to its Python tool in the same reply. He agreed to make Copy prompt the photo only; the mask is made in WODBLOK (Find product, Find with AI in the web app) or brought in with Import mask. The image prompt itself is unchanged.
+- Tests: tests/mockups-2-90.spec.js (the Copy prompt test: no mask or Python step), help. Run: those (4 passed), check:platform, check:style.
+
 ## 2.101.0 (Nov 4 2026): the AI selection plan is done (docs/ai-select-plan.md)
 - Live: 2.100.1 (Find with: Colour | AI for mockup masks, in the hosted app). Next, at the owner's word: the same AI tools in the Image panel.
 - Version and docs only (and a Help line); no app code changed. Tests: help.
