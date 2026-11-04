@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.93.1 (Nov 4 2026): a better Find product, step 1: the product's own colours, Show mask (docs/own-mockups-plan.md)
+- Owner sent a photo of white curtains with a wooden stool touching them; the stool took the design. Find product (`mkFind`) now learns the product's colours: six colours (Cb, Cr; k-means) of what is not background in the middle half of the photo, and keeps as product only what is within 10 of one of them (`MK_OFF`): wood, leaves, a pot or a rod touching the product are left out, while shadows and folds on it keep its colour. The product is the part covering most of the middle (no longer simply the largest), its holes filled. `mkDist` returns Cb and Cr with the distances (made once per photo).
+- Checked on the owner's curtain photo (not in the repo) and the six product photos: the stool, the curtain rod, the plant, the tote's peg and the cushion's bench are left out; the folds and shaded sides stay as before.
+- Show mask (own mockups with Find product on) tints what is not product in the accent colour, in the view only.
+- Tests: tests/mockups-2-90.spec.js (a sixth test: a made-up photo of a white curtain with a wooden stool touching it; Show mask). Run: it (6 passed), help, check:style.
+
 ## 2.93.0 (Nov 4 2026): your own mockups update is done (docs/own-mockups-plan.md)
 - Version and docs only. Live: 2.92.2 (Find product and Tolerance), 2.92.3 (Folds and Real width).
 - Tests: none new; the release changes no code.
