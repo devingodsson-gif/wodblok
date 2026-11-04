@@ -194,7 +194,7 @@ function mkWarp(G,ph,warp){const W=G.width,H=G.height,b=document.createElement('
 // the design as a picture (as it is exported), made again a moment after it changes while the panel is open
 function mkDesign(px){return new Promise(res=>{let svg='';try{svg=ser()}catch(e){return res(null)}const k=px/Math.max(CW,CH),w=Math.max(1,Math.round(CW*k)),h=Math.max(1,Math.round(CH*k)),img=new Image();
  img.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c)};img.onerror=()=>res(null);img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)})}
-const mkOpen=()=>{const s=document.querySelector('section.pn[data-p="mock"]');return!!(s&&!s.hidden)};
+const mkOpen=()=>{const s=$('mkstage');return!!(s&&!s.hidden)};   // 2.96.0: the view is the Mockup tab
 // ---- Copy prompt (2.95.0; owner Nov 4 2026: "a single chatgpt prompt to integrate into the mockup panel that can be copied and pasted into chat with a [product] so users
 // can make any product and mask"): one message for an AI chat that makes images and runs Python; it makes a blank in the house style of the built-in products and
 // its mask from the photo itself (so they line up), for Add mockup and Import mask
@@ -213,9 +213,9 @@ const mkCfg=()=>({p:'mk',pane:'#mkpane',word:'mockup',words:'mockups',ui:MK_TREE
   file.onchange=async()=>{const fl=[...(file.files||[])];file.value='';let last=null;for(const f of fl){const id=await mkAdd(f);if(id)last=id}if(!last)return;mkUiSet({cur:last});MKT.paintAll(true);mkPaint(true);
    pmsg(fl.length>1?'Added '+fl.length+' mockups.':'Added the mockup “'+mkGet(last).n+'”.')}}});
 // the view: the mockup in use at the panel's width (sharp on the screen), with the four corners over it while Edit corners is on
-async function mkView(){const c=$('mkc'),wrap=$('mkvw');if(!c||!mkOpen())return;const u=mkUi(),m=mkCur();wrap.hidden=!m;$('mkg').hidden=!m;if(!m){mkCorners();return}
+async function mkView(){const c=$('mkc'),wrap=$('mkvw'),stg=$('mkstage');{const m0=mkCur();$('mkg').hidden=!m0}if(!c||!mkOpen())return;const u=mkUi(),m=mkCur();wrap.hidden=!m;if(!m){mkCorners();return}
  const tok=++mkTok,ph=await mkPhoto(m.id),mask=await mkMask(m);if(tok!==mkTok)return;if(!ph){wrap.hidden=true;return}
- const cw=Math.max(80,wrap.clientWidth||260),dpr=window.devicePixelRatio||1,W=Math.round(cw*dpr),H=Math.round(W*m.h/m.w);
+ const pad=32,aw=Math.max(80,stg.clientWidth-pad),ah=Math.max(80,stg.clientHeight-pad),cw=Math.round(Math.min(aw,ah*m.w/m.h)),dpr=window.devicePixelRatio||1,W=Math.round(cw*dpr),H=Math.round(W*m.h/m.w);wrap.style.width=cw+'px';   // as large as the stage holds it
  const dk=[CW,CH,Math.round(W*1.2/256)].join();if(!mkDes||mkDesK!==dk){mkDes=await mkDesign(Math.min(2048,Math.max(512,W*1.2)));mkDesK=dk;if(tok!==mkTok)return}
  if(c.width!==W||c.height!==H){c.width=W;c.height=H}c.style.aspectRatio=m.w+' / '+m.h;mkDraw(c,ph,m,mkDes,u,mask);
  // 2.93.1: Show mask tints what is not product (the view only; Export mockup never shows it)
@@ -273,8 +273,11 @@ function init23(){if(!$('mkpane'))return;MKT=ltMake(mkCfg());MKT.init();$('mkpan
  ov.addEventListener('pointermove',e=>{if(!mkDrag)return;const[x,y]=pt(e),i=mkDrag.i;mkDrag.m.q[i*2]=+Math.max(-.2,Math.min(1.2,x)).toFixed(4);mkDrag.m.q[i*2+1]=+Math.max(-.2,Math.min(1.2,y)).toFixed(4);
   const d=mkLoad(),t=d.t.find(z=>z.id===mkDrag.m.id);if(t){t.q=mkDrag.m.q.slice();mkStore(d)}if(!mkDrag.f)mkDrag.f=requestAnimationFrame(()=>{if(mkDrag)mkDrag.f=0;mkView()})});
  const up=()=>{if(!mkDrag)return;mkDrag=null;mkView()};ov.addEventListener('pointerup',up);ov.addEventListener('pointercancel',up);
- {const s=document.querySelector('section.pn[data-p="mock"]');new MutationObserver(()=>{if(!s.hidden){mkDes=null;mkPaint()}}).observe(s,{attributes:true,attributeFilter:['hidden']});
-  try{new ResizeObserver(()=>{if(mkOpen())mkView()}).observe($('mkvw'))}catch(e){}}
+ // 2.96.0: the panel opens the Mockup tab (and shows it); closed for good, the tab goes too
+ {const s=document.querySelector('section.pn[data-p="mock"]');let was=false;new MutationObserver(()=>{if(!s.hidden){if(!was&&WBX.wbMockTab)WBX.wbMockTab(true);was=true;mkDes=null;mkPaint()}else if(!(WBX.wbPanelIn&&WBX.wbPanelIn('mock'))){was=false;if(WBX.wbMockTab)WBX.wbMockTab(false)}}).observe(s,{attributes:true,attributeFilter:['hidden']});
+  try{new ResizeObserver(()=>{if(mkOpen())mkView()}).observe($('mkstage'))}catch(e){}}
+ WBX.wbMockShown=()=>{mkDes=null;mkSync();mkView()};
+ {const s=document.querySelector('section.pn[data-p="mock"]');if(s&&!s.hidden&&WBX.wbMockTab)WBX.wbMockTab(true,false)}   // open at start (a saved layout): the tab is there, the Canvas shown
  WBX.wbMockDrawn=mkLater;
  cmdRegister({id:'export.mockup',label:'Export mockup',run:mkExport});
  cmdRegister({id:'mockup.copyPrompt',label:'Copy mockup prompt',run:()=>{const i=document.querySelector('#mkpane .mkpp');mkCopyPrompt(i?i.value:'')}});
