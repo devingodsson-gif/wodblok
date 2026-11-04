@@ -4,7 +4,9 @@ import {bkElMark} from './03-stamp-prints-and-drawing.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
 import {fpL,fpU} from './24-free-place-layers.js';
-import {artBU} from './25-art-layers.js';
+import {artBU,artEnc,artId} from './25-art-layers.js';
+import {cmdRegister} from '../commands/registry.js';
+import {pmsg} from './18-projects-and-cover-overlay.js';
 import {elExtend,elSel} from './65-element-core.js';
 import {fxGr,fxTex} from './69-effect-stack.js';
 import {abInsert} from './73-add-bar.js';
@@ -57,10 +59,11 @@ function imAdd(a){const A=WBS.ARTS[a];if(!A||!fpL())return null;const S=Math.min
 function imSwap(q,a){const A=WBS.ARTS[a];if(!A||q.a==a)return false;const L=Math.max(+q.s*(+q.wx||1),+q.s*(+q.wy||1)),m=Math.max(A.w,A.h);q.a=a;q.n=String(A.n||'Image').slice(0,40);q.s=+L.toFixed(1);q.wx=+(A.w/m).toFixed(4);q.wy=+(A.h/m).toFixed(4);delete q.ic;delete q.pc}
 const imSel=()=>{const q=elSel();return q&&q.k=='image'&&imArt(q)?q:null};
 // the panel: the Feather slider and Reset crop follow the selected image
-function imSync(){const q=imSel(),g=$('imcrop');if(g&&g.hidden===!!q)g.hidden=!q;if(!q)return;const fe=Math.round(+q.fe||0);if(+$('im_fe').value!==fe)$('im_fe').value=fe;
+function imSync(){const q=imSel(),g=$('imcrop'),gs=$('imsm');if(g&&g.hidden===!!q)g.hidden=!q;if(gs&&gs.hidden===!!q)gs.hidden=!q;if(!q)return;const fe=Math.round(+q.fe||0);if(+$('im_fe').value!==fe)$('im_fe').value=fe;
  const cut=Array.isArray(q.ic)&&q.ic.some(v=>+v>0)||Array.isArray(q.pc)&&q.pc.length>2;if($('im_reset').disabled===cut)$('im_reset').disabled=!cut}
 function init95(){
  elExtend('image',{dz:5,is:q=>q.k=='image',name:q=>q.n||(imArt(q)&&imArt(q).n)||'Image',draw:(L,li)=>imLayer(L,li)});
+ $('im_sm').onclick=imSeamless;cmdRegister({id:'image.makeSeamless',label:'Make seamless',run:imSeamless});
  WBX.wbImageAdd=imAdd;WBX.wbImSync=imSync;WBX.wbImSwap=imSwap;WBX.wbImSel=imSel;WBX.wbImDraw=imDraw;WBX.wbImVis=imVis;WBX.wbImPath=imPath;
  $('im_fe').addEventListener('input',()=>{const q=imSel();if(!q)return;const v=Math.round(+$('im_fe').value);if(v>0)q.fe=v;else delete q.fe;store();upd()});
  $('im_reset').onclick=()=>{const q=imSel(),A=q&&imArt(q);if(!A)return;const s=+q.s,V=imVis(q,A),kx=s*(+q.wx||1)/V.w,ky=s*(+q.wy||1)/V.h,cx=V.x+V.w/2-A.w/2,cy=V.y+V.h/2-A.h/2,a=(+q.r||0)*Math.PI/180,X=-cx*kx*(+q.f||1),Y=-cy*ky;
@@ -69,4 +72,17 @@ function init95(){
  // the library of pictures (Replace while an image is selected): a pick swaps its picture
  pmRegister('image',{pn:'image',lib:'section.pn[data-p="image"] details.g:has(> #impane)',at:'#imcrop',pos:'beforebegin',key:q=>String(q.a),name:q=>(imArt(q)&&imArt(q).n)||'Image',
   thumb:q=>{const A=imArt(q);return A?`<img src="${artBU(A)}" alt="" style="width:100%;height:100%;object-fit:contain">`:''},picked:e=>!!e.target.closest('.pctr .lib button[data-pc]')&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey})}
+// ---- Make seamless (2.91.2, docs/repeats-plan.md step 2): the selected Image's picture becomes a new picture that repeats with no seam. Near each edge (Blend: that
+// much of the width or height) the picture fades into itself moved half across (then half down), so what leaves one edge comes back at the other: a pixel at the
+// left edge is the one from the middle that the right edge also ends with. The middle stays as it was. The new picture keeps the old one's name with "seamless" and
+// takes its place in the Image (one History step); the old one stays in Pictures.
+function imSeamCanvas(img,w,h,band){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,w,h);
+ const im=x.getImageData(0,0,w,h),d=im.data,f=new Float32Array(d),ramp=(i,n)=>{const b=Math.max(1,n*band),t=Math.min(i+.5,n-i-.5)/b;if(t>=1)return 1;const s=Math.max(0,t);return s*s*(3-2*s)};
+ const pass=(n,m,at)=>{const g=new Float32Array(f);for(let a=0;a<m;a++)for(let i=0;i<n;i++){const k=ramp(i,n),p=at(i,a),q=at((i+(n>>1))%n,a);for(let ch=0;ch<4;ch++)f[p+ch]=g[p+ch]*k+g[q+ch]*(1-k)}};
+ pass(w,h,(i,a)=>(a*w+i)*4);pass(h,w,(i,a)=>(i*w+a)*4);for(let i=0;i<d.length;i++)d[i]=Math.round(f[i]);x.putImageData(im,0,0);return c}
+async function imSeamless(){const q=imSel(),A=q&&imArt(q);if(!A){pmsg('Select an Image first.');return}
+ const img=await new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=artBU(A)});if(!img){pmsg('Could not read that picture.');return}
+ const band=Math.max(5,Math.min(50,+$('im_smb').value||25))/100,c=imSeamCanvas(img,A.w,A.h,band),id=artId(),n=String(A.n||'Image').replace(/ seamless$/,'').slice(0,30)+' seamless';
+ WBS.ARTS[id]={n,k:'img',src:artEnc(c),w:A.w,h:A.h,...(A.f?{f:A.f}:{})};WBX.wbLabelNext={t:'Make seamless',at:performance.now()};
+ if(imSwap(q,id)!==false){store();upd();if(WBX.wbCap)WBX.wbCap();if(WBX.wbPicPaint)WBX.wbPicPaint(true);pmsg('Made “'+n+'”.')}}
 export {imAdd,imDraw,imPath,imSel,imSwap,imVis,init95};

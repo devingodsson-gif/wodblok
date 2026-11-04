@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.91.2 (Nov 4 2026): repeats step 2, Make seamless for pictures (docs/repeats-plan.md)
+- The Image panel has a Seamless group (shown with an Image selected): Blend (5 to 50%, 25) and Make seamless (also the command `image.makeSeamless`). Near each edge the picture fades, by a smooth step over Blend of its width (then height), into itself moved half across (then half down), so a pixel at one edge is the neighbour of the one at the opposite edge; the middle is untouched. It works where the picture is smooth in its middle (a photo, a texture); a hard line through the middle shows at the edges. The result is a new picture ("… seamless", in the same Pictures folder) swapped into the Image as one History step ("Make seamless"); the old picture stays in Pictures. No offset view (the plan's idea): an Image stretched to a repeat tile is checked in the 3 × 3 view.
+- Tests: tests/make-seamless-2-91-2.spec.js (new). Run: it, image-element-2-75, review-fixes-2-76-4, commands, help, check:style.
+
 ## 2.91.1 (Nov 4 2026): repeats step 1, a mirror repeat for the canvas tile (docs/repeats-plan.md)
 - Owner: "Do it" (the rest of the repeats update). Canvas > Format > Repeat has a fourth choice, Mirror (`dim.rk = 'mirror'`, optional; the file format stays 30, and an older app reads it as Grid). Every other column of tiles is flipped across and every other row flipped down, so the edges meet their own reflection: `tileOffs` is empty (no wrap copies; what runs off an edge is cut there), `tileCells` gives the 3 × 3 view its flipped copies, the repeat unit is 2 × 2 tiles (`xrUnit`, `xrPlaces` with flips), the print file's bleed was already mirrored, and the mockups lay it the same way.
 - Tests: tests/mirror-repeat-2-91-1.spec.js (new). Run: it, repeat-tile, print-and-sell-2-76-6, mockups-2-90, arrangement-settings-2-90, help specs, check:style, `npm run perf`.
