@@ -647,7 +647,7 @@ body.dropping::after{content:"Drop the image to import it";position:fixed;inset:
 .lrw.act{background:var(--raise);box-shadow:inset 2px 0 0 var(--acc)}.lrw.hid .lfi,.lrw.hid .lfn{opacity:.6}
 .lmo{flex:none;width:var(--h-sm);height:var(--h-sm);padding:0;margin:0 4px 0 0;border:0;border-radius:var(--r-m);background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center}.lmo svg{width:15px;height:15px}
 .lmo:hover{color:var(--fg);background:var(--line)}
-.ltr .lib{grid-template-columns:repeat(var(--lcols,4),1fr);margin:4px 6px 8px calc(var(--d,0) * 12px + 8px)}
+.ltr .lib{grid-template-columns:repeat(auto-fill,minmax(max(16px,calc((100% - (var(--lcols,4) - 1) * 6px) / var(--lcols,4) - .5px)),1fr));margin:4px 6px 8px calc(var(--d,0) * 12px + 8px)}.ltr .lib>div{min-width:0}   /* 2.95.0: as many columns as the size slider asks, wrapping to a new row on a narrow panel (a phone) */
 .lmt{padding:3px 0 7px calc(var(--d,0) * 12px + 27px);font-size:var(--fs-s);color:var(--faint)}
 .ltr .fform{margin:4px 6px 8px calc(var(--d,0) * 12px + 8px)}
 /* the texture library in the Texture effect (2.50.0): the shape library's tree and tiles, a picture on each tile */
