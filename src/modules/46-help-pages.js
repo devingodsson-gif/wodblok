@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.99.0','Nov 4 2026',['The web app is about a tenth of the download it was: pictures, fonts and textures load when they are first used.']],
  ['2.98.5','Nov 4 2026',['The web app clears out old downloaded files when it updates.']],
  ['2.98.4','Nov 4 2026',['The web app is a much smaller download, and an update no longer downloads the built-in shapes and templates again.']],
  ['2.98.3','Nov 4 2026',['The web app loads each lettering font the first time text is set in it.']],
