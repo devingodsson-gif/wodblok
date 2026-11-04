@@ -59,7 +59,11 @@ test('installs, opens offline, finds a new version without reloading, and applie
   await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
   await expect(page.locator('#pupd')).toBeVisible({ timeout: 15000 });
   expect(await page.evaluate(() => window.__stay)).toBe('same page');            // the page was not reloaded
-  expect(await page.evaluate(async () => (await caches.keys()).sort())).toEqual([`wodblok-${VER}-2026-10-09T10:00:00Z`, `wodblok-${VER}-2026-10-09T11:00:00Z`]);
+  expect(await page.evaluate(async () => (await caches.keys()).sort())).toEqual([`wodblok-${VER}-2026-10-09T10:00:00Z`, `wodblok-${VER}-2026-10-09T11:00:00Z`, 'wodblok-assets-1']);
+  // 2.98.5: the asset cache holds the start-up data (shapes, templates); a file no version uses is put in, to be deleted when the new version takes over
+  const assetPaths = () => page.evaluate(async () => (await (await caches.open('wodblok-assets-1')).keys()).map(q => new URL(q.url).pathname));
+  expect((await assetPaths()).filter(u => /^\/assets\/data\/(shapes|templates)\.[0-9a-f]{10}\.json$/.test(u)).length).toBe(2);
+  await page.evaluate(async () => { await (await caches.open('wodblok-assets-1')).put('assets/old/gone.0123456789.webp', new Response('x')); });
 
   // with unsaved work the dot asks to save first and changes nothing
   await page.locator('.rail [data-pn="rand"]').dispatchEvent('click');
@@ -75,8 +79,11 @@ test('installs, opens offline, finds a new version without reloading, and applie
   await page.reload();
   await expect(page.locator('#pupd')).toBeVisible({ timeout: 15000 });
   await Promise.all([page.waitForEvent('load'), page.click('#pupd')]);
-  await page.waitForFunction(async () => (await caches.keys()).length === 1);
-  expect(await page.evaluate(async () => (await caches.keys())[0])).toBe(`wodblok-${VER}-2026-10-09T11:00:00Z`);
+  await page.waitForFunction(async () => (await caches.keys()).length === 2);
+  expect(await page.evaluate(async () => (await caches.keys()).sort())).toEqual([`wodblok-${VER}-2026-10-09T11:00:00Z`, 'wodblok-assets-1']);
+  const kept = await assetPaths();
+  expect(kept).not.toContain('/assets/old/gone.0123456789.webp');                 // the unused file went
+  expect(kept.every(u => fs.existsSync(path.join(OUT, 'b', u)))).toBe(true);      // what stays is the new version's
   await expect(page.locator('#pupd')).toBeHidden();
   expect(external).toEqual([]);                                                  // no fonts or anything else from the network
 });
