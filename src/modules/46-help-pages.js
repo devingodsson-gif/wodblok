@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.93.0','Nov 4 2026',['Your own mockups are as good as the built-in ones: the product is found for you, the design follows the folds, and Real size works.']],
  ['2.92.3','Nov 4 2026',['Your own mockups have Folds (the design follows the photo\u2019s folds) and Real width, so Real size works for them too.']],
  ['2.92.2','Nov 4 2026',['Your own mockups find the product in the photo: the design prints only on it. Tolerance fine-tunes it.']],
  ['2.92.1','Nov 4 2026',['Mockups print right up to the edges of each product, around the plant on the wallpaper too.']],

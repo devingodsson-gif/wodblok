@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.93.0 (Nov 4 2026): your own mockups update is done (docs/own-mockups-plan.md)
+- Version and docs only. Live: 2.92.2 (Find product and Tolerance), 2.92.3 (Folds and Real width).
+- Tests: none new; the release changes no code.
+
 ## 2.92.3 (Nov 4 2026): your own mockups step 2, Folds and Real width (docs/own-mockups-plan.md)
 - The Mockup group shows, for your own mockups, Folds (0 to 100%: the record's `warp`, 0 to 1, the same displacement by the photo's light as the products') and Real width (the print area's width in Settings > General > Units, px counted as mm; kept as `cm`), so Real size works for them as for the products. Clearing Real width takes it away. No change to the products.
 - Tests: tests/mockups-2-90.spec.js (a fifth test: Folds, Real width, Real size, clearing it). Run: it, help, check:style.
