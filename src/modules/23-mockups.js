@@ -91,8 +91,10 @@ function mkLight(ph,W,H,P){const c=document.createElement('canvas');c.width=W;c.
  for(let i=0;i<n;i++){const v=Math.min(255,L[i]*k);d[i*4]=d[i*4+1]=d[i*4+2]=v;d[i*4+3]=255}x.putImageData(im,0,0);return c}
 // the mockup at W x H on a canvas: the photo, then the design warped onto the print area, shaded and cut to it
 function mkDraw(out,ph,m,D,u,mask){const W=out.width,H=out.height,x=out.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,W,H);x.drawImage(ph,0,0,W,H);if(!D)return;
- const P=m.q.map((v,i)=>v*(i%2?H:W)),len=(a,b)=>Math.hypot(P[b*2]-P[a*2],P[b*2+1]-P[a*2+1]),fw=Math.max(4,Math.min(4096,(len(0,1)+len(3,2))/2)),fh=Math.max(4,Math.min(4096,(len(0,3)+len(1,2))/2)),fill=mkFill(u);
- const F=mkFlat(D,fw,fh,fill,mkScale(m,u)),G=document.createElement('canvas');G.width=W;G.height=H;const g=G.getContext('2d'),T=mkHom(P),N=MK_N;
+ const P=m.q.map((v,i)=>v*(i%2?H:W)),T0=mkHom(P),fill=mkFill(u),
+  // 2.92.1: with a mask the design is laid a little past the print area (e of it on every side), so the mask's edge, and the folds' warp near it, always find design
+  e=mask?.06:0,Q=e?[...T0(-e,-e),...T0(1+e,-e),...T0(1+e,1+e),...T0(-e,1+e)]:P,len=(a,b)=>Math.hypot(Q[b*2]-Q[a*2],Q[b*2+1]-Q[a*2+1]),fw=Math.max(4,Math.min(4096,(len(0,1)+len(3,2))/2)),fh=Math.max(4,Math.min(4096,(len(0,3)+len(1,2))/2));
+ const F=mkFlat(D,fw,fh,fill,mkScale(m,u)/(1+2*e)),G=document.createElement('canvas');G.width=W;G.height=H;const g=G.getContext('2d'),T=mkHom(Q),N=MK_N;
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const u0=i/N,u1=(i+1)/N,v0=j/N,v1=(j+1)/N,S=(a,b)=>[a*F.width,b*F.height];
   mkTri(g,F,[S(u0,v0),S(u1,v0),S(u1,v1)],[T(u0,v0),T(u1,v0),T(u1,v1)]);mkTri(g,F,[S(u0,v0),S(u1,v1),S(u0,v1)],[T(u0,v0),T(u1,v1),T(u0,v1)])}
  if(m.warp>0)mkWarp(G,ph,m.warp);
