@@ -1,6 +1,7 @@
 import {WBS,WBX} from './01-launch-and-version.js';
 import {sRng} from './15-print-effects-and-stamp-texture.js';
 import {TXIMG} from '../data/textures.js';
+import {assetUrl} from '../platform/index.js';
 
 // ===== Textures are pictures (2.50.0; owner Oct 26 2026: "instead of using procedural texture, have them all be images"). =====
 // The built-in ones are grayscale WebP pictures in textures/<set>/<id>.webp, put into the app by the build (src/data/textures.js); placeholders made by
@@ -35,7 +36,7 @@ const txSpecs=(l,def)=>(Array.isArray(l)?l:[]).slice(0,6).map(u=>txSpec(u,def)).
 const txKey=q=>[q.t,q.a,q.sc,q.sd,q.md=='relief'?q.az:'',q.md,q.rot||0,q.fh?1:0,q.fv?1:0,txOk(q.t)?1:0].join(',');
 const isOf=t=>{const r=txSpecs(t&&t.tu,'wear');return r.length?r:null};
 // ---------- the pictures ----------
-// TXS: id -> {n: name, set, src: data URL, imp: imported, img: the decoded picture once read, st: 0 not read, 1 reading, 2 ready, 3 failed, th: small picture for the library}
+// TXS: id -> {n: name, set, src: data URL (a built-in's may be its file in assets/; ref is its reference for assetBytes, 2.98.2), imp: imported, img: the decoded picture once read, st: 0 not read, 1 reading, 2 ready, 3 failed, th: small picture for the library}
 let TXS;let TXPEND=0,TXLT=0;
 const txOk=id=>{const e=TXS&&TXS.get(id);return!!e&&e.st===2};
 const txBusy=()=>TXPEND>0;
@@ -111,7 +112,7 @@ function init16(){// ===== Texture library (v87) =====
 //   stain  = the pattern tints / darkens
 WBS.texLib=[];WBS.txSel='';TXS=new Map();
 // the built-in pictures: the sets above first, in their order (Randomize counts on it), then any set or picture that only the textures/ folder has
-TXIMG.forEach(e=>{let g=TXF.find(f=>f[0]===e.set);if(!g){g=[e.set,{}];TXF.push(g)}const n=g[1][e.id]||e.id.replace(/-/g,' ').replace(/^./,c=>c.toUpperCase());g[1][e.id]=n;TXS.set(e.id,{n,set:e.set,src:e.src,span:+e.span||1,st:0,img:null,th:''})});
+TXIMG.forEach(e=>{let g=TXF.find(f=>f[0]===e.set);if(!g){g=[e.set,{}];TXF.push(g)}const n=g[1][e.id]||e.id.replace(/-/g,' ').replace(/^./,c=>c.toUpperCase());g[1][e.id]=n;TXS.set(e.id,{n,set:e.set,src:assetUrl(e.src),ref:e.src,span:+e.span||1,st:0,img:null,th:''})});
 TXF.forEach(([g,o])=>Object.keys(o).forEach(k=>{if(TXS.has(k))TXN[k]=o[k];else delete o[k]}));
 WBX.wbTexBusy=txBusy;WBX.wbTexImgsLoad=txImgsLoad;WBX.wbTexImgsUsed=txImgsUsed;
 TXHC=new Map();
