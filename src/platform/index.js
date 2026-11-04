@@ -3,6 +3,8 @@
 // Rules: no work on import; no alert/confirm/prompt; callers keep their own try/catch (these do not swallow errors).
 
 import {records,files,offline,storage} from './web.js';
+// 2.98.1: the app's own files (inside the page, or next to it in the hosted app)
+import {assetBytes,assetText,assetUrl} from './assets.js';
 
 // Small key/value settings and records. v100 kept about 36 separate localStorage keys (wb2_ ... wb95_). They now live in ONE
 // versioned record, `wb_settings` = {v:1, values:{key:string}}, so they can be exported, versioned and moved as a unit.
@@ -85,4 +87,4 @@ const clipboard = {
   write: items => navigator.clipboard.write(items),
 };
 
-export {kv,use,clipboard,reload,collection,recovery,offline,storage,files};
+export {kv,use,clipboard,reload,collection,recovery,offline,storage,files,assetBytes,assetText,assetUrl};

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Rule: platform access only through src/platform/. Fails if any other source file touches storage, the clipboard,
-// the artifact runtime, the file pickers, the network (fetch and friends: only platform/account.js may use it) or alert/confirm/prompt directly.
+// the artifact runtime, the file pickers, the network (fetch and friends: only src/platform/ may use it: account.js for the app's host API, assets.js for the app's own files) or alert/confirm/prompt directly.
 const fs = require('fs'), path = require('path');
 const SRC = path.join(__dirname, '..', 'src');
 const banned = [/\blocalStorage\b/, /\bsessionStorage\b/, /\bindexedDB\b/, /navigator\.clipboard/, /window\.claude\b/, /\bclaude\.use\b/, /showSaveFilePicker|showOpenFilePicker/, /navigator\.serviceWorker|navigator\.storage/, /(^|[^.\w$])(alert|confirm|prompt)\s*\(/, /(^|[^.\w$])fetch\s*\(|XMLHttpRequest|sendBeacon|new WebSocket|EventSource/];
