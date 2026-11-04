@@ -1,4 +1,4 @@
-import {kv} from '../platform/index.js';
+import {assetBytes,kv} from '../platform/index.js';
 import {WBS,WBX} from './01-launch-and-version.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {TXF,txSrc,txSrcAdd,txThumb} from './16-texture-generators.js';
@@ -40,7 +40,7 @@ const tlCfg=()=>({p:'tx',pane:'.fxtl',word:'texture',words:'textures',ui:TL_UI,e
  tile:id=>{const th=txThumb(id);return th?`<img src="${th}" alt="" draggable="false">`:''},
  remove(list){const d=tlLoad();d.t=d.t.filter(x=>!list.includes(x.id));tlStore(d)},
  rename(id,v){const d=tlLoad(),x=d.t.find(y=>y.id===id);if(!x)return;x.n=v;tlStore(d);txSrcAdd(x.id,v,x.src,{imp:1})},
- file(id){const e=txSrc(id),b=e&&txzBytes(e.src);return b?{name:e.n,data:b.data,ext:b.ext,fb:'Texture'}:null},
+ file(id){const e=txSrc(id);if(e&&!e.imp&&e.ref)return assetBytes(e.ref).then(a=>({name:e.n,data:a,ext:'.webp',fb:'Texture'})).catch(()=>null);const b=e&&txzBytes(e.src);return b?{name:e.n,data:b.data,ext:b.ext,fb:'Texture'}:null},
  wire(pane,pick){const add=pane.querySelector('[data-txadd]');if(!add||add.dataset.w)return;add.dataset.w='1';const file=pane.querySelector('.txfile');
   add.onclick=()=>{file.value='';file.click()};
   file.onchange=()=>{const fl=[...(file.files||[])];file.value='';if(fl.length)tlAddFiles(fl,pane.querySelector('.txtr')._pick||pick)}}});
