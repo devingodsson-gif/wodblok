@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.98.0 (Nov 4 2026): the Randomize dice rolls
+- Owner: "when the randomize dice icon spins it changes the icon to a dice with 1-6 sides like it's actually rolling". Six die faces in 00-icons.js (`die1` to `die6`, the dice's own outline and pips). After a roll, while the button's dice spins (.45 s, `rspin`), `rzTumble` (20-before-after-and-randomizer.js) changes its face every 60 ms, seven times, never to the face showing, and leaves it on the last (a face from one to six, kept until the next roll). With reduced motion only the last face shows.
+- Tests: tests/rolling-dice-2-98.spec.js (new). Run: it and the Randomize, top bar and icon specs (27 passed), check:style, check:platform.
+
 ## 2.97.0 (Nov 4 2026): Opacity in the Mockup panel
 - Owner: "an opacity slider on the mockup panel so we can make the image transparent over the mockup image". The Mockup group has Opacity (0 to 100%, 100) under Shading: the design (warped, shaded and cut) is drawn over the photo at that opacity (`mkDraw`), in the Mockup tab and in Export mockup. Kept with the panel's settings (`op` in `wb2901_mockui`), for every mockup.
 - Tests: tests/mockups-2-90.spec.js (an eleventh test: 0% shows the photo, 50% halfway, the value kept; 11 passed), help, check:style, check:platform.
