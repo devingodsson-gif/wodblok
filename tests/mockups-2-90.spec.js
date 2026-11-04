@@ -255,3 +255,18 @@ test('Import mask: the design prints only where the mask is white; a mask of ano
   await expect(page.locator('#mktolr')).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+// 2.95.0 (owner Nov 4 2026): Copy prompt under Add mockup copies one message for an AI chat that makes a blank of the product typed in Product and its mask
+test('Copy prompt copies a message for the product typed in Product, or [product] when it is empty', async ({ page }) => {
+  const { errors } = await H.openApp(page, { seed: 4 });
+  await page.evaluate(() => { window.__copied = []; navigator.clipboard.writeText = t => { window.__copied.push(t); return Promise.resolve(); }; });
+  await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
+  await page.locator('#mkpane [data-mkpc]').click(); await expect(page.locator('#pmsg')).toHaveText('Copied the prompt.');
+  await page.locator('#mkpane .mkpp').fill('Baby onesie'); await page.locator('#mkpane [data-mkpc]').click();
+  await expect(page.locator('#pmsg')).toHaveText('Copied the prompt for Baby onesie.');
+  const [a, b] = await page.evaluate(() => window.__copied);
+  expect(a).toContain('Make a mockup blank of: [product].'); expect(a).toContain('"product.png"');
+  expect(b).toContain('Make a mockup blank of: Baby onesie.'); expect(b).toContain('"Baby onesie. Photorealistic studio product photo, square 1:1.');
+  expect(b).toContain('"baby-onesie.png"'); expect(b).toContain('"baby-onesie-mask.png"'); expect(b).not.toContain('{P}');
+  expect(errors).toEqual([]);
+});
