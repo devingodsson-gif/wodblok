@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.103.0','Nov 5 2026',['Book cover: changing the spine width, pages or bleed keeps everything where it was on the back cover, the spine and the front cover.']],
  ['2.102.1','Nov 4 2026',['The web app opens again after the first visit.']],
  ['2.102.0','Nov 4 2026',['Copy prompt in the Mockup panel now asks the AI chat for the photo only; WODBLOK finds the product in it.']],
  ['2.101.0','Nov 4 2026',['AI selection is in: in the web app, Find with AI in the Mockup panel finds your product for you.']],

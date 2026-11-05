@@ -1,9 +1,9 @@
 import {kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,PAPER,TRIMS,bk,col,setDim,stvOn} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,PAPER,TRIMS,bk,bkInch,col,setDim,stvOn} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
-import {canMove,ser} from './14-presets-and-layer-grid-ui.js';
+import {canMap,canMove,ser} from './14-presets-and-layer-grid-ui.js';
 import {buildTex} from './17-texture-panel-and-previews.js';
 import {renderGuides} from './18-projects-and-cover-overlay.js';
 
@@ -17,8 +17,16 @@ $('bksum').textContent=on?`${g.W.toFixed(2)} × ${g.H.toFixed(2)} in`:'';
 // the middle of the front cover (with Book cover off, of the canvas). 2.76.2: turning Book cover on or off, or changing its trim, pages or bleed, moves the elements
 // with the front cover, so the art stays on the front (before, it kept its place and so landed on the back)
 const bkFront=()=>{if(!WBS.book.on)return[CW/2,CH/2];const g=bk();return[CW*(g.b+g.tw+g.sw+g.tw/2)/g.W,CH/2]};
-const bookSet=o=>{const c0=bkFront();WBS.book={...WBS.book,...o};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}WBX.wbBookSync();
- const c1=bkFront();if(!stvOn()&&canMove(c1[0]-c0[0],c1[1]-c0[1])){store();upd()}};
+// 2.103.0 (owner Nov 5 2026: "When I adjust the spine width I want all the elements on the front and back cover and also the spine to stay where they are relative
+// to the section they are in"): while the trim size stays, a change of spine (width, pages, paper, Custom spine width) or bleed keeps every element in its own part:
+// the back cover (with the bleed beside it), the spine or the front cover (with its bleed), by where its middle is, at the same distance in inches from that part's
+// middle, across and down. Book cover on or off, or another trim size: everything goes with the front cover's middle, as before.
+function bkKeep(g0,g1){const u0=bkInch(g0),u1=bkInch(g1),mid=g=>[g.b+g.tw/2,g.b+g.tw+g.sw/2,g.b+g.tw+g.sw+g.tw/2],m0=mid(g0),m1=mid(g1);
+ return(x,y)=>{const X=x*u0,k=X<g0.b+g0.tw?0:X<g0.b+g0.tw+g0.sw?1:2;return[(X-m0[k]+m1[k])/u1,(y*u0-g0.b-g0.th/2+g1.b+g1.th/2)/u1]}}
+const bookSet=o=>{const c0=bkFront(),on0=WBS.book.on,g0=bk();WBS.book={...WBS.book,...o};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}WBX.wbBookSync();
+ const g1=bk();if(stvOn())return;let moved;
+ if(on0&&WBS.book.on&&g0.tw===g1.tw&&g0.th===g1.th)moved=canMap(bkKeep(g0,g1));else{const c1=bkFront();moved=canMove(c1[0]-c0[0],c1[1]-c0[1])}
+ if(moved){store();upd()}};
 // --- export at 300 DPI (PNG, or a PDF sized to the full cover with trim and bleed boxes)
 function coverRaster(cb){const g=bk(),W=Math.round(g.W*300),H=Math.round(g.H*300);$('pmsg').textContent='Rendering the print cover at 300 DPI…';
 let sv=ser().replace(/^<svg([^>]*?)>/,(m,a)=>`<svg${a.replace(/\s(width|height|preserveAspectRatio)="[^"]*"/g,'')} width="${W}" height="${H}" preserveAspectRatio="none">`);
