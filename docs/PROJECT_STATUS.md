@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 5: 2.104.2 (group effects, step 2 of docs/group-panel-plan.md)** on `feat/2.104.2-group-effects`, not merged. Next: 2.105.0 closes the plan.
+- **Nov 5: 2.105.0 (the Group panel plan is done)** on `fix/2.105.0-close-group-panel`, not merged.
+- **Nov 5: 2.104.2 LIVE (group effects, step 2 of docs/group-panel-plan.md)**.
 - **Nov 5: 2.104.1 LIVE (the Group panel, step 1)**.
 - **Nov 5: 2.104.0 LIVE (a spine or bleed change keeps every element's size too)**. Known, as before: a book change is not an undo step, so undoing an edit made before a spine change puts that element back at its place for the old spine.
 - **Nov 5: 2.103.0 LIVE (a spine or bleed change keeps every element in its own part of the book cover)**.

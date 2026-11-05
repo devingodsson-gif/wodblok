@@ -19,4 +19,5 @@ Not in this plan: a stamp's tab (checked in step 2: it lists the stamp's shapes 
 
 ## Outcome
 - 2.104.1 (Nov 5 2026): live. tests/group-panel-2-104-1.spec.js.
-- 2.104.2 (Nov 5 2026): built. The Group panel's Effects (KIND_PANEL group, the `group` kind in Texture's, Colour grade's and the filter effects' lists); drawn over the members drawn together by a hook in the group's wrapper (WBX.wbGpFx, 100-group-panel.js; gWrap, 65-element-core.js), between the group's ink and its opacity and blend. All 18 effects draw on a group (a new Colour grade draws nothing until a slider moves, as on an element). tests/group-effects-2-104-2.spec.js.
+- 2.104.2 (Nov 5 2026): live. The Group panel's Effects (KIND_PANEL group, the `group` kind in Texture's, Colour grade's and the filter effects' lists); drawn over the members drawn together by a hook in the group's wrapper (WBX.wbGpFx, 100-group-panel.js; gWrap, 65-element-core.js), between the group's ink and its opacity and blend. All 18 effects draw on a group (a new Colour grade draws nothing until a slider moves, as on an element). tests/group-effects-2-104-2.spec.js.
+- **2.105.0 (Nov 5 2026): the plan is done.** A group picked in the Elements list moves, sizes, turns and shifts as one, and takes effects over its whole drawing.
