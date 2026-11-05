@@ -1,6 +1,7 @@
 // 2.106.0 (B1 of docs/bug-test-2.105.md; owner Nov 5 2026: the screen matches the print): a stamp's wear is a blur cut sharply at a threshold, so a line thinner than a
 // screen pixel was worn away on screen and printed whole. Stamps are now printed at no fewer than 2 pixels per stamp unit and shown scaled down.
 // 2.106.1: switched off with the change it tests (taken back out: the wide project drew live, 2.4M of markup against a 120k budget; see docs/plan.md 2.106.1).
+// 2.106.2: on again. The plain print is shown first and the dense one replaces it a moment later, so the test waits until both print queues are empty.
 const { test, expect } = require('@playwright/test');
 const H = require('./helpers/harness');
 
@@ -24,12 +25,13 @@ const diff = (page, a, b) => page.evaluate(async ([a, b]) => {
   for (let i = 0; i < p.length; i += 4) d += Math.abs(p[i] - q[i]) + Math.abs(p[i + 1] - q[i + 1]) + Math.abs(p[i + 2] - q[i + 2]);
   return d / (p.length / 4) / 3; }, [a, b]);
 
-test.fixme('small stamps are printed at 2 pixels or more per stamp unit, so their thin worn lines look on screen as they print', async ({ page }) => {
+test('small stamps are printed at 2 pixels or more per stamp unit, so their thin worn lines look on screen as they print', async ({ page }) => {
   test.setTimeout(180000);
   const { errors } = await H.openApp(page, { seed: 7 });
   // a Tilework roll whose tile stamps have thin frame lines (they were broken on screen and whole in print)
   await page.evaluate(() => window.__wbTest.kv.set('wb167_rzlook', 'tilework')); await H.openPanel(page, 'rand'); await page.click('#rzdo'); await H.settle(page, { max: 60000 });
   await page.evaluate(() => window.__wbTest.commands.run('panels.closeAll')); await page.waitForTimeout(150); await H.settle(page, { max: 60000 });
+  await page.waitForFunction(() => !window.__wbTest.printsBusy(), null, { timeout: 60000 }); await H.settle(page, { max: 60000 });   // the dense prints come after the plain ones
   const d = await densities(page);
   expect(d.length, 'the pattern is drawn from printed stamps').toBeGreaterThan(0);
   expect(Math.min(...d), 'every stamp print has at least 2 pixels per stamp unit').toBeGreaterThanOrEqual(1.99);
