@@ -38,7 +38,7 @@ WBS.ARTS=artLoad(d.arts);const L=d.lib||{};Object.entries(L.motifs||{}).forEach(
 (L.colors||[]).forEach(([n,h])=>{if(n&&/^#[0-9a-f]{6}$/i.test(h)&&!CM[n]){C.push([n,h]);CM[n]=h;CC.push(n)}});saveCC();paintColors();
 WBS.tiles=JSON.parse(JSON.stringify(d.tiles));WBS.layers=[oneLayer(JSON.parse(JSON.stringify(Array.isArray(d.els)?d.els:flatEls(d.layers))),WBS.tiles.map(t=>t.id))];
 WBS.proj=trayIn({proj:d.proj&&typeof d.proj=='object'?JSON.parse(JSON.stringify(d.proj)):{},tiles:WBS.tiles,layers:WBS.layers}).proj;
-if(d.cover&&d.cover.book&&typeof d.cover.book=='object')WBS.book={...WBS.book,...d.cover.book};else WBS.book={...WBS.book,on:false};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}
+if(d.cover&&d.cover.book&&typeof d.cover.book=='object')WBS.book={...WBS.book,...d.cover.book};else WBS.book={...WBS.book,on:false};if(!(d.cover&&d.cover.book&&+d.cover.book.u>0))delete WBS.book.u;   /* 2.104.0: the cover's unit is this project's own */try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}
 WBS.dim=d.dim&&d.dim.s&&d.dim.c?JSON.parse(JSON.stringify(d.dim)):{s:[1,1],c:[2,3]};WBS.tiles.forEach(shOf);migLayers();setDim();WBS.pgrid=pgFix(d.pg);
 WBS.tex={...PDEF.tex,...(d.tex||{})};if(WBX.wbTexImgsLoad)WBX.wbTexImgsLoad(d.texImgs);WBS.texLib=txClean(d.texLib);texNorm();if(WBX.wbGrade)WBX.wbGrade.set(d.grade||null);WBS.guiKey='';if(WBX.wbBookSync)WBX.wbBookSync();
 WBS.nid=1+Math.max(0,...WBS.tiles.map(t=>+t.id||0));WBS.cur=0;selOne(-1);WBS.selL=WBS.layers.length-1;WBS.symKey='';$('sasp').dataset.custom='';$('casp').dataset.custom='';

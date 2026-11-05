@@ -67,9 +67,10 @@ const physLen=v=>{const P=physOf();return P?v/CW*P.w:null};
 const physToCv=v=>{const P=physOf();return P?v/P.w*CW:null};
 const tileExt=()=>tileOn()?[Math.min(CW,48),Math.min(CH,48)]:[0,0];   // 2.66.2: the 3 x 3 view is a picture of the tile (44-repeat-tile.js), so the drawing is the same with it on
 const setDim=()=>{['cs','cr','n','co','g','cp'].forEach(x=>{if(x in WBS.dim)delete WBS.dim[x]});useG(geom(WBS.dim));try{useT(WBS.tiles[WBS.cur])}catch(e){}
-if(STV){CW=STV[0];CH=STV[1]}else if(WBS.book.on){const g=bk();if(g.W>=g.H){CW=1000;CH=+(1000*g.H/g.W).toFixed(3)}else{CH=1000;CW=+(1000*g.W/g.H).toFixed(3)}}else[CW,CH]=csDims()};
-// the inches one canvas unit is on a book cover of geometry g (its long side is 1000 units, as setDim makes it)
-const bkInch=g=>(g.W>=g.H?g.W:g.H)/1000;
+if(STV){CW=STV[0];CH=STV[1]}else if(WBS.book.on){const g=bk(),u=bkInch(g);CW=+(g.W/u).toFixed(3);CH=+(g.H/u).toFixed(3)}else[CW,CH]=csDims()};
+// the inches one canvas unit is on a book cover of geometry g: the cover's own (WBS.book.u, 2.104.0: kept while only its spine or bleed changes, so nothing on it
+// changes size), else its long side over 1000 (the long side is 1000 units)
+const bkInch=g=>+WBS.book.u>0?+WBS.book.u:(g.W>=g.H?g.W:g.H)/1000;
 // Canvas (2.32.0, owner Oct 23 2026): the canvas is always a rectangle. The other outlines (rounded, circle, oval, arch, hex, triangle, diamond, polygon) are gone; setDim drops the old fields.
 const CSH=[['rect','Rectangle']];let CSN;const CASP=['rect'];
 function csk(){return'rect'}
@@ -182,7 +183,7 @@ function init04(){// Stamp is SW x SH units (long side 240); canvas is CW x CH u
 WBS.dim={s:[1,1],c:[2,3]};
 try{const d=JSON.parse(kv.get('wb14_dim')||'null');if(d&&d.s&&d.c)WBS.dim=d}catch(e){}
 WBS.book={on:false,trim:'6x9',tw:6,th:9,pages:200,paper:'white',man:false,sw:.45,bleed:.125,gd:true};
-try{const q=JSON.parse(kv.get('wb40_book')||'null');if(q&&typeof q=='object')WBS.book={...WBS.book,...q}}catch(e){}
+try{const q=JSON.parse(kv.get('wb40_book')||'null');if(q&&typeof q=='object')WBS.book={...WBS.book,...q}}catch(e){}delete WBS.book.u;   // a cover's own unit belongs to its project (2.104.0)
 GC=new Map();
 CSN=Object.fromEntries(CSH);
 setDim();

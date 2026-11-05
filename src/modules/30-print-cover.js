@@ -23,7 +23,10 @@ const bkFront=()=>{if(!WBS.book.on)return[CW/2,CH/2];const g=bk();return[CW*(g.b
 // middle, across and down. Book cover on or off, or another trim size: everything goes with the front cover's middle, as before.
 function bkKeep(g0,g1){const u0=bkInch(g0),u1=bkInch(g1),mid=g=>[g.b+g.tw/2,g.b+g.tw+g.sw/2,g.b+g.tw+g.sw+g.tw/2],m0=mid(g0),m1=mid(g1);
  return(x,y)=>{const X=x*u0,k=X<g0.b+g0.tw?0:X<g0.b+g0.tw+g0.sw?1:2;return[(X-m0[k]+m1[k])/u1,(y*u0-g0.b-g0.th/2+g1.b+g1.th/2)/u1]}}
-const bookSet=o=>{const c0=bkFront(),on0=WBS.book.on,g0=bk();WBS.book={...WBS.book,...o};try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}WBX.wbBookSync();
+// 2.104.0 (owner Nov 5 2026: yes to keeping sizes too): while only the spine or bleed changes, the cover keeps its own inches per canvas unit (book.u), so every element
+// keeps its size in inches (the canvas grows or shrinks around them); another trim size or Book cover off and on goes back to 1000 units across
+const bookSet=o=>{const c0=bkFront(),on0=WBS.book.on,g0=bk(),u0=bkInch(g0),b0={...WBS.book};WBS.book={...WBS.book,...o};
+ {const g=bk();if(on0&&WBS.book.on&&g.tw===g0.tw&&g.th===g0.th)WBS.book.u=u0;else delete WBS.book.u;if(JSON.stringify(b0)===JSON.stringify(WBS.book))return}try{kv.set('wb40_book',JSON.stringify(WBS.book))}catch(e){}WBX.wbBookSync();
  const g1=bk();if(stvOn())return;let moved;
  if(on0&&WBS.book.on&&g0.tw===g1.tw&&g0.th===g1.th)moved=canMap(bkKeep(g0,g1));else{const c1=bkFront();moved=canMove(c1[0]-c0[0],c1[1]-c0[1])}
  if(moved){store();upd()}};
