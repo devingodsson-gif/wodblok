@@ -12,10 +12,11 @@ Owner, Nov 5 2026: "What do you think about adding effects and moving groups? Of
 
 ## Steps
 1. **2.104.1: the Group panel, moving and turning.** X, Y (the box's top-left), W, H (scales evenly from the top-left), Rotate (-180 to 180 degrees, about the middle of the members' places, a point that stays still as they turn), Shift across and Shift down (-100 to 100%, of the canvas's width and height). One History step per change. Per kind: shapes, pictures, text and stamps move, turn and scale by their place, angle and size; a Paint element's strokes turn and scale point by point (widths too); a Pattern's area moves and sizes but does not turn (an area is upright); a Sheet, the Background and a Pattern that fills the canvas stay where they are.
-2. **2.104.2: group effects.** An Effects section in the Group panel with the elements' Add effect list (Texture, Colour grade and the 15 filter effects; not Pressure offset or Jitter, which act on single stamps), drawn over the group's combined drawing; each checked on a group, on the canvas and in exports.
+2. **2.104.2: group effects.** An Effects section in the Group panel with the elements' Add effect list (Texture, Colour grade and the 16 filter effects; not Pressure offset or Jitter, which act on single stamps), drawn over the group's combined drawing; each checked on a group, on the canvas and in exports.
 3. **2.105.0: the plan is done.**
 
-Not in this plan: groups inside a stamp's tab (checked in step 2 whether they share the code).
+Not in this plan: a stamp's tab (checked in step 2: it lists the stamp's shapes on their own and has no groups).
 
 ## Outcome
-- 2.104.1 (Nov 5 2026): built. tests/group-panel-2-104-1.spec.js.
+- 2.104.1 (Nov 5 2026): live. tests/group-panel-2-104-1.spec.js.
+- 2.104.2 (Nov 5 2026): built. The Group panel's Effects (KIND_PANEL group, the `group` kind in Texture's, Colour grade's and the filter effects' lists); drawn over the members drawn together by a hook in the group's wrapper (WBX.wbGpFx, 100-group-panel.js; gWrap, 65-element-core.js), between the group's ink and its opacity and blend. All 18 effects draw on a group (a new Colour grade draws nothing until a slider moves, as on an element). tests/group-effects-2-104-2.spec.js.

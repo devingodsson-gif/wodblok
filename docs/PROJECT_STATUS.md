@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 5: 2.104.1 (the Group panel, step 1 of docs/group-panel-plan.md)** on `feat/2.104.1-group-panel`, not merged. Next: 2.104.2, group effects.
+- **Nov 5: 2.104.2 (group effects, step 2 of docs/group-panel-plan.md)** on `feat/2.104.2-group-effects`, not merged. Next: 2.105.0 closes the plan.
+- **Nov 5: 2.104.1 LIVE (the Group panel, step 1)**.
 - **Nov 5: 2.104.0 LIVE (a spine or bleed change keeps every element's size too)**. Known, as before: a book change is not an undo step, so undoing an edit made before a spine change puts that element back at its place for the old spine.
 - **Nov 5: 2.103.0 LIVE (a spine or bleed change keeps every element in its own part of the book cover)**.
 - **Nov 4: 2.102.1 LIVE (hotfix: the service worker kept a redirected page, so the app would not open after the first visit)**. Found Nov 4: Cloudflare had been building `npm run build` (the single file), not `npm run build:web` as docs/hosting.md said, so the asset split, the AI and the service worker were never live; the owner switched it to `npm ci && npm run build:web`, output `dist/web`, and the first live service worker failed every load after the first. A browser left with the broken worker does not check for a new one itself (about a day): unregister it (Application > Service workers) to recover at once; do not clear site data (projects and libraries are in browser storage).
