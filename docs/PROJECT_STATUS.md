@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 5: 2.105.0 (the Group panel plan is done)** on `fix/2.105.0-close-group-panel`, not merged.
+- **Nov 5: whole-app bug test of 2.105.0: docs/bug-test-2.105.md (read it first).** Full CI suite on `main` passed (eight Chromium shards and WebKit; picture comparison skipped). No page error anywhere. Findings: **B1 (high): an export larger than the screen does not look like the screen** (at 3x thin worn lines print solid, the surface wear differs; at the screen's size they match); B2 Mockup tile names all cut off; B3 the "Paragraph spacing" label 3 px too wide; B4 X/Y/W/H fields not in columns (Element and Group sections); B5 a harmless 401 from /api/me in the console; B6 small touch targets on a phone (mobile is later). Speed: no regression (perf mean 1.01); live first visit 2.4 s, reload and offline 1.1 s. Next, my recommendation: B1, then one small style release (B2 to B4). Nothing fixed yet; nothing waits on a branch.
+- **Nov 5: 2.105.0 LIVE (the Group panel plan is done)**.
 - **Nov 5: 2.104.2 LIVE (group effects, step 2 of docs/group-panel-plan.md)**.
 - **Nov 5: 2.104.1 LIVE (the Group panel, step 1)**.
 - **Nov 5: 2.104.0 LIVE (a spine or bleed change keeps every element's size too)**. Known, as before: a book change is not an undo step, so undoing an edit made before a spine change puts that element back at its place for the old spine.
@@ -217,7 +218,8 @@ Public repo: keep this page free of names, emails, accounts, prices and business
 - Full list and history: `docs/known-issues.md` (mostly rare "drawn after the settle check" flakes; re-run the spec alone before calling it a bug).
 - From `docs/plan.md`: Texture, mask and filter effects on Text mapped to an outline use the Shape's area; selection handles of mapped text show the text box at the Shape's middle; separate pop-overs for shapes, stamps and pictures and Stamp texture as an effect were left for later (2.3.0).
 - (Closed 2.78.1: no seam measured, a test keeps it.) Repeat tile: a rolled Pattern with a Texture effect can show a faint seam at the tile edge (`repeat-tile` roll 21 fails since 2.24.0, which shows the roll as it is saved; 2.23.0 had the same seam after Undo and Redo). Not fixed.
-- `speed-guard` markup budget: "after Randomize" sits at about 148,000 against a limit of 150,000, so adding markup to a rolled picture will fail it.
+- `speed-guard` markup budget: "after Randomize" was about 148,000 of 150,000 in October; on 2.105.0 it is 32,398 (Nov 5 bug test), so there is room.
+- Nov 5 bug test (docs/bug-test-2.105.md): B1 an export larger than the screen does not match it (thin worn lines, surface wear); B2 to B4 style slips; open.
 - 2.9.0 left the texture and grade engines, the `tu` / `WBS.tex` fields and the unreachable grade panel DOM and `init31` UI code in place. The owner has said a project-wide texture/grade element is planned; cleanup is not decided.
 
 ## Unfinished and next
@@ -292,6 +294,7 @@ None at the moment. Add new ones here.
 - Run the CI shard suite once before the next release goes live (my estimate: high importance, because 2.4.0 to 2.9.0 changed the Add bar, panels, stamp view and removed tools with no recorded full run). The owner said to ask him first, so suggest it with the importance percentage and wait.
 
 ## Changelog of this page
+- Nov 5 2026: whole-app bug test of 2.105.0 (docs/bug-test-2.105.md); 2.105.0 marked live; speed-guard note brought up to date.
 - Oct 28 2026: handover block added at the top (state at 2.73.0, pending approvals, unmerged branches, working notes).
 - Oct 26 2026: 2.51.0 (texture library follow-ups: select mode, drag to folder, hidden sets, export and zip import, stamp pictures) on branch feat/2.51.0-texture-library-follow-up (built on 2.50.2), not merged. The saved-stamps, saved-trays, templates and colourways libraries still lack folders or select mode (see the table in docs/developing-wodblok.md); bringing them to the same standard is a separate release, suggested below.
 - Oct 21 2026 (night): updated for 2.10.0 to 2.15.0, the handover to another agent.
