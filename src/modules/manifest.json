@@ -98,5 +98,6 @@
  "96-picture-library.js",
  "97-touch.js",
  "98-units.js",
- "99-rulers.js"
+ "99-rulers.js",
+ "100-group-panel.js"
 ]

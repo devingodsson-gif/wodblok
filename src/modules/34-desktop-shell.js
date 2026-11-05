@@ -29,14 +29,14 @@ let panel='canvas',z=0,fitS=1;try{panel=kv.get('wb24_panel')||'canvas';if(!PN[pa
 // ===== Workspace: one set of panels. Panels live in groups (tabs).
 // Groups are docked on the left, right, top or bottom edge of the window, or float over the stage. Drag a tab or a group's title bar to move it:
 // drop on another group's title bar to tab it in, on a dock to stack it there, on an empty window edge to open a dock, anywhere else to float it.
-const PNAME={xrec:'Export',help:'Help',layout:'Layout',mock:'Mockup',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',image:'Image',sheet:'Sheet',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
+const PNAME={xrec:'Export',help:'Help',layout:'Layout',mock:'Mockup',slib:'Stamp library',text:'Text',lyrs:'Elements',canvas:'Canvas',colors:'Colours',stamp:'Stamp settings',motifs:'Shape',image:'Image',sheet:'Sheet',group:'Group',elpaint:'Paint',layers:'Pattern',stmp:'Stamp',pgrid:'Grid',rand:'Randomize',hist:'History'};
 // the element panels open from the element bar only (owner, Oct 20 2026): no rail button, not in the tool repository
-const EL_ONLY=['layers','stmp','motifs','image','sheet','text','elpaint'];
+const EL_ONLY=['layers','stmp','motifs','image','sheet','text','elpaint','group'];   // 2.104.1: the Group panel opens when a group is picked in the Elements list
 // Element panels (2.3.0; 2.6.0 shows each under its own name, not as one "Properties" tab): every element panel opens in one group, right under the Elements list
 const ELP=EL_ONLY,wsIsP=g=>!!g&&g.tabs.length>0&&g.tabs.every(p=>ELP.includes(p));
 // undocked panels (2.87.4, owner Nov 3 2026): with no remembered place they open floating in the middle of the window, and dock like any panel
 const WS_UNDOCK=['xrec','help','layout'],WS_USZ={layout:[260,148]};   // 2.96.0: Mockup docks like the other panels again (its view is the Mockup tab)   // 2.87.7: Layout is small
-const MODEP={pattern:['lyrs','layers','stmp','motifs','image','sheet','elpaint','text','pgrid','canvas','colors','rand','hist','xrec','help','layout','mock']};
+const MODEP={pattern:['lyrs','layers','stmp','motifs','image','sheet','elpaint','group','text','pgrid','canvas','colors','rand','hist','xrec','help','layout','mock']};
 let wsReady=false,wsZ=10,wd=null,wsJust=0;
 const wsG=(tabs,o={})=>({id:'g'+Math.random().toString(36).slice(2,9),tabs,a:tabs[0],f:1,e:'r',...o});
 const wsDef=()=>({dock:[wsG(['lyrs'],{f:.85,lk:1}),wsG(['layers']),wsG(['canvas','colors'],{f:.8})],float:[]});   // Elements, Properties, then the document tools (three groups, three random ids as before)
