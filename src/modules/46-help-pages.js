@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.106.0','Nov 5 2026',['Stamps on screen look as they print: thin worn lines are no longer broken on screen and whole in an export.']],
  ['2.105.0','Nov 5 2026',['Groups are done: pick one in the Elements list to move, size, turn and shift it, and to give it effects.']],
  ['2.104.2','Nov 5 2026',['Group effects: in the Group panel, Add effect puts one effect over the whole group (a blur, a texture, a halftone…).']],
  ['2.104.1','Nov 5 2026',['The Group panel: pick a group in the Elements list to move, size, turn and shift it as one.']],

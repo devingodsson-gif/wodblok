@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.106.0 (Nov 5 2026, branch fix/2.106.0-print-matches-screen): the screen matches the print (B1 of docs/bug-test-2.105.md)
+- Owner, Nov 5 2026, asked which should be the reference: "Screen matches print". Cause: a stamp's wear is a blur cut sharply at a threshold; a stamp shrunk on the canvas has lines thinner than a screen pixel, which the cut wore away on screen (stamps show as prints made at screen size), while a 3x export drew them whole. The print converges above 3x (3x, 6x and 9x agree within about 1 of 255), so the print is the true drawing.
+- Fix (03-stamp-prints-and-drawing.js, bkDense): a stamp is printed at no fewer than 2 pixels per stamp unit and shown scaled down. Measured on Tilework rolls (seeds 1, 5, 7) against a 6x print: density 1 (before) 5.1 / 4.2 / 6.1, density 2 3.4 / 3.1 / 4.1, density 3 no closer and slower. Shapes with effects (el prints) are unchanged.
+- Tests: tests/print-density-2-106.spec.js (new; fails on 2.105.0); print-batches, pressure-prints-2-67-1, element-print-2-44-3, hand-printed-2-76-5, speed-guard, stamp-settings, any-layer-items: 21 passed. `npm run perf`: ratio 0.917 (no regression); roll + settle 1.3 s.
+- Not done: a timing comparison of stamp-heavy rolls old against new was stopped (usage); earlier single runs showed settles about 0 to 18% longer on Tilework. Not run: the full suite, the picture comparison (pixel goldens that show stamps may differ: expected, look at each). Still open: zoomed in between fit and about 2x the pattern draws live at screen density, and small PNG exports (below about 3x) are drawn at their own size, so both can still wear thin lines a little. Preview artifact not republished (usage).
+
 ## 2.105.0 (Nov 5 2026): the Group panel plan is done (docs/group-panel-plan.md)
 - Live: 2.104.1 (move, size, turn and shift a group in the Group panel), 2.104.2 (group effects). Version, docs and a Help line; no app code changed. Tests: help.
 
