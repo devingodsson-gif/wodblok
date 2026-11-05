@@ -55,6 +55,7 @@ const HELP_PAGES=[
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
  ['2.107.0','Nov 5 2026',['Mockup names show in full (three cards a row), the Text panel says Paragraph gap, and X, Y, W and H line up in columns.']],
+ ['2.106.2','Nov 5 2026',['Stamps on screen look as they print again, without the slowdown: the sharper drawing arrives a moment after the first.']],
  ['2.106.1','Nov 5 2026',['Stamps are drawn on screen as in 2.105 again while the sharper drawing is reworked: it slowed large projects.']],
  ['2.106.0','Nov 5 2026',['Stamps on screen look as they print: thin worn lines are no longer broken on screen and whole in an export.']],
  ['2.105.0','Nov 5 2026',['Groups are done: pick one in the Elements list to move, size, turn and shift it, and to give it effects.']],

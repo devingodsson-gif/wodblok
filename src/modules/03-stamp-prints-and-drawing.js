@@ -38,18 +38,32 @@ function bkElMark(slot,s,xd,c){if(!BK||BK.off||BK.live||tileOn())return s;
  BK.XD[slot]=xd;return`<!--@M:${slot}|${+x0.toFixed(4)}|${+y0.toFixed(4)}|${W}|${H}|${bkH(s.replace(RXD,'')+xd+x0+'|'+y0)}-->${s}<!--@-->`}
 // the pictures and filters in the texture host (#txd) that a printed shape refers to: the print is a separate document and cannot see the page
 function bkXd(inner,xd){const h=document.getElementById('txd');let o=xd;if(!h)return o;const seen=new Set(),walk=t=>t.replace(/(?:href="#|url\(#)(tx[\w.-]*)/g,(m,id)=>{if(!seen.has(id)){seen.add(id);const n=h.querySelector('[id="'+id+'"]');if(n){const z=n.outerHTML;o+=z;walk(z)}}return m});walk(inner+xd);return o}
+// 2.106.0 (B1 of docs/bug-test-2.105.md; owner Nov 5 2026: the screen matches the print): a stamp's wear is a blur cut sharply at a threshold, so a line thinner than a
+// pixel was worn away on screen and printed whole. A stamp is printed at no fewer than BK_DENSE pixels per stamp unit (more than the screen shows when the stamp is small)
+// and shown scaled down, so its wear is worked out finely enough to look as it prints (measured: 2 gives the thin lines of the print; 3 looked no closer and printed slower).
+// 2.106.2: a dense print takes several times longer to make, and 2.106.0 waited for it, so the pattern drew live for seconds after a project opened or changed (the wide
+// test project: 2.37M characters of markup against 35k). Now the plain print (screen density, as fast as 2.105.0) is made first and shown; the dense print is made after
+// it in a second queue (BK.q2) that only runs when the first is empty, and replaces it when ready. Nothing waits for it: Randomize's cover, dragging and the defer below
+// look at the first queue only. The second queue is filled again by every redraw, so a dense print nobody needs any more is not made.
+const BK_DENSE=2;
+const bkDense=(sx,sy)=>{const m=Math.min(Math.abs(sx),Math.abs(sy))*BK.sc;return m>0?Math.max(1,BK_DENSE/m):1};
 const RXM=/<!--@([FPE]):(\w+)-->([\s\S]*?)<!--@-->/g;
 // one impression: the printed image when there is one (an out-of-date one is fine for a moment, it is reprinted right away), else null = draw it live
 function bkOne(slot,inner,tid,pk,ch,sx,sy,tw,th,dc,op,tr,flt,used,el,xd){const W=-2*tw,H=-2*th;if(!(W>0&&H>0))return null;
- const bx=bkQ(Math.abs(sx)*BK.sc),by=bkQ(Math.abs(sy)*BK.sc);if(W*bx>BK.MAXC||H*by>BK.MAXC)return null;
- const key=slot+'@'+bx+'x'+by,e=BK.map.get(key),fit=x=>x&&x.W===W&&x.H===H;let u=fit(e)?e:null;
+ const b1x=bkQ(Math.abs(sx)*BK.sc),b1y=bkQ(Math.abs(sy)*BK.sc);if(W*b1x>BK.MAXC||H*b1y>BK.MAXC)return null;
+ const key1=slot+'@'+b1x+'x'+b1y,fit=x=>x&&x.W===W&&x.H===H;
+ // the dense print this impression should end up with (el prints stay at screen density); none when it would be larger than a print may be
+ let dk=null,dx=b1x,dy=b1y;if(!el){const kd=bkDense(sx,sy);if(kd>1){dx=bkQ(Math.abs(sx)*BK.sc*kd);dy=bkQ(Math.abs(sy)*BK.sc*kd);if(W*dx<=BK.MAXC&&H*dy<=BK.MAXC)dk=slot+'@'+dx+'x'+dy}}
+ const d=dk&&BK.map.get(dk);let u=null;
+ if(d&&fit(d)&&d.h===ch){BK.nHit++;u=d}
+ else{const bx=b1x,by=b1y,key=key1,e=BK.map.get(key);u=fit(e)?e:null;
  // el (2.44.3): a shape with effects. Where it is and how it looks are in the print, so a print that is out of date is never shown: the shape draws live until its new print is ready
  if(el){if(u&&u.h===ch)BK.nHit++;else{BK.q.set(key,{slot,inner,tid,pk,h:ch,W,H,bx,by,xd});if(u)BK.nStale++;else BK.nMiss++;u=null}}
- else if(u&&u.h===ch)BK.nHit++;
+ else if(u&&u.h===ch){BK.nHit++;if(dk&&!BK.cont&&!WBS.DRAFT)BK.q2.set(dk,{slot,inner,tid,pk,h:ch,W,H,bx:dx,by:dy})}   // the plain print is up to date: the dense one is made next, when nothing else waits
  else{if(!u){const a=BK.map.get(BK.alt.get(slot));if(fit(a))u=a}
   if(u&&u.h===ch&&BK.cont)BK.nHit++; // only the size is off, and something is being dragged: reprinted when it is let go
   else{if(!BK.q.has(key))BK.q.set(key,{slot,inner,tid,pk,h:ch,W,H,bx,by});else{const j=BK.q.get(key);j.inner=inner;j.h=ch;j.tid=tid;j.pk=pk}
-   if(!u)BK.nMiss++;else if(u.h!==ch)BK.nStale++;else BK.nRes++}}
+   if(!u)BK.nMiss++;else if(u.h!==ch)BK.nStale++;else BK.nRes++}}}
  if(!u)return null;u.u=BK.gen;used.add(u);const f=v=>+v.toFixed(4);
  return`<use href="#bk${u.n}" x="${f(-2/u.sx)}" y="${f(-2/u.sy)}" width="${f(u.cw/u.sx)}" height="${f(u.ch/u.sy)}"${dc}${op} transform="${tr}"${flt}/>`}
 function bkSub(s,used,need){
@@ -82,7 +96,7 @@ function bkPut(h){const d=$('dyn');if(!d||!d.firstChild||BK.noMorph){d.innerHTML
 function bkHost(sd){if(sd!==BK.sd){BK.sd=sd;const h=$('stdefs');if(h)h.innerHTML=sd}}
 function bkShow(defs,ik,lg,body,sd){sd=sd||'';const bd=body(lg);BK.vdefs=sd+defs+ik;BK.vdyn='<defs>'+BK.vdefs+'</defs>'+bd;BK.wasLive=BK.live;BK.sc0=BK.sc;
  if(BK.off||BK.live){bkHost(sd);bkPut('<defs>'+defs+ik+'</defs>'+bd);BK.shown=1;BK.defT=0;return}
- const now=performance.now();BK.cont=WBS.DRAFT||now-BK.inT<450;BK.gen++;BK.nHit=BK.nStale=BK.nRes=BK.nMiss=0;const used=new Set(),need=new Set();
+ const now=performance.now();BK.cont=WBS.DRAFT||now-BK.inT<450;BK.gen++;BK.q2.clear();BK.nHit=BK.nStale=BK.nRes=BK.nMiss=0;const used=new Set(),need=new Set();
  const d2=bkSub(defs,used,need),l2=bkSub(lg,used,need);bkNeed(l2,need);try{if(WBS.fpB!=null&&WBS.fpB!==false)need.add('E'+WBS.fpB)}catch(e){}
  BK.st.hit+=BK.nHit;BK.st.stale+=BK.nStale;BK.st.miss+=BK.nMiss;
  // a big one-off change (randomize, undo, a new palette): keep the old picture up for a moment while the new stamps print, rather than flashing
@@ -93,15 +107,15 @@ function bkShow(defs,ik,lg,body,sd){sd=sd||'';const bd=body(lg);BK.vdefs=sd+defs
  // prints that have not been shown for a while are let go
  if(BK.map.size>300)for(const[k,e]of BK.map)if(BK.gen-(e.u||0)>4){bkDrop(e);BK.map.delete(k)}
  bkFlush();bkKick(WBS.DRAFT?120:20)}
-function bkKick(d){if(BK.tm||BK.busy||!BK.q.size||BK.off)return;BK.tm=setTimeout(()=>{BK.tm=0;const n=performance.now();if((WBS.DRAFT||n-BK.inT<300)&&n-BK.last<350){bkKick(100);return}bkRun()},d==null?20:d)}
+function bkKick(d){if(BK.tm||BK.busy||!(BK.q.size||BK.q2.size)||BK.off)return;BK.tm=setTimeout(()=>{BK.tm=0;const n=performance.now();if((WBS.DRAFT||n-BK.inT<300)&&n-BK.last<350){bkKick(100);return}bkRun()},d==null?20:d)}
 // Prints in small sheets (about 1 megapixel, tens of milliseconds each) and lets the app react between them, instead of one sheet of up to 4096 x 4096
 // that holds everything up for a second or more. The pattern is redrawn once the queue is empty, or every half second while it is long.
 const bkTick=()=>new Promise(r=>setTimeout(r,0));
-async function bkBatch(){const MW=2048,MH=512,G=4,P=2,take=[],cells=[],tids=new Set(),pks=new Set();let x=0,y=0,rh=0,aw=0;
-  for(const[slot,j]of BK.q){const sx=Math.min(j.bx,BK.MAXC/j.W),sy=Math.min(j.by,BK.MAXC/j.H),cw=Math.ceil(j.W*sx)+2*P,ch=Math.ceil(j.H*sy)+2*P;
+async function bkBatch(Q){const MW=2048,MH=512,G=4,P=2,take=[],cells=[],tids=new Set(),pks=new Set();let x=0,y=0,rh=0,aw=0;
+  for(const[slot,j]of Q){const sx=Math.min(j.bx,BK.MAXC/j.W),sy=Math.min(j.by,BK.MAXC/j.H),cw=Math.ceil(j.W*sx)+2*P,ch=Math.ceil(j.H*sy)+2*P;
    if(x&&x+cw>MW){x=0;y+=rh+G;rh=0}if(take.length&&y+ch>MH)break;
    j.c={x,y,cw,ch,sx,sy};cells.push(`<g transform="translate(${x+P} ${y+P}) scale(${sx} ${sy})">${j.inner}</g>`);take.push([slot,j]);x+=cw+G;rh=Math.max(rh,ch);aw=Math.max(aw,x);tids.add(j.tid);if(j.pk)pks.add(j.pk)}
-  take.forEach(([k])=>BK.q.delete(k));
+  take.forEach(([k])=>Q.delete(k));
   let defs='';tids.forEach(t=>defs+=(BK.TD[t]||'')+bkSurf(t));{const px=$('stpix');if(px&&px.firstChild)defs+=px.innerHTML}   /* 2.31.0: the pictures that fill motifs of stamps */
   /* 2.67.1: the pressure variants' definitions. The comment above used to run on into this line and hide it, so every printed pressure variant came out empty (a stamp with Pressure offset vanished once printed) */
   pks.forEach(k=>{const x=k.slice(0,k.lastIndexOf('_'));defs+=(BK.PF[x]||'')+(BK.PC[k]||'')});
@@ -114,9 +128,9 @@ async function bkBatch(){const MW=2048,MH=512,G=4,P=2,take=[],cells=[],tids=new 
   take.forEach(([key,j])=>{bkDrop(BK.map.get(key));BK.map.delete(key);A.live++;BK.map.set(key,{n:++BK.n,A,cx:j.c.x,cy:j.c.y,cw:j.c.cw,ch:j.c.ch,sx:j.c.sx,sy:j.c.sy,h:j.h,W:j.W,H:j.H,u:BK.gen});BK.alt.set(j.slot,key)});
   if(!A.live)URL.revokeObjectURL(A.url);
   BK.st.printed+=take.length}
-async function bkRun(){if(BK.busy||!BK.q.size||BK.off)return;BK.busy=1;const t0=performance.now();let tu=t0;
- try{while(BK.q.size&&!BK.off){await bkBatch();BK.fail=0;BK.st.bakes++;
-   if(!BK.q.size)break;
+async function bkRun(){if(BK.busy||!(BK.q.size||BK.q2.size)||BK.off)return;BK.busy=1;const t0=performance.now();let tu=t0;
+ try{while((BK.q.size||BK.q2.size)&&!BK.off){const two=!BK.q.size;await bkBatch(two?BK.q2:BK.q);BK.fail=0;BK.st.bakes++;if(two)BK.st.dense++;
+   if(!(BK.q.size||BK.q2.size))break;
    const n=performance.now();if(n-tu>500){tu=n;BK.last=n;if(typeof upd=='function')upd()}   // a long queue: show what is done so far
    await bkTick();if(performance.now()-BK.inT<300)break}}                                 // something is being dragged: stop, bkKick prints the rest when it settles
  catch(e){if(++BK.fail>2)BK.off=1}
@@ -138,8 +152,8 @@ function bkPng(id){const w=id.width,h=id.height,px=id.data,rl=w*4+1,n=rl*h,nb=Ma
 // sliders, colour pickers and wheel zoom count as continuous: the picture follows at once, exact prints come a moment after they stop
 const bkIn=()=>{BK.inT=performance.now();clearTimeout(BK.inTm);BK.inTm=setTimeout(()=>{if(typeof upd=='function')upd()},500)};
 function init03(){
-BK={map:new Map(),alt:new Map(),q:new Map(),busy:0,tm:0,n:0,off:0,live:0,sc:1,sc0:0,wasLive:0,shown:0,defT:0,fail:0,last:0,inT:0,inTm:0,gen:0,cont:0,
- XD:{},T:{},TD:{},TK:{},sd:'',P:{},PC:{},PF:{},PD:new Map(),dead:[],vdyn:null,vdefs:null,MAXC:2048,nHit:0,nStale:0,nRes:0,nMiss:0,st:{hit:0,stale:0,miss:0,bakes:0,ms:0,printed:0,defer:0}};
+BK={map:new Map(),alt:new Map(),q:new Map(),q2:new Map(),busy:0,tm:0,n:0,off:0,live:0,sc:1,sc0:0,wasLive:0,shown:0,defT:0,fail:0,last:0,inT:0,inTm:0,gen:0,cont:0,
+ XD:{},T:{},TD:{},TK:{},sd:'',P:{},PC:{},PF:{},PD:new Map(),dead:[],vdyn:null,vdefs:null,MAXC:2048,nHit:0,nStale:0,nRes:0,nMiss:0,st:{hit:0,stale:0,miss:0,bakes:0,ms:0,printed:0,defer:0,dense:0}};
 // zooming or resizing: redraw when the pattern switches between printed and live, or shows at a new size
 window.bkZ=()=>{if(BK.off||!BK.shown)return;const live=!!(WBX.wbZoomIn&&WBX.wbZoomIn());if(live!==!!BK.wasLive||(!live&&Math.abs(bkScale()/BK.sc0-1)>1e-4))upd()};
 // the vector pattern, for exports and anything else that turns the canvas into a picture
