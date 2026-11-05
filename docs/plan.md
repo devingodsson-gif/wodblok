@@ -1,5 +1,8 @@
 # Development plan
 
+## 2.105.0 (Nov 5 2026): the Group panel plan is done (docs/group-panel-plan.md)
+- Live: 2.104.1 (move, size, turn and shift a group in the Group panel), 2.104.2 (group effects). Version, docs and a Help line; no app code changed. Tests: help.
+
 ## 2.104.2 (Nov 5 2026): the Group panel, step 2: group effects (docs/group-panel-plan.md)
 - Owner: "Yes one combined effect". The Group panel has Effects with the elements' Add effect list but Pressure offset and Jitter (Texture, Colour grade, the 16 filter effects). A group's effects are drawn over its members drawn together, one filter round the group (WBX.wbGpFx in 100-group-panel.js, called from the group's wrapper in 65-element-core.js, between its ink and its opacity and blend); kept on the group (fx), shown in exports, gone with Ungroup; the members keep their own. A stamp's tab has no groups.
 - Tests: tests/group-effects-2-104-2.spec.js (new: the list, one filter round both members, the eye, the exported PNG, Ungroup, all 18 effects draw on a group). Run: it, the Group panel spec, every effect spec, the bug test, element-group, dock-default (38 passed), perf (six runs: 0.94 to 1.10, mean 1.01; the group check costs nothing on a document without groups), check:platform, check:style, the start-up error check.
