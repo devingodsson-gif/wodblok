@@ -5,7 +5,8 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 5: 2.103.0 (a spine or bleed change keeps every element in its own part of the book cover)** on `fix/2.103.0-spine-keeps-places`, not merged. Known: the canvas is 1000 units across whatever the cover's width, so a wider spine still makes every element slightly larger in inches (3.5% when a 0.45 in spine doubles on a 6 x 9 in book); see Suggestions.
+- **Nov 5: 2.104.0 (a spine or bleed change keeps every element's size too)** on `fix/2.104.0-spine-keeps-sizes`, not merged. Known, as before: a book change is not an undo step, so undoing an edit made before a spine change puts that element back at its place for the old spine.
+- **Nov 5: 2.103.0 LIVE (a spine or bleed change keeps every element in its own part of the book cover)**.
 - **Nov 4: 2.102.1 LIVE (hotfix: the service worker kept a redirected page, so the app would not open after the first visit)**. Found Nov 4: Cloudflare had been building `npm run build` (the single file), not `npm run build:web` as docs/hosting.md said, so the asset split, the AI and the service worker were never live; the owner switched it to `npm ci && npm run build:web`, output `dist/web`, and the first live service worker failed every load after the first. A browser left with the broken worker does not check for a new one itself (about a day): unregister it (Application > Service workers) to recover at once; do not clear site data (projects and libraries are in browser storage).
 - **Nov 4: 2.102.0 LIVE (Copy prompt asks for the photo only)**.
 - **Nov 4: 2.101.0 LIVE (the AI selection plan is done)**. AI in the Image panel is shelved (owner, Nov 4 2026: "shelve the ai image panel for now"). Open: cross-origin isolation for faster AI (Suggestions).
@@ -275,7 +276,7 @@ None at the moment. Add new ones here.
 - Still open from before: owner's Mac `npm run perf:draw`; printing text, picture and pattern elements with effects (2.44.3 prints only shapes); stale remote branch docs/2.44.0-live could not be deleted.
 
 ## Suggestions
-- (Nov 5 2026, book cover) When the spine or bleed changes, also keep every element's size in inches (today they grow or shrink with the cover's width, because the canvas is always 1000 units across: 3.5% for a doubled 0.45 in spine on a 6 x 9 in book). Needs every size property of every element scaled together (shapes, strokes, text, pictures, pattern spacing); not done.
+- (Nov 5 2026, book cover) Make a book change (trim, spine, bleed) an undo step, so Undo puts the cover and the elements back together.
 - (Nov 4 2026, AI selection) Cross-origin isolation (COOP and COEP headers on wodblok.com) would let the AI use several processor threads, reading a photo several times faster; it must be checked against sign-in (Clerk) first. Not done; the owner's decision.
 - **Patterns library** (pattern plan step 8, shelved by the owner Oct 30 2026): saved patterns reused across projects on the shared library tree. (my recommendations, not decisions)
 - Mockups (shelved by the owner Oct 29 2026, "for later"): a pattern's repeat previewed on fabric, wallpaper, wrapping paper or a book at real scale, once the physical canvas size of docs/pattern-plan.md step 3 exists.
