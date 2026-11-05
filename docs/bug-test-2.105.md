@@ -24,7 +24,7 @@ The app is sturdy: no page error anywhere, in about 800 actions plus the full su
 ## Findings
 
 ### B1 (high for a print product): an export larger than the screen does not look like the screen
-**Fixed in 2.106.0** (owner: "Screen matches print"; docs/plan.md): the cause was the screen, which wore away stamp lines thinner than a pixel; stamps are now printed at 2 pixels or more per stamp unit.
+**Fixed in 2.106.0, taken back out in 2.106.1** (it made large projects draw live; owner: "Screen matches print"; docs/plan.md 2.106.1): the cause was the screen, which wore away stamp lines thinner than a pixel; stamps are now printed at 2 pixels or more per stamp unit.
 At the screen's own size (480 x 720 here) the PNG export matches the canvas. At 800 px it starts to differ, and at 3x (2,160 px, the "PNG image 3x" button) it clearly differs: in Tilework the thin frame lines that are **broken and worn on screen are solid unbroken lines in the export**, and the ink's surface wear is a different pattern. Mean difference against the screen at 3x: Tilework 5.5, Random 4.2, Plate 3.0, Repeat 2.3 (of 255), with up to 6% of pixels clearly different; at the screen's size all are under 2.
 - Why it matters: what prints (3x, PDF, CMYK) is not what the owner judged on screen.
 - Suspect (not confirmed): the worn edge (`11-pressure-flooding-block-edges.js`, the filter at line 35: noise, then a very steep cut, slope 40) and the other noise filters decide pixel by pixel, so the result depends on how many pixels the drawing is made at; the break pattern of thin lines then changes with the size. It is also possible that thin lines take a different path in the export.

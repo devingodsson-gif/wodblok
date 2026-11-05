@@ -1,5 +1,6 @@
 // 2.106.0 (B1 of docs/bug-test-2.105.md; owner Nov 5 2026: the screen matches the print): a stamp's wear is a blur cut sharply at a threshold, so a line thinner than a
 // screen pixel was worn away on screen and printed whole. Stamps are now printed at no fewer than 2 pixels per stamp unit and shown scaled down.
+// 2.106.1: switched off with the change it tests (taken back out: the wide project drew live, 2.4M of markup against a 120k budget; see docs/plan.md 2.106.1).
 const { test, expect } = require('@playwright/test');
 const H = require('./helpers/harness');
 
@@ -23,7 +24,7 @@ const diff = (page, a, b) => page.evaluate(async ([a, b]) => {
   for (let i = 0; i < p.length; i += 4) d += Math.abs(p[i] - q[i]) + Math.abs(p[i + 1] - q[i + 1]) + Math.abs(p[i + 2] - q[i + 2]);
   return d / (p.length / 4) / 3; }, [a, b]);
 
-test('small stamps are printed at 2 pixels or more per stamp unit, so their thin worn lines look on screen as they print', async ({ page }) => {
+test.fixme('small stamps are printed at 2 pixels or more per stamp unit, so their thin worn lines look on screen as they print', async ({ page }) => {
   test.setTimeout(180000);
   const { errors } = await H.openApp(page, { seed: 7 });
   // a Tilework roll whose tile stamps have thin frame lines (they were broken on screen and whole in print)
