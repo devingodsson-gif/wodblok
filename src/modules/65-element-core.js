@@ -29,7 +29,7 @@ EL_O.filter(k=>EL_K[k].draw).sort((a,b)=>(EL_K[a].dz||0)-(EL_K[b].dz||0)).forEac
 const GP=new Map(pl.filter(q=>q.k=='group').map(q=>[q.u,q]));
 const gpath=q=>{const o=[];let g=q.g,n=0;while(g&&GP.has(g)&&n++<16){o.unshift(GP.get(g));g=GP.get(g).g}return o};
 const gid=G=>String(G.u).replace(/[^\w-]/g,'');
-const gWrap=(G,inner)=>{if(!inner)return'';const ink=okC(G.ink)?col(G.ink):'';let o=inner;if(ink){defs+=`<filter id="gk${gid(G)}" filterUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" color-interpolation-filters="sRGB"><feFlood flood-color="${ink}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;o=`<g filter="url(#gk${gid(G)})">${o}</g>`}return`<g${elOB(G)}>${o}</g>`};
+const gWrap=(G,inner)=>{if(!inner)return'';const ink=okC(G.ink)?col(G.ink):'';let o=inner;if(ink){defs+=`<filter id="gk${gid(G)}" filterUnits="userSpaceOnUse" x="${-CW}" y="${-CH}" width="${3*CW}" height="${3*CH}" color-interpolation-filters="sRGB"><feFlood flood-color="${ink}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;o=`<g filter="url(#gk${gid(G)})">${o}</g>`}if(WBX.wbGpFx){const F=WBX.wbGpFx(G,pl,li);if(F){defs+=F.defs;o=F.wrap(o)}}return`<g${elOB(G)}>${o}</g>`};   /* 2.104.2: a group's own effects, over its members drawn together */
 const its=pl.filter(q=>q.k!='group').map(q=>({q,path:gpath(q)})).filter(it=>!it.path.some(G=>G.v===false));
 // Repeat tile: every top-level piece (a group, a wrapped element, a run of one kind) is copied to the neighbouring tiles on its own, inside its own opacity, blend and ink, so a translucent piece spilling over a tile edge is not laid over its neighbour's copy twice
 const tU=h=>tileOn()?elTile(`${li}_${tn++}`,h):h;let tn=0;
