@@ -18,7 +18,7 @@ import {ltMake} from './87-library-tree.js';
 // 2.90.2 (step 2): the built-in Products set (the owner's photos, mockups/ and src/data/mockups.js; ids 'p-' + the product's id). Each has a mask (where the design
 // prints, so a T-shirt's sleeves and a cushion's corners take it and the background does not), its real width (cm: Real size lays the repeat at the size it prints at
 // when the canvas has a real size) and warp (how much the design follows the folds: it is moved by the photo's light, as a displacement map).
-const MK_KEY='wb2901_mockups',MK_UI='wb2901_mockui',MK_TREE='wb2901_mocktree',MK_MAX=2000,MK_TH=320,MK_N=14;
+const MK_KEY='wb2901_mockups',MK_UI='wb2901_mockui',MK_TREE='wb2107_mocktree',MK_MAX=2000,MK_TH=320,MK_N=14;   // 2.107.0: the library tree's remembered layout under a new name, so a card size saved before (five a row, names cut off) gives way to the new start of three
 let MKT=null,mkC=null,mkCr=null,mkCol=null,mkDes=null,mkDesK='',mkT=0,mkTok=0,mkDrag=null,mkBusy=false;
 const mkPh=new Map();   // id -> HTMLImageElement of the photo, loaded once
 const mkEsc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -268,7 +268,7 @@ const mkOpen=()=>{const s=$('mkstage');return!!(s&&!s.hidden)};   // 2.96.0: the
 // failed; the mask is made in WODBLOK (Find product, with AI in the web app) or brought in with Import mask.
 const MK_PROMPT='Make a mockup blank of: {P}.\n\nCall the image tool with exactly this image prompt, the product in its first line, adding nothing about patterns, prints, colours or designs:\n"{P}. Photorealistic studio product photo, square 1:1. The product is completely blank: plain matte pure neutral white, with absolutely no pattern, print, graphic, text, logo or colour on it. Background: a plain, smooth, seamless warm light grey (soft taupe) wall or surface, no texture. Soft even daylight from the upper left, gentle natural shadows, no glare. Camera straight on (or directly from above for flat things), product centred, filling about 75% of the frame, background visible on all sides. Nothing in front of the product; props only if the product needs them (a wooden peg, rod or hanger, a light oak table), never white."\nIf the result has any pattern or colour on the product, a textured background or is not square, make it again. Reply with the image, named "{F}.png".';
 // ---- the panel
-const mkCfg=()=>({p:'mk',pane:'#mkpane',word:'mockup',words:'mockups',ui:MK_TREE,cards:true,z:5,open:['s:Products'],exportName:'wodblok-mockups',exportAs:'pictures',usedFix:'',
+const mkCfg=()=>({p:'mk',pane:'#mkpane',word:'mockup',words:'mockups',ui:MK_TREE,cards:true,z:7,open:['s:Products'],exportName:'wodblok-mockups',exportAs:'pictures',usedFix:'',
  top:`<div class="row"><button type="button" class="alt" data-mkadd>Add mockup</button></div><input type="file" class="mkfile vh" accept="image/*" multiple tabindex="-1"><div class="row mkpr"><input type="text" class="mkpp" maxlength="60" placeholder="Product" aria-label="Product"><button type="button" class="alt" data-mkpc>Copy prompt</button></div>`,
  read(){const d=mkLoad(),at={};d.t.forEach(x=>{at[x.id]=x.f});return{f:d.f,at,b:{},h:d.h,r:d.r}},
  write(m){const d=mkLoad();d.f=m.f;d.t.forEach(x=>{if(x.id in m.at)x.f=m.at[x.id]});d.h=m.h;d.r=m.r;mkStore(d)},

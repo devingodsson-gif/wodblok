@@ -31,12 +31,15 @@ At the screen's own size (480 x 720 here) the PNG export matches the canvas. At 
 - Next: reproduce on one thin line with one effect at 1x, 2x and 3x; decide which one is right (the owner should say: the screen is the reference, or the print is); then make the noise and the cut independent of the output size (or render the screen at the export's density). Needs `npm run perf` and the picture comparison, since it touches drawing.
 
 ### B2 (low, style): every Mockup tile name is cut off
+**Fixed in 2.107.0** (docs/plan.md 2.107.0).
 In the Mockup panel's library (desktop width, five tiles a row) every product name is cut to three or four letters: "T-sh...", "Tote...", "Cus...", "Fab...", "Wall...", "Not...". On a phone (four a row) Wallpaper and Notebook are still cut. Nobody can read the library by name. Fix inside the standard (Part 9): the same card as the other libraries, with fewer columns or the name allowed a second line.
 
 ### B3 (low, style): "Paragraph spacing" is wider than its label column
+**Fixed in 2.107.0** (docs/plan.md 2.107.0).
 Text panel: the label measures 99 px in a 96 px column, so its last letters touch or clip the slider. Same on a phone. Fix: a shorter word ("Paragraph") or the standard's label width for long labels.
 
 ### B4 (low, style): X, Y, W and H fields do not line up
+**Fixed in 2.107.0** (docs/plan.md 2.107.0).
 The Element section (every element panel) and the new Group panel put X and Y on one line and W and H on the next, each letter followed by its field; because W is wider than X, the second row's fields start further right, so the four fields are not in columns. Shared markup (`.aspc unr`), so one fix covers both.
 
 ### B5 (cosmetic, live site): a red 401 in the browser console on every visit
