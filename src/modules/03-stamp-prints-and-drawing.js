@@ -38,15 +38,10 @@ function bkElMark(slot,s,xd,c){if(!BK||BK.off||BK.live||tileOn())return s;
  BK.XD[slot]=xd;return`<!--@M:${slot}|${+x0.toFixed(4)}|${+y0.toFixed(4)}|${W}|${H}|${bkH(s.replace(RXD,'')+xd+x0+'|'+y0)}-->${s}<!--@-->`}
 // the pictures and filters in the texture host (#txd) that a printed shape refers to: the print is a separate document and cannot see the page
 function bkXd(inner,xd){const h=document.getElementById('txd');let o=xd;if(!h)return o;const seen=new Set(),walk=t=>t.replace(/(?:href="#|url\(#)(tx[\w.-]*)/g,(m,id)=>{if(!seen.has(id)){seen.add(id);const n=h.querySelector('[id="'+id+'"]');if(n){const z=n.outerHTML;o+=z;walk(z)}}return m});walk(inner+xd);return o}
-// 2.106.0 (B1 of docs/bug-test-2.105.md; owner Nov 5 2026: the screen matches the print): a stamp's wear is a blur cut sharply at a threshold, so a line thinner than a
-// pixel was worn away on screen and printed whole. A stamp is printed at no fewer than BK_DENSE pixels per stamp unit (more than the screen shows when the stamp is small)
-// and shown scaled down, so its wear is worked out finely enough to look as it prints (measured: 2 gives the thin lines of the print; 3 looked no closer and printed slower).
-const BK_DENSE=2;
-const bkDense=(sx,sy)=>{const m=Math.min(Math.abs(sx),Math.abs(sy))*BK.sc;return m>0?Math.max(1,BK_DENSE/m):1};
 const RXM=/<!--@([FPE]):(\w+)-->([\s\S]*?)<!--@-->/g;
 // one impression: the printed image when there is one (an out-of-date one is fine for a moment, it is reprinted right away), else null = draw it live
 function bkOne(slot,inner,tid,pk,ch,sx,sy,tw,th,dc,op,tr,flt,used,el,xd){const W=-2*tw,H=-2*th;if(!(W>0&&H>0))return null;
- const kd=el?1:bkDense(sx,sy),bx=bkQ(Math.abs(sx)*BK.sc*kd),by=bkQ(Math.abs(sy)*BK.sc*kd);if(W*bx>BK.MAXC||H*by>BK.MAXC)return null;
+ const bx=bkQ(Math.abs(sx)*BK.sc),by=bkQ(Math.abs(sy)*BK.sc);if(W*bx>BK.MAXC||H*by>BK.MAXC)return null;
  const key=slot+'@'+bx+'x'+by,e=BK.map.get(key),fit=x=>x&&x.W===W&&x.H===H;let u=fit(e)?e:null;
  // el (2.44.3): a shape with effects. Where it is and how it looks are in the print, so a print that is out of date is never shown: the shape draws live until its new print is ready
  if(el){if(u&&u.h===ch)BK.nHit++;else{BK.q.set(key,{slot,inner,tid,pk,h:ch,W,H,bx,by,xd});if(u)BK.nStale++;else BK.nMiss++;u=null}}
