@@ -39,8 +39,12 @@ WBS.symKey='';try{kv.set('wb14_dim',JSON.stringify(WBS.dim))}catch(e){}store();u
 let CANCH=[.5,.5];
 function canShift(W0,H0){canMove((CW-W0)*CANCH[0],(CH-H0)*CANCH[1])}
 // moves every element that sits somewhere on the canvas (not the Background, Sheets, groups or a Pattern that fills the canvas) by dx, dy; true when anything moved
-function canMove(dx,dy){if(Math.abs(dx)<1e-6&&Math.abs(dy)<1e-6)return false;let n=0;
- WBS.layers.forEach(L=>(L.pl||[]).forEach(p=>{if(!p||p.bgd||p.k=='sheet'||p.k=='group'||p.x==null||p.y==null)return;if(p.k=='pattern'&&(p.af||!(+p.aw>0)))return;p.x=+(+p.x+dx).toFixed(2);p.y=+(+p.y+dy).toFixed(2);n++}));return n>0}
+function canMove(dx,dy){if(Math.abs(dx)<1e-6&&Math.abs(dy)<1e-6)return false;return canMap((x,y)=>[x+dx,y+dy])}
+// 2.103.0: every element that has a place of its own (not the Background, a Sheet, a group, or a Pattern that fills the canvas) moved to f(x, y) = [x, y];
+// true when one moved
+function canMap(f){let n=0;
+ WBS.layers.forEach(L=>(L.pl||[]).forEach(p=>{if(!p||p.bgd||p.k=='sheet'||p.k=='group'||p.x==null||p.y==null)return;if(p.k=='pattern'&&(p.af||!(+p.aw>0)))return;
+  const[x,y]=f(+p.x,+p.y),nx=+x.toFixed(2),ny=+y.toFixed(2);if(nx===+p.x&&ny===+p.y)return;p.x=nx;p.y=ny;n++}));return n>0}
 function canPaint(){const g=$('canc');if(!g)return;g.querySelectorAll('button').forEach(b=>{const on=+b.dataset.x==CANCH[0]&&+b.dataset.y==CANCH[1];if(b.classList.contains('on')!==on)b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))})}
 const LY=()=>WBS.layers[WBS.selL];
 const expName=ext=>{const n=($('pnm')&&$('pnm').value.trim()||'').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'Untitled-project';return n+'.'+ext};   // 2.76.6: an untitled project's files are called Untitled-project
@@ -77,4 +81,4 @@ $('let').oninput=()=>{WBS.tiles[WBS.cur].et=+$('let').value;store();upd()};$('le
 $('cpy').onclick=async()=>{try{await clipboard.writeText(ser());say('SVG copied.')}catch(e){say('Copy was blocked here.')}};
 // 2.21.0: the quick PNG and SVG buttons are made by the Export recipes code (43), so a quick file and a recipe's file are made the same way
 }
-export {syncPhys,LY,canMove,expName,ser,syncAsp,init14};
+export {syncPhys,LY,canMap,canMove,expName,ser,syncAsp,init14};
