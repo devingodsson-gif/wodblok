@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.112.0 (Nov 5 2026, branch fix/2.112.0-group-on-canvas): a picked group's box on the canvas moves, sizes and turns it
+- Owner, Nov 5 2026: "When i click a group i want the selection rectangle over the group and the ability to click and drag to move it". Asked: a click on the canvas still picks one element (his choice), so the group is still picked in the Elements list.
+- Before: the picked group showed a bare box (no handles, no drag); moving it took the Group panel's fields.
+- Now (100-group-panel.js `gpOverlay`, `gpDown`; one line in 28-canvas-select.js hands it the press): the selection rectangle with four corner handles and the rotate handle. A drag inside the box moves the whole group (Snap to grid puts its top-left on the grid); a corner scales it evenly from the opposite corner (Alt: the middle), as W and H; the rotate handle turns it about its members' middle and keeps its angle (G.gr) as Rotate (Shift: 15 degree steps). Each drag is one History step (Moved, Sized, Turned group); a press that does not move picks the element under the pointer. Every drag works from the members as they were when it began, so nothing drifts. A locked group shows the rectangle only. No side handles: a group scales evenly. Part 9 has the rule. What's new line in Help.
+- Tests: tests/group-canvas-2-112.spec.js (new, two tests). Run: it and the 63 specs that mention groups, handles, dragging or selection (scenarios left out: its snapshot files fail in this sandbox on `main` too): 260 passed, 1 failed under load (commands "documented shortcuts really work", 24 s; passed twice alone). `npm run perf` against `main`: 0.985, 0.92, 0.908 (one more run stopped without a result and was run again). check:style, check:platform OK. Screenshot looked at.
+
 ## 2.108.0 (Nov 5 2026, branch fix/2.108.0-cover-guides): the book cover guides follow the styling rules
 - Owner, Nov 5 2026: the SPINE label was not centred (it stood to the right of the spine), and the bleed lines and labels were ugly and off-style; he chose labels above the cover and the selection colour he picks in the options (Settings > General > Highlight, `--hl`).
 - Cause of the off-centre label: the labels were drawn on their text baseline, so the letters stood above the point centred on; turned 90 degrees for the spine, above became to the right.
