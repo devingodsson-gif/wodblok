@@ -83,7 +83,7 @@ const TXRES=1.15,TXSCMAX=200;
 // least as many pixels as the view shows of it (TXPU: screen pixels per canvas unit, in steps of the square root of 2, set a moment after the zoom changes; at most
 // TXCAP on its long side), and an export makes its pictures again for the export's size (txHi, at most TXCAPX). Small boxes keep their pictures. While a slider is
 // held a picture that is not made yet at the view's size is made at the old size, and sharp when the slider is let go.
-let TXPU=0,TXLV=0,TXMISS=0,TXZT=0,TXBT=0,TXI,TXX;const TXCAP=2560,TXCAPX=4800,TXBPX=24e6,TXXPX=40e6;
+let TXGCD=0,TXPU=0,TXLV=0,TXMISS=0,TXZT=0,TXBT=0,TXI,TXX;const TXCAP=2560,TXCAPX=4800,TXBPX=24e6,TXXPX=40e6;
 function txDims(W,H,R,k,cap){const M=Math.max(W,H,1e-6),b=R>=384?R*TXRES:R;let L=b;if(k>0&&R>=400){const w=Math.round(Math.min(cap||TXCAP,M*k)/64)*64;if(w>b)L=w}
 const s=L/M;return[Math.max(8,Math.round(W*s)),Math.max(8,Math.round(H*s))]}
 const txLive=()=>!!(TXLV||WBS.DRAFT);
@@ -108,14 +108,14 @@ function txHi(root,k){if(!(k>0))return;const m=new Map();root.querySelectorAll('
   if(!x){const url=txPic(S,pw,ph,tl);if(url){x={url,n:pw*ph};TXX.set(key,x);let t=0;TXX.forEach(v=>t+=v.n);for(const[kk,v]of TXX){if(t<=TXXPX||TXX.size<=1)break;TXX.delete(kk);t-=v.n}}}else{TXX.delete(key);TXX.set(key,x)}u=x?x.url:null}m.set(id,u)}
  const u=m.get(id);if(u)n.setAttribute('href',u)})}
 // 2.118.0 (full check: two snapshots gained a filter): the pictures and overlay filters kept in #txd that nothing under root uses any more (made for another zoom
-// step, or for a texture that is gone) are taken out: from the page a moment after the zoom moves a step (live), and from every copy the exports make (ser)
+// step, or for a texture that is gone) are taken out: from the page when the zoom moves a step (live), and from every copy the exports make (ser)
 function txGc(root,live){const h=root.querySelector('#txd');if(!h)return;const used=new Set();
  root.querySelectorAll('use').forEach(u=>{const r=u.getAttribute('href')||u.getAttribute('xlink:href')||'';if(r.startsWith('#txi'))used.add(r.slice(1))});
  root.querySelectorAll('[filter]').forEach(n=>{const m=/url\(#(txf[^)]+)\)/.exec(n.getAttribute('filter')||'');if(m)used.add(m[1])});
  h.querySelectorAll('image[data-e],filter[data-f]').forEach(n=>{if(used.has(n.id))return;n.remove();if(live){TXHS.delete(n.id);TXFL.delete(n.id)}})}
 // the view's pixels per canvas unit, a moment after the zoom changes; the drawing is made again when it moves a step
 function txZoomed(){const a=document.getElementById('art');if(!a)return;const s=parseFloat(a.style.width)/(a.viewBox&&a.viewBox.baseVal&&a.viewBox.baseVal.width||1);if(!(s>0))return;
- const q=Math.min(4,Math.max(.5,2**(Math.round(Math.log2(s*(window.devicePixelRatio||1))*2)/2)));if(q===TXPU)return;clearTimeout(TXZT);TXZT=setTimeout(()=>{TXPU=q;upd();requestAnimationFrame(()=>requestAnimationFrame(()=>txGc(document,true)))},250)}
+ const q=Math.min(4,Math.max(.5,2**(Math.round(Math.log2(s*(window.devicePixelRatio||1))*2)/2)));if(q===TXPU)return;clearTimeout(TXZT);TXZT=setTimeout(()=>{TXPU=q;TXGCD=1;upd()},250)}
 // big pictures stay out of the per-frame markup: they live once in a persistent block (#txd) and the page refers to them by id
 let TXHS;
 function txHostEl(){return document.getElementById('txd')}
@@ -145,7 +145,7 @@ TXF.forEach(([g,o])=>Object.keys(o).forEach(k=>{if(TXS.has(k))TXN[k]=o[k];else d
 WBX.wbTexBusy=txBusy;WBX.wbTexImgsLoad=txImgsLoad;WBX.wbTexImgsUsed=txImgsUsed;
 TXHC=new Map();
 TXB=new Map();TXI=new Map();TXX=new Map();
-{const pz=WBX.wbZoomed;WBX.wbZoomed=()=>{if(pz)pz();txZoomed()}}WBX.wbTxHi=txHi;WBX.wbTxGc=txGc;
+{const pz=WBX.wbZoomed;WBX.wbZoomed=()=>{if(pz)pz();txZoomed()}}WBX.wbTxHi=txHi;WBX.wbTxGc=txGc;WBX.wbTxAfter=()=>{if(TXGCD){TXGCD=0;txGc(document,true)}};
 document.addEventListener('pointerdown',e=>{if(e.target&&e.target.matches&&e.target.matches('input[type=range]'))TXLV=1},true);
 ['pointerup','pointercancel'].forEach(k=>document.addEventListener(k,()=>{if(!TXLV)return;TXLV=0;if(TXMISS){TXMISS=0;setTimeout(upd,240)}},true));
 TXHS=new Set();
