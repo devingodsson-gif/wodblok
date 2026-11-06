@@ -89,6 +89,11 @@ function trayRemove(id){const o=WBS.proj;if(!o.ts.includes(id)||o.ts.length<=1)r
  // fixed colours that remembered this slot forget it
  refsAll().forEach(x=>{const r=x.get();if(isFixed(r)&&r.endsWith('|'+id))x.set(r.split('|')[0])});
  return uses.length}
+// 2.117.0 (owner Nov 6 2026: "shift the colors positions in the tray by one, so ... color a switches to b, b to c and c to a"; "The entire tray should shift", paper
+// included): every colour of the colourway showing, with its name, moves one place along the tray (by -1: one place back). Whatever links to a place takes the colour
+// now in it; fixed (locked) colours keep theirs. The other colourways are left as they are.
+function trayShift(by=1,o=WBS.proj){const n=o.ts.length;if(n<2)return false;const w=cwNow(o),c=o.ts.map(id=>w.c[id]),m=o.ts.map(id=>w.m[id]);
+ o.ts.forEach((id,i)=>{const j=((i-by)%n+n)%n;w.c[id]=c[j];if(m[j])w.m[id]=m[j];else delete w.m[id]});return true}
 function trayMove(id,to){const o=WBS.proj,i=o.ts.indexOf(id);if(i<0)return;o.ts.splice(i,1);o.ts.splice(Math.max(0,Math.min(o.ts.length,to)),0,id)}
 // fill the first slots with a set of colours ([hex,name] pairs) in the colourway that is showing; slots after them keep their colours;
 // slots are added when the set is longer than the tray.
@@ -108,4 +113,4 @@ function cwMove(i,to){const o=WBS.proj;if(!o.cw[i])return;const cur=o.cw[o.cwa],
 // ---- colours as a short list for other tools: the tray colours in order (hex), then fixed colours in use
 function fixedInUse(){const s=new Set();refsAll().forEach(x=>{const r=x.get();if(isFixed(r))s.add(col(r))});return[...s]}
 // ---- recently used colours (settings, not the document)
-export {fxCols,trayLive,TRAY_MAX,TRAY_VIEW,setTrayView,cwAdd,cwDel,cwMove,cwNow,cwUse,fixedInUse,hexAlpha,hexOpaque,isFixed,isLink,lockRef,normHexA,refAdopt,refLabel,refSlot,refsAll,slotHex,slotName,trayAdd,trayDefault,trayDone,trayFromLegacy,trayGuard,trayIn,trayLoad,trayMove,trayNew,trayRemove,traySet,trayUses,unlockRef,withAlpha};
+export {trayShift,fxCols,trayLive,TRAY_MAX,TRAY_VIEW,setTrayView,cwAdd,cwDel,cwMove,cwNow,cwUse,fixedInUse,hexAlpha,hexOpaque,isFixed,isLink,lockRef,normHexA,refAdopt,refLabel,refSlot,refsAll,slotHex,slotName,trayAdd,trayDefault,trayDone,trayFromLegacy,trayGuard,trayIn,trayLoad,trayMove,trayNew,trayRemove,traySet,trayUses,unlockRef,withAlpha};

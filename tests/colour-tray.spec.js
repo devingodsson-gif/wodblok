@@ -22,7 +22,8 @@ test('a new project has a two-colour tray: paper and ink link to it, the dock sh
   expect(p.bg).toBe('@k1'); expect(p.ink).toBe('@k2');
   await expect(page.locator('#tyc .tys')).toHaveCount(2);
   await expect(page.locator('#tyc .tye')).toHaveCount(2);
-  await expect(page.locator('#tyc .tyadd')).toHaveCount(1);
+  await expect(page.locator('#tyc .tyadd[data-add]')).toHaveCount(1);
+  await expect(page.locator('#tyc #tysh'), '2.117.0: the shift button, same style, at the far right').toHaveCount(1);
   await expect(page.locator('#tycw')).toBeHidden();             // one colourway: no switcher
   expect(errors).toEqual([]);
 });

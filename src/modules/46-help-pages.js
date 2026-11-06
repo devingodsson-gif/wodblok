@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.117.0','Nov 6 2026',['A new button at the right end of the colour tray shifts every colour one place along the tray (Shift + click: the other way). Also Colour > Shift tray colours.']],
  ['2.116.0','Nov 6 2026',['Textures on a Sheet, a whole Pattern, Paint and large shapes are sharp at any zoom and in exports (they were soft, most of all on a book cover).']],
  ['2.115.0','Nov 6 2026',['A new mockup, Notebook on a table. On a mockup, drag the design to move it, Shift + drag to turn it, and use the mouse wheel to size it.']],
  ['2.114.0','Nov 6 2026',['A Pattern\'s Texture, Colour grade and filter effects now cover the whole pattern at once, which is much faster; switch off Whole pattern on an effect to give each stamp its own.']],

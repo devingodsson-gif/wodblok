@@ -21,7 +21,7 @@ const MNB=[
  ['image','Image',['panel.canvas','panel.pgrid','-','view.tileRepeat','-','image.crop','image.pointcrop','-','element.rotateCw','element.rotateCcw','element.flip']],   // 2.76.11: more than Open Canvas and Open Grid
  ['elements','Elements',['panel.lyrs','-',mnbAdds,'element.makePattern','-','stamp.new','stamp.duplicate','stamp.delete','stamp.saveToLibrary','library.importStamp','-','library.importImage','library.importSheet','library.newFolder','-','stamp.split','stamp.knockout']],
  ['effects','Effects',[mnbFx,'-','randomize.roll','panel.rand']],
- ['colour','Colour',['panel.colors','tray.add','tray.save','-','colourway.new','colourway.exportAll']],
+ ['colour','Colour',['panel.colors','tray.add','tray.save','tray.shift','-','colourway.new','colourway.exportAll']],
  ['view','View',['view.zoomIn','view.zoomOut','view.fit','view.actualSize','view.realSize','view.hand','-','view.grid','view.smartGuides','-','view.rulers','view.guides','view.lockGuides','view.clearGuides','view.newGuide','-','view.proof','-','view.before','view.split','view.tileRepeat','-','view.theme']],
  ['window','Window',['panel.canvas','panel.colors','panel.lyrs','panel.layers','panel.stmp','panel.motifs','panel.text','panel.image','panel.sheet','panel.pgrid','panel.hist','panel.rand','panel.xrec','panel.mock','-','panel.layout','layout.save','layout.reset','layout.default','panels.closeAll']],   // 2.76.11: Image and Sheet too
  ['help','Help',['help.start','help.manual','help.shortcuts','help.whatsNew','-','app.commandSearch','feedback.open','-','help.about']]];   // 2.87.4: Help pages open in the Help panel (47-help.js)

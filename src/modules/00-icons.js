@@ -12,6 +12,7 @@ redo:'<path d="M15.5 5.5l4 4-4 4"/><path d="M19.5 9.5H10a5 5 0 000 10h3.5"/>',
 search:'<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/>',
 close:'<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
 plus:'<path d="M12 5v14M5 12h14"/>',
+trayShift:'<path d="M4 9h15.5"/><path d="M16.5 5.5l3.5 3.5-3.5 3.5"/><path d="M20 15H4.5"/><path d="M7.5 11.5L4 15l3.5 3.5"/>',   // 2.117.0: shift every tray colour one place
 minus:'<path d="M5 12h14"/>',
 more:'<circle cx="6" cy="12" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="18" cy="12" r="1.1"/>',
 menu:'<path d="M4.5 7h15M4.5 12h15M4.5 17h15"/>',

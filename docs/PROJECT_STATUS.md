@@ -5,6 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
+- **Nov 6: 2.117.0 on `feat/2.117.0-tray-shift` (on top of 2.116.0, which is on top of 2.115.0), pushed, NOT merged:** the tray's shift button (docs/plan.md 2.117.0). This finishes the Nov 6 update: merge 2.115.0, 2.116.0 and 2.117.0 together on the owner's word. Whole-window pixel goldens will show the new button.
 - **Nov 6: 2.116.0 on `fix/2.116.0-sharp-textures` (on top of 2.115.0), pushed, NOT merged:** textures on Sheets and other large boxes follow the view's zoom and the export's size (docs/plan.md 2.116.0). Pixel goldens with such textures may change on the next suite run (expected: finer).
 - **Nov 6: 2.115.0 on `feat/2.115.0-mockups`, pushed, NOT merged:** Notebook on a table, and mouse drag, Shift-drag rotate and wheel scale on mockups (docs/plan.md 2.115.0). Next in the same update: sharp Sheet textures (2.116.0), the tray shift button (2.117.0).
 - **Nov 6: CI suite on `main` 2.114.0 run (docs/plan.md "CI suite on main 2.114.0").** One real bug (group drag made two History steps on a slow machine): fixed in 2.114.1, LIVE (owner: "Yes do those two things"). Nine SVG snapshots (roundtrip 3, scenarios 6) changed by 2.106.2 as intended: regenerated in CI with the owner's approval and in `main` (Nov 6). The side branch `snapshots/main-42227978891` is merged in content but could not be deleted from the agent sandbox (the proxy refuses branch deletion); delete it on GitHub when convenient.
@@ -308,7 +309,7 @@ None at the moment. Add new ones here.
 - Run the CI shard suite once before the next release goes live (my estimate: high importance, because 2.4.0 to 2.9.0 changed the Add bar, panels, stamp view and removed tools with no recorded full run). The owner said to ask him first, so suggest it with the importance percentage and wait.
 
 ## Changelog of this page
-- Nov 6 2026: 2.115.0 and 2.116.0 recorded.
+- Nov 6 2026: 2.115.0, 2.116.0 and 2.117.0 recorded.
 - Nov 6 2026: CI suite on 2.114.0; 2.114.1 recorded.
 - Nov 6 2026: 2.114.0 recorded.
 - Nov 5 2026 (night): 2.109.0 to 2.112.0 live; 2.113.0 recorded.
