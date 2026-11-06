@@ -5,7 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 6: CI suite on `main` 2.114.0 run (docs/plan.md "CI suite on main 2.114.0").** One real bug (group drag made two History steps on a slow machine): fixed in 2.114.1 on `fix/2.114.1-group-drag-one-step`, pushed, NOT merged. Nine SVG snapshots (roundtrip 3, scenarios 6) changed by 2.106.2 as intended: waiting for the owner's approval to regenerate them in CI.
+- **Nov 6: CI suite on `main` 2.114.0 run (docs/plan.md "CI suite on main 2.114.0").** One real bug (group drag made two History steps on a slow machine): fixed in 2.114.1, LIVE (owner: "Yes do those two things"). Nine SVG snapshots (roundtrip 3, scenarios 6) changed by 2.106.2 as intended: the owner approved regenerating them in CI (Nov 6).
 - **Nov 6: 2.114.0 LIVE (owner: "Merge"; CI suite not run):** a Pattern's effects over the whole pattern, Whole pattern switch on by default (docs/plan.md 2.114.0). Suite importance about 70% (drawing).
 - **Nov 6: 2.113.0 LIVE (owner: "Merge"; CI suite not run):** the font library (docs/plan.md 2.113.0). 2.109.0 to 2.112.0 are LIVE.
 - **Nov 5 (night): 2.112.0 LIVE (owner: "merge everything"; CI suite not run):** a picked group's box on the canvas moves, sizes and turns it (docs/plan.md 2.112.0). The font library followed as 2.113.0.
