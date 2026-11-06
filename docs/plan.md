@@ -1,5 +1,11 @@
 # Development plan
 
+## 2.115.0 (Nov 6 2026, branch feat/2.115.0-mockups): Notebook on a table, and the design moved on a mockup with the mouse
+- Owner, Nov 6 2026: "a diagonal mockup like a notebook on a table at an angle" (he made the photo in ChatGPT from Claude's prompt) and "Drag image on mockup with mouse cursor", with extra controls (Scale and Rotate).
+- New product `notebook-angle`, "Notebook on a table" (mockups/: the owner's photo as WebP, 170 KB; its mask, the cover's top face, the spine strip in and the page edges out, found by the cover's colour and checked by eye; 15.6 cm across, no warp), after Notebook.
+- On a mockup's print area (23-mockups.js): a drag moves the design along the product's surface (the pointer is mapped back through the print area's perspective, mkHomInv, so Shift across and Shift down change by the fraction of the print area dragged), Shift + drag turns it about its middle (Rotate), the wheel sizes it (Scale; not while Real size sets it). Corner squares and picking the product keep the pointer; off the print area nothing happens; the cursor is a move cursor over the print area. While dragging or scrolling the view draws at half resolution and sharp again when it stops. The sliders follow.
+- Tests: tests/mockup-drag-2-115.spec.js (new: a drag along the cover changes Shift across only, Shift + drag turns, the wheel sizes, nothing off the print area); mockups-2-90 now expects seven products. Run: both, 13 passed. Screenshot looked at (a design on the new product).
+
 ## 2.114.1 (Nov 6 2026, hotfix, branch fix/2.114.1-group-drag-one-step): a group's drag is one History step on a slow machine too
 - Found by the CI suite on `main` 2.114.0 (owner: "Run the suite", run 42223236368): group-canvas-2-112 "a corner scales the group..." made 2 History steps for one corner drag. Reproduced here with the CPU slowed six times (3 of 3 failed on 2.114.0, the corner and the rotate drag): History saves a step when changes pause (34 cap()), and skips it only while a drag flag is set; the group drag of 2.112.0 set none.
 - Fix (100-group-panel.js): the group drag sets WBS.WBDRG while it moves, as the other drags do. The test now runs that drag with the CPU slowed six times (the double step does not show on every slowed run, so it makes a regression likely to show, not certain).

@@ -193,6 +193,7 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 - Nov 6 2026: "Merge": 2.113.0 went live without the CI suite.
 - Nov 6 2026: effects on Patterns were slow (each effect on every stamp). Wants a checkbox on the effects that can apply to the whole pattern, whole pattern by default (2.114.0; "Merge": live without the CI suite).
 - Nov 6 2026: "Run the suite": CI on main 2.114.0; found the group drag double History step (2.114.1).
+- Nov 6 2026: next update: a diagonal notebook-on-a-table mockup (owner made the photo in ChatGPT from Claude's prompt), drag the design on a mockup with the mouse (yes to wheel Scale and Shift-drag Rotate), a tray button that shifts every colour one place (the whole tray, paper included), and blurry Sheet textures on the book cover. Wants Claude's thoughts before anything is built.
 - Nov 5 2026: "Do a bug test. Check everything": taken as his word for the full CI suite for that test; report in docs/bug-test-2.105.md.
 - Nov 4 2026: "shelve the ai image panel for now": AI in the Image panel is shelved (docs/ai-select-plan.md).
 - Nov 4 2026: AI selection: "I really want to use just one agent for all those selection needs" (SAM 2.1 tiny, fp16, after the trial), "let's add it right now just for the mockup masks, but later link it into image panel"; he chose "Find with: Colour | AI" and keeping the model in the repo (ai/, about 100 MB); the Transformers.js and ONNX Runtime Web dependency approved with it.

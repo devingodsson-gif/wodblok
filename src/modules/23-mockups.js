@@ -19,7 +19,8 @@ import {ltMake} from './87-library-tree.js';
 // prints, so a T-shirt's sleeves and a cushion's corners take it and the background does not), its real width (cm: Real size lays the repeat at the size it prints at
 // when the canvas has a real size) and warp (how much the design follows the folds: it is moved by the photo's light, as a displacement map).
 const MK_KEY='wb2901_mockups',MK_UI='wb2901_mockui',MK_TREE='wb2107_mocktree',MK_MAX=2000,MK_TH=320,MK_N=14;   // 2.107.0: the library tree's remembered layout under a new name, so a card size saved before (five a row, names cut off) gives way to the new start of three
-let MKT=null,mkC=null,mkCr=null,mkCol=null,mkDes=null,mkDesK='',mkT=0,mkTok=0,mkDrag=null,mkBusy=false;
+let mkWh=0;
+let MKT=null,mkC=null,mkCr=null,mkCol=null,mkDes=null,mkDesK='',mkT=0,mkTok=0,mkDrag=null,mkBusy=false,mkMv=null,mkLo=false;
 const mkPh=new Map();   // id -> HTMLImageElement of the photo, loaded once
 const mkEsc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const mkName=s=>String(s||'').replace(/\.[^.]*$/,'').replace(/[<>&"|]/g,'').trim().slice(0,40)||'Mockup';
@@ -213,6 +214,11 @@ const mkScale=(m,u)=>{const f=mkFill(u);if(f=='rep'&&u.rs&&mkRealOk(m,u)){const 
 function mkHom(P){const[x0,y0,x1,y1,x2,y2,x3,y3]=P,dx1=x1-x2,dx2=x3-x2,dy1=y1-y2,dy2=y3-y2,sx=x0-x1+x2-x3,sy=y0-y1+y2-y3,den=dx1*dy2-dx2*dy1||1e-9,
  g=(sx*dy2-dx2*sy)/den,h=(dx1*sy-sx*dy1)/den,a=x1-x0+g*x1,b=x3-x0+h*x3,d=y1-y0+g*y1,e=y3-y0+h*y3;
  return(u,v)=>{const w=g*u+h*v+1;return[(a*u+b*v+x0)/w,(d*u+e*v+y0)/w]}}
+// 2.115.0: the other way, a point on the photo to the unit square of the print area (u, v; outside 0..1 when it is outside); P as mkHom's
+function mkHomInv(P){const[x0,y0,x1,y1,x2,y2,x3,y3]=P,dx1=x1-x2,dx2=x3-x2,dy1=y1-y2,dy2=y3-y2,sx=x0-x1+x2-x3,sy=y0-y1+y2-y3,den=dx1*dy2-dx2*dy1||1e-9,
+ g=(sx*dy2-dx2*sy)/den,h=(dx1*sy-sx*dy1)/den,a=x1-x0+g*x1,b=x3-x0+h*x3,d=y1-y0+g*y1,e=y3-y0+h*y3,
+ A=e-y0*h,B=x0*h-b,C=b*y0-x0*e,D=y0*g-d,E=a-x0*g,F=x0*d-a*y0,G=d*h-e*g,Hh=b*g-a*h,I=a*e-b*d;
+ return(X,Y)=>{const w=G*X+Hh*Y+I||1e-9;return[(A*X+B*Y+C)/w,(D*X+E*Y+F)/w]}}
 // one triangle of the flat picture F drawn onto the photo: the affine map from (s0, s1, s2) in F to (d0, d1, d2), clipped to the triangle (widened half a pixel, so no seams show)
 function mkTri(x,F,s,d){const[[u0,v0],[u1,v1],[u2,v2]]=s,[[X0,Y0],[X1,Y1],[X2,Y2]]=d,den=(u1-u0)*(v2-v0)-(u2-u0)*(v1-v0);if(Math.abs(den)<1e-9)return;
  const a=((X1-X0)*(v2-v0)-(X2-X0)*(v1-v0))/den,b=((Y1-Y0)*(v2-v0)-(Y2-Y0)*(v1-v0))/den,c=((X2-X0)*(u1-u0)-(X1-X0)*(u2-u0))/den,e=((Y2-Y0)*(u1-u0)-(Y1-Y0)*(u2-u0))/den;
@@ -283,7 +289,7 @@ const mkCfg=()=>({p:'mk',pane:'#mkpane',word:'mockup',words:'mockups',ui:MK_TREE
 // the view: the mockup in use at the panel's width (sharp on the screen), with the four corners over it while Edit corners is on
 async function mkView(){const c=$('mkc'),wrap=$('mkvw'),stg=$('mkstage');{const m0=mkCur();$('mkg').hidden=!m0}if(!c||!mkOpen())return;const u=mkUi(),m=mkCur();wrap.hidden=!m;if(!m){mkCorners();return}
  const tok=++mkTok,ph=await mkPhoto(m.id),mask=await mkMask(m);if(tok!==mkTok)return;if(!ph){wrap.hidden=true;return}
- const pad=32,aw=Math.max(80,stg.clientWidth-pad),ah=Math.max(80,stg.clientHeight-pad),cw=Math.round(Math.min(aw,ah*m.w/m.h)),dpr=window.devicePixelRatio||1,W=Math.round(cw*dpr),H=Math.round(W*m.h/m.w);wrap.style.width=cw+'px';   // as large as the stage holds it
+ const pad=32,aw=Math.max(80,stg.clientWidth-pad),ah=Math.max(80,stg.clientHeight-pad),cw=Math.round(Math.min(aw,ah*m.w/m.h)),dpr=(window.devicePixelRatio||1)*(mkLo?.5:1),W=Math.round(cw*dpr),H=Math.round(W*m.h/m.w);wrap.style.width=cw+'px';   // as large as the stage holds it
  const dk=[CW,CH,Math.round(W*1.2/256)].join();if(!mkDes||mkDesK!==dk){mkDes=await mkDesign(Math.min(2048,Math.max(512,W*1.2)));mkDesK=dk;if(tok!==mkTok)return}
  if(c.width!==W||c.height!==H){c.width=W;c.height=H}c.style.aspectRatio=m.w+' / '+m.h;mkDraw(c,ph,m,mkDes,u,mask);
  // 2.93.1: Show mask tints what is not product (the view only; Export mockup never shows it)
@@ -345,6 +351,24 @@ function init23(){if(!$('mkpane'))return;MKT=ltMake(mkCfg());MKT.init();$('mkpan
  ov.addEventListener('pointermove',e=>{if(!mkDrag)return;const[x,y]=pt(e),i=mkDrag.i;mkDrag.m.q[i*2]=+Math.max(-.2,Math.min(1.2,x)).toFixed(4);mkDrag.m.q[i*2+1]=+Math.max(-.2,Math.min(1.2,y)).toFixed(4);
   const d=mkLoad(),t=d.t.find(z=>z.id===mkDrag.m.id);if(t){t.q=mkDrag.m.q.slice();mkStore(d)}if(!mkDrag.f)mkDrag.f=requestAnimationFrame(()=>{if(mkDrag)mkDrag.f=0;mkView()})});
  const up=()=>{if(!mkDrag)return;mkDrag=null;mkView()};ov.addEventListener('pointerup',up);ov.addEventListener('pointercancel',up);
+ // 2.115.0 (owner Nov 6 2026: "Drag image on mockup with mouse cursor", with extra controls): on the print area a drag moves the design along the product's surface
+ // (Shift across and Shift down follow, as fractions of the print area, so it follows the perspective), Shift + drag turns it about its middle (Rotate), and the
+ // wheel sizes it (Scale; not while Real size sets it). Corner squares and picking the product keep the pointer; the view is drawn at half resolution while dragging.
+ {const vw=$('mkvw'),c=$('mkc'),at=e=>{const m=mkCur();if(!m)return null;const r=c.getBoundingClientRect();if(!(r.width>0))return null;const X=(e.clientX-r.left)/r.width,Y=(e.clientY-r.top)/r.height,[u,v]=mkHomInv(m.q)(X,Y);return{m,u,v,X,Y,r}};
+  const inside=p=>!!p&&p.u>=0&&p.u<=1&&p.v>=0&&p.v<=1,busy=e=>vw.classList.contains('mkpk')||(e.target.closest&&e.target.closest('[data-mkq]'));
+  const draw=()=>{if(!mkMv.f)mkMv.f=requestAnimationFrame(()=>{if(mkMv)mkMv.f=0;mkView()})};
+  vw.addEventListener('pointerdown',e=>{if(e.button>0||busy(e))return;const p=at(e);if(!inside(p))return;e.preventDefault();e.stopPropagation();try{vw.setPointerCapture(e.pointerId)}catch(er){}const u=mkUi();
+   mkMv={id:e.pointerId,rot:e.shiftKey,u0:p.u,v0:p.v,ox0:u.ox||0,oy0:u.oy||0,rt0:u.rt||0,a0:null,f:0,moved:false,x0:e.clientX,y0:e.clientY};
+   if(mkMv.rot){const T=mkHom(p.m.q.map((v,i)=>v*(i%2?p.r.height:p.r.width))),[cx,cy]=T(.5+(u.ox||0)/100,.5+(u.oy||0)/100);mkMv.cx=p.r.left+cx;mkMv.cy=p.r.top+cy;mkMv.a0=Math.atan2(e.clientY-mkMv.cy,e.clientX-mkMv.cx)}},true);
+  vw.addEventListener('pointermove',e=>{if(!mkMv){if(!busy(e))c.style.cursor=inside(at(e))?'move':'';return}if(e.pointerId!==mkMv.id)return;
+   if(!mkMv.moved){if(Math.hypot(e.clientX-mkMv.x0,e.clientY-mkMv.y0)<3)return;mkMv.moved=true;mkLo=true}
+   if(mkMv.rot){let d=(Math.atan2(e.clientY-mkMv.cy,e.clientX-mkMv.cx)-mkMv.a0)*180/Math.PI,r=mkMv.rt0+d;r=((r+180)%360+360)%360-180;mkUiSet({rt:Math.round(r)})}
+   else{const p=at(e);if(!p)return;const cl=v=>Math.max(-100,Math.min(100,Math.round(v*10)/10));mkUiSet({ox:cl(mkMv.ox0+(p.u-mkMv.u0)*100),oy:cl(mkMv.oy0+(p.v-mkMv.v0)*100)})}
+   mkSync();draw()});
+  const end=e=>{if(!mkMv||e.pointerId!==mkMv.id)return;const was=mkMv.moved;if(mkMv.f)cancelAnimationFrame(mkMv.f);mkMv=null;mkLo=false;if(was)mkView()};vw.addEventListener('pointerup',end);vw.addEventListener('pointercancel',end);
+  vw.addEventListener('wheel',e=>{if(busy(e))return;const p=at(e),m=p&&p.m,u=mkUi();if(!inside(p)||(mkFill(u)=='rep'&&u.rs&&mkRealOk(m,u)))return;e.preventDefault();
+   const k=Math.exp(-e.deltaY*.0015),key=mkFill(u)=='rep'?'sr':'so',v=Math.max(5,Math.min(200,Math.round((u[key]||25)*k*10)/10));if(v===u[key])return;mkUiSet({[key]:v});mkSync();
+   clearTimeout(mkWh);mkLo=true;mkView();mkWh=setTimeout(()=>{mkLo=false;mkView()},180)},{passive:false})}
  // 2.96.0: the panel opens the Mockup tab (and shows it); closed for good, the tab goes too
  {const s=document.querySelector('section.pn[data-p="mock"]');let was=false;new MutationObserver(()=>{if(!s.hidden){if(!was&&WBX.wbMockTab)WBX.wbMockTab(true);was=true;mkDes=null;mkPaint()}else if(!(WBX.wbPanelIn&&WBX.wbPanelIn('mock'))){was=false;if(WBX.wbMockTab)WBX.wbMockTab(false)}}).observe(s,{attributes:true,attributeFilter:['hidden']});
   try{new ResizeObserver(()=>{if(mkOpen())mkView()}).observe($('mkstage'))}catch(e){}}
