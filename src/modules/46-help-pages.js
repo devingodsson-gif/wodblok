@@ -55,6 +55,9 @@ const HELP_PAGES=[
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
  ['2.112.0','Nov 5 2026',['A group picked in the Elements list has a selection box on the canvas: drag inside it to move the group, pull a corner to size it, or turn it.']],
+ ['2.111.0','Nov 5 2026',['With Snap to grid on, the corner or side you pull to resize lands on the grid.']],
+ ['2.110.0','Nov 5 2026',['Rename anything of yours in a library (pictures, textures, shapes, mockups, saved stamps, trays and more): double-click it.']],
+ ['2.109.0','Nov 5 2026',['The highlight colour (guides and the selection box) is magenta by default; your accent is still a choice in Settings > General.']],
  ['2.108.0','Nov 5 2026',['Book cover guides in your highlight colour, crisp at any zoom, with Back, Spine and Front labelled above the cover.']],
  ['2.107.0','Nov 5 2026',['Mockup names show in full (three cards a row), the Text panel says Paragraph gap, and X, Y, W and H line up in columns.']],
  ['2.106.2','Nov 5 2026',['Stamps on screen look as they print again, without the slowdown: the sharper drawing arrives a moment after the first.']],

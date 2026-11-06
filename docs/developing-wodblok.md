@@ -221,7 +221,7 @@ The editor supports light and dark. Both must be correct for every screen. Theme
 | `--acc-ink` | `#836635` | `#c4a46e` | Text and icons on a soft accent background |
 | `--acc-fg` | `#1b1a18` | `#1b1a18` | Text on a solid accent fill |
 | `--acc-soft` | `rgba(184,145,79,.16)` | `rgba(196,164,110,.16)` | Pressed toggles and modes, slider halo |
-| `--hl` | `var(--acc)` | `var(--acc)` | Highlight (2.60.0, owner Oct 27 2026): smart guides and the selection box dragged on the canvas. Follows the accent unless Settings > General > Highlight picks the opposite of the accent or a colour |
+| `--hl` | `#d6336c` | `#d6336c` | Highlight (2.60.0, owner Oct 27 2026; magenta by default since 2.109.0, owner Nov 5 2026, with the accent a choice in Settings): smart guides, ruler guides, book cover guides and the selection box dragged on the canvas. Settings > General > Highlight picks Magenta (the default), Accent, the opposite of the accent, or a colour |
 | `--warn` | `#c0532e` | `#e8895c` | Unsaved dot, warnings, destructive confirm |
 | `--ok` | `#3f8f66` | `#7fb08a` | Success |
 | `--shadow` | layered, neutral | layered, dark | Floating surfaces only |
@@ -566,6 +566,7 @@ Choosing New folder inside, Rename, Move to… or Delete folder opens the **fold
 - **Select** toggles select mode. Clicking items toggles them; **Shift-click** selects the range from the last click; **Select all / Select none** works on the items visible (only open folders count). Esc leaves select mode.
 - A bar shows `N selected` or `None selected` with: **Move to…** (a dropdown of every folder by full path, and `＋ New folder…` to make one and move into it) · **Take out of folder** · **Delete N**.
 - **Delete N is two-tap in place:** the first tap changes the label to `Click to confirm` for 3 seconds; the second tap deletes. Built-in items and items in use are skipped, and the status line says how many.
+- **Rename an item** (2.110.0, owner Nov 5 2026: anything imported can be renamed, in every library): a double-click on one of your items opens Rename (the same small form as its right-click menu's Rename, under its folder). A click on one of your items waits a moment (260 ms, `LT_DBL`) before it does its work, so a double-click does not also add or apply it; a built-in item and Enter act at once. Every library on the shared tree (87-library-tree.js) and the shape library (21-motif-library-ui.js: your imported and drawn shapes; a built-in set's shapes and a text's letters are not renamed) work this way.
 - **Drag an item onto a folder row** moves it (the whole selection if the dragged item is selected). The row highlights while you hover over it. A drop never copies.
 
 #### 12.8 Where things are saved

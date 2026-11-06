@@ -18,6 +18,8 @@ import {zipRead} from '../format/libzip.js';
 //   tile(id, {cur, pk}): the inside of an item's tile (a picture); used(id): in use in the project (cannot be deleted); remove(ids): deletes your items
 //   rename(id, name): your item gets a name; file(id): {name, data, ext, fb} for Export, or null; usedFix: what to do when an item in use cannot be deleted; itemMenu(id): more entries at the top of an item's right-click menu; act: {icon, label, run(id)} puts a small button at the end of each item's row (rows only); ids trId, qId: ids for the tree and the search field; top: markup above the bar; wire(pane, pick): its listeners; pane: the pane's selector
 // What it returns: pane() markup for the tree (after the library's own top row), show(pane, cur, pick), paintAll(), here() (the active folder, where new items go), init().
+// 2.110.0 (owner Nov 5 2026: anything imported can be renamed, in every library): a double-click on one of your items opens Rename; LT_DBL is how long its click waits for a second one
+const LT_DBL=260;
 function ltMake(cfg){
 const P=cfg.p,W=cfg.word,WS=cfg.words;
 const TL={q:'',active:'',open:new Set(['',...(cfg.open||[])]),form:null,z:cfg.z||6,sm:false,sel:new Set(),anc:null,vis:[],hidOpen:false};
@@ -165,7 +167,8 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
   if(isSet(k)){const n=k.slice(2),hid=m.h.includes(n);return rowMenu(btn,[sub,['Rename',()=>{TL.open.add(k);TL.form={t:'ren',p:k,v:shown(m,n),ph:n};paintAll(true)}],['Reset name',()=>{const e=cfg.read();delete e.r[n];cfg.write(e);paintAll(true);pmsg('Set name reset.')},!m.r[n]],
    [hid?'Show in the list':'Hide from the list',()=>{const e=cfg.read();e.h=hid?e.h.filter(x=>x!==n):[...e.h,n];cfg.write(e);if(!hid&&within(TL.active,k))TL.active='';uiSave();paintAll(true);pmsg(hid?`“${shown(m,n)}” is back in the list.`:`Hid “${shown(m,n)}”.`)}],exp])}
   rowMenu(btn,[sub,['Rename',()=>{TL.open.add(k);TL.form={t:'ren',p:k,v:leaf(k)};paintAll(true)}],['Move to…',()=>{TL.open.add(k);TL.form={t:'mvf',p:k};paintAll(true)}],exp,['Delete folder',()=>{TL.open.add(k);TL.form={t:'del',p:k};paintAll(true)}]])};
- const itemMenu=(btn,id)=>{const m=cfg.read();if(cfg.name(id)==null)return;const extra=cfg.itemMenu?cfg.itemMenu(id):[];if(!cfg.own(id)){if(extra.length)rowMenu(btn,extra);return}const at=m.at[id]||'',items=[...extra,['Rename',()=>{TL.form={t:'iren',p:at,id,v:cfg.name(id)};TL.open.add(at);paintAll(true)}]];
+ const renOpen=id=>{const at=cfg.read().at[id]||'';TL.form={t:'iren',p:at,id,v:cfg.name(id)};TL.open.add(at);paintAll(true)};
+ const itemMenu=(btn,id)=>{const m=cfg.read();if(cfg.name(id)==null)return;const extra=cfg.itemMenu?cfg.itemMenu(id):[];if(!cfg.own(id)){if(extra.length)rowMenu(btn,extra);return}const at=m.at[id]||'',items=[...extra,['Rename',()=>renOpen(id)]];
   if(at)items.push(['Move to Yours',()=>moveIds([id],'')]);folders(m).sort(cmp).filter(p=>p!==at).slice(0,40).forEach(p=>items.push(['Move to “'+pathName(p)+'”',()=>moveIds([id],p)]));items.push(['Delete',()=>removeOne(id)]);rowMenu(btn,items)};
  const ok=()=>{const f=TL.form,m=cfg.read();if(!f)return;
   if(f.t=='del'){const gone=p=>within(p,f.p);m.f=m.f.filter(p=>!gone(p));Object.keys(m.at).forEach(i=>{if(gone(m.at[i]))m.at[i]=''});Object.keys(m.b).forEach(i=>{if(gone(m.b[i]))delete m.b[i]});cfg.write(m);TL.form=null;TL.open.delete(f.p);if(gone(TL.active))TL.active=parent(f.p);uiSave();paintAll(true);pmsg(`Deleted the folder “${leaf(f.p)}”. Its ${WS} went back to Yours.`);return}
@@ -190,7 +193,11 @@ function wire(pane){const host=pane.querySelector(`.${P}tr`);if(!host||host.data
   const fr=e.target.closest('.lfr[data-k]');if(fr){toggle(fr.dataset.k);return}
   const x=e.target.closest(`[data-${P}x]`);if(x){removeAsk(x);return}
   const ac=e.target.closest(`[data-${P}a]`);if(ac){e.stopPropagation();cfg.act.run(ac.dataset[P+'a']);return}
-  const t=e.target.closest(`[data-${P}]`);if(!t)return;if(TL.sm||e.ctrlKey||e.metaKey||e.shiftKey){pick(t.dataset[P],e);return}if(host._pick)host._pick(t.dataset[P])});
+  const t=e.target.closest(`[data-${P}]`);if(!t)return;if(TL.sm||e.ctrlKey||e.metaKey||e.shiftKey){pick(t.dataset[P],e);return}
+  // 2.110.0: one of your items can be renamed with a double-click, so its click waits a moment (LT_DBL) and a second click calls it off; Enter (detail 0) and built-in items are at once
+  const id=t.dataset[P];if(e.detail>0&&cfg.rename&&cfg.own(id)){clearTimeout(TL.dt);TL.dt=0;if(e.detail>1)return;TL.dt=setTimeout(()=>{TL.dt=0;if(host._pick)host._pick(id)},LT_DBL);return}
+  if(host._pick)host._pick(id)});
+ host.addEventListener('dblclick',e=>{if(TL.sm)return;const t=e.target.closest(`[data-${P}]`);if(!t)return;const id=t.dataset[P];if(!cfg.rename||!cfg.own(id))return;clearTimeout(TL.dt);TL.dt=0;e.preventDefault();renOpen(id)});
  host.addEventListener('contextmenu',e=>{const fr=e.target.closest('.lrw'),b=fr&&fr.querySelector('[data-fm]');if(b){e.preventDefault();b.click();return}
   const t=e.target.closest(`[data-${P}]`);if(t&&(cfg.own(t.dataset[P])||cfg.itemMenu)){e.preventDefault();itemMenu(t,t.dataset[P])}});
  host.addEventListener('keydown',e=>{const t=e.target;
