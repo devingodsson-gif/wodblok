@@ -6,6 +6,11 @@
 - Now: a double-click on one of your items opens Rename (87-library-tree.js `renOpen`, the same form as the menu's). Since a click on an item adds or applies it, a click on one of your items waits 260 ms (`LT_DBL`) and a second click calls it off; built-in items and Enter act at once. The shape library (21, 13): your imported and drawn shapes rename the same way (a double-click, or Rename in a new right-click menu on the shape), in the folder form, placed above the shape's grid; built-in sets' shapes and a text's letters are not renamed. Part 9 has the rule (Rename an item). What's new line in Help.
 - Tests: tests/rename-2-110.spec.js (a picture: the double-click renames and does not add it, a single click still adds it; an imported shape renamed, a built-in shape's double-click opens nothing). Run: it, and the 62 specs that touch a library: 250 passed, 1 failed under load (small-updates-2-79-2 Alt + wheel, a History count; passed twice alone; it arms a built-in shape, so the click wait is not in its path). check:style, check:platform OK.
 
+## 2.109.0 (Nov 5 2026, branch fix/2.109.0-magenta-highlight): the highlight is magenta by default
+- Owner, Nov 5 2026: "make the highlight color magenta by default". The `--hl` token is the Magenta preset (`#d6336c`) in both themes; Settings > General > Highlight lists Magenta first as the default (nothing saved), then Accent (now saved as `acc`), Opposite, Blue, Lime and Custom. A highlight saved as the magenta value before counts as the default. Anyone who had not picked a highlight sees magenta (it was the accent).
+- Tests: selection-2-60 updated (magenta by default, Accent gives the accent). Run: it, cover-guides-2-108, settings, settings-menu, stamp-settings, arrangement-settings-2-90: 31 passed. check:style OK.
+
+
 ## 2.108.0 (Nov 5 2026, branch fix/2.108.0-cover-guides): the book cover guides follow the styling rules
 - Owner, Nov 5 2026: the SPINE label was not centred (it stood to the right of the spine), and the bleed lines and labels were ugly and off-style; he chose labels above the cover and the selection colour he picks in the options (Settings > General > Highlight, `--hl`).
 - Cause of the off-centre label: the labels were drawn on their text baseline, so the letters stood above the point centred on; turned 90 degrees for the spine, above became to the right.
