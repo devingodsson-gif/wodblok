@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.110.0','Nov 5 2026',['Rename anything of yours in a library (pictures, textures, shapes, mockups, saved stamps, trays and more): double-click it.']],
  ['2.109.0','Nov 5 2026',['The highlight colour (guides and the selection box) is magenta by default; your accent is still a choice in Settings > General.']],
  ['2.108.0','Nov 5 2026',['Book cover guides in your highlight colour, crisp at any zoom, with Back, Spine and Front labelled above the cover.']],
  ['2.107.0','Nov 5 2026',['Mockup names show in full (three cards a row), the Text panel says Paragraph gap, and X, Y, W and H line up in columns.']],
