@@ -1,5 +1,14 @@
 # Development plan
 
+## 2.114.1 (Nov 6 2026, hotfix, branch fix/2.114.1-group-drag-one-step): a group's drag is one History step on a slow machine too
+- Found by the CI suite on `main` 2.114.0 (owner: "Run the suite", run 42223236368): group-canvas-2-112 "a corner scales the group..." made 2 History steps for one corner drag. Reproduced here with the CPU slowed six times (3 of 3 failed on 2.114.0, the corner and the rotate drag): History saves a step when changes pause (34 cap()), and skips it only while a drag flag is set; the group drag of 2.112.0 set none.
+- Fix (100-group-panel.js): the group drag sets WBS.WBDRG while it moves, as the other drags do. The test now runs that drag with the CPU slowed six times (the double step does not show on every slowed run, so it makes a regression likely to show, not certain).
+- Run: group-canvas-2-112, group-panel-2-104-1, undo-redo-2-87-11: 7 passed; the slowed reproduction 3 of 3 passed after the fix.
+
+## CI suite on `main` 2.114.0 (Nov 6 2026, run 42223236368)
+- WebKit and Chromium shards 1, 2, 4, 7, 8 passed. Failed: shard 3, the group drag above (fixed in 2.114.1); shard 5, roundtrip "open project-1/3/4" SVG snapshots; shard 6, scenarios "randomize with seed 1/2/3", "before / after compare", "split compare view", "light theme" SVG snapshots. The picture comparison does not run on a hand-started run (pull requests labelled run-suite only).
+- The nine SVG snapshots: only the markup's length and fingerprint changed, not its element counts. Built here 2.106.1, 2.106.2, 2.113.0 and 2.114.0: the three roundtrip ones and "light theme" change at 2.106.2 and at no later release (the other scenarios stop earlier in this sandbox and could not be compared). The change: each stamp print's `<use>` has other x, y, width and height (the dense print's padding) and two stamp sizes share one print, so one `<symbol>` fewer; the same elements, transforms and filters. That is 2.106.2's intended change (B1). They need the owner's approval to be regenerated in CI (update-snapshots workflow).
+
 ## 2.114.0 (Nov 6 2026, branch feat/2.114.0-whole-pattern-effects): a Pattern's effects over the whole pattern
 - Owner, Nov 6 2026: effects on Patterns were slow because each effect was applied to every stamp; asked for a checkbox on the effects that can apply to the whole pattern, whole pattern by default.
 - Found: patItems copied the pattern's `fx` onto every stamp, and each stamp drew its own filter and texture mask (514 stamps with Texture, Colour grade and Blur: 1,028 filters, 1,027 masks, 1.6 MB of markup).
