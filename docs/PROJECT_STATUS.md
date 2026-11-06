@@ -5,6 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
+- **Nov 5 (night): 2.108.0 built on `fix/2.108.0-cover-guides`, pushed, NOT merged (owner must say).** Book cover guides restyled: `--hl`, 1px at any zoom, labels above the cover, Spine centred (docs/plan.md 2.108.0). Suite importance about 35% (the canvas overlay only; nothing in drawing, files or exports).
 - **Nov 5 (late): 2.107.0 LIVE (owner: "Merge everything no tests"; CI suite not run).** B2 Mockup names in full, B3 "Paragraph gap", B4 X/Y/W/H in columns (docs/plan.md 2.107.0). Suite not needed for 2.107.0 (about 15%: CSS and words only). Suggestion: the Pictures library also starts at five cards a row (`z:5`, 96-picture-library.js); long picture names would be cut the same way.
 - **Nov 5 (late): 2.106.2 LIVE (owner: "Merge everything no tests"; CI suite not run, so the SVG snapshot and golden changes it should cause are not seen yet).** B1 again, in two passes: the plain print first, the dense print after it (cause of 2.106.0's failure: dense prints are about 7x slower to make, and stamps waiting for them drew live). Speed guard and the related specs pass, perf mean 1.03 (docs/plan.md 2.106.2). Suggested before going live: the CI suite (about 70%: it changes every stamp's screen drawing; SVG snapshots with stamp prints will change and need the owner's approval, pixel goldens with stamps to look at). Next after it: the style release B2 to B4.
 - **Nov 5 (evening): 2.106.1 LIVE (hotfix); CI suite passed on it (run 42097582882).** The CI suite on 2.106.0 (live) failed: its denser stamp prints made the wide project draw live (speed-guard 339k against 120k) and changed 9 SVG snapshots. 2.106.1 takes the drawing change back out (B1 open again); details and next steps in docs/plan.md 2.106.1. Next agent: B1 again (docs/plan.md 2.106.1), then the style release (B2 to B4).
@@ -298,6 +299,7 @@ None at the moment. Add new ones here.
 - Run the CI shard suite once before the next release goes live (my estimate: high importance, because 2.4.0 to 2.9.0 changed the Add bar, panels, stamp view and removed tools with no recorded full run). The owner said to ask him first, so suggest it with the importance percentage and wait.
 
 ## Changelog of this page
+- Nov 5 2026 (night): 2.108.0 recorded (book cover guides).
 - Nov 5 2026 (late): 2.107.0 recorded (B2 to B4).
 - Nov 5 2026 (late): 2.106.2 recorded (B1 in two passes).
 - Nov 5 2026: whole-app bug test of 2.105.0 (docs/bug-test-2.105.md); 2.105.0 marked live; speed-guard note brought up to date.

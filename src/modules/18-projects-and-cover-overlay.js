@@ -22,14 +22,32 @@ const pgFix=o=>{let g={...PGD};const nn=v=>Math.max(2,Math.min(60,Math.round(+v)
 const core=()=>({tiles:WBS.tiles,els:flatEls(WBS.layers),proj:WBS.proj,dim:WBS.dim,tex:WBS.tex,texLib:WBS.texLib,pg:{...WBS.pgrid},grade:WBX.wbGrade?WBX.wbGrade.get():null});
 const coreStr=()=>JSON.stringify(core());
 // ---- Book guides: trim, spine and safe-area lines drawn over the cover; redrawn only when the canvas, the book or the Stamp view changes.
+// 2.108.0 (owner Nov 5 2026: the guides follow the styling rules, the labels sit above the cover): one colour, the highlight (--hl, Settings > General > Highlight),
+// as the smart guides and the ruler guides. The lines stay inside the artwork (#guig, so they move with it and never export) but are 1 screen pixel at any zoom
+// (non-scaling): trim and spine folds solid, safe areas and the barcode box dashed. The bleed is shaded with the scrim. Back, Spine and Front are labels in the
+// group-label style in a screen overlay just above the cover (#bkl), the same size at any zoom; Barcode sits inside its box. Before: magenta, cyan and green lines
+// and white pills drawn in the artwork, so they grew with zoom, and the turned SPINE pill stood to the right of the spine (its text sat above its baseline).
 function renderGuides(){const k=[stvOn(),CW,CH,WBS.book.on?JSON.stringify(WBS.book):''].join('|');if(k==WBS.guiKey)return;WBS.guiKey=k;drawGuides()}
-function drawGuides(){const G=$('guig');if(stvOn()||!WBS.book.on||!WBS.book.gd){G.innerHTML='';return}const g=bk(),u=CW/g.W,f=v=>(v*u).toFixed(2),lw=(CW/1000).toFixed(2),b=g.b,x1=b+g.tw,x2=x1+g.sw,sf=.125,ss=.0625;
-const R=(x,y,w,h,st,da)=>`<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="none" stroke="${st}" stroke-width="${lw}"${da?` stroke-dasharray="${da}"`:''}/>`,T=(x,y,t,r)=>{const fs=CW/70,w=t.length*fs*.66+fs*1.1,h=fs*1.5,tr=r?` transform="rotate(90 ${f(x)} ${f(y)})"`:'';return`<g${tr}><rect x="${(x*u-w/2).toFixed(2)}" y="${(y*u-fs*1.05).toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}" rx="${(h/4).toFixed(2)}" fill="#fff" fill-opacity=".94" stroke="#e0006e" stroke-width="${lw}"/><text x="${f(x)}" y="${f(y)}" font-family="system-ui,sans-serif" font-size="${fs.toFixed(1)}" font-weight="600" fill="#e0006e" text-anchor="middle" letter-spacing="1">${t}</text></g>`};
-let o=`<path d="M0 0H${CW}V${CH}H0Z M${f(b)} ${f(b)}V${f(b+g.th)}H${f(g.W-b)}V${f(b)}Z" fill="rgba(224,0,110,.16)" fill-rule="evenodd"/>`;
-o+=R(b,b,g.W-2*b,g.th,'#00a3c4');o+=`<line x1="${f(x1)}" y1="0" x2="${f(x1)}" y2="${CH}" stroke="#e0006e" stroke-width="${lw}"/><line x1="${f(x2)}" y1="0" x2="${f(x2)}" y2="${CH}" stroke="#e0006e" stroke-width="${lw}"/>`;
-o+=R(b+sf,b+sf,g.tw-2*sf,g.th-2*sf,'#1a9a4a','4 3')+R(x2+sf,b+sf,g.tw-2*sf,g.th-2*sf,'#1a9a4a','4 3');if(g.sw>2*ss)o+=R(x1+ss,b+sf,g.sw-2*ss,g.th-2*sf,'#1a9a4a','4 3');
-o+=R(x1-.25-2,b+g.th-.25-1.2,2,1.2,'#e0006e','6 3')+T(x1-1.25,b+g.th-.25-.55,'BARCODE');
-o+=T(b+g.tw/2,b+.4,'BACK')+T(x2+g.tw/2,b+.4,'FRONT');if(g.sw>.15)o+=T(x1+g.sw/2,b+g.th/2,'SPINE',1);G.innerHTML=o}
+const bkGuidesOn=()=>!stvOn()&&!!WBS.book.on&&!!WBS.book.gd;
+function drawGuides(){const G=$('guig');bklSched();if(!bkGuidesOn()){G.innerHTML='';return}const g=bk(),u=CW/g.W,f=v=>(v*u).toFixed(2),b=g.b,x1=b+g.tw,x2=x1+g.sw,sf=.125,ss=.0625;
+const R=(x,y,w,h,c)=>`<rect class="${c}" x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}"/>`,V=x=>`<line class="bgl" x1="${f(x)}" y1="0" x2="${f(x)}" y2="${CH}"/>`;
+let o=`<path class="bgb" d="M0 0H${CW}V${CH}H0Z M${f(b)} ${f(b)}V${f(b+g.th)}H${f(g.W-b)}V${f(b)}Z"/>`;
+o+=R(b,b,g.W-2*b,g.th,'bgl')+V(x1)+V(x2);
+o+=R(b+sf,b+sf,g.tw-2*sf,g.th-2*sf,'bgl bgd')+R(x2+sf,b+sf,g.tw-2*sf,g.th-2*sf,'bgl bgd');if(g.sw>2*ss)o+=R(x1+ss,b+sf,g.sw-2*ss,g.th-2*sf,'bgl bgd');
+o+=R(x1-.25-2,b+g.th-.25-1.2,2,1.2,'bgl bgd');G.innerHTML=o}
+// the labels: where each sits, in inches across the cover (y < 0: just above the cover; else the middle of a box, in inches down)
+function bkLabels(){const g=bk(),b=g.b,x1=b+g.tw,x2=x1+g.sw,L=[['Back',b+g.tw/2,-1],['Front',x2+g.tw/2,-1]];if(g.sw>.15)L.splice(1,0,['Spine',x1+g.sw/2,-1]);
+ L.push(['Barcode',x1-.25-1,b+g.th-.25-.6]);return{g,L}}
+const bkl={raf:0,key:''};
+const bklSched=()=>{if(!bkl.raf)bkl.raf=requestAnimationFrame(bklDraw)};
+function bklDraw(){bkl.raf=0;const O=$('bkl'),bd=$('boardP'),a=$('art');if(!O||!bd||!a)return;const show=bkGuidesOn()&&!bd.classList.contains('off');O.hidden=!show;if(!show){bkl.key='';return}
+ const r=a.getBoundingClientRect(),vb=a.viewBox&&a.viewBox.baseVal,bb=bd.getBoundingClientRect(),st=O.offsetParent?O.offsetParent.getBoundingClientRect():{left:0,top:0};if(!vb||!(vb.width>0)||!(r.width>0))return;
+ const kx=r.width/vb.width,ky=r.height/vb.height,ax=r.left-vb.x*kx,ay=r.top-vb.y*ky,{g,L}=bkLabels(),u=CW/g.W,bw=bd.clientWidth,bh=bd.clientHeight;
+ const key=[bb.left,bb.top,bw,bh,kx,ky,ax,ay,CW,JSON.stringify(WBS.book)].join('|');if(key===bkl.key)return;bkl.key=key;
+ Object.assign(O.style,{left:(bb.left-st.left)+'px',top:(bb.top-st.top)+'px',width:bw+'px',height:bh+'px'});
+ while(O.children.length>L.length)O.lastChild.remove();while(O.children.length<L.length)O.appendChild(document.createElement('span'));
+ L.forEach(([t,x,y],i)=>{const e=O.children[i],sx=Math.round(ax+x*u*kx-bb.left),top=y<0;e.className='bkt'+(top?'':' bkin');e.textContent=t;
+  e.style.transform=top?`translate(${sx}px,${Math.round(ay-bb.top)}px) translate(-50%,calc(-100% - 6px))`:`translate(${sx}px,${Math.round(ay+y*u*ky-bb.top)}px) translate(-50%,-50%)`})}
 function snapshot(){const c=JSON.parse(coreStr()),used=new Set();c.tiles.forEach(t=>t.items.forEach(q=>used.add(q.m)));
 const cm={};Object.keys(cust).forEach(k=>{if(used.has(k))cm[k]=cust[k]});
 return{app:'WODBLOK',v:30,...c,arts:artUsed(),texImgs:WBX.wbTexImgsUsed?WBX.wbTexImgsUsed():{},cover:{book:WBS.book},grade:WBX.wbGrade?WBX.wbGrade.get():null,lib:{motifs:cm,colors:C.filter(x=>CC.includes(x[0]))}}}
@@ -57,6 +75,10 @@ const c2Txt=btn=>[...btn.childNodes].reverse().find(n=>n.nodeType==3&&n.nodeValu
 const confirm2=(btn,label,fn)=>{if(!dirty()||btn.dataset.sure){delete btn.dataset.sure;return fn()}btn.dataset.sure='1';const t=c2Txt(btn),o=t?t.nodeValue:btn.textContent;if(t)t.nodeValue=label;else btn.textContent=label;setTimeout(()=>{delete btn.dataset.sure;const t2=c2Txt(btn);if(t2)t2.nodeValue=o;else btn.textContent=o},3500)};
 function openData(d,id,name){if(WBX.wbSteReset)WBX.wbSteReset();applySnap(d);if(WBX.wbClipClear)WBX.wbClipClear();WBS.cp={id,name,saved:coreStr()};$('pnm').value=name;paintPst();if(WBX.wbResetHist)WBX.wbResetHist();if(WBX.wbWatch)WBX.wbWatch()}
 function init18(){WBS.pgrid={...PGD};
+// the cover labels follow the view: zoom and pan change #art and #artwrap, the board scrolls or resizes, the Stamp view is a body class
+{const mo=new MutationObserver(bklSched),bd=$('boardP');mo.observe($('art'),{attributes:true,attributeFilter:['style','viewBox']});mo.observe($('artwrap'),{attributes:true,attributeFilter:['style']});
+ mo.observe(document.body,{attributes:true,attributeFilter:['class']});mo.observe(bd,{attributes:true,attributeFilter:['class']});
+ bd.addEventListener('scroll',bklSched,{passive:true});addEventListener('resize',bklSched);if(window.ResizeObserver)new ResizeObserver(bklSched).observe(bd)}
 WBS.guiKey='';
 WBS.cp={id:null,name:'',saved:''};
 $('pnm').value=WBS.cp.name||'';setInterval(paintPst,800);paintPst();

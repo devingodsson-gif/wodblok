@@ -28,6 +28,6 @@ test('a Book cover canvas has its guides but no Cover overlay', async ({ page })
   await expect(page.locator('#bkgd')).toHaveCount(1);
   await expect(page.locator('summary', { hasText: 'Cover overlay' })).toHaveCount(0);
   await page.check('#bkgd'); await settle(page);
-  expect(await page.locator('#guig text').count()).toBeGreaterThan(0);
+  expect(await page.locator('#guig line').count()).toBeGreaterThan(0);   // 2.108.0: the labels moved out of the artwork into #bkl; the lines are still here
   expect(errors).toEqual([]);
 });
