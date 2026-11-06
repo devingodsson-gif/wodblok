@@ -64,7 +64,7 @@ const xrPlaces=(r,w,h)=>r.rep=='brick'?[[0,0],[-w/2,h],[w/2,h]]:r.rep=='half'?[[
 function xrRender(r){return(r.fmt!='svg'&&wmGet()?wmReady():Promise.resolve()).then(()=>xrRender0(r))}
 function xrRender0(r){
   return new Promise((res,rej)=>{
-    if(r.fmt=='svg')return res(new Blob([ser()],{type:'image/svg+xml'}));
+    if(r.fmt=='svg')return res(new Blob([ser({px:r.w>0&&r.h>0?Math.max(r.w,r.h):xrPx(r.px)})],{type:'image/svg+xml'}));
     const [w,h]=r.w>0&&r.h>0?[Math.round(r.w),Math.round(r.h)]:xrDims(xrPx(r.px)),U=xrUnit(r,w,h);if(U[0]*U[1]>XR_AREA)return rej(new Error('That size is too large for this browser. Try a smaller size.'));
     const img=new Image();
     img.onload=()=>{try{const[W,H]=U,c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d',{willReadFrequently:r.fmt=='tiff'});if(r.fmt=='jpg'||r.fmt=='tiff'||r.fmt=='pdf'){ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H)}
@@ -72,7 +72,7 @@ function xrRender0(r){
       if(r.fmt=='pdf'){c.toBlob(async b=>{if(!b)return rej(new Error('The picture could not be made at that size.'));try{res(new Blob([pdfJpeg(new Uint8Array(await b.arrayBuffer()),W,H,{W:r.inW||W/300,H:r.inH||H/300,b:0})],{type:'application/pdf'}))}catch(e){rej(e)}},'image/jpeg',.95);return}
       c.toBlob(b=>b?res(b):rej(new Error('The picture could not be made at that size.')),r.fmt=='jpg'?'image/jpeg':'image/png',.92)}catch(e){rej(e)}};
     img.onerror=()=>rej(new Error('The picture could not be made.'));
-    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser());
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser({px:Math.max(w,h)}));
   });
 }
 // The Export recipes library is the shared folder tree (2.59.0, owner Oct 27 2026): Starting points is a set, yours sit in Yours and your folders; a click loads a recipe into Custom export,

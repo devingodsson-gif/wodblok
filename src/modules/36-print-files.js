@@ -41,11 +41,11 @@ async function prSheet(o){const{W,H,inW,inH}=coSize(o.dpi),b=Math.round(prBleedI
  // a book cover's canvas already holds its bleed: the picture is the bleed box as it is, and the trim (and the crop marks) sit that far inside it
  const P=physNow(),cb=P&&P.cover?Math.round(P.cover.b*o.dpi):0;
  const spots=o.spots?coSpots().filter(id=>coInks().includes(id)):[];let base=null;const plates=[];
- if(spots.length){await coWith((k,id,c)=>spots.includes(id)?withAlpha('#ffffff',hexAlpha(c)):c,[0],async()=>{base=await coRaster(ser(),W,H)});
-  await coWith((ink,id,c)=>withAlpha(id===ink?'#000000':'#ffffff',hexAlpha(c)),spots,async ink=>{const im=await coRaster(ser(),W,H),g=coPlate(im,'tone',o.dpi),pc=document.createElement('canvas');pc.width=W;pc.height=H;
+ if(spots.length){await coWith((k,id,c)=>spots.includes(id)?withAlpha('#ffffff',hexAlpha(c)):c,[0],async()=>{base=await coRaster(ser({px:Math.max(W,H)}),W,H)});
+  await coWith((ink,id,c)=>withAlpha(id===ink?'#000000':'#ffffff',hexAlpha(c)),spots,async ink=>{const im=await coRaster(ser({px:Math.max(W,H)}),W,H),g=coPlate(im,'tone',o.dpi),pc=document.createElement('canvas');pc.width=W;pc.height=H;
    const pd=pc.getContext('2d').createImageData(W,H);for(let i=0,p=0;i<g.length;i++,p+=4){pd.data[p]=pd.data[p+1]=pd.data[p+2]=g[i];pd.data[p+3]=255}pc.getContext('2d').putImageData(pd,0,0);
    const e=prBleed(pc,b).getContext('2d').getImageData(0,0,W+2*b,H+2*b).data,cov=new Uint8Array((W+2*b)*(H+2*b));for(let i=0,p=0;i<cov.length;i++,p+=4)cov[i]=255-e[p];plates.push({id:ink,cov})})}
- else{await coIdle();base=await coRaster(ser(),W,H)}
+ else{await coIdle();base=await coRaster(ser({px:Math.max(W,H)}),W,H)}
  const sheet=document.createElement('canvas');sheet.width=SW;sheet.height=SH;const x=sheet.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,SW,SH);x.drawImage(prBleed(prCanvas(base),b),s,s);
  if(cb)return{sheet,W:W-2*cb,H:H-2*cb,b:cb,s,SW,SH,inW,inH,plates,M:prMarks(W-2*cb,H-2*cb,cb,s,o.dpi,o.crop,o.reg)};
  return{sheet,W,H,b,s,SW,SH,inW,inH,plates,M:prMarks(W,H,b,s,o.dpi,o.crop,o.reg)}}
@@ -104,11 +104,11 @@ function prCrop(im){const{width:W,height:H,data:d}=im;let x0=W,y0=H,x1=-1,y1=-1;
 const prNoTex=svg=>{const d=new DOMParser().parseFromString(svg,'image/svg+xml'),t=d.getElementById('texg');if(t)t.textContent='';return new XMLSerializer().serializeToString(d)};
 async function prLayers(o){const L=(WBS.layers||[])[WBS.selL]||(WBS.layers||[])[0],pl=(L&&L.pl)||[],{W,H}=coSize(o.dpi),leaves=pl.filter(q=>q.k!='group'&&!fpHid(pl,q)),keep=new Map(pl.map(q=>[q,q.v])),out=[];
  WBX.wbNoCap=1;try{for(let i=0;i<leaves.length;i++){const q=leaves[i];pmsg('Layer '+(i+1)+' of '+leaves.length+'…');leaves.forEach(z=>{z.v=z===q?keep.get(z):false});upd();await coIdle();
-   const c=prCrop(await coRaster(prNoTex(ser()),W,H,true));if(c)out.push({...c,name:lyNm(q)})}}
+   const c=prCrop(await coRaster(prNoTex(ser({px:Math.max(W,H)})),W,H,true));if(c)out.push({...c,name:lyNm(q)})}}
  finally{pl.forEach(q=>{const v=keep.get(q);if(v===undefined)delete q.v;else q.v=v});upd();await coIdle();WBX.wbNoCap=0}
- const merged=(await coRaster(ser(),W,H)).data;let inks=[];
+ const merged=(await coRaster(ser({px:Math.max(W,H)}),W,H)).data;let inks=[];
  if(o.inkCh){const ids=coInks(),all=WBS.proj.ts.slice(),info=new Map(ids.map(id=>{const h=slotHex(id);return[id,{name:coInkName(id,all.indexOf(id)),rgb:[1,3,5].map(i=>parseInt(h.slice(i,i+2),16))}]}));   /* names and colours before the colourway made for the moment */
-  await coWith((ink,id,c)=>withAlpha(id===ink?'#000000':'#ffffff',hexAlpha(c)),ids,async ink=>{const g=coPlate(await coRaster(ser(),W,H),'tone',o.dpi);inks.push({...info.get(ink),plane:g})})}
+  await coWith((ink,id,c)=>withAlpha(id===ink?'#000000':'#ffffff',hexAlpha(c)),ids,async ink=>{const g=coPlate(await coRaster(ser({px:Math.max(W,H)}),W,H),'tone',o.dpi);inks.push({...info.get(ink),plane:g})})}
  return prPsd(W,H,o.dpi,out,merged,inks)}
 // ---- the Print file dialog
 const prOpt={fmt:'pdf',cm:'rgb',dpi:300,crop:true,reg:true,spots:true,inkCh:false};

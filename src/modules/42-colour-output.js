@@ -89,7 +89,7 @@ async function coSeparate(o){if(coBusy)return;const d=await use('downloads');if(
  coBusy=true;const base=coBase(),zn=base+'-separations.zip',files={};let h0=null;
  try{h0=d.pick?await d.pick({filename:zn}):null;const{W,H}=coSize(o.dpi),fx=fixedInUse(),all=WBS.proj.ts.slice(),names=inks.map((id,i)=>coInkName(id,all.indexOf(id)));let k=0;
   await coWith((ink,id,c)=>withAlpha(id===ink?'#000000':'#ffffff',hexAlpha(c)),inks,async ink=>{const i=inks.indexOf(ink);pmsg('Separating '+(++k)+' of '+inks.length+'…');
-   let svg=ser();if(fx.length)svg=vrRecolor(svg,new Map(fx.map(h=>[h,'#ffffff'])));
+   let svg=ser({px:Math.max(W,H)});if(fx.length)svg=vrRecolor(svg,new Map(fx.map(h=>[h,'#ffffff'])));
    const im=await coRaster(svg,W,H),g=coPlate(im,o.tint,o.dpi,o.lpi),label=(coIsSpot(ink)?'Spot ':'')+names[i]+'  ·  '+(i+1)+' of '+inks.length,sh=coSheet(g,W,H,o.dpi,o.marks,label);
    const fn=`${base}-${String(i+1).padStart(2,'0')}-${coIsSpot(ink)?'spot-':''}${coSafe(names[i])}.${o.fmt}`;
    let b;if(o.fmt=='tiff'){const x=sh.getContext('2d').getImageData(0,0,sh.width,sh.height).data,gr=new Uint8Array(sh.width*sh.height);for(let j=0,p=0;j<gr.length;j++,p+=4)gr[j]=x[p];b=coTiff(gr,sh.width,sh.height,1,o.dpi)}
@@ -99,7 +99,7 @@ async function coSeparate(o){if(coBusy)return;const d=await use('downloads');if(
  catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not export.')}finally{coBusy=false}}
 // CMYK: the design as it is, at the print size and resolution, converted
 async function coCmykOut(fmt){if(coBusy)return;coBusy=true;try{const P=physNow(),dpi=P?P.dpi:300,{W,H,inW,inH}=coSize(dpi);pmsg('Exporting CMYK…');await coIdle();
- const im=await coRaster(ser(),W,H),c=coCmyk(im.data),name=coBase()+'-cmyk.'+fmt;
+ const im=await coRaster(ser({px:Math.max(W,H)}),W,H),c=coCmyk(im.data),name=coBase()+'-cmyk.'+fmt;
  if(await coSave(name,fmt=='tiff'?coTiff(c,W,H,4,dpi):coPdf(c,W,H,inW,inH)))pmsg('Exported '+name+'.')}
  catch(e){if(e&&e.code=='declined')return pmsg('');pmsg((e&&e.message)||'Could not export.')}finally{coBusy=false}}
 // ---- the Separations dialog: the inks (ticked), format, resolution, tints, halftone lines and marks
@@ -121,7 +121,7 @@ function coProofKey(){return coreStr()+'|'+CW+'|'+CH+'|'+(WBS.proj?WBS.proj.cwa:
 function coProofG(on){let g=$('prfg');if(on&&!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='prfg';g.setAttribute('pointer-events','none');const at=$('guig');at.parentNode.insertBefore(g,at)}if(!on&&g){g.remove();g=null}return g}
 async function coProofDraw(){if(!PRF.on||PRF.busy)return;const g=coProofG(true);if(!g)return;if(document.body.classList.contains('stedit')){g.innerHTML='';PRF.key='';return}
  const k=coProofKey();if(k===PRF.key)return;PRF.busy=true;try{await coIdle();const a=$('art').getBoundingClientRect(),s=Math.min(2,window.devicePixelRatio||1),L=Math.min(1600,Math.max(200,Math.round(Math.max(a.width,a.height)*s))),f=L/Math.max(CW,CH),W=Math.round(CW*f),H=Math.round(CH*f);
-  const im=await coRaster(ser(),W,H);coProofPx(im.data);const c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').putImageData(im,0,0);
+  const im=await coRaster(ser({px:Math.max(W,H)}),W,H);coProofPx(im.data);const c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').putImageData(im,0,0);
   if(PRF.on&&g.isConnected){g.innerHTML=`<image href="${c.toDataURL('image/png')}" x="0" y="0" width="${CW}" height="${CH}" preserveAspectRatio="none"/>`;PRF.key=coProofKey()}}
  catch(e){}finally{PRF.busy=false}if(PRF.on&&coProofKey()!==PRF.key)coProofSoon()}
 const coProofSoon=()=>{clearTimeout(PRF.t);PRF.t=setTimeout(coProofDraw,350)};
