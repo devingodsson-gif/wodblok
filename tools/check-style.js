@@ -44,5 +44,10 @@ for (const f of files) {
 {const IC_OK = new Set(['13', '15', '18']), THUMB = /\.rpth svg|\.mr\.kid svg/, css = fs.readFileSync(path.join(SRC, 'shell.html'), 'utf8');
  for (const m of css.matchAll(/([^{}<>]+)\{([^{}]*)\}/g)) { const sel = m[1].trim(); if (THUMB.test(sel) || !sel.split(',').every(x => /(svg|\.ic)\s*$/.test(x.trim()))) continue;
   for (const d of m[2].matchAll(/width:(\d+)px;height:(\d+)px/g)) if (!IC_OK.has(d[1])) { console.error(`shell.html: icon ${sel.slice(0, 60)} at ${d[1]}px (13, 15 or 18)`); bad++; } }}
+// 2.118.0 (full check S6): padding on the spacing scale: 0, 1, 2, 4, 6, 8, 12, 16 px, and above 16 a multiple of 4 (section 6)
+{const PAD_OK = v => { const n = +v.replace('px', ''); return [0, 1, 2, 4, 6, 8, 12, 16].includes(n) || (n > 16 && n % 4 === 0); };
+ for (const f of files) fs.readFileSync(f, 'utf8').split('\n').forEach((line, i) => {
+  for (const m of line.matchAll(/(?<![\w-])padding(?:-(?:top|right|bottom|left))?\s*:\s*([^;}"'`]+)/g)) for (const v of m[1].trim().split(/\s+/)) if (/^\d*\.?\d+px$/.test(v) && !PAD_OK(v)) report(f, i, `padding ${v} off the spacing scale`);
+ });}
 if (bad) { console.error(bad + ' style violations'); process.exit(1); }
 console.log('style check OK');

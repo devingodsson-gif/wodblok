@@ -418,7 +418,7 @@ const navDirty=()=>{if(WBX.wbNavDirty)WBX.wbNavDirty();if(WBX.wbVarDirty)WBX.wbV
 let thT=0,thWant=null;
 function thRun(){if(WBS.WBDRG||WBX.wbHoldOn||WBX.wbRollHold||(WBX.wbTxBusy||0)>0||document.body.classList.contains('babusy')){thT=setTimeout(thRun,800);return}
  const s=thWant;if(!s||s!==coreStr())return;thWant=null;thumb(120).then(u=>{const i=hist.lastIndexOf(s);if(u&&i>=0){histTh[i]=u;if(WBX.wbHistPaint)WBX.wbHistPaint()}})}
-function cap(){if(WBS.WBDRG||WBX.wbNoCap||WBX.wbRollHold||(WBS.fpXf&&WBS.fpXf.moved)||(WBS.fpDrag&&WBS.fpDrag.moved))return;   // a drag in progress is not a step yet (2.27.0)
+function cap(){if(WBS.WBDRG||WBX.wbNoCap||WBX.wbWheelHold||WBX.wbRollHold||(WBS.fpXf&&WBS.fpXf.moved)||(WBS.fpDrag&&WBS.fpDrag.moved))return;   // a drag in progress is not a step yet (2.27.0)
 if(texNorm())buildTex();const s=coreStr();if(s!==hist[hi]){const prev=hist[hi];
 // typing in a text is one step, not one per pause (2.27.0): the same text edited again within a few seconds replaces the last step
 if(hi>0&&hi==hist.length-1&&!(WBX.wbLabelNext&&performance.now()-WBX.wbLabelNext.at<3000)&&hLabel(prev,s)=='Edited text'&&hLU&&histL[hi]=='Edited text'&&hLU===histU[hi]&&Date.now()-histT[hi]<6000){hist[hi]=s;histT[hi]=Date.now();histTh[hi]='';navDirty();ub();return}
