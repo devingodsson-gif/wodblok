@@ -44,6 +44,8 @@ test('a picked group shows the selection rectangle with corner and rotate handle
 
 test('a corner scales the group evenly, the rotate handle turns it; a press that does not move picks the element under it', async ({ page }) => {
   const { errors } = await grouped(page);
+  // 2.114.1: on a slow machine (CI, Nov 6 2026) a History step was saved in the middle of a drag; the CPU is slowed here so that would show
+  { const c = await page.context().newCDPSession(page); await c.send('Emulation.setCPUThrottlingRate', { rate: 6 }); }
   const a = await mem(page), h0 = (await hist(page)).length;
   // the south-east corner, pulled out: sizes and the gap between the members grow by the same factor, the north-west corner stays
   await drag(page, await centre(page, '#fpov [data-gh="se"]'), 60, 60);
