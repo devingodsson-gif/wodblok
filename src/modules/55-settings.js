@@ -78,7 +78,7 @@ const stViewOn=id=>$(id)?.getAttribute('aria-pressed')==='true';
 const stViewToggles=()=>stVIEW.map(([sid,bid,t])=>stTgl(sid,stViewOn(bid),t)).join('');
 const stThemeNow=()=>document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
 // ---------------------------------------------------------------- highlight colour (2.60.0, owner Oct 27 2026: "a highlight colour for the smart alignment guides and when we
-// draw selection boxes"). '' follows the accent, 'opp' is the accent's opposite (its hue turned half way round), else a colour; it is the --hl token.
+// draw selection boxes"). '' is the default, magenta (since 2.109.0; 'acc' the accent), 'opp' is the accent's opposite (its hue turned half way round), else a colour; it is the --hl token.
 const stK_HL='wb260_highlight';
 // 2.109.0 (owner Nov 5 2026): Magenta is the default (nothing saved; the --hl token itself, shell.html); Accent is a choice of its own ('acc'). A highlight saved as
 // the magenta value before counts as the default.
