@@ -70,7 +70,7 @@ WBX.wbTxXf=(g,fn)=>{const t=WBS.tiles[WBS.cur],M=A(t)[g];if(!M)return;fn(M)};
 WBX.wbTxSync=()=>{if(!$('tx_t')||!stTxMode())return;txArmUI();const g=grpOf();if(g===edit)return;edit=g;const box=$('tx_ed');
 if(g){const M=A(WBS.tiles[WBS.cur])[g];st={...teD,...M,auto:false};delete st.ax;delete st.ay;delete st.mx;delete st.my;toUI();box.hidden=false;$('tx_convrow').hidden=false;$('tx_edn').textContent=st.text.replace(/\n/g,' ');$('tx_go').textContent='Add text'}
 else{box.hidden=true;$('tx_convrow').hidden=true;$('tx_go').textContent='Add text';st.auto=true}later()};
-teSetNotify(pmsg);teLoadFonts(fillFonts);fillFonts();toUI();
+teSetNotify(pmsg);teLoadFonts(()=>{fillFonts();if(WBX.wbFontsChanged)WBX.wbFontsChanged()});fillFonts();toUI();WBX.wbFillFonts=fillFonts;   // 2.113.0: the font library (101) renames fonts and follows the ones loaded
 $('tx_t').addEventListener('input',()=>{fromUI();later();live()});
 TXO_IDS.forEach(id=>$(id).addEventListener('input',e=>{if(id=='tx_sz'&&e.isTrusted)st.auto=false;fromUI();later();live()}));
 ['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(!e.isTrusted)return;const w=$('tx_sz').closest('.ctl');if(e.target===$('tx_sz')||(w&&w.contains(e.target)))st.auto=false},true));
@@ -80,7 +80,7 @@ $('tx_go').onclick=()=>{if(!stTxMode())return;if(txArmed())txArm(false);else{fro
 $('tx_conv').onclick=()=>{if(!stTxMode()||!edit)return;const g=edit,t=WBS.tiles[WBS.cur];if(WBX.wbCap)WBX.wbCap();t.items.forEach(q=>{if(q.tg==g)delete q.tg});delete A(t)[g];edit=null;$('tx_ed').hidden=true;$('tx_convrow').hidden=true;store();upd();if(WBX.wbCap)WBX.wbCap();pmsg('Turned the text into plain shapes.')};
 $('tx_new').onclick=()=>{if(!stTxMode())return;selOne(-1);edit=null;$('tx_ed').hidden=true;$('tx_convrow').hidden=true;$('tx_go').textContent='Add text';st={...teD,f:st.f};toUI();upd();later();$('tx_t').focus()};
 $('tx_file').onchange=async()=>{if(!stTxMode())return;const fl=$('tx_file').files[0];$('tx_file').value='';if(!fl)return;try{const nm=fl.name.replace(/\.[a-z0-9]+$/i,'').replace(/[_-]+/g,' ').replace(/["<>&|]/g,'').slice(0,40)||'My font';
-const id=await teAddUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();$('tx_f').value=id;fromUI();later();pmsg(`Loaded “${nm}”.`+(fl.size>=900000?' It is large, so it will not be kept for next time.':''))}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}};
+const id=await teAddUF(nm,await fl.arrayBuffer(),fl.size<900000);fillFonts();if(WBX.wbFontsChanged)WBX.wbFontsChanged();$('tx_f').value=id;fromUI();later();pmsg(`Loaded “${nm}”.`+(fl.size>=900000?' It is large, so it will not be kept for next time.':''))}catch(e){pmsg('That font file could not be read. Try a .ttf or .otf file.')}};
 // text boxes in the pattern: lay the text out at canvas scale, returning the letter paths (centred on the box)
 WBX.wbTxLay=teLayBox;
 WBX.wbTxUnit=()=>Math.min(CW,CH)/100;
