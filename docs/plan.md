@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.111.0 (Nov 5 2026, branch fix/2.111.0-resize-snap): resizing snaps to the grid
+- Owner, Nov 5 2026: when resizing any element with the grid open and grid snap on, the point being dragged snaps to the grid.
+- Now: with Snap to grid on (the Grid tool, the switch a move already follows), the pulled corner or side lands on the grid's snap points (Crossings, Centres or Both, as set; a non-square grid's own points). Canvas pieces (28-canvas-select.js: the pointer is snapped after the smart guides, which are off while snapping, then fpResize puts the corner on it): shapes, pictures, text boxes, a pattern's area. A shape inside a stamp on the canvas (64-stamp-canvas-edit.js): the handle point goes through sceSnap, as a moved shape does (not for a copy's handle, `h.cop`). Alt: no snap, as for a move. "Snap size to whole cells" still works as before.
+- Tests: tests/resize-snap-2-111.spec.js (snap off: an odd pull is off the grid; on: a corner and a side land on grid lines). Run: it and the 24 specs that touch handles, the grid or a stamp's shapes on the canvas: 117 passed, 6 failed, all in scenarios.spec.js (snapshot files; the same 6 fail on unchanged `main` in this sandbox). `npm run perf` three runs against `main`: 0.959, 0.921, 0.978. check:style OK.
+
 ## 2.110.0 (Nov 5 2026, branch fix/2.110.0-rename-everywhere): rename anything of yours with a double-click, in every library
 - Owner, Nov 5 2026: anything imported (images, masks, textures, fonts etc.) needs a way to be renamed, as a change to the whole folder system. He chose a double-click (asked), a font library with folders (2.113.0, its own release) and no preference on masks (a mockup's imported mask belongs to its mockup and has no name of its own, so nothing was done for masks).
 - Found: every library on the shared tree (pictures, textures, mockups, saved stamps, trays, templates, colourways, export recipes) could already rename your items, but only from the right-click menu; the shape library could rename folders and sets but not a shape.

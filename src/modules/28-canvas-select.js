@@ -100,7 +100,8 @@ function fpResize(h,x,y,e){const p=h.p,S0=Math.min(CW,CH),r0=h.r0!=null?h.r0:(+p
  else{const d=k0=='s'?1:-1,sh=mid?2*d*ly:d*ly+h0/2;fy=sh<0?-1:1;const hh=Math.max(h0*.02,Math.abs(sh)),ny=cl(+(h.wy0*hh/h0).toFixed(3),.05,20);if(ny!=1||p.wy)p.wy=ny;if(!mid)oy=-d*h0/2+d*fy*(h0*ny/h.wy0)/2;turn()}
  const r=-a;p.x=+(h.x0+ox*Math.cos(r)-oy*Math.sin(r)).toFixed(1);p.y=+(h.y0+ox*Math.sin(r)+oy*Math.cos(r)).toFixed(1);if(h.rel&&WBX.wbTbRelay)WBX.wbTbRelay(h.rel[0],h.rel[1],h)}
 $('art').addEventListener('pointermove',e=>{if(!WBS.fpXf)return;const[x,y]=fpPt(e),p=WBS.fpXf.p,S0=Math.min(CW,CH);
-if(WBS.fpXf.k!='rot'){const[sx,sy]=sgPull(WBS.fpXf,fpL(),x,y,e);fpResize(WBS.fpXf,sx,sy,e);sgPullShow(WBS.fpXf)}   // smart guides (2.40.0, 84)
+if(WBS.fpXf.k!='rot'){const L=fpL();let[sx,sy]=sgPull(WBS.fpXf,L,x,y,e);[sx,sy]=fpSnap(L,sx,sy,e);fpResize(WBS.fpXf,sx,sy,e);sgPullShow(WBS.fpXf)}   // smart guides (2.40.0, 84)
+// 2.111.0 (owner Nov 5 2026): with Snap to grid on (the Grid tool), the corner or side being pulled lands on the grid's snap points, as a moved piece does (Alt: no snap)
 else{let r=Math.atan2(y-p.y,x-p.x)*180/Math.PI+90;r=((r+180)%360+360)%360-180;if(e.shiftKey)r=Math.round(r/15)*15;p.r=Math.round(r)}
 WBS.fpXf.moved=true;upd()});$('art').addEventListener('pointerup',xfEnd);$('art').addEventListener('pointercancel',xfEnd);
 $('art').addEventListener('pointerleave',()=>{if(WBS.fpGhost){WBS.fpGhost=null;WBH.fpOverlay()}});$('art').addEventListener('pointerup',fpEnd);$('art').addEventListener('pointercancel',fpEnd);$('art').addEventListener('pointerup',fpMqEnd);$('art').addEventListener('pointercancel',fpMqEnd);
