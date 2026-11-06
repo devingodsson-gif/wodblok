@@ -5,7 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 5 (night): 2.113.0 on `feat/2.113.0-font-library`, pushed, NOT merged (owner must say):** the font library (docs/plan.md 2.113.0). 2.109.0 to 2.112.0 are LIVE.
+- **Nov 6: 2.113.0 LIVE (owner: "Merge"; CI suite not run):** the font library (docs/plan.md 2.113.0). 2.109.0 to 2.112.0 are LIVE.
 - **Nov 5 (night): 2.112.0 LIVE (owner: "merge everything"; CI suite not run):** a picked group's box on the canvas moves, sizes and turns it (docs/plan.md 2.112.0). The font library followed as 2.113.0.
 - **Nov 5 (night): 2.111.0 LIVE (owner: "merge everything"; CI suite not run):** resizing snaps to the grid (docs/plan.md 2.111.0). scenarios.spec.js fails 6 tests in this sandbox on unchanged `main` too.
 - **Nov 5 (night): 2.110.0 LIVE (owner: "merge everything"; CI suite not run):** rename anything of yours with a double-click (docs/plan.md 2.110.0). Built from `main` 2.108.0, as are 2.109.0 (magenta highlight) and 2.111.0 (resize snap); each merge after the first needs its version lines put in order.
