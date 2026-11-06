@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.111.0','Nov 5 2026',['With Snap to grid on, the corner or side you pull to resize lands on the grid.']],
  ['2.108.0','Nov 5 2026',['Book cover guides in your highlight colour, crisp at any zoom, with Back, Spine and Front labelled above the cover.']],
  ['2.107.0','Nov 5 2026',['Mockup names show in full (three cards a row), the Text panel says Paragraph gap, and X, Y, W and H line up in columns.']],
  ['2.106.2','Nov 5 2026',['Stamps on screen look as they print again, without the slowdown: the sharper drawing arrives a moment after the first.']],

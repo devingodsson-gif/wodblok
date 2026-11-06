@@ -1,5 +1,10 @@
 # Development plan
 
+## 2.111.0 (Nov 5 2026, branch fix/2.111.0-resize-snap): resizing snaps to the grid
+- Owner, Nov 5 2026: when resizing any element with the grid open and grid snap on, the point being dragged snaps to the grid.
+- Now: with Snap to grid on (the Grid tool, the switch a move already follows), the pulled corner or side lands on the grid's snap points (Crossings, Centres or Both, as set; a non-square grid's own points). Canvas pieces (28-canvas-select.js: the pointer is snapped after the smart guides, which are off while snapping, then fpResize puts the corner on it): shapes, pictures, text boxes, a pattern's area. A shape inside a stamp on the canvas (64-stamp-canvas-edit.js): the handle point goes through sceSnap, as a moved shape does (not for a copy's handle, `h.cop`). Alt: no snap, as for a move. "Snap size to whole cells" still works as before.
+- Tests: tests/resize-snap-2-111.spec.js (snap off: an odd pull is off the grid; on: a corner and a side land on grid lines). Run: it and the 24 specs that touch handles, the grid or a stamp's shapes on the canvas: 117 passed, 6 failed, all in scenarios.spec.js (snapshot files; the same 6 fail on unchanged `main` in this sandbox). `npm run perf` three runs against `main`: 0.959, 0.921, 0.978. check:style OK.
+
 ## 2.108.0 (Nov 5 2026, branch fix/2.108.0-cover-guides): the book cover guides follow the styling rules
 - Owner, Nov 5 2026: the SPINE label was not centred (it stood to the right of the spine), and the bleed lines and labels were ugly and off-style; he chose labels above the cover and the selection colour he picks in the options (Settings > General > Highlight, `--hl`).
 - Cause of the off-centre label: the labels were drawn on their text baseline, so the letters stood above the point centred on; turned 90 degrees for the spine, above became to the right.
