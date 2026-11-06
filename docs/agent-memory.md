@@ -185,6 +185,7 @@ Read docs/PROJECT_STATUS.md first; this is the owner's wording and the lessons.
 - Nov 5 2026: "Yes work on b1" (after 2.106.1 took the first fix back out): 2.106.2 brings it back in two passes.
 - Nov 5 2026: "Start style release": B2 to B4 of the 2.105 bug test as 2.107.0 (Paragraph spacing renamed Paragraph gap, my wording).
 - Nov 5 2026: "Merge everything no tests": 2.106.2 and 2.107.0 went live together without the CI suite.
+- Nov 5 2026: wants to work on the book cover canvas. The SPINE label was off to the right, and the bleed lines and label font were ugly and off-style. Chose: labels above the cover, and the guides in the selection colour picked in the options (Settings > General > Highlight). Built as 2.108.0.
 - Nov 5 2026: "Do a bug test. Check everything": taken as his word for the full CI suite for that test; report in docs/bug-test-2.105.md.
 - Nov 4 2026: "shelve the ai image panel for now": AI in the Image panel is shelved (docs/ai-select-plan.md).
 - Nov 4 2026: AI selection: "I really want to use just one agent for all those selection needs" (SAM 2.1 tiny, fp16, after the trial), "let's add it right now just for the mockup masks, but later link it into image panel"; he chose "Find with: Colour | AI" and keeping the model in the repo (ai/, about 100 MB); the Transformers.js and ONNX Runtime Web dependency approved with it.
