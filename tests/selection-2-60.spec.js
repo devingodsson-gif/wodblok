@@ -99,13 +99,17 @@ test('Shift while moving turns the smart guides off', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('Settings > General > Highlight colours the guides and the selection box: the accent by default, the opposite, or a colour', async ({ page }) => {
+// 2.109.0 (owner Nov 5 2026): magenta by default; the accent is a choice of its own.
+test('Settings > General > Highlight colours the guides and the selection box: magenta by default, the accent, the opposite, or a colour', async ({ page }) => {
   const { errors } = await H.openApp(page, { seed: 4 });
   const hl = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--hl').trim());
   const acc = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--acc').trim());
-  expect(await hl()).toBe(acc);
+  expect(await hl()).toBe('#d6336c');
   await page.click('#fileb'); await page.click('#stgo'); await expect(page.locator('#stgdlg')).toBeVisible();
   await page.click('#stgnav [data-p="general"]');
+  await expect(page.locator('#stghn')).toHaveText('Magenta');
+  await page.click('#stghl [aria-label="Accent"]');
+  expect(await page.evaluate(() => getComputedStyle(document.body).getPropertyValue('--hl').trim())).toBe(acc);
   await expect(page.locator('#stghn')).toHaveText('Accent');
   await page.click('#stghl [aria-label="Magenta"]');
   expect(await hl()).toBe('#d6336c');

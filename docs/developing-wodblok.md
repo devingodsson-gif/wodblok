@@ -221,7 +221,7 @@ The editor supports light and dark. Both must be correct for every screen. Theme
 | `--acc-ink` | `#836635` | `#c4a46e` | Text and icons on a soft accent background |
 | `--acc-fg` | `#1b1a18` | `#1b1a18` | Text on a solid accent fill |
 | `--acc-soft` | `rgba(184,145,79,.16)` | `rgba(196,164,110,.16)` | Pressed toggles and modes, slider halo |
-| `--hl` | `var(--acc)` | `var(--acc)` | Highlight (2.60.0, owner Oct 27 2026): smart guides and the selection box dragged on the canvas. Follows the accent unless Settings > General > Highlight picks the opposite of the accent or a colour |
+| `--hl` | `#d6336c` | `#d6336c` | Highlight (2.60.0, owner Oct 27 2026; magenta by default since 2.109.0, owner Nov 5 2026, with the accent a choice in Settings): smart guides, ruler guides, book cover guides and the selection box dragged on the canvas. Settings > General > Highlight picks Magenta (the default), Accent, the opposite of the accent, or a colour |
 | `--warn` | `#c0532e` | `#e8895c` | Unsaved dot, warnings, destructive confirm |
 | `--ok` | `#3f8f66` | `#7fb08a` | Success |
 | `--shadow` | layered, neutral | layered, dark | Floating surfaces only |

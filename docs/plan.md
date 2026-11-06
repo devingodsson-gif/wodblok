@@ -1,5 +1,9 @@
 # Development plan
 
+## 2.109.0 (Nov 5 2026, branch fix/2.109.0-magenta-highlight): the highlight is magenta by default
+- Owner, Nov 5 2026: "make the highlight color magenta by default". The `--hl` token is the Magenta preset (`#d6336c`) in both themes; Settings > General > Highlight lists Magenta first as the default (nothing saved), then Accent (now saved as `acc`), Opposite, Blue, Lime and Custom. A highlight saved as the magenta value before counts as the default. Anyone who had not picked a highlight sees magenta (it was the accent).
+- Tests: selection-2-60 updated (magenta by default, Accent gives the accent). Run: it, cover-guides-2-108, settings, settings-menu, stamp-settings, arrangement-settings-2-90: 31 passed. check:style OK.
+
 ## 2.108.0 (Nov 5 2026, branch fix/2.108.0-cover-guides): the book cover guides follow the styling rules
 - Owner, Nov 5 2026: the SPINE label was not centred (it stood to the right of the spine), and the bleed lines and labels were ugly and off-style; he chose labels above the cover and the selection colour he picks in the options (Settings > General > Highlight, `--hl`).
 - Cause of the off-centre label: the labels were drawn on their text baseline, so the letters stood above the point centred on; turned 90 degrees for the spine, above became to the right.
