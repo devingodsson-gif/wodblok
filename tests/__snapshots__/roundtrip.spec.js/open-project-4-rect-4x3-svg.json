@@ -1,6 +1,6 @@
 {
- "length": 549895,
- "sha256": "21d2053f49d2d122136ac92b30af261f97492f2ea4e0782e35305c802cd97fd1",
+ "length": 549456,
+ "sha256": "05fe2a1af01efa045b4453a78186a6461b5c0aa07058c5085e6f7f1b29e98513",
  "tags": {
   "circle": 179,
   "clipPath": 7,
@@ -18,12 +18,12 @@
   "feMergeNode": 2,
   "filter": 13,
   "g": 205,
-  "image": 23,
+  "image": 22,
   "mask": 156,
   "path": 98,
   "rect": 185,
   "svg": 1,
-  "symbol": 19,
+  "symbol": 18,
   "use": 29
  }
 }
