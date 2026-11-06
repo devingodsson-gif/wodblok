@@ -72,13 +72,13 @@ test('the view follows the design: a change on the canvas draws the mockup again
   expect(errors).toEqual([]);
 });
 
-test('the Products: six built-in products, the design only on the product, Real size with a canvas of real size', async ({ page }) => {
+test('the Products: seven built-in products, the design only on the product, Real size with a canvas of real size', async ({ page }) => {
   test.setTimeout(120000);
   const { errors } = await H.openApp(page, { seed: 11 });
   await page.evaluate(() => window.__wbTest.commands.run('randomize.roll')); await H.settle(page);
   await page.evaluate(() => window.__wbTest.commands.run('panel.mock'));
   const ids = await page.locator('#mkpane [data-mk^="p-"]').evaluateAll(b => b.map(x => x.dataset.mk));
-  expect(ids).toEqual(['p-tshirt', 'p-tote', 'p-cushion', 'p-fabric', 'p-wallpaper', 'p-notebook']);
+  expect(ids).toEqual(['p-tshirt', 'p-tote', 'p-cushion', 'p-fabric', 'p-wallpaper', 'p-notebook', 'p-notebook-angle']);   // 2.115.0: the notebook on a table
   await page.locator('#mkfl [data-f="rep"]').click();
   // the cushion: the wall above it and beside it stays as the photo; its middle takes the design
   await page.locator('#mkpane [data-mk="p-cushion"]').click(); await waitView(page, 0);
