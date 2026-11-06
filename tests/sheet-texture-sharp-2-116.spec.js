@@ -47,3 +47,18 @@ test('an export makes the Sheet\'s texture again at the export\'s size; the view
   expect(Math.max(...(await pics(page)).filter(Boolean).map(q => q.px)), 'the view is untouched').toBe(view);
   expect(errors).toEqual([]);
 });
+
+// 2.118.0: the pictures and filters made for another zoom step are taken out of the page, and out of exports
+const unused = root => { const used = new Set(); root.querySelectorAll('use').forEach(u => { const r = u.getAttribute('href') || ''; if (r.startsWith('#txi')) used.add(r.slice(1)); });
+  root.querySelectorAll('[filter]').forEach(n => { const m = /url\(#(txf[^)]+)\)/.exec(n.getAttribute('filter') || ''); if (m) used.add(m[1]); });
+  return [...root.querySelectorAll('#txd image[data-e], #txd filter[data-f]')].filter(n => !used.has(n.id)).length; };
+test('after zooming, nothing made for the old zoom stays in the page or goes into an export', async ({ page }) => {
+  const { errors } = await textured(page);
+  await page.evaluate(() => window.__wbTest.commands.run('view.zoomIn')); await page.evaluate(() => window.__wbTest.commands.run('view.zoomIn'));
+  await page.waitForTimeout(800); await H.settle(page);
+  expect(await page.evaluate(`(${unused.toString()})(document)`), 'unused pictures or filters in the page').toBe(0);
+  await page.evaluate(() => window.__wbTest.commands.run('export.svg'));
+  await page.waitForFunction(() => window.__wbDownloads.length > 0, null, { timeout: 60000 });
+  expect(await page.evaluate(`(${unused.toString()})(new DOMParser().parseFromString(atob(window.__wbDownloads[0].base64), 'image/svg+xml'))`), 'unused in the export').toBe(0);
+  expect(errors).toEqual([]);
+});
