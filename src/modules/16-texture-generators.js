@@ -2,6 +2,7 @@ import {WBS,WBX} from './01-launch-and-version.js';
 import {sRng} from './15-print-effects-and-stamp-texture.js';
 import {TXIMG} from '../data/textures.js';
 import {assetUrl} from '../platform/index.js';
+import {upd} from './11-pressure-flooding-block-edges.js';
 
 // ===== Textures are pictures (2.50.0; owner Oct 26 2026: "instead of using procedural texture, have them all be images"). =====
 // The built-in ones are grayscale WebP pictures in textures/<set>/<id>.webp, put into the app by the build (src/data/textures.js); placeholders made by
@@ -77,7 +78,15 @@ return px}
 let TXB;let TXBN=0;
 // 2.49.0 (owner Oct 26 2026: textures render soft): every picture of 384 px or more is made 15% finer (the look is the same, only finer; the cost is about 1.3 times), and the Scale slider stops at 200%.
 const TXRES=1.15,TXSCMAX=200;
-function txDims(W,H,R){const s=(R>=384?R*TXRES:R)/Math.max(W,H,1e-6);return[Math.max(8,Math.round(W*s)),Math.max(8,Math.round(H*s))]}
+// 2.116.0 (owner Nov 6 2026: "Textures seem very blurry when applied to a sheet on the book cover"): a box of R 400 or more (a Sheet, a Shape, a whole Pattern, Paint) was
+// one picture of 460 (or 920) pixels however big it was, so a Sheet across a whole book cover had about 200 pixels for its front. Such a box's picture now has at
+// least as many pixels as the view shows of it (TXPU: screen pixels per canvas unit, in steps of the square root of 2, set a moment after the zoom changes; at most
+// TXCAP on its long side), and an export makes its pictures again for the export's size (txHi, at most TXCAPX). Small boxes keep their pictures. While a slider is
+// held a picture that is not made yet at the view's size is made at the old size, and sharp when the slider is let go.
+let TXPU=0,TXLV=0,TXMISS=0,TXZT=0,TXBT=0,TXI,TXX;const TXCAP=2560,TXCAPX=4800,TXBPX=24e6,TXXPX=40e6;
+function txDims(W,H,R,k,cap){const M=Math.max(W,H,1e-6),b=R>=384?R*TXRES:R;let L=b;if(k>0&&R>=400){const w=Math.round(Math.min(cap||TXCAP,M*k)/64)*64;if(w>b)L=w}
+const s=L/M;return[Math.max(8,Math.round(W*s)),Math.max(8,Math.round(H*s))]}
+const txLive=()=>!!(TXLV||WBS.DRAFT);
 // Repeat tile: make the picture meet itself at the edges. The middle is the texture as it was; towards each edge it fades into a copy
 // moved half a picture across, and at the edge both sides show the same part of that copy, so the edges match.
 function txSeam(px,pw,ph){const src=new Uint8ClampedArray(px),hx=pw>>1,hy=ph>>1,wx=new Float32Array(pw),wy=new Float32Array(ph);
@@ -85,22 +94,35 @@ for(let x=0;x<pw;x++)wx[x]=Math.pow(Math.sin(Math.PI*x/pw),2);for(let y=0;y<ph;y
 for(let y=0;y<ph;y++){const y2=(y+hy)%ph;for(let x=0;x<pw;x++){const a=wx[x]*wy[y],o=(y*pw+x)*4,o2=(y2*pw+(x+hx)%pw)*4;for(let c=0;c<4;c++)px[o+c]=src[o+c]*a+src[o2+c]*(1-a)}}}
 // The texture keeps its size in canvas units (2.27.0): the picture is made for the whole box, so its scale is set against 200 units, whatever the box measures. A Shape or Motif
 // (R 400) that is made bigger or smaller shows the same texture, not a magnified one.
-function txBmp(S,W,H,R,tl){const M=Math.max(W,H),Z=R>=800?Math.max(1,M/200):R>=400?Math.max(.1,M/200):1;if(Z!==1)S={...S,sc:S.sc/Z};const[pw,ph]=txDims(W,H,R),key=txKey(S)+'|'+pw+'x'+ph+(tl?'|tile':'');let e=TXB.get(key);if(e){TXB.delete(key);TXB.set(key,e);return e}
-const px=txPix(S,pw,ph);if(!px)return null;if(tl)txSeam(px,pw,ph);const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;cv.getContext('2d').putImageData(new ImageData(px,pw,ph),0,0);
-e={id:++TXBN,url:cv.toDataURL('image/png'),pw,ph,key};TXB.set(key,e);while(TXB.size>90){const k=TXB.keys().next().value;txUnhost(TXB.get(k).id);TXB.delete(k)}return e}
+// the texture's scale for a box: the picture is made for the whole box, its scale set against 200 canvas units
+function txZ(S,W,H,R){const M=Math.max(W,H),Z=R>=800?Math.max(1,M/200):R>=400?Math.max(.1,M/200):1;return Z!==1?{...S,sc:S.sc/Z}:S}
+function txPic(S,pw,ph,tl){const px=txPix(S,pw,ph);if(!px)return null;if(tl)txSeam(px,pw,ph);const cv=document.createElement('canvas');cv.width=pw;cv.height=ph;cv.getContext('2d').putImageData(new ImageData(px,pw,ph),0,0);return cv.toDataURL('image/png')}
+function txBmp(S0,W,H,R,tl){const S=txZ(S0,W,H,R),k0=txKey(S)+(tl?'|tile':'');let[pw,ph]=txDims(W,H,R,TXPU),key=k0+'|'+pw+'x'+ph;
+if(!TXB.has(key)&&txLive()){const d=txDims(W,H,R,0);if(d[0]!==pw||d[1]!==ph){TXMISS=1;[pw,ph]=d;key=k0+'|'+pw+'x'+ph}}
+let e=TXB.get(key);if(e){TXB.delete(key);TXB.set(key,e);return e}
+const url=txPic(S,pw,ph,tl);if(!url)return null;e={id:++TXBN,url,pw,ph,key,a:[S0,W,H,R,tl]};TXB.set(key,e);TXI.set(e.id,e);TXBT+=pw*ph;
+while(TXB.size>1&&(TXB.size>90||TXBT>TXBPX)){const k=TXB.keys().next().value,o=TXB.get(k);txUnhost(o.id);TXB.delete(k);TXI.delete(o.id);TXBT-=o.pw*o.ph}return e}
+// an export: every texture picture in the copy of the drawing (root) made again for k export pixels per canvas unit, where that gives more pixels than the view's
+function txHi(root,k){if(!(k>0))return;const m=new Map();root.querySelectorAll('image[data-e],[data-te]').forEach(n=>{const id=+(n.getAttribute('data-e')||n.getAttribute('data-te')),e=TXI.get(id);if(!e)return;
+ if(!m.has(id)){const[S0,W,H,R,tl]=e.a,[pw,ph]=txDims(W,H,R,k,TXCAPX);let u=null;if(pw>e.pw){const S=txZ(S0,W,H,R),key=txKey(S)+(tl?'|tile':'')+'|'+pw+'x'+ph;let x=TXX.get(key);
+  if(!x){const url=txPic(S,pw,ph,tl);if(url){x={url,n:pw*ph};TXX.set(key,x);let t=0;TXX.forEach(v=>t+=v.n);for(const[kk,v]of TXX){if(t<=TXXPX||TXX.size<=1)break;TXX.delete(kk);t-=v.n}}}else{TXX.delete(key);TXX.set(key,x)}u=x?x.url:null}m.set(id,u)}
+ const u=m.get(id);if(u)n.setAttribute('href',u)})}
+// the view's pixels per canvas unit, a moment after the zoom changes; the drawing is made again when it moves a step
+function txZoomed(){const a=document.getElementById('art');if(!a)return;const s=parseFloat(a.style.width)/(a.viewBox&&a.viewBox.baseVal&&a.viewBox.baseVal.width||1);if(!(s>0))return;
+ const q=Math.min(4,Math.max(.5,2**(Math.round(Math.log2(s*(window.devicePixelRatio||1))*2)/2)));if(q===TXPU)return;clearTimeout(TXZT);TXZT=setTimeout(()=>{TXPU=q;upd()},250)}
 // big pictures stay out of the per-frame markup: they live once in a persistent block (#txd) and the page refers to them by id
 let TXHS;
 function txHostEl(){return document.getElementById('txd')}
 function txUnhost(id){const h=txHostEl();if(!h)return;h.querySelectorAll('[data-e="'+id+'"]').forEach(n=>{TXHS.delete(n.id);n.remove()})}
 function txHostImg(e,W,H){const id='txi'+e.id+'_'+(+W).toFixed(1)+'_'+(+H).toFixed(1),h=txHostEl();if(h&&!TXHS.has(id)){h.insertAdjacentHTML('beforeend',`<image id="${id}" data-e="${e.id}" href="${e.url}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none"/>`);TXHS.add(id)}return id}
 // images for the specs of one mode-group. how: 'inline' = the picture is in the markup, 'host' = a reference to the persistent copy
-function txImgs(list,W,H,R,how,want,ox,oy,tl){let o='';const x=ox||0,y=oy||0;list.forEach(S=>{if(!want(S))return;const e=txBmp(S,W,H,R,tl);if(!e)return;o+=how=='inline'?`<image${S.op!=null?` data-x="${S.x}" opacity="${S.op}"`:''} href="${e.url}" x="${x}" y="${y}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none"/>`:`<use href="#${txHostImg(e,W,H)}" x="${x}" y="${y}"/>`});return o}
+function txImgs(list,W,H,R,how,want,ox,oy,tl){let o='';const x=ox||0,y=oy||0;list.forEach(S=>{if(!want(S))return;const e=txBmp(S,W,H,R,tl);if(!e)return;o+=how=='inline'?`<image data-te="${e.id}"${S.op!=null?` data-x="${S.x}" opacity="${S.op}"`:''} href="${e.url}" x="${x}" y="${y}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none"/>`:`<use href="#${txHostImg(e,W,H)}" x="${x}" y="${y}"/>`});return o}
 const txIsW=S=>S.md=='wear',txIsO=S=>S.md!='wear';
 const txHash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=(Math.imul(h,33)+s.charCodeAt(i))|0;return(h>>>0).toString(36)};
 // overlay filter (relief / stain on a layer or a text box): the picture is laid over the shape only where the shape has ink
 let TXFL;
 // ext = [ex,ey] on a repeat tile: the picture is repeated (feTile) over a filter area that reaches that far past the tile on every side
-function txFilt(list,x,y,W,H,R,ext){const ov=list.filter(txIsO);if(!ov.length)return'';const ex=ext?ext[0]:0,ey=ext?ext[1]:0,key='txf'+txHash(ov.map(txKey).join(';')+'|'+[x,y,W,H,R].join(',')+(ext?'|'+ex+','+ey:'')),h=txHostEl();if(!TXFL.has(key)){let f='',m='<feMergeNode in="SourceGraphic"/>';ov.forEach((S,i)=>{const e=txBmp(S,W,H,R,!!ext);if(!e)return;f+=`<feImage href="${e.url}" x="${(+x).toFixed(2)}" y="${(+y).toFixed(2)}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none" result="o${i}"/>${ext?`<feTile in="o${i}" result="ot${i}"/>`:''}<feComposite in="${ext?'ot':'o'}${i}" in2="SourceAlpha" operator="in" result="c${i}"/>`;m+=`<feMergeNode in="c${i}"/>`});
+function txFilt(list,x,y,W,H,R,ext){const ov=list.filter(txIsO);if(!ov.length)return'';const ex=ext?ext[0]:0,ey=ext?ext[1]:0,key='txf'+txHash(ov.map(txKey).join(';')+'|'+[x,y,W,H,R,TXPU].join(',')+(ext?'|'+ex+','+ey:'')),h=txHostEl();if(!TXFL.has(key)){let f='',m='<feMergeNode in="SourceGraphic"/>';ov.forEach((S,i)=>{const e=txBmp(S,W,H,R,!!ext);if(!e)return;f+=`<feImage data-te="${e.id}" href="${e.url}" x="${(+x).toFixed(2)}" y="${(+y).toFixed(2)}" width="${(+W).toFixed(2)}" height="${(+H).toFixed(2)}" preserveAspectRatio="none" result="o${i}"/>${ext?`<feTile in="o${i}" result="ot${i}"/>`:''}<feComposite in="${ext?'ot':'o'}${i}" in2="SourceAlpha" operator="in" result="c${i}"/>`;m+=`<feMergeNode in="c${i}"/>`});
 if(!f)return'';if(h)h.insertAdjacentHTML('beforeend',`<filter id="${key}" data-f="1" filterUnits="userSpaceOnUse" x="${(x-ex).toFixed(2)}" y="${(y-ey).toFixed(2)}" width="${(+W+2*ex).toFixed(2)}" height="${(+H+2*ey).toFixed(2)}" color-interpolation-filters="sRGB">${f}<feMerge>${m}</feMerge></filter>`);TXFL.set(key,1);
 while(TXFL.size>40){const k=TXFL.keys().next().value;TXFL.delete(k);const n=h&&h.querySelector('#'+k);if(n)n.remove()}}
 else if(h&&!h.querySelector('#'+key)){TXFL.delete(key);return txFilt(list,x,y,W,H,R,ext)}return key}
@@ -116,7 +138,10 @@ TXIMG.forEach(e=>{let g=TXF.find(f=>f[0]===e.set);if(!g){g=[e.set,{}];TXF.push(g
 TXF.forEach(([g,o])=>Object.keys(o).forEach(k=>{if(TXS.has(k))TXN[k]=o[k];else delete o[k]}));
 WBX.wbTexBusy=txBusy;WBX.wbTexImgsLoad=txImgsLoad;WBX.wbTexImgsUsed=txImgsUsed;
 TXHC=new Map();
-TXB=new Map();
+TXB=new Map();TXI=new Map();TXX=new Map();
+{const pz=WBX.wbZoomed;WBX.wbZoomed=()=>{if(pz)pz();txZoomed()}}WBX.wbTxHi=txHi;
+document.addEventListener('pointerdown',e=>{if(e.target&&e.target.matches&&e.target.matches('input[type=range]'))TXLV=1},true);
+['pointerup','pointercancel'].forEach(k=>document.addEventListener(k,()=>{if(!TXLV)return;TXLV=0;if(TXMISS){TXMISS=0;setTimeout(upd,240)}},true));
 TXHS=new Set();
 TXFL=new Map();
 }

@@ -32,7 +32,7 @@ const bookSet=o=>{const c0=bkFront(),on0=WBS.book.on,g0=bk(),u0=bkInch(g0),b0={.
  if(moved){store();upd()}};
 // --- export at 300 DPI (PNG, or a PDF sized to the full cover with trim and bleed boxes)
 function coverRaster(cb){const g=bk(),W=Math.round(g.W*300),H=Math.round(g.H*300);$('pmsg').textContent='Rendering the print cover at 300 DPI…';
-let sv=ser().replace(/^<svg([^>]*?)>/,(m,a)=>`<svg${a.replace(/\s(width|height|preserveAspectRatio)="[^"]*"/g,'')} width="${W}" height="${H}" preserveAspectRatio="none">`);
+let sv=ser({px:Math.max(W,H)}).replace(/^<svg([^>]*?)>/,(m,a)=>`<svg${a.replace(/\s(width|height|preserveAspectRatio)="[^"]*"/g,'')} width="${W}" height="${H}" preserveAspectRatio="none">`);
 const img=new Image();img.onload=()=>{try{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);x.drawImage(img,0,0,W,H);cb(c,g,W,H)}catch(e){$('pmsg').textContent='The cover was too large to render here: '+e.message}};
 img.onerror=()=>{$('pmsg').textContent='Print cover export failed.'};img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(sv)}
 function pdfJpeg(jpg,W,H,g){const enc=new TextEncoder(),pt=v=>(v*72).toFixed(3),pw=pt(g.W),ph=pt(g.H),b=pt(g.b),tr=`${b} ${b} ${(g.W*72-g.b*72).toFixed(3)} ${(g.H*72-g.b*72).toFixed(3)}`,parts=[],off=[];let len=0;

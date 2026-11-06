@@ -32,7 +32,7 @@ async function proofCanvas(paper){
   x.strokeStyle=line;x.lineWidth=2;x.beginPath();x.moveTo(m,m+92);x.lineTo(W-m,m+92);x.stroke();
   // the picture
   const tile=tileOn(),top=m+120,ah=Math.round(H*.45),aw=W-2*m;
-  const img=await loadImg('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser()));
+  const img=await loadImg('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(ser({px:Math.max(aw,ah)*2})));
   const frame=(px,py,pw2,ph2)=>{x.strokeStyle=line;x.lineWidth=2;x.strokeRect(px-1,py-1,pw2+2,ph2+2)};
   if(tile){
     const lw=Math.round(aw*.42),rw=Math.round(aw*.52),gap=aw-lw-rw;
