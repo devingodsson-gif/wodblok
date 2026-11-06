@@ -80,13 +80,16 @@ const stThemeNow=()=>document.documentElement.getAttribute('data-theme')==='ligh
 // ---------------------------------------------------------------- highlight colour (2.60.0, owner Oct 27 2026: "a highlight colour for the smart alignment guides and when we
 // draw selection boxes"). '' follows the accent, 'opp' is the accent's opposite (its hue turned half way round), else a colour; it is the --hl token.
 const stK_HL='wb260_highlight';
-const stHLS=[['Accent',''],['Opposite','opp'],['Blue','#2f7fe0'],['Magenta','#d6336c'],['Lime','#7cc23a']];
-const stHlGet=()=>{let v='';try{v=kv.get(stK_HL)||''}catch(e){}return v=='opp'||stHEX6.test(v)?v.toLowerCase():''};
-const stHlColour=v=>{if(v=='opp'){const[h,s,l]=stRgb2hsl(stToRgb(stAccentGet()||'#b8914f'));return stToHex(stHsl2rgb([(h+.5)%1,Math.max(.55,Math.min(.8,s)),Math.max(.45,Math.min(.55,l))]))}return v};
+// 2.109.0 (owner Nov 5 2026): Magenta is the default (nothing saved; the --hl token itself, shell.html); Accent is a choice of its own ('acc'). A highlight saved as
+// the magenta value before counts as the default.
+const HL_DEF='#d6336c';
+const stHLS=[['Magenta',''],['Accent','acc'],['Opposite','opp'],['Blue','#2f7fe0'],['Lime','#7cc23a']];
+const stHlGet=()=>{let v='';try{v=(kv.get(stK_HL)||'').toLowerCase()}catch(e){}return v==HL_DEF?'':v=='opp'||v=='acc'||stHEX6.test(v)?v:''};
+const stHlColour=v=>{if(v=='acc')return'var(--acc)';if(v=='')return'';if(v=='opp'){const[h,s,l]=stRgb2hsl(stToRgb(stAccentGet()||'#b8914f'));return stToHex(stHsl2rgb([(h+.5)%1,Math.max(.55,Math.min(.8,s)),Math.max(.45,Math.min(.55,l))]))}return v};
 function hlApply(){let el=$('hlstyle');const c=stHlColour(stHlGet());if(!c){if(el)el.textContent='';return}if(!el){el=document.createElement('style');el.id='hlstyle';document.head.appendChild(el)}el.textContent=`html:root{--hl:${c}}`}
 const stHlName=v=>{const a=stHLS.find(x=>x[1]===v);return a?a[0]:'Custom'};
 function stHlRow(){const cur=stHlGet(),custom=!!cur&&!stHLS.some(a=>a[1]===cur);
- return`<div class="stgr stgacc"><span>Highlight</span><b id="stghn">${stHlName(cur)}</b><div class="stga" id="stghl" role="group" aria-label="Highlight colour">${stHLS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${h===cur}" style="--c:${h?stHlColour(h):'var(--acc)'}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">${ICN.plus}</svg></button></div></div>`}
+ return`<div class="stgr stgacc"><span>Highlight</span><b id="stghn">${stHlName(cur)}</b><div class="stga" id="stghl" role="group" aria-label="Highlight colour">${stHLS.map(([n,h])=>`<button type="button" class="stgab" data-h="${h}" aria-label="${n}" aria-pressed="${h===cur}" style="--c:${h?stHlColour(h):HL_DEF}"></button>`).join('')}<button type="button" class="stgab stgac" data-custom="1" aria-label="Custom colour" aria-pressed="${custom}" aria-haspopup="dialog" style="--c:${custom?cur:'transparent'}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">${ICN.plus}</svg></button></div></div>`}
 function stHlMarks(){const g=$('stghl');if(!g)return;const cur=stHlGet(),custom=!!cur&&!stHLS.some(a=>a[1]===cur),n=$('stghn');if(n)n.textContent=stHlName(cur);
  g.querySelectorAll('.stgab').forEach(b=>{const c=b.dataset.custom;b.setAttribute('aria-pressed',String(c?custom:b.dataset.h===cur));if(c)b.style.setProperty('--c',custom?cur:'transparent');else if(b.dataset.h=='opp')b.style.setProperty('--c',stHlColour('opp'))})}
 const stHlSet=v=>{try{if(v)kv.set(stK_HL,v);else kv.remove(stK_HL)}catch(e){}hlApply();stHlMarks()};
