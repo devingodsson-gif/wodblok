@@ -6,12 +6,12 @@ import {upd} from './11-pressure-flooding-block-edges.js';
 import {QS} from './12-selection-and-split.js';
 import {LY} from './14-presets-and-layer-grid-ui.js';
 import {newId,pmsg} from './18-projects-and-cover-overlay.js';
-import {fxCols,TRAY_MAX,TRAY_VIEW,cwAdd,cwNow,cwUse,hexAlpha,isFixed,isLink,lockRef,normHexA,refSlot,slotHex,slotName,trayAdd,trayDone,trayLoad,trayMove,trayRemove,traySet,trayUses,unlockRef} from './50-tray-core.js';
+import {fxCols,TRAY_MAX,TRAY_VIEW,cwAdd,cwNow,cwUse,hexAlpha,isFixed,isLink,lockRef,normHexA,refSlot,slotHex,slotName,trayAdd,trayDone,trayLoad,trayMove,trayRemove,traySet,trayShift,trayUses,unlockRef} from './50-tray-core.js';
 import {closePicker,openPicker,swBg} from './51-colour-picker.js';
 import {ltMake} from './87-library-tree.js';
 // ===== The tray on screen =====
 // 1. The dock: the tray's colours above the canvas in both views (7 places, "+" to add more, up to 16). Click a colour to edit it; drag
-//    one along the tray to move it. With more than one colourway, a switcher sits next to it.
+//    one along the tray to move it; the last button shifts every colour one place (2.117.0). With more than one colourway, a switcher sits next to it.
 // 2. Colour wells: everywhere a colour is chosen (paper, ink, a stamp, a layer, the Replace colour, a text). A lock beside each one:
 //    open = follows a tray colour, closed = a fixed colour of its own. The well opens the tray to choose from.
 // 3. The Colours tool: the tray as a list (name, hex, what uses it), paper and ink, and saved trays in folders (Wada's sets built in).
@@ -53,6 +53,7 @@ function paintDock(force){const o=tyP(),w=cwNow(o),box=$('tyc');if(!box)return;
  let h=o.ts.map((id,i)=>{const c=w.c[id],nm=w.m[id];return`<button type="button" class="tys${WBS.trayEdit===id?' on':''}${used.has(id)?' used':''}${hexAlpha(c)<1?' see':''}" data-s="${id}" role="listitem" aria-label="Colour ${i+1}${nm?': '+tyEsc(nm):''}" style="--c:${c}">${hexAlpha(c)<1?'<b></b>':''}</button>`}).join('');
  for(let i=o.ts.length;i<TRAY_VIEW;i++)h+=`<button type="button" class="tye" data-add="1" aria-label="Add a colour"></button>`;
  if(o.ts.length<TRAY_MAX)h+=`<button type="button" class="tyadd" data-add="1" aria-label="Add a colour">${TY_IC(ICN.plus,2.2)}</button>`;
+ if(o.ts.length>1)h+=`<button type="button" class="tyadd" id="tysh" data-shift="1" aria-label="Shift colours along the tray">${TY_IC(ICN.trayShift)}</button>`;   // 2.117.0: at the far right; Shift + click goes the other way
  box.innerHTML=h;
  const cw=$('tycw');cw.hidden=o.cw.length<2;if(!cw.hidden){cw.querySelector('span').textContent=w.n;cw.querySelector('i').style.background=`linear-gradient(90deg,${o.ts.slice(0,4).map((id,i,a)=>`${w.c[id]} ${i/a.length*100}% ${(i+1)/a.length*100}%`).join(',')})`;cw.setAttribute('aria-label','Colourway: '+w.n)}}
 // which slots something links to
@@ -70,7 +71,7 @@ function dockEvents(){const box=$('tyc');let dr=null;
   if(e.type=='pointerup'){if(WBX.wbPicker.isOpen()&&WBX.wbPicker.anchor()===d.b){closePicker();return}editSlot(d.id,d.b)}};
  box.addEventListener('pointerup',end);box.addEventListener('pointercancel',end);
  box.addEventListener('keydown',e=>{const b=e.target.closest('.tys');if(b&&(e.key=='Enter'||e.key==' ')){e.preventDefault();editSlot(b.dataset.s,b)}});
- box.addEventListener('click',e=>{const a=e.target.closest('[data-add]');if(a)addSlot(id=>box.querySelector(`[data-s="${id}"]`))});
+ box.addEventListener('click',e=>{const sh=e.target.closest('[data-shift]');if(sh){closePicker();if(trayShift(e.shiftKey?-1:1))trayDone('Shifted tray colours');return}const a=e.target.closest('[data-add]');if(a)addSlot(id=>box.querySelector(`[data-s="${id}"]`))});
  $('tycw').addEventListener('click',e=>{e.stopPropagation();const o=tyP(),btn=$('tycw');
   rowMenu(btn,[...o.cw.map((w,i)=>[`<i class="cwsw" style="background:linear-gradient(90deg,${o.ts.slice(0,4).map((id,j,a)=>`${w.c[id]} ${j/a.length*100}% ${(j+1)/a.length*100}%`).join(',')})"></i>${i==o.cwa?'<b>'+tyEsc(w.n)+'</b>':tyEsc(w.n)}`,()=>{if(i!==o.cwa){cwUse(i);trayDone('Colourway “'+w.n+'”')}}]),['Colourways…',()=>{const r=$('rail-cways');if(r&&!r.classList.contains('on'))r.click()}]])})}
 // ---------------------------------------------------------------- 2. colour wells

@@ -62,6 +62,7 @@ const COMMANDS = [
   ['colourway.exportAll', 'Export all colourways', 'cwgo'],
   ['tray.add', 'Add a colour to the tray', 'tyaddl'],
   ['tray.save', 'Save tray', 'tysave'],
+  ['tray.shift', 'Shift tray colours', 'tysh'],
   ['panel.motifs', 'Open Shape', 'rail-motifs'],
   ['panel.text', 'Open Text', 'rail-text'],
   ['panel.lyrs', 'Open Elements', 'rail-lyrs'],
