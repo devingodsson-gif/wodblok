@@ -27,6 +27,9 @@ const lbBasicTop=n=>n&&n.t=='b'&&n.orig=='Basic shapes'?1:0;   // 2.31.0: the Ba
 const lbSort=(a,b)=>(lbBasicTop(b)-lbBasicTop(a))||a.n.localeCompare(b.n,undefined,{numeric:true,sensitivity:'base'});
 const fOf=k=>k[0]=='b'?BF[k]:(cust[k]||{}).g;
 const fSet=(k,g)=>{if(k[0]=='b'){if(g)BF[k]=g;else delete BF[k]}else if(cust[k]){if(g)cust[k].g=g;else delete cust[k].g}};
+// 2.110.0: a shape you brought in or made (not a built-in set's, not a text's letters) can be renamed: a double-click, or Rename in its right-click menu
+const shOwn=k=>!!k&&k[0]!='b'&&!k.startsWith('t|')&&!!cust[k];
+const shRename=k=>{if(!shOwn(k))return;WBS.frk=k;fOpen('iren')};
 const mNm=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
 // The library is one tree: click a folder to open it in place (its folders, then its shapes, under it) and as many folders as you
 // like can be open at once. lbOpen: the open folders (kept between sessions). WBS.mcat is the active folder (the last one opened,
@@ -118,7 +121,8 @@ if(hidL.length){out.push(`<div class="lrw" style="--d:0"><button type="button" c
 // the folder form (new folder, rename, move, delete) sits under the active folder
 if(L.contains(F))L.before(F);
 L.innerHTML=out.join('');
-if(WBS.fmode){const a=WBS.fmode!='mv'&&L.querySelector('.lrw.act');if(a){a.after(F);F.style.setProperty('--d',+a.style.getPropertyValue('--d')+1)}else{L.prepend(F);F.style.setProperty('--d',0)}}
+if(WBS.fmode=='iren'){const t=L.querySelector(`button[data-m="${CSS.escape(WBS.frk||'')}"]`),g=t&&t.closest('.lib');if(g){g.before(F);F.style.setProperty('--d',+g.style.getPropertyValue('--d')||0)}else{L.prepend(F);F.style.setProperty('--d',0)}}
+else if(WBS.fmode){const a=WBS.fmode!='mv'&&L.querySelector('.lrw.act');if(a){a.after(F);F.style.setProperty('--d',+a.style.getPropertyValue('--d')+1)}else{L.prepend(F);F.style.setProperty('--d',0)}}
 if(lbScroll){const r=L.querySelector(`.lrw.act`);lbScroll=null;if(r&&r.scrollIntoView)r.scrollIntoView({block:'nearest'})}
 // toolbar
 const any=lbOpen.size>0;$('ltog').setAttribute('aria-label',any?'Collapse all folders':'Expand all folders');$('ltog').classList.toggle('on',any);
@@ -143,9 +147,9 @@ function lbAll(){if(lbOpen.size){lbOpen.clear();WBS.mcat='/';mcSave()}else{const
 loSave();closeF();renderLib(true)}
 // the small form under the active folder: new folder, rename, move the folder, or confirm deleting it
 function fOpen(mode){const c=libCur(),nm=$('fname'),ds=$('fdest');WBS.fmode=mode;$('fform').hidden=false;$('fform').dataset.m=mode;
-nm.hidden=!['new','mv','ren'].includes(mode);ds.hidden=mode!='mvf';$('fq').hidden=mode!='del';
-$('fok').textContent={new:'Create',mv:'Create and move',ren:'Rename',mvf:'Move',del:'Delete'}[mode];$('fok').classList.toggle('warn',mode=='del');
-if(mode=='ren'){nm.value=c.n;nm.placeholder=c.t=='b'?c.orig:'Folder name'}else{nm.value='';nm.placeholder='Folder name'}
+nm.hidden=!['new','mv','ren','iren'].includes(mode);nm.maxLength=mode=='iren'?40:30;nm.setAttribute('aria-label',mode=='iren'?'Shape name':'Folder name');ds.hidden=mode!='mvf';$('fq').hidden=mode!='del';
+$('fok').textContent={new:'Create',mv:'Create and move',ren:'Rename',iren:'Rename',mvf:'Move',del:'Delete'}[mode];$('fok').classList.toggle('warn',mode=='del');
+if(mode=='iren'){nm.value=mNm(WBS.frk);nm.placeholder='Shape name'}else if(mode=='ren'){nm.value=c.n;nm.placeholder=c.t=='b'?c.orig:'Folder name'}else{nm.value='';nm.placeholder='Folder name'}
 if(mode=='mvf')ds.innerHTML='<option value="/">Top level</option>'+lbOpts(lbId(lbPar(c.p)),x=>x.v=='i'||x.v==c.v||x.v.startsWith('g:')&&lbIn(x.v.slice(2),c.p));
 if(mode=='del'){const sub=[...lbX().all].filter(p=>p!==c.p&&lbIn(p,c.p)).length;$('fq').textContent=`Delete “${c.n}”${sub?` and ${sub} folder${sub>1?'s':''} inside`:''}?`}
 renderLib(true);const f=mode=='mvf'?ds:mode=='del'?$('fok'):nm;f.focus();if(f===nm)nm.select()}
@@ -155,7 +159,7 @@ function fMenu(v){const c=lbNode(v);if(!c)return;WBS.mcat=c.v;mcSave();closeF();
 const exp=['Export…',()=>{if(WBX.wbExport)setTimeout(()=>WBX.wbExport(c.v,btn),0)},!lbCount(c)],sub=['New folder inside',()=>{lbOpen.add(c.v);loSave();fOpen('new')}];
 rowMenu(btn,c.t=='b'?[sub,['Rename',()=>fOpen('ren')],['Reset name',()=>{delete REN[c.orig];fSave();renderLib(true);pmsg('Set name reset.')},!REN[c.orig]],[c.hid?'Show in the list':'Hide from the list',()=>{if(c.hid)WBS.HID=WBS.HID.filter(x=>x!=c.orig);else WBS.HID.push(c.orig);fSave();renderLib(true);pmsg(c.hid?`“${c.n}” is back in the list.`:`Hid “${c.n}”.`)}],exp]
 :c.t=='f'?[sub,['Rename',()=>fOpen('ren')],['Move to…',()=>fOpen('mvf')],exp,['Delete folder',()=>fOpen('del')]]:[exp])}
-function closeF(){WBS.fmode=null;$('fform').hidden=true}
+function closeF(){WBS.fmode=null;WBS.frk=null;$('fform').hidden=true}
 function libMoveKeys(ks,t){const n=lbNode(t);if(!ks.length||!n||n.t=='r')return;const g=n.t=='f'||n.t=='b'?n.g:'';let nb=0;
 ks.forEach(k=>{if(k[0]=='b'){if(n.t=='b'&&CATS[lbSet(n.orig)].k.includes(k)){delete BF[k];return}if(!g){delete BF[k];return}nb++}fSet(k,g||null)});
 fSave();store();lsel.clear();WBS.lanc=null;lbDirty();upd();
@@ -175,7 +179,8 @@ $('limp').onclick=e=>{e.stopPropagation();rowMenu($('limp'),[['Image…',()=>$('
 const L=$('lib');
 L.addEventListener('click',e=>{const mo=e.target.closest('[data-fm]');if(mo){e.stopPropagation();fMenu(mo.dataset.fm);return}
 if(e.target.closest('#lhid')){lbHidOpen=!lbHidOpen;renderLib(true);return}const r=e.target.closest('.lfr[data-f]');if(r)lbToggle(r.dataset.f)});
-L.addEventListener('contextmenu',e=>{const r=e.target.closest('.lrw'),b=r&&r.querySelector('[data-fm]');if(b){e.preventDefault();e.stopPropagation();fMenu(b.dataset.fm)}});
+L.addEventListener('contextmenu',e=>{const sh=e.target.closest('button[data-m]');if(sh){if(shOwn(sh.dataset.m)&&!WBS.lsm){e.preventDefault();e.stopPropagation();rowMenu(sh,[['Rename',()=>shRename(sh.dataset.m)]])}return}const r=e.target.closest('.lrw'),b=r&&r.querySelector('[data-fm]');if(b){e.preventDefault();e.stopPropagation();fMenu(b.dataset.fm)}});
+L.addEventListener('dblclick',e=>{const sh=e.target.closest('button[data-m]');if(!sh||WBS.lsm||!shOwn(sh.dataset.m))return;e.preventDefault();if(WBX.wbShapeClickOff)WBX.wbShapeClickOff();shRename(sh.dataset.m)});
 L.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('.lfr[data-f]');if(!r||e.target!==r)return;const v=r.dataset.f,o=lbOpen.has(v);
 if(e.key=='ArrowRight'&&!o||e.key=='ArrowLeft'&&o){e.preventDefault();lbToggle(v)}});
 // drop a shape dragged from the library onto a folder to move it there
@@ -192,6 +197,7 @@ $('fok').onclick=()=>{const c=libCur(),mode=WBS.fmode,v=lbName($('fname').value)
 if(mode=='del'){if(c.t!='f')return;const p=c.p;let back=0;Object.values(cust).forEach(x=>{if(x&&lbIn(x.g,p)){delete x.g;back++}});Object.keys(BF).forEach(k=>{if(lbIn(BF[k],p))delete BF[k]});WBS.FOLD=WBS.FOLD.filter(x=>!lbIn(x,p));fSave();store();closeF();libOpen(lbId(lbPar(p)));upd();
 pmsg(`Deleted the folder “${c.n}”.`+(back?` Its imported shapes went back to Yours.`:''));return}
 if(mode=='mvf'){if(c.t!='f')return;const t=$('fdest').value,tn=lbNode(t);if(!tn)return;const np=(tn.t=='r'?'':tn.p+'/')+lbLeaf(c.p);closeF();if(np!==c.p&&!lbIn(tn.p||'',c.p)){lbRemap(c.p,np);upd()}else renderLib(true);pmsg(`Moved “${c.n}” to “${libPath(t)}”.`);return}
+if(mode=='iren'){const k=WBS.frk,r=String($('fname').value||'').replace(/[\\"<>&|]/g,'').trim().slice(0,40);if(!k||!shOwn(k)){closeF();renderLib(true);return}if(!r){$('fname').focus();return}cust[k].n=r;store();closeF();renderLib(true);pmsg(`Renamed the shape to “${r}”.`);return}
 if(mode=='ren'&&c.t=='b'){const r=fClean($('fname').value);if(!r||r==c.orig)delete REN[c.orig];else REN[c.orig]=r;fSave();closeF();renderLib(true);pmsg(r&&r!=c.orig?`Renamed the set to “${r}”.`:'Set name reset.');return}
 if(!v){$('fname').focus();return}
 if(mode=='ren'){if(c.t!='f')return;const np=(lbPar(c.p)?lbPar(c.p)+'/':'')+v;closeF();if(np===c.p){renderLib(true);return}const merge=lbX().all.has(np);lbRemap(c.p,np);upd();pmsg(merge?`Merged “${c.n}” into “${v}”.`:`Renamed the folder to “${v}”.`);return}
@@ -205,4 +211,4 @@ if(!dm.dataset.sure){dm.dataset.sure=1;dm.textContent='Click to confirm';setTime
 delete dm.dataset.sure;ok.forEach(k=>{delete cust[k];lsel.delete(k)});store();lbDirty();upd();pmsg(`Deleted ${ok.length} shape${ok.length>1?'s':''} from the library.`+(ok.length<ks.length?` ${ks.length-ok.length} in use on your stamps were kept.`:''))};
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&WBS.lsm&&!(e.target.matches&&e.target.matches('input,textarea,select')))libExit()});
 }
-export {libDest,libExportList,libG,libMk,libOpen,libOptions,libPath,libPick,mNm,renderLib,init21};
+export {shOwn,libDest,libExportList,libG,libMk,libOpen,libOptions,libPath,libPick,mNm,renderLib,init21};

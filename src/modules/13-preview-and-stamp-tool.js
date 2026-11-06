@@ -12,7 +12,8 @@ import {sceDropShape} from './64-stamp-canvas-edit.js';
 import {QS,clampN,delItems,selSet,selToggle,wrapA} from './12-selection-and-split.js';
 import {syncAsp,syncPhys} from './14-presets-and-layer-grid-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
-import {libPick} from './21-motif-library-ui.js';
+import {libPick,shOwn} from './21-motif-library-ui.js';
+let shClk=0;   // 2.110.0: the click on one of your shapes, waiting to see if it is a double-click
 import {fpL} from './24-free-place-layers.js';
 import {stTxMode,stUnlocked} from './63-stamp-tool.js';
 const mName=k=>k[0]=='b'?N[+k.slice(1)]||'Shape':cust[k]?cust[k].n:'Shape';
@@ -106,6 +107,10 @@ const lend=e=>{if(!ld)return;const x=ld;ld=null;if(x.g)x.g.remove();if(!x.on)ret
 document.addEventListener('pointerup',lend);document.addEventListener('pointercancel',lend);
 L.addEventListener('click',e=>{if(lsw){e.stopImmediatePropagation();e.preventDefault()}},true)}
 $('lib').onclick=e=>{const x=e.target.closest('[data-x]');if(x){const k=x.dataset.x;if(WBS.tiles.some(t=>t.items.some(q=>q.m==k))){$('pmsg').textContent='That shape is used on a stamp. Remove it from your stamps first.';return}if(!x.dataset.sure){x.dataset.sure=1;x.textContent='?';setTimeout(()=>{if(x.isConnected){delete x.dataset.sure;x.innerHTML='&#215;'}},2500);return}delete cust[k];store();build();$('pmsg').textContent='Removed from the library.';return}const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;if(WBX.wbLibPick&&!WBS.lsm){WBX.wbLibPick(k);return}   // (2.28.0) a pattern is waiting for a source
-if(WBS.lsm||e.ctrlKey||e.metaKey||e.shiftKey){libPick(k,e);return}if(WBX.wbMotifSwap&&WBX.wbMotifSwap(k)){upd();return}WBS.brush=WBS.brush&&WBS.brush.m==k?null:{m:k,s:DOTK.has(k)?.22:.8,r:0};selOne(-1);upd()};
+if(WBS.lsm||e.ctrlKey||e.metaKey||e.shiftKey){libPick(k,e);return}
+// 2.110.0: one of your shapes can be renamed with a double-click (21-motif-library-ui.js), so its click waits a moment and a second click calls it off; Enter is at once
+const use=()=>{if(WBX.wbMotifSwap&&WBX.wbMotifSwap(k)){upd();return}WBS.brush=WBS.brush&&WBS.brush.m==k?null:{m:k,s:DOTK.has(k)?.22:.8,r:0};selOne(-1);upd()};
+clearTimeout(shClk);shClk=0;if(e.detail>0&&shOwn(k)){if(e.detail>1)return;shClk=setTimeout(()=>{shClk=0;use()},260);return}use()};
+WBX.wbShapeClickOff=()=>{clearTimeout(shClk);shClk=0};
 }
 export {renderML,sync,init13};
