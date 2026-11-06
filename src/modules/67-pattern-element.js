@@ -11,6 +11,7 @@ import {pmsg} from './18-projects-and-cover-overlay.js';
 import {fpL,fpU} from './24-free-place-layers.js';
 import {fpSz} from './25-art-layers.js';
 import {elDef,elExtend,elKind,elSel} from './65-element-core.js';
+import {fxGr,fxPad,fxTex,fxWhole} from './69-effect-stack.js';
 import {TL_AR,TL_TS,tlArr,tlFlagPreview,tlOpDefs,tlOpt,tlPts,tlShape} from './92-pattern-tiling.js';
 
 // ===== The Pattern element (element update, step 5, 2.1.5): a list of points plus sources placed at them.
@@ -99,37 +100,49 @@ function patMk(p,s,b,i,cls,bw,bh,ms){if(s.k=='stamp')return patVary(p,{...b,k:'s
  if(s.k=='text'){const{u,x,y,s:_s,r:_r,f:_f,...it}=s.it;return patVary(p,{...it,...b,k:'text'},i,cls)}return null}
 // a Pattern as a source (one level deep): its pieces, its area scaled to the place's size, turned with the place; at most 64 a place and 4,000 in all (speed)
 const PAT_NEST_MAX=4000;
+// 2.114.0: the effects each stamp of a pattern carries (Jitter, Pressure offset, and any effect whose Whole pattern box is unticked); the rest are drawn once over
+// the whole pattern, on the wrapper its stamps share (patFx, 65-element-core.js)
+const patFxEach=p=>(p.fx||[]).filter(e=>e&&!fxWhole(e));
+const patFxWhole=p=>(p.fx||[]).filter(e=>e&&e.on!==false&&fxWhole(e));
+// 2.114.0: a pattern's whole-pattern effects as one wrapper over all its stamps, in its area with room round it (as a group's, 100-group-panel.js): Colour grade and
+// the filter effects in list order, then Texture's mask. null = none
+// unit: one stamp's size, which the filter effects work out their sizes from (as each stamp's did), so a blur or noise looks as it did on each stamp and only
+// the seams between stamps go. Texture is one texture over the whole pattern, set in canvas units as a Sheet's is (R 800): the look of a textured paper, not each
+// stamp's own wear (untick Whole pattern for that)
+function patFx(u,li,unit){const p=patRef(u);if(!p)return null;const wh=patFxWhole(p);if(!wh.length)return null;const A=patArea(p),B=fxPad(A.x0,A.y0,A.w,A.h),id='pfx'+li+'_'+String(p.u).replace(/[^\w-]/g,''),q={...p,fx:wh},U=+unit>0?+unit:Math.min(A.w,A.h)/4;B.S=U;
+ const g=fxGr(q,id,B),t=fxTex(q,id+'t',{x:B.x,y:B.y,W:B.W,H:B.H,R:800});if(!g&&!t)return null;
+ return{defs:(g?g.defs:'')+(t?t.defs:''),wrap:c=>{const o=g?g.wrap(c):c;return t?`<g${t.attrs}>${o}</g>`:o}}}
 function patRef(u){for(const L of WBS.layers){const q=(L.pl||[]).find(x=>x.k=='pattern'&&String(x.u)===String(u));if(q)return q}return null}
 function patNest(p,s,b,cache){const ref=patRef(s.p);if(!ref||ref.u===p.u||(ref.src||[]).some(x=>x.k=='pattern'))return[];let its=cache.get(ref.u);if(!its){its=patItems(ref).slice(0,64);cache.set(ref.u,its)}
- if(cache.n>=PAT_NEST_MAX)return[];const A=patArea(ref),cx=A.x0+A.w/2,cy=A.y0+A.h/2,f=(+b.s||1)/Math.max(1,Math.min(A.w,A.h)),a=(+b.r||0)*Math.PI/180,co=Math.cos(a),si=Math.sin(a),out=[];
+ if(cache.n>=PAT_NEST_MAX)return[];const rw=patFxWhole(ref),A=patArea(ref),cx=A.x0+A.w/2,cy=A.y0+A.h/2,f=(+b.s||1)/Math.max(1,Math.min(A.w,A.h)),a=(+b.r||0)*Math.PI/180,co=Math.cos(a),si=Math.sin(a),out=[];
  for(const it of its){if(cache.n>=PAT_NEST_MAX)break;const dx=(+it.x-cx)*f,dy=(+it.y-cy)*f,{wk,clp,cwk,pin,pk,op,bl,v,g,...o}=it;
-  out.push({...o,u:b.u+'.'+String(it.u).split('.').pop(),pu:p.u,x:+(b.x+dx*co-dy*si).toFixed(2),y:+(b.y+dx*si+dy*co).toFixed(2),s:+((+it.s||1)*f).toFixed(3),r:+((+it.r||0)+(+b.r||0)).toFixed(2)});cache.n++}
+  out.push({...o,...(rw.length?{fx:[...(o.fx||[]),...rw]}:{}),u:b.u+'.'+String(it.u).split('.').pop(),pu:p.u,x:+(b.x+dx*co-dy*si).toFixed(2),y:+(b.y+dx*si+dy*co).toFixed(2),s:+((+it.s||1)*f).toFixed(3),r:+((+it.r||0)+(+b.r||0)).toFixed(2)});cache.n++}
  return out}
 // 2.76.10: one piece's own edit (p.pe[key]: d deleted, s another source by its number, c a colour, dx dy a move, dr a turn), applied to the piece made at its place
 function patEd(o,E,key){if(!o)return o;o.pk=key;if(!E)return o;if(E.dx)o.x=+(+o.x+ +E.dx).toFixed(2);if(E.dy)o.y=+(+o.y+ +E.dy).toFixed(2);if(E.dr)o.r=+((+o.r||0)+ +E.dr).toFixed(2);if(okC(E.c))o.ink=E.c;return o}
 function patSrcAt(p,s,E){if(E&&E.s!=null){const s2=(p.src||[])[E.s];if(patSrcOk(s2))return s2}return s}
-function patItems(p){const ss=(p.src||[]).filter(patSrcOk);if(!ss.length)return[];if(p.lay=='tile'&&!mapShape(p))return patTiles(p,ss);const{pts,cell,rot}=patPts(p),r=patRnd(p.sd),sz=cell*patClamp(p.sz||80,5,300)/100,tot=ss.reduce((a,s)=>a+(+s.w>0?+s.w:1),0),out=[],nc=new Map();nc.n=0;
+function patItems(p){const ss=(p.src||[]).filter(patSrcOk);if(!ss.length)return[];if(p.lay=='tile'&&!mapShape(p))return patTiles(p,ss);const fe=patFxEach(p);const{pts,cell,rot}=patPts(p),r=patRnd(p.sd),sz=cell*patClamp(p.sz||80,5,300)/100,tot=ss.reduce((a,s)=>a+(+s.w>0?+s.w:1),0),out=[],nc=new Map();nc.n=0;
 const I=patIn(p);pts.forEach((q,i)=>{if(!patWhole(p,I,q[0],q[1],sz,(+p.rt||0)+(rot?rot[i]||0:0)))return;let s;if(p.ds=='random')s=ss[Math.floor(r()*ss.length)];else if(p.ds=='weight'){let v=r()*tot;s=ss.find(z=>(v-=(+z.w>0?+z.w:1))<0)||ss[ss.length-1]}else s=ss[i%ss.length];
 const key=String(i),E=p.pe&&p.pe[key];if(E&&E.d)return;s=patSrcAt(p,s,E);
-const b={u:p.u+'.'+i,pu:p.u,...(p.fx&&p.fx.length?{fx:p.fx}:{}),x:+q[0].toFixed(1),y:+q[1].toFixed(1),s:+sz.toFixed(2),r:(+p.rt||0)+(rot?rot[i]||0:0),f:1};
+const b={u:p.u+'.'+i,pu:p.u,...(fe.length?{fx:fe}:{}),x:+q[0].toFixed(1),y:+q[1].toFixed(1),s:+sz.toFixed(2),r:(+p.rt||0)+(rot?rot[i]||0:0),f:1};
 if(s.k=='pattern'){const b2=patEd({...b},E,key);out.push(...patNest(p,s,b2,nc).map(o=>{o.pk=key;return o}));return}
 out.push(patEd(patMk(p,s,b,i,i,null,null,+(sz/1.5).toFixed(2)),E,key))});return out.filter(Boolean)}
 // the pieces of a tiling: each place's own size, turn and flip; Cycle picks the source by the place's class (a Checkerboard's two colours, a Diagonal's stripes),
 // so sources alternate the way the arrangement says; a place marked gap (the small squares of Octagons and squares) is left empty with only one source; an accent
 // place (2.76.10) takes the accent's source (p.ac.s, else the last one)
-function patTiles(p,ss){const T=patPts(p),r=patRnd(p.sd),tot=ss.reduce((a,s)=>a+(+s.w>0?+s.w:1),0),out=[],n=ss.length,nc=new Map();nc.n=0;
+function patTiles(p,ss){const fe=patFxEach(p);const T=patPts(p),r=patRnd(p.sd),tot=ss.reduce((a,s)=>a+(+s.w>0?+s.w:1),0),out=[],n=ss.length,nc=new Map();nc.n=0;
  const I=patIn(p);T.pts.forEach((q,i)=>{if(T.gap[i]&&n<2)return;if(!patWhole(p,I,q[0],q[1],T.size[i],T.rot[i]))return;let s;
   if(T.acc&&T.acc[i]){const a=p.ac&&p.ac.src&&patSrcOk(p.ac.src)?p.ac.src:(p.src||[])[p.ac&&p.ac.s];s=patSrcOk(a)?a:ss[n-1]}else if(p.ds=='random')s=ss[Math.floor(r()*n)];else if(p.ds=='weight'){let v=r()*tot;s=ss.find(z=>(v-=(+z.w>0?+z.w:1))<0)||ss[n-1]}else s=ss[((T.cls[i]%n)+n)%n];
   const key=T.keys&&T.keys[i]!=null?T.keys[i]:String(i),E=p.pe&&p.pe[key];if(E&&E.d)return;s=patSrcAt(p,s,E);
-  const sz=T.size[i],b={u:p.u+'.'+i,pu:p.u,...(p.fx&&p.fx.length?{fx:p.fx}:{}),x:+q[0].toFixed(2),y:+q[1].toFixed(2),s:+sz.toFixed(3),r:+(T.rot[i]||0).toFixed(2),f:T.flip[i]||1};
+  const sz=T.size[i],b={u:p.u+'.'+i,pu:p.u,...(fe.length?{fx:fe}:{}),x:+q[0].toFixed(2),y:+q[1].toFixed(2),s:+sz.toFixed(3),r:+(T.rot[i]||0).toFixed(2),f:T.flip[i]||1};
   if(s.k=='pattern'){const b2=patEd({...b},E,key);out.push(...patNest(p,s,b2,nc).map(o=>{o.pk=key;return o}));return}
   const bw=s.k=='motif'?(T.gap[i]||T.acc&&T.acc[i]?1:T.box.w):null,bh=s.k=='motif'?(T.gap[i]||T.acc&&T.acc[i]?1:T.box.h):null;   // a shape fills the tile's own box (a hexagon tile is narrower than it is tall), times its own stretch
   out.push(patEd(patMk(p,s,b,i,T.cls[i],bw,bh),E,key))});
  return out.filter(Boolean)}
 // the layer as the kinds should draw it: each pattern replaced, in place, by the elements it stands for
 function patExpand(L){const pl=L.pl||[];if(!pl.some(q=>q.k=='pattern'))return L;const o=[];pl.forEach(q=>{if(q.k=='pattern'){if(q.af){const cx=+(CW/2).toFixed(1),cy=+(CH/2).toFixed(1);if(q.x!==cx)q.x=cx;if(q.y!==cy)q.y=cy}   /* an area that follows the canvas keeps its middle on the canvas's (its box is drawn there) */
- const A=(+q.mg>0)&&q.ed!='whole'?patIn(q):patArea(q),cl=(!q.af&&+q.aw>0)||((+q.mg>0)&&q.ed!='whole')?{clp:[A.x0,A.y0,A.w,A.h]}:null,pin=q.pin&&(L.pl||[]).some(x=>String(x.u)===String(q.pin))?{pin:q.pin}:null,w=q.op!=null||q.bl||q.v===false||q.g||cl||pin?{wk:q.u,...(cl||{}),...(pin||{}),...(q.g?{g:q.g}:{}),...(q.op!=null?{op:q.op}:{}),...(q.bl?{bl:q.bl}:{}),...(q.v===false?{v:false}:{})}:null;const vr=(+q.iv>0)||q.ov;   // pieces with their own pressure or overprinting are wrapped one by one (the pattern's own opacity and blend ride on each); their clip is shared by id
- o.push(...(w?patItems(q).map(i=>{if(!vr)return{...i,...w};const m={...i,...w,wk:i.u};if(cl)m.cwk=q.u;if(w.op!=null||i.op!=null)m.op=Math.round((i.op==null?100:i.op)*(w.op==null?100:w.op)/100);else delete m.op;if(i.bl||w.bl)m.bl=i.bl||w.bl;return m}):patItems(q)))}else o.push(q)});return{...L,pl:o}}
+ const A=(+q.mg>0)&&q.ed!='whole'?patIn(q):patArea(q),cl=(!q.af&&+q.aw>0)||((+q.mg>0)&&q.ed!='whole')?{clp:[A.x0,A.y0,A.w,A.h]}:null,pin=q.pin&&(L.pl||[]).some(x=>String(x.u)===String(q.pin))?{pin:q.pin}:null,wh=patFxWhole(q),its=patItems(q),pfs=wh.length&&its.length?+(its.reduce((a,i)=>a+(+i.s||0),0)/its.length).toFixed(2):0,w=q.op!=null||q.bl||q.v===false||q.g||cl||pin||wh.length?{wk:q.u,...(wh.length?{pfx:q.u,pfs}:{}),...(cl||{}),...(pin||{}),...(q.g?{g:q.g}:{}),...(q.op!=null?{op:q.op}:{}),...(q.bl?{bl:q.bl}:{}),...(q.v===false?{v:false}:{})}:null;const vr=(+q.iv>0)||q.ov;   // pieces with their own pressure or overprinting are wrapped one by one (the pattern's own opacity and blend ride on each); their clip is shared by id
+ o.push(...(w?its.map(i=>{if(!vr)return{...i,...w};const m={...i,...w,wk:i.u};if(m.pfx){delete m.pfx;delete m.pfs;m.fx=[...(i.fx||[]),...wh]}   /* stamps wrapped one by one keep the whole-pattern effects each */if(cl)m.cwk=q.u;if(w.op!=null||i.op!=null)m.op=Math.round((i.op==null?100:i.op)*(w.op==null?100:w.op)/100);else delete m.op;if(i.bl||w.bl)m.bl=i.bl||w.bl;return m}):its))}else o.push(q)});return{...L,pl:o}}
 
 // Empty patterns (2.4.0): each point is drawn as an arrow pointing the way a placed piece would face (its top), so the pattern can be seen and set up before anything is in it.
 // The arrows are editor overlay only: they are not part of the picture, nor of an export.
@@ -188,7 +201,8 @@ function patAddMenu(){const p=patCur(),b=$('peadd');if(!p||!b)return;const L=fpL
  (L?(L.pl||[]):[]).filter(q=>q.k=='pattern'&&q.u!==p.u&&!(q.src||[]).some(x=>x.k=='pattern')).forEach(q=>items.push([patHx(q.n||'Pattern'),()=>patAddSrc(p,{k:'pattern',p:q.u,w:1})]));
  items.push(['Shape from the library…',()=>{WBX.wbLibPick=m=>{WBX.wbLibPick=null;patAddSrc(p,{k:'motif',m,w:1});if(WBX.wbOpenPanel)WBX.wbOpenPanel('layers');pmsg('Added '+mNm(m)+' to '+p.n+'.')};if(WBX.wbOpenPanel)WBX.wbOpenPanel('motifs');pmsg('Choose a shape for '+p.n+'.')}]);
  rowMenu(b,items)}
-function init67(){
+function init67(){WBX.wbPatFx=patFx;   // 2.114.0: the element layer draws a pattern's whole-pattern effects through this (65-element-core.js)
+
 elExtend('pattern',{expand:patExpand,name:q=>q.n});
 if(!$('pelist'))return;
 $('penew').onclick=()=>{const L=fpL();if(!L)return;L.pl=L.pl||[];const n=patList().length+1,q={u:fpU(),k:'pattern',n:'Pattern '+n,lay:'grid',...patStart(),sz:100,rt:0,ds:'cycle',sd:1+Math.floor(Math.random()*9998),src:[],x:+(CW/2).toFixed(1),y:+(CH/2).toFixed(1),s:Math.min(CW,CH),r:0,f:1};L.pl.push(q);WBS.patSel=q.u;patCh()};

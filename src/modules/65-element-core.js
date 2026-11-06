@@ -33,9 +33,10 @@ const gWrap=(G,inner)=>{if(!inner)return'';const ink=okC(G.ink)?col(G.ink):'';le
 const its=pl.filter(q=>q.k!='group').map(q=>({q,path:gpath(q)})).filter(it=>!it.path.some(G=>G.v===false));
 // Repeat tile: every top-level piece (a group, a wrapped element, a run of one kind) is copied to the neighbouring tiles on its own, inside its own opacity, blend and ink, so a translucent piece spilling over a tile edge is not laid over its neighbour's copy twice
 const tU=h=>tileOn()?elTile(`${li}_${tn++}`,h):h;let tn=0;
-function render(its,d){let out='',run='',buf='',wb='',wk=null,wa='',wn=false;const T=(h,own)=>d||own?h:tU(h);const flush=()=>{if(run&&buf){const r=R[run];out+=T(r[2]+buf+r[3],EL_K[run].notile)}buf='';run=''};
+function render(its,d){let out='',run='',buf='',wb='',wk=null,wa='',wn=false,wf=null;const T=(h,own)=>d||own?h:tU(h);const flush=()=>{if(run&&buf){const r=R[run];out+=T(r[2]+buf+r[3],EL_K[run].notile)}buf='';run=''};
 // an element with its own opacity (op), blend (bl) or eye (v:false) is wrapped on its own; the placements a pattern prints share their pattern's wrapper (key wk)
-const emit=()=>{if(wb)out+=`<g${wa}>${T(wb,wn)}</g>`;wb='';wk=null;wn=false};
+// 2.114.0: a pattern's whole-pattern effects (pfx: the pattern; 67-pattern-element.js) wrap its stamps once, inside its opacity, blend and clip
+const emit=()=>{if(wb){const h=T(wb,wn);out+=`<g${wa}>${wf?wf.wrap(h):h}</g>`}wb='';wk=null;wn=false;wf=null};
 for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
  if(G){let j=i;while(j<its.length&&its[j].path[d]&&its[j].path[d].u==G.u)j++;const inner=render(its.slice(i,j),d+1);i=j-1;emit();flush();out+=gWrap(G,T(inner));continue}
  const q=it.q;if(q.v===false)continue;const k=elKind(q),r=R[k];if(!r)continue;let s=r[4].get(String(q.u));if(s==null)continue;let a=elOB(q);
@@ -61,7 +62,7 @@ for(let i=0;i<its.length;i++){const it=its[i],G=it.path[d];
    +`<mask id="${id}k" maskUnits="userSpaceOnUse" ${RB}><rect ${RB} fill="#000"/><g filter="url(#${id}m)">${out}</g></mask>`
    +`<filter id="${id}a" filterUnits="userSpaceOnUse" ${RB} color-interpolation-filters="sRGB"><feFlood flood-color="${A}"/><feComposite in2="SourceAlpha" operator="in"/></filter><filter id="${id}b" filterUnits="userSpaceOnUse" ${RB} color-interpolation-filters="sRGB"><feFlood flood-color="${B}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`;
   out+=(okC(q.ra)?flood('a'):S)+`<g mask="url(#${id}k)">${flood('b')}</g>`;continue}
- if(a){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a;wn=!!EL_K[k].notile}wb+=r[2]+s+r[3];continue}
+ if(a||q.pfx){flush();const key=q.wk||q.u;if(key!==wk){emit();wk=key;wa=a;wn=!!EL_K[k].notile;if(q.pfx&&WBX.wbPatFx){wf=WBX.wbPatFx(q.pfx,li,q.pfs);if(wf)defs+=wf.defs}}wb+=r[2]+s+r[3];continue}
  emit();if(k!==run){flush();run=k}buf+=s}
 flush();emit();return out}
 const body=render(its,0);return[defs,body,'','',null,'']}   // render first: a group's ink adds its filter to defs while it draws

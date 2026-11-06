@@ -19,6 +19,12 @@ import {pmClose,pmIsOpen,pmPop} from './90-panel-modes.js';
 // Texture {x: its own library texture (type, strength, scale, light; edited right in the effect), sd: seed, md: wear | relief | stain}. Works on stamps, pictures, text, patterns and the Sheet.
 // Pressure offset {pst: uneven pressure 0 to 10, pfl: ink flooding 0 to 10}: the layer's pressure and flooding for one stamp (or a pattern's stamps).
 const fxOn=q=>fxOf(q).filter(e=>e&&e.on!==false);
+// 2.114.0 (owner Nov 6 2026): a Pattern's Texture, Colour grade and filter effects are drawn once over the whole pattern (all its stamps together) unless the effect's
+// Whole pattern box is unticked (wp: false), when each stamp gets its own as before. Jitter and Pressure offset are always each stamp's: varying them is what they are.
+// Whole is the default (nothing saved). One filter and one mask for the pattern instead of one per stamp: far less to draw.
+const FX_EACH=new Set(['jitter','pressure']);
+const fxWholeOk=e=>!!e&&!FX_EACH.has(e.k);
+const fxWhole=e=>fxWholeOk(e)&&e.wp!==false;
 // the texture uses of an element, in the form the texture engine reads
 const fxTexUses=q=>fxOn(q).filter(e=>e.k=='texture'&&e.x).map(e=>({x:e.x,sd:e.sd,md:e.md}));
 // the mask and filter that carry an element's textures, for a box (x, y, W, H) in the element's own units; id names the mask. null = nothing to draw
@@ -62,6 +68,7 @@ const FXI={eye:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentC
  car:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'+ICN.chevR+'</svg>'};
 function fxGroup(kind){return`<details class="g fxg" data-fxk="${kind}" open hidden><summary>Effects</summary><div class="gb">
 <div class="row fxar"><button type="button" class="alt fxadd" aria-haspopup="menu" data-more>Add effect</button></div><div class="fxl"></div><div class="fxpane">
+<label class="chk fxwp" hidden><input type="checkbox" class="fxwpc" checked><span>Whole pattern</span></label>
 <div class="fxs" data-e="texture" hidden>
 <div class="rprow fxtr"><span class="rpth"></span><span class="rpn"></span><button type="button" class="alt rpgo" aria-haspopup="dialog">Replace</button></div>
 <div class="fxtl" hidden>${tlPane()}</div>
@@ -106,6 +113,7 @@ const host=gQ(g,'.fxl'),host2=gQ(g,'.fxl2');if(host.dataset.k!==key){host.datase
 const row=e=>{const d=fxDef(e.k),on=e.on!==false,op=sel&&e.u==sel.u;return`<div class="fxr${op?' on':''}${on?'':' off'}" data-fu="${e.u}" draggable="true"><button type="button" class="ib" data-fon aria-pressed="${on}" aria-label="${on?'Hide':'Show'} this effect">${on?FXI.eye:FXI.off}</button><span class="fxc${op?' open':''}">${FXI.car}</span><b>${fxHx(d?d.label:e.k)}</b><button type="button" class="ib" data-fmore aria-haspopup="menu" aria-label="More">${FXI.more}</button></div>`};
 const si=sel?list.indexOf(sel):list.length-1;host.innerHTML=list.slice(0,si+1).map(row).join('');host2.innerHTML=list.slice(si+1).map(row).join('');}
 fxPaneOf(g).querySelectorAll('.fxs').forEach(s=>{const on=!!sel&&s.dataset.e==sel.k;if(s.hidden===on)s.hidden=!on});
+{const w=gQ(g,'.fxwp'),show=kind=='pattern'&&fxWholeOk(sel);if(w){if(w.hidden===show)w.hidden=!show;if(show){const c=w.querySelector('input'),v=sel.wp!==false;if(c.checked!==v)c.checked=v}}}   // 2.114.0
 if(sel&&sel.k=='texture'){const L=txLib(sel.x)||{t:Object.keys(TXN)[0],a:40,sc:100,az:225},sm=gQ(g,'.fxsm'),set=(c,v)=>{const el=gQ(g,c);if(+el.value!==+v){el.value=v;uiFire(el)}};set('.fxsa',+L.a);set('.fxsc',+L.sc);set('.fxsr',+L.rot||0);set('.fxsz',+L.az);gQ(g,'.fxsfh').checked=!!L.fh;gQ(g,'.fxsfv').checked=!!L.fv;if(sm.value!==(sel.md||'wear'))sm.value=sel.md||'wear';
  // 2.50.0: the texture is picked from the texture library; 2.55.0 (creating and editing, docs/panel-modes-plan.md): an effect is always being edited, so its texture
  // shows as a row (thumbnail, name, Replace) and the library opens from Replace in a popover; the library keeps its place on the group while it is moved
@@ -167,9 +175,10 @@ GRL.forEach(([k])=>gQ(g,'.fxg_'+k).addEventListener('input',()=>{if(WBS.uiLoad)r
 [['.fxjp','pos'],['.fxjr2','rot'],['.fxjz','sz']].forEach(([c,f])=>gQ(g,c).addEventListener('input',()=>{if(WBS.uiLoad)return;const e=cur();if(!e||e.k!='jitter')return;const v=+gQ(g,c).value;if(e[f]!==v){e[f]=v;fxCh()}}));
 [['.fxjh','fh'],['.fxjv','fv']].forEach(([c,f])=>gQ(g,c).onchange=()=>{const e=cur();if(e&&e.k=='jitter'){e[f]=gQ(g,c).checked;fxCh()}});
 gQ(g,'.fxjs').addEventListener('change',()=>{const e=cur();if(!e||e.k!='jitter')return;const v=+gQ(g,'.fxjs').value;if(v)e.rs=v;else delete e.rs;gQ(g,'.fxjr2').closest('.ctl').hidden=!!v;fxCh()});
+gQ(g,'.fxwpc').onchange=()=>{const e=cur();if(!fxWholeOk(e))return;if(gQ(g,'.fxwpc').checked)delete e.wp;else e.wp=false;fxCh()};   // 2.114.0: Whole pattern
 gQ(g,'.fxjrr').onclick=()=>{const e=cur();if(e&&e.k=='jitter'){e.sd=txRid();fxCh()}};
 [['.fxpp','pst'],['.fxpf','pfl']].forEach(([c,f])=>gQ(g,c).addEventListener('input',()=>{if(WBS.uiLoad)return;const e=cur();if(!e||e.k!='pressure')return;const v=+gQ(g,c).value;if(e[f]!==v){e[f]=v;fxCh()}}))});
 WBX.wbFxSync=fxSync;WBX.wbFxTexSet=(kind,k,v)=>{const f=WBX.wbFxTexSets&&WBX.wbFxTexSets[kind];if(f)f(k,v)}}
 // a text's Jitter is rolled per letter: letter i of text p gets its own seed, and the size it moves by is the font size
 const fxJitL=(p,i,fs)=>fxJit({u:p.u+'#'+i,s:fs,fx:p.fx});
-export {fxAddTo,fxMenuAdd,fxMenuKind,fxGr,fxJit,fxJitL,fxPad,fxPress,fxSync,fxTex,fxTexUses,init69};
+export {FX_EACH,fxWhole,fxWholeOk,fxAddTo,fxMenuAdd,fxMenuKind,fxGr,fxJit,fxJitL,fxPad,fxPress,fxSync,fxTex,fxTexUses,init69};
