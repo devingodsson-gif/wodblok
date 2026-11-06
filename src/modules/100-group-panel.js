@@ -3,8 +3,8 @@ import {$,WBH,WBS,WBX} from './01-launch-and-version.js';
 import {CH,CW} from './04-canvas-and-stamp-outlines.js';
 import {store} from './06-motif-library-folders.js';
 import {upd} from './11-pressure-flooding-block-edges.js';
-import {fpL} from './24-free-place-layers.js';
-import {fpWH} from './25-art-layers.js';
+import {fpL,fpSnap} from './24-free-place-layers.js';
+import {fpHit,fpPt,fpUnit,fpWH} from './25-art-layers.js';
 import {elRegister,elSel,fxOf} from './65-element-core.js';
 import {fxGr,fxPad,fxTex} from './69-effect-stack.js';
 import {unFmt,unGet,unParse} from './98-units.js';
@@ -48,13 +48,40 @@ function gpSync(){const G=gpSel(),sec=document.querySelector('section.pn[data-p=
  $('gpbox').hidden=!b;if(b)[['gpx',b.x],['gpy',b.y],['gpw',b.w],['gph',b.h]].forEach(([id,v])=>{const e=$(id);if(document.activeElement===e)return;const t=unFmt(v,u);if(e.value!==t)e.value=t;e.classList.remove('bad')});
  sec.querySelectorAll('.unu').forEach(s=>{if(s.textContent!==u)s.textContent=u});
  [['gprt',+G.gr||0],['gpox',+G.gox||0],['gpoy',+G.goy||0]].forEach(([id,v])=>{const e=$(id);if(+e.value!==v){e.value=v;gpSyncing++;try{e.dispatchEvent(new Event('input',{bubbles:true}))}finally{gpSyncing--}}})}
-// the group's box on the canvas while it is selected (the Elements list is where it is picked; the canvas shows what it is)
-function gpOverlay(G){const b=gpBox(G);return b?`<rect class="sel" x="${b.x.toFixed(2)}" y="${b.y.toFixed(2)}" width="${b.w.toFixed(2)}" height="${b.h.toFixed(2)}"/>`:''}
+// the group's box on the canvas while it is selected (the Elements list is where it is picked; a click on the canvas still picks one element, owner Nov 5 2026).
+// 2.112.0 (owner Nov 5 2026: "When i click a group i want the selection rectangle over the group and the ability to click and drag to move it"): the box is the
+// selection rectangle with the element box's handles (fpHandles' classes and sizes): four corners, which scale the group evenly as W and H do (a group never
+// stretches, so it has no side handles), and the rotate handle, which turns it as Rotate does. A drag inside the box moves the group (Snap to grid puts its
+// top-left on the grid); a press inside it that does not move picks the element under the pointer, as a click does. Each drag is one History step.
+function gpOverlay(G){const b=gpBox(G);if(!b)return'';const f=v=>v.toFixed(2),u=fpUnit(),hs=4.5*u,arm=20*u,cx=b.x+b.w/2;
+ let o=`<rect class="sel" x="${f(b.x)}" y="${f(b.y)}" width="${f(b.w)}" height="${f(b.h)}"/>`;
+ if(G.lk)return o;
+ o+=`<line class="frl" x1="${f(cx)}" y1="${f(b.y)}" x2="${f(cx)}" y2="${f(b.y-arm)}"/><circle class="frt" data-gh="rot" cx="${f(cx)}" cy="${f(b.y-arm)}" r="${f(hs)}" style="cursor:grab"><title>Rotate</title></circle>`;
+ [['nw',0,0],['ne',1,0],['se',1,1],['sw',0,1]].forEach(([n,ax,ay])=>{o+=`<rect class="fhd" data-gh="${n}" x="${f(b.x+ax*b.w-hs)}" y="${f(b.y+ay*b.h-hs)}" width="${f(hs*2)}" height="${f(hs*2)}" style="cursor:${n=='nw'||n=='se'?'nwse':'nesw'}-resize"><title>Resize</title></rect>`});
+ return o}
+// a press on the canvas while a group is selected: a handle, or inside its box. true when the group takes it
+function gpDown(L,x,y,e){const G=(L.pl||[]).find(q=>q.k=='group'&&q.u==WBS.fpSel);if(!G||G.lk||e.shiftKey||e.ctrlKey||e.metaKey)return false;const b=gpBox(G);if(!b)return false;
+ const hd=e.target.closest&&e.target.closest('[data-gh]'),k=hd?hd.dataset.gh:null;if(!k&&!(x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h))return false;
+ e.preventDefault();const M=gpMembers(G),D={G,k:k||'mv',b,x0:x,y0:y,cx0:e.clientX,cy0:e.clientY,ax:0,ay:0,moved:false,id:e.pointerId,orig:new Map(M.map(q=>[String(q.u),JSON.stringify(q)])),gr0:+G.gr||0,
+  mx:M.reduce((s,q)=>s+ +q.x,0)/Math.max(1,M.length),my:M.reduce((s,q)=>s+ +q.y,0)/Math.max(1,M.length)};
+ const art=$('art');try{art.setPointerCapture(e.pointerId)}catch(er){}
+ const back=()=>gpMembers(G).forEach(q=>{const o=D.orig.get(String(q.u));if(!o)return;const v=JSON.parse(o);Object.keys(q).forEach(n=>{if(!(n in v))delete q[n]});Object.assign(q,v)});
+ const mv=ev=>{if(ev.pointerId!==D.id)return;if(!D.moved){if(Math.hypot(ev.clientX-D.cx0,ev.clientY-D.cy0)<3)return;D.moved=true}const[px,py]=fpPt(ev);
+  if(D.k=='mv'){let dx=px-D.x0,dy=py-D.y0;const[sx,sy]=fpSnap(L,D.b.x+dx,D.b.y+dy,ev);dx=sx-D.b.x;dy=sy-D.b.y;gpMove(G,dx-D.ax,dy-D.ay);D.ax=dx;D.ay=dy}
+  else if(D.k=='rot'){let d=(Math.atan2(py-D.my,px-D.mx)-Math.atan2(D.y0-D.my,D.x0-D.mx))*180/Math.PI;d=wrapD(d);if(ev.shiftKey)d=Math.round((D.gr0+d)/15)*15-D.gr0;back();gpTurn(G,d);G.gr=+wrapD(D.gr0+d).toFixed(1)}
+  else{const[qx,qy]=fpSnap(L,px,py,ev),b=D.b,cx=D.k.includes('e')?b.x+b.w:b.x,cy=D.k.includes('s')?b.y+b.h:b.y,Fx=ev.altKey?b.x+b.w/2:2*b.x+b.w-cx,Fy=ev.altKey?b.y+b.h/2:2*b.y+b.h-cy,vx=cx-Fx,vy=cy-Fy,
+    kk=Math.max(.02,((qx-Fx)*vx+(qy-Fy)*vy)/(vx*vx+vy*vy||1));back();gpScale(G,kk,Fx,Fy)}
+  upd();gpSync()};
+ const end=ev=>{if(ev.pointerId!==D.id)return;removeEventListener('pointermove',mv,true);removeEventListener('pointerup',end,true);removeEventListener('pointercancel',end,true);
+  if(ev.type=='pointercancel'){if(D.moved){back();upd();gpSync()}return}
+  if(D.moved){WBX.wbLabelNext={t:D.k=='mv'?'Moved group':D.k=='rot'?'Turned group':'Sized group',at:performance.now()};gpDone(true);gpSync();return}
+  if(D.k=='mv'){const[px,py]=fpPt(ev),h=fpHit(L,px,py);if(h&&h.u!=G.u){WBS.fpSel=h.u;WBS.fpMS=new Set();WBS.fpAnc=String(h.u);upd()}}};
+ addEventListener('pointermove',mv,true);addEventListener('pointerup',end,true);addEventListener('pointercancel',end,true);return true}
 const gpDone=cap=>{store();upd();if(cap&&WBX.wbCap)WBX.wbCap()};
 function init100(){
  elRegister('group',{hide:true,label:'Group',pn:'group',icon:ICN.group,is:q=>q.k=='group',name:q=>q.nm||q.n||'Group'});
  if(!$('gpbox'))return;
- WBX.wbGpSync=gpSync;WBX.wbGpBox=gpOverlay;WBX.wbGpFx=gpFx;
+ WBX.wbGpSync=gpSync;WBX.wbGpBox=gpOverlay;WBX.wbGpFx=gpFx;WBX.wbGpDown=gpDown;
  // X, Y: the box's top-left; W, H: its size (the group scales evenly from the top-left)
  const go=id=>{const G=gpSel(),e=$(id);if(!G||!e)return;const b=gpBox(G);if(!b)return;const cur=id=='gpx'?b.x:id=='gpy'?b.y:id=='gpw'?b.w:b.h,v=unParse(e.value,cur);
   if(v==null||!isFinite(v)){e.classList.add('bad');return}e.classList.remove('bad');let ch=false;
