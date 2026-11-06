@@ -5,7 +5,7 @@ The one page that says where development stands. **Every agent reads this after 
 Public repo: keep this page free of names, emails, accounts, prices and business plans (`CLAUDE.md`, "Public repo rules").
 
 ## Handover, Oct 28 2026 (read this first; the older sections below are partly stale)
-- **Nov 6: 2.114.0 on `feat/2.114.0-whole-pattern-effects`, pushed, NOT merged (owner must say):** a Pattern's effects over the whole pattern, Whole pattern switch on by default (docs/plan.md 2.114.0). Suite importance about 70% (drawing).
+- **Nov 6: 2.114.0 LIVE (owner: "Merge"; CI suite not run):** a Pattern's effects over the whole pattern, Whole pattern switch on by default (docs/plan.md 2.114.0). Suite importance about 70% (drawing).
 - **Nov 6: 2.113.0 LIVE (owner: "Merge"; CI suite not run):** the font library (docs/plan.md 2.113.0). 2.109.0 to 2.112.0 are LIVE.
 - **Nov 5 (night): 2.112.0 LIVE (owner: "merge everything"; CI suite not run):** a picked group's box on the canvas moves, sizes and turns it (docs/plan.md 2.112.0). The font library followed as 2.113.0.
 - **Nov 5 (night): 2.111.0 LIVE (owner: "merge everything"; CI suite not run):** resizing snaps to the grid (docs/plan.md 2.111.0). scenarios.spec.js fails 6 tests in this sandbox on unchanged `main` too.
