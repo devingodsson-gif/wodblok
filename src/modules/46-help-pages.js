@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.113.0','Nov 5 2026',['Your fonts have a library in the Text panel (Fonts): add fonts, put them in folders, rename them with a double-click, delete or export them.']],
  ['2.112.0','Nov 5 2026',['A group picked in the Elements list has a selection box on the canvas: drag inside it to move the group, pull a corner to size it, or turn it.']],
  ['2.111.0','Nov 5 2026',['With Snap to grid on, the corner or side you pull to resize lands on the grid.']],
  ['2.110.0','Nov 5 2026',['Rename anything of yours in a library (pictures, textures, shapes, mockups, saved stamps, trays and more): double-click it.']],

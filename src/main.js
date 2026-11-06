@@ -86,6 +86,7 @@ import {init42} from './modules/42-colour-output.js';
 import {init36} from './modules/36-print-files.js';
 import {init99} from './modules/99-rulers.js';
 import {init100} from './modules/100-group-panel.js';
+import {init101} from './modules/101-font-library.js';
 import {init58} from './modules/58-account.js';
 import {init59} from './modules/59-align.js';
 import {acAccount} from './platform/account.js';
@@ -179,7 +180,7 @@ init94();
 init62();
 init63();
 init64();
-init36();init42();init47();init99();init100();   // 2.104.1: the Group panel   // rulers and guides (2.87.2): its commands before the menu bar
+init36();init42();init47();init99();init100();init101();   // 2.104.1: the Group panel   // rulers and guides (2.87.2): its commands before the menu bar
 // the menu bar last: its menus list commands from every module, the account's included
 init85();
 // a launch with no template picker is an untouched new project: no unsaved dot, nothing to confirm before opening another (2.22.1; the picker's own finish used to set this)
