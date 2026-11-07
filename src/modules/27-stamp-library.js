@@ -18,7 +18,7 @@ import {zipRead} from '../format/libzip.js';
 import {basicKey} from './76-basic-shapes.js';
 // ===== Stamp library: keep stamps between projects, and export a stamp as a PNG =====
 // A library record: {name, updated, w, h, img (transparent picture), tile (the stamp, as JSON), motifs (the custom motifs it uses), colors (its custom ink)}.
-// Stored privately with your Claude account when that is available, otherwise in this browser.
+// Stored in the host's per-user store when there is one, otherwise in this browser. (2.118.0, full check S1: the panel no longer says where.)
 const SL={kind:null,col:null,ready:null,
 init(){return this.ready||(this.ready=(async()=>{try{const db=await use('db'),u=db&&await use('user'),id=u&&await u.id();if(db&&id){this.col=db.collection('data/users/'+id+'/stamps');this.kind='account';return}}catch(e){}this.kind='browser';this.col=await collection('stamps','wb50_stamps')})())},
 loc(){try{return JSON.parse(kv.get('wb50_stamps')||'{}')}catch(e){return{}}},
@@ -88,7 +88,7 @@ const slCfg=()=>({p:'sl',word:'stamp',words:'stamps',ui:SLF_UI,exportName:'wodbl
  rename(id,v){const x=slRec(id);if(x)x.name=v;slPatch(id,{name:v})},
  async file(id){const r=await SL.get(id);return r?{name:r.name||'Stamp',data:new TextEncoder().encode(fmtStampPack(r)),ext:'.wodblok-stamp',fb:'Stamp'}:null},
  itemMenu:id=>slStart(id)?[['Add to project',()=>slAct(id,'add')]]:[['Add to project',()=>slAct(id,'add')],['Save as PNG',()=>slAct(id,'png')],['Save as file',()=>slAct(id,'file')]]});
-async function slPaint(){if(!$('slpane'))return;slSync();await SL.init();$('slwhere').textContent=SL.kind=='account'?'Saved to your Claude account':'Saved in this browser';
+async function slPaint(){if(!$('slpane'))return;slSync();await SL.init();
 try{const all=await SL.list();slRecs=all.map(p=>({id:p.id,name:p.name||'Stamp',img:p.img,g:slPathOk(p.g)}));$('slcount').textContent=all.length?String(all.length):'';SLT.show($('slpane'),'',slAct0);SLT.paintAll(true)}
 catch(e){slMsg('Could not load the library.')}}
 // --- Art: import an image, or use a saved project

@@ -10,8 +10,8 @@ const W = webBuild();
 test('the hosted build: mockup photos are files in assets/, fetched only when the Mockup tab shows them', async ({ page }) => {
   test.setTimeout(120000);
   const files = fs.readdirSync(path.join(W.dir, 'assets', 'mockups'));
-  expect(files.filter(f => /^[a-z]+\.[0-9a-f]{10}\.webp$/.test(f)).length).toBe(6);
-  expect(files.filter(f => /-mask\.[0-9a-f]{10}\.png$/.test(f)).length).toBe(6);
+  expect(files.filter(f => /^[a-z-]+\.[0-9a-f]{10}\.webp$/.test(f)).length).toBe(7);   // 2.118.0: seven products since 2.115.0
+  expect(files.filter(f => /-mask\.[0-9a-f]{10}\.png$/.test(f)).length).toBe(7);   // 2.118.0: seven products since 2.115.0
   const html = fs.readFileSync(path.join(W.dir, 'index.html'), 'utf8');
   expect(html).toContain('"assets/mockups/tshirt.');
   expect(html).not.toContain(fs.readFileSync(path.join(ROOT, 'mockups', 'tshirt.webp')).toString('base64').slice(0, 400));   // the photo is not inside the page
@@ -24,7 +24,7 @@ test('the hosted build: mockup photos are files in assets/, fetched only when th
   expect(asked.some(u => /^\/assets\/mockups\/tshirt-mask\.[0-9a-f]{10}\.png$/.test(u))).toBe(true);
   // the thumbnails are the files too, and they load
   const ok = await page.locator('#mkpane [data-mk^="p-"] img').evaluateAll(a => Promise.all(a.map(i => i.decode().then(() => i.naturalWidth > 0, () => false))));
-  expect(ok).toEqual([true, true, true, true, true, true]);
+  expect(ok).toEqual(Array(7).fill(true));   // 2.118.0: seven products
   // the view drew the photo (not an empty canvas)
   const lit = await page.evaluate(() => { const c = document.getElementById('mkc'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 400) if (d[i]) n++; return n; });
   expect(lit).toBeGreaterThan(100);

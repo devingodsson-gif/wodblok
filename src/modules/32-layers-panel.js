@@ -117,7 +117,7 @@ function init32(){lyCmds();
  $('lygrp').onclick=e=>{e.stopPropagation();lyGroup()};
  $('lyung').onclick=e=>{e.stopPropagation();lyUngroup()};
  // 2.78.3 (bug test B6): Group and Ungroup ask the selection itself, not their buttons, which catch up only on the next redraw (right after Select all Group read as off)
- cmdRegister({id:'element.group',label:'Group the selected elements',shortcut:'Mod+G',elId:'lygrp',enabled:()=>lySel().length>=2,run:()=>lyGroup()});
+ cmdRegister({id:'element.group',label:'Group',shortcut:'Mod+G',elId:'lygrp',enabled:()=>lySel().length>=2,run:()=>lyGroup()});
  cmdRegister({id:'element.ungroup',label:'Ungroup',shortcut:'Mod+Shift+G',elId:'lyung',enabled:()=>lySel().some(lyIsG),run:()=>lyUngroup()});
  document.addEventListener('keydown',e=>{const t=e.target;if(t.matches&&t.matches('input,select,textarea'))return;if((e.ctrlKey||e.metaKey)&&!e.altKey&&e.key.toLowerCase()=='g'){e.preventDefault();if(e.shiftKey){if(lySel().some(lyIsG))lyUngroup()}else if(lySel().length>=2)lyGroup()}});   // Photoshop's: Ctrl+G groups, Ctrl+Shift+G ungroups (2.27.0; it was Shift+G)
  /* 2.87.10 (step 10): the Blend list previews the mode pointed at or arrowed to on the selected elements, drawn only (no store, no History step); leaving the list
