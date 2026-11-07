@@ -3,6 +3,9 @@
 // so adding a template is: put the file in the folder. The name is the project's own name; the id is "tpl-" + the file name without .wodblok.
 // The stored copy drops the file's own picture (the list keeps it as the card picture, as it is).
 const fs = require('fs'), path = require('path'), { unzipSync, zipSync } = require('fflate');
+// 2.120.0: every entry gets the same time, so the same templates make the same file (the zip held the time of the build, so templates.<hash>.json changed with
+// every build and web-app.spec.js, which expects one templates file across two builds, failed now and then)
+const ZIP_TIME = new Date(2026, 0, 1);
 const ROOT = path.join(__dirname, '..', '..'), KINDS = ['canvas', 'tile', 'book'];
 function folderTemplates() {
   const out = [];
@@ -15,7 +18,7 @@ function folderTemplates() {
       if (!files['project.json'] || !files['thumbnail.png']) throw new Error('templates/' + kind + '/' + f + ' is not a .wodblok project with a picture');
       const name = String(JSON.parse(Buffer.from(files['project.json']).toString('utf8')).name || '').trim().slice(0, 40) || f.replace(/\.wodblok$/i, '');
       const zip = {};                                                        // same order as the file; the type marker stays first and unpacked
-      for (const k of Object.keys(files)) if (k !== 'thumbnail.png') zip[k] = [files[k], { level: k === 'mimetype' || k.startsWith('assets/') ? 0 : 6 }];
+      for (const k of Object.keys(files)) if (k !== 'thumbnail.png') zip[k] = [files[k], { level: k === 'mimetype' || k.startsWith('assets/') ? 0 : 6, mtime: ZIP_TIME }];
       mine.push({ id: 'tpl-' + f.replace(/\.wodblok$/i, ''), type: kind, n: name, th: 'data:image/png;base64,' + Buffer.from(files['thumbnail.png']).toString('base64'), b: Buffer.from(zipSync(zip)).toString('base64') });
     }
     out.push(...mine.sort((a, b) => a.n.localeCompare(b.n)));
