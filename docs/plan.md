@@ -1,6 +1,14 @@
 # Development plan
 
-## 2.118.0 (Nov 6 2026, branch fix/2.118.0-small-fixes): step 1 of docs/full-check-2.117.md, small fixes
+## 2.119.0 (Nov 6 2026, branch feat/2.119.0-mockups-cover, on top of 2.118.0): step 3 of docs/full-check-2.117.md, mockups
+- Owner, Nov 6 2026: "front cover" (a book cover on a notebook mockup shows its front cover only).
+- B4: a product can be a book (`"book": 1` in mockups/products.json, passed through tools/mockups/folders.js and MK_B): Notebook and Angled book. mkArea(m) (23-mockups.js) is the part of the canvas a product shows: for a book on a book cover, the front cover trim to trim (no bleed, no spine), else the whole canvas. mkDesign draws that part only; mkFlat takes the design's aspect from the picture (not CW/CH); the view's cache key holds the area. Real size works for a book on a book cover: its real width is the trim width.
+- B7: mkDesign makes the design through ser({px}), so a mockup's textures are made for the size it is drawn at (the view and Export mockup), like every other export since 2.116.0.
+- B5: each warp triangle is widened 1.5 px (was 0.6). Measured on a flat colour: light seam pixels per 10,000 of the design, T-shirt 148 to 2, Cushion 200 to 3, Tote 242 to 8; 3 px gives no fewer (what is left on the Angled book is the photo's own grain).
+- B6 (faint lines between pattern rows on screen only) not changed: no clean fix found; the exports have none.
+- Tests: tests/mockup-cover-2-119.spec.js (new: on a book cover the Notebook and Angled book show no back cover, the Wallpaper still shows the whole wrap; a flat colour on the T-shirt shows fewer than 20 seam pixels in 10,000), both checked failing without the change. Run with every mockup, asset-split, book-cover and texture-sharpness spec: 25 passed. Screenshots of both notebooks with a rolled design on a book cover looked at. `npm run perf` (2.118.0's run on the same drawing code: ratio 1.007; the mockup drawing is not on the perf path).
+
+, branch fix/2.118.0-small-fixes): step 1 of docs/full-check-2.117.md, small fixes
 - Owner, Nov 6 2026, on the full check's plan and questions: "Yes, front cover, yes" (the shorter card name, a book cover shows its front cover on the notebooks, regenerate the 9 SVG snapshots).
 - B1: the product "Notebook on a table" is now **"Angled book"**. "Notebook, angled" (Claude's suggestion, approved) is 82 px in the card's font and the card has 70 px, so it was still cut off; "Desk notebook" was too. "Angled book" fits and keeps the word the owner approved.
 - B2: Alt or Shift + wheel on an element holds History while the wheel is changing the slider (WBX.wbWheelHold, read by cap()), so a slow machine cannot save a step between notches; one step when the change ends (41-view-keys.js, 34-desktop-shell.js).

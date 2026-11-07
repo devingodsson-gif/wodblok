@@ -3,7 +3,7 @@ import {MKIMG} from '../data/mockups.js';
 import {AI_FILES} from '../data/ai.js';
 import {aiLoad,aiOk,aiPhoto,assetBytes,assetUrl,clipboard,collection,kv,use} from '../platform/index.js';
 import {$,WBS,WBX} from './01-launch-and-version.js';
-import {CH,CW,physOf,tileOn,tileRk} from './04-canvas-and-stamp-outlines.js';
+import {bk,CH,CW,physOf,tileOn,tileRk} from './04-canvas-and-stamp-outlines.js';
 import {expName,ser} from './14-presets-and-layer-grid-ui.js';
 import {pmsg} from './18-projects-and-cover-overlay.js';
 import {unGet} from './98-units.js';
@@ -36,7 +36,7 @@ function mkLoad(){let raw=null;try{raw=kv.get(MK_KEY)}catch(e){}
  return{f:[...mkC.f],t:mkC.t.map(x=>({...x,q:x.q.slice()})),h:[...mkC.h],r:{...mkC.r},b:{}}}
 const mkStore=d=>{try{kv.set(MK_KEY,JSON.stringify(d));mkC=null;return true}catch(e){pmsg('Could not keep the mockups in this browser.');return false}};
 // 2.98.1: a product's photo and mask are references to the app's own files (inside the page, or next to it in the hosted app: src/platform/assets.js)
-const MK_B=MKIMG.map(e=>({id:'p-'+e.id,n:e.n,w:e.w,h:e.h,q:e.q.slice(),th:assetUrl(e.src),src:assetUrl(e.src),mask:assetUrl(e.mask),ref:e.src,cm:e.cm,warp:e.warp,b:1}));
+const MK_B=MKIMG.map(e=>({id:'p-'+e.id,n:e.n,w:e.w,h:e.h,q:e.q.slice(),th:assetUrl(e.src),src:assetUrl(e.src),mask:assetUrl(e.mask),ref:e.src,cm:e.cm,warp:e.warp,b:1,...(e.book?{book:1}:{})}));
 const mkGet=id=>{if(typeof id!='string')return null;if(id.startsWith('p-')){const b=MK_B.find(x=>x.id===id);return b?{...b,q:b.q.slice()}:null}return mkLoad().t.find(x=>x.id===id)||null};
 // the mockup showing: the one chosen, else the first product
 const mkCur=()=>mkGet(mkUi().cur)||(MK_B[0]?mkGet(MK_B[0].id):null);
@@ -206,9 +206,12 @@ async function mkImportMask(f){const m=mkCur();if(!m||m.b)return;if(!f||!/^image
 async function mkFindSet(id,on,tol){const d=mkLoad(),t=d.t.find(z=>z.id===id);if(!t)return false;delete t.mi;delete t.ai;if(!on){delete t.am;delete t.tol;mkStore(d);return true}
  const ph=await mkPhoto(id);if(!ph)return false;let r;if(tol==null){const b=mkFindBest(ph,t.w,t.h);r=b&&b.r;tol=b?b.tol:50}else r=mkFind(ph,t.w,t.h,tol);if(!r){if(t.am){delete t.am;delete t.tol;mkStore(d)}return false}
  await mkPhotoPut(id+'~mask',r.c.toDataURL('image/png'));t.am=1;t.tol=tol;t.q=r.q;mkStore(d);[...mkMk.keys()].forEach(k=>{if(k.startsWith(id+'|'))mkMk.delete(k)});return true}
+// 2.119.0 (owner Nov 6 2026, full check B4: "front cover"): the part of the canvas a product shows, in canvas units. A book product (Notebook, Angled book) shows a book
+// cover's front cover, trim to trim (no bleed, no spine); anything else shows the whole canvas. inW: its real width in inches, or 0 when the canvas has none.
+function mkArea(m){if(m&&m.book&&WBS.book&&WBS.book.on){const g=bk(),ux=CW/g.W,uy=CH/g.H;return{x:(g.b+g.tw+g.sw)*ux,y:g.b*uy,w:g.tw*ux,h:g.th*uy,inW:g.tw}}const P=physOf();return{x:0,y:0,w:CW,h:CH,inW:P?P.inW:0}}
 // Scale as a % of the print area's width: Real size works it out from the canvas's real width and the product's (Repeat only)
-const mkRealOk=(m,u)=>!!(m&&m.cm>0&&physOf()&&mkFill(u)=='rep');
-const mkScale=(m,u)=>{const f=mkFill(u);if(f=='rep'&&u.rs&&mkRealOk(m,u)){const P=physOf();return Math.max(.5,Math.min(400,P.inW*2.54/m.cm*100))}return f=='rep'?u.sr:u.so};
+const mkRealOk=(m,u)=>!!(m&&m.cm>0&&mkArea(m).inW>0&&mkFill(u)=='rep');
+const mkScale=(m,u)=>{const f=mkFill(u);if(f=='rep'&&u.rs&&mkRealOk(m,u))return Math.max(.5,Math.min(400,mkArea(m).inW*2.54/m.cm*100));return f=='rep'?u.sr:u.so};
 // ---- drawing
 // the perspective map from the unit square to the four corners (P: [x0,y0, ... x3,y3] in pixels, top left, top right, bottom right, bottom left)
 function mkHom(P){const[x0,y0,x1,y1,x2,y2,x3,y3]=P,dx1=x1-x2,dx2=x3-x2,dy1=y1-y2,dy2=y3-y2,sx=x0-x1+x2-x3,sy=y0-y1+y2-y3,den=dx1*dy2-dx2*dy1||1e-9,
@@ -219,22 +222,22 @@ function mkHomInv(P){const[x0,y0,x1,y1,x2,y2,x3,y3]=P,dx1=x1-x2,dx2=x3-x2,dy1=y1
  g=(sx*dy2-dx2*sy)/den,h=(dx1*sy-sx*dy1)/den,a=x1-x0+g*x1,b=x3-x0+h*x3,d=y1-y0+g*y1,e=y3-y0+h*y3,
  A=e-y0*h,B=x0*h-b,C=b*y0-x0*e,D=y0*g-d,E=a-x0*g,F=x0*d-a*y0,G=d*h-e*g,Hh=b*g-a*h,I=a*e-b*d;
  return(X,Y)=>{const w=G*X+Hh*Y+I||1e-9;return[(A*X+B*Y+C)/w,(D*X+E*Y+F)/w]}}
-// one triangle of the flat picture F drawn onto the photo: the affine map from (s0, s1, s2) in F to (d0, d1, d2), clipped to the triangle (widened half a pixel, so no seams show)
+// one triangle of the flat picture F drawn onto the photo: the affine map from (s0, s1, s2) in F to (d0, d1, d2), clipped to the triangle (widened 1.5 pixels: 2.119.0, full check B5; at 0.6 the anti-aliased edges left light seams, about 150 seam pixels in every 10,000 of the design, 2 at 1.5, none fewer at 3)
 function mkTri(x,F,s,d){const[[u0,v0],[u1,v1],[u2,v2]]=s,[[X0,Y0],[X1,Y1],[X2,Y2]]=d,den=(u1-u0)*(v2-v0)-(u2-u0)*(v1-v0);if(Math.abs(den)<1e-9)return;
  const a=((X1-X0)*(v2-v0)-(X2-X0)*(v1-v0))/den,b=((Y1-Y0)*(v2-v0)-(Y2-Y0)*(v1-v0))/den,c=((X2-X0)*(u1-u0)-(X1-X0)*(u2-u0))/den,e=((Y2-Y0)*(u1-u0)-(Y1-Y0)*(u2-u0))/den;
- const cx=(X0+X1+X2)/3,cy=(Y0+Y1+Y2)/3,gr=([X,Y])=>{const l=Math.hypot(X-cx,Y-cy)||1;return[X+(X-cx)/l*.6,Y+(Y-cy)/l*.6]},p=[gr(d[0]),gr(d[1]),gr(d[2])];
+ const cx=(X0+X1+X2)/3,cy=(Y0+Y1+Y2)/3,gr=([X,Y])=>{const l=Math.hypot(X-cx,Y-cy)||1;return[X+(X-cx)/l*1.5,Y+(Y-cy)/l*1.5]},p=[gr(d[0]),gr(d[1]),gr(d[2])];
  x.save();x.beginPath();x.moveTo(p[0][0],p[0][1]);x.lineTo(p[1][0],p[1][1]);x.lineTo(p[2][0],p[2][1]);x.closePath();x.clip();
  x.setTransform(a,b,c,e,X0-a*u0-c*v0,Y0-b*u0-e*v0);x.drawImage(F,0,0);x.restore()}
 // the design laid flat at fw x fh: Repeat on the repeat tile's lattice (grid, brick, half drop), one copy Scale% of the width; Once in the middle, Scale% of the area
 // 2.100.0 (owner Nov 4 2026: "two sliders ... one for horizontal across and one for vertical ... Also let's add one for rotate"): the design is moved by dx, dy
 // pixels and turned by rt degrees about the print area's middle, before it is laid on the product, so the move and turn follow its perspective, shading and mask;
 // a turned or moved repeat still covers the whole print area
-function mkFlat(D,fw,fh,fill,sc,o){const F=document.createElement('canvas');F.width=Math.max(1,Math.round(fw));F.height=Math.max(1,Math.round(fh));const x=F.getContext('2d'),ar=CH/CW;
+function mkFlat(D,fw,fh,fill,sc,o){const F=document.createElement('canvas');F.width=Math.max(1,Math.round(fw));F.height=Math.max(1,Math.round(fh));const x=F.getContext('2d'),DW=D.width,DH=D.height,ar=DH/DW;
  const dx=o?o.dx:0,dy=o?o.dy:0,rt=o?o.rt:0;x.translate(fw/2+dx,fh/2+dy);if(rt)x.rotate(rt*Math.PI/180);
  if(fill=='rep'){const tw=Math.max(2,fw*sc/100),th=tw*ar,k=tileOn()?tileRk():'grid',R=Math.hypot(fw,fh)/2+Math.hypot(dx,dy),i0=Math.floor((fw/2-R)/tw)-1,i1=Math.ceil((fw/2+R)/tw)+1,j0=Math.floor((fh/2-R)/th)-1,j1=Math.ceil((fh/2+R)/th)+1;
   for(let j=j0;j<j1;j++)for(let i=i0;i<i1;i++){const X=i*tw-fw/2+(k=='brick'&&j%2?tw/2:0),Y=j*th-fh/2+(k=='half'&&i%2?th/2:0),fx=k=='mirror'&&i&1,fy=k=='mirror'&&j&1;   // 2.91.1: a mirror repeat flips odd columns and rows
    if(!fx&&!fy){x.drawImage(D,X,Y,tw+.5,th+.5);continue}x.save();x.translate(X+(fx?tw:0),Y+(fy?th:0));x.scale(fx?-1:1,fy?-1:1);x.drawImage(D,0,0,tw+.5,th+.5);x.restore()}}
- else{const k=Math.min(fw/CW,fh/CH)*sc/100,w=CW*k,h=CH*k;x.drawImage(D,-w/2,-h/2,w,h)}
+ else{const k=Math.min(fw/DW,fh/DH)*sc/100,w=DW*k,h=DH*k;x.drawImage(D,-w/2,-h/2,w,h)}
  return F}
 // the photo's light: its greyscale, made white at the print area's brightest (the 95th of a hundred), opaque, at W x H
 function mkLight(ph,W,H,P){const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(ph,0,0,W,H);const im=x.getImageData(0,0,W,H),d=im.data,n=W*H,L=new Float32Array(n);
@@ -264,8 +267,11 @@ function mkWarp(G,ph,warp){const W=G.width,H=G.height,b=document.createElement('
  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=(y*W+x)*4,d=(L[i]-mean)*A,sx=Math.min(W-1,Math.max(0,Math.round(x+d))),sy=Math.min(H-1,Math.max(0,Math.round(y+d*.6))),j=(sy*W+sx)*4;O[i]=S[j];O[i+1]=S[j+1];O[i+2]=S[j+2];O[i+3]=S[j+3]}
  g.putImageData(out,0,0)}
 // the design as a picture (as it is exported), made again a moment after it changes while the panel is open
-function mkDesign(px){return new Promise(res=>{let svg='';try{svg=ser()}catch(e){return res(null)}const k=px/Math.max(CW,CH),w=Math.max(1,Math.round(CW*k)),h=Math.max(1,Math.round(CH*k)),img=new Image();
- img.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c)};img.onerror=()=>res(null);img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)})}
+// the design as a picture, px on its long side: the product's part of the canvas (mkArea). 2.119.0 (full check B7): its textures are made for that size (ser px)
+function mkDesign(px,A){A=A||mkArea(null);return new Promise(res=>{const k=px/Math.max(A.w,A.h);let svg='';try{svg=ser({px:Math.max(CW,CH)*k})}catch(e){return res(null)}
+ const w=Math.max(1,Math.round(A.w*k)),h=Math.max(1,Math.round(A.h*k)),img=new Image();
+ img.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,-A.x*k,-A.y*k,CW*k,CH*k);res(c)};img.onerror=()=>res(null);
+ img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg.replace(/^<svg([^>]*?)>/,(m,a)=>`<svg${a.replace(/\s(width|height|preserveAspectRatio)="[^"]*"/g,'')} width="${Math.round(CW*k)}" height="${Math.round(CH*k)}" preserveAspectRatio="none">`))})}
 const mkOpen=()=>{const s=$('mkstage');return!!(s&&!s.hidden)};   // 2.96.0: the view is the Mockup tab
 // ---- Copy prompt, 2.95.0 (owner Nov 4 2026: "a single chatgpt prompt to integrate into the mockup panel that can be copied and pasted into chat with a [product] so users
 // can make any product and mask"): one message for an AI chat that makes images and runs Python; it makes a blank in the house style of the built-in products and
@@ -290,7 +296,7 @@ const mkCfg=()=>({p:'mk',pane:'#mkpane',word:'mockup',words:'mockups',ui:MK_TREE
 async function mkView(){const c=$('mkc'),wrap=$('mkvw'),stg=$('mkstage');{const m0=mkCur();$('mkg').hidden=!m0}if(!c||!mkOpen())return;const u=mkUi(),m=mkCur();wrap.hidden=!m;if(!m){mkCorners();return}
  const tok=++mkTok,ph=await mkPhoto(m.id),mask=await mkMask(m);if(tok!==mkTok)return;if(!ph){wrap.hidden=true;return}
  const pad=32,aw=Math.max(80,stg.clientWidth-pad),ah=Math.max(80,stg.clientHeight-pad),cw=Math.round(Math.min(aw,ah*m.w/m.h)),dpr=(window.devicePixelRatio||1)*(mkLo?.5:1),W=Math.round(cw*dpr),H=Math.round(W*m.h/m.w);wrap.style.width=cw+'px';   // as large as the stage holds it
- const dk=[CW,CH,Math.round(W*1.2/256)].join();if(!mkDes||mkDesK!==dk){mkDes=await mkDesign(Math.min(2048,Math.max(512,W*1.2)));mkDesK=dk;if(tok!==mkTok)return}
+ const A=mkArea(m),dk=[CW,CH,A.x,A.y,A.w,A.h,Math.round(W*1.2/256)].join();if(!mkDes||mkDesK!==dk){mkDes=await mkDesign(Math.min(2048,Math.max(512,W*1.2)),A);mkDesK=dk;if(tok!==mkTok)return}
  if(c.width!==W||c.height!==H){c.width=W;c.height=H}c.style.aspectRatio=m.w+' / '+m.h;mkDraw(c,ph,m,mkDes,u,mask);
  // 2.93.1: Show mask tints what is not product (the view only; Export mockup never shows it)
  if(mask&&!m.b&&m.am&&$('mkmv').checked){const t=document.createElement('canvas');t.width=W;t.height=H;const tx=t.getContext('2d');tx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()||'#b98a4b';tx.globalAlpha=.55;tx.fillRect(0,0,W,H);
@@ -321,7 +327,7 @@ const mkLater=()=>{if(!mkOpen())return;clearTimeout(mkT);mkT=setTimeout(()=>{mkD
 async function mkExport(){const u=mkUi(),m=mkCur();if(!m){if(WBX.wbOpenPanel)WBX.wbOpenPanel('mock');pmsg('Add a mockup first.');return}if(mkBusy)return;
  const d=await use('downloads');if(!d)return pmsg('Saving is not available here.');mkBusy=true;
  try{const name=expName('png').replace(/\.png$/,'')+'-'+m.n.replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')+'.png',h0=d.pick?await d.pick({filename:name}):null;pmsg('Exporting…');
-  const ph=await mkPhoto(m.id);if(!ph)throw new Error('The photo is not in this browser.');const D=await mkDesign(Math.min(4096,Math.max(m.w,m.h)*1.2)),mask=await mkMask(m),c=document.createElement('canvas');c.width=m.w;c.height=m.h;mkDraw(c,ph,m,D,u,mask);
+  const ph=await mkPhoto(m.id);if(!ph)throw new Error('The photo is not in this browser.');const D=await mkDesign(Math.min(4096,Math.max(m.w,m.h)*1.2),mkArea(m)),mask=await mkMask(m),c=document.createElement('canvas');c.width=m.w;c.height=m.h;mkDraw(c,ph,m,D,u,mask);
   const b=await new Promise(r=>c.toBlob(r,'image/png'));if(!b)throw new Error('The picture could not be made.');await d.save({filename:name,data:b,handle:h0});pmsg('Exported “'+name+'”.')}
  catch(e){if(!e||e.code!=='declined')pmsg(e&&e.message?e.message:'Could not export the mockup.')}finally{mkBusy=false}}
 async function mkCopyPrompt(p){p=String(p||'').replace(/[\r\n"]+/g,' ').trim().slice(0,60)||'[product]';const id=p=='[product]'?'product':p.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'product';

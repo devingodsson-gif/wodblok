@@ -13,7 +13,7 @@ function mockupList(out) {
     if (ph.length > MAX) throw new Error('mockups/' + id + '.webp is larger than 300 KB');
     if (!Array.isArray(o.q) || o.q.length !== 8) throw new Error('mockups/products.json: ' + id + ' needs q, its four corners');
     if (!(o.w > 0 && o.h > 0)) throw new Error('mockups/products.json: ' + id + ' needs w and h, the photo\'s size');
-    return { id, n, src: out.ref('mockups', id, ph, 'webp'), mask: out.ref('mockups', id + '-mask', mk, 'png'), q: o.q, w: +o.w, h: +o.h, cm: +o.cm || 0, warp: Math.max(0, Math.min(1, +o.warp || 0)) };
+    return { id, n, src: out.ref('mockups', id, ph, 'webp'), mask: out.ref('mockups', id + '-mask', mk, 'png'), q: o.q, w: +o.w, h: +o.h, cm: +o.cm || 0, warp: Math.max(0, Math.min(1, +o.warp || 0)), ...(o.book ? { book: 1 } : {}) };   // 2.119.0: a book (a book cover shows its front cover on it)
   });
 }
 // Takes the text of src/data/mockups.js and returns it with the products in.

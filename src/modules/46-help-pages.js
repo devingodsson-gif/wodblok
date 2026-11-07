@@ -54,6 +54,7 @@ const HELP_PAGES=[
   ['p','Canvas > Format sets the canvas’s real size (pixels, inches or millimetres) and resolution, which the rulers and the Element group’s units use too.']]]];
 // What's new: newest first, [version, date, [lines]]
 const HELP_NEWS=[
+ ['2.119.0','Nov 6 2026',['On a book cover, the Notebook and Angled book mockups show the front cover. Mockups no longer show faint lines across the design, and exported mockups have sharp textures.']],
  ['2.118.0','Nov 6 2026',['Small fixes: Alt or Shift + wheel on an element is one Undo step; units such as px and cm no longer sit over the number; the new notebook mockup is called Angled book.']],
  ['2.117.0','Nov 6 2026',['A new button at the right end of the colour tray shifts every colour one place along the tray (Shift + click: the other way). Also Colour > Shift tray colours.']],
  ['2.116.0','Nov 6 2026',['Textures on a Sheet, a whole Pattern, Paint and large shapes are sharp at any zoom and in exports (they were soft, most of all on a book cover).']],

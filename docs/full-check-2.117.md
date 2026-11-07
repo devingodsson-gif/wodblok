@@ -74,3 +74,13 @@ Looked at and fine: every panel's sections, rows, sliders, lists and folder tree
    - B7: mockup exports at export resolution.
    - B5: wider triangle overlap, or a single-pass warp, so the seams go away.
    - B6 is screen-only and minor: look at it in the same release, but only if a clean fix appears.
+
+## Outcome (Nov 6 2026)
+- Owner: "Yes, front cover, yes".
+- Step 1 is 2.118.0. The card name is "Angled book": the approved "Notebook, angled" was still cut off at 82 px in a 70 px card.
+- Regenerating the snapshots turned up one more 2.116.0 slip: texture pictures and filters made for an old zoom step stayed in the page and went into exports. It is fixed in 2.118.0.
+- Step 2: the 9 SVG snapshots were regenerated in CI. They now differ only by the `data-te` attribute.
+- Step 3 is 2.119.0: B4, B5 and B7. B6 was not changed.
+- Suite on PR #269 (run 42259583447): all passed, including WebKit and the picture comparison. The pixel goldens did not need regenerating: the picture comparison checks the build against `main`'s build and passed.
+- Still open: B6, and the "About Wodblok" wording.
+
