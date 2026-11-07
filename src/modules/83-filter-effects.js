@@ -1,6 +1,6 @@
 import {txRid} from './16-texture-generators.js';
 import {WBX} from './01-launch-and-version.js';
-import {col,okC} from './04-canvas-and-stamp-outlines.js';
+import {CH,CW,col,okC} from './04-canvas-and-stamp-outlines.js';
 import {fxRegister} from './65-element-core.js';
 
 // 2.36.0 adds Print (Halftone moves in, with Line Screen, Stipple, Ink Bleed, Misregistration) and Distort (Roughen, Ripple).
@@ -16,7 +16,11 @@ const fqFilter=(id,x,y,w,h,body)=>`<filter id="${id}" filterUnits="userSpaceOnUs
 const fqWrap=id=>c=>`<g filter="url(#${id})">${c}</g>`;
 // an effect that works along one direction runs in a turned frame: turn the element back inside, so only the effect is turned
 const fqTurn=(id,a,cx,cy)=>c=>`<g transform="rotate(${q4(a)} ${q4(cx)} ${q4(cy)})"><g filter="url(#${id})"><g transform="rotate(${q4(-a)} ${q4(cx)} ${q4(cy)})">${c}</g></g></g>`;
-const fqSize=b=>b.S>0?+b.S:Math.max(1e-6,Math.max(b.W,b.H)/1.3);   // the element's own size (fxPad adds 15% each side); 2.114.0: b.S, a pattern's stamp size, when the effect is over a whole pattern
+// 2.120.0 (owner Nov 6 2026: "I want all the effects to be scaled the same regardless of the element size", and he prefers what Sheets got): every filter effect
+// works out its sizes from the canvas, not the element: the size a Sheet over the whole canvas had (its box is the canvas plus 5% each side, and the size was the box's
+// long side / 1.3), so a Sheet looks as it did and a pattern, shape, image or text gets the same look at the same settings, as a Photoshop filter's pixels do.
+// b.u: canvas units per unit of the box, for a box drawn in another unit (a placed stamp is drawn in the stamp's units, then scaled)
+const fqSize=b=>Math.max(CW,CH)*1.1/1.3/(+b.u>0?+b.u:1);
 const fqSeed=e=>Math.abs(e.sd|0)%100000;
 // the i-th number (0 to 1) of a seed's own sequence
 const fqRnd=(sd,i)=>{const x=Math.sin((sd+1)*12.9898+i*78.233)*43758.5453;return x-Math.floor(x)};
