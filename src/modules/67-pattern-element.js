@@ -106,10 +106,9 @@ const patFxEach=p=>(p.fx||[]).filter(e=>e&&!fxWhole(e));
 const patFxWhole=p=>(p.fx||[]).filter(e=>e&&e.on!==false&&fxWhole(e));
 // 2.114.0: a pattern's whole-pattern effects as one wrapper over all its stamps, in its area with room round it (as a group's, 100-group-panel.js): Colour grade and
 // the filter effects in list order, then Texture's mask. null = none
-// unit: one stamp's size, which the filter effects work out their sizes from (as each stamp's did), so a blur or noise looks as it did on each stamp and only
-// the seams between stamps go. Texture is one texture over the whole pattern, set in canvas units as a Sheet's is (R 800): the look of a textured paper, not each
+// (2.120.0: the filter effects work out their sizes from the canvas, as every element's do; until then from one stamp's size, the unit argument, now unused.) Texture is one texture over the whole pattern, set in canvas units as a Sheet's is (R 800): the look of a textured paper, not each
 // stamp's own wear (untick Whole pattern for that)
-function patFx(u,li,unit){const p=patRef(u);if(!p)return null;const wh=patFxWhole(p);if(!wh.length)return null;const A=patArea(p),B=fxPad(A.x0,A.y0,A.w,A.h),id='pfx'+li+'_'+String(p.u).replace(/[^\w-]/g,''),q={...p,fx:wh},U=+unit>0?+unit:Math.min(A.w,A.h)/4;B.S=U;
+function patFx(u,li,unit){const p=patRef(u);if(!p)return null;const wh=patFxWhole(p);if(!wh.length)return null;const A=patArea(p),B=fxPad(A.x0,A.y0,A.w,A.h),id='pfx'+li+'_'+String(p.u).replace(/[^\w-]/g,''),q={...p,fx:wh};
  const g=fxGr(q,id,B),t=fxTex(q,id+'t',{x:B.x,y:B.y,W:B.W,H:B.H,R:800});if(!g&&!t)return null;
  return{defs:(g?g.defs:'')+(t?t.defs:''),wrap:c=>{const o=g?g.wrap(c):c;return t?`<g${t.attrs}>${o}</g>`:o}}}
 function patRef(u){for(const L of WBS.layers){const q=(L.pl||[]).find(x=>x.k=='pattern'&&String(x.u)===String(u));if(q)return q}return null}
